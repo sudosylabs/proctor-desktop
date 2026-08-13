@@ -1,0 +1,186 @@
+{
+  "$schema": "./schemas/assurance.schema.json",
+  "schemaVersion": 1,
+  "invariantSource": "docs/architecture/invariants.md",
+  "controls": [
+    {
+      "id": "architecture.review",
+      "kind": "review",
+      "status": "active",
+      "owner": "architecture",
+      "invariants": [
+        "product.exam-workbench", "product.remote-workspace", "product.remote-terminal", "product.integrity-flag", "product.independent-gates",
+        "source.namespace", "source.layer-direction", "source.deep-modules", "source.interface-tests", "source.static-contributions",
+        "renderer.plain-dom", "renderer.no-ambient-node", "renderer.sandboxed", "composition.immutable-window", "preload.capability-allowlist", "privilege.validate-authorize", "identity.credential-custody", "runtime.handle-isolation", "diagnostics.sensitive-data",
+        "design.shared-system", "design.static-registration", "design.presentation-not-authority", "design.accessibility", "design.css-ownership", "design.control-interface", "design.test-code-excluded",
+        "upstream.evidence-not-authority", "upstream.boundary-grill", "upstream.exact-provenance", "upstream.license-preservation", "upstream.product-assumptions-excluded", "upstream.single-revision-closure", "upstream.no-aggregate-entrypoints",
+        "workspace.stable-entry-identity", "workspace.opaque-content-version", "workspace.acknowledged-durability", "workspace.distinct-states", "workspace.protected-recovery", "workspace.provider-projection", "workspace.orthogonal-state", "workspace.protect-unacknowledged-work", "workspace.submission-readiness", "workspace.exam-resources-separated",
+        "security.privileged-credential-custody", "security.independent-authorization", "security.privileged-posture", "security.online-only", "security.containment-before-presentation", "security.fenced-participation", "security.integrity-vocabulary",
+        "native.passive-sources", "native.process-boundaries", "native.single-display-window", "native.race-free-session", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance",
+        "settings.server-authority", "settings.static-registry", "settings.no-authority", "settings.dedicated-window", "settings.frozen-candidate-baseline", "settings.stronger-live-constraints", "settings.conditional-writes",
+        "toolchain.single-esm-graph", "toolchain.closed-packages", "toolchain.native-schema-authority", "toolchain.signed-capability-matrix", "toolchain.attempt-safe-updates"
+      ],
+      "evidence": ["docs/architecture/invariants.md"]
+    },
+    {
+      "id": "policy-authorities",
+      "kind": "source",
+      "status": "active",
+      "owner": "toolchain",
+      "invariants": ["source.deep-modules", "toolchain.single-esm-graph"],
+      "implementation": "policy.schemas",
+      "evidence": ["build/policies/schemas/assurance.schema.json"]
+    },
+    {
+      "id": "source-graph",
+      "kind": "source",
+      "status": "active",
+      "owner": "source-organization",
+      "invariants": ["source.namespace", "source.layer-direction", "renderer.no-ambient-node", "runtime.handle-isolation", "design.test-code-excluded", "toolchain.single-esm-graph"],
+      "implementation": "source.graph",
+      "evidence": ["build/policies/source-boundaries.json"]
+    },
+    {
+      "id": "composition-closure",
+      "kind": "source",
+      "status": "active",
+      "owner": "workbench",
+      "invariants": ["source.static-contributions", "composition.immutable-window", "preload.capability-allowlist", "design.static-registration", "design.test-code-excluded", "upstream.no-aggregate-entrypoints", "toolchain.closed-packages"],
+      "implementation": "source.compositions",
+      "evidence": ["build/policies/compositions.json"]
+    },
+    {
+      "id": "stylesheet-ownership",
+      "kind": "source",
+      "status": "active",
+      "owner": "design-system",
+      "invariants": ["renderer.plain-dom", "design.shared-system", "design.static-registration", "design.css-ownership"],
+      "implementation": "source.css",
+      "evidence": ["docs/architecture/design-system.md"]
+    },
+    {
+      "id": "dependency-admission",
+      "kind": "package",
+      "status": "active",
+      "owner": "toolchain",
+      "invariants": ["toolchain.single-esm-graph", "toolchain.closed-packages"],
+      "implementation": "dependencies.admission",
+      "evidence": ["build/policies/dependencies.json", "package-lock.json"]
+    },
+    {
+      "id": "generated-ownership",
+      "kind": "generation",
+      "status": "active",
+      "owner": "toolchain",
+      "invariants": ["settings.static-registry", "toolchain.native-schema-authority"],
+      "implementation": "generated.parity",
+      "evidence": ["build/generators/registry.ts"]
+    },
+    {
+      "id": "vscode-provenance",
+      "kind": "source",
+      "status": "active",
+      "owner": "upstream-intake",
+      "invariants": ["upstream.evidence-not-authority", "upstream.boundary-grill", "upstream.exact-provenance", "upstream.license-preservation", "upstream.product-assumptions-excluded", "upstream.single-revision-closure", "upstream.no-aggregate-entrypoints"],
+      "implementation": "upstream.provenance",
+      "evidence": ["docs/upstream/vscode-ports/schema.json"]
+    },
+    {
+      "id": "agent-knowledge-integrity",
+      "kind": "source",
+      "status": "active",
+      "owner": "agent-documentation",
+      "invariants": ["source.deep-modules", "source.interface-tests", "upstream.evidence-not-authority"],
+      "implementation": "repository.documentation",
+      "evidence": ["AGENTS.md", "docs/README.md"]
+    },
+    {
+      "id": "repository-text-hygiene",
+      "kind": "source",
+      "status": "active",
+      "owner": "toolchain",
+      "invariants": ["diagnostics.sensitive-data", "toolchain.single-esm-graph"],
+      "implementation": "repository.hygiene",
+      "evidence": [".gitignore"]
+    },
+    {
+      "id": "foundation-ci",
+      "kind": "test",
+      "status": "active",
+      "owner": "toolchain",
+      "invariants": ["source.interface-tests", "toolchain.single-esm-graph", "toolchain.closed-packages"],
+      "implementation": "ci.actions-pinned",
+      "evidence": [".github/workflows/foundation.yml", "test/checks/contracts.test.ts"]
+    },
+    {
+      "id": "runtime-environment-typechecks",
+      "kind": "source",
+      "status": "deferred",
+      "owner": "toolchain",
+      "invariants": ["renderer.no-ambient-node", "renderer.sandboxed", "runtime.handle-isolation", "toolchain.single-esm-graph"],
+      "activation": "source-present",
+      "futureKind": "source",
+      "rationale": "Runtime-specific TypeScript projects require their first real common, browser, Node, or Electron source graph."
+    },
+    {
+      "id": "workspace-contract-tests",
+      "kind": "test",
+      "status": "deferred",
+      "owner": "attempt-workspace",
+      "invariants": ["workspace.stable-entry-identity", "workspace.opaque-content-version", "workspace.acknowledged-durability", "workspace.distinct-states", "workspace.protected-recovery", "workspace.provider-projection", "workspace.orthogonal-state", "workspace.protect-unacknowledged-work", "workspace.submission-readiness", "workspace.exam-resources-separated"],
+      "activation": "source-present",
+      "futureKind": "test",
+      "rationale": "The Attempt Workspace contracts have no source implementation to exercise yet."
+    },
+    {
+      "id": "composition-security-tests",
+      "kind": "test",
+      "status": "deferred",
+      "owner": "workbench-security",
+      "invariants": ["renderer.no-ambient-node", "renderer.sandboxed", "composition.immutable-window", "preload.capability-allowlist", "privilege.validate-authorize", "identity.credential-custody", "runtime.handle-isolation", "security.privileged-credential-custody", "security.independent-authorization", "security.privileged-posture", "security.online-only", "security.containment-before-presentation", "security.fenced-participation"],
+      "activation": "code-layer-present",
+      "futureKind": "test",
+      "rationale": "Electron process compositions and privileged interfaces do not exist yet."
+    },
+    {
+      "id": "design-system-tests",
+      "kind": "test",
+      "status": "deferred",
+      "owner": "design-system",
+      "invariants": ["renderer.plain-dom", "design.shared-system", "design.static-registration", "design.presentation-not-authority", "design.accessibility", "design.css-ownership", "design.control-interface", "design.test-code-excluded"],
+      "activation": "css-present",
+      "futureKind": "test",
+      "rationale": "No reusable control or production stylesheet exists yet."
+    },
+    {
+      "id": "settings-contract-tests",
+      "kind": "test",
+      "status": "deferred",
+      "owner": "user-settings",
+      "invariants": ["settings.server-authority", "settings.static-registry", "settings.no-authority", "settings.dedicated-window", "settings.frozen-candidate-baseline", "settings.stronger-live-constraints", "settings.conditional-writes"],
+      "activation": "settings-registry-present",
+      "futureKind": "test",
+      "rationale": "The static settings registry and settings service do not exist yet."
+    },
+    {
+      "id": "native-conformance",
+      "kind": "package",
+      "status": "deferred",
+      "owner": "native-capabilities",
+      "invariants": ["native.passive-sources", "native.process-boundaries", "native.single-display-window", "native.race-free-session", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance", "toolchain.native-schema-authority", "toolchain.signed-capability-matrix"],
+      "activation": "native-package-present",
+      "futureKind": "package",
+      "rationale": "No native capability package or supported target tuple exists yet."
+    },
+    {
+      "id": "packaged-security",
+      "kind": "package",
+      "status": "deferred",
+      "owner": "release",
+      "invariants": ["toolchain.closed-packages", "toolchain.signed-capability-matrix", "toolchain.attempt-safe-updates"],
+      "activation": "packaged-target-present",
+      "futureKind": "package",
+      "rationale": "Packaging, signing, updates, and supported target declarations are intentionally not configured yet."
+    }
+  ]
+}

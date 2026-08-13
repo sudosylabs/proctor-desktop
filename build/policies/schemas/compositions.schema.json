@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "compositions.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "schemaVersion", "activationPath", "compositions"],
+  "properties": {
+    "$schema": { "const": "./schemas/compositions.schema.json" },
+    "schemaVersion": { "const": 1 },
+    "activationPath": { "$ref": "#/$defs/path" },
+    "compositions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/composition" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "path": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$" },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "entrypoint", "required", "forbidden", "allowedDynamicImports"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["main", "utility", "preload", "renderer"] },
+        "entrypoint": { "$ref": "#/$defs/path" },
+        "preload": { "$ref": "#/$defs/path" },
+        "required": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+        "forbidden": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+        "allowedDynamicImports": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } }
+      }
+    }
+  }
+}

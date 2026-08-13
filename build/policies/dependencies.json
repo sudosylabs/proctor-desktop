@@ -1,0 +1,76 @@
+{
+  "$schema": "./schemas/dependencies.schema.json",
+  "schemaVersion": 1,
+  "dependencies": [
+    {
+      "package": "@types/node",
+      "version": "24.13.3",
+      "kind": "development",
+      "purpose": "Type declarations for Node-based build checks and tests.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/@types/node",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "ajv",
+      "version": "8.20.0",
+      "kind": "development",
+      "purpose": "Draft 2020-12 JSON Schema validation for repository policies and provenance.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/ajv",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "mdast-util-from-markdown",
+      "version": "2.0.3",
+      "kind": "development",
+      "purpose": "Markdown AST parsing for repository-relative link validation.",
+      "owner": "agent-documentation",
+      "source": "https://www.npmjs.com/package/mdast-util-from-markdown",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "postcss",
+      "version": "8.5.26",
+      "kind": "development",
+      "purpose": "Standards-aware CSS parsing for ownership and cascade checks.",
+      "owner": "design-system",
+      "source": "https://www.npmjs.com/package/postcss",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "postcss-selector-parser",
+      "version": "7.1.5",
+      "kind": "development",
+      "purpose": "Selector AST parsing for scoped CSS enforcement.",
+      "owner": "design-system",
+      "source": "https://www.npmjs.com/package/postcss-selector-parser",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "typescript",
+      "version": "6.0.3",
+      "kind": "development",
+      "purpose": "Application type checking and source-graph parsing.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/typescript",
+      "license": "Apache-2.0",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "yaml",
+      "version": "2.9.0",
+      "kind": "development",
+      "purpose": "YAML parsing for skills, UI metadata, and GitHub workflow policy.",
+      "owner": "agent-documentation",
+      "source": "https://www.npmjs.com/package/yaml",
+      "license": "ISC",
+      "lifecycleScripts": "none"
+    }
+  ]
+}

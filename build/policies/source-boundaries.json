@@ -1,0 +1,17 @@
+{
+  "$schema": "./schemas/source-boundaries.schema.json",
+  "schemaVersion": 1,
+  "sourceRoot": "src/prctr",
+  "layers": ["base", "platform", "editor", "workbench", "code"],
+  "environments": {
+    "common": ["common"],
+    "worker": ["common", "worker"],
+    "browser": ["common", "browser"],
+    "node": ["common", "node"],
+    "electron-browser": ["common", "browser", "electron-browser"],
+    "electron-utility": ["common", "node", "electron-utility"],
+    "electron-main": ["common", "node", "electron-utility", "electron-main"]
+  },
+  "testSegments": ["test"],
+  "productionDynamicImportAllowlist": []
+}

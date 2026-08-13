@@ -1,0 +1,51 @@
+{
+  "name": "proctor-desktop",
+  "version": "0.0.0-private",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "packageManager": "npm@11.19.0",
+  "engines": {
+    "node": "24.19.0",
+    "npm": "11.19.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.19.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": "11.19.0",
+      "onFail": "error"
+    }
+  },
+  "scripts": {
+    "audit:upstream": "node build/checks/upstreamAudit.ts",
+    "check": "npm run check:types && node build/checks/main.ts && npm run test:checks",
+    "check:types": "tsc --project build/tsconfig.json --noEmit",
+    "check:assurance": "node build/checks/main.ts --check assurance.coverage",
+    "check:dependencies": "node build/checks/main.ts --check dependencies.admission",
+    "check:docs": "node build/checks/main.ts --check repository.documentation --check repository.hygiene --check ci.actions-pinned",
+    "check:generated": "node build/checks/main.ts --check generated.parity",
+    "check:layers": "node build/checks/main.ts --check source.graph",
+    "check:provenance": "node build/checks/main.ts --check upstream.provenance",
+    "check:source": "node build/checks/main.ts --check source.graph --check source.compositions --check source.css",
+    "generate": "node build/generators/main.ts --write",
+    "inspect": "node build/checks/main.ts --inspect",
+    "test": "npm run test:checks",
+    "test:checks": "node --test test/checks/*.test.ts",
+    "test:unit": "node --test"
+  },
+  "allowScripts": {},
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "ajv": "8.20.0",
+    "mdast-util-from-markdown": "2.0.3",
+    "postcss": "8.5.26",
+    "postcss-selector-parser": "7.1.5",
+    "typescript": "6.0.3",
+    "yaml": "2.9.0"
+  }
+}
