@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop UI Layout"
+  short_description: "Own DOM, CSS, responsive layout, and overlays"
+  default_prompt: "Use $develop-ui-layout to implement and review this Proctor UI layout."

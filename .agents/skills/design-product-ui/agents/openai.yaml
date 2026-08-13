@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Product UI"
+  short_description: "Shape calm, trustworthy product experiences"
+  default_prompt: "Use $design-product-ui to design and review this Proctor user-facing surface."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Native Capabilities"
+  short_description: "Build and verify bounded native observation sources"
+  default_prompt: "Use $develop-native-capabilities to add or review a Proctor native observation source."

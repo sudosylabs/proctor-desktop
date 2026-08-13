@@ -1,0 +1,4 @@
+interface:
+  display_name: "Maintain Agent Documentation"
+  short_description: "Keep agent knowledge concise and correctly routed"
+  default_prompt: "Use $maintain-agent-documentation to update this repository's agent guidance."

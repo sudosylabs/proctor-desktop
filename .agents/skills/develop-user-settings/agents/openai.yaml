@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop User Settings"
+  short_description: "Build candidate-safe settings and preferences"
+  default_prompt: "Use $develop-user-settings to add or review a Proctor user setting safely."

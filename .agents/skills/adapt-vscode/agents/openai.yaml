@@ -1,0 +1,4 @@
+interface:
+  display_name: "Adapt VS Code"
+  short_description: "Intake and audit VS Code-derived source"
+  default_prompt: "Use $adapt-vscode to evaluate and safely intake this VS Code behavior for Proctor Desktop."

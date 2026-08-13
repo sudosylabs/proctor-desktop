@@ -1,0 +1,13 @@
+.DS_Store
+node_modules/
+out/
+coverage/
+artifacts/
+.generated-check/
+
+# Local planning and investigation material; never authoritative.
+.scratch/
+
+# Decisions belong in living architecture topics.
+docs/adr/
+docs/adrs/

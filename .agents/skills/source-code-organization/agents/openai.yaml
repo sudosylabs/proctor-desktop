@@ -1,0 +1,4 @@
+interface:
+  display_name: "Source Code Organization"
+  short_description: "Place Proctor modules in the right layer"
+  default_prompt: "Use $source-code-organization to place this module in the Proctor source tree."

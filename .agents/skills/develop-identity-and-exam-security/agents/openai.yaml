@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Identity and Exam Security"
+  short_description: "Change privileged exam security safely"
+  default_prompt: "Use $develop-identity-and-exam-security to add or review identity and secure-exam behavior."

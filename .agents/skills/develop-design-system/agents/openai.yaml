@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Design System"
+  short_description: "Build tokens, themes, controls, and fixtures"
+  default_prompt: "Use $develop-design-system to add or review this Proctor design-system primitive."

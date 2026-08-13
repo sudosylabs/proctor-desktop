@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Attempt Workspace"
+  short_description: "Change workspace durability and sync safely"
+  default_prompt: "Use $develop-attempt-workspace to add or review Attempt Workspace behavior."

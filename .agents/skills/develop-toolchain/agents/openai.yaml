@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Toolchain"
+  short_description: "Build, test, package, and release safely"
+  default_prompt: "Use $develop-toolchain to design or review this Proctor Desktop build, package, test, or release change."

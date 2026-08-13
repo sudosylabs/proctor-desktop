@@ -1,0 +1,208 @@
+# Product model
+
+This is the canonical desktop-facing subset of Proctor's product language. Add
+terms when a real desktop workflow needs them; do not mirror the entire server
+model preemptively.
+
+The initial definitions were aligned with the Proctor repository at revision
+`0b0f825c667568d3ce3c92167a8e5bc0a12d7e2f`. Once a versioned server contract
+exists, its wire semantics govern transferred data while this document governs
+the language used in the desktop codebase.
+
+## System
+
+**Proctor Server**
+
+The authoritative application server for durable product state,
+authorization, examination coordination, and submission records.
+
+_Avoid_: Backend helper, desktop database
+
+**Desktop Client**
+
+The installed Proctor application that presents local workflows and mediates
+trusted operating-system capabilities. It is a client of the Proctor Server.
+
+_Avoid_: Server, source of truth
+
+**Principal**
+
+The authenticated security identity acting in an operation, including its
+credential and authentication context.
+
+_Avoid_: User when authentication context matters
+
+**User Settings Document**
+
+One server-authoritative, Principal-owned JSONC document containing portable
+approved IDE and presentation preferences. `settings.json` is its virtual
+user-facing representation rather than a host file or Attempt Workspace
+resource.
+
+_Avoid_: Workspace settings, local settings file, security policy
+
+**Candidate Settings Baseline**
+
+The validated user preferences frozen for one Exam Attempt at first successful
+admission. It survives interruption and authorized re-entry; current trusted
+policy and accessibility constraints produce a separate effective projection.
+
+_Avoid_: Current user settings, renderer configuration, Attempt presentation
+
+## Examination work
+
+**Exam**
+
+A reusable authored assessment containing material and configuration that may
+be delivered through one or more exam sittings.
+
+_Avoid_: Exam Sitting, exam session
+
+**Exam Revision**
+
+An immutable published generation of an exam's authored content and delivery
+configuration.
+
+_Avoid_: Exam Sitting, draft edit
+
+**Exam Sitting**
+
+A scheduled delivery of an exam to a defined eligible population.
+
+_Avoid_: Exam Revision, exam session
+
+**Exam Attempt**
+
+One student's private, durable body of work while participating in an exam; its
+acknowledged work survives interruption and submission.
+
+_Avoid_: Exam session, workspace
+
+**Attempt Workspace**
+
+The isolated, remote-first collection of working files belonging to one exam
+attempt. It may contain source code, project configuration, permitted assets,
+and generated or other permitted files; it is not an arbitrary local folder.
+
+_Avoid_: Shared workspace, arbitrary local folder
+
+**Workspace File**
+
+A file in one Attempt Workspace. The desktop identifies it independently of its
+mutable Workspace Path and uses an opaque provider-issued content version for
+acknowledgement and conflict checks. That token does not imply that the server
+creates a retained File Revision for every save.
+
+_Avoid_: Local file, File Revision
+
+**Workspace Path**
+
+The normalized, case-sensitive POSIX-relative location of an entry within one
+Attempt Workspace. It is mutable hierarchy metadata rather than identity,
+authorization, or a host filesystem path.
+
+_Avoid_: Local path, remote-VM path
+
+**Acknowledged Workspace State**
+
+Attempt Workspace state the Proctor Server has confirmed durable. Protected
+local recovery and a clean-looking editor do not establish acknowledgement.
+
+_Avoid_: Local backup, cached workspace
+
+**Exam Resource**
+
+A read-only file deliberately made available to students to explain or support
+an exam, such as a PDF, image, or Markdown document. It belongs to the delivered
+exam material, not the student's Attempt Workspace.
+
+_Avoid_: Arbitrary attachment
+
+**Submission**
+
+A sealed manifest of the exact acknowledged Attempt Workspace state presented
+for grading at one submission point. The server chooses how that state maps to
+its File Entry, File Revision, and other persistence models.
+
+_Avoid_: Exam Attempt, copied folder
+
+**Secure Exam Posture**
+
+The privileged desktop assessment of whether current authenticated policy,
+connectivity, monitoring, and controls permit candidate interaction. It may be
+not applicable, checking, ready, explicitly restricted, or blocked and is
+independent of authentication and guilt.
+
+_Avoid_: Login state, renderer context key, cheating verdict
+
+**Attempt Participation**
+
+One continuous, server-recognized candidate desktop participation in an Exam
+Attempt. It has a fenced generation so an authorized later participation cannot
+be confused with a stale or terminated client process.
+
+_Avoid_: Exam Attempt, Session, application window
+
+**Participation Interruption**
+
+Loss of required privileged client continuity before the server permits the
+candidate application to close. It requires an authoritative re-entry decision
+and is not submission, suspension, an Integrity Flag, or guilt.
+
+_Avoid_: Automatic cheating violation, ordinary logout
+
+**Native Observation**
+
+A bounded mechanical fact reported by a privileged operating-system capability,
+including its source, sequence, time, schema, and known gaps. It is an input to
+security evaluation rather than a conclusion about candidate conduct.
+
+_Avoid_: Integrity Flag, cheating event
+
+**Security Signal**
+
+A normalized policy input derived from one or more observations, source-health
+facts, connectivity facts, or other trusted state.
+
+_Avoid_: Raw native event, guilt
+
+**Detector Finding**
+
+A versioned rule result derived from identified signals with its uncertainty
+and gaps preserved. It may support containment or server review but is not an
+Integrity Flag or consequence by itself.
+
+_Avoid_: Cheating verdict
+
+**Integrity Evidence**
+
+Minimized, purpose-specific material retained to support an Integrity Flag or
+authorized review. It has stricter access and retention than ordinary audit or
+diagnostic data.
+
+_Avoid_: Security audit record, application log
+
+**Integrity Flag**
+
+A recorded indication of suspected examination-rule violation. It is evidence
+for review, not a finding of guilt.
+
+_Avoid_: Cheating verdict, automatic violation
+
+## Relationship rules
+
+- A Desktop Client acts for an authenticated Principal.
+- An Exam Sitting delivers one Exam Revision.
+- An Exam Attempt belongs to one student and one Exam Sitting.
+- An Attempt Workspace belongs to one Exam Attempt.
+- An Attempt Workspace is identified independently of any local or remote host
+  filesystem path.
+- A Workspace File keeps its identity when its Workspace Path changes.
+- A Submission seals identified, acknowledged workspace state; it is not merely
+  a copy of whichever files happen to be present locally.
+- One Exam Attempt may have more than one sequential Attempt Participation after
+  an authorized re-entry, but never more than one current generation.
+- A Participation Interruption never establishes guilt or submission.
+- Native Observations may become Security Signals and Detector Findings before
+  minimized material becomes Integrity Evidence.
+- An Integrity Flag records evidence and never determines guilt by itself.

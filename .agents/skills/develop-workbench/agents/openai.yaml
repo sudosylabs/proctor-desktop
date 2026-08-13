@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Workbench"
+  short_description: "Change Proctor workbench composition safely"
+  default_prompt: "Use $develop-workbench to add or review a Proctor workbench contribution."

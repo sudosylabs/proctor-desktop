@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "./schema.json",
+  "title": "Proctor Desktop VS Code port cluster",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "clusterId",
+    "admission",
+    "upstream",
+    "items",
+    "licenses",
+    "dependencies",
+    "divergences",
+    "verification"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "./schema.json"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "clusterId": {
+      "$ref": "#/$defs/clusterId"
+    },
+    "admission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workflow", "callers", "interface", "decision"],
+      "properties": {
+        "workflow": {
+          "type": "string",
+          "minLength": 1
+        },
+        "callers": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/repositoryPath"
+          }
+        },
+        "interface": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "decision": {
+          "$ref": "#/$defs/repositoryPath"
+        }
+      }
+    },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "revision"],
+      "properties": {
+        "repository": {
+          "const": "https://github.com/microsoft/vscode"
+        },
+        "revision": {
+          "$ref": "#/$defs/gitObjectId"
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/reviewedItem"
+      }
+    },
+    "licenses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/license"
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      }
+    },
+    "divergences": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/divergence"
+      }
+    },
+    "verification": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/verification"
+      }
+    }
+  },
+  "$defs": {
+    "clusterId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "repositoryPath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "gitObjectId": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reviewedItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "upstreamPath",
+        "upstreamBlob",
+        "category",
+        "disposition",
+        "rationale",
+        "licenseRefs"
+      ],
+      "properties": {
+        "upstreamPath": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "upstreamBlob": {
+          "$ref": "#/$defs/gitObjectId"
+        },
+        "category": {
+          "enum": [
+            "source",
+            "test",
+            "registration",
+            "style",
+            "asset",
+            "localization",
+            "configuration",
+            "schema",
+            "generated-input",
+            "generated-output",
+            "license"
+          ]
+        },
+        "disposition": {
+          "enum": [
+            "copied",
+            "adapted",
+            "behaviorally-reimplemented",
+            "evidence-only",
+            "excluded",
+            "locally-satisfied",
+            "external"
+          ]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "licenseRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "localPath": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "localSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "mechanicalTransforms": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "namespace-path-translation",
+              "relative-import-rewrite",
+              "accepted-dependency-substitution",
+              "provenance-marker-insertion"
+            ]
+          }
+        },
+        "localInterface": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "externalReference": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "enum": ["copied", "adapted"]
+              }
+            },
+            "required": ["disposition"]
+          },
+          "then": {
+            "required": ["localPath", "localSha256", "mechanicalTransforms"],
+            "properties": {
+              "licenseRefs": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "const": "behaviorally-reimplemented"
+              }
+            },
+            "required": ["disposition"]
+          },
+          "then": {
+            "required": ["localPath"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "const": "locally-satisfied"
+              }
+            },
+            "required": ["disposition"]
+          },
+          "then": {
+            "required": ["localInterface"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "disposition": {
+                "const": "external"
+              }
+            },
+            "required": ["disposition"]
+          },
+          "then": {
+            "required": ["externalReference"]
+          }
+        }
+      ]
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "upstreamPaths", "localNoticePath"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "upstreamPaths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/repositoryPath"
+          }
+        },
+        "localNoticePath": {
+          "$ref": "#/$defs/repositoryPath"
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "reference", "rationale"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": ["local-interface", "external-package", "platform-interface"]
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "divergence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "summary", "localPaths", "verificationRefs"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "localPaths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/repositoryPath"
+          }
+        },
+        "verificationRefs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "path", "obligation"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "enum": ["test", "check", "review"]
+        },
+        "path": {
+          "$ref": "#/$defs/repositoryPath"
+        },
+        "obligation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
