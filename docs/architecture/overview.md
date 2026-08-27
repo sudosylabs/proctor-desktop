@@ -1,66 +1,79 @@
 # Architecture overview
 
-No application implementation has landed. This document contains only confirmed
-boundaries.
+No application or native runtime implementation has landed. This document
+summarizes accepted boundaries, not completed features.
 
-Proctor Desktop is an Electron workbench for programming examinations. Every
-candidate Exam Attempt includes an IDE workspace, while the surrounding shell
-owns examination materials, capability policy, attempt state, and proctoring.
-The renderer uses plain TypeScript, DOM APIs, and CSS.
+Proctor Desktop is an Electron workbench for the whole Proctor examination
+product. Authenticated students see their exam activity; teachers, Exam
+Managers, and administrators see their current server-authorized areas. Every
+Candidate Exam Attempt includes an IDE workspace and may include an integrated
+browser and one remote terminal. The renderer uses plain TypeScript, DOM APIs,
+and CSS.
 
-An unauthenticated user receives a minimal launch window. Electron main creates
-an immutable candidate or proctor workbench only after authentication and role
-authorization. Candidate examination interaction additionally depends on a
-privileged secure-exam posture, continuous participation, and current server
-admission that the renderer cannot grant to itself. See the
-[identity and exam-security architecture](./identity-and-exam-security.md) and
-[workbench architecture](./workbench.md).
+The application has three trusted window kinds. `LaunchWindow` selects one
+Proctor Server and presents only safe Institution readiness/compatibility before
+starting authentication. The server-hosted system-browser page owns local or
+external authentication choice and final approval. Electron main completes
+state/PKCE/registered-installation proof through an exact loopback callback.
+`AuthenticatedWindow` is the normal signed-in product home, including account
+and settings. `CandidateWindow` exists only for one active secure Attempt;
+opening it closes AuthenticatedWindow, and relaunch never restores it directly.
 
-An authenticated User may instead open a dedicated SettingsWindow outside the
-role workbenches. It edits one server-authoritative virtual `settings.json` and
-cannot exist during active candidate participation. Candidate mode consumes an
-Attempt-wide frozen baseline under current trusted constraints. See the
-[user-settings architecture](./user-settings.md).
+Candidate interaction additionally depends on a registered Desktop key,
+current Session and active Session lock, Attempt admission, Participation lease,
+frozen Attempt Configuration, local Secure Exam Posture, and current operation
+authorization. Renderer presentation cannot establish any of them. Suspension
+returns to AuthenticatedWindow; manager reallow creates ready state, and only a
+successful secure join returns the Attempt to active.
 
-Most durable product data is remote. The desktop may eventually cache or stage
-data, but a local folder is not assumed to be the Attempt Workspace. A future
-terminal renders a PTY hosted by an isolated remote VM.
+Most durable product data is remote. A local folder is not the Attempt
+Workspace. Desktop owns a Working Overlay and protected recovery/cache around
+the server's v1 cursor/journal/mutation contract. The integrated browser enforces
+revision-frozen policy over the candidate's network and delivers minimized
+ordered Browser Activity. The terminal attaches to one PTY in an isolated
+remote Execution Environment; its filesystem remains a projection rather than
+Workspace authority. The AI agent is deferred.
 
 ## Process boundary
 
 ```text
-remote Proctor services and isolated runtimes
-                    ^
-                    |
-          privileged Electron processes
-                    ^
-                    | narrow, validated capabilities
-                    v
-              sandboxed renderer
+Proctor Server and isolated Execution Environments
+                         ^
+                         |
+               privileged Electron processes
+                         ^
+                         | narrow validated capabilities
+                         v
+                   sandboxed renderers
 ```
 
-- The renderer owns presentation and interaction without ambient Node.js or
-  unrestricted Electron access.
-- Preload exposes a minimal capability surface and contains no product
-  orchestration.
-- Electron main and utility processes own privileged lifecycle, native access,
-  and runtime adapters.
-- Passive native packages expose bounded mechanical observations to the
-  dedicated exam-security utility process. Electron main owns process launch,
-  permissions, and closed candidate-window effects. The renderer receives
-  neither raw native streams nor generic native control.
+- Renderers own presentation and closed intents without ambient Node.js,
+  credentials, native handles, or unrestricted Electron access.
+- Preloads expose fixed window-specific capabilities and no product
+  orchestration or generic IPC.
+- Electron main owns identity/key custody, window lifecycle, protected storage,
+  system-browser/loopback coordination, updater, permissions, and closed
+  CandidateWindow effects.
+- A dedicated utility process owns Attempt-scoped security coordination and
+  consumes passive bounded native sources through private protocols.
+- Server adapters own wire representation while domain modules expose
+  purpose-specific projections and operations.
 
-The accepted [design-system architecture](./design-system.md) governs
-presentation and interaction across all compositions. The accepted
-[Attempt Workspace architecture](./attempt-workspace.md) governs workspace and
-Exam Resource durability. The accepted
-[identity and exam-security architecture](./identity-and-exam-security.md)
-governs privileged credential custody, admission projections, online-only
-posture, containment, participation continuity, re-entry gating, and integrity
-information. The accepted
-[native-capability architecture](./native-capabilities.md) governs passive
-sources, private process protocols, candidate-window enforcement, strict
-display topology, failure behavior, privacy, and platform verification.
-The accepted [toolchain architecture](./toolchain.md) governs the package graph,
-compilation, deterministic generation, native delivery, packaged verification,
-updates, CI, and release provenance that must preserve those boundaries.
+The focused architecture topics own the detailed rules:
+
+- [Workbench](./workbench.md) — three windows, shell, contributions, and
+  lifecycle;
+- [Identity and exam security](./identity-and-exam-security.md) — readiness,
+  authorization, installation proof, Sessions, Attempt continuity, and
+  integrity;
+- [User settings](./user-settings.md) — virtual JSONC and Attempt Configuration;
+- [Attempt Workspace](./attempt-workspace.md) — remote workspace, overlay,
+  recovery, and v1 adapter;
+- [Integrated browser](./integrated-browser.md) — navigation enforcement and
+  Browser Activity;
+- [Execution Environment](./execution-environment.md) — remote PTY and Workspace
+  projection boundary;
+- [Native capabilities](./native-capabilities.md) — passive sources, window/
+  display enforcement, privacy, and packaged conformance;
+- [Design system](./design-system.md) and [toolchain](./toolchain.md) — shared
+  presentation and the exact artifact that preserves these boundaries.

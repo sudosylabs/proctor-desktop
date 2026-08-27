@@ -37,9 +37,9 @@ authorization, and execution-projection semantics are separately accepted.
 
 A `Workspace Content Version` is an opaque provider-issued comparison token for
 one exact acknowledged content state of a workspace file. It supports
-optimistic mutation, acknowledgement, reconciliation, exact reads, and
-submission readiness. It does not imply that the server retains a corresponding
-File Revision entity.
+optimistic mutation, acknowledgement, reconciliation, and submission
+readiness. Workspace v1 reads only current content; the token does not promise a
+server-retained historical version or File Revision entity.
 
 Canonical file content is binary-safe. Text adapters own explicit decoding,
 encoding, byte-order-mark, and line-ending behavior. Network transport may use
@@ -80,17 +80,20 @@ later projections, avoiding a snapshot/subscription race. A local monotonic
 `Workspace View Generation` orders visible authoritative and overlay changes;
 it is distinct from the server-issued Workspace Cursor.
 
-`read` addresses a stable reference and either an exact content version or
-`current`. Every successful result identifies the exact version returned,
-media type, byte size, and relevant text metadata. Normal source reads use
-bounded buffers. Large files and renditions may use cancellable streams or
-ranges under explicit size and range capabilities.
+`read` addresses a stable reference at `current`. Every successful result
+identifies the version returned, media type, byte size, and relevant text
+metadata. The production v1 adapter reads the whole current file with bounded
+streaming transport where available. Monaco/VS Code may build its piece tree
+from a stream, but the full logical text model exists only after that stream
+completes; this is not range-backed editing. The initial packaged editor model
+limit is 10 MiB even if a server permits a larger file.
 
 `change` expresses a closed local intent: replace file content, create a file or
-directory, move or rename, delete, apply a bounded atomic workspace edit,
-resolve a conflict, or revert. Acceptance means the intent is installed in the
-Working Workspace Overlay and receives a local generation. It does not mean the
-server has acknowledged the change.
+directory, move or rename, delete, resolve a local conflict, or discard/revert a
+selected part of the Working Workspace Overlay. Acceptance means the intent is
+installed locally and receives a generation. It does not mean the server has
+acknowledged the change. V1 has no server batch, resolve-conflict, or revert
+mutation.
 
 `settle` requests a condition through an exact Workspace View Generation:
 
@@ -115,11 +118,12 @@ The Attempt Workspace implementation owns two internal seams:
 - a protected-content port with a privileged native encrypted-store adapter and
   an in-memory adapter.
 
-The authoritative port supplies snapshots, exact and current reads, mutation
-dispatch and result lookup, ordered changes after a Workspace Cursor,
-capabilities, and Exam Resource reads where applicable. Transport routes, DTOs,
+The authoritative port supplies snapshots, current reads, single-mutation
+dispatch and result lookup, ordered changes after an integer Workspace Cursor,
+and Exam Resource reads where applicable. Transport routes, DTOs,
 authentication headers, serialization, and replay strategy remain inside its
-production adapter.
+production adapter. Rich local capability state must not imply a server
+capability-snapshot endpoint.
 
 The protected-content adapter performs encrypted, authenticated, atomic record
 operations under opaque identifiers and returns no raw path. Key custody and
@@ -196,10 +200,11 @@ tombstone state, then removes blobs.
 
 ## Mutations, acknowledgements, and ordering
 
-The module compiles accepted local intents into a closed Workspace Mutation
-family: file or directory creation, content replacement, move or rename,
-deletion, and bounded atomic batch. Callers never create idempotency keys,
-expected conditions, or mutation scopes.
+The module compiles accepted local intents into the five Workspace v1 mutation
+families: create directory, create file, replace file content, move or rename,
+and delete. Callers never create idempotency keys or expected conditions. The
+Desktop scheduler may coordinate several local intents, but it cannot represent
+them to the server as one atomic batch.
 
 Every mutation has one immutable idempotency key and explicit expectations:
 
@@ -208,7 +213,6 @@ Every mutation has one immutable idempotency key and explicit expectations:
 - move expects stable identity, current path, and destination absence;
 - deletion expects stable identity and current content version where relevant;
 - directory move applies atomically to its subtree;
-- a batch declares its complete scope and is all-or-nothing.
 
 Acknowledgement means the result is durably authoritative. It returns resulting
 identities, paths and content versions plus an opaque Workspace Cursor. An
@@ -236,10 +240,11 @@ file unchanged.
 
 ## Reconciliation and conflict
 
-An authoritative Workspace Snapshot carries a Workspace Cursor. Ordered changes
-after that cursor identify stable entries, old and new paths, resulting content
-versions, originating mutation keys where applicable, and the next cursor.
-Acknowledgements and remote changes pass through one reducer. Duplicates are
+An authoritative Workspace Snapshot carries an integer Workspace Cursor.
+Ordered changes after that cursor identify stable entries, old and new paths,
+resulting content versions, and the next cursor. Workspace v1 journal entries do
+not promise originating mutation keys, so acknowledgements and refresh changes
+are reconciled through recorded mutation results and one reducer. Duplicates are
 idempotent. A gap, expired history, or inconsistency forces a full snapshot
 refresh followed by overlay reapplication.
 
@@ -256,18 +261,18 @@ explicit version choice or authorized new path. Deletion and path conflicts
 similarly require explicit authorized resolution or discard.
 
 Authorization, lifecycle, policy, quota, size, and unsupported-operation
-failures are typed rejections rather than content conflicts. Revert is an
+failures are typed rejections rather than content conflicts. Revert is a local
 explicit destructive operation: it first reconciles in-flight or unknown
-mutations, then discards the selected protected local state and reloads
-authoritative content.
+mutations, protects anything still needed for recovery, discards the selected
+overlay state, and reloads current authoritative content.
 
 ## Capability and lifecycle rules
 
-A versioned, deny-by-default Workspace Capability Snapshot projects technical
-and authoritative operation availability at workspace, subtree, or stable-entry
-scope. It covers hierarchy and content read, creation, replacement, move,
-deletion, and bounded batch. Exam Resources expose only authorized hierarchy,
-metadata, and content reads.
+A deny-by-default local Workspace Capability Projection combines packaged
+support, current Attempt/Participation state, and purpose-specific server
+results. V1 provides no per-entry server Capability Snapshot. The projection
+covers current hierarchy/content read and the five supported mutations. Exam
+Resources expose only authorized hierarchy, metadata, and content reads.
 
 Capabilities control presentation and dispatch eligibility. The authoritative
 operation owner reauthorizes every mutation against current state; stale
@@ -301,12 +306,19 @@ acknowledgement, unknown outcome, authoritative cursor, protected overlay, or
 submission boundary. Any future intake starts from the Proctor interfaces above
 and follows the VS Code admission procedure.
 
-## Unresolved dependencies
+## Production v1 and unresolved extensions
 
-The server transport, token and cursor representations, ordered-change delivery,
-protected-record retention durations, content-size limits, and
-execution-environment synchronization protocol remain unresolved. The identity
-architecture governs key custody and secure-exam gating; native-capability work
-must still settle concrete privileged placement, administrative threat
-assumptions, anti-tamper behavior, and OS-specific enforcement before production
-adapters are designed.
+The first production adapter pins integer Workspace Cursors, whole current-file
+reads, ordered journal refresh, idempotent results, and the five single
+mutations above. The server defaults are 10 MiB per file and 50 MiB total, with
+hard configurable maxima of 100 MiB per file and 1 GiB total. Clients treat
+server-advertised effective limits as authority and enforce their independent
+10 MiB initial editor-model limit before opening a text model.
+
+Atomic batch, historical-version reads, range-backed models, server conflict
+resolution/revert, journal mutation keys, and per-entry capability snapshots are
+deferred extensions. Protected-record retention remains unresolved. Remote
+execution projection exists server-side; its Desktop terminal and synchronization
+boundary is defined by [Execution Environment architecture](./execution-environment.md).
+Identity/security governs key custody and candidate gates, and native capability
+work owns privileged placement and platform enforcement.

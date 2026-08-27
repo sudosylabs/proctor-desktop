@@ -11,12 +11,17 @@ These files contain accepted current-state rules:
 - [Attempt Workspace](./attempt-workspace.md) — resource identity, provider
   projection, working state, acknowledgements, recovery, and reconciliation
 - [Identity and exam security](./identity-and-exam-security.md) — credential
-  custody, admission, posture, containment, continuity, and integrity data
+  custody, installation proof, Sessions, Attempt state, posture, continuity,
+  and integrity data
+- [Integrated browser](./integrated-browser.md) — revision-frozen navigation,
+  privileged enforcement, Browser Activity, privacy, and delivery
+- [Execution Environment](./execution-environment.md) — remote PTY, generation
+  fencing, Workspace projection, terminal presentation, and lifecycle
 - [Native capabilities](./native-capabilities.md) — passive observation sources,
   candidate-window enforcement, privileged process boundaries, and platform
   verification
 - [User settings](./user-settings.md) — registry, JSONC authority, effective
-  configuration, persistence, SettingsWindow, and candidate baselines
+  configuration, Account/Settings persistence, and Attempt Configuration
 - [Toolchain and release](./toolchain.md) — package graph, compilation,
   generation, verification, native builds, packaging, updates, and provenance
 - [Repository enforcement](./repository-enforcement.md) — invariant assurance,
@@ -30,7 +35,7 @@ skill so an agent loads them when creating or reviewing source.
 Use
 [`develop-workbench`](../../.agents/skills/develop-workbench/SKILL.md) when
 implementing or reviewing the shell, content seam, contributions, interaction
-registrations, lifecycle, restoration, or role composition.
+registrations, lifecycle, restoration, or three-window transitions.
 
 Use
 [`develop-attempt-workspace`](../../.agents/skills/develop-attempt-workspace/SKILL.md)
@@ -44,6 +49,16 @@ secure-exam posture, containment, connectivity gating, participation, re-entry,
 or integrity-information handling.
 
 Use
+[`develop-integrated-browser`](../../.agents/skills/develop-integrated-browser/SKILL.md)
+when implementing or reviewing Candidate browser policy, navigation
+enforcement, Browser Activity, protected delivery, privacy, or access.
+
+Use
+[`develop-execution-environment`](../../.agents/skills/develop-execution-environment/SKILL.md)
+when implementing or reviewing remote PTY transport, terminal presentation,
+generation fencing, or Workspace projection synchronization.
+
+Use
 [`develop-native-capabilities`](../../.agents/skills/develop-native-capabilities/SKILL.md)
 when implementing or reviewing a native observation source, OS adapter,
 permission flow, candidate-window effect, utility-process boundary, native IPC,
@@ -52,7 +67,7 @@ or platform-capability test.
 Use
 [`develop-user-settings`](../../.agents/skills/develop-user-settings/SKILL.md)
 when implementing or reviewing settings declarations, effective configuration,
-persistence, candidate baselines, or the SettingsWindow.
+persistence, Account/Settings, or Attempt Configuration.
 
 Use [`develop-toolchain`](../../.agents/skills/develop-toolchain/SKILL.md) when
 implementing or reviewing dependencies, compilation, generation, tests, native

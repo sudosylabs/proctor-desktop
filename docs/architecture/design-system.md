@@ -1,7 +1,7 @@
 # Design system
 
-Proctor Desktop uses one Proctor-owned design system across the launch,
-candidate, and proctor compositions. The system governs presentation and
+Proctor Desktop uses one Proctor-owned design system across LaunchWindow,
+AuthenticatedWindow, and CandidateWindow. The system governs presentation and
 interaction; it never authorizes an operation or turns a visual state into
 authoritative examination or integrity state.
 
@@ -43,7 +43,7 @@ must be local, justified, and verified.
 
 Proctor owns four resolved themes: light, dark, high-contrast light, and
 high-contrast dark. A follow-system preference resolves to one of them rather
-than creating another theme. Candidate and proctor preferences may select
+than creating another theme. Authenticated and Candidate preferences may select
 approved presentation options but cannot redefine feedback, examination, or
 integrity semantics.
 
@@ -247,7 +247,7 @@ Use a risk-based review matrix rather than every Cartesian combination:
 - short, long, empty, multiline, localized, and relevant RTL content;
 - complete keyboard traversal and focus restoration;
 - supported forced-color behavior;
-- screen readers for new patterns and critical candidate/proctor workflows.
+- screen readers for new patterns and critical authenticated/Candidate workflows.
 
 Readiness combines semantic and state tests through the interface, real-browser
 interaction, automated accessibility checks, deterministic visual comparison,
@@ -260,7 +260,8 @@ A reusable control and every changed state or variant require a fixture,
 interface tests, the applicable matrix, and accessibility behavior. An exception
 identifies missing evidence, reason, owner, and blocking follow-up. Production
 manifests and packages must prove the explorer, fixtures, test adapters, and
-baseline tooling unreachable from candidate and proctor compositions.
+baseline tooling unreachable from production AuthenticatedWindow and
+CandidateWindow compositions.
 
 ## Knowledge and enforcement
 

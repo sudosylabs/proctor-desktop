@@ -1,137 +1,111 @@
 ---
 name: develop-user-settings
-description: Design, implement, or review Proctor Desktop User Settings Document parsing, registry declarations, effective configuration, SettingsWindow editing, candidate baselines, preferences, constraints, migrations, conflicts, caches, schemas, or settings projections. Use before changing any user setting or settings-related interface.
+description: Design, implement, or review Proctor Desktop User Settings JSONC, static registry declarations, Account/Settings editing, effective configuration, Attempt Configuration, preferences, constraints, migrations, conflicts, caches, schemas, or settings projections. Use before changing any user setting or settings-related interface.
 ---
 
 # Develop user settings
 
-Keep portable user intent, local presentation state, trusted constraints, and
-candidate-safe effective configuration behind distinct Proctor-owned seams.
+Keep portable user intent, presentation state, authoritative constraints, and
+the frozen Attempt Configuration behind distinct seams.
 
-## 1. Load authority and classify the value
+## 1. Load and classify
 
-Read the [user-settings architecture](../../../docs/architecture/user-settings.md),
+Read [user-settings architecture](../../../docs/architecture/user-settings.md),
 [design-system architecture](../../../docs/architecture/design-system.md), and
-[architecture invariants](../../../docs/architecture/invariants.md). Use
-[`develop-workbench`](../develop-workbench/SKILL.md) for shell placement or
-restoration, [`develop-attempt-workspace`](../develop-attempt-workspace/SKILL.md)
-for editor working state or autosave, and
+[invariants](../../../docs/architecture/invariants.md). Use
+[`develop-workbench`](../develop-workbench/SKILL.md) for Account/Settings
+placement, [`develop-attempt-workspace`](../develop-attempt-workspace/SKILL.md)
+for working state/autosave, and
 [`develop-identity-and-exam-security`](../develop-identity-and-exam-security/SKILL.md)
-for candidate baselines, trusted policy, accessibility containment, or Session
-Binding.
+for Attempt Configuration admission or Session binding.
 
-Classify the proposed value as portable user preference, device preference,
-composition restoration, Attempt presentation, Exam configuration, Exam
-Security Policy, or authoritative product state. Keep only the first two in the
-settings registry. Use [`adapt-vscode`](../adapt-vscode/SKILL.md) before relying
-on a VS Code key or implementation.
+Classify a value as portable user preference, device preference, composition
+restoration, Attempt presentation, Exam configuration, security/browser/
+execution policy, or authoritative product state. Only the first two belong in
+the settings registry. Use [`adapt-vscode`](../adapt-vscode/SKILL.md) before
+adopting a VS Code key/implementation. The step is complete when one authority,
+scope, window set, and candidate treatment are explicit.
 
-This step is complete when one authority, storage scope, composition set, and
-candidate treatment are explicit.
+## 2. Declare one packaged setting
 
-## 2. Declare one static setting
+Add one immutable typed declaration through the owning capability and literal
+settings manifest. Declare identifier, schema/default, bounds/normalization,
+portable/device scope, domain, window applicability, candidate treatment,
+activation, language override, fallback, lifecycle, migration, and localized
+editor metadata.
 
-Add an immutable typed descriptor through the owning capability and the literal
-Proctor settings manifest. Declare identifier, schema/default, bounds and
-normalization, portable-user or device storage, domain, composition
-applicability, candidate treatment, activation point, language-override support,
-fallback, lifecycle, migration, and localized editor metadata.
+Choose `eligible`, `policyConstrained`, `nonCandidateOnly`, or `prohibited`.
+Preserve unknown keys without activating them and diagnose prohibited keys.
+Keep credentials, paths, commands, executable/network/browser/security policy,
+extensions, formatters, file associations, autosave semantics, and injected
+visual content outside settings.
 
-Choose `eligible`, `policyConstrained`, `nonCandidateOnly`, or `prohibited` for
-candidate treatment. Preserve an unknown key without activating it. Diagnose a
-known prohibited key without giving it an effective value. Keep secrets,
-commands, paths, arbitrary network or execution configuration, injected visual
-material, and security controls outside settings.
-
-This step is complete when generated schema, SettingsWindow catalog, rejection
-catalog, and registry fingerprint have one declaration owner and the frozen
-registry accepts it.
-
-Use [`develop-toolchain`](../develop-toolchain/SKILL.md) when changing the
-generator, committed-artifact policy, or clean-regeneration gate.
+The step is complete when schema, Account/Settings catalog, rejection catalog,
+and registry fingerprint derive from one owner. Use `develop-toolchain` when
+changing generation.
 
 ## 3. Resolve through the deep interface
 
-Select packaged default, then exactly one portable-user or device value, then
-an applicable language override. Apply composition constraints, authenticated
-Exam and security constraints, platform/accessibility requirements, and
-packaged safety invariants in that order.
+Apply packaged default, one user/device value, applicable language override,
+window constraints, authenticated Exam/security constraints, platform/
+accessibility requirements, then packaged safety. Return typed immutable values
+and bounded provenance. Workspace content, restoration, context keys, renderer
+state, and remote schema never enter precedence; settings never grant.
 
-Return typed immutable effective values. Expose only requested/effective values,
-sanitized source categories, and bounded constraint reasons through inspection.
-Never let workspace content, restoration, context keys, renderer state, or a
-remote schema enter precedence. Never let a setting grant a capability or
-authorize an operation.
+The step is complete when callers need no JSONC parsing, policy object, storage
+target, or arbitrary string-key lookup.
 
-This step is complete when callers need no parsing, policy object, storage
-target, or arbitrary string-key access.
+## 4. Derive and freeze Attempt Configuration
 
-## 4. Preserve candidate freezing
+At initial join derive only the closed candidate-safe subset: theme/high
+contrast, bounded zoom/font/line height, reduced motion, screen-reader/
+announcement mode, cursor, and approved Candidate command/keybinding IDs. Include
+schema, registry, build/target, and User Settings revision provenance.
 
-Capture the Candidate Settings Baseline once for the Exam Attempt using the
-fenced server document revision, registry/build and composition versions, and
-normalized eligible values. Reuse it across renderer restart, Participation
-Interruption, and authorized re-entry. Apply stronger current policy, platform,
-accessibility, and safety constraints only to the Effective Candidate Settings
-Projection.
+Submit it for server validation/freeze on the Attempt. Re-entry applies the
+exact stored object, never current User Settings. Stronger current platform,
+accessibility, or safety constraints may narrow only the effective projection.
+Candidate preload receives no source/cache/draft/mutation interface.
 
-Keep document source, caches, drafts, mutations, and conflict operations out of
-candidate preload. Put safe candidate resize and placement in
-`attemptPresentation`; make closed accessibility changes Attempt-scoped. A
-remote user edit affects a future Attempt, never the active baseline.
-
-This step is complete when killing and re-entering the application cannot
-change candidate behavior by changing settings.
+The step is complete when restart/rejoin cannot change candidate behavior by
+editing settings and unknown/unsupported fields cannot silently activate.
 
 ## 5. Edit and persist safely
 
-Use the dedicated authenticated SettingsWindow and one in-memory SettingsDraft
-for structured and JSONC views. Validate before explicit save. Commit the whole
-bounded source with expected opaque revision and idempotency key. Verify an
-ambiguous outcome with that same key.
+Use the Account/Settings destination in AuthenticatedWindow with one in-memory
+draft for structured and JSONC views. Validate before explicit save. Commit the
+whole bounded source with expected revision/idempotency key and verify ambiguous
+outcomes using the same key.
 
-On conflict, retain base, draft, and latest remote source. Auto-merge only
-unambiguous disjoint paths and language entries; preserve comments and surface
-same-path, delete/modify, or uncertain-trivia conflicts. Keep unavailable-server
-state read-only and do not create an offline queue. Cache only acknowledged
-source in protected Principal-bound storage and clean or lock it on binding
-replacement.
+On conflict retain base/draft/latest. Auto-merge only unambiguous disjoint
+properties/language entries while preserving comments; surface same-path,
+delete/modify, and trivia ambiguity. Server-unavailable state is read-only with
+no offline queue. Cache only acknowledged source in protected Principal-bound
+storage.
 
-This step is complete when failure, conflict, cancellation, sign-out, and
-unknown completion cannot lose the draft, guess authority, or expose another
-Principal's data.
+The step is complete when failure, conflict, cancel, sign-out, and unknown
+completion preserve the draft and never guess authority or cross Principals.
 
-## 6. Place source and presentation
+## 6. Place and present
 
 Keep registry, JSONC grammar, migrations, resolution, inspection, schema inputs,
-and immutable projections under `src/prctr/platform/settings/common/`. Keep the
-privileged UserSettingsCoordinator and protected/network adapters in their
-narrow Electron-main environment. Keep the editing contribution under
-`src/prctr/workbench/contrib/settings/` and select it only through
-`src/prctr/code/electron-browser/settings.main.ts` and the dedicated trusted
-window composition root.
+and immutable projections under `src/prctr/platform/settings/common/`. Keep
+coordinator/network/protected-cache adapters in Electron main. Put UI under
+`src/prctr/workbench/contrib/settings/` and select it from the authenticated
+manifest/`authenticated.main.ts`.
 
-Use [`design-product-ui`](../design-product-ui/SKILL.md),
-[`develop-accessible-ui`](../develop-accessible-ui/SKILL.md), and
-[`develop-ui-layout`](../develop-ui-layout/SKILL.md) for SettingsWindow changes.
-Use [`develop-design-system`](../develop-design-system/SKILL.md) for visual
-preference or preview behavior.
+Use product-UI, accessibility, layout, and design-system skills for the page and
+preview. The step is complete when imports, process APIs, Session binding,
+preload, and manifest express the accepted ownership.
 
-This step is complete when import direction, process APIs, window binding,
-preload surface, and manifest inclusion express the accepted ownership.
+## 7. Verify
 
-## 7. Verify through the interfaces
+Test registry/generated parity, parser bounds/fuzzing, unknown/prohibited keys,
+precedence, migrations, conditional writes, ambiguity/conflict, cache isolation,
+Attempt Configuration closed schema/freeze/rejoin, and Candidate preload
+exclusion. Exercise the Account/Settings page for keyboard/focus, loading,
+invalid, conflict, unavailable, themes, reduced motion, high contrast, and 200%
+zoom. Keep values/source/conflicts out of diagnostics.
 
-Test registry/schema/catalog parity, grammar bounds and fuzzing, unknown and
-prohibited keys, exact precedence, sanitized inspection, migrations, conditional
-writes, idempotent ambiguity handling, conflict merges, cache isolation,
-candidate baseline stability, stronger live constraints, and manifest/preload
-exclusion.
-
-Exercise the SettingsWindow with keyboard, focus, diagnostics, conflict,
-loading/read-only/error states, all four themes, reduced motion, and 200% zoom.
-Keep source JSONC, values, conflicts, and cache data out of ordinary diagnostics.
-
-The work is complete when document authority, generated artifacts, effective
-values, candidate behavior, persistence, presentation, and tests agree through
-the same small role-specific interfaces.
+The work is complete when authority, artifacts, effective values, candidate
+behavior, presentation, and tests agree through the same small interfaces.

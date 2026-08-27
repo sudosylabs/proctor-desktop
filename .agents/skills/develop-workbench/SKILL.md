@@ -1,141 +1,109 @@
 ---
 name: develop-workbench
-description: Design, implement, or review Proctor Desktop workbench shell parts, WorkbenchItem and WorkbenchPane types, resolvers, navigation, contributions, commands, menus, keybindings, manifests, lifecycle, restoration, or candidate/proctor composition behavior. Use before changing any workbench mechanism or user-visible contribution under src/prctr.
+description: Design, implement, or review Proctor Desktop LaunchWindow, AuthenticatedWindow, or CandidateWindow shell parts, destinations, WorkbenchItem/WorkbenchPane types, resolvers, navigation, contributions, commands, menus, keybindings, manifests, lifecycle, restoration, or secure window transitions. Use before changing a workbench mechanism or user-visible contribution under src/prctr.
 ---
 
 # Develop the workbench
 
-Preserve the accepted workbench seams while adding product behavior through an
-explicit composition.
+Preserve the three-window product and keep durable domain behavior behind its
+owning capability.
 
 ## 1. Load authority
 
-Read [`docs/architecture/workbench.md`](../../../docs/architecture/workbench.md),
-[`docs/architecture/invariants.md`](../../../docs/architecture/invariants.md),
-and the relevant product terms in
-[`docs/product/model.md`](../../../docs/product/model.md). Use
-[`source-code-organization`](../source-code-organization/SKILL.md) to place the
-source.
+Read [workbench architecture](../../../docs/architecture/workbench.md),
+[product model](../../../docs/product/model.md), and
+[architecture invariants](../../../docs/architecture/invariants.md). Use
+[`source-code-organization`](../source-code-organization/SKILL.md) for placement.
 
-Use
-[`develop-identity-and-exam-security`](../develop-identity-and-exam-security/SKILL.md)
-for authentication, role-window binding, candidate gates, security posture,
-containment, participation, or re-entry behavior.
+Use [`develop-identity-and-exam-security`](../develop-identity-and-exam-security/SKILL.md)
+for readiness, auth, bindings, candidate gates, Attempt transitions, or secure
+window handoff. Use [`develop-user-settings`](../develop-user-settings/SKILL.md)
+for Account/Settings or Attempt Configuration,
+[`develop-integrated-browser`](../develop-integrated-browser/SKILL.md) for
+browser items, and
+[`develop-execution-environment`](../develop-execution-environment/SKILL.md) for
+terminal panels. Use [`adapt-vscode`](../adapt-vscode/SKILL.md) before deriving
+from VS Code.
 
-Use [`develop-user-settings`](../develop-user-settings/SKILL.md) for the
-SettingsWindow, registered preferences, effective configuration, candidate
-baseline, or settings-related restoration behavior.
+For user-visible work, also load the design-system architecture and applicable
+product-UI, accessibility, design-system, and layout skills. The step is complete
+when every domain state and action has one authority outside shell presentation.
 
-If the change derives from VS Code, also use
-[`adapt-vscode`](../adapt-vscode/SKILL.md). For user-visible work, read the
-[design-system architecture](../../../docs/architecture/design-system.md) and
-use the applicable `design-product-ui`, `develop-design-system`,
-`develop-accessible-ui`, and `develop-ui-layout` skills. If the change requires
-unsettled product, server-transport, or native-capability rules, continue the
-corresponding `.scratch/` grill instead of settling that domain in workbench
-code.
+## 2. Choose the window and owner
 
-The step is complete when every governing accepted rule and every unresolved
-dependency of the requested behavior is identified.
+Place behavior in exactly one window:
 
-## 2. Choose the owner
+- LaunchWindow: signed-out server selection/readiness and start/cancel auth;
+- AuthenticatedWindow: student activity, authorized non-student areas, account,
+  and settings;
+- CandidateWindow: one active secure Attempt only.
 
-Classify the behavior before designing its interface:
-
-- Put mechanics required by both role compositions in the shared kernel.
-- Put one user-visible product capability in `workbench/contrib/<name>` behind
-  one registration entrypoint.
-- Put composition selection and concrete adapter selection in a `code`-layer
-  process root.
-- Put privileged observation, policy, credentials, and authorization outside
-  the renderer; project only bounded state and actions into workbench UI.
-
-Prefer one deep owning module over cross-contribution coordination. Introduce a
-workbench service only when behavior genuinely spans contributions.
-
-The step is complete when one module owns the state and behavior and its callers
-cross one small interface.
+Put shared shell mechanics in the kernel, one product capability under
+`workbench/contrib/<name>`, cross-feature behavior behind a narrow workbench
+service, and window/concrete-adapter selection in `code` composition roots.
+Keep credentials, authorization, policy, native facts, and protected data out of
+renderers. The step is complete when one module owns the behavior behind one
+small interface.
 
 ## 3. Preserve the content seam
 
-Represent central content with `WorkbenchItem`, `WorkbenchPane`, and a resolver.
-Keep the item limited to identity, presentation, shell capabilities, matching,
-and presentation changes. Keep the pane limited to DOM lifecycle, cancellable
-item assignment, visibility, layout, focus, safe view state, and disposal.
+Use `WorkbenchItem`, `WorkbenchPane`, and a resolver for central content. Items
+own identity/presentation/shell capabilities; panes own DOM lifecycle,
+cancellable assignment, visibility/layout/focus, safe view state, and disposal.
+The resolver acquires the model. Saving, synchronization, browser enforcement,
+terminal lifetime, review, and submission remain in owning capabilities.
 
-Let the resolver acquire the model. Keep saving, synchronization, content
-versions, submission, and terminal lifetime inside the owning capability.
-Make superseded resolution cancellable and make failure local to its item.
+Use [`develop-attempt-workspace`](../develop-attempt-workspace/SKILL.md) for
+files, resources, durability, recovery, or merge UI. The step is complete when
+the workbench can host/restore presentation without learning durable semantics.
 
-For a workspace file, Exam Resource, file-tree, durability status, or merge
-surface, use
-[`develop-attempt-workspace`](../develop-attempt-workspace/SKILL.md) and keep its
-working and authoritative state outside `WorkbenchItem` and `WorkbenchPane`.
+## 4. Register static interaction
 
-The step is complete when the workbench can host and restore the item without
-learning its durable product semantics.
+Register Proctor-namespaced commands and project them through actions, menus,
+keybindings, or quick input. Validate arguments and recheck the owning
+privileged capability at execution. Context keys control visibility, enablement,
+and routing only.
 
-## 4. Register interaction
+Register destination/item types statically. Remote self-context may populate
+authorized instances in AuthenticatedWindow but never register code, choose a
+module path, or grant an action. The step is complete when executable behavior
+is reachable only through literal Proctor manifests.
 
-Register a Proctor-namespaced command for executable intent. Project that
-command through actions, menus, packaged keybindings, or quick input only where
-the composition needs it. Validate command arguments and recheck privileged
-capability at execution time. Use context keys only for visibility, enablement,
-and routing.
-
-Register destination and item types statically. Let authorized remote data
-populate instances only. Load optional packaged code through a literal import
-reachable from an approved role manifest.
-
-The step is complete when no remote value, restored state, context key, or DOM
-state can register code or authorize execution.
-
-## 5. Assign lifecycle and state
+## 5. Own lifecycle and safe state
 
 Choose the latest viable phase: `Starting`, `Ready`, `Restored`, or
-`Eventually`. Add early blocking work only to the reviewed bootstrap allowlist.
-Render authentication, connectivity, attempt loading, and secure-exam readiness
-as explicit gates.
+`Eventually`. Keep early blockers on the reviewed allowlist and present
+readiness, authentication, Attempt loading, and security as explicit gates.
 
-For local state, declare the `device`, `principalComposition`,
-`attemptPresentation`, or `windowSession` scope together with sensitivity,
-schema version, and cleanup owner. Store only non-sensitive presentation state.
-Restore through minimal references and safe placeholders.
+Declare local state as `device`, `principalComposition`,
+`attemptPresentation`, or `windowSession`, with sensitivity/schema/cleanup.
+CandidateWindow is never a restorable application entrypoint. The step is
+complete when cancellation/disposal are owned and restored state cannot become
+authority.
 
-The step is complete when startup failure is contained, cancellation and
-disposal are owned, and persisted state cannot become product authority.
+## 6. Preserve secure window transitions
 
-## 6. Compose deliberately
+Compose common, authenticated, and candidate allowlists explicitly. Candidate
+always includes IDE Workspace and Exam Materials; browser and terminal activate
+only from trusted Attempt capability and posture. The AI agent remains absent.
 
-Import the registration entrypoint only from a Proctor-owned common or role
-manifest. Keep candidate and proctor allowlists explicit. The candidate manifest
-always composes the IDE workspace and read-only exam-materials destinations.
-Browser, terminal, and agent contributions remain separately packaged and may
-activate only from trusted attempt capability and security state.
+Opening CandidateWindow closes AuthenticatedWindow. Pause keeps CandidateWindow
+under a blocking overlay and gates interaction. Suspension gates first, protects
+work, shows the overlay, destroys CandidateWindow, then opens
+AuthenticatedWindow at the Attempt. Reallow is ready; only successful secure
+join opens CandidateWindow. Relaunch begins through normal authentication and
+never focuses/restores CandidateWindow directly.
 
-Keep each window bound to the launch descriptor selected by Electron main. Keep
-preload capabilities specific to the window kind. Exclude production developer
-surfaces and arbitrary external navigation.
+The step is complete when event-before-refetch gating and every create/destroy/
+focus transition have one privileged owner and testable order.
 
-Keep SettingsWindow outside role workbench manifests. Select its editing
-contribution through its dedicated literal manifest, bind it to one User and
-Session, and exclude it during active candidate participation.
+## 7. Verify
 
-The step is complete when the final import graph expresses the intended product
-composition without an upstream aggregate or generic conditional manifest.
+Test through owning interfaces: item resolution/cancellation, pane lifecycle,
+static contribution activation, command authorization, restoration failure,
+focus/accessibility, three-window exclusion, pause/suspension/rejoin order, and
+cleanup. Review literal imports, preload allowlists, sensitive storage/logging,
+mandatory Candidate IDE dependencies, and exclusion of agent/developer code.
 
-## 7. Verify through interfaces
-
-Test observable behavior through the owning interface. Cover item resolution
-and cancellation, pane lifecycle, contribution activation, command capability
-checks, restoration failure, focus and accessibility, composition exclusion,
-and cleanup at the smallest relevant scope.
-
-Review the final diff for layer direction, environment APIs, literal manifest
-imports, sensitive storage or diagnostics, mandatory candidate IDE dependencies,
-and accidental activation of disallowed browser, terminal, or agent capability.
-When upstream material is involved, complete its port-map and license
-verification.
-
-The work is complete when implementation, tests, manifests, and the accepted
-workbench architecture describe the same observable behavior.
+The work is complete when implementation, manifests, tests, and workbench
+architecture describe the same observable product.

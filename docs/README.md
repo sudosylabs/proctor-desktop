@@ -23,14 +23,19 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
   identity, working state, provider projection, durability, recovery, and
   read-only Exam Resources
 - [Identity and exam security](./architecture/identity-and-exam-security.md) —
-  privileged authentication, admission, posture, containment, participation,
-  re-entry, and integrity-information boundaries
+  readiness, privileged authentication/installation proof, Sessions, Attempt
+  state, posture, participation, re-entry, and integrity boundaries
+- [Integrated browser](./architecture/integrated-browser.md) — frozen browser
+  policy, privileged navigation, minimized activity, protected delivery, and
+  privacy
+- [Execution Environment](./architecture/execution-environment.md) — remote PTY,
+  lifecycle/generation fencing, Workspace projection, and terminal presentation
 - [Native capabilities](./architecture/native-capabilities.md) — passive native
   observation, candidate-window enforcement, process, privacy, failure, and
   platform-verification boundaries
 - [User settings](./architecture/user-settings.md) — authoritative JSONC,
-  static registry, effective configuration, SettingsWindow, persistence, and
-  Attempt-wide candidate baselines
+  static registry, effective configuration, Account/Settings persistence, and
+  Attempt Configuration
 - [Toolchain and release](./architecture/toolchain.md) — package authority,
   compilation, generation, tests, native builds, packaging, updates, CI, and
   release provenance
@@ -38,8 +43,8 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
   controls, typed checks, policies, exceptions, CI, and dependency automation
 - [Invariants](./architecture/invariants.md) — accepted rules every future
   implementation preserves
-- [Project status](./project/status.md) — current foundation and unresolved
-  grilling tracks
+- [Project status](./project/status.md) — accepted foundation, actual
+  implementation state, server dependencies, and delivery tracks
 
 ## Upstream
 
@@ -79,9 +84,19 @@ state, recovery, conflicts, caching, and Exam Resource delivery.
 
 Use
 [`develop-identity-and-exam-security`](../.agents/skills/develop-identity-and-exam-security/SKILL.md)
-for authentication, credential custody, role-window binding, admission,
-secure-exam policy and posture, containment, connectivity, participation,
-re-entry, and integrity information.
+for readiness, authentication, credential/installation-key custody, Sessions,
+Attempt admission/state, secure posture, containment, connectivity,
+participation, re-entry, and integrity information.
+
+Use
+[`develop-integrated-browser`](../.agents/skills/develop-integrated-browser/SKILL.md)
+for browser policy, navigation enforcement, Browser Activity, protected
+spooling, privacy, access, and Candidate presentation.
+
+Use
+[`develop-execution-environment`](../.agents/skills/develop-execution-environment/SKILL.md)
+for remote PTY transport, terminal lifecycle/presentation, generation fencing,
+and Workspace projection synchronization.
 
 Use
 [`develop-native-capabilities`](../.agents/skills/develop-native-capabilities/SKILL.md)
@@ -91,8 +106,8 @@ enforcement, security-utility supervision, native IPC, and platform verification
 Use
 [`develop-user-settings`](../.agents/skills/develop-user-settings/SKILL.md) for
 registered preferences, JSONC parsing and persistence, effective configuration,
-SettingsWindow editing, candidate baselines, constraints, migrations, conflicts,
-and caches.
+Account/Settings editing, Attempt Configuration, constraints, migrations,
+conflicts, and caches.
 
 Use [`develop-toolchain`](../.agents/skills/develop-toolchain/SKILL.md) for
 dependencies, compilation, generated artifacts, localization, test harnesses,

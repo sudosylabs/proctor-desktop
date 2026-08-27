@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Execution Environment"
+  short_description: "Build remote exam terminal integration"
+  default_prompt: "Use $develop-execution-environment to implement or review the remote PTY integration."

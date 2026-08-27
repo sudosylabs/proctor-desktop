@@ -10,8 +10,9 @@ The renderer is built with plain TypeScript, DOM APIs, and CSS. React, Vite,
 Next.js, JSX, and equivalent application frameworks are outside the accepted
 architecture.
 
-Most durable data is remote. An Attempt Workspace is not a local folder, and a
-future integrated terminal attaches to a PTY in an isolated remote VM. Native
+Most durable data is remote. An Attempt Workspace is not a local folder, and the
+integrated terminal attaches to one PTY in an isolated remote Execution
+Environment. Native
 observation packages report bounded mechanical facts behind privileged process
 boundaries; the exam-security coordinator applies policy and separate adapters
 own enforcement.
@@ -22,15 +23,16 @@ working overlay, protected local recovery, and remote execution projection. Read
 before changing workspace resources, file providers, working state, recovery,
 reconciliation, or Exam Resource delivery.
 
-The accepted workbench uses a minimal signed-out launch window and immutable
-candidate or proctor compositions. Read
+The accepted workbench uses LaunchWindow, AuthenticatedWindow, and
+CandidateWindow with privileged secure transitions. Read
 [`docs/architecture/workbench.md`](docs/architecture/workbench.md) before
 changing shell structure, composition, contributions, content items, lifecycle,
 or workbench security integration.
 
 The accepted identity and exam-security architecture keeps credentials and
-policy enforcement privileged, requires continuous online participation, and
-projects only bounded state and intents to renderers. Read
+registered installation keys privileged, keeps authentication method choice on
+the server-hosted page, requires continuous online participation, and projects
+only bounded state and intents to renderers. Read
 [`docs/architecture/identity-and-exam-security.md`](docs/architecture/identity-and-exam-security.md)
 before changing authentication, admission, secure-exam posture, containment,
 participation continuity, re-entry, or integrity-information handling.
@@ -44,11 +46,23 @@ before changing native observation, permissions, candidate-window enforcement,
 security-utility supervision, native IPC, or platform capability tests.
 
 The accepted user-settings architecture uses one server-authoritative virtual
-`settings.json`, a static Proctor registry, a dedicated non-candidate
-SettingsWindow, and an Attempt-wide candidate baseline. Read
+`settings.json`, a static Proctor registry, an Account/Settings destination in
+AuthenticatedWindow, and a server-frozen Attempt Configuration. Read
 [`docs/architecture/user-settings.md`](docs/architecture/user-settings.md)
 before changing preferences, effective configuration, settings persistence,
-candidate setting projections, or the SettingsWindow.
+Attempt Configuration, or the Account/Settings destination.
+
+The integrated browser is a first-release Candidate capability with privileged
+revision-frozen navigation enforcement and minimized ordered Browser Activity.
+Read [`docs/architecture/integrated-browser.md`](docs/architecture/integrated-browser.md)
+before changing browser policy, navigation, Electron browser boundaries,
+activity collection, protected spooling, or manager access.
+
+The initial terminal exposes one server-authorized remote PTY and keeps
+Execution Environment files distinct from Workspace authority. Read
+[`docs/architecture/execution-environment.md`](docs/architecture/execution-environment.md)
+before changing terminal transport, PTY lifecycle, generation fencing,
+Workspace projection synchronization, or terminal presentation.
 
 The accepted UI uses one Proctor-owned design system across every composition.
 Read [`docs/architecture/design-system.md`](docs/architecture/design-system.md)
@@ -160,22 +174,28 @@ Use these repository skills when their trigger matches:
   overlays, or first-frame presentation.
 - [`develop-workbench`](.agents/skills/develop-workbench/SKILL.md) when adding or
   reviewing a shell part, workbench item or pane, resolver, contribution,
-  command, menu, keybinding, manifest, or composition behavior.
+  command, menu, keybinding, manifest, window, or secure transition behavior.
 - [`develop-attempt-workspace`](.agents/skills/develop-attempt-workspace/SKILL.md)
   when changing workspace identity, hierarchy, content, providers, working
   state, persistence, recovery, caching, reconciliation, or Exam Resource reads.
 - [`develop-identity-and-exam-security`](.agents/skills/develop-identity-and-exam-security/SKILL.md)
-  when changing authentication, credentials, Session Binding, admission,
-  secure-exam policy or posture, containment, participation, re-entry, or
-  integrity information.
+  when changing readiness, authentication, installation proof, credentials,
+  Sessions, Attempt admission/state, secure posture, containment, participation,
+  re-entry, or integrity information.
 - [`develop-native-capabilities`](.agents/skills/develop-native-capabilities/SKILL.md)
   when changing native observations, source sessions, permissions,
   candidate-window enforcement, security-utility supervision, native IPC, or
   Windows/macOS capability verification.
 - [`develop-user-settings`](.agents/skills/develop-user-settings/SKILL.md) when
   changing registered preferences, JSONC settings, effective configuration,
-  SettingsWindow editing, candidate baselines, constraints, migrations,
-  conflicts, caches, or renderer projections.
+  Account/Settings editing, Attempt Configuration, constraints, migrations,
+  conflicts, caches, or projections.
+- [`develop-integrated-browser`](.agents/skills/develop-integrated-browser/SKILL.md)
+  when changing Candidate browser policy, navigation enforcement, activity,
+  spooling, privacy, access, or workbench presentation.
+- [`develop-execution-environment`](.agents/skills/develop-execution-environment/SKILL.md)
+  when changing remote PTY transport, terminal lifecycle, fencing, Workspace
+  projection synchronization, or terminal presentation.
 - [`develop-toolchain`](.agents/skills/develop-toolchain/SKILL.md) when changing
   package metadata, dependencies, TypeScript or esbuild configuration,
   generators, tests, Electron packaging, native builds, updates, signing, CI,

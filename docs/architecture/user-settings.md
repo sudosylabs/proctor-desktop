@@ -1,318 +1,199 @@
 # User settings architecture
 
-Proctor gives every authenticated user one durable settings document for
-approved IDE and presentation preferences. Settings personalize packaged
-behavior; they never define the product, grant a capability, authorize an
-operation, or weaken examination and accessibility requirements.
-
 ## Authority and vocabulary
 
+User settings express portable presentation and editor preferences. They never
+define product areas, grant a capability, authorize an operation, configure
+exam security, or override Exam/Attempt state.
+
 The **User Settings Document** is one server-authoritative, Principal-owned,
-bounded JSONC document. It has an opaque optimistic revision and a separate
-grammar format version. `settings.json` is its familiar user-facing virtual
-representation. It is not a host file, an Attempt Workspace resource, or a
-general file-service target.
+bounded JSONC document. Its opaque revision is the condition for mutation.
+`settings.json` is a virtual editing representation, not a host file or Attempt
+Workspace resource.
 
-The server exposes purpose-specific settings operations. It may reuse File
-Entry, File Revision, File Rendition, VFS, or other storage mechanics
-internally, but those concepts do not cross the settings interface. The source
-document is authoritative user intent; parsed values, normalized values,
-schemas, catalogs, caches, and effective settings are derived state.
+Keep these other state families separate:
 
-A protected local cache may supply the last acknowledged document for first
-paint or bounded recovery. It cannot authorize offline editing, become the
-current revision, or be read by another Principal. If protected persistence is
-unavailable, the client fetches from the server and never silently stores
-plaintext.
+- packaged defaults and the static Proctor settings registry;
+- device-only preferences;
+- `AuthenticatedWindow` and Attempt presentation/restoration;
+- authoritative Exam configuration and Exam Security Policy;
+- the Attempt's frozen **Attempt Configuration**;
+- stronger current platform, accessibility, and safety constraints.
 
 ## Static settings registry
 
-A frozen Proctor-owned registry defines every setting that can affect the
-application. Familiar VS Code identifiers are retained only when Proctor
-deliberately supports their meaning. Neither VS Code, an extension, remote
-content, an examination, a server-supplied schema, nor restored state can add a
-setting or executable behavior.
+Only packaged immutable declarations make a key effective. Each declaration
+defines identifier, schema/default, bounds/normalization, storage scope, domain,
+window applicability, language-override support, activation point, migration,
+localized editor metadata, and candidate treatment:
 
-Each declaration identifies:
+- `eligible` may enter Attempt Configuration;
+- `policyConstrained` may enter only after authoritative constraints;
+- `nonCandidateOnly` remains available in AuthenticatedWindow;
+- `prohibited` is diagnosed and never effective.
 
-- dotted identifier, type, accepted values, bounds, normalization, packaged
-  default, and safe fallback;
-- domain: appearance, accessibility, editor behavior, workbench placement, or
-  capability presentation;
-- storage: portable user or device-local;
-- applicable packaged compositions;
-- candidate treatment: `eligible`, `policyConstrained`, `nonCandidateOnly`, or
-  `prohibited`;
-- activation: live outside candidate mode, next window, or next Attempt;
-- global-only or approved language-override support;
-- current, deprecated, migrated, or retained-but-unsupported lifecycle;
-- localized editing, search, diagnostic, and replacement metadata.
+Owning capabilities contribute declarations through literal Proctor manifests.
+One deterministic generator derives JSON Schema, settings catalog, rejection
+catalog, and registry fingerprint. Remote schemas and workspace content cannot
+register behavior. Unknown keys are preserved but inactive; known prohibited
+keys have no effective value.
 
-Eligibility permits a candidate composition to consume a value; it never
-permits mutation. Policy can narrow only a registered `policyConstrained`
-setting. A known prohibited identifier exists only to produce a precise
-diagnostic and never has an effective value. Unknown identifiers survive safe
-round trips for forward compatibility but remain inactive.
-
-Sensitive values are ineligible for registration. The rejection catalog
-includes credentials, tokens and cookies; arbitrary filesystem paths;
-executables, commands, arguments and environments; proxies, certificates,
-origins and navigation allowlists; runtime module or formatter-provider
-selection; injected CSS, palettes, token maps, themes and icon packs; and
-developer, update, telemetry, IPC, security and native-monitoring controls.
-
-Owning capabilities export immutable declarations. One Proctor settings
-manifest imports them through literal paths, validates identifier/default/type/
-migration/applicability consistency, and freezes the registry. Build tooling
-derives the JSON Schema, SettingsWindow catalog, rejection catalog, and registry
-fingerprint from that manifest. Registration has no side effects and cannot be
-mutated after composition.
+Keep credentials, tokens, keys, arbitrary paths, commands, code, visual
+injection, extension identifiers, formatters, file associations, autosave
+semantics, execution/terminal configuration, browser/network/proxy policy,
+monitoring, evidence, telemetry, update, developer, and IPC controls outside the
+registry.
 
 ## Settings and presentation scopes
 
-The User Settings Document contains portable preferences as flat dotted keys
-and approved VS Code-style `[language]` blocks. It contains no role,
-composition, device, Attempt, authority, or policy section. Proctor initially
-has one settings document per User and no multiple settings profiles.
+Use explicit storage scopes:
 
-State outside that document retains its existing owner:
+- `portableUser` is the server User Settings Document;
+- `device` stores safe machine-local preferences through approved storage;
+- `principalComposition` stores safe AuthenticatedWindow presentation;
+- `attemptPresentation` stores safe CandidateWindow layout for one Attempt;
+- `windowSession` is discarded with its window.
 
-- `device` stores genuinely device-specific presentation such as window bounds;
-- `principalComposition` stores exact role-workbench restoration and geometry;
-- `attemptPresentation` stores safe layout for one candidate Attempt;
-- `windowSession` stores ephemeral interaction state;
-- Exam configuration and Exam Security Policy own creator-selected constraints
-  and capabilities;
-- authoritative identity, authorization, lifecycle, monitoring, integrity, and
-  evidence state is never a setting.
-
-An explicit preference such as explorer side may be portable. Exact sidebar
-width, collapsed regions, open items, selected destination, and editor splits
-are restoration state. Attempt Workspace content, including
-`.vscode/settings.json` or any other settings-looking file, cannot configure the
-application. User keybinding customization and multiple profiles are outside
-the initial architecture.
+Each category declares sensitivity, schema, lifecycle, cleanup owner, and
+whether it may be cached. Generic workbench restoration stores presentation,
+not setting authority. Another Principal cannot enumerate or apply protected
+settings/cache data.
 
 ## Effective configuration
 
-Resolution has two stages. Selection chooses:
+`UserSettingsService` is the small external interface for observing typed
+effective values, inspecting bounded provenance, validating a source, and
+conditionally committing the complete document. Callers do not parse JSONC,
+select storage, or look up arbitrary string keys.
 
-1. the packaged default, specialized only by trusted packaged composition;
-2. exactly one registered portable-user or device value;
-3. an applicable frozen language override.
+Resolution applies:
 
-Constraints then apply:
+1. packaged default;
+2. exactly one portable-user or device value;
+3. applicable language override;
+4. window/composition constraints;
+5. authenticated Exam and security constraints;
+6. platform/accessibility requirements;
+7. packaged safety invariants.
 
-1. static composition applicability and registered bounds;
-2. authenticated Exam configuration and Exam Security Policy after the owning
-   authority has resolved accommodations;
-3. current platform and operating-system accessibility requirements;
-4. non-negotiable packaged safety and accessibility invariants.
+Inspection reveals only requested/effective values, sanitized source category,
+and bounded constraint reason. Workspace content, layout restoration, context
+keys, renderer state, and remote schema never enter precedence.
 
-Attempt Workspace files and restoration never enter this chain. An examination
-may narrow or force only a statically registered value. A setting cannot enable
-the terminal, browser, agent, filesystem, monitoring, or another capability;
-those require their own current authorization.
+The initial non-candidate settings surface may cover theme, high contrast,
+zoom, typography, editor indentation/wrapping/line numbers/minimap, cursor,
+approved keybindings, reduced motion, screen-reader/announcement behavior,
+safe file-tree presentation, and terminal/browser presentation that does not
+alter their authority. A stored preference may remain inactive when its
+capability is absent.
 
-Constraints do not rewrite user intent. Inspection returns requested and
-effective values, a sanitized source category, and a bounded reason such as
-`unsupported`, `compositionRestricted`, `examConstrained`,
-`accessibilityAdjusted`, or `frozen`. It reveals no raw policy, accommodation,
-detector, evidence, or authorization material.
+## Account/Settings editing
 
-## Initial preference surface
+Settings is one destination inside `AuthenticatedWindow`. It carries the
+window's Principal/Session binding and no Attempt authority. Opening
+CandidateWindow closes the entire AuthenticatedWindow, so the editing surface
+cannot coexist with active candidate participation.
 
-Appearance supports only the packaged `system`, `light`, `dark`, `hc-light`,
-and `hc-dark` theme preferences; bounded whole-window zoom; default or compact
-density; system-aware reduced motion and transparency; packaged monospace font
-identifiers; bounded editor and terminal font metrics and ligatures; and safe
-editor presentation. Application chrome retains the platform UI font. Control
-Explorer evidence fixes numeric bounds before release.
+One in-memory `SettingsDraft` supports structured controls and a JSONC editor.
+Both views edit the same source and validation state. Preview affects only the
+current AuthenticatedWindow and reverts on cancel/failure. Explicit save sends
+the complete bounded source with expected revision and idempotency key.
 
-Portable layout preference may place the file-tree sidebar left or right, the
-terminal panel at bottom, left, or right, and the future agent region left or
-right. Composition-owned layout resolves collisions and supplies an accessible
-reset. Settings cannot move or hide the titlebar, destination switcher, status,
-gates, mandatory IDE workspace, Exam Materials destination, or overlay host;
-detach content; or create arbitrary docking.
+On conflict, retain base, draft, and latest remote source. Auto-merge only
+unambiguous disjoint properties/language entries while preserving comments.
+Same-path, delete/modify, syntax-trivia ambiguity, and unknown completion remain
+explicit. Server-unavailable state is read-only; there is no offline mutation
+queue. Cache only acknowledged source in protected Principal-bound storage.
 
-The initial editor surface includes indentation, wrapping, line numbers,
-whitespace, rulers, minimap, guides, folding, bracket presentation,
-cursor/selection presentation, and bounded packaged suggestion/completion
-presentation. Approved editor settings may have language overrides. Formatting
-is policy-constrained and can use only a formatter already selected by packaged
-or authoritative examination capability. Settings cannot select an extension,
-executable, command, or module.
+Import/export is absent initially. Diagnostics may name safe key/reason/revision
+metadata but never source JSONC, values, comments, drafts, or conflicts.
 
-Autosave remains deferred until the editor-to-Attempt-Workspace working-state
-contract is accepted. Protected recovery and server acknowledgement never
-depend on a preference. User keybindings, code actions on save, task execution,
-and local tool discovery remain unsupported initially.
+## Attempt Configuration
 
-Optional-capability settings affect presentation only after the capability is
-separately available. Terminal settings may cover packaged font, size, cursor,
-and bounded scrollback; browser settings may cover bounded page zoom and safe
-presentation; agent settings may cover layout and presentation. They cannot
-select shells, processes, PTY targets, paths, proxy or navigation policy,
-browser retention, AI provider/model/prompt/tool permissions, network access,
-or data retention. A preference remains stored when its capability is absent
-but is omitted from the effective projection.
+Attempt Configuration replaces the former Candidate Settings Baseline. At
+initial secure join, Desktop derives a closed object from:
 
-## SettingsWindow and editing
+- Attempt Configuration schema version;
+- packaged registry version and Desktop build/target;
+- current acknowledged User Settings revision;
+- normalized eligible preferences;
+- current server/Exam constraints and packaged bounds.
 
-`SettingsWindow` is a trusted authenticated window kind outside the launch,
-candidate, and proctor workbench compositions. It is permanently bound to one
-User and server Session and is destroyed when either changes. It loads no
-Attempt, role authority, editor workspace, terminal, browser, agent,
-monitoring, enforcement, or examination contribution.
+The server validates and freezes the exact object/digest on the Attempt. The
+Desktop applies that stored object on renderer restart and successful join from
+ready. It never recomputes an existing Attempt from newer User Settings.
 
-The window may coexist with an authorized proctor workbench. Electron main
-prevents it during active candidate participation and closes it before
-candidate preflight. This rule is enforced by trusted composition state, not by
-renderer visibility.
+The first accepted fields are:
 
-A structured searchable editor and an advanced virtual `settings.json` JSONC
-editor operate on one in-memory `SettingsDraft` containing source text and the
-base server revision. They never persist independently. Explicit **Save
-settings** performs the only commit. Theme, zoom, and density may preview only
-within SettingsWindow and revert on cancel or failure. Reset deletes a key
-rather than storing its default.
+- theme and high-contrast selection;
+- bounded UI zoom and editor font size;
+- bounded line height;
+- reduced motion;
+- screen-reader and announcement mode;
+- cursor presentation;
+- approved Candidate command/keybinding identifiers.
 
-Syntax and registered-value errors block save and link the structured field to
-the source location. Unknown keys are retained with an inactive warning.
-Prohibited keys must be removed. Deprecated keys expose replacement or
-migration. Server unavailability permits a marked read-only acknowledged cache,
-not an offline draft. Unsaved drafts are memory-only initially, require close
-confirmation, and are cleared on sign-out or Session replacement. Import and
-export are deferred.
+Terminal execution, browser/network policy, extensions, executable commands,
+formatters, file associations, autosave semantics, and arbitrary editor values
+cannot enter Attempt Configuration. Unknown fields fail admission rather than
+silently activating.
 
-The complete workflow is keyboard-operable and provides accessible validation,
-focus restoration, all four themes, and 200% zoom reflow. It distinguishes
-requested values, effective values, constraints, unsaved state, verifying
-state, conflicts, and committed state without relying on color or icons.
+Current trusted platform, accessibility, or safety constraints may narrow an
+**Effective Attempt Configuration Projection** without mutating the frozen
+object or User Settings Document. Stronger constraints never grant a capability
+and cannot silently rewrite later User preferences.
 
-## Candidate baseline
+Candidate preload receives only the immutable effective projection and
+revision/digest needed by packaged consumers. It exposes no User Settings
+source, cache, draft, update, merge, or conflict operation. Attempt layout
+remains `attemptPresentation`, not configuration.
 
-A **Candidate Settings Baseline** freezes validated user choices for an entire
-Exam Attempt at its first successful admission. It identifies the User and
-Attempt, source User Settings Document revision, registry and application build,
-candidate composition version, normalized registered values, and applicable
-language overrides. Authoritative admission fences the source revision.
-Protected local state may help reconstruct the baseline but is not its sole
-authority.
+## Persistence, parsing, and migration
 
-The same baseline survives renderer restart, full Participation Interruption,
-and teacher-authorized re-entry into the Attempt. A new participation generation
-does not reread newer user settings. Remote document changes apply to future
-non-candidate windows and future Attempts only.
+The server owns the document and opaque revision. Desktop PUT commits the
+complete bounded JSONC source with expected revision and idempotency key; its
+success response is revision metadata and need not echo source. Ambiguous
+completion is verified with the same key.
 
-An **Effective Candidate Settings Projection** derives typed values from the
-baseline under current trusted policy, platform, accessibility, and packaged
-safety constraints. Stronger trusted constraints can change this projection
-immediately without mutating the baseline. Language values already present in
-the baseline may activate as the active editor language changes.
+The parser bounds bytes, depth, properties, string lengths, nesting, and
+language overrides while preserving supported JSONC comments and ordering for
+the editor. Duplicate keys and dangerous/confusable forms produce precise
+diagnostics. A syntax-invalid acknowledged document remains editable but does
+not become effective.
 
-The candidate renderer receives only the immutable projection and revision. It
-has no settings source, draft, cache, update, or conflict operation. Safe
-resizing, collapsing, approved relocation, and splitting remain
-`attemptPresentation`. Closed accessibility actions may temporarily adjust
-bounded zoom or select packaged high contrast for the Attempt without changing
-behavior, capability, or the User Settings Document.
-
-Attempt-scoped presentation and the baseline follow authoritative Attempt
-completion cleanup. The next Attempt captures the then-current document.
-Corrupt or unsupported settings never block entry: candidate mode uses packaged
-defaults plus trusted accessibility requirements and emits a sanitized
-diagnostic while preserving the original server revision for repair.
-
-## Persistence, conflicts, and format
-
-Proctor has no separate Settings Sync subsystem. A purpose-specific read returns
-source JSONC, grammar format version, and opaque revision. Conditional replace
-sends the complete source, expected revision, and idempotency key. Success
-returns exact committed source and a new revision. An ambiguous outcome is
-verified or retried with the same key; it is never guessed.
-
-SettingsWindow retains base, draft, and latest-remote forms. A syntax-aware
-three-way merge may combine unambiguous disjoint setting paths and language
-entries while preserving comments and formatting. Same-path edits,
-delete-versus-modify, or uncertain comment/trivia placement produce explicit
-conflicts. One clean merge may retry against the latest revision. There is no
-last-write-wins or offline mutation queue.
-
-The grammar is valid UTF-8 JSONC with one top-level object, comments and
-trailing commas, unique keys, dotted setting identifiers, and approved language
-blocks. It admits no executable expressions, includes, references, or
-substitutions. Initial bounds are 256 KiB source, nesting depth 8, 2,048 setting
-paths, 256 UTF-8 bytes per key, 16 KiB per string, and 256 elements per
-collection.
-
-Grammar `formatVersion` is server metadata rather than a document envelope. The
-server validates authentication, ownership, expected revision, grammar and
-bounds. The packaged desktop registry validates known types, applicability,
-prohibition and behavior. A malicious or newer client can therefore store only
-bounded structural data and cannot make an unregistered setting effective.
-
-Registry migrations are packaged, deterministic, pure, and identified by
-registry version. Candidate admission may migrate in memory but never silently
-rewrites remote source. SettingsWindow shows a migration and commits it through
-normal conditional save. A newer unsupported grammar opens read-only and
-preserves its source.
+Registry migrations are deterministic transforms over parsed data and preserve
+unknown keys/comments where safe. Automatic migration updates in-memory form
+only; server authority changes only through explicit save. A registry/build
+that cannot reproduce a stored Attempt Configuration blocks secure re-entry
+with a precise compatibility result instead of changing candidate behavior.
 
 ## Module and process seams
 
-Environment-neutral registry, parsing, migration, resolution, inspection,
-schema/catalog inputs, and immutable projections belong under
-`src/prctr/platform/settings/common/`. Callers use typed setting descriptors,
-not arbitrary string keys.
+Keep static declarations, JSONC grammar, migrations, resolution, inspection,
+schema inputs, and immutable projections under
+`src/prctr/platform/settings/common/`. Keep `UserSettingsCoordinator`,
+authenticated transport, and protected cache in Electron main. Put the settings
+destination under `src/prctr/workbench/contrib/settings/` and select it through
+the authenticated manifest and `authenticated.main.ts` composition root.
 
-A privileged Electron-main `UserSettingsCoordinator` owns authenticated reads
-and writes, acknowledged cache lifecycle, idempotency, unknown-outcome
-verification, editor sessions, and ordinary-window projections. Attempt
-admission and the Exam Security Coordinator own baseline fencing and trusted
-constraint inputs; they call the resolver rather than exposing policy objects
-to it.
+Candidate consumers depend on an Attempt Configuration projection contract,
+not the User Settings service. Editor, design system, workbench, terminal, and
+browser modules request only their owned typed values.
 
-`src/prctr/workbench/contrib/settings/` owns the SettingsWindow editing surface.
-A dedicated `src/prctr/code/electron-browser/settings.main.ts` manifest selects
-only its renderer contributions, and the Electron-main composition root creates
-the bound window and capability-specific preload.
+## Verification
 
-Ordinary callers can observe immutable effective values and changes and request
-sanitized inspection where needed. SettingsWindow alone receives a closed
-editor-session interface for open, validate, conditional save, conflict
-reconciliation, discard, and disposal. Privileged admission receives a separate
-baseline-capture operation. There is no universal configuration service joining
-all roles.
+Verify:
 
-## Diagnostics and verification
+- registry/schema/catalog/fingerprint parity;
+- JSONC bounds/fuzzing, unknown/prohibited keys, precedence, and migrations;
+- conditional writes, idempotent ambiguity, conflict merge, and cache isolation;
+- Account/Settings loading, empty, invalid, conflict, unavailable, save, cancel,
+  keyboard/focus, themes, reduced motion, high contrast, and 200% zoom;
+- Attempt Configuration closed schema, bounds, server validation/freeze,
+  unchanged re-entry, incompatible registry/build, and stronger live constraints;
+- absence of settings mutation/source/cache from Candidate preload and of
+  values/source from ordinary diagnostics.
 
-Ordinary diagnostics never contain JSONC, comments, setting values, user text,
-conflict source, or cache contents. They may contain bounded setting
-identifiers, registry/document versions, result categories, and sanitized
-migration or constraint reasons.
-
-Verification covers:
-
-- registry uniqueness and freezing, schema/catalog parity, fingerprints, and
-  rejection-catalog completeness;
-- grammar limits, duplicate keys, fuzzing, comments, minimal edits, and unknown
-  key preservation;
-- exact selection/constraint precedence and sanitized inspection;
-- deterministic idempotent migrations and unsupported-version preservation;
-- optimistic concurrency, idempotent retries, ambiguous outcomes, three-way
-  merges, and conflicts;
-- cache isolation, sign-out cleanup, and protected-storage failure;
-- Attempt-wide baseline stability across remote edits, crashes, and authorized
-  re-entry, plus live stronger constraints without baseline mutation;
-- absence of mutation capability from candidate preload and production role
-  manifests;
-- proof that workspace files, restoration, and remote schemas cannot affect
-  configuration;
-- SettingsWindow keyboard, focus, validation, conflict, theme, and zoom
-  behavior.
-
-VS Code's useful evidence is its registry, layered models, inspection and
-change mechanics, JSONC experience, and three-way conflict handling. Proctor
-behaviorally reimplements those concepts behind its own authority and process
-seams. No VS Code settings source cluster is admitted by this architecture.
+Implementation, generators, manifests, tests, and this architecture must agree
+on document authority, AuthenticatedWindow placement, and the closed Attempt
+Configuration subset.

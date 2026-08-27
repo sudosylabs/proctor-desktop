@@ -26,7 +26,20 @@ schema generation, FFI, packaged artifacts, signing, or platform release work.
 The step is complete when the caller, process, mechanical fact, policy owner,
 effect owner, platform claim, and sensitive fields are explicit.
 
+Before implementation, state separately whether the capability is accepted,
+implemented in source, proven in a packaged build, and supported on a concrete
+OS/architecture tuple. Architecture acceptance alone is never an implementation
+or release claim.
+
 ## 2. Classify the capability
+
+First classify its product phase. The initial baseline is source/permission
+health, CandidateWindow state, physical/virtual/remote display topology, one
+physical usable display, supported capture/remote-session facts, best-effort
+content protection, and participation continuity. Process/application policy,
+OS user/session policy, clipboard, printing, removable devices, VM detection,
+VPN/network-interface restriction, camera/microphone, and content capture remain
+deferred until separately accepted.
 
 Place behavior in exactly one role:
 
@@ -114,9 +127,10 @@ idempotent outcome.
 Add contract tests, a shared adapter conformance suite, packaged Windows/macOS
 integration tests, hostile cross-process tests, and product security scenarios.
 Cover snapshot ordering, gaps, permissions, display and mirror topology,
-virtual/remote targets, process and session changes, candidate-window drift,
-hot-plug, overload, hang, crash, restart, renderer isolation, sensitive-data
-absence, normal release, and forced-loss re-entry.
+virtual/remote targets, supported capture/remote-session facts, candidate-window
+drift, hot-plug, overload, hang, crash, restart, renderer isolation, sensitive-
+data absence, normal release, and forced-loss re-entry. Add deferred families
+only after their own accepted policy/privacy/false-positive contract.
 
 Use mocks for coordinator behavior, not for a native platform guarantee. Update
 the release capability matrix for every supported OS/version, architecture,

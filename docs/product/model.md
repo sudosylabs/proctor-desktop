@@ -4,10 +4,9 @@ This is the canonical desktop-facing subset of Proctor's product language. Add
 terms when a real desktop workflow needs them; do not mirror the entire server
 model preemptively.
 
-The initial definitions were aligned with the Proctor repository at revision
-`0b0f825c667568d3ce3c92167a8e5bc0a12d7e2f`. Once a versioned server contract
-exists, its wire semantics govern transferred data while this document governs
-the language used in the desktop codebase.
+Versioned Proctor Server contracts govern transferred data while this document
+governs the language used in the Desktop codebase. A server implementation or
+wire name does not silently change these accepted product relationships.
 
 ## System
 
@@ -25,6 +24,68 @@ trusted operating-system capabilities. It is a client of the Proctor Server.
 
 _Avoid_: Server, source of truth
 
+**Institution**
+
+The organization represented by one Proctor Server installation. Its public
+display identity helps a User confirm where they are signing in; it is not a
+server-health or authorization statement.
+
+_Avoid_: Tenant, server setup state
+
+**Proctor Server Origin**
+
+The normalized, verified HTTP origin for one self-hosted Proctor installation.
+The desktop pins it for public readiness, authorization, and the resulting
+Session; an arbitrary URL, redirect target, or upstream identity-provider origin
+is not a Proctor Server Origin.
+
+_Avoid_: Tenant, provider URL, arbitrary backend URL
+
+**Desktop Authorization**
+
+The short-lived transaction through which the Desktop Client starts one
+server-hosted authentication flow in the system browser and exchanges one
+server-issued code with the pinned Proctor Server using state, PKCE, a
+registered installation key, and an exact loopback callback. The server-hosted
+page owns the available local or external method, account choice, and explicit
+approval. The transaction is not the User's later Session or an upstream
+provider token.
+
+_Avoid_: Desktop login form, embedded-browser authentication, Session
+
+**Desktop Installation**
+
+One Institution-specific registered public key whose private key is held by the
+privileged Desktop through an approved operating-system store. Proof from that
+key sender-constrains Desktop credentials and requests. It establishes a
+registered Desktop key, not that an untampered official binary is running.
+
+_Avoid_: Device fingerprint, hardware identity, binary attestation
+
+**LaunchWindow**
+
+The signed-out window for selecting and safely describing one Proctor Server,
+checking compatibility and availability, and starting Desktop Authorization.
+It contains no authentication method or credential form.
+
+_Avoid_: Login window, setup-status console
+
+**AuthenticatedWindow**
+
+The normal signed-in application window. It presents the currently authorized
+student, teacher/Exam Manager, administration, account, and settings areas
+without turning Role names or navigation state into authority.
+
+_Avoid_: ProctorWindow, role window, SettingsWindow
+
+**CandidateWindow**
+
+The constrained window used only while securely participating in one Exam
+Attempt. Opening it closes the AuthenticatedWindow. Application relaunch never
+restores it directly; re-entry starts from normal authenticated navigation.
+
+_Avoid_: Candidate role, ordinary student home, restored exam window
+
 **Principal**
 
 The authenticated security identity acting in an operation, including its
@@ -41,13 +102,16 @@ resource.
 
 _Avoid_: Workspace settings, local settings file, security policy
 
-**Candidate Settings Baseline**
+**Attempt Configuration**
 
-The validated user preferences frozen for one Exam Attempt at first successful
-admission. It survives interruption and authorized re-entry; current trusted
-policy and accessibility constraints produce a separate effective projection.
+The closed, candidate-safe configuration derived by the Desktop from its
+packaged registry, the User Settings Document, and authoritative constraints,
+then validated and frozen by the Proctor Server for one Exam Attempt. Re-entry
+uses the exact stored configuration; stronger current accessibility or safety
+constraints may only narrow its effective projection.
 
-_Avoid_: Current user settings, renderer configuration, Attempt presentation
+_Avoid_: Candidate Settings Baseline, current user settings, arbitrary editor
+configuration
 
 ## Examination work
 
@@ -77,6 +141,11 @@ One student's private, durable body of work while participating in an exam; its
 acknowledged work survives interruption and submission.
 
 _Avoid_: Exam session, workspace
+
+Its lifecycle states are `ready`, `active`, `suspended`, and `submitted`.
+`ready` means a manager has reallowed a suspended Attempt but a successful
+secure join has not yet made it active. Only active state carries one bound
+Desktop Session and current Attempt Participation generation.
 
 **Attempt Workspace**
 
@@ -145,11 +214,38 @@ _Avoid_: Exam Attempt, Session, application window
 
 **Participation Interruption**
 
-Loss of required privileged client continuity before the server permits the
-candidate application to close. It requires an authoritative re-entry decision
-and is not submission, suspension, an Integrity Flag, or guilt.
+A local period in which required privileged client continuity is uncertain or
+lost. Brief transport recovery inside the server Participation lease may retain
+the active generation; confirmed lease, policy, or bound-Session loss causes
+the server to suspend the Attempt. It is never submission, an Integrity Flag,
+or guilt.
 
 _Avoid_: Automatic cheating violation, ordinary logout
+
+**Execution Environment**
+
+The isolated remote environment that projects acknowledged Attempt Workspace
+state and hosts the candidate's permitted execution. The integrated terminal
+attaches to its remote PTY; its filesystem is not a second Workspace authority.
+
+_Avoid_: Local shell, Attempt Workspace, terminal window
+
+**Browser Policy**
+
+The Exam Revision-frozen allowlist and navigation rules enforced by the
+privileged integrated Candidate browser. Only an explicit immutable live
+correction may change it for an open Sitting.
+
+_Avoid_: User browser settings, arbitrary URL filter
+
+**Browser Activity**
+
+The minimized, ordered record of integrated-browser open/close and top-level
+navigation, redirect, or blocked-navigation events for one Attempt. It excludes
+subresources, page content, cookies, headers, and general system-browser
+history. Allowed activity is not Integrity Evidence.
+
+_Avoid_: Browser history, web content, Integrity Flag
 
 **Native Observation**
 
@@ -201,8 +297,17 @@ _Avoid_: Cheating verdict, automatic violation
 - A Submission seals identified, acknowledged workspace state; it is not merely
   a copy of whichever files happen to be present locally.
 - One Exam Attempt may have more than one sequential Attempt Participation after
-  an authorized re-entry, but never more than one current generation.
-- A Participation Interruption never establishes guilt or submission.
+  successful secure joins from ready, but never more than one current generation.
+- One candidate may have at most one unresolved Exam Attempt (`ready`, `active`,
+  or `suspended`) across all Exam Sittings.
+- A current student cannot simultaneously hold current teacher/staff,
+  Academic Unit membership, Role Binding, Exam Manager, or system-administrator
+  relationships. Those non-student responsibilities may overlap with each
+  other. Historical ended relationships do not conflict.
+- Disabled account, no current affiliation, and no assigned access are distinct
+  states.
+- A Participation Interruption never establishes guilt or submission; confirmed
+  continuity loss is represented by authoritative Attempt suspension.
 - Native Observations may become Security Signals and Detector Findings before
   minimized material becomes Integrity Evidence.
 - An Integrity Flag records evidence and never determines guilt by itself.

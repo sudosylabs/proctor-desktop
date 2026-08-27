@@ -2,275 +2,297 @@
 
 ## Authority and scope
 
-Proctor Desktop authenticates a Principal and enforces candidate examination
-policy without becoming the authority for institutional roles, Exam Attempt
-lifecycle, re-entry approval, Integrity Flags, review, or consequences.
+Proctor Desktop authenticates a Principal and enforces local candidate security
+without becoming authority for institutional relationships, operation access,
+Exam Attempt lifecycle, Integrity Flags, review, or consequences.
 
-Authority is split deliberately:
+- The Proctor Server owns Institution availability and compatibility, Session
+  validity, current authorization, self-context, Attempt admission and state,
+  the active Session lock, Participation generations and leases, Exam Security
+  Policy, re-entry, Integrity Flags, and consequences.
+- Privileged Desktop modules own installation-key and credential custody,
+  authenticated transport, native-capability coordination, local Secure Exam
+  Posture, reversible containment, window transitions, continuity, and protected
+  delivery.
+- Sandboxed renderers present bounded projections and emit closed intents. DOM,
+  context keys, restored state, and remote presentation never grant authority.
 
-- the Proctor Server owns Session validity, current authorization, composition
-  and Attempt admission, Exam Security Policy, Attempt lifecycle, participation
-  generations, re-entry decisions, Integrity Flags, and consequences;
-- privileged desktop modules own credential custody, authenticated client
-  transport, native-capability coordination, local Secure Exam Posture,
-  reversible containment, participation continuity, and protected delivery;
-- the sandboxed renderer owns presentation and sends only closed, validated
-  intents. Its projections, context keys, restored state, and DOM never grant
-  authority.
+The Desktop consumes purpose-specific server decisions. It does not reproduce
+raw Roles or infer UI authority from their names.
 
-The desktop consumes bounded server decisions. Exact teacher roles, re-entry
-grants, server routes, evidence persistence, Attempt lifecycle transitions, and
-review workflows remain server-owned contracts rather than desktop models.
+## Independent decisions and bindings
 
-## Decisions and bindings
+Keep these decisions independent:
 
-Authentication, Composition Admission, Attempt Admission, and Operation
-Authorization are independent decisions:
-
+- **Server Readiness** establishes one safe Institution origin, availability,
+  and Desktop/protocol compatibility before authentication.
 - **Authentication** establishes the current Principal and server Session.
-- **Composition Admission** permits one immutable candidate or proctor window
-  kind and scope.
-- **Attempt Admission** permits one candidate process to begin or recover one
-  Exam Attempt under a current policy and participation generation.
-- **Operation Authorization** checks the Action and actual Resource immediately
-  before each sensitive operation.
+- **Authenticated Navigation** projects the product areas the User may visit;
+  it grants no operation.
+- **Attempt Admission** validates the candidate, Sitting, Attempt
+  Configuration, registered Desktop proof, Session, secure posture inputs, and
+  candidate-wide unresolved-Attempt rule before secure join.
+- **Operation Authorization** checks the current Action and actual Resource at
+  each privileged operation.
 
-Admission projections are short-lived routing inputs rather than reusable
-authorization receipts. Realtime events trigger invalidation or refresh and
-never grant an operation.
+Realtime events invalidate or route to an authoritative refetch. They do not
+grant access or complete a lifecycle transition locally.
 
-A role window has one immutable `Session Binding`: authenticated User reference,
-server Session reference, workbench composition, and composition scope. A
-sanitized Principal Snapshot may change after credential rotation, MFA, or
-reauthentication without changing that binding. Changing User or server Session
-destroys the role window; changing role opens a new window.
+`AuthenticatedWindow` has one immutable Session Binding containing the
+Institution origin, authenticated User reference, and server Session reference.
+`CandidateWindow` adds one Attempt reference, active Participation generation,
+and local security-session identity. Changing Institution, User, or Session
+destroys the affected window. CandidateWindow is destroyed on suspension or
+departure and is never restored directly on application relaunch.
 
-The authenticated SettingsWindow is likewise bound to one User and server
-Session but carries no role or Attempt authority. A binding replacement destroys
-it. Active candidate participation excludes it, and Electron main closes it
-before candidate preflight.
+## Server readiness and LaunchWindow
 
-## Privileged identity module
+The privileged `DesktopIdentityCoordinator` normalizes the submitted server URL
+and calls unauthenticated `GET /api/v1/system/ping`. The response is a small
+client contract containing:
 
-`DesktopIdentityCoordinator` is a deep privileged module used by the
-`LaunchWindow`, Electron composition root, and product transport adapters. It
-owns:
+- canonical public origin and safe Institution display identity;
+- availability: `ready`, `maintenance`, or `temporarily_unavailable`;
+- stable safe reason, optional bounded administrator message, and optional
+  authoritative retry timing;
+- compatible minimum and maximum Desktop releases by platform/architecture;
+- supported Desktop Authorization and realtime protocol ranges.
 
-- authentication transactions and exact callback validation;
-- the isolated Electron network-session partition;
-- refresh coordination, expiry, reauthentication, revocation, and sign-out;
-- OS credential-store handles and secure-persistence availability;
-- construction and invalidation of Principal Snapshots and Session Bindings;
-- attachment of credentials to approved product transport adapters.
+Internal initialization, migrations, database, queue, dependency, and node
+health never enter the projection. `/api/v1/system/version` is build/provenance
+information, not readiness or admission.
 
-Its external interface has three operation families:
+After URL submission, LaunchWindow replaces the input with the verified
+Institution state regardless of availability. It offers `Sign in to
+<Institution>` only while ready and compatible and always offers `Change
+server`. Too old, too new, unsupported, maintenance, and temporary failure use
+distinct localized outcomes. Production origins require HTTPS. An explicit
+development loopback HTTP origin is visibly marked and cannot enter a production
+Candidate Attempt.
 
-1. observe an immutable, sanitized `IdentityProjection` and its changes;
-2. submit a closed identity intent such as authenticate, continue a challenge,
-   reauthenticate, cancel, retry, or sign out;
-3. obtain a trusted Session Binding through the privileged composition root
-   after current Composition Admission succeeds.
+## Desktop Authorization and installation proof
 
-The renderer receives no access token, refresh token, cookie, CSRF secret,
-provider secret, credential-store handle, encryption primitive, arbitrary URL
-fetcher, or generic secret-storage interface. Product transports receive a
-narrow authenticated-network capability rather than credentials.
+LaunchWindow contains no local/external method selector or authentication form.
+To start authorization, Electron main creates:
 
-Password material may cross one validated, one-shot privileged authentication
-operation and is not retained. External authentication initially uses a
-dedicated window sharing the isolated Electron session. A future system-browser
-flow requires a separately reviewed server handoff. Callback transactions are
-high-entropy, expiring, single-use, and bound to the exact expected provider and
-URI state.
+- high-entropy state;
+- PKCE S256 verifier/challenge;
+- an exact ephemeral `127.0.0.1` or `[::1]` loopback callback with random port
+  and transaction path;
+- the public key or thumbprint for one Institution-specific Desktop
+  Installation;
+- declared Desktop release and target metadata.
 
-Persistent credentials require an approved OS-backed adapter. Unavailable
-secure storage becomes explicit credential unavailability; there is no
-plaintext, weak-encryption, generic application-storage, or silent in-memory
-substitute that pretends persistence succeeded.
+The private installation key is non-exportable where supported and remains
+behind an approved OS-backed adapter. No hardware serial, MAC address, or global
+cross-Institution identifier is used.
 
-## Identity projection and lifecycle
+The Proctor Server returns the exact same-origin hosted authorization URL. Its
+page owns every currently available local or external method, authentication,
+`Use another account`, explicit `Continue` approval, cancel, and return to the
+pending Desktop transaction. Existing Web Sessions may skip authentication but
+never skip final approval. Provider credentials and tokens remain between the
+browser, server, and provider.
 
-`IdentityProjection` keeps independent facts rather than collapsing them into a
-single signed-in boolean:
+Only Electron main opens that exact URL in the system browser. The server
+returns one very short-lived, single-use code and state to the exact loopback
+callback. Electron main validates address, path, state, pinned origin, and
+pending transaction, then exchanges code, PKCE verifier, and installation proof
+only with the pinned origin. The callback carries no Session or refresh
+credential. There is no embedded authentication BrowserWindow, custom scheme,
+manual copyable code, or renderer-owned callback handling.
 
-- Authentication: `signedOut`, `authenticating`, `authenticated`, or `ending`;
+Cancel, timeout, mismatch, replay, server switch, proof failure, or ambiguous
+exchange invalidates the local transaction. If the callback cannot be reached,
+the hosted page gives a bounded retry instruction and a new transaction is
+required.
+
+After enrollment, Desktop access/refresh credentials and protected requests are
+sender-constrained to the registered installation key with DPoP-compatible
+proof. The authenticated transport validates method/URI binding, issued-at
+window, proof uniqueness, access-token hash, server nonce where required, and
+the Session's key thumbprint. The same proof boundary covers refresh, logout,
+and authenticated realtime establishment/actions. The assurance claim is
+`registered_desktop_key`; it is not official-binary or device attestation.
+
+Access credentials remain memory-only. A rotating Desktop refresh credential
+and installation private key use only approved OS-backed custody. Missing secure
+storage makes persistent sign-in or registered-key use explicitly unavailable;
+plaintext, renderer storage, generic application storage, URLs, logs, settings,
+and restored state never carry credentials or private key material.
+
+## Identity and self-context projection
+
+`IdentityProjection` keeps separate facts:
+
+- authentication: `signedOut`, `authenticating`, `authenticated`, or `ending`;
 - Session validity: `valid`, `reauthenticationRequired`, `expired`, `revoked`,
   or `verificationRequired`;
-- Credential readiness: `ready`, `refreshing`, `locked`, or `unavailable`;
-- sanitized Principal Snapshot, reason code, revision, and permitted identity
+- credential/key readiness: `ready`, `refreshing`, `locked`, or `unavailable`;
+- sanitized Principal, Institution, reason, revision, and permitted identity
   intents.
 
-Refresh is single-flight. An ambiguously completed credential rotation enters
-`verificationRequired`; it does not retry an old credential whose server outcome
-is unknown. Security-related connection closure invalidates current projections
-and triggers authoritative verification rather than inventing logout or
-continuing optimistically.
+The authoritative self-context independently represents disabled account, no
+current affiliation, no assigned access, available product areas, manageable
+Academic Units, unresolved Attempt presence, and account/session-management
+availability. A current student is exclusively student. Non-student teacher,
+staff, Academic Unit, Exam Manager, scoped-role, and system-administration
+relationships may overlap.
 
-Local Identity Lock, confirmed Session Revocation, and unknown revocation
-outcome remain distinct. Sign-out first revokes local capabilities, closes role
-windows, and locks Principal-bound protected data. It then attempts server
-revocation and reports the exact outcome. Sign-out never submits an Attempt,
-deletes candidate work, or claims server revocation merely because local
-credentials were removed.
+Refresh is single-flight. Ambiguous credential rotation enters
+`verificationRequired` rather than replaying an old credential. Security-related
+connection closure triggers authoritative verification. Sign-out immediately
+revokes local capabilities and locks Principal-bound protected data, then
+attempts server revocation while preserving its exact outcome. Sign-out never
+submits an Attempt or deletes candidate work.
+
+## Authoritative Attempt and Session state
+
+Desktop recognizes `ready`, `active`, `suspended`, and `submitted`:
+
+```text
+first successful join --------------------------> active
+active -- continuity/policy/session loss ------> suspended
+suspended -- manager reallow ------------------> ready
+ready -- successful secure join ---------------> active
+active | ready | suspended -- seal ------------> submitted
+```
+
+Ready is durable and has no reconnect interval. It may join whenever the
+Sitting is open and otherwise joinable. Pause preserves ready but prevents the
+join. Manager reallow changes only suspended to ready. There is no durable
+`kicked` state; manager End Attempt seals acknowledged work and submits with
+distinct provenance. Scheduled cancellation is pre-open and creates no Attempt
+or Submission.
+
+One candidate may have at most one unresolved Attempt (`ready`, `active`, or
+`suspended`) across all Sittings. A new join while another Attempt is active
+suspends the old Attempt with safe competing-admission provenance and rejects
+the new join. A ready or suspended existing Attempt rejects the new join without
+mutation. Submitted Attempts do not block later Sittings.
+
+Only active state carries the account Session lock:
+
+1. one active Attempt binds exactly one valid Desktop Session and current
+   Participation generation;
+2. entering active revokes all other Sessions for the User;
+3. every new interactive Session-creation path refuses issuance while that
+   active lock exists;
+4. ready, suspended, and submitted hold no lock and permit normal sign-in;
+5. rejoining ready selects the joining Session and revokes all others;
+6. Attempt transitions do not revoke an otherwise valid Session;
+7. invalidating the bound Session immediately suspends the active Attempt and
+   fences its Participation.
+
+The Desktop observes this state but never implements the lock locally as
+authority. It prevents confusing duplicate local actions and presents the
+server's stable safe outcome.
 
 ## Privileged exam-security module
 
-`ExamSecurityCoordinator` is one attempt-scoped privileged module used by the
-candidate composition root and its security contribution. It owns:
+`ExamSecurityCoordinator` is one Attempt-scoped privileged module used by the
+CandidateWindow composition root. It owns:
 
-- policy verification, freshness, scope, and rollback protection;
-- secure-exam preflight and continuous posture evaluation;
-- passive native-source supervision and normalization through private ports;
-- coordination of closed effects through separate enforcement adapters;
-- authenticated connectivity evaluation and reversible containment;
-- participation lease renewal, interruption detection, and re-entry gating;
-- integrity-record delivery and reconciliation;
-- orchestration with Attempt Workspace protection and reconciliation.
+- policy authenticity, freshness, scope, and rollback checks;
+- secure preflight and continuous local posture;
+- passive native-source supervision and normalization;
+- closed containment effects through separate enforcement adapters;
+- connectivity evaluation and Participation lease continuity;
+- Browser Activity/integrity delivery reconciliation;
+- coordination with Attempt Workspace protection and recovery.
 
-Its renderer-facing interface has two operation families:
+Its renderer interface exposes only an immutable
+`CandidateSecurityProjection` and closed intents such as retry checks, begin a
+permitted join, acknowledge an explicit correction, or contact approved
+support. Raw native streams, policy internals, detector thresholds, evidence,
+credentials, server authorization objects, and privileged handles stay behind
+the module.
 
-1. observe an immutable `CandidateSecurityProjection` and its changes;
-2. submit a closed permitted intent such as retry checks, continue an approved
-   recovery step, request re-entry, or contact approved support.
+The projection keeps separate:
 
-Native streams, policy internals, detector thresholds, raw evidence, credentials,
-server authorization objects, and privileged handles remain behind the module.
-The [native-capability architecture](./native-capabilities.md) fixes the concrete
-process roles and source/effect separation while preserving this interface.
+- authoritative Attempt state and revision;
+- local Secure Exam Posture and safe reason;
+- Participation generation/lease phase;
+- join/re-entry/departure affordances;
+- Attempt Configuration and packaged capability availability;
+- pause/correction state, protected-work status, authoritative time, and
+  permitted intents.
 
-`CandidateSecurityProjection` contains only what presentation and packaged
-capabilities need:
+## Secure Exam Posture and containment
 
-- projection revision and opaque Attempt scope;
-- Secure Exam Posture and sanitized reason code;
-- participation continuity: `inactive`, `establishing`, `continuous`,
-  `interrupted`, or `superseded`;
-- re-entry: `notRequired`, `required`, `pending`, `authorized`, or `denied`;
-- packaged capability availability, including browser, terminal, and agent
-  surfaces where policy permits them;
-- connectivity/recovery phase, protected-work status, authoritative time
-  anchor, application-close permission, and permitted intents.
+Secure Exam Posture is `notApplicable`, `checking`, `ready`, `restricted`, or
+`blocked`. It is local privileged state, not the Attempt's authoritative
+`ready` state. Attempt entry requires usable posture plus fresh server
+admission. Unsupported target, required permission/source loss, expired policy,
+connectivity failure, or unverifiable enforcement produces a safe reason and
+never a renderer-selected exception.
 
-These fields remain separate facts inside the projection. The workbench may
-derive one gate presentation from them but cannot turn that presentation back
-into authority. `authorized` re-entry permits the recovery transaction to
-continue; it does not itself permit candidate interaction.
+The initial policy model includes current server Focus Loss and Connection Loss
+plus the separately accepted first-release native baseline. Additional process,
+clipboard, printing, device, VM, camera/microphone, and VPN policies remain
+deferred until their Desktop models are accepted.
 
-## Policy and Secure Exam Posture
-
-Exam Security Policy is an authenticated immutable envelope scoped to its
-revision, Exam Sitting and Attempt, User and Session, installation, supported
-build, effective period, required monitors and controls, packaged detectors,
-feature capabilities, accommodations, disclosures, evidence classes, and
-restricted or blocked behavior. The desktop verifies authenticity, exact scope,
-monotonic revision, and freshness and rejects rollback. Policy selects packaged
-behavior; it supplies no executable code.
-
-Secure Exam Posture is one of:
-
-- `notApplicable` — candidate examination enforcement is not required;
-- `checking` — required policy, admission, monitor, control, or recovery checks
-  have not yet produced a usable posture;
-- `ready` — every required current condition permits normal interaction;
-- `restricted` — current policy explicitly permits a named reduced capability
-  set;
-- `blocked` — only bounded recovery, status, teacher/support contact, and
-  protected-work information are available.
-
-Attempt entry requires `ready` or an explicitly entry-permitting `restricted`
-policy. Only fresh checks restore `ready`. Unsupported platforms, missing
-permission, expired policy, monitor loss, connection loss, and control failure
-produce sanitized reasons rather than renderer-selected exceptions.
-
-Policy evaluation produces a closed, idempotent `Containment Plan`. Execution
-orders effects as follows:
+A closed idempotent containment plan orders effects:
 
 1. deny affected operations and prevent new dispatch;
-2. cancel work proven not to have been dispatched;
-3. protect accepted work and retain outcome-unknown operation identities;
-4. apply required native controls;
+2. cancel work proven not dispatched;
+3. protect accepted work and retain unknown outcomes;
+4. apply required native effects;
 5. commit posture and capability state;
 6. publish the sanitized projection;
-7. queue permitted integrity reporting.
+7. queue permitted activity/integrity delivery.
 
-Containment is policy-scoped and reversible. Failure of a required containment
-step resolves to blocked rather than partial readiness. The authoritative
-operation owner still reauthorizes every operation independently.
+Failure of a required step remains blocked. The actual Workspace, browser,
+terminal, submission, and server operation owners still reauthorize requests.
 
-## Online-only interaction and recovery
+## Connectivity, pause, suspension, and re-entry
 
-Candidate examination interaction requires a continuously authenticated server
-channel and has no offline grace or offline editing mode. A trusted native
-connectivity source reports bounded facts; the coordinator distinguishes device
-network loss, server unreachability, invalid authenticated channel, suspected
-manipulation, and unknown transport failure. Renderer browser status and one
-failed request are not transition authority.
+Candidate interaction requires continuous authenticated server participation
+and has no offline editing grace. A transport close is not immediately
+Connection Loss. Reconnect within the short server lease may preserve active
+state and the current generation. Confirmed lease expiry suspends the Attempt
+under Connection Loss policy while leaving an otherwise valid Session usable.
 
-Confirmed loss immediately enters blocked posture, denies new workspace changes
-and privileged operations, closes policy-gated browser, terminal, and agent
-surfaces, protects all previously accepted work, and preserves every in-flight
-or outcome-unknown mutation for reconciliation. Required monitoring and bounded
-integrity spooling continue where possible.
+On any authoritative event that may block mutation, privileged gates close
+before refetch. A paused Sitting keeps active Attempt, Participation renewal,
+and Session lock. CandidateWindow remains visible beneath an overlay while
+Workspace changes, browser, terminal, and submission are frozen.
 
-Connectivity restoration never resumes interaction by itself. Recovery is one
-gated transaction:
+Suspension closes gates, protects accepted/unknown work, shows a blocking
+overlay, destroys CandidateWindow, and opens AuthenticatedWindow at the
+suspended Attempt. Reallow later projects ready. A successful join from ready
+rechecks Session, registered installation, release, Sitting, Attempt
+Configuration, posture, Workspace reconciliation, and current operation
+authorization before creating the new generation and CandidateWindow.
 
-1. restore native connectivity and authenticated transport;
-2. verify or reauthenticate the Session;
-3. upload and reconcile permitted integrity records;
-4. load authoritative Attempt and re-entry state;
-5. renew Attempt Admission and Exam Security Policy;
-6. restore required monitor and control health;
-7. reconcile authoritative workspace outcomes and protected work;
-8. obtain fresh server authorization.
+Application relaunch always begins at LaunchWindow or AuthenticatedWindow. It
+never restores CandidateWindow directly. A renderer-only restart may recover
+inside the same CandidateWindow only while the privileged coordinator, bound
+Session, required monitors, and Participation lease remain continuously valid.
 
-Only then may posture progress through `checking` to `ready` or an explicitly
-permitted `restricted` state. Server time remains authoritative; a local
-monotonic estimate may support display, but blocking, interruption, or reconnect
-does not pause the examination or cause local submission.
+Ordinary close and quit are vetoed while authoritative active state denies
+departure. Force Quit, crash, shutdown, or power loss never submits. Sitting
+close seals active, ready, and suspended Attempts; manager End Attempt also
+seals acknowledged work. Submission is one immutable server-owned outcome.
 
-Attempt admission also fences the source revision of the Candidate Settings
-Baseline defined by the [user-settings architecture](./user-settings.md). A
-Participation Interruption or authorized re-entry reuses that Attempt-wide
-baseline; it does not reread a remotely changed User Settings Document. Current
-trusted policy and accessibility constraints may still narrow its effective
-projection.
+## Attempt Configuration and live corrections
 
-## Participation continuity and application close
+At first join, Desktop derives the candidate-safe Attempt Configuration from
+the packaged registry, current User Settings revision, and authoritative
+constraints. The server validates and freezes its exact object/digest on the
+Attempt. Re-entry uses that stored object; later User Settings changes do not
+alter it. Stronger current accessibility or safety constraints may narrow the
+effective projection without mutating the stored configuration.
 
-Every active candidate Attempt has one server-recognized `Attempt Participation`
-generation. The coordinator holds a short-lived continuity credential outside
-the renderer and renews it while the privileged process and required monitoring
-remain continuous. The generation scopes candidate operations without replacing
-their current authorization checks.
+Attempt admission pins one Exam Revision. Explicit immutable live corrections
+may advance instructions, Exam Resources, or Browser Policy. CandidateWindow
+shows a persistent bounded notice. Only a correction marked as requiring
+acknowledgement gates affected mutations until its fenced acknowledgement is
+accepted.
 
-Ordinary application close and quit are prohibited while the authoritative
-Attempt projection says examination participation remains active. Electron main
-vetoes ordinary close requests. The candidate first completes the normal
-server-authorized examination workflow; only an authoritative projection may
-permit application departure. Shutdown messages and close modals remain orderly
-lifecycle mechanisms rather than security boundaries.
+## Integrity meaning and privacy
 
-A renderer-only failure may recover while the privileged coordinator, required
-monitors, and participation lease remain healthy. Loss of that continuity—by
-process termination, crash, power loss, forced close, or monitor failure—creates
-a `Participation Interruption`. Authentication after relaunch does not restore
-Attempt Admission.
-
-Re-entry is a bounded server projection. Product policy limits approval to the
-Exam creator or another server-authorized teacher, while roles, grants, and the
-decision workflow remain server-owned. The desktop stays gated until approval,
-integrity and workspace reconciliation, fresh admission, and secure preflight
-all succeed. Authorized re-entry creates a new generation that fences stale
-heartbeats, credentials, and operations from the old process.
-
-An interruption is not submission, suspension, an Integrity Flag, or guilt.
-The sequence of a vetoed close followed by continuity loss may become detector
-input, but the desktop does not decide its review or consequence.
-
-## Integrity information
-
-Use the explicit transformation chain:
+Keep the transformation explicit:
 
 ```text
 Native Observation
@@ -282,114 +304,60 @@ Native Observation
     → Consequence
 ```
 
-Each transformation preserves source, schema and policy version, uncertainty,
-and known gaps. Local normalization may reduce high-volume observations, and
-packaged local detectors may support immediate posture or containment. Server
-policy owns flag creation and authoritative consequences.
+Every transition preserves source/schema/policy version, uncertainty, and known
+gaps. Local findings may drive reversible containment but do not declare guilt
+or authoritative Attempt state. Integrity review is not grading.
 
-Source facts carry source-instance identity, schema version, per-source
-monotonic sequence, device wall and monotonic time, bounded classified payload,
-and explicit reset or gap information. The coordinator wraps accepted facts
-with stable observation IDs and trusted installation, Session, Attempt,
-participation-generation, and policy scope. Server receipt provides
-authoritative receive time; the desktop invents no total order across sources.
+Sources use source-instance identity, monotonic sequence, device wall and
+monotonic time, bounded classified payload, and explicit gaps/resets. Delivery
+is at-least-once and idempotent with server watermarks. Protected Browser
+Activity and integrity spools are distinct from Attempt Workspace recovery.
+Raw observations remain ephemeral unless policy promotes minimized material.
 
-Delivery is at-least-once and idempotent with per-source watermarks and missing
-ranges. A bounded encrypted integrity spool, separate from Attempt Workspace
-recovery, preserves permitted records during connection loss. Overflow,
-corruption, restart, and loss become explicit signals. Raw observations are
-ephemeral unless policy promotes minimized material to Integrity Evidence.
+Candidate status, manager board state, detailed review evidence, and
+exceptional live access remain distinct visibility classes. Ordinary managers
+see students and safe current state, not multiple hidden attempt identities.
+Exact authorized review may inspect minimized evidence. Ordinary audit,
+diagnostics, renderer state, and application logs contain no credentials,
+content, raw observations, browser URLs with sensitive query values, or private
+review material.
 
-Required sources expose `starting`, `healthy`, `degraded`, `failed`, or
-`stopped`. Restart changes source-instance identity and reports a sequence
-reset. Required-source failure follows policy; optional-source failure reduces
-coverage without fabricating misconduct.
+## Process and workbench integration
 
-Integrity information has four visibility classes:
+LaunchWindow receives only readiness/identity projection and identity intents.
+AuthenticatedWindow receives self-context and authorized product projections.
+CandidateWindow receives the bounded security, Attempt, Workspace, browser, and
+execution projections for its one active Attempt.
 
-- Candidate Posture;
-- Live Proctor Signal;
-- Restricted Review Evidence;
-- separately authorized Exceptional Live Observation.
-
-Collection purpose, monitoring categories, permission requirements, evidence
-classes, broad retention, and support/correction routes are disclosed before
-entry. Accommodations and candidate exceptions enter authenticated policy before
-detection. Ordinary proctors receive minimized signals rather than candidate
-files, screenshots, terminal or clipboard content, or raw process/window data.
-Audit records decisions and transitions; it is not the raw evidence store.
-
-## Workbench and process integration
-
-`LaunchWindow` renders the identity projection and identity intents only. A role
-window is created from a trusted Session Binding and composition admission.
-Candidate composition then opens behind an explicit attempt-loading and
-secure-preflight gate.
-
-The candidate security contribution renders the current security projection,
-closes or disables revoked capability surfaces, and restores focus into the
-gate. Context keys mirror projection state for menus, routing, and accessibility
-only. Candidate content, Exam Resources, terminal, browser, and agent interaction
-are unavailable while blocked or awaiting re-entry.
-
-Concrete Electron, server-transport, protected-storage, observation-source, and
-enforcement adapters are selected in privileged process composition roots. The
-coordinator runs in the dedicated exam-security utility process; Electron main
-owns its launcher, permission broker, candidate-window enforcer, and fail-closed
-projection bridge. Preload exposes only capability-specific observation and
-intent channels for its window kind. IPC validates scope, revision, action
-family, and payload bounds in the owning process.
+Concrete credential, DPoP, server transport, protected storage, native source,
+and enforcement adapters are chosen in privileged composition roots. The exam-
+security coordinator runs in the dedicated utility process. Electron main owns
+its launcher, permission broker, CandidateWindow enforcer, window transitions,
+and fail-closed projection bridge. Preload exposes fixed capability-specific
+channels and validates scope, revision, intent family, and bounds.
 
 ## Verification
 
-Test the two deep modules through their external interfaces with in-memory
-server, credential, policy, native-source, native-control, and protected-store
-adapters. Cover at least:
+Use real coordinators behind in-memory ports and packaged-process tests. Cover:
 
-- authentication cancellation, callback mismatch/replay, single-flight refresh,
-  ambiguous rotation, MFA, expiry, revocation, unavailable secure storage, and
-  sign-out with unknown server outcome;
-- immutable Session Binding across Principal refresh and destruction on User or
-  Session replacement;
-- policy signature, scope, expiry and rollback failures; accommodations;
-  required and optional source failure; and containment ordering;
-- connection loss before dispatch, after dispatch, and with unknown mutation
-  outcome; protected-store failure; and the complete recovery transaction;
-- renderer crash with continuous privileged health, full process loss,
-  prohibited close, participation interruption, denied and approved re-entry,
-  generation fencing, and stale-operation rejection;
-- observation duplication, gaps, reset, spool overflow/corruption, data
-  minimization, visibility, and absence of sensitive values from renderer
-  projections and diagnostics.
+- ping origin/availability/compatibility and change-server behavior;
+- method-agnostic hosted auth, another account, cancel, loopback IPv4/IPv6,
+  state/PKCE, proof mismatch/replay, callback failure, and active-lock denial;
+- installation enrollment/revocation, DPoP URI/method/token/nonce binding,
+  refresh rotation, and credential/key redaction;
+- current-student exclusivity projection and mixed non-student areas;
+- first join, candidate-wide conflict, other-Session revocation, Session issue
+  refusal, brief reconnect, lease expiry, bound-Session invalidation, reallow,
+  ready join, pause, close, and manager end;
+- containment order, immediate event gating, Workspace protection/reconciliation,
+  correction acknowledgement, and stale-generation denial;
+- window destruction/creation order and absence of direct CandidateWindow
+  restoration after relaunch;
+- observation/activity duplication, gaps, resets, spool failure, visibility,
+  and sensitive-data absence.
 
-Cross-process tests verify IPC validation, renderer sandboxing, Electron-session
-isolation, close veto, window destruction on binding change, and capability
-revocation before presentation. Tests assert observable results through the
-same interfaces used by callers.
-
-Native sources, candidate-window effects, utility supervision, strict display
-topology, overload, and platform claims follow the additional conformance and
-packaged verification requirements in the
-[native-capability architecture](./native-capabilities.md).
-
-## Deferred dependencies and VS Code relationship
-
-The server owns exact routes, teacher authorization, participation persistence,
-Attempt lifecycle, evidence retention, review, and consequences. Electron/native
-builds, wire encoding, signing, package integrity, updates, and test runtimes
-follow the accepted [toolchain architecture](./toolchain.md) and cannot weaken
-the interfaces above or the native-capability boundary.
-
-Production admission and immediate revocation claims also depend on a server
-contract with sufficiently fresh authorization and participation checks. A
-desktop projection cannot close a stale server authorization-cache window;
-documentation and tests must state the bounded behavior until the server
-provides the required guarantee.
-
-At the reviewed VS Code baseline, authentication is a renderer/extension-host
-account-and-token broker, secret values cross renderer and extension-host RPC,
-Workspace Trust is user-controlled, and lifecycle vetoes coordinate only
-orderly shutdown. Proctor therefore admits no VS Code identity or security
-cluster. PKCE, one-time callback state, cancellation, disposal, events, and
-ordered transition participants remain behavioral evidence for a future
-Proctor-owned implementation.
+Cross-process tests verify sandboxing, IPC validation, fixed preloads, key and
+credential custody, close veto, window transitions, security-utility loss, and
+capability revocation before presentation. Native platform claims follow
+[native-capability architecture](./native-capabilities.md); browser and PTY
+claims follow their focused architecture topics.

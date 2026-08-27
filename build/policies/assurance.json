@@ -11,14 +11,16 @@
       "invariants": [
         "product.exam-workbench", "product.remote-workspace", "product.remote-terminal", "product.integrity-flag", "product.independent-gates",
         "source.namespace", "source.layer-direction", "source.deep-modules", "source.interface-tests", "source.static-contributions",
-        "renderer.plain-dom", "renderer.no-ambient-node", "renderer.sandboxed", "composition.immutable-window", "preload.capability-allowlist", "privilege.validate-authorize", "identity.credential-custody", "runtime.handle-isolation", "diagnostics.sensitive-data",
+        "renderer.plain-dom", "renderer.no-ambient-node", "renderer.sandboxed", "composition.immutable-window", "composition.candidate-transition", "preload.capability-allowlist", "privilege.validate-authorize", "identity.credential-custody", "runtime.handle-isolation", "diagnostics.sensitive-data",
         "design.shared-system", "design.static-registration", "design.presentation-not-authority", "design.accessibility", "design.css-ownership", "design.control-interface", "design.test-code-excluded",
         "upstream.evidence-not-authority", "upstream.boundary-grill", "upstream.exact-provenance", "upstream.license-preservation", "upstream.product-assumptions-excluded", "upstream.single-revision-closure", "upstream.no-aggregate-entrypoints",
-        "workspace.stable-entry-identity", "workspace.opaque-content-version", "workspace.acknowledged-durability", "workspace.distinct-states", "workspace.protected-recovery", "workspace.provider-projection", "workspace.orthogonal-state", "workspace.protect-unacknowledged-work", "workspace.submission-readiness", "workspace.exam-resources-separated",
-        "security.privileged-credential-custody", "security.independent-authorization", "security.privileged-posture", "security.online-only", "security.containment-before-presentation", "security.fenced-participation", "security.integrity-vocabulary",
-        "native.passive-sources", "native.process-boundaries", "native.single-display-window", "native.race-free-session", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance",
-        "settings.server-authority", "settings.static-registry", "settings.no-authority", "settings.dedicated-window", "settings.frozen-candidate-baseline", "settings.stronger-live-constraints", "settings.conditional-writes",
-        "toolchain.single-esm-graph", "toolchain.closed-packages", "toolchain.native-schema-authority", "toolchain.signed-capability-matrix", "toolchain.attempt-safe-updates"
+        "workspace.stable-entry-identity", "workspace.opaque-content-version", "workspace.acknowledged-durability", "workspace.distinct-states", "workspace.protected-recovery", "workspace.provider-projection", "workspace.orthogonal-state", "workspace.protect-unacknowledged-work", "workspace.submission-readiness", "workspace.exam-resources-separated", "workspace.v1-contract",
+        "security.public-readiness", "security.privileged-credential-custody", "security.system-browser-authentication", "security.registered-desktop-key", "security.independent-authorization", "security.authoritative-attempt-state", "security.active-session-lock", "security.candidate-attempt-exclusion", "security.privileged-posture", "security.online-only", "security.containment-before-presentation", "security.pause-suspension", "security.fenced-participation", "security.integrity-vocabulary",
+        "native.passive-sources", "native.initial-scope", "native.process-boundaries", "native.single-display-window", "native.race-free-session", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance",
+        "settings.server-authority", "settings.static-registry", "settings.no-authority", "settings.authenticated-page", "settings.frozen-attempt-configuration", "settings.stronger-live-constraints", "settings.conditional-writes",
+        "browser.revision-frozen-policy", "browser.privileged-enforcement", "browser.minimized-activity", "browser.ordered-delivery",
+        "execution.remote-pty", "execution.generation-fencing", "execution.workspace-projection",
+        "toolchain.single-esm-graph", "toolchain.closed-packages", "toolchain.native-schema-authority", "toolchain.signed-capability-matrix", "toolchain.central-distribution", "toolchain.attempt-safe-updates"
       ],
       "evidence": ["docs/architecture/invariants.md"]
     },
@@ -45,7 +47,7 @@
       "kind": "source",
       "status": "active",
       "owner": "workbench",
-      "invariants": ["source.static-contributions", "composition.immutable-window", "preload.capability-allowlist", "design.static-registration", "design.test-code-excluded", "upstream.no-aggregate-entrypoints", "toolchain.closed-packages"],
+      "invariants": ["source.static-contributions", "composition.immutable-window", "composition.candidate-transition", "preload.capability-allowlist", "design.static-registration", "design.test-code-excluded", "upstream.no-aggregate-entrypoints", "toolchain.closed-packages"],
       "implementation": "source.compositions",
       "evidence": ["build/policies/compositions.json"]
     },
@@ -127,17 +129,17 @@
       "kind": "test",
       "status": "deferred",
       "owner": "attempt-workspace",
-      "invariants": ["workspace.stable-entry-identity", "workspace.opaque-content-version", "workspace.acknowledged-durability", "workspace.distinct-states", "workspace.protected-recovery", "workspace.provider-projection", "workspace.orthogonal-state", "workspace.protect-unacknowledged-work", "workspace.submission-readiness", "workspace.exam-resources-separated"],
+      "invariants": ["workspace.stable-entry-identity", "workspace.opaque-content-version", "workspace.acknowledged-durability", "workspace.distinct-states", "workspace.protected-recovery", "workspace.provider-projection", "workspace.orthogonal-state", "workspace.protect-unacknowledged-work", "workspace.submission-readiness", "workspace.exam-resources-separated", "workspace.v1-contract"],
       "activation": "source-present",
       "futureKind": "test",
-      "rationale": "The Attempt Workspace contracts have no source implementation to exercise yet."
+      "rationale": "The Attempt Workspace contracts have no Desktop source implementation to exercise yet."
     },
     {
       "id": "composition-security-tests",
       "kind": "test",
       "status": "deferred",
       "owner": "workbench-security",
-      "invariants": ["renderer.no-ambient-node", "renderer.sandboxed", "composition.immutable-window", "preload.capability-allowlist", "privilege.validate-authorize", "identity.credential-custody", "runtime.handle-isolation", "security.privileged-credential-custody", "security.independent-authorization", "security.privileged-posture", "security.online-only", "security.containment-before-presentation", "security.fenced-participation"],
+      "invariants": ["renderer.no-ambient-node", "renderer.sandboxed", "composition.immutable-window", "composition.candidate-transition", "preload.capability-allowlist", "privilege.validate-authorize", "identity.credential-custody", "runtime.handle-isolation", "security.public-readiness", "security.privileged-credential-custody", "security.system-browser-authentication", "security.registered-desktop-key", "security.independent-authorization", "security.authoritative-attempt-state", "security.active-session-lock", "security.candidate-attempt-exclusion", "security.privileged-posture", "security.online-only", "security.containment-before-presentation", "security.pause-suspension", "security.fenced-participation"],
       "activation": "code-layer-present",
       "futureKind": "test",
       "rationale": "Electron process compositions and privileged interfaces do not exist yet."
@@ -157,17 +159,37 @@
       "kind": "test",
       "status": "deferred",
       "owner": "user-settings",
-      "invariants": ["settings.server-authority", "settings.static-registry", "settings.no-authority", "settings.dedicated-window", "settings.frozen-candidate-baseline", "settings.stronger-live-constraints", "settings.conditional-writes"],
+      "invariants": ["settings.server-authority", "settings.static-registry", "settings.no-authority", "settings.authenticated-page", "settings.frozen-attempt-configuration", "settings.stronger-live-constraints", "settings.conditional-writes"],
       "activation": "settings-registry-present",
       "futureKind": "test",
       "rationale": "The static settings registry and settings service do not exist yet."
+    },
+    {
+      "id": "browser-contract-tests",
+      "kind": "test",
+      "status": "deferred",
+      "owner": "integrated-browser",
+      "invariants": ["browser.revision-frozen-policy", "browser.privileged-enforcement", "browser.minimized-activity", "browser.ordered-delivery"],
+      "activation": "source-present",
+      "futureKind": "test",
+      "rationale": "The integrated browser coordinator, contribution, and protected activity spool do not exist yet."
+    },
+    {
+      "id": "execution-contract-tests",
+      "kind": "test",
+      "status": "deferred",
+      "owner": "execution-environment",
+      "invariants": ["execution.remote-pty", "execution.generation-fencing", "execution.workspace-projection"],
+      "activation": "source-present",
+      "futureKind": "test",
+      "rationale": "The Desktop remote-terminal model, transport, and workbench contribution do not exist yet."
     },
     {
       "id": "native-conformance",
       "kind": "package",
       "status": "deferred",
       "owner": "native-capabilities",
-      "invariants": ["native.passive-sources", "native.process-boundaries", "native.single-display-window", "native.race-free-session", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance", "toolchain.native-schema-authority", "toolchain.signed-capability-matrix"],
+      "invariants": ["native.passive-sources", "native.initial-scope", "native.process-boundaries", "native.single-display-window", "native.race-free-session", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance", "toolchain.native-schema-authority", "toolchain.signed-capability-matrix"],
       "activation": "native-package-present",
       "futureKind": "package",
       "rationale": "No native capability package or supported target tuple exists yet."
@@ -177,10 +199,10 @@
       "kind": "package",
       "status": "deferred",
       "owner": "release",
-      "invariants": ["toolchain.closed-packages", "toolchain.signed-capability-matrix", "toolchain.attempt-safe-updates"],
+      "invariants": ["toolchain.closed-packages", "toolchain.signed-capability-matrix", "toolchain.central-distribution", "toolchain.attempt-safe-updates"],
       "activation": "packaged-target-present",
       "futureKind": "package",
-      "rationale": "Packaging, signing, updates, and supported target declarations are intentionally not configured yet."
+      "rationale": "Packaging, signing, central distribution, updates, and supported target declarations are intentionally not configured yet."
     }
   ]
 }

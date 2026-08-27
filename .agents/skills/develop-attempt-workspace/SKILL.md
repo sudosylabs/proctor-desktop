@@ -33,7 +33,7 @@ unresolved dependency of the change are explicit.
 
 Keep mutable workspace behavior behind one attempt-scoped
 `AttemptWorkspaceSession` with four operation families: observe immutable
-projections, read exact or current content, accept closed local changes, and
+projections, read current content, accept closed local changes, and
 settle a precise Workspace View Generation. Keep disposal explicit.
 
 Keep Exam Resources behind a separate read-only `ExamResourceCatalog`. Share
@@ -45,6 +45,13 @@ scheduling, Workspace Cursor reduction, overlay rebase, checkpoint timing,
 cache policy, URI mapping, and provider-error translation inside the workspace
 implementation. Keep text edit coordinates and transport DTOs out of the
 external interface; text adapters publish immutable binary-safe content.
+
+Pin the first production port to workspace v1: integer cursors, whole current-
+file reads, ordered refresh, idempotent results, and create-directory,
+create-file, replace-content, move/rename, and delete. Model atomic batch,
+historical reads, range-backed models, server revert/conflict resolution,
+journal mutation keys, and per-entry server capabilities only after an explicit
+contract extension.
 
 The step is complete when deleting the module would force these rules back into
 multiple callers and tests can exercise them through the same interface.
@@ -68,7 +75,7 @@ provider, URI, or presentation state can become authority.
 ## 4. Coordinate changes and durability
 
 Accept local change into the overlay before remote acknowledgement and assign a
-Workspace View Generation. Compile it internally into the closed Workspace
+Workspace View Generation. Compile it internally into the closed v1 Workspace
 Mutation family with one idempotency key and operation-specific expectations.
 Order overlapping entry and path scopes while allowing bounded concurrency for
 independent files.
@@ -80,7 +87,8 @@ conflicted, rejected, and unknown local work protected until acknowledged
 replacement or explicit discard.
 
 Make Revert reconcile possible in-flight results before discarding the selected
-local state. Make interruption and shutdown handling protect captured work
+local overlay state and reloading current authority; it is not a server
+mutation. Make interruption and shutdown handling protect captured work
 without depending indefinitely on the network; application-close permission is
 owned by identity and exam security. Keep submission outside this module and
 permit only acknowledged state at an authoritative Workspace Cursor to become
@@ -106,6 +114,12 @@ Store unregistered and expose no raw native path.
 The step is complete when production behavior can change transport, storage, or
 VS Code compatibility without changing the external workspace interface.
 
+Enforce server-advertised effective limits within the known defaults/hard
+maxima, and independently enforce the initial 10 MiB text-model limit. Streaming
+may bound transport/model construction, but Monaco/VS Code exposes a complete
+logical model only after the stream ends; never present it as range-backed
+editing.
+
 ## 6. Reconcile and preserve conflicts
 
 Apply acknowledgements and authoritative changes through one Workspace
@@ -124,11 +138,14 @@ duplicates, authorizes, or discards protected work.
 ## 7. Verify through the interface
 
 Use the real module with in-memory authority and protected-store adapters. Cover
-stable identity across rename, exact reads, local edit and checkpoint,
+stable identity across rename, current whole-file reads, all five v1 mutations,
+local edit and checkpoint,
 acknowledgement of an older local version, identical retry, cancellation before
 and after dispatch, cursor gap, overlay reapplication, overlapping subtree
-operations, revocation, storage exhaustion, conflict families, interruption
-protection, Exam Resource read-only behavior, and submission blockers.
+operations, rejection of unsupported batch/history/range/server-revert
+assumptions, size/editor limits, revocation, storage exhaustion, conflict
+families, interruption protection, Exam Resource read-only behavior, and
+submission blockers.
 
 Review diagnostics for sensitive paths, content, identity, policy, and storage
 metadata. When source derives from VS Code, complete intake and provenance only

@@ -26,6 +26,16 @@ runtime, native target, package assembly, update, signing, CI, or release
 evidence. The step is complete when its authority, consuming process, target
 tuple, and smallest proving gate are explicit.
 
+For compatibility/update work, separate central Proctor distribution of signed
+artifacts from each Institution server's safe ping metadata: supported Desktop
+release/protocol range and build revocation. Exact OS-version support requires a
+signed packaged conformance matrix; architecture text or a generic CI run does
+not establish it.
+
+Keep `/api/v1` consumption additive by tolerating unknown fields, events, and
+reasons while honoring an Institution's security-raised minimum release and
+explicit too-new incompatibility.
+
 ## 2. Preserve one build graph
 
 Keep one private npm application graph, one lock, strict NodeNext ESM, relative
@@ -94,7 +104,8 @@ Keep unsigned payload verification separate from protected signing and
 notarization. Record the clean revision, tools, locks, input hashes, generated
 parity, target tuple, native identities, unsigned manifest, attestations, and
 final hashes. Never install, restart, or downgrade through the updater during
-active or interrupted participation.
+active, paused, or continuity-unresolved participation, and do not stage an
+update while CandidateWindow is active.
 
 The work is complete when a clean protected CI run can reproduce the unsigned
 payload, establish the declared platform evidence, and trace every shipped file

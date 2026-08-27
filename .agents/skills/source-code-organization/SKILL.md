@@ -74,25 +74,44 @@ Keep static setting declarations, JSONC grammar, migrations, resolution,
 inspection, generated-schema inputs, and immutable projections under
 `src/prctr/platform/settings/common/`. Keep privileged settings transport and
 protected-cache ownership in Electron main. Put the editing surface in
-`src/prctr/workbench/contrib/settings/` and select it only from
-`src/prctr/code/electron-browser/settings.main.ts` and the dedicated trusted
-SettingsWindow composition root. Use
+`src/prctr/workbench/contrib/settings/` and select it only from the authenticated
+manifest and `src/prctr/code/electron-browser/authenticated.main.ts`. Use
 [`develop-user-settings`](../develop-user-settings/SKILL.md) for its authority,
-candidate-freezing, and interface rules.
+Attempt Configuration, and interface rules.
+
+Keep browser policy/activity contracts and canonicalization under
+`src/prctr/platform/integratedBrowser/common/`, privileged Electron session and
+protected-spool adapters under the narrow Electron-main environment, Attempt-
+scoped coordination under `src/prctr/workbench/services/integratedBrowser/`,
+and the item/pane under `src/prctr/workbench/contrib/integratedBrowser/`. Use
+[`develop-integrated-browser`](../develop-integrated-browser/SKILL.md).
+
+Keep terminal framing/state contracts under
+`src/prctr/platform/executionEnvironment/common/`, authenticated transport in
+the narrow privileged environment, Workspace/Attempt coordination under
+`src/prctr/workbench/services/executionEnvironment/`, and the Candidate panel
+under `src/prctr/workbench/contrib/terminal/`. Use
+[`develop-execution-environment`](../develop-execution-environment/SKILL.md).
 
 Use these aggregate manifest locations when workbench source lands:
 
 - `src/prctr/workbench/workbench.common.main.ts` for mechanics shared by every
-  role workbench;
+  authenticated/candidate workbench;
 - `src/prctr/code/electron-browser/workbench.desktop.main.ts` for shared
   Electron-renderer adapter selection;
+- `src/prctr/code/electron-browser/launch.main.ts` for the signed-out
+  LaunchWindow allowlist;
+- `src/prctr/code/electron-browser/authenticated.main.ts` for the general
+  AuthenticatedWindow allowlist;
 - `src/prctr/code/electron-browser/candidate.main.ts` for the candidate
-  contribution allowlist;
-- `src/prctr/code/electron-browser/proctor.main.ts` for the proctor contribution
-  allowlist.
+  contribution allowlist.
+
+Place integrated-browser policy/enforcement/activity modules and remote-terminal
+modules behind their focused skills. Their renderer contributions enter only
+the candidate manifest; privileged adapters remain outside renderer closure.
 
 Load an optional packaged capability through a literal, statically discoverable
-import reachable from an approved role manifest. A remote value may select only
+import reachable from an approved window manifest. A remote value may select only
 among packaged capabilities; it never supplies a manifest or module path.
 
 Keep concrete adapter selection in the composition root. Create a separate

@@ -62,7 +62,7 @@ erasable syntax and valid runtime imports.
 Every production process and renderer starts from a closed Proctor-owned
 entrypoint manifest. A remote value may select only among packaged capabilities;
 it cannot provide a module path or contribution manifest. Package checks prove
-candidate and proctor exclusions as well as inclusions.
+AuthenticatedWindow and CandidateWindow exclusions as well as inclusions.
 
 esbuild follows owned CSS, fonts, icons, images, and other static assets from
 the entrypoint graph. The design-system cascade and DOM ownership remain source
@@ -88,7 +88,7 @@ named placeholders. A deterministic extractor owns the translation catalog.
 Translations are checked for identifier and placeholder parity and packaged
 inside the signed application; candidate mode does not fetch catalogs. Locale
 is resolved before composition and active candidate behavior follows the
-Attempt's frozen settings baseline plus current accessibility constraints.
+Attempt's frozen Attempt Configuration plus current accessibility constraints.
 Fallback, expansion, RTL, and privileged-process messages receive explicit
 tests.
 
@@ -143,25 +143,34 @@ binary. Helper processes are explicit signed executables and never depend on
 
 ## Supported release targets and updates
 
-Initial secure-candidate targets are Windows 11 x64 and macOS arm64/x64. macOS
-ships as a universal application. Linux is not a secure-candidate target;
-Windows arm64 requires a later support decision and complete conformance. Only
-explicit vendor-supported OS versions in the signed release capability matrix
-are eligible. Unknown combinations fail candidate preflight.
+Initial secure-candidate platform families are Windows x64 and macOS arm64/x64;
+macOS ships as a universal application. Linux is not a secure-candidate target,
+and Windows arm64 requires a later support decision. Exact supported OS-version
+ranges are not claimed until the signed release capability matrix records
+packaged conformance. Unknown or unproven combinations fail candidate preflight.
 
+Central Proctor distribution owns the signed installers and update feeds.
 Windows uses signed Squirrel installation and update packages. macOS uses a
 hardened, signed, notarized DMG and a signed ZIP update feed. Stable and pilot
-are the only release channels initially. A future elevated Windows service
-reopens the installer decision rather than being hidden inside an install hook.
+are the only release channels initially. An Institution server publishes safe
+Desktop compatibility and build-revocation policy; it does not distribute
+executables. A future elevated Windows service reopens the installer decision
+rather than being hidden inside an install hook.
 
-The privileged main-process updater verifies channel, signature, version
-direction, compatibility, and payload hash. It may download and stage only
-outside active participation. Installation and restart are forbidden during an
-active Attempt or Participation Interruption. Admission requires a
-server-approved minimum release and compatible signed capability matrix. A
+The privileged main-process updater verifies central feed identity, channel,
+signature, version direction, compatibility, and payload hash. It may download
+and stage only outside active or paused participation. Installation and restart
+are forbidden while CandidateWindow is active or continuity is unresolved.
+Institution system ping supplies the supported Desktop release range; candidate
+admission additionally requires the applicable signed capability matrix. A
 critical mid-Attempt revocation follows exam-security policy rather than
 silently restarting the product. Downgrade requires an explicitly approved,
 signed release.
+
+The server evolves `/api/v1` additively and Desktop tolerates unknown additive
+fields/events/reasons. An Institution may still raise its minimum Desktop
+release for security. A too-new result remains explicit even though backward-
+compatible server releases should make it rare.
 
 ## Verification ladder
 
@@ -247,10 +256,11 @@ exact flags once implemented.
 ## Deferred release facts
 
 The release capability matrix will name exact supported OS-version ranges and
-physical-device evidence. Signing identities/providers, artifact publication,
-support-artifact retention, and server update endpoints remain deployment
-decisions. They may specialize this architecture but cannot weaken its package,
-admission, update, privacy, or evidence boundaries.
+physical-device evidence. Signing identities/providers, central artifact
+publication, and support-artifact retention remain deployment decisions.
+Institution compatibility endpoints carry policy metadata only. These facts may
+specialize this architecture but cannot weaken its package, admission, update,
+privacy, or evidence boundaries.
 
 VS Code supplied build and verification evidence for these decisions. No VS
 Code source cluster is admitted by this architecture.

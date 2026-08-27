@@ -55,5 +55,13 @@ Review the result for calm density, one clear lead, consistent vocabulary,
 honest system feedback, restrained polish, and absence of theatrical security
 effects. Remove decoration that competes with examination work.
 
-This step is complete when the design-system character holds across candidate
-and proctor compositions without creating a role-specific visual language.
+For LaunchWindow, cover submitted-server, ready, maintenance, temporarily
+unavailable, incompatible, authenticating, cancelled, and change-server states.
+For AuthenticatedWindow, cover student exam activity and every authorized
+non-student/account/settings area without exposing Role names as UI authority.
+For CandidateWindow, cover admission, active, pause overlay, suspension handoff,
+ready rejoin, correction, submission, and safe departure.
+
+This step is complete when the design-system character holds across
+LaunchWindow, AuthenticatedWindow, and CandidateWindow without creating a
+destination-specific visual language.

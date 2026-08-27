@@ -15,8 +15,13 @@ deployment explicitly accepts them.
 
 Secure candidate mode initially targets declared Windows and macOS versions and
 architectures. Untested combinations and unsupported platforms fail preflight;
-there is no silently weakened mode. Exact version ranges belong to the signed
-release capability matrix.
+there is no silently weakened mode. Exact version ranges wait for packaged
+conformance and belong to the signed release capability matrix.
+
+This document is accepted architecture, not an implementation claim. No
+Desktop/native runtime source currently implements these capabilities; project
+status and release evidence must keep that absence explicit until real packaged
+adapters pass conformance.
 
 ## Ownership and process flow
 
@@ -88,29 +93,32 @@ Sources expose health as `starting`, `healthy`, `degraded`, `failed`, or
 `stopped` and permission as `notDetermined`, `granted`, `denied`, `restricted`,
 or `unavailable`.
 
-The initial required source families cover:
+The first-release required source families cover:
 
 - source supervision and capability health;
-- device network-interface and connectivity state;
-- OS session lock, unlock, suspend, resume, shutdown, and active-user changes;
+- required permission and platform-capability state;
 - candidate-window focus, visibility, minimized/maximized state, fullscreen,
   bounds, and close attempts;
 - physical, active, mirrored, virtual, remote, and specialized display
   topology;
-- application and process lifecycle and identity posture;
-- permission and platform-capability state.
+- reliable screen-capture or remote-session facts where the supported platform
+  can establish them;
+- privileged process/source continuity and connection state needed to preserve
+  the active Participation.
 
-Raw process inventories are ephemeral. Local inspection may use process start
-and stop, PID and parent PID, executable/application identity, publisher or code
-signature, package identity, version and digest, trusted Proctor ancestry, and
-foreground state. Command lines, environments, working directories, document
-names, browser URLs, and window titles are not collected by default.
+The initial display rule requires exactly one physical usable display and no
+mirrored, virtual, remote, or specialized target. CandidateWindow enforcement
+also applies best-effort platform content protection without claiming that it
+prevents external capture.
 
-The initial foundation excludes screen, camera, microphone, and audio capture;
-global keystroke logging; OS clipboard content or history; and generic native
-diagnostic enumeration. Each high-sensitivity category requires a separate
-product, privacy, permission, evidence, retention, access, and accommodation
-decision before it can become a packaged capability.
+Process/application policy, OS session/user-change policy, clipboard access,
+printing, removable devices, VM detection, VPN/network-interface restrictions,
+camera, microphone, audio or screen content capture, global keystroke logging,
+and generic native diagnostics are deferred. Reliable mechanical capture or
+remote-session detection is distinct from collecting screen content. Each
+deferred family requires a separate product, privacy, permission, false-positive,
+evidence, retention, access, and accommodation decision before it can become a
+packaged capability.
 
 ## Policy and evidence transformation
 
@@ -164,7 +172,7 @@ evaluation. A partial or unverifiable required effect keeps posture blocked.
 
 Candidate admission requires:
 
-- exactly one connected usable display target;
+- exactly one connected physical usable display target;
 - exactly one active display surface;
 - no mirrored secondary target;
 - no virtual or remote display/session target;
@@ -249,9 +257,9 @@ Verification has five layers:
 1. contract tests cover schema compatibility, snapshot/event ordering,
    sequences, gaps, resets, bounds, and forbidden fields;
 2. every adapter passes a shared black-box source conformance suite;
-3. packaged Windows and macOS integration tests cover process, window, session,
-   permission, display, mirroring, virtual/remote topology, hot-plug, and
-   cleanup behavior;
+3. packaged Windows and macOS integration tests cover the admitted source
+   families: window, permission, display, mirroring, virtual/remote topology,
+   capture/remote-session detection where supported, hot-plug, and cleanup;
 4. cross-process tests cover handshake attacks, malformed and oversized input,
    stale generations, crash, hang, restart, overload, and renderer isolation;
 5. product scenarios cover admission, containment, abnormal loss, re-entry,

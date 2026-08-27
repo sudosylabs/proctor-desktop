@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Integrated Browser"
+  short_description: "Build secure exam browser capabilities"
+  default_prompt: "Use $develop-integrated-browser to implement or review the Candidate browser boundary."
