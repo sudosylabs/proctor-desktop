@@ -61,11 +61,14 @@ utility process. Electron main launches the exact entrypoint and transfers one
 private MessagePort with fixed build/source identity, challenge, participation-
 generation, sequencing, heartbeat, acknowledgement, bounded-backpressure, and
 shutdown checks. Process-neutral tests and a real Electron development-runtime
-test exercise this bridge. Screen-capture observation, the
-`ExamSecurityCoordinator`, policy/evidence transformation, the permission
-broker, Electron-main BrowserWindow listeners, and enforcement do not yet
-exist. This is source and development-runtime evidence, not packaged secure-
-target conformance.
+test exercise this bridge. A closed Electron-main CandidateWindow constructor
+and enforcer own BrowserWindow listeners, verified platform constraints,
+generation fencing, bounded window-state delivery, and authoritative release;
+focused interface tests and the real Electron harness exercise that boundary.
+Screen-capture observation, the `ExamSecurityCoordinator`, policy/evidence
+transformation, the permission broker, and production CandidateWindow
+composition do not yet exist. This is source and development-runtime evidence,
+not packaged secure-target conformance.
 
 The executable repository foundation contains package metadata and locks,
 pinned Electron and esbuild dependencies, runtime-specific TypeScript checks,
@@ -75,8 +78,9 @@ and macOS/Windows jobs that run both native-source and real Electron utility
 tests. The complete application graph, Forge packaging, renderer/browser
 harnesses, static window manifests, User Settings registry, Workspace client,
 protected stores, integrated browser, terminal client, other native source
-families, screen-capture observation, coordinator and main-process enforcement,
-packaging, signing, distribution, and release jobs remain to be implemented.
+families, screen-capture observation, coordinator and production CandidateWindow
+security composition, packaging, signing, distribution, and release jobs remain
+to be implemented.
 Accepted architecture must never be reported as working runtime behavior.
 
 ## Server integration baseline

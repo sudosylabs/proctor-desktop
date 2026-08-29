@@ -35,13 +35,16 @@ opens that exact three-source baseline inside a dedicated Electron utility
 process. Electron main launches the exact utility entrypoint and transfers one
 private MessagePort; the fixed protocol verifies a one-use challenge, build and
 source-manifest identity, participation generation, sequence order, heartbeat,
-acknowledgement, bounded output pressure, and terminal shutdown. Its
-process-neutral contract tests and real Electron development-runtime test do
-not establish packaged conformance. The `ExamSecurityCoordinator`, policy and
-evidence transformation, `NativePermissionBroker`, Electron-main BrowserWindow
-listeners and enforcement, other native source families, packaged verification,
-and the signed capability matrix remain unimplemented. No supported secure-
-candidate target exists yet.
+acknowledgement, bounded output pressure, and terminal shutdown. A closed
+Electron-main CandidateWindow constructor and enforcer now own BrowserWindow
+listeners, apply and verify platform constraints, fence the participation
+generation, bound delivered window state, and perform authoritative release.
+Their interface tests and real Electron development-runtime test do not
+establish production composition or packaged conformance. The
+`ExamSecurityCoordinator`, policy and evidence transformation,
+`NativePermissionBroker`, production CandidateWindow composition, other native
+source families, packaged verification, and the signed capability matrix remain
+unimplemented. No supported secure-candidate target exists yet.
 
 ## Ownership and process flow
 
