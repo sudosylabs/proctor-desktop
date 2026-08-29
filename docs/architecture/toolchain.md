@@ -25,8 +25,10 @@ allowlist.
 Native source uses one pinned Rust workspace and lockfile. The workspace is a
 dependency and reproducibility authority, not one native product: each
 capability package remains independently buildable, testable, signable, and
-shippable. Shared crates contain only bounded values, protocols, and mechanics
-needed by more than one package.
+shippable. Shared crates contain only bounded protocols or runtime mechanics
+behind narrow independently reviewable contracts. Such a crate may land with
+its first capability consumer when the boundary is authoritative and intended
+for reuse; capability-specific OS behavior remains in the capability package.
 
 ## TypeScript and module graph
 
@@ -233,8 +235,10 @@ builds. Releases are produced only by clean protected CI workflows.
 ## Command contract
 
 The foundation currently exposes `check`, focused repository checks,
-`check:types`, `generate`, `inspect`, and the checker test
-suite. Configuration owns their exact implemented spelling and behavior.
+`check:types`, `generate`, `inspect`, the checker test suite, and a typed
+`test:native` entrypoint. Native tests accept an exact workspace-package focus
+and a built-in Rust target selector; command help and configuration own their
+exact flags and implemented behavior.
 
 As their first real consumers land, the root package will extend that small
 cross-platform vocabulary with:
@@ -242,8 +246,8 @@ cross-platform vocabulary with:
 - `dev` and `build`;
 - `check`, plus focused `check:types`, `check:layers`, `check:runtimes`,
   `check:generated`, and `check:provenance`;
-- `test:unit`, `test:browser`, `test:electron`, `test:native`, and
-  `test:package`, each accepting the relevant focused selector;
+- `test:unit`, `test:browser`, `test:electron`, and `test:package`, each
+  accepting the relevant focused selector;
 - `package` for one declared target;
 - `check:release` for the exhaustive packaged target gate.
 

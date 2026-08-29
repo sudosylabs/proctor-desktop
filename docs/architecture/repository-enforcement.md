@@ -106,5 +106,7 @@ IDs, and overlapping generator output ownership. New checks must land their
 contract in the same change.
 
 No Git hook is installed. Local use is voluntary; CI is the required authority.
-No Electron, Forge, esbuild, Playwright, or Rust scaffolding exists until a real
-consumer activates its accepted control.
+Electron, Forge, esbuild, and Playwright scaffolding remain absent. The Rust
+workspace exists because display topology is a real consumer and activates its
+native schema, source, and test controls; it does not activate packaged-target
+claims.

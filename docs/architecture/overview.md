@@ -1,7 +1,9 @@
 # Architecture overview
 
-No application or native runtime implementation has landed. This document
-summarizes accepted boundaries, not completed features.
+No Electron application runtime has landed. The native display-topology source
+and its repository/toolchain controls are implemented at source level. This
+document summarizes accepted boundaries and does not claim packaged
+secure-target conformance or completion of the remaining features.
 
 Proctor Desktop is an Electron workbench for the whole Proctor examination
 product. Authenticated students see their exam activity; teachers, Exam

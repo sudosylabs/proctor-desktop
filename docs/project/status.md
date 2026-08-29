@@ -42,17 +42,33 @@
 
 ## Desktop implementation state
 
-No application, Electron renderer/main/preload, browser, terminal, or native
-capability source has landed, and no VS Code source cluster is admitted. The
-executable repository foundation contains package metadata/lock, typed policy
-and checker modules, generators, focused Node tests, one Linux foundation CI
-job, and bounded dependency-update configuration.
+No application, Electron renderer/main/preload, browser, terminal, or VS Code
+source cluster has landed. The native Rust workspace now implements the
+display-topology protocol, bounded source session/runtime support, generated
+Rust/TypeScript wire types, macOS, Windows, and Linux display adapters, and the
+CandidateWindow state protocol/source core with a bounded utility-local post-IPC
+ingress. It also implements the capture/session protocol and bounded source
+core, a notification-first Windows WTS adapter with RemoteFX-aware
+remote-session classification, and explicit unavailable macOS/Linux coverage.
+The transport-neutral Rust source-supervision core now composes the fixed
+display, CandidateWindow, and capture/session baseline with atomic startup
+rollback, bounded polling and restart, reset-fenced source replacement, and
+reverse-order shutdown. Screen-capture observation remains unsupported.
+Electron utility-process composition, authenticated private MessagePort
+composition, the `ExamSecurityCoordinator`, and Electron-main BrowserWindow
+listeners and enforcement do not yet exist. This is source-level capability
+evidence, not packaged secure-target conformance.
 
-Electron/Forge/esbuild runtime graphs, browser/Electron harnesses, static
+The executable repository foundation contains package metadata/lock, typed
+policy and checker modules, generators, focused Node/Rust tests, a Linux
+foundation job, a Rust dependency-audit job, and macOS/Windows native-source CI
+jobs. Electron/Forge/esbuild runtime graphs, browser/Electron harnesses, static
 window manifests, User Settings registry, Workspace client, protected stores,
-integrated browser, terminal client, native workspaces/adapters, packaging,
-signing, distribution, and release jobs remain to be implemented. Accepted
-architecture must never be reported as working runtime behavior.
+integrated browser, terminal client, other native source families,
+screen-capture observation, Electron utility-process coordination,
+authenticated native IPC, main-process enforcement, packaging, signing,
+distribution, and release jobs remain to be implemented. Accepted architecture
+must never be reported as working runtime behavior.
 
 ## Server integration baseline
 

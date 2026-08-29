@@ -18,10 +18,24 @@ architectures. Untested combinations and unsupported platforms fail preflight;
 there is no silently weakened mode. Exact version ranges wait for packaged
 conformance and belong to the signed release capability matrix.
 
-This document is accepted architecture, not an implementation claim. No
-Desktop/native runtime source currently implements these capabilities; project
-status and release evidence must keep that absence explicit until real packaged
-adapters pass conformance.
+This document separates accepted architecture from implementation and release
+claims. The display-topology protocol, source-session/runtime support, and
+macOS, Windows, and Linux source adapters are implemented and source-tested.
+The CandidateWindow state protocol, bounded source core, and utility-local
+post-IPC ingress are also implemented and source-tested. The capture/session
+protocol and bounded source core are implemented and source-tested; its Windows
+adapter uses notification-first WTS observation and a RemoteFX-aware
+current-session fallback, while macOS and Linux report explicit unavailable
+coverage. The transport-neutral source-supervision core is implemented and
+source-tested for the fixed display, CandidateWindow, and capture/session
+baseline, including atomic startup rollback, bounded polling and restart,
+reset-fenced source replacement, and reverse-order shutdown. Screen-capture
+observation remains unsupported on every adapter. Electron utility-process
+composition, authenticated private MessagePort composition, the
+`ExamSecurityCoordinator`, Electron-main BrowserWindow listeners and
+enforcement, other native source families, packaged verification, and the
+signed capability matrix remain unimplemented; source tests establish no
+supported secure-candidate target.
 
 ## Ownership and process flow
 
@@ -90,7 +104,7 @@ wraps accepted facts with trusted installation, Session, Attempt,
 participation-generation, and policy provenance to form a `Native Observation`.
 
 Sources expose health as `starting`, `healthy`, `degraded`, `failed`, or
-`stopped` and permission as `notDetermined`, `granted`, `denied`, `restricted`,
+`stopped` and permission as `not_determined`, `granted`, `denied`, `restricted`,
 or `unavailable`.
 
 The first-release required source families cover:
