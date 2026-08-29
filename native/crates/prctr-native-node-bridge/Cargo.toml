@@ -1,0 +1,22 @@
+[package]
+name = "prctr-native-node-bridge"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "=3.12.2", default-features = false, features = ["dyn-symbols", "napi8", "serde-json"] }
+napi-derive = { version = "=3.6.3", default-features = false, features = ["strict"] }
+prctr-candidate-window-state = { path = "../prctr-candidate-window-state" }
+prctr-capture-session-state = { path = "../prctr-capture-session-state" }
+prctr-display-topology = { path = "../prctr-display-topology" }
+prctr-native-protocol = { path = "../prctr-native-protocol" }
+prctr-native-source-supervisor = { path = "../prctr-native-source-supervisor" }
+serde = { version = "=1.0.229", features = ["derive"] }
+
+[lints]
+workspace = true

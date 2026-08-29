@@ -944,16 +944,30 @@ mod tests {
             CandidateWindowSource::open(&request(2), utility_ingress_backend(initial, bridge))
                 .expect("utility ingress source opens and reports overflow through health");
         let mut accepted = Vec::new();
+        let mut overflow_visible = false;
         for _attempt in 0..10_000 {
-            accepted.extend(source.drain().observations);
-            if accepted.len() == 2 {
+            let drain = source.drain();
+            accepted.extend(drain.observations);
+            if drain.health == SourceHealth::Failed {
+                assert_eq!(drain.terminal_error, Some(SourceFailureCode::QueueOverflow));
+                overflow_visible = true;
                 break;
             }
             std::thread::yield_now();
         }
-        assert_eq!(accepted.len(), 2);
+        assert!(
+            overflow_visible,
+            "overflow becomes poll-visible without a later event"
+        );
+        assert!(accepted.iter().any(|observation| {
+            observation.sequence == 6
+                && observation.gap
+                    == Some(SequenceGap {
+                        first_missing: 3,
+                        last_missing: 5,
+                    })
+        }));
         let fresh_final = window(CandidateWindowPlacement::Fullscreen);
-        assert_ne!(accepted[1].event.window, fresh_final);
         ingress
             .fence_with_final_state(fresh_final.clone())
             .expect("fresh state fences the tail-loss boundary");
@@ -961,17 +975,69 @@ mod tests {
 
         assert_eq!(drain.health, SourceHealth::Failed);
         assert_eq!(drain.terminal_error, Some(SourceFailureCode::QueueOverflow));
-        assert_eq!(drain.observations.len(), 2);
+        assert_eq!(drain.observations.len(), 1);
+        assert_eq!(drain.observations[0].sequence, 7);
+        assert_eq!(drain.observations[0].event.window, fresh_final);
+    }
+
+    #[test]
+    fn utility_ingress_preserves_loss_reported_by_the_electron_sender() {
+        let initial = window(CandidateWindowPlacement::Normal);
+        let (ingress, bridge) = candidate_window_utility_ingress(8).expect("valid bridge");
         assert_eq!(
-            drain.observations[0].gap,
+            ingress
+                .try_send(host_state_event(
+                    CandidateWindowHostEventKind::StateTransition,
+                    window(CandidateWindowPlacement::Maximized),
+                ))
+                .expect("valid transition"),
+            CandidateWindowUtilityIngressOutcome::Accepted
+        );
+        assert_eq!(
+            ingress
+                .record_lost_events(3)
+                .expect("positive loss count advances ingress sequence"),
+            CandidateWindowUtilityIngressOutcome::Accepted
+        );
+
+        let mut source =
+            CandidateWindowSource::open(&request(8), utility_ingress_backend(initial, bridge))
+                .expect("utility ingress source opens");
+        let mut observations = Vec::new();
+        let mut loss_visible = false;
+        for _attempt in 0..10_000 {
+            let drain = source.drain();
+            observations.extend(drain.observations);
+            if drain.health == SourceHealth::Failed {
+                assert_eq!(drain.terminal_error, Some(SourceFailureCode::QueueOverflow));
+                loss_visible = true;
+                break;
+            }
+            std::thread::yield_now();
+        }
+        assert!(
+            loss_visible,
+            "reported loss becomes poll-visible without a later event"
+        );
+        assert_eq!(observations.len(), 2);
+        assert_eq!(
+            observations[1].gap,
             Some(SequenceGap {
-                first_missing: 3,
-                last_missing: 5,
+                first_missing: 2,
+                last_missing: 4,
             })
         );
+        assert_eq!(observations[1].sequence, 5);
+        ingress
+            .fence_with_final_state(window(CandidateWindowPlacement::Fullscreen))
+            .expect("fresh final state fences sender-side loss");
+        let drain = source.stop();
+
+        assert_eq!(drain.health, SourceHealth::Failed);
+        assert_eq!(drain.terminal_error, Some(SourceFailureCode::QueueOverflow));
+        assert_eq!(drain.observations.len(), 1);
         assert_eq!(drain.observations[0].sequence, 6);
-        assert_eq!(drain.observations[1].sequence, 7);
-        assert_eq!(drain.observations[1].event.window, fresh_final);
+        assert!(ingress.record_lost_events(0).is_err());
     }
 
     #[test]

@@ -72,3 +72,5 @@ jobs:
         run: npm ci
       - name: Verify native target
         run: npm run test:native
+      - name: Verify Electron security utility
+        run: npm run test:electron

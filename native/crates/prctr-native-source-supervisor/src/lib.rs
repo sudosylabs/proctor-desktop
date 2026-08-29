@@ -21,7 +21,8 @@ use prctr_native_protocol::{
     CANDIDATE_WINDOW_SCHEMA_VERSION, CAPTURE_SESSION_SCHEMA_VERSION, CandidateWindowDrain,
     CandidateWindowSourceSnapshot, CaptureSessionDrain, CaptureSessionSourceSnapshot,
     DISPLAY_TOPOLOGY_SCHEMA_VERSION, DisplayTopologyDrain, DisplayTopologySourceSnapshot,
-    PermissionState, ProtocolValidatable, SourceFailureCode, SourceHealth, SourceOpenRequest,
+    NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS, PermissionState, ProtocolValidatable, SourceFailureCode,
+    SourceHealth, SourceOpenRequest,
 };
 use prctr_native_source_runtime::{
     BoundedTaskError, ensure_native_source_process_usable, poison_native_source_process,
@@ -32,7 +33,7 @@ const RESTART_BOUNDARY_MISSING_COUNT: u64 = 1;
 const RESTART_REASON: &str = "supervised-source-restart";
 const MAX_RESTART_ATTEMPTS: u8 = 8;
 const MAX_RESTART_BACKOFF: Duration = Duration::from_secs(60);
-const SOURCE_OPEN_DEADLINE: Duration = Duration::from_secs(5);
+const SOURCE_OPEN_DEADLINE: Duration = Duration::from_millis(NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS);
 
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub enum NativeSourceKind {

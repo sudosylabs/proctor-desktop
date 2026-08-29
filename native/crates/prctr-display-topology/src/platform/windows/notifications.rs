@@ -58,7 +58,11 @@ impl NotificationState {
 }
 
 pub(super) struct MonitorNotifications {
-    handle: HCMNOTIFICATION,
+    // Windows models this registration token as a pointer, but it is an
+    // opaque process-local value: Rust never dereferences it. Keeping the
+    // address avoids making subscription ownership inherit raw-pointer
+    // thread-affinity that the Configuration Manager API does not impose.
+    handle: usize,
     state: Arc<NotificationState>,
 }
 
@@ -90,15 +94,17 @@ impl MonitorNotifications {
                 "CM_Register_Notification(monitor) failed with CONFIGRET {result}"
             )));
         }
-        Ok(Self { handle, state })
+        Ok(Self {
+            handle: handle as usize,
+            state,
+        })
     }
 
     pub(super) fn unregister(&mut self) -> Result<(), DisplayTopologyError> {
-        if self.handle.is_null() {
+        if self.handle == 0 {
             return Ok(());
         }
-        let handle = mem::replace(&mut self.handle, ptr::null_mut());
-        let handle_address = handle as usize;
+        let handle_address = mem::take(&mut self.handle);
         let callback_state = Arc::clone(&self.state);
         let result = cleanup_with_deadline(
             "prctr-display-callback-remove-windows",

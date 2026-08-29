@@ -8,9 +8,39 @@ mod generated;
 
 use std::fmt;
 
+use serde::{Deserialize, Deserializer, Serializer};
+
 pub use candidate_window_generated::*;
 pub use capture_session_generated::*;
 pub use generated::*;
+
+#[allow(clippy::trivially_copy_pass_by_ref)] // Serde's serialize_with ABI requires a reference.
+pub(crate) fn serialize_protocol_safe_u64<S>(value: &u64, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    if *value > MAX_PROTOCOL_SAFE_INTEGER {
+        return Err(serde::ser::Error::custom(
+            "integer exceeds the protocol safe-integer maximum",
+        ));
+    }
+    let wire_value = i64::try_from(*value).map_err(serde::ser::Error::custom)?;
+    serializer.serialize_i64(wire_value)
+}
+
+pub(crate) fn deserialize_protocol_safe_u64<'de, D>(deserializer: D) -> Result<u64, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let wire_value = i64::deserialize(deserializer)?;
+    let value = u64::try_from(wire_value).map_err(serde::de::Error::custom)?;
+    if value > MAX_PROTOCOL_SAFE_INTEGER {
+        return Err(serde::de::Error::custom(
+            "integer exceeds the protocol safe-integer maximum",
+        ));
+    }
+    Ok(value)
+}
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ProtocolViolation {

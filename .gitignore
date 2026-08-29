@@ -5,6 +5,7 @@ out/
 coverage/
 artifacts/
 .generated-check/
+.build/
 
 # Local planning and investigation material; never authoritative.
 .scratch/

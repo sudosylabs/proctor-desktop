@@ -106,7 +106,10 @@ IDs, and overlapping generator output ownership. New checks must land their
 contract in the same change.
 
 No Git hook is installed. Local use is voluntary; CI is the required authority.
-Electron, Forge, esbuild, and Playwright scaffolding remain absent. The Rust
-workspace exists because display topology is a real consumer and activates its
-native schema, source, and test controls; it does not activate packaged-target
-claims.
+Electron and esbuild now support the isolated security-utility composition:
+the cheap `check` gate runs its process-neutral protocol tests, and the native
+macOS/Windows jobs run its real Electron/Node-API lifecycle test. Forge,
+renderer/Playwright harnesses, packaging, and packaged-target gates remain
+absent. The Rust workspace, native addon, and development-runtime Electron
+evidence activate source/runtime controls only; they establish no packaged-
+target claim.

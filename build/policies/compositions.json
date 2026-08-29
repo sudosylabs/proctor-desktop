@@ -2,5 +2,32 @@
   "$schema": "./schemas/compositions.schema.json",
   "schemaVersion": 1,
   "activationPath": "src/prctr/code",
-  "compositions": []
+  "compositions": [
+    {
+      "id": "security-utility-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/securityUtilityComposition.ts",
+      "required": [
+        "src/prctr/platform/native/common",
+        "src/prctr/platform/native/electron-main"
+      ],
+      "forbidden": [
+        "src/prctr/platform/native/electron-utility"
+      ],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "security-utility-process",
+      "kind": "utility",
+      "entrypoint": "src/prctr/code/electron-utility/securityUtilityEntryPoint.ts",
+      "required": [
+        "src/prctr/platform/native/common",
+        "src/prctr/platform/native/electron-utility"
+      ],
+      "forbidden": [
+        "src/prctr/platform/native/electron-main"
+      ],
+      "allowedDynamicImports": []
+    }
+  ]
 }

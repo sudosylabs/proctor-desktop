@@ -6,6 +6,7 @@ members = [
   "crates/prctr-candidate-window-state",
   "crates/prctr-capture-session-state",
   "crates/prctr-native-source-supervisor",
+  "crates/prctr-native-node-bridge",
 ]
 resolver = "2"
 

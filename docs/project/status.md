@@ -42,33 +42,42 @@
 
 ## Desktop implementation state
 
-No application, Electron renderer/main/preload, browser, terminal, or VS Code
-source cluster has landed. The native Rust workspace now implements the
-display-topology protocol, bounded source session/runtime support, generated
-Rust/TypeScript wire types, macOS, Windows, and Linux display adapters, and the
-CandidateWindow state protocol/source core with a bounded utility-local post-IPC
-ingress. It also implements the capture/session protocol and bounded source
-core, a notification-first Windows WTS adapter with RemoteFX-aware
-remote-session classification, and explicit unavailable macOS/Linux coverage.
-The transport-neutral Rust source-supervision core now composes the fixed
-display, CandidateWindow, and capture/session baseline with atomic startup
-rollback, bounded polling and restart, reset-fenced source replacement, and
-reverse-order shutdown. Screen-capture observation remains unsupported.
-Electron utility-process composition, authenticated private MessagePort
-composition, the `ExamSecurityCoordinator`, and Electron-main BrowserWindow
-listeners and enforcement do not yet exist. This is source-level capability
-evidence, not packaged secure-target conformance.
+No user-facing application, Electron renderer or preload, workbench window,
+browser, terminal, or VS Code source cluster has landed. Production Electron-
+main and utility-process source exists only for the native security baseline.
+The native Rust workspace implements the display-topology protocol, bounded
+source session/runtime support, generated Rust/TypeScript wire types, macOS,
+Windows, and Linux display adapters, and the CandidateWindow state protocol/
+source core with bounded utility-local ingress. It also implements the capture/
+session protocol and bounded source core, a notification-first Windows WTS
+adapter with RemoteFX-aware remote-session classification, and explicit
+unavailable macOS/Linux coverage. The transport-neutral Rust supervisor
+composes the fixed display, CandidateWindow, and capture/session baseline with
+atomic startup rollback, bounded polling and restart, reset-fenced source
+replacement, and reverse-order shutdown.
 
-The executable repository foundation contains package metadata/lock, typed
-policy and checker modules, generators, focused Node/Rust tests, a Linux
-foundation job, a Rust dependency-audit job, and macOS/Windows native-source CI
-jobs. Electron/Forge/esbuild runtime graphs, browser/Electron harnesses, static
-window manifests, User Settings registry, Workspace client, protected stores,
-integrated browser, terminal client, other native source families,
-screen-capture observation, Electron utility-process coordination,
-authenticated native IPC, main-process enforcement, packaging, signing,
-distribution, and release jobs remain to be implemented. Accepted architecture
-must never be reported as working runtime behavior.
+A narrow Node-API adapter exposes that baseline to the dedicated Electron
+utility process. Electron main launches the exact entrypoint and transfers one
+private MessagePort with fixed build/source identity, challenge, participation-
+generation, sequencing, heartbeat, acknowledgement, bounded-backpressure, and
+shutdown checks. Process-neutral tests and a real Electron development-runtime
+test exercise this bridge. Screen-capture observation, the
+`ExamSecurityCoordinator`, policy/evidence transformation, the permission
+broker, Electron-main BrowserWindow listeners, and enforcement do not yet
+exist. This is source and development-runtime evidence, not packaged secure-
+target conformance.
+
+The executable repository foundation contains package metadata and locks,
+pinned Electron and esbuild dependencies, runtime-specific TypeScript checks,
+typed policy/checker modules, generators, focused Node/Rust tests, an Electron
+security-utility harness, a Linux foundation job, a Rust dependency-audit job,
+and macOS/Windows jobs that run both native-source and real Electron utility
+tests. The complete application graph, Forge packaging, renderer/browser
+harnesses, static window manifests, User Settings registry, Workspace client,
+protected stores, integrated browser, terminal client, other native source
+families, screen-capture observation, coordinator and main-process enforcement,
+packaging, signing, distribution, and release jobs remain to be implemented.
+Accepted architecture must never be reported as working runtime behavior.
 
 ## Server integration baseline
 

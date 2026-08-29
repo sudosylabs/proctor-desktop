@@ -2,6 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://proctor.invalid/native/native-observation.schema.json",
   "title": "Proctor shared native-observation protocol",
+  "x-proctor-source-manifest-version": 1,
+  "x-proctor-source-manifest": [
+    "display-topology",
+    "candidate-window",
+    "capture-session"
+  ],
+  "x-proctor-source-lifecycle-deadline-ms": 5000,
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version"],

@@ -120,7 +120,7 @@
       "status": "active",
       "owner": "toolchain",
       "invariants": ["renderer.no-ambient-node", "runtime.handle-isolation", "toolchain.single-esm-graph"],
-      "evidence": ["build/tsconfig.base.json", "build/tsconfig.common.json", "package.json", "src/prctr/platform/native/common/nativeObservation.generated.ts"]
+      "evidence": ["build/tsconfig.base.json", "build/tsconfig.common.json", "build/tsconfig.electron-main.json", "build/tsconfig.electron-utility.json", "package.json", "src/prctr/platform/native/common/nativeObservation.generated.ts"]
     },
     {
       "id": "workspace-contract-tests",
@@ -133,14 +133,12 @@
       "rationale": "The Attempt Workspace contracts have no Desktop source implementation to exercise yet."
     },
     {
-      "id": "composition-security-tests",
+      "id": "native-security-utility-bridge-tests",
       "kind": "test",
-      "status": "deferred",
-      "owner": "workbench-security",
-      "invariants": ["renderer.no-ambient-node", "renderer.sandboxed", "composition.immutable-window", "composition.candidate-transition", "preload.capability-allowlist", "privilege.validate-authorize", "identity.credential-custody", "runtime.handle-isolation", "security.public-readiness", "security.privileged-credential-custody", "security.system-browser-authentication", "security.registered-desktop-key", "security.independent-authorization", "security.authoritative-attempt-state", "security.active-session-lock", "security.candidate-attempt-exclusion", "security.privileged-posture", "security.online-only", "security.containment-before-presentation", "security.pause-suspension", "security.fenced-participation"],
-      "activation": "code-layer-present",
-      "futureKind": "test",
-      "rationale": "Electron process compositions and privileged interfaces do not exist yet."
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": ["runtime.handle-isolation"],
+      "evidence": ["src/prctr/platform/native/common/securityUtilityProtocol.ts", "src/prctr/platform/native/electron-main/securityUtilityClient.ts", "src/prctr/platform/native/electron-utility/securityUtilityHost.ts", "test/security-utility/securityUtilityProtocol.test.ts", "test/electron/securityUtility.real.test.ts", ".github/workflows/foundation.yml", "package.json"]
     },
     {
       "id": "design-system-tests",
@@ -214,7 +212,7 @@
       "invariants": ["native.initial-scope", "native.process-boundaries", "native.single-display-window", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance", "toolchain.signed-capability-matrix"],
       "activation": "packaged-target-present",
       "futureKind": "package",
-      "rationale": "Source-level display-topology, CandidateWindow utility-ingress, and capture/session observation contract tests exist, but the authenticated private MessagePort composition, coordinator/enforcement boundary tests, packaged target tuple, and signed capability matrix do not exist yet."
+      "rationale": "Source-level native observation and authenticated private MessagePort composition tests exist, but coordinator/enforcement boundary tests, a packaged target tuple, and the signed capability matrix do not exist yet."
     },
     {
       "id": "packaged-security",

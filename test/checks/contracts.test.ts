@@ -80,7 +80,11 @@ const failures: Readonly<Record<string, { mutate: Mutation; expectedPath: string
     expectedPath: 'src/prctr/base/common/lower.ts', expectedProblem: /imports upward/
   },
   'source.compositions': {
-    mutate: files => { files['src/prctr/code/common/main.ts'] = 'export {};\n'; },
+    mutate: files => {
+      const policy = JSON.parse(String(files['build/policies/compositions.json'])) as { compositions: unknown[] };
+      policy.compositions = [];
+      files['build/policies/compositions.json'] = `${JSON.stringify(policy, null, 2)}\n`;
+    },
     expectedPath: 'build/policies/compositions.json', expectedProblem: /without declared compositions/
   },
   'source.css': {
@@ -360,7 +364,8 @@ test('dependency admission keeps shared Cargo feature sets bound to their exact 
     const policy = JSON.parse(String(files[policyPath])) as {
       dependencies: Array<{ ecosystem?: string; declarations?: Array<{ manifest: string; features: string[] }> }>;
     };
-    const cargo = policy.dependencies.find(entry => entry.ecosystem === 'cargo');
+    const cargo = policy.dependencies.find(entry => entry.ecosystem === 'cargo'
+      && entry.declarations?.some(declaration => declaration.manifest === displayTopologyManifest));
     assert.ok(cargo?.declarations);
     const capture = cargo.declarations.find(entry => entry.manifest === captureSessionManifest);
     const display = cargo.declarations.find(entry => entry.manifest === displayTopologyManifest);

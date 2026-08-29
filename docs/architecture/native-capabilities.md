@@ -30,12 +30,18 @@ coverage. The transport-neutral source-supervision core is implemented and
 source-tested for the fixed display, CandidateWindow, and capture/session
 baseline, including atomic startup rollback, bounded polling and restart,
 reset-fenced source replacement, and reverse-order shutdown. Screen-capture
-observation remains unsupported on every adapter. Electron utility-process
-composition, authenticated private MessagePort composition, the
-`ExamSecurityCoordinator`, Electron-main BrowserWindow listeners and
-enforcement, other native source families, packaged verification, and the
-signed capability matrix remain unimplemented; source tests establish no
-supported secure-candidate target.
+observation remains unsupported on every adapter. A narrow Node-API bridge now
+opens that exact three-source baseline inside a dedicated Electron utility
+process. Electron main launches the exact utility entrypoint and transfers one
+private MessagePort; the fixed protocol verifies a one-use challenge, build and
+source-manifest identity, participation generation, sequence order, heartbeat,
+acknowledgement, bounded output pressure, and terminal shutdown. Its
+process-neutral contract tests and real Electron development-runtime test do
+not establish packaged conformance. The `ExamSecurityCoordinator`, policy and
+evidence transformation, `NativePermissionBroker`, Electron-main BrowserWindow
+listeners and enforcement, other native source families, packaged verification,
+and the signed capability matrix remain unimplemented. No supported secure-
+candidate target exists yet.
 
 ## Ownership and process flow
 

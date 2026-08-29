@@ -19,6 +19,14 @@ const CAPTURE_SESSION_GENERATED_MARKER = `// @${'generated'} by capture-session.
 type JsonSchema = {
   readonly $defs?: Readonly<Record<string, Definition>>;
   readonly properties?: Readonly<Record<string, Property>>;
+  readonly ['x-proctor-source-manifest']?: readonly unknown[];
+  readonly ['x-proctor-source-manifest-version']?: unknown;
+  readonly ['x-proctor-source-lifecycle-deadline-ms']?: unknown;
+};
+
+type SourceManifestEntry = {
+  readonly source_id: string;
+  readonly schema_version: number;
 };
 
 type SemanticRule = 'ordered_sequence_gap' | 'unique_target_ids' | 'valid_mirror_references'
@@ -74,15 +82,45 @@ export const nativeProtocolGenerator: Generator = {
     }
     const schemaVersion = schema.properties?.schema_version?.const;
     if (typeof schemaVersion !== 'number') throw new Error(`${DISPLAY_TOPOLOGY_AUTHORITY} must declare numeric schema_version const`);
-    const rustOutput = write(outputRoot, RUST_OUTPUT, renderRust(definitions, schemaVersion));
+    const candidateWindowSchemaVersion = candidateWindowSchema.properties?.schema_version?.const;
+    if (typeof candidateWindowSchemaVersion !== 'number') {
+      throw new Error(`${CANDIDATE_WINDOW_AUTHORITY} must declare numeric schema_version const`);
+    }
+    const captureSessionSchemaVersion = captureSessionSchema.properties?.schema_version?.const;
+    if (typeof captureSessionSchemaVersion !== 'number') {
+      throw new Error(`${CAPTURE_SESSION_AUTHORITY} must declare numeric schema_version const`);
+    }
+    const sourceManifest = requiredSourceManifest(commonSchema, new Map([
+      ['display-topology', schemaVersion],
+      ['candidate-window', candidateWindowSchemaVersion],
+      ['capture-session', captureSessionSchemaVersion]
+    ]));
+    const sourceManifestVersion = requiredSourceManifestVersion(commonSchema);
+    const sourceLifecycleDeadlineMs = requiredSourceLifecycleDeadline(commonSchema);
+    const rustOutput = write(
+      outputRoot,
+      RUST_OUTPUT,
+      renderRust(
+        definitions,
+        schemaVersion,
+        sourceManifest,
+        sourceManifestVersion,
+        sourceLifecycleDeadlineMs
+      )
+    );
     execFileSync('rustfmt', ['--edition', '2024', rustOutput]);
     write(
       outputRoot,
       TYPESCRIPT_OUTPUT,
-      renderTypeScript(mergeDefinitions(
-        mergeDefinitions(definitions, candidateWindowDefinitions),
-        captureSessionDefinitions
-      ))
+      renderTypeScript(
+        mergeDefinitions(
+          mergeDefinitions(definitions, candidateWindowDefinitions),
+          captureSessionDefinitions
+        ),
+        sourceManifest,
+        sourceManifestVersion,
+        sourceLifecycleDeadlineMs
+      )
     );
   }
 };
@@ -145,7 +183,13 @@ export const captureSessionProtocolGenerator: Generator = {
   }
 };
 
-function renderRust(definitions: Readonly<Record<string, Definition>>, schemaVersion: number): string {
+function renderRust(
+  definitions: Readonly<Record<string, Definition>>,
+  schemaVersion: number,
+  sourceManifest: readonly SourceManifestEntry[],
+  sourceManifestVersion: number,
+  sourceLifecycleDeadlineMs: number
+): string {
   const maximumTargets = definitions.DisplayTopologySnapshot?.properties?.targets?.maxItems;
   if (maximumTargets === undefined) throw new Error(`${DISPLAY_TOPOLOGY_AUTHORITY} must bound DisplayTopologySnapshot.targets`);
   const maximumFacts = sourceBatchFactLimit(definitions, 'DisplayTopologyDrain');
@@ -156,11 +200,30 @@ function renderRust(definitions: Readonly<Record<string, Definition>>, schemaVer
     '// Do not edit by hand.',
     '',
     'use std::fmt;',
+    'use serde::{Deserialize, Serialize};',
     '',
     `pub const DISPLAY_TOPOLOGY_SCHEMA_VERSION: u16 = ${rustNumber(schemaVersion)};`,
     `pub const MAX_DISPLAY_TARGETS: usize = ${rustNumber(maximumTargets)};`,
     `pub const MAX_DISPLAY_TOPOLOGY_FACTS: usize = ${rustNumber(maximumFacts)};`,
     `pub const MAX_PROTOCOL_SAFE_INTEGER: u64 = ${rustNumber(maximumTimestamp)};`,
+    `pub const NATIVE_SOURCE_COUNT: usize = ${sourceManifest.length};`,
+    `pub const NATIVE_SOURCE_MANIFEST_VERSION: u16 = ${rustNumber(sourceManifestVersion)};`,
+    `pub const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS: u64 = ${rustNumber(sourceLifecycleDeadlineMs)};`,
+    '',
+    '#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]',
+    'pub struct NativeSourceManifestEntry {',
+    "    pub source_id: &'static str,",
+    '    pub schema_version: u16,',
+    '}',
+    '',
+    'pub const NATIVE_SOURCE_MANIFEST: [NativeSourceManifestEntry; NATIVE_SOURCE_COUNT] = [',
+    ...sourceManifest.map(entry => [
+      '    NativeSourceManifestEntry {',
+      `        source_id: ${JSON.stringify(entry.source_id)},`,
+      `        schema_version: ${rustNumber(entry.schema_version)},`,
+      '    },'
+    ]).flat(),
+    '];',
     '',
     '#[derive(Clone, Debug, Eq, PartialEq)]',
     'pub struct ProtocolValidationError {',
@@ -210,6 +273,8 @@ function renderCapabilityRust(
     marker,
     '// Do not edit by hand.',
     '',
+    'use serde::{Deserialize, Serialize};',
+    '',
     'use crate::{',
     '    PermissionState, PlatformFamily, ProtocolValidatable, ProtocolValidationError,',
     '    SequenceGap, SourceFailureCode, SourceHealth, SourceReset, SourceTimestamp,',
@@ -227,7 +292,11 @@ function renderRustDefinitions(definitions: Readonly<Record<string, Definition>>
   const lines: string[] = [];
   for (const [name, definition] of Object.entries(definitions)) {
     if (definition.type === 'string' && definition.enum !== undefined) {
-      lines.push('#[derive(Clone, Copy, Debug, Eq, PartialEq)]', `pub enum ${name} {`);
+      lines.push(
+        '#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]',
+        '#[serde(rename_all = "snake_case")]',
+        `pub enum ${name} {`
+      );
       for (const value of definition.enum) lines.push(`    ${rustVariant(value)},`);
       lines.push('}', '');
       lines.push(`impl ProtocolValidatable for ${name} {`);
@@ -245,9 +314,21 @@ function renderRustDefinitions(definitions: Readonly<Record<string, Definition>>
         lines.push('// These independent mechanical facts are intentionally not one state machine.');
         lines.push('#[allow(clippy::struct_excessive_bools)]');
       }
-      lines.push('#[derive(Clone, Debug, Eq, PartialEq)]', `pub struct ${name} {`);
+      lines.push(
+        '#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]',
+        `pub struct ${name} {`
+      );
       for (const [propertyName, property] of Object.entries(definition.properties)) {
         const type = rustType(property);
+        if (!required.has(propertyName)) {
+          lines.push('    #[serde(skip_serializing_if = "Option::is_none")]');
+        }
+        if (property['x-rust-type'] === 'u64') {
+          lines.push('    #[serde(');
+          lines.push('        serialize_with = "crate::serialize_protocol_safe_u64",');
+          lines.push('        deserialize_with = "crate::deserialize_protocol_safe_u64"');
+          lines.push('    )]');
+        }
         lines.push(`    pub ${propertyName}: ${required.has(propertyName) ? type : `Option<${type}>`},`);
       }
       lines.push('}', '');
@@ -268,7 +349,12 @@ function renderRustDefinitions(definitions: Readonly<Record<string, Definition>>
   return lines;
 }
 
-function renderTypeScript(definitions: Readonly<Record<string, Definition>>): string {
+function renderTypeScript(
+  definitions: Readonly<Record<string, Definition>>,
+  sourceManifest: readonly SourceManifestEntry[],
+  sourceManifestVersion: number,
+  sourceLifecycleDeadlineMs: number
+): string {
   const maximumTargets = definitions.DisplayTopologySnapshot?.properties?.targets?.maxItems;
   if (maximumTargets === undefined) throw new Error(`${DISPLAY_TOPOLOGY_AUTHORITY} must bound DisplayTopologySnapshot.targets`);
   const maximumDisplayFacts = sourceBatchFactLimit(definitions, 'DisplayTopologyDrain');
@@ -277,6 +363,11 @@ function renderTypeScript(definitions: Readonly<Record<string, Definition>>): st
   const lines = [
     GENERATED_MARKER,
     '// Do not edit by hand.',
+    '',
+    `export const NATIVE_SOURCE_MANIFEST = ${JSON.stringify(sourceManifest)} as const;`,
+    'export type NativeSourceManifest = typeof NATIVE_SOURCE_MANIFEST;',
+    `export const NATIVE_SOURCE_MANIFEST_VERSION = ${sourceManifestVersion};`,
+    `export const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS = ${sourceLifecycleDeadlineMs};`,
     '',
     `const MAX_DISPLAY_TOPOLOGY_FACTS = ${maximumDisplayFacts};`,
     `const MAX_CANDIDATE_WINDOW_FACTS = ${maximumCandidateWindowFacts};`,
@@ -404,6 +495,55 @@ function renderTypeScript(definitions: Readonly<Record<string, Definition>>): st
   ];
   lines.push(...renderTypeScriptDefinitions(definitions));
   return `${lines.join('\n').trimEnd()}\n`;
+}
+
+function requiredSourceManifest(
+  schema: JsonSchema,
+  schemaVersions: ReadonlyMap<string, number>
+): readonly SourceManifestEntry[] {
+  const manifest = schema['x-proctor-source-manifest'];
+  if (manifest === undefined || manifest.length === 0) {
+    throw new Error(`${COMMON_AUTHORITY} must declare a non-empty x-proctor-source-manifest`);
+  }
+  const sourceIds = new Set<string>();
+  const result = manifest.map((sourceId, index) => {
+    if (typeof sourceId !== 'string' || !/^[a-z]+(?:-[a-z]+)*$/u.test(sourceId)) {
+      throw new Error(`${COMMON_AUTHORITY} source manifest entry ${index} has an invalid source_id`);
+    }
+    if (sourceIds.has(sourceId)) {
+      throw new Error(`${COMMON_AUTHORITY} source manifest repeats ${sourceId}`);
+    }
+    const schemaVersion = schemaVersions.get(sourceId);
+    if (schemaVersion === undefined) {
+      throw new Error(`${COMMON_AUTHORITY} source manifest names unsupported source ${sourceId}`);
+    }
+    sourceIds.add(sourceId);
+    return { source_id: sourceId, schema_version: schemaVersion };
+  });
+  if (sourceIds.size !== schemaVersions.size) {
+    throw new Error(`${COMMON_AUTHORITY} source manifest must name every generated source exactly once`);
+  }
+  return result;
+}
+
+function requiredSourceLifecycleDeadline(schema: JsonSchema): number {
+  const deadline = schema['x-proctor-source-lifecycle-deadline-ms'];
+  if (typeof deadline !== 'number' || !Number.isSafeInteger(deadline)
+    || deadline < 1 || deadline > 60_000) {
+    throw new Error(
+      `${COMMON_AUTHORITY} must declare a bounded x-proctor-source-lifecycle-deadline-ms`
+    );
+  }
+  return deadline;
+}
+
+function requiredSourceManifestVersion(schema: JsonSchema): number {
+  const version = schema['x-proctor-source-manifest-version'];
+  if (typeof version !== 'number' || !Number.isInteger(version)
+    || version < 1 || version > 65_535) {
+    throw new Error(`${COMMON_AUTHORITY} must declare a bounded x-proctor-source-manifest-version`);
+  }
+  return version;
 }
 
 function renderTypeScriptDefinitions(

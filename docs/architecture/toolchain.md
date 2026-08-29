@@ -17,10 +17,10 @@ and one committed root lockfile. `base`, `platform`, `editor`, `workbench`, and
 `code` remain source-graph layers rather than npm packages. npm workspaces are
 not part of the initial architecture.
 
-The repository pins exact Node, npm, Electron, TypeScript, esbuild, Electron
-Forge, Rust, and package-manager releases. CI installs JavaScript dependencies
-with `npm ci`. Dependency lifecycle scripts use an exact deny-by-default
-allowlist.
+The repository currently pins exact Node, npm, Electron, TypeScript, esbuild,
+and Rust releases. Electron Forge remains the accepted packaging owner but has
+not been admitted or pinned yet. CI installs JavaScript dependencies with `npm
+ci`. Dependency lifecycle scripts use an exact deny-by-default allowlist.
 
 Native source uses one pinned Rust workspace and lockfile. The workspace is a
 dependency and reproducibility authority, not one native product: each
@@ -227,16 +227,23 @@ dumps require explicit support authorization and are never uploaded
 automatically.
 
 GitHub Actions owns initial CI. Linux may run inexpensive source checks but
-cannot establish supported-platform behavior. Windows x64 and macOS arm64/x64
-jobs own package and native claims. Unsigned verified payloads enter protected
-signing jobs whose credentials are unavailable to pull requests and ordinary
-builds. Releases are produced only by clean protected CI workflows.
+cannot establish supported-platform behavior. Current Windows and macOS jobs
+run native-source verification and the real Electron security-utility bridge;
+that development-runtime evidence establishes no packaged platform claim.
+Windows x64 and macOS arm64/x64 jobs will own package and native claims once the
+packaged target gates exist. Unsigned verified payloads enter protected signing
+jobs whose credentials are unavailable to pull requests and ordinary builds.
+Releases are produced only by clean protected CI workflows.
 
 ## Command contract
 
 The foundation currently exposes `check`, focused repository checks,
 `check:types`, `generate`, `inspect`, the checker test suite, and a typed
-`test:native` entrypoint. Native tests accept an exact workspace-package focus
+`test:native` entrypoint. `build:security-utility` compiles the native Node-API
+addon and exact Electron-main/utility test bundles. `test:security-utility`
+proves the process-neutral private protocol, while `test:electron` runs the
+real Electron/Node-API lifecycle. These are development-runtime commands, not
+package or release gates. Native tests accept an exact workspace-package focus
 and a built-in Rust target selector; command help and configuration own their
 exact flags and implemented behavior.
 
@@ -244,10 +251,9 @@ As their first real consumers land, the root package will extend that small
 cross-platform vocabulary with:
 
 - `dev` and `build`;
-- `check`, plus focused `check:types`, `check:layers`, `check:runtimes`,
-  `check:generated`, and `check:provenance`;
-- `test:unit`, `test:browser`, `test:electron`, and `test:package`, each
-  accepting the relevant focused selector;
+- additional focused runtime checks where an independent boundary needs one;
+- `test:browser` and `test:package`, each accepting the relevant focused
+  selector;
 - `package` for one declared target;
 - `check:release` for the exhaustive packaged target gate.
 
