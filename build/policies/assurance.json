@@ -149,6 +149,14 @@
       "evidence": ["src/prctr/platform/native/electron-main/candidateWindowEnforcer.ts", "src/prctr/platform/native/electron-main/electronCandidateWindow.ts", "test/checks/candidateWindowEnforcer.test.ts", "test/electron/securityUtilityMain.ts", "test/electron/securityUtility.real.test.ts", ".github/workflows/foundation.yml", "package.json"]
     },
     {
+      "id": "native-permission-broker-tests",
+      "kind": "test",
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": ["source.interface-tests", "runtime.handle-isolation", "native.initial-scope", "native.process-boundaries", "native.fail-closed"],
+      "evidence": ["src/prctr/platform/native/electron-main/nativePermissionBroker.ts", "src/prctr/code/electron-main/securityUtilityComposition.ts", "test/security-utility/nativePermissionBroker.test.ts", "test/electron/securityUtilityMain.ts", "test/electron/securityUtility.real.test.ts", "build/testSecurityUtility.ts", ".github/workflows/foundation.yml", "package.json"]
+    },
+    {
       "id": "design-system-tests",
       "kind": "test",
       "status": "deferred",
@@ -220,7 +228,7 @@
       "invariants": ["native.initial-scope", "native.process-boundaries", "native.single-display-window", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance", "toolchain.signed-capability-matrix"],
       "activation": "packaged-target-present",
       "futureKind": "package",
-      "rationale": "Source-level native observation, CandidateWindow enforcement boundary tests, and authenticated private MessagePort composition tests exist, but the coordinator, a packaged target tuple, and the signed capability matrix do not exist yet."
+      "rationale": "Source-level native observation, permission-broker lifecycle, CandidateWindow enforcement boundary tests, and authenticated private MessagePort composition tests exist, but the coordinator, a packaged target tuple, and the signed capability matrix do not exist yet."
     },
     {
       "id": "packaged-security",

@@ -39,12 +39,16 @@ acknowledgement, bounded output pressure, and terminal shutdown. A closed
 Electron-main CandidateWindow constructor and enforcer now own BrowserWindow
 listeners, apply and verify platform constraints, fence the participation
 generation, bound delivered window state, and perform authoritative release.
-Their interface tests and real Electron development-runtime test do not
-establish production composition or packaged conformance. The
-`ExamSecurityCoordinator`, policy and evidence transformation,
-`NativePermissionBroker`, production CandidateWindow composition, other native
-source families, packaged verification, and the signed capability matrix remain
-unimplemented. No supported secure-candidate target exists yet.
+An Electron-main `NativePermissionBroker` now declares the fixed baseline's
+platform permission modes, permits an admitted adapter to inspect or request an
+OS permission only during preflight, and seals prompting across security-utility
+startup and participation until normal utility shutdown. Focused interface
+tests and the real Electron development-runtime test exercise these boundaries;
+they do not establish production composition or packaged conformance. The
+`ExamSecurityCoordinator`, policy and evidence transformation, production
+CandidateWindow composition, other native source families, packaged
+verification, and the signed capability matrix remain unimplemented. No
+supported secure-candidate target exists yet.
 
 ## Ownership and process flow
 

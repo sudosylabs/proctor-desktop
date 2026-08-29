@@ -11,9 +11,22 @@ test('authenticated Electron utility process opens and stops the Rust baseline',
     timeout: 30_000
   }).trim();
   const result: unknown = JSON.parse(output);
+  const capturePermission = process.platform === 'win32' ? 'granted' : 'unavailable';
+  const captureMode = process.platform === 'win32' ? 'not_required' : 'unavailable';
+  const permissionPlatform = process.platform === 'darwin'
+    ? 'macos'
+    : process.platform === 'win32' ? 'windows' : 'linux';
   assert.deepEqual(result, {
     ready: 'ready',
     sources: ['candidate_window', 'capture_session', 'display_topology'],
+    permission_platform: permissionPlatform,
+    permission_modes: ['not_required', 'not_required', captureMode],
+    permission_states: ['granted', 'granted', capturePermission],
+    permission_prompt_blocked: true,
+    permission_startup_failure_retained_seal: true,
+    permission_unsealed_launch_rejected: true,
+    permission_active_release_rejected: true,
+    permission_preflight_reopened: true,
     constraints: {
       alwaysOnTopDisabled: true,
       closePrevented: true,

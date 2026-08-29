@@ -65,10 +65,14 @@ test exercise this bridge. A closed Electron-main CandidateWindow constructor
 and enforcer own BrowserWindow listeners, verified platform constraints,
 generation fencing, bounded window-state delivery, and authoritative release;
 focused interface tests and the real Electron harness exercise that boundary.
-Screen-capture observation, the `ExamSecurityCoordinator`, policy/evidence
-transformation, the permission broker, and production CandidateWindow
-composition do not yet exist. This is source and development-runtime evidence,
-not packaged secure-target conformance.
+An Electron-main permission broker declares the fixed baseline's platform
+permission modes, restricts any admitted OS permission request to preflight,
+and seals prompting across utility startup and participation until normal
+shutdown. Focused tests and the real Electron harness cover that lifecycle,
+including fail-closed startup loss. Screen-capture observation, the
+`ExamSecurityCoordinator`, policy/evidence transformation, and production
+CandidateWindow composition do not yet exist. This is source and
+development-runtime evidence, not packaged secure-target conformance.
 
 The executable repository foundation contains package metadata and locks,
 pinned Electron and esbuild dependencies, runtime-specific TypeScript checks,

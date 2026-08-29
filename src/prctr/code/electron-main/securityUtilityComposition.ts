@@ -8,7 +8,8 @@ import {
 } from 'electron';
 import type {
   CandidateWindowHostEvent,
-  CandidateWindowState
+  CandidateWindowState,
+  PlatformFamily
 } from '../../platform/native/common/nativeObservation.generated.js';
 import {
   SECURITY_UTILITY_STARTUP_TIMEOUT_MS,
@@ -21,6 +22,14 @@ import {
   SecurityUtilityClient,
   type SecurityUtilityClientFailure
 } from '../../platform/native/electron-main/securityUtilityClient.js';
+import {
+  NativePermissionBroker,
+  createBaselineNativePermissionAdapters,
+  type NativePermissionCapability,
+  type NativePermissionFact,
+  type NativePermissionPreflightReceipt,
+  type NativePermissionPreflightSeal
+} from '../../platform/native/electron-main/nativePermissionBroker.js';
 
 declare const __PRCTR_SECURITY_UTILITY_BUILD_IDENTITY__: string;
 declare const __PRCTR_ALLOW_UNSIGNED_SECURITY_UTILITY_NATIVE__: boolean;
@@ -40,6 +49,150 @@ export interface LaunchSecurityUtilityOptions {
 export interface SecurityUtilityConnection {
   readonly sendCandidateWindowEvent: (event: CandidateWindowHostEvent) => void;
   readonly shutdown: (finalCandidateWindow: CandidateWindowState) => Promise<NativeSupervisorStop>;
+}
+
+export type NativeSecurityCompositionErrorCode =
+  | 'permission_preflight_active'
+  | 'permission_preflight_not_sealed'
+  | 'security_utility_active'
+  | 'security_utility_not_active';
+
+export class NativeSecurityCompositionError extends Error {
+  public readonly code: NativeSecurityCompositionErrorCode;
+
+  public constructor(code: NativeSecurityCompositionErrorCode) {
+    super(`native security composition failed: ${code}`);
+    this.name = 'NativeSecurityCompositionError';
+    this.code = code;
+  }
+}
+
+export interface NativeSecurityComposition {
+  readonly inspectPermissionPreflight: () => Promise<NativePermissionPreflightReceipt>;
+  readonly requestPermissionDuringPreflight: (
+    capability: NativePermissionCapability
+  ) => Promise<NativePermissionFact>;
+  readonly sealPermissionPreflight: () => Promise<NativePermissionPreflightReceipt>;
+  readonly cancelPermissionPreflight: () => void;
+  readonly launchSecurityUtility: (
+    options: LaunchSecurityUtilityOptions
+  ) => Promise<{ readonly connection: SecurityUtilityConnection; readonly ready: SecurityUtilityReady }>;
+}
+
+export function createNativeSecurityComposition(): NativeSecurityComposition {
+  const composition = new ElectronMainNativeSecurityComposition();
+  return Object.freeze({
+    inspectPermissionPreflight: () => composition.inspectPermissionPreflight(),
+    requestPermissionDuringPreflight: (capability: NativePermissionCapability) => (
+      composition.requestPermissionDuringPreflight(capability)
+    ),
+    sealPermissionPreflight: () => composition.sealPermissionPreflight(),
+    cancelPermissionPreflight: () => composition.cancelPermissionPreflight(),
+    launchSecurityUtility: (options: LaunchSecurityUtilityOptions) => (
+      composition.launchSecurityUtility(options)
+    )
+  });
+}
+
+class ElectronMainNativeSecurityComposition {
+  readonly #permissionBroker = new NativePermissionBroker({
+    adapters: createBaselineNativePermissionAdapters(currentPlatformFamily())
+  });
+  #permissionSeal: NativePermissionPreflightSeal | undefined;
+  #utilityState: 'idle' | 'starting' | 'active' | 'stopping' | 'failed_closed' = 'idle';
+
+  public inspectPermissionPreflight(): Promise<NativePermissionPreflightReceipt> {
+    return this.#permissionBroker.inspectPreflight();
+  }
+
+  public requestPermissionDuringPreflight(
+    capability: NativePermissionCapability
+  ): Promise<NativePermissionFact> {
+    return this.#permissionBroker.requestDuringPreflight(capability);
+  }
+
+  public async sealPermissionPreflight(): Promise<NativePermissionPreflightReceipt> {
+    const sealed = await this.#permissionBroker.sealPreflight();
+    this.#permissionSeal = sealed.seal;
+    return sealed.receipt;
+  }
+
+  public cancelPermissionPreflight(): void {
+    if (this.#utilityState !== 'idle') {
+      throw new NativeSecurityCompositionError('permission_preflight_active');
+    }
+    this.#releasePermissionSeal();
+  }
+
+  public async launchSecurityUtility(
+    options: LaunchSecurityUtilityOptions
+  ): Promise<{ readonly connection: SecurityUtilityConnection; readonly ready: SecurityUtilityReady }> {
+    if (this.#permissionSeal === undefined) {
+      throw new NativeSecurityCompositionError('permission_preflight_not_sealed');
+    }
+    if (this.#utilityState !== 'idle') {
+      throw new NativeSecurityCompositionError('security_utility_active');
+    }
+    this.#utilityState = 'starting';
+    try {
+      const launched = await launchSecurityUtilityProcess({
+        ...options,
+        onFailure: failure => {
+          if (this.#utilityState === 'active') this.#utilityState = 'failed_closed';
+          options.onFailure(failure);
+        }
+      });
+      const connection = launched.connection;
+      this.#utilityState = 'active';
+      return Object.freeze({
+        ready: launched.ready,
+        connection: Object.freeze({
+          sendCandidateWindowEvent: (event: CandidateWindowHostEvent) => {
+            this.#assertUtilityActive();
+            connection.sendCandidateWindowEvent(event);
+          },
+          shutdown: (finalCandidateWindow: CandidateWindowState) => (
+            this.#shutdownNormally(connection, finalCandidateWindow)
+          )
+        })
+      });
+    } catch (error) {
+      this.#utilityState = 'failed_closed';
+      throw error;
+    }
+  }
+
+  async #shutdownNormally(
+    connection: SecurityUtilityConnection,
+    finalCandidateWindow: CandidateWindowState
+  ): Promise<NativeSupervisorStop> {
+    this.#assertUtilityActive();
+    this.#utilityState = 'stopping';
+    try {
+      const stopped = await connection.shutdown(finalCandidateWindow);
+      this.#utilityState = 'idle';
+      this.#releasePermissionSeal();
+      return stopped;
+    } catch (error) {
+      this.#utilityState = 'failed_closed';
+      throw error;
+    }
+  }
+
+  #assertUtilityActive(): void {
+    if (this.#utilityState !== 'active') {
+      throw new NativeSecurityCompositionError('security_utility_not_active');
+    }
+  }
+
+  #releasePermissionSeal(): void {
+    if (this.#permissionSeal === undefined) {
+      throw new Error('native permission preflight is not sealed');
+    }
+    const seal = this.#permissionSeal;
+    this.#permissionBroker.releasePreflightSeal(seal);
+    this.#permissionSeal = undefined;
+  }
 }
 
 class SecurityUtilityProcessConnection implements SecurityUtilityConnection {
@@ -75,7 +228,7 @@ class SecurityUtilityProcessConnection implements SecurityUtilityConnection {
   }
 }
 
-export async function launchSecurityUtility(
+async function launchSecurityUtilityProcess(
   options: LaunchSecurityUtilityOptions
 ): Promise<{ readonly connection: SecurityUtilityConnection; readonly ready: SecurityUtilityReady }> {
   const child = utilityProcess.fork(UTILITY_ENTRYPOINT, [], {
@@ -150,4 +303,11 @@ function waitForSpawn(child: UtilityProcess): Promise<void> {
     child.once('exit', exited);
     child.once('error', errored);
   });
+}
+
+function currentPlatformFamily(): PlatformFamily {
+  if (process.platform === 'darwin') return 'macos';
+  if (process.platform === 'win32') return 'windows';
+  if (process.platform === 'linux') return 'linux';
+  throw new Error(`unsupported Electron platform: ${process.platform}`);
 }

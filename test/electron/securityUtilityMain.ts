@@ -1,12 +1,14 @@
 import { app, BrowserWindow, Menu } from 'electron';
 import {
-  launchSecurityUtility,
+  createNativeSecurityComposition,
+  NativeSecurityCompositionError,
   type SecurityUtilityConnection
 } from '../../src/prctr/code/electron-main/securityUtilityComposition.js';
 import type { CandidateWindowHostEvent } from '../../src/prctr/platform/native/common/nativeObservation.generated.js';
 import type { NativeBatchEnvelope } from '../../src/prctr/platform/native/common/securityUtilityProtocol.js';
 import { CandidateWindowEnforcementError } from '../../src/prctr/platform/native/electron-main/candidateWindowEnforcer.js';
 import { createElectronCandidateWindow } from '../../src/prctr/platform/native/electron-main/electronCandidateWindow.js';
+import { NativePermissionBrokerError } from '../../src/prctr/platform/native/electron-main/nativePermissionBroker.js';
 
 const participationGeneration = 'participation-generation-test-0001';
 
@@ -25,6 +27,17 @@ void app.whenReady().then(runHarness).catch(error => failHarness(error));
 
 async function runHarness(): Promise<void> {
   try {
+    phase = 'checking_native_permissions';
+    const nativeSecurity = createNativeSecurityComposition();
+    const permissionPreflight = await nativeSecurity.inspectPermissionPreflight();
+    await nativeSecurity.sealPermissionPreflight();
+    let permissionPromptBlocked = false;
+    try {
+      await nativeSecurity.requestPermissionDuringPreflight('capture-session');
+    } catch (error) {
+      permissionPromptBlocked = error instanceof NativePermissionBrokerError
+        && error.code === 'preflight_sealed';
+    }
     phase = 'preparing_candidate_window';
     const applicationMenuAtCreation = Menu.buildFromTemplate([
       { label: 'Proctor Test', submenu: [{ label: 'Creation menu marker', enabled: false }] }
@@ -51,7 +64,7 @@ async function runHarness(): Promise<void> {
     const enforcer = candidateWindow.enforcer;
     const prepared = enforcer.prepare(participationGeneration);
     phase = 'launching_utility';
-    const launched = await launchSecurityUtility({
+    const launchOptions = {
       participationGeneration,
       collectionSessionId: 'collection-session-test-0001',
       queueCapacity: 32,
@@ -60,9 +73,43 @@ async function runHarness(): Promise<void> {
         observedCloseAttempts += countCandidateCloseAttempts(poll.batches);
       },
       onFailure: failure => failures.push(failure)
-    });
+    } as const;
+    const failedStartupSecurity = createNativeSecurityComposition();
+    await failedStartupSecurity.inspectPermissionPreflight();
+    await failedStartupSecurity.sealPermissionPreflight();
+    let startupFailureRetainedSeal = false;
+    try {
+      await failedStartupSecurity.launchSecurityUtility({
+        ...launchOptions,
+        collectionSessionId: 'collection-session-failed-startup-test-0001',
+        queueCapacity: 0,
+        onFailure: () => undefined
+      });
+    } catch {
+      const [inspection, request] = await Promise.allSettled([
+        failedStartupSecurity.inspectPermissionPreflight(),
+        failedStartupSecurity.requestPermissionDuringPreflight('capture-session')
+      ]);
+      startupFailureRetainedSeal = rejectedWithBrokerCode(inspection, 'preflight_sealed')
+        && rejectedWithBrokerCode(request, 'preflight_sealed');
+    }
+    let unsealedLaunchRejected = false;
+    try {
+      await createNativeSecurityComposition().launchSecurityUtility(launchOptions);
+    } catch (error) {
+      unsealedLaunchRejected = error instanceof NativeSecurityCompositionError
+        && error.code === 'permission_preflight_not_sealed';
+    }
+    const launched = await nativeSecurity.launchSecurityUtility(launchOptions);
     phase = 'utility_ready';
     connection = launched.connection;
+    let activePermissionReleaseRejected = false;
+    try {
+      nativeSecurity.cancelPermissionPreflight();
+    } catch (error) {
+      activePermissionReleaseRejected = error instanceof NativeSecurityCompositionError
+        && error.code === 'permission_preflight_active';
+    }
     for (const event of pendingCandidateEvents.splice(0)) {
       connection.sendCandidateWindowEvent(event);
     }
@@ -74,6 +121,7 @@ async function runHarness(): Promise<void> {
     observedCloseAttempts += countCandidateCloseAttempts(stopped.batches);
     phase = 'utility_stopped';
     const released = enforcer.release(participationGeneration);
+    const reopenedPermissionPreflight = await nativeSecurity.inspectPermissionPreflight();
     const applicationMenuRestored = process.platform !== 'darwin'
       || Menu.getApplicationMenu() === applicationMenuBeforeCandidate;
     const listenerRollback = verifyTransactionalListenerRollback();
@@ -81,6 +129,15 @@ async function runHarness(): Promise<void> {
     process.stdout.write(`${JSON.stringify({
       ready: launched.ready.kind,
       sources: Object.keys(launched.ready.snapshots).sort(),
+      permission_platform: permissionPreflight.platform,
+      permission_modes: permissionPreflight.permissions.map(permission => permission.mode),
+      permission_states: permissionPreflight.permissions.map(permission => permission.permission),
+      permission_prompt_blocked: permissionPromptBlocked,
+      permission_startup_failure_retained_seal: startupFailureRetainedSeal,
+      permission_unsealed_launch_rejected: unsealedLaunchRejected,
+      permission_active_release_rejected: activePermissionReleaseRejected,
+      permission_preflight_reopened:
+        reopenedPermissionPreflight.permissions.length === permissionPreflight.permissions.length,
       constraints: verified.constraints,
       close_vetoed: closeVetoed,
       close_attempt_observed: observedCloseAttempts > 0,
@@ -97,6 +154,15 @@ async function runHarness(): Promise<void> {
   } catch (error) {
     failHarness(error);
   }
+}
+
+function rejectedWithBrokerCode(
+  result: PromiseSettledResult<unknown>,
+  code: NativePermissionBrokerError['code']
+): boolean {
+  return result.status === 'rejected'
+    && result.reason instanceof NativePermissionBrokerError
+    && result.reason.code === code;
 }
 
 function verifyTransactionalListenerRollback(): {
