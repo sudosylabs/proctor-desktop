@@ -29,5 +29,46 @@ jobs:
         run: npm install --global npm@11.19.0 --ignore-scripts
       - name: Install locked dependencies
         run: npm ci
+      - name: Audit npm vulnerabilities
+        run: npm run audit:dependencies
       - name: Verify foundation
         run: npm run check
+
+  dependency-audit:
+    name: dependency-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      checks: write
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Audit locked Rust dependencies
+        uses: rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: native
+
+  native-targets:
+    name: native-${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Use exact Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Use exact npm
+        run: npm install --global npm@11.19.0 --ignore-scripts
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify native target
+        run: npm run test:native

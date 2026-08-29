@@ -1,0 +1,24 @@
+[workspace]
+members = [
+  "crates/prctr-native-protocol",
+  "crates/prctr-native-source-runtime",
+  "crates/prctr-display-topology",
+  "crates/prctr-candidate-window-state",
+  "crates/prctr-capture-session-state",
+  "crates/prctr-native-source-supervisor",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+license = "UNLICENSED"
+rust-version = "1.89"
+version = "0.1.0"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+unused_must_use = "deny"
+
+[workspace.lints.clippy]
+all = "deny"
+pedantic = "deny"

@@ -1,4 +1,9 @@
 import type { Repository } from '../checks/types.ts';
+import {
+  candidateWindowProtocolGenerator,
+  captureSessionProtocolGenerator,
+  nativeProtocolGenerator
+} from './nativeProtocol.ts';
 
 export interface Generator {
   readonly id: string;
@@ -8,7 +13,11 @@ export interface Generator {
   generate(repository: Repository, outputRoot: string): void | Promise<void>;
 }
 
-export const generators: readonly Generator[] = [];
+export const generators: readonly Generator[] = [
+  nativeProtocolGenerator,
+  candidateWindowProtocolGenerator,
+  captureSessionProtocolGenerator
+];
 
 export function validateGeneratorRegistry(entries: readonly Generator[]): readonly string[] {
   const problems: string[] = [];

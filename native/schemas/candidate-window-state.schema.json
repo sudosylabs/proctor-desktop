@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proctor.invalid/native/candidate-window-state.schema.json",
+  "title": "Proctor native CandidateWindow state protocol",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": { "const": 1 }
+  },
+  "$defs": {
+    "CandidateWindowCertainty": {
+      "type": "string",
+      "enum": ["complete", "partial", "unknown"]
+    },
+    "CandidateWindowPresence": {
+      "type": "string",
+      "enum": ["present", "absent", "unknown"]
+    },
+    "CandidateWindowFocus": {
+      "type": "string",
+      "enum": ["focused", "not_focused", "unknown"]
+    },
+    "CandidateWindowVisibility": {
+      "type": "string",
+      "enum": ["visible", "not_visible", "unknown"]
+    },
+    "CandidateWindowPlacement": {
+      "type": "string",
+      "enum": ["normal", "minimized", "maximized", "fullscreen", "unknown"]
+    },
+    "CandidateWindowBounds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": { "type": "integer", "minimum": -1048576, "maximum": 1048576, "x-rust-type": "i32" },
+        "y": { "type": "integer", "minimum": -1048576, "maximum": 1048576, "x-rust-type": "i32" },
+        "width": { "type": "integer", "minimum": 1, "maximum": 262144, "x-rust-type": "u32" },
+        "height": { "type": "integer", "minimum": 1, "maximum": 262144, "x-rust-type": "u32" }
+      }
+    },
+    "CandidateWindowState": {
+      "type": "object",
+      "x-proctor-rules": ["coherent_candidate_window_state"],
+      "additionalProperties": false,
+      "required": ["certainty", "presence", "focus", "visibility", "placement"],
+      "properties": {
+        "certainty": { "$ref": "#/$defs/CandidateWindowCertainty" },
+        "presence": { "$ref": "#/$defs/CandidateWindowPresence" },
+        "focus": { "$ref": "#/$defs/CandidateWindowFocus" },
+        "visibility": { "$ref": "#/$defs/CandidateWindowVisibility" },
+        "placement": { "$ref": "#/$defs/CandidateWindowPlacement" },
+        "bounds": { "$ref": "#/$defs/CandidateWindowBounds" },
+        "display_target_id": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "CandidateWindowHostEventKind": {
+      "type": "string",
+      "enum": ["state_refresh", "state_transition", "close_attempt"]
+    },
+    "CandidateWindowHostEvent": {
+      "type": "object",
+      "x-proctor-rules": ["coherent_candidate_window_host_event"],
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/CandidateWindowHostEventKind" },
+        "window": { "$ref": "#/$defs/CandidateWindowState" }
+      }
+    },
+    "CandidateWindowEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["window", "close_attempts_since_previous"],
+      "properties": {
+        "window": { "$ref": "#/$defs/CandidateWindowState" },
+        "close_attempts_since_previous": { "type": "integer", "minimum": 0, "maximum": 1024, "x-rust-type": "u16" }
+      }
+    },
+    "CandidateWindowSourceSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_instance_id", "source_version", "adapter_version", "schema_version", "platform", "permission", "health", "sequence", "observed_at", "window"],
+      "properties": {
+        "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
+        "source_version": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "adapter_version": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "schema_version": { "type": "integer", "const": 1, "minimum": 1, "maximum": 65535, "x-rust-type": "u16" },
+        "platform": { "$ref": "native-observation.schema.json#/$defs/PlatformFamily" },
+        "permission": { "$ref": "native-observation.schema.json#/$defs/PermissionState" },
+        "health": { "$ref": "native-observation.schema.json#/$defs/SourceHealth" },
+        "sequence": { "type": "integer", "minimum": 0, "maximum": 9007199254740991, "x-rust-type": "u64" },
+        "observed_at": { "$ref": "native-observation.schema.json#/$defs/SourceTimestamp" },
+        "window": { "$ref": "#/$defs/CandidateWindowState" }
+      }
+    },
+    "CandidateWindowObservation": {
+      "type": "object",
+      "x-proctor-rules": ["gap_ends_immediately_before_sequence"],
+      "additionalProperties": false,
+      "required": ["source_instance_id", "sequence", "observed_at", "event"],
+      "properties": {
+        "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
+        "sequence": { "type": "integer", "minimum": 1, "maximum": 9007199254740991, "x-rust-type": "u64" },
+        "observed_at": { "$ref": "native-observation.schema.json#/$defs/SourceTimestamp" },
+        "gap": { "$ref": "native-observation.schema.json#/$defs/SequenceGap" },
+        "event": { "$ref": "#/$defs/CandidateWindowEvent" }
+      }
+    },
+    "CandidateWindowDrain": {
+      "type": "object",
+      "x-proctor-rules": ["coherent_source_batch"],
+      "additionalProperties": false,
+      "required": ["source_instance_id", "health", "observations", "resets"],
+      "properties": {
+        "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
+        "health": { "$ref": "native-observation.schema.json#/$defs/SourceHealth" },
+        "observations": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": { "$ref": "#/$defs/CandidateWindowObservation" }
+        },
+        "resets": {
+          "type": "array",
+          "maxItems": 1024,
+          "items": { "$ref": "native-observation.schema.json#/$defs/SourceReset" }
+        },
+        "terminal_error": { "$ref": "native-observation.schema.json#/$defs/SourceFailureCode" }
+      }
+    }
+  }
+}

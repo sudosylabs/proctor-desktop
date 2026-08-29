@@ -1,7 +1,57 @@
 {
   "$schema": "./schemas/dependencies.schema.json",
   "schemaVersion": 1,
+  "allowedLicenseExpressions": ["Apache-2.0", "BSD-3-Clause", "ISC", "MIT", "MIT OR Apache-2.0"],
   "dependencies": [
+    {
+      "ecosystem": "cargo",
+      "package": "windows-sys",
+      "version": "0.61.2",
+      "kind": "production",
+      "purpose": "Typed Windows CCD enumeration, monitor notifications, hidden-window display and WTS session refreshes, and native remote-session classification for passive Windows capability adapters.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/windows-sys/0.61.2",
+      "license": "MIT OR Apache-2.0",
+      "lifecycleScripts": "none",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-capture-session-state/Cargo.toml",
+          "alias": "windows-sys",
+          "kind": "production",
+          "features": ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_System_Registry", "Win32_System_RemoteDesktop", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": "cfg(target_os=\"windows\")"
+        },
+        {
+          "manifest": "native/crates/prctr-display-topology/Cargo.toml",
+          "alias": "windows-sys",
+          "kind": "production",
+          "features": ["Win32_Devices_DeviceAndDriverInstallation", "Win32_Devices_Display", "Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": "cfg(target_os=\"windows\")"
+        }
+      ],
+      "processes": ["native-capture-session", "native-display-topology"],
+      "networkBehavior": "None; the crate provides generated Win32 bindings and links system libraries only.",
+      "nativeBehavior": "No bundled native binary or build script; generated Rust declarations call reviewed CCD, Configuration Manager, WTS notification, registry-query, window-messaging, module-loader, thread, and system-metric APIs through Windows system linking.",
+      "transitiveRisk": "Locks windows-link 0.2.1, which supplies Windows import linkage without lifecycle scripts or network behavior; it is target-scoped with windows-sys.",
+      "bundleTreatment": "external-platform",
+      "localAlternative": "Handwritten CCD, Configuration Manager callback, WTS, registry, and window-message FFI would duplicate ABI-sensitive structures and lifecycle signatures, increasing memory-safety risk.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "package": "smol-toml",
+      "version": "1.8.0",
+      "kind": "development",
+      "purpose": "Parse Cargo manifests structurally so dependency admission evaluates decoded TOML rather than an unsafe lexical approximation.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/smol-toml/v/1.8.0",
+      "license": "BSD-3-Clause",
+      "lifecycleScripts": "none"
+    },
     {
       "package": "@types/node",
       "version": "24.13.3",

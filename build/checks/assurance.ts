@@ -9,6 +9,9 @@ function activationPresent(repository: Repository, activation: NonNullable<Assur
   const files = repository.files();
   switch (activation) {
     case 'source-present': return files.some(path => path.startsWith('src/prctr/') && path.endsWith('.ts'));
+    case 'workspace-source-present': return files.some(path => path.includes('/attemptWorkspace/') || path.includes('/workspace/'));
+    case 'browser-source-present': return files.some(path => path.includes('/integratedBrowser/'));
+    case 'execution-source-present': return files.some(path => path.includes('/executionEnvironment/') || path.includes('/terminal/'));
     case 'code-layer-present': return files.some(path => path.startsWith('src/prctr/code/'));
     case 'css-present': return files.some(path => path.startsWith('src/prctr/') && path.endsWith('.css'));
     case 'settings-registry-present': return repository.exists('src/prctr/platform/settings/common/settingsManifest.ts');

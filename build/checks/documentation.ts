@@ -63,13 +63,14 @@ export const documentationCheck: Check = {
     if (!repository.exists(ignorePath)) diagnostics.push(diagnostic('repository.documentation', ignorePath, 'Repository ignore policy is missing.', 'Add the canonical root .gitignore.'));
     else {
       const patterns = new Set(repository.read(ignorePath).split('\n').map(line => line.trim()).filter(line => line !== '' && !line.startsWith('#')));
-      for (const required of ['.scratch/', 'node_modules/', 'out/', 'coverage/', 'artifacts/', '.generated-check/']) if (!patterns.has(required)) diagnostics.push(diagnostic('repository.documentation', ignorePath, `Required ignore pattern ${required} is missing.`, 'Restore the foundation ignore policy.'));
+      for (const required of ['.scratch/', 'node_modules/', 'out/', '/native/target/', 'coverage/', 'artifacts/', '.generated-check/']) if (!patterns.has(required)) diagnostics.push(diagnostic('repository.documentation', ignorePath, `Required ignore pattern ${required} is missing.`, 'Restore the foundation ignore policy.'));
+      if (patterns.has('target/')) diagnostics.push(diagnostic('repository.documentation', ignorePath, 'The unanchored target/ pattern can hide application source directories.', 'Ignore only the native Cargo output at /native/target/.'));
     }
     return diagnostics;
   }
 };
 
-const TEXT_EXTENSIONS = new Set(['.css', '.json', '.jsonc', '.md', '.ts', '.yaml', '.yml']);
+const TEXT_EXTENSIONS = new Set(['.css', '.json', '.jsonc', '.md', '.rs', '.toml', '.ts', '.yaml', '.yml']);
 export const hygieneCheck: Check = {
   id: 'repository.hygiene', category: 'documentation', contractRequired: true,
   run: ({ repository }) => {
@@ -77,7 +78,8 @@ export const hygieneCheck: Check = {
     for (const path of repository.files()) {
       if (repository.kind(path) === 'symlink') continue;
       const extension = posix.extname(path);
-      if (!TEXT_EXTENSIONS.has(extension) && !['.gitignore', '.npmrc', '.nvmrc', 'AGENTS.md', 'package.json'].includes(path)) continue;
+      if (!TEXT_EXTENSIONS.has(extension) && posix.basename(path) !== 'Cargo.lock'
+        && !['.gitignore', '.npmrc', '.nvmrc', 'AGENTS.md', 'package.json'].includes(path)) continue;
       const text = repository.read(path);
       if (text.includes('\u0000') || new TextDecoder('utf-8', { fatal: true }).decode(repository.readBytes(path)) !== text) diagnostics.push(diagnostic('repository.hygiene', path, 'Text is not valid UTF-8.', 'Encode repository text as UTF-8.'));
       if (!text.endsWith('\n')) diagnostics.push(diagnostic('repository.hygiene', path, 'Text lacks a final newline.', 'End text files with one newline.'));

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proctor.invalid/native/native-observation.schema.json",
+  "title": "Proctor shared native-observation protocol",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version"],
+  "properties": {
+    "schema_version": { "const": 1 }
+  },
+  "$defs": {
+    "PlatformFamily": {
+      "type": "string",
+      "enum": ["macos", "windows", "linux"]
+    },
+    "PermissionState": {
+      "type": "string",
+      "enum": ["not_determined", "granted", "denied", "restricted", "unavailable"]
+    },
+    "SourceHealth": {
+      "type": "string",
+      "enum": ["starting", "healthy", "degraded", "failed", "stopped"]
+    },
+    "SourceFailureCode": {
+      "type": "string",
+      "enum": ["backend", "cleanup", "protocol", "queue", "queue_overflow"]
+    },
+    "SourceTimestamp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wall_time_unix_ms", "monotonic_time_ns"],
+      "properties": {
+        "wall_time_unix_ms": { "type": "integer", "minimum": 0, "maximum": 9007199254740991, "x-rust-type": "u64" },
+        "monotonic_time_ns": { "type": "integer", "minimum": 0, "maximum": 9007199254740991, "x-rust-type": "u64" }
+      }
+    },
+    "SequenceGap": {
+      "type": "object",
+      "x-proctor-rules": ["ordered_sequence_gap"],
+      "additionalProperties": false,
+      "required": ["first_missing", "last_missing"],
+      "properties": {
+        "first_missing": { "type": "integer", "minimum": 1, "maximum": 9007199254740991, "x-rust-type": "u64" },
+        "last_missing": { "type": "integer", "minimum": 1, "maximum": 9007199254740991, "x-rust-type": "u64" }
+      }
+    },
+    "SourceOpenRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collection_session_id", "requested_schema_version", "queue_capacity"],
+      "properties": {
+        "collection_session_id": { "type": "string", "minLength": 16, "maxLength": 128 },
+        "requested_schema_version": { "type": "integer", "minimum": 1, "maximum": 65535, "x-rust-type": "u16" },
+        "queue_capacity": { "type": "integer", "minimum": 2, "maximum": 1024, "x-rust-type": "u16" }
+      }
+    },
+    "SourceReset": {
+      "type": "object",
+      "x-proctor-rules": ["gap_ends_immediately_before_sequence"],
+      "additionalProperties": false,
+      "required": ["source_instance_id", "sequence", "observed_at", "reason"],
+      "properties": {
+        "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
+        "sequence": { "type": "integer", "minimum": 1, "maximum": 9007199254740991, "x-rust-type": "u64" },
+        "observed_at": { "$ref": "#/$defs/SourceTimestamp" },
+        "gap": { "$ref": "#/$defs/SequenceGap" },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    }
+  }
+}

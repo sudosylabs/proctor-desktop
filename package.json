@@ -23,8 +23,10 @@
   },
   "scripts": {
     "audit:upstream": "node build/checks/upstreamAudit.ts",
-    "check": "npm run check:types && node build/checks/main.ts && npm run test:checks",
-    "check:types": "tsc --project build/tsconfig.json --noEmit",
+    "audit:dependencies": "npm audit --audit-level=high",
+    "check": "npm run check:types && node build/checks/main.ts && npm run check:licenses && npm run test:checks && npm run test:native",
+    "check:licenses": "node build/checks/dependencyLicenses.ts",
+    "check:types": "tsc --project build/tsconfig.json --noEmit && tsc --project build/tsconfig.common.json --noEmit",
     "check:assurance": "node build/checks/main.ts --check assurance.coverage",
     "check:dependencies": "node build/checks/main.ts --check dependencies.admission",
     "check:docs": "node build/checks/main.ts --check repository.documentation --check repository.hygiene --check ci.actions-pinned",
@@ -36,6 +38,7 @@
     "inspect": "node build/checks/main.ts --inspect",
     "test": "npm run test:checks",
     "test:checks": "node --test test/checks/*.test.ts",
+    "test:native": "node build/testNative.ts",
     "test:unit": "node --test"
   },
   "allowScripts": {},
@@ -45,6 +48,7 @@
     "mdast-util-from-markdown": "2.0.3",
     "postcss": "8.5.26",
     "postcss-selector-parser": "7.1.5",
+    "smol-toml": "1.8.0",
     "typescript": "6.0.3",
     "yaml": "2.9.0"
   }

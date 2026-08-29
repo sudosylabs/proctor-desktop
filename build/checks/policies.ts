@@ -30,11 +30,32 @@ export type AssuranceControl = {
   readonly invariants: readonly string[];
   readonly implementation?: string;
   readonly evidence?: readonly string[];
-  readonly activation?: 'source-present' | 'code-layer-present' | 'css-present' | 'settings-registry-present' | 'native-package-present' | 'packaged-target-present';
+  readonly activation?: 'source-present' | 'workspace-source-present' | 'browser-source-present' | 'execution-source-present' | 'code-layer-present' | 'css-present' | 'settings-registry-present' | 'native-package-present' | 'packaged-target-present';
   readonly futureKind?: string;
   readonly rationale?: string;
 };
 export type AssurancePolicy = { readonly invariantSource: string; readonly controls: readonly AssuranceControl[] };
+export type DependencyAdmission = {
+  readonly ecosystem?: 'npm' | 'cargo';
+  readonly package: string;
+  readonly version: string;
+  readonly kind: 'development' | 'production';
+  readonly license: string;
+  readonly lifecycleScripts: 'none' | 'blocked' | 'allowed';
+  readonly declarations?: readonly {
+    readonly manifest: string;
+    readonly alias: string;
+    readonly kind: 'development' | 'production';
+    readonly features: readonly string[];
+    readonly defaultFeatures: boolean;
+    readonly optional: boolean;
+    readonly targetScope: string | null;
+  }[];
+};
+export type DependencyPolicy = {
+  readonly allowedLicenseExpressions: readonly string[];
+  readonly dependencies: readonly DependencyAdmission[];
+};
 
 export function readJson<T>(repository: Repository, path: string): T {
   return JSON.parse(repository.read(path)) as T;

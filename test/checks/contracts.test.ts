@@ -21,6 +21,27 @@ async function run(check: Check, repository: VirtualRepository): Promise<readonl
   return check.run({ repository, registeredCheckIds: new Set(checks.map(entry => entry.id)) });
 }
 
+const displayTopologyManifest = 'native/crates/prctr-display-topology/Cargo.toml';
+const captureSessionManifest = 'native/crates/prctr-capture-session-state/Cargo.toml';
+
+function appendCargoDependency(files: Record<string, string | Uint8Array | { symlink: string }>, declaration: string): void {
+  const scoped = declaration.replace(/^\[dependencies\./, "[target.'cfg(proctor_checker_fixture)'.dependencies.");
+  const prefix = scoped === declaration ? "[target.'cfg(proctor_checker_fixture)'.dependencies]\n" : '';
+  files[displayTopologyManifest] = `${String(files[displayTopologyManifest])}\n${prefix}${scoped}\n`;
+}
+
+function prependCargoRoot(files: Record<string, string | Uint8Array | { symlink: string }>, declaration: string): void {
+  files[displayTopologyManifest] = `${declaration}\n${String(files[displayTopologyManifest])}`;
+}
+
+function replaceDisplayTopologyWithRootDeclaration(files: Record<string, string | Uint8Array | { symlink: string }>, declaration: string): void {
+  files[displayTopologyManifest] = `${declaration}
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "=0.61.2", features = ["Win32_Devices_Display", "Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_UI_WindowsAndMessaging"] }
+`;
+}
+
 const failures: Readonly<Record<string, { mutate: Mutation; expectedPath: string; expectedProblem: RegExp }>> = {
   'policy.schemas': {
     mutate: files => { files['build/policies/assurance.json'] = String(files['build/policies/assurance.json']).replace('"controls": [', '"controls": [], "unused": ['); },
@@ -39,8 +60,8 @@ const failures: Readonly<Record<string, { mutate: Mutation; expectedPath: string
     expectedPath: 'docs/README.md', expectedProblem: /does not exist/
   },
   'repository.hygiene': {
-    mutate: files => { files['docs/README.md'] = `${String(files['docs/README.md']).trimEnd()}  \n`; },
-    expectedPath: 'docs/README.md', expectedProblem: /trailing whitespace/
+    mutate: files => { files['native/Cargo.toml'] = `${String(files['native/Cargo.toml']).trimEnd()}  \n`; },
+    expectedPath: 'native/Cargo.toml', expectedProblem: /trailing whitespace/
   },
   'ci.actions-pinned': {
     mutate: files => { files['.github/workflows/foundation.yml'] = 'jobs:\n  check:\n    steps:\n      - uses: actions/checkout@v4\n'; },
@@ -81,4 +102,407 @@ test('every registered checker has a pass/fail virtual repository contract', asy
       assert.ok(failing.some(item => item.checkId === check.id && item.path === contract.expectedPath && contract.expectedProblem.test(item.problem)), JSON.stringify(failing, null, 2));
     });
   }
+});
+
+test('dependency admission rejects an unreviewed exact Cargo dependency', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const repository = snapshot(files => {
+    appendCargoDependency(files, 'unreviewed-native = { version = "=1.2.3" }');
+  });
+  const diagnostics = await run(check, repository);
+  assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+    && /unreviewed-native is not admitted/.test(item.problem)));
+});
+
+test('dependency admission covers every Cargo registry declaration form', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const declaration of [
+    'unreviewed-string = "=1.2.3"',
+    'unreviewed-inline = { version = "=1.2.3", default-features = false }',
+    '[dependencies.unreviewed-table]\nversion = "=1.2.3"'
+  ]) {
+    const repository = snapshot(files => {
+      appendCargoDependency(files, declaration);
+    });
+    const diagnostics = await run(check, repository);
+    assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+      && /unreviewed-(?:string|inline|table) is not admitted/.test(item.problem)), `${declaration}: ${JSON.stringify(diagnostics)}`);
+  }
+});
+
+test('dependency admission resolves Cargo package aliases and rejects skipped keys', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const declaration of [
+    'local-alias = { package = "unreviewed-renamed", version = "=1.2.3" }',
+    '[dependencies.local-table-alias]\npackage = "unreviewed-table-renamed"\nversion = "=1.2.3"',
+    '"unreviewed-quoted" = "=1.2.3"',
+    '[dependencies."unreviewed-quoted-table"]\nversion = "=1.2.3"'
+  ]) {
+    const repository = snapshot(files => {
+      appendCargoDependency(files, declaration);
+    });
+    const diagnostics = await run(check, repository);
+    assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+      && /unreviewed-(?:renamed|table-renamed|quoted|quoted-table)|unsupported/.test(item.problem)), `${declaration}: ${JSON.stringify(diagnostics)}`);
+  }
+});
+
+test('dependency admission rejects non-exact Cargo versions', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const repository = snapshot(files => {
+    appendCargoDependency(files, 'not-exact = "1.2.3"');
+  });
+  const diagnostics = await run(check, repository);
+  assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+    && /not-exact is not pinned/.test(item.problem)));
+});
+
+test('dependency admission rejects alternate Cargo sources', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const declaration of [
+    'windows-sys = { version = "=0.61.2", git = "https://example.invalid/windows-rs" }',
+    'windows-sys = { version = "=0.61.2", registry = "private" }',
+    '[dependencies.windows-sys]\nversion = "=0.61.2"\ngit = "https://example.invalid/windows-rs"'
+  ]) {
+    const repository = snapshot(files => {
+      appendCargoDependency(files, declaration);
+    });
+    const diagnostics = await run(check, repository);
+    assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+      && /unsupported alternate Cargo source/.test(item.problem)), `${declaration}: ${JSON.stringify(diagnostics)}`);
+  }
+});
+
+test('dependency admission rejects quoted Cargo source and path properties', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const declaration of [
+    'windows-sys = { version = "=0.61.2", "git" = "https://example.invalid/windows-rs" }',
+    'windows-sys = { version = "=0.61.2", "path" = "../../../../outside" }',
+    '[dependencies.windows-sys]\nversion = "=0.61.2"\n"git" = "https://example.invalid/windows-rs"',
+    '[dependencies.windows-sys]\nversion = "=0.61.2"\n"path" = "../../../../outside"'
+  ]) {
+    const repository = snapshot(files => {
+      appendCargoDependency(files, declaration);
+    });
+    const diagnostics = await run(check, repository);
+    assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+      && /unsupported alternate Cargo source|not a tracked member/.test(item.problem)), `${declaration}: ${JSON.stringify(diagnostics)}`);
+  }
+});
+
+test('dependency admission rejects dotted Cargo dependency declarations', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const declaration of [
+    'dependencies.unreviewed-dotted = "=1.2.3"',
+    'target.\'cfg(proctor_checker_dotted)\'.dependencies.unreviewed-target-dotted = "=1.2.3"'
+  ]) {
+    const repository = snapshot(files => {
+      replaceDisplayTopologyWithRootDeclaration(files, declaration);
+    });
+    const diagnostics = await run(check, repository);
+    assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+      && /unreviewed-(?:dotted|target-dotted) is not admitted/.test(item.problem)), `${declaration}: ${JSON.stringify(diagnostics)}`);
+  }
+});
+
+test('dependency admission rejects dotted Cargo source overrides', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const declaration of [
+    'patch.crates-io.windows-sys = { git = "https://example.invalid/windows-rs" }',
+    'replace."windows-sys:0.61.2" = { path = "../../../../outside" }'
+  ]) {
+    const repository = snapshot(files => {
+      prependCargoRoot(files, declaration);
+    });
+    const diagnostics = await run(check, repository);
+    assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+      && /Cargo override/.test(item.problem)), `${declaration}: ${JSON.stringify(diagnostics)}`);
+  }
+});
+
+test('dependency admission rejects quoted Cargo structural keys', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const declaration of [
+    '["dependencies".unreviewed-quoted-structure]\nversion = "=1.2.3"',
+    '["patch".crates-io]\nwindows-sys = { git = "https://example.invalid/windows-rs" }',
+    '"replace"."windows-sys:0.61.2" = { path = "../../../../outside" }'
+  ]) {
+    const repository = snapshot(files => {
+      prependCargoRoot(files, declaration);
+    });
+    const diagnostics = await run(check, repository);
+    assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+      && /is not admitted as a Cargo dependency|Cargo override/.test(item.problem)), `${declaration}: ${JSON.stringify(diagnostics)}`);
+  }
+  const assignmentDiagnostics = await run(check, snapshot(files => {
+    replaceDisplayTopologyWithRootDeclaration(files, '"dependencies".unreviewed-quoted-assignment = "=1.2.3"');
+  }));
+  assert.ok(assignmentDiagnostics.some(item => /unreviewed-quoted-assignment is not admitted/.test(item.problem)), JSON.stringify(assignmentDiagnostics));
+});
+
+test('dependency admission rejects spaced Cargo structural dotted keys', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const declaration of [
+    'dependencies . unreviewed-spaced = "=1.2.3"',
+    '[patch . crates-io]\nwindows-sys = { git = "https://example.invalid/windows-rs" }'
+  ]) {
+    const repository = snapshot(files => {
+      if (declaration.startsWith('dependencies')) replaceDisplayTopologyWithRootDeclaration(files, declaration);
+      else prependCargoRoot(files, declaration);
+    });
+    const diagnostics = await run(check, repository);
+    assert.ok(diagnostics.some(item => item.path === 'native/crates/prctr-display-topology/Cargo.toml'
+      && /is not admitted as a Cargo dependency|Cargo override/.test(item.problem)), `${declaration}: ${JSON.stringify(diagnostics)}`);
+  }
+});
+
+test('dependency admission rejects external Cargo paths and source overrides', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const mutate of [
+    (files: Record<string, string | Uint8Array | { symlink: string }>): void => {
+      appendCargoDependency(files, 'outside = { path = "../../../../outside" }');
+    },
+    (files: Record<string, string | Uint8Array | { symlink: string }>): void => {
+      const path = 'native/crates/prctr-display-topology/Cargo.toml';
+      files[path] = `${String(files[path])}\n[patch.crates-io]\nwindows-sys = { path = "../patched" }\n`;
+    },
+    (files: Record<string, string | Uint8Array | { symlink: string }>): void => {
+      files['native/.cargo/config.toml'] = '[registry]\ndefault = "private"\n';
+    }
+  ]) {
+    const diagnostics = await run(check, snapshot(mutate));
+    assert.ok(diagnostics.some(item => /not a tracked member|Cargo override|Cargo configuration is not admitted/.test(item.problem)), JSON.stringify(diagnostics));
+  }
+});
+
+test('dependency admission parses escaped and bracket-bearing TOML keys structurally', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const declaration of [
+    '["depend\\u0065ncies".unreviewed-escaped]\nversion = "=1.2.3"',
+    '[dependencies."unreviewed]name"]\nversion = "=1.2.3"'
+  ]) {
+    const diagnostics = await run(check, snapshot(files => { appendCargoDependency(files, declaration.replace(/^\[dependencies\./, '[dependencies.')); }));
+    assert.ok(diagnostics.some(item => /unreviewed-(?:escaped|]name) is not admitted|dependency key unreviewed]name is unsupported/.test(item.problem)), `${declaration}: ${JSON.stringify(diagnostics)}`);
+  }
+  const overrideDiagnostics = await run(check, snapshot(files => {
+    prependCargoRoot(files, '"p\\u0061tch".crates-io.windows-sys = { git = "https://example.invalid/windows-rs" }');
+  }));
+  assert.ok(overrideDiagnostics.some(item => /Cargo override/.test(item.problem)), JSON.stringify(overrideDiagnostics));
+});
+
+test('dependency admission compares normalized Cargo features, defaults, optionality, and target scopes', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const mutation of [
+    (manifest: string): string => manifest.replace('"Win32_Graphics_Gdi"', '"Win32_System_Registry"'),
+    (manifest: string): string => manifest.replace('features = [', 'default-features = false, features = ['),
+    (manifest: string): string => manifest.replace('features = [', 'optional = true, features = ['),
+    (manifest: string): string => manifest.replace('[target.\'cfg(target_os = "windows")\'.dependencies]\n', '')
+  ]) {
+    const diagnostics = await run(check, snapshot(files => {
+      files[displayTopologyManifest] = mutation(String(files[displayTopologyManifest]));
+    }));
+    assert.ok(diagnostics.some(item => /exact per-manifest declaration tuples/.test(item.problem)), JSON.stringify(diagnostics));
+  }
+});
+
+test('dependency admission normalizes insignificant Cargo target-selector whitespace', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const diagnostics = await run(check, snapshot(files => {
+    files[displayTopologyManifest] = String(files[displayTopologyManifest]).replace(
+      'cfg(target_os = "windows")',
+      'cfg( target_os="windows" )'
+    );
+  }));
+  assert.deepEqual(diagnostics, []);
+});
+
+test('dependency admission distinguishes an unconditional declaration from a target named unconditional', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const diagnostics = await run(check, snapshot(files => {
+    files[displayTopologyManifest] = String(files[displayTopologyManifest]).replace(
+      '[target.\'cfg(target_os = "windows")\'.dependencies]',
+      '[target.unconditional.dependencies]'
+    );
+  }));
+  assert.ok(diagnostics.some(item => /exact per-manifest declaration tuples/.test(item.problem)), JSON.stringify(diagnostics));
+});
+
+test('dependency admission rejects an additional unreviewed per-manifest declaration', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const diagnostics = await run(check, snapshot(files => {
+    const path = 'native/crates/prctr-candidate-window-state/Cargo.toml';
+    files[path] = `${String(files[path])}\n[target.'cfg(target_os = "macos")'.dependencies]\nwindows-sys = { version = "=0.61.2", features = ["Win32_Foundation"] }\n`;
+  }));
+  assert.ok(diagnostics.some(item => /exact per-manifest declaration tuples/.test(item.problem)), JSON.stringify(diagnostics));
+});
+
+test('dependency admission keeps shared Cargo feature sets bound to their exact manifests', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const diagnostics = await run(check, snapshot(files => {
+    const policyPath = 'build/policies/dependencies.json';
+    const policy = JSON.parse(String(files[policyPath])) as {
+      dependencies: Array<{ ecosystem?: string; declarations?: Array<{ manifest: string; features: string[] }> }>;
+    };
+    const cargo = policy.dependencies.find(entry => entry.ecosystem === 'cargo');
+    assert.ok(cargo?.declarations);
+    const capture = cargo.declarations.find(entry => entry.manifest === captureSessionManifest);
+    const display = cargo.declarations.find(entry => entry.manifest === displayTopologyManifest);
+    assert.ok(capture && display);
+    [capture.features, display.features] = [display.features, capture.features];
+    files[policyPath] = `${JSON.stringify(policy, null, 2)}\n`;
+  }));
+  assert.ok(diagnostics.some(item => /exact per-manifest declaration tuples/.test(item.problem)), JSON.stringify(diagnostics));
+});
+
+test('dependency admission rejects workspace-inherited registry declarations until member tuples are modeled', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const diagnostics = await run(check, snapshot(files => {
+    const manifest = String(files[displayTopologyManifest]);
+    const declaration = manifest.match(/^windows-sys = .*$/mu)?.[0];
+    assert.ok(declaration);
+    files['native/Cargo.toml'] = `${String(files['native/Cargo.toml'])}\n[workspace.dependencies]\n${declaration}\n`;
+    files[displayTopologyManifest] = manifest.replace(declaration, 'windows-sys = { workspace = true }');
+  }));
+  assert.ok(diagnostics.some(item => item.path === displayTopologyManifest
+    && /workspace dependency inheritance, whose member scope and optionality are not admitted/.test(item.problem)), JSON.stringify(diagnostics));
+});
+
+test('dependency admission rejects package features that forward unadmitted Cargo features', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const forwarded of ['windows-sys/Win32_System_Registry', 'windows-sys?/Win32_System_Registry']) {
+    const diagnostics = await run(check, snapshot(files => {
+      files[displayTopologyManifest] = `${String(files[displayTopologyManifest])}\n[features]\nstealth = ["${forwarded}"]\n`;
+    }));
+    assert.ok(diagnostics.some(item => item.path === displayTopologyManifest
+      && /forwards unadmitted dependency feature/.test(item.problem)), `${forwarded}: ${JSON.stringify(diagnostics)}`);
+  }
+});
+
+test('dependency admission rejects Cargo manifests outside the native workspace', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const diagnostics = await run(check, snapshot(files => {
+    files['tools/unreviewed/Cargo.toml'] = '[package]\nname = "unreviewed"\nversion = "0.1.0"\n';
+  }));
+  assert.ok(diagnostics.some(item => item.path === 'tools/unreviewed/Cargo.toml' && /outside the declared native workspace/.test(item.problem)), JSON.stringify(diagnostics));
+});
+
+test('dependency admission rejects duplicate ecosystem package records', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  for (const ecosystem of ['npm', 'cargo'] as const) {
+    const diagnostics = await run(check, snapshot(files => {
+      const path = 'build/policies/dependencies.json';
+      const policy = JSON.parse(String(files[path])) as { dependencies: Array<Record<string, unknown>> };
+      const original = policy.dependencies.find(entry => ecosystem === 'npm' ? entry.ecosystem === undefined : entry.ecosystem === ecosystem);
+      assert.ok(original);
+      policy.dependencies.push({ ...original, purpose: 'Conflicting duplicate review authority.' });
+      files[path] = `${JSON.stringify(policy, null, 2)}\n`;
+    }));
+    const label = ecosystem === 'cargo' ? 'Cargo' : ecosystem;
+    assert.ok(diagnostics.some(item => new RegExp(`duplicate ${label} admission`).test(item.problem)), `${ecosystem}: ${JSON.stringify(diagnostics)}`);
+  }
+});
+
+test('dependency admission requires pinned npm and Cargo vulnerability audits', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const cargoDiagnostics = await run(check, snapshot(files => {
+    const path = '.github/workflows/foundation.yml';
+    files[path] = String(files[path]).replace('rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998', 'rustsec/audit-check@v2');
+  }));
+  assert.ok(cargoDiagnostics.some(item => item.path === '.github/workflows/foundation.yml' && /Cargo advisory audit is missing/.test(item.problem)), JSON.stringify(cargoDiagnostics));
+  const npmDiagnostics = await run(check, snapshot(files => {
+    const path = 'package.json';
+    const manifest = JSON.parse(String(files[path])) as { scripts: Record<string, string> };
+    manifest.scripts['audit:dependencies'] = 'npm audit --audit-level=critical';
+    files[path] = `${JSON.stringify(manifest, null, 2)}\n`;
+  }));
+  assert.ok(npmDiagnostics.some(item => item.path === 'package.json' && /npm vulnerability audit command/.test(item.problem)), JSON.stringify(npmDiagnostics));
+  const commentDecoyDiagnostics = await run(check, snapshot(files => {
+    const path = '.github/workflows/foundation.yml';
+    files[path] = String(files[path]).replace(
+      'uses: rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998',
+      '# uses: rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998\n        uses: rustsec/audit-check@v2'
+    );
+  }));
+  assert.ok(commentDecoyDiagnostics.some(item => /Cargo advisory audit is missing/.test(item.problem)), JSON.stringify(commentDecoyDiagnostics));
+  const privilegeDiagnostics = await run(check, snapshot(files => {
+    const path = '.github/workflows/foundation.yml';
+    files[path] = String(files[path]).replace('permissions:\n  contents: read', 'permissions:\n  checks: write\n  contents: read');
+  }));
+  assert.ok(privilegeDiagnostics.some(item => /foundation job has permissions beyond read-only/.test(item.problem)), JSON.stringify(privilegeDiagnostics));
+  const disabledFoundationDiagnostics = await run(check, snapshot(files => {
+    const path = '.github/workflows/foundation.yml';
+    files[path] = String(files[path]).replace('  foundation:\n    name:', '  foundation:\n    if: false\n    name:');
+  }));
+  assert.ok(disabledFoundationDiagnostics.some(item => /npm vulnerability audit is not executed/.test(item.problem)), JSON.stringify(disabledFoundationDiagnostics));
+  const ignoredNpmAuditDiagnostics = await run(check, snapshot(files => {
+    const path = '.github/workflows/foundation.yml';
+    files[path] = String(files[path]).replace(
+      '      - name: Audit npm vulnerabilities\n        run: npm run audit:dependencies',
+      '      - name: Audit npm vulnerabilities\n        continue-on-error: true\n        run: npm run audit:dependencies'
+    );
+  }));
+  assert.ok(ignoredNpmAuditDiagnostics.some(item => /npm vulnerability audit is not executed/.test(item.problem)), JSON.stringify(ignoredNpmAuditDiagnostics));
+  const disabledCargoAuditDiagnostics = await run(check, snapshot(files => {
+    const path = '.github/workflows/foundation.yml';
+    files[path] = String(files[path]).replace('  dependency-audit:\n    name:', '  dependency-audit:\n    if: false\n    name:');
+  }));
+  assert.ok(disabledCargoAuditDiagnostics.some(item => /Cargo advisory audit is missing/.test(item.problem)), JSON.stringify(disabledCargoAuditDiagnostics));
+  const ignoredCargoAuditDiagnostics = await run(check, snapshot(files => {
+    const path = '.github/workflows/foundation.yml';
+    files[path] = String(files[path]).replace(
+      '      - name: Audit locked Rust dependencies\n        uses:',
+      '      - name: Audit locked Rust dependencies\n        continue-on-error: true\n        uses:'
+    );
+  }));
+  assert.ok(ignoredCargoAuditDiagnostics.some(item => /Cargo advisory audit is missing/.test(item.problem)), JSON.stringify(ignoredCargoAuditDiagnostics));
+});
+
+test('dependency admission keeps the typed native test command entrypoint', async () => {
+  const check = checkMap().get('dependencies.admission');
+  assert.ok(check);
+  const diagnostics = await run(check, snapshot(files => {
+    const path = 'package.json';
+    const manifest = JSON.parse(String(files[path])) as { scripts: Record<string, string> };
+    manifest.scripts['test:native'] = 'cargo test --manifest-path native/Cargo.toml';
+    files[path] = `${JSON.stringify(manifest, null, 2)}\n`;
+  }));
+  assert.ok(diagnostics.some(item => /native test command bypasses/.test(item.problem)), JSON.stringify(diagnostics));
+});
+
+test('production dependency policy requires native and transitive risk ownership', async () => {
+  const check = checkMap().get('policy.schemas');
+  assert.ok(check);
+  const repository = snapshot(files => {
+    const path = 'build/policies/dependencies.json';
+    const policy = JSON.parse(String(files[path])) as { dependencies: Array<Record<string, unknown>> };
+    const production = policy.dependencies.find(entry => entry.kind === 'production');
+    assert.ok(production);
+    delete production.transitiveRisk;
+    files[path] = `${JSON.stringify(policy, null, 2)}\n`;
+  });
+  const diagnostics = await run(check, repository);
+  assert.ok(diagnostics.some(item => item.path === 'build/policies/dependencies.json'
+    && /transitiveRisk/.test(item.problem)));
 });

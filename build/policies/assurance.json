@@ -67,7 +67,7 @@
       "owner": "toolchain",
       "invariants": ["toolchain.single-esm-graph", "toolchain.closed-packages"],
       "implementation": "dependencies.admission",
-      "evidence": ["build/policies/dependencies.json", "package-lock.json"]
+      "evidence": ["build/checks/dependencyLicenses.ts", "build/policies/dependencies.json", "package-lock.json", "native/Cargo.lock", "native/Cargo.toml", ".github/workflows/foundation.yml"]
     },
     {
       "id": "generated-ownership",
@@ -117,12 +117,10 @@
     {
       "id": "runtime-environment-typechecks",
       "kind": "source",
-      "status": "deferred",
+      "status": "active",
       "owner": "toolchain",
-      "invariants": ["renderer.no-ambient-node", "renderer.sandboxed", "runtime.handle-isolation", "toolchain.single-esm-graph"],
-      "activation": "source-present",
-      "futureKind": "source",
-      "rationale": "Runtime-specific TypeScript projects require their first real common, browser, Node, or Electron source graph."
+      "invariants": ["renderer.no-ambient-node", "runtime.handle-isolation", "toolchain.single-esm-graph"],
+      "evidence": ["build/tsconfig.base.json", "build/tsconfig.common.json", "package.json", "src/prctr/platform/native/common/nativeObservation.generated.ts"]
     },
     {
       "id": "workspace-contract-tests",
@@ -130,7 +128,7 @@
       "status": "deferred",
       "owner": "attempt-workspace",
       "invariants": ["workspace.stable-entry-identity", "workspace.opaque-content-version", "workspace.acknowledged-durability", "workspace.distinct-states", "workspace.protected-recovery", "workspace.provider-projection", "workspace.orthogonal-state", "workspace.protect-unacknowledged-work", "workspace.submission-readiness", "workspace.exam-resources-separated", "workspace.v1-contract"],
-      "activation": "source-present",
+      "activation": "workspace-source-present",
       "futureKind": "test",
       "rationale": "The Attempt Workspace contracts have no Desktop source implementation to exercise yet."
     },
@@ -170,7 +168,7 @@
       "status": "deferred",
       "owner": "integrated-browser",
       "invariants": ["browser.revision-frozen-policy", "browser.privileged-enforcement", "browser.minimized-activity", "browser.ordered-delivery"],
-      "activation": "source-present",
+      "activation": "browser-source-present",
       "futureKind": "test",
       "rationale": "The integrated browser coordinator, contribution, and protected activity spool do not exist yet."
     },
@@ -180,19 +178,43 @@
       "status": "deferred",
       "owner": "execution-environment",
       "invariants": ["execution.remote-pty", "execution.generation-fencing", "execution.workspace-projection"],
-      "activation": "source-present",
+      "activation": "execution-source-present",
       "futureKind": "test",
       "rationale": "The Desktop remote-terminal model, transport, and workbench contribution do not exist yet."
     },
     {
-      "id": "native-conformance",
+      "id": "native-display-source-contract-tests",
+      "kind": "test",
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": ["native.passive-sources", "native.race-free-session", "toolchain.native-schema-authority"],
+      "evidence": ["rust-toolchain.toml", "native/Cargo.lock", "native/Cargo.toml", "native/schemas/native-observation.schema.json", "native/schemas/display-topology.schema.json", "native/crates/prctr-native-protocol/src/generated.rs", "native/crates/prctr-native-protocol/src/lib.rs", "native/crates/prctr-native-source-runtime/src/lib.rs", "native/crates/prctr-display-topology/src/lib.rs", "native/crates/prctr-display-topology/src/platform/linux.rs", "native/crates/prctr-display-topology/src/platform/macos.rs", "native/crates/prctr-display-topology/src/platform/macos/core_graphics.rs", "native/crates/prctr-display-topology/src/platform/macos/notifications.rs", "native/crates/prctr-display-topology/src/platform/macos/topology_query.rs", "native/crates/prctr-display-topology/src/platform/polling.rs", "native/crates/prctr-display-topology/src/platform/windows.rs", "native/crates/prctr-display-topology/src/platform/windows/notifications.rs", "native/crates/prctr-display-topology/src/platform/windows/topology_query.rs", "native/crates/prctr-display-topology/src/platform/windows/window_watcher.rs", "src/prctr/platform/native/common/nativeObservation.generated.ts", "test/checks/nativeProtocol.test.ts", "test/checks/testNative.test.ts", ".github/workflows/foundation.yml", "package.json", "build/testNative.ts"]
+    },
+    {
+      "id": "native-candidate-window-source-contract-tests",
+      "kind": "test",
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": ["native.passive-sources", "native.race-free-session", "runtime.handle-isolation", "toolchain.native-schema-authority"],
+      "evidence": ["native/Cargo.lock", "native/Cargo.toml", "native/schemas/native-observation.schema.json", "native/schemas/candidate-window-state.schema.json", "native/crates/prctr-native-protocol/src/candidate_window.generated.rs", "native/crates/prctr-native-protocol/src/lib.rs", "native/crates/prctr-native-source-runtime/src/lib.rs", "native/crates/prctr-candidate-window-state/Cargo.toml", "native/crates/prctr-candidate-window-state/src/lib.rs", "native/crates/prctr-candidate-window-state/src/platform/mod.rs", "native/crates/prctr-candidate-window-state/src/platform/event_backend.rs", "native/crates/prctr-candidate-window-state/src/platform/linux.rs", "native/crates/prctr-candidate-window-state/src/platform/macos.rs", "native/crates/prctr-candidate-window-state/src/platform/windows.rs", "native/crates/prctr-candidate-window-state/tests/backend_stop_fence.rs", "native/crates/prctr-candidate-window-state/tests/process_fence.rs", "src/prctr/platform/native/common/nativeObservation.generated.ts", "test/checks/candidateWindowProtocol.test.ts", "test/checks/testNative.test.ts", ".github/workflows/foundation.yml", "package.json", "build/testNative.ts"]
+    },
+    {
+      "id": "native-capture-session-source-contract-tests",
+      "kind": "test",
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": ["native.passive-sources", "native.race-free-session", "toolchain.native-schema-authority"],
+      "evidence": ["native/Cargo.lock", "native/Cargo.toml", "native/schemas/native-observation.schema.json", "native/schemas/capture-session-state.schema.json", "native/crates/prctr-native-protocol/src/capture_session.generated.rs", "native/crates/prctr-native-protocol/src/lib.rs", "native/crates/prctr-native-source-runtime/src/lib.rs", "native/crates/prctr-capture-session-state/Cargo.toml", "native/crates/prctr-capture-session-state/src/lib.rs", "native/crates/prctr-capture-session-state/src/platform/mod.rs", "native/crates/prctr-capture-session-state/src/platform/static_coverage.rs", "native/crates/prctr-capture-session-state/src/platform/linux.rs", "native/crates/prctr-capture-session-state/src/platform/macos.rs", "native/crates/prctr-capture-session-state/src/platform/windows.rs", "native/crates/prctr-capture-session-state/src/platform/windows/metrics.rs", "native/crates/prctr-capture-session-state/src/platform/windows/notifications.rs", "native/crates/prctr-capture-session-state/src/platform/windows/session_watcher.rs", "native/crates/prctr-capture-session-state/tests/cleanup_fence.rs", "src/prctr/platform/native/common/nativeObservation.generated.ts", "test/checks/captureSessionProtocol.test.ts", "test/checks/testNative.test.ts", ".github/workflows/foundation.yml", "package.json", "build/testNative.ts"]
+    },
+    {
+      "id": "native-packaged-conformance",
       "kind": "package",
       "status": "deferred",
       "owner": "native-capabilities",
-      "invariants": ["native.passive-sources", "native.initial-scope", "native.process-boundaries", "native.single-display-window", "native.race-free-session", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance", "toolchain.native-schema-authority", "toolchain.signed-capability-matrix"],
-      "activation": "native-package-present",
+      "invariants": ["native.initial-scope", "native.process-boundaries", "native.single-display-window", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance", "toolchain.signed-capability-matrix"],
+      "activation": "packaged-target-present",
       "futureKind": "package",
-      "rationale": "No native capability package or supported target tuple exists yet."
+      "rationale": "Source-level display-topology, CandidateWindow utility-ingress, and capture/session observation contract tests exist, but the authenticated private MessagePort composition, coordinator/enforcement boundary tests, packaged target tuple, and signed capability matrix do not exist yet."
     },
     {
       "id": "packaged-security",
