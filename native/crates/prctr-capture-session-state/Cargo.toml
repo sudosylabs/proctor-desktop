@@ -1,0 +1,16 @@
+[package]
+name = "prctr-capture-session-state"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+prctr-native-protocol = { path = "../prctr-native-protocol" }
+prctr-native-source-runtime = { path = "../prctr-native-source-runtime" }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_System_Registry", "Win32_System_RemoteDesktop", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"] }
+
+[lints]
+workspace = true
