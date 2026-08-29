@@ -1,0 +1,16 @@
+[package]
+name = "prctr-native-source-supervisor"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+prctr-candidate-window-state = { path = "../prctr-candidate-window-state" }
+prctr-capture-session-state = { path = "../prctr-capture-session-state" }
+prctr-display-topology = { path = "../prctr-display-topology" }
+prctr-native-protocol = { path = "../prctr-native-protocol" }
+prctr-native-source-runtime = { path = "../prctr-native-source-runtime" }
+
+[lints]
+workspace = true
