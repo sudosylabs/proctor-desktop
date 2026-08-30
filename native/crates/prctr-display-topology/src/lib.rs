@@ -11,7 +11,7 @@ use prctr_native_protocol::{
 };
 use prctr_native_source_runtime::{
     BoundedTaskError, DeadlineThread, QueueError, SOURCE_CLEANUP_DEADLINE, SourceModel,
-    SourceResetPlan, SourceSession, SourceSessionFact, SourceStateChange,
+    SourceResetPlan, SourceSession, SourceSessionFact, SourceSessionMetadata, SourceStateChange,
     ensure_native_source_process_usable, poison_native_source_process, run_bounded_task,
 };
 
@@ -28,6 +28,7 @@ pub const SOURCE_VERSION: &str = env!("CARGO_PKG_VERSION");
 pub enum DisplayTopologyError {
     Backend(String),
     Cleanup(String),
+    InventoryOverflow(String),
     Protocol(ProtocolViolation),
     Queue(QueueError),
     QueueOverflow,
@@ -40,6 +41,7 @@ impl DisplayTopologyError {
         match self {
             Self::Backend(_) => SourceFailureCode::Backend,
             Self::Cleanup(_) => SourceFailureCode::Cleanup,
+            Self::InventoryOverflow(_) => SourceFailureCode::InventoryOverflow,
             Self::Protocol(_) => SourceFailureCode::Protocol,
             Self::Queue(_) => SourceFailureCode::Queue,
             Self::QueueOverflow => SourceFailureCode::QueueOverflow,
@@ -52,6 +54,9 @@ impl fmt::Display for DisplayTopologyError {
         match self {
             Self::Backend(reason) => write!(formatter, "display topology backend failed: {reason}"),
             Self::Cleanup(reason) => write!(formatter, "display topology cleanup failed: {reason}"),
+            Self::InventoryOverflow(reason) => {
+                write!(formatter, "display topology inventory overflowed: {reason}")
+            }
             Self::Protocol(error) => {
                 write!(formatter, "display topology protocol violation: {error}")
             }
@@ -110,6 +115,7 @@ where
     )
 }
 
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 fn cleanup_with_deadline<F>(
     thread_name: &str,
     operation_name: &'static str,
@@ -327,6 +333,7 @@ impl DisplayTopologyEmitter {
     /// Records an OS transition wakeup. Unlike a state refresh, an explicit
     /// transition remains observable even if enumeration has already returned
     /// to the preceding topology.
+    #[cfg(any(target_os = "macos", target_os = "windows", test))]
     pub(crate) fn emit_transition(
         &self,
         topology: Result<DisplayTopologySnapshot, DisplayTopologyError>,
@@ -346,6 +353,7 @@ impl DisplayTopologyEmitter {
     }
 
     #[must_use]
+    #[cfg(any(target_os = "macos", target_os = "windows"))]
     pub(crate) fn queue_capacity(&self) -> usize {
         self.session.queue_capacity()
     }
@@ -355,19 +363,18 @@ impl DisplayTopologyEmitter {
         initial_topology: DisplayTopologySnapshot,
         initial_health: OpenedSourceHealth,
         reset: Option<SourceResetPlan>,
-    ) -> Result<(), DisplayTopologyError> {
+    ) -> Result<SourceSessionMetadata, DisplayTopologyError> {
         self.session
             .finish_open(initial_topology, initial_health.into(), reset)
     }
 
     fn source_snapshot(
-        &self,
         platform: PlatformFamily,
         permission: PermissionState,
         adapter_version: &str,
         topology: DisplayTopologySnapshot,
+        metadata: SourceSessionMetadata,
     ) -> Result<DisplayTopologySourceSnapshot, DisplayTopologyError> {
-        let metadata = self.session.metadata();
         let snapshot = DisplayTopologySourceSnapshot {
             source_instance_id: metadata.source_instance_id,
             source_version: SOURCE_VERSION.to_owned(),
@@ -466,6 +473,7 @@ impl DisplayTopologyEmitter {
         self.session.fail(error);
     }
 
+    #[cfg(any(target_os = "macos", target_os = "windows", test))]
     pub(crate) fn report_missing_transitions(&self, count: u64) {
         self.session.report_missing(count);
     }
@@ -510,14 +518,17 @@ impl<S: DisplayTopologySubscription> DisplayTopologySource<S> {
         let opened = backend.open(emitter.clone())?;
         let mut subscription = opened.subscription;
         let initial_topology = opened.initial_topology.clone();
-        if let Err(error) = emitter.finish_open(opened.initial_topology, opened.health, reset) {
-            return Err(rollback_subscription(error, &mut subscription));
-        }
-        let snapshot = match emitter.source_snapshot(
+        let snapshot_metadata =
+            match emitter.finish_open(opened.initial_topology, opened.health, reset) {
+                Ok(metadata) => metadata,
+                Err(error) => return Err(rollback_subscription(error, &mut subscription)),
+            };
+        let snapshot = match DisplayTopologyEmitter::source_snapshot(
             opened.platform,
             opened.permission,
             opened.adapter_version,
             initial_topology,
+            snapshot_metadata,
         ) {
             Ok(snapshot) => snapshot,
             Err(error) => return Err(rollback_subscription(error, &mut subscription)),

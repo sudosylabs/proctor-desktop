@@ -53,6 +53,7 @@ impl ProtocolValidatable for CaptureSessionCertainty {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CaptureSessionSignal {
     pub support: CaptureSessionSupport,
     pub activity: CaptureSessionActivity,
@@ -99,6 +100,7 @@ impl ProtocolValidatable for CaptureSessionSignal {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CaptureSessionState {
     pub screen_capture: CaptureSessionSignal,
     pub native_remote_session: CaptureSessionSignal,
@@ -113,6 +115,7 @@ impl ProtocolValidatable for CaptureSessionState {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CaptureSessionSourceSnapshot {
     pub source_instance_id: String,
     pub source_version: String,
@@ -130,6 +133,8 @@ pub struct CaptureSessionSourceSnapshot {
     pub state: CaptureSessionState,
 }
 
+// Validation remains generated next to the complete bounded wire shape.
+#[allow(clippy::too_many_lines)]
 impl ProtocolValidatable for CaptureSessionSourceSnapshot {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
         if !(16..=64).contains(&self.source_instance_id.chars().count()) {
@@ -177,6 +182,7 @@ impl ProtocolValidatable for CaptureSessionSourceSnapshot {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CaptureSessionObservation {
     pub source_instance_id: String,
     #[serde(
@@ -227,6 +233,7 @@ impl ProtocolValidatable for CaptureSessionObservation {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CaptureSessionDrain {
     pub source_instance_id: String,
     pub health: SourceHealth,

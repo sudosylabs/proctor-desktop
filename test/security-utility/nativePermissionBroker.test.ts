@@ -17,14 +17,18 @@ import {
 
 test('baseline adapters declare exact cross-platform permission requirements', async () => {
   const expectedModes = {
-    macos: ['not_required', 'not_required', 'unavailable'],
-    windows: ['not_required', 'not_required', 'not_required'],
-    linux: ['not_required', 'not_required', 'unavailable']
+    macos: [
+      ...Array(10).fill('not_required'),
+      'unavailable', 'unavailable'
+    ],
+    windows: [...Array(10).fill('not_required'), 'unavailable', 'unavailable'],
+    linux: Array(12).fill('not_required')
   } as const satisfies Record<PlatformFamily, readonly NativePermissionAdapter['mode'][]>;
   const expectedPermissions = {
-    macos: ['granted', 'granted', 'unavailable'],
-    windows: ['granted', 'granted', 'granted'],
-    linux: ['granted', 'granted', 'unavailable']
+    macos: [...Array(10).fill('granted'),
+      'unavailable', 'unavailable'],
+    windows: [...Array(10).fill('granted'), 'unavailable', 'unavailable'],
+    linux: Array(12).fill('granted')
   } as const satisfies Record<PlatformFamily, readonly PermissionState[]>;
 
   for (const platform of ['macos', 'windows', 'linux'] as const) {
@@ -38,7 +42,8 @@ test('baseline adapters declare exact cross-platform permission requirements', a
 
     const broker = new NativePermissionBroker({ adapters, monotonicNow: () => 42 });
     assert.deepEqual(
-      (await broker.inspectPreflight()).permissions.map(fact => fact.permission),
+      (await broker.inspectPreflight(BASELINE_NATIVE_PERMISSION_CAPABILITIES))
+        .permissions.map(fact => fact.permission),
       expectedPermissions[platform]
     );
   }
@@ -50,11 +55,12 @@ test('preflight inspection returns a bounded immutable receipt', async () => {
     monotonicNow: () => 42
   });
 
-  const receipt = await broker.inspectPreflight();
+  const receipt = await broker.inspectPreflight(BASELINE_NATIVE_PERMISSION_CAPABILITIES);
 
   assert.deepEqual(receipt, {
     platform: 'windows',
     checkedAtMonotonicMs: 42,
+    capabilities: BASELINE_NATIVE_PERMISSION_CAPABILITIES,
     permissions: [
       {
         capability: 'display-topology',
@@ -73,12 +79,50 @@ test('preflight inspection returns a bounded immutable receipt', async () => {
         mode: 'not_required',
         permission: 'granted',
         requestable: false
-      }
+      },
+      {
+        capability: 'process-application',
+        mode: 'not_required',
+        permission: 'granted',
+        requestable: false
+      },
+      ...BASELINE_NATIVE_PERMISSION_CAPABILITIES.slice(4, 10).map(capability => ({
+        capability,
+        mode: 'not_required' as const,
+        permission: 'granted' as const,
+        requestable: false
+      })),
+      ...BASELINE_NATIVE_PERMISSION_CAPABILITIES.slice(10).map(capability => ({
+        capability,
+        mode: 'unavailable' as const,
+        permission: 'unavailable' as const,
+        requestable: false
+      }))
     ]
   });
   assert.equal(Object.isFrozen(receipt), true);
   assert.equal(Object.isFrozen(receipt.permissions), true);
   assert.ok(receipt.permissions.every(permission => Object.isFrozen(permission)));
+});
+
+test('camera and microphone permissions remain independently inspectable and requestable', async () => {
+  const requested: string[] = [];
+  const adapters = createBaselineNativePermissionAdapters('macos', {
+    inspect: capability => capability === 'camera' ? 'not_determined' : 'granted',
+    requestDuringPreflight: capability => {
+      requested.push(capability);
+      return 'granted';
+    }
+  });
+  const broker = new NativePermissionBroker({ adapters, monotonicNow: () => 42 });
+
+  const receipt = await broker.inspectPreflight(['camera', 'microphone']);
+  assert.equal(receipt.permissions.find(fact => fact.capability === 'camera')?.permission,
+    'not_determined');
+  assert.equal(receipt.permissions.find(fact => fact.capability === 'microphone')?.permission,
+    'granted');
+  assert.equal((await broker.requestDuringPreflight('camera')).permission, 'granted');
+  assert.deepEqual(requested, ['camera']);
 });
 
 test('an explicit preflight request refreshes only the selected OS permission', async () => {
@@ -95,6 +139,8 @@ test('an explicit preflight request refreshes only the selected OS permission', 
       return permission;
     }
   }));
+  await broker.inspectPreflight(['capture-session']);
+  calls.length = 0;
 
   const result = await broker.requestDuringPreflight('capture-session');
 
@@ -116,6 +162,7 @@ test('a granted OS permission does not invoke its request callback again', async
       return 'granted';
     }
   }));
+  await broker.inspectPreflight(['capture-session']);
 
   const result = await broker.requestDuringPreflight('capture-session');
 
@@ -127,6 +174,7 @@ test('a capability with no accepted OS prompt fails without invoking another ada
   const broker = new NativePermissionBroker({
     adapters: createBaselineNativePermissionAdapters('macos')
   });
+  await broker.inspectPreflight(['capture-session']);
 
   await assert.rejects(
     broker.requestDuringPreflight('capture-session'),
@@ -145,7 +193,7 @@ test('sealing preflight fences prompts before asynchronous inspection completes'
     request: () => 'granted'
   }));
 
-  const sealing = broker.sealPreflight();
+  const sealing = broker.sealPreflight(['capture-session']);
   await assert.rejects(
     broker.requestDuringPreflight('capture-session'),
     error => hasErrorCode(error, 'preflight_sealed')
@@ -169,30 +217,34 @@ test('preflight inspection cannot overlap sealing', async () => {
     request: () => 'granted'
   }));
 
-  const inspecting = broker.inspectPreflight();
+  const inspecting = broker.inspectPreflight(['capture-session']);
   await assert.rejects(
-    broker.sealPreflight(),
+    broker.sealPreflight(['capture-session']),
     error => hasErrorCode(error, 'preflight_operation_in_progress')
   );
   releaseInspection?.();
   await inspecting;
-  await broker.sealPreflight();
+  await broker.sealPreflight(['capture-session']);
 });
 
 test('only the current opaque seal can reopen preflight and release is idempotent', async () => {
   const broker = new NativePermissionBroker({
     adapters: createBaselineNativePermissionAdapters('windows')
   });
-  const sealed = await broker.sealPreflight();
+  const sealed = await broker.sealPreflight(BASELINE_NATIVE_PERMISSION_CAPABILITIES);
   const staleSeal = Object.freeze({}) as NativePermissionPreflightSeal;
 
+  assert.throws(
+    () => broker.cancelPreflight(),
+    error => hasErrorCode(error, 'preflight_sealed')
+  );
   assert.throws(
     () => broker.releasePreflightSeal(staleSeal),
     error => hasErrorCode(error, 'stale_preflight_seal')
   );
   broker.releasePreflightSeal(sealed.seal);
   broker.releasePreflightSeal(sealed.seal);
-  await broker.inspectPreflight();
+  await broker.inspectPreflight(BASELINE_NATIVE_PERMISSION_CAPABILITIES);
   assert.throws(
     () => broker.releasePreflightSeal(staleSeal),
     error => hasErrorCode(error, 'no_active_preflight_seal')
@@ -215,11 +267,12 @@ test('malformed adapter manifests and OS permission results fail closed', async 
     inspect: () => 'unexpected' as PermissionState
   };
   const broker = new NativePermissionBroker({
-    adapters: [adapters[0], adapters[1], malformed]
+    adapters: adapters.map(adapter =>
+      adapter.capability === malformed.capability ? malformed : adapter)
   });
 
   await assert.rejects(
-    broker.inspectPreflight(),
+    broker.inspectPreflight(BASELINE_NATIVE_PERMISSION_CAPABILITIES),
     error => hasErrorCode(error, 'invalid_permission_state')
   );
 });
@@ -229,12 +282,13 @@ test('a failed OS request restores preflight instead of leaving it sealed', asyn
     inspect: () => 'not_determined',
     request: () => { throw new Error('OS request failed'); }
   }));
+  await broker.inspectPreflight(['capture-session']);
 
   await assert.rejects(
     broker.requestDuringPreflight('capture-session'),
     error => hasErrorCode(error, 'permission_request_failed')
   );
-  await broker.inspectPreflight();
+  await broker.inspectPreflight(['capture-session']);
 });
 
 test('invalid receipt timing fails closed and restores preflight', async () => {
@@ -244,13 +298,118 @@ test('invalid receipt timing fails closed and restores preflight', async () => {
   });
 
   await assert.rejects(
-    broker.inspectPreflight(),
+    broker.inspectPreflight(BASELINE_NATIVE_PERMISSION_CAPABILITIES),
     error => hasErrorCode(error, 'invalid_monotonic_time')
   );
   await assert.rejects(
-    broker.inspectPreflight(),
+    broker.inspectPreflight(BASELINE_NATIVE_PERMISSION_CAPABILITIES),
     error => hasErrorCode(error, 'invalid_monotonic_time')
   );
+});
+
+test('preflight inspects only the frozen selection and rejects scope drift', async () => {
+  const inspected: NativePermissionCapability[] = [];
+  const adapters = createBaselineNativePermissionAdapters('macos', {
+    inspect: capability => {
+      inspected.push(capability);
+      return 'granted';
+    }
+  });
+  const broker = new NativePermissionBroker({ adapters, monotonicNow: () => 42 });
+
+  const receipt = await broker.inspectPreflight(['camera']);
+
+  assert.deepEqual(receipt.capabilities, ['camera']);
+  assert.deepEqual(inspected, ['camera']);
+  await assert.rejects(
+    broker.requestDuringPreflight('microphone'),
+    error => hasErrorCode(error, 'capability_outside_preflight_scope')
+  );
+  await assert.rejects(
+    broker.sealPreflight(['microphone']),
+    error => hasErrorCode(error, 'preflight_scope_mismatch')
+  );
+});
+
+test('unsealed cancellation drops the frozen scope and permits a new selection', async () => {
+  const broker = new NativePermissionBroker({
+    adapters: createBaselineNativePermissionAdapters('windows'),
+    monotonicNow: () => 42
+  });
+  await broker.inspectPreflight(['display-topology']);
+
+  broker.cancelPreflight();
+
+  const receipt = await broker.inspectPreflight(['candidate-window']);
+  assert.deepEqual(receipt.capabilities, ['candidate-window']);
+});
+
+test('cancellation invalidates an in-flight inspection before it can publish a receipt', async () => {
+  let release: (() => void) | undefined;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  const broker = brokerWithAdapter(osPermissionAdapter('macos', 'capture-session', {
+    inspect: async () => { await pending; return 'granted'; },
+    request: () => 'granted'
+  }));
+
+  const inspecting = broker.inspectPreflight(['capture-session']);
+  broker.cancelPreflight();
+  release?.();
+
+  await assert.rejects(inspecting, error => hasErrorCode(error, 'preflight_cancelled'));
+  const receipt = await broker.inspectPreflight(['display-topology']);
+  assert.deepEqual(receipt.capabilities, ['display-topology']);
+});
+
+test('cancellation invalidates an in-flight OS permission request', async () => {
+  let release: (() => void) | undefined;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  let initialInspection = true;
+  const broker = brokerWithAdapter(osPermissionAdapter('macos', 'capture-session', {
+    inspect: () => {
+      if (initialInspection) {
+        initialInspection = false;
+        return 'not_determined';
+      }
+      return 'not_determined';
+    },
+    request: async () => { await pending; return 'granted'; }
+  }));
+  await broker.inspectPreflight(['capture-session']);
+
+  const requesting = broker.requestDuringPreflight('capture-session');
+  await Promise.resolve();
+  broker.cancelPreflight();
+  await assert.rejects(
+    broker.inspectPreflight(['candidate-window']),
+    error => hasErrorCode(error, 'preflight_operation_in_progress')
+  );
+  release?.();
+
+  await assert.rejects(requesting, error => hasErrorCode(error, 'preflight_cancelled'));
+  const receipt = await broker.inspectPreflight(['candidate-window']);
+  assert.deepEqual(receipt.capabilities, ['candidate-window']);
+});
+
+test('cancellation invalidates an in-flight seal before launch authorization exists', async () => {
+  let release: (() => void) | undefined;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  const broker = brokerWithAdapter(osPermissionAdapter('macos', 'capture-session', {
+    inspect: async () => { await pending; return 'granted'; },
+    request: () => 'granted'
+  }));
+
+  const sealing = broker.sealPreflight(['capture-session']);
+  broker.cancelPreflight();
+  release?.();
+
+  await assert.rejects(sealing, error => hasErrorCode(error, 'preflight_cancelled'));
+  assert.throws(
+    () => broker.releasePreflightSeal(Object.freeze({}) as NativePermissionPreflightSeal),
+    error => hasErrorCode(error, 'no_active_preflight_seal')
+  );
+  const sealed = await broker.sealPreflight(['display-topology']);
+  assert.deepEqual(sealed.receipt.capabilities, ['display-topology']);
 });
 
 function brokerWithAdapter(adapter: NativePermissionAdapter): NativePermissionBroker {

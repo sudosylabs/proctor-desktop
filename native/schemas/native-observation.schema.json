@@ -2,11 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://proctor.invalid/native/native-observation.schema.json",
   "title": "Proctor shared native-observation protocol",
-  "x-proctor-source-manifest-version": 1,
+  "x-proctor-source-manifest-version": 3,
   "x-proctor-source-manifest": [
     "display-topology",
     "candidate-window",
-    "capture-session"
+    "capture-session",
+    "process-application",
+    "interactive-session",
+    "clipboard",
+    "print-spooler",
+    "removable-storage",
+    "virtualization",
+    "network-configuration",
+    "media-device"
   ],
   "x-proctor-source-lifecycle-deadline-ms": 5000,
   "type": "object",
@@ -30,14 +38,28 @@
     },
     "SourceFailureCode": {
       "type": "string",
-      "enum": ["backend", "cleanup", "protocol", "queue", "queue_overflow"]
+      "enum": ["backend", "cleanup", "inventory_overflow", "protocol", "queue", "queue_overflow"]
+    },
+    "NativeSourceCategory": {
+      "type": "string",
+      "enum": [
+        "os-clipboard-change",
+        "removable-block-storage",
+        "portable-mtp",
+        "system-proxy-state",
+        "os-managed-vpn-state",
+        "tunnel-interface-state",
+        "route-change",
+        "network-source-health",
+        "camera",
+        "microphone"
+      ]
     },
     "SourceTimestamp": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["wall_time_unix_ms", "monotonic_time_ns"],
+      "required": ["monotonic_time_ns"],
       "properties": {
-        "wall_time_unix_ms": { "type": "integer", "minimum": 0, "maximum": 9007199254740991, "x-rust-type": "u64" },
         "monotonic_time_ns": { "type": "integer", "minimum": 0, "maximum": 9007199254740991, "x-rust-type": "u64" }
       }
     },

@@ -1,0 +1,21 @@
+[package]
+name = "prctr-removable-storage-state"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+prctr-native-protocol = { path = "../prctr-native-protocol" }
+prctr-native-source-runtime = { path = "../prctr-native-source-runtime" }
+hmac = "=0.12.1"
+sha2 = { version = "=0.10.9", default-features = false }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+libc = { version = "=0.2.189" }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "=0.61.2", features = ["Win32_Storage_FileSystem", "Win32_System_WindowsProgramming"] }
+
+[lints]
+workspace = true

@@ -13,33 +13,73 @@ use prctr_candidate_window_state::{
 use prctr_capture_session_state::{
     CaptureSessionBackend, CaptureSessionError, CaptureSessionSource, CaptureSessionSubscription,
 };
+use prctr_clipboard_state::ClipboardWire;
 use prctr_display_topology::{
     DisplayTopologyBackend, DisplayTopologyError, DisplayTopologySource,
     DisplayTopologySubscription,
 };
+use prctr_interactive_session_state::InteractiveSessionWire;
+use prctr_media_device_state::MediaDeviceWire;
 use prctr_native_protocol::{
     CANDIDATE_WINDOW_SCHEMA_VERSION, CAPTURE_SESSION_SCHEMA_VERSION, CandidateWindowDrain,
     CandidateWindowSourceSnapshot, CaptureSessionDrain, CaptureSessionSourceSnapshot,
-    DISPLAY_TOPOLOGY_SCHEMA_VERSION, DisplayTopologyDrain, DisplayTopologySourceSnapshot,
-    NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS, PermissionState, ProtocolValidatable, SourceFailureCode,
-    SourceHealth, SourceOpenRequest,
+    ClipboardDrain, ClipboardSourceSnapshot, DISPLAY_TOPOLOGY_SCHEMA_VERSION, DisplayTopologyDrain,
+    DisplayTopologySourceSnapshot, InteractiveSessionDrain, InteractiveSessionSourceSnapshot,
+    MediaDeviceDrain, MediaDeviceSourceSnapshot, NATIVE_SOURCE_COUNT,
+    NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS, NetworkConfigurationDrain,
+    NetworkConfigurationSourceSnapshot, PROCESS_APPLICATION_SCHEMA_VERSION, PermissionState,
+    PrintSpoolerDrain, PrintSpoolerSourceSnapshot, ProcessApplicationDrain,
+    ProcessApplicationSourceSnapshot, ProtocolValidatable, RemovableStorageDrain,
+    RemovableStorageSourceSnapshot, SourceFailureCode, SourceHealth, SourceOpenRequest,
+    VirtualizationDrain, VirtualizationSourceSnapshot,
 };
 use prctr_native_source_runtime::{
-    BoundedTaskError, ensure_native_source_process_usable, poison_native_source_process,
-    run_bounded_task,
+    BoundedTaskError, PassiveStateBackend, PassiveStateSource, PassiveStateSourceError,
+    PassiveStateSubscription, PassiveStateWire, ensure_native_source_process_usable,
+    poison_native_source_process, run_bounded_task,
 };
+use prctr_network_configuration_state::NetworkConfigurationWire;
+use prctr_print_spooler_state::PrintSpoolerWire;
+use prctr_process_application_state::{
+    ProcessApplicationBackend, ProcessApplicationError, ProcessApplicationSource,
+    ProcessApplicationSubscription,
+};
+use prctr_removable_storage_state::RemovableStorageWire;
+use prctr_virtualization_state::VirtualizationWire;
 
 const RESTART_BOUNDARY_MISSING_COUNT: u64 = 1;
 const RESTART_REASON: &str = "supervised-source-restart";
-const MAX_RESTART_ATTEMPTS: u8 = 8;
+const REQUIRED_RESTART_ATTEMPTS: u8 = 1;
 const MAX_RESTART_BACKOFF: Duration = Duration::from_secs(60);
 const SOURCE_OPEN_DEADLINE: Duration = Duration::from_millis(NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS);
+
+pub const NATIVE_SOURCE_KINDS: [NativeSourceKind; NATIVE_SOURCE_COUNT] = [
+    NativeSourceKind::DisplayTopology,
+    NativeSourceKind::CandidateWindow,
+    NativeSourceKind::CaptureSession,
+    NativeSourceKind::ProcessApplication,
+    NativeSourceKind::InteractiveSession,
+    NativeSourceKind::Clipboard,
+    NativeSourceKind::PrintSpooler,
+    NativeSourceKind::RemovableStorage,
+    NativeSourceKind::Virtualization,
+    NativeSourceKind::NetworkConfiguration,
+    NativeSourceKind::MediaDevice,
+];
 
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub enum NativeSourceKind {
     DisplayTopology,
     CandidateWindow,
     CaptureSession,
+    ProcessApplication,
+    InteractiveSession,
+    Clipboard,
+    PrintSpooler,
+    RemovableStorage,
+    Virtualization,
+    NetworkConfiguration,
+    MediaDevice,
 }
 
 impl fmt::Display for NativeSourceKind {
@@ -48,7 +88,24 @@ impl fmt::Display for NativeSourceKind {
             Self::DisplayTopology => "display-topology",
             Self::CandidateWindow => "candidate-window",
             Self::CaptureSession => "capture-session",
+            Self::ProcessApplication => "process-application",
+            Self::InteractiveSession => "interactive-session",
+            Self::Clipboard => "clipboard",
+            Self::PrintSpooler => "print-spooler",
+            Self::RemovableStorage => "removable-storage",
+            Self::Virtualization => "virtualization",
+            Self::NetworkConfiguration => "network-configuration",
+            Self::MediaDevice => "media-device",
         })
+    }
+}
+
+impl NativeSourceKind {
+    #[must_use]
+    pub fn from_source_id(source_id: &str) -> Option<Self> {
+        NATIVE_SOURCE_KINDS
+            .into_iter()
+            .find(|kind| kind.to_string() == source_id)
     }
 }
 
@@ -57,6 +114,14 @@ pub enum NativeSourceSnapshot {
     DisplayTopology(DisplayTopologySourceSnapshot),
     CandidateWindow(CandidateWindowSourceSnapshot),
     CaptureSession(CaptureSessionSourceSnapshot),
+    ProcessApplication(ProcessApplicationSourceSnapshot),
+    InteractiveSession(InteractiveSessionSourceSnapshot),
+    Clipboard(ClipboardSourceSnapshot),
+    PrintSpooler(PrintSpoolerSourceSnapshot),
+    RemovableStorage(RemovableStorageSourceSnapshot),
+    Virtualization(VirtualizationSourceSnapshot),
+    NetworkConfiguration(NetworkConfigurationSourceSnapshot),
+    MediaDevice(MediaDeviceSourceSnapshot),
 }
 
 impl NativeSourceSnapshot {
@@ -66,6 +131,14 @@ impl NativeSourceSnapshot {
             Self::DisplayTopology(_) => NativeSourceKind::DisplayTopology,
             Self::CandidateWindow(_) => NativeSourceKind::CandidateWindow,
             Self::CaptureSession(_) => NativeSourceKind::CaptureSession,
+            Self::ProcessApplication(_) => NativeSourceKind::ProcessApplication,
+            Self::InteractiveSession(_) => NativeSourceKind::InteractiveSession,
+            Self::Clipboard(_) => NativeSourceKind::Clipboard,
+            Self::PrintSpooler(_) => NativeSourceKind::PrintSpooler,
+            Self::RemovableStorage(_) => NativeSourceKind::RemovableStorage,
+            Self::Virtualization(_) => NativeSourceKind::Virtualization,
+            Self::NetworkConfiguration(_) => NativeSourceKind::NetworkConfiguration,
+            Self::MediaDevice(_) => NativeSourceKind::MediaDevice,
         }
     }
 
@@ -75,6 +148,14 @@ impl NativeSourceSnapshot {
             Self::DisplayTopology(snapshot) => &snapshot.source_instance_id,
             Self::CandidateWindow(snapshot) => &snapshot.source_instance_id,
             Self::CaptureSession(snapshot) => &snapshot.source_instance_id,
+            Self::ProcessApplication(snapshot) => &snapshot.source_instance_id,
+            Self::InteractiveSession(snapshot) => &snapshot.source_instance_id,
+            Self::Clipboard(snapshot) => &snapshot.source_instance_id,
+            Self::PrintSpooler(snapshot) => &snapshot.source_instance_id,
+            Self::RemovableStorage(snapshot) => &snapshot.source_instance_id,
+            Self::Virtualization(snapshot) => &snapshot.source_instance_id,
+            Self::NetworkConfiguration(snapshot) => &snapshot.source_instance_id,
+            Self::MediaDevice(snapshot) => &snapshot.source_instance_id,
         }
     }
 
@@ -84,6 +165,14 @@ impl NativeSourceSnapshot {
             Self::DisplayTopology(snapshot) => snapshot.health,
             Self::CandidateWindow(snapshot) => snapshot.health,
             Self::CaptureSession(snapshot) => snapshot.health,
+            Self::ProcessApplication(snapshot) => snapshot.health,
+            Self::InteractiveSession(snapshot) => snapshot.health,
+            Self::Clipboard(snapshot) => snapshot.health,
+            Self::PrintSpooler(snapshot) => snapshot.health,
+            Self::RemovableStorage(snapshot) => snapshot.health,
+            Self::Virtualization(snapshot) => snapshot.health,
+            Self::NetworkConfiguration(snapshot) => snapshot.health,
+            Self::MediaDevice(snapshot) => snapshot.health,
         }
     }
 
@@ -93,6 +182,14 @@ impl NativeSourceSnapshot {
             Self::DisplayTopology(snapshot) => snapshot.permission,
             Self::CandidateWindow(snapshot) => snapshot.permission,
             Self::CaptureSession(snapshot) => snapshot.permission,
+            Self::ProcessApplication(snapshot) => snapshot.permission,
+            Self::InteractiveSession(snapshot) => snapshot.permission,
+            Self::Clipboard(snapshot) => snapshot.permission,
+            Self::PrintSpooler(snapshot) => snapshot.permission,
+            Self::RemovableStorage(snapshot) => snapshot.permission,
+            Self::Virtualization(snapshot) => snapshot.permission,
+            Self::NetworkConfiguration(snapshot) => snapshot.permission,
+            Self::MediaDevice(snapshot) => snapshot.permission,
         }
     }
 }
@@ -102,6 +199,14 @@ pub enum NativeSourceBatch {
     DisplayTopology(DisplayTopologyDrain),
     CandidateWindow(CandidateWindowDrain),
     CaptureSession(CaptureSessionDrain),
+    ProcessApplication(ProcessApplicationDrain),
+    InteractiveSession(InteractiveSessionDrain),
+    Clipboard(ClipboardDrain),
+    PrintSpooler(PrintSpoolerDrain),
+    RemovableStorage(RemovableStorageDrain),
+    Virtualization(VirtualizationDrain),
+    NetworkConfiguration(NetworkConfigurationDrain),
+    MediaDevice(MediaDeviceDrain),
 }
 
 impl NativeSourceBatch {
@@ -111,6 +216,14 @@ impl NativeSourceBatch {
             Self::DisplayTopology(_) => NativeSourceKind::DisplayTopology,
             Self::CandidateWindow(_) => NativeSourceKind::CandidateWindow,
             Self::CaptureSession(_) => NativeSourceKind::CaptureSession,
+            Self::ProcessApplication(_) => NativeSourceKind::ProcessApplication,
+            Self::InteractiveSession(_) => NativeSourceKind::InteractiveSession,
+            Self::Clipboard(_) => NativeSourceKind::Clipboard,
+            Self::PrintSpooler(_) => NativeSourceKind::PrintSpooler,
+            Self::RemovableStorage(_) => NativeSourceKind::RemovableStorage,
+            Self::Virtualization(_) => NativeSourceKind::Virtualization,
+            Self::NetworkConfiguration(_) => NativeSourceKind::NetworkConfiguration,
+            Self::MediaDevice(_) => NativeSourceKind::MediaDevice,
         }
     }
 
@@ -120,6 +233,14 @@ impl NativeSourceBatch {
             Self::DisplayTopology(batch) => &batch.source_instance_id,
             Self::CandidateWindow(batch) => &batch.source_instance_id,
             Self::CaptureSession(batch) => &batch.source_instance_id,
+            Self::ProcessApplication(batch) => &batch.source_instance_id,
+            Self::InteractiveSession(batch) => &batch.source_instance_id,
+            Self::Clipboard(batch) => &batch.source_instance_id,
+            Self::PrintSpooler(batch) => &batch.source_instance_id,
+            Self::RemovableStorage(batch) => &batch.source_instance_id,
+            Self::Virtualization(batch) => &batch.source_instance_id,
+            Self::NetworkConfiguration(batch) => &batch.source_instance_id,
+            Self::MediaDevice(batch) => &batch.source_instance_id,
         }
     }
 
@@ -129,6 +250,14 @@ impl NativeSourceBatch {
             Self::DisplayTopology(batch) => batch.health,
             Self::CandidateWindow(batch) => batch.health,
             Self::CaptureSession(batch) => batch.health,
+            Self::ProcessApplication(batch) => batch.health,
+            Self::InteractiveSession(batch) => batch.health,
+            Self::Clipboard(batch) => batch.health,
+            Self::PrintSpooler(batch) => batch.health,
+            Self::RemovableStorage(batch) => batch.health,
+            Self::Virtualization(batch) => batch.health,
+            Self::NetworkConfiguration(batch) => batch.health,
+            Self::MediaDevice(batch) => batch.health,
         }
     }
 
@@ -138,6 +267,14 @@ impl NativeSourceBatch {
             Self::DisplayTopology(batch) => batch.terminal_error,
             Self::CandidateWindow(batch) => batch.terminal_error,
             Self::CaptureSession(batch) => batch.terminal_error,
+            Self::ProcessApplication(batch) => batch.terminal_error,
+            Self::InteractiveSession(batch) => batch.terminal_error,
+            Self::Clipboard(batch) => batch.terminal_error,
+            Self::PrintSpooler(batch) => batch.terminal_error,
+            Self::RemovableStorage(batch) => batch.terminal_error,
+            Self::Virtualization(batch) => batch.terminal_error,
+            Self::NetworkConfiguration(batch) => batch.terminal_error,
+            Self::MediaDevice(batch) => batch.terminal_error,
         }
     }
 
@@ -147,6 +284,14 @@ impl NativeSourceBatch {
             Self::DisplayTopology(batch) => batch.observations.len() + batch.resets.len(),
             Self::CandidateWindow(batch) => batch.observations.len() + batch.resets.len(),
             Self::CaptureSession(batch) => batch.observations.len() + batch.resets.len(),
+            Self::ProcessApplication(batch) => batch.observations.len() + batch.resets.len(),
+            Self::InteractiveSession(batch) => batch.observations.len() + batch.resets.len(),
+            Self::Clipboard(batch) => batch.observations.len() + batch.resets.len(),
+            Self::PrintSpooler(batch) => batch.observations.len() + batch.resets.len(),
+            Self::RemovableStorage(batch) => batch.observations.len() + batch.resets.len(),
+            Self::Virtualization(batch) => batch.observations.len() + batch.resets.len(),
+            Self::NetworkConfiguration(batch) => batch.observations.len() + batch.resets.len(),
+            Self::MediaDevice(batch) => batch.observations.len() + batch.resets.len(),
         }
     }
 }
@@ -172,14 +317,14 @@ impl RestartPolicy {
     ///
     /// # Errors
     ///
-    /// Returns a configuration error for a zero or excessive attempt count,
-    /// a zero backoff, an inverted range, or a backoff longer than one minute.
+    /// Returns a configuration error unless exactly one automatic restart is
+    /// requested, or for a zero, inverted, or excessive backoff.
     pub fn new(
         maximum_attempts: u8,
         initial_backoff: Duration,
         maximum_backoff: Duration,
     ) -> Result<Self, SupervisorConfigError> {
-        if maximum_attempts == 0 || maximum_attempts > MAX_RESTART_ATTEMPTS {
+        if maximum_attempts != REQUIRED_RESTART_ATTEMPTS {
             return Err(SupervisorConfigError::InvalidRestartAttempts);
         }
         if initial_backoff.is_zero()
@@ -199,7 +344,7 @@ impl RestartPolicy {
 impl Default for RestartPolicy {
     fn default() -> Self {
         Self {
-            maximum_attempts: 3,
+            maximum_attempts: REQUIRED_RESTART_ATTEMPTS,
             initial_backoff: Duration::from_millis(250),
             maximum_backoff: Duration::from_secs(4),
         }
@@ -251,7 +396,7 @@ impl fmt::Display for SupervisorConfigError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str(match self {
             Self::InvalidSourceRequest => "source request is outside the bounded native protocol",
-            Self::InvalidRestartAttempts => "restart attempts must be between one and eight",
+            Self::InvalidRestartAttempts => "restart attempts must be exactly one",
             Self::InvalidRestartBackoff => {
                 "restart backoff must be ordered, nonzero, and no longer than one minute"
             }
@@ -315,18 +460,102 @@ where
     }
 }
 
+pub struct ProcessApplicationFactory<F, B> {
+    make_backend: F,
+    backend: PhantomData<fn() -> B>,
+}
+
+#[must_use]
+pub fn process_application_factory<F, B>(make_backend: F) -> ProcessApplicationFactory<F, B>
+where
+    F: FnMut() -> Result<B, ProcessApplicationError> + Send,
+    B: ProcessApplicationBackend + Send,
+    B::Subscription: Send,
+{
+    ProcessApplicationFactory {
+        make_backend,
+        backend: PhantomData,
+    }
+}
+
+pub trait SupervisedPassiveStateWire: PassiveStateWire {
+    const KIND: NativeSourceKind;
+    fn wrap_snapshot(snapshot: Self::Snapshot) -> NativeSourceSnapshot;
+    fn wrap_batch(batch: Self::Drain) -> NativeSourceBatch;
+}
+
+macro_rules! supervised_passive_wire {
+    ($wire:ty, $kind:ident, $snapshot:ident, $batch:ident) => {
+        impl SupervisedPassiveStateWire for $wire {
+            const KIND: NativeSourceKind = NativeSourceKind::$kind;
+            fn wrap_snapshot(snapshot: Self::Snapshot) -> NativeSourceSnapshot {
+                NativeSourceSnapshot::$snapshot(snapshot)
+            }
+            fn wrap_batch(batch: Self::Drain) -> NativeSourceBatch {
+                NativeSourceBatch::$batch(batch)
+            }
+        }
+    };
+}
+
+supervised_passive_wire!(
+    InteractiveSessionWire,
+    InteractiveSession,
+    InteractiveSession,
+    InteractiveSession
+);
+supervised_passive_wire!(ClipboardWire, Clipboard, Clipboard, Clipboard);
+supervised_passive_wire!(PrintSpoolerWire, PrintSpooler, PrintSpooler, PrintSpooler);
+supervised_passive_wire!(
+    RemovableStorageWire,
+    RemovableStorage,
+    RemovableStorage,
+    RemovableStorage
+);
+supervised_passive_wire!(
+    VirtualizationWire,
+    Virtualization,
+    Virtualization,
+    Virtualization
+);
+supervised_passive_wire!(
+    NetworkConfigurationWire,
+    NetworkConfiguration,
+    NetworkConfiguration,
+    NetworkConfiguration
+);
+supervised_passive_wire!(MediaDeviceWire, MediaDevice, MediaDevice, MediaDevice);
+
+pub struct PassiveStateFactory<W, F, B> {
+    make_backend: F,
+    wire: PhantomData<fn() -> (W, B)>,
+}
+
+#[must_use]
+pub fn passive_state_factory<W, F, B>(make_backend: F) -> PassiveStateFactory<W, F, B>
+where
+    W: SupervisedPassiveStateWire,
+    F: FnMut() -> Result<B, PassiveStateSourceError> + Send,
+    B: PassiveStateBackend<W> + Send,
+    B::Subscription: Send,
+{
+    PassiveStateFactory {
+        make_backend,
+        wire: PhantomData,
+    }
+}
+
 pub struct BaselineSourceFactories {
-    display_topology: Box<dyn ErasedFactory>,
-    candidate_window: Box<dyn ErasedFactory>,
-    capture_session: Box<dyn ErasedFactory>,
+    manifest_order: Vec<(NativeSourceKind, Box<dyn ErasedFactory>)>,
 }
 
 impl BaselineSourceFactories {
     #[must_use]
-    pub fn new<DF, DB, WF, WB, CF, CB>(
+    pub fn new<DF, DB, WF, WB, CF, CB, PF, PB>(
         display_topology: DisplayTopologyFactory<DF, DB>,
         candidate_window: CandidateWindowFactory<WF, WB>,
         capture_session: CaptureSessionFactory<CF, CB>,
+        process_application: ProcessApplicationFactory<PF, PB>,
     ) -> Self
     where
         DF: FnMut() -> Result<DB, DisplayTopologyError> + Send + 'static,
@@ -338,33 +567,83 @@ impl BaselineSourceFactories {
         CF: FnMut() -> Result<CB, CaptureSessionError> + Send + 'static,
         CB: CaptureSessionBackend + Send + 'static,
         CB::Subscription: Send + 'static,
+        PF: FnMut() -> Result<PB, ProcessApplicationError> + Send + 'static,
+        PB: ProcessApplicationBackend + Send + 'static,
+        PB::Subscription: Send + 'static,
     {
         Self {
-            display_topology: Box::new(display_topology),
-            candidate_window: Box::new(candidate_window),
-            capture_session: Box::new(capture_session),
+            manifest_order: vec![
+                (
+                    NativeSourceKind::DisplayTopology,
+                    Box::new(display_topology),
+                ),
+                (
+                    NativeSourceKind::CandidateWindow,
+                    Box::new(candidate_window),
+                ),
+                (NativeSourceKind::CaptureSession, Box::new(capture_session)),
+                (
+                    NativeSourceKind::ProcessApplication,
+                    Box::new(process_application),
+                ),
+            ],
         }
     }
 
-    #[cfg(test)]
-    fn from_erased(
-        display_topology: Box<dyn ErasedFactory>,
-        candidate_window: Box<dyn ErasedFactory>,
-        capture_session: Box<dyn ErasedFactory>,
-    ) -> Self {
-        Self {
-            display_topology,
-            candidate_window,
-            capture_session,
+    #[must_use]
+    pub fn with_passive_source<W, F, B>(mut self, factory: PassiveStateFactory<W, F, B>) -> Self
+    where
+        W: SupervisedPassiveStateWire,
+        F: FnMut() -> Result<B, PassiveStateSourceError> + Send + 'static,
+        B: PassiveStateBackend<W> + Send + 'static,
+        B::Subscription: Send + 'static,
+    {
+        self.manifest_order.push((W::KIND, Box::new(factory)));
+        self
+    }
+
+    /// Retains only explicitly enabled sources while preserving manifest order.
+    ///
+    /// # Errors
+    ///
+    /// Returns a configuration error for an empty selection, duplicates, or a
+    /// source for which this factory collection has no entry.
+    pub fn select_sources(
+        mut self,
+        selected: &[NativeSourceKind],
+    ) -> Result<Self, SupervisorConfigError> {
+        if selected.is_empty()
+            || selected
+                .iter()
+                .enumerate()
+                .any(|(index, kind)| selected[..index].contains(kind))
+            || selected.iter().any(|selected_kind| {
+                !self
+                    .manifest_order
+                    .iter()
+                    .any(|(kind, _)| kind == selected_kind)
+            })
+        {
+            return Err(SupervisorConfigError::InvalidSourceRequest);
         }
+        self.manifest_order
+            .retain(|(kind, _factory)| selected.contains(kind));
+        Ok(self)
+    }
+
+    #[cfg(test)]
+    fn from_erased(manifest_order: Vec<(NativeSourceKind, Box<dyn ErasedFactory>)>) -> Self {
+        Self { manifest_order }
+    }
+
+    fn into_manifest_order(self) -> Vec<(NativeSourceKind, Box<dyn ErasedFactory>)> {
+        self.manifest_order
     }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct BaselineSourceSnapshots {
-    pub display_topology: DisplayTopologySourceSnapshot,
-    pub candidate_window: CandidateWindowSourceSnapshot,
-    pub capture_session: CaptureSessionSourceSnapshot,
+    pub sources: Vec<NativeSourceSnapshot>,
 }
 
 pub struct OpenedSupervisor {
@@ -453,7 +732,7 @@ pub struct NativeSourceSupervisor {
     clock: Box<dyn SupervisorClock>,
     process_fence: Box<dyn ProcessFence>,
     restart_open_deadline: Duration,
-    slots: [SourceSlot; 3],
+    slots: Vec<SourceSlot>,
     process_replacement_required: bool,
     stopped: bool,
 }
@@ -504,63 +783,14 @@ impl NativeSourceSupervisor {
         restart_open_deadline: Duration,
     ) -> Result<OpenedSupervisor, SupervisorOpenError> {
         let parameters = SourceParameters::from(&config);
-        let display_opened = open_source_with_rollback(
-            NativeSourceKind::DisplayTopology,
-            &parameters,
-            factories.display_topology,
-            [],
-        )?;
-        let OpenedErasedSource {
-            factory: display_factory,
-            source: mut display_source,
-            snapshot: display_snapshot,
-        } = display_opened;
-
-        let candidate_opened = open_source_with_rollback(
-            NativeSourceKind::CandidateWindow,
-            &parameters,
-            factories.candidate_window,
-            [(NativeSourceKind::DisplayTopology, &mut display_source)],
-        )?;
-        let OpenedErasedSource {
-            factory: candidate_factory,
-            source: mut candidate_source,
-            snapshot: candidate_snapshot,
-        } = candidate_opened;
-
-        let capture_opened = open_source_with_rollback(
-            NativeSourceKind::CaptureSession,
-            &parameters,
-            factories.capture_session,
-            [
-                (NativeSourceKind::CandidateWindow, &mut candidate_source),
-                (NativeSourceKind::DisplayTopology, &mut display_source),
-            ],
-        )?;
-        let OpenedErasedSource {
-            factory: capture_factory,
-            source: capture_source,
-            snapshot: capture_snapshot,
-        } = capture_opened;
-
-        let snapshots =
-            match baseline_snapshots(display_snapshot, candidate_snapshot, capture_snapshot) {
-                Ok(snapshots) => snapshots,
-                Err(failure) => {
-                    let mut capture_source = capture_source;
-                    let cleanup_failures = cleanup_sources([
-                        (NativeSourceKind::CaptureSession, &mut capture_source),
-                        (NativeSourceKind::CandidateWindow, &mut candidate_source),
-                        (NativeSourceKind::DisplayTopology, &mut display_source),
-                    ]);
-                    return Err(SupervisorOpenError {
-                        source: NativeSourceKind::DisplayTopology,
-                        failure,
-                        process_replacement_required: !cleanup_failures.is_empty(),
-                        cleanup_failures,
-                    });
-                }
-            };
+        let OpenedManifest { sources, snapshots } = open_initial_manifest(&parameters, factories)?;
+        let slots = sources
+            .into_iter()
+            .map(|opened| {
+                let kind = opened.source.kind();
+                SourceSlot::active(kind, opened.factory, opened.source)
+            })
+            .collect();
 
         Ok(OpenedSupervisor {
             supervisor: Self {
@@ -568,23 +798,7 @@ impl NativeSourceSupervisor {
                 clock,
                 process_fence,
                 restart_open_deadline,
-                slots: [
-                    SourceSlot::active(
-                        NativeSourceKind::DisplayTopology,
-                        display_factory,
-                        display_source,
-                    ),
-                    SourceSlot::active(
-                        NativeSourceKind::CandidateWindow,
-                        candidate_factory,
-                        candidate_source,
-                    ),
-                    SourceSlot::active(
-                        NativeSourceKind::CaptureSession,
-                        capture_factory,
-                        capture_source,
-                    ),
-                ],
+                slots,
                 process_replacement_required: false,
                 stopped: false,
             },
@@ -884,6 +1098,63 @@ where
     }
 }
 
+impl<F, B> ErasedFactory for ProcessApplicationFactory<F, B>
+where
+    F: FnMut() -> Result<B, ProcessApplicationError> + Send,
+    B: ProcessApplicationBackend + Send + 'static,
+    B::Subscription: Send + 'static,
+{
+    fn open(
+        &mut self,
+        parameters: &SourceParameters,
+        restart: Option<RestartBoundary>,
+    ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
+        let backend =
+            (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
+        let request = parameters.request(PROCESS_APPLICATION_SCHEMA_VERSION);
+        let source = match restart {
+            Some(boundary) => ProcessApplicationSource::open_after_reset(
+                &request,
+                backend,
+                boundary.missing_count,
+                boundary.reason.to_owned(),
+            ),
+            None => ProcessApplicationSource::open(&request, backend),
+        }
+        .map_err(|error| source_start_failure(error.failure_code()))?;
+        Ok(Box::new(ProcessSource(source)))
+    }
+}
+
+impl<W, F, B> ErasedFactory for PassiveStateFactory<W, F, B>
+where
+    W: SupervisedPassiveStateWire,
+    F: FnMut() -> Result<B, PassiveStateSourceError> + Send,
+    B: PassiveStateBackend<W> + Send + 'static,
+    B::Subscription: Send + 'static,
+{
+    fn open(
+        &mut self,
+        parameters: &SourceParameters,
+        restart: Option<RestartBoundary>,
+    ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
+        let backend =
+            (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
+        let request = parameters.request(W::SCHEMA_VERSION);
+        let source = match restart {
+            Some(boundary) => PassiveStateSource::<W, B::Subscription>::open_after_reset(
+                &request,
+                backend,
+                boundary.missing_count,
+                boundary.reason.to_owned(),
+            ),
+            None => PassiveStateSource::<W, B::Subscription>::open(&request, backend),
+        }
+        .map_err(|error| source_start_failure(error.failure_code()))?;
+        Ok(Box::new(PassiveSource(source)))
+    }
+}
+
 struct DisplaySource<S: DisplayTopologySubscription>(DisplayTopologySource<S>);
 
 impl<S: DisplayTopologySubscription + Send> ErasedSource for DisplaySource<S> {
@@ -960,6 +1231,67 @@ impl<S: CaptureSessionSubscription + Send> ErasedSource for SessionSource<S> {
     fn stop(&mut self) -> SourceStopOutcome {
         SourceStopOutcome {
             batch: NativeSourceBatch::CaptureSession(self.0.stop()),
+            closed_input_boundary: ensure_native_source_process_usable().is_ok(),
+        }
+    }
+}
+
+struct ProcessSource<S: ProcessApplicationSubscription>(ProcessApplicationSource<S>);
+
+impl<S: ProcessApplicationSubscription + Send> ErasedSource for ProcessSource<S> {
+    fn kind(&self) -> NativeSourceKind {
+        NativeSourceKind::ProcessApplication
+    }
+
+    fn snapshot(&self) -> NativeSourceSnapshot {
+        NativeSourceSnapshot::ProcessApplication(self.0.snapshot().clone())
+    }
+
+    fn health(&self) -> SourceHealth {
+        self.0.health()
+    }
+
+    fn drain(&mut self) -> NativeSourceBatch {
+        NativeSourceBatch::ProcessApplication(self.0.drain())
+    }
+
+    fn stop(&mut self) -> SourceStopOutcome {
+        SourceStopOutcome {
+            batch: NativeSourceBatch::ProcessApplication(self.0.stop()),
+            closed_input_boundary: ensure_native_source_process_usable().is_ok(),
+        }
+    }
+}
+
+struct PassiveSource<W, S>(PassiveStateSource<W, S>)
+where
+    W: SupervisedPassiveStateWire,
+    S: PassiveStateSubscription<W>;
+
+impl<W, S> ErasedSource for PassiveSource<W, S>
+where
+    W: SupervisedPassiveStateWire,
+    S: PassiveStateSubscription<W> + Send,
+{
+    fn kind(&self) -> NativeSourceKind {
+        W::KIND
+    }
+
+    fn snapshot(&self) -> NativeSourceSnapshot {
+        W::wrap_snapshot(self.0.snapshot().clone())
+    }
+
+    fn health(&self) -> SourceHealth {
+        self.0.health()
+    }
+
+    fn drain(&mut self) -> NativeSourceBatch {
+        W::wrap_batch(self.0.drain())
+    }
+
+    fn stop(&mut self) -> SourceStopOutcome {
+        SourceStopOutcome {
+            batch: W::wrap_batch(self.0.stop()),
             closed_input_boundary: ensure_native_source_process_usable().is_ok(),
         }
     }
@@ -1044,25 +1376,60 @@ struct OpenedErasedSource {
     snapshot: NativeSourceSnapshot,
 }
 
-fn open_source_with_rollback<const N: usize>(
-    kind: NativeSourceKind,
+struct OpenedManifest {
+    sources: Vec<OpenedErasedSource>,
+    snapshots: BaselineSourceSnapshots,
+}
+
+fn open_initial_manifest(
     parameters: &SourceParameters,
-    factory: Box<dyn ErasedFactory>,
-    rollback: [(NativeSourceKind, &mut Box<dyn ErasedSource>); N],
-) -> Result<OpenedErasedSource, SupervisorOpenError> {
-    match open_initial_source(kind, parameters, factory) {
-        Ok(opened) => Ok(opened),
-        Err(failure) => {
-            let cleanup_failures = cleanup_sources(rollback);
-            Err(SupervisorOpenError {
-                source: kind,
-                failure: failure.code,
-                process_replacement_required: failure.process_replacement_required
-                    || !cleanup_failures.is_empty(),
-                cleanup_failures,
-            })
+    factories: BaselineSourceFactories,
+) -> Result<OpenedManifest, SupervisorOpenError> {
+    let manifest_order = factories.into_manifest_order();
+    let manifest_kinds: Vec<_> = manifest_order
+        .iter()
+        .map(|(kind, _factory)| *kind)
+        .collect();
+    let expected_kinds: Vec<_> = NATIVE_SOURCE_KINDS
+        .into_iter()
+        .filter(|kind| manifest_kinds.contains(kind))
+        .collect();
+    let manifest_is_exact = !manifest_order.is_empty() && manifest_kinds == expected_kinds;
+    if !manifest_is_exact {
+        return Err(SupervisorOpenError {
+            source: NativeSourceKind::DisplayTopology,
+            failure: SourceFailureCode::Protocol,
+            cleanup_failures: Vec::new(),
+            process_replacement_required: false,
+        });
+    }
+
+    let mut opened = Vec::with_capacity(NATIVE_SOURCE_COUNT);
+    for (kind, factory) in manifest_order {
+        match open_initial_source(kind, parameters, factory) {
+            Ok(source) => opened.push(source),
+            Err(failure) => {
+                let cleanup_failures = cleanup_opened_sources(&mut opened);
+                return Err(SupervisorOpenError {
+                    source: kind,
+                    failure: failure.code,
+                    process_replacement_required: failure.process_replacement_required
+                        || !cleanup_failures.is_empty(),
+                    cleanup_failures,
+                });
+            }
         }
     }
+    let snapshots = BaselineSourceSnapshots {
+        sources: opened
+            .iter()
+            .map(|source| source.snapshot.clone())
+            .collect(),
+    };
+    Ok(OpenedManifest {
+        sources: opened,
+        snapshots,
+    })
 }
 
 fn open_initial_source(
@@ -1080,39 +1447,56 @@ fn open_initial_source(
                 });
             }
         };
-    let mut source = opened?;
-    let snapshot = source.snapshot();
-    if source.kind() != expected_kind || snapshot.kind() != expected_kind {
-        let cleanup = source.stop();
-        return Err(SourceStartFailure {
-            code: cleanup
-                .batch
-                .terminal_error()
-                .unwrap_or(SourceFailureCode::Protocol),
-            process_replacement_required: !cleanup.closed_input_boundary,
-        });
-    }
-    if matches!(
-        snapshot.health(),
-        SourceHealth::Starting | SourceHealth::Failed | SourceHealth::Stopped
-    ) || matches!(
-        source.health(),
-        SourceHealth::Starting | SourceHealth::Failed | SourceHealth::Stopped
-    ) {
-        let cleanup = source.stop();
-        return Err(SourceStartFailure {
-            code: cleanup
-                .batch
-                .terminal_error()
-                .unwrap_or(SourceFailureCode::Protocol),
-            process_replacement_required: !cleanup.closed_input_boundary,
-        });
-    }
+    let (source, snapshot) = validate_opened_source(
+        expected_kind,
+        opened?,
+        None,
+        ensure_native_source_process_usable().is_ok(),
+    )?;
     Ok(OpenedErasedSource {
         factory,
         source,
         snapshot,
     })
+}
+
+fn validate_opened_source(
+    expected_kind: NativeSourceKind,
+    mut source: Box<dyn ErasedSource>,
+    previous_source_instance_id: Option<&str>,
+    process_usable: bool,
+) -> Result<(Box<dyn ErasedSource>, NativeSourceSnapshot), SourceStartFailure> {
+    if !process_usable {
+        let _cleanup = source.stop();
+        return Err(SourceStartFailure {
+            code: SourceFailureCode::Cleanup,
+            process_replacement_required: true,
+        });
+    }
+    let snapshot = source.snapshot();
+    if source.kind() != expected_kind
+        || snapshot.kind() != expected_kind
+        || previous_source_instance_id
+            .is_some_and(|previous| snapshot.source_instance_id() == previous)
+        || matches!(
+            snapshot.health(),
+            SourceHealth::Starting | SourceHealth::Failed | SourceHealth::Stopped
+        )
+        || matches!(
+            source.health(),
+            SourceHealth::Starting | SourceHealth::Failed | SourceHealth::Stopped
+        )
+    {
+        let cleanup = source.stop();
+        return Err(SourceStartFailure {
+            code: cleanup
+                .batch
+                .terminal_error()
+                .unwrap_or(SourceFailureCode::Protocol),
+            process_replacement_required: !cleanup.closed_input_boundary,
+        });
+    }
+    Ok((source, snapshot))
 }
 
 enum FactoryOpenOutcome {
@@ -1168,35 +1552,24 @@ fn source_open_thread_name(kind: NativeSourceKind) -> &'static str {
         NativeSourceKind::DisplayTopology => "prctr-open-display-source",
         NativeSourceKind::CandidateWindow => "prctr-open-window-source",
         NativeSourceKind::CaptureSession => "prctr-open-session-source",
+        NativeSourceKind::ProcessApplication => "prctr-open-process-source",
+        NativeSourceKind::InteractiveSession => "prctr-open-interactive-session-source",
+        NativeSourceKind::Clipboard => "prctr-open-clipboard-source",
+        NativeSourceKind::PrintSpooler => "prctr-open-print-spooler-source",
+        NativeSourceKind::RemovableStorage => "prctr-open-removable-storage-source",
+        NativeSourceKind::Virtualization => "prctr-open-virtualization-source",
+        NativeSourceKind::NetworkConfiguration => "prctr-open-network-source",
+        NativeSourceKind::MediaDevice => "prctr-open-media-device-source",
     }
 }
 
-fn baseline_snapshots(
-    display: NativeSourceSnapshot,
-    window: NativeSourceSnapshot,
-    session: NativeSourceSnapshot,
-) -> Result<BaselineSourceSnapshots, SourceFailureCode> {
-    match (display, window, session) {
-        (
-            NativeSourceSnapshot::DisplayTopology(display_topology),
-            NativeSourceSnapshot::CandidateWindow(candidate_window),
-            NativeSourceSnapshot::CaptureSession(capture_session),
-        ) => Ok(BaselineSourceSnapshots {
-            display_topology,
-            candidate_window,
-            capture_session,
-        }),
-        _ => Err(SourceFailureCode::Protocol),
-    }
-}
-
-fn cleanup_sources<const N: usize>(
-    sources: [(NativeSourceKind, &mut Box<dyn ErasedSource>); N],
-) -> Vec<NativeSourceKind> {
+fn cleanup_opened_sources(sources: &mut [OpenedErasedSource]) -> Vec<NativeSourceKind> {
     sources
-        .into_iter()
-        .filter_map(|(kind, source)| {
-            let outcome = source.stop();
+        .iter_mut()
+        .rev()
+        .filter_map(|opened| {
+            let kind = opened.source.kind();
+            let outcome = opened.source.stop();
             (!outcome.closed_input_boundary || outcome.batch.health() == SourceHealth::Failed)
                 .then_some(kind)
         })
@@ -1349,34 +1722,17 @@ fn complete_restart_open(
 ) -> RestartOpenCompletion {
     let result = factory
         .open(parameters, Some(restart))
+        .and_then(|source| {
+            validate_opened_source(
+                kind,
+                source,
+                Some(previous_source_instance_id),
+                ensure_native_source_process_usable().is_ok(),
+            )
+        })
         .map_err(|failure| RestartOpenFailure {
             code: failure.code,
             process_replacement_required: failure.process_replacement_required,
-        })
-        .and_then(|mut source| {
-            let snapshot = source.snapshot();
-            if source.kind() != kind
-                || snapshot.kind() != kind
-                || snapshot.source_instance_id() == previous_source_instance_id
-                || matches!(
-                    snapshot.health(),
-                    SourceHealth::Starting | SourceHealth::Failed | SourceHealth::Stopped
-                )
-                || matches!(
-                    source.health(),
-                    SourceHealth::Starting | SourceHealth::Failed | SourceHealth::Stopped
-                )
-            {
-                let cleanup = source.stop();
-                return Err(RestartOpenFailure {
-                    code: cleanup
-                        .batch
-                        .terminal_error()
-                        .unwrap_or(SourceFailureCode::Protocol),
-                    process_replacement_required: !cleanup.closed_input_boundary,
-                });
-            }
-            Ok((source, snapshot))
         });
     RestartOpenCompletion { factory, result }
 }
@@ -1475,7 +1831,7 @@ fn poll_restart_source(
     PollControl::Continue
 }
 
-fn supervisor_state(slots: &[SourceSlot; 3]) -> SupervisorState {
+fn supervisor_state(slots: &[SourceSlot]) -> SupervisorState {
     if slots
         .iter()
         .any(|slot| matches!(slot.lifecycle, SlotLifecycle::Exhausted))
@@ -1547,6 +1903,7 @@ fn failure_code_name(code: SourceFailureCode) -> &'static str {
     match code {
         SourceFailureCode::Backend => "backend",
         SourceFailureCode::Cleanup => "cleanup",
+        SourceFailureCode::InventoryOverflow => "inventory-overflow",
         SourceFailureCode::Protocol => "protocol",
         SourceFailureCode::Queue => "queue",
         SourceFailureCode::QueueOverflow => "queue-overflow",
@@ -1574,7 +1931,12 @@ mod tests {
         CandidateWindowPlacement, CandidateWindowPresence, CandidateWindowState,
         CandidateWindowVisibility, CaptureSessionActivity, CaptureSessionCertainty,
         CaptureSessionSignal, CaptureSessionState, CaptureSessionSupport, DisplayTopologySnapshot,
-        PlatformFamily, SequenceGap, SourceReset, SourceTimestamp, TopologyCertainty,
+        PlatformFamily, ProcessApplicationCertainty, ProcessApplicationCoverage,
+        ProcessApplicationState, SequenceGap, SourceReset, SourceTimestamp, TopologyCertainty,
+    };
+    use prctr_native_source_runtime::{SourceSessionMetadata, UnavailablePassiveStateBackend};
+    use prctr_process_application_state::{
+        OpenedProcessApplicationBackend, ProcessApplicationEmitter,
     };
 
     struct TestDisplayBackend;
@@ -1658,28 +2020,97 @@ mod tests {
         }
     }
 
+    struct TestProcessBackend;
+    struct TestProcessSubscription;
+
+    impl ProcessApplicationBackend for TestProcessBackend {
+        type Subscription = TestProcessSubscription;
+
+        fn open(
+            self,
+            _emitter: ProcessApplicationEmitter,
+        ) -> Result<OpenedProcessApplicationBackend<Self::Subscription>, ProcessApplicationError>
+        {
+            Ok(OpenedProcessApplicationBackend {
+                platform: PlatformFamily::Linux,
+                permission: PermissionState::Unavailable,
+                adapter_version: "test-process-v1",
+                initial_state: process_state(),
+                subscription: TestProcessSubscription,
+            })
+        }
+    }
+
+    impl ProcessApplicationSubscription for TestProcessSubscription {
+        fn stop(self) -> Result<ProcessApplicationState, ProcessApplicationError> {
+            Ok(process_state())
+        }
+    }
+
     #[test]
     fn public_factories_open_the_fixed_baseline_and_stop_in_reverse_order() {
         let factories = BaselineSourceFactories::new(
             display_topology_factory(|| Ok(TestDisplayBackend)),
             candidate_window_factory(|| Ok(TestWindowBackend)),
             capture_session_factory(|| Ok(TestSessionBackend)),
-        );
+            process_application_factory(|| Ok(TestProcessBackend)),
+        )
+        .with_passive_source(passive_state_factory::<InteractiveSessionWire, _, _>(
+            || {
+                Ok(UnavailablePassiveStateBackend::new(
+                    PlatformFamily::Linux,
+                    "test-interactive-v1",
+                ))
+            },
+        ))
+        .with_passive_source(passive_state_factory::<ClipboardWire, _, _>(|| {
+            Ok(UnavailablePassiveStateBackend::new(
+                PlatformFamily::Linux,
+                "test-clipboard-v1",
+            ))
+        }))
+        .with_passive_source(passive_state_factory::<PrintSpoolerWire, _, _>(|| {
+            Ok(UnavailablePassiveStateBackend::new(
+                PlatformFamily::Linux,
+                "test-print-v1",
+            ))
+        }))
+        .with_passive_source(passive_state_factory::<RemovableStorageWire, _, _>(|| {
+            Ok(UnavailablePassiveStateBackend::new(
+                PlatformFamily::Linux,
+                "test-storage-v1",
+            ))
+        }))
+        .with_passive_source(passive_state_factory::<VirtualizationWire, _, _>(|| {
+            Ok(UnavailablePassiveStateBackend::new(
+                PlatformFamily::Linux,
+                "test-virtual-v1",
+            ))
+        }))
+        .with_passive_source(passive_state_factory::<NetworkConfigurationWire, _, _>(
+            || {
+                Ok(UnavailablePassiveStateBackend::new(
+                    PlatformFamily::Linux,
+                    "test-network-v1",
+                ))
+            },
+        ))
+        .with_passive_source(passive_state_factory::<MediaDeviceWire, _, _>(|| {
+            Ok(UnavailablePassiveStateBackend::new(
+                PlatformFamily::Linux,
+                "test-media-v1",
+            ))
+        }));
         let opened = NativeSourceSupervisor::open(config(), factories).expect("baseline opens");
 
-        assert_eq!(
-            opened.snapshots.display_topology.platform,
-            PlatformFamily::Linux
-        );
-        assert_eq!(
-            opened.snapshots.candidate_window.platform,
-            PlatformFamily::Linux
-        );
-        assert_eq!(
-            opened.snapshots.capture_session.permission,
-            PermissionState::Unavailable
-        );
-        assert_eq!(opened.supervisor.state(), SupervisorState::Healthy);
+        assert_eq!(opened.snapshots.sources.len(), NATIVE_SOURCE_COUNT);
+        assert!(opened.snapshots.sources.iter().all(|snapshot| {
+            matches!(
+                snapshot.permission(),
+                PermissionState::Granted | PermissionState::Unavailable
+            )
+        }));
+        assert_eq!(opened.supervisor.state(), SupervisorState::Degraded);
 
         let mut supervisor = opened.supervisor;
         let stopped = supervisor.stop();
@@ -1692,6 +2123,14 @@ mod tests {
                 .map(NativeSourceBatch::kind)
                 .collect::<Vec<_>>(),
             vec![
+                NativeSourceKind::MediaDevice,
+                NativeSourceKind::NetworkConfiguration,
+                NativeSourceKind::Virtualization,
+                NativeSourceKind::RemovableStorage,
+                NativeSourceKind::PrintSpooler,
+                NativeSourceKind::Clipboard,
+                NativeSourceKind::InteractiveSession,
+                NativeSourceKind::ProcessApplication,
                 NativeSourceKind::CaptureSession,
                 NativeSourceKind::CandidateWindow,
                 NativeSourceKind::DisplayTopology,
@@ -1707,9 +2146,64 @@ mod tests {
     }
 
     #[test]
+    fn explicit_source_selection_does_not_open_disabled_factories() {
+        let display = fake_factory(
+            NativeSourceKind::DisplayTopology,
+            vec![FactoryStep::open(fake_source(
+                display_snapshot("display-instance-0001", SourceHealth::Healthy),
+                Vec::new(),
+                empty_batch(
+                    NativeSourceKind::DisplayTopology,
+                    "display-instance-0001",
+                    SourceHealth::Stopped,
+                    None,
+                ),
+                Arc::new(AtomicU32::new(0)),
+            ))],
+        );
+        let factories = healthy_fake_baseline(display)
+            .select_sources(&[
+                NativeSourceKind::DisplayTopology,
+                NativeSourceKind::Clipboard,
+            ])
+            .expect("selection is valid");
+        let opened = NativeSourceSupervisor::open(config(), factories).expect("selection opens");
+
+        assert_eq!(
+            opened
+                .snapshots
+                .sources
+                .iter()
+                .map(NativeSourceSnapshot::kind)
+                .collect::<Vec<_>>(),
+            vec![
+                NativeSourceKind::DisplayTopology,
+                NativeSourceKind::Clipboard,
+            ]
+        );
+        let mut supervisor = opened.supervisor;
+        assert_eq!(
+            supervisor
+                .stop()
+                .batches
+                .iter()
+                .map(NativeSourceBatch::kind)
+                .collect::<Vec<_>>(),
+            vec![
+                NativeSourceKind::Clipboard,
+                NativeSourceKind::DisplayTopology,
+            ]
+        );
+    }
+
+    #[test]
     fn configuration_rejects_unbounded_requests_and_restart_policies() {
         assert_eq!(
             RestartPolicy::new(0, Duration::from_millis(1), Duration::from_secs(1)),
+            Err(SupervisorConfigError::InvalidRestartAttempts)
+        );
+        assert_eq!(
+            RestartPolicy::new(2, Duration::from_millis(1), Duration::from_secs(1)),
             Err(SupervisorConfigError::InvalidRestartAttempts)
         );
         assert_eq!(
@@ -1744,7 +2238,13 @@ mod tests {
             vec![FactoryStep::Fail(SourceFailureCode::Backend)],
         );
         let capture = fake_factory(NativeSourceKind::CaptureSession, Vec::new());
-        let factories = BaselineSourceFactories::from_erased(display, candidate, capture);
+        let process = fake_factory(NativeSourceKind::ProcessApplication, Vec::new());
+        let factories = factories_from_prefix(vec![
+            (NativeSourceKind::DisplayTopology, display),
+            (NativeSourceKind::CandidateWindow, candidate),
+            (NativeSourceKind::CaptureSession, capture),
+            (NativeSourceKind::ProcessApplication, process),
+        ]);
 
         let error = NativeSourceSupervisor::open(config(), factories)
             .err()
@@ -1765,11 +2265,7 @@ mod tests {
             NativeSourceKind::DisplayTopology,
             vec![FactoryStep::PoisonedFailure(SourceFailureCode::Protocol)],
         );
-        let factories = BaselineSourceFactories::from_erased(
-            display,
-            fake_factory(NativeSourceKind::CandidateWindow, Vec::new()),
-            fake_factory(NativeSourceKind::CaptureSession, Vec::new()),
-        );
+        let factories = factories_from_prefix(vec![(NativeSourceKind::DisplayTopology, display)]);
 
         let error = NativeSourceSupervisor::open(config(), factories)
             .err()
@@ -1778,6 +2274,35 @@ mod tests {
         assert_eq!(error.failure, SourceFailureCode::Protocol);
         assert!(error.cleanup_failures.is_empty());
         assert!(error.process_replacement_required);
+    }
+
+    #[test]
+    fn a_poisoned_process_rejects_and_stops_the_last_opened_source() {
+        let stop_count = Arc::new(AtomicU32::new(0));
+        let source = fake_source(
+            display_snapshot("display-instance-0001", SourceHealth::Healthy),
+            Vec::new(),
+            empty_batch(
+                NativeSourceKind::DisplayTopology,
+                "display-instance-0001",
+                SourceHealth::Stopped,
+                None,
+            ),
+            Arc::clone(&stop_count),
+        );
+
+        let error = validate_opened_source(
+            NativeSourceKind::DisplayTopology,
+            Box::new(source),
+            None,
+            false,
+        )
+        .err()
+        .expect("poisoned process rejects opened source");
+
+        assert_eq!(error.code, SourceFailureCode::Cleanup);
+        assert!(error.process_replacement_required);
+        assert_eq!(stop_count.load(Ordering::Acquire), 1);
     }
 
     #[test]
@@ -1881,7 +2406,7 @@ mod tests {
     }
 
     #[test]
-    fn restart_failures_back_off_and_exhaust_the_fixed_budget() {
+    fn one_restart_failure_exhausts_the_fixed_budget() {
         let clock = FakeClock::default();
         let display = fake_factory(
             NativeSourceKind::DisplayTopology,
@@ -1903,11 +2428,10 @@ mod tests {
                     Arc::new(AtomicU32::new(0)),
                 )),
                 FactoryStep::Fail(SourceFailureCode::Backend),
-                FactoryStep::Fail(SourceFailureCode::Protocol),
             ],
         );
         let factories = healthy_fake_baseline(display);
-        let policy = RestartPolicy::new(2, Duration::from_millis(10), Duration::from_millis(40))
+        let policy = RestartPolicy::new(1, Duration::from_millis(10), Duration::from_millis(40))
             .expect("valid policy");
         let config = SupervisorConfig::new("collection-session-0001".to_owned(), 16, policy)
             .expect("valid config");
@@ -1923,36 +2447,16 @@ mod tests {
         let first_attempt = poll_until(&mut supervisor, |poll| {
             matches!(
                 poll.transitions.as_slice(),
-                [SourceLifecycleTransition::RestartAttemptFailed { .. }]
-            )
-        });
-        assert_eq!(first_attempt.state, SupervisorState::Recovering);
-        assert!(matches!(
-            first_attempt.transitions.as_slice(),
-            [SourceLifecycleTransition::RestartAttemptFailed {
-                attempt: 1,
-                retry_after,
-                failure: SourceFailureCode::Backend,
-                ..
-            }] if *retry_after == Duration::from_millis(20)
-        ));
-
-        clock.advance(Duration::from_millis(20));
-        let started_second_attempt = supervisor.poll();
-        assert!(started_second_attempt.transitions.is_empty());
-        let exhausted = poll_until(&mut supervisor, |poll| {
-            matches!(
-                poll.transitions.as_slice(),
                 [SourceLifecycleTransition::RestartExhausted { .. }]
             )
         });
-        assert_eq!(exhausted.state, SupervisorState::Failed);
+        assert_eq!(first_attempt.state, SupervisorState::Failed);
         assert!(matches!(
-            exhausted.transitions.as_slice(),
+            first_attempt.transitions.as_slice(),
             [SourceLifecycleTransition::RestartExhausted {
                 source: NativeSourceKind::DisplayTopology,
-                attempts: 2,
-                failure: SourceFailureCode::Protocol,
+                attempts: 1,
+                failure: SourceFailureCode::Backend,
             }]
         ));
         assert!(supervisor.poll().transitions.is_empty());
@@ -2178,6 +2682,14 @@ mod tests {
                 .map(NativeSourceBatch::kind)
                 .collect::<Vec<_>>(),
             vec![
+                NativeSourceKind::MediaDevice,
+                NativeSourceKind::NetworkConfiguration,
+                NativeSourceKind::Virtualization,
+                NativeSourceKind::RemovableStorage,
+                NativeSourceKind::PrintSpooler,
+                NativeSourceKind::Clipboard,
+                NativeSourceKind::InteractiveSession,
+                NativeSourceKind::ProcessApplication,
                 NativeSourceKind::CaptureSession,
                 NativeSourceKind::CandidateWindow,
                 NativeSourceKind::DisplayTopology,
@@ -2265,7 +2777,7 @@ mod tests {
     }
 
     fn config() -> SupervisorConfig {
-        let policy = RestartPolicy::new(2, Duration::from_millis(10), Duration::from_millis(40))
+        let policy = RestartPolicy::new(1, Duration::from_millis(10), Duration::from_millis(40))
             .expect("valid policy");
         SupervisorConfig::new("collection-session-0001".to_owned(), 16, policy)
             .expect("valid config")
@@ -2339,9 +2851,16 @@ mod tests {
         }
     }
 
+    fn process_state() -> ProcessApplicationState {
+        ProcessApplicationState {
+            coverage: ProcessApplicationCoverage::FullLifecycle,
+            certainty: ProcessApplicationCertainty::Complete,
+            processes: Vec::new(),
+        }
+    }
+
     fn timestamp() -> SourceTimestamp {
         SourceTimestamp {
-            wall_time_unix_ms: 1,
             monotonic_time_ns: 1,
         }
     }
@@ -2391,6 +2910,49 @@ mod tests {
         })
     }
 
+    fn process_snapshot(id: &str) -> NativeSourceSnapshot {
+        NativeSourceSnapshot::ProcessApplication(ProcessApplicationSourceSnapshot {
+            source_instance_id: id.to_owned(),
+            source_version: "test-v1".to_owned(),
+            adapter_version: "test-adapter-v1".to_owned(),
+            schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
+            platform: PlatformFamily::Linux,
+            permission: PermissionState::Unavailable,
+            health: SourceHealth::Healthy,
+            sequence: 0,
+            observed_at: timestamp(),
+            state: process_state(),
+        })
+    }
+
+    fn passive_snapshot<W: SupervisedPassiveStateWire>(id: &str) -> NativeSourceSnapshot {
+        W::wrap_snapshot(W::snapshot(
+            SourceSessionMetadata {
+                source_instance_id: id.to_owned(),
+                health: SourceHealth::Healthy,
+                observed_at: timestamp(),
+            },
+            PlatformFamily::Linux,
+            PermissionState::Unavailable,
+            "test-adapter-v1",
+            W::unavailable_state(),
+        ))
+    }
+
+    fn empty_passive_batch<W: SupervisedPassiveStateWire>(
+        id: &str,
+        health: SourceHealth,
+        terminal_error: Option<SourceFailureCode>,
+    ) -> NativeSourceBatch {
+        W::wrap_batch(W::drain(
+            id.to_owned(),
+            health,
+            Vec::new(),
+            Vec::new(),
+            terminal_error,
+        ))
+    }
+
     fn empty_batch(
         kind: NativeSourceKind,
         id: &str,
@@ -2424,6 +2986,36 @@ mod tests {
                     resets: Vec::new(),
                     terminal_error,
                 })
+            }
+            NativeSourceKind::ProcessApplication => {
+                NativeSourceBatch::ProcessApplication(ProcessApplicationDrain {
+                    source_instance_id: id.to_owned(),
+                    health,
+                    observations: Vec::new(),
+                    resets: Vec::new(),
+                    terminal_error,
+                })
+            }
+            NativeSourceKind::InteractiveSession => {
+                empty_passive_batch::<InteractiveSessionWire>(id, health, terminal_error)
+            }
+            NativeSourceKind::Clipboard => {
+                empty_passive_batch::<ClipboardWire>(id, health, terminal_error)
+            }
+            NativeSourceKind::PrintSpooler => {
+                empty_passive_batch::<PrintSpoolerWire>(id, health, terminal_error)
+            }
+            NativeSourceKind::RemovableStorage => {
+                empty_passive_batch::<RemovableStorageWire>(id, health, terminal_error)
+            }
+            NativeSourceKind::Virtualization => {
+                empty_passive_batch::<VirtualizationWire>(id, health, terminal_error)
+            }
+            NativeSourceKind::NetworkConfiguration => {
+                empty_passive_batch::<NetworkConfigurationWire>(id, health, terminal_error)
+            }
+            NativeSourceKind::MediaDevice => {
+                empty_passive_batch::<MediaDeviceWire>(id, health, terminal_error)
             }
         }
     }
@@ -2691,7 +3283,78 @@ mod tests {
                 Arc::new(AtomicU32::new(0)),
             ))],
         );
-        BaselineSourceFactories::from_erased(display, candidate, capture)
+        let process = fake_factory(
+            NativeSourceKind::ProcessApplication,
+            vec![FactoryStep::open(fake_source(
+                process_snapshot("process-instance-0001"),
+                Vec::new(),
+                empty_batch(
+                    NativeSourceKind::ProcessApplication,
+                    "process-instance-0001",
+                    SourceHealth::Stopped,
+                    None,
+                ),
+                Arc::new(AtomicU32::new(0)),
+            ))],
+        );
+        let mut manifest_order = vec![
+            (NativeSourceKind::DisplayTopology, display),
+            (NativeSourceKind::CandidateWindow, candidate),
+            (NativeSourceKind::CaptureSession, capture),
+            (NativeSourceKind::ProcessApplication, process),
+        ];
+        manifest_order.push(healthy_passive_entry::<InteractiveSessionWire>(
+            "interactive-instance-0001",
+        ));
+        manifest_order.push(healthy_passive_entry::<ClipboardWire>(
+            "clipboard-instance-0001",
+        ));
+        manifest_order.push(healthy_passive_entry::<PrintSpoolerWire>(
+            "print-instance-000001",
+        ));
+        manifest_order.push(healthy_passive_entry::<RemovableStorageWire>(
+            "storage-instance-0001",
+        ));
+        manifest_order.push(healthy_passive_entry::<VirtualizationWire>(
+            "virtual-instance-0001",
+        ));
+        manifest_order.push(healthy_passive_entry::<NetworkConfigurationWire>(
+            "network-instance-0001",
+        ));
+        manifest_order.push(healthy_passive_entry::<MediaDeviceWire>(
+            "media-instance-00001",
+        ));
+        BaselineSourceFactories::from_erased(manifest_order)
+    }
+
+    fn factories_from_prefix(
+        mut manifest_order: Vec<(NativeSourceKind, Box<dyn ErasedFactory>)>,
+    ) -> BaselineSourceFactories {
+        for kind in NATIVE_SOURCE_KINDS
+            .iter()
+            .copied()
+            .skip(manifest_order.len())
+        {
+            manifest_order.push((kind, fake_factory(kind, Vec::new())));
+        }
+        BaselineSourceFactories::from_erased(manifest_order)
+    }
+
+    fn healthy_passive_entry<W: SupervisedPassiveStateWire>(
+        id: &str,
+    ) -> (NativeSourceKind, Box<dyn ErasedFactory>) {
+        (
+            W::KIND,
+            fake_factory(
+                W::KIND,
+                vec![FactoryStep::open(fake_source(
+                    passive_snapshot::<W>(id),
+                    Vec::new(),
+                    empty_passive_batch::<W>(id, SourceHealth::Stopped, None),
+                    Arc::new(AtomicU32::new(0)),
+                ))],
+            ),
+        )
     }
 
     #[derive(Clone, Default)]

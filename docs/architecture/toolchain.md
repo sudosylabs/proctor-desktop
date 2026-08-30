@@ -97,8 +97,12 @@ tests.
 ## Native and private protocol artifacts
 
 Language-neutral JSON Schema files are authoritative for native observation and
-enforcement DTOs. One generator produces TypeScript and Rust types plus runtime
-validators. Generated types improve callers but never replace validation.
+enforcement DTOs, including the fixed privileged-helper handshake, source
+configuration, and normalized event envelope. One generator registry produces
+TypeScript and Rust types plus runtime validators. Generated types improve
+callers but never replace validation. Generated Rust deserializers reject
+unknown object fields rather than accepting an extension at a security
+boundary.
 
 Electron MessagePorts carry only schema-valid JSON-compatible structured-clone
 values. Node-API bindings expose the same bounded DTO shapes. A separately
@@ -151,13 +155,23 @@ and Windows arm64 requires a later support decision. Exact supported OS-version
 ranges are not claimed until the signed release capability matrix records
 packaged conformance. Unknown or unproven combinations fail candidate preflight.
 
+The matrix records `enforce`, `observe`, or `unavailable` per native sub-
+capability, schema, packaged adapter/helper identity, permission, OS version,
+and architecture. Compilation or a passing mock never creates a claim. A failed,
+skipped, flaky, stale, or absent required target result removes that entry or
+blocks release instead of inheriting a prior result.
+
 Central Proctor distribution owns the signed installers and update feeds.
 Windows uses signed Squirrel installation and update packages. macOS uses a
 hardened, signed, notarized DMG and a signed ZIP update feed. Stable and pilot
 are the only release channels initially. An Institution server publishes safe
 Desktop compatibility and build-revocation policy; it does not distribute
-executables. A future elevated Windows service reopens the installer decision
-rather than being hidden inside an install hook.
+executables. The accepted process/session expansion includes one signed,
+version-matched Windows service and one entitled macOS Endpoint Security
+component with required approvals. Their installation, update, rollback,
+signature, service/extension lifecycle, and removal are explicit installer and
+release responsibilities rather than hidden lifecycle hooks. Neither component
+starts observation outside an admitted native source session.
 
 The privileged main-process updater verifies central feed identity, channel,
 signature, version direction, compatibility, and payload hash. It may download
@@ -173,6 +187,10 @@ The server evolves `/api/v1` additively and Desktop tolerates unknown additive
 fields/events/reasons. An Institution may still raise its minimum Desktop
 release for security. A too-new result remains explicit even though backward-
 compatible server releases should make it rare.
+
+Security policy, native source, enum, schema, and capability-matrix values are a
+stricter boundary: an unknown required value fails explicitly instead of being
+ignored as an additive field.
 
 ## Verification ladder
 

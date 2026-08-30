@@ -12,8 +12,8 @@ use prctr_native_protocol::{
 };
 use prctr_native_source_runtime::{
     BoundedTaskError, QueueError, SourceModel, SourceResetPlan, SourceSession, SourceSessionFact,
-    SourceStateChange, ensure_native_source_process_usable, prefer_boundary_error,
-    run_bounded_source_stop,
+    SourceSessionMetadata, SourceStateChange, ensure_native_source_process_usable,
+    prefer_boundary_error, run_bounded_source_stop,
 };
 
 #[cfg(target_os = "linux")]
@@ -246,19 +246,18 @@ impl CandidateWindowEmitter {
         &self,
         initial_window: CandidateWindowState,
         reset: Option<SourceResetPlan>,
-    ) -> Result<(), CandidateWindowError> {
+    ) -> Result<SourceSessionMetadata, CandidateWindowError> {
         let health = health_for(initial_window.certainty);
         self.session.finish_open(initial_window, health, reset)
     }
 
     fn source_snapshot(
-        &self,
         platform: PlatformFamily,
         permission: PermissionState,
         adapter_version: &str,
         window: CandidateWindowState,
+        metadata: SourceSessionMetadata,
     ) -> Result<CandidateWindowSourceSnapshot, CandidateWindowError> {
-        let metadata = self.session.metadata();
         let snapshot = CandidateWindowSourceSnapshot {
             source_instance_id: metadata.source_instance_id,
             source_version: SOURCE_VERSION.to_owned(),
@@ -416,14 +415,16 @@ impl<S: CandidateWindowSubscription> CandidateWindowSource<S> {
         let opened = backend.open(emitter.clone())?;
         let initial_window = opened.initial_window.clone();
         let subscription = opened.subscription;
-        if let Err(error) = emitter.finish_open(opened.initial_window, reset) {
-            return Err(rollback_subscription(error, subscription));
-        }
-        let snapshot = match emitter.source_snapshot(
+        let snapshot_metadata = match emitter.finish_open(opened.initial_window, reset) {
+            Ok(metadata) => metadata,
+            Err(error) => return Err(rollback_subscription(error, subscription)),
+        };
+        let snapshot = match CandidateWindowEmitter::source_snapshot(
             opened.platform,
             opened.permission,
             opened.adapter_version,
             initial_window,
+            snapshot_metadata,
         ) {
             Ok(snapshot) => snapshot,
             Err(error) => return Err(rollback_subscription(error, subscription)),

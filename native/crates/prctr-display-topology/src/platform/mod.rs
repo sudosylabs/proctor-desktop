@@ -25,7 +25,7 @@ enum EventWakeup {
     Transition,
 }
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum EventWorkerMode {
     #[cfg(target_os = "macos")]
@@ -34,7 +34,7 @@ enum EventWorkerMode {
     NotificationWithPollingFallback { poll_interval: Duration },
 }
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum EventTimeoutAction {
     #[cfg(target_os = "macos")]
@@ -43,7 +43,7 @@ enum EventTimeoutAction {
     RefreshTopology,
 }
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 impl EventTimeoutAction {
     fn should_refresh(self) -> bool {
         match self {
@@ -55,14 +55,14 @@ impl EventTimeoutAction {
     }
 }
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 struct EventWaitPolicy {
     interval: Duration,
     on_timeout: EventTimeoutAction,
 }
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 impl EventWorkerMode {
     fn wait_policy(self) -> EventWaitPolicy {
         match self {
@@ -80,7 +80,7 @@ impl EventWorkerMode {
     }
 }
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 struct EventWorkerConfig {
     mode: EventWorkerMode,
@@ -88,7 +88,7 @@ struct EventWorkerConfig {
     backend_name: &'static str,
 }
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 fn start_event_worker<F, D, C>(
     emitter: &DisplayTopologyEmitter,
     receiver: Receiver<EventWakeup>,
@@ -171,25 +171,27 @@ where
         .saturating_add(u64::try_from(receiver.try_iter().count()).unwrap_or(u64::MAX))
 }
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 use std::panic::{self, AssertUnwindSafe};
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 use std::sync::Arc;
 #[cfg(test)]
 use std::sync::atomic::AtomicU64;
 #[cfg(any(target_os = "macos", target_os = "windows", test))]
 use std::sync::atomic::{AtomicBool, Ordering};
 #[cfg(any(target_os = "macos", target_os = "windows", test))]
-use std::sync::mpsc::{Receiver, RecvTimeoutError};
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+use std::sync::mpsc::Receiver;
+#[cfg(any(target_os = "macos", target_os = "windows"))]
+use std::sync::mpsc::RecvTimeoutError;
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 use std::time::Duration;
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 use prctr_native_protocol::DisplayTopologySnapshot;
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 use prctr_native_source_runtime::DeadlineThread;
 
-#[cfg(any(target_os = "macos", target_os = "windows", test))]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 use crate::{DisplayTopologyEmitter, DisplayTopologyError};
 
 #[cfg(test)]

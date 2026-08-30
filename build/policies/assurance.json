@@ -221,6 +221,22 @@
       "evidence": ["native/Cargo.lock", "native/Cargo.toml", "native/schemas/native-observation.schema.json", "native/schemas/capture-session-state.schema.json", "native/crates/prctr-native-protocol/src/capture_session.generated.rs", "native/crates/prctr-native-protocol/src/lib.rs", "native/crates/prctr-native-source-runtime/src/lib.rs", "native/crates/prctr-capture-session-state/Cargo.toml", "native/crates/prctr-capture-session-state/src/lib.rs", "native/crates/prctr-capture-session-state/src/platform/mod.rs", "native/crates/prctr-capture-session-state/src/platform/static_coverage.rs", "native/crates/prctr-capture-session-state/src/platform/linux.rs", "native/crates/prctr-capture-session-state/src/platform/macos.rs", "native/crates/prctr-capture-session-state/src/platform/windows.rs", "native/crates/prctr-capture-session-state/src/platform/windows/metrics.rs", "native/crates/prctr-capture-session-state/src/platform/windows/notifications.rs", "native/crates/prctr-capture-session-state/src/platform/windows/session_watcher.rs", "native/crates/prctr-capture-session-state/tests/cleanup_fence.rs", "src/prctr/platform/native/common/nativeObservation.generated.ts", "test/checks/captureSessionProtocol.test.ts", "test/checks/testNative.test.ts", ".github/workflows/foundation.yml", "package.json", "build/testNative.ts"]
     },
     {
+      "id": "native-process-application-source-contract-tests",
+      "kind": "test",
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": ["native.passive-sources", "native.race-free-session", "toolchain.native-schema-authority"],
+      "evidence": ["native/Cargo.lock", "native/Cargo.toml", "native/schemas/native-observation.schema.json", "native/schemas/process-application-state.schema.json", "native/crates/prctr-native-protocol/src/process_application.generated.rs", "native/crates/prctr-native-protocol/src/lib.rs", "native/crates/prctr-native-source-runtime/src/lib.rs", "native/crates/prctr-process-application-state/Cargo.toml", "native/crates/prctr-process-application-state/src/lib.rs", "native/crates/prctr-process-application-state/src/platform/mod.rs", "native/crates/prctr-process-application-state/src/platform/snapshot.rs", "native/crates/prctr-process-application-state/src/platform/unavailable.rs", "native/crates/prctr-process-application-state/src/platform/linux.rs", "native/crates/prctr-process-application-state/src/platform/macos.rs", "native/crates/prctr-process-application-state/src/platform/windows.rs", "native/crates/prctr-native-source-supervisor/src/lib.rs", "native/crates/prctr-native-node-bridge/src/lib.rs", "src/prctr/platform/native/common/nativeObservation.generated.ts", "src/prctr/platform/native/common/securityUtilityProtocol.ts", "test/checks/processApplicationProtocol.test.ts", "test/checks/testNative.test.ts", ".github/workflows/foundation.yml", "package.json", "build/testNative.ts"]
+    },
+    {
+      "id": "native-capability-family-source-contract-tests",
+      "kind": "test",
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": ["native.passive-sources", "native.race-free-session", "native.process-boundaries", "native.fail-closed", "toolchain.native-schema-authority", "toolchain.signed-capability-matrix"],
+      "evidence": ["native/schemas/interactive-session-state.schema.json", "native/schemas/clipboard-state.schema.json", "native/schemas/print-spooler-state.schema.json", "native/schemas/removable-storage-state.schema.json", "native/schemas/virtualization-state.schema.json", "native/schemas/network-configuration-state.schema.json", "native/schemas/media-device-state.schema.json", "native/schemas/native-helper.schema.json", "native/crates/prctr-native-source-runtime/src/lib.rs", "native/crates/prctr-native-source-supervisor/src/lib.rs", "native/crates/prctr-native-helper-protocol/src/lib.rs", "native/crates/prctr-interactive-session-state/src/lib.rs", "native/crates/prctr-clipboard-state/src/lib.rs", "native/crates/prctr-print-spooler-state/src/lib.rs", "native/crates/prctr-removable-storage-state/src/lib.rs", "native/crates/prctr-virtualization-state/src/lib.rs", "native/crates/prctr-network-configuration-state/src/lib.rs", "native/crates/prctr-media-device-state/src/lib.rs", "src/prctr/platform/native/common/nativeCapabilityRegistry.ts", "src/prctr/platform/native/common/privateAttemptClipboard.ts", "src/prctr/platform/native/common/candidatePrintCommandGate.ts", "src/prctr/platform/native/electron-main/nativePermissionBroker.ts", "test/checks/nativeCapabilityFamiliesProtocol.test.ts", "test/checks/nativeCapabilityRegistry.test.ts", "test/checks/privateAttemptClipboard.test.ts", "test/checks/candidatePrintCommandGate.test.ts", "test/security-utility/nativePermissionBroker.test.ts", "test/checks/testNative.test.ts"]
+    },
+    {
       "id": "native-packaged-conformance",
       "kind": "package",
       "status": "deferred",
@@ -228,7 +244,7 @@
       "invariants": ["native.initial-scope", "native.process-boundaries", "native.single-display-window", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance", "toolchain.signed-capability-matrix"],
       "activation": "packaged-target-present",
       "futureKind": "package",
-      "rationale": "Source-level native observation, permission-broker lifecycle, CandidateWindow enforcement boundary tests, and authenticated private MessagePort composition tests exist, but the coordinator, a packaged target tuple, and the signed capability matrix do not exist yet."
+      "rationale": "Source-level native observation, partial platform adapters, permission-broker lifecycle, CandidateWindow enforcement, helper-protocol, registry/matrix-verifier, private clipboard, print gate, and authenticated private MessagePort tests exist, but enforcement-grade process/session helpers, remaining full-coverage variants, the coordinator, a packaged target tuple, and a generated signed capability matrix do not exist yet."
     },
     {
       "id": "packaged-security",

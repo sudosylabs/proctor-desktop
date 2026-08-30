@@ -120,13 +120,15 @@ export class SecurityUtilityHost {
       opened = this.#driver.openBaseline({
         collection_session_id: bootstrap.collection_session_id,
         queue_capacity: bootstrap.queue_capacity,
+        selected_sources: bootstrap.selected_sources,
+        selected_source_categories: bootstrap.selected_source_categories,
         initial_candidate_window: bootstrap.initial_candidate_window
       });
     } catch {
       this.#terminateWithoutRelease('native-open-failed');
       return;
     }
-    if (!isNativeBaselineOpenResult(opened)) {
+    if (!isNativeBaselineOpenResult(opened, bootstrap.selected_sources)) {
       this.#terminateWithoutRelease('native-open-result-invalid');
       return;
     }
@@ -141,7 +143,10 @@ export class SecurityUtilityHost {
       build_identity: this.#buildIdentity,
       source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
       source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
+      selected_sources: bootstrap.selected_sources,
+      selected_source_categories: bootstrap.selected_source_categories,
       participation_generation: bootstrap.participation_generation,
+      delivered_at_wall_time_unix_ms: Date.now(),
       snapshots: opened.snapshots
     });
     this.#pollTimer = setInterval(() => this.#poll(), SECURITY_UTILITY_POLL_INTERVAL_MS);
@@ -222,6 +227,7 @@ export class SecurityUtilityHost {
       protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
       message_sequence: this.#takeOutgoingSequence(),
       participation_generation: this.#bootstrap.participation_generation,
+      delivered_at_wall_time_unix_ms: Date.now(),
       poll
     });
   }

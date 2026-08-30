@@ -9,6 +9,8 @@ import {
   isSecurityUtilityChildMessage,
   type NativeSupervisorPoll,
   type NativeSupervisorStop,
+  type NativeSourceId,
+  type NativeSourceCategory,
   type SecurityUtilityBootstrap,
   type SecurityUtilityReady
 } from '../common/securityUtilityProtocol.js';
@@ -41,6 +43,8 @@ export interface SecurityUtilityClientOptions {
   readonly participationGeneration: string;
   readonly collectionSessionId: string;
   readonly queueCapacity: number;
+  readonly selectedSources: readonly NativeSourceId[];
+  readonly selectedSourceCategories: readonly NativeSourceCategory[];
   readonly initialCandidateWindow: CandidateWindowState;
   readonly onPoll: (poll: NativeSupervisorPoll) => void;
   readonly onFailure: (failure: SecurityUtilityClientFailure) => void;
@@ -86,6 +90,8 @@ export class SecurityUtilityClient {
       participation_generation: options.participationGeneration,
       collection_session_id: options.collectionSessionId,
       queue_capacity: options.queueCapacity,
+      selected_sources: Object.freeze([...options.selectedSources]),
+      selected_source_categories: Object.freeze([...options.selectedSourceCategories]),
       initial_candidate_window: options.initialCandidateWindow
     };
     this.#onPoll = options.onPoll;
@@ -93,8 +99,14 @@ export class SecurityUtilityClient {
     this.#candidateIngressCapacity = options.queueCapacity;
   }
 
-  public start(): Promise<SecurityUtilityReady> {
+  public start(
+    startupTimeoutMs: number = SECURITY_UTILITY_STARTUP_TIMEOUT_MS
+  ): Promise<SecurityUtilityReady> {
     if (this.#state !== 'created') return Promise.reject(new Error('security utility client can start only once'));
+    if (!Number.isSafeInteger(startupTimeoutMs) || startupTimeoutMs <= 0
+      || startupTimeoutMs > SECURITY_UTILITY_STARTUP_TIMEOUT_MS) {
+      return Promise.reject(new Error('security utility startup timeout is outside its bound'));
+    }
     this.#state = 'starting';
     const started = new Promise<SecurityUtilityReady>((resolve, reject) => {
       this.#startResolve = resolve;
@@ -108,7 +120,7 @@ export class SecurityUtilityClient {
       this.#port.start();
       this.#startupTimer = setTimeout(
         () => this.abort('startup_timeout'),
-        SECURITY_UTILITY_STARTUP_TIMEOUT_MS
+        startupTimeoutMs
       );
       this.#port.postMessage(this.#bootstrap);
     } catch {
@@ -187,6 +199,8 @@ export class SecurityUtilityClient {
     } else if (value.kind === 'native_poll') {
       if (this.#state !== 'ready' && this.#state !== 'stopping') {
         this.abort('unexpected_message');
+      } else if (!pollMatchesSelection(value.poll, this.#bootstrap.selected_sources)) {
+        this.abort('unexpected_message');
       } else {
         try {
           this.#onPoll(value.poll);
@@ -214,6 +228,10 @@ export class SecurityUtilityClient {
         this.abort('unexpected_message');
         return;
       }
+      if (!stopMatchesSelection(value.result, this.#bootstrap.selected_sources)) {
+        this.abort('unexpected_message');
+        return;
+      }
       this.#state = 'stopped';
       this.#clearTimers();
       this.#shutdownResolve?.(value.result);
@@ -231,7 +249,12 @@ export class SecurityUtilityClient {
   #acceptReady(ready: SecurityUtilityReady): void {
     if (ready.challenge_response !== this.#bootstrap.challenge
       || ready.build_identity !== this.#bootstrap.build_identity
-      || ready.participation_generation !== this.#bootstrap.participation_generation) {
+      || ready.participation_generation !== this.#bootstrap.participation_generation
+      || !sameOrderedSelection(ready.selected_sources, this.#bootstrap.selected_sources)
+      || !sameOrderedSelection(
+        ready.selected_source_categories,
+        this.#bootstrap.selected_source_categories
+      )) {
       this.abort('unexpected_message');
       return;
     }
@@ -371,4 +394,28 @@ export class SecurityUtilityClient {
       // killed by the failure callback; a close error cannot be recovered.
     }
   }
+}
+
+function sameOrderedSelection(
+  actual: readonly string[],
+  expected: readonly string[]
+): boolean {
+  return actual.length === expected.length
+    && actual.every((value, index) => expected[index] === value);
+}
+
+function pollMatchesSelection(
+  poll: NativeSupervisorPoll,
+  selectedSources: readonly NativeSourceId[]
+): boolean {
+  return poll.opened_snapshots.every(snapshot => selectedSources.includes(snapshot.source))
+    && poll.batches.every(batch => selectedSources.includes(batch.source))
+    && poll.transitions.every(transition => selectedSources.includes(transition.source));
+}
+
+function stopMatchesSelection(
+  stop: NativeSupervisorStop,
+  selectedSources: readonly NativeSourceId[]
+): boolean {
+  return stop.batches.every(batch => selectedSources.includes(batch.source));
 }

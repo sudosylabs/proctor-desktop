@@ -198,11 +198,22 @@ _Avoid_: Exam Attempt, copied folder
 **Secure Exam Posture**
 
 The privileged desktop assessment of whether current authenticated policy,
-connectivity, monitoring, and controls permit candidate interaction. It may be
-not applicable, checking, ready, explicitly restricted, or blocked and is
-independent of authentication and guilt.
+connectivity, monitoring, and controls permit candidate interaction. Its local
+lifecycle is uninitialized, checking, compliant, degraded, contained, failed,
+or stopped and is independent of authoritative Exam Attempt state,
+authentication, and guilt.
 
 _Avoid_: Login state, renderer context key, cheating verdict
+
+**Exam Security Policy**
+
+The canonical server-frozen effective envelope for one Exam Attempt. It combines
+the Exam Revision's declared rules with resolved accommodations and exceptions,
+selects only packaged Desktop capability identifiers and bounded configuration,
+and is bound to a digest used by preflight and integrity delivery. The Desktop
+evaluates it but does not author, weaken, or resolve it.
+
+_Avoid_: User Settings, renderer configuration, local exception
 
 **Attempt Participation**
 

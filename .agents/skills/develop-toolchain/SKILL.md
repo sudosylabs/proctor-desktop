@@ -32,9 +32,11 @@ release/protocol range and build revocation. Exact OS-version support requires a
 signed packaged conformance matrix; architecture text or a generic CI run does
 not establish it.
 
-Keep `/api/v1` consumption additive by tolerating unknown fields, events, and
-reasons while honoring an Institution's security-raised minimum release and
-explicit too-new incompatibility.
+Keep ordinary `/api/v1` consumption additive by tolerating unknown optional
+fields, events, and reasons while honoring an Institution's security-raised
+minimum release and explicit too-new incompatibility. Fail explicitly when an
+unknown required security-policy, native source, enum, schema, or capability-
+matrix value would otherwise be ignored.
 
 ## 2. Preserve one build graph
 

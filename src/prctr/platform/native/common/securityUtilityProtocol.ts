@@ -1,5 +1,6 @@
 import {
   NATIVE_SOURCE_MANIFEST,
+  NATIVE_SOURCE_CATEGORY_ORDER,
   NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS,
   NATIVE_SOURCE_MANIFEST_VERSION,
   isCandidateWindowDrain,
@@ -8,19 +9,52 @@ import {
   isCandidateWindowState,
   isCaptureSessionDrain,
   isCaptureSessionSourceSnapshot,
+  isClipboardDrain,
+  isClipboardSourceSnapshot,
   isDisplayTopologyDrain,
   isDisplayTopologySourceSnapshot,
+  isInteractiveSessionDrain,
+  isInteractiveSessionSourceSnapshot,
+  isMediaDeviceDrain,
+  isMediaDeviceSourceSnapshot,
+  isNetworkConfigurationDrain,
+  isNetworkConfigurationSourceSnapshot,
+  isPrintSpoolerDrain,
+  isPrintSpoolerSourceSnapshot,
+  isProcessApplicationDrain,
+  isProcessApplicationSourceSnapshot,
+  isRemovableStorageDrain,
+  isRemovableStorageSourceSnapshot,
   isSourceFailureCode,
+  isVirtualizationDrain,
+  isVirtualizationSourceSnapshot,
   type CandidateWindowDrain,
   type CandidateWindowHostEvent,
   type CandidateWindowSourceSnapshot,
   type CandidateWindowState,
   type CaptureSessionDrain,
   type CaptureSessionSourceSnapshot,
+  type ClipboardDrain,
+  type ClipboardSourceSnapshot,
   type DisplayTopologyDrain,
   type DisplayTopologySourceSnapshot,
+  type InteractiveSessionDrain,
+  type InteractiveSessionSourceSnapshot,
+  type MediaDeviceDrain,
+  type MediaDeviceSourceSnapshot,
+  type NativeSourceCategory,
   type NativeSourceManifest,
-  type SourceFailureCode
+  type NetworkConfigurationDrain,
+  type NetworkConfigurationSourceSnapshot,
+  type PrintSpoolerDrain,
+  type PrintSpoolerSourceSnapshot,
+  type ProcessApplicationDrain,
+  type ProcessApplicationSourceSnapshot,
+  type RemovableStorageDrain,
+  type RemovableStorageSourceSnapshot,
+  type SourceFailureCode,
+  type VirtualizationDrain,
+  type VirtualizationSourceSnapshot
 } from './nativeObservation.generated.js';
 
 export const SECURITY_UTILITY_PROTOCOL_VERSION = 1;
@@ -28,6 +62,7 @@ export const SECURITY_UTILITY_SOURCE_MANIFEST_VERSION = NATIVE_SOURCE_MANIFEST_V
 export const SECURITY_UTILITY_SOURCE_MANIFEST = NATIVE_SOURCE_MANIFEST;
 
 export type SecurityUtilitySourceManifest = NativeSourceManifest;
+export type { NativeSourceCategory };
 
 export const SECURITY_UTILITY_POLL_INTERVAL_MS = 100;
 export const SECURITY_UTILITY_HEARTBEAT_INTERVAL_MS = 500;
@@ -56,11 +91,13 @@ export interface SecurityUtilityBootstrap {
   readonly protocol_version: 1;
   readonly challenge: string;
   readonly build_identity: string;
-  readonly source_manifest_version: 1;
+  readonly source_manifest_version: typeof SECURITY_UTILITY_SOURCE_MANIFEST_VERSION;
   readonly source_manifest: SecurityUtilitySourceManifest;
   readonly participation_generation: string;
   readonly collection_session_id: string;
   readonly queue_capacity: number;
+  readonly selected_sources: readonly NativeSourceId[];
+  readonly selected_source_categories: readonly NativeSourceCategory[];
   readonly initial_candidate_window: CandidateWindowState;
 }
 
@@ -103,21 +140,33 @@ export type SecurityUtilityMainMessage =
   | SecurityUtilityAcknowledgement
   | SecurityUtilityShutdown;
 
-export interface NativeBaselineSnapshots {
-  readonly display_topology: DisplayTopologySourceSnapshot;
-  readonly candidate_window: CandidateWindowSourceSnapshot;
-  readonly capture_session: CaptureSessionSourceSnapshot;
-}
+export type NativeBaselineSnapshots = readonly NativeSnapshotEnvelope[];
 
 export type NativeSnapshotEnvelope =
   | { readonly source: 'display-topology'; readonly snapshot: DisplayTopologySourceSnapshot }
   | { readonly source: 'candidate-window'; readonly snapshot: CandidateWindowSourceSnapshot }
-  | { readonly source: 'capture-session'; readonly snapshot: CaptureSessionSourceSnapshot };
+  | { readonly source: 'capture-session'; readonly snapshot: CaptureSessionSourceSnapshot }
+  | { readonly source: 'process-application'; readonly snapshot: ProcessApplicationSourceSnapshot }
+  | { readonly source: 'interactive-session'; readonly snapshot: InteractiveSessionSourceSnapshot }
+  | { readonly source: 'clipboard'; readonly snapshot: ClipboardSourceSnapshot }
+  | { readonly source: 'print-spooler'; readonly snapshot: PrintSpoolerSourceSnapshot }
+  | { readonly source: 'removable-storage'; readonly snapshot: RemovableStorageSourceSnapshot }
+  | { readonly source: 'virtualization'; readonly snapshot: VirtualizationSourceSnapshot }
+  | { readonly source: 'network-configuration'; readonly snapshot: NetworkConfigurationSourceSnapshot }
+  | { readonly source: 'media-device'; readonly snapshot: MediaDeviceSourceSnapshot };
 
 export type NativeBatchEnvelope =
   | { readonly source: 'display-topology'; readonly batch: DisplayTopologyDrain }
   | { readonly source: 'candidate-window'; readonly batch: CandidateWindowDrain }
-  | { readonly source: 'capture-session'; readonly batch: CaptureSessionDrain };
+  | { readonly source: 'capture-session'; readonly batch: CaptureSessionDrain }
+  | { readonly source: 'process-application'; readonly batch: ProcessApplicationDrain }
+  | { readonly source: 'interactive-session'; readonly batch: InteractiveSessionDrain }
+  | { readonly source: 'clipboard'; readonly batch: ClipboardDrain }
+  | { readonly source: 'print-spooler'; readonly batch: PrintSpoolerDrain }
+  | { readonly source: 'removable-storage'; readonly batch: RemovableStorageDrain }
+  | { readonly source: 'virtualization'; readonly batch: VirtualizationDrain }
+  | { readonly source: 'network-configuration'; readonly batch: NetworkConfigurationDrain }
+  | { readonly source: 'media-device'; readonly batch: MediaDeviceDrain };
 
 export type NativeSourceId = NativeSnapshotEnvelope['source'];
 export type NativeSupervisorState = 'healthy' | 'degraded' | 'recovering' | 'failed' | 'stopped';
@@ -176,9 +225,12 @@ export interface SecurityUtilityReady {
   readonly message_sequence: 0;
   readonly challenge_response: string;
   readonly build_identity: string;
-  readonly source_manifest_version: 1;
+  readonly source_manifest_version: typeof SECURITY_UTILITY_SOURCE_MANIFEST_VERSION;
   readonly source_manifest: SecurityUtilitySourceManifest;
+  readonly selected_sources: readonly NativeSourceId[];
+  readonly selected_source_categories: readonly NativeSourceCategory[];
   readonly participation_generation: string;
+  readonly delivered_at_wall_time_unix_ms: number;
   readonly snapshots: NativeBaselineSnapshots;
 }
 
@@ -187,6 +239,7 @@ export interface SecurityUtilityPoll {
   readonly protocol_version: 1;
   readonly message_sequence: number;
   readonly participation_generation: string;
+  readonly delivered_at_wall_time_unix_ms: number;
   readonly poll: NativeSupervisorPoll;
 }
 
@@ -251,6 +304,8 @@ export interface NativeBaselineDriver {
   readonly openBaseline: (request: {
     readonly collection_session_id: string;
     readonly queue_capacity: number;
+    readonly selected_sources: readonly NativeSourceId[];
+    readonly selected_source_categories: readonly NativeSourceCategory[];
     readonly initial_candidate_window: CandidateWindowState;
   }) => unknown;
   readonly candidateWindowEvent: (event: CandidateWindowHostEvent) => unknown;
@@ -263,7 +318,7 @@ export function isSecurityUtilityBootstrap(value: unknown): value is SecurityUti
   return isRecordWithKeys(value, [
     'kind', 'protocol_version', 'challenge', 'build_identity', 'source_manifest_version',
     'source_manifest', 'participation_generation', 'collection_session_id', 'queue_capacity',
-    'initial_candidate_window'
+    'selected_sources', 'selected_source_categories', 'initial_candidate_window'
   ])
     && value.kind === 'bootstrap'
     && value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION
@@ -274,6 +329,8 @@ export function isSecurityUtilityBootstrap(value: unknown): value is SecurityUti
     && isBoundedString(value.participation_generation, 16, 128)
     && isBoundedString(value.collection_session_id, 16, 128)
     && isBoundedInteger(value.queue_capacity, 2, 1_024)
+    && isSelectedNativeSources(value.selected_sources)
+    && isSelectedSourceCategories(value.selected_source_categories, value.selected_sources)
     && isCandidateWindowState(value.initial_candidate_window);
 }
 
@@ -325,15 +382,25 @@ export function isNativeBridgeManifest(value: unknown): boolean {
     && isSecurityUtilitySourceManifest(value.source_manifest);
 }
 
-export function isNativeBaselineSnapshots(value: unknown): value is NativeBaselineSnapshots {
-  return isRecordWithKeys(value, ['display_topology', 'candidate_window', 'capture_session'])
-    && isDisplayTopologySourceSnapshot(value.display_topology)
-    && isCandidateWindowSourceSnapshot(value.candidate_window)
-    && isCaptureSessionSourceSnapshot(value.capture_session);
+export function isNativeBaselineSnapshots(
+  value: unknown,
+  selectedSources: readonly NativeSourceId[] = SECURITY_UTILITY_SOURCE_MANIFEST.map(
+    entry => entry.source_id
+  )
+): value is NativeBaselineSnapshots {
+  return isBoundedArray(value, SECURITY_UTILITY_SOURCE_COUNT, isNativeSnapshotEnvelope)
+    && value.length === selectedSources.length
+    && selectedSources.every(
+      (sourceId, index) => value[index]?.source === sourceId
+    );
 }
 
-export function isNativeBaselineOpenResult(value: unknown): value is { readonly snapshots: NativeBaselineSnapshots } {
-  return isRecordWithKeys(value, ['snapshots']) && isNativeBaselineSnapshots(value.snapshots);
+export function isNativeBaselineOpenResult(
+  value: unknown,
+  selectedSources?: readonly NativeSourceId[]
+): value is { readonly snapshots: NativeBaselineSnapshots } {
+  return isRecordWithKeys(value, ['snapshots'])
+    && isNativeBaselineSnapshots(value.snapshots, selectedSources);
 }
 
 export function isNativeSupervisorPoll(value: unknown): value is NativeSupervisorPoll {
@@ -356,7 +423,8 @@ export function isSecurityUtilityChildMessage(value: unknown): value is Security
   if (value.kind === 'ready') {
     return isRecordWithKeys(value, [
       'kind', 'protocol_version', 'message_sequence', 'challenge_response', 'build_identity',
-      'source_manifest_version', 'source_manifest', 'participation_generation', 'snapshots'
+      'source_manifest_version', 'source_manifest', 'selected_sources', 'selected_source_categories',
+      'participation_generation', 'delivered_at_wall_time_unix_ms', 'snapshots'
     ])
       && value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION
       && value.message_sequence === 0
@@ -364,11 +432,18 @@ export function isSecurityUtilityChildMessage(value: unknown): value is Security
       && isBoundedString(value.build_identity, 16, 256)
       && value.source_manifest_version === SECURITY_UTILITY_SOURCE_MANIFEST_VERSION
       && isSecurityUtilitySourceManifest(value.source_manifest)
+      && isSelectedNativeSources(value.selected_sources)
+      && isSelectedSourceCategories(value.selected_source_categories, value.selected_sources)
       && isBoundedString(value.participation_generation, 16, 128)
-      && isNativeBaselineSnapshots(value.snapshots);
+      && isBoundedInteger(value.delivered_at_wall_time_unix_ms, 0, Number.MAX_SAFE_INTEGER)
+      && isNativeBaselineSnapshots(value.snapshots, value.selected_sources);
   }
   if (value.kind === 'native_poll') {
-    return hasChildEnvelope(value, ['kind', 'protocol_version', 'message_sequence', 'participation_generation', 'poll'])
+    return hasChildEnvelope(value, [
+      'kind', 'protocol_version', 'message_sequence', 'participation_generation',
+      'delivered_at_wall_time_unix_ms', 'poll'
+    ])
+      && isBoundedInteger(value.delivered_at_wall_time_unix_ms, 0, Number.MAX_SAFE_INTEGER)
       && isNativeSupervisorPoll(value.poll);
   }
   if (value.kind === 'heartbeat') {
@@ -404,6 +479,55 @@ export function isSecurityUtilitySourceManifest(value: unknown): value is Securi
   });
 }
 
+export function isSelectedNativeSources(value: unknown): value is readonly NativeSourceId[] {
+  if (!Array.isArray(value) || value.length === 0 || value.length > SECURITY_UTILITY_SOURCE_COUNT) {
+    return false;
+  }
+  const sourceIds = new Set(SECURITY_UTILITY_SOURCE_MANIFEST.map(entry => entry.source_id));
+  const selected = new Set<unknown>();
+  let previousManifestIndex = -1;
+  for (const sourceId of value) {
+    const manifestIndex = SECURITY_UTILITY_SOURCE_MANIFEST.findIndex(
+      entry => entry.source_id === sourceId
+    );
+    if (!sourceIds.has(sourceId as NativeSourceId)
+      || selected.has(sourceId)
+      || manifestIndex <= previousManifestIndex) {
+      return false;
+    }
+    selected.add(sourceId);
+    previousManifestIndex = manifestIndex;
+  }
+  return true;
+}
+
+export function isSelectedSourceCategories(
+  value: unknown,
+  selectedSources: readonly NativeSourceId[]
+): value is readonly NativeSourceCategory[] {
+  if (!Array.isArray(value) || value.length > NATIVE_SOURCE_CATEGORY_ORDER.length) return false;
+  const selected = NATIVE_SOURCE_CATEGORY_ORDER.filter(category => value.includes(category));
+  if (selected.length !== value.length
+    || !selected.every((category, index) => value[index] === category)) return false;
+  const clipboardSelected = selectedSources.includes('clipboard');
+  const clipboardCategory = selected.includes('os-clipboard-change');
+  const removableSelected = selectedSources.includes('removable-storage');
+  const removableCategory = selected.includes('removable-block-storage')
+    || selected.includes('portable-mtp');
+  const networkSelected = selectedSources.includes('network-configuration');
+  const networkCategory = selected.includes('system-proxy-state')
+    || selected.includes('os-managed-vpn-state')
+    || selected.includes('tunnel-interface-state')
+    || selected.includes('route-change')
+    || selected.includes('network-source-health');
+  const mediaSelected = selectedSources.includes('media-device');
+  const mediaCategory = selected.includes('camera') || selected.includes('microphone');
+  return clipboardSelected === clipboardCategory
+    && removableSelected === removableCategory
+    && networkSelected === networkCategory
+    && mediaSelected === mediaCategory;
+}
+
 function hasChildEnvelope(value: Record<string, unknown>, keys: readonly string[]): boolean {
   return hasOnlyKeys(value, keys)
     && value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION
@@ -415,14 +539,30 @@ function isNativeSnapshotEnvelope(value: unknown): value is NativeSnapshotEnvelo
   if (!isRecordWithKeys(value, ['source', 'snapshot'])) return false;
   if (value.source === 'display-topology') return isDisplayTopologySourceSnapshot(value.snapshot);
   if (value.source === 'candidate-window') return isCandidateWindowSourceSnapshot(value.snapshot);
-  return value.source === 'capture-session' && isCaptureSessionSourceSnapshot(value.snapshot);
+  if (value.source === 'capture-session') return isCaptureSessionSourceSnapshot(value.snapshot);
+  if (value.source === 'process-application') return isProcessApplicationSourceSnapshot(value.snapshot);
+  if (value.source === 'interactive-session') return isInteractiveSessionSourceSnapshot(value.snapshot);
+  if (value.source === 'clipboard') return isClipboardSourceSnapshot(value.snapshot);
+  if (value.source === 'print-spooler') return isPrintSpoolerSourceSnapshot(value.snapshot);
+  if (value.source === 'removable-storage') return isRemovableStorageSourceSnapshot(value.snapshot);
+  if (value.source === 'virtualization') return isVirtualizationSourceSnapshot(value.snapshot);
+  if (value.source === 'network-configuration') return isNetworkConfigurationSourceSnapshot(value.snapshot);
+  return value.source === 'media-device' && isMediaDeviceSourceSnapshot(value.snapshot);
 }
 
 function isNativeBatchEnvelope(value: unknown): value is NativeBatchEnvelope {
   if (!isRecordWithKeys(value, ['source', 'batch'])) return false;
   if (value.source === 'display-topology') return isDisplayTopologyDrain(value.batch);
   if (value.source === 'candidate-window') return isCandidateWindowDrain(value.batch);
-  return value.source === 'capture-session' && isCaptureSessionDrain(value.batch);
+  if (value.source === 'capture-session') return isCaptureSessionDrain(value.batch);
+  if (value.source === 'process-application') return isProcessApplicationDrain(value.batch);
+  if (value.source === 'interactive-session') return isInteractiveSessionDrain(value.batch);
+  if (value.source === 'clipboard') return isClipboardDrain(value.batch);
+  if (value.source === 'print-spooler') return isPrintSpoolerDrain(value.batch);
+  if (value.source === 'removable-storage') return isRemovableStorageDrain(value.batch);
+  if (value.source === 'virtualization') return isVirtualizationDrain(value.batch);
+  if (value.source === 'network-configuration') return isNetworkConfigurationDrain(value.batch);
+  return value.source === 'media-device' && isMediaDeviceDrain(value.batch);
 }
 
 function isNativeLifecycleTransition(value: unknown): value is NativeLifecycleTransition {
@@ -457,7 +597,12 @@ function isNativeLifecycleTransition(value: unknown): value is NativeLifecycleTr
 }
 
 function isNativeSourceId(value: unknown): value is NativeSourceId {
-  return value === 'display-topology' || value === 'candidate-window' || value === 'capture-session';
+  return value === 'display-topology' || value === 'candidate-window'
+    || value === 'capture-session' || value === 'process-application'
+    || value === 'interactive-session' || value === 'clipboard'
+    || value === 'print-spooler' || value === 'removable-storage'
+    || value === 'virtualization' || value === 'network-configuration'
+    || value === 'media-device';
 }
 
 function isNativeSupervisorState(value: unknown): value is NativeSupervisorState {

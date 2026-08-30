@@ -84,6 +84,7 @@ impl ProtocolValidatable for CandidateWindowPlacement {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CandidateWindowBounds {
     pub x: i32,
     pub y: i32,
@@ -126,6 +127,7 @@ impl ProtocolValidatable for CandidateWindowBounds {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CandidateWindowState {
     pub certainty: CandidateWindowCertainty,
     pub presence: CandidateWindowPresence,
@@ -235,6 +237,7 @@ impl ProtocolValidatable for CandidateWindowHostEventKind {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CandidateWindowHostEvent {
     pub kind: CandidateWindowHostEventKind,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -260,6 +263,7 @@ impl ProtocolValidatable for CandidateWindowHostEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CandidateWindowEvent {
     pub window: CandidateWindowState,
     pub close_attempts_since_previous: u16,
@@ -280,6 +284,7 @@ impl ProtocolValidatable for CandidateWindowEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CandidateWindowSourceSnapshot {
     pub source_instance_id: String,
     pub source_version: String,
@@ -297,6 +302,8 @@ pub struct CandidateWindowSourceSnapshot {
     pub window: CandidateWindowState,
 }
 
+// Validation remains generated next to the complete bounded wire shape.
+#[allow(clippy::too_many_lines)]
 impl ProtocolValidatable for CandidateWindowSourceSnapshot {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
         if !(16..=64).contains(&self.source_instance_id.chars().count()) {
@@ -344,6 +351,7 @@ impl ProtocolValidatable for CandidateWindowSourceSnapshot {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CandidateWindowObservation {
     pub source_instance_id: String,
     #[serde(
@@ -394,6 +402,7 @@ impl ProtocolValidatable for CandidateWindowObservation {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct CandidateWindowDrain {
     pub source_instance_id: String,
     pub health: SourceHealth,

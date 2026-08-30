@@ -8,13 +8,68 @@ const COMMON_AUTHORITY = 'native/schemas/native-observation.schema.json';
 const DISPLAY_TOPOLOGY_AUTHORITY = 'native/schemas/display-topology.schema.json';
 const CANDIDATE_WINDOW_AUTHORITY = 'native/schemas/candidate-window-state.schema.json';
 const CAPTURE_SESSION_AUTHORITY = 'native/schemas/capture-session-state.schema.json';
+const PROCESS_APPLICATION_AUTHORITY = 'native/schemas/process-application-state.schema.json';
+const INTERACTIVE_SESSION_AUTHORITY = 'native/schemas/interactive-session-state.schema.json';
+const CLIPBOARD_AUTHORITY = 'native/schemas/clipboard-state.schema.json';
+const PRINT_SPOOLER_AUTHORITY = 'native/schemas/print-spooler-state.schema.json';
+const REMOVABLE_STORAGE_AUTHORITY = 'native/schemas/removable-storage-state.schema.json';
+const VIRTUALIZATION_AUTHORITY = 'native/schemas/virtualization-state.schema.json';
+const NETWORK_CONFIGURATION_AUTHORITY = 'native/schemas/network-configuration-state.schema.json';
+const MEDIA_DEVICE_AUTHORITY = 'native/schemas/media-device-state.schema.json';
+const NATIVE_HELPER_AUTHORITY = 'native/schemas/native-helper.schema.json';
 const RUST_OUTPUT = 'native/crates/prctr-native-protocol/src/generated.rs';
 const TYPESCRIPT_OUTPUT = 'src/prctr/platform/native/common/nativeObservation.generated.ts';
-const GENERATED_MARKER = `// @${'generated'} by native.protocol from ${COMMON_AUTHORITY}, ${DISPLAY_TOPOLOGY_AUTHORITY}, ${CANDIDATE_WINDOW_AUTHORITY}, and ${CAPTURE_SESSION_AUTHORITY}.`;
-const CANDIDATE_WINDOW_RUST_OUTPUT = 'native/crates/prctr-native-protocol/src/candidate_window.generated.rs';
-const CANDIDATE_WINDOW_GENERATED_MARKER = `// @${'generated'} by candidate-window.protocol from ${COMMON_AUTHORITY} and ${CANDIDATE_WINDOW_AUTHORITY}.`;
-const CAPTURE_SESSION_RUST_OUTPUT = 'native/crates/prctr-native-protocol/src/capture_session.generated.rs';
-const CAPTURE_SESSION_GENERATED_MARKER = `// @${'generated'} by capture-session.protocol from ${COMMON_AUTHORITY} and ${CAPTURE_SESSION_AUTHORITY}.`;
+const NATIVE_HELPER_RUST_OUTPUT =
+  'native/crates/prctr-native-protocol/src/native_helper.generated.rs';
+
+type CapabilityDescriptor = {
+  readonly sourceId: string;
+  readonly generatorId: string;
+  readonly authority: string;
+  readonly rustOutput: string;
+  readonly drainType: string;
+  readonly schemaVersionConstant: string;
+  readonly maximumFactsConstant: string;
+  readonly typescriptValidator: string;
+};
+
+const CAPABILITY_DESCRIPTORS: readonly CapabilityDescriptor[] = [
+  capabilityDescriptor('candidate-window', CANDIDATE_WINDOW_AUTHORITY, 'CandidateWindow'),
+  capabilityDescriptor('capture-session', CAPTURE_SESSION_AUTHORITY, 'CaptureSession'),
+  capabilityDescriptor('process-application', PROCESS_APPLICATION_AUTHORITY, 'ProcessApplication'),
+  capabilityDescriptor('interactive-session', INTERACTIVE_SESSION_AUTHORITY, 'InteractiveSession'),
+  capabilityDescriptor('clipboard', CLIPBOARD_AUTHORITY, 'Clipboard'),
+  capabilityDescriptor('print-spooler', PRINT_SPOOLER_AUTHORITY, 'PrintSpooler'),
+  capabilityDescriptor('removable-storage', REMOVABLE_STORAGE_AUTHORITY, 'RemovableStorage'),
+  capabilityDescriptor('virtualization', VIRTUALIZATION_AUTHORITY, 'Virtualization'),
+  capabilityDescriptor('network-configuration', NETWORK_CONFIGURATION_AUTHORITY, 'NetworkConfiguration'),
+  capabilityDescriptor('media-device', MEDIA_DEVICE_AUTHORITY, 'MediaDevice')
+];
+
+const GENERATED_MARKER = `// @${'generated'} by native.protocol from ${[
+  COMMON_AUTHORITY,
+  DISPLAY_TOPOLOGY_AUTHORITY,
+  ...CAPABILITY_DESCRIPTORS.map(descriptor => descriptor.authority),
+  NATIVE_HELPER_AUTHORITY
+].join(', ')}.`;
+
+function capabilityDescriptor(
+  sourceId: string,
+  authority: string,
+  typePrefix: string
+): CapabilityDescriptor {
+  const snakePrefix = typePrefix.replace(/([a-z0-9])([A-Z])/gu, '$1_$2').toUpperCase();
+  return {
+    sourceId,
+    generatorId: `${sourceId}.protocol`,
+    authority,
+    rustOutput: `native/crates/prctr-native-protocol/src/${sourceId.replaceAll('-', '_')}.generated.rs`,
+    drainType: `${typePrefix}Drain`,
+    schemaVersionConstant: `${snakePrefix}_SCHEMA_VERSION`,
+    maximumFactsConstant: `MAX_${snakePrefix}_FACTS`,
+    typescriptValidator: `is${typePrefix}Observation`
+  };
+}
 
 type JsonSchema = {
   readonly $defs?: Readonly<Record<string, Definition>>;
@@ -32,7 +87,18 @@ type SourceManifestEntry = {
 type SemanticRule = 'ordered_sequence_gap' | 'unique_target_ids' | 'valid_mirror_references'
   | 'gap_ends_immediately_before_sequence' | 'coherent_source_batch'
   | 'coherent_candidate_window_state' | 'coherent_candidate_window_host_event'
-  | 'coherent_capture_session_signal';
+  | 'coherent_capture_session_signal' | 'coherent_process_executable_identity'
+  | 'coherent_process_application_state' | 'unique_process_instance_ids'
+  | 'coherent_process_application_event' | 'coherent_interactive_session_state'
+  | 'coherent_clipboard_state' | 'coherent_print_spooler_state'
+  | 'coherent_removable_storage_state' | 'unique_removable_storage_function_ids'
+  | 'coherent_virtualization_state' | 'coherent_network_configuration_state'
+  | 'unique_network_tunnel_interface_ids'
+  | 'coherent_media_endpoint_state' | 'valid_helper_channel_nonce'
+  | 'unique_helper_capabilities' | 'coherent_helper_source_open'
+  | 'coherent_helper_source_snapshot' | 'coherent_helper_source_failure'
+  | 'coherent_helper_observation' | 'coherent_helper_client_message'
+  | 'coherent_helper_server_message';
 
 type Definition = {
   readonly type?: string;
@@ -57,7 +123,8 @@ type Property = Definition & {
 
 export const nativeProtocolGenerator: Generator = {
   id: 'native.protocol',
-  inputs: [COMMON_AUTHORITY, DISPLAY_TOPOLOGY_AUTHORITY, CANDIDATE_WINDOW_AUTHORITY, CAPTURE_SESSION_AUTHORITY],
+  inputs: [COMMON_AUTHORITY, DISPLAY_TOPOLOGY_AUTHORITY,
+    ...CAPABILITY_DESCRIPTORS.map(descriptor => descriptor.authority), NATIVE_HELPER_AUTHORITY],
   committedOutputs: [RUST_OUTPUT, TYPESCRIPT_OUTPUT],
   buildOutputs: [],
   generate(repository: Repository, outputRoot: string): void {
@@ -68,35 +135,35 @@ export const nativeProtocolGenerator: Generator = {
     const commonDefinitions = commonSchema.$defs;
     if (commonDefinitions === undefined) throw new Error(`${COMMON_AUTHORITY} must define $defs`);
     const definitions = mergeDefinitions(commonDefinitions, capabilityDefinitions);
-    const candidateWindowSchema = JSON.parse(
-      repository.read(CANDIDATE_WINDOW_AUTHORITY)
-    ) as JsonSchema;
-    const candidateWindowDefinitions = candidateWindowSchema.$defs;
-    if (candidateWindowDefinitions === undefined) {
-      throw new Error(`${CANDIDATE_WINDOW_AUTHORITY} must define $defs`);
-    }
-    const captureSessionSchema = JSON.parse(repository.read(CAPTURE_SESSION_AUTHORITY)) as JsonSchema;
-    const captureSessionDefinitions = captureSessionSchema.$defs;
-    if (captureSessionDefinitions === undefined) {
-      throw new Error(`${CAPTURE_SESSION_AUTHORITY} must define $defs`);
-    }
+    const capabilities = CAPABILITY_DESCRIPTORS.map(descriptor => {
+      const capabilitySchema = JSON.parse(repository.read(descriptor.authority)) as JsonSchema;
+      const capabilityDefinitions = capabilitySchema.$defs;
+      if (capabilityDefinitions === undefined) {
+        throw new Error(`${descriptor.authority} must define $defs`);
+      }
+      const capabilitySchemaVersion = capabilitySchema.properties?.schema_version?.const;
+      if (typeof capabilitySchemaVersion !== 'number') {
+        throw new Error(`${descriptor.authority} must declare numeric schema_version const`);
+      }
+      return { descriptor, definitions: capabilityDefinitions, schemaVersion: capabilitySchemaVersion };
+    });
     const schemaVersion = schema.properties?.schema_version?.const;
     if (typeof schemaVersion !== 'number') throw new Error(`${DISPLAY_TOPOLOGY_AUTHORITY} must declare numeric schema_version const`);
-    const candidateWindowSchemaVersion = candidateWindowSchema.properties?.schema_version?.const;
-    if (typeof candidateWindowSchemaVersion !== 'number') {
-      throw new Error(`${CANDIDATE_WINDOW_AUTHORITY} must declare numeric schema_version const`);
-    }
-    const captureSessionSchemaVersion = captureSessionSchema.properties?.schema_version?.const;
-    if (typeof captureSessionSchemaVersion !== 'number') {
-      throw new Error(`${CAPTURE_SESSION_AUTHORITY} must declare numeric schema_version const`);
-    }
     const sourceManifest = requiredSourceManifest(commonSchema, new Map([
       ['display-topology', schemaVersion],
-      ['candidate-window', candidateWindowSchemaVersion],
-      ['capture-session', captureSessionSchemaVersion]
+      ...capabilities.map(capability => [
+        capability.descriptor.sourceId,
+        capability.schemaVersion
+      ] as const)
     ]));
     const sourceManifestVersion = requiredSourceManifestVersion(commonSchema);
     const sourceLifecycleDeadlineMs = requiredSourceLifecycleDeadline(commonSchema);
+    const sourceCategories = requiredNativeSourceCategories(commonDefinitions);
+    const helperSchema = JSON.parse(repository.read(NATIVE_HELPER_AUTHORITY)) as JsonSchema;
+    const helperDefinitions = helperSchema.$defs;
+    if (helperDefinitions === undefined) {
+      throw new Error(`${NATIVE_HELPER_AUTHORITY} must define $defs`);
+    }
     const rustOutput = write(
       outputRoot,
       RUST_OUTPUT,
@@ -105,7 +172,8 @@ export const nativeProtocolGenerator: Generator = {
         schemaVersion,
         sourceManifest,
         sourceManifestVersion,
-        sourceLifecycleDeadlineMs
+        sourceLifecycleDeadlineMs,
+        sourceCategories
       )
     );
     execFileSync('rustfmt', ['--edition', '2024', rustOutput]);
@@ -113,71 +181,71 @@ export const nativeProtocolGenerator: Generator = {
       outputRoot,
       TYPESCRIPT_OUTPUT,
       renderTypeScript(
-        mergeDefinitions(
-          mergeDefinitions(definitions, candidateWindowDefinitions),
-          captureSessionDefinitions
+        capabilities.reduce(
+          (merged, capability) => mergeDefinitions(merged, capability.definitions),
+          mergeDefinitions(definitions, helperDefinitions)
         ),
         sourceManifest,
         sourceManifestVersion,
-        sourceLifecycleDeadlineMs
+        sourceLifecycleDeadlineMs,
+        sourceCategories
       )
     );
   }
 };
 
-export const candidateWindowProtocolGenerator: Generator = {
-  id: 'candidate-window.protocol',
-  inputs: [COMMON_AUTHORITY, CANDIDATE_WINDOW_AUTHORITY],
-  committedOutputs: [CANDIDATE_WINDOW_RUST_OUTPUT],
-  buildOutputs: [],
-  generate(repository: Repository, outputRoot: string): void {
-    const schema = JSON.parse(repository.read(CANDIDATE_WINDOW_AUTHORITY)) as JsonSchema;
-    const definitions = schema.$defs;
-    if (definitions === undefined) throw new Error(`${CANDIDATE_WINDOW_AUTHORITY} must define $defs`);
-    const schemaVersion = schema.properties?.schema_version?.const;
-    if (typeof schemaVersion !== 'number') {
-      throw new Error(`${CANDIDATE_WINDOW_AUTHORITY} must declare numeric schema_version const`);
+export const nativeCapabilityProtocolGenerators: readonly Generator[] =
+  CAPABILITY_DESCRIPTORS.map(descriptor => ({
+    id: descriptor.generatorId,
+    inputs: [COMMON_AUTHORITY, descriptor.authority],
+    committedOutputs: [descriptor.rustOutput],
+    buildOutputs: [],
+    generate(repository: Repository, outputRoot: string): void {
+      const schema = JSON.parse(repository.read(descriptor.authority)) as JsonSchema;
+      const definitions = schema.$defs;
+      if (definitions === undefined) throw new Error(`${descriptor.authority} must define $defs`);
+      const schemaVersion = schema.properties?.schema_version?.const;
+      if (typeof schemaVersion !== 'number') {
+        throw new Error(`${descriptor.authority} must declare numeric schema_version const`);
+      }
+      const rustOutput = write(
+        outputRoot,
+        descriptor.rustOutput,
+        renderCapabilityRust(
+          definitions,
+          schemaVersion,
+          `// @${'generated'} by ${descriptor.generatorId} from ${COMMON_AUTHORITY} and ${descriptor.authority}.`,
+          descriptor.drainType,
+          descriptor.schemaVersionConstant,
+          descriptor.maximumFactsConstant
+        )
+      );
+      execFileSync('rustfmt', ['--edition', '2024', rustOutput]);
     }
-    const rustOutput = write(
-      outputRoot,
-      CANDIDATE_WINDOW_RUST_OUTPUT,
-      renderCapabilityRust(
-        definitions,
-        schemaVersion,
-        CANDIDATE_WINDOW_GENERATED_MARKER,
-        'CandidateWindowDrain',
-        'CANDIDATE_WINDOW_SCHEMA_VERSION',
-        'MAX_CANDIDATE_WINDOW_FACTS'
-      )
-    );
-    execFileSync('rustfmt', ['--edition', '2024', rustOutput]);
-  }
-};
+  }));
 
-export const captureSessionProtocolGenerator: Generator = {
-  id: 'capture-session.protocol',
-  inputs: [COMMON_AUTHORITY, CAPTURE_SESSION_AUTHORITY],
-  committedOutputs: [CAPTURE_SESSION_RUST_OUTPUT],
+export const nativeHelperProtocolGenerator: Generator = {
+  id: 'native-helper.protocol',
+  inputs: [
+    COMMON_AUTHORITY,
+    PROCESS_APPLICATION_AUTHORITY,
+    INTERACTIVE_SESSION_AUTHORITY,
+    NATIVE_HELPER_AUTHORITY
+  ],
+  committedOutputs: [NATIVE_HELPER_RUST_OUTPUT],
   buildOutputs: [],
   generate(repository: Repository, outputRoot: string): void {
-    const schema = JSON.parse(repository.read(CAPTURE_SESSION_AUTHORITY)) as JsonSchema;
+    const schema = JSON.parse(repository.read(NATIVE_HELPER_AUTHORITY)) as JsonSchema;
     const definitions = schema.$defs;
-    if (definitions === undefined) throw new Error(`${CAPTURE_SESSION_AUTHORITY} must define $defs`);
+    if (definitions === undefined) throw new Error(`${NATIVE_HELPER_AUTHORITY} must define $defs`);
     const schemaVersion = schema.properties?.schema_version?.const;
     if (typeof schemaVersion !== 'number') {
-      throw new Error(`${CAPTURE_SESSION_AUTHORITY} must declare numeric schema_version const`);
+      throw new Error(`${NATIVE_HELPER_AUTHORITY} must declare numeric schema_version const`);
     }
     const rustOutput = write(
       outputRoot,
-      CAPTURE_SESSION_RUST_OUTPUT,
-      renderCapabilityRust(
-        definitions,
-        schemaVersion,
-        CAPTURE_SESSION_GENERATED_MARKER,
-        'CaptureSessionDrain',
-        'CAPTURE_SESSION_SCHEMA_VERSION',
-        'MAX_CAPTURE_SESSION_FACTS'
-      )
+      NATIVE_HELPER_RUST_OUTPUT,
+      renderHelperRust(definitions, schemaVersion)
     );
     execFileSync('rustfmt', ['--edition', '2024', rustOutput]);
   }
@@ -188,7 +256,8 @@ function renderRust(
   schemaVersion: number,
   sourceManifest: readonly SourceManifestEntry[],
   sourceManifestVersion: number,
-  sourceLifecycleDeadlineMs: number
+  sourceLifecycleDeadlineMs: number,
+  sourceCategories: readonly string[]
 ): string {
   const maximumTargets = definitions.DisplayTopologySnapshot?.properties?.targets?.maxItems;
   if (maximumTargets === undefined) throw new Error(`${DISPLAY_TOPOLOGY_AUTHORITY} must bound DisplayTopologySnapshot.targets`);
@@ -207,6 +276,7 @@ function renderRust(
     `pub const MAX_DISPLAY_TOPOLOGY_FACTS: usize = ${rustNumber(maximumFacts)};`,
     `pub const MAX_PROTOCOL_SAFE_INTEGER: u64 = ${rustNumber(maximumTimestamp)};`,
     `pub const NATIVE_SOURCE_COUNT: usize = ${sourceManifest.length};`,
+    `pub const NATIVE_SOURCE_CATEGORY_COUNT: usize = ${sourceCategories.length};`,
     `pub const NATIVE_SOURCE_MANIFEST_VERSION: u16 = ${rustNumber(sourceManifestVersion)};`,
     `pub const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS: u64 = ${rustNumber(sourceLifecycleDeadlineMs)};`,
     '',
@@ -223,6 +293,10 @@ function renderRust(
       `        schema_version: ${rustNumber(entry.schema_version)},`,
       '    },'
     ]).flat(),
+    '];',
+    '',
+    'pub const NATIVE_SOURCE_CATEGORY_ORDER: [NativeSourceCategory; NATIVE_SOURCE_CATEGORY_COUNT] = [',
+    ...sourceCategories.map(category => `    NativeSourceCategory::${rustVariant(category)},`),
     '];',
     '',
     '#[derive(Clone, Debug, Eq, PartialEq)]',
@@ -288,16 +362,41 @@ function renderCapabilityRust(
   return `${lines.join('\n').trimEnd()}\n`;
 }
 
+function renderHelperRust(
+  definitions: Readonly<Record<string, Definition>>,
+  schemaVersion: number
+): string {
+  const lines = [
+    `// @${'generated'} by native-helper.protocol from ${COMMON_AUTHORITY}, ${PROCESS_APPLICATION_AUTHORITY}, ${INTERACTIVE_SESSION_AUTHORITY}, and ${NATIVE_HELPER_AUTHORITY}.`,
+    '// Do not edit by hand.',
+    '',
+    'use serde::{Deserialize, Serialize};',
+    '',
+    'use crate::{',
+    '    INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveSessionEvent, InteractiveSessionState,',
+    '    PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationEvent, ProcessApplicationState,',
+    '    ProtocolValidatable, ProtocolValidationError,',
+    '};',
+    '',
+    `pub const NATIVE_HELPER_SCHEMA_VERSION: u16 = ${rustNumber(schemaVersion)};`,
+    ''
+  ];
+  lines.push(...renderRustDefinitions(definitions));
+  return `${lines.join('\n').trimEnd()}\n`;
+}
+
 function renderRustDefinitions(definitions: Readonly<Record<string, Definition>>): string[] {
   const lines: string[] = [];
   for (const [name, definition] of Object.entries(definitions)) {
     if (definition.type === 'string' && definition.enum !== undefined) {
-      lines.push(
-        '#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]',
-        '#[serde(rename_all = "snake_case")]',
-        `pub enum ${name} {`
-      );
-      for (const value of definition.enum) lines.push(`    ${rustVariant(value)},`);
+      const needsExactRename = definition.enum.some(value => value.includes('-'));
+      lines.push('#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]');
+      if (!needsExactRename) lines.push('#[serde(rename_all = "snake_case")]');
+      lines.push(`pub enum ${name} {`);
+      for (const value of definition.enum) {
+        if (needsExactRename) lines.push(`    #[serde(rename = ${JSON.stringify(value)})]`);
+        lines.push(`    ${rustVariant(value)},`);
+      }
       lines.push('}', '');
       lines.push(`impl ProtocolValidatable for ${name} {`);
       lines.push('    fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {');
@@ -316,22 +415,37 @@ function renderRustDefinitions(definitions: Readonly<Record<string, Definition>>
       }
       lines.push(
         '#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]',
-        `pub struct ${name} {`
       );
+      if (definition.additionalProperties === false) {
+        lines.push('#[serde(deny_unknown_fields)]');
+      }
+      lines.push(`pub struct ${name} {`);
       for (const [propertyName, property] of Object.entries(definition.properties)) {
         const type = rustType(property);
-        if (!required.has(propertyName)) {
+        const optional = !required.has(propertyName);
+        if (optional && property['x-rust-type'] !== 'u64') {
           lines.push('    #[serde(skip_serializing_if = "Option::is_none")]');
         }
         if (property['x-rust-type'] === 'u64') {
           lines.push('    #[serde(');
-          lines.push('        serialize_with = "crate::serialize_protocol_safe_u64",');
-          lines.push('        deserialize_with = "crate::deserialize_protocol_safe_u64"');
+          if (optional) {
+            lines.push('        default,');
+            lines.push('        skip_serializing_if = "Option::is_none",');
+            lines.push('        serialize_with = "crate::serialize_protocol_safe_optional_u64",');
+            lines.push('        deserialize_with = "crate::deserialize_protocol_safe_optional_u64"');
+          } else {
+            lines.push('        serialize_with = "crate::serialize_protocol_safe_u64",');
+            lines.push('        deserialize_with = "crate::deserialize_protocol_safe_u64"');
+          }
           lines.push('    )]');
         }
-        lines.push(`    pub ${propertyName}: ${required.has(propertyName) ? type : `Option<${type}>`},`);
+        lines.push(`    pub ${propertyName}: ${optional ? `Option<${type}>` : type},`);
       }
       lines.push('}', '');
+      if (Object.keys(definition.properties).length > 8) {
+        lines.push('// Validation remains generated next to the complete bounded wire shape.');
+        lines.push('#[allow(clippy::too_many_lines)]');
+      }
       lines.push(`impl ProtocolValidatable for ${name} {`);
       lines.push('    fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {');
       for (const [propertyName, property] of Object.entries(definition.properties)) {
@@ -353,13 +467,12 @@ function renderTypeScript(
   definitions: Readonly<Record<string, Definition>>,
   sourceManifest: readonly SourceManifestEntry[],
   sourceManifestVersion: number,
-  sourceLifecycleDeadlineMs: number
+  sourceLifecycleDeadlineMs: number,
+  sourceCategories: readonly string[]
 ): string {
   const maximumTargets = definitions.DisplayTopologySnapshot?.properties?.targets?.maxItems;
   if (maximumTargets === undefined) throw new Error(`${DISPLAY_TOPOLOGY_AUTHORITY} must bound DisplayTopologySnapshot.targets`);
   const maximumDisplayFacts = sourceBatchFactLimit(definitions, 'DisplayTopologyDrain');
-  const maximumCandidateWindowFacts = sourceBatchFactLimit(definitions, 'CandidateWindowDrain');
-  const maximumCaptureSessionFacts = sourceBatchFactLimit(definitions, 'CaptureSessionDrain');
   const lines = [
     GENERATED_MARKER,
     '// Do not edit by hand.',
@@ -368,10 +481,12 @@ function renderTypeScript(
     'export type NativeSourceManifest = typeof NATIVE_SOURCE_MANIFEST;',
     `export const NATIVE_SOURCE_MANIFEST_VERSION = ${sourceManifestVersion};`,
     `export const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS = ${sourceLifecycleDeadlineMs};`,
+    `export const NATIVE_SOURCE_CATEGORY_ORDER = ${JSON.stringify(sourceCategories)} as const;`,
     '',
     `const MAX_DISPLAY_TOPOLOGY_FACTS = ${maximumDisplayFacts};`,
-    `const MAX_CANDIDATE_WINDOW_FACTS = ${maximumCandidateWindowFacts};`,
-    `const MAX_CAPTURE_SESSION_FACTS = ${maximumCaptureSessionFacts};`,
+    ...CAPABILITY_DESCRIPTORS.map(descriptor =>
+      `const ${descriptor.maximumFactsConstant} = ${sourceBatchFactLimit(definitions, descriptor.drainType)};`
+    ),
     '',
     'type JsonObject = Record<string, unknown>;',
     '',
@@ -492,6 +607,194 @@ function renderTypeScript(
     "  return value.certainty !== 'unknown' || value.activity === 'unknown';",
     '}',
     '',
+    'function hasCoherentProcessExecutableIdentity(value: JsonObject): boolean {',
+    "  const identityKeys = ['signer_chain_id', 'publisher_id', 'product_id', 'signing_id',",
+    "    'team_id', 'designated_requirement', 'bundle_id', 'package_id', 'version', 'digest_sha256'] as const;",
+    "  if (value.digest_sha256 !== undefined",
+    "    && (typeof value.digest_sha256 !== 'string' || !/^[0-9a-f]{64}$/u.test(value.digest_sha256))) return false;",
+    '  if (value.status === \'pending\' || value.status === \'unavailable\') {',
+    '    return identityKeys.every(key => value[key] === undefined);',
+    '  }',
+    "  if (value.status === 'unsigned') {",
+    "    return typeof value.digest_sha256 === 'string'",
+    '      && identityKeys.every(key => key === \'digest_sha256\' || value[key] === undefined);',
+    '  }',
+    "  const windowsIdentity = typeof value.signer_chain_id === 'string'",
+    "    && typeof value.publisher_id === 'string' && typeof value.product_id === 'string'",
+    "    && typeof value.version === 'string' && value.signing_id === undefined",
+    '    && value.team_id === undefined && value.designated_requirement === undefined',
+    '    && value.bundle_id === undefined && value.package_id === undefined;',
+    "  const macosIdentity = typeof value.signing_id === 'string' && typeof value.team_id === 'string'",
+    "    && typeof value.designated_requirement === 'string' && typeof value.bundle_id === 'string'",
+    "    && typeof value.version === 'string' && value.signer_chain_id === undefined",
+    '    && value.publisher_id === undefined && value.product_id === undefined',
+    '    && value.package_id === undefined;',
+    "  const linuxIdentity = typeof value.package_id === 'string'",
+    "    && typeof value.version === 'string' && typeof value.digest_sha256 === 'string'",
+    '    && value.signer_chain_id === undefined && value.publisher_id === undefined',
+    '    && value.product_id === undefined && value.signing_id === undefined',
+    '    && value.team_id === undefined && value.designated_requirement === undefined',
+    '    && value.bundle_id === undefined;',
+    '  return windowsIdentity || macosIdentity || linuxIdentity;',
+    '}',
+    '',
+    'function hasCoherentProcessApplicationState(value: JsonObject): boolean {',
+    "  return value.coverage !== 'unavailable'",
+    "    || (value.certainty === 'unknown' && Array.isArray(value.processes) && value.processes.length === 0);",
+    '}',
+    '',
+    'function hasUniqueProcessInstanceIds(value: unknown): boolean {',
+    '  if (!Array.isArray(value)) return false;',
+    '  return value.every((process, index) => isProcessApplicationProcess(process)',
+    '    && value.findIndex(candidate => isProcessApplicationProcess(candidate)',
+    '      && candidate.process_instance_id === process.process_instance_id) === index);',
+    '}',
+    '',
+    'function hasCoherentProcessApplicationEvent(value: JsonObject): boolean {',
+    "  if (value.kind === 'reconciled') return value.process_instance_id === undefined",
+    '    && value.process === undefined && isProcessApplicationState(value.state);',
+    "  if (value.kind === 'exited') return typeof value.process_instance_id === 'string'",
+    '    && value.process === undefined && value.state === undefined;',
+    "  return typeof value.process_instance_id === 'string' && value.state === undefined",
+    '    && isProcessApplicationProcess(value.process)',
+    '    && value.process.process_instance_id === value.process_instance_id;',
+    '}',
+    '',
+    'function hasCoherentInteractiveSessionState(value: JsonObject): boolean {',
+    "  if (value.coverage === 'unavailable') return value.certainty === 'unknown'",
+    "    && value.console_ownership === 'unknown' && value.lock_state === 'unknown'",
+    "    && value.remote_attachment === 'unknown' && value.other_human_session_count === 0;",
+    "  return value.certainty !== 'complete' || (value.console_ownership !== 'unknown'",
+    "    && value.lock_state !== 'unknown' && value.remote_attachment !== 'unknown');",
+    '}',
+    '',
+    'function hasCoherentClipboardState(value: JsonObject): boolean {',
+    "  return value.coverage !== 'unavailable'",
+    "    || (value.certainty === 'unknown' && value.change_generation === 0);",
+    '}',
+    '',
+    'function hasCoherentPrintSpoolerState(value: JsonObject): boolean {',
+    "  if (value.coverage === 'unavailable') return value.certainty === 'unknown'",
+    '    && value.candidate_job_count === 0 && value.other_job_count === 0',
+    '    && value.unknown_job_count === 0;',
+    "  return value.certainty !== 'complete' || value.unknown_job_count === 0;",
+    '}',
+    '',
+    'function hasCoherentRemovableStorageState(value: JsonObject): boolean {',
+    "  if (value.coverage === 'unavailable') return value.certainty === 'unknown'",
+    '    && Array.isArray(value.attached_functions) && value.attached_functions.length === 0;',
+    "  return value.coverage !== 'block_only' || (Array.isArray(value.attached_functions)",
+    "    && value.attached_functions.every(entry => isRemovableStorageFunction(entry) && entry.kind === 'block_storage'));",
+    '}',
+    '',
+    'function hasUniqueRemovableStorageFunctionIds(value: unknown): boolean {',
+    '  if (!Array.isArray(value)) return false;',
+    '  return value.every((entry, index) => isRemovableStorageFunction(entry)',
+    '    && value.findIndex(candidate => isRemovableStorageFunction(candidate)',
+    '      && candidate.function_instance_id === entry.function_instance_id) === index);',
+    '}',
+    '',
+    'function hasCoherentVirtualizationState(value: JsonObject): boolean {',
+    "  return value.coverage !== 'unavailable' || (value.certainty === 'unknown'",
+    "    && value.classification === 'unknown');",
+    '}',
+    '',
+    'function hasCoherentNetworkConfigurationState(value: JsonObject): boolean {',
+    "  if (value.coverage === 'unavailable') return value.certainty === 'unknown'",
+    "    && value.system_proxy === 'unknown' && value.managed_vpn === 'unknown'",
+    '    && Array.isArray(value.tunnel_interfaces) && value.tunnel_interfaces.length === 0',
+    '    && value.route_generation === 0;',
+    "  return value.coverage !== 'full_configuration' || value.certainty !== 'complete'",
+    "    || (value.system_proxy !== 'unknown' && value.managed_vpn !== 'unknown');",
+    '}',
+    '',
+    'function hasUniqueNetworkTunnelInterfaceIds(value: unknown): boolean {',
+    '  if (!Array.isArray(value)) return false;',
+    '  return value.every((entry, index) => isNetworkTunnelInterface(entry)',
+    '    && value.findIndex(candidate => isNetworkTunnelInterface(candidate)',
+    '      && candidate.interface_instance_id === entry.interface_instance_id) === index);',
+    '}',
+    '',
+    'function hasCoherentMediaEndpointState(value: JsonObject): boolean {',
+    "  if (value.coverage === 'not_collected') return value.certainty === 'unknown'",
+    "    && value.permission === 'not_determined' && value.readiness === 'unknown'",
+    "    && value.endpoint_count === 0 && value.other_application_use === 'unknown';",
+    "  if (value.coverage === 'unavailable') return value.certainty === 'unknown'",
+    "    && value.permission === 'unavailable' && value.readiness === 'unknown'",
+    "    && value.endpoint_count === 0 && value.other_application_use === 'unknown';",
+    "  if (value.coverage === 'readiness_only' && value.other_application_use !== 'unknown') return false;",
+    "  return value.certainty !== 'complete' || (value.readiness !== 'unknown'",
+    "    && (value.coverage !== 'readiness_and_concurrent_use' || value.other_application_use !== 'unknown'));",
+    '}',
+    '',
+    'function hasValidHelperChannelNonce(value: JsonObject): boolean {',
+    "  return typeof value.channel_nonce === 'string'",
+    "    && /^[0-9a-f]{64}$/u.test(value.channel_nonce);",
+    '}',
+    '',
+    'function hasUniqueHelperCapabilities(value: JsonObject): boolean {',
+    '  return Array.isArray(value.capabilities) && value.capabilities.length > 0',
+    '    && new Set(value.capabilities).size === value.capabilities.length;',
+    '}',
+    '',
+    'function hasCoherentHelperSourceOpen(value: JsonObject): boolean {',
+    '  if (!Array.isArray(value.event_classes) || value.event_classes.length === 0',
+    '    || new Set(value.event_classes).size !== value.event_classes.length) return false;',
+    "  const schemaMatches = value.source_kind === 'process_application'",
+    '    ? value.schema_version === 1',
+    "    : value.source_kind === 'interactive_session' && value.schema_version === 1;",
+    '  if (!schemaMatches) return false;',
+    "  return value.source_kind === 'process_application'",
+    "    ? value.event_classes.every(eventClass => eventClass === 'process_lifecycle'",
+    "      || eventClass === 'process_identity')",
+    "    : value.source_kind === 'interactive_session'",
+    "      && value.event_classes.every(eventClass => eventClass === 'interactive_session_lifecycle');",
+    '}',
+    '',
+    'function hasCoherentHelperObservation(value: JsonObject): boolean {',
+    "  return value.source_kind === 'process_application'",
+    '    ? isProcessApplicationEvent(value.process_event)',
+    '      && value.interactive_session_event === undefined',
+    "    : value.source_kind === 'interactive_session'",
+    '      && isInteractiveSessionEvent(value.interactive_session_event)',
+    '      && value.process_event === undefined;',
+    '}',
+    '',
+    'function hasCoherentHelperSourceSnapshot(value: JsonObject): boolean {',
+    "  const schemaMatches = value.source_kind === 'process_application'",
+    '    ? value.schema_version === 1',
+    "    : value.source_kind === 'interactive_session' && value.schema_version === 1;",
+    '  if (!schemaMatches) return false;',
+    "  return value.source_kind === 'process_application'",
+    '    ? isProcessApplicationState(value.process_state)',
+    '      && value.interactive_session_state === undefined',
+    "    : value.source_kind === 'interactive_session'",
+    '      && isInteractiveSessionState(value.interactive_session_state)',
+    '      && value.process_state === undefined;',
+    '}',
+    '',
+    'function hasCoherentHelperSourceFailure(value: JsonObject): boolean {',
+    "  const reportsLoss = value.failure_code === 'native_event_loss'",
+    "    || value.failure_code === 'queue_overflow';",
+    "  return reportsLoss === (typeof value.lost_event_count === 'number');",
+    '}',
+    '',
+    'function hasCoherentHelperClientMessage(value: JsonObject): boolean {',
+    "  if (value.kind === 'open') return isHelperSourceOpen(value.open)",
+    '    && value.close === undefined;',
+    "  return value.kind === 'close' && value.open === undefined",
+    '    && isHelperSourceClose(value.close);',
+    '}',
+    '',
+    'function hasCoherentHelperServerMessage(value: JsonObject): boolean {',
+    "  if (value.kind === 'snapshot') return isHelperSourceSnapshot(value.snapshot)",
+    '    && value.observation === undefined && value.failure === undefined;',
+    "  if (value.kind === 'observation') return value.snapshot === undefined",
+    '    && isHelperObservation(value.observation) && value.failure === undefined;',
+    "  return value.kind === 'failure' && value.snapshot === undefined",
+    '    && value.observation === undefined && isHelperSourceFailure(value.failure);',
+    '}',
+    '',
   ];
   lines.push(...renderTypeScriptDefinitions(definitions));
   return `${lines.join('\n').trimEnd()}\n`;
@@ -544,6 +847,21 @@ function requiredSourceManifestVersion(schema: JsonSchema): number {
     throw new Error(`${COMMON_AUTHORITY} must declare a bounded x-proctor-source-manifest-version`);
   }
   return version;
+}
+
+function requiredNativeSourceCategories(
+  definitions: Readonly<Record<string, Definition>>
+): readonly string[] {
+  const categories = definitions.NativeSourceCategory?.enum;
+  if (categories === undefined || categories.length === 0) {
+    throw new Error(`${COMMON_AUTHORITY} must define a non-empty NativeSourceCategory enum`);
+  }
+  const unique = new Set(categories);
+  if (unique.size !== categories.length
+    || categories.some(category => !/^[a-z]+(?:-[a-z]+)*$/u.test(category))) {
+    throw new Error(`${COMMON_AUTHORITY} NativeSourceCategory entries must be unique kebab-case`);
+  }
+  return categories;
 }
 
 function renderTypeScriptDefinitions(
@@ -743,6 +1061,416 @@ const semanticRuleEmitters = {
       '        }'
     ],
     typescript: () => 'hasCoherentCaptureSessionSignal(value)'
+  },
+  coherent_process_executable_identity: {
+    rust: typeName => [
+      '        let has_any_identity = self.signer_chain_id.is_some()',
+      '            || self.publisher_id.is_some()',
+      '            || self.product_id.is_some()',
+      '            || self.signing_id.is_some()',
+      '            || self.team_id.is_some()',
+      '            || self.designated_requirement.is_some()',
+      '            || self.bundle_id.is_some()',
+      '            || self.package_id.is_some()',
+      '            || self.version.is_some()',
+      '            || self.digest_sha256.is_some();',
+      '        let digest_is_valid = self.digest_sha256.as_ref().is_none_or(|digest| {',
+      '            digest.len() == 64',
+      '                && digest',
+      '                    .bytes()',
+      "                    .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))",
+      '        });',
+      '        let coherent = match self.status {',
+      '            ProcessExecutableIdentityStatus::Pending | ProcessExecutableIdentityStatus::Unavailable => !has_any_identity,',
+      '            ProcessExecutableIdentityStatus::Unsigned => self.digest_sha256.is_some()',
+      '                && self.signer_chain_id.is_none()',
+      '                && self.publisher_id.is_none()',
+      '                && self.product_id.is_none()',
+      '                && self.signing_id.is_none()',
+      '                && self.team_id.is_none()',
+      '                && self.designated_requirement.is_none()',
+      '                && self.bundle_id.is_none()',
+      '                && self.package_id.is_none()',
+      '                && self.version.is_none(),',
+      '            ProcessExecutableIdentityStatus::Verified => {',
+      '                let windows_identity = self.signer_chain_id.is_some()',
+      '                    && self.publisher_id.is_some()',
+      '                    && self.product_id.is_some()',
+      '                    && self.version.is_some()',
+      '                    && self.signing_id.is_none()',
+      '                    && self.team_id.is_none()',
+      '                    && self.designated_requirement.is_none()',
+      '                    && self.bundle_id.is_none()',
+      '                    && self.package_id.is_none();',
+      '                let macos_identity = self.signing_id.is_some()',
+      '                    && self.team_id.is_some()',
+      '                    && self.designated_requirement.is_some()',
+      '                    && self.bundle_id.is_some()',
+      '                    && self.version.is_some()',
+      '                    && self.signer_chain_id.is_none()',
+      '                    && self.publisher_id.is_none()',
+      '                    && self.product_id.is_none()',
+      '                    && self.package_id.is_none();',
+      '                let linux_identity = self.package_id.is_some()',
+      '                    && self.version.is_some()',
+      '                    && self.digest_sha256.is_some()',
+      '                    && self.signer_chain_id.is_none()',
+      '                    && self.publisher_id.is_none()',
+      '                    && self.product_id.is_none()',
+      '                    && self.signing_id.is_none()',
+      '                    && self.team_id.is_none()',
+      '                    && self.designated_requirement.is_none()',
+      '                    && self.bundle_id.is_none();',
+      '                windows_identity || macos_identity || linux_identity',
+      '            }',
+      '        };',
+      '        if !coherent || !digest_is_valid {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "status", "identity fields match one bounded platform form"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentProcessExecutableIdentity(value)'
+  },
+  coherent_process_application_state: {
+    rust: typeName => [
+      '        if matches!(self.coverage, ProcessApplicationCoverage::Unavailable)',
+      '            && (!matches!(self.certainty, ProcessApplicationCertainty::Unknown)',
+      '                || !self.processes.is_empty())',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "coverage", "unavailable coverage has unknown certainty and no inventory"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentProcessApplicationState(value)'
+  },
+  unique_process_instance_ids: {
+    rust: typeName => [
+      '        for (index, process) in self.processes.iter().enumerate() {',
+      '            if self.processes[..index].iter().any(|existing| existing.process_instance_id == process.process_instance_id) {',
+      `                return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "processes", "unique process_instance_id"));`,
+      '            }',
+      '        }'
+    ],
+    typescript: () => 'hasUniqueProcessInstanceIds(value.processes)'
+  },
+  coherent_process_application_event: {
+    rust: typeName => [
+      '        let coherent = match self.kind {',
+      '            ProcessApplicationEventKind::Reconciled => self.process_instance_id.is_none()',
+      '                && self.process.is_none()',
+      '                && self.state.is_some(),',
+      '            ProcessApplicationEventKind::Exited => self.process_instance_id.is_some()',
+      '                && self.process.is_none()',
+      '                && self.state.is_none(),',
+      '            ProcessApplicationEventKind::Started | ProcessApplicationEventKind::IdentityChanged => self',
+      '                .process',
+      '                .as_ref()',
+      '                .zip(self.process_instance_id.as_ref())',
+      '                .is_some_and(|(process, process_instance_id)| &process.process_instance_id == process_instance_id)',
+      '                && self.state.is_none(),',
+      '        };',
+      '        if !coherent {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "process", "event payload matches kind and process_instance_id"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentProcessApplicationEvent(value)'
+  },
+  coherent_interactive_session_state: {
+    rust: typeName => [
+      '        if matches!(self.coverage, InteractiveSessionCoverage::Unavailable)',
+      '            && (!matches!(self.certainty, InteractiveSessionCertainty::Unknown)',
+      '                || !matches!(self.console_ownership, InteractiveConsoleOwnership::Unknown)',
+      '                || !matches!(self.lock_state, InteractiveLockState::Unknown)',
+      '                || !matches!(self.remote_attachment, InteractiveRemoteAttachment::Unknown)',
+      '                || self.other_human_session_count != 0)',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "coverage", "unavailable coverage carries no session facts"));`,
+      '        }',
+      '        if matches!(self.certainty, InteractiveSessionCertainty::Complete)',
+      '            && (matches!(self.console_ownership, InteractiveConsoleOwnership::Unknown)',
+      '                || matches!(self.lock_state, InteractiveLockState::Unknown)',
+      '                || matches!(self.remote_attachment, InteractiveRemoteAttachment::Unknown))',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "certainty", "complete state contains known session facts"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentInteractiveSessionState(value)'
+  },
+  coherent_clipboard_state: {
+    rust: typeName => [
+      '        if matches!(self.coverage, ClipboardCoverage::Unavailable)',
+      '            && (!matches!(self.certainty, ClipboardCertainty::Unknown)',
+      '                || self.change_generation != 0)',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "coverage", "unavailable coverage carries no clipboard fact"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentClipboardState(value)'
+  },
+  coherent_print_spooler_state: {
+    rust: typeName => [
+      '        if matches!(self.coverage, PrintSpoolerCoverage::Unavailable)',
+      '            && (!matches!(self.certainty, PrintSpoolerCertainty::Unknown)',
+      '                || self.candidate_job_count != 0',
+      '                || self.other_job_count != 0',
+      '                || self.unknown_job_count != 0)',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "coverage", "unavailable coverage carries no print jobs"));`,
+      '        }',
+      '        if matches!(self.certainty, PrintSpoolerCertainty::Complete)',
+      '            && self.unknown_job_count != 0',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "certainty", "complete state has no unknown attribution"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentPrintSpoolerState(value)'
+  },
+  coherent_removable_storage_state: {
+    rust: typeName => [
+      '        if matches!(self.coverage, RemovableStorageCoverage::Unavailable)',
+      '            && (!matches!(self.certainty, RemovableStorageCertainty::Unknown)',
+      '                || !self.attached_functions.is_empty())',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "coverage", "unavailable coverage carries no storage inventory"));`,
+      '        }',
+      '        if matches!(self.coverage, RemovableStorageCoverage::BlockOnly)',
+      '            && self.attached_functions.iter().any(|entry| !matches!(entry.kind, RemovableStorageFunctionKind::BlockStorage))',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "attached_functions", "block-only coverage carries only block storage"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentRemovableStorageState(value)'
+  },
+  unique_removable_storage_function_ids: {
+    rust: typeName => [
+      '        for (index, entry) in self.attached_functions.iter().enumerate() {',
+      '            if self.attached_functions[..index].iter().any(|existing| existing.function_instance_id == entry.function_instance_id) {',
+      `                return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "attached_functions", "unique function_instance_id"));`,
+      '            }',
+      '        }'
+    ],
+    typescript: () => 'hasUniqueRemovableStorageFunctionIds(value.attached_functions)'
+  },
+  coherent_virtualization_state: {
+    rust: typeName => [
+      '        if matches!(self.coverage, VirtualizationCoverage::Unavailable)',
+      '            && (!matches!(self.certainty, VirtualizationCertainty::Unknown)',
+      '                || !matches!(self.classification, VirtualizationClassification::Unknown))',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "coverage", "unavailable coverage has unknown classification"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentVirtualizationState(value)'
+  },
+  coherent_network_configuration_state: {
+    rust: typeName => [
+      '        if matches!(self.coverage, NetworkConfigurationCoverage::Unavailable)',
+      '            && (!matches!(self.certainty, NetworkConfigurationCertainty::Unknown)',
+      '                || !matches!(self.system_proxy, NetworkActivityState::Unknown)',
+      '                || !matches!(self.managed_vpn, NetworkActivityState::Unknown)',
+      '                || !self.tunnel_interfaces.is_empty()',
+      '                || self.route_generation != 0)',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "coverage", "unavailable coverage carries no network facts"));`,
+      '        }',
+      '        if matches!(self.coverage, NetworkConfigurationCoverage::FullConfiguration)',
+      '            && matches!(self.certainty, NetworkConfigurationCertainty::Complete)',
+      '            && (matches!(self.system_proxy, NetworkActivityState::Unknown)',
+      '                || matches!(self.managed_vpn, NetworkActivityState::Unknown))',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "certainty", "complete full coverage contains known network states"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentNetworkConfigurationState(value)'
+  },
+  unique_network_tunnel_interface_ids: {
+    rust: typeName => [
+      '        for (index, entry) in self.tunnel_interfaces.iter().enumerate() {',
+      '            if self.tunnel_interfaces[..index].iter().any(|existing| existing.interface_instance_id == entry.interface_instance_id) {',
+      `                return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "tunnel_interfaces", "unique interface_instance_id"));`,
+      '            }',
+      '        }'
+    ],
+    typescript: () => 'hasUniqueNetworkTunnelInterfaceIds(value.tunnel_interfaces)'
+  },
+  coherent_media_endpoint_state: {
+    rust: typeName => [
+      '        if matches!(self.coverage, MediaDeviceCoverage::NotCollected)',
+      '            && (!matches!(self.certainty, MediaDeviceCertainty::Unknown)',
+      '                || !matches!(self.permission, PermissionState::NotDetermined)',
+      '                || !matches!(self.readiness, MediaEndpointReadiness::Unknown)',
+      '                || self.endpoint_count != 0',
+      '                || !matches!(self.other_application_use, MediaConcurrentUse::Unknown))',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "coverage", "not-collected coverage carries no media facts"));`,
+      '        }',
+      '        if matches!(self.coverage, MediaDeviceCoverage::Unavailable)',
+      '            && (!matches!(self.certainty, MediaDeviceCertainty::Unknown)',
+      '                || !matches!(self.permission, PermissionState::Unavailable)',
+      '                || !matches!(self.readiness, MediaEndpointReadiness::Unknown)',
+      '                || self.endpoint_count != 0',
+      '                || !matches!(self.other_application_use, MediaConcurrentUse::Unknown))',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "coverage", "unavailable coverage carries no media facts"));`,
+      '        }',
+      '        if matches!(self.coverage, MediaDeviceCoverage::ReadinessOnly)',
+      '            && !matches!(self.other_application_use, MediaConcurrentUse::Unknown)',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "other_application_use", "readiness-only coverage makes no concurrent-use claim"));`,
+      '        }',
+      '        if matches!(self.certainty, MediaDeviceCertainty::Complete)',
+      '            && (matches!(self.readiness, MediaEndpointReadiness::Unknown)',
+      '                || (matches!(self.coverage, MediaDeviceCoverage::ReadinessAndConcurrentUse)',
+      '                    && matches!(self.other_application_use, MediaConcurrentUse::Unknown)))',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "certainty", "complete media coverage contains known applicable facts"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentMediaEndpointState(value)'
+  },
+  valid_helper_channel_nonce: {
+    rust: typeName => [
+      '        if self.channel_nonce.len() != 64',
+      '            || !self.channel_nonce.bytes().all(|byte| {',
+      "                byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase()",
+      '            })',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "channel_nonce", "64 lowercase hexadecimal characters"));`,
+      '        }'
+    ],
+    typescript: () => 'hasValidHelperChannelNonce(value)'
+  },
+  unique_helper_capabilities: {
+    rust: typeName => [
+      '        if self.capabilities.is_empty()',
+      '            || self.capabilities.iter().enumerate().any(|(index, capability)| {',
+      '                self.capabilities[..index].contains(capability)',
+      '            })',
+      '        {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "capabilities", "nonempty unique helper capabilities"));`,
+      '        }'
+    ],
+    typescript: () => 'hasUniqueHelperCapabilities(value)'
+  },
+  coherent_helper_source_open: {
+    rust: typeName => [
+      '        let unique = !self.event_classes.is_empty()',
+      '            && !self.event_classes.iter().enumerate().any(|(index, event_class)| {',
+      '                self.event_classes[..index].contains(event_class)',
+      '            });',
+      '        let matching = self.event_classes.iter().all(|event_class| match self.source_kind {',
+      '            HelperSourceKind::ProcessApplication => matches!(',
+      '                event_class,',
+      '                HelperEventClass::ProcessLifecycle | HelperEventClass::ProcessIdentity',
+      '            ),',
+      '            HelperSourceKind::InteractiveSession => {',
+      '                matches!(event_class, HelperEventClass::InteractiveSessionLifecycle)',
+      '            }',
+      '        });',
+      '        let schema_matches = match self.source_kind {',
+      '            HelperSourceKind::ProcessApplication => {',
+      '                self.schema_version == PROCESS_APPLICATION_SCHEMA_VERSION',
+      '            }',
+      '            HelperSourceKind::InteractiveSession => {',
+      '                self.schema_version == INTERACTIVE_SESSION_SCHEMA_VERSION',
+      '            }',
+      '        };',
+      '        if !unique || !matching || !schema_matches {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "event_classes", "unique classes match helper source"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentHelperSourceOpen(value)'
+  },
+  coherent_helper_source_snapshot: {
+    rust: typeName => [
+      '        let coherent = match self.source_kind {',
+      '            HelperSourceKind::ProcessApplication => {',
+      '                self.process_state.is_some() && self.interactive_session_state.is_none()',
+      '            }',
+      '            HelperSourceKind::InteractiveSession => {',
+      '                self.process_state.is_none() && self.interactive_session_state.is_some()',
+      '            }',
+      '        };',
+      '        let schema_matches = match self.source_kind {',
+      '            HelperSourceKind::ProcessApplication => {',
+      '                self.schema_version == PROCESS_APPLICATION_SCHEMA_VERSION',
+      '            }',
+      '            HelperSourceKind::InteractiveSession => {',
+      '                self.schema_version == INTERACTIVE_SESSION_SCHEMA_VERSION',
+      '            }',
+      '        };',
+      '        if !coherent || !schema_matches {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "source_kind", "exact matching source state"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentHelperSourceSnapshot(value)'
+  },
+  coherent_helper_source_failure: {
+    rust: typeName => [
+      '        let reports_loss = matches!(',
+      '            self.failure_code,',
+      '            HelperFailureCode::NativeEventLoss | HelperFailureCode::QueueOverflow',
+      '        );',
+      '        if reports_loss != self.lost_event_count.is_some() {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "lost_event_count", "present exactly for native loss or queue overflow"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentHelperSourceFailure(value)'
+  },
+  coherent_helper_observation: {
+    rust: typeName => [
+      '        let coherent = match self.source_kind {',
+      '            HelperSourceKind::ProcessApplication => {',
+      '                self.process_event.is_some() && self.interactive_session_event.is_none()',
+      '            }',
+      '            HelperSourceKind::InteractiveSession => {',
+      '                self.process_event.is_none() && self.interactive_session_event.is_some()',
+      '            }',
+      '        };',
+      '        if !coherent {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "source_kind", "exact matching event payload"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentHelperObservation(value)'
+  },
+  coherent_helper_client_message: {
+    rust: typeName => [
+      '        let coherent = match self.kind {',
+      '            HelperClientMessageKind::Open => {',
+      '                self.open.is_some() && self.close.is_none()',
+      '            }',
+      '            HelperClientMessageKind::Close => {',
+      '                self.open.is_none() && self.close.is_some()',
+      '            }',
+      '        };',
+      '        if !coherent {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "kind", "exact discriminated client payload"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentHelperClientMessage(value)'
+  },
+  coherent_helper_server_message: {
+    rust: typeName => [
+      '        let coherent = match self.kind {',
+      '            HelperServerMessageKind::Snapshot => {',
+      '                self.snapshot.is_some()',
+      '                    && self.observation.is_none()',
+      '                    && self.failure.is_none()',
+      '            }',
+      '            HelperServerMessageKind::Observation => {',
+      '                self.snapshot.is_none()',
+      '                    && self.observation.is_some()',
+      '                    && self.failure.is_none()',
+      '            }',
+      '            HelperServerMessageKind::Failure => {',
+      '                self.snapshot.is_none()',
+      '                    && self.observation.is_none()',
+      '                    && self.failure.is_some()',
+      '            }',
+      '        };',
+      '        if !coherent {',
+      `            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "kind", "exact discriminated server payload"));`,
+      '        }'
+    ],
+    typescript: () => 'hasCoherentHelperServerMessage(value)'
   }
 } satisfies Readonly<Record<SemanticRule, SemanticRuleEmitter>>;
 
@@ -771,26 +1499,23 @@ type SourceBatchDescriptor = {
   readonly typescriptValidator: string;
 };
 
-const sourceBatchDescriptors = {
+const sourceBatchDescriptors: Readonly<Record<string, SourceBatchDescriptor>> = {
   DisplayTopologyDrain: {
     authority: DISPLAY_TOPOLOGY_AUTHORITY,
     rustLimit: 'MAX_DISPLAY_TOPOLOGY_FACTS',
     typescriptLimit: 'MAX_DISPLAY_TOPOLOGY_FACTS',
     typescriptValidator: 'isDisplayTopologyObservation'
   },
-  CandidateWindowDrain: {
-    authority: CANDIDATE_WINDOW_AUTHORITY,
-    rustLimit: 'MAX_CANDIDATE_WINDOW_FACTS',
-    typescriptLimit: 'MAX_CANDIDATE_WINDOW_FACTS',
-    typescriptValidator: 'isCandidateWindowObservation'
-  },
-  CaptureSessionDrain: {
-    authority: CAPTURE_SESSION_AUTHORITY,
-    rustLimit: 'MAX_CAPTURE_SESSION_FACTS',
-    typescriptLimit: 'MAX_CAPTURE_SESSION_FACTS',
-    typescriptValidator: 'isCaptureSessionObservation'
-  }
-} satisfies Readonly<Record<string, SourceBatchDescriptor>>;
+  ...Object.fromEntries(CAPABILITY_DESCRIPTORS.map(descriptor => [
+    descriptor.drainType,
+    {
+      authority: descriptor.authority,
+      rustLimit: descriptor.maximumFactsConstant,
+      typescriptLimit: descriptor.maximumFactsConstant,
+      typescriptValidator: descriptor.typescriptValidator
+    }
+  ]))
+};
 
 function sourceBatchDescriptor(typeName: string): SourceBatchDescriptor {
   const descriptor: SourceBatchDescriptor | undefined = sourceBatchDescriptors[
@@ -999,7 +1724,9 @@ function referenceName(reference: string): string {
 }
 
 function rustVariant(value: string): string {
-  return value.split('_').map(part => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`).join('');
+  return value.split(/[_-]/u)
+    .map(part => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
+    .join('');
 }
 
 function rustNumber(value: number): string {

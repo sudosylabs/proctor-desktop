@@ -50,7 +50,7 @@ test('capture-session observations require exact adjacent gap boundaries', () =>
   const observation = {
     source_instance_id: 'capture-session-source-0001',
     sequence: 3,
-    observed_at: { wall_time_unix_ms: 1, monotonic_time_ns: 1 },
+    observed_at: { monotonic_time_ns: 1 },
     gap: { first_missing: 1, last_missing: 2 },
     state
   };
@@ -65,7 +65,7 @@ test('capture-session drains fence source identity and terminal health', () => {
   const observation = {
     source_instance_id: 'capture-session-source-0001',
     sequence: 1,
-    observed_at: { wall_time_unix_ms: 1, monotonic_time_ns: 1 },
+    observed_at: { monotonic_time_ns: 1 },
     state
   };
   const drain = {

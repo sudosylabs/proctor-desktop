@@ -4,7 +4,26 @@
 mod candidate_window_generated;
 #[path = "capture_session.generated.rs"]
 mod capture_session_generated;
+#[path = "clipboard.generated.rs"]
+mod clipboard_generated;
+#[path = "generated.rs"]
 mod generated;
+#[path = "interactive_session.generated.rs"]
+mod interactive_session_generated;
+#[path = "media_device.generated.rs"]
+mod media_device_generated;
+#[path = "native_helper.generated.rs"]
+mod native_helper_generated;
+#[path = "network_configuration.generated.rs"]
+mod network_configuration_generated;
+#[path = "print_spooler.generated.rs"]
+mod print_spooler_generated;
+#[path = "process_application.generated.rs"]
+mod process_application_generated;
+#[path = "removable_storage.generated.rs"]
+mod removable_storage_generated;
+#[path = "virtualization.generated.rs"]
+mod virtualization_generated;
 
 use std::fmt;
 
@@ -12,7 +31,16 @@ use serde::{Deserialize, Deserializer, Serializer};
 
 pub use candidate_window_generated::*;
 pub use capture_session_generated::*;
+pub use clipboard_generated::*;
 pub use generated::*;
+pub use interactive_session_generated::*;
+pub use media_device_generated::*;
+pub use native_helper_generated::*;
+pub use network_configuration_generated::*;
+pub use print_spooler_generated::*;
+pub use process_application_generated::*;
+pub use removable_storage_generated::*;
+pub use virtualization_generated::*;
 
 #[allow(clippy::trivially_copy_pass_by_ref)] // Serde's serialize_with ABI requires a reference.
 pub(crate) fn serialize_protocol_safe_u64<S>(value: &u64, serializer: S) -> Result<S::Ok, S::Error>
@@ -40,6 +68,42 @@ where
         ));
     }
     Ok(value)
+}
+
+// Serde's `serialize_with` ABI passes `&T`; for an optional protocol field that
+// necessarily makes this parameter `&Option<u64>` rather than `Option<&u64>`.
+#[allow(clippy::ref_option)]
+pub(crate) fn serialize_protocol_safe_optional_u64<S>(
+    value: &Option<u64>,
+    serializer: S,
+) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    match value {
+        Some(value) => serialize_protocol_safe_u64(value, serializer),
+        None => serializer.serialize_none(),
+    }
+}
+
+pub(crate) fn deserialize_protocol_safe_optional_u64<'de, D>(
+    deserializer: D,
+) -> Result<Option<u64>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let wire_value = Option::<i64>::deserialize(deserializer)?;
+    wire_value
+        .map(|wire_value| {
+            let value = u64::try_from(wire_value).map_err(serde::de::Error::custom)?;
+            if value > MAX_PROTOCOL_SAFE_INTEGER {
+                return Err(serde::de::Error::custom(
+                    "integer exceeds the protocol safe-integer maximum",
+                ));
+            }
+            Ok(value)
+        })
+        .transpose()
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -102,7 +166,23 @@ impl SourceOpenRequest {
         self.validate_for(CAPTURE_SESSION_SCHEMA_VERSION)
     }
 
-    fn validate_for(&self, supported: u16) -> Result<(), ProtocolViolation> {
+    /// Validates this request for the process/application schema.
+    ///
+    /// # Errors
+    ///
+    /// Returns a protocol violation when the request is outside the shared
+    /// bounds or requests an incompatible process/application schema version.
+    pub fn validate_process_application(&self) -> Result<(), ProtocolViolation> {
+        self.validate_for(PROCESS_APPLICATION_SCHEMA_VERSION)
+    }
+
+    /// Validates this request against one generated capability schema version.
+    ///
+    /// # Errors
+    ///
+    /// Returns a protocol violation when shared bounds fail or the requested
+    /// schema version differs from the capability's supported version.
+    pub fn validate_for_schema_version(&self, supported: u16) -> Result<(), ProtocolViolation> {
         self.validate_protocol()?;
         if self.requested_schema_version != supported {
             return Err(ProtocolViolation::SchemaVersion {
@@ -111,6 +191,10 @@ impl SourceOpenRequest {
             });
         }
         Ok(())
+    }
+
+    fn validate_for(&self, supported: u16) -> Result<(), ProtocolViolation> {
+        self.validate_for_schema_version(supported)
     }
 }
 
@@ -146,6 +230,32 @@ impl CaptureSessionState {
     /// # Errors
     ///
     /// Returns a protocol violation when a signal overstates its support or certainty.
+    pub fn validate(&self) -> Result<(), ProtocolViolation> {
+        self.validate_protocol()?;
+        Ok(())
+    }
+}
+
+impl ProcessApplicationState {
+    /// Validates bounded coverage, identity, and inventory facts.
+    ///
+    /// # Errors
+    ///
+    /// Returns a protocol violation when the inventory overstates coverage,
+    /// repeats process identity, or carries an incoherent executable identity.
+    pub fn validate(&self) -> Result<(), ProtocolViolation> {
+        self.validate_protocol()?;
+        Ok(())
+    }
+}
+
+impl ProcessApplicationEvent {
+    /// Validates one bounded transition-oriented process fact.
+    ///
+    /// # Errors
+    ///
+    /// Returns a protocol violation when the payload does not match its event
+    /// kind or process-instance identity.
     pub fn validate(&self) -> Result<(), ProtocolViolation> {
         self.validate_protocol()?;
         Ok(())
@@ -267,7 +377,6 @@ mod tests {
             source_instance_id: "source-instance-0001".to_owned(),
             sequence: 9_007_199_254_740_992,
             observed_at: SourceTimestamp {
-                wall_time_unix_ms: 1,
                 monotonic_time_ns: 1,
             },
             gap: None,
@@ -301,7 +410,6 @@ mod tests {
             source_instance_id: source_instance_id.to_owned(),
             sequence,
             observed_at: SourceTimestamp {
-                wall_time_unix_ms: 1,
                 monotonic_time_ns: sequence,
             },
             gap: None,
@@ -418,7 +526,6 @@ mod tests {
                 source_instance_id: "different-instance".to_owned(),
                 sequence: 1,
                 observed_at: SourceTimestamp {
-                    wall_time_unix_ms: 1,
                     monotonic_time_ns: 1,
                 },
                 gap: None,

@@ -218,19 +218,55 @@ The projection keeps separate:
 - pause/correction state, protected-work status, authoritative time, and
   permitted intents.
 
+## Effective Exam Security Policy
+
+The server returns one canonical authenticated effective-policy envelope for
+preflight and participation. It contains:
+
+- Institution, Exam Revision and Sitting scope, plus either an existing Attempt
+  reference for re-entry or a one-use candidate admission scope for first join;
+- resolved accommodation/exception provenance without exposing authorization
+  internals;
+- required packaged capability and schema versions;
+- explicit native `disabled`/`observe`/`enforce` selections and bounded
+  registered configuration identifiers;
+- evidence/visibility/retention classes and admission/expiry bounds;
+- a canonical policy digest and anti-rollback identity.
+
+The server resolves Institution policy, Exam Revision rules, current authority,
+accommodations, and manager grants before delivery. Desktop validates the
+envelope against its static registry and signed packaged capability matrix
+before it requests permissions or opens sources. Unknown, contradictory,
+oversized, prohibited, or unsupported requirements fail admission; Desktop does
+not repair them with local precedence or a cached exception.
+
+The policy remains frozen through one active Participation. Changing it requires
+suspension and a fresh join. A separately authenticated emergency restriction
+may strengthen or block current participation but cannot weaken the envelope.
+The preflight report binds Institution, User Session, the existing Attempt or
+one-use admission scope, policy digest, application release, signed matrix
+identity, registered installation key, and source generations. The one-use
+scope prevents replay but grants no operation and creates no durable Attempt
+state. The report proves only the declared admitted capabilities, not official-
+binary, device, or kernel attestation.
+
 ## Secure Exam Posture and containment
 
-Secure Exam Posture is `notApplicable`, `checking`, `ready`, `restricted`, or
-`blocked`. It is local privileged state, not the Attempt's authoritative
-`ready` state. Attempt entry requires usable posture plus fresh server
-admission. Unsupported target, required permission/source loss, expired policy,
-connectivity failure, or unverifiable enforcement produces a safe reason and
-never a renderer-selected exception.
+Secure Exam Posture is `uninitialized`, `checking`, `compliant`, `degraded`,
+`contained`, `failed`, or `stopped`. It is local privileged state, not the
+Attempt's authoritative `ready` state. Attempt entry requires compliant posture
+plus fresh server admission; explicitly degraded observe-only coverage may join
+only when every enforced requirement remains complete. Unsupported target,
+required permission/source loss, expired policy, connectivity failure, or
+unverifiable enforcement produces a safe reason and never a renderer-selected
+exception.
 
-The initial policy model includes current server Focus Loss and Connection Loss
-plus the separately accepted first-release native baseline. Additional process,
-clipboard, printing, device, VM, camera/microphone, and VPN policies remain
-deferred until their Desktop models are accepted.
+The accepted initial policy model includes Focus Loss, Connection Loss, and the
+first-release native families defined by the
+[native family contracts](./native-capability-families.md). Each native family
+uses an explicit `disabled`, `observe`, or `enforce` mode. Desktop does not
+silently downgrade an enforced requirement or promote a disabled/observe
+family.
 
 A closed idempotent containment plan orders effects:
 
@@ -244,6 +280,22 @@ A closed idempotent containment plan orders effects:
 
 Failure of a required step remains blocked. The actual Workspace, browser,
 terminal, submission, and server operation owners still reauthorize requests.
+
+A high-confidence native event may synchronously enter `checking` and close
+mutation gates while the coordinator reconciles. It creates no occurrence or
+integrity evidence until deterministic policy evaluation confirms the condition.
+`contained` keeps CandidateWindow visible beneath one aggregated secure overlay
+while blocking editor changes, terminal input, browser interaction/navigation,
+resource mutation, and submission. Observe-only conditions never contain and do
+not repeatedly notify the candidate.
+
+Independent conditions retain independent occurrence lifecycles. Posture derives
+from fixed precedence: failed/unknown enforced coverage, inactive authoritative
+participation, confirmed enforced condition, checking, observe degradation, then
+compliant. There is no suspicion score. A clean complete snapshot plus any
+platform-certified stability fence may automatically remove local containment
+while the Attempt remains active. Server suspension still requires manager
+reallow to ready and a later successful join.
 
 ## Connectivity, pause, suspension, and re-entry
 
@@ -308,11 +360,22 @@ Every transition preserves source/schema/policy version, uncertainty, and known
 gaps. Local findings may drive reversible containment but do not declare guilt
 or authoritative Attempt state. Integrity review is not grading.
 
-Sources use source-instance identity, monotonic sequence, device wall and
-monotonic time, bounded classified payload, and explicit gaps/resets. Delivery
-is at-least-once and idempotent with server watermarks. Protected Browser
+Sources use source-instance identity, monotonic sequence/time, bounded classified
+payload, and explicit gaps/resets; the privileged delivery layer adds wall-clock
+context. Raw native facts remain ephemeral; only minimized occurrences,
+health/gap transitions,
+recovery records, and preflight capability reports enter delivery. The main-
+process delivery service binds canonical batches to Institution, User Session,
+Attempt, policy digest, application release, capability matrix, source
+generations, batch sequence, prior acknowledgement, and idempotency key, then
+authenticates them with the registered installation credential. Helpers and the
+utility never receive that credential.
+
+Delivery is at-least-once and idempotent with server watermarks. Encrypted local
+spool records remain until acknowledgement or server-defined retention expiry.
+One aggregated continuity heartbeat reports required-source health, generations,
+gaps, and posture rather than recurring normal observations. Protected Browser
 Activity and integrity spools are distinct from Attempt Workspace recovery.
-Raw observations remain ephemeral unless policy promotes minimized material.
 
 Candidate status, manager board state, detailed review evidence, and
 exceptional live access remain distinct visibility classes. Ordinary managers

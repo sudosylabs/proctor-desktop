@@ -43,7 +43,11 @@ strict single-display candidate window, and packaged Windows/macOS verification.
 Read
 [`docs/architecture/native-capabilities.md`](docs/architecture/native-capabilities.md)
 before changing native observation, permissions, candidate-window enforcement,
-security-utility supervision, native IPC, or platform capability tests.
+security-utility supervision, native IPC, or platform capability tests. Read
+[`docs/architecture/native-capability-families.md`](docs/architecture/native-capability-families.md)
+before changing process/application or interactive-session policy, clipboard,
+printing, removable storage, virtualization, network configuration, camera,
+microphone, platform coverage, correction, or minimized native evidence.
 
 The accepted user-settings architecture uses one server-authoritative virtual
 `settings.json`, a static Proctor registry, an Account/Settings destination in

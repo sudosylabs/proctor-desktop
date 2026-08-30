@@ -8,7 +8,16 @@ import {
 export const BASELINE_NATIVE_PERMISSION_CAPABILITIES = [
   'display-topology',
   'candidate-window',
-  'capture-session'
+  'capture-session',
+  'process-application',
+  'interactive-session',
+  'clipboard',
+  'print-spooler',
+  'removable-storage',
+  'virtualization',
+  'network-configuration',
+  'camera',
+  'microphone'
 ] as const;
 
 export type NativePermissionCapability =
@@ -48,6 +57,7 @@ export interface NativePermissionFact {
 export interface NativePermissionPreflightReceipt {
   readonly platform: PlatformFamily;
   readonly checkedAtMonotonicMs: number;
+  readonly capabilities: readonly NativePermissionCapability[];
   readonly permissions: readonly NativePermissionFact[];
 }
 
@@ -64,11 +74,15 @@ export interface SealedNativePermissionPreflight {
 
 export type NativePermissionBrokerErrorCode =
   | 'invalid_adapter_manifest'
+  | 'invalid_preflight_scope'
+  | 'capability_outside_preflight_scope'
+  | 'preflight_scope_mismatch'
   | 'invalid_monotonic_time'
   | 'invalid_permission_state'
   | 'permission_inspection_failed'
   | 'permission_request_failed'
   | 'permission_request_unavailable'
+  | 'preflight_cancelled'
   | 'preflight_operation_in_progress'
   | 'preflight_sealed'
   | 'no_active_preflight_seal'
@@ -89,6 +103,17 @@ export interface NativePermissionBrokerOptions {
   readonly monotonicNow?: () => number;
 }
 
+export type NativeMediaPermissionCapability = 'camera' | 'microphone';
+
+export interface NativeMediaPermissionServices {
+  readonly inspect: (
+    capability: NativeMediaPermissionCapability
+  ) => PermissionState | Promise<PermissionState>;
+  readonly requestDuringPreflight?: (
+    capability: NativeMediaPermissionCapability
+  ) => PermissionState | Promise<PermissionState>;
+}
+
 type BrokerState =
   | 'preflight'
   | 'inspecting'
@@ -101,8 +126,10 @@ export class NativePermissionBroker {
   readonly #platform: PlatformFamily;
   readonly #monotonicNow: () => number;
   #state: BrokerState = 'preflight';
+  #preflightScope: readonly NativePermissionCapability[] | undefined;
   #activeSeal: NativePermissionPreflightSeal | undefined;
   #releasedSeal: NativePermissionPreflightSeal | undefined;
+  #cancellationEpoch = 0;
 
   public constructor(options: NativePermissionBrokerOptions) {
     this.#platform = validateAdapterManifest(options.adapters);
@@ -110,13 +137,17 @@ export class NativePermissionBroker {
     this.#monotonicNow = options.monotonicNow ?? (() => performance.now());
   }
 
-  public async inspectPreflight(): Promise<NativePermissionPreflightReceipt> {
+  public async inspectPreflight(
+    capabilities: readonly NativePermissionCapability[]
+  ): Promise<NativePermissionPreflightReceipt> {
     this.#assertPreflightOpen();
+    const scope = this.#establishScope(capabilities);
+    const epoch = this.#cancellationEpoch;
     this.#state = 'inspecting';
     try {
-      return await this.#inspectReceipt();
+      return await this.#inspectReceipt(scope, epoch);
     } finally {
-      this.#state = 'preflight';
+      if (this.#state === 'inspecting') this.#state = 'preflight';
     }
   }
 
@@ -124,13 +155,18 @@ export class NativePermissionBroker {
     capability: NativePermissionCapability
   ): Promise<NativePermissionFact> {
     this.#assertPreflightOpen();
+    if (this.#preflightScope === undefined || !this.#preflightScope.includes(capability)) {
+      throw new NativePermissionBrokerError('capability_outside_preflight_scope');
+    }
     const adapter = this.#adapter(capability);
     if (adapter.mode !== 'os_permission') {
       throw new NativePermissionBrokerError('permission_request_unavailable');
     }
+    const epoch = this.#cancellationEpoch;
     this.#state = 'requesting';
     try {
       const current = await inspectAdapter(adapter);
+      this.#assertCurrentEpoch(epoch);
       if (current === 'granted') return permissionFact(adapter, current);
       if (adapter.requestDuringPreflight === undefined) {
         throw new NativePermissionBrokerError('permission_request_unavailable');
@@ -141,27 +177,33 @@ export class NativePermissionBroker {
       } catch (cause) {
         throw new NativePermissionBrokerError('permission_request_failed', { cause });
       }
+      this.#assertCurrentEpoch(epoch);
       if (!isPermissionState(requested)) {
         throw new NativePermissionBrokerError('invalid_permission_state');
       }
       return permissionFact(adapter, requested);
     } finally {
-      this.#state = 'preflight';
+      if (this.#state === 'requesting') this.#state = 'preflight';
     }
   }
 
-  public async sealPreflight(): Promise<SealedNativePermissionPreflight> {
+  public async sealPreflight(
+    capabilities: readonly NativePermissionCapability[]
+  ): Promise<SealedNativePermissionPreflight> {
     this.#assertPreflightOpen();
+    const scope = this.#establishScope(capabilities);
+    const epoch = this.#cancellationEpoch;
     this.#state = 'sealing';
     this.#releasedSeal = undefined;
     try {
-      const receipt = await this.#inspectReceipt();
+      const receipt = await this.#inspectReceipt(scope, epoch);
+      this.#assertCurrentEpoch(epoch);
       const seal = Object.freeze({}) as NativePermissionPreflightSeal;
       this.#activeSeal = seal;
       this.#state = 'sealed';
       return Object.freeze({ receipt, seal });
     } catch (error) {
-      this.#state = 'preflight';
+      if (this.#state === 'sealing') this.#state = 'preflight';
       throw error;
     }
   }
@@ -176,18 +218,61 @@ export class NativePermissionBroker {
     }
     this.#activeSeal = undefined;
     this.#releasedSeal = seal;
+    this.#preflightScope = undefined;
     this.#state = 'preflight';
   }
 
-  async #inspectReceipt(): Promise<NativePermissionPreflightReceipt> {
+  public cancelPreflight(): void {
+    if (this.#state === 'sealed') {
+      throw new NativePermissionBrokerError('preflight_sealed');
+    }
+    const operationInProgress = this.#state === 'inspecting'
+      || this.#state === 'requesting'
+      || this.#state === 'sealing';
+    this.#cancellationEpoch += 1;
+    if (!operationInProgress) this.#state = 'preflight';
+    this.#activeSeal = undefined;
+    this.#preflightScope = undefined;
+    this.#releasedSeal = undefined;
+  }
+
+  async #inspectReceipt(
+    capabilities: readonly NativePermissionCapability[],
+    epoch: number
+  ): Promise<NativePermissionPreflightReceipt> {
     const permissions = Object.freeze(await Promise.all(
-      this.#adapters.map(async adapter => permissionFact(adapter, await inspectAdapter(adapter)))
+      capabilities.map(async capability => {
+        const adapter = this.#adapter(capability);
+        const permission = await inspectAdapter(adapter);
+        this.#assertCurrentEpoch(epoch);
+        return permissionFact(adapter, permission);
+      })
     ));
+    this.#assertCurrentEpoch(epoch);
     return Object.freeze({
       platform: this.#platform,
       checkedAtMonotonicMs: this.#checkedAtMonotonicMs(),
+      capabilities,
       permissions
     });
+  }
+
+  #assertCurrentEpoch(epoch: number): void {
+    if (epoch !== this.#cancellationEpoch) {
+      throw new NativePermissionBrokerError('preflight_cancelled');
+    }
+  }
+
+  #establishScope(
+    capabilities: readonly NativePermissionCapability[]
+  ): readonly NativePermissionCapability[] {
+    const scope = validatePreflightScope(capabilities);
+    if (this.#preflightScope !== undefined
+      && !sameCapabilities(this.#preflightScope, scope)) {
+      throw new NativePermissionBrokerError('preflight_scope_mismatch');
+    }
+    this.#preflightScope ??= scope;
+    return this.#preflightScope;
   }
 
   #checkedAtMonotonicMs(): number {
@@ -216,21 +301,75 @@ export class NativePermissionBroker {
   }
 }
 
+function validatePreflightScope(
+  capabilities: readonly NativePermissionCapability[]
+): readonly NativePermissionCapability[] {
+  if (capabilities.length === 0
+    || capabilities.length > BASELINE_NATIVE_PERMISSION_CAPABILITIES.length) {
+    throw new NativePermissionBrokerError('invalid_preflight_scope');
+  }
+  const expected = BASELINE_NATIVE_PERMISSION_CAPABILITIES.filter(
+    capability => capabilities.includes(capability)
+  );
+  if (expected.length !== capabilities.length
+    || !expected.every((capability, index) => capabilities[index] === capability)) {
+    throw new NativePermissionBrokerError('invalid_preflight_scope');
+  }
+  return Object.freeze([...expected]);
+}
+
+function sameCapabilities(
+  left: readonly NativePermissionCapability[],
+  right: readonly NativePermissionCapability[]
+): boolean {
+  return left.length === right.length
+    && left.every((capability, index) => right[index] === capability);
+}
+
 export function createBaselineNativePermissionAdapters(
-  platform: PlatformFamily
-): readonly [NativePermissionAdapter, NativePermissionAdapter, NativePermissionAdapter] {
+  platform: PlatformFamily,
+  mediaPermissions?: NativeMediaPermissionServices
+): readonly NativePermissionAdapter[] {
   if (!isPlatformFamily(platform)) {
     throw new NativePermissionBrokerError('invalid_adapter_manifest');
   }
   return Object.freeze([
     fixedAdapter(platform, 'display-topology', 'not_required'),
     fixedAdapter(platform, 'candidate-window', 'not_required'),
-    fixedAdapter(
-      platform,
-      'capture-session',
-      platform === 'windows' ? 'not_required' : 'unavailable'
-    )
+    fixedAdapter(platform, 'capture-session', 'not_required'),
+    fixedAdapter(platform, 'process-application', 'not_required'),
+    fixedAdapter(platform, 'interactive-session', 'not_required'),
+    fixedAdapter(platform, 'clipboard', 'not_required'),
+    fixedAdapter(platform, 'print-spooler', 'not_required'),
+    fixedAdapter(platform, 'removable-storage', 'not_required'),
+    fixedAdapter(platform, 'virtualization', 'not_required'),
+    fixedAdapter(platform, 'network-configuration', 'not_required'),
+    mediaPermissionAdapter(platform, 'camera', mediaPermissions),
+    mediaPermissionAdapter(platform, 'microphone', mediaPermissions)
   ]);
+}
+
+function mediaPermissionAdapter(
+  platform: PlatformFamily,
+  capability: NativeMediaPermissionCapability,
+  services: NativeMediaPermissionServices | undefined
+): NativePermissionAdapter {
+  if (platform === 'linux') {
+    return fixedAdapter(platform, capability, 'not_required');
+  }
+  if (services === undefined) {
+    return fixedAdapter(platform, capability, 'unavailable');
+  }
+  return Object.freeze({
+    capability,
+    platform,
+    mode: 'os_permission',
+    inspect: () => services.inspect(capability),
+    ...(services.requestDuringPreflight === undefined ? {} : {
+      requestDuringPreflight: () => services.requestDuringPreflight?.(capability)
+        ?? 'unavailable'
+    })
+  });
 }
 
 function validateAdapterManifest(adapters: readonly NativePermissionAdapter[]): PlatformFamily {

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proctor.invalid/native/clipboard-state.schema.json",
+  "title": "Proctor native host-clipboard observation protocol",
+  "type": "object", "additionalProperties": false, "required": ["schema_version"],
+  "properties": { "schema_version": { "const": 1 } },
+  "$defs": {
+    "ClipboardCoverage": { "type": "string", "enum": ["change_notifications", "snapshot_counter", "unavailable"] },
+    "ClipboardCertainty": { "type": "string", "enum": ["complete", "partial", "unknown"] },
+    "ClipboardState": {
+      "type": "object", "x-proctor-rules": ["coherent_clipboard_state"], "additionalProperties": false,
+      "required": ["coverage", "certainty", "change_generation"],
+      "properties": {
+        "coverage": { "$ref": "#/$defs/ClipboardCoverage" },
+        "certainty": { "$ref": "#/$defs/ClipboardCertainty" },
+        "change_generation": { "type": "integer", "minimum": 0, "maximum": 9007199254740991, "x-rust-type": "u64" }
+      }
+    },
+    "ClipboardEventKind": { "type": "string", "enum": ["changed", "reconciled"] },
+    "ClipboardEvent": { "type": "object", "additionalProperties": false, "required": ["kind", "state"], "properties": { "kind": { "$ref": "#/$defs/ClipboardEventKind" }, "state": { "$ref": "#/$defs/ClipboardState" } } },
+    "ClipboardSourceSnapshot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source_instance_id", "source_version", "adapter_version", "schema_version", "platform", "permission", "health", "sequence", "observed_at", "state"],
+      "properties": {
+        "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 }, "source_version": { "type": "string", "minLength": 1, "maxLength": 32 }, "adapter_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "schema_version": { "type": "integer", "const": 1, "minimum": 1, "maximum": 65535, "x-rust-type": "u16" }, "platform": { "$ref": "native-observation.schema.json#/$defs/PlatformFamily" }, "permission": { "$ref": "native-observation.schema.json#/$defs/PermissionState" }, "health": { "$ref": "native-observation.schema.json#/$defs/SourceHealth" },
+        "sequence": { "type": "integer", "minimum": 0, "maximum": 9007199254740991, "x-rust-type": "u64" }, "observed_at": { "$ref": "native-observation.schema.json#/$defs/SourceTimestamp" }, "state": { "$ref": "#/$defs/ClipboardState" }
+      }
+    },
+    "ClipboardObservation": {
+      "type": "object", "x-proctor-rules": ["gap_ends_immediately_before_sequence"], "additionalProperties": false, "required": ["source_instance_id", "sequence", "observed_at", "event"],
+      "properties": { "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 }, "sequence": { "type": "integer", "minimum": 1, "maximum": 9007199254740991, "x-rust-type": "u64" }, "observed_at": { "$ref": "native-observation.schema.json#/$defs/SourceTimestamp" }, "gap": { "$ref": "native-observation.schema.json#/$defs/SequenceGap" }, "event": { "$ref": "#/$defs/ClipboardEvent" } }
+    },
+    "ClipboardDrain": {
+      "type": "object", "x-proctor-rules": ["coherent_source_batch"], "additionalProperties": false, "required": ["source_instance_id", "health", "observations", "resets"],
+      "properties": { "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 }, "health": { "$ref": "native-observation.schema.json#/$defs/SourceHealth" }, "observations": { "type": "array", "maxItems": 1024, "items": { "$ref": "#/$defs/ClipboardObservation" } }, "resets": { "type": "array", "maxItems": 1024, "items": { "$ref": "native-observation.schema.json#/$defs/SourceReset" } }, "terminal_error": { "$ref": "native-observation.schema.json#/$defs/SourceFailureCode" } }
+    }
+  }
+}

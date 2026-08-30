@@ -161,10 +161,13 @@ change.
 60. `native.passive-sources` Native packages are passive mechanical fact sources. They receive no exam
     policy or generic control command; the coordinator interprets facts and
     separate closed adapters own effects.
-61. `native.initial-scope` The first-release required native scope is source/permission health,
-    CandidateWindow state, physical/virtual/remote display topology, supported
-    capture/remote-session facts, content protection, and continuity; broader
-    process/device/media/network policy remains deferred.
+61. `native.initial-scope` The accepted first-release native scope includes source/permission health,
+    CandidateWindow and display topology, remote interactive-session facts,
+    process/application and OS-session state, private clipboard and clipboard-
+    change observation, printing, removable storage, bounded virtualization and
+    network configuration, camera/microphone endpoint state, content protection,
+    and continuity. Each sub-capability declares enforce, observe, or unavailable
+    coverage without implying global external-capture detection.
 62. `native.process-boundaries` The Attempt-scoped coordinator runs in a dedicated utility process behind a
     private authenticated protocol. Electron main owns supervision, permissions,
     CandidateWindow enforcement, and fail-closed renderer projection.

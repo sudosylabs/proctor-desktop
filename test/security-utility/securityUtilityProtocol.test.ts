@@ -8,6 +8,7 @@ import {
   SECURITY_UTILITY_SHUTDOWN_TIMEOUT_MS,
   SECURITY_UTILITY_SOURCE_COUNT,
   SECURITY_UTILITY_SOURCE_MANIFEST,
+  SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
   SECURITY_UTILITY_STARTUP_TIMEOUT_MS,
   SECURITY_UTILITY_HEARTBEAT_TIMEOUT_MS,
   isNativeBridgeManifest,
@@ -28,9 +29,24 @@ const candidateWindow: CandidateWindowState = {
   display_target_id: 'security-test-display'
 };
 
-const timestamp = { wall_time_unix_ms: 1, monotonic_time_ns: 1 } as const;
-const snapshots = {
-  display_topology: {
+const selectedSources = SECURITY_UTILITY_SOURCE_MANIFEST.map(entry => entry.source_id);
+const selectedSourceCategories = [
+  'os-clipboard-change',
+  'removable-block-storage',
+  'portable-mtp',
+  'system-proxy-state',
+  'os-managed-vpn-state',
+  'tunnel-interface-state',
+  'route-change',
+  'network-source-health',
+  'camera',
+  'microphone'
+] as const;
+
+const timestamp = { monotonic_time_ns: 1 } as const;
+const snapshots = [{
+  source: 'display-topology',
+  snapshot: {
     source_instance_id: 'display-source-0001',
     source_version: '0.1.0',
     adapter_version: 'test-v1',
@@ -53,8 +69,10 @@ const snapshots = {
         pixel_height: 900
       }]
     }
-  },
-  candidate_window: {
+  }
+}, {
+  source: 'candidate-window',
+  snapshot: {
     source_instance_id: 'candidate-source-001',
     source_version: '0.1.0',
     adapter_version: 'test-v1',
@@ -65,8 +83,10 @@ const snapshots = {
     sequence: 0,
     observed_at: timestamp,
     window: candidateWindow
-  },
-  capture_session: {
+  }
+}, {
+  source: 'capture-session',
+  snapshot: {
     source_instance_id: 'capture-source-0001',
     source_version: '0.1.0',
     adapter_version: 'test-v1',
@@ -81,7 +101,110 @@ const snapshots = {
       native_remote_session: { support: 'unsupported', activity: 'unknown', certainty: 'unknown' }
     }
   }
-} as const;
+}, {
+  source: 'process-application',
+  snapshot: {
+    source_instance_id: 'process-source-0001',
+    source_version: '0.1.0',
+    adapter_version: 'test-v1',
+    schema_version: 1,
+    platform: 'macos',
+    permission: 'unavailable',
+    health: 'degraded',
+    sequence: 0,
+    observed_at: timestamp,
+    state: {
+      coverage: 'unavailable',
+      certainty: 'unknown',
+      processes: []
+    }
+  }
+}, {
+  source: 'interactive-session',
+  snapshot: {
+    source_instance_id: 'interactive-source-0001', source_version: '0.1.0',
+    adapter_version: 'test-v1', schema_version: 1, platform: 'macos',
+    permission: 'unavailable', health: 'degraded', sequence: 0, observed_at: timestamp,
+    state: { coverage: 'unavailable', certainty: 'unknown', console_ownership: 'unknown',
+      lock_state: 'unknown', remote_attachment: 'unknown', other_human_session_count: 0 }
+  }
+}, {
+  source: 'clipboard',
+  snapshot: {
+    source_instance_id: 'clipboard-source-0001', source_version: '0.1.0',
+    adapter_version: 'test-v1', schema_version: 1, platform: 'macos',
+    permission: 'unavailable', health: 'degraded', sequence: 0, observed_at: timestamp,
+    state: { coverage: 'unavailable', certainty: 'unknown', change_generation: 0 }
+  }
+}, {
+  source: 'print-spooler',
+  snapshot: {
+    source_instance_id: 'print-source-000001', source_version: '0.1.0',
+    adapter_version: 'test-v1', schema_version: 1, platform: 'macos',
+    permission: 'unavailable', health: 'degraded', sequence: 0, observed_at: timestamp,
+    state: { coverage: 'unavailable', certainty: 'unknown', candidate_job_count: 0,
+      other_job_count: 0, unknown_job_count: 0 }
+  }
+}, {
+  source: 'removable-storage',
+  snapshot: {
+    source_instance_id: 'storage-source-0001', source_version: '0.1.0',
+    adapter_version: 'test-v1', schema_version: 1, platform: 'macos',
+    permission: 'unavailable', health: 'degraded', sequence: 0, observed_at: timestamp,
+    state: { coverage: 'unavailable', certainty: 'unknown', attached_functions: [] }
+  }
+}, {
+  source: 'virtualization',
+  snapshot: {
+    source_instance_id: 'virtual-source-0001', source_version: '0.1.0',
+    adapter_version: 'test-v1', schema_version: 1, platform: 'macos',
+    permission: 'unavailable', health: 'degraded', sequence: 0, observed_at: timestamp,
+    state: { coverage: 'unavailable', certainty: 'unknown', classification: 'unknown' }
+  }
+}, {
+  source: 'network-configuration',
+  snapshot: {
+    source_instance_id: 'network-source-0001', source_version: '0.1.0',
+    adapter_version: 'test-v1', schema_version: 1, platform: 'macos',
+    permission: 'unavailable', health: 'degraded', sequence: 0, observed_at: timestamp,
+    state: { coverage: 'unavailable', certainty: 'unknown', system_proxy: 'unknown',
+      managed_vpn: 'unknown', tunnel_interfaces: [], route_generation: 0 }
+  }
+}, {
+  source: 'media-device',
+  snapshot: {
+    source_instance_id: 'media-source-00001', source_version: '0.1.0',
+    adapter_version: 'test-v1', schema_version: 1, platform: 'macos',
+    permission: 'unavailable', health: 'degraded', sequence: 0, observed_at: timestamp,
+    state: {
+      camera: { coverage: 'unavailable', certainty: 'unknown', permission: 'unavailable',
+        readiness: 'unknown', endpoint_count: 0, other_application_use: 'unknown' },
+      microphone: { coverage: 'unavailable', certainty: 'unknown', permission: 'unavailable',
+        readiness: 'unknown', endpoint_count: 0, other_application_use: 'unknown' }
+    }
+  }
+}] as const;
+
+test('main client honors a smaller remaining startup budget', async () => {
+  const [mainPort] = memoryPortPair();
+  const failures: string[] = [];
+  const client = new SecurityUtilityClient({
+    port: mainPort,
+    challenge: 'a'.repeat(43),
+    buildIdentity: 'proctor-build-identity-0001',
+    participationGeneration: 'participation-generation-0001',
+    collectionSessionId: 'collection-session-0001',
+    queueCapacity: 32,
+    selectedSources,
+    selectedSourceCategories,
+    initialCandidateWindow: candidateWindow,
+    onPoll: () => undefined,
+    onFailure: failure => failures.push(failure)
+  });
+
+  await assert.rejects(client.start(10), /startup_timeout/u);
+  assert.deepEqual(failures, ['startup_timeout']);
+});
 
 test('private bootstrap validator rejects unknown fields and manifest drift', () => {
   const bootstrap = {
@@ -89,15 +212,56 @@ test('private bootstrap validator rejects unknown fields and manifest drift', ()
     protocol_version: 1,
     challenge: 'a'.repeat(43),
     build_identity: 'proctor-build-identity-0001',
-    source_manifest_version: 1,
+    source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
     source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
     participation_generation: 'participation-generation-0001',
     collection_session_id: 'collection-session-0001',
     queue_capacity: 32,
+    selected_sources: selectedSources,
+    selected_source_categories: selectedSourceCategories,
     initial_candidate_window: candidateWindow
   };
   assert.equal(isSecurityUtilityBootstrap(bootstrap), true);
   assert.equal(isSecurityUtilityBootstrap({ ...bootstrap, unexpected: true }), false);
+  assert.equal(isSecurityUtilityBootstrap({ ...bootstrap, selected_sources: [] }), false);
+  assert.equal(isSecurityUtilityBootstrap({
+    ...bootstrap,
+    selected_sources: ['clipboard', 'clipboard']
+  }), false);
+  assert.equal(isSecurityUtilityBootstrap({
+    ...bootstrap,
+    selected_sources: ['clipboard', 'candidate-window']
+  }), false);
+  assert.equal(isSecurityUtilityBootstrap({
+    ...bootstrap,
+    selected_source_categories: ['camera']
+  }), false);
+  assert.equal(isSecurityUtilityBootstrap({
+    ...bootstrap,
+    selected_source_categories: selectedSourceCategories.filter(
+      category => category !== 'removable-block-storage' && category !== 'portable-mtp'
+    )
+  }), false);
+  assert.equal(isSecurityUtilityBootstrap({
+    ...bootstrap,
+    selected_source_categories: selectedSourceCategories.filter(
+      category => ![
+        'system-proxy-state',
+        'os-managed-vpn-state',
+        'tunnel-interface-state',
+        'route-change',
+        'network-source-health'
+      ].includes(category)
+    )
+  }), false);
+  assert.equal(isSecurityUtilityBootstrap({
+    ...bootstrap,
+    selected_sources: selectedSources.filter(source => source !== 'network-configuration')
+  }), false);
+  assert.equal(isSecurityUtilityBootstrap({
+    ...bootstrap,
+    selected_source_categories: ['microphone', 'camera']
+  }), false);
   assert.equal(isSecurityUtilityBootstrap({
     ...bootstrap,
     source_manifest: [...SECURITY_UTILITY_SOURCE_MANIFEST].reverse()
@@ -107,7 +271,7 @@ test('private bootstrap validator rejects unknown fields and manifest drift', ()
 test('native bridge admission compares the generated per-source schema manifest', () => {
   const manifest = {
     bridge_version: 1,
-    source_manifest_version: 1,
+    source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
     source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
   };
   assert.equal(isNativeBridgeManifest(manifest), true);
@@ -136,13 +300,116 @@ test('outer lifecycle budgets cover full native work and transport margin', () =
   );
 });
 
+test('main rejects a ready echo with a different valid source selection', async () => {
+  const [mainPort, utilityPort] = memoryPortPair();
+  const failures: string[] = [];
+  utilityPort.onMessage(message => {
+    if (typeof message !== 'object' || message === null
+      || Reflect.get(message, 'kind') !== 'bootstrap') return;
+    utilityPort.postMessage({
+      kind: 'ready',
+      protocol_version: 1,
+      message_sequence: 0,
+      challenge_response: 'a'.repeat(43),
+      build_identity: 'proctor-build-identity-0001',
+      source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
+      source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
+      selected_sources: selectedSources.slice(0, -1),
+      selected_source_categories: [
+        'os-clipboard-change',
+        'removable-block-storage',
+        'portable-mtp',
+        'system-proxy-state',
+        'os-managed-vpn-state',
+        'tunnel-interface-state',
+        'route-change',
+        'network-source-health'
+      ],
+      participation_generation: 'participation-generation-0001',
+      delivered_at_wall_time_unix_ms: 1,
+      snapshots: snapshots.slice(0, -1)
+    });
+  });
+  utilityPort.start();
+  const client = new SecurityUtilityClient({
+    port: mainPort,
+    challenge: 'a'.repeat(43),
+    buildIdentity: 'proctor-build-identity-0001',
+    participationGeneration: 'participation-generation-0001',
+    collectionSessionId: 'collection-session-0001',
+    queueCapacity: 32,
+    selectedSources,
+    selectedSourceCategories,
+    initialCandidateWindow: candidateWindow,
+    onPoll: () => undefined,
+    onFailure: failure => failures.push(failure)
+  });
+
+  await assert.rejects(client.start());
+  assert.deepEqual(failures, ['unexpected_message']);
+});
+
+test('main rejects later utility output from a source outside the sealed subset', async () => {
+  const [mainPort, utilityPort] = memoryPortPair();
+  const failures: string[] = [];
+  utilityPort.onMessage(message => {
+    if (typeof message !== 'object' || message === null
+      || Reflect.get(message, 'kind') !== 'bootstrap') return;
+    utilityPort.postMessage({
+      kind: 'ready',
+      protocol_version: 1,
+      message_sequence: 0,
+      challenge_response: 'a'.repeat(43),
+      build_identity: 'proctor-build-identity-0001',
+      source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
+      source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
+      selected_sources: ['display-topology'],
+      selected_source_categories: [],
+      participation_generation: 'participation-generation-0001',
+      delivered_at_wall_time_unix_ms: 1,
+      snapshots: [snapshots[0]]
+    });
+  });
+  utilityPort.start();
+  const client = new SecurityUtilityClient({
+    port: mainPort,
+    challenge: 'a'.repeat(43),
+    buildIdentity: 'proctor-build-identity-0001',
+    participationGeneration: 'participation-generation-0001',
+    collectionSessionId: 'collection-session-0001',
+    queueCapacity: 32,
+    selectedSources: ['display-topology'],
+    selectedSourceCategories: [],
+    initialCandidateWindow: candidateWindow,
+    onPoll: () => assert.fail('out-of-scope poll must not be delivered'),
+    onFailure: failure => failures.push(failure)
+  });
+  await client.start();
+
+  utilityPort.postMessage({
+    kind: 'native_poll',
+    protocol_version: 1,
+    message_sequence: 1,
+    participation_generation: 'participation-generation-0001',
+    delivered_at_wall_time_unix_ms: 2,
+    poll: {
+      state: 'healthy',
+      opened_snapshots: [snapshots[1]],
+      batches: [],
+      transitions: []
+    }
+  });
+  await waitUntil(() => failures.length > 0);
+  assert.deepEqual(failures, ['unexpected_message']);
+});
+
 test('main and utility complete the authenticated lifecycle over a private port', async () => {
   const [mainPort, utilityPort] = memoryPortPair();
   const acceptedEvents: unknown[] = [];
   const driver: NativeBaselineDriver = {
     manifest: () => ({
       bridge_version: 1,
-      source_manifest_version: 1,
+      source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
       source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
     }),
     openBaseline: () => ({ snapshots }),
@@ -178,6 +445,8 @@ test('main and utility complete the authenticated lifecycle over a private port'
     participationGeneration: 'participation-generation-0001',
     collectionSessionId: 'collection-session-0001',
     queueCapacity: 32,
+    selectedSources,
+    selectedSourceCategories,
     initialCandidateWindow: candidateWindow,
     onPoll: () => undefined,
     onFailure: failure => failures.push(failure)
@@ -202,7 +471,7 @@ test('candidate ingress stays bounded and reports the exact sender-side loss cou
   const driver: NativeBaselineDriver = {
     manifest: () => ({
       bridge_version: 1,
-      source_manifest_version: 1,
+      source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
       source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
     }),
     openBaseline: () => ({ snapshots }),
@@ -240,6 +509,8 @@ test('candidate ingress stays bounded and reports the exact sender-side loss cou
     participationGeneration: 'participation-generation-0001',
     collectionSessionId: 'collection-session-0001',
     queueCapacity: 2,
+    selectedSources,
+    selectedSourceCategories,
     initialCandidateWindow: candidateWindow,
     onPoll: () => undefined,
     onFailure: failure => failures.push(failure)
@@ -265,7 +536,7 @@ test('shutdown compacts the maximum pending ingress into one exact loss marker',
   const driver: NativeBaselineDriver = {
     manifest: () => ({
       bridge_version: 1,
-      source_manifest_version: 1,
+      source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
       source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
     }),
     openBaseline: () => ({ snapshots }),
@@ -302,6 +573,8 @@ test('shutdown compacts the maximum pending ingress into one exact loss marker',
     participationGeneration: 'participation-generation-0001',
     collectionSessionId: 'collection-session-0001',
     queueCapacity: 1_024,
+    selectedSources,
+    selectedSourceCategories,
     initialCandidateWindow: candidateWindow,
     onPoll: () => undefined,
     onFailure: () => undefined
@@ -325,7 +598,7 @@ test('native ingress drops remain ordered so a later event can expose the exact 
   const driver: NativeBaselineDriver = {
     manifest: () => ({
       bridge_version: 1,
-      source_manifest_version: 1,
+      source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
       source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
     }),
     openBaseline: () => ({ snapshots }),
@@ -357,6 +630,8 @@ test('native ingress drops remain ordered so a later event can expose the exact 
     participationGeneration: 'participation-generation-0001',
     collectionSessionId: 'collection-session-0001',
     queueCapacity: 2,
+    selectedSources,
+    selectedSourceCategories,
     initialCandidateWindow: candidateWindow,
     onPoll: () => undefined,
     onFailure: failure => failures.push(failure)
@@ -383,9 +658,12 @@ test('supervisor polls do not conceal a missing utility heartbeat', async () => 
       message_sequence: 0,
       challenge_response: 'a'.repeat(43),
       build_identity: 'proctor-build-identity-0001',
-      source_manifest_version: 1,
+      source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
       source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
+      selected_sources: selectedSources,
+      selected_source_categories: selectedSourceCategories,
       participation_generation: 'participation-generation-0001',
+      delivered_at_wall_time_unix_ms: 1,
       snapshots
     });
   });
@@ -398,6 +676,8 @@ test('supervisor polls do not conceal a missing utility heartbeat', async () => 
     participationGeneration: 'participation-generation-0001',
     collectionSessionId: 'collection-session-0001',
     queueCapacity: 2,
+    selectedSources,
+    selectedSourceCategories,
     initialCandidateWindow: candidateWindow,
     onPoll: () => undefined,
     onFailure: failure => failures.push(failure)
@@ -409,6 +689,7 @@ test('supervisor polls do not conceal a missing utility heartbeat', async () => 
       protocol_version: 1,
       message_sequence: nextSequence,
       participation_generation: 'participation-generation-0001',
+      delivered_at_wall_time_unix_ms: 1,
       poll: { state: 'healthy', opened_snapshots: [], batches: [], transitions: [] }
     });
     nextSequence += 1;
@@ -426,7 +707,7 @@ test('utility fails closed when the main side does not acknowledge bounded outpu
   const driver: NativeBaselineDriver = {
     manifest: () => ({
       bridge_version: 1,
-      source_manifest_version: 1,
+      source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
       source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
     }),
     openBaseline: () => ({ snapshots }),
@@ -468,7 +749,7 @@ test('main fails closed when a supervisor poll cannot be delivered', async () =>
   const driver: NativeBaselineDriver = {
     manifest: () => ({
       bridge_version: 1,
-      source_manifest_version: 1,
+      source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
       source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
     }),
     openBaseline: () => ({ snapshots }),
@@ -501,6 +782,8 @@ test('main fails closed when a supervisor poll cannot be delivered', async () =>
     participationGeneration: 'participation-generation-0001',
     collectionSessionId: 'collection-session-0001',
     queueCapacity: 32,
+    selectedSources,
+    selectedSourceCategories,
     initialCandidateWindow: candidateWindow,
     onPoll: () => { throw new Error('coordinator rejected poll'); },
     onFailure: failure => failures.push(failure)
@@ -574,11 +857,13 @@ function validBootstrap(): unknown {
     protocol_version: 1,
     challenge: 'a'.repeat(43),
     build_identity: 'proctor-build-identity-0001',
-    source_manifest_version: 1,
+    source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
     source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
     participation_generation: 'participation-generation-0001',
     collection_session_id: 'collection-session-0001',
     queue_capacity: 32,
+    selected_sources: selectedSources,
+    selected_source_categories: selectedSourceCategories,
     initial_candidate_window: candidateWindow
   };
 }

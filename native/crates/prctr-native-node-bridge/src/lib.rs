@@ -20,25 +20,53 @@ use prctr_capture_session_state::LinuxCaptureSessionBackend as PlatformCaptureSe
 use prctr_capture_session_state::MacOsCaptureSessionBackend as PlatformCaptureSessionBackend;
 #[cfg(target_os = "windows")]
 use prctr_capture_session_state::WindowsCaptureSessionBackend as PlatformCaptureSessionBackend;
+use prctr_clipboard_state::{ClipboardWire, PlatformClipboardBackend};
 #[cfg(target_os = "linux")]
 use prctr_display_topology::LinuxDisplayTopologyBackend as PlatformDisplayTopologyBackend;
 #[cfg(target_os = "macos")]
 use prctr_display_topology::MacOsDisplayTopologyBackend as PlatformDisplayTopologyBackend;
 #[cfg(target_os = "windows")]
 use prctr_display_topology::WindowsDisplayTopologyBackend as PlatformDisplayTopologyBackend;
+use prctr_interactive_session_state::{InteractiveSessionWire, PlatformInteractiveSessionBackend};
+use prctr_media_device_state::{
+    MediaDeviceError, MediaDeviceSelection, MediaDeviceWire, PlatformMediaDeviceBackend,
+};
 use prctr_native_protocol::{
     CandidateWindowDrain, CandidateWindowHostEvent, CandidateWindowSourceSnapshot,
-    CandidateWindowState, CaptureSessionDrain, CaptureSessionSourceSnapshot, DisplayTopologyDrain,
-    DisplayTopologySourceSnapshot, NATIVE_SOURCE_COUNT, NATIVE_SOURCE_MANIFEST,
-    NATIVE_SOURCE_MANIFEST_VERSION, NativeSourceManifestEntry, ProtocolValidatable,
-    SourceFailureCode,
+    CandidateWindowState, CaptureSessionDrain, CaptureSessionSourceSnapshot, ClipboardDrain,
+    ClipboardSourceSnapshot, DisplayTopologyDrain, DisplayTopologySourceSnapshot,
+    InteractiveSessionDrain, InteractiveSessionSourceSnapshot, MediaDeviceDrain,
+    MediaDeviceSourceSnapshot, NATIVE_SOURCE_CATEGORY_ORDER, NATIVE_SOURCE_COUNT,
+    NATIVE_SOURCE_MANIFEST, NATIVE_SOURCE_MANIFEST_VERSION, NativeSourceCategory,
+    NativeSourceManifestEntry, NetworkConfigurationDrain, NetworkConfigurationSourceSnapshot,
+    PrintSpoolerDrain, PrintSpoolerSourceSnapshot, ProcessApplicationDrain,
+    ProcessApplicationSourceSnapshot, ProtocolValidatable, RemovableStorageDrain,
+    RemovableStorageSourceSnapshot, SourceFailureCode, VirtualizationDrain,
+    VirtualizationSourceSnapshot,
 };
 use prctr_native_source_supervisor::{
-    BaselineSourceFactories, BaselineSourceSnapshots, NativeSourceBatch, NativeSourceKind,
+    BaselineSourceFactories, NATIVE_SOURCE_KINDS, NativeSourceBatch, NativeSourceKind,
     NativeSourceSnapshot, NativeSourceSupervisor, RestartPolicy, SourceLifecycleTransition,
     SupervisorConfig, SupervisorPoll, SupervisorState, SupervisorStop, candidate_window_factory,
-    capture_session_factory, display_topology_factory,
+    capture_session_factory, display_topology_factory, passive_state_factory,
+    process_application_factory,
 };
+use prctr_network_configuration_state::{
+    NetworkConfigurationCategory, NetworkConfigurationError, NetworkConfigurationSelection,
+    NetworkConfigurationWire, PlatformNetworkConfigurationBackend,
+};
+use prctr_print_spooler_state::{PlatformPrintSpoolerBackend, PrintSpoolerWire};
+#[cfg(target_os = "linux")]
+use prctr_process_application_state::LinuxProcessApplicationBackend as PlatformProcessApplicationBackend;
+#[cfg(target_os = "macos")]
+use prctr_process_application_state::MacOsProcessApplicationBackend as PlatformProcessApplicationBackend;
+#[cfg(target_os = "windows")]
+use prctr_process_application_state::WindowsProcessApplicationBackend as PlatformProcessApplicationBackend;
+use prctr_removable_storage_state::{
+    PlatformRemovableStorageBackend, RemovableStorageError, RemovableStorageSelection,
+    RemovableStorageWire,
+};
+use prctr_virtualization_state::{PlatformVirtualizationBackend, VirtualizationWire};
 use serde::{Deserialize, Serialize};
 
 const BRIDGE_VERSION: u16 = 1;
@@ -49,13 +77,16 @@ thread_local! {
 
 struct BridgeRuntime {
     supervisor: NativeSourceSupervisor,
-    candidate_window_ingress: CandidateWindowUtilityIngress,
+    candidate_window_ingress: Option<CandidateWindowUtilityIngress>,
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct OpenBaselineRequest {
     collection_session_id: String,
     queue_capacity: u16,
+    selected_sources: Vec<String>,
+    selected_source_categories: Vec<NativeSourceCategory>,
     initial_candidate_window: CandidateWindowState,
 }
 
@@ -68,14 +99,7 @@ struct BridgeManifest {
 
 #[derive(Serialize)]
 struct OpenBaselineResult {
-    snapshots: WireBaselineSnapshots,
-}
-
-#[derive(Serialize)]
-struct WireBaselineSnapshots {
-    display_topology: DisplayTopologySourceSnapshot,
-    candidate_window: CandidateWindowSourceSnapshot,
-    capture_session: CaptureSessionSourceSnapshot,
+    snapshots: Vec<WireSnapshot>,
 }
 
 #[derive(Serialize)]
@@ -99,6 +123,14 @@ enum WireSnapshot {
     DisplayTopology(DisplayTopologySourceSnapshot),
     CandidateWindow(CandidateWindowSourceSnapshot),
     CaptureSession(CaptureSessionSourceSnapshot),
+    ProcessApplication(ProcessApplicationSourceSnapshot),
+    InteractiveSession(InteractiveSessionSourceSnapshot),
+    Clipboard(ClipboardSourceSnapshot),
+    PrintSpooler(PrintSpoolerSourceSnapshot),
+    RemovableStorage(RemovableStorageSourceSnapshot),
+    Virtualization(VirtualizationSourceSnapshot),
+    NetworkConfiguration(NetworkConfigurationSourceSnapshot),
+    MediaDevice(MediaDeviceSourceSnapshot),
 }
 
 #[derive(Serialize)]
@@ -107,6 +139,14 @@ enum WireBatch {
     DisplayTopology(DisplayTopologyDrain),
     CandidateWindow(CandidateWindowDrain),
     CaptureSession(CaptureSessionDrain),
+    ProcessApplication(ProcessApplicationDrain),
+    InteractiveSession(InteractiveSessionDrain),
+    Clipboard(ClipboardDrain),
+    PrintSpooler(PrintSpoolerDrain),
+    RemovableStorage(RemovableStorageDrain),
+    Virtualization(VirtualizationDrain),
+    NetworkConfiguration(NetworkConfigurationDrain),
+    MediaDevice(MediaDeviceDrain),
 }
 
 #[derive(Serialize)]
@@ -160,7 +200,7 @@ pub fn manifest<'env>(env: Env) -> Result<Unknown<'env>> {
 }
 
 #[napi(js_name = "openBaseline")]
-/// Opens the exact three-source baseline once in this utility process.
+/// Opens the exact generated native-source baseline once in this utility process.
 ///
 /// # Errors
 ///
@@ -174,6 +214,9 @@ pub fn open_baseline(env: Env, request: Unknown<'_>) -> Result<Unknown<'_>> {
         .initial_candidate_window
         .validate_protocol()
         .map_err(|_error| invalid_argument("invalid initial CandidateWindow state"))?;
+    let selected_sources = parse_selected_sources(&request.selected_sources)?;
+    let selected_categories =
+        parse_selected_categories(&selected_sources, &request.selected_source_categories)?;
     let config = SupervisorConfig::new(
         request.collection_session_id,
         request.queue_capacity,
@@ -188,13 +231,26 @@ pub fn open_baseline(env: Env, request: Unknown<'_>) -> Result<Unknown<'_>> {
         if slot.is_some() {
             return Err(invalid_state("baseline supervisor is already open"));
         }
-        let factories = baseline_factories(receiver, request.initial_candidate_window);
+        let factories = baseline_factories(
+            receiver,
+            request.initial_candidate_window,
+            selected_categories,
+        )
+        .select_sources(&selected_sources)
+        .map_err(|_error| invalid_argument("invalid native source selection"))?;
         let opened = NativeSourceSupervisor::open(config, factories)
             .map_err(|_error| Error::new(Status::GenericFailure, "native baseline open failed"))?;
-        let snapshots = WireBaselineSnapshots::from(opened.snapshots);
+        let snapshots = opened
+            .snapshots
+            .sources
+            .into_iter()
+            .map(WireSnapshot::from)
+            .collect();
         *slot = Some(BridgeRuntime {
             supervisor: opened.supervisor,
-            candidate_window_ingress: ingress,
+            candidate_window_ingress: selected_sources
+                .contains(&NativeSourceKind::CandidateWindow)
+                .then_some(ingress),
         });
         Ok(OpenBaselineResult { snapshots })
     })?;
@@ -219,6 +275,8 @@ pub fn candidate_window_event(env: Env, event: Unknown<'_>) -> Result<String> {
             .ok_or_else(|| invalid_state("baseline supervisor is not open"))?;
         let outcome = runtime
             .candidate_window_ingress
+            .as_ref()
+            .ok_or_else(|| invalid_state("CandidateWindow source is not selected"))?
             .try_send(event)
             .map_err(|_error| invalid_argument("invalid CandidateWindow host event"))?;
         Ok(match outcome {
@@ -251,6 +309,8 @@ pub fn candidate_window_events_lost(lost_count: u32) -> Result<String> {
             .ok_or_else(|| invalid_state("baseline supervisor is not open"))?;
         let outcome = runtime
             .candidate_window_ingress
+            .as_ref()
+            .ok_or_else(|| invalid_state("CandidateWindow source is not selected"))?
             .record_lost_events(lost_count)
             .map_err(|_error| invalid_state("CandidateWindow ingress sequence cannot advance"))?;
         Ok(match outcome {
@@ -299,12 +359,13 @@ pub fn stop_baseline(env: Env, final_candidate_window: Unknown<'_>) -> Result<Un
         let runtime = slot
             .as_mut()
             .ok_or_else(|| invalid_state("baseline supervisor is not open"))?;
-        runtime
-            .candidate_window_ingress
-            .fence_with_final_state(final_candidate_window)
-            .map_err(|_error| {
-                Error::new(Status::GenericFailure, "CandidateWindow input fence failed")
-            })?;
+        if let Some(ingress) = &runtime.candidate_window_ingress {
+            ingress
+                .fence_with_final_state(final_candidate_window)
+                .map_err(|_error| {
+                    Error::new(Status::GenericFailure, "CandidateWindow input fence failed")
+                })?;
+        }
         let stopped = WireStop::from(runtime.supervisor.stop());
         *slot = None;
         Ok::<WireStop, Error>(stopped)
@@ -312,9 +373,120 @@ pub fn stop_baseline(env: Env, final_candidate_window: Unknown<'_>) -> Result<Un
     to_js(env, &stopped)
 }
 
+fn parse_selected_sources(source_ids: &[String]) -> Result<Vec<NativeSourceKind>> {
+    if source_ids.is_empty() || source_ids.len() > NATIVE_SOURCE_COUNT {
+        return Err(invalid_argument("invalid native source selection"));
+    }
+    let mut selected = Vec::with_capacity(source_ids.len());
+    let mut previous_manifest_index = None;
+    for source_id in source_ids {
+        let kind = NativeSourceKind::from_source_id(source_id)
+            .ok_or_else(|| invalid_argument("unknown native source selection"))?;
+        if selected.contains(&kind) {
+            return Err(invalid_argument("duplicate native source selection"));
+        }
+        let manifest_index = NATIVE_SOURCE_KINDS
+            .iter()
+            .position(|candidate| *candidate == kind)
+            .ok_or_else(|| invalid_argument("native source is outside the manifest"))?;
+        if previous_manifest_index.is_some_and(|previous| previous >= manifest_index) {
+            return Err(invalid_argument(
+                "native source selection is outside manifest order",
+            ));
+        }
+        previous_manifest_index = Some(manifest_index);
+        selected.push(kind);
+    }
+    Ok(selected)
+}
+
+#[derive(Clone, Copy)]
+struct SelectedSourceCategories {
+    media: Option<MediaDeviceSelection>,
+    removable_storage: Option<RemovableStorageSelection>,
+    network_configuration: Option<NetworkConfigurationSelection>,
+}
+
+fn parse_selected_categories(
+    selected_sources: &[NativeSourceKind],
+    categories: &[NativeSourceCategory],
+) -> Result<SelectedSourceCategories> {
+    if categories.len() > NATIVE_SOURCE_CATEGORY_ORDER.len()
+        || !categories.iter().copied().eq(NATIVE_SOURCE_CATEGORY_ORDER
+            .into_iter()
+            .filter(|category| categories.contains(category)))
+    {
+        return Err(invalid_argument("invalid native source category selection"));
+    }
+    let clipboard_selected = selected_sources.contains(&NativeSourceKind::Clipboard);
+    let clipboard_category = categories.contains(&NativeSourceCategory::OsClipboardChange);
+    if clipboard_selected != clipboard_category {
+        return Err(invalid_argument(
+            "clipboard source/category selection mismatch",
+        ));
+    }
+    let removable_block_storage = categories.contains(&NativeSourceCategory::RemovableBlockStorage);
+    let portable_mtp = categories.contains(&NativeSourceCategory::PortableMtp);
+    let removable_storage = RemovableStorageSelection::new(removable_block_storage, portable_mtp);
+    if selected_sources.contains(&NativeSourceKind::RemovableStorage) != removable_storage.is_some()
+    {
+        return Err(invalid_argument(
+            "removable-storage source/category selection mismatch",
+        ));
+    }
+    let mut network_categories = Vec::with_capacity(5);
+    for (wire_category, category) in [
+        (
+            NativeSourceCategory::SystemProxyState,
+            NetworkConfigurationCategory::SystemProxyState,
+        ),
+        (
+            NativeSourceCategory::OsManagedVpnState,
+            NetworkConfigurationCategory::OsManagedVpnState,
+        ),
+        (
+            NativeSourceCategory::TunnelInterfaceState,
+            NetworkConfigurationCategory::TunnelInterfaceState,
+        ),
+        (
+            NativeSourceCategory::RouteChange,
+            NetworkConfigurationCategory::RouteChange,
+        ),
+        (
+            NativeSourceCategory::NetworkSourceHealth,
+            NetworkConfigurationCategory::NetworkSourceHealth,
+        ),
+    ] {
+        if categories.contains(&wire_category) {
+            network_categories.push(category);
+        }
+    }
+    let network_configuration = NetworkConfigurationSelection::new(&network_categories);
+    if selected_sources.contains(&NativeSourceKind::NetworkConfiguration)
+        != network_configuration.is_some()
+    {
+        return Err(invalid_argument(
+            "network-configuration source/category selection mismatch",
+        ));
+    }
+    let camera = categories.contains(&NativeSourceCategory::Camera);
+    let microphone = categories.contains(&NativeSourceCategory::Microphone);
+    let media_selected = selected_sources.contains(&NativeSourceKind::MediaDevice);
+    if media_selected != (camera || microphone) {
+        return Err(invalid_argument("media source/category selection mismatch"));
+    }
+    let media = MediaDeviceSelection::new(camera, microphone);
+    Ok(SelectedSourceCategories {
+        media,
+        removable_storage,
+        network_configuration,
+    })
+}
+
 fn baseline_factories(
     receiver: CandidateWindowUtilityReceiver,
     initial_candidate_window: CandidateWindowState,
+    selected_categories: SelectedSourceCategories,
 ) -> BaselineSourceFactories {
     let mut candidate_receiver = Some(receiver);
     BaselineSourceFactories::new(
@@ -336,7 +508,54 @@ fn baseline_factories(
             )
         }),
         capture_session_factory(|| Ok(PlatformCaptureSessionBackend)),
+        process_application_factory(|| Ok(PlatformProcessApplicationBackend)),
     )
+    .with_passive_source(passive_state_factory::<InteractiveSessionWire, _, _>(
+        || Ok(PlatformInteractiveSessionBackend),
+    ))
+    .with_passive_source(passive_state_factory::<ClipboardWire, _, _>(|| {
+        Ok(PlatformClipboardBackend)
+    }))
+    .with_passive_source(passive_state_factory::<PrintSpoolerWire, _, _>(|| {
+        Ok(PlatformPrintSpoolerBackend)
+    }))
+    .with_passive_source(passive_state_factory::<RemovableStorageWire, _, _>(
+        move || {
+            selected_categories.removable_storage.map_or_else(
+                || {
+                    Err(RemovableStorageError::Backend(
+                        "removable-storage source has no selected category".to_owned(),
+                    ))
+                },
+                |selection| Ok(PlatformRemovableStorageBackend::new(selection)),
+            )
+        },
+    ))
+    .with_passive_source(passive_state_factory::<VirtualizationWire, _, _>(|| {
+        Ok(PlatformVirtualizationBackend)
+    }))
+    .with_passive_source(passive_state_factory::<NetworkConfigurationWire, _, _>(
+        move || {
+            selected_categories.network_configuration.map_or_else(
+                || {
+                    Err(NetworkConfigurationError::Backend(
+                        "network-configuration source has no selected category".to_owned(),
+                    ))
+                },
+                |selection| Ok(PlatformNetworkConfigurationBackend::new(selection)),
+            )
+        },
+    ))
+    .with_passive_source(passive_state_factory::<MediaDeviceWire, _, _>(move || {
+        selected_categories.media.map_or_else(
+            || {
+                Err(MediaDeviceError::Backend(
+                    "media-device source has no selected category".to_owned(),
+                ))
+            },
+            |selection| Ok(PlatformMediaDeviceBackend::new(selection)),
+        )
+    }))
 }
 
 impl From<SupervisorPoll> for WirePoll {
@@ -358,16 +577,6 @@ impl From<SupervisorPoll> for WirePoll {
     }
 }
 
-impl From<BaselineSourceSnapshots> for WireBaselineSnapshots {
-    fn from(value: BaselineSourceSnapshots) -> Self {
-        Self {
-            display_topology: value.display_topology,
-            candidate_window: value.candidate_window,
-            capture_session: value.capture_session,
-        }
-    }
-}
-
 impl From<SupervisorStop> for WireStop {
     fn from(value: SupervisorStop) -> Self {
         Self {
@@ -384,6 +593,20 @@ impl From<NativeSourceSnapshot> for WireSnapshot {
             NativeSourceSnapshot::DisplayTopology(snapshot) => Self::DisplayTopology(snapshot),
             NativeSourceSnapshot::CandidateWindow(snapshot) => Self::CandidateWindow(snapshot),
             NativeSourceSnapshot::CaptureSession(snapshot) => Self::CaptureSession(snapshot),
+            NativeSourceSnapshot::ProcessApplication(snapshot) => {
+                Self::ProcessApplication(snapshot)
+            }
+            NativeSourceSnapshot::InteractiveSession(snapshot) => {
+                Self::InteractiveSession(snapshot)
+            }
+            NativeSourceSnapshot::Clipboard(snapshot) => Self::Clipboard(snapshot),
+            NativeSourceSnapshot::PrintSpooler(snapshot) => Self::PrintSpooler(snapshot),
+            NativeSourceSnapshot::RemovableStorage(snapshot) => Self::RemovableStorage(snapshot),
+            NativeSourceSnapshot::Virtualization(snapshot) => Self::Virtualization(snapshot),
+            NativeSourceSnapshot::NetworkConfiguration(snapshot) => {
+                Self::NetworkConfiguration(snapshot)
+            }
+            NativeSourceSnapshot::MediaDevice(snapshot) => Self::MediaDevice(snapshot),
         }
     }
 }
@@ -394,6 +617,14 @@ impl From<NativeSourceBatch> for WireBatch {
             NativeSourceBatch::DisplayTopology(batch) => Self::DisplayTopology(batch),
             NativeSourceBatch::CandidateWindow(batch) => Self::CandidateWindow(batch),
             NativeSourceBatch::CaptureSession(batch) => Self::CaptureSession(batch),
+            NativeSourceBatch::ProcessApplication(batch) => Self::ProcessApplication(batch),
+            NativeSourceBatch::InteractiveSession(batch) => Self::InteractiveSession(batch),
+            NativeSourceBatch::Clipboard(batch) => Self::Clipboard(batch),
+            NativeSourceBatch::PrintSpooler(batch) => Self::PrintSpooler(batch),
+            NativeSourceBatch::RemovableStorage(batch) => Self::RemovableStorage(batch),
+            NativeSourceBatch::Virtualization(batch) => Self::Virtualization(batch),
+            NativeSourceBatch::NetworkConfiguration(batch) => Self::NetworkConfiguration(batch),
+            NativeSourceBatch::MediaDevice(batch) => Self::MediaDevice(batch),
         }
     }
 }
@@ -470,6 +701,14 @@ fn source_name(source: NativeSourceKind) -> &'static str {
         NativeSourceKind::DisplayTopology => "display-topology",
         NativeSourceKind::CandidateWindow => "candidate-window",
         NativeSourceKind::CaptureSession => "capture-session",
+        NativeSourceKind::ProcessApplication => "process-application",
+        NativeSourceKind::InteractiveSession => "interactive-session",
+        NativeSourceKind::Clipboard => "clipboard",
+        NativeSourceKind::PrintSpooler => "print-spooler",
+        NativeSourceKind::RemovableStorage => "removable-storage",
+        NativeSourceKind::Virtualization => "virtualization",
+        NativeSourceKind::NetworkConfiguration => "network-configuration",
+        NativeSourceKind::MediaDevice => "media-device",
     }
 }
 
@@ -488,4 +727,68 @@ fn invalid_argument(reason: &'static str) -> Error {
 
 fn invalid_state(reason: &'static str) -> Error {
     Error::new(Status::GenericFailure, reason)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde::de::value::{Error as ValueError, MapDeserializer};
+
+    #[test]
+    fn baseline_request_rejects_unknown_privileged_fields() {
+        let fields = [("unexpected_authority", true)];
+        let deserializer = MapDeserializer::<_, ValueError>::new(fields.into_iter());
+
+        let Err(error) = OpenBaselineRequest::deserialize(deserializer) else {
+            panic!("unknown privileged request fields must be rejected");
+        };
+        assert!(error.to_string().contains("unknown field"));
+    }
+
+    #[test]
+    fn category_parser_preserves_each_independent_native_selection() {
+        let sources = [
+            NativeSourceKind::Clipboard,
+            NativeSourceKind::RemovableStorage,
+            NativeSourceKind::NetworkConfiguration,
+            NativeSourceKind::MediaDevice,
+        ];
+        let categories = [
+            NativeSourceCategory::OsClipboardChange,
+            NativeSourceCategory::PortableMtp,
+            NativeSourceCategory::RouteChange,
+            NativeSourceCategory::NetworkSourceHealth,
+            NativeSourceCategory::Microphone,
+        ];
+
+        let parsed = parse_selected_categories(&sources, &categories).expect("valid selection");
+
+        assert_eq!(
+            parsed.removable_storage,
+            RemovableStorageSelection::new(false, true)
+        );
+        assert_eq!(
+            parsed.network_configuration,
+            NetworkConfigurationSelection::new(&[
+                NetworkConfigurationCategory::RouteChange,
+                NetworkConfigurationCategory::NetworkSourceHealth,
+            ])
+        );
+        assert_eq!(parsed.media, MediaDeviceSelection::new(false, true));
+    }
+
+    #[test]
+    fn category_parser_rejects_a_selected_source_without_categories() {
+        assert!(parse_selected_categories(&[NativeSourceKind::RemovableStorage], &[]).is_err());
+        assert!(parse_selected_categories(&[NativeSourceKind::NetworkConfiguration], &[]).is_err());
+        assert!(parse_selected_categories(&[NativeSourceKind::MediaDevice], &[]).is_err());
+    }
+
+    #[test]
+    fn source_parser_rejects_valid_sources_outside_manifest_order() {
+        assert!(
+            parse_selected_sources(&["clipboard".to_owned(), "display-topology".to_owned(),])
+                .is_err()
+        );
+    }
 }

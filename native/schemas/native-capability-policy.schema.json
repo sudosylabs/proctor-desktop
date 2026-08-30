@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://proctor.invalid/native/native-capability-policy.schema.json",
+  "title": "Proctor native capability policy",
+  "$defs": {
+    "Mode": { "type": "string", "enum": ["disabled", "observe", "enforce"] },
+    "CatalogIdentifiers": {
+      "type": "array", "maxItems": 256, "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$" }
+    },
+    "ProcessApplicationPolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "allowed_application_ids"],
+      "properties": {
+        "mode": { "$ref": "#/$defs/Mode" },
+        "allowed_application_ids": { "$ref": "#/$defs/CatalogIdentifiers" }
+      },
+      "allOf": [{
+        "if": { "properties": { "mode": { "const": "disabled" } }, "required": ["mode"] },
+        "then": { "properties": { "allowed_application_ids": { "maxItems": 0 } } }
+      }]
+    },
+    "InteractiveSessionPolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode"],
+      "properties": { "mode": { "$ref": "#/$defs/Mode" } }
+    },
+    "ClipboardPolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "strategy", "observe_os_clipboard_changes"],
+      "properties": {
+        "mode": { "$ref": "#/$defs/Mode" },
+        "strategy": { "type": "string", "enum": ["private_attempt", "disabled"] },
+        "observe_os_clipboard_changes": { "type": "boolean" }
+      },
+      "allOf": [{
+        "if": { "properties": { "mode": { "const": "disabled" } }, "required": ["mode"] },
+        "then": { "properties": {
+          "strategy": { "const": "disabled" },
+          "observe_os_clipboard_changes": { "const": false }
+        } }
+      }, {
+        "if": { "properties": { "mode": { "const": "observe" } }, "required": ["mode"] },
+        "then": { "properties": {
+          "strategy": { "const": "disabled" },
+          "observe_os_clipboard_changes": { "const": true }
+        } }
+      }, {
+        "if": { "properties": { "mode": { "const": "enforce" } }, "required": ["mode"] },
+        "then": { "properties": { "strategy": { "const": "private_attempt" } } }
+      }]
+    },
+    "PrintingPolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "candidate_print_commands", "monitored_spooler"],
+      "properties": {
+        "mode": { "$ref": "#/$defs/Mode" },
+        "candidate_print_commands": { "type": "string", "enum": ["deny", "not_applied"] },
+        "monitored_spooler": { "type": "string", "enum": ["required", "not_required"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "disabled" } }, "required": ["mode"] },
+          "then": { "properties": {
+            "candidate_print_commands": { "const": "not_applied" },
+            "monitored_spooler": { "const": "not_required" }
+          } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "observe" } }, "required": ["mode"] },
+          "then": { "properties": { "monitored_spooler": { "const": "required" } } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "observe" } }, "required": ["mode"] },
+          "then": { "properties": { "candidate_print_commands": { "const": "not_applied" } } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "enforce" } }, "required": ["mode"] },
+          "then": { "properties": { "candidate_print_commands": { "const": "deny" } } }
+        }
+      ]
+    },
+    "RemovableStoragePolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "enabled_sub_capabilities", "allowed_storage_function_class_ids"],
+      "properties": {
+        "mode": { "$ref": "#/$defs/Mode" },
+        "enabled_sub_capabilities": {
+          "type": "array", "maxItems": 2, "uniqueItems": true,
+          "items": { "type": "string", "enum": ["removable_block_storage", "portable_mtp"] }
+        },
+        "allowed_storage_function_class_ids": { "$ref": "#/$defs/CatalogIdentifiers" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "disabled" } }, "required": ["mode"] },
+          "then": { "properties": {
+            "enabled_sub_capabilities": { "maxItems": 0 },
+            "allowed_storage_function_class_ids": { "maxItems": 0 }
+          } }
+        },
+        {
+          "if": { "properties": { "mode": { "enum": ["observe", "enforce"] } }, "required": ["mode"] },
+          "then": { "properties": { "enabled_sub_capabilities": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "VirtualizationPolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "rule"],
+      "properties": {
+        "mode": { "$ref": "#/$defs/Mode" },
+        "rule": { "type": "string", "enum": ["block_recognized_guest", "require_certified_physical_environment", "not_applied"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "disabled" } }, "required": ["mode"] },
+          "then": { "properties": { "rule": { "const": "not_applied" } } }
+        },
+        {
+          "if": { "properties": { "mode": { "enum": ["observe", "enforce"] } }, "required": ["mode"] },
+          "then": { "properties": { "rule": { "enum": ["block_recognized_guest", "require_certified_physical_environment"] } } }
+        }
+      ]
+    },
+    "NetworkConfigurationPolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "enabled_sub_capabilities", "allowed_managed_profile_ids", "allowed_adapter_class_ids", "allowed_tunnel_class_ids"],
+      "properties": {
+        "mode": { "$ref": "#/$defs/Mode" },
+        "enabled_sub_capabilities": { "type": "array", "maxItems": 5, "uniqueItems": true, "items": { "type": "string", "enum": ["system_proxy_state", "os_managed_vpn_state", "tunnel_interface_state", "route_change", "network_source_health"] } },
+        "allowed_managed_profile_ids": { "$ref": "#/$defs/CatalogIdentifiers" },
+        "allowed_adapter_class_ids": { "$ref": "#/$defs/CatalogIdentifiers" },
+        "allowed_tunnel_class_ids": { "$ref": "#/$defs/CatalogIdentifiers" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "disabled" } }, "required": ["mode"] },
+          "then": { "properties": {
+            "enabled_sub_capabilities": { "maxItems": 0 },
+            "allowed_managed_profile_ids": { "maxItems": 0 },
+            "allowed_adapter_class_ids": { "maxItems": 0 },
+            "allowed_tunnel_class_ids": { "maxItems": 0 }
+          } }
+        },
+        {
+          "if": { "properties": { "mode": { "enum": ["observe", "enforce"] } }, "required": ["mode"] },
+          "then": { "properties": { "enabled_sub_capabilities": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "MediaDevicePolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode", "require_ready", "concurrent_use_check"],
+      "properties": {
+        "mode": { "$ref": "#/$defs/Mode" },
+        "require_ready": { "type": "boolean" },
+        "concurrent_use_check": { "type": "string", "enum": ["supported_required", "not_required"] }
+      },
+      "allOf": [{
+        "if": { "properties": { "mode": { "const": "disabled" } }, "required": ["mode"] },
+        "then": { "properties": {
+          "require_ready": { "const": false },
+          "concurrent_use_check": { "const": "not_required" }
+        } }
+      }]
+    },
+    "ExternalCapturePolicy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mode"],
+      "properties": { "mode": { "const": "disabled" } }
+    }
+  }
+}

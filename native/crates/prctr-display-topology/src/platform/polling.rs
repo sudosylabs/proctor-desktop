@@ -19,7 +19,7 @@ pub struct PollingSubscription {
 
 impl PollingSubscription {
     pub(super) fn start<F>(
-        emitter: DisplayTopologyEmitter,
+        emitter: &DisplayTopologyEmitter,
         interval: Duration,
         snapshot: F,
     ) -> Result<Self, DisplayTopologyError>

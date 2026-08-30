@@ -5,12 +5,29 @@ import {
   type SecurityUtilityConnection
 } from '../../src/prctr/code/electron-main/securityUtilityComposition.js';
 import type { CandidateWindowHostEvent } from '../../src/prctr/platform/native/common/nativeObservation.generated.js';
-import type { NativeBatchEnvelope } from '../../src/prctr/platform/native/common/securityUtilityProtocol.js';
+import {
+  SECURITY_UTILITY_SOURCE_MANIFEST,
+  type NativeBatchEnvelope
+} from '../../src/prctr/platform/native/common/securityUtilityProtocol.js';
 import { CandidateWindowEnforcementError } from '../../src/prctr/platform/native/electron-main/candidateWindowEnforcer.js';
 import { createElectronCandidateWindow } from '../../src/prctr/platform/native/electron-main/electronCandidateWindow.js';
 import { NativePermissionBrokerError } from '../../src/prctr/platform/native/electron-main/nativePermissionBroker.js';
 
 const participationGeneration = 'participation-generation-test-0001';
+const selectedSources = SECURITY_UTILITY_SOURCE_MANIFEST.map(entry => entry.source_id);
+const selectedSourceCategories = [
+  'os-clipboard-change',
+  'removable-block-storage',
+  'portable-mtp',
+  'system-proxy-state',
+  'os-managed-vpn-state',
+  'tunnel-interface-state',
+  'route-change',
+  'network-source-health',
+  'camera',
+  'microphone'
+] as const;
+const permissionSelection = { selectedSources, selectedSourceCategories } as const;
 
 let connection: SecurityUtilityConnection | undefined;
 const failures: string[] = [];
@@ -29,8 +46,10 @@ async function runHarness(): Promise<void> {
   try {
     phase = 'checking_native_permissions';
     const nativeSecurity = createNativeSecurityComposition();
-    const permissionPreflight = await nativeSecurity.inspectPermissionPreflight();
-    await nativeSecurity.sealPermissionPreflight();
+    const permissionPreflight = await nativeSecurity.inspectPermissionPreflight(
+      permissionSelection
+    );
+    await nativeSecurity.sealPermissionPreflight(permissionSelection);
     let permissionPromptBlocked = false;
     try {
       await nativeSecurity.requestPermissionDuringPreflight('capture-session');
@@ -68,6 +87,8 @@ async function runHarness(): Promise<void> {
       participationGeneration,
       collectionSessionId: 'collection-session-test-0001',
       queueCapacity: 32,
+      selectedSources,
+      selectedSourceCategories,
       initialCandidateWindow: prepared.window,
       onPoll: poll => {
         observedCloseAttempts += countCandidateCloseAttempts(poll.batches);
@@ -75,8 +96,8 @@ async function runHarness(): Promise<void> {
       onFailure: failure => failures.push(failure)
     } as const;
     const failedStartupSecurity = createNativeSecurityComposition();
-    await failedStartupSecurity.inspectPermissionPreflight();
-    await failedStartupSecurity.sealPermissionPreflight();
+    await failedStartupSecurity.inspectPermissionPreflight(permissionSelection);
+    await failedStartupSecurity.sealPermissionPreflight(permissionSelection);
     let startupFailureRetainedSeal = false;
     try {
       await failedStartupSecurity.launchSecurityUtility({
@@ -87,7 +108,7 @@ async function runHarness(): Promise<void> {
       });
     } catch {
       const [inspection, request] = await Promise.allSettled([
-        failedStartupSecurity.inspectPermissionPreflight(),
+        failedStartupSecurity.inspectPermissionPreflight(permissionSelection),
         failedStartupSecurity.requestPermissionDuringPreflight('capture-session')
       ]);
       startupFailureRetainedSeal = rejectedWithBrokerCode(inspection, 'preflight_sealed')
@@ -100,7 +121,27 @@ async function runHarness(): Promise<void> {
       unsealedLaunchRejected = error instanceof NativeSecurityCompositionError
         && error.code === 'permission_preflight_not_sealed';
     }
-    const launched = await nativeSecurity.launchSecurityUtility(launchOptions);
+    let mismatchedPreflightLaunchRejected = false;
+    try {
+      await nativeSecurity.launchSecurityUtility({
+        ...launchOptions,
+        selectedSources: selectedSources.filter(source => source !== 'media-device'),
+        selectedSourceCategories: ['os-clipboard-change']
+      });
+    } catch (error) {
+      mismatchedPreflightLaunchRejected = error instanceof NativeSecurityCompositionError
+        && error.code === 'permission_preflight_scope_mismatch';
+    }
+    const mutableLaunchSources = [...launchOptions.selectedSources];
+    const mutableLaunchCategories = [...launchOptions.selectedSourceCategories];
+    const launching = nativeSecurity.launchSecurityUtility({
+      ...launchOptions,
+      selectedSources: mutableLaunchSources,
+      selectedSourceCategories: mutableLaunchCategories
+    });
+    mutableLaunchSources.splice(0);
+    mutableLaunchCategories.splice(0);
+    const launched = await launching;
     phase = 'utility_ready';
     connection = launched.connection;
     let activePermissionReleaseRejected = false;
@@ -121,20 +162,23 @@ async function runHarness(): Promise<void> {
     observedCloseAttempts += countCandidateCloseAttempts(stopped.batches);
     phase = 'utility_stopped';
     const released = enforcer.release(participationGeneration);
-    const reopenedPermissionPreflight = await nativeSecurity.inspectPermissionPreflight();
+    const reopenedPermissionPreflight = await nativeSecurity.inspectPermissionPreflight(
+      permissionSelection
+    );
     const applicationMenuRestored = process.platform !== 'darwin'
       || Menu.getApplicationMenu() === applicationMenuBeforeCandidate;
     const listenerRollback = verifyTransactionalListenerRollback();
     const restorationFailure = verifyRestorationFailureContainment();
     process.stdout.write(`${JSON.stringify({
       ready: launched.ready.kind,
-      sources: Object.keys(launched.ready.snapshots).sort(),
+      sources: launched.ready.snapshots.map(snapshot => snapshot.source).sort(),
       permission_platform: permissionPreflight.platform,
       permission_modes: permissionPreflight.permissions.map(permission => permission.mode),
       permission_states: permissionPreflight.permissions.map(permission => permission.permission),
       permission_prompt_blocked: permissionPromptBlocked,
       permission_startup_failure_retained_seal: startupFailureRetainedSeal,
       permission_unsealed_launch_rejected: unsealedLaunchRejected,
+      permission_mismatched_launch_rejected: mismatchedPreflightLaunchRejected,
       permission_active_release_rejected: activePermissionReleaseRejected,
       permission_preflight_reopened:
         reopenedPermissionPreflight.permissions.length === permissionPreflight.permissions.length,

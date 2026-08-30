@@ -100,11 +100,25 @@ non-authorizing outcomes.
 
 ## 7. Contain before presentation
 
-Evaluate authenticated policy and admitted native baseline into local
-`notApplicable`, `checking`, `ready`, `restricted`, or `blocked` posture. Keep it
-distinct from Attempt ready. Execute containment: deny dispatch, cancel proven-
-undispatched work, protect accepted/unknown work, apply effects, commit state,
-publish presentation, then queue permitted delivery.
+Validate one canonical effective-policy envelope containing resolved exception
+provenance, packaged capability/schema requirements, bounded configuration,
+expiry/admission bounds, and digest. Reject unknown, conflicting, prohibited,
+oversized, or unsupported requirements before permission/source startup. Keep
+server policy resolution out of Desktop and bind preflight/evidence to the
+verified digest and signed capability matrix.
+
+Evaluate authenticated policy and admitted native sources into local
+`uninitialized`, `checking`, `compliant`, `degraded`, `contained`, `failed`, or
+`stopped` posture. Keep it distinct from Attempt ready. Execute containment:
+deny dispatch, cancel proven-undispatched work, protect accepted/unknown work,
+apply effects, commit state, publish presentation, then queue permitted
+delivery.
+
+A high-confidence event may provisionally enter checking and close mutation
+gates, but creates no occurrence until deterministic evaluation confirms it.
+Observe conditions never contain. Contained CandidateWindow blocks editor,
+terminal, browser, resource, and submission mutations behind one safe correction
+overlay while sources continue verifying recovery.
 
 Pause keeps CandidateWindow/Participation/lock while gating Workspace, browser,
 terminal, and submission. Suspension gates and protects first, shows overlay,
@@ -121,6 +135,13 @@ distinct. Preserve versions, uncertainty, gaps, source sequences, and delivery
 watermarks. Keep Browser Activity and Workspace Recovery in separate protected
 spools. Project only authorized minimized state and keep content/evidence/
 credentials out of ordinary audit, diagnostics, renderer state, and logs.
+
+Let main canonicalize and authenticate minimized batches with the registered
+installation credential; helpers and the utility never receive it. Bind batch
+sequence, prior acknowledgement, idempotency key, policy digest, release,
+matrix, and source generations. Send one aggregate coverage heartbeat rather
+than recurring normal observations. Separate safe live manager state from
+authorized detailed review and use server-defined retention.
 
 The step is complete when every collected field has a purpose, classification,
 scope, delivery/access/retention rule, and failure behavior without becoming a

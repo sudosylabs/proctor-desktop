@@ -10,8 +10,8 @@ use prctr_native_protocol::{
 };
 use prctr_native_source_runtime::{
     BoundedTaskError, QueueError, SourceModel, SourceResetPlan, SourceSession, SourceSessionFact,
-    SourceStateChange, ensure_native_source_process_usable, prefer_boundary_error,
-    run_bounded_source_stop,
+    SourceSessionMetadata, SourceStateChange, ensure_native_source_process_usable,
+    prefer_boundary_error, run_bounded_source_stop,
 };
 
 #[cfg(target_os = "linux")]
@@ -211,19 +211,18 @@ impl CaptureSessionEmitter {
         &self,
         state: CaptureSessionState,
         reset: Option<SourceResetPlan>,
-    ) -> Result<(), CaptureSessionError> {
+    ) -> Result<SourceSessionMetadata, CaptureSessionError> {
         let health = health_for(&state);
         self.session.finish_open(state, health, reset)
     }
 
     fn snapshot(
-        &self,
         platform: PlatformFamily,
         permission: PermissionState,
         adapter_version: &str,
         state: CaptureSessionState,
+        metadata: SourceSessionMetadata,
     ) -> Result<CaptureSessionSourceSnapshot, CaptureSessionError> {
-        let metadata = self.session.metadata();
         let snapshot = CaptureSessionSourceSnapshot {
             source_instance_id: metadata.source_instance_id,
             source_version: SOURCE_VERSION.to_owned(),
@@ -359,14 +358,16 @@ impl<S: CaptureSessionSubscription> CaptureSessionSource<S> {
         let opened = backend.open(emitter.clone())?;
         let initial_state = opened.initial_state.clone();
         let subscription = opened.subscription;
-        if let Err(error) = emitter.finish_open(opened.initial_state, reset) {
-            return Err(rollback_subscription(error, subscription));
-        }
-        let snapshot = match emitter.snapshot(
+        let snapshot_metadata = match emitter.finish_open(opened.initial_state, reset) {
+            Ok(metadata) => metadata,
+            Err(error) => return Err(rollback_subscription(error, subscription)),
+        };
+        let snapshot = match CaptureSessionEmitter::snapshot(
             opened.platform,
             opened.permission,
             opened.adapter_version,
             initial_state,
+            snapshot_metadata,
         ) {
             Ok(snapshot) => snapshot,
             Err(error) => return Err(rollback_subscription(error, subscription)),

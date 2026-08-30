@@ -33,6 +33,9 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
 - [Native capabilities](./architecture/native-capabilities.md) — passive native
   observation, candidate-window enforcement, process, privacy, failure, and
   platform-verification boundaries
+- [Native capability families](./architecture/native-capability-families.md) —
+  accepted process/session, clipboard, printing, storage, virtualization,
+  network, media, platform-coverage, correction, and evidence contracts
 - [User settings](./architecture/user-settings.md) — authoritative JSONC,
   static registry, effective configuration, Account/Settings persistence, and
   Attempt Configuration

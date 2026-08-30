@@ -19,7 +19,6 @@ const windowState = {
 } as const;
 
 const observedAt = {
-  wall_time_unix_ms: 1,
   monotonic_time_ns: 1
 } as const;
 

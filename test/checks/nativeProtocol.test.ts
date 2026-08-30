@@ -62,7 +62,7 @@ test('generated observation validator checks nested values and safe integers', (
   const valid = {
     source_instance_id: 'source-instance-0001',
     sequence: 1,
-    observed_at: { wall_time_unix_ms: 1, monotonic_time_ns: 1 },
+    observed_at: { monotonic_time_ns: 1 },
     topology
   };
   assert.equal(isDisplayTopologyObservation(valid), true);
@@ -122,7 +122,7 @@ test('generated reset validator rejects optional-field and reason violations', (
   const valid = {
     source_instance_id: 'source-instance-0001',
     sequence: 2,
-    observed_at: { wall_time_unix_ms: 1, monotonic_time_ns: 2 },
+    observed_at: { monotonic_time_ns: 2 },
     reason: 'adapter restarted'
   };
   assert.equal(isSourceReset(valid), true);
@@ -134,13 +134,13 @@ test('generated drain validator bounds dynamic health and terminal state', () =>
   const observation = {
     source_instance_id: 'source-instance-0001',
     sequence: 2,
-    observed_at: { wall_time_unix_ms: 1, monotonic_time_ns: 2 },
+    observed_at: { monotonic_time_ns: 2 },
     topology
   };
   const reset = {
     source_instance_id: 'source-instance-0001',
     sequence: 1,
-    observed_at: { wall_time_unix_ms: 1, monotonic_time_ns: 1 },
+    observed_at: { monotonic_time_ns: 1 },
     reason: 'adapter restarted'
   };
   const valid = {

@@ -38,7 +38,10 @@ review, and remote execution. Desktop implementation pins those contracts while
 coordinated server work adds readiness/compatibility, method-agnostic Desktop
 Authorization, registered-installation proof, complete Attempt re-entry,
 candidate/manager projections, Attempt Configuration, and browser policy and
-activity.
+activity. It also adds the canonical effective Exam Security Policy, signed
+native capability-matrix admission, minimized integrity delivery, coverage
+heartbeats, and safe live manager projections required by the accepted native
+families.
 
 ## Non-goals
 
