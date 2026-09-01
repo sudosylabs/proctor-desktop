@@ -17,11 +17,18 @@ use prctr_native_source_runtime::{
 
 #[cfg(target_os = "linux")]
 pub use platform::LinuxProcessApplicationBackend;
-#[cfg(target_os = "macos")]
-pub use platform::MacOsProcessApplicationBackend;
 pub use platform::UnavailableProcessApplicationSubscription;
 #[cfg(target_os = "windows")]
 pub use platform::WindowsProcessApplicationBackend;
+#[cfg(target_os = "macos")]
+pub use platform::{
+    MacOsCandidateAuditSession, MacOsIdentityResolution, MacOsLifecycleCheckpoint,
+    MacOsLifecycleClose, MacOsLifecycleDrain, MacOsLifecycleEvent, MacOsLifecycleEventFeed,
+    MacOsLifecycleFailure, MacOsLifecycleInput, MacOsLifecycleSink, MacOsLifecycleSubscription,
+    MacOsLifecycleTerminal, MacOsLifecycleTimeOrigin, MacOsProcessAccountClass,
+    MacOsProcessApplicationBackend, MacOsProcessFact, MacOsProcessInventory,
+    MacOsProcessInventoryCollector, MacOsProcessKey, MacOsProcessLifecycle,
+};
 
 pub const SOURCE_VERSION: &str = env!("CARGO_PKG_VERSION");
 

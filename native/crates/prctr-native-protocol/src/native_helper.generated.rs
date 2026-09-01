@@ -196,24 +196,20 @@ impl ProtocolValidatable for HelperSourceOpen {
                 "64 lowercase hexadecimal characters",
             ));
         }
-        let unique = !self.event_classes.is_empty()
-            && !self
-                .event_classes
-                .iter()
-                .enumerate()
-                .any(|(index, event_class)| self.event_classes[..index].contains(event_class));
-        let matching = self
-            .event_classes
-            .iter()
-            .all(|event_class| match self.source_kind {
-                HelperSourceKind::ProcessApplication => matches!(
-                    event_class,
-                    HelperEventClass::ProcessLifecycle | HelperEventClass::ProcessIdentity
-                ),
-                HelperSourceKind::InteractiveSession => {
-                    matches!(event_class, HelperEventClass::InteractiveSessionLifecycle)
-                }
-            });
+        let matching = match self.source_kind {
+            HelperSourceKind::ProcessApplication => {
+                self.event_classes.len() == 2
+                    && self
+                        .event_classes
+                        .contains(&HelperEventClass::ProcessLifecycle)
+                    && self
+                        .event_classes
+                        .contains(&HelperEventClass::ProcessIdentity)
+            }
+            HelperSourceKind::InteractiveSession => {
+                self.event_classes.as_slice() == [HelperEventClass::InteractiveSessionLifecycle]
+            }
+        };
         let schema_matches = match self.source_kind {
             HelperSourceKind::ProcessApplication => {
                 self.schema_version == PROCESS_APPLICATION_SCHEMA_VERSION
@@ -222,11 +218,11 @@ impl ProtocolValidatable for HelperSourceOpen {
                 self.schema_version == INTERACTIVE_SESSION_SCHEMA_VERSION
             }
         };
-        if !unique || !matching || !schema_matches {
+        if !matching || !schema_matches {
             return Err(ProtocolValidationError::new(
                 "HelperSourceOpen",
                 "event_classes",
-                "unique classes match helper source",
+                "complete coherent class set matches helper source",
             ));
         }
         Ok(())

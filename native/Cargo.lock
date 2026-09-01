@@ -369,6 +369,7 @@ version = "0.1.0"
 dependencies = [
  "prctr-native-helper-protocol",
  "prctr-native-protocol",
+ "prctr-process-application-state",
  "serde",
  "serde_json",
  "windows-sys",

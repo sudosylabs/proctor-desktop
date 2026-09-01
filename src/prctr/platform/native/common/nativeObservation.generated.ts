@@ -269,17 +269,18 @@ function hasUniqueHelperCapabilities(value: JsonObject): boolean {
 }
 
 function hasCoherentHelperSourceOpen(value: JsonObject): boolean {
-  if (!Array.isArray(value.event_classes) || value.event_classes.length === 0
-    || new Set(value.event_classes).size !== value.event_classes.length) return false;
+  if (!Array.isArray(value.event_classes)) return false;
   const schemaMatches = value.source_kind === 'process_application'
     ? value.schema_version === 1
     : value.source_kind === 'interactive_session' && value.schema_version === 1;
   if (!schemaMatches) return false;
   return value.source_kind === 'process_application'
-    ? value.event_classes.every(eventClass => eventClass === 'process_lifecycle'
-      || eventClass === 'process_identity')
+    ? value.event_classes.length === 2
+      && value.event_classes.includes('process_lifecycle')
+      && value.event_classes.includes('process_identity')
     : value.source_kind === 'interactive_session'
-      && value.event_classes.every(eventClass => eventClass === 'interactive_session_lifecycle');
+      && value.event_classes.length === 1
+      && value.event_classes[0] === 'interactive_session_lifecycle';
 }
 
 function hasCoherentHelperObservation(value: JsonObject): boolean {

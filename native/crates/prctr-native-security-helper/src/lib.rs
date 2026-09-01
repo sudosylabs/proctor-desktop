@@ -12,10 +12,10 @@ use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant};
 
 use prctr_native_helper_protocol::{
-    HelperObservation, HelperProtocolError, HelperServerMessage, HelperServerMessageKind,
-    HelperSourceClose, HelperSourceFailure, HelperSourceFence, HelperSourceKind, HelperSourceOpen,
-    HelperSourceSnapshot, VerifiedHelperChannel, VerifiedHelperPeer, bind_verified_helper_channel,
-    validate_helper_frame_size,
+    HelperFailureCode, HelperObservation, HelperProtocolError, HelperServerMessage,
+    HelperServerMessageKind, HelperSourceClose, HelperSourceFailure, HelperSourceFence,
+    HelperSourceKind, HelperSourceOpen, HelperSourceSnapshot, VerifiedHelperChannel,
+    VerifiedHelperPeer, bind_verified_helper_channel, validate_helper_frame_size,
 };
 use prctr_native_protocol::{
     HelperClientMessage, HelperClientMessageKind, HelperHandshake, ProtocolValidatable,
@@ -33,7 +33,7 @@ mod windows;
 mod macos;
 
 pub const HELPER_BUILD_ID: &str = "prctr-native-helper-0.1.0";
-const MAX_PENDING_HELPER_EVENTS: usize = 2_048;
+const MAX_PENDING_HELPER_OBSERVATIONS: usize = 2_048;
 const HELPER_STARTUP_DEADLINE: Duration = Duration::from_secs(5);
 const HELPER_REQUEST_DEADLINE: Duration = Duration::from_secs(5);
 const HELPER_TERMINATION_DEADLINE: Duration = Duration::from_millis(500);
@@ -52,6 +52,7 @@ pub enum HelperTransportError {
     DeadlineExceeded,
     ConnectionFenced,
     UtilityPoisoned,
+    SourceFailure(HelperSourceFailure),
 }
 
 impl fmt::Display for HelperTransportError {
@@ -68,6 +69,7 @@ impl fmt::Display for HelperTransportError {
             Self::DeadlineExceeded => "native helper transport deadline was exceeded",
             Self::ConnectionFenced => "native helper connection is terminally fenced",
             Self::UtilityPoisoned => "native helper utility process must be replaced",
+            Self::SourceFailure(_) => "native helper source reported a terminal failure",
         })
     }
 }
@@ -85,7 +87,8 @@ impl std::error::Error for HelperTransportError {
             | Self::ChildTermination
             | Self::DeadlineExceeded
             | Self::ConnectionFenced
-            | Self::UtilityPoisoned => None,
+            | Self::UtilityPoisoned
+            | Self::SourceFailure(_) => None,
         }
     }
 }
@@ -141,7 +144,6 @@ pub struct NativeHelperConnection {
 struct ActiveHelperSource {
     kind: HelperSourceKind,
     fence: HelperSourceFence,
-    queue_capacity: usize,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -238,8 +240,23 @@ impl NativeHelperConnection {
         &mut self,
         request: &HelperSourceOpen,
     ) -> Result<HelperSourceSnapshot, HelperTransportError> {
-        let result = self.open_source_inner(request);
-        self.finish_operation(result)
+        match self.open_source_inner(request) {
+            Err(HelperTransportError::SourceFailure(failure)) => {
+                match failure_disposition(failure.failure_code) {
+                    FailureDisposition::PreserveChannel => {
+                        Err(HelperTransportError::SourceFailure(failure))
+                    }
+                    FailureDisposition::FenceConnection => {
+                        self.finish_operation(Err(HelperTransportError::SourceFailure(failure)))
+                    }
+                    FailureDisposition::PoisonUtility => {
+                        poison_helper_utility();
+                        self.finish_operation(Err(HelperTransportError::UtilityPoisoned))
+                    }
+                }
+            }
+            result => self.finish_operation(result),
+        }
     }
 
     fn open_source_inner(
@@ -269,8 +286,8 @@ impl NativeHelperConnection {
             remaining(deadline)?,
         )?;
         loop {
-            match self.read_server_message(deadline)? {
-                HelperServerPayload::Snapshot(snapshot) => {
+            match self.read_server_payload(deadline)? {
+                DecodedHelperServerPayload::Snapshot(snapshot) => {
                     if snapshot.helper_source_instance_id != request.helper_source_instance_id {
                         return Err(HelperProtocolError::Lifecycle.into());
                     }
@@ -280,12 +297,30 @@ impl NativeHelperConnection {
                         ActiveHelperSource {
                             kind: request.source_kind,
                             fence,
-                            queue_capacity: usize::from(request.queue_capacity),
                         },
                     );
                     return Ok(snapshot);
                 }
-                HelperServerPayload::Event(event) => self.queue_event(event)?,
+                DecodedHelperServerPayload::Observation(observation) => {
+                    let event = route_server_event(
+                        DecodedHelperServerPayload::Observation(observation),
+                        &mut self.active_sources,
+                    )?;
+                    self.queue_event(event)?;
+                }
+                DecodedHelperServerPayload::Failure(failure)
+                    if failure.helper_source_instance_id == request.helper_source_instance_id =>
+                {
+                    fence.accept_initial_failure(&failure)?;
+                    return Err(HelperTransportError::SourceFailure(failure));
+                }
+                DecodedHelperServerPayload::Failure(failure) => {
+                    let event = route_server_event(
+                        DecodedHelperServerPayload::Failure(failure),
+                        &mut self.active_sources,
+                    )?;
+                    self.queue_event(event)?;
+                }
             }
         }
     }
@@ -307,7 +342,7 @@ impl NativeHelperConnection {
         }
         match self.read_server_message(Instant::now() + HELPER_REQUEST_DEADLINE)? {
             HelperServerPayload::Event(event) => Ok(event),
-            HelperServerPayload::Snapshot(_) => Err(HelperProtocolError::Lifecycle.into()),
+            HelperServerPayload::Snapshot => Err(HelperProtocolError::Lifecycle.into()),
         }
     }
 
@@ -330,19 +365,17 @@ impl NativeHelperConnection {
         request: &HelperSourceClose,
     ) -> Result<HelperSourceCloseResult, HelperTransportError> {
         self.assert_usable()?;
+        self.channel.validate_source_close(request)?;
         if !self
             .active_sources
             .contains_key(&request.helper_source_instance_id)
         {
             return Err(HelperProtocolError::Lifecycle.into());
         }
-        let queue_capacity = self
-            .active_sources
-            .get(&request.helper_source_instance_id)
-            .ok_or(HelperProtocolError::Lifecycle)?
-            .queue_capacity;
         let mut events = self.take_pending_events_for(&request.helper_source_instance_id);
-        if events.len() > queue_capacity {
+        let mut event_counts =
+            HelperEventBatchCounts::from_events(events.iter(), &request.helper_source_instance_id);
+        if !event_counts.fits() {
             return Err(HelperProtocolError::Lifecycle.into());
         }
         let deadline = Instant::now() + HELPER_REQUEST_DEADLINE;
@@ -355,8 +388,8 @@ impl NativeHelperConnection {
             remaining(deadline)?,
         )?;
         loop {
-            match self.read_server_message(deadline)? {
-                HelperServerPayload::Snapshot(snapshot) => {
+            match self.read_server_payload(deadline)? {
+                DecodedHelperServerPayload::Snapshot(snapshot) => {
                     if snapshot.helper_source_instance_id != request.helper_source_instance_id {
                         return Err(HelperProtocolError::Lifecycle.into());
                     }
@@ -372,9 +405,40 @@ impl NativeHelperConnection {
                         final_snapshot: snapshot,
                     });
                 }
-                HelperServerPayload::Event(event) => {
+                DecodedHelperServerPayload::Failure(failure)
+                    if failure.helper_source_instance_id == request.helper_source_instance_id
+                        && matches!(
+                            failure.failure_code,
+                            HelperFailureCode::Cleanup | HelperFailureCode::Protocol
+                        ) =>
+                {
+                    let source = self
+                        .active_sources
+                        .get_mut(&request.helper_source_instance_id)
+                        .ok_or(HelperProtocolError::Lifecycle)?;
+                    source.fence.accept_close_failure(&failure)?;
+                    return match failure.failure_code {
+                        HelperFailureCode::Cleanup => {
+                            poison_helper_utility();
+                            Err(HelperTransportError::UtilityPoisoned)
+                        }
+                        HelperFailureCode::Protocol => {
+                            Err(HelperTransportError::SourceFailure(failure))
+                        }
+                        HelperFailureCode::PermissionLost
+                        | HelperFailureCode::NativeEventLoss
+                        | HelperFailureCode::QueueOverflow
+                        | HelperFailureCode::InventoryOverflow
+                        | HelperFailureCode::Backend => {
+                            unreachable!("close-failure guard admitted a recoverable failure code")
+                        }
+                    };
+                }
+                payload @ (DecodedHelperServerPayload::Observation(_)
+                | DecodedHelperServerPayload::Failure(_)) => {
+                    let event = route_server_event(payload, &mut self.active_sources)?;
                     if event_source_id(&event) == request.helper_source_instance_id {
-                        if events.len() >= queue_capacity {
+                        if !event_counts.try_append(&event) {
                             return Err(HelperProtocolError::Lifecycle.into());
                         }
                         events.push(event);
@@ -394,21 +458,22 @@ impl NativeHelperConnection {
         route_server_message(message, &mut self.active_sources)
     }
 
+    fn read_server_payload(
+        &self,
+        deadline: Instant,
+    ) -> Result<DecodedHelperServerPayload, HelperTransportError> {
+        let message: HelperServerMessage = self.transport.read_json(remaining(deadline)?)?;
+        decode_server_message(message)
+    }
+
     fn queue_event(&mut self, event: NativeHelperSourceEvent) -> Result<(), HelperTransportError> {
         let source_id = event_source_id(&event);
-        let source_capacity = self
-            .active_sources
+        self.active_sources
             .get(source_id)
-            .ok_or(HelperProtocolError::Lifecycle)?
-            .queue_capacity;
-        if self.pending_events.len() >= MAX_PENDING_HELPER_EVENTS
-            || self
-                .pending_events
-                .iter()
-                .filter(|pending| event_source_id(pending) == source_id)
-                .count()
-                >= source_capacity
-        {
+            .ok_or(HelperProtocolError::Lifecycle)?;
+        let mut event_counts =
+            HelperEventBatchCounts::from_events(self.pending_events.iter(), source_id);
+        if !event_counts.try_append(&event) {
             return Err(HelperProtocolError::Lifecycle.into());
         }
         self.pending_events.push_back(event);
@@ -467,6 +532,56 @@ fn event_source_id(event: &NativeHelperSourceEvent) -> &str {
     }
 }
 
+#[derive(Clone, Copy, Default)]
+struct HelperEventBatchCounts {
+    observations: usize,
+    failures_for_source: usize,
+}
+
+impl HelperEventBatchCounts {
+    fn from_events<'a>(
+        events: impl IntoIterator<Item = &'a NativeHelperSourceEvent>,
+        failure_source_id: &str,
+    ) -> Self {
+        let mut counts = Self::default();
+        for event in events {
+            match event {
+                NativeHelperSourceEvent::Observation(_) => counts.observations += 1,
+                NativeHelperSourceEvent::Failure(_)
+                    if event_source_id(event) == failure_source_id =>
+                {
+                    counts.failures_for_source += 1;
+                }
+                NativeHelperSourceEvent::Failure(_) => {}
+            }
+        }
+        counts
+    }
+
+    const fn fits(self) -> bool {
+        self.observations <= MAX_PENDING_HELPER_OBSERVATIONS && self.failures_for_source <= 1
+    }
+
+    fn try_append(&mut self, event: &NativeHelperSourceEvent) -> bool {
+        if !self.fits() {
+            return false;
+        }
+        match event {
+            NativeHelperSourceEvent::Observation(_)
+                if self.observations < MAX_PENDING_HELPER_OBSERVATIONS =>
+            {
+                self.observations += 1;
+                true
+            }
+            NativeHelperSourceEvent::Failure(_) if self.failures_for_source == 0 => {
+                self.failures_for_source = 1;
+                true
+            }
+            NativeHelperSourceEvent::Observation(_) | NativeHelperSourceEvent::Failure(_) => false,
+        }
+    }
+}
+
 fn remaining(deadline: Instant) -> Result<Duration, HelperTransportError> {
     let remaining = deadline.saturating_duration_since(Instant::now());
     if remaining.is_zero() {
@@ -480,39 +595,98 @@ fn route_server_message(
     message: HelperServerMessage,
     active_sources: &mut BTreeMap<String, ActiveHelperSource>,
 ) -> Result<HelperServerPayload, HelperTransportError> {
+    match decode_server_message(message)? {
+        DecodedHelperServerPayload::Snapshot(_) => Ok(HelperServerPayload::Snapshot),
+        payload => Ok(HelperServerPayload::Event(route_server_event(
+            payload,
+            active_sources,
+        )?)),
+    }
+}
+
+fn decode_server_message(
+    message: HelperServerMessage,
+) -> Result<DecodedHelperServerPayload, HelperTransportError> {
     message.validate_protocol()?;
     match message.kind {
-        HelperServerMessageKind::Snapshot => Ok(HelperServerPayload::Snapshot(
+        HelperServerMessageKind::Snapshot => Ok(DecodedHelperServerPayload::Snapshot(
             message.snapshot.ok_or(HelperProtocolError::Snapshot)?,
         )),
         HelperServerMessageKind::Observation => {
-            let observation = message
-                .observation
-                .ok_or(HelperProtocolError::Observation)?;
+            Ok(DecodedHelperServerPayload::Observation(Box::new(
+                message
+                    .observation
+                    .ok_or(HelperProtocolError::Observation)?,
+            )))
+        }
+        HelperServerMessageKind::Failure => Ok(DecodedHelperServerPayload::Failure(
+            message.failure.ok_or(HelperProtocolError::Failure)?,
+        )),
+    }
+}
+
+fn route_server_event(
+    payload: DecodedHelperServerPayload,
+    active_sources: &mut BTreeMap<String, ActiveHelperSource>,
+) -> Result<NativeHelperSourceEvent, HelperTransportError> {
+    match payload {
+        DecodedHelperServerPayload::Snapshot(_) => Err(HelperProtocolError::Lifecycle.into()),
+        DecodedHelperServerPayload::Observation(observation) => {
             let source = active_sources
                 .get_mut(&observation.helper_source_instance_id)
                 .ok_or(HelperProtocolError::Lifecycle)?;
             source.fence.accept_observation(&observation)?;
-            Ok(HelperServerPayload::Event(
-                NativeHelperSourceEvent::Observation(Box::new(observation)),
-            ))
+            Ok(NativeHelperSourceEvent::Observation(observation))
         }
-        HelperServerMessageKind::Failure => {
-            let failure = message.failure.ok_or(HelperProtocolError::Failure)?;
+        DecodedHelperServerPayload::Failure(failure) => {
             let source = active_sources
                 .get_mut(&failure.helper_source_instance_id)
                 .ok_or(HelperProtocolError::Lifecycle)?;
             source.fence.accept_failure(&failure)?;
-            Ok(HelperServerPayload::Event(
-                NativeHelperSourceEvent::Failure(failure),
-            ))
+            match failure_disposition(failure.failure_code) {
+                FailureDisposition::PreserveChannel => {
+                    Ok(NativeHelperSourceEvent::Failure(failure))
+                }
+                FailureDisposition::FenceConnection => {
+                    Err(HelperTransportError::SourceFailure(failure))
+                }
+                FailureDisposition::PoisonUtility => {
+                    poison_helper_utility();
+                    Err(HelperTransportError::UtilityPoisoned)
+                }
+            }
         }
     }
 }
 
 enum HelperServerPayload {
-    Snapshot(HelperSourceSnapshot),
+    Snapshot,
     Event(NativeHelperSourceEvent),
+}
+
+enum DecodedHelperServerPayload {
+    Snapshot(HelperSourceSnapshot),
+    Observation(Box<HelperObservation>),
+    Failure(HelperSourceFailure),
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum FailureDisposition {
+    PreserveChannel,
+    FenceConnection,
+    PoisonUtility,
+}
+
+const fn failure_disposition(code: HelperFailureCode) -> FailureDisposition {
+    match code {
+        HelperFailureCode::Cleanup => FailureDisposition::PoisonUtility,
+        HelperFailureCode::Protocol => FailureDisposition::FenceConnection,
+        HelperFailureCode::PermissionLost
+        | HelperFailureCode::NativeEventLoss
+        | HelperFailureCode::QueueOverflow
+        | HelperFailureCode::InventoryOverflow
+        | HelperFailureCode::Backend => FailureDisposition::PreserveChannel,
+    }
 }
 
 struct DeadlineFramedTransport {
@@ -1028,8 +1202,7 @@ mod tests {
     use std::sync::{Arc, mpsc::Receiver};
 
     use prctr_native_helper_protocol::{
-        HELPER_PROTOCOL_VERSION, HelperEventClass, HelperFailureCode, HelperKind,
-        MAX_HELPER_FRAME_BYTES,
+        HELPER_PROTOCOL_VERSION, HelperEventClass, HelperKind, MAX_HELPER_FRAME_BYTES,
     };
     use prctr_native_protocol::{
         INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveConsoleOwnership, InteractiveLockState,
@@ -1269,6 +1442,130 @@ mod tests {
     }
 
     #[test]
+    fn initial_source_failure_preserves_its_category_without_fencing_the_channel() {
+        const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let (channel, request, _initial) = process_channel(NONCE);
+        let failure = HelperSourceFailure {
+            protocol_version: HELPER_PROTOCOL_VERSION,
+            channel_nonce: NONCE.to_owned(),
+            helper_source_instance_id: request.helper_source_instance_id.clone(),
+            source_kind: HelperSourceKind::ProcessApplication,
+            failure_code: HelperFailureCode::InventoryOverflow,
+            last_sequence: 0,
+            lost_event_count: None,
+            monotonic_time_ns: 1,
+        };
+        let mut frames = Vec::new();
+        write_json_frame(
+            &mut frames,
+            &HelperServerMessage {
+                kind: HelperServerMessageKind::Failure,
+                snapshot: None,
+                observation: None,
+                failure: Some(failure.clone()),
+            },
+        )
+        .expect("failure frame");
+        let mut connection = test_connection(channel, Cursor::new(frames));
+        assert!(matches!(
+            connection.open_source(&request),
+            Err(HelperTransportError::SourceFailure(value)) if value == failure
+        ));
+        assert!(!connection.fenced);
+        assert!(connection.active_sources.is_empty());
+        connection
+            .assert_usable()
+            .expect("verified channel remains usable");
+    }
+
+    #[test]
+    fn failure_disposition_preserves_only_clean_operational_categories() {
+        for code in [
+            HelperFailureCode::PermissionLost,
+            HelperFailureCode::NativeEventLoss,
+            HelperFailureCode::QueueOverflow,
+            HelperFailureCode::InventoryOverflow,
+            HelperFailureCode::Backend,
+        ] {
+            assert_eq!(
+                failure_disposition(code),
+                FailureDisposition::PreserveChannel
+            );
+        }
+        assert_eq!(
+            failure_disposition(HelperFailureCode::Protocol),
+            FailureDisposition::FenceConnection
+        );
+        assert_eq!(
+            failure_disposition(HelperFailureCode::Cleanup),
+            FailureDisposition::PoisonUtility
+        );
+    }
+
+    #[test]
+    fn interleaved_backlog_is_distinct_from_ingress_capacity_and_reserves_failure_control() {
+        const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let (channel, mut request, initial) = process_channel(NONCE);
+        request.queue_capacity = 2;
+        let mut connection = test_connection(channel, Cursor::new(Vec::<u8>::new()));
+        insert_active_source(
+            &connection.channel,
+            &mut connection.active_sources,
+            request.clone(),
+            &initial,
+        );
+
+        for sequence in 1..=4 {
+            let observation = HelperObservation {
+                protocol_version: HELPER_PROTOCOL_VERSION,
+                channel_nonce: NONCE.to_owned(),
+                helper_source_instance_id: request.helper_source_instance_id.clone(),
+                source_kind: HelperSourceKind::ProcessApplication,
+                sequence,
+                monotonic_time_ns: sequence + 1,
+                process_event: Some(ProcessApplicationEvent {
+                    kind: ProcessApplicationEventKind::Reconciled,
+                    process_instance_id: None,
+                    process: None,
+                    state: initial.process_state.clone(),
+                }),
+                interactive_session_event: None,
+            };
+            let event = route_server_event(
+                DecodedHelperServerPayload::Observation(Box::new(observation)),
+                &mut connection.active_sources,
+            )
+            .expect("observation is ordered");
+            connection.queue_event(event).expect("observation fits");
+        }
+
+        let failure = HelperSourceFailure {
+            protocol_version: HELPER_PROTOCOL_VERSION,
+            channel_nonce: NONCE.to_owned(),
+            helper_source_instance_id: request.helper_source_instance_id,
+            source_kind: HelperSourceKind::ProcessApplication,
+            failure_code: HelperFailureCode::QueueOverflow,
+            last_sequence: 4,
+            lost_event_count: Some(1),
+            monotonic_time_ns: 6,
+        };
+        let event = route_server_event(
+            DecodedHelperServerPayload::Failure(failure.clone()),
+            &mut connection.active_sources,
+        )
+        .expect("failure is ordered");
+        connection
+            .queue_event(event)
+            .expect("terminal control event has reserved capacity");
+
+        assert_eq!(connection.pending_events.len(), 5);
+        assert!(matches!(
+            connection.pending_events.back(),
+            Some(NativeHelperSourceEvent::Failure(value)) if value == &failure
+        ));
+    }
+
+    #[test]
     fn close_returns_the_ordered_tail_before_its_terminal_snapshot() {
         const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
         let (channel, request, initial) = process_channel(NONCE);
@@ -1333,6 +1630,60 @@ mod tests {
         );
         assert_eq!(result.final_snapshot, final_snapshot);
         assert!(connection.pending_events.is_empty());
+    }
+
+    #[test]
+    fn close_protocol_failure_can_follow_an_operational_source_failure() {
+        const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let (channel, request, initial) = process_channel(NONCE);
+        let backend_failure = HelperSourceFailure {
+            protocol_version: HELPER_PROTOCOL_VERSION,
+            channel_nonce: NONCE.to_owned(),
+            helper_source_instance_id: request.helper_source_instance_id.clone(),
+            source_kind: request.source_kind,
+            failure_code: HelperFailureCode::Backend,
+            last_sequence: 0,
+            lost_event_count: None,
+            monotonic_time_ns: 2,
+        };
+        let close_failure = HelperSourceFailure {
+            failure_code: HelperFailureCode::Protocol,
+            monotonic_time_ns: 3,
+            ..backend_failure.clone()
+        };
+        let mut frames = Vec::new();
+        for failure in [&backend_failure, &close_failure] {
+            write_json_frame(
+                &mut frames,
+                &HelperServerMessage {
+                    kind: HelperServerMessageKind::Failure,
+                    snapshot: None,
+                    observation: None,
+                    failure: Some(failure.clone()),
+                },
+            )
+            .expect("failure frame");
+        }
+        let mut connection = test_connection(channel, Cursor::new(frames));
+        insert_active_source(
+            &connection.channel,
+            &mut connection.active_sources,
+            request.clone(),
+            &initial,
+        );
+        assert!(matches!(
+            connection.receive_event(),
+            Ok(NativeHelperSourceEvent::Failure(value)) if value == backend_failure
+        ));
+        assert!(matches!(
+            connection.close_source(&HelperSourceClose {
+                protocol_version: HELPER_PROTOCOL_VERSION,
+                channel_nonce: NONCE.to_owned(),
+                helper_source_instance_id: request.helper_source_instance_id,
+            }),
+            Err(HelperTransportError::SourceFailure(value)) if value == close_failure
+        ));
+        assert!(connection.fenced);
     }
 
     #[test]
@@ -1421,7 +1772,6 @@ mod tests {
             ActiveHelperSource {
                 kind: request.source_kind,
                 fence,
-                queue_capacity: usize::from(request.queue_capacity),
             },
         );
     }
@@ -1436,7 +1786,10 @@ mod tests {
                 source_kind: HelperSourceKind::ProcessApplication,
                 schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
                 queue_capacity: 8,
-                event_classes: vec![HelperEventClass::ProcessLifecycle],
+                event_classes: vec![
+                    HelperEventClass::ProcessLifecycle,
+                    HelperEventClass::ProcessIdentity,
+                ],
             },
             HelperSourceSnapshot {
                 protocol_version: HELPER_PROTOCOL_VERSION,

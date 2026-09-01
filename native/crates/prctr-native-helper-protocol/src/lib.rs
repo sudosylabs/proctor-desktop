@@ -153,6 +153,19 @@ impl VerifiedHelperChannel {
         }
         HelperSourceFence::new(request, &self.channel_nonce)
     }
+
+    /// Validates a close request against this verified channel before a caller
+    /// clones or serializes any request-owned string.
+    ///
+    /// # Errors
+    ///
+    /// Returns a bounded protocol category for a stale channel or invalid source identity.
+    pub fn validate_source_close(
+        &self,
+        request: &HelperSourceClose,
+    ) -> Result<(), HelperProtocolError> {
+        validate_helper_source_close(request, &self.channel_nonce)
+    }
 }
 
 /// Validates policy-blind operational source configuration.
@@ -352,6 +365,34 @@ impl HelperSourceFence {
         Ok(())
     }
 
+    /// Accepts a terminal source failure produced while the authoritative
+    /// sequence-zero inventory is still being constructed.
+    ///
+    /// # Errors
+    ///
+    /// Returns an ordering, lifecycle, time, identity, or payload error.
+    pub fn accept_initial_failure(
+        &mut self,
+        failure: &HelperSourceFailure,
+    ) -> Result<(), HelperProtocolError> {
+        if self.phase != HelperSourcePhase::AwaitingInitialSnapshot {
+            return Err(HelperProtocolError::Lifecycle);
+        }
+        validate_helper_source_failure(
+            failure,
+            &self.channel_nonce,
+            &self.source_instance_id,
+            self.source_kind,
+        )?;
+        if failure.last_sequence != 0 {
+            return Err(HelperProtocolError::Sequence);
+        }
+        self.ensure_monotonic(failure.monotonic_time_ns)?;
+        self.last_monotonic_time_ns = failure.monotonic_time_ns;
+        self.phase = HelperSourcePhase::Failed;
+        Ok(())
+    }
+
     /// Accepts exactly the next source observation.
     ///
     /// # Errors
@@ -370,7 +411,11 @@ impl HelperSourceFence {
             &self.source_instance_id,
             self.source_kind,
         )?;
-        if observation.sequence != self.last_sequence.saturating_add(1) {
+        let expected_sequence = self
+            .last_sequence
+            .checked_add(1)
+            .ok_or(HelperProtocolError::Sequence)?;
+        if observation.sequence != expected_sequence {
             return Err(HelperProtocolError::Sequence);
         }
         self.advance(observation.sequence, observation.monotonic_time_ns)
@@ -394,6 +439,44 @@ impl HelperSourceFence {
             &self.source_instance_id,
             self.source_kind,
         )?;
+        if failure.last_sequence != self.last_sequence {
+            return Err(HelperProtocolError::Sequence);
+        }
+        self.ensure_monotonic(failure.monotonic_time_ns)?;
+        self.last_monotonic_time_ns = failure.monotonic_time_ns;
+        self.phase = HelperSourcePhase::Failed;
+        Ok(())
+    }
+
+    /// Accepts a cleanup or source-protocol failure returned while an explicit
+    /// close is fencing native callback intake. A close failure may follow an
+    /// earlier operational failure, but it never advances the source sequence.
+    ///
+    /// # Errors
+    ///
+    /// Returns an ordering, lifecycle, time, identity, or payload error.
+    pub fn accept_close_failure(
+        &mut self,
+        failure: &HelperSourceFailure,
+    ) -> Result<(), HelperProtocolError> {
+        if !matches!(
+            self.phase,
+            HelperSourcePhase::Active | HelperSourcePhase::Failed
+        ) {
+            return Err(HelperProtocolError::Lifecycle);
+        }
+        validate_helper_source_failure(
+            failure,
+            &self.channel_nonce,
+            &self.source_instance_id,
+            self.source_kind,
+        )?;
+        if !matches!(
+            failure.failure_code,
+            HelperFailureCode::Cleanup | HelperFailureCode::Protocol
+        ) {
+            return Err(HelperProtocolError::Lifecycle);
+        }
         if failure.last_sequence != self.last_sequence {
             return Err(HelperProtocolError::Sequence);
         }
@@ -495,7 +578,7 @@ mod tests {
     use prctr_native_protocol::{
         InteractiveConsoleOwnership, InteractiveLockState, InteractiveRemoteAttachment,
         InteractiveSessionCertainty, InteractiveSessionCoverage, InteractiveSessionEvent,
-        InteractiveSessionEventKind, InteractiveSessionState,
+        InteractiveSessionEventKind, InteractiveSessionState, PROCESS_APPLICATION_SCHEMA_VERSION,
     };
 
     const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
@@ -550,12 +633,35 @@ mod tests {
             validate_helper_source_open(
                 &HelperSourceOpen {
                     event_classes: vec![HelperEventClass::ProcessIdentity],
-                    ..request
+                    ..request.clone()
                 },
                 NONCE,
             ),
             Err(HelperProtocolError::SourceConfiguration)
         );
+
+        let mut process_request = HelperSourceOpen {
+            source_kind: HelperSourceKind::ProcessApplication,
+            schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
+            event_classes: vec![
+                HelperEventClass::ProcessLifecycle,
+                HelperEventClass::ProcessIdentity,
+            ],
+            ..request
+        };
+        assert_eq!(validate_helper_source_open(&process_request, NONCE), Ok(()));
+        process_request.event_classes.reverse();
+        assert_eq!(validate_helper_source_open(&process_request, NONCE), Ok(()));
+        for singleton in [
+            HelperEventClass::ProcessLifecycle,
+            HelperEventClass::ProcessIdentity,
+        ] {
+            process_request.event_classes = vec![singleton];
+            assert_eq!(
+                validate_helper_source_open(&process_request, NONCE),
+                Err(HelperProtocolError::SourceConfiguration)
+            );
+        }
     }
 
     #[test]
@@ -582,6 +688,36 @@ mod tests {
             }
             .validate_protocol()
             .is_err()
+        );
+    }
+
+    #[test]
+    fn verified_channel_rejects_an_oversized_close_nonce_before_transport() {
+        let peer = VerifiedHelperPeer {
+            helper_kind: HelperKind::MacosEndpointSecurityHelper,
+            helper_build_id: "helper-build-0001".to_owned(),
+            capabilities: vec![HelperSourceKind::ProcessApplication],
+        };
+        let channel = bind_verified_helper_channel(
+            &HelperHandshake {
+                protocol_version: HELPER_PROTOCOL_VERSION,
+                channel_nonce: NONCE.to_owned(),
+                helper_kind: peer.helper_kind,
+                helper_build_id: peer.helper_build_id.clone(),
+                capabilities: peer.capabilities.clone(),
+            },
+            &peer,
+            NONCE,
+        )
+        .expect("verified channel");
+        let request = HelperSourceClose {
+            protocol_version: HELPER_PROTOCOL_VERSION,
+            channel_nonce: "a".repeat(MAX_HELPER_FRAME_BYTES + 1),
+            helper_source_instance_id: "helper-source-0001".to_owned(),
+        };
+        assert_eq!(
+            channel.validate_source_close(&request),
+            Err(HelperProtocolError::ChannelNonce)
         );
     }
 
@@ -718,6 +854,118 @@ mod tests {
                 HelperSourceKind::InteractiveSession,
             ),
             Ok(())
+        );
+    }
+
+    #[test]
+    fn close_failure_accepts_only_fatal_cleanup_outcomes_at_the_current_fence() {
+        let request = interactive_source_open();
+        let channel = interactive_channel();
+        let mut active = channel
+            .open_source(&request)
+            .expect("active source fence opens");
+        active
+            .accept_initial_snapshot(&interactive_snapshot(0, 1))
+            .expect("initial snapshot accepted");
+        let cleanup = HelperSourceFailure {
+            protocol_version: HELPER_PROTOCOL_VERSION,
+            channel_nonce: NONCE.to_owned(),
+            helper_source_instance_id: request.helper_source_instance_id.clone(),
+            source_kind: HelperSourceKind::InteractiveSession,
+            failure_code: HelperFailureCode::Cleanup,
+            last_sequence: 0,
+            lost_event_count: None,
+            monotonic_time_ns: 2,
+        };
+        active
+            .accept_close_failure(&cleanup)
+            .expect("active cleanup failure accepted");
+
+        let mut failed = channel
+            .open_source(&request)
+            .expect("failed source fence opens");
+        failed
+            .accept_initial_snapshot(&interactive_snapshot(0, 1))
+            .expect("initial snapshot accepted");
+        failed
+            .accept_failure(&HelperSourceFailure {
+                failure_code: HelperFailureCode::Backend,
+                ..cleanup.clone()
+            })
+            .expect("operational failure accepted");
+        failed
+            .accept_close_failure(&HelperSourceFailure {
+                failure_code: HelperFailureCode::Protocol,
+                monotonic_time_ns: 3,
+                ..cleanup.clone()
+            })
+            .expect("protocol failure can follow an operational failure");
+
+        let mut rejected = channel
+            .open_source(&request)
+            .expect("rejection source fence opens");
+        rejected
+            .accept_initial_snapshot(&interactive_snapshot(0, 2))
+            .expect("initial snapshot accepted");
+        assert_eq!(
+            rejected.accept_close_failure(&HelperSourceFailure {
+                failure_code: HelperFailureCode::Backend,
+                ..cleanup.clone()
+            }),
+            Err(HelperProtocolError::Lifecycle)
+        );
+        assert_eq!(
+            rejected.accept_close_failure(&HelperSourceFailure {
+                last_sequence: 1,
+                ..cleanup.clone()
+            }),
+            Err(HelperProtocolError::Sequence)
+        );
+        assert_eq!(
+            rejected.accept_close_failure(&HelperSourceFailure {
+                monotonic_time_ns: 1,
+                ..cleanup
+            }),
+            Err(HelperProtocolError::MonotonicTime)
+        );
+    }
+
+    #[test]
+    fn source_fence_rejects_sequence_exhaustion_without_wrapping() {
+        let request = interactive_source_open();
+        let channel = interactive_channel();
+        let mut fence = channel.open_source(&request).expect("source fence opens");
+        fence
+            .accept_initial_snapshot(&interactive_snapshot(0, 1))
+            .expect("initial snapshot accepted");
+        fence.last_sequence = u64::MAX;
+        assert_eq!(
+            fence.accept_observation(&interactive_observation(1, 2)),
+            Err(HelperProtocolError::Sequence)
+        );
+    }
+
+    #[test]
+    fn source_fence_preserves_a_terminal_failure_before_snapshot_zero() {
+        let request = interactive_source_open();
+        let channel = interactive_channel();
+        let mut fence = channel.open_source(&request).expect("source fence opens");
+        let failure = HelperSourceFailure {
+            protocol_version: HELPER_PROTOCOL_VERSION,
+            channel_nonce: NONCE.to_owned(),
+            helper_source_instance_id: request.helper_source_instance_id,
+            source_kind: HelperSourceKind::InteractiveSession,
+            failure_code: HelperFailureCode::InventoryOverflow,
+            last_sequence: 0,
+            lost_event_count: None,
+            monotonic_time_ns: 1,
+        };
+        fence
+            .accept_initial_failure(&failure)
+            .expect("initial inventory failure accepted");
+        assert_eq!(
+            fence.accept_initial_snapshot(&interactive_snapshot(0, 2)),
+            Err(HelperProtocolError::Lifecycle)
         );
     }
 
