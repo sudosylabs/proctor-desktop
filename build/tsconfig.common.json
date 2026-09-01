@@ -4,6 +4,9 @@
     "types": []
   },
   "include": [
-    "../src/prctr/**/common/**/*.ts"
+    "../src/prctr/platform/**/common/**/*.ts",
+    "../src/prctr/editor/**/common/**/*.ts",
+    "../src/prctr/workbench/**/common/**/*.ts",
+    "../src/prctr/code/**/common/**/*.ts"
   ]
 }

@@ -77,8 +77,12 @@ change.
 28. `upstream.evidence-not-authority` VS Code is evidence, not authority over Proctor product behavior or module
     boundaries.
 29. `upstream.boundary-grill` A VS Code behavior cluster is admitted only after its Proctor workflow,
-    interface, assumptions, dependency closure, and competing treatments have
-    been grilled.
+    interface, assumptions, dependency closure, competing treatments, and
+    behavioral-fidelity obligations have been grilled. Product scope narrows
+    through explicit exclusions; admitted behavior retains relevant upstream
+    correctness, lifecycle, failure, performance, accessibility, and test
+    obligations unless a stronger Proctor constraint owns a verified
+    divergence.
 30. `upstream.exact-provenance` Every admitted cluster records exact revisions, source blobs, dispositions,
     licenses, divergence, and verification in one canonical registry manifest.
 31. `upstream.license-preservation` Applicable upstream notices and copyright headers are preserved.

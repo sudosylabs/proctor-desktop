@@ -50,6 +50,18 @@ The active cheap controls cover:
 - deterministic generator ownership and byte parity;
 - offline VS Code port schema, digest, marker, license, and unique-owner parity.
 
+The graph checker preserves an intentional cycle only when every participating
+source file carries the same cluster marker and that cluster has a tracked ports
+manifest. This treats the admitted cluster as one deep module without allowing
+an unowned, cross-cluster, or cross-layer cycle; provenance validation remains
+the authority for membership and exact source ownership.
+
+The text-hygiene check permits absolute-path and `file:` URI literals only in
+marked base-common port source and its transferred owner tests, where those
+literals are behavioral fixtures covered by an exact manifest digest. Unmarked
+files and all other repository areas retain the portable-path prohibition;
+runtime dependencies on another checkout remain forbidden.
+
 Static checks never claim keyboard behavior, visual meaning, authoritative
 server behavior, Electron isolation, packaged security, native capability, or
 physical-device conformance. The assurance catalog keeps those obligations

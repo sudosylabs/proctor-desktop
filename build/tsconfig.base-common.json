@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "erasableSyntaxOnly": false,
+    "exactOptionalPropertyTypes": false,
+    "experimentalDecorators": true,
+    "isolatedModules": false,
+    "lib": ["DOM", "DOM.Iterable", "ES2024", "ESNext.Disposable", "WebWorker.ImportScripts"],
+    "moduleDetection": "legacy",
+    "noUncheckedIndexedAccess": false,
+    "noUnusedParameters": false,
+    "skipLibCheck": true,
+    "types": [],
+    "useDefineForClassFields": false,
+    "useUnknownInCatchVariables": false,
+    "verbatimModuleSyntax": false
+  },
+  "include": [
+    "../src/prctr/base/common/**/*.ts"
+  ],
+  "exclude": [
+    "../src/prctr/base/common/localization.ts",
+    "../src/prctr/base/common/localizationCatalog.generated.ts"
+  ]
+}

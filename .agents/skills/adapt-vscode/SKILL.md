@@ -25,7 +25,9 @@ owner are known.
 Challenge the Proctor workflow and caller, upstream interface and assumptions,
 product conflicts, process and trust placement, lifecycle and persistence,
 failure and performance, accessibility, dependency closure, registrations, and
-all available treatments.
+all available treatments. Separate product breadth from behavioral fidelity:
+narrow scope only through explicit exclusions, and preserve the source policy's
+quality obligations for every admitted behavior.
 
 Format every VS Code-informed decision as:
 
@@ -63,9 +65,12 @@ machinery internal unless callers need them. Select concrete adapters in
 process composition roots.
 
 Choose copied, adapted, behavioral reimplementation, or exclusion for each
-exact item. Treat any non-mechanical local edit as adaptation. This step is
-complete when callers and tests can use the same Proctor-owned interface and
-every imported dependency respects local layer and runtime direction.
+exact item. Treat any non-mechanical local edit as adaptation. A smaller
+interface or simpler implementation must preserve the admitted observable
+behavior and evidence; otherwise classify the missing behavior as an explicit
+exclusion or a verified Proctor divergence. This step is complete when callers
+and tests can use the same Proctor-owned interface and every imported dependency
+respects local layer and runtime direction.
 
 ## 5. Create the provenance record
 
@@ -107,9 +112,11 @@ independent of the checkout.
 ## 8. Verify and review
 
 Test observable behavior through the Proctor interface. Compare upstream tests
-for missing cases while expressing Proctor requirements. Verify layer and
-environment direction, process isolation, contribution composition,
-accessibility, divergence, and provenance completeness.
+for missing cases while expressing Proctor requirements. Preserve applicable
+upstream performance and accessibility evidence, and tie every omitted case to
+an explicit exclusion or verified divergence. Verify layer and environment
+direction, process isolation, contribution composition, accessibility,
+divergence, and provenance completeness.
 
 For an update, rerun the complete cluster intake at the new commit. Reopen the
 product boundary only when its interface, assumptions, or Proctor use changed.

@@ -119,9 +119,12 @@ subsystem first requires a boundary grill under `.scratch/`; an admitted cluster
 then receives one exact manifest in
 [`docs/upstream/vscode-ports/`](docs/upstream/vscode-ports/README.md).
 
-No VS Code source cluster has been admitted. Preserve meaningful architectural
-and runtime topology under `src/prctr/`, but keep Proctor interfaces, seams, and
-aggregate manifests authoritative.
+Admitted VS Code source clusters are listed only in
+[`docs/upstream/vscode-ports/`](docs/upstream/vscode-ports/README.md). Preserve
+meaningful architectural and runtime topology under `src/prctr/`, but keep
+Proctor interfaces, seams, and aggregate manifests authoritative. Narrow
+product scope through explicit exclusions; do not replace admitted behavior
+with a lower-fidelity substitute.
 
 Preserve applicable licenses and copyright notices. Never depend at runtime on
 another local checkout or put absolute checkout paths in tracked files.

@@ -47,9 +47,19 @@
 
 ## Desktop implementation state
 
-No user-facing application, Electron renderer or preload, workbench window,
-browser, terminal, or VS Code source cluster has landed. Production Electron-
-main and utility-process source exists only for the native security baseline.
+No user-facing application, production Electron renderer or preload, workbench
+window, browser, terminal, or VS Code UI/editor source cluster has landed. Two
+foundation clusters are admitted at exact VS Code revision
+`c89cda63706360aa2fe45a0e5669c76fb20f29f8`: localization provides the Proctor
+named-message interface, deterministic English catalog generation, and a
+private positional compatibility seam; base-common preserves the complete
+reviewed lifecycle, event, cancellation, async, resource, URI, and observable
+closure instead of reduced local substitutes. Its direct owner suites are
+ported to the pinned Node runner, including virtual-time, leak, ordering,
+failure, and observable-debug behavior, with experimental APIs outside the
+approved closure explicitly excluded. Production
+Electron-main and utility-process source exists only for the native security
+baseline.
 The native Rust workspace implements an eleven-source generated manifest:
 display topology, CandidateWindow, capture/session, process/application,
 interactive session, clipboard, print spooler, removable storage,
@@ -153,10 +163,16 @@ target conformance.
 The executable repository foundation contains package metadata and locks,
 pinned Electron and esbuild dependencies, runtime-specific TypeScript checks,
 typed policy/checker modules, generators, focused Node/Rust tests, an Electron
-security-utility harness, a Linux foundation job, a Rust dependency-audit job,
-and macOS/Windows jobs that run both native-source and real Electron utility
-tests. The complete application graph, Forge packaging, renderer/browser
-harnesses, static window manifests, User Settings registry, Workspace client,
+security-utility harness, a sandboxed real-Electron Chromium renderer harness,
+a Linux foundation job, a Rust dependency-audit job, and macOS/Windows jobs that
+run native-source, real Electron utility, and renderer tests. Browser source now
+has an independent DOM typecheck; the harness exercises the production
+localization interface with deterministic locale and direction plus
+DisposableStore/Emitter interaction and absence of ambient Node.js without
+claiming a production window. Dedicated compiler projects and an esbuild test
+build preserve the admitted base-common TypeScript/runtime semantics. The complete application
+graph, Forge packaging, Control Explorer,
+static window manifests, User Settings registry, Workspace client,
 protected stores, integrated browser, terminal client, enforcement-grade
 process/session helpers and remaining full-coverage adapter variants,
 coordinator and

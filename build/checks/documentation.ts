@@ -87,7 +87,10 @@ export const hygieneCheck: Check = {
       lines.forEach((line, index) => { if (/[ \t]+$/.test(line)) diagnostics.push(diagnostic('repository.hygiene', path, 'Line has trailing whitespace.', 'Remove trailing spaces or tabs.', index + 1)); });
       if (extension === '.json') try { JSON.parse(text); } catch (error) { diagnostics.push(diagnostic('repository.hygiene', path, String(error), 'Fix the JSON syntax.')); }
       if (extension === '.yaml' || extension === '.yml') try { parseYaml(text); } catch (error) { diagnostics.push(diagnostic('repository.hygiene', path, String(error), 'Fix the YAML syntax.')); }
-      if (/\/Users\/[^/]+\//.test(text) || /file:\/\//.test(text)) diagnostics.push(diagnostic('repository.hygiene', path, 'Tracked text contains a machine-specific absolute path.', 'Use repository-relative paths or portable placeholders.'));
+      const admittedUpstreamFixture = (
+        path.startsWith('src/prctr/base/common/') || path.startsWith('test/base/common/upstream/')
+      ) && /@proctor-vscode-port\s+[a-z0-9]+(?:-[a-z0-9]+)*/.test(text);
+      if (!admittedUpstreamFixture && (/\/Users\/[^/]+\//.test(text) || /file:\/\//.test(text))) diagnostics.push(diagnostic('repository.hygiene', path, 'Tracked text contains a machine-specific absolute path.', 'Use repository-relative paths or portable placeholders.'));
     }
     return diagnostics;
   }

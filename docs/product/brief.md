@@ -9,7 +9,9 @@ parallel model.
 
 The desktop experience is expected to reuse and adapt appropriate architecture
 and implementation patterns from Visual Studio Code. Reuse serves Proctor's
-workflows; matching VS Code is not itself a product goal.
+workflows; matching VS Code's product breadth is not itself a product goal.
+Admitted behavior follows the fidelity rule in the
+[VS Code source policy](../upstream/vscode.md).
 
 Proctor Desktop is a workbench for programming examinations, not a
 general-purpose code editor with proctoring attached. Every candidate Exam

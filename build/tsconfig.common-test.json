@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": [
+    "../src/prctr/base/common/localization.ts",
+    "../src/prctr/base/common/localizationCatalog.generated.ts",
+    "../src/prctr/base/common/vscodeNls.ts",
+    "../test/base/common/localization.test.ts"
+  ]
+}

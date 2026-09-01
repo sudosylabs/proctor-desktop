@@ -25,6 +25,15 @@ meaning. Proctor owns product names, interfaces, seams, aggregate manifests, and
 composition. Never copy an upstream aggregate entrypoint to select Proctor's
 services or contributions.
 
+Proctor narrows product scope through explicit exclusions, not lower-fidelity
+substitutes. Once a behavior is admitted, preserve the relevant upstream
+correctness, lifecycle, cancellation, disposal, failure, performance,
+accessibility, and test obligations. A smaller Proctor interface or simpler
+implementation is acceptable only when it preserves the admitted observable
+behavior and evidence. A Proctor product or security constraint may require a
+stronger or intentionally different result; record that divergence and its
+verification in the cluster manifest.
+
 ## Admission gate
 
 Admit a behavior cluster only for a concrete Proctor workflow and caller after
@@ -47,7 +56,10 @@ The dependency walk stops only at an accepted Proctor interface, a previously
 admitted compatible module, a standard platform interface, or a reviewed
 external dependency. Directory edges and file proximity are not stopping
 rules. Upstream tests are behavioral evidence; transfer them only when Proctor
-intentionally preserves the exact lower-level behavior.
+intentionally preserves the exact lower-level behavior. Excluding an upstream
+test case requires an explicit behavior exclusion or verified Proctor
+divergence; current product breadth alone is not a reason to weaken an admitted
+behavior.
 
 ## Treatment and maintenance
 

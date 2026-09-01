@@ -120,7 +120,31 @@
       "status": "active",
       "owner": "toolchain",
       "invariants": ["renderer.no-ambient-node", "runtime.handle-isolation", "toolchain.single-esm-graph"],
-      "evidence": ["build/tsconfig.base.json", "build/tsconfig.common.json", "build/tsconfig.electron-main.json", "build/tsconfig.electron-utility.json", "package.json", "src/prctr/platform/native/common/nativeObservation.generated.ts"]
+      "evidence": ["build/tsconfig.base.json", "build/tsconfig.common.json", "build/tsconfig.base-common.json", "build/tsconfig.base-common-test.json", "build/tsconfig.common-test.json", "build/tsconfig.browser.json", "build/tsconfig.electron-main.json", "build/tsconfig.electron-utility.json", "build/tsconfig.electron-test.json", "package.json", "src/prctr/platform/native/common/nativeObservation.generated.ts"]
+    },
+    {
+      "id": "browser-renderer-harness",
+      "kind": "test",
+      "status": "active",
+      "owner": "toolchain",
+      "invariants": ["renderer.plain-dom", "renderer.no-ambient-node", "renderer.sandboxed", "runtime.handle-isolation", "source.interface-tests"],
+      "evidence": ["build/buildBrowserHarness.ts", "test/browser/rendererHarness.html", "test/browser/rendererHarness.ts", "test/electron/browserHarnessMain.ts", "test/electron/browserHarness.real.test.ts", ".github/workflows/foundation.yml", "package.json"]
+    },
+    {
+      "id": "localization-runtime",
+      "kind": "test",
+      "status": "active",
+      "owner": "toolchain",
+      "invariants": ["source.interface-tests", "design.static-registration", "design.accessibility", "upstream.exact-provenance", "toolchain.single-esm-graph"],
+      "evidence": ["src/prctr/base/common/localization.ts", "src/prctr/base/common/vscodeNls.ts", "src/prctr/base/common/localizationCatalog.generated.ts", "resources/localization/en.json", "build/generators/localizationCatalog.ts", "docs/upstream/vscode-ports/localization-runtime.json", "test/base/common/localization.test.ts", "test/checks/localizationCatalog.test.ts", "test/electron/browserHarness.real.test.ts", "package.json"]
+    },
+    {
+      "id": "base-common-runtime",
+      "kind": "test",
+      "status": "active",
+      "owner": "upstream-intake",
+      "invariants": ["source.deep-modules", "source.interface-tests", "upstream.exact-provenance", "upstream.single-revision-closure", "toolchain.single-esm-graph"],
+      "evidence": ["src/prctr/base/common/lifecycle.ts", "src/prctr/base/common/event.ts", "src/prctr/base/common/cancellation.ts", "src/prctr/base/common/async.ts", "src/prctr/base/common/observable.ts", "docs/upstream/vscode-ports/base-common-runtime.json", "build/tsconfig.base-common.json", "build/tsconfig.base-common-test.json", "build/buildBaseCommonTests.ts", "test/base/common/upstream/event.test.ts", "test/base/common/upstream/observables/observable.test.ts", "test/electron/browserHarness.real.test.ts", "package.json"]
     },
     {
       "id": "workspace-contract-tests",

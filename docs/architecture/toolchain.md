@@ -94,6 +94,24 @@ Attempt's frozen Attempt Configuration plus current accessibility constraints.
 Fallback, expansion, RTL, and privileged-process messages receive explicit
 tests.
 
+The implemented `localization-runtime` cluster exposes immutable Proctor
+contexts with stable dotted identifiers and named placeholders. The registered
+catalog generator statically extracts literal declarations and owns the
+committed English runtime and translator views. A private positional adapter
+preserves admitted VS Code module behavior without making VS Code NLS the
+product interface; extension language packs and runtime catalog fetching remain
+excluded.
+
+The implemented `base-common-runtime` cluster retains the full reviewed static
+closure rooted at lifecycle, events, cancellation, async scheduling, and
+observables. Explicit modules remain the interface; there is no aggregate
+barrel. Dedicated compiler projects retain the upstream class-field, namespace,
+decorator, DOM, and unchecked-index semantics, while the pinned esbuild test
+build executes the transferred owner suites under Node 24. Proctor substitutes
+only the admitted localization and resource-root seams, and records
+experimental APIs outside the closure as exclusions rather than replacing
+admitted behavior with smaller implementations.
+
 ## Native and private protocol artifacts
 
 Language-neutral JSON Schema files are authoritative for native observation and
@@ -260,18 +278,24 @@ The foundation currently exposes `check`, focused repository checks,
 `test:native` entrypoint. `build:security-utility` compiles the native Node-API
 addon and exact Electron-main/utility test bundles. `test:security-utility`
 proves the process-neutral private protocol, while `test:electron` runs the
-real Electron/Node-API lifecycle. These are development-runtime commands, not
-package or release gates. Native tests accept an exact workspace-package focus
-and a built-in Rust target selector; command help and configuration own their
-exact flags and implemented behavior.
+real Electron/Node-API lifecycle. `build:browser-harness` bundles a sandboxed
+plain-DOM fixture against Electron's exact Chromium major, and `test:browser`
+verifies DOM execution, locale/direction control, and absence of ambient Node.js
+through that real renderer. `test:base` compiles and executes the localization
+tests and transferred base-common owner suites, including deterministic virtual
+time, disposal/leak tracking, cancellation, event ordering, async scheduling,
+resources, URI behavior, and observables. These are development-runtime commands,
+not package or release gates. Native tests accept an exact workspace-package focus and a
+built-in Rust target selector; command help and configuration own their exact
+flags and implemented behavior.
 
 As their first real consumers land, the root package will extend that small
 cross-platform vocabulary with:
 
 - `dev` and `build`;
 - additional focused runtime checks where an independent boundary needs one;
-- `test:browser` and `test:package`, each accepting the relevant focused
-  selector;
+- `test:package` and focused browser-fixture selectors when multiple fixture
+  families justify them;
 - `package` for one declared target;
 - `check:release` for the exhaustive packaged target gate.
 
@@ -290,5 +314,5 @@ Institution compatibility endpoints carry policy metadata only. These facts may
 specialize this architecture but cannot weaken its package, admission, update,
 privacy, or evidence boundaries.
 
-VS Code supplied build and verification evidence for these decisions. No VS
-Code source cluster is admitted by this architecture.
+VS Code supplied build and verification evidence for these decisions. Exact
+admitted source relationships live only in the VS Code ports registry.

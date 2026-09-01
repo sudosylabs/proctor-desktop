@@ -6,7 +6,6 @@
     "types": ["node"]
   },
   "include": [
-    "../src/prctr/**/common/**/*.ts",
     "../src/prctr/**/node/**/*.ts",
     "../src/prctr/**/electron-utility/**/*.ts"
   ]

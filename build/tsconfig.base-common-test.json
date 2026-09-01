@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base-common.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "types": []
+  },
+  "include": [
+    "../src/prctr/base/common/**/*.ts",
+    "../test/base/common/upstream/**/*.ts"
+  ]
+}

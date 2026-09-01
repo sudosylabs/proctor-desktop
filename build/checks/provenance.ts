@@ -23,7 +23,10 @@ export const provenanceCheck: Check = {
     try { validate = new Ajv2020({ allErrors: true, strict: false }).compile(JSON.parse(repository.read(schemaPath)) as object); }
     catch (error) { return [diagnostic(checkId, schemaPath, String(error), 'Fix the canonical provenance schema.')]; }
     const localOwners = new Map<string, string>(); const clusters = new Set<string>(); const marked = new Map<string, string>();
-    for (const path of repository.files().filter(candidate => candidate.startsWith('src/prctr/') && /\.(?:ts|css)$/.test(candidate))) {
+    for (const path of repository.files().filter(candidate =>
+      (candidate.startsWith('src/prctr/') || candidate.startsWith('test/base/common/upstream/'))
+      && /\.(?:ts|css)$/.test(candidate)
+    )) {
       const matches = [...repository.read(path).matchAll(/@proctor-vscode-port\s+([a-z0-9]+(?:-[a-z0-9]+)*)/g)];
       if (matches.length > 1) diagnostics.push(diagnostic(checkId, path, 'File has multiple VS Code port markers.', 'Keep exactly one canonical cluster marker.'));
       if (matches[0]?.[1] !== undefined) marked.set(path, matches[0][1]);

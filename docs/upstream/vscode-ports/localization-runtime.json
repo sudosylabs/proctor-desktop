@@ -1,0 +1,197 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "localization-runtime",
+  "admission": {
+    "workflow": "Provide deterministic packaged localization for Proctor surfaces and a private compatibility seam for admitted VS Code modules without runtime language-pack fetching.",
+    "callers": [
+      "src/prctr/base/common/vscodeNls.ts",
+      "test/browser/rendererHarness.ts"
+    ],
+    "interface": "src/prctr/base/common/localization.ts",
+    "decision": "docs/architecture/toolchain.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "The canonical Microsoft MIT text is preserved as the local notice for the cluster.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/nls.ts",
+      "upstreamBlob": "8383ae24d96d4d9361921b89bdf48519d13d4260",
+      "category": "localization",
+      "disposition": "adapted",
+      "rationale": "Preserve positional formatting, build-index lookup, localized/original pairs, multi-digit placeholders, fallback, and pseudo expansion behind a private Proctor compatibility module while removing extension language-pack DTOs and mutable VS Code bootstrap globals.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/vscodeNls.ts",
+      "localSha256": "e2935794d7520d02244fc8d5c3c64b12ef64f42b2961baea5859f218c34451d4",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/base/test/common/nls.test.ts",
+      "upstreamBlob": "aa73a6151d58b1a3932ab5705e9026ade9fb1359",
+      "category": "test",
+      "disposition": "evidence-only",
+      "rationale": "Its positional, multi-digit, unreplaceable-value, and localized/original cases are preserved through Proctor interface tests using Node's built-in runner.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "build/lib/nls-analysis.ts",
+      "upstreamBlob": "2b00da68c7a232f8ab88654228507e97fd5fa398",
+      "category": "generated-input",
+      "disposition": "evidence-only",
+      "rationale": "Its TypeScript-AST discovery and static-call requirements inform the Proctor extractor, but Proctor owns a named-message declaration syntax and has no textual synchronization promise.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "build/next/nls-plugin.ts",
+      "upstreamBlob": "e2b19f7d7f13de75f2189fb192aa8a8953fda4fd",
+      "category": "generated-output",
+      "disposition": "behaviorally-reimplemented",
+      "rationale": "Proctor deterministically discovers static declarations, sorts stable identifiers, validates placeholders, and emits English runtime and translator catalogs through its existing generator registry.",
+      "licenseRefs": [],
+      "localPath": "build/generators/localizationCatalog.ts"
+    },
+    {
+      "upstreamPath": "src/typings/vscode-globals-nls.d.ts",
+      "upstreamBlob": "2b5d48e110c8c9766c6b9dd2fb23053012931eec",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "A one-time private compatibility configuration replaces ambient VS Code localization globals.",
+      "licenseRefs": [],
+      "localInterface": "src/prctr/base/common/vscodeNls.ts"
+    },
+    {
+      "upstreamPath": "src/bootstrap-esm.ts",
+      "upstreamBlob": "3d529345763721b240b7c8c65e52cb141c9dedaf",
+      "category": "configuration",
+      "disposition": "excluded",
+      "rationale": "VS Code bootstrap, product globals, developer lookup, and language-pack loading do not select Proctor composition or localization.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/node/nls.ts",
+      "upstreamBlob": "0bb75a11b81b4fafe0121ef490d814f84efb82fb",
+      "category": "localization",
+      "disposition": "excluded",
+      "rationale": "Runtime discovery, conversion, caching, corruption repair, and filesystem loading of extension language packs conflict with signed packaged Proctor catalogs and frozen Candidate locale.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/languagePacks/common/languagePacks.ts",
+      "upstreamBlob": "28fa2ccd356af05eae7b6882aa9cb6eb62b5aa5e",
+      "category": "localization",
+      "disposition": "excluded",
+      "rationale": "Extension-contributed language-pack registration and lookup are outside Proctor's closed packaged catalog model.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/localization/common/localizationsActions.ts",
+      "upstreamBlob": "050dde414fd27f1ecc0af99d412c3679727b92ed",
+      "category": "registration",
+      "disposition": "excluded",
+      "rationale": "Install-language and marketplace actions are product behavior that Proctor does not package or expose.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "proctor-localization-interface",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/localization.ts",
+      "rationale": "Proctor product callers use stable named placeholders, immutable contexts, packaged catalogs, fallback, pseudo expansion, and explicit direction through this interface."
+    },
+    {
+      "id": "ecmascript-intl",
+      "kind": "platform-interface",
+      "reference": "ECMAScript Intl.getCanonicalLocales",
+      "rationale": "The pinned Node and Electron Chromium runtimes provide canonical BCP 47 locale normalization without network or mutable external data."
+    },
+    {
+      "id": "typescript-compiler-api",
+      "kind": "external-package",
+      "reference": "typescript@6.0.3",
+      "rationale": "The admitted development dependency provides deterministic AST discovery of literal localization declarations."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "named-packaged-catalogs",
+      "summary": "Proctor product messages use stable dotted identifiers, validated named placeholders, immutable locale contexts, explicit catalog direction, and deterministic packaged catalogs instead of exposing VS Code positional NLS as the product interface.",
+      "localPaths": [
+        "src/prctr/base/common/localization.ts",
+        "build/generators/localizationCatalog.ts",
+        "src/prctr/base/common/localizationCatalog.generated.ts",
+        "resources/localization/en.json"
+      ],
+      "verificationRefs": [
+        "catalog-generator-tests",
+        "localization-runtime-tests",
+        "real-browser-localization"
+      ]
+    },
+    {
+      "id": "closed-catalog-delivery",
+      "summary": "Extension language packs, marketplace actions, filesystem cache generation, URL-controlled pseudo mode, and runtime catalog fetching are excluded; production compositions will load only signed packaged catalogs and Candidate locale remains frozen in its context.",
+      "localPaths": [
+        "src/prctr/base/common/localization.ts",
+        "src/prctr/base/common/vscodeNls.ts"
+      ],
+      "verificationRefs": [
+        "localization-runtime-tests",
+        "offline-provenance"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "id": "localization-runtime-tests",
+      "kind": "test",
+      "path": "test/base/common/localization.test.ts",
+      "obligation": "Verify named and positional formatting, exact placeholder validation, locale fallback, RTL, pseudo expansion, immutable contexts, indexed compatibility lookup, and one-time compatibility configuration."
+    },
+    {
+      "id": "catalog-generator-tests",
+      "kind": "test",
+      "path": "test/checks/localizationCatalog.test.ts",
+      "obligation": "Verify static literal extraction, deterministic identifier ordering, named placeholder discovery, and rejection of dynamic or duplicate declarations."
+    },
+    {
+      "id": "real-browser-localization",
+      "kind": "test",
+      "path": "test/electron/browserHarness.real.test.ts",
+      "obligation": "Verify the production localization interface in the pinned sandboxed Electron Chromium renderer with an RTL packaged-style catalog and no ambient Node.js."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Verify schema, local digest, marker, license reference, unique ownership, divergence, and evidence parity without a VS Code checkout."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Resolve the exact VS Code commit and verify every reviewed upstream blob against the canonical checkout."
+    }
+  ]
+}

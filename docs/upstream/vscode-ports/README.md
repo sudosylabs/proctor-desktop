@@ -5,7 +5,14 @@ reimplemented VS Code material in Proctor Desktop. It contains no speculative
 catalog: create `<cluster-id>.json` only in the change that admits or updates
 the corresponding behavior cluster.
 
-No clusters have been admitted.
+Admitted clusters:
+
+- [`base-common-runtime`](./base-common-runtime.json) — the complete admitted
+  base-common dependency closure for lifecycle, events, cancellation, async
+  scheduling, resources, and observables, with upstream owner suites.
+- [`localization-runtime`](./localization-runtime.json) — Proctor named-message
+  runtime and deterministic packaged catalog generation, plus the private
+  positional compatibility seam used by admitted VS Code modules.
 
 ## Record identity
 

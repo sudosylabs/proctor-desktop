@@ -16,7 +16,9 @@ const isTest = (path: string, policy: SourcePolicy): boolean => path.split('/').
 
 function resolveLocal(repository: Repository, from: string, specifier: string): string | undefined {
   const joined = posix.normalize(posix.join(posix.dirname(from), specifier));
-  const candidates = specifier.endsWith('.js') ? [joined.slice(0, -3) + '.ts', joined.slice(0, -3) + '.tsx', joined.slice(0, -3) + '/index.ts'] : [joined];
+  const candidates = specifier.endsWith('.js')
+    ? [joined.slice(0, -3) + '.ts', joined.slice(0, -3) + '.tsx', joined.slice(0, -3) + '.d.ts', joined.slice(0, -3) + '/index.ts']
+    : [joined];
   return candidates.find(candidate => repository.exists(candidate));
 }
 
@@ -40,6 +42,17 @@ export function analyzeSource(repository: Repository): Graph {
   const packageManifest = readJson<{ readonly dependencies?: Readonly<Record<string, string>> }>(repository, 'package.json');
   const productionDependencies = new Set(Object.keys(packageManifest.dependencies ?? {}));
   const sourceFiles = repository.files().filter(path => path.startsWith(`${policy.sourceRoot}/`) && isTs(path));
+  const admittedPortClusters = new Set(repository.files()
+    .filter(path => path.startsWith('docs/upstream/vscode-ports/') && path.endsWith('.json') && !path.endsWith('/schema.json'))
+    .map(path => {
+      try { return (JSON.parse(repository.read(path)) as { readonly clusterId?: unknown }).clusterId; }
+      catch { return undefined; }
+    })
+    .filter((cluster): cluster is string => typeof cluster === 'string'));
+  const portMarkers = new Map(sourceFiles.map(path => {
+    const marker = repository.read(path).match(/@proctor-vscode-port\s+([a-z0-9]+(?:-[a-z0-9]+)*)/u)?.[1];
+    return [path, marker !== undefined && admittedPortClusters.has(marker) ? marker : undefined] as const;
+  }));
   for (const path of repository.files().filter(candidate => candidate.startsWith('src/') && isTs(candidate) && !candidate.startsWith(`${policy.sourceRoot}/`))) diagnostics.push(diagnostic(checkId, path, 'Application source is outside src/prctr.', 'Move Proctor-owned source under its accepted namespace.'));
   for (const path of sourceFiles) {
     const text = repository.read(path);
@@ -96,7 +109,14 @@ export function analyzeSource(repository: Repository): Graph {
   for (const edge of edges) adjacency.set(edge.from, [...(adjacency.get(edge.from) ?? []), edge.to]);
   const visiting = new Set<string>(); const visited = new Set<string>(); const stack: string[] = []; const cycles = new Set<string>();
   const walk = (node: string): void => {
-    if (visiting.has(node)) { const start = stack.indexOf(node); cycles.add([...stack.slice(start), node].join(' -> ')); return; }
+    if (visiting.has(node)) {
+      const start = stack.indexOf(node); const members = stack.slice(start);
+      const cluster = portMarkers.get(members[0] ?? '');
+      if (cluster === undefined || !members.every(member => portMarkers.get(member) === cluster)) {
+        cycles.add([...members, node].join(' -> '));
+      }
+      return;
+    }
     if (visited.has(node)) return;
     visiting.add(node); stack.push(node);
     for (const next of adjacency.get(node) ?? []) walk(next);

@@ -33,6 +33,8 @@ jobs:
         run: npm run audit:dependencies
       - name: Verify foundation
         run: npm run check
+      - name: Verify sandboxed Chromium renderer
+        run: xvfb-run --auto-servernum npm run test:browser
 
   dependency-audit:
     name: dependency-audit
@@ -74,3 +76,5 @@ jobs:
         run: npm run test:native
       - name: Verify Electron security utility
         run: npm run test:electron
+      - name: Verify sandboxed Chromium renderer
+        run: npm run test:browser

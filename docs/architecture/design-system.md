@@ -273,5 +273,5 @@ Markdown.
 
 The toolchain architecture chooses the Control Explorer runner and baseline
 platform. The repository-enforcement track turns the accepted contracts into
-automated checks. No VS Code source cluster is admitted by this architecture
-decision.
+automated checks. This architecture decision does not itself admit a VS Code
+source cluster; exact admitted relationships live in the ports registry.

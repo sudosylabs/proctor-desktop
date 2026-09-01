@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2024"],
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": [
+    "../src/prctr/**/node/**/*.ts",
+    "../src/prctr/**/electron-main/**/*.ts",
+    "../test/electron/browserHarnessMain.ts",
+    "../test/electron/browserHarness.real.test.ts"
+  ]
+}
