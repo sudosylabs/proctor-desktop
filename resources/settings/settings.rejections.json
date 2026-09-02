@@ -1,0 +1,27 @@
+{
+  "generatedBy": "settings.registry",
+  "registryVersion": 1,
+  "registryFingerprint": "fnv1a64:35ec2f0722dc930e",
+  "settings": [
+    {
+      "id": "terminal.integrated.shell",
+      "reason": "Execution configuration is server-authoritative and prohibited in User Settings.",
+      "reasonMessageId": "settings.prohibited.shell.rejection"
+    },
+    {
+      "id": "http.proxy",
+      "reason": "Network and browser policy are authoritative security configuration.",
+      "reasonMessageId": "settings.prohibited.proxy.rejection"
+    },
+    {
+      "id": "files.autoSave",
+      "reason": "Attempt Workspace durability is server-acknowledged and cannot be configured here.",
+      "reasonMessageId": "settings.prohibited.autosave.rejection"
+    },
+    {
+      "id": "editor.defaultFormatter",
+      "reason": "Executable and extension-backed behavior is prohibited in User Settings.",
+      "reasonMessageId": "settings.prohibited.formatter.rejection"
+    }
+  ]
+}

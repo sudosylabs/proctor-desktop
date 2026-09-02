@@ -1,0 +1,8 @@
+@layer contributions {
+  .prctr-attempt-workspace[data-region="navigation"] { display: grid; gap: var(--prctr-spacing-content-small); padding: var(--prctr-spacing-content-small); }
+  .prctr-attempt-workspace[data-region="navigation"] button { background: transparent; border: 0; border-radius: var(--prctr-shape-radius-small); color: var(--prctr-color-text-primary); font: inherit; min-block-size: 36px; padding: var(--prctr-spacing-control-block) var(--prctr-spacing-control-inline); text-align: start; }
+  .prctr-attempt-workspace[data-region="navigation"] button[aria-current="page"] { background: var(--prctr-color-interaction-selected); }
+  .prctr-attempt-workspace[data-region="navigation"] button:focus-visible { outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus); outline-offset: 1px; }
+  .prctr-attempt-workspace[data-region="sidebar"] { box-sizing: border-box; display: grid; gap: var(--prctr-spacing-content-medium); padding: var(--prctr-spacing-region); }
+  .prctr-attempt-workspace[data-region="sidebar"] h2, .prctr-attempt-workspace[data-region="sidebar"] p { margin: 0; }
+}

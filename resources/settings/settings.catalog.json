@@ -1,0 +1,289 @@
+{
+  "generatedBy": "settings.registry",
+  "registryVersion": 1,
+  "registryFingerprint": "fnv1a64:35ec2f0722dc930e",
+  "settings": [
+    {
+      "id": "workbench.colorTheme",
+      "title": "Color theme",
+      "titleMessageId": "settings.theme.title",
+      "description": "Selects one packaged Proctor color theme.",
+      "descriptionMessageId": "settings.theme.description",
+      "default": "dark",
+      "storage": "portableUser",
+      "domain": "appearance",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "eligible"
+    },
+    {
+      "id": "workbench.preferHighContrast",
+      "title": "Prefer high contrast",
+      "titleMessageId": "settings.contrast.title",
+      "description": "Uses a packaged high-contrast theme when stronger accessibility requirements apply.",
+      "descriptionMessageId": "settings.contrast.description",
+      "default": false,
+      "storage": "portableUser",
+      "domain": "accessibility",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "policyConstrained"
+    },
+    {
+      "id": "window.zoomLevel",
+      "title": "Interface zoom",
+      "titleMessageId": "settings.zoom.title",
+      "description": "Sets bounded interface zoom as a percentage.",
+      "descriptionMessageId": "settings.zoom.description",
+      "default": 100,
+      "storage": "portableUser",
+      "domain": "appearance",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "policyConstrained"
+    },
+    {
+      "id": "editor.fontSize",
+      "title": "Editor font size",
+      "titleMessageId": "settings.editor.fontsize.title",
+      "description": "Sets the editor font size in pixels.",
+      "descriptionMessageId": "settings.editor.fontsize.description",
+      "default": 14,
+      "storage": "portableUser",
+      "domain": "editor",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": true,
+      "activation": "immediate",
+      "candidate": "policyConstrained"
+    },
+    {
+      "id": "editor.lineHeight",
+      "title": "Editor line height",
+      "titleMessageId": "settings.editor.lineheight.title",
+      "description": "Sets the editor line height in pixels.",
+      "descriptionMessageId": "settings.editor.lineheight.description",
+      "default": 22,
+      "storage": "portableUser",
+      "domain": "editor",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": true,
+      "activation": "immediate",
+      "candidate": "policyConstrained"
+    },
+    {
+      "id": "editor.tabSize",
+      "title": "Tab size",
+      "titleMessageId": "settings.editor.tabsize.title",
+      "description": "Sets the displayed indentation width outside an Attempt.",
+      "descriptionMessageId": "settings.editor.tabsize.description",
+      "default": 4,
+      "storage": "portableUser",
+      "domain": "editor",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": true,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
+      "id": "editor.wordWrap",
+      "title": "Word wrap",
+      "titleMessageId": "settings.editor.wordwrap.title",
+      "description": "Controls editor word wrapping outside an Attempt.",
+      "descriptionMessageId": "settings.editor.wordwrap.description",
+      "default": "off",
+      "storage": "portableUser",
+      "domain": "editor",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": true,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
+      "id": "editor.lineNumbers",
+      "title": "Line numbers",
+      "titleMessageId": "settings.editor.linenumbers.title",
+      "description": "Controls editor line-number presentation outside an Attempt.",
+      "descriptionMessageId": "settings.editor.linenumbers.description",
+      "default": "on",
+      "storage": "portableUser",
+      "domain": "editor",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": true,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
+      "id": "editor.minimap.enabled",
+      "title": "Minimap",
+      "titleMessageId": "settings.editor.minimap.title",
+      "description": "Shows the editor minimap outside an Attempt.",
+      "descriptionMessageId": "settings.editor.minimap.description",
+      "default": true,
+      "storage": "portableUser",
+      "domain": "editor",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": true,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
+      "id": "editor.cursorStyle",
+      "title": "Cursor style",
+      "titleMessageId": "settings.editor.cursorstyle.title",
+      "description": "Selects the editor cursor shape.",
+      "descriptionMessageId": "settings.editor.cursorstyle.description",
+      "default": "line",
+      "storage": "portableUser",
+      "domain": "editor",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": true,
+      "activation": "immediate",
+      "candidate": "eligible"
+    },
+    {
+      "id": "editor.cursorBlinking",
+      "title": "Cursor blinking",
+      "titleMessageId": "settings.editor.cursorblinking.title",
+      "description": "Selects the editor cursor animation.",
+      "descriptionMessageId": "settings.editor.cursorblinking.description",
+      "default": "blink",
+      "storage": "portableUser",
+      "domain": "editor",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": true,
+      "activation": "immediate",
+      "candidate": "eligible"
+    },
+    {
+      "id": "accessibility.reducedMotion",
+      "title": "Reduced motion",
+      "titleMessageId": "settings.accessibility.motion.title",
+      "description": "Reduces nonessential interface animation.",
+      "descriptionMessageId": "settings.accessibility.motion.description",
+      "default": false,
+      "storage": "portableUser",
+      "domain": "accessibility",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "policyConstrained"
+    },
+    {
+      "id": "accessibility.screenReaderMode",
+      "title": "Screen reader mode",
+      "titleMessageId": "settings.accessibility.screenreader.title",
+      "description": "Controls screen-reader optimized presentation.",
+      "descriptionMessageId": "settings.accessibility.screenreader.description",
+      "default": "auto",
+      "storage": "portableUser",
+      "domain": "accessibility",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": false,
+      "activation": "nextWindow",
+      "candidate": "policyConstrained"
+    },
+    {
+      "id": "accessibility.announcementMode",
+      "title": "Announcements",
+      "titleMessageId": "settings.accessibility.announcements.title",
+      "description": "Controls the detail of assistive announcements.",
+      "descriptionMessageId": "settings.accessibility.announcements.description",
+      "default": "auto",
+      "storage": "portableUser",
+      "domain": "accessibility",
+      "windows": [
+        "authenticated",
+        "candidate"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "policyConstrained"
+    },
+    {
+      "id": "workbench.tree.indent",
+      "title": "Tree indentation",
+      "titleMessageId": "settings.navigation.indent.title",
+      "description": "Sets indentation for hierarchical navigation outside an Attempt.",
+      "descriptionMessageId": "settings.navigation.indent.description",
+      "default": 8,
+      "storage": "portableUser",
+      "domain": "navigation",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
+      "id": "terminal.integrated.fontSize",
+      "title": "Terminal font size",
+      "titleMessageId": "settings.terminal.fontsize.title",
+      "description": "Sets terminal presentation outside an Attempt.",
+      "descriptionMessageId": "settings.terminal.fontsize.description",
+      "default": 14,
+      "storage": "device",
+      "domain": "terminal",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
+      "id": "browser.presentation.zoom",
+      "title": "Browser zoom",
+      "titleMessageId": "settings.browser.zoom.title",
+      "description": "Sets integrated-browser presentation outside an Attempt.",
+      "descriptionMessageId": "settings.browser.zoom.description",
+      "default": 100,
+      "storage": "device",
+      "domain": "browser",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "attempt-workspace-core",
+  "admission": {
+    "workflow": "Own an Attempt-scoped remote workspace overlay, protected recovery, five-mutation persistence and reconciliation contract, plus a caller-side filesystem projection and separate read-only Exam Resource catalog.",
+    "callers": ["src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts"],
+    "interface": "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts",
+    "decision": "docs/architecture/attempt-workspace.md"
+  },
+  "upstream": { "repository": "https://github.com/microsoft/vscode", "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8" },
+  "items": [
+    { "upstreamPath": "LICENSE.txt", "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5", "category": "license", "disposition": "evidence-only", "rationale": "Canonical Microsoft MIT text for the reviewed filesystem and working-copy evidence.", "licenseRefs": ["vscode-mit"] },
+    { "upstreamPath": "src/vs/platform/files/common/files.ts", "upstreamBlob": "4181a930379caa56bcdd02202162685decddbd22", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain scheme-scoped provider operations, typed errors, immutable stats and invalidation events while replacing generic filesystem authority and URI identity with Attempt-scoped stable references.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts" },
+    { "upstreamPath": "src/vs/platform/files/common/fileService.ts", "upstreamBlob": "493471fe8560bf2c630a61ba47ec698c155a7bef", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain strict provider-boundary validation and error translation at the caller adapter without allowing registration or provider capability flags to grant authorization.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts" },
+    { "upstreamPath": "src/vs/workbench/services/workingCopy/common/workingCopy.ts", "upstreamBlob": "a33cf57efb1d432d1144f3d9d10eb063e9ded938", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain explicit working, dirty, save, revert, capability and event semantics while exposing Proctor's orthogonal content, mutation, protection, availability and access facts.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts" },
+    { "upstreamPath": "src/vs/workbench/services/workingCopy/common/storedFileWorkingCopy.ts", "upstreamBlob": "e4fa57a33e846ae6809683e404eb2393c780f117", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain serialized overlapping saves, concurrent-edit preservation, conflict state, backup-first close and explicit revert, adapted to opaque server versions, exact mutation outcomes and protected local recovery.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts" },
+    { "upstreamPath": "src/vs/workbench/services/workingCopy/browser/workingCopyBackupService.ts", "upstreamBlob": "d39643cc33025c9ed33de94a2b1b107d07e3f919", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain durable backup records and discard-after-save behavior behind a privileged protected-content port using opaque storage identifiers rather than a renderer-visible backup filesystem.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts" }
+  ],
+  "licenses": [{ "id": "vscode-mit", "name": "MIT License", "upstreamPaths": ["LICENSE.txt"], "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt" }],
+  "dependencies": [
+    { "id": "base-runtime", "kind": "local-interface", "reference": "src/prctr/base/common/lifecycle.ts", "rationale": "Events, disposal and cancellation retain deterministic lifecycle semantics." },
+    { "id": "server-adapter", "kind": "platform-interface", "reference": "src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts", "rationale": "The production server transport remains unresolved behind the exact authoritative port." },
+    { "id": "protected-content-adapter", "kind": "platform-interface", "reference": "src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts", "rationale": "Production encryption, key custody and atomic native storage remain unresolved behind the protected-content port." }
+  ],
+  "divergences": [
+    { "id": "remote-authority", "summary": "Stable entry references, opaque content versions, authoritative cursors, exact acknowledgements and submission blockers replace local URI, mtime and editor-cleanliness assumptions.", "localPaths": ["src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts", "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts"], "verificationRefs": ["workspace-contract-tests"] },
+    { "id": "protected-overlay", "summary": "Recovery protection is an independent durability fact; scoped records reload the overlay after relaunch, while conflict, rejection, unknown outcome and authorization loss retain local work until acknowledgement or explicit discard.", "localPaths": ["src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts", "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts"], "verificationRefs": ["workspace-contract-tests"] },
+    { "id": "closed-v1", "summary": "The public seam admits only whole current-file reads and five single mutation families; unsupported server batch, history, range, revert and conflict operations are explicit false capabilities.", "localPaths": ["src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts"], "verificationRefs": ["workspace-contract-tests", "source-check"] }
+  ],
+  "verification": [
+    { "id": "workspace-contract-tests", "kind": "test", "path": "test/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.test.ts", "obligation": "Verify state separation, five mutations, stable identity, idempotency, cancellation, cursor gaps, overlay reapplication and relaunch recovery, bounded concurrency, subtree serialization, protected conflict sides, safe text rebase, revocation, dual-path durability gating, limits and submission blockers." },
+    { "id": "provider-tests", "kind": "test", "path": "test/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.test.ts", "obligation": "Verify scoped URI projection, acknowledged writes, hierarchy enumeration, watch-filtered invalidation events, rich-to-coarse error translation and retention of locally protected unacknowledged writes." },
+    { "id": "exam-resource-tests", "kind": "test", "path": "test/workbench/contrib/attemptWorkspace/common/examResourceCatalog.test.ts", "obligation": "Verify Exam Resources remain separately authorized and read only." },
+    { "id": "source-check", "kind": "check", "path": "build/checks/source.ts", "obligation": "Verify layer direction, environment placement, cycle absence and interface-test ownership." },
+    { "id": "upstream-audit", "kind": "review", "path": "build/checks/upstreamAudit.ts", "obligation": "Verify every reviewed filesystem and working-copy evidence blob at the exact pinned VS Code revision." }
+  ]
+}

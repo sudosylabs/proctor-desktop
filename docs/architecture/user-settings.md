@@ -34,7 +34,9 @@ localized editor metadata, and candidate treatment:
 
 Owning capabilities contribute declarations through literal Proctor manifests.
 One deterministic generator derives JSON Schema, settings catalog, rejection
-catalog, and registry fingerprint. Remote schemas and workspace content cannot
+catalog, and registry fingerprint. Generator and runtime registry import the
+same canonical serialization/fingerprint implementation so build parity cannot
+drift through duplicated algorithms. Remote schemas and workspace content cannot
 register behavior. Unknown keys are preserved but inactive; known prohibited
 keys have no effective value.
 

@@ -1,0 +1,250 @@
+{
+  "generatedBy": "settings.registry",
+  "registryVersion": 1,
+  "registryFingerprint": "fnv1a64:35ec2f0722dc930e",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "workbench.colorTheme": {
+      "type": "string",
+      "default": "dark",
+      "enum": [
+        "light",
+        "dark",
+        "hcLight",
+        "hcDark"
+      ],
+      "title": "Color theme",
+      "description": "Selects one packaged Proctor color theme."
+    },
+    "workbench.preferHighContrast": {
+      "type": "boolean",
+      "default": false,
+      "title": "Prefer high contrast",
+      "description": "Uses a packaged high-contrast theme when stronger accessibility requirements apply."
+    },
+    "window.zoomLevel": {
+      "type": "integer",
+      "default": 100,
+      "minimum": 80,
+      "maximum": 200,
+      "title": "Interface zoom",
+      "description": "Sets bounded interface zoom as a percentage."
+    },
+    "editor.fontSize": {
+      "type": "integer",
+      "default": 14,
+      "minimum": 12,
+      "maximum": 24,
+      "title": "Editor font size",
+      "description": "Sets the editor font size in pixels."
+    },
+    "editor.lineHeight": {
+      "type": "integer",
+      "default": 22,
+      "minimum": 16,
+      "maximum": 40,
+      "title": "Editor line height",
+      "description": "Sets the editor line height in pixels."
+    },
+    "editor.tabSize": {
+      "type": "integer",
+      "default": 4,
+      "minimum": 1,
+      "maximum": 8,
+      "title": "Tab size",
+      "description": "Sets the displayed indentation width outside an Attempt."
+    },
+    "editor.wordWrap": {
+      "type": "string",
+      "default": "off",
+      "enum": [
+        "off",
+        "on",
+        "wordWrapColumn",
+        "bounded"
+      ],
+      "title": "Word wrap",
+      "description": "Controls editor word wrapping outside an Attempt."
+    },
+    "editor.lineNumbers": {
+      "type": "string",
+      "default": "on",
+      "enum": [
+        "off",
+        "on",
+        "relative"
+      ],
+      "title": "Line numbers",
+      "description": "Controls editor line-number presentation outside an Attempt."
+    },
+    "editor.minimap.enabled": {
+      "type": "boolean",
+      "default": true,
+      "title": "Minimap",
+      "description": "Shows the editor minimap outside an Attempt."
+    },
+    "editor.cursorStyle": {
+      "type": "string",
+      "default": "line",
+      "enum": [
+        "line",
+        "block",
+        "underline"
+      ],
+      "title": "Cursor style",
+      "description": "Selects the editor cursor shape."
+    },
+    "editor.cursorBlinking": {
+      "type": "string",
+      "default": "blink",
+      "enum": [
+        "blink",
+        "smooth",
+        "phase",
+        "expand",
+        "solid"
+      ],
+      "title": "Cursor blinking",
+      "description": "Selects the editor cursor animation."
+    },
+    "accessibility.reducedMotion": {
+      "type": "boolean",
+      "default": false,
+      "title": "Reduced motion",
+      "description": "Reduces nonessential interface animation."
+    },
+    "accessibility.screenReaderMode": {
+      "type": "string",
+      "default": "auto",
+      "enum": [
+        "auto",
+        "on",
+        "off"
+      ],
+      "title": "Screen reader mode",
+      "description": "Controls screen-reader optimized presentation."
+    },
+    "accessibility.announcementMode": {
+      "type": "string",
+      "default": "auto",
+      "enum": [
+        "auto",
+        "verbose",
+        "minimal"
+      ],
+      "title": "Announcements",
+      "description": "Controls the detail of assistive announcements."
+    },
+    "workbench.tree.indent": {
+      "type": "integer",
+      "default": 8,
+      "minimum": 4,
+      "maximum": 20,
+      "title": "Tree indentation",
+      "description": "Sets indentation for hierarchical navigation outside an Attempt."
+    },
+    "terminal.integrated.fontSize": {
+      "type": "integer",
+      "default": 14,
+      "minimum": 12,
+      "maximum": 24,
+      "title": "Terminal font size",
+      "description": "Sets terminal presentation outside an Attempt."
+    },
+    "browser.presentation.zoom": {
+      "type": "integer",
+      "default": 100,
+      "minimum": 80,
+      "maximum": 200,
+      "title": "Browser zoom",
+      "description": "Sets integrated-browser presentation outside an Attempt."
+    }
+  },
+  "patternProperties": {
+    "^\\[[A-Za-z0-9][A-Za-z0-9+._-]{0,63}\\]$": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "editor.fontSize": {
+          "type": "integer",
+          "default": 14,
+          "minimum": 12,
+          "maximum": 24,
+          "title": "Editor font size",
+          "description": "Sets the editor font size in pixels."
+        },
+        "editor.lineHeight": {
+          "type": "integer",
+          "default": 22,
+          "minimum": 16,
+          "maximum": 40,
+          "title": "Editor line height",
+          "description": "Sets the editor line height in pixels."
+        },
+        "editor.tabSize": {
+          "type": "integer",
+          "default": 4,
+          "minimum": 1,
+          "maximum": 8,
+          "title": "Tab size",
+          "description": "Sets the displayed indentation width outside an Attempt."
+        },
+        "editor.wordWrap": {
+          "type": "string",
+          "default": "off",
+          "enum": [
+            "off",
+            "on",
+            "wordWrapColumn",
+            "bounded"
+          ],
+          "title": "Word wrap",
+          "description": "Controls editor word wrapping outside an Attempt."
+        },
+        "editor.lineNumbers": {
+          "type": "string",
+          "default": "on",
+          "enum": [
+            "off",
+            "on",
+            "relative"
+          ],
+          "title": "Line numbers",
+          "description": "Controls editor line-number presentation outside an Attempt."
+        },
+        "editor.minimap.enabled": {
+          "type": "boolean",
+          "default": true,
+          "title": "Minimap",
+          "description": "Shows the editor minimap outside an Attempt."
+        },
+        "editor.cursorStyle": {
+          "type": "string",
+          "default": "line",
+          "enum": [
+            "line",
+            "block",
+            "underline"
+          ],
+          "title": "Cursor style",
+          "description": "Selects the editor cursor shape."
+        },
+        "editor.cursorBlinking": {
+          "type": "string",
+          "default": "blink",
+          "enum": [
+            "blink",
+            "smooth",
+            "phase",
+            "expand",
+            "solid"
+          ],
+          "title": "Cursor blinking",
+          "description": "Selects the editor cursor animation."
+        }
+      }
+    }
+  }
+}

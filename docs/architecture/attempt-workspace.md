@@ -108,6 +108,10 @@ mutation.
 The Exam Resource Catalog has no mutation or settlement interface. Internally it
 may share binary content-reading and protected-cache mechanics with the Attempt
 Workspace module without sharing authority, overlay, or submission semantics.
+The packaged catalog admits at most 2,048 unique resource identities and paths,
+bounds each whole-resource read at 100 MiB, and requires the read response to
+match the authorized catalog identity, version, media type, display metadata,
+and byte size exactly. Disposal fences in-flight reads before publication.
 
 ## Provider and adapter seams
 
@@ -142,7 +146,8 @@ can operate. URI possession, provider registration, connectivity, context keys,
 and provider capability flags never authorize access.
 
 The compatibility adapter translates rich results into filesystem operations,
-events, and coarser errors. It resolves a canonical write as successful only
+directory enumeration, scoped recursive or non-recursive watches, events, and
+coarser errors. It resolves a canonical write as successful only
 after authoritative acknowledgement; local recovery alone cannot clear the
 editor's server-durability obligation. Provider events are UI invalidation
 hints, not acknowledgements or authority. The Recovery Store is never registered
@@ -231,6 +236,15 @@ deletes; independent files may persist concurrently. Failure leaves independent
 work running. Dependent queued work rebases onto acknowledged state or becomes
 an explicit conflict. Callers receive no generic lock or transaction interface.
 
+Workspace View facts remain independent. `contentRelation` becomes `modified`
+only for a local file creation or content replacement; a move, rename, or
+directory operation changes remote-mutation and recovery facts without claiming
+that bytes changed. A directory move projects its latest mutation/recovery state
+to every visible descendant while preserving each descendant's prior content
+relation. Projection replays the bounded operation overlay once and builds the
+fact index during that replay; it does not rescan the operation journal for
+every Workspace entry.
+
 Explicit Save requests immediate persistence through a captured generation; it
 does not establish a separate durability model. Unsent obsolete content versions
 may coalesce, while in-flight and outcome-unknown versions remain identifiable.
@@ -313,7 +327,10 @@ reads, ordered journal refresh, idempotent results, and the five single
 mutations above. The server defaults are 10 MiB per file and 50 MiB total, with
 hard configurable maxima of 100 MiB per file and 1 GiB total. Clients treat
 server-advertised effective limits as authority and enforce their independent
-10 MiB initial editor-model limit before opening a text model.
+10 MiB initial editor-model limit before opening a text model. Desktop also
+rejects a single in-memory protected-recovery restore envelope above a packaged
+512 MiB safety ceiling. That ceiling is an implementation input bound, not the
+still-unresolved protected-record retention policy.
 
 Atomic batch, historical-version reads, range-backed models, server conflict
 resolution/revert, journal mutation keys, and per-entry capability snapshots are
