@@ -74,16 +74,22 @@ bounded family-policy schema references and per-platform coverage keys,
 fail-closed signed-matrix parser
 and signature-verifier boundary, bounded CandidateWindow-only private clipboard,
 and closed candidate print-command denial gate are implemented and interface-
-tested. They are primitives, not production CandidateWindow composition or a
-signed release matrix. Electron main also owns the implemented CandidateWindow
-constructor/enforcer and preflight-only permission broker. Focused interfaces
-and the real Electron development-runtime harness test the existing boundaries;
-they do not establish packaged conformance. The `ExamSecurityCoordinator`,
-effective-policy activation, policy/evidence transformation, production
-CandidateWindow composition, privileged platform helpers and remaining full-
-coverage adapter variants,
-packaged target verification, matrix generation/signing, and release gates
-remain unimplemented. Global external screen-capture detection is explicitly
+tested. Electron main also owns the implemented CandidateWindow
+constructor/enforcer and preflight-only permission broker. The Attempt-scoped
+`ExamSecurityCoordinator` state machine now validates the closed effective-
+policy shape against the registry and a verified matrix identity, derives the
+exact native source/category selection, keeps policy authenticity and anti-
+rollback behind a privileged port, orders containment and protected-work steps,
+maintains minimized occurrence lifecycles, fences Participation, and exposes a
+sanitized Candidate projection through closed Electron-main IPC. These remain
+source-level primitives: the coordinator is not yet activated by the production
+utility bootstrap, and no packaged detector set, production CandidateWindow
+composition, signed release matrix, or supported target tuple exists. Focused
+interfaces and the real Electron development-runtime harness test the existing
+boundaries; they do not establish packaged conformance. Privileged platform
+helpers, remaining full-coverage adapter variants, packaged target
+verification, matrix generation/signing, and release gates remain
+unimplemented. Global external screen-capture detection is explicitly
 unavailable rather than an unfinished promise. No supported secure-candidate
 target exists yet.
 
@@ -274,6 +280,9 @@ system-proxy, OS-managed-VPN, tunnel-interface, route-change, and network-source
 health; and camera/microphone selections in the schema-generated fixed order. A selected
 clipboard, removable-storage, network-configuration, or media source requires a
 non-empty matching category selection, while an unselected source permits none.
+Main-owned private clipboard and candidate print-command denial are closed
+effects, not observation categories: selecting either effect alone does not open
+the clipboard or print-spooler source.
 Platform adapters do not query an unselected storage or network category;
 unsupported selected categories remain explicit unavailable or unknown coverage
 instead of widening collection.
@@ -476,6 +485,15 @@ generation, emits an explicit reset/gap, and repeats permission, policy,
 capability, health, and complete snapshot checks. Repeated failure remains
 blocked until explicit retry or a new preflight. Failure is operational evidence
 and never candidate misconduct.
+
+Coordinator reconciliation carries the authenticated supervisor `restarted`
+edge as an exact source, prior instance/sequence watermark, replacement instance,
+and the sole `attempt: 1` automatic restart. A second automatic restart, an
+unlinked replacement, reuse of any instance identity seen during the current
+preflight, or any later message from a retired instance fails closed until
+explicit retry or a new preflight. Active findings are fenced onto the replacement
+instance and cannot recover until that replacement supplies a healthy,
+permission-granted, gap-free complete snapshot.
 
 Normal authoritative departure stops callback intake, fences the generation,
 drains already accepted bounded facts, removes OS subscriptions, closes handles
