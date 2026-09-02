@@ -23,11 +23,20 @@ export interface WorkbenchItemResolver {
 export class WorkbenchItemResolverRegistry {
 	readonly #resolvers = new Map<string, WorkbenchItemResolver>();
 	register(resolver: WorkbenchItemResolver): IDisposable {
-		if (this.#resolvers.has(resolver.typeId)) throw new Error(`Workbench resolver ${resolver.typeId} is already registered`);
+		if (this.#resolvers.has(resolver.typeId))
+			throw new Error(`Workbench resolver ${resolver.typeId} is already registered`);
 		this.#resolvers.set(resolver.typeId, resolver);
-		return { dispose: () => { if (this.#resolvers.get(resolver.typeId) === resolver) this.#resolvers.delete(resolver.typeId); } };
+		return {
+			dispose: () => {
+				if (this.#resolvers.get(resolver.typeId) === resolver)
+					this.#resolvers.delete(resolver.typeId);
+			}
+		};
 	}
 	get(typeId: string): WorkbenchItemResolver {
-		const resolver = this.#resolvers.get(typeId); if (resolver === undefined) throw new Error(`No packaged resolver is registered for ${typeId}`); return resolver;
+		const resolver = this.#resolvers.get(typeId);
+		if (resolver === undefined)
+			throw new Error(`No packaged resolver is registered for ${typeId}`);
+		return resolver;
 	}
 }

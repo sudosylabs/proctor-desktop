@@ -1,9 +1,4 @@
-import {
-	afterEach,
-	beforeEach,
-	suite as nodeSuite,
-	test as nodeTest
-} from 'node:test';
+import { afterEach, beforeEach, suite as nodeSuite, test as nodeTest } from 'node:test';
 
 type Done = (error?: unknown) => void;
 interface TestContext {
@@ -22,7 +17,7 @@ interface TestRegistration {
 
 function adaptTestBody(body: TestBody): (context: { skip(): void }) => Promise<void> {
 	if (body.length === 0) {
-		return async context => {
+		return async (context) => {
 			try {
 				await (body as (this: TestContext) => unknown).call({
 					timeout: () => {},
@@ -37,37 +32,41 @@ function adaptTestBody(body: TestBody): (context: { skip(): void }) => Promise<v
 		};
 	}
 
-	return context => new Promise<void>((resolve, reject) => {
-		let completed = false;
-		const done: Done = error => {
-			if (completed) {
-				reject(new Error('The test completion callback was invoked more than once.'));
-				return;
-			}
-			completed = true;
-			if (error === undefined) {
-				resolve();
-			} else {
-				reject(error);
-			}
-		};
-
-		try {
-			const result = (body as (this: TestContext, done: Done) => unknown).call({
-				timeout: () => {},
-				skip: () => {
-					context.skip();
-					throw skippedTest;
+	return (context) =>
+		new Promise<void>((resolve, reject) => {
+			let completed = false;
+			const done: Done = (error) => {
+				if (completed) {
+					reject(new Error('The test completion callback was invoked more than once.'));
+					return;
 				}
-			}, done);
-			if (result instanceof Promise) {
-				void result.catch(reject);
+				completed = true;
+				if (error === undefined) {
+					resolve();
+				} else {
+					reject(error);
+				}
+			};
+
+			try {
+				const result = (body as (this: TestContext, done: Done) => unknown).call(
+					{
+						timeout: () => {},
+						skip: () => {
+							context.skip();
+							throw skippedTest;
+						}
+					},
+					done
+				);
+				if (result instanceof Promise) {
+					void result.catch(reject);
+				}
+			} catch (error) {
+				if (error === skippedTest) resolve();
+				else reject(error);
 			}
-		} catch (error) {
-			if (error === skippedTest) resolve();
-			else reject(error);
-		}
-	});
+		});
 }
 
 export const suite: typeof nodeSuite = nodeSuite;

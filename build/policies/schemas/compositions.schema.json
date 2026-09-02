@@ -27,7 +27,11 @@
         "preload": { "$ref": "#/$defs/path" },
         "required": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
         "forbidden": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
-        "allowedDynamicImports": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } }
+        "allowedDynamicImports": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/path" }
+        }
       }
     }
   }

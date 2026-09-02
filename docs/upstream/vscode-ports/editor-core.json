@@ -4,47 +4,334 @@
   "clusterId": "editor-core",
   "admission": {
     "workflow": "Provide mature editor position, range, selection, chunked piece-tree text, immutable snapshot, edit, EOL, word-boundary, and full search mechanics without assuming a local file or importing the VS Code product model.",
-    "callers": ["test/editor/common/upstream/model/pieceTreeTextBuffer/pieceTreeTextBuffer.test.ts", "test/editor/common/upstream/model/textModelSearch.test.ts"],
+    "callers": [
+      "test/editor/common/upstream/model/pieceTreeTextBuffer/pieceTreeTextBuffer.test.ts",
+      "test/editor/common/upstream/model/textModelSearch.test.ts"
+    ],
     "interface": "src/prctr/editor/common/model.ts",
     "decision": "docs/architecture/attempt-workspace.md"
   },
-  "upstream": { "repository": "https://github.com/microsoft/vscode", "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8" },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
   "items": [
-    { "upstreamPath": "LICENSE.txt", "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5", "category": "license", "disposition": "evidence-only", "rationale": "Canonical Microsoft MIT text for every copied editor source and owner test.", "licenseRefs": ["vscode-mit"] },
-    { "upstreamPath": "src/vs/base/common/date.ts", "upstreamBlob": "6562ab5a7d950391808341d8b4b4ac1a87f4d243", "category": "source", "disposition": "adapted", "rationale": "Extract the complete exception-safe safeIntl constructor seam required by the word classifier, excluding unrelated human-duration strings that belong to Proctor localization.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/common/date.ts", "localSha256": "95f5a5082c0384024f69050b340748fed4017931f03539dd560f02b9ba75bfe7", "mechanicalTransforms": ["namespace-path-translation", "accepted-dependency-substitution", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/core/position.ts", "upstreamBlob": "713362dd70b444e92c05f0b91d4c4444d0448d21", "category": "source", "disposition": "adapted", "rationale": "Complete upstream Position implementation under Proctor ownership.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/core/position.ts", "localSha256": "5a7a2a5598c5620059c8a53a154690ff52a88114400e804515fd48a9a828bab3", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/core/range.ts", "upstreamBlob": "b42088e53a10e0b9a8acf3babb4d91b9f5cb8052", "category": "source", "disposition": "adapted", "rationale": "Complete upstream Range implementation including ordering, intersection, containment and lifting.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/core/range.ts", "localSha256": "9e146989f30c6702eab8ac2bb844face8c247adb37d2a19074023277a02f3502", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/core/selection.ts", "upstreamBlob": "4dd6c645c47aa7d801829cfe821c0df851f59f9f", "category": "source", "disposition": "adapted", "rationale": "Complete upstream directional Selection implementation.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/core/selection.ts", "localSha256": "52f62b4c7eeb804862f02a5d0f33a77a19352c3954f36f3a08b525f0e7efbea9", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/core/characterClassifier.ts", "upstreamBlob": "595d08818f12bd4ae5456378b5bea1e1a72f8bb4", "category": "source", "disposition": "adapted", "rationale": "Complete compact character classifier used by editor word semantics.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/core/characterClassifier.ts", "localSha256": "d56fa738e04dbe8c5212944a5ee63dd06b6a6682a1b3ee5b2668f79c175b1505", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/core/wordCharacterClassifier.ts", "upstreamBlob": "2ae55681cbcbc8821c8001f2af8b852c08f580d6", "category": "source", "disposition": "adapted", "rationale": "Complete Unicode-aware word classifier and bounded cache using the admitted safeIntl seam.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/core/wordCharacterClassifier.ts", "localSha256": "1e14a5367e2b11161aa0633490b4c1e652085d5e782c02ba5625768a96f57e53", "mechanicalTransforms": ["namespace-path-translation", "accepted-dependency-substitution", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/core/wordHelper.ts", "upstreamBlob": "32838f92011dbb00b2267d642f3119c1fb4495dd", "category": "source", "disposition": "adapted", "rationale": "Complete word-definition registry and word-at-position behavior.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/core/wordHelper.ts", "localSha256": "44a3ff8a783edeeee1f8c7c68adf3d3aa2c43d8f9392fc9cd8f1e0f33de2575b", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/core/stringBuilder.ts", "upstreamBlob": "4231fba27fa7655280272939eed0dae3accb2926", "category": "source", "disposition": "adapted", "rationale": "Complete UTF-16 string builder used by reversible text changes.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/core/stringBuilder.ts", "localSha256": "7c113dca02b0ed36c847f5a8042dd37dcab70f34ed376c40365420a8de96f29b", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/core/textChange.ts", "upstreamBlob": "43925f181261a2fb02284a5283f402616f43f711", "category": "source", "disposition": "adapted", "rationale": "Complete text-change representation, compression, serialization and inversion support.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/core/textChange.ts", "localSha256": "266d85e32dd90c0293cdccdf971e6007c6a46448c3157a7ad457b3488e487272", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/core/misc/eolCounter.ts", "upstreamBlob": "f37989cb442c1a19d267d229eec092dd3b0cb506", "category": "source", "disposition": "adapted", "rationale": "Complete CR/LF/CRLF counter and first/last line-length calculation.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/core/misc/eolCounter.ts", "localSha256": "859ac773aabda7004dc4880d8d0fcfcaab96332ee01ec30e8ccb4e6ab2c77f21", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/model.ts", "upstreamBlob": "34c57f255760cfa7630139cf9300ad9c4889aaad", "category": "source", "disposition": "adapted", "rationale": "Retain the complete text-buffer, edit, snapshot, EOL, match and search data contracts required by this admitted cluster while excluding unrelated decorations, tokenization, URI, language, extension and undo-redo product contracts.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/model.ts", "localSha256": "32514ccd18bd1e765739ffae1230c41a0c041f9a8f48d064264c55073464b32b", "mechanicalTransforms": ["namespace-path-translation", "accepted-dependency-substitution", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/model/textModelSearch.ts", "upstreamBlob": "ae259f035d5db2a25b17995352d8ea724b5dcd07", "category": "source", "disposition": "adapted", "rationale": "Preserve the complete search algorithms while replacing the concrete VS Code TextModel dependency with its exact seven-method structural read seam.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/model/textModelSearch.ts", "localSha256": "bc4ed9313c0842480db7f7dedd51891ab8d01499d22dcd4809ea3d35c205509c", "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeBase.ts", "upstreamBlob": "bf2f4a91fee67374c1338343d38b9269d3aba303", "category": "source", "disposition": "adapted", "rationale": "Complete upstream piece-tree storage, insertion, deletion, offset/position mapping, line access and search implementation.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeBase.ts", "localSha256": "cf3b97d9f07a3324f677794221cf563cdbbbc4be2476a2514d1b2e690227c92d", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/model/pieceTreeTextBuffer/rbTreeBase.ts", "upstreamBlob": "7dfd9d8373a26c4e068aaebb4a876599a93c0fa7", "category": "source", "disposition": "adapted", "rationale": "Complete red-black tree nodes, rotations, insert/delete repair and metadata maintenance.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/model/pieceTreeTextBuffer/rbTreeBase.ts", "localSha256": "c5a95fc659d299e31e291951bf5b1956e1b07fab0b22547ff7bae592a94221f3", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts", "upstreamBlob": "f98a925a47a8a836eb23d4e7c1f4be7b09b885cb", "category": "source", "disposition": "adapted", "rationale": "Complete buffer API, normalized EOL handling, snapshots, edit ordering/reduction, inverse edits and content-change production.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts", "localSha256": "924468f4f7f84346ebaf5872d6e1c7c0035f27df0c2c892106b7dc0f8e35e419", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBufferBuilder.ts", "upstreamBlob": "3ee4d87991ab66dfea838fdecbf73d8f6d3f2a71", "category": "source", "disposition": "adapted", "rationale": "Complete chunked builder with BOM, RTL, unusual terminator, basic-ASCII, normalization and dominant-EOL detection.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBufferBuilder.ts", "localSha256": "fa4ec872a4395b83d77233c955a456006176541155faa0205c29f5dba57f3028", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/test/common/core/range.test.ts", "upstreamBlob": "5916ebe3370e01233335e54678afbeed4e615e2c", "category": "test", "disposition": "adapted", "rationale": "Complete Range owner test suite routed through the repository Node test adapter.", "licenseRefs": ["vscode-mit"], "localPath": "test/editor/common/upstream/core/range.test.ts", "localSha256": "133805f09b11a51993416b71c6b8311421273bbbbbe3e1f8f60106b93d327b4b", "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/test/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.test.ts", "upstreamBlob": "cb60242c20b07e0eac9325731def6e967536c0f0", "category": "test", "disposition": "adapted", "rationale": "Complete 87-test piece-tree owner suite, including randomized invariant checks, adapted only to local imports, leak tracking and a piece-tree-backed model fixture.", "licenseRefs": ["vscode-mit"], "localPath": "test/editor/common/upstream/model/pieceTreeTextBuffer/pieceTreeTextBuffer.test.ts", "localSha256": "7087969b606e85aafc878f5e1fcd506107caea97a8d1c483233d065364080885", "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/editor/test/common/model/textModelSearch.test.ts", "upstreamBlob": "d2067f3081411d5bc37f5b41145863fd05bd63ba", "category": "test", "disposition": "adapted", "rationale": "Complete 42-test search owner suite adapted to the structural model fixture and Node test adapter.", "licenseRefs": ["vscode-mit"], "localPath": "test/editor/common/upstream/model/textModelSearch.test.ts", "localSha256": "989c6cfb31d251b20f7cbc4f6d58531f3c9715c76aebd45e79ff965e6e3e6c36", "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"] }
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Canonical Microsoft MIT text for every copied editor source and owner test.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/date.ts",
+      "upstreamBlob": "6562ab5a7d950391808341d8b4b4ac1a87f4d243",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Extract the complete exception-safe safeIntl constructor seam required by the word classifier, excluding unrelated human-duration strings that belong to Proctor localization.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/date.ts",
+      "localSha256": "95f5a5082c0384024f69050b340748fed4017931f03539dd560f02b9ba75bfe7",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/position.ts",
+      "upstreamBlob": "713362dd70b444e92c05f0b91d4c4444d0448d21",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete upstream Position implementation under Proctor ownership.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/position.ts",
+      "localSha256": "5a7a2a5598c5620059c8a53a154690ff52a88114400e804515fd48a9a828bab3",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/range.ts",
+      "upstreamBlob": "b42088e53a10e0b9a8acf3babb4d91b9f5cb8052",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete upstream Range implementation including ordering, intersection, containment and lifting.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/range.ts",
+      "localSha256": "9e146989f30c6702eab8ac2bb844face8c247adb37d2a19074023277a02f3502",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/selection.ts",
+      "upstreamBlob": "4dd6c645c47aa7d801829cfe821c0df851f59f9f",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete upstream directional Selection implementation.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/selection.ts",
+      "localSha256": "52f62b4c7eeb804862f02a5d0f33a77a19352c3954f36f3a08b525f0e7efbea9",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/characterClassifier.ts",
+      "upstreamBlob": "595d08818f12bd4ae5456378b5bea1e1a72f8bb4",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete compact character classifier used by editor word semantics.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/characterClassifier.ts",
+      "localSha256": "d56fa738e04dbe8c5212944a5ee63dd06b6a6682a1b3ee5b2668f79c175b1505",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/wordCharacterClassifier.ts",
+      "upstreamBlob": "2ae55681cbcbc8821c8001f2af8b852c08f580d6",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete Unicode-aware word classifier and bounded cache using the admitted safeIntl seam.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/wordCharacterClassifier.ts",
+      "localSha256": "1e14a5367e2b11161aa0633490b4c1e652085d5e782c02ba5625768a96f57e53",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/wordHelper.ts",
+      "upstreamBlob": "32838f92011dbb00b2267d642f3119c1fb4495dd",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete word-definition registry and word-at-position behavior.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/wordHelper.ts",
+      "localSha256": "44a3ff8a783edeeee1f8c7c68adf3d3aa2c43d8f9392fc9cd8f1e0f33de2575b",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/stringBuilder.ts",
+      "upstreamBlob": "4231fba27fa7655280272939eed0dae3accb2926",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete UTF-16 string builder used by reversible text changes.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/stringBuilder.ts",
+      "localSha256": "7c113dca02b0ed36c847f5a8042dd37dcab70f34ed376c40365420a8de96f29b",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/textChange.ts",
+      "upstreamBlob": "43925f181261a2fb02284a5283f402616f43f711",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete text-change representation, compression, serialization and inversion support.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/textChange.ts",
+      "localSha256": "266d85e32dd90c0293cdccdf971e6007c6a46448c3157a7ad457b3488e487272",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/misc/eolCounter.ts",
+      "upstreamBlob": "f37989cb442c1a19d267d229eec092dd3b0cb506",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete CR/LF/CRLF counter and first/last line-length calculation.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/misc/eolCounter.ts",
+      "localSha256": "859ac773aabda7004dc4880d8d0fcfcaab96332ee01ec30e8ccb4e6ab2c77f21",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model.ts",
+      "upstreamBlob": "34c57f255760cfa7630139cf9300ad9c4889aaad",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete text-buffer, edit, snapshot, EOL, match and search data contracts required by this admitted cluster while excluding unrelated decorations, tokenization, URI, language, extension and undo-redo product contracts.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/model.ts",
+      "localSha256": "32514ccd18bd1e765739ffae1230c41a0c041f9a8f48d064264c55073464b32b",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/textModelSearch.ts",
+      "upstreamBlob": "ae259f035d5db2a25b17995352d8ea724b5dcd07",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve the complete search algorithms while replacing the concrete VS Code TextModel dependency with its exact seven-method structural read seam.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/model/textModelSearch.ts",
+      "localSha256": "bc4ed9313c0842480db7f7dedd51891ab8d01499d22dcd4809ea3d35c205509c",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeBase.ts",
+      "upstreamBlob": "bf2f4a91fee67374c1338343d38b9269d3aba303",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete upstream piece-tree storage, insertion, deletion, offset/position mapping, line access and search implementation.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeBase.ts",
+      "localSha256": "cf3b97d9f07a3324f677794221cf563cdbbbc4be2476a2514d1b2e690227c92d",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/pieceTreeTextBuffer/rbTreeBase.ts",
+      "upstreamBlob": "7dfd9d8373a26c4e068aaebb4a876599a93c0fa7",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete red-black tree nodes, rotations, insert/delete repair and metadata maintenance.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/model/pieceTreeTextBuffer/rbTreeBase.ts",
+      "localSha256": "c5a95fc659d299e31e291951bf5b1956e1b07fab0b22547ff7bae592a94221f3",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts",
+      "upstreamBlob": "f98a925a47a8a836eb23d4e7c1f4be7b09b885cb",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete buffer API, normalized EOL handling, snapshots, edit ordering/reduction, inverse edits and content-change production.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts",
+      "localSha256": "924468f4f7f84346ebaf5872d6e1c7c0035f27df0c2c892106b7dc0f8e35e419",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBufferBuilder.ts",
+      "upstreamBlob": "3ee4d87991ab66dfea838fdecbf73d8f6d3f2a71",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete chunked builder with BOM, RTL, unusual terminator, basic-ASCII, normalization and dominant-EOL detection.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBufferBuilder.ts",
+      "localSha256": "fa4ec872a4395b83d77233c955a456006176541155faa0205c29f5dba57f3028",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/test/common/core/range.test.ts",
+      "upstreamBlob": "5916ebe3370e01233335e54678afbeed4e615e2c",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Complete Range owner test suite routed through the repository Node test adapter.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/common/upstream/core/range.test.ts",
+      "localSha256": "133805f09b11a51993416b71c6b8311421273bbbbbe3e1f8f60106b93d327b4b",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/test/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.test.ts",
+      "upstreamBlob": "cb60242c20b07e0eac9325731def6e967536c0f0",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Complete 87-test piece-tree owner suite, including randomized invariant checks, adapted only to local imports, leak tracking and a piece-tree-backed model fixture.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/common/upstream/model/pieceTreeTextBuffer/pieceTreeTextBuffer.test.ts",
+      "localSha256": "7087969b606e85aafc878f5e1fcd506107caea97a8d1c483233d065364080885",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/test/common/model/textModelSearch.test.ts",
+      "upstreamBlob": "d2067f3081411d5bc37f5b41145863fd05bd63ba",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Complete 42-test search owner suite adapted to the structural model fixture and Node test adapter.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/common/upstream/model/textModelSearch.test.ts",
+      "localSha256": "989c6cfb31d251b20f7cbc4f6d58531f3c9715c76aebd45e79ff965e6e3e6c36",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    }
   ],
-  "licenses": [{ "id": "vscode-mit", "name": "MIT License", "upstreamPaths": ["LICENSE.txt"], "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt" }],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
   "dependencies": [
-    { "id": "base-common-runtime", "kind": "local-interface", "reference": "src/prctr/base/common/lifecycle.ts", "rationale": "The previously admitted base cluster supplies events, disposal, strings, buffers, collections and platform primitives." },
-    { "id": "attempt-workspace", "kind": "platform-interface", "reference": "docs/architecture/attempt-workspace.md", "rationale": "Workspace identity, remote content versions, durability, recovery and synchronization remain outside this in-memory editor cluster." }
+    {
+      "id": "base-common-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/lifecycle.ts",
+      "rationale": "The previously admitted base cluster supplies events, disposal, strings, buffers, collections and platform primitives."
+    },
+    {
+      "id": "attempt-workspace",
+      "kind": "platform-interface",
+      "reference": "docs/architecture/attempt-workspace.md",
+      "rationale": "Workspace identity, remote content versions, durability, recovery and synchronization remain outside this in-memory editor cluster."
+    }
   ],
   "divergences": [
-    { "id": "structural-search-model", "summary": "The complete TextModelSearch algorithms depend on an exact structural read seam instead of VS Code's concrete TextModel, preventing URI, language, decoration, extension and local-workspace assumptions from crossing the boundary.", "localPaths": ["src/prctr/editor/common/model/textModelSearch.ts"], "verificationRefs": ["search-owner-tests"] },
-    { "id": "text-buffer-contract-subset", "summary": "The local model contract contains every upstream type and behavior required by the admitted buffer and search cluster; every omitted VS Code model feature is an explicit non-admitted subsystem, not a reduced implementation of an admitted behavior.", "localPaths": ["src/prctr/editor/common/model.ts"], "verificationRefs": ["piece-tree-owner-tests", "search-owner-tests"] }
+    {
+      "id": "structural-search-model",
+      "summary": "The complete TextModelSearch algorithms depend on an exact structural read seam instead of VS Code's concrete TextModel, preventing URI, language, decoration, extension and local-workspace assumptions from crossing the boundary.",
+      "localPaths": ["src/prctr/editor/common/model/textModelSearch.ts"],
+      "verificationRefs": ["search-owner-tests"]
+    },
+    {
+      "id": "text-buffer-contract-subset",
+      "summary": "The local model contract contains every upstream type and behavior required by the admitted buffer and search cluster; every omitted VS Code model feature is an explicit non-admitted subsystem, not a reduced implementation of an admitted behavior.",
+      "localPaths": ["src/prctr/editor/common/model.ts"],
+      "verificationRefs": ["piece-tree-owner-tests", "search-owner-tests"]
+    }
   ],
   "verification": [
-    { "id": "piece-tree-owner-tests", "kind": "test", "path": "test/editor/common/upstream/model/pieceTreeTextBuffer/pieceTreeTextBuffer.test.ts", "obligation": "Run the complete upstream insert/delete, red-black metadata, CRLF, chunks, positions, ranges, content, API, snapshot and line-search owner suite." },
-    { "id": "search-owner-tests", "kind": "test", "path": "test/editor/common/upstream/model/textModelSearch.test.ts", "obligation": "Run the complete upstream case, whole-word, multiline, regex, capture, Unicode, CRLF, zero-length, next and previous search suite." },
-    { "id": "range-owner-tests", "kind": "test", "path": "test/editor/common/upstream/core/range.test.ts", "obligation": "Run the complete upstream Range ordering, containment and intersection suite." },
-    { "id": "source-check", "kind": "check", "path": "build/checks/source.ts", "obligation": "Verify editor-to-base dependency direction and source-cycle absence." },
-    { "id": "upstream-audit", "kind": "review", "path": "build/checks/upstreamAudit.ts", "obligation": "Verify every upstream editor source and test blob at the exact pinned revision." }
+    {
+      "id": "piece-tree-owner-tests",
+      "kind": "test",
+      "path": "test/editor/common/upstream/model/pieceTreeTextBuffer/pieceTreeTextBuffer.test.ts",
+      "obligation": "Run the complete upstream insert/delete, red-black metadata, CRLF, chunks, positions, ranges, content, API, snapshot and line-search owner suite."
+    },
+    {
+      "id": "search-owner-tests",
+      "kind": "test",
+      "path": "test/editor/common/upstream/model/textModelSearch.test.ts",
+      "obligation": "Run the complete upstream case, whole-word, multiline, regex, capture, Unicode, CRLF, zero-length, next and previous search suite."
+    },
+    {
+      "id": "range-owner-tests",
+      "kind": "test",
+      "path": "test/editor/common/upstream/core/range.test.ts",
+      "obligation": "Run the complete upstream Range ordering, containment and intersection suite."
+    },
+    {
+      "id": "source-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify editor-to-base dependency direction and source-cycle absence."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Verify every upstream editor source and test blob at the exact pinned revision."
+    }
   ]
 }

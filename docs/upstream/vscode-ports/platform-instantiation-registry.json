@@ -121,7 +121,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/instantiation/common/upstream/graph.test.ts",
       "localSha256": "ae642831d62cf70696698f153d35679e070b5f03bb1ea2f717dde50d1263b50d",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/instantiation/test/common/instantiationService.test.ts",
@@ -132,7 +137,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/instantiation/common/upstream/instantiationService.test.ts",
       "localSha256": "daa42f7c394eae1612fbc16615e3e493c69d78f28d57466de62e241ed3960996",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/instantiation/test/common/instantiationServiceMock.ts",
@@ -151,7 +161,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/registry/common/upstream/platform.test.ts",
       "localSha256": "2a61c4d388ee715af94c1682bb43b51be5ee239a546aadadafbf28fc924533e3",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     }
   ],
   "licenses": [

@@ -9,7 +9,11 @@ declare module 'node:assert' {
 		function notStrictEqual(...arguments_: any[]): void;
 		function ok(value: unknown, message?: string | Error): asserts value;
 		function rejects(...arguments_: any[]): Promise<void>;
-		function strictEqual<T>(actual: unknown, expected: T, message?: string | Error): asserts actual is T;
+		function strictEqual<T>(
+			actual: unknown,
+			expected: T,
+			message?: string | Error
+		): asserts actual is T;
 		function throws(...arguments_: any[]): void;
 	}
 	export = assert;

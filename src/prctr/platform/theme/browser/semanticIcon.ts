@@ -26,7 +26,10 @@ export interface SemanticIconControl extends IDisposable {
 	setState(state: SemanticIconState): void;
 }
 
-export function createSemanticIcon(document: Document, state: SemanticIconState): SemanticIconControl {
+export function createSemanticIcon(
+	document: Document,
+	state: SemanticIconState
+): SemanticIconControl {
 	const element = document.createElement('span');
 	element.className = 'prctr-semantic-icon';
 

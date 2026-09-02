@@ -8,36 +8,287 @@
     "interface": "src/prctr/base/browser/dom.ts",
     "decision": "docs/architecture/design-system.md"
   },
-  "upstream": { "repository": "https://github.com/microsoft/vscode", "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8" },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
   "items": [
-    { "upstreamPath": "LICENSE.txt", "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5", "category": "license", "disposition": "evidence-only", "rationale": "Canonical Microsoft MIT notice for all transferred modules and owner tests.", "licenseRefs": ["vscode-mit"] },
-    { "upstreamPath": "src/vs/base/browser/browser.ts", "upstreamBlob": "7b6cd63133cbdc2149a3e53f8f984f83edf2eb1b", "category": "source", "disposition": "copied", "rationale": "Complete current browser feature and zoom detection.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/browser.ts", "localSha256": "bcf4a6834a74c014b056a04409c9754cc413d73fc72daa92c8e9641ef13a1291", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/browser/canIUse.ts", "upstreamBlob": "d7c129abb2757ef6920de452e88321d6a2f518b2", "category": "source", "disposition": "copied", "rationale": "Complete current browser capability classification.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/canIUse.ts", "localSha256": "599a6218e25a3db8673f1a5bb9b3b1e01306973147e17881310bf1f1e94c1cad", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/browser/window.ts", "upstreamBlob": "ab920e18349ace49c32f92eb5d0c946abfbfe366", "category": "source", "disposition": "copied", "rationale": "Complete code-window identity and auxiliary-window classification.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/window.ts", "localSha256": "8d5ff94e5ea732908914fe0dbd4e6b8fb357091d8062fefcff487b93e573b64d", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/browser/iframe.ts", "upstreamBlob": "e8522e03115ea8f2278a30c72256cbb5d6a6951e", "category": "source", "disposition": "copied", "rationale": "Complete same-origin iframe position and ancestor traversal mechanics.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/iframe.ts", "localSha256": "0fb98ebf4e96a2382c5e9b1bc011f41cff6d023aa653364d546afb897e12b5f8", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/browser/keyboardEvent.ts", "upstreamBlob": "b7c24be72904b5a4a5f4fa07878d3d8883283a98", "category": "source", "disposition": "copied", "rationale": "Complete normalized keyboard event behavior and keybinding equality.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/keyboardEvent.ts", "localSha256": "436f342d063f8552f84069648f6f9125e577d2b738be70c3f22c723f4a2a51a9", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/browser/mouseEvent.ts", "upstreamBlob": "2873a56e1e40c27ffc14726c4ba8069994a3b90c", "category": "source", "disposition": "copied", "rationale": "Complete normalized mouse and wheel event behavior across zoom and iframes.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/mouseEvent.ts", "localSha256": "6f6da3fac7d8b111ace78c19cc00b68a44577ee1e52940548a44cfa64ad68dae", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/browser/fastDomNode.ts", "upstreamBlob": "218a68c4fec2c0d59142f85a3e9cfc0b9f25e411", "category": "source", "disposition": "copied", "rationale": "Complete cached DOM write surface used by mature controls.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/fastDomNode.ts", "localSha256": "5cd1a5c70aa1dc75f83aadc9d564ce19392b93947b8aad5cfae6db5ee871433b", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/browser/dom.ts", "upstreamBlob": "ac3f08fdc23bf17bff65ced4f9927acf031a9e0a", "category": "source", "disposition": "copied", "rationale": "Complete current DOM construction, lifecycle, focus, geometry, scheduling, observation, listener, window, and accessibility mechanics.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/dom.ts", "localSha256": "e19d56d6a782ca056a443c5df7515373801c55dd1b82ceff2a96171ba279a284", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/browser/touch.ts", "upstreamBlob": "8e857e292df7ef9b5bad64eda1587dbe8a125713", "category": "source", "disposition": "copied", "rationale": "Complete gesture and touch dispatch mechanics with lifecycle ownership.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/touch.ts", "localSha256": "5cae43aac1d0647e847722b7b413642912c01d78b4374fd4fc33c70343b5a474", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/browser/cssValue.ts", "upstreamBlob": "84cee8522ae9db2c7d4773e4a60ca6f7f9e695e2", "category": "source", "disposition": "copied", "rationale": "Complete safe CSS variable fallback and URL/value conversion behavior.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/cssValue.ts", "localSha256": "919e640538f6b077b8e56c834970cc3825c4484ef9fb6a2ed590bf49314fd8cd", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/common/hash.ts", "upstreamBlob": "80372db8d71bcef166fddd6866c3ab0eaae15143", "category": "source", "disposition": "copied", "rationale": "Exact transitive hashing behavior required by DOM identity helpers.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/common/hash.ts", "localSha256": "dca725a05be6ba2046e5b70d5899bc844f48657f499aa9c3c24e4dba5d90b127", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/common/numbers.ts", "upstreamBlob": "423eee869140f4dcff8efd6ce2a2d30a1f30c4f9", "category": "source", "disposition": "copied", "rationale": "Exact transitive geometry predicates required by safe-triangle behavior.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/common/numbers.ts", "localSha256": "68cf655a139d2be11340b436a98a946e141ee4e55590563adc3e7b8b9a1c596b", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/common/decorators.ts", "upstreamBlob": "74d2e56f51e1297e3ba77e08572db9f7e8ebe69b", "category": "source", "disposition": "copied", "rationale": "Exact memoization and cancellation decorator behavior required by touch mechanics.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/common/decorators.ts", "localSha256": "1f5c69e7d8cc7c2e2a61a905c4535d53f2b227401ead3ec79b358bf2f1ce3a46", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/common/buffer.ts", "upstreamBlob": "b105bdfeb86762f2b53f66afa92821a123d8424f", "category": "source", "disposition": "copied", "rationale": "Exact transitive byte-buffer behavior required by hashing.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/common/buffer.ts", "localSha256": "be9338b629523e296bf20c60f7d7fa3a6dc9cadbc575f42f4fec26007ffe014e", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/common/stream.ts", "upstreamBlob": "ebc0ef5d23b373ad75c876950046e788eaa2c591", "category": "source", "disposition": "copied", "rationale": "Exact transitive stream behavior required by byte buffers.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/common/stream.ts", "localSha256": "34e169b1c2ddebf78036bb9f0beed791164cd0a3d54d287247451eb3786ede11", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/common/decorators/cancelPreviousCalls.ts", "upstreamBlob": "50a4ca8d81950d97baa502c8bdc05773ea46c89c", "category": "source", "disposition": "copied", "rationale": "Exact decorator closure; retained rather than truncating the upstream barrel contract.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/common/decorators/cancelPreviousCalls.ts", "localSha256": "f149e986042ed8fee0715ecdfb8b48f533f9d1c092b456cbc881943d2d98d2e4", "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/test/browser/dom.test.ts", "upstreamBlob": "81bcb3c252638d6050ce2721aab5540dff6e253d", "category": "test", "disposition": "adapted", "rationale": "Run the complete current 40-test DOM owner suite in real Chromium through the local browser test adapter.", "licenseRefs": ["vscode-mit"], "localPath": "test/browser/upstream/dom.test.ts", "localSha256": "66118b410201006c0bfa3de9dff47c980f1b37b44b2d4e172f1bf2259a3000d4", "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"] },
-    { "upstreamPath": "src/vs/base/test/browser/keyboardEvent.test.ts", "upstreamBlob": "50746c7391024a2317b1d15d3c05e9d02a8db3d7", "category": "test", "disposition": "adapted", "rationale": "Run the complete current five-test normalized keyboard owner suite in real Chromium.", "licenseRefs": ["vscode-mit"], "localPath": "test/browser/upstream/keyboardEvent.test.ts", "localSha256": "344df0e76b13edecb0894843912bef8f06909f4eedf1cd96ef6f815920a26ee3", "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"] }
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Canonical Microsoft MIT notice for all transferred modules and owner tests.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/browser.ts",
+      "upstreamBlob": "7b6cd63133cbdc2149a3e53f8f984f83edf2eb1b",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete current browser feature and zoom detection.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/browser.ts",
+      "localSha256": "bcf4a6834a74c014b056a04409c9754cc413d73fc72daa92c8e9641ef13a1291",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/canIUse.ts",
+      "upstreamBlob": "d7c129abb2757ef6920de452e88321d6a2f518b2",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete current browser capability classification.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/canIUse.ts",
+      "localSha256": "599a6218e25a3db8673f1a5bb9b3b1e01306973147e17881310bf1f1e94c1cad",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/window.ts",
+      "upstreamBlob": "ab920e18349ace49c32f92eb5d0c946abfbfe366",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete code-window identity and auxiliary-window classification.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/window.ts",
+      "localSha256": "8d5ff94e5ea732908914fe0dbd4e6b8fb357091d8062fefcff487b93e573b64d",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/iframe.ts",
+      "upstreamBlob": "e8522e03115ea8f2278a30c72256cbb5d6a6951e",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete same-origin iframe position and ancestor traversal mechanics.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/iframe.ts",
+      "localSha256": "0fb98ebf4e96a2382c5e9b1bc011f41cff6d023aa653364d546afb897e12b5f8",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/keyboardEvent.ts",
+      "upstreamBlob": "b7c24be72904b5a4a5f4fa07878d3d8883283a98",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete normalized keyboard event behavior and keybinding equality.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/keyboardEvent.ts",
+      "localSha256": "436f342d063f8552f84069648f6f9125e577d2b738be70c3f22c723f4a2a51a9",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/mouseEvent.ts",
+      "upstreamBlob": "2873a56e1e40c27ffc14726c4ba8069994a3b90c",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete normalized mouse and wheel event behavior across zoom and iframes.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/mouseEvent.ts",
+      "localSha256": "6f6da3fac7d8b111ace78c19cc00b68a44577ee1e52940548a44cfa64ad68dae",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/fastDomNode.ts",
+      "upstreamBlob": "218a68c4fec2c0d59142f85a3e9cfc0b9f25e411",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete cached DOM write surface used by mature controls.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/fastDomNode.ts",
+      "localSha256": "5cd1a5c70aa1dc75f83aadc9d564ce19392b93947b8aad5cfae6db5ee871433b",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/dom.ts",
+      "upstreamBlob": "ac3f08fdc23bf17bff65ced4f9927acf031a9e0a",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete current DOM construction, lifecycle, focus, geometry, scheduling, observation, listener, window, and accessibility mechanics.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/dom.ts",
+      "localSha256": "e19d56d6a782ca056a443c5df7515373801c55dd1b82ceff2a96171ba279a284",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/touch.ts",
+      "upstreamBlob": "8e857e292df7ef9b5bad64eda1587dbe8a125713",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete gesture and touch dispatch mechanics with lifecycle ownership.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/touch.ts",
+      "localSha256": "5cae43aac1d0647e847722b7b413642912c01d78b4374fd4fc33c70343b5a474",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/cssValue.ts",
+      "upstreamBlob": "84cee8522ae9db2c7d4773e4a60ca6f7f9e695e2",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete safe CSS variable fallback and URL/value conversion behavior.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/cssValue.ts",
+      "localSha256": "919e640538f6b077b8e56c834970cc3825c4484ef9fb6a2ed590bf49314fd8cd",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/hash.ts",
+      "upstreamBlob": "80372db8d71bcef166fddd6866c3ab0eaae15143",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Exact transitive hashing behavior required by DOM identity helpers.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/hash.ts",
+      "localSha256": "dca725a05be6ba2046e5b70d5899bc844f48657f499aa9c3c24e4dba5d90b127",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/numbers.ts",
+      "upstreamBlob": "423eee869140f4dcff8efd6ce2a2d30a1f30c4f9",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Exact transitive geometry predicates required by safe-triangle behavior.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/numbers.ts",
+      "localSha256": "68cf655a139d2be11340b436a98a946e141ee4e55590563adc3e7b8b9a1c596b",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/decorators.ts",
+      "upstreamBlob": "74d2e56f51e1297e3ba77e08572db9f7e8ebe69b",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Exact memoization and cancellation decorator behavior required by touch mechanics.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/decorators.ts",
+      "localSha256": "1f5c69e7d8cc7c2e2a61a905c4535d53f2b227401ead3ec79b358bf2f1ce3a46",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/buffer.ts",
+      "upstreamBlob": "b105bdfeb86762f2b53f66afa92821a123d8424f",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Exact transitive byte-buffer behavior required by hashing.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/buffer.ts",
+      "localSha256": "be9338b629523e296bf20c60f7d7fa3a6dc9cadbc575f42f4fec26007ffe014e",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/stream.ts",
+      "upstreamBlob": "ebc0ef5d23b373ad75c876950046e788eaa2c591",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Exact transitive stream behavior required by byte buffers.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/stream.ts",
+      "localSha256": "34e169b1c2ddebf78036bb9f0beed791164cd0a3d54d287247451eb3786ede11",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/decorators/cancelPreviousCalls.ts",
+      "upstreamBlob": "50a4ca8d81950d97baa502c8bdc05773ea46c89c",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Exact decorator closure; retained rather than truncating the upstream barrel contract.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/decorators/cancelPreviousCalls.ts",
+      "localSha256": "f149e986042ed8fee0715ecdfb8b48f533f9d1c092b456cbc881943d2d98d2e4",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/test/browser/dom.test.ts",
+      "upstreamBlob": "81bcb3c252638d6050ce2721aab5540dff6e253d",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete current 40-test DOM owner suite in real Chromium through the local browser test adapter.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/browser/upstream/dom.test.ts",
+      "localSha256": "66118b410201006c0bfa3de9dff47c980f1b37b44b2d4e172f1bf2259a3000d4",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/base/test/browser/keyboardEvent.test.ts",
+      "upstreamBlob": "50746c7391024a2317b1d15d3c05e9d02a8db3d7",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete current five-test normalized keyboard owner suite in real Chromium.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/browser/upstream/keyboardEvent.test.ts",
+      "localSha256": "344df0e76b13edecb0894843912bef8f06909f4eedf1cd96ef6f815920a26ee3",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    }
   ],
-  "licenses": [{ "id": "vscode-mit", "name": "MIT License", "upstreamPaths": ["LICENSE.txt"], "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt" }],
-  "dependencies": [{ "id": "base-common-runtime", "kind": "local-interface", "reference": "src/prctr/base/common/lifecycle.ts", "rationale": "The already admitted base runtime supplies events, observables, cancellation, lifecycle, paths, URIs, and platform normalization." }],
-  "divergences": [{ "id": "mechanics-only", "summary": "Browser primitives normalize packaged renderer mechanics but cannot register product behavior, grant authority, navigate, or select a composition.", "localPaths": ["src/prctr/base/browser/dom.ts", "src/prctr/base/browser/keyboardEvent.ts", "src/prctr/base/browser/mouseEvent.ts", "src/prctr/base/browser/touch.ts"], "verificationRefs": ["browser-owner-tests", "source-composition-check"] }],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "base-common-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/lifecycle.ts",
+      "rationale": "The already admitted base runtime supplies events, observables, cancellation, lifecycle, paths, URIs, and platform normalization."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "mechanics-only",
+      "summary": "Browser primitives normalize packaged renderer mechanics but cannot register product behavior, grant authority, navigate, or select a composition.",
+      "localPaths": [
+        "src/prctr/base/browser/dom.ts",
+        "src/prctr/base/browser/keyboardEvent.ts",
+        "src/prctr/base/browser/mouseEvent.ts",
+        "src/prctr/base/browser/touch.ts"
+      ],
+      "verificationRefs": ["browser-owner-tests", "source-composition-check"]
+    }
+  ],
   "verification": [
-    { "id": "browser-owner-tests", "kind": "test", "path": "test/electron/browserHarness.real.test.ts", "obligation": "Run all 45 complete DOM and keyboard owner tests in real packaged Chromium alongside sandbox and Node-absence assertions." },
-    { "id": "browser-typecheck", "kind": "check", "path": "build/tsconfig.browser.json", "obligation": "Type-check the complete browser closure against DOM and renderer-only globals." },
-    { "id": "source-composition-check", "kind": "check", "path": "build/checks/source.ts", "obligation": "Verify layer direction, browser environment boundaries, and cycles." },
-    { "id": "offline-provenance", "kind": "check", "path": "build/checks/provenance.ts", "obligation": "Verify every transferred digest, marker, license, and unique owner." },
-    { "id": "upstream-audit", "kind": "review", "path": "build/checks/upstreamAudit.ts", "obligation": "Verify every reviewed blob at the exact admitted VS Code revision." }
+    {
+      "id": "browser-owner-tests",
+      "kind": "test",
+      "path": "test/electron/browserHarness.real.test.ts",
+      "obligation": "Run all 45 complete DOM and keyboard owner tests in real packaged Chromium alongside sandbox and Node-absence assertions."
+    },
+    {
+      "id": "browser-typecheck",
+      "kind": "check",
+      "path": "build/tsconfig.browser.json",
+      "obligation": "Type-check the complete browser closure against DOM and renderer-only globals."
+    },
+    {
+      "id": "source-composition-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify layer direction, browser environment boundaries, and cycles."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Verify every transferred digest, marker, license, and unique owner."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Verify every reviewed blob at the exact admitted VS Code revision."
+    }
   ]
 }

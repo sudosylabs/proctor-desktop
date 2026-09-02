@@ -2,7 +2,8 @@ import { RawContextKey } from '../../platform/contextkey/common/contextkey.js';
 
 export type WorkbenchWindowKind = 'launch' | 'authenticated' | 'candidate';
 export type WorkbenchLifecyclePhase = 'starting' | 'ready' | 'restored' | 'eventually';
-export type WorkbenchPartId = 'titlebar' | 'banner' | 'navigation' | 'sidebar' | 'content' | 'panel' | 'status' | 'overlay';
+export type WorkbenchPartId =
+	'titlebar' | 'banner' | 'navigation' | 'sidebar' | 'content' | 'panel' | 'status' | 'overlay';
 
 /**
  * Context keys are presentation and routing inputs only. They never establish
@@ -23,10 +24,7 @@ export const WorkbenchFocusedPartContext = new RawContextKey<WorkbenchPartId | '
 	''
 );
 
-export const WorkbenchModalContext = new RawContextKey<boolean>(
-	'prctr.workbench.modal',
-	false
-);
+export const WorkbenchModalContext = new RawContextKey<boolean>('prctr.workbench.modal', false);
 
 export const CandidateInteractionAllowedContext = new RawContextKey<boolean>(
 	'prctr.candidate.interactionAllowed',

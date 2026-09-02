@@ -8,7 +8,11 @@
       "kind": "renderer",
       "entrypoint": "src/prctr/code/electron-browser/launch.main.ts",
       "required": ["src/prctr/workbench/browser", "src/prctr/platform/theme/browser"],
-      "forbidden": ["src/prctr/platform/native", "src/prctr/workbench/contrib/candidate", "src/prctr/workbench/common"],
+      "forbidden": [
+        "src/prctr/platform/native",
+        "src/prctr/workbench/contrib/candidate",
+        "src/prctr/workbench/common"
+      ],
       "allowedDynamicImports": []
     },
     {
@@ -32,7 +36,10 @@
       "kind": "main",
       "entrypoint": "src/prctr/code/electron-main/productWindowComposition.ts",
       "required": ["src/prctr/platform/windows/common", "src/prctr/platform/windows/electron-main"],
-      "forbidden": ["src/prctr/platform/windows/electron-browser", "src/prctr/platform/native/electron-utility"],
+      "forbidden": [
+        "src/prctr/platform/windows/electron-browser",
+        "src/prctr/platform/native/electron-utility"
+      ],
       "allowedDynamicImports": []
     },
     {
@@ -63,13 +70,8 @@
       "id": "security-utility-main",
       "kind": "main",
       "entrypoint": "src/prctr/code/electron-main/securityUtilityComposition.ts",
-      "required": [
-        "src/prctr/platform/native/common",
-        "src/prctr/platform/native/electron-main"
-      ],
-      "forbidden": [
-        "src/prctr/platform/native/electron-utility"
-      ],
+      "required": ["src/prctr/platform/native/common", "src/prctr/platform/native/electron-main"],
+      "forbidden": ["src/prctr/platform/native/electron-utility"],
       "allowedDynamicImports": []
     },
     {
@@ -125,10 +127,7 @@
         "src/prctr/platform/settings/common",
         "src/prctr/platform/settings/electron-main"
       ],
-      "forbidden": [
-        "src/prctr/workbench/contrib/settings/browser",
-        "src/prctr/platform/native"
-      ],
+      "forbidden": ["src/prctr/workbench/contrib/settings/browser", "src/prctr/platform/native"],
       "allowedDynamicImports": []
     },
     {
@@ -139,9 +138,7 @@
         "src/prctr/platform/native/common",
         "src/prctr/platform/native/electron-utility"
       ],
-      "forbidden": [
-        "src/prctr/platform/native/electron-main"
-      ],
+      "forbidden": ["src/prctr/platform/native/electron-main"],
       "allowedDynamicImports": []
     }
   ]

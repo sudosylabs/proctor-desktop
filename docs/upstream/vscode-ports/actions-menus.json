@@ -33,7 +33,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/actions.ts",
       "localSha256": "0f30c36ccee140875eb41e7b18fffe0a90df9f35d048a1f293894e48c678db4d",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/actions/common/actions.ts",

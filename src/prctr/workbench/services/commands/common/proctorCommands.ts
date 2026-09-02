@@ -14,12 +14,17 @@ function assertProctorCommandId(id: string): asserts id is ProctorCommandId {
 }
 
 export const ProctorCommands = Object.freeze({
-	register<Args extends unknown[]>(id: ProctorCommandId, handler: ICommandHandler<Args>): IDisposable {
+	register<Args extends unknown[]>(
+		id: ProctorCommandId,
+		handler: ICommandHandler<Args>
+	): IDisposable {
 		assertProctorCommandId(id);
 		return CommandsRegistry.registerCommand(id, handler);
 	},
 
-	registerCommand<Args extends unknown[]>(command: ICommand<Args> & { readonly id: ProctorCommandId }): IDisposable {
+	registerCommand<Args extends unknown[]>(
+		command: ICommand<Args> & { readonly id: ProctorCommandId }
+	): IDisposable {
 		assertProctorCommandId(command.id);
 		return CommandsRegistry.registerCommand(command);
 	}

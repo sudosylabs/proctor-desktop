@@ -53,7 +53,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/commands/common/commands.ts",
       "localSha256": "38a16062ce8194edbdcd6df1767e21fcad9c83d14d0e3086452a962461fe3f0b",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/commands/test/common/commands.test.ts",
@@ -64,7 +69,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/commands/common/upstream/commands.test.ts",
       "localSha256": "a66563884a856353635f4f6d4951f05e7dbd695e6fccc50f3941898c0dd7e1d6",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/commands/test/common/nullCommandService.ts",
@@ -83,7 +93,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/services/commands/common/commandService.ts",
       "localSha256": "fce03134a102be131257429a76cfe8fde44c3b0a1f8568d64eba2b14c098c31c",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/workbench/services/commands/test/common/commandService.test.ts",

@@ -33,7 +33,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/contextkey/common/contextkey.ts",
       "localSha256": "a5610ad767354112e3145ffaf2a590411cec520eb5d05b59cd47eea18c512cfd",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/contextkey/common/scanner.ts",
@@ -44,7 +49,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/contextkey/common/scanner.ts",
       "localSha256": "da3590c97c3bdd99375595c030746e0b417ba54b35c31f804ddc55f96d350a07",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/contextkey/common/contextkeys.ts",
@@ -63,7 +73,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/contextkey/browser/contextKeyService.ts",
       "localSha256": "3c75c336ae684514f3efdd305e2284939a40ec14f8ccf99e3733512a35c2649a",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/contextkey/test/common/contextkey.test.ts",
@@ -74,7 +89,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/contextkey/common/upstream/contextkey.test.ts",
       "localSha256": "bd77dfc012026750ac88b66582649157bf57b950efabdea8c161e0b307ee0eec",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/contextkey/test/common/parser.test.ts",
@@ -85,7 +105,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/contextkey/common/upstream/parser.test.ts",
       "localSha256": "9c9ec8dacf5a9271bc240307f3bc70d9b283cc8c342a9853b0bfd027913336d1",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/contextkey/test/common/scanner.test.ts",
@@ -96,7 +121,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/contextkey/common/upstream/scanner.test.ts",
       "localSha256": "efe7d45d735918acc798381af446fdee872450fbdc232b12dcfe17d191d058c8",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/contextkey/test/browser/contextkey.test.ts",

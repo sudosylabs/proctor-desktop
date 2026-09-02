@@ -3,7 +3,17 @@
   "$id": "source-boundaries.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "schemaVersion", "sourceRoot", "layers", "environments", "environmentOverrides", "testSegments", "productionDynamicImportAllowlist", "cssImportantOverrides"],
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "sourceRoot",
+    "layers",
+    "environments",
+    "environmentOverrides",
+    "testSegments",
+    "productionDynamicImportAllowlist",
+    "cssImportantOverrides"
+  ],
   "properties": {
     "$schema": { "const": "./schemas/source-boundaries.schema.json" },
     "schemaVersion": { "const": 1 },

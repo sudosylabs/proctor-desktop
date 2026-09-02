@@ -22,11 +22,23 @@
     "dependency": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["package", "version", "kind", "purpose", "owner", "source", "license", "lifecycleScripts"],
+      "required": [
+        "package",
+        "version",
+        "kind",
+        "purpose",
+        "owner",
+        "source",
+        "license",
+        "lifecycleScripts"
+      ],
       "properties": {
         "ecosystem": { "enum": ["npm", "cargo"] },
         "package": { "type": "string", "minLength": 1 },
-        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$" },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$"
+        },
         "kind": { "enum": ["development", "production"] },
         "purpose": { "type": "string", "minLength": 1 },
         "owner": { "type": "string", "minLength": 1 },
@@ -39,7 +51,12 @@
           "uniqueItems": true,
           "items": { "$ref": "#/$defs/cargoDeclaration" }
         },
-        "processes": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "processes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
         "networkBehavior": { "type": "string", "minLength": 1 },
         "nativeBehavior": { "type": "string", "minLength": 1 },
         "transitiveRisk": { "type": "string", "minLength": 1 },
@@ -51,7 +68,18 @@
       "allOf": [
         {
           "if": { "properties": { "kind": { "const": "production" } }, "required": ["kind"] },
-          "then": { "required": ["processes", "networkBehavior", "nativeBehavior", "transitiveRisk", "bundleTreatment", "localAlternative", "updateOwner", "removalOwner"] }
+          "then": {
+            "required": [
+              "processes",
+              "networkBehavior",
+              "nativeBehavior",
+              "transitiveRisk",
+              "bundleTreatment",
+              "localAlternative",
+              "updateOwner",
+              "removalOwner"
+            ]
+          }
         },
         {
           "if": { "properties": { "ecosystem": { "const": "cargo" } }, "required": ["ecosystem"] },
@@ -62,12 +90,24 @@
     "cargoDeclaration": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["manifest", "alias", "kind", "features", "defaultFeatures", "optional", "targetScope"],
+      "required": [
+        "manifest",
+        "alias",
+        "kind",
+        "features",
+        "defaultFeatures",
+        "optional",
+        "targetScope"
+      ],
       "properties": {
         "manifest": { "type": "string", "pattern": "^native/(?:[A-Za-z0-9._-]+/)+Cargo\\.toml$" },
         "alias": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
         "kind": { "enum": ["development", "production"] },
-        "features": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "features": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
         "defaultFeatures": { "type": "boolean" },
         "optional": { "type": "boolean" },
         "targetScope": { "oneOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] }

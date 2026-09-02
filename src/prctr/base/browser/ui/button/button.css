@@ -1,14 +1,74 @@
 @layer controls {
-  .prctr-button { align-items: center; background: transparent; border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong); border-radius: var(--prctr-shape-radius-small); color: var(--prctr-color-text-primary); cursor: pointer; display: inline-flex; font: var(--prctr-typography-weight-semibold) var(--prctr-typography-label-size)/var(--prctr-typography-label-lineHeight) var(--prctr-typography-font-application); gap: var(--prctr-spacing-content-small); justify-content: center; min-block-size: 32px; min-inline-size: 44px; padding: var(--prctr-spacing-control-block) var(--prctr-spacing-control-inline); position: relative; }
-  .prctr-button[data-variant="primary"] { background: var(--prctr-color-interaction-accent); border-color: var(--prctr-color-interaction-accent); color: var(--prctr-color-text-inverse); }
-  .prctr-button[data-variant="danger"] { background: var(--prctr-color-feedback-errorBackground); border-color: var(--prctr-color-feedback-error); }
-  .prctr-button:hover:not(:disabled) { background-color: var(--prctr-color-interaction-hover); }
-  .prctr-button:active:not(:disabled) { background-color: var(--prctr-color-interaction-active); }
-  .prctr-button:focus-visible { outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus); outline-offset: 2px; }
-  .prctr-button:disabled { color: var(--prctr-color-text-disabled); cursor: not-allowed; opacity: .72; }
-  .prctr-button .prctr-button__label { overflow-wrap: anywhere; }
-  .prctr-button .prctr-button__busy { border: var(--prctr-shape-stroke-default) solid currentColor; border-inline-end-color: transparent; border-radius: var(--prctr-shape-radius-circle); block-size: var(--prctr-icon-size-small); inline-size: var(--prctr-icon-size-small); animation: prctr-button-spin var(--prctr-motion-duration-slow) linear infinite; }
-  @keyframes prctr-button-spin { to { transform: rotate(1turn); } }
-  @media (prefers-reduced-motion: reduce) { .prctr-button .prctr-button__busy { animation: none; border-inline-end-color: currentColor; } }
-  @media (forced-colors: active) { .prctr-button { border-color: ButtonText; } .prctr-button:focus-visible { outline-color: Highlight; } }
+	.prctr-button {
+		align-items: center;
+		background: transparent;
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border-radius: var(--prctr-shape-radius-small);
+		color: var(--prctr-color-text-primary);
+		cursor: pointer;
+		display: inline-flex;
+		font: var(--prctr-typography-weight-semibold)
+			var(--prctr-typography-label-size)/var(--prctr-typography-label-lineHeight)
+			var(--prctr-typography-font-application);
+		gap: var(--prctr-spacing-content-small);
+		justify-content: center;
+		min-block-size: 32px;
+		min-inline-size: 44px;
+		padding: var(--prctr-spacing-control-block) var(--prctr-spacing-control-inline);
+		position: relative;
+	}
+	.prctr-button[data-variant='primary'] {
+		background: var(--prctr-color-interaction-accent);
+		border-color: var(--prctr-color-interaction-accent);
+		color: var(--prctr-color-text-inverse);
+	}
+	.prctr-button[data-variant='danger'] {
+		background: var(--prctr-color-feedback-errorBackground);
+		border-color: var(--prctr-color-feedback-error);
+	}
+	.prctr-button:hover:not(:disabled) {
+		background-color: var(--prctr-color-interaction-hover);
+	}
+	.prctr-button:active:not(:disabled) {
+		background-color: var(--prctr-color-interaction-active);
+	}
+	.prctr-button:focus-visible {
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 2px;
+	}
+	.prctr-button:disabled {
+		color: var(--prctr-color-text-disabled);
+		cursor: not-allowed;
+		opacity: 0.72;
+	}
+	.prctr-button .prctr-button__label {
+		overflow-wrap: anywhere;
+	}
+	.prctr-button .prctr-button__busy {
+		border: var(--prctr-shape-stroke-default) solid currentColor;
+		border-inline-end-color: transparent;
+		border-radius: var(--prctr-shape-radius-circle);
+		block-size: var(--prctr-icon-size-small);
+		inline-size: var(--prctr-icon-size-small);
+		animation: prctr-button-spin var(--prctr-motion-duration-slow) linear infinite;
+	}
+	@keyframes prctr-button-spin {
+		to {
+			transform: rotate(1turn);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.prctr-button .prctr-button__busy {
+			animation: none;
+			border-inline-end-color: currentColor;
+		}
+	}
+	@media (forced-colors: active) {
+		.prctr-button {
+			border-color: ButtonText;
+		}
+		.prctr-button:focus-visible {
+			outline-color: Highlight;
+		}
+	}
 }

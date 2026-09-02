@@ -44,7 +44,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/performance.test.ts",
       "localSha256": "2a4ed29cea605383960217c0ed5745efa8ba4ed42a48d1210415c551059039d6",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/browser/performance.ts",

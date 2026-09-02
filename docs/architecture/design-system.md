@@ -102,15 +102,15 @@ Application chrome uses the operating-system UI font. Monospace is reserved for
 code, terminals, logs, and data that requires alignment. Examination content
 uses controlled content roles and cannot override application chrome.
 
-| Typography role | Font size / line height |
-| --- | --- |
-| `label.small` | 12px / 16px |
-| `label` | 13px / 18px |
-| `body` | 14px / 20px |
-| `content.body` | 16px / 24px |
-| `heading.small` | 16px / 22px |
-| `heading.medium` | 20px / 28px |
-| `heading.large` | 24px / 32px |
+| Typography role  | Font size / line height |
+| ---------------- | ----------------------- |
+| `label.small`    | 12px / 16px             |
+| `label`          | 13px / 18px             |
+| `body`           | 14px / 20px             |
+| `content.body`   | 16px / 24px             |
+| `heading.small`  | 16px / 22px             |
+| `heading.medium` | 20px / 28px             |
+| `heading.large`  | 24px / 32px             |
 
 Use weights 400 and 600; weight alone cannot communicate state. Whole-window
 zoom is the primary scaling mechanism, and layout must reflow rather than clip.

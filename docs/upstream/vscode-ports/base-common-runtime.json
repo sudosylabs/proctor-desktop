@@ -4,10 +4,7 @@
   "clusterId": "base-common-runtime",
   "admission": {
     "workflow": "Provide the mature disposal, event, cancellation, asynchronous scheduling, resource, and observable mechanics used by Proctor browser controls, workbench services, and later admitted editor modules without reduced local substitutes.",
-    "callers": [
-      "test/browser/rendererHarness.ts",
-      "test/base/common/upstream/event.test.ts"
-    ],
+    "callers": ["test/browser/rendererHarness.ts", "test/base/common/upstream/event.test.ts"],
     "interface": "src/prctr/base/common/event.ts",
     "decision": "docs/architecture/toolchain.md"
   },
@@ -22,9 +19,7 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "The canonical Microsoft MIT text is preserved as the local notice for this cluster.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/common/arrays.ts",
@@ -32,15 +27,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/arrays.ts",
       "localSha256": "67ea075d95296d94e9c3c404ba9be284e44fef77b22fd1abd15f0d9b6dd225a1",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/arraysFind.ts",
@@ -48,15 +38,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/arraysFind.ts",
       "localSha256": "2a203965baa95cdafd5e0e0b41095f376fcb7dfb8ad86cbf1c663fe8e0c3b005",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/assert.ts",
@@ -64,15 +49,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/assert.ts",
       "localSha256": "79a0d675ae46cfa38bfc9d3ad8b33166ee72f61556086f02430e9af9bc5843be",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/async.ts",
@@ -80,15 +60,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/async.ts",
       "localSha256": "902c661572db376bf94005cb8558619ff6a6643e73d63a0979df47167ecd1f38",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/cache.ts",
@@ -96,15 +71,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/cache.ts",
       "localSha256": "db2187f109ba9bd9a5c1944d657a474c8cf13ff680101859846f01560f92af7a",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/cancellation.ts",
@@ -112,15 +82,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/cancellation.ts",
       "localSha256": "28adfcffce6fc19140ba1f6b8c7ea2169fa68ee984646fe346360dd0b05dc018",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/charCode.ts",
@@ -128,15 +93,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/charCode.ts",
       "localSha256": "8090cba0f97eaa8205f7e35dceed0ab67abf3d089816c3501e6549bd4d012991",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/collections.ts",
@@ -144,15 +104,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/collections.ts",
       "localSha256": "5b0ab1d49c4f195214253f09bcc1796dfbeeace98702875ed826ccc37b86cf85",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/equals.ts",
@@ -160,15 +115,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/equals.ts",
       "localSha256": "51543aec2607e1c68dcc762332dadab6cca33658038ecece9fd87fbd0964c33d",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/errors.ts",
@@ -176,9 +126,7 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/errors.ts",
       "localSha256": "76bb877033e44dcb92783817eb7ceaecaa080ca015367c51eaa15de1055a315f",
       "mechanicalTransforms": [
@@ -193,15 +141,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/event.ts",
       "localSha256": "41fa31c81b8a066951dc14603fbe063b1fc1b61340d785319ee9c9476a31565e",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/extpath.ts",
@@ -209,15 +152,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/extpath.ts",
       "localSha256": "296f5b51912f3e3351c200118610618478f0553dff2fad49a623bd4fe03b23fb",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/functional.ts",
@@ -225,15 +163,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/functional.ts",
       "localSha256": "5dc41af26d7e887c9f9b0abf4d616047793b689c2558ffd5a675f901c23433a4",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/iterator.ts",
@@ -241,15 +174,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/iterator.ts",
       "localSha256": "3df8b1f09927ea3d4105e94116d78d9c5358dffbef6775681fb1763a389efe99",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/lazy.ts",
@@ -257,15 +185,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/lazy.ts",
       "localSha256": "33d36feefde5186dd8e6f8b1fce83c7ca38b3b57050377a8b87a4e0a96fadeac",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/lifecycle.ts",
@@ -273,15 +196,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/lifecycle.ts",
       "localSha256": "75392af8e3f2fc94eafb2f6ac5c36167b2edb6225f99cb518e0552e5d0d06003",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/linkedList.ts",
@@ -289,15 +207,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/linkedList.ts",
       "localSha256": "bd555d315fd2e175173d24dc0df035f934c398684a280407c8160e2d26ee5a77",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/map.ts",
@@ -305,15 +218,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/map.ts",
       "localSha256": "6be53b39ac19c8d830660ce260562c4b5681011c3ba44218406f95a9f9d01001",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/marshallingIds.ts",
@@ -321,15 +229,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/marshallingIds.ts",
       "localSha256": "8080fcc1d5d0aa1e87f201b2c22755342ac6dabfaa92189288e7b36452cf2f29",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/network.ts",
@@ -337,9 +240,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve VS Code resource URI behavior while substituting the explicit Proctor resource-root seam for the ambient VS Code product global.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/network.ts",
       "localSha256": "2f912277706c78b7753550747836a32f033964cb982691d08a8b33d654dc33df",
       "mechanicalTransforms": [
@@ -354,15 +255,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observable.ts",
       "localSha256": "0d7f95107823c9259f1a030a9223f261cc6c7fd483eedd8e679c10b7402e85d1",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/base.ts",
@@ -370,15 +266,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/base.ts",
       "localSha256": "752f5351c0e05892e29af06a57e12d596ea7f6a0c2a448cb0f3053d22781ba7d",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/changeTracker.ts",
@@ -386,15 +277,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/changeTracker.ts",
       "localSha256": "e4f7e27171a87482641e8e601a8de1770aba2a241c3fc454a581309ee895aed9",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/commonFacade/cancellation.ts",
@@ -402,15 +288,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/commonFacade/cancellation.ts",
       "localSha256": "6889f5e60ed3b239df73d26ab62793659f0cb9aa8a94ffab360b3fc266576db7",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/commonFacade/deps.ts",
@@ -418,15 +299,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/commonFacade/deps.ts",
       "localSha256": "9ecf071f1c99b7edb76c5400a519eee8d2192d56f13e7ecf391c9a2f2520bb2c",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/debugLocation.ts",
@@ -434,15 +310,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/debugLocation.ts",
       "localSha256": "4257cd70a00a0da346b9dc164b4d96ddd323aa741fb66f442cf6f4f2775665a6",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/debugName.ts",
@@ -450,15 +321,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/debugName.ts",
       "localSha256": "eba545751393195f598fb5573a0645cb805854eb4c03e0292d54e9f4c50a9474",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/experimental/utils.ts",
@@ -466,15 +332,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/experimental/utils.ts",
       "localSha256": "14f4f0cb995f835fc9ced66215689f57e49ad5b096e01436747380a81d65f594",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/index.ts",
@@ -482,15 +343,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/index.ts",
       "localSha256": "36b161688bd0b77f6c5f39b83d51433db5eb2cdaf927b8c5b9b8cc41f5e72f8b",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/logging/consoleObservableLogger.ts",
@@ -498,15 +354,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/logging/consoleObservableLogger.ts",
       "localSha256": "c5d649807543abb429194bf53942dc55b04963c4c31072002439af6c9328f304",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/logging/debugGetDependencyGraph.ts",
@@ -514,15 +365,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/logging/debugGetDependencyGraph.ts",
       "localSha256": "2d3985a21b190cb71c36c23a2df0f9a0b4a58ee645a8108c6fddc61c4d9c60ef",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/logging/debugger/debuggerApi.d.ts",
@@ -530,15 +376,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/logging/debugger/debuggerApi.d.ts",
       "localSha256": "20ef7a31ad9490024b2d68c42e2995cd428c071d6e9c7b3a1d52974d90628822",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/logging/debugger/debuggerRpc.ts",
@@ -546,15 +387,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/logging/debugger/debuggerRpc.ts",
       "localSha256": "94e83a81c335a6a34d13996bec58255a882dbe3659f2704c87738f3afe730956",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/logging/debugger/devToolsLogger.ts",
@@ -562,15 +398,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/logging/debugger/devToolsLogger.ts",
       "localSha256": "9f1c245b4089c9cd152ec15b303cc3c1ce50553194a0ea4aa5b30f5457133012",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/logging/debugger/rpc.ts",
@@ -578,15 +409,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/logging/debugger/rpc.ts",
       "localSha256": "bcad6199dbab4bdea8a500edaeeab043cc47971b438c431bbd30e59bc5332656",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/logging/debugger/utils.ts",
@@ -594,15 +420,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/logging/debugger/utils.ts",
       "localSha256": "f7b58c56f98708bbb7ddd36a0a4fc9a41a660b192415d2ff1f9e4604d53e89c6",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/logging/logging.ts",
@@ -610,15 +431,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/logging/logging.ts",
       "localSha256": "67bf6641d961c086667c616898ce405f089e425ee8ac56119f6b02de681a172f",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/map.ts",
@@ -626,15 +442,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/map.ts",
       "localSha256": "4b74d504d5a4f6382f29e80d4f23ee82bfab525c53cecb7ea2655524239c4b13",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/baseObservable.ts",
@@ -642,15 +453,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/baseObservable.ts",
       "localSha256": "5c4b564c32502baacbb6885de12e5168fc9a26f9671944071839533c5a2d4deb",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/constObservable.ts",
@@ -658,15 +464,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/constObservable.ts",
       "localSha256": "8192bb3168abd5d9f011995229ec7728ea39c1c1d0ea404188c593290ab15c57",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/derived.ts",
@@ -674,15 +475,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/derived.ts",
       "localSha256": "0e70dcab716198577a2f953bda4e1905ae958967b75e7ce56039c00f1f505845",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/derivedImpl.ts",
@@ -690,15 +486,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/derivedImpl.ts",
       "localSha256": "5dd7db095bc2b6ca6f9fec9411d673be2e229b6d5f7ae595a51d5f69c15e0dde",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/lazyObservableValue.ts",
@@ -706,15 +497,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/lazyObservableValue.ts",
       "localSha256": "952769412f432494fe75930e6ae2d0c5985a67de44ac8f330235e8bee84b8a28",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/observableFromEvent.ts",
@@ -722,15 +508,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/observableFromEvent.ts",
       "localSha256": "af0dcb01d46c210ea5a117f8cbc4a371081a53be8ebc8d97fb312581d4626b2c",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/observableSignal.ts",
@@ -738,15 +519,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/observableSignal.ts",
       "localSha256": "8b5ca80532adbe536ca987d437406e5d07fa451d8e1b4d766df3b208f90709f8",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/observableSignalFromEvent.ts",
@@ -754,15 +530,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/observableSignalFromEvent.ts",
       "localSha256": "f4e78190c3708a7a3e7fc82404891f3402b5aa24d5b1e70731a9e37b91e585d6",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/observableValue.ts",
@@ -770,15 +541,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/observableValue.ts",
       "localSha256": "031c4081b91c7a4f99eb2ab9b5f550ea238fb7cd77c5719fff0f2e8589ef79ab",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/observables/observableValueOpts.ts",
@@ -786,15 +552,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/observables/observableValueOpts.ts",
       "localSha256": "273d6013c46fa00c9fd96a08dc5fc6d7ef7c84babfda2be7398b16ad9a0003a0",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/reactions/autorun.ts",
@@ -802,15 +563,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/reactions/autorun.ts",
       "localSha256": "635eca4a4f7e1998ee1caf1a145be447fc6d4aefe78ed140f5181e8162231a40",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/reactions/autorunImpl.ts",
@@ -818,15 +574,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/reactions/autorunImpl.ts",
       "localSha256": "77369978036f4d839caef6962d5bb2a6d740a46ab87c4171bf39669126ddb921",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/set.ts",
@@ -834,15 +585,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/set.ts",
       "localSha256": "7e5e7fac145d4aff20ccdc146d5b6bf6601f8c90093f8d29e1e16531942ae752",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/transaction.ts",
@@ -850,15 +596,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/transaction.ts",
       "localSha256": "e1ef33e4f86f4bc78359401ccfbfa813526424910a6259cd5ceeadfbfcdbc29f",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/utils/promise.ts",
@@ -866,15 +607,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/utils/promise.ts",
       "localSha256": "f4dc0434d3390515564ca7ab42ea82a3a854230c623ce1f50c32aeea2e4a15fb",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/utils/runOnChange.ts",
@@ -882,15 +618,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/utils/runOnChange.ts",
       "localSha256": "68891a1601882e5848add01d7cc1be59d1af859690ae7108ba96ab7a13efcd6a",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/utils/utils.ts",
@@ -898,15 +629,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/utils/utils.ts",
       "localSha256": "ab280db6e923bc5e70b76f69ed42af093338895615396e9b0e0b4321be32b6ed",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/utils/utilsCancellation.ts",
@@ -914,15 +640,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/utils/utilsCancellation.ts",
       "localSha256": "cd1335ebc6914e015773da00b798307e43033a28cd6733433e05e68c68a02135",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/utils/valueWithChangeEvent.ts",
@@ -930,15 +651,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/observableInternal/utils/valueWithChangeEvent.ts",
       "localSha256": "474abf2b9fdb61e1165088167b84377e8cee0773207cf84a0ac2a3bafaac857b",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/path.ts",
@@ -946,15 +662,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/path.ts",
       "localSha256": "ef9c9dcadc4025dc526c43d3699d108105c51bd87b46947a7b4048e3d21e9fe6",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/platform.ts",
@@ -962,9 +673,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve platform detection and scheduling behavior while substituting the admitted Proctor localization compatibility seam for VS Code bootstrap globals.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/platform.ts",
       "localSha256": "d82f63ba32e85aaac79f6c050e66a22488408140f3f12149a53a331808ac549a",
       "mechanicalTransforms": [
@@ -979,15 +688,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/process.ts",
       "localSha256": "4150c6a350cd0d23a0546df257f4e738abe2256805145c725c74a34ee91eaa24",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/resources.ts",
@@ -995,15 +699,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/resources.ts",
       "localSha256": "2016ca39efc731e199ae0a186b4f74020734da8fe4c83757997ae9cb20feed19",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/sequence.ts",
@@ -1011,15 +710,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/sequence.ts",
       "localSha256": "5453e8154365d98b39def8eae2461dcd3a02036233b092cb03954b45d834a246",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/stopwatch.ts",
@@ -1027,15 +721,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/stopwatch.ts",
       "localSha256": "21f4f21acee604fa2c902b3f2991e1e43f929c4b817f9adc11bc533ca9c5fe23",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/strings.ts",
@@ -1043,15 +732,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/strings.ts",
       "localSha256": "6136b6b6c6297c20b804287ef239ff39751132beee33245246005c942db6bf78",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/symbols.ts",
@@ -1059,15 +743,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/symbols.ts",
       "localSha256": "0f3689afcaf5dfbfd8ebfe8f3eb7f8e7d44e92c6a52b89d885834febadcaf578",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/typings/thenable.d.ts",
@@ -1075,15 +754,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the ambient compile-time contract required by the admitted upstream common sources.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/thenable.d.ts",
       "localSha256": "8463df7c307f49940ab87463e1340baa6bcb705e87710864645e70fa96cb5be5",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/types.ts",
@@ -1091,15 +765,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/types.ts",
       "localSha256": "849bb31fa50f33aa75084b788f14a40d31cde0ed92ab8d39d2e6bbb6cac308ee",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/uint.ts",
@@ -1107,15 +776,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/uint.ts",
       "localSha256": "4a4663d595def1addce2f305c6496c1a0d290c3d014f84aebb43d2da54eab122",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/uri.ts",
@@ -1123,15 +787,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete statically reachable base-common implementation and its upstream module topology.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/uri.ts",
       "localSha256": "56e4cbf8fb5a0d1253ff0845583d9b43c389ee2a13af2f31851fb45bee0ea8e8",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/typings/base-common.d.ts",
@@ -1139,15 +798,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the ambient compile-time contract required by the admitted upstream common sources.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/vscodeBaseCommonGlobals.d.ts",
       "localSha256": "dafe8b054a8a34e461bd6ef25c20e6649a4f6884dc7e28638e021256720ea0c3",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/test/common/arrays.test.ts",
@@ -1155,9 +809,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/arrays.test.ts",
       "localSha256": "cc893564bbe711b5e2be00ca38ecd023029d7808ed38a7bcdfc5c318854edca7",
       "mechanicalTransforms": [
@@ -1173,9 +825,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/arraysFind.test.ts",
       "localSha256": "86adaaa95ea14a7142d5ce686153a7418d741a84da7bf4dcc0812c317cf47282",
       "mechanicalTransforms": [
@@ -1191,9 +841,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/assert.test.ts",
       "localSha256": "cdcb311bcbb56b55d29cc40a51bb90c507c367a565d40875157aac5a9df838e5",
       "mechanicalTransforms": [
@@ -1209,9 +857,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/async.test.ts",
       "localSha256": "1fdb9c70abe9ef2bddae8bf587f3e6c020c57d1bbe378aac942922438e0163b8",
       "mechanicalTransforms": [
@@ -1227,9 +873,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/cache.test.ts",
       "localSha256": "53ba9d282ede0ab882434296635a00bff763443864c6d16e3e9726dbee143e1b",
       "mechanicalTransforms": [
@@ -1245,9 +889,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/cancellation.test.ts",
       "localSha256": "6481b85b3b99eea781740c8e1e32403c924c17c98c1e60a7d032af7b95d48da6",
       "mechanicalTransforms": [
@@ -1263,9 +905,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/charCode.test.ts",
       "localSha256": "e08e08b8c397d1aa515b7127048e27ca1d3247324bb96affbd9139566127ecf7",
       "mechanicalTransforms": [
@@ -1281,9 +921,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/collections.test.ts",
       "localSha256": "19b5ec174bcefd8235976f03855669818ea11b110541b88415a8ca1d27244f97",
       "mechanicalTransforms": [
@@ -1299,9 +937,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/event.test.ts",
       "localSha256": "bba337a40c45b450c902628adf6c35f50fccb40dc46011f2bf57afaab8f7b7d5",
       "mechanicalTransforms": [
@@ -1317,9 +953,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/executionGraph.ts",
       "localSha256": "3780f073aa3820e62b4fb5cba43c86c0732e7c40b67a470a99ebd1d29784ef37",
       "mechanicalTransforms": [
@@ -1335,9 +969,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/extpath.test.ts",
       "localSha256": "5f19cd62d9ca7d9cc06d63f5e89b081c5da7e9481ea5d422c77918c14b2ea8d4",
       "mechanicalTransforms": [
@@ -1353,9 +985,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/iterator.test.ts",
       "localSha256": "394620fececc1b55c79a22eedeb397e62aff88820c31d89fc4754b431c69d9ef",
       "mechanicalTransforms": [
@@ -1371,9 +1001,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/lazy.test.ts",
       "localSha256": "675bf8226e5073910c0149555d23a058e68a5555bbedf9d75d5dc0973fdd1465",
       "mechanicalTransforms": [
@@ -1389,9 +1017,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/lifecycle.test.ts",
       "localSha256": "28a798c79137bf3ef35588a73f35a099bb89a318f8087a60f27886a519e418d6",
       "mechanicalTransforms": [
@@ -1407,9 +1033,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/linkedList.test.ts",
       "localSha256": "5de9770d9ea2d26af60107ef138c0dde8a4bd97fbe2f41ab4a13a8316fe747d8",
       "mechanicalTransforms": [
@@ -1425,9 +1049,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/map.test.ts",
       "localSha256": "2d1efab4ed3219991d7177ef1c378df27c7ae30946cccb2558afea6da80aefe5",
       "mechanicalTransforms": [
@@ -1443,9 +1065,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve resource URI cases through the explicit Proctor resource-root seam instead of the ambient VS Code product global.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/network.test.ts",
       "localSha256": "41643781a9ee3cbda9c90ae4bf6dba58f3f9b39428565ea0945eb0a4fb3c70fe",
       "mechanicalTransforms": [
@@ -1461,9 +1081,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/observableInternal/logging/debugger/rpc.test.ts",
       "localSha256": "adc25eed84f56827299a3ff4d74395ee134c4f1ebeaacbede3c1b996da9c7ef7",
       "mechanicalTransforms": [
@@ -1479,9 +1097,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/observables/debug.test.ts",
       "localSha256": "3889302d983a27b7545e82cbee95f4b5477514fdc3ea8be97bd168f0b1dc46b1",
       "mechanicalTransforms": [
@@ -1497,9 +1113,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the observable tutorial, transaction, dependency, disposal, and error cases in the admitted runtime; the separate experimental reducer cases are explicitly excluded.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/observables/observable.test.ts",
       "localSha256": "ad89464ff56c548bdac6df0f5493b4f9948b555bed3c9ff91fd5825263cf43c8",
       "mechanicalTransforms": [
@@ -1515,9 +1129,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/observables/throttledObservable.test.ts",
       "localSha256": "8bd9598ba11d93bb340d1453895473df4367ce91ed059768e0e03580b9c056bb",
       "mechanicalTransforms": [
@@ -1533,9 +1145,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/path.test.ts",
       "localSha256": "bb3decc04bdadde7b916d54f8d3d613a20f60005b56620eb1d5391390b07f61f",
       "mechanicalTransforms": [
@@ -1551,9 +1161,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/resources.test.ts",
       "localSha256": "eff374b71e8b7c37c06411aa8f30b4fab885c04ee8c957957d3825d4284c27cf",
       "mechanicalTransforms": [
@@ -1569,9 +1177,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/strings.test.ts",
       "localSha256": "829dbd5de1cba06b9827faad1f590dca76a3410022116969d1e3fe902c1d08a3",
       "mechanicalTransforms": [
@@ -1587,9 +1193,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/timeTravelScheduler.ts",
       "localSha256": "96a55d388ec44089ab578e4a0afd805dd78b1741ab3f740644dad925b39c6e2e",
       "mechanicalTransforms": [
@@ -1605,9 +1209,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/types.test.ts",
       "localSha256": "d135eaecad2fac17b04307abeac47bc63e1279fffce3563b471b73423e124a8d",
       "mechanicalTransforms": [
@@ -1623,9 +1225,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream disposable leak-tracking helper while adapting hooks to the local Node test adapter.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/upstreamTestUtils.ts",
       "localSha256": "18aab4fcca2968e45c974782c700b026f8cc4a8817654458c346ca4104b9d2be",
       "mechanicalTransforms": [
@@ -1641,9 +1241,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/uri.test.ts",
       "localSha256": "f5df4d47b75157ad3e7e15547221dd9b0eb1e3d3caea6398b9f86ddae9d4ca69",
       "mechanicalTransforms": [
@@ -1659,9 +1257,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/embedding.ts",
       "localSha256": "30ba51bf71104d94194d566d230d549b59a70172462277c513ce61692f997147",
       "mechanicalTransforms": [
@@ -1677,9 +1273,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/globalTimeApi.ts",
       "localSha256": "17e4d099b5b63b261a306056829b6836fc317b9a1e60e72b67ec1ffc5c0d01d8",
       "mechanicalTransforms": [
@@ -1695,9 +1289,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/index.ts",
       "localSha256": "7ed083649c9daf0403b0b77602053c9eac8ac2cf1e121f5eaba18ffa73a94912",
       "mechanicalTransforms": [
@@ -1713,9 +1305,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/loggingTimeApi.ts",
       "localSha256": "8bb2d7d42d9039ec5ce2ac298c9a04600b7adcc63f61db73d32b44b99fa5f4c1",
       "mechanicalTransforms": [
@@ -1731,9 +1321,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/processor.ts",
       "localSha256": "2448d439a0aefec565d0f34b251675ecdb38b8a2296839fcc708bc8a6f4ee332",
       "mechanicalTransforms": [
@@ -1749,9 +1337,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/recordingTimeApi.ts",
       "localSha256": "0b22f89572e3185da66cc8628101f6e598dbae989d4789ce3ecd094f27cbc2f6",
       "mechanicalTransforms": [
@@ -1767,9 +1353,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/runWithFakedTimers.ts",
       "localSha256": "ea4731e68c1ee3d0fbc6e679ceab7369d19c339b56247b5b00fe5b3af35b38f4",
       "mechanicalTransforms": [
@@ -1785,9 +1369,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/timeApi.ts",
       "localSha256": "a22dda02d86faf62661998543559d06564f21bd93a93696a4c17b1acdbf18712",
       "mechanicalTransforms": [
@@ -1803,9 +1385,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/trace.ts",
       "localSha256": "89ab14f6c7638ca53ab5851fad57496ca84cc35105dcec00be5aa5c5ef177e41",
       "mechanicalTransforms": [
@@ -1821,9 +1401,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/traceLogger.ts",
       "localSha256": "766ed10432d4652919444aed17aa286a93f662e17f7f7c6dc5a5b7a8688eee93",
       "mechanicalTransforms": [
@@ -1839,9 +1417,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/virtualClock.ts",
       "localSha256": "1540aa3bacce674a89c2bc5dec2a05562ff665c27526fc57661220facd231dd1",
       "mechanicalTransforms": [
@@ -1857,9 +1433,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve upstream owner assertions, timing, ordering, disposal, cancellation, failure, and diagnostic behavior while adapting only paths and the test runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/virtualScheduling.test.ts",
       "localSha256": "0655b052d1432a910d9e9c414a7e8366637a1dab3d2676ed7b6abf0425938941",
       "mechanicalTransforms": [
@@ -1875,9 +1449,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Preserve the upstream deterministic virtual-time or execution-history support required by the transferred owner suites, adapted to local paths and the Node runner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/virtualScheduling/virtualTimeApi.ts",
       "localSha256": "3752046f8d243fa58e79eeff2cbd108ae7082fca4a276369ab2299bdc58b475f",
       "mechanicalTransforms": [
@@ -1911,9 +1483,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "The experimental reducer is outside the approved static closure and is not exported by the admitted observable facade; its dedicated cases are removed as one explicit behavior exclusion.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/common/observableInternal/experimental/time.ts",
@@ -1921,9 +1491,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "This experimental time facade is outside the approved static closure; the non-experimental throttledObservable implementation and its owner suite are retained.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/test/common/errors.test.ts",
@@ -1931,9 +1499,7 @@
       "category": "test",
       "disposition": "evidence-only",
       "rationale": "The suite is coupled to errorMessage.ts outside the approved closure; admitted error routing, cancellation, and serialization dependencies remain exercised by assert, async, event, lifecycle, and observable owner suites.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/test/common/marshalling.test.ts",
@@ -1941,18 +1507,14 @@
       "category": "test",
       "disposition": "excluded",
       "rationale": "It owns marshalling.ts, which is outside the approved closure; marshallingIds.ts is a constants-only dependency and no reduced marshalling substitute is introduced.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -1998,10 +1560,7 @@
         "src/prctr/base/common/resourceRoot.ts",
         "src/prctr/base/common/vscodeNls.ts"
       ],
-      "verificationRefs": [
-        "base-common-runtime-tests",
-        "real-browser-base-common"
-      ]
+      "verificationRefs": ["base-common-runtime-tests", "real-browser-base-common"]
     },
     {
       "id": "node-test-harness",
@@ -2012,10 +1571,7 @@
         "test/base/common/upstream/upstreamTestUtils.ts",
         "build/buildBaseCommonTests.ts"
       ],
-      "verificationRefs": [
-        "base-common-runtime-tests",
-        "base-common-test-typecheck"
-      ]
+      "verificationRefs": ["base-common-runtime-tests", "base-common-test-typecheck"]
     },
     {
       "id": "experimental-observable-exclusion",
@@ -2025,10 +1581,7 @@
         "test/base/common/upstream/observables/observable.test.ts",
         "test/base/common/upstream/observables/throttledObservable.test.ts"
       ],
-      "verificationRefs": [
-        "base-common-runtime-tests",
-        "upstream-audit"
-      ]
+      "verificationRefs": ["base-common-runtime-tests", "upstream-audit"]
     },
     {
       "id": "upstream-compiler-semantics",
@@ -2051,10 +1604,7 @@
         "src/prctr/base/common/observableInternal/logging/debugger/rpc.ts",
         "test/browser/rendererHarness.ts"
       ],
-      "verificationRefs": [
-        "real-browser-base-common",
-        "source-graph-enforcement"
-      ]
+      "verificationRefs": ["real-browser-base-common", "source-graph-enforcement"]
     }
   ],
   "verification": [

@@ -44,7 +44,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/keybindingLabels.ts",
       "localSha256": "02da5fd2fcae6e0ff27e0bb78cf63c3d38a48cd654e09070731148a2d8710e9b",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/keybindingParser.ts",
@@ -88,7 +93,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/keybinding/common/abstractKeybindingService.ts",
       "localSha256": "2b7366e5006a8aa60ca309e07b0d0f6e11b6b7ce53280cbc94a045319361b6c8",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/keybinding/common/baseResolvedKeybinding.ts",
@@ -165,7 +175,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/services/keybinding/browser/browserKeybindingService.ts",
       "localSha256": "47ace26c93e07cf463986f068164b8218c30bb166cfb5f11906a5af6d00767cc",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/keybinding/test/common/abstractKeybindingService.test.ts",
@@ -176,7 +191,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/keybinding/common/upstream/abstractKeybindingService.test.ts",
       "localSha256": "08a143191e0e90fa9f2988baf6cfdb0ccc75d39540466f20c293cb6af366c852",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/keybinding/test/common/keybindingLabels.test.ts",
@@ -187,7 +207,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/keybinding/common/upstream/keybindingLabels.test.ts",
       "localSha256": "1e1833187422f8108321093cb3b3319fa527be3567a2ac4cac154a77a0c98ced",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/keybinding/test/common/keybindingResolver.test.ts",
@@ -198,7 +223,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/keybinding/common/upstream/keybindingResolver.test.ts",
       "localSha256": "06e7fe87859ed5437e732ac604ca0a9aa6751a0b5c801f1356e03411b1707e1e",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/keybinding/test/common/keybindingsTestUtils.ts",
@@ -209,7 +239,12 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/keybinding/common/upstream/keybindingsTestUtils.ts",
       "localSha256": "b7ac0a9c0fd8671ceadb6180c1c5a3ccffe9cc5c4a7ebb85ba1635c9da6452eb",
-      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/platform/keybinding/test/common/mockKeybindingService.ts",

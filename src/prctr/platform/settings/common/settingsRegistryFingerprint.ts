@@ -6,7 +6,10 @@ export function stableStringify(value: unknown): string {
 	if (value === null || typeof value !== 'object') return JSON.stringify(value);
 	if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
 	const record = value as Readonly<Record<string, unknown>>;
-	return `{${Object.keys(record).sort().map(key => `${JSON.stringify(key)}:${stableStringify(record[key])}`).join(',')}}`;
+	return `{${Object.keys(record)
+		.sort()
+		.map((key) => `${JSON.stringify(key)}:${stableStringify(record[key])}`)
+		.join(',')}}`;
 }
 
 /** Stable non-security identity used for parity; server-issued Attempt digests remain authoritative. */

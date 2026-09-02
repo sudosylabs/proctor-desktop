@@ -1,14 +1,65 @@
 @layer controls {
-  .prctr-text-field { color: var(--prctr-color-text-primary); display: grid; font-family: var(--prctr-typography-font-application); gap: var(--prctr-spacing-content-small); max-inline-size: 36rem; min-inline-size: 0; }
-  .prctr-text-field .prctr-text-field__label { font-size: var(--prctr-typography-label-size); font-weight: var(--prctr-typography-weight-semibold); line-height: var(--prctr-typography-label-lineHeight); }
-  .prctr-text-field .prctr-text-field__input { background: var(--prctr-color-background-surface); border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default); border-radius: var(--prctr-shape-radius-small); color: var(--prctr-color-text-primary); font: var(--prctr-typography-weight-regular) var(--prctr-typography-body-size)/var(--prctr-typography-body-lineHeight) var(--prctr-typography-font-application); min-block-size: 32px; min-inline-size: 0; padding: var(--prctr-spacing-control-block) var(--prctr-spacing-control-inline); }
-  .prctr-text-field .prctr-text-field__input:focus-visible { border-color: var(--prctr-color-border-focus); outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus); outline-offset: 1px; }
-  .prctr-text-field[data-state="invalid"] .prctr-text-field__input { border-color: var(--prctr-color-feedback-error); }
-  .prctr-text-field[data-state="readonly"] .prctr-text-field__input { border-style: dashed; }
-  .prctr-text-field .prctr-text-field__description, .prctr-text-field .prctr-text-field__error, .prctr-text-field .prctr-text-field__unavailable { font-size: var(--prctr-typography-label-small-size); line-height: var(--prctr-typography-label-small-lineHeight); margin: 0; overflow-wrap: anywhere; }
-  .prctr-text-field .prctr-text-field__description { color: var(--prctr-color-text-secondary); }
-  .prctr-text-field .prctr-text-field__error { color: var(--prctr-color-feedback-error); }
-  .prctr-text-field .prctr-text-field__unavailable { color: var(--prctr-color-text-disabled); }
-  .prctr-text-field .prctr-text-field__input:disabled { cursor: not-allowed; opacity: .72; }
-  @media (forced-colors: active) { .prctr-text-field .prctr-text-field__input:focus-visible { border-color: Highlight; outline-color: Highlight; } }
+	.prctr-text-field {
+		color: var(--prctr-color-text-primary);
+		display: grid;
+		font-family: var(--prctr-typography-font-application);
+		gap: var(--prctr-spacing-content-small);
+		max-inline-size: 36rem;
+		min-inline-size: 0;
+	}
+	.prctr-text-field .prctr-text-field__label {
+		font-size: var(--prctr-typography-label-size);
+		font-weight: var(--prctr-typography-weight-semibold);
+		line-height: var(--prctr-typography-label-lineHeight);
+	}
+	.prctr-text-field .prctr-text-field__input {
+		background: var(--prctr-color-background-surface);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border-radius: var(--prctr-shape-radius-small);
+		color: var(--prctr-color-text-primary);
+		font: var(--prctr-typography-weight-regular)
+			var(--prctr-typography-body-size)/var(--prctr-typography-body-lineHeight)
+			var(--prctr-typography-font-application);
+		min-block-size: 32px;
+		min-inline-size: 0;
+		padding: var(--prctr-spacing-control-block) var(--prctr-spacing-control-inline);
+	}
+	.prctr-text-field .prctr-text-field__input:focus-visible {
+		border-color: var(--prctr-color-border-focus);
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
+	}
+	.prctr-text-field[data-state='invalid'] .prctr-text-field__input {
+		border-color: var(--prctr-color-feedback-error);
+	}
+	.prctr-text-field[data-state='readonly'] .prctr-text-field__input {
+		border-style: dashed;
+	}
+	.prctr-text-field .prctr-text-field__description,
+	.prctr-text-field .prctr-text-field__error,
+	.prctr-text-field .prctr-text-field__unavailable {
+		font-size: var(--prctr-typography-label-small-size);
+		line-height: var(--prctr-typography-label-small-lineHeight);
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+	.prctr-text-field .prctr-text-field__description {
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-text-field .prctr-text-field__error {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-text-field .prctr-text-field__unavailable {
+		color: var(--prctr-color-text-disabled);
+	}
+	.prctr-text-field .prctr-text-field__input:disabled {
+		cursor: not-allowed;
+		opacity: 0.72;
+	}
+	@media (forced-colors: active) {
+		.prctr-text-field .prctr-text-field__input:focus-visible {
+			border-color: Highlight;
+			outline-color: Highlight;
+		}
+	}
 }

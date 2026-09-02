@@ -1,95 +1,785 @@
 import assert from 'node:assert';
 import { test } from '../../../../base/common/upstream/testAdapter.ts';
-import { errorHandler, setUnexpectedErrorHandler } from '../../../../../src/prctr/base/common/errors.ts';
+import {
+	errorHandler,
+	setUnexpectedErrorHandler
+} from '../../../../../src/prctr/base/common/errors.ts';
 import { BrowserActivityLedger } from '../../../../../src/prctr/platform/integratedBrowser/common/browserActivityLedger.ts';
-import type { BrowserActivityKind, BrowserActivityRecord, BrowserActivityScope, BrowserActivitySeal, BrowserActivityState, ProtectedBrowserActivityMutation, ProtectedBrowserActivityPort } from '../../../../../src/prctr/platform/integratedBrowser/common/browserActivity.ts';
+import type {
+	BrowserActivityKind,
+	BrowserActivityRecord,
+	BrowserActivityScope,
+	BrowserActivitySeal,
+	BrowserActivityState,
+	ProtectedBrowserActivityMutation,
+	ProtectedBrowserActivityPort
+} from '../../../../../src/prctr/platform/integratedBrowser/common/browserActivity.ts';
 import type { PrivilegedBrowserEngine } from '../../../../../src/prctr/platform/integratedBrowser/common/browserEnforcement.ts';
 import { validateBrowserPolicy } from '../../../../../src/prctr/platform/integratedBrowser/common/browserPolicy.ts';
 import { validateIntegratedBrowserProjection } from '../../../../../src/prctr/platform/integratedBrowser/common/browserProtocol.ts';
-import { IntegratedBrowserCoordinator, type IntegratedBrowserGate } from '../../../../../src/prctr/workbench/services/integratedBrowser/common/integratedBrowserCoordinator.ts';
+import {
+	IntegratedBrowserCoordinator,
+	type IntegratedBrowserGate
+} from '../../../../../src/prctr/workbench/services/integratedBrowser/common/integratedBrowserCoordinator.ts';
 
-class Store implements ProtectedBrowserActivityPort { state: BrowserActivityState | undefined; async load() { return { kind: 'available' as const, ...(this.state === undefined ? {} : { state: this.state }) }; } async replace(state: BrowserActivityState) { this.state = state; } async apply(requestedScope: BrowserActivityScope, sourceInstanceId: string, mutations: readonly ProtectedBrowserActivityMutation[]) { this.state = applyMutations(this.state, requestedScope, sourceInstanceId, mutations); } }
-class Engine implements PrivilegedBrowserEngine { opened: string[] = []; navigated: string[] = []; blocked = true; closed = false; openBarrier: Promise<void> | undefined; navigateBarrier: Promise<void> | undefined; closeBarrier: Promise<void> | undefined; backCalls = 0; forwardCalls = 0; reloadCalls = 0; async open(url: string) { this.opened.push(url); await this.openBarrier; } async navigate(url: string) { this.navigated.push(url); await this.navigateBarrier; } async back() { this.backCalls++; } async forward() { this.forwardCalls++; } async reload() { this.reloadCalls++; } async close() { await this.closeBarrier; this.closed = true; } setInputBlocked(value: boolean) { this.blocked = value; } historyState() { return { canGoBack: false, canGoForward: false }; } }
-function policyInputRevision(revision: string, ordinal: number, digest: string) { return { schemaVersion: 1 as const, attemptId: 'attempt:one', participationGeneration: 3, revision, ordinal, digest, rules: [{ id: 'docs', origin: 'https://docs.example.test', pathPrefix: '/reference', allowRedirects: true, blockedConsequence: 'integrityEvidence' as const }] }; }
-function policyRevision(revision: string, ordinal: number, digest: string) { return validateBrowserPolicy(policyInputRevision(revision, ordinal, digest)); }
+class Store implements ProtectedBrowserActivityPort {
+	state: BrowserActivityState | undefined;
+	async load() {
+		return {
+			kind: 'available' as const,
+			...(this.state === undefined ? {} : { state: this.state })
+		};
+	}
+	async replace(state: BrowserActivityState) {
+		this.state = state;
+	}
+	async apply(
+		requestedScope: BrowserActivityScope,
+		sourceInstanceId: string,
+		mutations: readonly ProtectedBrowserActivityMutation[]
+	) {
+		this.state = applyMutations(this.state, requestedScope, sourceInstanceId, mutations);
+	}
+}
+class Engine implements PrivilegedBrowserEngine {
+	opened: string[] = [];
+	navigated: string[] = [];
+	blocked = true;
+	closed = false;
+	openBarrier: Promise<void> | undefined;
+	navigateBarrier: Promise<void> | undefined;
+	closeBarrier: Promise<void> | undefined;
+	backCalls = 0;
+	forwardCalls = 0;
+	reloadCalls = 0;
+	async open(url: string) {
+		this.opened.push(url);
+		await this.openBarrier;
+	}
+	async navigate(url: string) {
+		this.navigated.push(url);
+		await this.navigateBarrier;
+	}
+	async back() {
+		this.backCalls++;
+	}
+	async forward() {
+		this.forwardCalls++;
+	}
+	async reload() {
+		this.reloadCalls++;
+	}
+	async close() {
+		await this.closeBarrier;
+		this.closed = true;
+	}
+	setInputBlocked(value: boolean) {
+		this.blocked = value;
+	}
+	historyState() {
+		return { canGoBack: false, canGoForward: false };
+	}
+}
+function policyInputRevision(revision: string, ordinal: number, digest: string) {
+	return {
+		schemaVersion: 1 as const,
+		attemptId: 'attempt:one',
+		participationGeneration: 3,
+		revision,
+		ordinal,
+		digest,
+		rules: [
+			{
+				id: 'docs',
+				origin: 'https://docs.example.test',
+				pathPrefix: '/reference',
+				allowRedirects: true,
+				blockedConsequence: 'integrityEvidence' as const
+			}
+		]
+	};
+}
+function policyRevision(revision: string, ordinal: number, digest: string) {
+	return validateBrowserPolicy(policyInputRevision(revision, ordinal, digest));
+}
 const policy = policyRevision('browser:1', 1, 'sha256:abcdefgh');
-const activeGate: IntegratedBrowserGate = { attemptState: 'active', participationGeneration: 3, paused: false, posture: 'compliant', coordinatorAvailable: true };
+const activeGate: IntegratedBrowserGate = {
+	attemptState: 'active',
+	participationGeneration: 3,
+	paused: false,
+	posture: 'compliant',
+	coordinatorAvailable: true
+};
 const institutionOrigin = 'https://institution.example.test';
-async function create() { const stores: Store[] = []; let source = 0; const activityFactory = { async create(current: typeof policy) { const store = new Store(); stores.push(store); const scope: BrowserActivityScope = { attemptId: current.attemptId, participationGeneration: current.participationGeneration, policyRevision: current.revision, policyDigest: current.digest }; return BrowserActivityLedger.create({ scope, capacity: 16, store, identity: { nextSourceInstanceId: () => `source:${++source}` }, clock: { now: () => 1 } }); } }; const ledger = await activityFactory.create(policy); const engine = new Engine(); const coordinator = new IntegratedBrowserCoordinator(policy, activeGate, engine, ledger, activityFactory, institutionOrigin); return { coordinator, engine, store: stores[0]!, stores, ledger }; }
+async function create() {
+	const stores: Store[] = [];
+	let source = 0;
+	const activityFactory = {
+		async create(current: typeof policy) {
+			const store = new Store();
+			stores.push(store);
+			const scope: BrowserActivityScope = {
+				attemptId: current.attemptId,
+				participationGeneration: current.participationGeneration,
+				policyRevision: current.revision,
+				policyDigest: current.digest
+			};
+			return BrowserActivityLedger.create({
+				scope,
+				capacity: 16,
+				store,
+				identity: { nextSourceInstanceId: () => `source:${++source}` },
+				clock: { now: () => 1 }
+			});
+		}
+	};
+	const ledger = await activityFactory.create(policy);
+	const engine = new Engine();
+	const coordinator = new IntegratedBrowserCoordinator(
+		policy,
+		activeGate,
+		engine,
+		ledger,
+		activityFactory,
+		institutionOrigin
+	);
+	return { coordinator, engine, store: stores[0]!, stores, ledger };
+}
 
 test('coordinator opens only a packaged rule, checks intents, minimizes commits and blocks popups', async () => {
-	const { coordinator, engine, store } = await create(); await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); assert.deepStrictEqual(engine.opened, ['https://docs.example.test/reference']); coordinator.commitTopLevel('https://docs.example.test/reference?q=secret#fragment', 'navigation'); assert.deepStrictEqual(coordinator.observe().location, { scheme: 'https', host: 'docs.example.test', port: '', path: '/reference' }); await coordinator.handleIntent({ kind: 'browser.navigate', url: 'https://docs.example.test/reference/api?token=secret' }); assert.strictEqual(engine.navigated.length, 1); await coordinator.handleIntent({ kind: 'browser.navigate', url: 'https://blocked.example.test/private?secret=value' }); await coordinator.handleIntent({ kind: 'browser.navigate', url: 'https://bücher.example/private?secret=value' }); await coordinator.handleIntent({ kind: 'browser.navigate', url: 'https://user@bad..example.test:8443/private?secret=value' }); coordinator.blockPopup('https://docs.example.test/reference/popup'); coordinator.blockPopup('https://bad..example.test/private?secret=value'); await coordinator.closeBrowser(); assert.strictEqual(validateIntegratedBrowserProjection(coordinator.observe()).canOpen, false); const records = store.state!.records; assert.deepStrictEqual(records.map(record => record.kind), ['browserOpened', 'topLevelNavigation', 'blockedTopLevelNavigation', 'blockedTopLevelNavigation', 'blockedTopLevelNavigation', 'blockedTopLevelNavigation', 'blockedTopLevelNavigation', 'browserClosed']); assert.deepStrictEqual(records[3]?.location, { scheme: 'https', host: '', port: '', path: '/private' }); assert.deepStrictEqual(records[4]?.location, { scheme: 'https', host: '', port: '', path: '/private' }); assert.deepStrictEqual(records[6]?.location, { scheme: 'https', host: '', port: '', path: '/private' }); assert.strictEqual(JSON.stringify(records).includes('secret'), false); await coordinator.dispose();
+	const { coordinator, engine, store } = await create();
+	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	assert.deepStrictEqual(engine.opened, ['https://docs.example.test/reference']);
+	coordinator.commitTopLevel(
+		'https://docs.example.test/reference?q=secret#fragment',
+		'navigation'
+	);
+	assert.deepStrictEqual(coordinator.observe().location, {
+		scheme: 'https',
+		host: 'docs.example.test',
+		port: '',
+		path: '/reference'
+	});
+	await coordinator.handleIntent({
+		kind: 'browser.navigate',
+		url: 'https://docs.example.test/reference/api?token=secret'
+	});
+	assert.strictEqual(engine.navigated.length, 1);
+	await coordinator.handleIntent({
+		kind: 'browser.navigate',
+		url: 'https://blocked.example.test/private?secret=value'
+	});
+	await coordinator.handleIntent({
+		kind: 'browser.navigate',
+		url: 'https://bücher.example/private?secret=value'
+	});
+	await coordinator.handleIntent({
+		kind: 'browser.navigate',
+		url: 'https://user@bad..example.test:8443/private?secret=value'
+	});
+	coordinator.blockPopup('https://docs.example.test/reference/popup');
+	coordinator.blockPopup('https://bad..example.test/private?secret=value');
+	await coordinator.closeBrowser();
+	assert.strictEqual(validateIntegratedBrowserProjection(coordinator.observe()).canOpen, false);
+	const records = store.state!.records;
+	assert.deepStrictEqual(
+		records.map((record) => record.kind),
+		[
+			'browserOpened',
+			'topLevelNavigation',
+			'blockedTopLevelNavigation',
+			'blockedTopLevelNavigation',
+			'blockedTopLevelNavigation',
+			'blockedTopLevelNavigation',
+			'blockedTopLevelNavigation',
+			'browserClosed'
+		]
+	);
+	assert.deepStrictEqual(records[3]?.location, {
+		scheme: 'https',
+		host: '',
+		port: '',
+		path: '/private'
+	});
+	assert.deepStrictEqual(records[4]?.location, {
+		scheme: 'https',
+		host: '',
+		port: '',
+		path: '/private'
+	});
+	assert.deepStrictEqual(records[6]?.location, {
+		scheme: 'https',
+		host: '',
+		port: '',
+		path: '/private'
+	});
+	assert.strictEqual(JSON.stringify(records).includes('secret'), false);
+	await coordinator.dispose();
 });
 
 test('pause, stale generation, suspension and stale policy correction gate before presentation', async () => {
-	const { coordinator, engine, ledger } = await create(); await coordinator.updateGate({ ...activeGate, paused: true }); assert.strictEqual(engine.blocked, true); const activityBeforePopup = ledger.pending().length; coordinator.blockPopup('https://docs.example.test/reference/popup'); assert.strictEqual(ledger.pending().length, activityBeforePopup); await assert.rejects(coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }), /paused/u); await coordinator.updateGate(activeGate); assert.strictEqual(engine.blocked, true); await assert.rejects(coordinator.replacePolicy(policyInputRevision('browser:1', 1, 'sha256:abcdefgh')), /stale/u); await coordinator.updateGate({ ...activeGate, participationGeneration: 4 }); assert.strictEqual(coordinator.observe().blockedReason, 'participationStale'); await coordinator.updateGate({ ...activeGate, attemptState: 'suspended', participationGeneration: 4 }); assert.strictEqual(engine.closed, true); await coordinator.dispose();
+	const { coordinator, engine, ledger } = await create();
+	await coordinator.updateGate({ ...activeGate, paused: true });
+	assert.strictEqual(engine.blocked, true);
+	const activityBeforePopup = ledger.pending().length;
+	coordinator.blockPopup('https://docs.example.test/reference/popup');
+	assert.strictEqual(ledger.pending().length, activityBeforePopup);
+	await assert.rejects(
+		coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }),
+		/paused/u
+	);
+	await coordinator.updateGate(activeGate);
+	assert.strictEqual(engine.blocked, true);
+	await assert.rejects(
+		coordinator.replacePolicy(policyInputRevision('browser:1', 1, 'sha256:abcdefgh')),
+		/stale/u
+	);
+	await coordinator.updateGate({ ...activeGate, participationGeneration: 4 });
+	assert.strictEqual(coordinator.observe().blockedReason, 'participationStale');
+	await coordinator.updateGate({
+		...activeGate,
+		attemptState: 'suspended',
+		participationGeneration: 4
+	});
+	assert.strictEqual(engine.closed, true);
+	await coordinator.dispose();
 });
 
 test('policy corrections are exactly validated, Institution-bound, cloned, and frozen before queuing', async () => {
 	const { coordinator, engine } = await create();
-	assert.throws(() => coordinator.replacePolicy({ schemaVersion: 1, attemptId: 'attempt:one', participationGeneration: 3, revision: 'browser:2', ordinal: 2, digest: 'sha256:ijklmnop', rules: [{ id: 'docs', origin: 'https://docs.example.test', pathPrefix: '/reference', allowRedirects: true, blockedConsequence: 'integrityEvidence' }], extra: true }), /exact supported schema/u);
-	assert.throws(() => coordinator.replacePolicy({ schemaVersion: 1, attemptId: 'attempt:one', participationGeneration: 3, revision: 'browser:2', ordinal: 2, digest: 'sha256:ijklmnop', rules: [{ id: 'docs', origin: 'http://other.example.test', pathPrefix: '/reference', allowRedirects: true, blockedConsequence: 'integrityEvidence', institutionHttpException: true }] }), /outside the bound Institution origin/u);
-	const correction = { schemaVersion: 1, attemptId: 'attempt:one', participationGeneration: 3, revision: 'browser:2', ordinal: 2, digest: 'sha256:ijklmnop', rules: [{ id: 'docs', origin: 'https://docs.example.test', pathPrefix: '/reference', allowRedirects: true, blockedConsequence: 'integrityEvidence' }] };
-	const replacing = coordinator.replacePolicy(correction); correction.rules[0]!.origin = 'https://mutated.example.test'; await replacing;
-	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); assert.deepStrictEqual(engine.opened, ['https://docs.example.test/reference']); await coordinator.dispose();
+	assert.throws(
+		() =>
+			coordinator.replacePolicy({
+				schemaVersion: 1,
+				attemptId: 'attempt:one',
+				participationGeneration: 3,
+				revision: 'browser:2',
+				ordinal: 2,
+				digest: 'sha256:ijklmnop',
+				rules: [
+					{
+						id: 'docs',
+						origin: 'https://docs.example.test',
+						pathPrefix: '/reference',
+						allowRedirects: true,
+						blockedConsequence: 'integrityEvidence'
+					}
+				],
+				extra: true
+			}),
+		/exact supported schema/u
+	);
+	assert.throws(
+		() =>
+			coordinator.replacePolicy({
+				schemaVersion: 1,
+				attemptId: 'attempt:one',
+				participationGeneration: 3,
+				revision: 'browser:2',
+				ordinal: 2,
+				digest: 'sha256:ijklmnop',
+				rules: [
+					{
+						id: 'docs',
+						origin: 'http://other.example.test',
+						pathPrefix: '/reference',
+						allowRedirects: true,
+						blockedConsequence: 'integrityEvidence',
+						institutionHttpException: true
+					}
+				]
+			}),
+		/outside the bound Institution origin/u
+	);
+	const correction = {
+		schemaVersion: 1,
+		attemptId: 'attempt:one',
+		participationGeneration: 3,
+		revision: 'browser:2',
+		ordinal: 2,
+		digest: 'sha256:ijklmnop',
+		rules: [
+			{
+				id: 'docs',
+				origin: 'https://docs.example.test',
+				pathPrefix: '/reference',
+				allowRedirects: true,
+				blockedConsequence: 'integrityEvidence'
+			}
+		]
+	};
+	const replacing = coordinator.replacePolicy(correction);
+	correction.rules[0]!.origin = 'https://mutated.example.test';
+	await replacing;
+	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	assert.deepStrictEqual(engine.opened, ['https://docs.example.test/reference']);
+	await coordinator.dispose();
 });
 
 test('throwing projection observers cannot interrupt policy rotation or browser lifecycle', async () => {
-	const originalHandler = errorHandler.getUnexpectedErrorHandler(); const observerErrors: unknown[] = []; setUnexpectedErrorHandler(error => observerErrors.push(error)); try { const { coordinator, engine, stores } = await create(); const throwingObserver = coordinator.onDidChange(() => { throw new Error('observer failed'); });
-		await coordinator.replacePolicy(policyInputRevision('browser:2', 2, 'sha256:ijklmnop')); await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); coordinator.commitTopLevel('https://docs.example.test/reference/observed', 'navigation'); await coordinator.closeBrowser();
-		assert.deepStrictEqual(engine.opened, ['https://docs.example.test/reference']); assert.strictEqual(stores.length, 2); assert.deepStrictEqual(stores[1]?.state?.records.map(record => record.kind), ['browserOpened', 'topLevelNavigation', 'browserClosed']); assert.strictEqual(observerErrors.length > 0, true); throwingObserver.dispose(); await coordinator.dispose(); } finally { setUnexpectedErrorHandler(originalHandler); }
+	const originalHandler = errorHandler.getUnexpectedErrorHandler();
+	const observerErrors: unknown[] = [];
+	setUnexpectedErrorHandler((error) => observerErrors.push(error));
+	try {
+		const { coordinator, engine, stores } = await create();
+		const throwingObserver = coordinator.onDidChange(() => {
+			throw new Error('observer failed');
+		});
+		await coordinator.replacePolicy(policyInputRevision('browser:2', 2, 'sha256:ijklmnop'));
+		await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+		coordinator.commitTopLevel('https://docs.example.test/reference/observed', 'navigation');
+		await coordinator.closeBrowser();
+		assert.deepStrictEqual(engine.opened, ['https://docs.example.test/reference']);
+		assert.strictEqual(stores.length, 2);
+		assert.deepStrictEqual(
+			stores[1]?.state?.records.map((record) => record.kind),
+			['browserOpened', 'topLevelNavigation', 'browserClosed']
+		);
+		assert.strictEqual(observerErrors.length > 0, true);
+		throwingObserver.dispose();
+		await coordinator.dispose();
+	} finally {
+		setUnexpectedErrorHandler(originalHandler);
+	}
 });
 
 test('browser lifecycle rejects premature controls and fences close races and late engine callbacks', async () => {
-	const { coordinator, engine, store } = await create(); await assert.rejects(coordinator.handleIntent({ kind: 'browser.reload' }), /not open: idle/u); await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); let releaseClose = () => {}; engine.closeBarrier = new Promise<void>(resolve => { releaseClose = resolve; }); const closing = coordinator.closeBrowser(); assert.deepStrictEqual(coordinator.observe(), { state: 'blocked', policyRevision: policy.revision, canOpen: false, canClose: false, canGoBack: false, canGoForward: false, canReload: false, blockedReason: 'evidenceUnavailable' }); await assert.rejects(coordinator.handleIntent({ kind: 'browser.reload' }), /evidenceUnavailable/u); assert.strictEqual(engine.reloadCalls, 0); coordinator.commitTopLevel('https://docs.example.test/reference/late', 'navigation'); assert.strictEqual(coordinator.checkSubresource('https://docs.example.test/reference/late.js'), false); releaseClose(); await closing; coordinator.commitTopLevel('https://docs.example.test/reference/after-close', 'navigation'); assert.deepStrictEqual(store.state?.records.map(record => record.kind), ['browserOpened', 'browserClosed']); await coordinator.dispose();
+	const { coordinator, engine, store } = await create();
+	await assert.rejects(coordinator.handleIntent({ kind: 'browser.reload' }), /not open: idle/u);
+	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	let releaseClose = () => {};
+	engine.closeBarrier = new Promise<void>((resolve) => {
+		releaseClose = resolve;
+	});
+	const closing = coordinator.closeBrowser();
+	assert.deepStrictEqual(coordinator.observe(), {
+		state: 'blocked',
+		policyRevision: policy.revision,
+		canOpen: false,
+		canClose: false,
+		canGoBack: false,
+		canGoForward: false,
+		canReload: false,
+		blockedReason: 'evidenceUnavailable'
+	});
+	await assert.rejects(
+		coordinator.handleIntent({ kind: 'browser.reload' }),
+		/evidenceUnavailable/u
+	);
+	assert.strictEqual(engine.reloadCalls, 0);
+	coordinator.commitTopLevel('https://docs.example.test/reference/late', 'navigation');
+	assert.strictEqual(
+		coordinator.checkSubresource('https://docs.example.test/reference/late.js'),
+		false
+	);
+	releaseClose();
+	await closing;
+	coordinator.commitTopLevel('https://docs.example.test/reference/after-close', 'navigation');
+	assert.deepStrictEqual(
+		store.state?.records.map((record) => record.kind),
+		['browserOpened', 'browserClosed']
+	);
+	await coordinator.dispose();
 });
 
 test('browser lifecycle serializes pending open and navigation commands before closure', async () => {
-	const openingFixture = await create(); let releaseOpen = () => {}; openingFixture.engine.openBarrier = new Promise<void>(resolve => { releaseOpen = resolve; }); const opening = openingFixture.coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); await waitFor(() => openingFixture.engine.opened.length === 1); const closeDuringOpen = openingFixture.coordinator.closeBrowser(); assert.strictEqual(openingFixture.engine.closed, false); releaseOpen(); await Promise.all([opening, closeDuringOpen]); assert.strictEqual(openingFixture.engine.closed, true); assert.strictEqual(openingFixture.coordinator.observe().state, 'closed'); await openingFixture.coordinator.dispose();
-	const navigationFixture = await create(); await navigationFixture.coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); let releaseNavigation = () => {}; navigationFixture.engine.navigateBarrier = new Promise<void>(resolve => { releaseNavigation = resolve; }); const navigation = navigationFixture.coordinator.handleIntent({ kind: 'browser.navigate', url: 'https://docs.example.test/reference/pending' }); await waitFor(() => navigationFixture.engine.navigated.length === 1); const closeDuringNavigation = navigationFixture.coordinator.closeBrowser(); assert.strictEqual(navigationFixture.engine.closed, false); releaseNavigation(); await Promise.all([navigation, closeDuringNavigation]); assert.strictEqual(navigationFixture.engine.closed, true); await navigationFixture.coordinator.dispose();
+	const openingFixture = await create();
+	let releaseOpen = () => {};
+	openingFixture.engine.openBarrier = new Promise<void>((resolve) => {
+		releaseOpen = resolve;
+	});
+	const opening = openingFixture.coordinator.handleIntent({
+		kind: 'browser.open',
+		startRuleId: 'docs'
+	});
+	await waitFor(() => openingFixture.engine.opened.length === 1);
+	const closeDuringOpen = openingFixture.coordinator.closeBrowser();
+	assert.strictEqual(openingFixture.engine.closed, false);
+	releaseOpen();
+	await Promise.all([opening, closeDuringOpen]);
+	assert.strictEqual(openingFixture.engine.closed, true);
+	assert.strictEqual(openingFixture.coordinator.observe().state, 'closed');
+	await openingFixture.coordinator.dispose();
+	const navigationFixture = await create();
+	await navigationFixture.coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	let releaseNavigation = () => {};
+	navigationFixture.engine.navigateBarrier = new Promise<void>((resolve) => {
+		releaseNavigation = resolve;
+	});
+	const navigation = navigationFixture.coordinator.handleIntent({
+		kind: 'browser.navigate',
+		url: 'https://docs.example.test/reference/pending'
+	});
+	await waitFor(() => navigationFixture.engine.navigated.length === 1);
+	const closeDuringNavigation = navigationFixture.coordinator.closeBrowser();
+	assert.strictEqual(navigationFixture.engine.closed, false);
+	releaseNavigation();
+	await Promise.all([navigation, closeDuringNavigation]);
+	assert.strictEqual(navigationFixture.engine.closed, true);
+	await navigationFixture.coordinator.dispose();
 });
 
 test('browser open failure atomically closes the engine when activity admission fails', async () => {
-	const order: string[] = []; const engine = new Engine(); const sink = new RetryableSink(order); sink.failAppend = true; sink.failFlush = false; const coordinator = new IntegratedBrowserCoordinator(policy, activeGate, engine, sink, { create: async () => new RetryableSink(order) }, institutionOrigin); await assert.rejects(coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }), /append unavailable/u); assert.strictEqual(engine.closed, true); assert.strictEqual(coordinator.observe().state, 'closed'); assert.deepStrictEqual(sink.kinds, []); await coordinator.dispose();
+	const order: string[] = [];
+	const engine = new Engine();
+	const sink = new RetryableSink(order);
+	sink.failAppend = true;
+	sink.failFlush = false;
+	const coordinator = new IntegratedBrowserCoordinator(
+		policy,
+		activeGate,
+		engine,
+		sink,
+		{ create: async () => new RetryableSink(order) },
+		institutionOrigin
+	);
+	await assert.rejects(
+		coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }),
+		/append unavailable/u
+	);
+	assert.strictEqual(engine.closed, true);
+	assert.strictEqual(coordinator.observe().state, 'closed');
+	assert.deepStrictEqual(sink.kinds, []);
+	await coordinator.dispose();
 });
 
 test('coordinator admits only Browser Activity sinks bound to the exact active policy', async () => {
-	const order: string[] = []; const mismatched = new RetryableSink(order, policyRevision('browser:other', 2, 'sha256:ijklmnop')); assert.throws(() => new IntegratedBrowserCoordinator(policy, activeGate, new Engine(), mismatched, { create: async () => mismatched }, institutionOrigin), /outside the active Browser Policy scope/u);
-	const initial = new RetryableSink(order); initial.failFlush = false; const wrongCorrection = new RetryableSink(order); wrongCorrection.failFlush = false; const closeContinuation = new RetryableSink(order); closeContinuation.failFlush = false; let creates = 0; const coordinator = new IntegratedBrowserCoordinator(policy, activeGate, new Engine(), initial, { create: async () => ++creates === 1 ? wrongCorrection : closeContinuation }, institutionOrigin); await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); await assert.rejects(coordinator.replacePolicy(policyInputRevision('browser:2', 2, 'sha256:ijklmnop')), /outside the active Browser Policy scope/u); assert.strictEqual(wrongCorrection.disposeCalls, 1); assert.strictEqual(coordinator.observe().blockedReason, 'policyUnavailable'); await coordinator.closeBrowser(); assert.deepStrictEqual(closeContinuation.kinds, ['browserOpened', 'browserClosed']); await coordinator.dispose();
+	const order: string[] = [];
+	const mismatched = new RetryableSink(
+		order,
+		policyRevision('browser:other', 2, 'sha256:ijklmnop')
+	);
+	assert.throws(
+		() =>
+			new IntegratedBrowserCoordinator(
+				policy,
+				activeGate,
+				new Engine(),
+				mismatched,
+				{ create: async () => mismatched },
+				institutionOrigin
+			),
+		/outside the active Browser Policy scope/u
+	);
+	const initial = new RetryableSink(order);
+	initial.failFlush = false;
+	const wrongCorrection = new RetryableSink(order);
+	wrongCorrection.failFlush = false;
+	const closeContinuation = new RetryableSink(order);
+	closeContinuation.failFlush = false;
+	let creates = 0;
+	const coordinator = new IntegratedBrowserCoordinator(
+		policy,
+		activeGate,
+		new Engine(),
+		initial,
+		{ create: async () => (++creates === 1 ? wrongCorrection : closeContinuation) },
+		institutionOrigin
+	);
+	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	await assert.rejects(
+		coordinator.replacePolicy(policyInputRevision('browser:2', 2, 'sha256:ijklmnop')),
+		/outside the active Browser Policy scope/u
+	);
+	assert.strictEqual(wrongCorrection.disposeCalls, 1);
+	assert.strictEqual(coordinator.observe().blockedReason, 'policyUnavailable');
+	await coordinator.closeBrowser();
+	assert.deepStrictEqual(closeContinuation.kinds, ['browserOpened', 'browserClosed']);
+	await coordinator.dispose();
 });
 
 test('browser-open activity precedes navigation committed synchronously by the privileged engine', async () => {
-	const order: string[] = []; const sink = new RetryableSink(order); sink.failFlush = false; const engine = new Engine(); let coordinator: IntegratedBrowserCoordinator; let openingProjection: ReturnType<typeof validateIntegratedBrowserProjection> | undefined; engine.open = async url => { engine.opened.push(url); coordinator.commitTopLevel(url, 'navigation'); openingProjection = validateIntegratedBrowserProjection(coordinator.observe()); }; coordinator = new IntegratedBrowserCoordinator(policy, activeGate, engine, sink, { create: async () => new RetryableSink(order) }, institutionOrigin); await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); assert.strictEqual(openingProjection?.state, 'opening'); assert.strictEqual(openingProjection?.canReload, false); assert.deepStrictEqual(openingProjection?.location, { scheme: 'https', host: 'docs.example.test', port: '', path: '/reference' }); assert.deepStrictEqual(sink.kinds.slice(0, 2), ['browserOpened', 'topLevelNavigation']); await coordinator.dispose();
+	const order: string[] = [];
+	const sink = new RetryableSink(order);
+	sink.failFlush = false;
+	const engine = new Engine();
+	let coordinator: IntegratedBrowserCoordinator;
+	let openingProjection: ReturnType<typeof validateIntegratedBrowserProjection> | undefined;
+	engine.open = async (url) => {
+		engine.opened.push(url);
+		coordinator.commitTopLevel(url, 'navigation');
+		openingProjection = validateIntegratedBrowserProjection(coordinator.observe());
+	};
+	coordinator = new IntegratedBrowserCoordinator(
+		policy,
+		activeGate,
+		engine,
+		sink,
+		{ create: async () => new RetryableSink(order) },
+		institutionOrigin
+	);
+	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	assert.strictEqual(openingProjection?.state, 'opening');
+	assert.strictEqual(openingProjection?.canReload, false);
+	assert.deepStrictEqual(openingProjection?.location, {
+		scheme: 'https',
+		host: 'docs.example.test',
+		port: '',
+		path: '/reference'
+	});
+	assert.deepStrictEqual(sink.kinds.slice(0, 2), ['browserOpened', 'topLevelNavigation']);
+	await coordinator.dispose();
 });
 
 test('policy correction seals the prior activity scope and binds subsequent activity to the corrected policy', async () => {
-	const { coordinator, stores } = await create(); await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); coordinator.commitTopLevel('https://docs.example.test/reference/one', 'navigation'); const corrected = policyInputRevision('browser:2', 2, 'sha256:ijklmnop'); const correctedAgain = policyInputRevision('browser:3', 3, 'sha256:qrstuvwx'); await Promise.all([coordinator.replacePolicy(corrected), coordinator.replacePolicy(correctedAgain)]); coordinator.commitTopLevel('https://docs.example.test/reference/two', 'navigation'); await coordinator.closeBrowser(); assert.strictEqual(stores.length, 3); assert.strictEqual(stores[0]?.state?.scope.policyRevision, 'browser:1'); assert.strictEqual(stores[0]?.state?.sealed, true); assert.strictEqual(stores[0]?.state?.records.some(record => record.location?.path === '/reference/two'), false); assert.strictEqual(stores[1]?.state?.scope.policyRevision, 'browser:2'); assert.strictEqual(stores[1]?.state?.sealed, true); assert.strictEqual(stores[2]?.state?.scope.policyRevision, 'browser:3'); assert.deepStrictEqual(stores[2]?.state?.records.map(record => record.kind), ['browserOpened', 'topLevelNavigation', 'browserClosed']); await coordinator.dispose();
+	const { coordinator, stores } = await create();
+	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	coordinator.commitTopLevel('https://docs.example.test/reference/one', 'navigation');
+	const corrected = policyInputRevision('browser:2', 2, 'sha256:ijklmnop');
+	const correctedAgain = policyInputRevision('browser:3', 3, 'sha256:qrstuvwx');
+	await Promise.all([
+		coordinator.replacePolicy(corrected),
+		coordinator.replacePolicy(correctedAgain)
+	]);
+	coordinator.commitTopLevel('https://docs.example.test/reference/two', 'navigation');
+	await coordinator.closeBrowser();
+	assert.strictEqual(stores.length, 3);
+	assert.strictEqual(stores[0]?.state?.scope.policyRevision, 'browser:1');
+	assert.strictEqual(stores[0]?.state?.sealed, true);
+	assert.strictEqual(
+		stores[0]?.state?.records.some((record) => record.location?.path === '/reference/two'),
+		false
+	);
+	assert.strictEqual(stores[1]?.state?.scope.policyRevision, 'browser:2');
+	assert.strictEqual(stores[1]?.state?.sealed, true);
+	assert.strictEqual(stores[2]?.state?.scope.policyRevision, 'browser:3');
+	assert.deepStrictEqual(
+		stores[2]?.state?.records.map((record) => record.kind),
+		['browserOpened', 'topLevelNavigation', 'browserClosed']
+	);
+	await coordinator.dispose();
 });
 
 test('close and dispose await an exact retryable activity seal before releasing the ledger', async () => {
-	const order: string[] = []; let closeCalls = 0; const engine = new Engine(); engine.close = async () => { closeCalls++; order.push('engine.close'); engine.closed = true; }; const sink = new RetryableSink(order); const coordinator = new IntegratedBrowserCoordinator(policy, activeGate, engine, sink, { create: async () => new RetryableSink(order) }, institutionOrigin); await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
-	await assert.rejects(coordinator.dispose(), /flush unavailable/u); assert.deepStrictEqual(order.slice(-3), ['engine.close', 'ledger.seal', 'ledger.flush']); assert.deepStrictEqual(coordinator.observe(), { state: 'blocked', policyRevision: policy.revision, canOpen: false, canClose: false, canGoBack: false, canGoForward: false, canReload: false, blockedReason: 'evidenceUnavailable' }); await assert.rejects(coordinator.handleIntent({ kind: 'browser.reload' }), /disposing/u); assert.strictEqual(sink.disposeCalls, 0); sink.failFlush = false; await Promise.all([coordinator.dispose(), coordinator.dispose()]); assert.strictEqual(closeCalls, 1); assert.strictEqual(sink.sealCalls, 1); assert.strictEqual(sink.kinds.filter(kind => kind === 'browserClosed').length, 1); assert.strictEqual(sink.flushCalls, 2); assert.strictEqual(sink.disposeCalls, 1);
+	const order: string[] = [];
+	let closeCalls = 0;
+	const engine = new Engine();
+	engine.close = async () => {
+		closeCalls++;
+		order.push('engine.close');
+		engine.closed = true;
+	};
+	const sink = new RetryableSink(order);
+	const coordinator = new IntegratedBrowserCoordinator(
+		policy,
+		activeGate,
+		engine,
+		sink,
+		{ create: async () => new RetryableSink(order) },
+		institutionOrigin
+	);
+	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	await assert.rejects(coordinator.dispose(), /flush unavailable/u);
+	assert.deepStrictEqual(order.slice(-3), ['engine.close', 'ledger.seal', 'ledger.flush']);
+	assert.deepStrictEqual(coordinator.observe(), {
+		state: 'blocked',
+		policyRevision: policy.revision,
+		canOpen: false,
+		canClose: false,
+		canGoBack: false,
+		canGoForward: false,
+		canReload: false,
+		blockedReason: 'evidenceUnavailable'
+	});
+	await assert.rejects(coordinator.handleIntent({ kind: 'browser.reload' }), /disposing/u);
+	assert.strictEqual(sink.disposeCalls, 0);
+	sink.failFlush = false;
+	await Promise.all([coordinator.dispose(), coordinator.dispose()]);
+	assert.strictEqual(closeCalls, 1);
+	assert.strictEqual(sink.sealCalls, 1);
+	assert.strictEqual(sink.kinds.filter((kind) => kind === 'browserClosed').length, 1);
+	assert.strictEqual(sink.flushCalls, 2);
+	assert.strictEqual(sink.disposeCalls, 1);
 });
 
 test('a failed policy-sink rotation creates an explicit continuation source before browser closure', async () => {
-	const order: string[] = []; const engine = new Engine(); const old = new RetryableSink(order); old.failFlush = false; const continuation = new RetryableSink(order); continuation.failFlush = false; let creates = 0; const coordinator = new IntegratedBrowserCoordinator(policy, activeGate, engine, old, { create: async () => { creates++; if (creates === 1) throw new Error('protected store unavailable'); return continuation; } }, institutionOrigin); await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); const corrected = policyInputRevision('browser:2', 2, 'sha256:ijklmnop'); await assert.rejects(coordinator.replacePolicy(corrected), /protected store unavailable/u); await coordinator.closeBrowser(); assert.strictEqual(engine.closed, true); assert.deepStrictEqual(old.kinds, ['browserOpened']); assert.deepStrictEqual(continuation.kinds, ['browserOpened', 'browserClosed']); assert.strictEqual(continuation.sealCalls, 1); await coordinator.dispose();
+	const order: string[] = [];
+	const engine = new Engine();
+	const old = new RetryableSink(order);
+	old.failFlush = false;
+	const continuation = new RetryableSink(order);
+	continuation.failFlush = false;
+	let creates = 0;
+	const coordinator = new IntegratedBrowserCoordinator(
+		policy,
+		activeGate,
+		engine,
+		old,
+		{
+			create: async () => {
+				creates++;
+				if (creates === 1) throw new Error('protected store unavailable');
+				return continuation;
+			}
+		},
+		institutionOrigin
+	);
+	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	const corrected = policyInputRevision('browser:2', 2, 'sha256:ijklmnop');
+	await assert.rejects(coordinator.replacePolicy(corrected), /protected store unavailable/u);
+	await coordinator.closeBrowser();
+	assert.strictEqual(engine.closed, true);
+	assert.deepStrictEqual(old.kinds, ['browserOpened']);
+	assert.deepStrictEqual(continuation.kinds, ['browserOpened', 'browserClosed']);
+	assert.strictEqual(continuation.sealCalls, 1);
+	await coordinator.dispose();
 });
 
 test('closure retries the sealed policy ledger before replacing or disposing it', async () => {
-	const order: string[] = []; const engine = new Engine(); const old = new RetryableSink(order); const continuation = new RetryableSink(order); continuation.failFlush = false; let creates = 0; const coordinator = new IntegratedBrowserCoordinator(policy, activeGate, engine, old, { create: async () => { creates++; return continuation; } }, institutionOrigin); await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' }); const corrected = policyInputRevision('browser:2', 2, 'sha256:ijklmnop'); await assert.rejects(coordinator.replacePolicy(corrected), /flush unavailable/u); await assert.rejects(coordinator.closeBrowser(), /flush unavailable/u); assert.strictEqual(engine.closed, true); assert.strictEqual(creates, 0); assert.strictEqual(old.disposeCalls, 0); assert.strictEqual(validateIntegratedBrowserProjection(coordinator.observe()).canClose, true); old.failFlush = false; await coordinator.handleIntent({ kind: 'browser.close' }); assert.strictEqual(creates, 1); assert.strictEqual(old.disposeCalls, 1); assert.deepStrictEqual(continuation.kinds, ['browserOpened', 'browserClosed']); assert.strictEqual(continuation.sealCalls, 1); await coordinator.dispose();
+	const order: string[] = [];
+	const engine = new Engine();
+	const old = new RetryableSink(order);
+	const continuation = new RetryableSink(order);
+	continuation.failFlush = false;
+	let creates = 0;
+	const coordinator = new IntegratedBrowserCoordinator(
+		policy,
+		activeGate,
+		engine,
+		old,
+		{
+			create: async () => {
+				creates++;
+				return continuation;
+			}
+		},
+		institutionOrigin
+	);
+	await coordinator.handleIntent({ kind: 'browser.open', startRuleId: 'docs' });
+	const corrected = policyInputRevision('browser:2', 2, 'sha256:ijklmnop');
+	await assert.rejects(coordinator.replacePolicy(corrected), /flush unavailable/u);
+	await assert.rejects(coordinator.closeBrowser(), /flush unavailable/u);
+	assert.strictEqual(engine.closed, true);
+	assert.strictEqual(creates, 0);
+	assert.strictEqual(old.disposeCalls, 0);
+	assert.strictEqual(validateIntegratedBrowserProjection(coordinator.observe()).canClose, true);
+	old.failFlush = false;
+	await coordinator.handleIntent({ kind: 'browser.close' });
+	assert.strictEqual(creates, 1);
+	assert.strictEqual(old.disposeCalls, 1);
+	assert.deepStrictEqual(continuation.kinds, ['browserOpened', 'browserClosed']);
+	assert.strictEqual(continuation.sealCalls, 1);
+	await coordinator.dispose();
 });
 
 test('blocked projections can retry close but can never advertise open', () => {
-	const blocked = { state: 'blocked' as const, policyRevision: 'browser:1', canOpen: false, canClose: true, canGoBack: false, canGoForward: false, canReload: false, blockedReason: 'evidenceUnavailable' as const }; assert.deepStrictEqual(validateIntegratedBrowserProjection(blocked), blocked); assert.throws(() => validateIntegratedBrowserProjection({ ...blocked, canOpen: true, canClose: false }), /inconsistent/u);
+	const blocked = {
+		state: 'blocked' as const,
+		policyRevision: 'browser:1',
+		canOpen: false,
+		canClose: true,
+		canGoBack: false,
+		canGoForward: false,
+		canReload: false,
+		blockedReason: 'evidenceUnavailable' as const
+	};
+	assert.deepStrictEqual(validateIntegratedBrowserProjection(blocked), blocked);
+	assert.throws(
+		() => validateIntegratedBrowserProjection({ ...blocked, canOpen: true, canClose: false }),
+		/inconsistent/u
+	);
 });
 
 class RetryableSink {
-	readonly kinds: BrowserActivityKind[] = []; readonly scope; readonly #order: string[]; failAppend = false; failFlush = true; sealCalls = 0; flushCalls = 0; disposeCalls = 0;
-	constructor(order: string[], current = policy) { this.#order = order; this.scope = Object.freeze({ attemptId: current.attemptId, participationGeneration: current.participationGeneration, policyRevision: current.revision, policyDigest: current.digest }); }
-	append(kind: BrowserActivityKind): BrowserActivityRecord | undefined { if (this.failAppend) throw new Error('append unavailable'); this.kinds.push(kind); return undefined; }
-	seal(): BrowserActivitySeal { this.sealCalls++; this.#order.push('ledger.seal'); return { sourceInstanceId: 'source:retry', participationGeneration: 3, highestAcknowledged: 0, finalSequence: this.kinds.length, gaps: [], sealed: true }; }
-	async flush(): Promise<void> { this.flushCalls++; this.#order.push('ledger.flush'); if (this.failFlush) throw new Error('flush unavailable'); }
-	dispose(): void { this.disposeCalls++; }
+	readonly kinds: BrowserActivityKind[] = [];
+	readonly scope;
+	readonly #order: string[];
+	failAppend = false;
+	failFlush = true;
+	sealCalls = 0;
+	flushCalls = 0;
+	disposeCalls = 0;
+	constructor(order: string[], current = policy) {
+		this.#order = order;
+		this.scope = Object.freeze({
+			attemptId: current.attemptId,
+			participationGeneration: current.participationGeneration,
+			policyRevision: current.revision,
+			policyDigest: current.digest
+		});
+	}
+	append(kind: BrowserActivityKind): BrowserActivityRecord | undefined {
+		if (this.failAppend) throw new Error('append unavailable');
+		this.kinds.push(kind);
+		return undefined;
+	}
+	seal(): BrowserActivitySeal {
+		this.sealCalls++;
+		this.#order.push('ledger.seal');
+		return {
+			sourceInstanceId: 'source:retry',
+			participationGeneration: 3,
+			highestAcknowledged: 0,
+			finalSequence: this.kinds.length,
+			gaps: [],
+			sealed: true
+		};
+	}
+	async flush(): Promise<void> {
+		this.flushCalls++;
+		this.#order.push('ledger.flush');
+		if (this.failFlush) throw new Error('flush unavailable');
+	}
+	dispose(): void {
+		this.disposeCalls++;
+	}
 }
-async function waitFor(predicate: () => boolean): Promise<void> { for (let index = 0; index < 50; index++) { if (predicate()) return; await Promise.resolve(); } throw new Error('Browser operation did not reach the expected state'); }
-function applyMutations(current: BrowserActivityState | undefined, requestedScope: BrowserActivityScope, sourceInstanceId: string, mutations: readonly ProtectedBrowserActivityMutation[]): BrowserActivityState { let state = current ?? { schemaVersion: 1 as const, scope: requestedScope, sourceInstanceId, highestAcknowledged: 0, lastSequence: 0, records: [], gaps: [], sealed: false }; let records = [...state.records]; let gaps = [...state.gaps]; let highestAcknowledged = state.highestAcknowledged; let lastSequence = state.lastSequence; let sealed = state.sealed; for (const mutation of mutations) { if (mutation.kind === 'appendRecord') { records.push(mutation.record); lastSequence = mutation.record.sequence; } else if (mutation.kind === 'appendGap') { const prior = gaps.at(-1); if (prior?.reason === mutation.gap.reason && prior.to + 1 === mutation.gap.from) gaps[gaps.length - 1] = { ...prior, to: mutation.gap.to }; else gaps.push(mutation.gap); lastSequence = mutation.gap.to; } else if (mutation.kind === 'acknowledge') { const requested = new Set(mutation.requestedGaps); records = records.filter(record => record.sequence > mutation.highestContiguousSequence || requested.has(record.sequence)); highestAcknowledged = mutation.highestContiguousSequence; } else sealed = true; } return Object.freeze({ schemaVersion: 1, scope: state.scope, sourceInstanceId, highestAcknowledged, lastSequence, records: Object.freeze(records), gaps: Object.freeze(gaps), sealed }); }
+async function waitFor(predicate: () => boolean): Promise<void> {
+	for (let index = 0; index < 50; index++) {
+		if (predicate()) return;
+		await Promise.resolve();
+	}
+	throw new Error('Browser operation did not reach the expected state');
+}
+function applyMutations(
+	current: BrowserActivityState | undefined,
+	requestedScope: BrowserActivityScope,
+	sourceInstanceId: string,
+	mutations: readonly ProtectedBrowserActivityMutation[]
+): BrowserActivityState {
+	let state = current ?? {
+		schemaVersion: 1 as const,
+		scope: requestedScope,
+		sourceInstanceId,
+		highestAcknowledged: 0,
+		lastSequence: 0,
+		records: [],
+		gaps: [],
+		sealed: false
+	};
+	let records = [...state.records];
+	let gaps = [...state.gaps];
+	let highestAcknowledged = state.highestAcknowledged;
+	let lastSequence = state.lastSequence;
+	let sealed = state.sealed;
+	for (const mutation of mutations) {
+		if (mutation.kind === 'appendRecord') {
+			records.push(mutation.record);
+			lastSequence = mutation.record.sequence;
+		} else if (mutation.kind === 'appendGap') {
+			const prior = gaps.at(-1);
+			if (prior?.reason === mutation.gap.reason && prior.to + 1 === mutation.gap.from)
+				gaps[gaps.length - 1] = { ...prior, to: mutation.gap.to };
+			else gaps.push(mutation.gap);
+			lastSequence = mutation.gap.to;
+		} else if (mutation.kind === 'acknowledge') {
+			const requested = new Set(mutation.requestedGaps);
+			records = records.filter(
+				(record) =>
+					record.sequence > mutation.highestContiguousSequence ||
+					requested.has(record.sequence)
+			);
+			highestAcknowledged = mutation.highestContiguousSequence;
+		} else sealed = true;
+	}
+	return Object.freeze({
+		schemaVersion: 1,
+		scope: state.scope,
+		sourceInstanceId,
+		highestAcknowledged,
+		lastSequence,
+		records: Object.freeze(records),
+		gaps: Object.freeze(gaps),
+		sealed
+	});
+}

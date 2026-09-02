@@ -9,5 +9,8 @@ interface IdleDeadline {
 	timeRemaining(): number;
 }
 
-declare function requestIdleCallback(callback: (deadline: IdleDeadline) => void, options?: { readonly timeout: number }): number;
+declare function requestIdleCallback(
+	callback: (deadline: IdleDeadline) => void,
+	options?: { readonly timeout: number }
+): number;
 declare function cancelIdleCallback(handle: number): void;

@@ -18,8 +18,8 @@
     "../test/platform/registry/common/upstream/**/*.ts",
     "../test/workbench/services/commands/common/**/*.ts",
     "../test/workbench/services/actions/common/**/*.ts",
-    "../test/workbench/services/keybinding/common/**/*.ts"
-    ,"../test/workbench/common/**/*.ts",
+    "../test/workbench/services/keybinding/common/**/*.ts",
+    "../test/workbench/common/**/*.ts",
     "../test/workbench/contrib/attemptWorkspace/common/**/*.ts",
     "../test/workbench/contrib/integratedBrowser/common/**/*.ts",
     "../test/workbench/contrib/terminal/common/**/*.ts",

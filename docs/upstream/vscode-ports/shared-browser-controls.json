@@ -8,31 +8,154 @@
     "interface": "src/prctr/base/browser/ui/button/button.ts",
     "decision": "docs/architecture/design-system.md"
   },
-  "upstream": { "repository": "https://github.com/microsoft/vscode", "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8" },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
   "items": [
-    { "upstreamPath": "LICENSE.txt", "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5", "category": "license", "disposition": "evidence-only", "rationale": "Canonical MIT notice for the behavior used as evidence.", "licenseRefs": ["vscode-mit"] },
-    { "upstreamPath": "src/vs/base/browser/ui/button/button.ts", "upstreamBlob": "0fdeff4661587690d8a0ee478e1d6826ee422ee5", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain native activation, focus, enabled/busy state, intent events, icon composition, and lifecycle behind a smaller Proctor interface.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/ui/button/button.ts" },
-    { "upstreamPath": "src/vs/base/browser/ui/inputbox/inputBox.ts", "upstreamBlob": "465101843c4552a2e84d2a91a34735bc0bad33ed", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain value events, validation association, disabled/read-only distinction, descriptions, and focus behavior using native label/input/error semantics.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/ui/field/textField.ts" },
-    { "upstreamPath": "src/vs/base/browser/ui/toggle/toggle.ts", "upstreamBlob": "971ba88c8af6148ab6d61a8726a8a97fe775e016", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain keyboard/pointer parity and requested-state events while preventing the control from silently owning authoritative checked state.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/ui/toggle/toggle.ts" },
-    { "upstreamPath": "src/vs/base/browser/ui/progressbar/progressbar.ts", "upstreamBlob": "254bb04f46cf07f3a19d403816e46e87c00a3335", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain hidden, determinate, and indeterminate progress semantics with explicit localized labels and bounded ranges.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/base/browser/ui/progress/progress.ts" },
-    { "upstreamPath": "src/vs/base/browser/ui/widget.ts", "upstreamBlob": "b27b3ca9794ef7f4fbbd0891040746e7ccfd08cc", "category": "source", "disposition": "excluded", "rationale": "A mandatory Widget inheritance hierarchy conflicts with Proctor's small independent control interfaces; complete listener/disposal ownership remains implemented directly through the admitted lifecycle and DOM primitives.", "licenseRefs": ["vscode-mit"] },
-    { "upstreamPath": "src/vs/base/test/browser/ui/toggle/toggle.test.ts", "upstreamBlob": "d7e6887723d940bfb133c58714997521b8367c59", "category": "test", "disposition": "evidence-only", "rationale": "Informs the toggle state and keyboard matrix covered by the Proctor Control Explorer contract.", "licenseRefs": ["vscode-mit"] },
-    { "upstreamPath": "src/vs/base/test/browser/progressBar.test.ts", "upstreamBlob": "fc9255f403467aed4de98bb2738f83782083138c", "category": "test", "disposition": "evidence-only", "rationale": "Informs determinate and indeterminate progress coverage in the real-browser fixture.", "licenseRefs": ["vscode-mit"] }
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Canonical MIT notice for the behavior used as evidence.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/ui/button/button.ts",
+      "upstreamBlob": "0fdeff4661587690d8a0ee478e1d6826ee422ee5",
+      "category": "source",
+      "disposition": "behaviorally-reimplemented",
+      "rationale": "Retain native activation, focus, enabled/busy state, intent events, icon composition, and lifecycle behind a smaller Proctor interface.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/ui/button/button.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/ui/inputbox/inputBox.ts",
+      "upstreamBlob": "465101843c4552a2e84d2a91a34735bc0bad33ed",
+      "category": "source",
+      "disposition": "behaviorally-reimplemented",
+      "rationale": "Retain value events, validation association, disabled/read-only distinction, descriptions, and focus behavior using native label/input/error semantics.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/ui/field/textField.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/ui/toggle/toggle.ts",
+      "upstreamBlob": "971ba88c8af6148ab6d61a8726a8a97fe775e016",
+      "category": "source",
+      "disposition": "behaviorally-reimplemented",
+      "rationale": "Retain keyboard/pointer parity and requested-state events while preventing the control from silently owning authoritative checked state.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/ui/toggle/toggle.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/ui/progressbar/progressbar.ts",
+      "upstreamBlob": "254bb04f46cf07f3a19d403816e46e87c00a3335",
+      "category": "source",
+      "disposition": "behaviorally-reimplemented",
+      "rationale": "Retain hidden, determinate, and indeterminate progress semantics with explicit localized labels and bounded ranges.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/ui/progress/progress.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/ui/widget.ts",
+      "upstreamBlob": "b27b3ca9794ef7f4fbbd0891040746e7ccfd08cc",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "A mandatory Widget inheritance hierarchy conflicts with Proctor's small independent control interfaces; complete listener/disposal ownership remains implemented directly through the admitted lifecycle and DOM primitives.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/test/browser/ui/toggle/toggle.test.ts",
+      "upstreamBlob": "d7e6887723d940bfb133c58714997521b8367c59",
+      "category": "test",
+      "disposition": "evidence-only",
+      "rationale": "Informs the toggle state and keyboard matrix covered by the Proctor Control Explorer contract.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/test/browser/progressBar.test.ts",
+      "upstreamBlob": "fc9255f403467aed4de98bb2738f83782083138c",
+      "category": "test",
+      "disposition": "evidence-only",
+      "rationale": "Informs determinate and indeterminate progress coverage in the real-browser fixture.",
+      "licenseRefs": ["vscode-mit"]
+    }
   ],
-  "licenses": [{ "id": "vscode-mit", "name": "MIT License", "upstreamPaths": ["LICENSE.txt"], "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt" }],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
   "dependencies": [
-    { "id": "browser-interaction", "kind": "local-interface", "reference": "src/prctr/base/browser/dom.ts", "rationale": "Controls use the complete admitted DOM and lifecycle mechanics." },
-    { "id": "themes-design-tokens", "kind": "local-interface", "reference": "src/prctr/platform/theme/common/tokens.ts", "rationale": "Control CSS consumes only inherited Proctor semantic variables." },
-    { "id": "codicons-semantic-icons", "kind": "local-interface", "reference": "src/prctr/platform/theme/browser/semanticIcon.ts", "rationale": "Callers inject Proctor semantic icons without creating a base-to-platform dependency." }
+    {
+      "id": "browser-interaction",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/browser/dom.ts",
+      "rationale": "Controls use the complete admitted DOM and lifecycle mechanics."
+    },
+    {
+      "id": "themes-design-tokens",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/common/tokens.ts",
+      "rationale": "Control CSS consumes only inherited Proctor semantic variables."
+    },
+    {
+      "id": "codicons-semantic-icons",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/browser/semanticIcon.ts",
+      "rationale": "Callers inject Proctor semantic icons without creating a base-to-platform dependency."
+    }
   ],
   "divergences": [
-    { "id": "intent-only-native-controls", "summary": "Native elements own transient interaction and emit intent while callers retain authoritative asynchronous state; disabled, read-only, busy, unavailable, and invalid states remain distinct.", "localPaths": ["src/prctr/base/browser/ui/button/button.ts", "src/prctr/base/browser/ui/field/textField.ts", "src/prctr/base/browser/ui/toggle/toggle.ts", "src/prctr/base/browser/ui/progress/progress.ts"], "verificationRefs": ["control-explorer-real-browser", "source-css-check"] },
-    { "id": "development-only-explorer", "summary": "A literal test-only manifest mounts production controls in an isolated same-origin frame and is unreachable from every production composition.", "localPaths": ["test/browser/controlExplorer/manifest.ts", "test/browser/controlExplorer/controlExplorer.ts"], "verificationRefs": ["control-explorer-real-browser", "composition-check"] }
+    {
+      "id": "intent-only-native-controls",
+      "summary": "Native elements own transient interaction and emit intent while callers retain authoritative asynchronous state; disabled, read-only, busy, unavailable, and invalid states remain distinct.",
+      "localPaths": [
+        "src/prctr/base/browser/ui/button/button.ts",
+        "src/prctr/base/browser/ui/field/textField.ts",
+        "src/prctr/base/browser/ui/toggle/toggle.ts",
+        "src/prctr/base/browser/ui/progress/progress.ts"
+      ],
+      "verificationRefs": ["control-explorer-real-browser", "source-css-check"]
+    },
+    {
+      "id": "development-only-explorer",
+      "summary": "A literal test-only manifest mounts production controls in an isolated same-origin frame and is unreachable from every production composition.",
+      "localPaths": [
+        "test/browser/controlExplorer/manifest.ts",
+        "test/browser/controlExplorer/controlExplorer.ts"
+      ],
+      "verificationRefs": ["control-explorer-real-browser", "composition-check"]
+    }
   ],
   "verification": [
-    { "id": "control-explorer-real-browser", "kind": "test", "path": "test/electron/browserHarness.real.test.ts", "obligation": "Verify 13 semantic states, intent-only changes, accessible invalid state, determinate/indeterminate progress, four themes, RTL, reduced motion, 200% scaling, and disposal in real Chromium." },
-    { "id": "source-css-check", "kind": "check", "path": "build/checks/source.ts", "obligation": "Verify one CSS owner/root, namespaced variables, cascade layers, layer direction, and cycles." },
-    { "id": "composition-check", "kind": "check", "path": "build/policies/compositions.json", "obligation": "Prove Control Explorer and fixtures remain outside production composition reachability." },
-    { "id": "upstream-audit", "kind": "review", "path": "build/checks/upstreamAudit.ts", "obligation": "Verify reviewed VS Code evidence at the exact admitted revision." }
+    {
+      "id": "control-explorer-real-browser",
+      "kind": "test",
+      "path": "test/electron/browserHarness.real.test.ts",
+      "obligation": "Verify 13 semantic states, intent-only changes, accessible invalid state, determinate/indeterminate progress, four themes, RTL, reduced motion, 200% scaling, and disposal in real Chromium."
+    },
+    {
+      "id": "source-css-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify one CSS owner/root, namespaced variables, cascade layers, layer direction, and cycles."
+    },
+    {
+      "id": "composition-check",
+      "kind": "check",
+      "path": "build/policies/compositions.json",
+      "obligation": "Prove Control Explorer and fixtures remain outside production composition reachability."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Verify reviewed VS Code evidence at the exact admitted revision."
+    }
   ]
 }

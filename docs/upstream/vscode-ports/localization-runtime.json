@@ -4,10 +4,7 @@
   "clusterId": "localization-runtime",
   "admission": {
     "workflow": "Provide deterministic packaged localization for Proctor surfaces and a private compatibility seam for admitted VS Code modules without runtime language-pack fetching.",
-    "callers": [
-      "src/prctr/base/common/vscodeNls.ts",
-      "test/browser/rendererHarness.ts"
-    ],
+    "callers": ["src/prctr/base/common/vscodeNls.ts", "test/browser/rendererHarness.ts"],
     "interface": "src/prctr/base/common/localization.ts",
     "decision": "docs/architecture/toolchain.md"
   },
@@ -33,10 +30,7 @@
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/vscodeNls.ts",
       "localSha256": "e2935794d7520d02244fc8d5c3c64b12ef64f42b2961baea5859f218c34451d4",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/test/common/nls.test.ts",
@@ -152,14 +146,8 @@
     {
       "id": "closed-catalog-delivery",
       "summary": "Extension language packs, marketplace actions, filesystem cache generation, URL-controlled pseudo mode, and runtime catalog fetching are excluded; production compositions will load only signed packaged catalogs and Candidate locale remains frozen in its context.",
-      "localPaths": [
-        "src/prctr/base/common/localization.ts",
-        "src/prctr/base/common/vscodeNls.ts"
-      ],
-      "verificationRefs": [
-        "localization-runtime-tests",
-        "offline-provenance"
-      ]
+      "localPaths": ["src/prctr/base/common/localization.ts", "src/prctr/base/common/vscodeNls.ts"],
+      "verificationRefs": ["localization-runtime-tests", "offline-provenance"]
     }
   ],
   "verification": [

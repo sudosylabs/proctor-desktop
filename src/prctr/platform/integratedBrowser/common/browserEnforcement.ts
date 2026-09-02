@@ -17,7 +17,11 @@ export interface PrivilegedBrowserEngine {
 
 /** Privileged navigation hooks implemented by the Attempt-scoped coordinator. */
 export interface BrowserEnforcementDelegate {
-	checkTopLevel(url: string, kind: 'navigation' | 'redirect', redirectFromRuleId?: string): BrowserNavigationDecision;
+	checkTopLevel(
+		url: string,
+		kind: 'navigation' | 'redirect',
+		redirectFromRuleId?: string
+	): BrowserNavigationDecision;
 	commitTopLevel(url: string, kind: 'navigation' | 'redirect'): void;
 	checkSubresource(url: string): boolean;
 	blockPopup(url: string): void;

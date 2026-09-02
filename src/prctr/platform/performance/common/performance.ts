@@ -1,4 +1,9 @@
-import { clearMarks, getMarks, mark, type PerformanceMark } from '../../../base/common/performance.js';
+import {
+	clearMarks,
+	getMarks,
+	mark,
+	type PerformanceMark
+} from '../../../base/common/performance.js';
 
 export interface PerformanceBudget {
 	readonly id: `prctr.${string}`;
@@ -29,7 +34,9 @@ export class PerformanceBudgetRegistry {
 			throw new Error(`Performance budget ${budget.id} is already registered`);
 		}
 		if (!Number.isFinite(budget.maximumDurationMs) || budget.maximumDurationMs <= 0) {
-			throw new TypeError(`Performance budget ${budget.id} must have a positive finite duration`);
+			throw new TypeError(
+				`Performance budget ${budget.id} must have a positive finite duration`
+			);
 		}
 		this.budgets.set(budget.id, Object.freeze({ ...budget }));
 	}
@@ -51,7 +58,11 @@ export class PerformanceService {
 	}
 
 	snapshot(): PerformanceSnapshot {
-		const marks = Object.freeze(getMarks().map(entry => Object.freeze({ name: entry.name, startTime: entry.startTime })).sort((left, right) => left.startTime - right.startTime));
+		const marks = Object.freeze(
+			getMarks()
+				.map((entry) => Object.freeze({ name: entry.name, startTime: entry.startTime }))
+				.sort((left, right) => left.startTime - right.startTime)
+		);
 		const byName = new Map<string, PerformanceMark>();
 		for (const entry of marks) {
 			byName.set(entry.name, entry);
@@ -66,13 +77,15 @@ export class PerformanceService {
 				continue;
 			}
 			const durationMs = end.startTime - start.startTime;
-			measurements.push(Object.freeze({
-				...budget,
-				startTime: start.startTime,
-				endTime: end.startTime,
-				durationMs,
-				withinBudget: durationMs <= budget.maximumDurationMs
-			}));
+			measurements.push(
+				Object.freeze({
+					...budget,
+					startTime: start.startTime,
+					endTime: end.startTime,
+					durationMs,
+					withinBudget: durationMs <= budget.maximumDurationMs
+				})
+			);
 		}
 		return Object.freeze({
 			marks,

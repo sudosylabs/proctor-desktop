@@ -1,4 +1,21 @@
 @layer workbench {
-  .prctr-startup-surface { align-items: center; background: var(--prctr-color-background-canvas); box-sizing: border-box; color: var(--prctr-color-text-primary); display: grid; font-family: var(--prctr-typography-font-application); justify-items: center; margin: 0; min-block-size: 100vh; padding: var(--prctr-spacing-region); text-align: center; }
-  @media (forced-colors: active) { .prctr-startup-surface { background: Canvas; color: CanvasText; } }
+	.prctr-startup-surface {
+		align-items: center;
+		background: var(--prctr-color-background-canvas);
+		box-sizing: border-box;
+		color: var(--prctr-color-text-primary);
+		display: grid;
+		font-family: var(--prctr-typography-font-application);
+		justify-items: center;
+		margin: 0;
+		min-block-size: 100vh;
+		padding: var(--prctr-spacing-region);
+		text-align: center;
+	}
+	@media (forced-colors: active) {
+		.prctr-startup-surface {
+			background: Canvas;
+			color: CanvasText;
+		}
+	}
 }
