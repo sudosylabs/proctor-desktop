@@ -1,0 +1,174 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "actions-menus",
+  "admission": {
+    "workflow": "Execute observable disposable actions and resolve static Proctor command, submenu, alternate, toggle, visibility, grouping, ordering, palette, menu, and keybinding contributions without making presentation metadata an authorization boundary.",
+    "callers": [
+      "src/prctr/workbench/services/actions/common/proctorActions.ts",
+      "test/platform/actions/common/menu.test.ts"
+    ],
+    "interface": "src/prctr/platform/actions/common/menu.ts",
+    "decision": "docs/architecture/workbench.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "The canonical Microsoft MIT text is preserved as the local notice for the admitted action source.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/actions.ts",
+      "upstreamBlob": "18641db33f93e8f0619caf7a35f71d0c1d9ba010",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve Action state-change events, ActionRunner ordering/error capture, separators, submenus, empty-submenu behavior, and lightweight action creation while routing the one fallback string through the admitted localization seam.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/actions.ts",
+      "localSha256": "0f30c36ccee140875eb41e7b18fffe0a90df9f35d048a1f293894e48c678db4d",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/actions/common/actions.ts",
+      "upstreamBlob": "2f4046000935f70a88d4fd14ed0a91a9d40b71b9",
+      "category": "registration",
+      "disposition": "behaviorally-reimplemented",
+      "rationale": "Retain unique menu identity, disposable registry changes, implicit command palette items, command metadata, alternates, toggles, preconditions, submenus, and all-in-one action contribution ownership behind a finite Proctor menu catalog.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/actions/common/menu.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/actions/common/menuService.ts",
+      "upstreamBlob": "f62922ec7109367d487e90c41c413e4991305f88",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Its navigation-first group sorting, falsy-group placement, numeric order, title fallback, context visibility, enablement, toggle, submenu flattening, separators, hidden defaults, and action invocation are preserved by the Proctor resolver; VS Code storage and keybinding-configuration UI are excluded.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/actions/test/common/menuService.test.ts",
+      "upstreamBlob": "b7044f46bd5835dc60baa197856135c9be41db44",
+      "category": "test",
+      "disposition": "evidence-only",
+      "rationale": "Defines upstream sorting, command-palette, and unique menu identity obligations reproduced through Proctor-owned interface tests without importing VS Code storage and mock-service graphs.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "base-common-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/event.ts",
+      "rationale": "The admitted base runtime supplies events, microtask batching, linked lists, and deterministic disposal."
+    },
+    {
+      "id": "platform-context-conditions",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/contextkey/common/contextkey.ts",
+      "rationale": "Static context expressions own menu visibility, command enablement, and toggle state."
+    },
+    {
+      "id": "platform-commands",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/commands/common/commands.ts",
+      "rationale": "Commands own executable handlers; menu actions invoke them but never authorize them."
+    },
+    {
+      "id": "platform-keybindings",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/services/keybinding/common/proctorKeybindings.ts",
+      "rationale": "The action contribution wrapper registers optional static keybindings through the namespaced product boundary."
+    },
+    {
+      "id": "localization-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/localization.ts",
+      "rationale": "Menu titles and tooltips are static named messages resolved by the active packaged locale."
+    },
+    {
+      "id": "semantic-icons",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/common/semanticIcons.ts",
+      "rationale": "Menu metadata can reference only Proctor semantic icon identifiers."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "finite-product-menu-catalog",
+      "summary": "Only nine Proctor-owned menu identities exist; extensions, remote content, renderer state, and arbitrary callers cannot construct new menu IDs or contribute executable behavior.",
+      "localPaths": ["src/prctr/platform/actions/common/menu.ts"],
+      "verificationRefs": ["menu-contract-tests", "source-composition-check"]
+    },
+    {
+      "id": "localized-semantic-metadata",
+      "summary": "Menu labels are placeholder-free named localization descriptors and icons are semantic Proctor IDs; raw CSS classes, glyph names, and unlocalized product strings do not cross the contribution interface.",
+      "localPaths": ["src/prctr/platform/actions/common/menu.ts"],
+      "verificationRefs": ["menu-contract-tests"]
+    },
+    {
+      "id": "closed-action-contribution",
+      "summary": "One registration owns the namespaced command, menu placements, optional command-palette entry, and keybindings and rolls back every partial registration on failure.",
+      "localPaths": ["src/prctr/workbench/services/actions/common/proctorActions.ts"],
+      "verificationRefs": ["proctor-action-tests"]
+    },
+    {
+      "id": "non-authoritative-visibility",
+      "summary": "Menu visibility, hidden state, enablement, and checked state are presentation projections only; privileged command handlers remain responsible for validation and authorization.",
+      "localPaths": ["src/prctr/platform/actions/common/menu.ts", "docs/architecture/workbench.md"],
+      "verificationRefs": ["menu-contract-tests"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "base-action-tests",
+      "kind": "test",
+      "path": "test/base/common/actions.test.ts",
+      "obligation": "Verify state-change suppression, callback execution, runner event order, disabled actions, error reporting, separators, submenus, and lightweight action forwarding."
+    },
+    {
+      "id": "menu-contract-tests",
+      "kind": "test",
+      "path": "test/platform/actions/common/menu.test.ts",
+      "obligation": "Verify navigation/group/order/title sorting, context visibility, preconditions, toggles, alternate commands, forwarded invocation, submenu separators, hidden defaults, palette completion, microtask event batching, and namespace/localization rejection."
+    },
+    {
+      "id": "proctor-action-tests",
+      "kind": "test",
+      "path": "test/workbench/services/actions/common/proctorActions.test.ts",
+      "obligation": "Verify one contribution owns command, menu, palette, keybinding, rollback, and disposal lifecycle."
+    },
+    {
+      "id": "source-composition-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify layer direction, static imports, executable-cycle absence, declaration-only dependency handling, and production contribution ownership."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Verify schema, local digest, marker, license reference, unique ownership, divergence, and evidence parity without a VS Code checkout."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Resolve the exact VS Code commit and verify every reviewed upstream blob against the canonical checkout."
+    }
+  ]
+}

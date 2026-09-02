@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port base-common-runtime
 
-import { CancellationToken, CancellationTokenSource } from './cancellation.js';
+import { CancellationTokenSource, type CancellationToken } from './cancellation.js';
 import { BugIndicatingError, CancellationError, isCancellationError } from './errors.js';
 import { Emitter, Event } from './event.js';
-import { Disposable, DisposableMap, DisposableStore, IDisposable, isDisposable, MutableDisposable, toDisposable } from './lifecycle.js';
-import { extUri as defaultExtUri, IExtUri } from './resources.js';
+import { Disposable, DisposableMap, DisposableStore, isDisposable, MutableDisposable, toDisposable, type IDisposable } from './lifecycle.js';
+import { extUri as defaultExtUri, type IExtUri } from './resources.js';
 import { URI } from './uri.js';
 import { setTimeout0 } from './platform.js';
 import { MicrotaskDelay } from './symbols.js';

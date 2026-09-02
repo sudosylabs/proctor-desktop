@@ -1,0 +1,339 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "platform-keybindings",
+  "admission": {
+    "workflow": "Resolve statically packaged Proctor keybindings across supported operating systems, context conditions, conflicts, removals, chords, IME composition, accessible labels, and command dispatch without reducing VS Code's mature common behavior.",
+    "callers": [
+      "src/prctr/workbench/services/keybinding/common/proctorKeybindings.ts",
+      "test/workbench/services/keybinding/common/proctorKeybindings.test.ts"
+    ],
+    "interface": "src/prctr/platform/keybinding/common/keybinding.ts",
+    "decision": "docs/architecture/workbench.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "The canonical Microsoft MIT text is preserved as the local notice for this cluster.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/keyCodes.ts",
+      "upstreamBlob": "c81e62f98f7ff85fe9a0b14ccfcfff5d0bc6008a",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve the complete key-code, scan-code, modifier, chord encoding, conversion, and immutable-code tables.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/keyCodes.ts",
+      "localSha256": "91a35dd7e26e28f90d62e272c421b34187072c16e38d0994f1db65d4c719e4ba",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/keybindingLabels.ts",
+      "upstreamBlob": "8f62b221709061865ceaf968baf9162837c83a8f",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve UI, ARIA, Electron accelerator, and settings label providers while routing fallback strings through the admitted packaged localization seam.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/keybindingLabels.ts",
+      "localSha256": "02da5fd2fcae6e0ff27e0bb78cf63c3d38a48cd654e09070731148a2d8710e9b",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/keybindingParser.ts",
+      "upstreamBlob": "8b2e736177d32b65923a0c28c02cbf4867da672a",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve complete user-label parsing for key-code and scan-code chords.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/keybindingParser.ts",
+      "localSha256": "e955db106185a847ca05de822748cfceafbcd10fb143cf0631a18ab8a1f8733f",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/keybindings.ts",
+      "upstreamBlob": "2a5ed9ac59dc1327c7c51a3f008d2a82dca966cd",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve key-code/scan-code chord invariants, modifier handling, equality, dispatch labels, and legacy decoding.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/keybindings.ts",
+      "localSha256": "163c2e967c0ca85063a75f87339a9661faa3e0c85a99d703c9b1ded1dce3e59f",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/ime.ts",
+      "upstreamBlob": "cbb4a44f9a6fd45bf3d26b425fc89fd37a88ce35",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve shared IME enabled state and change events used to avoid dispatching composition-owned keystrokes.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/ime.ts",
+      "localSha256": "007b83347aa51355008ea650d47a91f61fad1831e6ce61c904b8fd9b637487d6",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/common/abstractKeybindingService.ts",
+      "upstreamBlob": "6af73a017c7f37a149b2d9920bf618237902d992",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve soft/real dispatch agreement, multi-chord and single-modifier state, focus timeout, IME fencing, context resolution, command execution, prevention, labels, status feedback, and error presentation behind narrow Proctor feedback/log seams while excluding VS Code telemetry.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/keybinding/common/abstractKeybindingService.ts",
+      "localSha256": "2b7366e5006a8aa60ca309e07b0d0f6e11b6b7ce53280cbc94a045319361b6c8",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/common/baseResolvedKeybinding.ts",
+      "upstreamBlob": "96b56234d7fb0e4eee9339c82cd07d057f5eb0bd",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve accessible and platform-specific label projection over resolved chords.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/keybinding/common/baseResolvedKeybinding.ts",
+      "localSha256": "64cc6d126f8098227f1437c8098031fa04718e78d89af58ceeb9967d60d2ab94",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/common/keybinding.ts",
+      "upstreamBlob": "d4ce2da9b88ab10e75a9cf90afb1d1601d60c224",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve keyboard-event, schema-contribution, lookup, dispatch, hold-mode, and debug service contracts.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/keybinding/common/keybinding.ts",
+      "localSha256": "7e92e6ddeed398e767b1b7cebfb0463fb9e397625dc66e18ddbdafee8bbf5cf6",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/common/keybindingResolver.ts",
+      "upstreamBlob": "3752a6a95596d3df4eb3c378ff7cf627fe4be0db",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve complete conflict sorting, removal, context implication, prefix, chord, bubbling, and primary lookup behavior.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/keybinding/common/keybindingResolver.ts",
+      "localSha256": "906dab56adac10c492d2022a9e256efdf55c94bf4a7e25acb3ac3bc9693ee0d6",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/common/keybindingsRegistry.ts",
+      "upstreamBlob": "0d95d0bf798d000ff4f7037d0e97e866682f7c4f",
+      "category": "registration",
+      "disposition": "copied",
+      "rationale": "Preserve platform binding, primary/secondary ordering, rule disposal, command pairing, caching, and exact default item construction; Proctor product callers use a namespaced wrapper and never populate extension keybindings.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/keybinding/common/keybindingsRegistry.ts",
+      "localSha256": "eb122239f6bfb304544950547f193ea056511ff700241c806d48a780a2209867",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/common/resolvedKeybindingItem.ts",
+      "upstreamBlob": "135db192b1d680a961c8c09ee2e7342e99a15c37",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve normalized resolved items, removal-command encoding, args, context, default, and extension metadata.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/keybinding/common/resolvedKeybindingItem.ts",
+      "localSha256": "45329b816a4799fc463332591f4a3f8869d44a487235e2c0fa0c70703fb8720e",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/common/usLayoutResolvedKeybinding.ts",
+      "upstreamBlob": "5ea9a5ba515f0ed0bf2ea528cd063dbe71a6641e",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve US-layout resolution, immutable scan-code conversion, labels, dispatch, and WYSIWYG behavior for the initial mapper.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/keybinding/common/usLayoutResolvedKeybinding.ts",
+      "localSha256": "b287917aab0ef7845a25bc58845adc7a510d1674f17d0b9b2af88642919f7457",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/keybinding/browser/keybindingService.ts",
+      "upstreamBlob": "5db49b2be12174cf13b0bc95d3f7bc7bb9a1a972",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve document keydown and keyup ownership, StandardKeyboardEvent normalization, default-item resolution, context-aware dispatch, keybinding hold mode, chords, single-modifier handling, prevention, lookup, feedback and resolver invalidation for statically packaged Proctor bindings while excluding extension and filesystem user-keybinding product authority.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/workbench/services/keybinding/browser/browserKeybindingService.ts",
+      "localSha256": "47ace26c93e07cf463986f068164b8218c30bb166cfb5f11906a5af6d00767cc",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/test/common/abstractKeybindingService.test.ts",
+      "upstreamBlob": "bf73df3865b57a771ba4e008ce8aaa18efd87e43",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete owner dispatch suite through Node's built-in runner and narrow feedback/log fixtures, retaining chord, unbind, IME, context, prevention, and accessible-label cases.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/keybinding/common/upstream/abstractKeybindingService.test.ts",
+      "localSha256": "08a143191e0e90fa9f2988baf6cfdb0ccc75d39540466f20c293cb6af366c852",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/test/common/keybindingLabels.test.ts",
+      "upstreamBlob": "3d1e238d8962efc6fc2369a8b89830408ff10c90",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete Windows, Linux, macOS, ARIA, Electron accelerator, settings, and regression label suite through admitted Proctor paths.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/keybinding/common/upstream/keybindingLabels.test.ts",
+      "localSha256": "1e1833187422f8108321093cb3b3319fa527be3567a2ac4cac154a77a0c98ced",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/test/common/keybindingResolver.test.ts",
+      "upstreamBlob": "1317cc251f303a527bc354ce27d87befec61b7ef",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete resolver owner suite through Node's built-in runner and admitted Proctor paths.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/keybinding/common/upstream/keybindingResolver.test.ts",
+      "localSha256": "06e7fe87859ed5437e732ac604ca0a9aa6751a0b5c801f1356e03411b1707e1e",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/test/common/keybindingsTestUtils.ts",
+      "upstreamBlob": "e9c700e4b5f35925229840bc3a445a4fb021031b",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Retain the exact owner-suite US-layout resolution helper with Proctor path substitution.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/keybinding/common/upstream/keybindingsTestUtils.ts",
+      "localSha256": "b7ac0a9c0fd8671ceadb6180c1c5a3ccffe9cc5c4a7ebb85ba1635c9da6452eb",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/keybinding/test/common/mockKeybindingService.ts",
+      "upstreamBlob": "017e96fd0df7d7bf4bb26b32940aac26c9b32c84",
+      "category": "test",
+      "disposition": "excluded",
+      "rationale": "This broad reusable mock is not owner behavior; focused tests exercise the real resolver and abstract dispatch service through their public interfaces.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "base-common-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/event.ts",
+      "rationale": "The admitted base runtime supplies arrays, timers, errors, events, lifecycle, linked lists, platform detection, and character codes."
+    },
+    {
+      "id": "browser-interaction",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/browser/keyboardEvent.ts",
+      "rationale": "The admitted browser interaction cluster supplies complete DOM KeyboardEvent normalization and document-listener ownership for the BrowserKeybindingService."
+    },
+    {
+      "id": "platform-context-conditions",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/contextkey/common/contextkey.ts",
+      "rationale": "The admitted context cluster supplies expression evaluation and service contracts without granting authority."
+    },
+    {
+      "id": "platform-commands",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/commands/common/commands.ts",
+      "rationale": "The admitted command cluster supplies metadata registration and command execution."
+    },
+    {
+      "id": "platform-instantiation-registry",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/registry/common/platform.ts",
+      "rationale": "The admitted platform foundation supplies service identifiers and internal registry mechanics."
+    },
+    {
+      "id": "localization-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/vscodeNls.ts",
+      "rationale": "The private compatibility seam supplies deterministic packaged keybinding and chord feedback strings."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "static-product-keybindings",
+      "summary": "Product bindings target only runtime-validated prctr command identifiers and enter through literal packaged manifests; no extension host, remote value, user document, context key, or renderer state can register executable behavior.",
+      "localPaths": [
+        "src/prctr/workbench/services/keybinding/common/proctorKeybindings.ts",
+        "docs/architecture/workbench.md"
+      ],
+      "verificationRefs": ["proctor-keybinding-tests", "source-composition-check"]
+    },
+    {
+      "id": "bounded-feedback-no-telemetry",
+      "summary": "Dispatch preserves chord status and command-error feedback through narrow Proctor interfaces but does not emit VS Code workbench telemetry or depend on its broad log/notification services.",
+      "localPaths": [
+        "src/prctr/platform/keybinding/common/abstractKeybindingService.ts",
+        "test/platform/keybinding/common/upstream/abstractKeybindingService.test.ts"
+      ],
+      "verificationRefs": ["dispatch-owner-tests"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "dispatch-owner-tests",
+      "kind": "test",
+      "path": "test/platform/keybinding/common/upstream/abstractKeybindingService.test.ts",
+      "obligation": "Verify single and multi-chord dispatch, unbinding, context routing, IME composition fencing, prevention behavior, command invocation, status lifecycle, and accessible label append behavior."
+    },
+    {
+      "id": "labels-owner-tests",
+      "kind": "test",
+      "path": "test/platform/keybinding/common/upstream/keybindingLabels.test.ts",
+      "obligation": "Verify Windows, Linux, macOS, ARIA, Electron accelerator, and user-settings labels."
+    },
+    {
+      "id": "resolver-owner-tests",
+      "kind": "test",
+      "path": "test/platform/keybinding/common/upstream/keybindingResolver.test.ts",
+      "obligation": "Verify conflicts, removals, context implication, common prefixes, chord continuation, args, bubbling, and primary resolution."
+    },
+    {
+      "id": "proctor-keybinding-tests",
+      "kind": "test",
+      "path": "test/workbench/services/keybinding/common/proctorKeybindings.test.ts",
+      "obligation": "Verify namespace enforcement, static ordering, registry projection, and deterministic disposal."
+    },
+    {
+      "id": "browser-keybinding-service-tests",
+      "kind": "test",
+      "path": "test/browser/browserKeybindingServiceTests.ts",
+      "obligation": "Verify hold mode starts only during matching dispatch, suppresses repeated keydown, and releases on keyup, focus loss, and disposal in real Chromium."
+    },
+    {
+      "id": "source-composition-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify layer direction, cycles, static imports, and literal Proctor composition ownership."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Verify schema, local digest, marker, license reference, unique ownership, divergence, and evidence parity without a VS Code checkout."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Resolve the exact VS Code commit and verify every reviewed upstream blob against the canonical checkout."
+    }
+  ]
+}

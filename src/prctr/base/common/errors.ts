@@ -157,7 +157,7 @@ export function transformErrorForSerialization(error: any): any {
 	if (error instanceof Error) {
 		const { name, message, cause } = error;
 		// eslint-disable-next-line local/code-no-any-casts
-		const stack: string = (<any>error).stacktrace || (<any>error).stack;
+			const stack: string = (error as any).stacktrace || (error as any).stack;
 		return {
 			$isError: true,
 			name,
@@ -165,7 +165,7 @@ export function transformErrorForSerialization(error: any): any {
 			stack,
 			noTelemetry: ErrorNoTelemetry.isErrorNoTelemetry(error),
 			cause: cause ? transformErrorForSerialization(cause) : undefined,
-			code: (<ErrorWithCode>error).code
+				code: (error as ErrorWithCode).code
 		};
 	}
 
@@ -184,7 +184,7 @@ export function transformErrorFromSerialization(data: SerializedError): Error {
 	error.message = data.message;
 	error.stack = data.stack;
 	if (data.code) {
-		(<ErrorWithCode>error).code = data.code;
+			(error as ErrorWithCode).code = data.code;
 	}
 	if (data.cause) {
 		error.cause = transformErrorFromSerialization(data.cause);

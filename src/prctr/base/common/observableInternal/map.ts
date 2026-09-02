@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port base-common-runtime
 
-import { IObservable, ITransaction } from '../observable.js';
+import type { IObservable, ITransaction } from '../observable.js';
 import { observableValueOpts } from './observables/observableValueOpts.js';
 
 

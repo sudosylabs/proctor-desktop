@@ -4,14 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port base-common-runtime
 
-import { IObservableWithChange, IObserver, IReader, IObservable } from '../base.js';
+import type { IObservableWithChange, IObserver, IReader, IObservable } from '../base.js';
 import { DisposableStore } from '../commonFacade/deps.js';
 import { DebugLocation } from '../debugLocation.js';
-import { DebugOwner, getFunctionName } from '../debugName.js';
-import { debugGetObservableGraph } from '../logging/debugGetDependencyGraph.js';
+import { getFunctionName, type DebugOwner } from '../debugName.js';
+import type { debugGetObservableGraph } from '../logging/debugGetDependencyGraph.js';
 import { getLogger, logObservable } from '../logging/logging.js';
 import type { keepObserved, recomputeInitiallyAndOnChange } from '../utils/utils.js';
-import { derivedOpts } from './derived.js';
+import type { derivedOpts } from './derived.js';
 
 let _derived: typeof derivedOpts;
 /**

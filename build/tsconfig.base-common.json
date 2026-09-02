@@ -7,6 +7,7 @@
     "isolatedModules": false,
     "lib": ["DOM", "DOM.Iterable", "ES2024", "ESNext.Disposable", "WebWorker.ImportScripts"],
     "moduleDetection": "legacy",
+    "noFallthroughCasesInSwitch": false,
     "noUncheckedIndexedAccess": false,
     "noUnusedParameters": false,
     "skipLibCheck": true,

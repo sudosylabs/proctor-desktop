@@ -5,9 +5,9 @@
 // @proctor-vscode-port base-common-runtime
 
 import { findFirstIdxMonotonousOrArrLen } from './arraysFind.js';
-import { CancellationToken } from './cancellation.js';
+import type { CancellationToken } from './cancellation.js';
 import { CancellationError } from './errors.js';
-import { ISplice } from './sequence.js';
+import type { ISplice } from './sequence.js';
 
 /**
  * Returns the last entry and the initial N-1 entries of the array, as a tuple of [rest, last].

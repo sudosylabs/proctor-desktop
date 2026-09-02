@@ -8,6 +8,7 @@ import {
 type Done = (error?: unknown) => void;
 interface TestContext {
 	skip(): void;
+	timeout(milliseconds: number): void;
 }
 type TestBody = ((this: TestContext) => unknown) | ((this: TestContext, done: Done) => unknown);
 const skippedTest = Symbol('skipped-test');
@@ -24,6 +25,7 @@ function adaptTestBody(body: TestBody): (context: { skip(): void }) => Promise<v
 		return async context => {
 			try {
 				await (body as (this: TestContext) => unknown).call({
+					timeout: () => {},
 					skip: () => {
 						context.skip();
 						throw skippedTest;
@@ -52,6 +54,7 @@ function adaptTestBody(body: TestBody): (context: { skip(): void }) => Promise<v
 
 		try {
 			const result = (body as (this: TestContext, done: Done) => unknown).call({
+				timeout: () => {},
 				skip: () => {
 					context.skip();
 					throw skippedTest;

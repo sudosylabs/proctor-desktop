@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base-common.json",
+  "include": [
+    "../src/prctr/base/common/**/*.ts",
+    "../src/prctr/editor/common/**/*.ts"
+  ],
+  "exclude": [
+    "../src/prctr/base/common/localization.ts",
+    "../src/prctr/base/common/localizationCatalog.generated.ts"
+  ]
+}

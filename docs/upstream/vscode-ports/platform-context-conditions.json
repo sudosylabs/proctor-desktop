@@ -1,0 +1,200 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "platform-context-conditions",
+  "admission": {
+    "workflow": "Evaluate static Proctor command, menu, keybinding, focus, accessibility, and workbench-routing conditions with the mature parser, normalization, implication, comparison, regex, and serialization behavior used by later workbench mechanics.",
+    "callers": [
+      "src/prctr/workbench/common/contextKeys.ts",
+      "test/platform/contextkey/common/proctorContextKeys.test.ts"
+    ],
+    "interface": "src/prctr/platform/contextkey/common/contextkey.ts",
+    "decision": "docs/architecture/workbench.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "The canonical Microsoft MIT text is preserved as the local notice for this cluster.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/contextkey/common/contextkey.ts",
+      "upstreamBlob": "595a8d4bbd1455f10d74cc7256d54db515c72e23",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve the complete expression model, parser, normalization, implication, comparison, regex, serialization, metadata, and service contracts while routing fallback messages through the admitted packaged localization seam.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/contextkey/common/contextkey.ts",
+      "localSha256": "a5610ad767354112e3145ffaf2a590411cec520eb5d05b59cd47eea18c512cfd",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/contextkey/common/scanner.ts",
+      "upstreamBlob": "68aa70135069945a56b7ac818eb453f6881184bd",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve exact tokenization, offsets, errors, operators, quoting, regex scanning, and serialization while routing fallback messages through the admitted packaged localization seam.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/contextkey/common/scanner.ts",
+      "localSha256": "da3590c97c3bdd99375595c030746e0b417ba54b35c31f804ddc55f96d350a07",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/contextkey/common/contextkeys.ts",
+      "upstreamBlob": "c256dba0aa02307f343cce652fc18d69a1ecb197",
+      "category": "registration",
+      "disposition": "excluded",
+      "rationale": "VS Code's host, browser, mobile, and input context identifiers are product composition; Proctor owns its namespaced static context set and admits only keys required by its windows and capabilities.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/contextkey/browser/contextKeyService.ts",
+      "upstreamBlob": "a865e8a47ca90f17fcfc566b7f035e62ed686345",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve root, scoped DOM, overlay, inherited-value, buffered-event, parent-update and deterministic disposal behavior for the executable workbench while excluding VS Code configuration-backed and inspect-command product inputs that Proctor's static namespaced context authority forbids.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/contextkey/browser/contextKeyService.ts",
+      "localSha256": "3c75c336ae684514f3efdd305e2284939a40ec14f8ccf99e3733512a35c2649a",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/contextkey/test/common/contextkey.test.ts",
+      "upstreamBlob": "8307e894e2fca140bd6379a578d4ac2f685a5970",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete owner expression suite through Node's built-in runner and admitted Proctor paths.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/contextkey/common/upstream/contextkey.test.ts",
+      "localSha256": "bd77dfc012026750ac88b66582649157bf57b950efabdea8c161e0b307ee0eec",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/contextkey/test/common/parser.test.ts",
+      "upstreamBlob": "660161e5f5dc50264604fb565b9235ff0286b0df",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete owner parser suite through Node's built-in runner and admitted Proctor paths.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/contextkey/common/upstream/parser.test.ts",
+      "localSha256": "9c9ec8dacf5a9271bc240307f3bc70d9b283cc8c342a9853b0bfd027913336d1",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/contextkey/test/common/scanner.test.ts",
+      "upstreamBlob": "bde5a5df3a5a2c82d1ecaeb7f7a6cd935faad8e5",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete owner scanner suite through Node's built-in runner and admitted Proctor paths.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/contextkey/common/upstream/scanner.test.ts",
+      "localSha256": "efe7d45d735918acc798381af446fdee872450fbdc232b12dcfe17d191d058c8",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/contextkey/test/browser/contextkey.test.ts",
+      "upstreamBlob": "4d3ddd26f0003d547c29d5c8ffcd6a2a019fadad",
+      "category": "test",
+      "disposition": "excluded",
+      "rationale": "Browser-scoped service tests remain attached to the deferred DOM service and will be re-evaluated with that cluster rather than replaced by weaker common-only tests.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "base-common-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/event.ts",
+      "rationale": "The admitted base-common cluster supplies events, errors, platform facts, string handling, lifecycle, and character codes."
+    },
+    {
+      "id": "platform-instantiation-registry",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/instantiation/common/instantiation.ts",
+      "rationale": "The admitted platform foundation supplies the stable context-key service identifier contract."
+    },
+    {
+      "id": "localization-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/vscodeNls.ts",
+      "rationale": "The private compatibility seam supplies deterministic packaged fallback messages without runtime language-pack discovery."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "proctor-context-authority",
+      "summary": "Only Proctor-namespaced statically packaged context identifiers are product inputs; context values control presentation and routing but never authenticate, authorize, or establish authoritative Attempt or Secure Exam Posture state.",
+      "localPaths": [
+        "src/prctr/workbench/common/contextKeys.ts",
+        "src/prctr/platform/contextkey/browser/contextKeyService.ts",
+        "docs/architecture/workbench.md"
+      ],
+      "verificationRefs": ["proctor-context-tests", "source-composition-check"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "context-owner-tests",
+      "kind": "test",
+      "path": "test/platform/contextkey/common/upstream/contextkey.test.ts",
+      "obligation": "Verify complete expression construction, normalization, equality, implication, evaluation, comparison, regex, serialization, and constant behavior."
+    },
+    {
+      "id": "parser-owner-tests",
+      "kind": "test",
+      "path": "test/platform/contextkey/common/upstream/parser.test.ts",
+      "obligation": "Verify complete parser precedence, whitespace, operator, quoting, error, and recovery behavior."
+    },
+    {
+      "id": "scanner-owner-tests",
+      "kind": "test",
+      "path": "test/platform/contextkey/common/upstream/scanner.test.ts",
+      "obligation": "Verify exact token types, lexemes, offsets, error cases, regex forms, and serialization."
+    },
+    {
+      "id": "proctor-context-tests",
+      "kind": "test",
+      "path": "test/platform/contextkey/common/proctorContextKeys.test.ts",
+      "obligation": "Verify namespaced Proctor keys participate only as ordinary expression values."
+    },
+    {
+      "id": "real-browser-context-service",
+      "kind": "test",
+      "path": "test/electron/browserHarness.real.test.ts",
+      "obligation": "Verify production root and focused-part values, scoped DOM lookup, overlays, modal changes and disposal in real Chromium."
+    },
+    {
+      "id": "source-composition-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify layer direction, cycles, static imports, and literal Proctor composition ownership."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Verify schema, local digest, marker, license reference, unique ownership, divergence, and evidence parity without a VS Code checkout."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Resolve the exact VS Code commit and verify every reviewed upstream blob against the canonical checkout."
+    }
+  ]
+}

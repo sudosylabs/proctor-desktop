@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port base-common-runtime
 
-import { Comparator } from './arrays.js';
+import type { Comparator } from './arrays.js';
 
 export function findLast<T, R extends T>(array: readonly T[], predicate: (item: T, index: number) => item is R, fromIndex?: number): R | undefined;
 export function findLast<T>(array: readonly T[], predicate: (item: T, index: number) => unknown, fromIndex?: number): T | undefined;

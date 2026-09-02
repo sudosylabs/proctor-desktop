@@ -1,0 +1,29 @@
+{
+  "extends": "./tsconfig.platform-foundation.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "types": []
+  },
+  "include": [
+    "../src/prctr/base/common/**/*.ts",
+    "../src/prctr/platform/instantiation/common/**/*.ts",
+    "../src/prctr/platform/registry/common/**/*.ts",
+    "../src/prctr/platform/theme/common/**/*.ts",
+    "../src/prctr/platform/settings/common/**/*.ts",
+    "../test/base/common/upstream/testAdapter.ts",
+    "../test/base/common/upstream/nodeBuiltins.d.ts",
+    "../test/base/common/upstream/upstreamTestUtils.ts",
+    "../test/platform/**/*.test.ts",
+    "../test/platform/instantiation/common/upstream/**/*.ts",
+    "../test/platform/registry/common/upstream/**/*.ts",
+    "../test/workbench/services/commands/common/**/*.ts",
+    "../test/workbench/services/actions/common/**/*.ts",
+    "../test/workbench/services/keybinding/common/**/*.ts"
+    ,"../test/workbench/common/**/*.ts",
+    "../test/workbench/contrib/attemptWorkspace/common/**/*.ts",
+    "../test/workbench/contrib/integratedBrowser/common/**/*.ts",
+    "../test/workbench/contrib/terminal/common/**/*.ts",
+    "../test/workbench/services/examSecurity/**/*.test.ts",
+    "../src/prctr/workbench/services/examSecurity/electron-utility/**/*.ts"
+  ]
+}

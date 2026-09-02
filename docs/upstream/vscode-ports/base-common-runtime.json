@@ -36,7 +36,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/arrays.ts",
-      "localSha256": "d908b588fa59e56594bc652a1d8f91671c3de5ce4cf456dcb894c2fb35831e5b",
+      "localSha256": "67ea075d95296d94e9c3c404ba9be284e44fef77b22fd1abd15f0d9b6dd225a1",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -52,7 +52,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/arraysFind.ts",
-      "localSha256": "0b14e8cf6e80d7c9d7b50c5b295e406b83055493ad757a623c0a65472b2c567a",
+      "localSha256": "2a203965baa95cdafd5e0e0b41095f376fcb7dfb8ad86cbf1c663fe8e0c3b005",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -84,7 +84,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/async.ts",
-      "localSha256": "840e48c135e25707012ed148be79cb37d7086a739c2d40fea3824f354f28dc74",
+      "localSha256": "902c661572db376bf94005cb8558619ff6a6643e73d63a0979df47167ecd1f38",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -116,7 +116,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/cancellation.ts",
-      "localSha256": "b102f9a3dab0f05cbb5886d35eff1fec80c7c08904bd3358d77e25011ab6eeac",
+      "localSha256": "28adfcffce6fc19140ba1f6b8c7ea2169fa68ee984646fe346360dd0b05dc018",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -180,9 +180,10 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/errors.ts",
-      "localSha256": "355ad4519d68a85706e3005f1feb89e39f48fb96d2b1f4245318071539479c52",
+      "localSha256": "76bb877033e44dcb92783817eb7ceaecaa080ca015367c51eaa15de1055a315f",
       "mechanicalTransforms": [
         "namespace-path-translation",
+        "erasable-syntax-rewrite",
         "provenance-marker-insertion"
       ]
     },
@@ -196,7 +197,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/event.ts",
-      "localSha256": "7c2ec9e038341a2d3829730cdf018ced6604d4dbab7fe31c9ff80a5d48d82e36",
+      "localSha256": "41fa31c81b8a066951dc14603fbe063b1fc1b61340d785319ee9c9476a31565e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -613,7 +614,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/observableInternal/logging/logging.ts",
-      "localSha256": "24eaa45d26199a7570574a4b647a8e233816dcefb6f3baf9137b98af1fb0cf9e",
+      "localSha256": "67bf6641d961c086667c616898ce405f089e425ee8ac56119f6b02de681a172f",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -629,7 +630,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/observableInternal/map.ts",
-      "localSha256": "75804b97de56d1d79f68299ea17bc682bba67a3ec2d5a3ed8620a70bd3d4a9aa",
+      "localSha256": "4b74d504d5a4f6382f29e80d4f23ee82bfab525c53cecb7ea2655524239c4b13",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -645,7 +646,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/observableInternal/observables/baseObservable.ts",
-      "localSha256": "58685457f001001d77d4c2d988b1032f3345e3ebde3b4d34dacfad8f706634a8",
+      "localSha256": "5c4b564c32502baacbb6885de12e5168fc9a26f9671944071839533c5a2d4deb",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -837,7 +838,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/observableInternal/set.ts",
-      "localSha256": "cf12509a9f3bb19e95716d94341a6eb296fb02196e1010ff4c6cb827c8dc63aa",
+      "localSha256": "7e5e7fac145d4aff20ccdc146d5b6bf6601f8c90093f8d29e1e16531942ae752",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -853,7 +854,7 @@
         "vscode-mit"
       ],
       "localPath": "src/prctr/base/common/observableInternal/transaction.ts",
-      "localSha256": "c0793b69dcf51bf7863b67cdc2f3a15286f04c881ff091d1363b7e38de6be39b",
+      "localSha256": "e1ef33e4f86f4bc78359401ccfbfa813526424910a6259cd5ceeadfbfcdbc29f",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "provenance-marker-insertion"
@@ -2085,13 +2086,13 @@
       "id": "source-graph-enforcement",
       "kind": "check",
       "path": "build/checks/source.ts",
-      "obligation": "Resolve TypeScript declaration imports and permit internal cycles only when every member is owned by this exact admitted cluster."
+      "obligation": "Resolve TypeScript declaration imports while rejecting every executable source cycle, including cycles wholly owned by this admitted cluster."
     },
     {
       "id": "source-graph-tests",
       "kind": "test",
       "path": "test/checks/sourceGraph.test.ts",
-      "obligation": "Verify admitted internal cycles and declaration imports while rejecting unowned cycles."
+      "obligation": "Verify declaration-only dependencies remain analyzable while every executable source cycle is rejected."
     },
     {
       "id": "offline-provenance",

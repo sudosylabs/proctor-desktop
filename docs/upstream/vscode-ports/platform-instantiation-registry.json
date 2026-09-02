@@ -1,0 +1,223 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "platform-instantiation-registry",
+  "admission": {
+    "workflow": "Construct the closed Proctor workbench service graph with constructor injection, child scopes, delayed services, cycle detection, deterministic disposal, and typed internal registries without reduced substitutes.",
+    "callers": [
+      "test/platform/instantiation/common/extensions.test.ts",
+      "test/platform/instantiation/common/upstream/instantiationService.test.ts"
+    ],
+    "interface": "src/prctr/platform/instantiation/common/instantiation.ts",
+    "decision": "docs/architecture/workbench.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "The canonical Microsoft MIT text is preserved as the local notice for this cluster.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/descriptors.ts",
+      "upstreamBlob": "e259eba13f22f5b3c0c8af37cedfbeedb649ceb9",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve synchronous service descriptors and delayed-instantiation metadata exactly.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/instantiation/common/descriptors.ts",
+      "localSha256": "5ac4d12d409a8a4adb1a5587406a9b24074011f64eaa3fc9e030ca234c0c1486",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/extensions.ts",
+      "upstreamBlob": "e59cc837cc633dac0445d59b7d03dbc6c9dc783a",
+      "category": "registration",
+      "disposition": "copied",
+      "rationale": "Preserve singleton descriptor registration and eager/delayed selection as internal service-graph mechanics.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/instantiation/common/extensions.ts",
+      "localSha256": "1c8845ebd3e4d983785c295f18c915ca6d478b3b630a3df8aca38c1f67490199",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/graph.ts",
+      "upstreamBlob": "2882c62e843458d2507a960cf7e6a66082224a24",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve the dependency graph, root ordering, and cycle diagnostics used by service construction.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/instantiation/common/graph.ts",
+      "localSha256": "113cb8c97ab0c6421f0a4a1e1969403c50202c7ef3e5da08b13c3f00d22621e5",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/instantiation.ts",
+      "upstreamBlob": "b879acb0ee8da5a824321bd1b9925219fe07af94",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve service identifiers, constructor metadata, accessors, child scopes, and typed creation signatures.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/instantiation/common/instantiation.ts",
+      "localSha256": "014d3f720d88899c92919e8cfaab170d35d41dd2b78fb62e4e224ea1e91fa17d",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/instantiationService.ts",
+      "upstreamBlob": "dd21805b88d9b6a42e3fd16796835cce22d97205",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve complete construction, caching, child ownership, strict lookup, cycle handling, delayed proxy/event, disposal, and tracing behavior.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/instantiation/common/instantiationService.ts",
+      "localSha256": "72d25567763ec46af97e3fb836b80cec18198816d17f3e5f439d8949c719a1a8",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/serviceCollection.ts",
+      "upstreamBlob": "13c489e8325510bd3c86e88bef22f1414cedfa0f",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve the live service collection used by composition roots and child scopes.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/instantiation/common/serviceCollection.ts",
+      "localSha256": "c473a08d77b30bd76398fe9741b7713f049b0f9581ad12ad879a339271a33aa8",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/strictServiceCollection.ts",
+      "upstreamBlob": "dec8c569b8d78d49b4880badfec155283f93306a",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve strict descriptor argument validation at Proctor composition boundaries.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/instantiation/common/strictServiceCollection.ts",
+      "localSha256": "e2a5f4daaa4b0d9c258d90154fb1c048a16182a87f0b896fab940ec0349b3a34",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/registry/common/platform.ts",
+      "upstreamBlob": "9beaaf7c25cbb340793fdf209d279abcfb2fa025",
+      "category": "registration",
+      "disposition": "copied",
+      "rationale": "Preserve unique typed registry storage and deterministic disposal as internal mechanics; Proctor manifests remain the product-selection authority.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/registry/common/platform.ts",
+      "localSha256": "614b26b4b40d3c1d1ecfce50a725801fdc25809b834eb29c40b97745636af424",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/test/common/graph.test.ts",
+      "upstreamBlob": "36777f910b636c21f6e0bc1c63550aa726d7877c",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete owner graph suite through Node's built-in runner and the admitted Proctor paths.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/instantiation/common/upstream/graph.test.ts",
+      "localSha256": "ae642831d62cf70696698f153d35679e070b5f03bb1ea2f717dde50d1263b50d",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/test/common/instantiationService.test.ts",
+      "upstreamBlob": "9a8d8f9247436170c88145995f60a55dee37ae22",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete owner instantiation suite through Node's built-in runner while preserving decorator, delayed event, cycle, strictness, child-scope, and disposal cases.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/instantiation/common/upstream/instantiationService.test.ts",
+      "localSha256": "daa42f7c394eae1612fbc16615e3e493c69d78f28d57466de62e241ed3960996",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/test/common/instantiationServiceMock.ts",
+      "upstreamBlob": "deaefef16e7d7f15d46a184d75120d27dfb2f4b7",
+      "category": "test",
+      "disposition": "excluded",
+      "rationale": "This sinon-backed test helper is not an owner suite or runtime dependency; Proctor tests exercise the real InstantiationService interface directly.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/registry/test/common/platform.test.ts",
+      "upstreamBlob": "4ba3d6a88945763db31bccc34a6318882e3b7679",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete registry owner suite through Node's built-in runner and the admitted Proctor paths.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/registry/common/upstream/platform.test.ts",
+      "localSha256": "2a61c4d388ee715af94c1682bb43b51be5ee239a546aadadafbf28fc924533e3",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "base-common-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/lifecycle.ts",
+      "rationale": "The previously admitted base-common cluster supplies lifecycle, events, errors, idle scheduling, and linked-list behavior at the platform boundary."
+    },
+    {
+      "id": "ecmascript-runtime",
+      "kind": "platform-interface",
+      "reference": "ECMAScript Map, Set, Proxy, Reflect, and Function metadata",
+      "rationale": "The pinned Node and Electron Chromium runtimes supply the language primitives used by the cluster."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "closed-product-composition",
+      "summary": "Registry and singleton mechanics remain internal; they cannot discover remote modules or select user-visible behavior, which enters only through literal Proctor-owned composition manifests.",
+      "localPaths": [
+        "src/prctr/platform/instantiation/common/extensions.ts",
+        "src/prctr/platform/registry/common/platform.ts",
+        "build/policies/compositions.json"
+      ],
+      "verificationRefs": ["source-composition-check", "platform-owner-tests"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "platform-owner-tests",
+      "kind": "test",
+      "path": "test/platform/instantiation/common/upstream/instantiationService.test.ts",
+      "obligation": "Verify the complete transferred dependency graph, service construction, delayed instantiation and events, strict collection, child ownership, failure, and disposal behavior."
+    },
+    {
+      "id": "registry-owner-tests",
+      "kind": "test",
+      "path": "test/platform/registry/common/upstream/platform.test.ts",
+      "obligation": "Verify registry API, exact lookup, uniqueness, and stored value behavior."
+    },
+    {
+      "id": "source-composition-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify layer direction, cycles, static imports, and literal Proctor composition ownership."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Verify schema, local digest, marker, license reference, unique ownership, divergence, and evidence parity without a VS Code checkout."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Resolve the exact VS Code commit and verify every reviewed upstream blob against the canonical checkout."
+    }
+  ]
+}

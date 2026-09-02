@@ -4,14 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port base-common-runtime
 
-import { CancelablePromise } from './async.js';
-import { CancellationToken } from './cancellation.js';
+import type { CancelablePromise } from './async.js';
+import type { CancellationToken } from './cancellation.js';
 import { diffSets } from './collections.js';
 import { onUnexpectedError } from './errors.js';
 import { createSingleCallFunction } from './functional.js';
-import { combinedDisposable, Disposable, DisposableMap, DisposableStore, IDisposable, toDisposable } from './lifecycle.js';
+import { combinedDisposable, Disposable, DisposableMap, DisposableStore, toDisposable, type IDisposable } from './lifecycle.js';
 import { LinkedList } from './linkedList.js';
-import { IObservable, IObservableWithChange, IObserver } from './observable.js';
+import type { IObservable, IObservableWithChange, IObserver } from './observable.js';
 import { env } from './process.js';
 import { StopWatch } from './stopwatch.js';
 import { MicrotaskDelay } from './symbols.js';

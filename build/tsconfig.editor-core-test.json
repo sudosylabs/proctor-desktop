@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.editor-core.json",
+  "compilerOptions": { "allowImportingTsExtensions": true, "types": [] },
+  "include": [
+    "../src/prctr/base/common/**/*.ts",
+    "../src/prctr/editor/common/**/*.ts",
+    "../test/base/common/upstream/testAdapter.ts",
+    "../test/base/common/upstream/nodeBuiltins.d.ts",
+    "../test/base/common/upstream/upstreamTestUtils.ts",
+    "../test/editor/common/**/*.ts"
+  ]
+}

@@ -1,7 +1,9 @@
 declare module 'node:assert' {
 	function assert(value: unknown, message?: string | Error): asserts value;
 	namespace assert {
+		function deepEqual(...arguments_: any[]): void;
 		function deepStrictEqual(...arguments_: any[]): void;
+		function equal(...arguments_: any[]): void;
 		function doesNotThrow(...arguments_: any[]): void;
 		function fail(...arguments_: any[]): never;
 		function notStrictEqual(...arguments_: any[]): void;

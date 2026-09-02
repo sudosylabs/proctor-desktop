@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port base-common-runtime
 
-import { AutorunObserver } from '../reactions/autorunImpl.js';
-import { IObservable } from '../base.js';
-import { TransactionImpl } from '../transaction.js';
+import type { AutorunObserver } from '../reactions/autorunImpl.js';
+import type { IObservable } from '../base.js';
+import type { TransactionImpl } from '../transaction.js';
 import type { Derived } from '../observables/derivedImpl.js';
-import { DebugLocation } from '../debugLocation.js';
+import type { DebugLocation } from '../debugLocation.js';
 
 let globalObservableLogger: IObservableLogger | undefined;
 

@@ -1,0 +1,185 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "platform-commands",
+  "admission": {
+    "workflow": "Register and execute statically packaged Proctor intents with service access, metadata argument validation, override stacking, deterministic disposal, execution events, and immediate missing-command failure.",
+    "callers": [
+      "src/prctr/workbench/services/commands/common/proctorCommands.ts",
+      "test/workbench/services/commands/common/commandService.test.ts"
+    ],
+    "interface": "src/prctr/platform/commands/common/commands.ts",
+    "decision": "docs/architecture/workbench.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "The canonical Microsoft MIT text is preserved as the local notice for this cluster.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/jsonSchema.ts",
+      "upstreamBlob": "3a674ccdd0f0b23365e07d05ba9f993da1450081",
+      "category": "schema",
+      "disposition": "copied",
+      "rationale": "Preserve the complete command metadata JSON Schema contract and its draft/type mapping rather than reducing argument descriptions to an incomplete local type.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/jsonSchema.ts",
+      "localSha256": "d34f9aa0ba05ebb4cdf3a8402604cb2aa1fb1922e270aa162efa63ba3b627259",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/action/common/action.ts",
+      "upstreamBlob": "06bd702fcfcc988a2daee8d79dab7fb62929cccf",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Only the localized-string pair is required by command metadata; the admitted localization compatibility seam already owns the exact value/original shape, while the complete action model belongs to slice 8.",
+      "licenseRefs": [],
+      "localInterface": "src/prctr/base/common/vscodeNls.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/commands/common/commands.ts",
+      "upstreamBlob": "cb8d628d978d267b3ca26e75094e46c063c41d5d",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve the complete service contract, event, registry stacking, aliases, metadata, argument validation, disposal, and lookup behavior while satisfying the localized-string type through the admitted packaged seam.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/commands/common/commands.ts",
+      "localSha256": "38a16062ce8194edbdcd6df1767e21fcad9c83d14d0e3086452a962461fe3f0b",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/commands/test/common/commands.test.ts",
+      "upstreamBlob": "8a1ca7bd0536da2af64a78587d7bfb6fca79c7e8",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete command-registry owner suite through Node's built-in runner and admitted Proctor paths.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/platform/commands/common/upstream/commands.test.ts",
+      "localSha256": "a66563884a856353635f4f6d4951f05e7dbd695e6fccc50f3941898c0dd7e1d6",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/commands/test/common/nullCommandService.ts",
+      "upstreamBlob": "52c8e6b9df017d4554d9c34d77b72f33c90b05e5",
+      "category": "test",
+      "disposition": "excluded",
+      "rationale": "The null helper is not owner behavior; Proctor service tests exercise the real command service and registry interface.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/commands/common/commandService.ts",
+      "upstreamBlob": "9e38f1ff9d2632e027fa757fb056554a3dcc7a74",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve synchronous handler invocation, service access, ordered before/after events, promise normalization, failure propagation, and delayed service registration while removing extension-host activation and telemetry logging that do not exist in Proctor's closed composition.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/workbench/services/commands/common/commandService.ts",
+      "localSha256": "fce03134a102be131257429a76cfe8fde44c3b0a1f8568d64eba2b14c098c31c",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/commands/test/common/commandService.test.ts",
+      "upstreamBlob": "ca3be11a7f08c0cf03f537486eda38299ce8215d",
+      "category": "test",
+      "disposition": "evidence-only",
+      "rationale": "Its synchronous execution, ordering, missing-command, event, and result/error cases are retained in focused Proctor service tests; extension activation cases are excluded by the closed product model.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/extensions/common/extensions.ts",
+      "upstreamBlob": "54a7c445dcf073a627b3201a76e69c6a4869b07f",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Proctor has no extension host or public extension interface; all executable contributions and commands are packaged and statically selected.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/log/common/log.ts",
+      "upstreamBlob": "27e542896df074a88f1ee1f587b5695b12e2ca7e",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "The broad VS Code logging service is not admitted as a hidden dependency of command execution; later Proctor diagnostics must be bounded and redacted by their own interface.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "base-common-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/lifecycle.ts",
+      "rationale": "The admitted base runtime supplies events, iteration, linked lists, lifecycle, and constraint validation."
+    },
+    {
+      "id": "platform-instantiation-registry",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/instantiation/common/instantiation.ts",
+      "rationale": "The admitted platform foundation supplies service access and delayed service registration."
+    },
+    {
+      "id": "localization-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/vscodeNls.ts",
+      "rationale": "The private compatibility seam supplies the exact localized/original metadata pair until action presentation owns localized product labels."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "closed-static-command-composition",
+      "summary": "Product commands must use the prctr namespace, arrive through literal packaged manifests, and fail immediately when absent; no extension activation, remote module, visibility state, or context key may register or authorize them.",
+      "localPaths": [
+        "src/prctr/workbench/services/commands/common/proctorCommands.ts",
+        "src/prctr/workbench/services/commands/common/commandService.ts",
+        "docs/architecture/workbench.md"
+      ],
+      "verificationRefs": ["proctor-command-service-tests", "source-composition-check"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "command-registry-owner-tests",
+      "kind": "test",
+      "path": "test/platform/commands/common/upstream/commands.test.ts",
+      "obligation": "Verify invalid registration, stacking, override disposal, lookup, metadata argument validation, and cleanup."
+    },
+    {
+      "id": "proctor-command-service-tests",
+      "kind": "test",
+      "path": "test/workbench/services/commands/common/commandService.test.ts",
+      "obligation": "Verify namespace enforcement, synchronous invocation ordering, service execution events, promise results, missing-command failure, and override restoration."
+    },
+    {
+      "id": "source-composition-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify layer direction, cycles, static imports, and literal Proctor composition ownership."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Verify schema, local digest, marker, license reference, unique ownership, divergence, and evidence parity without a VS Code checkout."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Resolve the exact VS Code commit and verify every reviewed upstream blob against the canonical checkout."
+    }
+  ]
+}

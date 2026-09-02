@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port base-common-runtime
 
-import { handleBugIndicatingErrorRecovery, IObservable, IObserver, ITransaction } from './base.js';
+import { handleBugIndicatingErrorRecovery, type IObservable, type IObserver, type ITransaction } from './base.js';
 import { getFunctionName } from './debugName.js';
 import { getLogger } from './logging/logging.js';
 
@@ -111,4 +111,3 @@ export function subtransaction(tx: ITransaction | undefined, fn: (tx: ITransacti
 		return this._updatingObservers;
 	}
 }
-

@@ -1,0 +1,139 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "performance-foundation",
+  "admission": {
+    "workflow": "Capture monotonic cross-runtime marks and evaluate static Proctor performance budgets locally so startup, interaction, and capability slices can retain objective evidence without a telemetry or server dependency.",
+    "callers": [
+      "src/prctr/platform/performance/common/performance.ts",
+      "test/platform/performance/common/performance.test.ts"
+    ],
+    "interface": "src/prctr/platform/performance/common/performance.ts",
+    "decision": "docs/architecture/toolchain.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "The canonical Microsoft MIT text is preserved as the local notice for this cluster.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/performance.ts",
+      "upstreamBlob": "418ae1a415794d4a3709cab410918574b576558b",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve cross-browser, worker, and Node time-origin handling, shared global storage, explicit start times, exact clearing, and mark export behavior.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/performance.ts",
+      "localSha256": "b8e9daf7491ee14b0dc0a8e58340f3c77e9279ef8981e3b502757b6219ddfcde",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/test/common/performance.test.ts",
+      "upstreamBlob": "6936f7b0f5b0456a0492f421260b05580c77ca38",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete owner mark-clearing suite through Node's built-in runner and the admitted Proctor path.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/base/common/upstream/performance.test.ts",
+      "localSha256": "2a4ed29cea605383960217c0ed5745efa8ba4ed42a48d1210415c551059039d6",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/performance.ts",
+      "upstreamBlob": "abe81fdbea6f9c394499803fa22d39dc3f50af92",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Input-latency sampling is retained for the browser-interaction slice, where its complete keyboard/input/render event lifecycle can be composed and verified in real Chromium.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/performance/browser/inputLatencyContrib.ts",
+      "upstreamBlob": "9f7203f680fe8e59c24b2b04e04d6d69324643d4",
+      "category": "registration",
+      "disposition": "excluded",
+      "rationale": "VS Code telemetry reporting and aggregate workbench registration are not Proctor composition; later browser input sampling remains local unless an explicit redacted diagnostics owner is admitted.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/performance/browser/perfviewEditor.ts",
+      "upstreamBlob": "f54b39d9ba7b447dc1c5d6aab63ad81128962b98",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "A general startup performance editor and diagnostics command are outside the production examination workbench; Control Explorer may expose bounded development-only fixtures later.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "base-platform-contract",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/platform.ts",
+      "rationale": "The admitted base runtime supplies the bounded Node-process shape used only for runtime discrimination."
+    },
+    {
+      "id": "web-performance-api",
+      "kind": "platform-interface",
+      "reference": "Web Performance API performance.timeOrigin, mark, clearMarks, and getEntriesByType",
+      "rationale": "Electron Chromium supplies the native high-resolution source; the admitted implementation preserves its fallback behavior elsewhere."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "local-static-budgets",
+      "summary": "Proctor adds a namespaced static budget registry and immutable local snapshot interface; it does not inherit VS Code telemetry endpoints, product diagnostics commands, or aggregate workbench registrations.",
+      "localPaths": [
+        "src/prctr/platform/performance/common/performance.ts",
+        "test/platform/performance/common/performance.test.ts"
+      ],
+      "verificationRefs": ["proctor-performance-tests", "source-composition-check"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "mark-owner-tests",
+      "kind": "test",
+      "path": "test/base/common/upstream/performance.test.ts",
+      "obligation": "Verify exact mark-name clearing while preserving unrelated shared marks."
+    },
+    {
+      "id": "proctor-performance-tests",
+      "kind": "test",
+      "path": "test/platform/performance/common/performance.test.ts",
+      "obligation": "Verify unique positive budgets, explicit timestamps, duration evaluation, missing evidence, budget failure, and immutable snapshots."
+    },
+    {
+      "id": "source-composition-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify layer direction, cycles, static imports, and literal Proctor composition ownership."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Verify schema, local digest, marker, license reference, unique ownership, divergence, and evidence parity without a VS Code checkout."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Resolve the exact VS Code commit and verify every reviewed upstream blob against the canonical checkout."
+    }
+  ]
+}

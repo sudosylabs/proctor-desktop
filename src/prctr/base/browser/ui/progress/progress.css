@@ -1,0 +1,6 @@
+@layer controls {
+  .prctr-progress { color: var(--prctr-color-text-primary); display: grid; font: var(--prctr-typography-weight-regular) var(--prctr-typography-label-size)/var(--prctr-typography-label-lineHeight) var(--prctr-typography-font-application); gap: var(--prctr-spacing-content-small); inline-size: min(100%, 32rem); }
+  .prctr-progress .prctr-progress__label { overflow-wrap: anywhere; }
+  .prctr-progress .prctr-progress__bar { accent-color: var(--prctr-color-interaction-accent); block-size: 8px; inline-size: 100%; }
+  @media (forced-colors: active) { .prctr-progress .prctr-progress__bar { border: var(--prctr-shape-stroke-default) solid CanvasText; } }
+}
