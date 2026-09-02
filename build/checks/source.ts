@@ -29,6 +29,8 @@ function layer(path: string, policy: SourcePolicy): number | undefined {
 }
 
 function environment(path: string, policy: SourcePolicy): string {
+  const exact = policy.environmentOverrides?.[path];
+  if (exact !== undefined) return exact;
   const segments = path.split('/');
   return Object.keys(policy.environments).find(name => segments.includes(name)) ?? 'common';
 }
@@ -42,17 +44,6 @@ export function analyzeSource(repository: Repository): Graph {
   const packageManifest = readJson<{ readonly dependencies?: Readonly<Record<string, string>> }>(repository, 'package.json');
   const productionDependencies = new Set(Object.keys(packageManifest.dependencies ?? {}));
   const sourceFiles = repository.files().filter(path => path.startsWith(`${policy.sourceRoot}/`) && isTs(path));
-  const admittedPortClusters = new Set(repository.files()
-    .filter(path => path.startsWith('docs/upstream/vscode-ports/') && path.endsWith('.json') && !path.endsWith('/schema.json'))
-    .map(path => {
-      try { return (JSON.parse(repository.read(path)) as { readonly clusterId?: unknown }).clusterId; }
-      catch { return undefined; }
-    })
-    .filter((cluster): cluster is string => typeof cluster === 'string'));
-  const portMarkers = new Map(sourceFiles.map(path => {
-    const marker = repository.read(path).match(/@proctor-vscode-port\s+([a-z0-9]+(?:-[a-z0-9]+)*)/u)?.[1];
-    return [path, marker !== undefined && admittedPortClusters.has(marker) ? marker : undefined] as const;
-  }));
   for (const path of repository.files().filter(candidate => candidate.startsWith('src/') && isTs(candidate) && !candidate.startsWith(`${policy.sourceRoot}/`))) diagnostics.push(diagnostic(checkId, path, 'Application source is outside src/prctr.', 'Move Proctor-owned source under its accepted namespace.'));
   for (const path of sourceFiles) {
     const text = repository.read(path);
@@ -106,15 +97,15 @@ export function analyzeSource(repository: Repository): Graph {
     }
   }
   const adjacency = new Map<string, string[]>();
-  for (const edge of edges) adjacency.set(edge.from, [...(adjacency.get(edge.from) ?? []), edge.to]);
+  // Type-only imports are erased by TypeScript and cannot form a runtime
+  // module cycle. Keep them in the architecture graph, but exclude them from
+  // the executable dependency graph checked here.
+  for (const edge of edges) if (!edge.typeOnly) adjacency.set(edge.from, [...(adjacency.get(edge.from) ?? []), edge.to]);
   const visiting = new Set<string>(); const visited = new Set<string>(); const stack: string[] = []; const cycles = new Set<string>();
   const walk = (node: string): void => {
     if (visiting.has(node)) {
       const start = stack.indexOf(node); const members = stack.slice(start);
-      const cluster = portMarkers.get(members[0] ?? '');
-      if (cluster === undefined || !members.every(member => portMarkers.get(member) === cluster)) {
-        cycles.add([...members, node].join(' -> '));
-      }
+      cycles.add([...members, node].join(' -> '));
       return;
     }
     if (visited.has(node)) return;
@@ -167,10 +158,12 @@ export const compositionCheck: Check = {
 };
 
 const CASCADE = ['reset', 'theme', 'base', 'controls', 'workbench', 'contributions', 'overrides'];
+const DOCUMENT_RESET_PATH = 'src/prctr/workbench/browser/documentLayout.css';
+const DOCUMENT_RESET_SELECTORS = new Set(['html', 'body']);
 export const cssCheck: Check = {
   id: 'source.css', category: 'source', contractRequired: true,
   run: ({ repository }) => {
-    const graph = analyzeSource(repository); const diagnostics: Diagnostic[] = [];
+    const graph = analyzeSource(repository); const diagnostics: Diagnostic[] = []; const policy = readJson<SourcePolicy>(repository, 'build/policies/source-boundaries.json'); const importantOverrides = policy.cssImportantOverrides ?? []; const usedImportantOverrides = new Set<number>();
     for (const path of repository.files().filter(candidate => candidate.startsWith('src/prctr/') && candidate.endsWith('.css'))) {
       const owners = graph.cssOwners.get(path) ?? [];
       if (owners.length !== 1) diagnostics.push(diagnostic('source.css', path, `Stylesheet has ${owners.length} TypeScript owners; exactly one is required.`, 'Import the stylesheet from the single module that owns its DOM.'));
@@ -181,23 +174,34 @@ export const cssCheck: Check = {
       root.walkAtRules('layer', rule => { const name = rule.params.trim(); const index = CASCADE.indexOf(name); if (index < 0) diagnostics.push(diagnostic('source.css', path, `Unknown cascade layer ${name}.`, `Use one of ${CASCADE.join(', ')}.`)); else seenLayers.push(index); });
       for (let index = 1; index < seenLayers.length; index++) if ((seenLayers[index] as number) < (seenLayers[index - 1] as number)) diagnostics.push(diagnostic('source.css', path, 'Cascade layers occur out of accepted order.', `Order layers as ${CASCADE.join(', ')}.`));
       root.walkDecls(declaration => {
-        if (declaration.important) diagnostics.push(diagnostic('source.css', path, '!important is not backed by a structured override exception.', 'Use ordinary cascade ownership or add reviewed exception evidence.'));
+        if (declaration.important) {
+          const selector = declaration.parent?.type === 'rule' ? declaration.parent.selector : undefined;
+          const overrideIndex = importantOverrides.findIndex(override => override.path === path && override.selector === selector && override.property === declaration.prop);
+          const inOverrideLayer = declaration.parent?.parent?.type === 'atrule' && declaration.parent.parent.name === 'layer' && declaration.parent.parent.params.trim() === 'overrides';
+          if (overrideIndex < 0 || !inOverrideLayer) diagnostics.push(diagnostic('source.css', path, '!important is not backed by a structured override-layer exception.', 'Use ordinary cascade ownership or add reviewed exception evidence in the overrides layer.'));
+          else usedImportantOverrides.add(overrideIndex);
+        }
         for (const token of declaration.toString().matchAll(/--([A-Za-z0-9_-]+)/g)) if (!(token[1] as string).startsWith('prctr-')) diagnostics.push(diagnostic('source.css', path, `Custom property --${token[1]} is not Proctor-owned.`, 'Use a --prctr-* semantic token.'));
       });
       root.walkRules(rule => {
+		if (rule.parent?.type === 'atrule' && rule.parent.name.endsWith('keyframes')) return;
         try {
           selectorParser(selectors => selectors.each(selector => {
             let firstClass: string | undefined; let hasId = false; let rootHas = false;
             selector.walk(node => { if (node.type === 'class' && firstClass === undefined) firstClass = node.value; if (node.type === 'id') hasId = true; if (node.type === 'pseudo' && node.value === ':has' && firstClass === undefined) rootHas = true; });
             if (hasId) diagnostics.push(diagnostic('source.css', path, `Selector ${selector.toString()} uses an id.`, 'Use the owning .prctr-* root and semantic state.'));
             if (rootHas) diagnostics.push(diagnostic('source.css', path, `Selector ${selector.toString()} uses root-anchored :has().`, 'Anchor relational matching below the owning control root.'));
-            if (firstClass === undefined || !firstClass.startsWith('prctr-')) diagnostics.push(diagnostic('source.css', path, `Selector ${selector.toString()} is not rooted in .prctr-*.`, 'Give the owning control one Proctor root class.'));
+            if (firstClass === undefined || !firstClass.startsWith('prctr-')) {
+			  const selectorText = selector.toString().trim();
+			  if (path !== DOCUMENT_RESET_PATH || !DOCUMENT_RESET_SELECTORS.has(selectorText)) diagnostics.push(diagnostic('source.css', path, `Selector ${selector.toString()} is not rooted in .prctr-*.`, 'Give the owning control one Proctor root class or use the exact composition-owned document reset.'));
+			}
             else roots.add(firstClass);
           })).processSync(rule.selector);
         } catch (error) { diagnostics.push(diagnostic('source.css', path, String(error), 'Fix the selector syntax.')); }
       });
       if (roots.size > 1) diagnostics.push(diagnostic('source.css', path, `Stylesheet exposes multiple roots: ${[...roots].sort().join(', ')}.`, 'Keep one .prctr-* DOM root per owner.'));
     }
+    for (const [index, override] of importantOverrides.entries()) if (!usedImportantOverrides.has(index)) diagnostics.push(diagnostic('source.css', override.path, `CSS important override for ${override.selector} ${override.property} is stale or duplicated.`, 'Remove stale exception evidence or restore its exact reviewed declaration.'));
     return diagnostics;
   }
 };

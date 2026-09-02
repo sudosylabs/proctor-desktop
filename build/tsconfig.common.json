@@ -8,5 +8,32 @@
     "../src/prctr/editor/**/common/**/*.ts",
     "../src/prctr/workbench/**/common/**/*.ts",
     "../src/prctr/code/**/common/**/*.ts"
+  ],
+  "exclude": [
+    "../src/prctr/editor/common/**/*.ts",
+    "../src/prctr/workbench/contrib/attemptWorkspace/common/**/*.ts",
+    "../src/prctr/platform/integratedBrowser/common/**/*.ts",
+    "../src/prctr/platform/executionEnvironment/common/**/*.ts",
+    "../src/prctr/workbench/services/integratedBrowser/common/**/*.ts",
+    "../src/prctr/workbench/services/executionEnvironment/common/**/*.ts",
+    "../src/prctr/platform/instantiation/common/**/*.ts",
+    "../src/prctr/platform/registry/common/**/*.ts",
+    "../src/prctr/platform/contextkey/common/**/*.ts",
+    "../src/prctr/platform/commands/common/**/*.ts",
+    "../src/prctr/platform/actions/common/**/*.ts",
+    "../src/prctr/platform/keybinding/common/**/*.ts",
+    "../src/prctr/platform/performance/common/**/*.ts",
+    "../src/prctr/platform/theme/common/**/*.ts",
+    "../src/prctr/platform/settings/common/**/*.ts",
+    "../src/prctr/workbench/common/composition.ts",
+    "../src/prctr/workbench/common/contentGroups.ts",
+    "../src/prctr/workbench/common/lifecycle.ts",
+    "../src/prctr/workbench/common/restoration.ts",
+    "../src/prctr/workbench/common/workbenchItem.ts",
+    "../src/prctr/workbench/common/contextKeys.ts",
+    "../src/prctr/workbench/services/commands/common/**/*.ts",
+    "../src/prctr/workbench/services/actions/common/**/*.ts",
+    "../src/prctr/workbench/services/keybinding/common/**/*.ts",
+    "../src/prctr/workbench/services/examSecurity/common/**/*.ts"
   ]
 }

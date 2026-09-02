@@ -6,6 +6,7 @@ import {
 } from './nativeProtocol.ts';
 import { nativeCapabilityRegistryGenerator } from './nativeCapabilityRegistry.ts';
 import { localizationCatalogGenerator } from './localizationCatalog.ts';
+import { settingsRegistryGenerator } from './settingsRegistry.ts';
 
 export interface Generator {
   readonly id: string;
@@ -17,6 +18,7 @@ export interface Generator {
 
 export const generators: readonly Generator[] = [
   localizationCatalogGenerator,
+  settingsRegistryGenerator,
   nativeProtocolGenerator,
   ...nativeCapabilityProtocolGenerators,
   nativeHelperProtocolGenerator,

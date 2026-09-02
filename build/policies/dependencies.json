@@ -1,7 +1,7 @@
 {
   "$schema": "./schemas/dependencies.schema.json",
   "schemaVersion": 1,
-  "allowedLicenseExpressions": ["(MIT OR Apache-2.0) AND Unicode-3.0", "Apache-2.0", "Apache-2.0 OR MIT", "BSD-2-Clause", "BSD-3-Clause", "ISC", "MIT", "MIT OR Apache-2.0", "MIT/Apache-2.0", "Unlicense OR MIT"],
+  "allowedLicenseExpressions": ["(MIT OR Apache-2.0) AND Unicode-3.0", "Apache-2.0", "Apache-2.0 OR MIT", "BSD-2-Clause", "BSD-3-Clause", "CC-BY-4.0", "ISC", "MIT", "MIT OR Apache-2.0", "MIT/Apache-2.0", "Unlicense OR MIT"],
   "dependencies": [
     {
       "ecosystem": "cargo",
@@ -278,6 +278,42 @@
       "localAlternative": "Maintaining local statfs, ifaddrs, flags, and target-ABI declarations would duplicate platform headers and increase unsafe layout risk.",
       "updateOwner": "native-capabilities",
       "removalOwner": "native-capabilities"
+    },
+    {
+      "package": "@vscode/codicons",
+      "version": "0.0.46-38",
+      "kind": "production",
+      "purpose": "Supply the exact Codicon font asset used by the pinned VS Code source while Proctor exposes only static semantic icon identifiers.",
+      "owner": "design-system",
+      "source": "https://www.npmjs.com/package/@vscode/codicons/v/0.0.46-38",
+      "license": "CC-BY-4.0",
+      "lifecycleScripts": "blocked",
+      "processes": ["authenticated-renderer", "candidate-renderer"],
+      "networkBehavior": "None; the font is bundled into renderer assets at build time.",
+      "nativeBehavior": "Bundles one platform-neutral TrueType font and no executable or native library.",
+      "transitiveRisk": "The production package has no runtime dependencies; its development-only source repository scripts are not admitted or executed.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Recreating or subsetting the font would weaken exact upstream fidelity and add a separate glyph-maintenance pipeline.",
+      "updateOwner": "design-system",
+      "removalOwner": "design-system"
+    },
+    {
+      "package": "@xterm/xterm",
+      "version": "6.1.0-beta.303",
+      "kind": "production",
+      "purpose": "Render the exact terminal emulator generation admitted by the pinned VS Code source for the Candidate remote PTY surface.",
+      "owner": "execution-environment",
+      "source": "https://www.npmjs.com/package/@xterm/xterm/v/6.1.0-beta.303",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": ["candidate-renderer"],
+      "networkBehavior": "None; xterm parses and renders byte output already delivered through Proctor's closed terminal renderer API.",
+      "nativeBehavior": "Platform-neutral TypeScript and browser assets only; no executable or native library is bundled.",
+      "transitiveRisk": "The exact production package has no runtime dependencies and is imported only by the Candidate terminal panel.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "A smaller local escape-sequence parser would be observably less correct and accessible than the mature emulator VS Code currently uses.",
+      "updateOwner": "execution-environment",
+      "removalOwner": "execution-environment"
     },
     {
       "package": "electron",

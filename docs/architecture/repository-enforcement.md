@@ -56,6 +56,13 @@ manifest. This treats the admitted cluster as one deep module without allowing
 an unowned, cross-cluster, or cross-layer cycle; provenance validation remains
 the authority for membership and exact source ownership.
 
+Runtime classification normally comes from an explicit environment folder. An
+aggregate whose accepted product name cannot encode that folder uses one exact
+path classification in `source-boundaries.json`; the shared
+`workbench.common.main.ts` aggregate is therefore checked as browser source.
+This classification changes which dependency rules apply and is not a waiver
+from layer, runtime, composition, or cycle checking.
+
 The text-hygiene check permits absolute-path and `file:` URI literals only in
 marked base-common port source and its transferred owner tests, where those
 literals are behavioral fixtures covered by an exact manifest digest. Unmarked
@@ -121,7 +128,9 @@ No Git hook is installed. Local use is voluntary; CI is the required authority.
 Electron and esbuild now support the isolated security-utility composition:
 the cheap `check` gate runs its process-neutral protocol tests, and the native
 macOS/Windows jobs run its real Electron/Node-API lifecycle test. Forge,
-renderer/Playwright harnesses, packaging, and packaged-target gates remain
-absent. The Rust workspace, native addon, and development-runtime Electron
-evidence activate source/runtime controls only; they establish no packaged-
-target claim.
+Playwright, packaging, and packaged-target gates remain absent. A real
+sandboxed Chromium renderer harness covers browser-owned controls and
+workbench interactions, and a real Electron harness verifies the isolated
+product-window skeleton and capability-specific preloads. The Rust workspace,
+native addon, and development-runtime Electron evidence activate
+source/runtime controls only; they establish no packaged-target claim.

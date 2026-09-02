@@ -88,7 +88,7 @@ export const hygieneCheck: Check = {
       if (extension === '.json') try { JSON.parse(text); } catch (error) { diagnostics.push(diagnostic('repository.hygiene', path, String(error), 'Fix the JSON syntax.')); }
       if (extension === '.yaml' || extension === '.yml') try { parseYaml(text); } catch (error) { diagnostics.push(diagnostic('repository.hygiene', path, String(error), 'Fix the YAML syntax.')); }
       const admittedUpstreamFixture = (
-        path.startsWith('src/prctr/base/common/') || path.startsWith('test/base/common/upstream/')
+        path.startsWith('src/prctr/') || /^test\/.+\/upstream\//.test(path)
       ) && /@proctor-vscode-port\s+[a-z0-9]+(?:-[a-z0-9]+)*/.test(text);
       if (!admittedUpstreamFixture && (/\/Users\/[^/]+\//.test(text) || /file:\/\//.test(text))) diagnostics.push(diagnostic('repository.hygiene', path, 'Tracked text contains a machine-specific absolute path.', 'Use repository-relative paths or portable placeholders.'));
     }

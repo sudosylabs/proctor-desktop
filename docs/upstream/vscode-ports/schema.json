@@ -190,6 +190,7 @@
               "namespace-path-translation",
               "relative-import-rewrite",
               "accepted-dependency-substitution",
+              "erasable-syntax-rewrite",
               "provenance-marker-insertion"
             ]
           }

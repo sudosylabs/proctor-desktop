@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { analyzeSource } from '../../build/checks/source.ts';
+import { analyzeSource, cssCheck } from '../../build/checks/source.ts';
 import { VirtualRepository } from '../../build/checks/repository.ts';
 
 const sourcePolicy = JSON.stringify({
@@ -11,7 +11,7 @@ const sourcePolicy = JSON.stringify({
   productionDynamicImportAllowlist: []
 });
 
-test('source graph preserves cycles wholly internal to one admitted port cluster', () => {
+test('source graph rejects executable cycles even inside one admitted port cluster', () => {
   const repository = new VirtualRepository({
     'build/policies/source-boundaries.json': sourcePolicy,
     'docs/upstream/vscode-ports/cycle-port.json': '{"clusterId":"cycle-port"}',
@@ -25,7 +25,9 @@ test('source graph preserves cycles wholly internal to one admitted port cluster
       import './one.js';
     `
   });
-  assert.deepEqual(analyzeSource(repository).diagnostics, []);
+  const diagnostics = analyzeSource(repository).diagnostics;
+  assert.equal(diagnostics.length, 1);
+  assert.match(diagnostics[0]?.problem ?? '', /^Source cycle:/u);
 });
 
 test('source graph still rejects unowned cycles and resolves declaration dependencies', () => {
@@ -45,4 +47,35 @@ test('source graph still rejects unowned cycles and resolves declaration depende
   const diagnostics = analyzeSource(repository).diagnostics;
   assert.equal(diagnostics.length, 1);
   assert.match(diagnostics[0]?.problem ?? '', /^Source cycle:/u);
+});
+
+test('source graph applies exact aggregate environment classifications', () => {
+  const repository = new VirtualRepository({
+    'build/policies/source-boundaries.json': JSON.stringify({
+      sourceRoot: 'src/prctr',
+      layers: ['base', 'platform', 'editor', 'workbench', 'code'],
+      environments: { common: ['common'], browser: ['common', 'browser'] },
+      environmentOverrides: { 'src/prctr/workbench/workbench.common.main.ts': 'browser' },
+      testSegments: ['test'],
+      productionDynamicImportAllowlist: []
+    }),
+    'package.json': '{"dependencies":{}}',
+    'src/prctr/workbench/workbench.common.main.ts': "import './browser/owner.js';\n",
+    'src/prctr/workbench/browser/owner.ts': 'export const owner = true;\n'
+  });
+  assert.deepEqual(analyzeSource(repository).diagnostics, []);
+});
+
+test('CSS important declarations require one exact override-layer exception', async () => {
+  const path = 'src/prctr/workbench/browser/owner.css'; const selector = '.prctr-owner .compatibility'; const repository = new VirtualRepository({
+    'build/policies/source-boundaries.json': JSON.stringify({
+      sourceRoot: 'src/prctr', layers: ['base', 'platform', 'editor', 'workbench', 'code'], environments: { common: ['common'], browser: ['common', 'browser'] }, testSegments: ['test'], productionDynamicImportAllowlist: [], cssImportantOverrides: [{ path, selector, property: 'opacity', rationale: 'Preserve the exact behavior of the packaged compatibility surface.' }]
+    }),
+    'package.json': '{"dependencies":{}}',
+    'src/prctr/workbench/browser/owner.ts': "import './owner.css';\n",
+    [path]: `@layer overrides { ${selector} { opacity: 1 !important; } }`
+  });
+  assert.deepEqual(await cssCheck.run({ repository, registeredCheckIds: new Set([cssCheck.id]) }), []);
+  const stale = new VirtualRepository({ ...Object.fromEntries(repository.files().map(file => [file, repository.read(file)])), [path]: `@layer workbench { ${selector} { opacity: 1 !important; } }` });
+  const diagnostics = await cssCheck.run({ repository: stale, registeredCheckIds: new Set([cssCheck.id]) }); assert.equal(diagnostics.length, 2); assert.match(diagnostics.map(value => value.problem).join('\n'), /override-layer|stale/u);
 });

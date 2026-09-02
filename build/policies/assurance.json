@@ -149,12 +149,10 @@
     {
       "id": "workspace-contract-tests",
       "kind": "test",
-      "status": "deferred",
+      "status": "active",
       "owner": "attempt-workspace",
       "invariants": ["workspace.stable-entry-identity", "workspace.opaque-content-version", "workspace.acknowledged-durability", "workspace.distinct-states", "workspace.protected-recovery", "workspace.provider-projection", "workspace.orthogonal-state", "workspace.protect-unacknowledged-work", "workspace.submission-readiness", "workspace.exam-resources-separated", "workspace.v1-contract"],
-      "activation": "workspace-source-present",
-      "futureKind": "test",
-      "rationale": "The Attempt Workspace contracts have no Desktop source implementation to exercise yet."
+      "evidence": ["src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts", "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts", "src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts", "src/prctr/workbench/contrib/attemptWorkspace/common/threeWayMerge.ts", "src/prctr/workbench/contrib/attemptWorkspace/common/examResourceCatalog.ts", "src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts", "test/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.test.ts", "test/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.test.ts", "test/workbench/contrib/attemptWorkspace/common/examResourceCatalog.test.ts", "docs/upstream/vscode-ports/attempt-workspace-core.json"]
     },
     {
       "id": "native-security-utility-bridge-tests",
@@ -183,42 +181,51 @@
     {
       "id": "design-system-tests",
       "kind": "test",
-      "status": "deferred",
+      "status": "active",
       "owner": "design-system",
       "invariants": ["renderer.plain-dom", "design.shared-system", "design.static-registration", "design.presentation-not-authority", "design.accessibility", "design.css-ownership", "design.control-interface", "design.test-code-excluded"],
-      "activation": "css-present",
-      "futureKind": "test",
-      "rationale": "No reusable control or production stylesheet exists yet."
+      "evidence": ["src/prctr/platform/theme/common/semanticIcons.ts", "src/prctr/platform/theme/browser/semanticIcon.ts", "src/prctr/platform/theme/browser/semanticIcon.css", "src/prctr/base/browser/ui/button/button.ts", "src/prctr/base/browser/ui/field/textField.ts", "src/prctr/base/browser/ui/toggle/toggle.ts", "src/prctr/base/browser/ui/progress/progress.ts", "test/browser/controlExplorer/manifest.ts", "test/platform/theme/common/semanticIcons.test.ts", "test/checks/codiconAsset.test.ts", "test/electron/browserHarness.real.test.ts", "docs/upstream/vscode-ports/codicons-semantic-icons.json", "docs/upstream/vscode-ports/shared-browser-controls.json", "docs/architecture/design-system.md"]
+    },
+    {
+      "id": "workbench-kernel-tests",
+      "kind": "test",
+      "status": "active",
+      "owner": "workbench",
+      "invariants": ["source.deep-modules", "source.interface-tests", "source.static-contributions", "renderer.plain-dom", "composition.immutable-window", "design.accessibility", "design.css-ownership", "upstream.no-aggregate-entrypoints"],
+      "evidence": ["src/prctr/workbench/common/composition.ts", "src/prctr/workbench/common/lifecycle.ts", "src/prctr/workbench/common/contentGroups.ts", "src/prctr/workbench/common/restoration.ts", "src/prctr/workbench/browser/workbenchShell.ts", "src/prctr/workbench/browser/overlayHost.ts", "src/prctr/workbench/browser/paneHost.ts", "src/prctr/workbench/browser/authenticatedManifest.ts", "src/prctr/workbench/browser/candidateManifest.ts", "test/workbench/common/composition.test.ts", "test/workbench/common/lifecycle.test.ts", "test/workbench/common/contentGroups.test.ts", "test/workbench/common/restoration.test.ts", "test/browser/workbenchKernelTests.ts", "test/electron/browserHarness.real.test.ts", "docs/upstream/vscode-ports/workbench-kernel.json"]
+    },
+    {
+      "id": "editor-core-tests",
+      "kind": "test",
+      "status": "active",
+      "owner": "editor",
+      "invariants": ["source.layer-direction", "source.deep-modules", "source.interface-tests", "upstream.exact-provenance", "workspace.opaque-content-version", "workspace.acknowledged-durability"],
+      "evidence": ["src/prctr/editor/common/model.ts", "src/prctr/editor/common/core/position.ts", "src/prctr/editor/common/core/range.ts", "src/prctr/editor/common/core/selection.ts", "src/prctr/editor/common/model/textModelSearch.ts", "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeBase.ts", "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts", "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBufferBuilder.ts", "src/prctr/editor/common/model/pieceTreeTextBuffer/rbTreeBase.ts", "test/editor/common/upstream/core/range.test.ts", "test/editor/common/upstream/model/pieceTreeTextBuffer/pieceTreeTextBuffer.test.ts", "test/editor/common/upstream/model/textModelSearch.test.ts", "docs/upstream/vscode-ports/editor-core.json"]
     },
     {
       "id": "settings-contract-tests",
       "kind": "test",
-      "status": "deferred",
+      "status": "active",
       "owner": "user-settings",
       "invariants": ["settings.server-authority", "settings.static-registry", "settings.no-authority", "settings.authenticated-page", "settings.frozen-attempt-configuration", "settings.stronger-live-constraints", "settings.conditional-writes"],
-      "activation": "settings-registry-present",
-      "futureKind": "test",
-      "rationale": "The static settings registry and settings service do not exist yet."
+      "implementation": "generated.parity",
+      "evidence": ["src/prctr/platform/settings/common/settingsManifest.ts", "src/prctr/platform/settings/common/settingsDocument.ts", "src/prctr/platform/settings/common/settingsResolution.ts", "src/prctr/platform/settings/common/settingsRendererProtocol.ts", "src/prctr/platform/settings/common/userSettingsService.ts", "src/prctr/platform/settings/common/attemptConfiguration.ts", "src/prctr/platform/settings/electron-main/userSettingsCoordinator.ts", "src/prctr/platform/settings/electron-main/userSettingsIpc.ts", "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts", "src/prctr/workbench/browser/authenticatedManifest.ts", "src/prctr/code/electron-browser/authenticatedPreload.ts", "build/generators/settingsRegistry.ts", "resources/settings/settings.schema.json", "resources/settings/settings.catalog.json", "resources/settings/settings.rejections.json", "resources/settings/registry.fingerprint.json", "test/platform/settings/common/settingsDocument.test.ts", "test/platform/settings/common/userSettingsService.test.ts", "test/platform/settings/common/attemptConfiguration.test.ts", "test/electron/browserHarness.real.test.ts", "docs/upstream/vscode-ports/user-settings-common.json"]
     },
     {
       "id": "browser-contract-tests",
       "kind": "test",
-      "status": "deferred",
+      "status": "active",
       "owner": "integrated-browser",
       "invariants": ["browser.revision-frozen-policy", "browser.privileged-enforcement", "browser.minimized-activity", "browser.ordered-delivery"],
-      "activation": "browser-source-present",
-      "futureKind": "test",
-      "rationale": "The integrated browser coordinator, contribution, and protected activity spool do not exist yet."
+      "evidence": ["src/prctr/platform/integratedBrowser/common/browserPolicy.ts", "src/prctr/platform/integratedBrowser/common/browserActivity.ts", "src/prctr/platform/integratedBrowser/common/browserActivityLedger.ts", "src/prctr/platform/integratedBrowser/common/browserProtocol.ts", "src/prctr/workbench/services/integratedBrowser/common/integratedBrowserCoordinator.ts", "src/prctr/platform/integratedBrowser/electron-main/electronBrowserEnforcer.ts", "src/prctr/workbench/services/integratedBrowser/electron-main/integratedBrowserIpc.ts", "src/prctr/code/electron-browser/candidatePreload.ts", "src/prctr/workbench/browser/candidateManifest.ts", "test/workbench/contrib/integratedBrowser/common/browserPolicy.test.ts", "test/workbench/contrib/integratedBrowser/common/browserActivityLedger.test.ts", "test/workbench/contrib/integratedBrowser/common/integratedBrowserCoordinator.test.ts", "test/electron/windowSkeleton.real.test.ts", "docs/upstream/vscode-ports/integrated-browser-client.json"]
     },
     {
       "id": "execution-contract-tests",
       "kind": "test",
-      "status": "deferred",
+      "status": "active",
       "owner": "execution-environment",
       "invariants": ["execution.remote-pty", "execution.generation-fencing", "execution.workspace-projection"],
-      "activation": "execution-source-present",
-      "futureKind": "test",
-      "rationale": "The Desktop remote-terminal model, transport, and workbench contribution do not exist yet."
+      "evidence": ["src/prctr/platform/executionEnvironment/common/terminalProtocol.ts", "src/prctr/platform/executionEnvironment/common/terminalRendererProtocol.ts", "src/prctr/workbench/services/executionEnvironment/common/remoteTerminal.ts", "src/prctr/workbench/services/executionEnvironment/common/remoteTerminalModel.ts", "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.ts", "src/prctr/workbench/services/executionEnvironment/electron-main/terminalIpc.ts", "src/prctr/code/electron-browser/candidatePreload.ts", "src/prctr/code/electron-main/terminalComposition.ts", "src/prctr/workbench/browser/candidateManifest.ts", "test/workbench/contrib/terminal/common/remoteTerminalModel.test.ts", "test/browser/remoteTerminalPanelTests.ts", "test/electron/browserHarness.real.test.ts", "docs/upstream/vscode-ports/remote-terminal-client.json"]
     },
     {
       "id": "native-display-source-contract-tests",
@@ -261,6 +268,14 @@
       "evidence": ["native/schemas/interactive-session-state.schema.json", "native/schemas/clipboard-state.schema.json", "native/schemas/print-spooler-state.schema.json", "native/schemas/removable-storage-state.schema.json", "native/schemas/virtualization-state.schema.json", "native/schemas/network-configuration-state.schema.json", "native/schemas/media-device-state.schema.json", "native/schemas/native-helper.schema.json", "native/crates/prctr-native-source-runtime/src/lib.rs", "native/crates/prctr-native-source-supervisor/src/lib.rs", "native/crates/prctr-native-helper-protocol/src/lib.rs", "native/crates/prctr-interactive-session-state/src/lib.rs", "native/crates/prctr-clipboard-state/src/lib.rs", "native/crates/prctr-print-spooler-state/src/lib.rs", "native/crates/prctr-removable-storage-state/src/lib.rs", "native/crates/prctr-virtualization-state/src/lib.rs", "native/crates/prctr-network-configuration-state/src/lib.rs", "native/crates/prctr-media-device-state/src/lib.rs", "src/prctr/platform/native/common/nativeCapabilityRegistry.ts", "src/prctr/platform/native/common/privateAttemptClipboard.ts", "src/prctr/platform/native/common/candidatePrintCommandGate.ts", "src/prctr/platform/native/electron-main/nativePermissionBroker.ts", "test/checks/nativeCapabilityFamiliesProtocol.test.ts", "test/checks/nativeCapabilityRegistry.test.ts", "test/checks/privateAttemptClipboard.test.ts", "test/checks/candidatePrintCommandGate.test.ts", "test/security-utility/nativePermissionBroker.test.ts", "test/checks/testNative.test.ts"]
     },
     {
+      "id": "exam-security-coordinator-contract-tests",
+      "kind": "test",
+      "status": "active",
+      "owner": "exam-security",
+      "invariants": ["security.privileged-posture", "security.online-only", "security.containment-before-presentation", "security.pause-suspension", "security.fenced-participation", "security.integrity-vocabulary", "native.passive-sources", "native.process-boundaries", "native.fail-closed", "native.abnormal-loss-contained", "toolchain.signed-capability-matrix"],
+      "evidence": ["src/prctr/workbench/services/examSecurity/common/effectivePolicy.ts", "src/prctr/workbench/services/examSecurity/common/examSecurity.ts", "src/prctr/workbench/services/examSecurity/common/securityProjectionProtocol.ts", "src/prctr/workbench/services/examSecurity/electron-utility/examSecurityCoordinator.ts", "src/prctr/workbench/services/examSecurity/electron-main/examSecurityIpc.ts", "src/prctr/code/electron-main/examSecurityComposition.ts", "src/prctr/code/electron-browser/candidatePreload.ts", "src/prctr/workbench/browser/candidateManifest.ts", "test/workbench/services/examSecurity/common/examSecurityCoordinator.test.ts"]
+    },
+    {
       "id": "native-packaged-conformance",
       "kind": "package",
       "status": "deferred",
@@ -268,7 +283,7 @@
       "invariants": ["native.initial-scope", "native.process-boundaries", "native.single-display-window", "native.fail-closed", "native.abnormal-loss-contained", "native.packaged-conformance", "toolchain.signed-capability-matrix"],
       "activation": "packaged-target-present",
       "futureKind": "package",
-      "rationale": "Source-level native observation, partial platform adapters, permission-broker lifecycle, CandidateWindow enforcement, helper-protocol, registry/matrix-verifier, private clipboard, print gate, and authenticated private MessagePort tests exist, but enforcement-grade process/session helpers, remaining full-coverage variants, the coordinator, a packaged target tuple, and a generated signed capability matrix do not exist yet."
+      "rationale": "Source-level native observation, partial platform adapters, permission-broker lifecycle, CandidateWindow enforcement, helper-protocol, registry/matrix-verifier, private clipboard, print gate, authenticated private MessagePort tests, and the environment-neutral coordinator state machine exist, but enforcement-grade process/session helpers, remaining full-coverage variants, production coordinator activation, a packaged target tuple, and a generated signed capability matrix do not exist yet."
     },
     {
       "id": "packaged-security",

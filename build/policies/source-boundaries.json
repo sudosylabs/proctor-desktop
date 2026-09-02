@@ -12,6 +12,17 @@
     "electron-utility": ["common", "node", "electron-utility"],
     "electron-main": ["common", "node", "electron-utility", "electron-main"]
   },
+  "environmentOverrides": {
+    "src/prctr/workbench/workbench.common.main.ts": "browser"
+  },
   "testSegments": ["test"],
-  "productionDynamicImportAllowlist": []
+  "productionDynamicImportAllowlist": [],
+  "cssImportantOverrides": [
+    {
+      "path": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.css",
+      "selector": ".prctr-terminal .xterm-dim",
+      "property": "opacity",
+      "rationale": "Preserve xterm dim rendering by preventing its generated foreground opacity from dimming cell backgrounds."
+    }
+  ]
 }

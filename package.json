@@ -24,9 +24,9 @@
   "scripts": {
     "audit:upstream": "node build/checks/upstreamAudit.ts",
     "audit:dependencies": "npm audit --audit-level=high",
-    "check": "npm run check:types && node build/checks/main.ts && npm run check:licenses && npm run test:checks && npm run test:base && npm run test:security-utility && npm run test:native",
+    "check": "npm run check:types && node build/checks/main.ts && npm run check:licenses && npm run test:checks && npm run test:base && npm run test:platform-foundation && npm run test:editor && npm run test:window-skeleton && npm run test:security-utility && npm run test:native",
     "check:licenses": "node build/checks/dependencyLicenses.ts",
-    "check:types": "tsc --project build/tsconfig.json --noEmit && tsc --project build/tsconfig.common.json --noEmit && tsc --project build/tsconfig.base-common.json --noEmit && tsc --project build/tsconfig.base-common-test.json --noEmit && tsc --project build/tsconfig.common-test.json --noEmit && tsc --project build/tsconfig.browser.json --noEmit && tsc --project build/tsconfig.electron-main.json --noEmit && tsc --project build/tsconfig.electron-utility.json --noEmit && tsc --project build/tsconfig.electron-test.json --noEmit",
+    "check:types": "tsc --project build/tsconfig.json --noEmit && tsc --project build/tsconfig.common.json --noEmit && tsc --project build/tsconfig.base-common.json --noEmit && tsc --project build/tsconfig.base-common-test.json --noEmit && tsc --project build/tsconfig.platform-foundation.json --noEmit && tsc --project build/tsconfig.platform-foundation-test.json --noEmit && tsc --project build/tsconfig.editor-core.json --noEmit && tsc --project build/tsconfig.editor-core-test.json --noEmit && tsc --project build/tsconfig.common-test.json --noEmit && tsc --project build/tsconfig.browser.json --noEmit && tsc --project build/tsconfig.electron-browser.json --noEmit && tsc --project build/tsconfig.electron-main.json --noEmit && tsc --project build/tsconfig.electron-utility.json --noEmit && tsc --project build/tsconfig.electron-test.json --noEmit",
     "check:assurance": "node build/checks/main.ts --check assurance.coverage",
     "check:dependencies": "node build/checks/main.ts --check dependencies.admission",
     "check:docs": "node build/checks/main.ts --check repository.documentation --check repository.hygiene --check ci.actions-pinned",
@@ -37,21 +37,29 @@
     "build:security-utility": "node build/buildSecurityUtility.ts",
     "build:browser-harness": "node build/buildBrowserHarness.ts",
     "build:base-common-tests": "node build/buildBaseCommonTests.ts",
+    "build:platform-foundation-tests": "node build/buildPlatformFoundationTests.ts",
+    "build:editor-core-tests": "node build/buildEditorCoreTests.ts",
+    "build:window-skeleton": "node build/buildWindowSkeleton.ts",
     "generate": "node build/generators/main.ts --write",
     "inspect": "node build/checks/main.ts --inspect",
     "test": "npm run test:checks",
     "test:base": "npm run build:base-common-tests && node --test .build/base-common-tests/**/*.test.js",
+    "test:platform-foundation": "npm run build:platform-foundation-tests && node --test .build/platform-foundation-tests/**/*.test.js",
     "test:checks": "node --test test/checks/*.test.ts",
     "test:browser": "npm run build:browser-harness && node --test test/electron/browserHarness.real.test.ts",
     "test:electron": "npm run build:security-utility && node --test test/electron/*.real.test.ts",
+    "test:editor": "npm run build:editor-core-tests && node --test .build/editor-core-tests/**/*.test.js",
     "test:native": "node build/testNative.ts",
     "test:security-utility": "node build/testSecurityUtility.ts",
+    "test:window-skeleton": "npm run build:window-skeleton && node --test test/electron/windowSkeleton.real.test.ts",
     "test:unit": "npm run test:checks && npm run test:security-utility"
   },
   "allowScripts": {
     "esbuild": true
   },
   "dependencies": {
+    "@vscode/codicons": "0.0.46-38",
+    "@xterm/xterm": "6.1.0-beta.303",
     "electron": "44.0.0"
   },
   "devDependencies": {

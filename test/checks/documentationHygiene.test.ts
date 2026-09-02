@@ -24,3 +24,19 @@ test('hygiene permits exact upstream path fixtures only in the admitted base are
   }));
   assert.deepStrictEqual(diagnostics, []);
 });
+
+test('hygiene permits provenance-owned upstream fixtures in admitted platform clusters', () => {
+  const diagnostics = hygieneCheck.run(context({
+    'src/prctr/platform/contextkey/common/example.ts': `// @proctor-vscode-port platform-context-conditions\nexport const scheme = '${fileScheme}';\n`,
+    'test/platform/contextkey/common/upstream/example.test.ts': `// @proctor-vscode-port platform-context-conditions\nexport const path = '${fileScheme}${usersRoot}fixture/file.ts';\n`
+  }));
+  assert.deepStrictEqual(diagnostics, []);
+});
+
+test('hygiene does not permit markers to exempt unrelated test locations', () => {
+  const diagnostics = hygieneCheck.run(context({
+    'test/platform/contextkey/common/example.test.ts': `// @proctor-vscode-port platform-context-conditions\nexport const path = '${usersRoot}example/checkout/file.ts';\n`
+  }));
+  assert.ok(Array.isArray(diagnostics));
+  assert.match(diagnostics[0]?.problem ?? '', /machine-specific absolute path/);
+});

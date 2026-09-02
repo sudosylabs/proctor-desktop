@@ -24,7 +24,7 @@ export const provenanceCheck: Check = {
     catch (error) { return [diagnostic(checkId, schemaPath, String(error), 'Fix the canonical provenance schema.')]; }
     const localOwners = new Map<string, string>(); const clusters = new Set<string>(); const marked = new Map<string, string>();
     for (const path of repository.files().filter(candidate =>
-      (candidate.startsWith('src/prctr/') || candidate.startsWith('test/base/common/upstream/'))
+      (candidate.startsWith('src/prctr/') || /^test\/.+\/upstream\//.test(candidate))
       && /\.(?:ts|css)$/.test(candidate)
     )) {
       const matches = [...repository.read(path).matchAll(/@proctor-vscode-port\s+([a-z0-9]+(?:-[a-z0-9]+)*)/g)];

@@ -47,140 +47,96 @@
 
 ## Desktop implementation state
 
-No user-facing application, production Electron renderer or preload, workbench
-window, browser, terminal, or VS Code UI/editor source cluster has landed. Two
-foundation clusters are admitted at exact VS Code revision
-`c89cda63706360aa2fe45a0e5669c76fb20f29f8`: localization provides the Proctor
-named-message interface, deterministic English catalog generation, and a
-private positional compatibility seam; base-common preserves the complete
-reviewed lifecycle, event, cancellation, async, resource, URI, and observable
-closure instead of reduced local substitutes. Its direct owner suites are
-ported to the pinned Node runner, including virtual-time, leak, ordering,
-failure, and observable-debug behavior, with experimental APIs outside the
-approved closure explicitly excluded. Production
-Electron-main and utility-process source exists only for the native security
-baseline.
-The native Rust workspace implements an eleven-source generated manifest:
-display topology, CandidateWindow, capture/session, process/application,
-interactive session, clipboard, print spooler, removable storage,
-virtualization, network configuration, and media device state. Checked schemas
-generate bounded Rust/TypeScript contracts and validators. Shared runtime and
-supervisor code provide race-free source sessions, atomic startup rollback,
-bounded polling/restart, exact gaps, reset-fenced replacement, and reverse-order
-shutdown over an explicit manifest-ordered source selection. A failed wire
-conversion immediately returns failed health and a reconciled observation whose
-gap accounts for every discarded source sequence; disabled source factories are
-not opened. Initial availability probes degrade only ordinary backend discovery
-failure; inventory, protocol, queue, and cleanup failures retain their exact
-terminal category, and the supervisor rechecks the process fence after every
-completed source open. Display adapters exist for macOS, Windows, and Linux; CandidateWindow
-has bounded utility-local ingress; capture/session has notification-first
-Windows WTS support with RemoteFX-aware classification and explicit unavailable
-macOS/Linux coverage. Process/application now has snapshot-only, partial,
-identity-unavailable adapters using Windows Toolhelp, macOS declared running
-applications, and same-account Linux `/proc` with session scope left `unknown`.
-Windows and macOS omit entries when PID-plus-creation/launch generation cannot
-be established rather than aliasing a reused PID or transient object address;
-full lifecycle enforcement still
-requires the absent signed Windows ETW service or approved macOS Endpoint
-Security helper. Interactive-session state has partial Windows WTS and Linux
-logind snapshots while macOS remains unavailable without its helper. Clipboard
-change counters work on Windows/macOS and remain unavailable on generic Linux.
-Windows spooler adapters report bounded active scheduler-job counts from a
-field-selective owner/status notification refresh; printer/document names are
-never requested and transient owner buffers are cleared after relative
-classification. Cleanup outside the fixed field/owner bound runs behind the
-shared cleanup deadline and poisons the utility for process replacement if
-completion cannot be proved. macOS/Linux spooler coverage is explicitly
-unavailable until a bounded IPP implementation replaces the unbounded CUPS API.
-Storage reports mounted removable media on Windows/macOS and partial Linux
-sysfs-marked removable block/base-or-partition mount state with Attempt-keyed
-pseudonyms stable across source replacement, with no implemented portable/MTP
-claim. Policy selects block storage and portable/MTP separately. Windows/Linux provide
-bounded virtualization classification while macOS correctly remains
-unavailable. Network adapters report partial tunnel classes plus Windows
-adapter-topology, macOS interface-topology, and Linux IPv4 route/interface
-generation; only Windows reports system-proxy presence. macOS AVFoundation
-reports separate camera/microphone permission, device-input readiness, count,
-and documented concurrent use without starting a capture session or retaining
-content; Windows reports endpoint presence only, while Linux reports microphone
-endpoint presence and leaves camera coverage unavailable until bounded V4L2
-capture-capability inspection exists. Authorization/readiness remain unknown on
-those partial adapters. The shared media snapshot permission is a conservative
-aggregate of only the selected camera/microphone endpoint permissions.
-The private bootstrap also freezes non-empty per-source selections for removable
-block versus portable/MTP storage and for the five network categories. The Rust
-bridge rejects source/category mismatches; platform adapters skip unselected
-storage and network queries rather than emitting broader facts.
+The repository now contains a source-level Desktop application graph rather than
+only architecture and native foundations. Nineteen Proctor-owned VS Code port
+clusters have exact manifests under `docs/upstream/vscode-ports/`: localization,
+base-common runtime, performance, Codicons and semantic icons, themes and design
+tokens, browser interaction, shared browser controls, context conditions,
+commands, instantiation/registry, actions/menus, keybindings, editor core,
+workbench kernel, Electron window skeleton, Attempt Workspace core, User Settings,
+integrated browser, and remote terminal. Each admitted cluster is pinned to
+reviewed upstream blobs, retains applicable license evidence, and is compiled and
+tested without a runtime dependency on another checkout.
 
-A narrow Node-API adapter exposes that manifest to the dedicated Electron
-utility process. Electron main launches the exact entrypoint and transfers one
-private MessagePort with fixed build/source identity, challenge, participation-
-generation, sequencing, heartbeat, acknowledgement, bounded-backpressure, and
-shutdown checks. Spawn and authenticated ready consume one shared absolute
-startup budget. Process-neutral tests and a real Electron development-runtime
-test exercise this bridge. A closed Electron-main CandidateWindow constructor
-and enforcer own BrowserWindow listeners, verified platform constraints,
-generation fencing, bounded window-state delivery, and authoritative release;
-focused interface tests and the real Electron harness exercise that boundary.
-An Electron-main permission broker declares separate camera and microphone
-permission capabilities, restricts any admitted OS permission request to an
-explicit preflight action, and seals prompting across utility startup and
-participation until normal shutdown. Inspection and the seal are scoped to the
-exact selected source/category set, and a differently scoped launch is rejected.
-Cancellation epoch-fences in-flight inspection, permission requests, and
-sealing before clearing retained scope; normal sealed shutdown releases the
-seal and selection together. Utility ready, poll, and stop output is fenced
-to that same source subset.
-Non-prompting sources report permission as
-not required independently from their source coverage. A generated private
-helper protocol, Rust binding validator, and helper transport crate now fix
-frame, nonce, peer-build, event-class, literal discriminated client/server
-envelopes, source-owned observation/failure routing,
-bounded active sources, minimum loss-accounting queue capacity, broker-owned
-single-use nonce generation, one absolute identity-verification-through-
-handshake startup deadline, fixed request/I/O/termination deadlines, terminal
-fail-closed transport, exact Windows release digest held non-replaceable across
-spawn, live macOS SecCode validation, private inherited-pipe, and normalized-fact
-boundaries. Inventory overflow remains a distinct helper failure category.
-Unproved verifier completion or helper termination poisons the owning utility,
-rejects further helper launches, and requires process replacement. The present helper binary reports the affected
-sources unavailable: no Windows ETW/WTS service or entitled macOS Endpoint
-Security implementation is packaged or composed yet. A generated family
-registry backed by bounded policy schemas,
-authoritative per-family modes and per-platform coverage keys, plus signed-
-matrix verification that binds packaged component/adapter/helper identity,
-static target-specific permission requirements, limitations, and verification
-result while leaving current grant state to preflight,
-bounded private Attempt clipboard, and closed candidate print-command gate are
-also implemented and tested. No matrix is generated or signed yet. External
-screen-capture observation remains explicitly unavailable. The
-`ExamSecurityCoordinator`, policy/evidence transformation, policy-to-source
-selection composition, and production CandidateWindow composition do not yet
-exist. This is source and development-runtime evidence, not packaged secure-
-target conformance.
+The base/platform/editor foundation includes the complete admitted utility
+closures, generated English localization and settings registries, theme and
+presentation services, accessible reusable controls, command/menu/keybinding and
+context-condition ownership, and the piece-tree text buffer/search primitives.
+Independent Node and real-Chromium suites exercise the transplanted behavior,
+while source-graph checks enforce runtime placement, layer direction, manifest
+admission, and cycle absence.
 
-The executable repository foundation contains package metadata and locks,
-pinned Electron and esbuild dependencies, runtime-specific TypeScript checks,
-typed policy/checker modules, generators, focused Node/Rust tests, an Electron
-security-utility harness, a sandboxed real-Electron Chromium renderer harness,
-a Linux foundation job, a Rust dependency-audit job, and macOS/Windows jobs that
-run native-source, real Electron utility, and renderer tests. Browser source now
-has an independent DOM typecheck; the harness exercises the production
-localization interface with deterministic locale and direction plus
-DisposableStore/Emitter interaction and absence of ambient Node.js without
-claiming a production window. Dedicated compiler projects and an esbuild test
-build preserve the admitted base-common TypeScript/runtime semantics. The complete application
-graph, Forge packaging, Control Explorer,
-static window manifests, User Settings registry, Workspace client,
-protected stores, integrated browser, terminal client, enforcement-grade
-process/session helpers and remaining full-coverage adapter variants,
-coordinator and
-production CandidateWindow security composition, packaging, signing,
-distribution, and release jobs remain to be implemented. Global external
-screen-capture detection is an explicit unavailable claim rather than an
-unfinished implementation item. Accepted architecture and source-only
-boundaries must never be reported as working packaged behavior.
+The workbench source implements immutable LaunchWindow, AuthenticatedWindow, and
+CandidateWindow compositions with explicit contributions, lifecycle phases,
+content-item resolution, pane ownership, overlays, responsive sidebar/panel
+collapse, keyboard sashes, and localized accessible parts. Capability-specific
+sandboxed preloads and Electron-main IPC authorize the bound main frame. The real
+Electron window harness verifies the locked renderer preferences and three-window
+capability separation. This is a development-runtime skeleton; it is not yet a
+Forge-packaged, signed, updateable application.
+
+Attempt Workspace now has canonical URI/path validation, hierarchy and content
+models, a provider boundary, mutation scheduling, late-result fencing, retry and
+protected-recovery contracts, three-way reconciliation, Exam Resource delivery,
+and a Candidate contribution. These are tested client models with injected ports;
+production server transport and protected-store adapters are still required.
+Likewise, editor core is present, but a complete Candidate editor presentation,
+language services, and server-backed Workspace composition have not landed.
+
+User Settings includes the static generated registry, JSONC document/draft and
+comment-preserving edits, validation, migrations, effective-resolution and
+Attempt Configuration constraints. An Electron-main coordinator owns the
+protected cache and server-authoritative revisions, exposes a bounded preload
+protocol, and fails unavailable state read-only. AuthenticatedWindow has a real
+Account/Settings destination with structured and JSONC views. Production account
+transport and protected cache implementations remain composition inputs.
+
+The integrated browser implements strict revision-frozen HTTP(S) policy
+validation, institution-bound HTTP exceptions, privileged navigation and
+subresource enforcement in a sandboxed `WebContentsView`, popup/permission/
+download/DevTools denial, exact policy/gate lifecycle, scoped minimized ordered
+Browser Activity, and protected-ledger continuation. Its Candidate pane owns the
+native view through a validated zoom-aware bounds, visibility, overlay, focus,
+and close protocol; responsive behavior is exercised at 200% zoom in real
+Chromium, and enforcement is exercised in real Electron. Server Browser Policy,
+activity upload/acknowledgement, and production protected-spool adapters remain
+required.
+
+The remote terminal implements the server-authorized one-PTY protocol,
+generation/open-epoch fencing, bounded early and live output, sequence/gap and
+acknowledgement handling, Workspace projection settlement before readiness,
+resize/input/close intents, retryable teardown, Electron IPC, and an accessible
+xterm-backed Candidate panel. It still needs the production remote transport and
+Workspace projection adapter. The AI agent remains deferred.
+
+Exam security now includes effective-policy and native-selection validation,
+reconciliation, minimized evidence, authoritative projection derivation, action
+gates, correction acknowledgement, and a fail-closed Candidate contribution.
+The renderer subscribes before its initial projection and revision-fences that
+snapshot. Electron IPC and composition seams exist, but authoritative server
+participation, enforcement adapters, protected evidence delivery, and complete
+CandidateWindow startup composition are not yet wired into a production entrypoint.
+
+The native Rust/Node-API/Electron utility foundation remains substantial: the
+generated eleven-source manifest, bounded schemas, source-session supervision,
+sequence/gap accounting, helper transport and identity verification, Windows/
+macOS/Linux observation adapters, permission broker, CandidateWindow enforcer,
+private clipboard, print gate, capability-family registry, and signed-matrix
+verifier are implemented and tested. Several platform claims deliberately remain
+partial or unavailable, including the absent signed Windows ETW/WTS service,
+entitled macOS Endpoint Security helper, bounded Linux/macOS printing coverage,
+and global external screen-capture observation. No capability matrix is generated
+or signed yet, so this is not packaged secure-target conformance.
+
+The executable toolchain has one pinned npm graph, strict NodeNext compiler
+projects for every runtime, esbuild harnesses, generators, policy/schema/source/
+documentation/provenance checks, focused Node/Rust suites, real sandboxed Chromium
+and Electron tests, and target-native CI foundations. Remaining delivery work is
+production composition with real server and protected-store ports, complete
+Candidate editor integration, Forge packaging and fuses, signed capability-matrix
+generation, packaged Windows/macOS conformance, updates, signing/notarization,
+SBOM/provenance publication, distribution, and release evidence. Accepted
+source-level behavior must not be reported as packaged production behavior.
 
 ## Server integration baseline
 

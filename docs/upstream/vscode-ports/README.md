@@ -5,14 +5,28 @@ reimplemented VS Code material in Proctor Desktop. It contains no speculative
 catalog: create `<cluster-id>.json` only in the change that admits or updates
 the corresponding behavior cluster.
 
-Admitted clusters:
+Admitted clusters (the manifest files remain authoritative for exact paths,
+revision, disposition, dependencies, divergence, and evidence):
 
-- [`base-common-runtime`](./base-common-runtime.json) — the complete admitted
-  base-common dependency closure for lifecycle, events, cancellation, async
-  scheduling, resources, and observables, with upstream owner suites.
-- [`localization-runtime`](./localization-runtime.json) — Proctor named-message
-  runtime and deterministic packaged catalog generation, plus the private
-  positional compatibility seam used by admitted VS Code modules.
+- [`actions-menus`](./actions-menus.json) — observable actions and static Proctor menu contributions.
+- [`attempt-workspace-core`](./attempt-workspace-core.json) — Attempt Workspace overlay, recovery, persistence, reconciliation, providers, and Exam Resources.
+- [`base-common-runtime`](./base-common-runtime.json) — lifecycle, events, cancellation, scheduling, resources, and observables.
+- [`browser-interaction`](./browser-interaction.json) — DOM lifecycle, focus, input, geometry, scheduling, resize, touch, and safe CSS values.
+- [`codicons-semantic-icons`](./codicons-semantic-icons.json) — complete pinned Codicon assets behind Proctor semantic icon identifiers.
+- [`editor-core`](./editor-core.json) — positions, ranges, selections, piece-tree text, edits, EOL, word boundaries, and search.
+- [`electron-window-skeleton`](./electron-window-skeleton.json) — trusted product windows, immutable descriptors, preloads, and secure transitions.
+- [`integrated-browser-client`](./integrated-browser-client.json) — policy-enforced Candidate browser and minimized ordered activity.
+- [`localization-runtime`](./localization-runtime.json) — named messages, packaged catalogs, and the private upstream compatibility seam.
+- [`performance-foundation`](./performance-foundation.json) — monotonic marks and static local performance budgets.
+- [`platform-commands`](./platform-commands.json) — static command registration, validation, execution, events, and disposal.
+- [`platform-context-conditions`](./platform-context-conditions.json) — parsing, normalization, implication, comparison, regex, and serialization of context expressions.
+- [`platform-instantiation-registry`](./platform-instantiation-registry.json) — constructor injection, scopes, delayed services, cycle detection, and disposal.
+- [`platform-keybindings`](./platform-keybindings.json) — platform keybinding resolution, conflicts, chords, IME, labels, and dispatch.
+- [`remote-terminal-client`](./remote-terminal-client.json) — one Workspace-fenced, policy-gated, xterm-backed remote PTY.
+- [`shared-browser-controls`](./shared-browser-controls.json) — reusable native-DOM controls and deterministic Control Explorer evidence.
+- [`themes-design-tokens`](./themes-design-tokens.json) — static semantic tokens and four immutable Proctor themes.
+- [`user-settings-common`](./user-settings-common.json) — bounded JSONC settings, typed resolution, and frozen Attempt Configuration.
+- [`workbench-kernel`](./workbench-kernel.json) — executable compositions, lifecycle, shell, layout, items, panes, restoration, and overlays.
 
 ## Record identity
 
@@ -49,6 +63,9 @@ Copied and adapted files record their local path, local SHA-256 digest, and
 mechanical transformations. Adapted semantic differences live in `divergences`.
 Behaviorally reimplemented items point to local source but carry no
 source-synchronization digest.
+
+`erasable-syntax-rewrite` records behavior-neutral TypeScript assertion syntax
+rewrites required by Proctor's `erasableSyntaxOnly` compilation policy.
 
 ## Source markers and attribution
 

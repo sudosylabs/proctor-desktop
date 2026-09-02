@@ -7,8 +7,15 @@ export type SourcePolicy = {
   readonly sourceRoot: string;
   readonly layers: readonly string[];
   readonly environments: Readonly<Record<string, readonly string[]>>;
+  readonly environmentOverrides?: Readonly<Record<string, string>>;
   readonly testSegments: readonly string[];
   readonly productionDynamicImportAllowlist: readonly string[];
+  readonly cssImportantOverrides?: readonly {
+    readonly path: string;
+    readonly selector: string;
+    readonly property: string;
+    readonly rationale: string;
+  }[];
 };
 
 export type Composition = {

@@ -4,6 +4,62 @@
   "activationPath": "src/prctr/code",
   "compositions": [
     {
+      "id": "launch-window-renderer",
+      "kind": "renderer",
+      "entrypoint": "src/prctr/code/electron-browser/launch.main.ts",
+      "required": ["src/prctr/workbench/browser", "src/prctr/platform/theme/browser"],
+      "forbidden": ["src/prctr/platform/native", "src/prctr/workbench/contrib/candidate", "src/prctr/workbench/common"],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "authenticated-window-renderer",
+      "kind": "renderer",
+      "entrypoint": "src/prctr/code/electron-browser/authenticated.main.ts",
+      "required": ["src/prctr/workbench/browser", "src/prctr/platform/theme/browser"],
+      "forbidden": ["src/prctr/platform/native", "src/prctr/workbench/contrib/candidate"],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "candidate-window-renderer",
+      "kind": "renderer",
+      "entrypoint": "src/prctr/code/electron-browser/candidate.main.ts",
+      "required": ["src/prctr/workbench/browser", "src/prctr/platform/theme/browser"],
+      "forbidden": ["src/prctr/platform/native", "src/prctr/workbench/contrib/authenticated"],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "product-window-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/productWindowComposition.ts",
+      "required": ["src/prctr/platform/windows/common", "src/prctr/platform/windows/electron-main"],
+      "forbidden": ["src/prctr/platform/windows/electron-browser", "src/prctr/platform/native/electron-utility"],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "launch-window-preload",
+      "kind": "preload",
+      "entrypoint": "src/prctr/code/electron-browser/launchPreload.ts",
+      "required": ["src/prctr/platform/windows/common"],
+      "forbidden": ["src/prctr/platform/windows/electron-main", "src/prctr/platform/native"],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "authenticated-window-preload",
+      "kind": "preload",
+      "entrypoint": "src/prctr/code/electron-browser/authenticatedPreload.ts",
+      "required": ["src/prctr/platform/windows/common"],
+      "forbidden": ["src/prctr/platform/windows/electron-main", "src/prctr/platform/native"],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "candidate-window-preload",
+      "kind": "preload",
+      "entrypoint": "src/prctr/code/electron-browser/candidatePreload.ts",
+      "required": ["src/prctr/platform/windows/common"],
+      "forbidden": ["src/prctr/platform/windows/electron-main", "src/prctr/platform/native"],
+      "allowedDynamicImports": []
+    },
+    {
       "id": "security-utility-main",
       "kind": "main",
       "entrypoint": "src/prctr/code/electron-main/securityUtilityComposition.ts",
@@ -13,6 +69,65 @@
       ],
       "forbidden": [
         "src/prctr/platform/native/electron-utility"
+      ],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "integrated-browser-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/integratedBrowserComposition.ts",
+      "required": [
+        "src/prctr/platform/integratedBrowser/common",
+        "src/prctr/platform/integratedBrowser/electron-main",
+        "src/prctr/workbench/services/integratedBrowser/common",
+        "src/prctr/workbench/services/integratedBrowser/electron-main"
+      ],
+      "forbidden": [
+        "src/prctr/workbench/contrib/integratedBrowser/browser",
+        "src/prctr/platform/native/electron-utility"
+      ],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "remote-terminal-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/terminalComposition.ts",
+      "required": [
+        "src/prctr/platform/executionEnvironment/common",
+        "src/prctr/workbench/services/executionEnvironment/common",
+        "src/prctr/workbench/services/executionEnvironment/electron-main"
+      ],
+      "forbidden": [
+        "src/prctr/workbench/contrib/terminal/browser",
+        "src/prctr/platform/native/electron-utility"
+      ],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "exam-security-projection-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/examSecurityComposition.ts",
+      "required": [
+        "src/prctr/workbench/services/examSecurity/common",
+        "src/prctr/workbench/services/examSecurity/electron-main"
+      ],
+      "forbidden": [
+        "src/prctr/workbench/services/examSecurity/electron-utility",
+        "src/prctr/platform/native/electron-utility"
+      ],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "user-settings-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/userSettingsComposition.ts",
+      "required": [
+        "src/prctr/platform/settings/common",
+        "src/prctr/platform/settings/electron-main"
+      ],
+      "forbidden": [
+        "src/prctr/workbench/contrib/settings/browser",
+        "src/prctr/platform/native"
       ],
       "allowedDynamicImports": []
     },
