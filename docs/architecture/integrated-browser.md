@@ -34,6 +34,9 @@ custom schemes, external-application launches, and unlisted downloads.
 Draft edits never affect an open Sitting. Only an immutable live correction may
 advance Browser Policy; CandidateWindow presents a persistent summary and
 requires acknowledgement only when the correction declares it.
+Applying a correction seals and flushes the prior policy-bound Browser Activity
+source before a new source is created with the corrected revision and digest;
+activity never crosses policy scope.
 
 ## Privileged enforcement
 
@@ -61,6 +64,14 @@ coordinator failure immediately closes navigation/input gates. Pause preserves
 the item beneath the CandidateWindow overlay without producing activity from
 blocked UI. Suspension seals the browser source session before CandidateWindow
 is destroyed.
+
+The renderer projection reports lifecycle capabilities independently:
+`canOpen` is true only for an idle, ungated coordinator; `canClose` remains true
+while an underlying native owner is opening or open, including when policy has
+changed the visible state to `blocked`. A pane assigned while blocked opens
+automatically when a later projection permits `canOpen`, and pane cleanup uses
+`canClose` so a blocked native owner cannot be orphaned. Navigation capabilities
+remain false whenever the visible state is non-interactive.
 
 ## Browser Activity
 
@@ -92,7 +103,10 @@ One source session returns its instance ID and begins at a known sequence.
 Delivery is at-least-once and idempotent by source instance/sequence. The server
 acknowledges the highest contiguous sequence and reports gaps. Desktop retains
 unacknowledged records in a bounded encrypted spool distinct from Workspace
-Recovery and the general integrity spool.
+Recovery and the general integrity spool. Acknowledgements are serialized per
+source and advance the durable watermark in the same atomic protected-store
+mutation that removes acknowledged records; a failed mutation leaves those
+records replayable after restart.
 
 Reconnect resends from the authoritative acknowledgement. Submission and
 automatic sealing report final browser source/sequence/gap facts but cannot

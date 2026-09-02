@@ -1,0 +1,41 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "remote-terminal-client",
+  "admission": {
+    "workflow": "Present one xterm-backed Candidate terminal connected only to one server-authorized remote PTY after current Workspace acknowledgement and independent security gating.",
+    "callers": ["src/prctr/workbench/browser/candidateManifest.ts", "src/prctr/code/electron-browser/candidatePreload.ts"],
+    "interface": "src/prctr/workbench/services/executionEnvironment/common/remoteTerminal.ts",
+    "decision": "docs/architecture/execution-environment.md"
+  },
+  "upstream": { "repository": "https://github.com/microsoft/vscode", "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8" },
+  "items": [
+    { "upstreamPath": "LICENSE.txt", "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5", "category": "license", "disposition": "evidence-only", "rationale": "Canonical Microsoft MIT text for the reviewed VS Code terminal evidence.", "licenseRefs": ["vscode-mit"] },
+    { "upstreamPath": "src/vs/platform/terminal/common/terminal.ts", "upstreamBlob": "cca3805245ee082ff9e7554853de7deec4f6e184", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain explicit terminal dimensions, lifecycle concepts and data contracts while replacing local process/profile authority with one closed remote PTY protocol.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/platform/executionEnvironment/common/terminalProtocol.ts" },
+    { "upstreamPath": "src/vs/platform/terminal/common/terminalDataBuffering.ts", "upstreamBlob": "c9ad8399a95acc9b3a40f6be69eaf1ba38865c7b", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain ordered output delivery and acknowledgement pressure, with strict sequence gaps and a bounded unacknowledged-byte window replacing timer-based local-process batching.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/workbench/services/executionEnvironment/common/remoteTerminalModel.ts" },
+    { "upstreamPath": "src/vs/workbench/contrib/terminal/browser/terminalInstance.ts", "upstreamBlob": "5e921025518e951055ae9f313c881bc9868edd92", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain one explicit instance lifecycle, xterm write acknowledgement, resize, input, focus, accessibility and disposal through a Proctor-owned remote-only panel.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.ts" },
+    { "upstreamPath": "src/vs/workbench/contrib/terminal/browser/xterm/xtermTerminal.ts", "upstreamBlob": "2bf7f8bbec15358c7d9772963d16cbcbf0a845f5", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Use the same mature emulator family with screen-reader mode, token theme, device-pixel-ratio-aware measurement and bounded scrollback rather than implementing a lesser escape parser.", "licenseRefs": ["vscode-mit", "xterm-mit"], "localPath": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.ts" },
+    { "upstreamPath": "src/vs/workbench/contrib/terminal/common/terminal.ts", "upstreamBlob": "f1bcb84e4d70095c673c1fb0b311281d29e41d23", "category": "source", "disposition": "excluded", "rationale": "Local shell profiles, extension contributions, tabs, splits, tasks, persistent processes, reconnection and environment-variable collections would expand the product beyond one server-authorized remote PTY." , "licenseRefs": ["vscode-mit"] }
+  ],
+  "licenses": [
+    { "id": "vscode-mit", "name": "MIT License", "upstreamPaths": ["LICENSE.txt"], "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt" },
+    { "id": "xterm-mit", "name": "MIT License", "upstreamPaths": ["src/vs/workbench/contrib/terminal/browser/xterm/xtermTerminal.ts"], "localNoticePath": "docs/upstream/licenses/xterm-MIT.txt" }
+  ],
+  "dependencies": [
+    { "id": "xterm", "kind": "external-package", "reference": "@xterm/xterm@6.1.0-beta.303", "rationale": "The exact xterm generation declared by the pinned VS Code source provides mature terminal emulation and accessibility behavior." },
+    { "id": "attempt-workspace", "kind": "local-interface", "reference": "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts", "rationale": "Current Workspace persistence is acknowledged before the PTY may open against current content." },
+    { "id": "security-gate", "kind": "platform-interface", "reference": "src/prctr/workbench/services/executionEnvironment/common/remoteTerminal.ts", "rationale": "The Exam Security Coordinator supplies independent pause, posture, connection and Participation gates without entering the renderer." }
+  ],
+  "divergences": [
+    { "id": "remote-only", "summary": "One server-authorized PTY replaces all local shell, process, profile, task, split and persistent-session capabilities.", "localPaths": ["src/prctr/workbench/services/executionEnvironment/common/remoteTerminalModel.ts", "src/prctr/workbench/services/executionEnvironment/electron-main/terminalIpc.ts", "src/prctr/code/electron-main/terminalComposition.ts"], "verificationRefs": ["terminal-contract-tests", "source-check"] },
+    { "id": "workspace-and-generation-fences", "summary": "An open may require acknowledged current Workspace content and every privileged frame is fenced to exact connection and Participation generations.", "localPaths": ["src/prctr/platform/executionEnvironment/common/terminalProtocol.ts", "src/prctr/workbench/services/executionEnvironment/common/remoteTerminalModel.ts"], "verificationRefs": ["terminal-contract-tests"] },
+    { "id": "no-client-replay", "summary": "Transport loss, gaps, overflow and stale scope fail closed; first release has no Desktop PTY replay or resurrection.", "localPaths": ["src/prctr/workbench/services/executionEnvironment/common/remoteTerminalModel.ts"], "verificationRefs": ["terminal-contract-tests"] },
+    { "id": "scoped-xterm-presentation", "summary": "The pinned xterm package keeps its complete required DOM styles inside the terminal contribution's cascade ownership, including its documented dim compatibility override, and follows live workbench theme, forced-color and reduced-motion state.", "localPaths": ["src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.ts", "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.css", "build/policies/source-boundaries.json"], "verificationRefs": ["real-xterm-test", "source-check"] }
+  ],
+  "verification": [
+    { "id": "terminal-contract-tests", "kind": "test", "path": "test/workbench/contrib/terminal/common/remoteTerminalModel.test.ts", "obligation": "Verify Workspace acknowledgement, independent gates, exact scope, ordering, backpressure, bounds, stale generation, exit and renderer protocol closure." },
+    { "id": "real-xterm-test", "kind": "test", "path": "test/electron/browserHarness.real.test.ts", "obligation": "Verify the real sandboxed Chromium xterm surface, accessible prompt, live theme and reduced-motion presentation, measured resize, selector-fenced write acknowledgement, closed actions and disposal." },
+    { "id": "source-check", "kind": "check", "path": "build/checks/source.ts", "obligation": "Verify layer direction, runtime placement, static Candidate contribution, preload closure, cycle absence, contribution-scoped CSS and the exact reviewed xterm compatibility override." },
+    { "id": "upstream-audit", "kind": "review", "path": "build/checks/upstreamAudit.ts", "obligation": "Verify reviewed terminal evidence against the exact pinned VS Code revision." }
+  ]
+}

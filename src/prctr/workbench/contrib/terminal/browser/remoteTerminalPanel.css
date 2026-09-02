@@ -1,0 +1,70 @@
+/**
+ * The xterm rules in this file are adapted from @xterm/xterm/css/xterm.css.
+ * Copyright (c) 2014 The xterm.js authors. All rights reserved.
+ * Copyright (c) 2012-2013, Christopher Jeffrey. Licensed under the MIT License.
+ */
+
+@layer workbench {
+  .prctr-terminal { background: var(--prctr-color-terminal-background); block-size: 100%; color: var(--prctr-color-terminal-foreground); display: grid; grid-template-rows: 34px minmax(0, 1fr); min-block-size: 0; min-inline-size: 0; }
+  .prctr-terminal .prctr-terminal__header { align-items: center; border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default); display: flex; gap: var(--prctr-spacing-content-medium); min-inline-size: 0; padding-inline: var(--prctr-spacing-content-medium); }
+  .prctr-terminal .prctr-terminal__header h2 { font-family: var(--prctr-typography-font-application); font-size: var(--prctr-typography-label-size); font-weight: var(--prctr-typography-weight-semibold); margin: 0; }
+  .prctr-terminal .prctr-terminal__status { color: var(--prctr-color-text-secondary); font-family: var(--prctr-typography-font-application); font-size: var(--prctr-typography-label-small-size); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .prctr-terminal .prctr-terminal__action { background: transparent; border: 0; color: var(--prctr-color-text-link); cursor: pointer; font: inherit; margin-inline-start: auto; min-block-size: 30px; padding-inline: var(--prctr-spacing-control-inline); }
+  .prctr-terminal .prctr-terminal__action:disabled { color: var(--prctr-color-text-disabled); cursor: default; }
+  .prctr-terminal .prctr-terminal__action:focus-visible { outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus); outline-offset: -2px; }
+  .prctr-terminal .prctr-terminal__viewport { min-block-size: 0; min-inline-size: 0; overflow: hidden; padding: 4px 8px; }
+  .prctr-terminal .prctr-terminal__viewport .xterm { block-size: 100%; cursor: text; position: relative; user-select: none; -webkit-user-select: none; }
+  .prctr-terminal .xterm.focus, .prctr-terminal .xterm:focus { outline: none; }
+  .prctr-terminal .xterm .xterm-helpers { position: absolute; top: 0; z-index: 5; }
+  .prctr-terminal .xterm .xterm-helper-textarea { border: 0; height: 0; left: -9999em; margin: 0; opacity: 0; overflow: hidden; padding: 0; position: absolute; resize: none; top: 0; white-space: nowrap; width: 0; z-index: -5; }
+  .prctr-terminal .xterm .composition-view { background: #000; color: #fff; display: none; position: absolute; white-space: nowrap; z-index: 1; }
+  .prctr-terminal .xterm .composition-view.active { display: block; }
+  .prctr-terminal .xterm .xterm-viewport { cursor: default; inset: 0; overflow-y: scroll; position: absolute; }
+  .prctr-terminal .xterm:not(.allow-transparency) .xterm-viewport { background-color: var(--prctr-color-terminal-background); }
+  .prctr-terminal .xterm .xterm-screen { position: relative; }
+  .prctr-terminal .xterm .xterm-screen canvas { left: 0; position: absolute; top: 0; }
+  .prctr-terminal .xterm.enable-mouse-events { cursor: default; }
+  .prctr-terminal .xterm.xterm-cursor-pointer, .prctr-terminal .xterm .xterm-cursor-pointer { cursor: pointer; }
+  .prctr-terminal .xterm.column-select.focus { cursor: crosshair; }
+  .prctr-terminal .xterm .xterm-accessibility:not(.debug), .prctr-terminal .xterm .xterm-message { color: transparent; inset: 0; pointer-events: none; position: absolute; z-index: 10; }
+  .prctr-terminal .xterm .xterm-accessibility-tree:not(.debug) *::selection { color: transparent; }
+  .prctr-terminal .xterm .xterm-accessibility-tree { font-family: monospace; user-select: text; white-space: pre; }
+  .prctr-terminal .xterm .xterm-accessibility-tree > div { transform-origin: left; width: fit-content; }
+  .prctr-terminal .xterm .live-region { height: 1px; left: -9999px; overflow: hidden; position: absolute; width: 1px; }
+  .prctr-terminal .xterm-underline-1 { text-decoration: underline; }
+  .prctr-terminal .xterm-underline-2 { text-decoration: double underline; }
+  .prctr-terminal .xterm-underline-3 { text-decoration: wavy underline; }
+  .prctr-terminal .xterm-underline-4 { text-decoration: dotted underline; }
+  .prctr-terminal .xterm-underline-5 { text-decoration: dashed underline; }
+  .prctr-terminal .xterm-overline { text-decoration: overline; }
+  .prctr-terminal .xterm-overline.xterm-underline-1 { text-decoration: overline underline; }
+  .prctr-terminal .xterm-overline.xterm-underline-2 { text-decoration: overline double underline; }
+  .prctr-terminal .xterm-overline.xterm-underline-3 { text-decoration: overline wavy underline; }
+  .prctr-terminal .xterm-overline.xterm-underline-4 { text-decoration: overline dotted underline; }
+  .prctr-terminal .xterm-overline.xterm-underline-5 { text-decoration: overline dashed underline; }
+  .prctr-terminal .xterm-strikethrough { text-decoration: line-through; }
+  .prctr-terminal .xterm-screen .xterm-decoration-container .xterm-decoration { position: absolute; z-index: 6; }
+  .prctr-terminal .xterm-screen .xterm-decoration-container .xterm-decoration.xterm-decoration-top-layer { z-index: 7; }
+  .prctr-terminal .xterm-decoration-overview-ruler { pointer-events: none; position: absolute; right: 0; top: 0; z-index: 8; }
+  .prctr-terminal .xterm-decoration-top { position: relative; z-index: 2; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-scrollbar { cursor: default; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-scrollbar > .xterm-scra { background-color: var(--prctr-color-scrollbar-thumb); cursor: pointer; mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'><path d='M2.5 8.5 L5.5 2.5 L8.5 8.5 Z' fill='black'/></svg>"); mask-position: center; mask-repeat: no-repeat; mask-size: 100% 100%; -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'><path d='M2.5 8.5 L5.5 2.5 L8.5 8.5 Z' fill='black'/></svg>"); -webkit-mask-position: center; -webkit-mask-repeat: no-repeat; -webkit-mask-size: 100% 100%; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-scrollbar > .xterm-scra.xterm-arrow-down { transform: rotate(180deg); }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-visible { background: transparent; opacity: 1; transition: opacity 100ms linear; z-index: 11; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-invisible { opacity: 0; pointer-events: none; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-invisible.xterm-fade { transition: opacity 800ms linear; }
+  :where([data-prctr-motion="reduced"]) .prctr-terminal .xterm .xterm-scrollable-element > .xterm-visible,
+  :where([data-prctr-motion="reduced"]) .prctr-terminal .xterm .xterm-scrollable-element > .xterm-invisible.xterm-fade { transition-duration: 0ms; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-shadow { display: none; position: absolute; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-shadow.xterm-shadow-top { box-shadow: var(--prctr-color-border-strong) 0 6px 6px -6px inset; display: block; height: 3px; left: 3px; top: 0; width: 100%; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-shadow.xterm-shadow-left { box-shadow: var(--prctr-color-border-strong) 6px 0 6px -6px inset; display: block; height: 100%; left: 0; top: 3px; width: 3px; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-shadow.xterm-shadow-top-left-corner { display: block; height: 3px; left: 0; top: 0; width: 3px; }
+  .prctr-terminal .xterm .xterm-scrollable-element > .xterm-shadow.xterm-shadow-top.xterm-shadow-left { box-shadow: var(--prctr-color-border-strong) 6px 0 6px -6px inset; }
+  .prctr-terminal .prctr-terminal__measure { display: inline-block; line-height: normal; position: fixed; visibility: hidden; }
+  .prctr-terminal[data-phase="paused"], .prctr-terminal[data-phase="failed"] { border-block-start: var(--prctr-shape-stroke-strong) solid var(--prctr-color-feedback-warning); }
+  @media (forced-colors: active) { .prctr-terminal .prctr-terminal__action:focus-visible { outline-color: Highlight; } }
+}
+
+@layer overrides {
+  .prctr-terminal .xterm-dim { opacity: 1 !important; }
+}

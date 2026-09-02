@@ -62,7 +62,7 @@ model.
 ## Terminal presentation
 
 The terminal contribution lives in CandidateWindow `PanelPart` and attaches to
-one owning terminal model. It presents connection/opening/ready/paused/closed/
+one owning terminal model. It presents connection/opening/ready/paused/closing/closed/
 failed states, remote process exit, bounded scrollback, and safe retry when
 authorized. Closing the panel is presentation; it requests no local process and
 does not imply Attempt departure.
@@ -77,6 +77,9 @@ validated rows/columns. Output applies backpressure and bounded buffering; loss
 or overflow becomes an explicit terminal error and cannot be represented as
 complete output. Terminal content is candidate work and remains out of ordinary
 diagnostics, telemetry, integrity evidence, and generic restoration.
+Requesting close synchronously enters a non-interactive `closing` phase before
+the close frame is awaited, so no later input, resize, acknowledgement, or
+duplicate close can overtake it.
 
 ## Module and process seams
 
