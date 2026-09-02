@@ -1,0 +1,60 @@
+@layer theme {
+	@font-face {
+		font-family: "prctr-codicon";
+		font-display: block;
+		src: url("@vscode/codicons/dist/codicon.ttf") format("truetype");
+	}
+}
+
+@layer controls {
+	.prctr-semantic-icon {
+		display: inline-block;
+		flex: none;
+		font: normal normal normal 16px/1 "prctr-codicon";
+		font-size: 16px;
+		inline-size: 1em;
+		block-size: 1em;
+		text-align: center;
+		text-decoration: none;
+		text-rendering: auto;
+		text-transform: none;
+		user-select: none;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	.prctr-semantic-icon[data-prctr-icon-size="12"] {
+		font-size: 12px;
+	}
+
+	.prctr-semantic-icon[data-prctr-icon-size="20"] {
+		font-size: 20px;
+	}
+
+	.prctr-semantic-icon[data-prctr-icon-size="24"] {
+		font-size: 24px;
+	}
+
+	.prctr-semantic-icon[data-prctr-icon-modifier="disabled"] {
+		opacity: 0.4;
+	}
+
+	.prctr-semantic-icon[data-prctr-icon-modifier="spin"] {
+		animation: prctr-semantic-icon-spin 1.5s steps(30) infinite;
+		transform-origin: center center;
+	}
+}
+
+@keyframes prctr-semantic-icon-spin {
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	@layer controls {
+		.prctr-semantic-icon[data-prctr-icon-modifier="spin"] {
+			animation: none;
+		}
+	}
+}

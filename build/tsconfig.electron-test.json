@@ -1,14 +1,17 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "./tsconfig.electron-main.json",
   "compilerOptions": {
     "lib": ["ES2024"],
     "skipLibCheck": true,
     "types": ["node"]
   },
   "include": [
+    "../src/prctr/base/common/thenable.d.ts",
     "../src/prctr/**/node/**/*.ts",
     "../src/prctr/**/electron-main/**/*.ts",
     "../test/electron/browserHarnessMain.ts",
-    "../test/electron/browserHarness.real.test.ts"
+    "../test/electron/browserHarness.real.test.ts",
+    "../test/electron/windowSkeletonMain.ts",
+    "../test/electron/windowSkeleton.real.test.ts"
   ]
 }

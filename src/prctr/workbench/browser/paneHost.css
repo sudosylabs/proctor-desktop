@@ -1,0 +1,4 @@
+@layer workbench {
+  .prctr-pane-host { block-size: 100%; inline-size: 100%; min-block-size: 0; min-inline-size: 0; overflow: hidden; }
+  .prctr-pane-host > * { block-size: 100%; inline-size: 100%; min-block-size: 0; min-inline-size: 0; }
+}

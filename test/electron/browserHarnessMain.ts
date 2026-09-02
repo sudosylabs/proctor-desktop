@@ -4,7 +4,7 @@ import { app, BrowserWindow } from 'electron';
 const harnessTimeout = setTimeout(() => {
   process.stdout.write(`${JSON.stringify({ error: 'browser_harness_timeout' })}\n`);
   app.exit(1);
-}, 10_000);
+}, 20_000);
 
 void app.whenReady().then(runHarness).catch(failHarness);
 
@@ -26,21 +26,54 @@ async function runHarness(): Promise<void> {
     width: 900
   });
   try {
+    window.webContents.on('did-navigate', () => window.webContents.setZoomFactor(2));
     await window.loadFile(join(app.getAppPath(), 'index.html'), {
       query: { locale: 'ar' }
     });
-    const renderer = await window.webContents.executeJavaScript(`(() => {
+    const renderer = await window.webContents.executeJavaScript(`(async () => {
+      if (document.body.dataset.ready !== 'true') await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('renderer fixture timeout in ' + (document.body.dataset.currentSuite ?? 'initialization'))), 5000);
+        const observer = new MutationObserver(() => {
+          if (document.body.dataset.ready === 'true') { clearTimeout(timeout); observer.disconnect(); resolve(); }
+        });
+        observer.observe(document.body, { attributes: true, attributeFilter: ['data-ready'] });
+      });
       const button = document.querySelector('button');
       button?.click();
+      const icons = [...document.querySelectorAll('.prctr-semantic-icon')];
       return {
         activations: button?.dataset.activations,
+        browserOwnerTests: document.body.dataset.browserOwnerTests,
+        browserOwnerError: document.body.dataset.browserOwnerError,
+        controlExplorer: document.body.dataset.controlExplorer,
         direction: document.documentElement.dir,
         fixture: document.querySelector('main')?.dataset.fixture,
         hasNodeProcess: 'process' in globalThis,
         hasNodeRequire: 'require' in globalThis,
         heading: document.querySelector('h1')?.textContent,
         locale: document.documentElement.lang,
+        motionDuration: getComputedStyle(document.documentElement).getPropertyValue('--prctr-motion-duration-normal'),
+        overlayBackdrop: getComputedStyle(document.documentElement).getPropertyValue('--prctr-color-overlay-backdrop'),
+        presentation: {
+          density: document.documentElement.dataset.prctrDensity,
+          motion: document.documentElement.dataset.prctrMotion,
+          theme: document.documentElement.dataset.prctrTheme,
+          themeContrast: document.documentElement.dataset.prctrThemeContrast,
+          transparency: document.documentElement.dataset.prctrTransparency
+        },
+        semanticIcons: icons.map(icon => ({
+          ariaHidden: icon.getAttribute('aria-hidden'),
+          ariaLabel: icon.getAttribute('aria-label'),
+          fontFamily: getComputedStyle(icon).fontFamily,
+          id: icon.getAttribute('data-prctr-semantic-icon'),
+          modifier: icon.getAttribute('data-prctr-icon-modifier'),
+          role: icon.getAttribute('role'),
+          size: getComputedStyle(icon).fontSize
+        })),
         ready: document.body.dataset.ready,
+        themeChanges: document.body.dataset.themeChanges,
+        terminalPanelTests: document.body.dataset.terminalPanelTests,
+        workbenchKernelTests: document.body.dataset.workbenchKernelTests,
         userAgent: navigator.userAgent
       };
     })()`, true) as unknown;
@@ -67,6 +100,7 @@ async function runHarness(): Promise<void> {
         webSecurity: preferences.webSecurity,
         webviewTag: preferences.webviewTag
       },
+      zoomFactor: window.webContents.getZoomFactor(),
       renderer
     })}\n`);
     clearTimeout(harnessTimeout);

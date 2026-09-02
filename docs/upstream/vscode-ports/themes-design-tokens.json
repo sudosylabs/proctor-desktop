@@ -1,0 +1,169 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "themes-design-tokens",
+  "admission": {
+    "workflow": "Resolve four complete immutable Proctor themes over one static semantic-token catalog, retain mature color parsing and composition, and atomically project namespaced values plus density, motion, transparency, and contrast state into a renderer root.",
+    "callers": [
+      "src/prctr/platform/theme/browser/themeService.ts",
+      "test/browser/rendererHarness.ts"
+    ],
+    "interface": "src/prctr/platform/theme/common/themes.ts",
+    "decision": "docs/architecture/design-system.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "The canonical Microsoft MIT text is preserved as the local notice for the transferred source and owner test.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/color.ts",
+      "upstreamBlob": "ce1143ac7b46e48689ec2bd5af3f6b1bc334531c",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve complete RGBA, HSLA, HSVA, luminance, contrast, blending, transparency, color-space conversion, named-color, parse, and format behavior.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/common/color.ts",
+      "localSha256": "e5145cec2e067af8a056d8f070d5418f2da14ee2321fbd895866696634a33a26",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/theme.ts",
+      "upstreamBlob": "0f298890998b4f0525fbcae4fd04296ffdea142c",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Preserve the four color-scheme identities and dark/high-contrast classification helpers.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/theme.ts",
+      "localSha256": "c1546dd6b31b788c6bc3cd79dad3179802a8426539afe5de3c86d72ef23948d8",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/base/test/common/color.test.ts",
+      "upstreamBlob": "18f6ff81026de81c4c133b25d90970d81a6e2e7a",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Run the complete color owner suite through the admitted test adapter; one unsupported assertion helper is expressed as two exact hue assertions without reducing the obligation.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/base/common/upstream/color.test.ts",
+      "localSha256": "88bdd53504cf0d85d54dfc89bc1b627393cac434ef507828141b1314d8f46965",
+      "mechanicalTransforms": ["namespace-path-translation", "relative-import-rewrite", "accepted-dependency-substitution", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/themeService.ts",
+      "upstreamBlob": "5cf50f913a8922889992b3892901dd38882c6a91",
+      "category": "source",
+      "disposition": "behaviorally-reimplemented",
+      "rationale": "Retain current-theme access, ordered change events, themable lifecycle, and root application behind a narrow browser service that has no file, product-icon, extension, environment, or dynamic participant authority.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/browser/themeService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/colorUtils.ts",
+      "upstreamBlob": "6f725c9c9244a3cc715beb635c3ad3fd5b1d72a4",
+      "category": "registration",
+      "disposition": "excluded",
+      "rationale": "VS Code's mutable extension-facing color registry, theme JSON schema, and dynamic theming participants would violate Proctor's static packaged token authority; complete color math remains admitted through the base color module.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/browser/defaultStyles.ts",
+      "upstreamBlob": "063beb95f610d06d75d3c96c76e8b906000c327a",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Informs the root-theme projection boundary; Proctor publishes only its generated --prctr-* variables and explicit presentation attributes.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "base-common-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/event.ts",
+      "rationale": "The admitted base runtime supplies lifecycle and ordered event behavior."
+    },
+    {
+      "id": "codicons-semantic-icons",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/common/semanticIcons.ts",
+      "rationale": "The design-system icon catalog consumes the same root presentation contract without exposing glyph or theme authority."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "static-proctor-token-authority",
+      "summary": "One immutable Proctor catalog owns lowercase dotted semantic tokens and deterministic --prctr-* names; extensions, remote content, settings documents, arbitrary registrants, and VS Code JSON theme contributions cannot add or override tokens.",
+      "localPaths": [
+        "src/prctr/platform/theme/common/tokens.ts",
+        "src/prctr/platform/theme/common/themes.ts"
+      ],
+      "verificationRefs": ["theme-contract-tests", "source-composition-check"]
+    },
+    {
+      "id": "four-packaged-themes",
+      "summary": "Only light, dark, high-contrast light, and high-contrast dark records are admitted; every record must resolve every token before any root mutation, and high-contrast elevation uses explicit boundaries instead of shadow.",
+      "localPaths": ["src/prctr/platform/theme/common/themes.ts"],
+      "verificationRefs": ["theme-contract-tests", "real-browser-theme-test"]
+    },
+    {
+      "id": "presentation-only-preferences",
+      "summary": "Density, motion, and transparency selections affect only resolved visual tokens and root attributes; reduced motion resolves duration roles to zero and reduced transparency removes backdrop alpha without changing product or security state.",
+      "localPaths": ["src/prctr/platform/theme/browser/themeService.ts"],
+      "verificationRefs": ["real-browser-theme-test"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "color-owner-tests",
+      "kind": "test",
+      "path": "test/base/common/upstream/color.test.ts",
+      "obligation": "Run the complete upstream suite for color construction, conversion, luminance, contrast, blending, formatting, parsing, transparency, and regression cases."
+    },
+    {
+      "id": "theme-contract-tests",
+      "kind": "test",
+      "path": "test/platform/theme/common/themes.test.ts",
+      "obligation": "Verify four immutable complete themes, stable namespaced CSS variables, contrast, high-contrast elevation, and explicit compact-density mappings."
+    },
+    {
+      "id": "real-browser-theme-test",
+      "kind": "test",
+      "path": "test/electron/browserHarness.real.test.ts",
+      "obligation": "Verify root theme switching, one ordered event, high-contrast state, compact density, zero reduced-motion duration, and opaque reduced-transparency backdrop in sandboxed Chromium."
+    },
+    {
+      "id": "source-composition-check",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Verify layer direction, static imports, cycle ownership, CSS ownership, and production composition boundaries."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Verify schema, local digest, marker, license reference, unique ownership, divergence, and evidence parity without a VS Code checkout."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Resolve the exact VS Code commit and verify every reviewed upstream blob against the canonical checkout."
+    }
+  ]
+}

@@ -17,9 +17,11 @@ test('sandboxed Chromium renderer runs deterministic browser fixtures', () => {
     readonly electron?: unknown;
     readonly preferences?: unknown;
     readonly renderer?: unknown;
+    readonly zoomFactor?: unknown;
   };
   assert.equal(result.electron, '44.0.0');
   assert.equal(result.chrome, '152.0.7977.54');
+  assert.equal(result.zoomFactor, 2);
   assert.deepEqual(result.preferences, {
     contextIsolation: true,
     nodeIntegration: false,
@@ -38,12 +40,46 @@ test('sandboxed Chromium renderer runs deterministic browser fixtures', () => {
   assert.match(userAgent, /\bElectron\/44\.0\.0\b/u);
   assert.deepEqual(renderer, {
     activations: '1',
+    browserOwnerTests: '45',
+    controlExplorer: '{"fixtures":1,"states":13,"interactions":5,"themes":4}',
     direction: 'rtl',
     fixture: 'browser-harness',
     hasNodeProcess: false,
     hasNodeRequire: false,
     heading: 'بيئة اختبار Proctor',
     locale: 'ar',
-    ready: 'true'
+    motionDuration: '0ms',
+    overlayBackdrop: '#ffffff',
+    presentation: {
+      density: 'compact',
+      motion: 'reduced',
+      theme: 'highContrastLight',
+      themeContrast: 'high',
+      transparency: 'reduced'
+    },
+    semanticIcons: [
+      {
+        ariaHidden: 'true',
+        ariaLabel: null,
+        fontFamily: 'prctr-codicon',
+        id: 'action.settings',
+        modifier: null,
+        role: null,
+        size: '16px'
+      },
+      {
+        ariaHidden: null,
+        ariaLabel: 'Loading examination workspace',
+        fontFamily: 'prctr-codicon',
+        id: 'state.loading',
+        modifier: 'spin',
+        role: 'img',
+        size: '20px'
+      }
+    ],
+    ready: 'true',
+    themeChanges: '3',
+    terminalPanelTests: '24',
+    workbenchKernelTests: '27'
   });
 });

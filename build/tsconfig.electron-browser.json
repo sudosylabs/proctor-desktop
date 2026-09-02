@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base-common.json",
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2024"],
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": [
+    "../src/prctr/base/common/thenable.d.ts",
+    "../src/prctr/base/browser/**/*.d.ts",
+    "../src/prctr/platform/windows/common/**/*.ts",
+    "../src/prctr/**/electron-browser/**/*.ts"
+  ]
+}

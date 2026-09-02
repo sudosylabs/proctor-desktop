@@ -18,6 +18,7 @@ await Promise.all([
     entryPoints: { renderer: 'test/browser/rendererHarness.ts' },
     format: 'esm',
     logLevel: 'info',
+    loader: { '.ttf': 'file' },
     outdir: outputDirectory,
     platform: 'browser',
     sourcemap: false,
@@ -40,6 +41,7 @@ await Promise.all([
 ]);
 
 copyFileSync('test/browser/rendererHarness.html', `${outputDirectory}/index.html`);
+copyFileSync('test/browser/controlExplorerFrame.html', `${outputDirectory}/controlExplorerFrame.html`);
 writeFileSync(`${outputDirectory}/package.json`, `${JSON.stringify({
   name: 'proctor-browser-test-harness',
   private: true,

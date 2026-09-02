@@ -3,5 +3,999 @@
   "schemaVersion": 1,
   "locale": "en",
   "direction": "ltr",
-  "messages": {}
+  "messages": {
+    "authenticated.action.failed": {
+      "message": "The requested account action could not be completed.",
+      "description": "Safe authenticated action failure.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "authenticated.action.sign.out": {
+      "message": "Sign out",
+      "description": "Action that ends the current authenticated Session.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "authenticated.destination.account": {
+      "message": "Account",
+      "description": "Authenticated account destination.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "authenticated.destination.activity": {
+      "message": "Exam activity",
+      "description": "Authenticated destination for the current User’s examination activity.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "authenticated.destination.settings": {
+      "message": "Settings",
+      "description": "Authenticated User Settings destination.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "authenticated.destination.waiting": {
+      "message": "Waiting for the current authorized server projection.",
+      "description": "Honest unavailable state before an authenticated destination receives server data.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "authenticated.heading": {
+      "message": "Authenticated workspace",
+      "description": "Heading for the signed-in Proctor application.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "candidate.browser.back": {
+      "message": "Back",
+      "description": "Candidate browser back action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.blocked": {
+      "message": "Browser access is currently restricted.",
+      "description": "Candidate browser policy or security gate state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.close": {
+      "message": "Close browser",
+      "description": "Candidate browser close action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.closed": {
+      "message": "Browser is closed.",
+      "description": "Candidate browser closed state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.failed": {
+      "message": "The browser action could not be completed.",
+      "description": "Safe Candidate browser action failure.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.forward": {
+      "message": "Forward",
+      "description": "Candidate browser forward action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.location": {
+      "message": "Address",
+      "description": "Accessible label for the Candidate browser address.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.opening": {
+      "message": "Browser is opening.",
+      "description": "Candidate browser opening state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.ready": {
+      "message": "Browser is ready.",
+      "description": "Candidate browser ready state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.reload": {
+      "message": "Reload",
+      "description": "Candidate browser reload action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.browser.title": {
+      "message": "Browser",
+      "description": "Title of the policy-controlled Candidate browser item.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+    },
+    "candidate.destination.exam.materials": {
+      "message": "Exam materials",
+      "description": "Candidate destination for authorized Exam Resources.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
+    },
+    "candidate.destination.workspace": {
+      "message": "Workspace",
+      "description": "Candidate destination for Attempt Workspace files.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
+    },
+    "candidate.exam.materials.waiting": {
+      "message": "Waiting for authorized Exam Resources.",
+      "description": "Exam Resources loading state before the server-bound catalog is available.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
+    },
+    "candidate.security.acknowledge": {
+      "message": "Acknowledge update",
+      "description": "Action that acknowledges one exact live correction.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.acknowledge.correction": {
+      "message": "Acknowledge {reason} update for {capabilities} ({position} of {total})",
+      "description": "Correction-specific acknowledgement action including its safe reason, affected capabilities, and position.",
+      "placeholders": [
+        "reason",
+        "capabilities",
+        "position",
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.attention": {
+      "message": "An exam security condition requires attention.",
+      "description": "Candidate notice for a safe local security condition.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.capability.browser": {
+      "message": "browser",
+      "description": "Candidate capability affected by a live correction.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.capability.submission": {
+      "message": "submission",
+      "description": "Candidate capability affected by a live correction.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.capability.terminal": {
+      "message": "terminal",
+      "description": "Candidate capability affected by a live correction.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.capability.workspace": {
+      "message": "workspace",
+      "description": "Candidate capability affected by a live correction.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.checking": {
+      "message": "Exam security checks are in progress.",
+      "description": "Candidate notice while required local security checks are incomplete.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.checking.message": {
+      "message": "Keep Proctor open while required checks complete.",
+      "description": "Instruction in the Candidate security-check gate.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.checking.title": {
+      "message": "Checking exam environment",
+      "description": "Title of the Candidate security-check gate.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.correction": {
+      "message": "An exam update is available.",
+      "description": "Candidate notice for an immutable live correction.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.failed.message": {
+      "message": "Work is protected. Follow the displayed guidance or contact approved support.",
+      "description": "Consequence shown by the fail-closed Candidate security gate.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.failed.title": {
+      "message": "Exam environment unavailable",
+      "description": "Title of the fail-closed Candidate security gate.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.paused.message": {
+      "message": "Work is protected. Editing, browser, terminal, and submission actions are paused.",
+      "description": "Consequence explained by the Candidate pause gate.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.paused.title": {
+      "message": "Exam paused",
+      "description": "Title of the mandatory Candidate pause gate.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.candidatewindow": {
+      "message": "candidate window",
+      "description": "Safe Candidate correction reason for CandidateWindow state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.connection": {
+      "message": "connection",
+      "description": "Safe Candidate correction reason for connection state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.display": {
+      "message": "display",
+      "description": "Safe Candidate correction reason for display state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.interactivesession": {
+      "message": "interactive session",
+      "description": "Safe Candidate correction reason for interactive-session state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.media": {
+      "message": "camera or microphone",
+      "description": "Safe Candidate correction reason for media state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.network": {
+      "message": "network",
+      "description": "Safe Candidate correction reason for network state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.pause": {
+      "message": "pause",
+      "description": "Safe Candidate correction reason for pause state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.policy": {
+      "message": "exam policy",
+      "description": "Safe Candidate correction reason for exam-policy state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.printing": {
+      "message": "printing",
+      "description": "Safe Candidate correction reason for printing state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.processapplication": {
+      "message": "running application",
+      "description": "Safe Candidate correction reason for process/application state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.removablestorage": {
+      "message": "removable storage",
+      "description": "Safe Candidate correction reason for removable-storage state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.sourcecoverage": {
+      "message": "security coverage",
+      "description": "Safe Candidate correction reason for observation-source coverage.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.reason.virtualization": {
+      "message": "virtualization",
+      "description": "Safe Candidate correction reason for virtualization state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.security.request.failed": {
+      "message": "The update acknowledgement was not accepted. The affected actions remain restricted.",
+      "description": "Failure state for an exact correction acknowledgement.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+    },
+    "candidate.workspace.waiting": {
+      "message": "Waiting for the authoritative Attempt Workspace.",
+      "description": "Workspace loading state before the server-bound provider is available.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
+    },
+    "launch.action.change.server": {
+      "message": "Change server",
+      "description": "Action that changes the configured Proctor Server.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindow.ts"
+    },
+    "launch.action.exit": {
+      "message": "Exit Proctor",
+      "description": "Action that exits Proctor from the launch surface.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindow.ts"
+    },
+    "launch.action.failed": {
+      "message": "The requested action could not be completed.",
+      "description": "Safe failure shown for a launch action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindow.ts"
+    },
+    "launch.action.sign.in": {
+      "message": "Sign in",
+      "description": "Action that starts system-browser authentication.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindow.ts"
+    },
+    "launch.institution.ready": {
+      "message": "Ready to connect to {institution}",
+      "description": "Status shown when an Institution origin is configured.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/launchWindow.ts"
+    },
+    "launch.institution.unavailable": {
+      "message": "Choose your Institution server to continue.",
+      "description": "Status shown before an Institution origin is configured.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindow.ts"
+    },
+    "launch.startup.recovery": {
+      "message": "Proctor could not start the launch window safely.",
+      "description": "Minimal LaunchWindow startup recovery message.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindow.ts"
+    },
+    "launch.title": {
+      "message": "Proctor",
+      "description": "Heading for the signed-out Proctor launch surface.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindow.ts"
+    },
+    "settings.accessibility.announcements.description": {
+      "message": "Controls the detail of assistive announcements.",
+      "description": "Description of the assistive announcements setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.accessibility.announcements.title": {
+      "message": "Announcements",
+      "description": "Title for the assistive announcements setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.accessibility.motion.description": {
+      "message": "Reduces nonessential interface animation.",
+      "description": "Description of the reduced motion preference.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.accessibility.motion.title": {
+      "message": "Reduced motion",
+      "description": "Title for the reduced motion preference.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.accessibility.screenreader.description": {
+      "message": "Controls screen-reader optimized presentation.",
+      "description": "Description of the screen reader mode setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.accessibility.screenreader.title": {
+      "message": "Screen reader mode",
+      "description": "Title for the screen reader mode setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.action.cancel": {
+      "message": "Cancel changes",
+      "description": "Action that restores the acknowledged User Settings source.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.action.save": {
+      "message": "Save",
+      "description": "Action that conditionally saves User Settings.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.browser.zoom.description": {
+      "message": "Sets integrated-browser presentation outside an Attempt.",
+      "description": "Description of the integrated browser zoom setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.browser.zoom.title": {
+      "message": "Browser zoom",
+      "description": "Title for the integrated browser zoom setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.contrast.description": {
+      "message": "Uses a packaged high-contrast theme when stronger accessibility requirements apply.",
+      "description": "Description of the high contrast preference.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.contrast.title": {
+      "message": "Prefer high contrast",
+      "description": "Title for the high contrast preference.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.cursorblinking.description": {
+      "message": "Selects the editor cursor animation.",
+      "description": "Description of the editor cursor blinking setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.cursorblinking.title": {
+      "message": "Cursor blinking",
+      "description": "Title for the editor cursor blinking setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.cursorstyle.description": {
+      "message": "Selects the editor cursor shape.",
+      "description": "Description of the editor cursor style setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.cursorstyle.title": {
+      "message": "Cursor style",
+      "description": "Title for the editor cursor style setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.fontsize.description": {
+      "message": "Sets the editor font size in pixels.",
+      "description": "Description of the editor font size setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.fontsize.title": {
+      "message": "Editor font size",
+      "description": "Title for the editor font size setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.lineheight.description": {
+      "message": "Sets the editor line height in pixels.",
+      "description": "Description of the editor line height setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.lineheight.title": {
+      "message": "Editor line height",
+      "description": "Title for the editor line height setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.linenumbers.description": {
+      "message": "Controls editor line-number presentation outside an Attempt.",
+      "description": "Description of the editor line numbers setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.linenumbers.title": {
+      "message": "Line numbers",
+      "description": "Title for the editor line numbers setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.minimap.description": {
+      "message": "Shows the editor minimap outside an Attempt.",
+      "description": "Description of the editor minimap setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.minimap.title": {
+      "message": "Minimap",
+      "description": "Title for the editor minimap setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.tabsize.description": {
+      "message": "Sets the displayed indentation width outside an Attempt.",
+      "description": "Description of the editor tab size setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.tabsize.title": {
+      "message": "Tab size",
+      "description": "Title for the editor tab size setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.wordwrap.description": {
+      "message": "Controls editor word wrapping outside an Attempt.",
+      "description": "Description of the editor word wrap setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.editor.wordwrap.title": {
+      "message": "Word wrap",
+      "description": "Title for the editor word wrap setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.navigation.indent.description": {
+      "message": "Sets indentation for hierarchical navigation outside an Attempt.",
+      "description": "Description of the tree indentation setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.navigation.indent.title": {
+      "message": "Tree indentation",
+      "description": "Title for the tree indentation setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.option.announcements.minimal": {
+      "message": "Minimal",
+      "description": "Label for minimal accessibility announcements.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.announcements.verbose": {
+      "message": "Verbose",
+      "description": "Label for verbose accessibility announcements.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.auto": {
+      "message": "Automatic",
+      "description": "Label for an automatic setting value.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.cursor.block": {
+      "message": "Block",
+      "description": "Label for a block editor cursor.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.cursor.line": {
+      "message": "Line",
+      "description": "Label for a line editor cursor.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.cursor.underline": {
+      "message": "Underline",
+      "description": "Label for an underline editor cursor.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.cursorblink.blink": {
+      "message": "Blink",
+      "description": "Label for the standard cursor blink animation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.cursorblink.expand": {
+      "message": "Expand",
+      "description": "Label for the expanding cursor animation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.cursorblink.phase": {
+      "message": "Phase",
+      "description": "Label for the phase cursor blink animation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.cursorblink.smooth": {
+      "message": "Smooth",
+      "description": "Label for the smooth cursor blink animation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.cursorblink.solid": {
+      "message": "Solid",
+      "description": "Label for a non-blinking cursor.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.linenumbers.relative": {
+      "message": "Relative",
+      "description": "Label for relative editor line numbers.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.off": {
+      "message": "Off",
+      "description": "Label for a disabled setting value.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.on": {
+      "message": "On",
+      "description": "Label for an enabled setting value.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.theme.dark": {
+      "message": "Dark",
+      "description": "Label for the dark color theme.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.theme.highcontrastdark": {
+      "message": "High contrast dark",
+      "description": "Label for the high-contrast dark color theme.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.theme.highcontrastlight": {
+      "message": "High contrast light",
+      "description": "Label for the high-contrast light color theme.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.theme.light": {
+      "message": "Light",
+      "description": "Label for the light color theme.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.wordwrap.bounded": {
+      "message": "At the smaller viewport or column",
+      "description": "Label for bounded editor word wrapping.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.option.wordwrap.column": {
+      "message": "At word-wrap column",
+      "description": "Label for wrapping at the configured word-wrap column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.page.heading": {
+      "message": "Settings",
+      "description": "Heading for the AuthenticatedWindow User Settings destination.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.prohibited.autosave.description": {
+      "message": "Workspace durability is not a User Setting.",
+      "description": "Description of the prohibited automatic save key.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.autosave.rejection": {
+      "message": "Attempt Workspace durability is server-acknowledged and cannot be configured here.",
+      "description": "Diagnostic reason for rejecting automatic save configuration.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.autosave.title": {
+      "message": "Automatic save",
+      "description": "Title for the prohibited automatic save key.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.formatter.description": {
+      "message": "Executable formatter selection is not a User Setting.",
+      "description": "Description of the prohibited default formatter key.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.formatter.rejection": {
+      "message": "Executable and extension-backed behavior is prohibited in User Settings.",
+      "description": "Diagnostic reason for rejecting formatter configuration.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.formatter.title": {
+      "message": "Default formatter",
+      "description": "Title for the prohibited default formatter key.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.proxy.description": {
+      "message": "Network routing is not a User Setting.",
+      "description": "Description of the prohibited proxy key.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.proxy.rejection": {
+      "message": "Network and browser policy are authoritative security configuration.",
+      "description": "Diagnostic reason for rejecting proxy configuration.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.proxy.title": {
+      "message": "Network proxy",
+      "description": "Title for the prohibited proxy key.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.shell.description": {
+      "message": "Executable terminal selection is not a User Setting.",
+      "description": "Description of the prohibited terminal shell key.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.shell.rejection": {
+      "message": "Execution configuration is server-authoritative and prohibited in User Settings.",
+      "description": "Diagnostic reason for rejecting terminal shell configuration.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.prohibited.shell.title": {
+      "message": "Terminal shell",
+      "description": "Title for the prohibited terminal shell key.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.source.label": {
+      "message": "User Settings JSONC",
+      "description": "Accessible label for the User Settings JSONC editor.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.ambiguous": {
+      "message": "Save completion is unknown. Retry uses the same protected request identity.",
+      "description": "Status for ambiguous User Settings completion.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.conflict": {
+      "message": "Remote settings conflict with this draft. Cancel changes to use the latest acknowledged source.",
+      "description": "Status for an explicit User Settings merge conflict.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.failed": {
+      "message": "Settings could not be saved.",
+      "description": "Safe User Settings failure status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.invalid": {
+      "message": "{count} settings problem(s) must be resolved before saving.",
+      "description": "Bounded User Settings validation problem count.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.loading": {
+      "message": "Loading acknowledged settings…",
+      "description": "Status while User Settings load.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.merged": {
+      "message": "Remote changes were merged. Review and save again.",
+      "description": "Status after an unambiguous User Settings conflict merge.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.preview.revert.failed": {
+      "message": "The settings preview could not be reverted safely.",
+      "description": "Safe failure after a settings preview cancellation transport error.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.readonly": {
+      "message": "Settings are read-only while the server is unavailable.",
+      "description": "Status for server-unavailable User Settings.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.saved": {
+      "message": "Settings saved.",
+      "description": "Status after User Settings are acknowledged.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.status.valid": {
+      "message": "Settings are valid.",
+      "description": "Validation status for a valid User Settings draft.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.terminal.fontsize.description": {
+      "message": "Sets terminal presentation outside an Attempt.",
+      "description": "Description of the terminal font size setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.terminal.fontsize.title": {
+      "message": "Terminal font size",
+      "description": "Title for the terminal font size setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.theme.description": {
+      "message": "Selects one packaged Proctor color theme.",
+      "description": "Description of the packaged color theme setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.theme.title": {
+      "message": "Color theme",
+      "description": "Title for the packaged color theme setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.view.jsonc": {
+      "message": "JSONC",
+      "description": "Button that opens the User Settings JSONC view.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.view.structured": {
+      "message": "Controls",
+      "description": "Button that opens the structured User Settings view.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
+    "settings.zoom.description": {
+      "message": "Sets bounded interface zoom as a percentage.",
+      "description": "Description of the interface zoom setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.zoom.title": {
+      "message": "Interface zoom",
+      "description": "Title for the interface zoom setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "workbench.layout.reset": {
+      "message": "Reset layout",
+      "description": "Button that restores composition default region sizes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.layout.resize.panel": {
+      "message": "Resize terminal panel",
+      "description": "Accessible name for the Candidate panel separator.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.layout.resize.sidebar": {
+      "message": "Resize sidebar",
+      "description": "Accessible name for the sidebar separator.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.part.banner": {
+      "message": "Important notices",
+      "description": "Accessible name for the persistent notice region.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.part.content": {
+      "message": "Main content",
+      "description": "Accessible name for workbench content.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.part.navigation": {
+      "message": "Product navigation",
+      "description": "Accessible name for product navigation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.part.panel": {
+      "message": "Terminal panel",
+      "description": "Accessible name for Candidate panel content.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.part.sidebar": {
+      "message": "Current destination",
+      "description": "Accessible name for contextual navigation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.part.status": {
+      "message": "Connection and application status",
+      "description": "Accessible name for workbench status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.part.titlebar": {
+      "message": "Window controls",
+      "description": "Accessible name for the trusted titlebar.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.startup.loading": {
+      "message": "Starting Proctor securely…",
+      "description": "Minimal status shown while the privileged window binding is being established.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.startup.recovery": {
+      "message": "Proctor could not start this window safely.",
+      "description": "Minimal startup recovery message.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/bootstrap.ts"
+    },
+    "workbench.terminal.close": {
+      "message": "Close terminal",
+      "description": "Action that closes the Candidate remote terminal.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.input": {
+      "message": "Terminal input",
+      "description": "Accessible label for the Candidate remote terminal input.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.open": {
+      "message": "Start terminal",
+      "description": "Action that asks the server to open the Candidate remote terminal.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.status.closed": {
+      "message": "Not started",
+      "description": "Status shown when the Candidate remote terminal is closed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.status.closing": {
+      "message": "Closing…",
+      "description": "Status shown while the Candidate remote terminal close request is in flight.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.status.exited": {
+      "message": "Process exited",
+      "description": "Status shown after the remote terminal process exits.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.status.failed": {
+      "message": "Terminal unavailable",
+      "description": "Status shown after the remote terminal fails closed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.status.opening": {
+      "message": "Starting…",
+      "description": "Status shown while the remote terminal is opening.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.status.paused": {
+      "message": "Paused by exam policy",
+      "description": "Status shown while the remote terminal is paused by an independent exam gate.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.status.ready": {
+      "message": "Connected",
+      "description": "Status shown when the remote terminal is connected and accepts input.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    },
+    "workbench.terminal.title": {
+      "message": "Terminal",
+      "description": "Title of the Candidate remote terminal panel.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
+    }
+  }
 }

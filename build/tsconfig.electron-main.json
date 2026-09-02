@@ -1,11 +1,12 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "./tsconfig.base-common.json",
   "compilerOptions": {
     "lib": ["ES2024"],
     "skipLibCheck": true,
     "types": ["node"]
   },
   "include": [
+    "../src/prctr/base/common/thenable.d.ts",
     "../src/prctr/**/node/**/*.ts",
     "../src/prctr/**/electron-main/**/*.ts"
   ]

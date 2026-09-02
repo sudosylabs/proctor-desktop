@@ -1,0 +1,33 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "electron-window-skeleton",
+  "admission": {
+    "workflow": "Create one trusted Proctor product window with an immutable sender-bound descriptor, a capability-specific preload, locked production preferences, and main-owned secure transitions.",
+    "callers": ["src/prctr/code/electron-main/productWindowComposition.ts"],
+    "interface": "src/prctr/platform/windows/common/windowCoordinator.ts",
+    "decision": "docs/architecture/workbench.md"
+  },
+  "upstream": { "repository": "https://github.com/microsoft/vscode", "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8" },
+  "items": [
+    { "upstreamPath": "LICENSE.txt", "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5", "category": "license", "disposition": "evidence-only", "rationale": "Canonical MIT notice for the VS Code behavior used as evidence.", "licenseRefs": ["vscode-mit"] },
+    { "upstreamPath": "src/vs/base/parts/sandbox/electron-browser/preload.ts", "upstreamBlob": "589949f0592703b2d76e340d1ee28dba205bcc1a", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain sandboxed context-bridge bootstrap and invoke semantics through three narrower capability-specific Proctor APIs.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/code/electron-browser/launchPreload.ts" },
+    { "upstreamPath": "src/vs/base/parts/sandbox/electron-browser/globals.ts", "upstreamBlob": "bd43ae40457815c90e9555c075036b70ef21a800", "category": "source", "disposition": "excluded", "rationale": "VS Code's generic IPC, process, web-frame, and utility global surface is broader than any Proctor renderer capability and is intentionally not exposed.", "licenseRefs": ["vscode-mit"] },
+    { "upstreamPath": "src/vs/code/electron-main/app.ts", "upstreamBlob": "c9736ff355fa22791e95f12c9d38b2a26ece4832", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain navigation and popup denial, permission denial, trusted main lifecycle, and production hardening without VS Code protocols, auxiliary windows, shell integration, telemetry, updates, or developer surfaces.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts" },
+    { "upstreamPath": "src/vs/platform/windows/electron-main/windowsMainService.ts", "upstreamBlob": "d8428b529b26fa9ad5a1ad56f57677f2b086a991", "category": "source", "disposition": "behaviorally-reimplemented", "rationale": "Retain main-owned window creation, close control, and destruction ordering behind Proctor's three fixed window kinds and trusted transition contract.", "licenseRefs": ["vscode-mit"], "localPath": "src/prctr/platform/windows/common/windowCoordinator.ts" }
+  ],
+  "licenses": [{ "id": "vscode-mit", "name": "MIT License", "upstreamPaths": ["LICENSE.txt"], "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt" }],
+  "dependencies": [{ "id": "electron-runtime", "kind": "external-package", "reference": "electron@44.0.0", "rationale": "The pinned Electron runtime supplies BrowserWindow, contextBridge, and IPC primitives." }],
+  "divergences": [
+    { "id": "three-fixed-window-kinds", "summary": "LaunchWindow, AuthenticatedWindow, and CandidateWindow have immutable typed descriptors and distinct preloads; renderer state cannot select or change a composition.", "localPaths": ["src/prctr/platform/windows/common/windowProtocol.ts", "src/prctr/code/electron-browser/launchPreload.ts", "src/prctr/code/electron-browser/authenticatedPreload.ts", "src/prctr/code/electron-browser/candidatePreload.ts"], "verificationRefs": ["window-contract-tests", "real-electron-test"] },
+    { "id": "minimal-launch-window", "summary": "LaunchWindow is a small localized, themed sign-in surface and deliberately does not instantiate the Proctor workbench kernel.", "localPaths": ["src/prctr/workbench/browser/launchWindow.ts", "src/prctr/code/electron-browser/launch.main.ts"], "verificationRefs": ["real-electron-test", "composition-check"] },
+    { "id": "candidate-no-relaunch", "summary": "CandidateWindow cannot be an initial launch target, transitions preserve Principal/Session/Institution binding, and authorized departure destroys CandidateWindow before returning to AuthenticatedWindow.", "localPaths": ["src/prctr/platform/windows/common/windowCoordinator.ts"], "verificationRefs": ["window-contract-tests"] }
+  ],
+  "verification": [
+    { "id": "window-contract-tests", "kind": "test", "path": "test/platform/windows/common/windowCoordinator.test.ts", "obligation": "Verify exact descriptors/intents, binding preservation, destruction order, close veto, and Candidate relaunch exclusion." },
+    { "id": "real-electron-test", "kind": "test", "path": "test/electron/windowSkeleton.real.test.ts", "obligation": "Verify all three isolated globals, sender-bound bootstrap, bounded intents, sandbox, Node absence, popup denial, and production DevTools exclusion in real Electron." },
+    { "id": "composition-check", "kind": "check", "path": "build/policies/compositions.json", "obligation": "Verify each main/preload entrypoint has one closed immutable composition and forbidden roots remain unreachable." },
+    { "id": "source-composition-check", "kind": "check", "path": "build/checks/source.ts", "obligation": "Verify layer direction, environment boundaries, and cycles." },
+    { "id": "upstream-audit", "kind": "review", "path": "build/checks/upstreamAudit.ts", "obligation": "Verify every reviewed VS Code blob at the admitted revision." }
+  ]
+}

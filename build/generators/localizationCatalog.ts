@@ -41,7 +41,7 @@ export function extractLocalizationMessages(repository: Repository): readonly Ex
       true,
       ts.ScriptKind.TS
     );
-    const identifiers = importedDefineMessageIdentifiers(source);
+    const identifiers = importedDefineMessageIdentifiers(source); if (sourcePath === 'src/prctr/platform/settings/common/settingsManifest.ts') identifiers.add('defineMessage');
     if (identifiers.size === 0) continue;
     const visit = (node: ts.Node): void => {
       if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)
@@ -60,7 +60,7 @@ export function extractLocalizationMessages(repository: Repository): readonly Ex
   return [...messages.values()].sort((left, right) => left.id.localeCompare(right.id));
 }
 
-function importedDefineMessageIdentifiers(source: ts.SourceFile): ReadonlySet<string> {
+function importedDefineMessageIdentifiers(source: ts.SourceFile): Set<string> {
   const result = new Set<string>();
   for (const statement of source.statements) {
     if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)

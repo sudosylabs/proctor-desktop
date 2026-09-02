@@ -233,6 +233,13 @@ visibility, enablement, and routing only. Services and privileged adapters
 perform authorization. Menus, keybindings, quick input, and overlays come from
 static registrations and localized labels.
 
+The executable kernel instantiates the admitted context-key, instantiation,
+command, menu, and keybinding services in every workbench renderer. Product
+controls resolve their action through the same menu/precondition path used by
+packaged keybindings; direct DOM callbacks do not become a second command path.
+Window kind, lifecycle phase, focused part, modal state, direction, contrast,
+motion, and bounded Candidate interaction availability are live context values.
+
 Dialogs trap focus for one bounded decision. Gates block one region or window
 while preserving reason, consequence, allowed recovery, and protected-work
 state. Persistent corrections use banners; required acknowledgement is a
