@@ -28,7 +28,16 @@
     "DisplayTarget": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["target_id", "active", "primary_state", "builtin", "power_state", "kind", "pixel_width", "pixel_height"],
+      "required": [
+        "target_id",
+        "active",
+        "primary_state",
+        "builtin",
+        "power_state",
+        "kind",
+        "pixel_width",
+        "pixel_height"
+      ],
       "properties": {
         "target_id": { "type": "string", "minLength": 1, "maxLength": 128 },
         "active": { "type": "boolean" },
@@ -58,16 +67,38 @@
     "DisplayTopologySourceSnapshot": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["source_instance_id", "source_version", "adapter_version", "schema_version", "platform", "permission", "health", "sequence", "observed_at", "topology"],
+      "required": [
+        "source_instance_id",
+        "source_version",
+        "adapter_version",
+        "schema_version",
+        "platform",
+        "permission",
+        "health",
+        "sequence",
+        "observed_at",
+        "topology"
+      ],
       "properties": {
         "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
         "source_version": { "type": "string", "minLength": 1, "maxLength": 32 },
         "adapter_version": { "type": "string", "minLength": 1, "maxLength": 32 },
-        "schema_version": { "type": "integer", "const": 1, "minimum": 1, "maximum": 65535, "x-rust-type": "u16" },
+        "schema_version": {
+          "type": "integer",
+          "const": 1,
+          "minimum": 1,
+          "maximum": 65535,
+          "x-rust-type": "u16"
+        },
         "platform": { "$ref": "native-observation.schema.json#/$defs/PlatformFamily" },
         "permission": { "$ref": "native-observation.schema.json#/$defs/PermissionState" },
         "health": { "$ref": "native-observation.schema.json#/$defs/SourceHealth" },
-        "sequence": { "type": "integer", "minimum": 0, "maximum": 9007199254740991, "x-rust-type": "u64" },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "x-rust-type": "u64"
+        },
         "observed_at": { "$ref": "native-observation.schema.json#/$defs/SourceTimestamp" },
         "topology": { "$ref": "#/$defs/DisplayTopologySnapshot" }
       }
@@ -79,7 +110,12 @@
       "required": ["source_instance_id", "sequence", "observed_at", "topology"],
       "properties": {
         "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
-        "sequence": { "type": "integer", "minimum": 1, "maximum": 9007199254740991, "x-rust-type": "u64" },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991,
+          "x-rust-type": "u64"
+        },
         "observed_at": { "$ref": "native-observation.schema.json#/$defs/SourceTimestamp" },
         "gap": { "$ref": "native-observation.schema.json#/$defs/SequenceGap" },
         "topology": { "$ref": "#/$defs/DisplayTopologySnapshot" }

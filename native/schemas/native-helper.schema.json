@@ -152,8 +152,12 @@
           "maximum": 9007199254740991,
           "x-rust-type": "u64"
         },
-        "process_state": { "$ref": "process-application-state.schema.json#/$defs/ProcessApplicationState" },
-        "interactive_session_state": { "$ref": "interactive-session-state.schema.json#/$defs/InteractiveSessionState" }
+        "process_state": {
+          "$ref": "process-application-state.schema.json#/$defs/ProcessApplicationState"
+        },
+        "interactive_session_state": {
+          "$ref": "interactive-session-state.schema.json#/$defs/InteractiveSessionState"
+        }
       }
     },
     "HelperFailureCode": {
@@ -248,8 +252,12 @@
           "maximum": 9007199254740991,
           "x-rust-type": "u64"
         },
-        "process_event": { "$ref": "process-application-state.schema.json#/$defs/ProcessApplicationEvent" },
-        "interactive_session_event": { "$ref": "interactive-session-state.schema.json#/$defs/InteractiveSessionEvent" }
+        "process_event": {
+          "$ref": "process-application-state.schema.json#/$defs/ProcessApplicationEvent"
+        },
+        "interactive_session_event": {
+          "$ref": "interactive-session-state.schema.json#/$defs/InteractiveSessionEvent"
+        }
       }
     },
     "HelperClientMessageKind": {
