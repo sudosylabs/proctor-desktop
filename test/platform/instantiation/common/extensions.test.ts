@@ -20,7 +20,7 @@ class FixtureService implements IFixtureService {
 	readonly value = 42;
 }
 
-test('singleton registration preserves the delayed-instantiation descriptor', () => {
+void test('singleton registration preserves the delayed-instantiation descriptor', () => {
 	const before = getSingletonServiceDescriptors().length;
 	registerSingleton(IFixtureService, FixtureService, InstantiationType.Delayed);
 

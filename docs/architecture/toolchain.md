@@ -51,6 +51,9 @@ environment projects cover:
 
 Project references and declaration boundaries require measured graph pressure;
 they are not used to manufacture package APIs between the five source layers.
+The root solution-style configuration is an editor discovery index only: it
+references the independent no-emit runtime projects without composite builds,
+emitted declarations, or inter-layer package boundaries.
 
 esbuild is the only application emitter and bundler. It produces incremental,
 unbundled development output for focused debugging and explicit production

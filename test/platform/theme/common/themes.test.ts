@@ -13,38 +13,51 @@ import {
 	getThemes
 } from '../../../../src/prctr/platform/theme/common/themes.ts';
 
-test('four immutable packaged themes resolve every static semantic token', () => {
+void test('four immutable packaged themes resolve every static semantic token', () => {
 	const definitions = getDesignTokenDefinitions();
 	const themes = getThemes();
-	assert.deepStrictEqual(themes.map(theme => theme.id), [
-		'dark', 'highContrastDark', 'highContrastLight', 'light'
-	]);
-	assert.strictEqual(new Set(definitions.map(definition => definition.id)).size, definitions.length);
+	assert.deepStrictEqual(
+		themes.map((theme) => theme.id),
+		['dark', 'highContrastDark', 'highContrastLight', 'light']
+	);
+	assert.strictEqual(
+		new Set(definitions.map((definition) => definition.id)).size,
+		definitions.length
+	);
 	for (const definition of definitions) {
 		assert.ok(/^[a-z]+(?:\.[a-z][A-Za-z]*)+$/u.test(definition.id));
 		assert.ok(/^--prctr-/u.test(asCssVariableName(definition.id)));
-		assert.strictEqual(asCssVariable(definition.id), `var(${asCssVariableName(definition.id)})`);
+		assert.strictEqual(
+			asCssVariable(definition.id),
+			`var(${asCssVariableName(definition.id)})`
+		);
 	}
 	for (const theme of themes) {
 		assert.ok(Object.isFrozen(theme));
 		assert.ok(Object.isFrozen(theme.values));
-		assert.deepStrictEqual(Object.keys(theme.values).sort(), definitions.map(definition => definition.id).sort());
+		assert.deepStrictEqual(
+			Object.keys(theme.values).sort(),
+			definitions.map((definition) => definition.id).sort()
+		);
 	}
 });
 
-test('theme foregrounds meet ordinary text contrast against their canvases', () => {
+void test('theme foregrounds meet ordinary text contrast against their canvases', () => {
 	for (const theme of getThemes()) {
 		const background = Color.Format.CSS.parseHex(theme.values['color.background.canvas']);
 		const foreground = Color.Format.CSS.parseHex(theme.values['color.text.primary']);
 		assert.ok(background !== null && foreground !== null);
-		assert.ok(background.getContrastRatio(foreground) >= 4.5, `${theme.id} primary text contrast`);
+		assert.ok(
+			background.getContrastRatio(foreground) >= 4.5,
+			`${theme.id} primary text contrast`
+		);
 		if (theme.isHighContrast) {
 			assert.strictEqual(theme.values['elevation.modal'], 'none');
 		}
 	}
 });
 
-test('compact density uses explicit scale mappings without changing hit-area tokens', () => {
+void test('compact density uses explicit scale mappings without changing hit-area tokens', () => {
 	assert.deepStrictEqual(getDensityTokenOverrides('default'), {});
 	assert.deepStrictEqual(getDensityTokenOverrides('compact'), {
 		'spacing.control.inline': '6px',

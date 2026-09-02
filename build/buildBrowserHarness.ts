@@ -1,50 +1,60 @@
-import {
-  copyFileSync,
-  mkdirSync,
-  rmSync,
-  writeFileSync
-} from 'node:fs';
+import { copyFileSync, writeFileSync } from 'node:fs';
 import { build } from 'esbuild';
+import {
+	chromiumTarget,
+	nodeTarget,
+	repositoryRoot,
+	repositoryPath,
+	resetBuildOutput
+} from './lib/paths.ts';
 
-const outputDirectory = '.build/browser-harness';
-
-rmSync(outputDirectory, { force: true, recursive: true });
-mkdirSync(outputDirectory, { recursive: true });
+const outputDirectory = resetBuildOutput('browser-harness');
 
 await Promise.all([
-  build({
-    absWorkingDir: process.cwd(),
-    bundle: true,
-    entryPoints: { renderer: 'test/browser/rendererHarness.ts' },
-    format: 'esm',
-    logLevel: 'info',
-    loader: { '.ttf': 'file' },
-    outdir: outputDirectory,
-    platform: 'browser',
-    sourcemap: false,
-    target: 'chrome152',
-    tsconfig: 'build/tsconfig.browser.json'
-  }),
-  build({
-    absWorkingDir: process.cwd(),
-    bundle: true,
-    entryPoints: { main: 'test/electron/browserHarnessMain.ts' },
-    external: ['electron', 'electron/main'],
-    format: 'esm',
-    logLevel: 'info',
-    outdir: outputDirectory,
-    platform: 'node',
-    sourcemap: false,
-    target: 'node24',
-    tsconfig: 'build/tsconfig.electron-main.json'
-  })
+	build({
+		absWorkingDir: repositoryRoot,
+		bundle: true,
+		entryPoints: { renderer: 'test/browser/rendererHarness.ts' },
+		format: 'esm',
+		logLevel: 'info',
+		loader: { '.ttf': 'file' },
+		outdir: outputDirectory,
+		platform: 'browser',
+		sourcemap: false,
+		target: chromiumTarget,
+		tsconfig: 'build/tsconfig.browser.json'
+	}),
+	build({
+		absWorkingDir: repositoryRoot,
+		bundle: true,
+		entryPoints: { main: 'test/electron/browserHarnessMain.ts' },
+		external: ['electron', 'electron/main'],
+		format: 'esm',
+		logLevel: 'info',
+		outdir: outputDirectory,
+		platform: 'node',
+		sourcemap: false,
+		target: nodeTarget,
+		tsconfig: 'build/tsconfig.electron-main.json'
+	})
 ]);
 
-copyFileSync('test/browser/rendererHarness.html', `${outputDirectory}/index.html`);
-copyFileSync('test/browser/controlExplorerFrame.html', `${outputDirectory}/controlExplorerFrame.html`);
-writeFileSync(`${outputDirectory}/package.json`, `${JSON.stringify({
-  name: 'proctor-browser-test-harness',
-  private: true,
-  type: 'module',
-  main: 'main.js'
-}, null, 2)}\n`, 'utf8');
+copyFileSync(repositoryPath('test/browser/rendererHarness.html'), `${outputDirectory}/index.html`);
+copyFileSync(
+	repositoryPath('test/browser/controlExplorerFrame.html'),
+	`${outputDirectory}/controlExplorerFrame.html`
+);
+writeFileSync(
+	`${outputDirectory}/package.json`,
+	`${JSON.stringify(
+		{
+			name: 'proctor-browser-test-harness',
+			private: true,
+			type: 'module',
+			main: 'main.js'
+		},
+		null,
+		2
+	)}\n`,
+	'utf8'
+);

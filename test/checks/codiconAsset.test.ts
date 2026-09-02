@@ -3,8 +3,10 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
-test('the admitted Codicon package and font asset are exact', () => {
-	const packageMetadata = JSON.parse(readFileSync('node_modules/@vscode/codicons/package.json', 'utf8')) as {
+void test('the admitted Codicon package and font asset are exact', () => {
+	const packageMetadata = JSON.parse(
+		readFileSync('node_modules/@vscode/codicons/package.json', 'utf8')
+	) as {
 		readonly license?: unknown;
 		readonly version?: unknown;
 	};

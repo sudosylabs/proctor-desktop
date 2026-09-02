@@ -6,6 +6,7 @@
   },
   "include": [
     "../src/prctr/base/common/**/*.ts",
-    "../test/base/common/upstream/**/*.ts"
+    "../test/base/common/upstream/**/*.ts",
+    "../test/base/common/actions.test.ts"
   ]
 }

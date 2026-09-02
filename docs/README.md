@@ -11,6 +11,9 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
 
 ## Architecture
 
+- [Development environment](./project/development.md) — local setup, editor project
+  discovery, formatting ownership, verification commands, and optional commit checks
+
 - [Overview](./architecture/overview.md) — confirmed application and process
   boundaries
 - [Module system](./architecture/module-system.md) — deep-module vocabulary and

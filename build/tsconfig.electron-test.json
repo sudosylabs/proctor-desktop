@@ -12,6 +12,8 @@
     "../test/electron/browserHarnessMain.ts",
     "../test/electron/browserHarness.real.test.ts",
     "../test/electron/windowSkeletonMain.ts",
-    "../test/electron/windowSkeleton.real.test.ts"
+    "../test/electron/windowSkeleton.real.test.ts",
+    "../test/electron/securityUtility.real.test.ts",
+    "../test/electron/securityUtilityMain.ts"
   ]
 }

@@ -34,7 +34,10 @@ jobs:
       - name: Verify foundation
         run: npm run check
       - name: Verify sandboxed Chromium renderer
-        run: xvfb-run --auto-servernum npm run test:browser
+        run: |
+          npm run setup
+          xvfb-run --auto-servernum npm run test:browser
+          xvfb-run --auto-servernum npm run test:window-skeleton
 
   dependency-audit:
     name: dependency-audit
@@ -74,7 +77,7 @@ jobs:
         run: npm ci
       - name: Verify native target
         run: npm run test:native
+      - name: Prepare pinned Electron runtime
+        run: npm run setup
       - name: Verify Electron security utility
         run: npm run test:electron
-      - name: Verify sandboxed Chromium renderer
-        run: npm run test:browser

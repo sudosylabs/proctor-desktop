@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Check",
+      "type": "npm",
+      "script": "check",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$tsc", "$eslint-stylish"]
+    },
+    { "label": "Typecheck", "type": "npm", "script": "check:types", "problemMatcher": "$tsc" },
+    {
+      "label": "Unit tests",
+      "type": "npm",
+      "script": "test:unit",
+      "group": "test",
+      "problemMatcher": []
+    },
+    { "label": "Electron tests", "type": "npm", "script": "test:electron", "problemMatcher": [] },
+    { "label": "Environment doctor", "type": "npm", "script": "doctor", "problemMatcher": [] }
+  ]
+}

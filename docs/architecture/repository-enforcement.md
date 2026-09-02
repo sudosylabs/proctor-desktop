@@ -50,11 +50,10 @@ The active cheap controls cover:
 - deterministic generator ownership and byte parity;
 - offline VS Code port schema, digest, marker, license, and unique-owner parity.
 
-The graph checker preserves an intentional cycle only when every participating
-source file carries the same cluster marker and that cluster has a tracked ports
-manifest. This treats the admitted cluster as one deep module without allowing
-an unowned, cross-cluster, or cross-layer cycle; provenance validation remains
-the authority for membership and exact source ownership.
+The source graph rejects executable cycles, including cycles within one admitted
+cluster. Type-only edges remain visible to architecture checks without creating
+runtime cycles. A separate tooling graph check covers build modules and command
+wrappers; production source boundaries remain independently enforced.
 
 Runtime classification normally comes from an explicit environment folder. An
 aggregate whose accepted product name cannot encode that folder uses one exact
@@ -124,7 +123,10 @@ kernel tests cover path normalization, real symlink topology, duplicate check
 IDs, and overlapping generator output ownership. New checks must land their
 contract in the same change.
 
-No Git hook is installed. Local use is voluntary; CI is the required authority.
+An optional explicitly enabled hook checks staged hygiene, formatting and syntax
+without rewriting source or staging. It is never installed by npm lifecycle
+hooks. CI remains the required authority. See the
+[development environment](../project/development.md) for the ownership boundary.
 Electron and esbuild now support the isolated security-utility composition:
 the cheap `check` gate runs its process-neutral protocol tests, and the native
 macOS/Windows jobs run its real Electron/Node-API lifecycle test. Forge,

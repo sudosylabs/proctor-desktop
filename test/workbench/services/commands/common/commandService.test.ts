@@ -6,16 +6,18 @@ import { InstantiationService } from '../../../../../src/prctr/platform/instanti
 import { CommandService } from '../../../../../src/prctr/workbench/services/commands/common/commandService.ts';
 import { ProctorCommands } from '../../../../../src/prctr/workbench/services/commands/common/proctorCommands.ts';
 
-test('command execution is synchronous through invocation and emits ordered events', async () => {
+void test('command execution is synchronous through invocation and emits ordered events', async () => {
 	const store = new DisposableStore();
 	const service = store.add(new CommandService(new InstantiationService()));
 	const order: string[] = [];
-	store.add(service.onWillExecuteCommand(event => order.push(`will:${event.commandId}`)));
-	store.add(service.onDidExecuteCommand(event => order.push(`did:${event.commandId}`)));
-	store.add(ProctorCommands.register('prctr.test.execute', (_accessor, value: number) => {
-		order.push(`handler:${value}`);
-		return value * 2;
-	}));
+	store.add(service.onWillExecuteCommand((event) => order.push(`will:${event.commandId}`)));
+	store.add(service.onDidExecuteCommand((event) => order.push(`did:${event.commandId}`)));
+	store.add(
+		ProctorCommands.register('prctr.test.execute', (_accessor, value: number) => {
+			order.push(`handler:${value}`);
+			return value * 2;
+		})
+	);
 
 	const promise = service.executeCommand<number>('prctr.test.execute', 21);
 	order.push('after-call');
@@ -31,11 +33,17 @@ test('command execution is synchronous through invocation and emits ordered even
 	store.dispose();
 });
 
-test('registry stacking restores the prior product command when an override is disposed', () => {
+void test('registry stacking restores the prior product command when an override is disposed', () => {
 	const first = ProctorCommands.register('prctr.test.stack', () => 'first');
 	const second = ProctorCommands.register('prctr.test.stack', () => 'second');
-	assert.strictEqual(CommandsRegistry.getCommand('prctr.test.stack')?.handler(undefined as never), 'second');
+	assert.strictEqual(
+		CommandsRegistry.getCommand('prctr.test.stack')?.handler(undefined as never),
+		'second'
+	);
 	second.dispose();
-	assert.strictEqual(CommandsRegistry.getCommand('prctr.test.stack')?.handler(undefined as never), 'first');
+	assert.strictEqual(
+		CommandsRegistry.getCommand('prctr.test.stack')?.handler(undefined as never),
+		'first'
+	);
 	first.dispose();
 });

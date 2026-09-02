@@ -1,0 +1,20 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./build/tsconfig.json" },
+    { "path": "./build/tsconfig.common.json" },
+    { "path": "./build/tsconfig.base-common.json" },
+    { "path": "./build/tsconfig.base-common-test.json" },
+    { "path": "./build/tsconfig.platform-foundation.json" },
+    { "path": "./build/tsconfig.platform-foundation-test.json" },
+    { "path": "./build/tsconfig.editor-core.json" },
+    { "path": "./build/tsconfig.editor-core-test.json" },
+    { "path": "./build/tsconfig.common-test.json" },
+    { "path": "./build/tsconfig.browser.json" },
+    { "path": "./build/tsconfig.electron-browser.json" },
+    { "path": "./build/tsconfig.electron-main.json" },
+    { "path": "./build/tsconfig.electron-utility.json" },
+    { "path": "./build/tsconfig.electron-test.json" },
+    { "path": "./build/tsconfig.security-utility-test.json" }
+  ]
+}

@@ -5,26 +5,28 @@ import { documentationCheck, hygieneCheck, pinnedActionsCheck } from './document
 import { generatedCheck } from './generated.ts';
 import { provenanceCheck } from './provenance.ts';
 import { compositionCheck, cssCheck, sourceGraphCheck } from './source.ts';
+import { toolingGraphCheck } from './tooling.ts';
 
 export const checks: readonly Check[] = [
-  policySchemaCheck,
-  assuranceCheck,
-  dependencyCheck,
-  documentationCheck,
-  hygieneCheck,
-  pinnedActionsCheck,
-  generatedCheck,
-  provenanceCheck,
-  sourceGraphCheck,
-  compositionCheck,
-  cssCheck
+	policySchemaCheck,
+	assuranceCheck,
+	dependencyCheck,
+	documentationCheck,
+	hygieneCheck,
+	pinnedActionsCheck,
+	generatedCheck,
+	provenanceCheck,
+	sourceGraphCheck,
+	compositionCheck,
+	cssCheck,
+	toolingGraphCheck
 ];
 
 export function checkMap(entries: readonly Check[] = checks): ReadonlyMap<string, Check> {
-  const result = new Map<string, Check>();
-  for (const entry of entries) {
-    if (result.has(entry.id)) throw new Error(`Duplicate check id ${entry.id}`);
-    result.set(entry.id, entry);
-  }
-  return result;
+	const result = new Map<string, Check>();
+	for (const entry of entries) {
+		if (result.has(entry.id)) throw new Error(`Duplicate check id ${entry.id}`);
+		result.set(entry.id, entry);
+	}
+	return result;
 }

@@ -11,9 +11,12 @@ import {
 	WorkbenchWindowKindContext
 } from '../../../../src/prctr/workbench/common/contextKeys.ts';
 
-test('Proctor context keys are namespaced and remain expression inputs', () => {
+void test('Proctor context keys are namespaced and remain expression inputs', () => {
 	assert.strictEqual(WorkbenchWindowKindContext.key, 'prctr.workbench.windowKind');
-	assert.strictEqual(CandidateInteractionAllowedContext.key, 'prctr.candidate.interactionAllowed');
+	assert.strictEqual(
+		CandidateInteractionAllowedContext.key,
+		'prctr.candidate.interactionAllowed'
+	);
 	assert.strictEqual(WorkbenchDirectionContext.key, 'prctr.localization.direction');
 
 	const expression = ContextKeyExpr.and(
@@ -21,13 +24,16 @@ test('Proctor context keys are namespaced and remain expression inputs', () => {
 		CandidateInteractionAllowedContext
 	);
 	const values: Record<string, ContextKeyValue> = {
-			'prctr.workbench.windowKind': 'candidate',
-			'prctr.candidate.interactionAllowed': true
+		'prctr.workbench.windowKind': 'candidate',
+		'prctr.candidate.interactionAllowed': true
 	};
-	assert.strictEqual(expression?.evaluate({
-		getValue<T extends ContextKeyValue>(key: string): T | undefined {
-			return values[key] as T | undefined;
-		}
-	}), true);
-	assert.ok([...RawContextKey.all()].some(info => info.key === 'prctr.workbench.windowKind'));
+	assert.strictEqual(
+		expression?.evaluate({
+			getValue<T extends ContextKeyValue>(key: string): T | undefined {
+				return values[key] as T | undefined;
+			}
+		}),
+		true
+	);
+	assert.ok([...RawContextKey.all()].some((info) => info.key === 'prctr.workbench.windowKind'));
 });

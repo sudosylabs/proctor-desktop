@@ -1,0 +1,38 @@
+{
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "[typescript]": { "editor.insertSpaces": false, "editor.tabSize": 4 },
+  "[javascript]": { "editor.insertSpaces": false, "editor.tabSize": 4 },
+  "[css]": { "editor.insertSpaces": false, "editor.tabSize": 4 },
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+  },
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.preferences.importModuleSpecifier": "relative",
+  "js/ts.preferences.importModuleSpecifierEnding": "js",
+  "js/ts.preferences.quoteStyle": "single",
+  "eslint.useFlatConfig": true,
+  "prettier.requireConfig": true,
+  "prettier.prettierPath": "./node_modules/prettier",
+  "rust-analyzer.linkedProjects": ["native/Cargo.toml"],
+  "files.readonlyInclude": {
+    "**/node_modules/**": true,
+    "**/*.generated.*": true,
+    "package-lock.json": true,
+    "native/Cargo.lock": true,
+    ".prettierignore": true
+  },
+  "files.watcherExclude": {
+    "**/.build/**": true,
+    "**/native/target/**": true,
+    "**/node_modules/**": true
+  },
+  "search.exclude": { ".build": true, "out": true, "native/target": true, ".generated-check": true }
+}

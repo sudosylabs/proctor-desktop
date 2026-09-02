@@ -6,7 +6,7 @@ import {
 	resolveSemanticIcon
 } from '../../../../src/prctr/platform/theme/common/semanticIcons.js';
 
-test('semantic icon identifiers are unique, stable, and backed by font characters', () => {
+void test('semantic icon identifiers are unique, stable, and backed by font characters', () => {
 	const identifiers = getSemanticIconIds();
 	assert.ok(identifiers.length >= 24);
 	assert.deepStrictEqual(identifiers, [...identifiers].sort());
@@ -19,7 +19,7 @@ test('semantic icon identifiers are unique, stable, and backed by font character
 	}
 });
 
-test('semantic icon API keeps the glyph name private', () => {
+void test('semantic icon API keeps the glyph name private', () => {
 	assert.deepStrictEqual(resolveSemanticIcon('action.settings'), {
 		id: 'action.settings',
 		fontCharacter: 0xeb51

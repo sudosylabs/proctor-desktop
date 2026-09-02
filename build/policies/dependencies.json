@@ -1,7 +1,20 @@
 {
   "$schema": "./schemas/dependencies.schema.json",
   "schemaVersion": 1,
-  "allowedLicenseExpressions": ["(MIT OR Apache-2.0) AND Unicode-3.0", "Apache-2.0", "Apache-2.0 OR MIT", "BSD-2-Clause", "BSD-3-Clause", "CC-BY-4.0", "ISC", "MIT", "MIT OR Apache-2.0", "MIT/Apache-2.0", "Unlicense OR MIT"],
+  "allowedLicenseExpressions": [
+    "(MIT OR Apache-2.0) AND Unicode-3.0",
+    "Apache-2.0",
+    "Apache-2.0 OR MIT",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "BlueOak-1.0.0",
+    "CC-BY-4.0",
+    "ISC",
+    "MIT",
+    "MIT OR Apache-2.0",
+    "MIT/Apache-2.0",
+    "Unlicense OR MIT"
+  ],
   "dependencies": [
     {
       "ecosystem": "cargo",
@@ -13,7 +26,17 @@
       "source": "https://crates.io/crates/napi/3.12.2",
       "license": "MIT",
       "lifecycleScripts": "allowed",
-      "declarations": [{ "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml", "alias": "napi", "kind": "production", "features": ["dyn-symbols", "napi8", "serde-json"], "defaultFeatures": false, "optional": false, "targetScope": null }],
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
+          "alias": "napi",
+          "kind": "production",
+          "features": ["dyn-symbols", "napi8", "serde-json"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        }
+      ],
       "processes": ["exam-security-utility"],
       "networkBehavior": "None at runtime; Node-API calls remain process-local.",
       "nativeBehavior": "Links the platform Node-API symbols and uses its reviewed registration build support; it does not bundle a helper executable.",
@@ -33,7 +56,17 @@
       "source": "https://crates.io/crates/napi-derive/3.6.3",
       "license": "MIT",
       "lifecycleScripts": "none",
-      "declarations": [{ "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml", "alias": "napi-derive", "kind": "production", "features": ["strict"], "defaultFeatures": false, "optional": false, "targetScope": null }],
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
+          "alias": "napi-derive",
+          "kind": "production",
+          "features": ["strict"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        }
+      ],
       "processes": ["native-build"],
       "networkBehavior": "None at runtime or build time after Cargo acquisition.",
       "nativeBehavior": "A compile-time procedural macro emits Node-API registration glue; it ships no standalone binary.",
@@ -54,9 +87,33 @@
       "license": "MIT OR Apache-2.0",
       "lifecycleScripts": "none",
       "declarations": [
-        { "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml", "alias": "serde", "kind": "production", "features": ["derive"], "defaultFeatures": true, "optional": false, "targetScope": null },
-        { "manifest": "native/crates/prctr-native-protocol/Cargo.toml", "alias": "serde", "kind": "production", "features": ["derive"], "defaultFeatures": true, "optional": false, "targetScope": null },
-        { "manifest": "native/crates/prctr-native-security-helper/Cargo.toml", "alias": "serde", "kind": "production", "features": [], "defaultFeatures": true, "optional": false, "targetScope": null }
+        {
+          "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
+          "alias": "serde",
+          "kind": "production",
+          "features": ["derive"],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-native-protocol/Cargo.toml",
+          "alias": "serde",
+          "kind": "production",
+          "features": ["derive"],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-native-security-helper/Cargo.toml",
+          "alias": "serde",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        }
       ],
       "processes": ["exam-security-utility", "native-build", "native-security-helper"],
       "networkBehavior": "None.",
@@ -78,7 +135,15 @@
       "license": "MIT OR Apache-2.0",
       "lifecycleScripts": "none",
       "declarations": [
-        { "manifest": "native/crates/prctr-native-security-helper/Cargo.toml", "alias": "serde_json", "kind": "production", "features": [], "defaultFeatures": true, "optional": false, "targetScope": null }
+        {
+          "manifest": "native/crates/prctr-native-security-helper/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        }
       ],
       "processes": ["native-security-helper"],
       "networkBehavior": "None; all frames use private inherited process handles and are validated before nested allocation.",
@@ -99,7 +164,17 @@
       "source": "https://crates.io/crates/hmac/0.12.1",
       "license": "MIT OR Apache-2.0",
       "lifecycleScripts": "none",
-      "declarations": [{ "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml", "alias": "hmac", "kind": "production", "features": [], "defaultFeatures": true, "optional": false, "targetScope": null }],
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml",
+          "alias": "hmac",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        }
+      ],
       "processes": ["exam-security-utility"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust message-authentication construction; it ships no native library, helper, or lifecycle script.",
@@ -119,7 +194,17 @@
       "source": "https://crates.io/crates/sha2/0.10.9",
       "license": "MIT OR Apache-2.0",
       "lifecycleScripts": "none",
-      "declarations": [{ "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml", "alias": "sha2", "kind": "production", "features": [], "defaultFeatures": false, "optional": false, "targetScope": null }],
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml",
+          "alias": "sha2",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        }
+      ],
       "processes": ["exam-security-utility"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust SHA-256 primitives; it ships no native library, helper, or lifecycle script.",
@@ -144,7 +229,15 @@
           "manifest": "native/crates/prctr-capture-session-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_System_Registry", "Win32_System_RemoteDesktop", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"],
+          "features": [
+            "Win32_Foundation",
+            "Win32_Graphics_Gdi",
+            "Win32_System_LibraryLoader",
+            "Win32_System_Registry",
+            "Win32_System_RemoteDesktop",
+            "Win32_System_Threading",
+            "Win32_UI_WindowsAndMessaging"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -153,7 +246,15 @@
           "manifest": "native/crates/prctr-display-topology/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_Devices_DeviceAndDriverInstallation", "Win32_Devices_Display", "Win32_Foundation", "Win32_Graphics_Gdi", "Win32_System_LibraryLoader", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"],
+          "features": [
+            "Win32_Devices_DeviceAndDriverInstallation",
+            "Win32_Devices_Display",
+            "Win32_Foundation",
+            "Win32_Graphics_Gdi",
+            "Win32_System_LibraryLoader",
+            "Win32_System_Threading",
+            "Win32_UI_WindowsAndMessaging"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -162,7 +263,12 @@
           "manifest": "native/crates/prctr-process-application-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_Foundation", "Win32_System_Diagnostics_ToolHelp", "Win32_System_RemoteDesktop", "Win32_System_Threading"],
+          "features": [
+            "Win32_Foundation",
+            "Win32_System_Diagnostics_ToolHelp",
+            "Win32_System_RemoteDesktop",
+            "Win32_System_Threading"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -189,7 +295,13 @@
           "manifest": "native/crates/prctr-print-spooler-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_Foundation", "Win32_Globalization", "Win32_Graphics_Gdi", "Win32_Graphics_Printing", "Win32_System_WindowsProgramming"],
+          "features": [
+            "Win32_Foundation",
+            "Win32_Globalization",
+            "Win32_Graphics_Gdi",
+            "Win32_Graphics_Printing",
+            "Win32_System_WindowsProgramming"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -207,7 +319,13 @@
           "manifest": "native/crates/prctr-network-configuration-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_Foundation", "Win32_NetworkManagement_IpHelper", "Win32_NetworkManagement_Ndis", "Win32_Networking_WinHttp", "Win32_Networking_WinSock"],
+          "features": [
+            "Win32_Foundation",
+            "Win32_NetworkManagement_IpHelper",
+            "Win32_NetworkManagement_Ndis",
+            "Win32_Networking_WinHttp",
+            "Win32_Networking_WinSock"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -216,7 +334,12 @@
           "manifest": "native/crates/prctr-media-device-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_Devices_DeviceAndDriverInstallation", "Win32_Foundation", "Win32_Media_Audio", "Win32_Media_KernelStreaming"],
+          "features": [
+            "Win32_Devices_DeviceAndDriverInstallation",
+            "Win32_Foundation",
+            "Win32_Media_Audio",
+            "Win32_Media_KernelStreaming"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -225,13 +348,24 @@
           "manifest": "native/crates/prctr-native-security-helper/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_Foundation", "Win32_Security_Cryptography", "Win32_Security_WinTrust", "Win32_Storage_FileSystem", "Win32_System_Threading"],
+          "features": [
+            "Win32_Foundation",
+            "Win32_Security_Cryptography",
+            "Win32_Security_WinTrust",
+            "Win32_Storage_FileSystem",
+            "Win32_System_Threading"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
         }
       ],
-      "processes": ["exam-security-utility", "native-capture-session", "native-display-topology", "native-security-helper"],
+      "processes": [
+        "exam-security-utility",
+        "native-capture-session",
+        "native-display-topology",
+        "native-security-helper"
+      ],
       "networkBehavior": "None; the crate provides generated Win32 bindings and links system libraries only.",
       "nativeBehavior": "No bundled native binary or build script; generated declarations call reviewed Windows display/session, Toolhelp, clipboard, spooler, storage, IP Helper, WinHTTP, SetupAPI, media-class, BCrypt, live-process-image, and Authenticode trust APIs through system linking.",
       "transitiveRisk": "Locks windows-link 0.2.1, which supplies Windows import linkage without lifecycle scripts or network behavior; it is target-scoped with windows-sys.",
@@ -421,6 +555,36 @@
       "owner": "agent-documentation",
       "source": "https://www.npmjs.com/package/yaml",
       "license": "ISC",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "eslint",
+      "version": "10.8.0",
+      "kind": "development",
+      "purpose": "Repository-wide JavaScript and TypeScript correctness lint with a check-only default.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/eslint/v/10.8.0",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "typescript-eslint",
+      "version": "8.66.0",
+      "kind": "development",
+      "purpose": "Type-aware ESLint parsing and async safety checks using the independent runtime compiler projects.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/typescript-eslint/v/8.66.0",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "prettier",
+      "version": "3.9.6",
+      "kind": "development",
+      "purpose": "Deterministic formatting of handwritten Proctor-owned files; transferred and generated bytes retain their existing authorities.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/prettier/v/3.9.6",
+      "license": "MIT",
       "lifecycleScripts": "none"
     }
   ]
