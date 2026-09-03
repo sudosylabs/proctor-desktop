@@ -34,8 +34,6 @@ export type ProductWindowDescriptor =
 	LaunchWindowDescriptor | AuthenticatedWindowDescriptor | CandidateWindowDescriptor;
 
 export type ProductWindowIntent =
-	| { readonly kind: 'launch.changeServer' }
-	| { readonly kind: 'launch.signIn' }
 	| { readonly kind: 'launch.exit' }
 	| { readonly kind: 'authenticated.signOut' }
 	| { readonly kind: 'authenticated.joinAttempt'; readonly attemptId: string }
@@ -91,8 +89,6 @@ export function validateWindowIntent(
 	if (!isRecord(value) || typeof value.kind !== 'string')
 		throw new TypeError('Invalid product window intent');
 	switch (value.kind) {
-		case 'launch.changeServer':
-		case 'launch.signIn':
 		case 'launch.exit':
 			if (expected !== 'launch' || Object.keys(value).length !== 1) break;
 			return Object.freeze({ kind: value.kind });

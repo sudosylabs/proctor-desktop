@@ -315,55 +315,207 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
     },
-    "launch.action.change.server": {
+    "launch.auth.unavailable": {
+      "message": "Sign-in is not available in this build.",
+      "description": "Readiness is implemented but the hosted authentication owner is not connected.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.disabled": {
+      "message": "Desktop sign-in is not available on this server. Contact your Institution.",
+      "description": "Server has disabled desktop authorization.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.failed": {
+      "message": "Sign-in could not be completed. Retry to check this server again.",
+      "description": "Safe hosted authorization failure.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.unsupported": {
+      "message": "This Proctor build does not support the server’s sign-in protocol. Contact your Institution.",
+      "description": "Desktop authorization protocol incompatibility.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorizing": {
+      "message": "Continue signing in in your system browser.",
+      "description": "Privileged hosted authorization is in progress.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.change.server": {
       "message": "Change server",
-      "description": "Action that changes the configured Proctor Server.",
+      "description": "Discard the selected server and cancel pending work.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindow.ts"
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
-    "launch.action.exit": {
+    "launch.check": {
+      "message": "Continue",
+      "description": "Submit the Institution server for readiness checks.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.checking": {
+      "message": "Checking server availability and compatibility…",
+      "description": "Readiness check in progress.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.development": {
+      "message": "Development server · HTTP loopback connection",
+      "description": "Visible warning for explicitly enabled development-only HTTP.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.exit": {
       "message": "Exit Proctor",
-      "description": "Action that exits Proctor from the launch surface.",
+      "description": "Exit the signed-out LaunchWindow.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindow.ts"
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
-    "launch.action.failed": {
-      "message": "The requested action could not be completed.",
-      "description": "Safe failure shown for a launch action.",
+    "launch.failed": {
+      "message": "The requested action could not be completed. Please try again.",
+      "description": "Safe failure for a LaunchWindow action.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindow.ts"
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
-    "launch.action.sign.in": {
-      "message": "Sign in",
-      "description": "Action that starts system-browser authentication.",
+    "launch.identity.changed": {
+      "message": "This server’s Institution identity changed. Confirm the address with your Institution before retrying.",
+      "description": "Block an authorization handoff when the fresh check identifies a different Institution or installation.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindow.ts"
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
-    "launch.institution.ready": {
-      "message": "Ready to connect to {institution}",
-      "description": "Status shown when an Institution origin is configured.",
-      "placeholders": [
-        "institution"
-      ],
-      "source": "src/prctr/workbench/browser/launchWindow.ts"
-    },
-    "launch.institution.unavailable": {
-      "message": "Choose your Institution server to continue.",
-      "description": "Status shown before an Institution origin is configured.",
+    "launch.invalid.response": {
+      "message": "This server returned an unexpected response. Check the address or contact your Institution.",
+      "description": "Malformed public readiness response.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindow.ts"
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
-    "launch.startup.recovery": {
+    "launch.invalid.server": {
+      "message": "Enter a server address using HTTPS, without a path, query, or sign-in details.",
+      "description": "Invalid server origin input.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.maintenance": {
+      "message": "This server is undergoing maintenance. Try again later or contact your Institution.",
+      "description": "Server maintenance status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.origin.mismatch": {
+      "message": "The server identifies itself with a different address. Confirm the correct address with your Institution.",
+      "description": "Canonical server origin mismatch.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.ready": {
+      "message": "This server is ready for sign-in.",
+      "description": "Server passed both public readiness checks.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.recovery": {
       "message": "Proctor could not start the launch window safely.",
       "description": "Minimal LaunchWindow startup recovery message.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindow.ts"
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.redirect.blocked": {
+      "message": "This address redirects elsewhere. Enter the Institution’s server address directly.",
+      "description": "Server redirects are not followed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.retry": {
+      "message": "Retry",
+      "description": "Manually repeat both public readiness checks.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.retry.at": {
+      "message": "The server suggests trying again after {time}.",
+      "description": "Advisory server retry time, displayed in the user’s locale.",
+      "placeholders": [
+        "time"
+      ],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.selecting.server": {
+      "message": "Choose your Institution server to continue.",
+      "description": "Launch status before selecting a server.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.server.hint": {
+      "message": "Enter the server address provided by your Institution.",
+      "description": "Help for Institution server selection.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.server.incompatible": {
+      "message": "This Proctor build and server are not compatible. Contact your Institution for a supported version.",
+      "description": "Server and desktop compatibility failure.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.server.label": {
+      "message": "Institution server",
+      "description": "Label for the server address input.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.sign.in": {
+      "message": "Sign in to {institution}",
+      "description": "Start system-browser authentication for the verified Institution.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.sign.in.generic": {
+      "message": "Sign in",
+      "description": "Unavailable sign-in action before server identity is known.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.timed.out": {
+      "message": "The server did not respond in time. Check your connection and retry.",
+      "description": "Server request deadline elapsed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
     "launch.title": {
-      "message": "Proctor",
-      "description": "Heading for the signed-out Proctor launch surface.",
+      "message": "Connect to your Institution",
+      "description": "Task heading for the signed-out Proctor launch surface.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindow.ts"
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.unavailable": {
+      "message": "This server is temporarily unavailable. Try again later or contact your Institution.",
+      "description": "Coarse server unavailable status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.unreachable": {
+      "message": "Proctor could not reach this server. Check the address and your connection, then retry.",
+      "description": "Server request failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.unsupported.target": {
+      "message": "This server does not support Proctor on this platform. Contact your Institution.",
+      "description": "Unsupported desktop platform or architecture.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.update.required": {
+      "message": "This Proctor build cannot sign in. Install an approved update from your Institution.",
+      "description": "Server requires a different approved desktop build.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
     "settings.accessibility.announcements.description": {
       "message": "Controls the detail of assistive announcements.",

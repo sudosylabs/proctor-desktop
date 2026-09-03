@@ -1,5 +1,6 @@
 {
   "name": "proctor-desktop",
+  "productName": "Proctor",
   "version": "0.0.0-private",
   "private": true,
   "type": "module",
@@ -73,6 +74,7 @@
     "electron": "44.0.0"
   },
   "devDependencies": {
+    "@resvg/resvg-wasm": "2.6.2",
     "@types/node": "24.13.3",
     "ajv": "8.20.0",
     "esbuild": "0.28.2",

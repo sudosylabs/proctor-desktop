@@ -48,24 +48,39 @@ departure and is never restored directly on application relaunch.
 ## Server readiness and LaunchWindow
 
 The privileged `DesktopIdentityCoordinator` normalizes the submitted server URL
-and calls unauthenticated `GET /api/v1/system/ping`. The response is a small
-client contract containing:
+and consumes two existing unauthenticated contracts at that pinned origin:
 
-- canonical public origin and safe Institution display identity;
-- availability: `ready`, `maintenance`, or `temporarily_unavailable`;
-- stable safe reason, optional bounded administrator message, and optional
-  authoritative retry timing;
-- compatible minimum and maximum Desktop releases by platform/architecture;
-- supported Desktop Authorization and realtime protocol ranges.
+- `GET /api/v1/system/ping` receives trusted Desktop release, build ID,
+  platform, architecture, and realtime protocol selectors. It owns availability
+  (`ready`, `maintenance`, or `temporarily_unavailable`), the server's
+  build/realtime compatibility decision, safe reasons, optional bounded
+  administrator text, and advisory retry timing relative to server time.
+- `GET /api/v1/discovery` owns canonical public origin, safe Institution and
+  installation identity, Desktop Authorization availability, and the supported
+  authorization protocol range.
+
+The client does not combine these into a new server route or reproduce the
+server's build-catalog admission decision. Both responses must be usable for the
+same submitted origin before sign-in can start. Redirects, canonical-origin
+mismatch, unsupported required protocol versions, malformed responses, request
+deadlines, and transport failures block sign-in. Requests have bounded response
+sizes and deadlines; changing server cancels pending work and fences late
+responses. A sign-in intent repeats both checks before the privileged
+authorization handoff and rejects a changed Institution or installation identity
+rather than silently authorizing against the replacement.
 
 Internal initialization, migrations, database, queue, dependency, and node
-health never enter the projection. `/api/v1/system/version` is build/provenance
-information, not readiness or admission.
+health never enter the projection. Uninitialized discovery maps to coarse
+unavailability; provider lists and authentication method flags remain server
+concerns. `/api/v1/system/version` is build/provenance information, not readiness
+or admission.
 
 After URL submission, LaunchWindow replaces the input with the verified
-Institution state regardless of availability. It offers `Sign in to
-<Institution>` only while ready and compatible and always offers `Change
-server`. Too old, too new, unsupported, maintenance, and temporary failure use
+Institution state regardless of availability when discovery verifies that
+identity; otherwise it displays the submitted origin and a safe failure. It
+enables `Sign in to <Institution>` only while ready and compatible with an
+available privileged authorization owner, and always offers `Change server`
+after submission. Too old, too new, unsupported, maintenance, and temporary failure use
 distinct localized outcomes. Production origins require HTTPS. An explicit
 development loopback HTTP origin is visibly marked and cannot enter a production
 Candidate Attempt.
@@ -403,7 +418,8 @@ channels and validates scope, revision, intent family, and bounds.
 
 Use real coordinators behind in-memory ports and packaged-process tests. Cover:
 
-- ping origin/availability/compatibility and change-server behavior;
+- split ping/discovery origin, availability, build and authorization
+  compatibility, bounded responses, and change-server cancellation behavior;
 - method-agnostic hosted auth, another account, cancel, loopback IPv4/IPv6,
   state/PKCE, proof mismatch/replay, callback failure, and active-lock denial;
 - installation enrollment/revocation, DPoP URI/method/token/nonce binding,

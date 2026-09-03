@@ -67,6 +67,12 @@
   ],
   "dependencies": [
     {
+      "id": "launch-identity",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/identity/common/launchIdentity.ts",
+      "rationale": "Proctor owns the credential-free readiness projection and closed Launch intents; the main adapter binds that interface to the privileged identity coordinator."
+    },
+    {
       "id": "electron-runtime",
       "kind": "external-package",
       "reference": "electron@44.0.0",
@@ -74,6 +80,22 @@
     }
   ],
   "divergences": [
+    {
+      "id": "privileged-launch-readiness",
+      "summary": "LaunchWindow uses a Proctor-owned identity projection and closed intents. Main verifies the existing ping/discovery contracts; generic window intents cannot bypass readiness. No server payload, credentials, auth-provider selector, or arbitrary request API enters preload.",
+      "localPaths": [
+        "src/prctr/platform/identity/common/launchIdentity.ts",
+        "src/prctr/platform/identity/electron-main/launchIdentityIpc.ts",
+        "src/prctr/code/electron-main/launchWindowComposition.ts",
+        "src/prctr/code/electron-browser/launchPreload.ts"
+      ],
+      "verificationRefs": [
+        "launch-readiness-tests",
+        "launch-browser-tests",
+        "real-electron-test",
+        "composition-check"
+      ]
+    },
     {
       "id": "three-fixed-window-kinds",
       "summary": "LaunchWindow, AuthenticatedWindow, and CandidateWindow have immutable typed descriptors and distinct preloads; renderer state cannot select or change a composition.",
@@ -102,6 +124,18 @@
     }
   ],
   "verification": [
+    {
+      "id": "launch-readiness-tests",
+      "kind": "test",
+      "path": "test/platform/identity/electron-main/launchIdentity.test.ts",
+      "obligation": "Verify both public server contracts, bounded HTTP, origin pinning, freshness/cancellation, closed renderer projection/intents, sender-bound IPC, and rollback."
+    },
+    {
+      "id": "launch-browser-tests",
+      "kind": "test",
+      "path": "test/browser/launchWindowTests.ts",
+      "obligation": "Verify server entry, safe state presentation, cancellation/exit during checks, keyboard focus, stale snapshots, 200% zoom, and disposal through the production LaunchWindow interface."
+    },
     {
       "id": "window-contract-tests",
       "kind": "test",

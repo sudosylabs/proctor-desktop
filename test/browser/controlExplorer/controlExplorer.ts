@@ -74,8 +74,9 @@ export async function runControlExplorer(parent: HTMLElement): Promise<ControlEx
 	});
 	store.dispose();
 	if (
-		document.querySelector('.prctr-button,.prctr-text-field,.prctr-toggle,.prctr-progress') !==
-		null
+		document.querySelector(
+			'.prctr-brand-lockup,.prctr-button,.prctr-text-field,.prctr-toggle,.prctr-progress'
+		) !== null
 	)
 		throw new Error('Control fixture disposal left owned DOM behind');
 	iframe.remove();

@@ -75,6 +75,16 @@ Electron window harness verifies the locked renderer preferences and three-windo
 capability separation. This is a development-runtime skeleton; it is not yet a
 Forge-packaged, signed, updateable application.
 
+LaunchWindow now implements server selection and split public readiness through
+a privileged Desktop Identity Coordinator. The real HTTP adapter consumes system
+ping for availability/build/realtime compatibility and discovery for verified
+Institution/origin and Desktop Authorization compatibility. Bounded IPC,
+revision-fenced projections, cancellation, retry, localized failure states, and
+keyboard focus are exercised through unit, browser, and Electron tests. Sign-in
+remains disabled when no complete hosted-authentication owner is connected; the
+readiness slice does not implement loopback authorization, OS-backed key custody,
+credentials, Sessions, or the authenticated transition.
+
 Attempt Workspace now has canonical URI/path validation, hierarchy and content
 models, a provider boundary, mutation scheduling, late-result fencing, retry and
 protected-recovery contracts, three-way reconciliation, Exam Resource delivery,
@@ -147,9 +157,14 @@ and remote execution/terminal transport. Desktop work should characterize and
 pin those existing contracts rather than treating all server protocol design as
 future.
 
-Coordinated server work is still required for:
+The LaunchWindow readiness adapter now uses the existing public
+`/api/v1/system/ping` and `/api/v1/discovery` contracts. It does not require a
+combined ping response.
 
-- safe public system ping with Desktop/protocol compatibility;
+The remaining integration areas below require separate contract verification
+with the server owner; they are not claims that current server implementations
+are absent:
+
 - method-agnostic hosted Desktop Authorization and registered-key/DPoP binding;
 - current-student exclusivity and bounded self-context/activity projections;
 - ready state, candidate-wide unresolved-Attempt exclusion, and active Session
@@ -167,15 +182,15 @@ Coordinated server work is still required for:
 - correction acknowledgement and ready-state sealing/manager-end completion;
 - agreement repairs where server domain, OpenAPI, and public projections differ.
 
-Desktop features depending on those additions must expose an unavailable or
-compatibility-gated state until the versioned contract exists.
+Desktop features depending on those areas must expose an unavailable or
+compatibility-gated state until their adapters match the verified server contract.
 
 ## Approved Desktop delivery tracks
 
 1. **Application/toolchain skeleton** — pinned Electron/esbuild/Forge graph,
    three entrypoints/manifests/preloads, tests, package inventory, fuses, and
    deterministic development/release commands.
-2. **Launch and identity** — public ping, server selection, hosted browser auth,
+2. **Launch and identity** — split public readiness and server selection, hosted browser auth,
    loopback, OS key/credential custody, DPoP authenticated transport, Session
    lifecycle, and AuthenticatedWindow bootstrap.
 3. **Authenticated product** — self-context, student exam activity,

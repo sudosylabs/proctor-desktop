@@ -26,7 +26,7 @@ failure outcome are explicit.
 
 ## 2. Choose the privileged owner
 
-Put ping/auth/key/credential/Session lifecycle in the privileged
+Put readiness/auth/key/credential/Session lifecycle in the privileged
 `DesktopIdentityCoordinator`. Put Attempt-scoped policy, posture, containment,
 continuity, activity/integrity delivery, and Workspace orchestration in the
 privileged `ExamSecurityCoordinator`. Keep Electron-main-only window effects,
@@ -39,10 +39,15 @@ fetcher, generic IPC/native host, or renderer-owned authorization path.
 
 ## 3. Implement readiness and method-agnostic auth
 
-Normalize one submitted server origin and consume only safe public ping fields:
-Institution identity, canonical origin, availability/retry, Desktop target
-range, and auth/realtime protocol ranges. After submission, project that state
-and `Change server`; enable sign-in only when ready/compatible.
+Normalize and pin one submitted server origin. Use public system ping for
+availability/retry and the server's build/realtime compatibility decision; use
+public discovery for Institution/origin identity and Desktop Authorization
+availability/protocol compatibility. Follow the split contract in the
+architecture, not an expanded ping or a locally recomputed build catalog.
+Bound requests and responses, reject redirects and origin mismatches, cancel and
+fence stale checks on server change, and expose only sanitized presentation.
+After submission, project that state and `Change server`; enable sign-in only
+when both checks pass and the privileged authorization owner is available.
 
 For Desktop Authorization generate state, PKCE S256, exact random loopback,
 Institution-specific installation public key/thumbprint, and release target.
@@ -150,7 +155,7 @@ guilt or grading conclusion.
 ## 9. Verify
 
 Use real coordinators behind in-memory ports, then Electron/private-protocol
-tests. Cover ping/auth/DPoP, Session rotation/revocation, self-context, Attempt
+tests. Cover ping/discovery/auth/DPoP, Session rotation/revocation, self-context, Attempt
 and lock transitions, containment order, window handoff, correction,
 Workspace/activity reconciliation, source gaps, spool failures, and sensitive-
 data absence.

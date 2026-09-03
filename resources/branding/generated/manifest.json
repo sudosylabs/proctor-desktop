@@ -1,0 +1,123 @@
+{
+  "generatedBy": "brand.assets",
+  "schemaVersion": 1,
+  "authority": "resources/branding/manifest.json",
+  "outputs": [
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-16.png",
+      "sha256": "8f5993e03f99558945f34b910387bd80245571b69c9985e7c1f3833ed5b2ae0d",
+      "bytes": 334,
+      "width": 16,
+      "height": 16
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-20.png",
+      "sha256": "6fc3dcaf8fe141b32f2e4f763602e39b376c3e9694dfdf0455b00b102da06d99",
+      "bytes": 370,
+      "width": 20,
+      "height": 20
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-24.png",
+      "sha256": "a6796d6fd4d2d4a5d0f6fe78b47f25189fe0e5a2da375aa96ad8f5647daccbef",
+      "bytes": 421,
+      "width": 24,
+      "height": 24
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-32.png",
+      "sha256": "e97ba976a6aa1a36e2f755e3ae1861b6924ca4a1280de2e917d47e23eee14693",
+      "bytes": 500,
+      "width": 32,
+      "height": 32
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-40.png",
+      "sha256": "773ca3122877a022b24ed9bab0de0c83b848a3cd04d2b0eb022a8c7c8a429ef5",
+      "bytes": 590,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-48.png",
+      "sha256": "274fbdf7905b8dbe071ebf9f42584710c55604168582b9e1fe5c752728699b41",
+      "bytes": 717,
+      "width": 48,
+      "height": 48
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-64.png",
+      "sha256": "aafc9e0321bda61e89599adab9c3b792d8d2f6b77000b8eee5f5c57a458ffa8e",
+      "bytes": 923,
+      "width": 64,
+      "height": 64
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-128.png",
+      "sha256": "dac6f99d3c41f3b1cbcfd8c2bcc386e630a4f60355e8c8fecfc25a207bf20a52",
+      "bytes": 1885,
+      "width": 128,
+      "height": 128
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-256.png",
+      "sha256": "d8ad30b93dcf7e4d4e137aa2bdeb41906df9d88c20233b229fa0b9e16a21ae2a",
+      "bytes": 3741,
+      "width": 256,
+      "height": 256
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-512.png",
+      "sha256": "fa2b5362811eadd94e073116e17db170d362411ac629e8c6e7ecec0edf92b0a8",
+      "bytes": 9173,
+      "width": 512,
+      "height": 512
+    },
+    {
+      "path": "resources/branding/generated/app-icon/proctor-app-icon-1024.png",
+      "sha256": "02eb84eff779ce8b98daff091e48c66e1a0199db69f400bbb6f6687c56dbb340",
+      "bytes": 25703,
+      "width": 1024,
+      "height": 1024
+    },
+    {
+      "path": "resources/branding/platform/win32/proctor.ico",
+      "sha256": "0d115517e69c20dfb58194667bbdeb9a9fbe4aee68c0d25c8bd26ea8beeac30a",
+      "bytes": 7730,
+      "format": "ico",
+      "sizes": [
+        16,
+        20,
+        24,
+        32,
+        40,
+        48,
+        64,
+        256
+      ]
+    },
+    {
+      "path": "resources/branding/platform/darwin/proctor.icns",
+      "sha256": "6bf244483b18e0cbb3ed6fbde5aa93a2f0d3ef0520e29b3e86b78796704df9e9",
+      "bytes": 42323,
+      "format": "icns",
+      "sizes": [
+        16,
+        32,
+        64,
+        128,
+        256,
+        512,
+        1024
+      ]
+    },
+    {
+      "path": "resources/branding/platform/linux/proctor.png",
+      "sha256": "fa2b5362811eadd94e073116e17db170d362411ac629e8c6e7ecec0edf92b0a8",
+      "bytes": 9173,
+      "format": "png",
+      "width": 512,
+      "height": 512
+    }
+  ]
+}

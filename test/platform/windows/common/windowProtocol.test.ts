@@ -45,6 +45,8 @@ suite('Product window protocol', () => {
 			{ kind: 'authenticated.joinAttempt', attemptId: 'a1' }
 		);
 		assert.throws(() => validateWindowIntent('launch', { kind: 'authenticated.signOut' }));
+		assert.throws(() => validateWindowIntent('launch', { kind: 'launch.signIn' }));
+		assert.throws(() => validateWindowIntent('launch', { kind: 'launch.changeServer' }));
 		assert.throws(() =>
 			validateWindowIntent('candidate', { kind: 'candidate.requestDeparture', extra: true })
 		);

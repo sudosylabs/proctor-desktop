@@ -3,7 +3,8 @@ import { createServer } from 'node:http';
 import { app, BrowserWindow, ipcMain, Menu, type IpcMain, type WebContents } from 'electron';
 import {
 	assertProductWindowIpcSender,
-	ElectronProductWindowFactory
+	ElectronProductWindowFactory,
+	lockedBrowserWindowOptions
 } from '../../src/prctr/platform/windows/electron-main/electronProductWindowFactory.js';
 import type {
 	ProductWindowDescriptor,
@@ -31,14 +32,36 @@ import { createTerminalComposition } from '../../src/prctr/code/electron-main/te
 import { createUserSettingsComposition } from '../../src/prctr/code/electron-main/userSettingsComposition.js';
 import { ExamSecurityIpcBridge } from '../../src/prctr/workbench/services/examSecurity/electron-main/examSecurityIpc.js';
 import { errorHandler, setUnexpectedErrorHandler } from '../../src/prctr/base/common/errors.js';
+import { DesktopIdentityCoordinator } from '../../src/prctr/platform/identity/electron-main/desktopIdentityCoordinator.js';
+import { verifyLaunchWindowScenario } from './launchWindowScenario.js';
 
 const timeout = setTimeout(() => fail(new Error('window skeleton timeout')), 15_000);
+// Keep this multi-scenario harness alive between the skeleton and real LaunchWindow.
+app.on('window-all-closed', () => {});
 void app.whenReady().then(run).catch(fail);
 
 async function run(): Promise<void> {
 	const root = app.getAppPath();
 	const html = join(root, 'index.html');
+	const launchIdentity = new DesktopIdentityCoordinator({
+		target: {
+			release: '1.0.0',
+			buildId: 'test-build',
+			platform: 'darwin',
+			architecture: 'arm64',
+			realtimeProtocol: 1,
+			authorizationProtocol: 1
+		},
+		allowDevelopmentLoopback: false,
+		transport: {
+			probe: async () => ({
+				system: { ok: false, reason: 'unreachable' },
+				discovery: { ok: false, reason: 'unreachable' }
+			})
+		}
+	});
 	const factory = new ElectronProductWindowFactory({
+		launchIdentity,
 		production: true,
 		rendererByKind: { launch: html, authenticated: html, candidate: html },
 		preloadByKind: {
@@ -127,7 +150,16 @@ async function run(): Promise<void> {
       const names = ['proctorLaunch', 'proctorAuthenticated', 'proctorCandidate'].filter(name => name in globalThis);
       const api = globalThis[names[0]];
       const bootstrap = await api.bootstrap();
-      if (bootstrap.kind === 'launch') await api.changeServer();
+      if (bootstrap.kind === 'launch') {
+        if ('changeServer' in api || 'signIn' in api) throw new Error('legacy Launch authority remains exposed');
+        const events = []; const subscription = api.identity.onDidChange(value => events.push(value));
+        if ((await api.identity.projection()).state !== 'selectingServer') throw new Error('missing initial Launch state');
+        await api.identity.selectServer('https://institution.example.test');
+        if ((await api.identity.projection()).state !== 'unreachable') throw new Error('missing checked Launch state');
+        let rejected = false; try { await api.identity.signIn(); } catch { rejected = true; }
+        if (!rejected) throw new Error('unchecked sign-in accepted');
+        await api.identity.changeServer(); subscription.dispose(); await api.exit();
+      }
       else if (bootstrap.kind === 'authenticated') await api.joinAttempt('attempt-2');
       else { await api.requestDeparture(); await api.browser.surface({ visible: true, focus: true, bounds: { x: -10, y: 10, width: 100000, height: 100000 } }); if (await api.browser.surfaceFocus() !== false) throw new Error('unexpected integrated browser focus'); }
       let browserSurfaceValidationRejected = false; if (bootstrap.kind === 'candidate') { try { await api.browser.surface({ visible: true, focus: false, bounds: { x: 0, y: 0, width: 10, height: 10 }, extra: true }); } catch { browserSurfaceValidationRejected = true; } }
@@ -181,9 +213,11 @@ async function run(): Promise<void> {
 	);
 	for (const bridge of bridges.reverse()) bridge.dispose();
 	for (const managed of managedWindows.reverse()) managed.destroy();
+	launchIdentity.dispose();
+	await verifyLaunchWindowScenario(root);
 	clearTimeout(timeout);
 	process.stdout.write(
-		`${JSON.stringify({ results, integratedBrowser, transactionalRollback, candidateSurface, candidateContentBounds, applicationMenuRemoved: Menu.getApplicationMenu() === null })}\n`
+		`${JSON.stringify({ results, integratedBrowser, transactionalRollback, candidateSurface, candidateContentBounds, runtimeIconForwarded: lockedBrowserWindowOptions('launch', 'preload.cjs', true, 'proctor.png').icon === 'proctor.png', applicationMenuRemoved: Menu.getApplicationMenu() === null })}\n`
 	);
 	app.exit(0);
 }

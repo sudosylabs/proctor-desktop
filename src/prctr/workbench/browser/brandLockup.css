@@ -1,0 +1,12 @@
+@layer workbench {
+	.prctr-brand-lockup {
+		display: inline-flex;
+		max-inline-size: 100%;
+	}
+	.prctr-brand-lockup img {
+		block-size: auto;
+		display: block;
+		inline-size: 160px;
+		max-inline-size: 100%;
+	}
+}

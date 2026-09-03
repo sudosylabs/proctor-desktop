@@ -1,4 +1,7 @@
 import { controlsFixture } from './sharedControlsFixture.ts';
+import { brandLockupFixture } from './brandLockupFixture.ts';
+import { runLaunchWindowTests } from '../launchWindowTests.ts';
+import { launchStates } from '../../../src/prctr/platform/identity/common/launchIdentity.ts';
 
 export interface ControlFixtureResult {
 	readonly states: number;
@@ -13,5 +16,18 @@ export interface ControlFixture {
 
 /** Development-only literal manifest. Production compositions cannot reach this test root. */
 export const controlExplorerFixtures: readonly ControlFixture[] = Object.freeze([
-	Object.freeze({ id: 'shared-controls', title: 'Shared controls', mount: controlsFixture })
+	Object.freeze({ id: 'shared-controls', title: 'Shared controls', mount: controlsFixture }),
+	Object.freeze({ id: 'brand-lockup', title: 'Brand lockup', mount: brandLockupFixture }),
+	Object.freeze({
+		id: 'launch-window',
+		title: 'LaunchWindow readiness',
+		mount: (host: HTMLElement): ControlFixtureResult => ({
+			states: launchStates.length,
+			disposable: { dispose() {} },
+			verify: async () => {
+				await runLaunchWindowTests(host.ownerDocument, host);
+				return 1;
+			}
+		})
+	})
 ]);

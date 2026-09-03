@@ -21,6 +21,7 @@ void test('three product windows use isolated capability-specific preloads and l
 		readonly candidateSurface: Record<string, any>;
 		readonly candidateContentBounds: Record<string, any>;
 		readonly applicationMenuRemoved: boolean;
+		readonly runtimeIconForwarded: boolean;
 	};
 	assert.deepEqual(
 		result.results.map((item) => ({
@@ -29,7 +30,7 @@ void test('three product windows use isolated capability-specific preloads and l
 			intent: item.intents[0]
 		})),
 		[
-			{ kind: 'launch', names: ['proctorLaunch'], intent: { kind: 'launch.changeServer' } },
+			{ kind: 'launch', names: ['proctorLaunch'], intent: { kind: 'launch.exit' } },
 			{
 				kind: 'authenticated',
 				names: ['proctorAuthenticated'],
@@ -62,6 +63,7 @@ void test('three product windows use isolated capability-specific preloads and l
 		});
 	}
 	assert.equal(result.applicationMenuRemoved, true);
+	assert.equal(result.runtimeIconForwarded, true);
 	assert.equal(
 		result.results.find((item) => item.kind === 'candidate')?.renderer
 			.browserSurfaceValidationRejected,

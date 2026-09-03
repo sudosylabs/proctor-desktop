@@ -4,6 +4,20 @@
   "activationPath": "src/prctr/code",
   "compositions": [
     {
+      "id": "launch-window-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/launchWindowComposition.ts",
+      "required": [
+        "src/prctr/platform/identity/electron-main",
+        "src/prctr/platform/windows/electron-main"
+      ],
+      "forbidden": [
+        "src/prctr/platform/identity/browser",
+        "src/prctr/platform/native/electron-utility"
+      ],
+      "allowedDynamicImports": []
+    },
+    {
       "id": "launch-window-renderer",
       "kind": "renderer",
       "entrypoint": "src/prctr/code/electron-browser/launch.main.ts",

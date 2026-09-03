@@ -9,9 +9,11 @@
     "../src/prctr/base/common/thenable.d.ts",
     "../src/prctr/**/node/**/*.ts",
     "../src/prctr/**/electron-main/**/*.ts",
+    "../test/platform/identity/electron-main/**/*.ts",
     "../test/electron/browserHarnessMain.ts",
     "../test/electron/browserHarness.real.test.ts",
     "../test/electron/windowSkeletonMain.ts",
+    "../test/electron/launchWindowScenario.ts",
     "../test/electron/windowSkeleton.real.test.ts",
     "../test/electron/securityUtility.real.test.ts",
     "../test/electron/securityUtilityMain.ts"

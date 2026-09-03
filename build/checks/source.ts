@@ -20,6 +20,7 @@ type Graph = {
 };
 
 const TS_EXTENSIONS = ['.ts', '.tsx', '.mts', '.cts'] as const;
+const STATIC_ASSET_EXTENSIONS = ['.png', '.svg'] as const;
 const isTs = (path: string): boolean =>
 	TS_EXTENSIONS.some((extension) => path.endsWith(extension)) && !path.endsWith('.d.ts');
 const isTest = (path: string, policy: SourcePolicy): boolean =>
@@ -138,17 +139,21 @@ export function analyzeSource(repository: Repository): Graph {
 		visit(source);
 		for (const imported of imports) {
 			const specifier = imported.specifier;
+			const staticAsset = STATIC_ASSET_EXTENSIONS.some((extension) =>
+				specifier.endsWith(extension)
+			);
 			if (
 				specifier.startsWith('.') &&
 				!specifier.endsWith('.js') &&
-				!specifier.endsWith('.css')
+				!specifier.endsWith('.css') &&
+				!staticAsset
 			)
 				diagnostics.push(
 					diagnostic(
 						checkId,
 						path,
 						`Local import ${specifier} lacks a .js or .css suffix.`,
-						'Use NodeNext-compatible .js imports or an owned .css import.',
+						'Use a NodeNext-compatible .js import, an owned .css import, or a declared static asset.',
 						imported.line
 					)
 				);
@@ -201,6 +206,21 @@ export function analyzeSource(repository: Repository): Graph {
 				const owners = cssOwnersMutable.get(target) ?? [];
 				owners.push(path);
 				cssOwnersMutable.set(target, owners);
+				continue;
+			}
+			if (staticAsset) {
+				edges.push({ from: path, to: target, typeOnly: false, dynamic: false });
+				const fromEnvironment = environment(path, policy);
+				if (!['browser', 'electron-browser'].includes(fromEnvironment))
+					diagnostics.push(
+						diagnostic(
+							checkId,
+							path,
+							`${fromEnvironment} source imports renderer asset ${specifier}.`,
+							'Keep renderer assets in browser-owned source and pass native package paths from composition roots.',
+							imported.line
+						)
+					);
 				continue;
 			}
 			edges.push({

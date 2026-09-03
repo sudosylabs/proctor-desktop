@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "authority": "Proctor shared brand assets",
+  "brandColors": {
+    "purple": "#5C00AA",
+    "ink": "#161616",
+    "white": "#FFFFFF"
+  },
+  "sources": {
+    "appIcon": {
+      "path": "resources/branding/source/app-icon/proctor-app-icon.svg",
+      "canonicalPath": "assets/brand/app-icon/proctor-app-icon.svg",
+      "sha256": "687c32db1ff55025fbb49a709dae4eabd2003eb63fba57aefe65a145909edebe"
+    },
+    "mark": {
+      "path": "resources/branding/source/mark/proctor-mark.svg",
+      "canonicalPath": "assets/brand/mark/proctor-mark.svg",
+      "sha256": "6b487126608c51d871c35f64b5cf488b6055f23b8c9c3d4fb637334368f246f3"
+    },
+    "markWhite": {
+      "path": "resources/branding/source/mark/proctor-mark-white.svg",
+      "canonicalPath": "assets/brand/mark/proctor-mark-white.svg",
+      "sha256": "2428d3e1d5b37e24f4300d87360cc5ac28121a5337bd63ccf947293010f88880"
+    },
+    "lockupLight": {
+      "path": "resources/branding/source/lockup/proctor-lockup.svg",
+      "canonicalPath": "assets/brand/lockup/proctor-lockup.svg",
+      "sha256": "135c80050a078b8dc18b3291c72b30b35165ad852851654cf7b13dd7fd16a5db"
+    },
+    "lockupDark": {
+      "path": "resources/branding/source/lockup/proctor-lockup-purple-white.svg",
+      "canonicalPath": "assets/brand/lockup/proctor-lockup-purple-white.svg",
+      "sha256": "78440824573f68970786fdc110859588d9f52dac2fd21a9df728f0a73fde6f82"
+    },
+    "lockupMonochrome": {
+      "path": "resources/branding/source/lockup/proctor-lockup-white.svg",
+      "canonicalPath": "assets/brand/lockup/proctor-lockup-white.svg",
+      "sha256": "13ca8d2b548f7c8ba1b40f8b19aeb69fcaae691c007736d93f97f0c1b5d05a4a"
+    }
+  },
+  "platforms": {
+    "windows": {
+      "format": "ico",
+      "sizes": [16, 20, 24, 32, 40, 48, 64, 256]
+    },
+    "macos": {
+      "format": "icns",
+      "sizes": [16, 32, 64, 128, 256, 512, 1024]
+    },
+    "linux": {
+      "format": "png",
+      "sizes": [512],
+      "releaseStatus": "development-only"
+    }
+  }
+}

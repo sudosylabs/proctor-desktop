@@ -12,6 +12,12 @@ export const WINDOW_CHANNELS = Object.freeze({
 	})
 } satisfies Record<ProductWindowKind, { readonly bootstrap: string; readonly intent: string }>);
 
+export const LAUNCH_IDENTITY_CHANNELS = Object.freeze({
+	projection: 'prctr:launch:identity:projection',
+	intent: 'prctr:launch:identity:intent',
+	changed: 'prctr:launch:identity:changed'
+});
+
 export const CANDIDATE_BROWSER_CHANNELS = Object.freeze({
 	projection: 'prctr:candidate:browser:projection',
 	intent: 'prctr:candidate:browser:intent',

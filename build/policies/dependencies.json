@@ -13,6 +13,7 @@
     "MIT",
     "MIT OR Apache-2.0",
     "MIT/Apache-2.0",
+    "MPL-2.0",
     "Unlicense OR MIT"
   ],
   "dependencies": [
@@ -412,6 +413,16 @@
       "localAlternative": "Maintaining local statfs, ifaddrs, flags, and target-ABI declarations would duplicate platform headers and increase unsafe layout risk.",
       "updateOwner": "native-capabilities",
       "removalOwner": "native-capabilities"
+    },
+    {
+      "package": "@resvg/resvg-wasm",
+      "version": "2.6.2",
+      "kind": "development",
+      "purpose": "Render the accepted Proctor app-icon SVG into deterministic cross-platform PNG layers used by the reviewed ICO and ICNS package assets.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/@resvg/resvg-wasm/v/2.6.2",
+      "license": "MPL-2.0",
+      "lifecycleScripts": "none"
     },
     {
       "package": "@vscode/codicons",

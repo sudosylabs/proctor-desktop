@@ -436,9 +436,24 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 				institutionOrigin: 'https://institution.example.test'
 			};
 		},
-		changeServer: async () => {},
-		signIn: async () => {
-			signInCalls++;
+		identity: {
+			projection: async () => ({
+				protocolVersion: 1,
+				revision: 1,
+				state: 'ready',
+				origin: 'https://institution.example.test',
+				institutionName: 'Example University',
+				developmentOrigin: false,
+				canSignIn: true,
+				authorizationAvailable: true
+			}),
+			onDidChange: () => ({ dispose() {} }),
+			selectServer: async () => {},
+			retry: async () => {},
+			changeServer: async () => {},
+			signIn: async () => {
+				signInCalls++;
+			}
 		},
 		exit: async () => {}
 	});
@@ -449,8 +464,10 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		launchSurface.closest('.prctr-workbench') !== null
 	)
 		throw new Error('Minimal LaunchWindow surface did not activate independently');
-	const launchActions = launchSurface.querySelectorAll<HTMLButtonElement>('button');
-	if (launchActions.length !== 3 || launchActions[0]?.disabled)
+	const launchActions = launchSurface.querySelectorAll<HTMLButtonElement>(
+		'.prctr-launch-window__actions button'
+	);
+	if (launchActions.length !== 4 || launchActions[0]?.disabled)
 		throw new Error('LaunchWindow did not render its executable actions');
 	launchActions[0]?.click();
 	await Promise.resolve();
@@ -463,8 +480,16 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		bootstrap: async () => {
 			throw new Error('failed');
 		},
-		changeServer: async () => {},
-		signIn: async () => {},
+		identity: {
+			projection: async () => {
+				throw new Error('unavailable');
+			},
+			onDidChange: () => ({ dispose() {} }),
+			selectServer: async () => {},
+			retry: async () => {},
+			changeServer: async () => {},
+			signIn: async () => {}
+		},
 		exit: async () => {}
 	}).then(
 		() => {
