@@ -61,8 +61,8 @@
       "upstreamPath": "src/vs/platform/instantiation/common/instantiation.ts",
       "upstreamBlob": "b879acb0ee8da5a824321bd1b9925219fe07af94",
       "category": "source",
-      "disposition": "copied",
-      "rationale": "Preserve service identifiers, constructor metadata, accessors, child scopes, and typed creation signatures.",
+      "disposition": "adapted",
+      "rationale": "Preserve service identifiers, constructor metadata, accessors, child scopes, and typed creation signatures. Type-only import annotations make declaration dependencies explicit under Proctor's executable-cycle checks; the implementation is otherwise preserved.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/instantiation/common/instantiation.ts",
       "localSha256": "014d3f720d88899c92919e8cfaab170d35d41dd2b78fb62e4e224ea1e91fa17d",
@@ -83,8 +83,8 @@
       "upstreamPath": "src/vs/platform/instantiation/common/serviceCollection.ts",
       "upstreamBlob": "13c489e8325510bd3c86e88bef22f1414cedfa0f",
       "category": "source",
-      "disposition": "copied",
-      "rationale": "Preserve the live service collection used by composition roots and child scopes.",
+      "disposition": "adapted",
+      "rationale": "Preserve the live service collection used by composition roots and child scopes. Type-only import annotations make declaration dependencies explicit under Proctor's executable-cycle checks; the implementation is otherwise preserved.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/instantiation/common/serviceCollection.ts",
       "localSha256": "c473a08d77b30bd76398fe9741b7713f049b0f9581ad12ad879a339271a33aa8",
@@ -199,6 +199,15 @@
         "src/prctr/platform/instantiation/common/extensions.ts",
         "src/prctr/platform/registry/common/platform.ts",
         "build/policies/compositions.json"
+      ],
+      "verificationRefs": ["source-composition-check", "platform-owner-tests"]
+    },
+    {
+      "id": "explicit-type-only-dependencies",
+      "summary": "Type-only import annotations preserve upstream compiler elision while making the runtime dependency graph explicit. These source edits are adaptations rather than undeclared copy transformations.",
+      "localPaths": [
+        "src/prctr/platform/instantiation/common/instantiation.ts",
+        "src/prctr/platform/instantiation/common/serviceCollection.ts"
       ],
       "verificationRefs": ["source-composition-check", "platform-owner-tests"]
     }

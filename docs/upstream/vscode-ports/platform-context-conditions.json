@@ -72,7 +72,7 @@
       "rationale": "Preserve root, scoped DOM, overlay, inherited-value, buffered-event, parent-update and deterministic disposal behavior for the executable workbench while excluding VS Code configuration-backed and inspect-command product inputs that Proctor's static namespaced context authority forbids.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/contextkey/browser/contextKeyService.ts",
-      "localSha256": "3c75c336ae684514f3efdd305e2284939a40ec14f8ccf99e3733512a35c2649a",
+      "localSha256": "879e400c18f565e2bc0889fc3870b69c6eff15721bee2a2884affb2b95ae1a98",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -132,9 +132,33 @@
       "upstreamPath": "src/vs/platform/contextkey/test/browser/contextkey.test.ts",
       "upstreamBlob": "4d3ddd26f0003d547c29d5c8ffcd6a2a019fadad",
       "category": "test",
-      "disposition": "excluded",
-      "rationale": "Browser-scoped service tests remain attached to the deferred DOM service and will be re-evaluated with that cluster rather than replaced by weaker common-only tests.",
-      "licenseRefs": ["vscode-mit"]
+      "disposition": "adapted",
+      "rationale": "Run all fourteen applicable upstream scoped-context, reparenting, equality, buffering and disposal cases in real Chromium, with added overlay and lifecycle regressions. Only the URI-marshalling command test is omitted: generic setContext and extension commands are excluded product inputs.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/browser/upstream/contextKeyService.test.ts",
+      "localSha256": "d2e71a01bb0f9a06788ef36e9483641e9bb43658ea07460d8b6fe04d9fcfa59a",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/objects.ts",
+      "upstreamBlob": "ee35796736403682dde7d9384c05135bb3decc77",
+      "category": "source",
+      "licenseRefs": ["vscode-mit"],
+      "disposition": "adapted",
+      "localPath": "src/prctr/platform/contextkey/common/contextKeyEquality.ts",
+      "localSha256": "1cdac372b1bb008621d336d46f4f77139eb4df66dfcdcd6bcd69f5015b8a0f43",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ],
+      "rationale": "Extract the complete dependency-free equals function used by Context.setValue and reparenting diffs, preserving array holes, enumerable inherited keys, null-prototype records, signed zero and NaN. Other object utilities are not dependencies of this context-key closure."
     }
   ],
   "licenses": [
@@ -175,6 +199,12 @@
         "docs/architecture/workbench.md"
       ],
       "verificationRefs": ["proctor-context-tests", "source-composition-check"]
+    },
+    {
+      "id": "single-root-scope-ownership",
+      "summary": "Each context forest belongs to one renderer root. Duplicate DOM scopes reject before allocation; reparenting rejects disposed scopes, foreign roots and cycles before changing ownership. Read-only overlays retain their parent's scope and inherited values during expression evaluation.",
+      "localPaths": ["src/prctr/platform/contextkey/browser/contextKeyService.ts"],
+      "verificationRefs": ["context-service-owner-tests"]
     }
   ],
   "verification": [
@@ -225,6 +255,12 @@
       "kind": "review",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Resolve the exact VS Code commit and verify every reviewed upstream blob against the canonical checkout."
+    },
+    {
+      "id": "context-service-owner-tests",
+      "kind": "test",
+      "path": "test/browser/upstream/contextKeyService.test.ts",
+      "obligation": "Run the applicable upstream browser service suite and regressions for scoped/nested overlays, reparenting, duplicate-scope leak prevention, root/cycle guards, invalid DOM context isolation, and upstream value equality."
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { Emitter } from '../../src/prctr/base/common/event.ts';
+import { Emitter, Event as ServiceEvent } from '../../src/prctr/base/common/event.ts';
 import { DisposableStore } from '../../src/prctr/base/common/lifecycle.ts';
 import { KeyCode, KeyMod } from '../../src/prctr/base/common/keyCodes.ts';
 import { isMacintosh } from '../../src/prctr/base/common/platform.ts';
@@ -14,6 +14,7 @@ import {
 import { BrowserKeybindingService } from '../../src/prctr/workbench/services/keybinding/browser/browserKeybindingService.ts';
 
 export async function runBrowserKeybindingServiceTests(document: Document): Promise<void> {
+	verifySchemaContributionOwnership(document);
 	const disposables = new DisposableStore();
 	const willExecute = disposables.add(new Emitter<ICommandEvent>());
 	const didExecute = disposables.add(new Emitter<ICommandEvent>());
@@ -80,4 +81,53 @@ export async function runBrowserKeybindingServiceTests(document: Document): Prom
 		throw new Error('Focus loss did not release hold mode');
 	disposables.dispose();
 	await disposalHold;
+}
+
+function verifySchemaContributionOwnership(document: Document): void {
+	const disposables = new DisposableStore();
+	const changes = new Emitter<void>();
+	try {
+		const context = disposables.add(new ContextKeyService());
+		const commands: ICommandService = {
+			_serviceBrand: undefined,
+			onWillExecuteCommand: ServiceEvent.None,
+			onDidExecuteCommand: ServiceEvent.None,
+			executeCommand: async () => undefined
+		};
+		const service = disposables.add(
+			new BrowserKeybindingService(document, context, commands, {
+				status: () => ({ close() {} }),
+				warn: (error) => {
+					throw error;
+				}
+			})
+		);
+		const contribution = { onDidChange: changes.event, getSchemaAdditions: () => [] };
+		const removed = disposables.add(service.registerSchemaContribution(contribution));
+		if (!changes.hasListeners()) throw new Error('Schema contribution did not subscribe');
+		removed.dispose();
+		if (changes.hasListeners())
+			throw new Error('Removing a schema contribution leaked its listener');
+
+		const first = disposables.add(service.registerSchemaContribution(contribution));
+		const second = disposables.add(service.registerSchemaContribution(contribution));
+		let updates = 0;
+		disposables.add(service.onDidUpdateKeybindings(() => updates++));
+		first.dispose();
+		changes.fire();
+		if (updates !== 1)
+			throw new Error(
+				'Schema contribution registrations did not retain independent ownership'
+			);
+		service.dispose();
+		if (changes.hasListeners())
+			throw new Error('Keybinding service disposal leaked schema contribution listeners');
+		second.dispose();
+		changes.fire();
+		if (updates !== 1)
+			throw new Error('Disposed schema contribution still reached the keybinding service');
+	} finally {
+		disposables.dispose();
+		changes.dispose();
+	}
 }

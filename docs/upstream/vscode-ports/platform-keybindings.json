@@ -137,8 +137,8 @@
       "upstreamPath": "src/vs/platform/keybinding/common/keybindingsRegistry.ts",
       "upstreamBlob": "0d95d0bf798d000ff4f7037d0e97e866682f7c4f",
       "category": "registration",
-      "disposition": "copied",
-      "rationale": "Preserve platform binding, primary/secondary ordering, rule disposal, command pairing, caching, and exact default item construction; Proctor product callers use a namespaced wrapper and never populate extension keybindings.",
+      "disposition": "adapted",
+      "rationale": "Preserve platform binding, primary/secondary ordering, rule disposal, command pairing, caching, and exact default item construction; Proctor product callers use a namespaced wrapper and never populate extension keybindings. Proctor adds registry change events for live static resolver invalidation on registration and disposal; this runtime adaptation is not an exact copy.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/keybinding/common/keybindingsRegistry.ts",
       "localSha256": "eb122239f6bfb304544950547f193ea056511ff700241c806d48a780a2209867",
@@ -171,10 +171,10 @@
       "upstreamBlob": "5db49b2be12174cf13b0bc95d3f7bc7bb9a1a972",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Preserve document keydown and keyup ownership, StandardKeyboardEvent normalization, default-item resolution, context-aware dispatch, keybinding hold mode, chords, single-modifier handling, prevention, lookup, feedback and resolver invalidation for statically packaged Proctor bindings while excluding extension and filesystem user-keybinding product authority.",
+      "rationale": "Preserve document keydown and keyup ownership, StandardKeyboardEvent normalization, default-item resolution, context-aware dispatch, keybinding hold mode, chords, single-modifier handling, prevention, lookup, feedback, schema-listener ownership and resolver invalidation for statically packaged Proctor bindings while excluding extension and filesystem user-keybinding product authority.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/services/keybinding/browser/browserKeybindingService.ts",
-      "localSha256": "47ace26c93e07cf463986f068164b8218c30bb166cfb5f11906a5af6d00767cc",
+      "localSha256": "b881b8931b0ac403ac95fe4ce4d01b73b1622d734d0ef9e273ef9b6945c7aa62",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -319,6 +319,12 @@
         "test/platform/keybinding/common/upstream/abstractKeybindingService.test.ts"
       ],
       "verificationRefs": ["dispatch-owner-tests"]
+    },
+    {
+      "id": "static-registry-invalidation",
+      "summary": "The registry emits after each complete static registration or disposal so renderer resolvers invalidate without extension-host notifications. Sorting, caching, platform variants, and rule semantics remain upstream behavior.",
+      "localPaths": ["src/prctr/platform/keybinding/common/keybindingsRegistry.ts"],
+      "verificationRefs": ["proctor-keybinding-tests", "browser-keybinding-service-tests"]
     }
   ],
   "verification": [
@@ -350,7 +356,7 @@
       "id": "browser-keybinding-service-tests",
       "kind": "test",
       "path": "test/browser/browserKeybindingServiceTests.ts",
-      "obligation": "Verify hold mode starts only during matching dispatch, suppresses repeated keydown, and releases on keyup, focus loss, and disposal in real Chromium."
+      "obligation": "Verify hold mode starts only during matching dispatch, suppresses repeated keydown, and releases on keyup, focus loss, and disposal in real Chromium. Verify independent schema contribution registrations detach their listeners on removal and service disposal."
     },
     {
       "id": "source-composition-check",

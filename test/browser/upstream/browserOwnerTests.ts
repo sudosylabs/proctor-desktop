@@ -1,5 +1,6 @@
 import './dom.test.ts';
 import './keyboardEvent.test.ts';
+import './contextKeyService.test.ts';
 import { runRegisteredBrowserTests } from './testAdapter.ts';
 
 export async function runBrowserInteractionOwnerTests(): Promise<number> {

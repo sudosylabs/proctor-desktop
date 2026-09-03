@@ -4,12 +4,8 @@
 
 import { addDisposableListener } from '../../base/browser/dom.js';
 import { KeyCode, KeyMod } from '../../base/common/keyCodes.js';
-import {
-	MenuId,
-	MenuRegistry,
-	MenuService,
-	type ResolvedMenuAction
-} from '../../platform/actions/common/menu.js';
+import { MenuId, type Menu, type ResolvedMenuAction } from '../../platform/actions/common/menu.js';
+import { MenuService } from '../../platform/actions/common/menuService.js';
 import { ICommandService } from '../../platform/commands/common/commands.js';
 import { ContextKeyService } from '../../platform/contextkey/browser/contextKeyService.js';
 import {
@@ -61,7 +57,9 @@ export function activateWorkbenchKernel(context: WorkbenchBootstrapContext): voi
 	const instantiationService = context.disposables.add(new InstantiationService(services, true));
 	const commandService = context.disposables.add(new CommandService(instantiationService));
 	services.set(ICommandService, commandService);
-	const menuService = new MenuService(commandService, context.localization);
+	const menuService = context.disposables.add(
+		new MenuService(commandService, context.localization)
+	);
 	const themeService = context.getService<BrowserThemeService>(BROWSER_THEME_SERVICE);
 	const lifecycle = context.getService<WorkbenchLifecycleService>(WORKBENCH_LIFECYCLE_SERVICE);
 
@@ -133,22 +131,22 @@ export function activateWorkbenchKernel(context: WorkbenchBootstrapContext): voi
 	);
 	services.set(IKeybindingService, keybindingService);
 
+	const titleMenu = context.disposables.add(
+		menuService.createMenu(MenuId.WorkbenchTitle, contextKeyService)
+	);
 	const updateResetAction = (): void => {
-		const action = findAction(
-			menuService,
-			MenuId.WorkbenchTitle,
-			RESET_LAYOUT_COMMAND_ID,
-			contextKeyService.getContext(context.shell.element)
-		);
+		const action = findAction(titleMenu, RESET_LAYOUT_COMMAND_ID);
 		context.shell.setResetLayoutAction(async () => {
 			await action?.run();
 		}, action?.enabled === true);
 	};
 	updateResetAction();
-	context.disposables.add(contextKeyService.onDidChangeContext(updateResetAction));
+	context.disposables.add(titleMenu.onDidChange(updateResetAction));
+	// Modal gating remains synchronous; ordinary menu invalidation is deliberately batched.
+	const modalKeys = new Set([WorkbenchModalContext.key]);
 	context.disposables.add(
-		MenuRegistry.onDidChangeMenu((event) => {
-			if (event.has(MenuId.WorkbenchTitle)) updateResetAction();
+		contextKeyService.onDidChangeContext((event) => {
+			if (event.affectsSome(modalKeys)) updateResetAction();
 		})
 	);
 
@@ -203,13 +201,8 @@ function isWorkbenchPart(value: string | undefined): value is Exclude<WorkbenchP
 		)
 	);
 }
-function findAction(
-	menuService: MenuService,
-	menuId: MenuId,
-	id: string,
-	menuContext: Parameters<MenuService['getActions']>[1]
-): ResolvedMenuAction | undefined {
-	for (const [, actions] of menuService.getActions(menuId, menuContext))
+function findAction(menu: Menu, id: string): ResolvedMenuAction | undefined {
+	for (const [, actions] of menu.getActions())
 		for (const action of actions)
 			if (action.id === id && 'run' in action) return action as ResolvedMenuAction;
 	return undefined;

@@ -28,8 +28,8 @@
       "upstreamPath": "src/vs/base/common/codicons.ts",
       "upstreamBlob": "e73173e2d5e128e7bc4c0bc6a47c40f658bd7551",
       "category": "source",
-      "disposition": "copied",
-      "rationale": "Preserve the complete built-in and derived Codicon catalog composition.",
+      "disposition": "adapted",
+      "rationale": "Preserve the complete built-in and derived Codicon catalog composition. Type-only import annotations make declaration dependencies explicit under Proctor's executable-cycle checks; the implementation is otherwise preserved.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/codicons.ts",
       "localSha256": "cd0c6b860483937a15ec8c9fea9e358a3034aa1f6f3cde4e7fa843904dc4fe35",
@@ -50,8 +50,8 @@
       "upstreamPath": "src/vs/base/common/codiconsUtil.ts",
       "upstreamBlob": "74177b0e760afd615bd13270b0cea2fa8816fd54",
       "category": "source",
-      "disposition": "copied",
-      "rationale": "Preserve registration, aliases, validation, and font-character lookup for the complete library.",
+      "disposition": "adapted",
+      "rationale": "Preserve registration, aliases, validation, and font-character lookup for the complete library. Type-only import annotations make declaration dependencies explicit under Proctor's executable-cycle checks; the implementation is otherwise preserved.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/codiconsUtil.ts",
       "localSha256": "07a6640894c2276c1631c35c59d11d172677d68560859feb2aae07331456f53c",
@@ -134,6 +134,12 @@
         "src/prctr/platform/theme/browser/semanticIcon.css"
       ],
       "verificationRefs": ["real-browser-icon-test", "css-ownership-check"]
+    },
+    {
+      "id": "explicit-type-only-dependencies",
+      "summary": "Type-only import annotations preserve upstream compiler elision while making the runtime dependency graph explicit. These source edits are adaptations rather than undeclared copy transformations.",
+      "localPaths": ["src/prctr/base/common/codicons.ts", "src/prctr/base/common/codiconsUtil.ts"],
+      "verificationRefs": ["semantic-registry-tests", "real-browser-icon-test"]
     }
   ],
   "verification": [

@@ -160,8 +160,10 @@ native/Cargo.lock
 /src/prctr/editor/common/model/pieceTreeTextBuffer/rbTreeBase.ts
 /src/prctr/editor/common/model/textModelSearch.ts
 /src/prctr/platform/actions/common/menu.ts
+/src/prctr/platform/actions/common/menuService.ts
 /src/prctr/platform/commands/common/commands.ts
 /src/prctr/platform/contextkey/browser/contextKeyService.ts
+/src/prctr/platform/contextkey/common/contextKeyEquality.ts
 /src/prctr/platform/contextkey/common/contextkey.ts
 /src/prctr/platform/contextkey/common/scanner.ts
 /src/prctr/platform/executionEnvironment/common/terminalProtocol.ts
@@ -201,6 +203,7 @@ native/Cargo.lock
 /src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts
 /src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts
 /src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.ts
+/src/prctr/workbench/services/actions/common/proctorActions.ts
 /src/prctr/workbench/services/commands/common/commandService.ts
 /src/prctr/workbench/services/executionEnvironment/common/remoteTerminalModel.ts
 /src/prctr/workbench/services/integratedBrowser/common/integratedBrowserCoordinator.ts
@@ -252,6 +255,7 @@ native/Cargo.lock
 /test/base/common/upstream/virtualScheduling/virtualClock.ts
 /test/base/common/upstream/virtualScheduling/virtualScheduling.test.ts
 /test/base/common/upstream/virtualScheduling/virtualTimeApi.ts
+/test/browser/upstream/contextKeyService.test.ts
 /test/browser/upstream/dom.test.ts
 /test/browser/upstream/keyboardEvent.test.ts
 /test/editor/common/upstream/core/range.test.ts

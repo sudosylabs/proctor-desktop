@@ -6,6 +6,7 @@
 
 import { Event, PauseableEmitter } from '../../../base/common/event.js';
 import { Disposable, MutableDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
+import { equals } from '../common/contextKeyEquality.js';
 import {
 	type ContextKeyExpression,
 	type ContextKeyValue,
@@ -25,7 +26,7 @@ export class Context implements IContext {
 	#parent: Context | null;
 	constructor(readonly id: number, parent: Context | null) { this.#parent = parent; this.#value._contextId = id; }
 	get value(): Readonly<Record<string, ContextKeyValue>> { return { ...this.#value }; }
-	setValue(key: string, value: ContextKeyValue): boolean { if (contextValueEquals(this.#value[key], value)) return false; this.#value[key] = value; return true; }
+	setValue(key: string, value: ContextKeyValue): boolean { if (equals(this.#value[key], value)) return false; this.#value[key] = value; return true; }
 	removeValue(key: string): boolean { if (!(key in this.#value)) return false; delete this.#value[key]; return true; }
 	getValue<T extends ContextKeyValue>(key: string): T | undefined { const value = this.#value[key]; return value === undefined && this.#parent !== null ? this.#parent.getValue<T>(key) : value as T | undefined; }
 	updateParent(parent: Context): void { this.#parent = parent; }
@@ -101,8 +102,8 @@ class ScopedContextKeyService extends AbstractContextKeyService {
 	#parent: AbstractContextKeyService;
 	readonly #parentChangeListener = this._register(new MutableDisposable<IDisposable>());
 	constructor(parent: AbstractContextKeyService, private readonly target: IContextKeyServiceTarget) {
-		super(parent.createChildContext()); this.#parent = parent; this.#listenToParent();
 		if (target.hasAttribute(KEYBINDING_CONTEXT_ATTR)) throw new Error('Element already owns a scoped keybinding context');
+		super(parent.createChildContext()); this.#parent = parent; this.#listenToParent();
 		target.setAttribute(KEYBINDING_CONTEXT_ATTR, String(this.contextId));
 	}
 	#listenToParent(): void { this.#parentChangeListener.value = this.#parent.onDidChangeContext(event => { const local = this.#parent.getContextValuesContainer(this.contextId).value; if (!event.allKeysContainedIn(new Set(Object.keys(local)))) this.changeEmitter.fire(event); }); }
@@ -110,9 +111,17 @@ class ScopedContextKeyService extends AbstractContextKeyService {
 	createChildContext(parentContextId = this.contextId): number { this.assertLive(); return this.#parent.createChildContext(parentContextId); }
 	disposeContext(contextId: number): void { this.#parent.disposeContext(contextId); }
 	updateParent(parentContextKeyService: IContextKeyService): void {
+		this.assertLive();
 		if (!(parentContextKeyService instanceof AbstractContextKeyService)) throw new TypeError('Scoped context parents must be mutable context services');
 		if (this.#parent === parentContextKeyService) return;
-		const container = this.#parent.getContextValuesContainer(this.contextId); const before = container.collectAllValues(); this.#parent = parentContextKeyService; this.#listenToParent(); container.updateParent(this.#parent.getContextValuesContainer(this.#parent.contextId)); const after = container.collectAllValues(); const changed = distinctKeys(before, after); if (changed.length > 0) this.changeEmitter.fire(new ArrayContextKeyChangeEvent(changed));
+		const container = this.#parent.getContextValuesContainer(this.contextId);
+		if (container === NullContext.instance || parentContextKeyService.getContextValuesContainer(this.contextId) !== container) {
+			throw new Error('Scoped contexts must remain in the same live root context service');
+		}
+		for (let ancestor: AbstractContextKeyService = parentContextKeyService; ancestor instanceof ScopedContextKeyService; ancestor = ancestor.#parent) {
+			if (ancestor === this) throw new Error('Scoped context parent cycle');
+		}
+		const before = container.collectAllValues(); this.#parent = parentContextKeyService; this.#listenToParent(); container.updateParent(this.#parent.getContextValuesContainer(this.#parent.contextId)); const after = container.collectAllValues(); const changed = distinctKeys(before, after); this.changeEmitter.fire(new ArrayContextKeyChangeEvent(changed));
 	}
 	override dispose(): void { if (this.disposed) return; this.#parentChangeListener.clear(); this.#parent.disposeContext(this.contextId); this.target.removeAttribute(KEYBINDING_CONTEXT_ATTR); super.dispose(); }
 }
@@ -125,10 +134,12 @@ class OverlayContextKeyService implements IContextKeyService {
 	declare readonly _serviceBrand: undefined;
 	readonly #overlay: ReadonlyMap<string, ContextKeyValue>;
 	constructor(private readonly parent: AbstractContextKeyService | OverlayContextKeyService, overlay: Iterable<[string, ContextKeyValue]>) { this.#overlay = new Map(overlay); }
+	get contextId(): number { return this.parent.contextId; }
 	get onDidChangeContext(): Event<IContextKeyChangeEvent> { return this.parent.onDidChangeContext; }
 	bufferChangeEvents(callback: Function): void { this.parent.bufferChangeEvents(callback); }
 	createKey<T extends ContextKeyValue>(): IContextKey<T> { throw new Error('Overlay contexts are read-only'); }
-	contextMatchesRules(rules: ContextKeyExpression | undefined): boolean { return rules?.evaluate(this.getContext(null)) ?? true; }
+	getContextValuesContainer(contextId: number): IContext { return new OverlayContext(this.parent.getContextValuesContainer(contextId), this.#overlay); }
+	contextMatchesRules(rules: ContextKeyExpression | undefined): boolean { return rules?.evaluate(this.getContextValuesContainer(this.contextId)) ?? true; }
 	getContextKeyValue<T>(key: string): T | undefined { return (this.#overlay.has(key) ? this.#overlay.get(key) : this.parent.getContextKeyValue<T>(key)) as T | undefined; }
 	createScoped(): IScopedContextKeyService { throw new Error('Overlay contexts cannot own DOM scopes'); }
 	createOverlay(overlay: Iterable<[string, ContextKeyValue]> = []): IContextKeyService { return new OverlayContextKeyService(this, overlay); }
@@ -136,11 +147,13 @@ class OverlayContextKeyService implements IContextKeyService {
 	updateParent(): void { throw new Error('Overlay contexts cannot change parent'); }
 }
 
-function findContextId(target: IContextKeyServiceTarget | null): number { let current = target; while (current !== null) { const value = current.getAttribute(KEYBINDING_CONTEXT_ATTR); if (value !== null) { const parsed = Number.parseInt(value, 10); return Number.isSafeInteger(parsed) ? parsed : 0; } current = current.parentElement; } return 0; }
-function distinctKeys(left: Readonly<Record<string, ContextKeyValue>>, right: Readonly<Record<string, ContextKeyValue>>): readonly string[] { return [...new Set([...Object.keys(left), ...Object.keys(right)])].filter(key => !contextValueEquals(left[key], right[key])); }
-function contextValueEquals(left: ContextKeyValue, right: ContextKeyValue): boolean {
-	if (Object.is(left, right)) return true;
-	if (left === null || right === null || typeof left !== 'object' || typeof right !== 'object') return false;
-	if (Array.isArray(left) || Array.isArray(right)) return Array.isArray(left) && Array.isArray(right) && left.length === right.length && left.every((value, index) => contextValueEquals(value, right[index]));
-	const leftKeys = Object.keys(left); const rightKeys = Object.keys(right); return leftKeys.length === rightKeys.length && leftKeys.every(key => Object.hasOwn(right, key) && contextValueEquals(left[key], right[key]));
+function findContextId(target: IContextKeyServiceTarget | null): number {
+	for (let current = target; current !== null; current = current.parentElement) {
+		if (current.hasAttribute(KEYBINDING_CONTEXT_ATTR)) {
+			const value = current.getAttribute(KEYBINDING_CONTEXT_ATTR);
+			return value ? Number.parseInt(value, 10) : NaN;
+		}
+	}
+	return 0;
 }
+function distinctKeys(left: Readonly<Record<string, ContextKeyValue>>, right: Readonly<Record<string, ContextKeyValue>>): readonly string[] { return [...new Set([...Object.keys(left), ...Object.keys(right)])].filter(key => !equals(left[key], right[key])); }

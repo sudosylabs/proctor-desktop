@@ -90,8 +90,10 @@ empty.
 
 VS Code port validation is deliberately split. `check:provenance` is offline
 and belongs to the normal gate. `audit:upstream` takes an explicit VS Code
-checkout, resolves the recorded commit, and verifies every recorded upstream
-blob. Intake review still owns transformations, closure, and notices; this
+checkout, resolves the recorded commit, verifies every recorded upstream
+blob, and reconstructs copied files using the admitted mechanical transformations.
+An undeclared source edit fails rather than passing merely because its local
+digest was updated. Intake review still owns adapted behavior, closure, and notices; this
 checkout-dependent work is never hidden inside the local check.
 
 ## Dependency and CI discipline

@@ -4,6 +4,7 @@ type Assert = {
 	deepStrictEqual(actual: unknown, expected: unknown, message?: string): void;
 	ok(value: unknown, message?: string): asserts value;
 	doesNotThrow(body: () => unknown, message?: string): void;
+	throws(body: () => unknown, message?: string): void;
 };
 function fail(message: string): never {
 	throw new Error(message);
@@ -35,3 +36,11 @@ assert.doesNotThrow = (body, message) => {
 	}
 };
 export default assert;
+assert.throws = (body, message) => {
+	try {
+		body();
+	} catch {
+		return;
+	}
+	fail(message ?? 'Expected the callback to throw.');
+};

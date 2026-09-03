@@ -1,14 +1,16 @@
 /*---------------------------------------------------------------------------------------------
- *  Copyright (c) Proctor contributors. All rights reserved.
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+// @proctor-vscode-port actions-menus
 
-import { Separator, SubmenuAction, type IAction } from '../../../base/common/actions.js';
-import { Emitter, MicrotaskEmitter, type Event } from '../../../base/common/event.js';
+import { SubmenuAction, type IAction } from '../../../base/common/actions.js';
+import { MicrotaskEmitter, type Event } from '../../../base/common/event.js';
 import type { LocalizationContext, MessageDescriptor } from '../../../base/common/localization.js';
-import { Disposable, DisposableStore, markAsSingleton, toDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
+import { DisposableStore, markAsSingleton, toDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import { LinkedList } from '../../../base/common/linkedList.js';
-import type { ICommandService } from '../../commands/common/commands.js';
-import type { ContextKeyExpression, IContext } from '../../contextkey/common/contextkey.js';
+import type { ICommandMetadata, ICommandService } from '../../commands/common/commands.js';
+import type { ContextKeyExpression, IContextKeyService } from '../../contextkey/common/contextkey.js';
 import type { SemanticIconId } from '../../theme/common/semanticIcons.js';
 
 export class MenuId {
@@ -40,6 +42,7 @@ export interface MenuCommand {
 	readonly shortTitle?: MessageDescriptor;
 	readonly tooltip?: MessageDescriptor;
 	readonly icon?: SemanticIconId;
+	readonly metadata?: ICommandMetadata;
 	readonly precondition?: ContextKeyExpression;
 	readonly toggled?: MenuCommandToggle;
 }
@@ -127,6 +130,7 @@ class StaticMenuRegistry {
 	getCommands(): ReadonlyMap<string, MenuCommand> { return new Map(this.commands); }
 
 	appendMenuItem(id: MenuId, item: MenuContribution): IDisposable {
+		assertMenuId(id);
 		assertContribution(item);
 		let items = this.menuItems.get(id);
 		if (items === undefined) {
@@ -144,8 +148,13 @@ class StaticMenuRegistry {
 
 	appendMenuItems(items: Iterable<{ readonly id: MenuId; readonly item: MenuContribution }>): IDisposable {
 		const result = new DisposableStore();
-		for (const { id, item } of items) result.add(this.appendMenuItem(id, item));
-		return result;
+		try {
+			for (const { id, item } of items) result.add(this.appendMenuItem(id, item));
+			return result;
+		} catch (error) {
+			result.dispose();
+			throw error;
+		}
 	}
 
 	getMenuItems(id: MenuId): MenuContribution[] {
@@ -160,34 +169,28 @@ class StaticMenuRegistry {
 
 export const MenuRegistry = new StaticMenuRegistry();
 
-export class MenuVisibilityState extends Disposable {
-	private readonly values = new Map<string, boolean>();
-	private readonly changeEmitter = this._register(new Emitter<MenuId>());
-	readonly onDidChange: Event<MenuId> = this.changeEmitter.event;
+export interface MenuActionOptions {
+	readonly arg?: unknown;
+	readonly args?: readonly unknown[];
+	readonly shouldForwardArgs?: boolean;
+	readonly renderShortTitle?: boolean;
+}
 
-	isHidden(menu: MenuId, itemId: string, hiddenByDefault: boolean): boolean {
-		return this.values.get(`${menu.id}/${itemId}`) ?? hiddenByDefault;
-	}
+export interface MenuCreateOptions {
+	readonly emitEventsForSubmenuChanges?: boolean;
+	readonly eventDebounceDelay?: number;
+}
 
-	setHidden(menu: MenuId, itemId: string, hidden: boolean): void {
-		const key = `${menu.id}/${itemId}`;
-		if (this.values.get(key) === hidden) return;
-		this.values.set(key, hidden);
-		this.changeEmitter.fire(menu);
-	}
+export interface MenuChangeEvent {
+	readonly menu: Menu;
+	readonly isStructuralChange: boolean;
+	readonly isEnablementChange: boolean;
+	readonly isToggleChange: boolean;
+}
 
-	reset(menu?: MenuId): void {
-		if (menu === undefined) {
-			if (this.values.size === 0) return;
-			const changed = new Set([...this.values.keys()].map(key => allMenuIds.find(id => key.startsWith(`${id.id}/`))).filter((id): id is MenuId => id !== undefined));
-			this.values.clear();
-			for (const id of changed) this.changeEmitter.fire(id);
-			return;
-		}
-		let changed = false;
-		for (const key of [...this.values.keys()]) if (key.startsWith(`${menu.id}/`)) changed = this.values.delete(key) || changed;
-		if (changed) this.changeEmitter.fire(menu);
-	}
+export interface Menu extends IDisposable {
+	readonly onDidChange: Event<MenuChangeEvent>;
+	getActions(options?: MenuActionOptions): readonly MenuActionGroup[];
 }
 
 export interface ResolvedMenuAction extends IAction {
@@ -195,7 +198,7 @@ export interface ResolvedMenuAction extends IAction {
 	readonly alt?: ResolvedMenuAction;
 }
 
-class CommandMenuAction implements ResolvedMenuAction {
+export class CommandMenuAction implements ResolvedMenuAction {
 	readonly id: string;
 	readonly label: string;
 	readonly tooltip: string;
@@ -208,23 +211,33 @@ class CommandMenuAction implements ResolvedMenuAction {
 	constructor(
 		command: MenuCommand,
 		alt: MenuCommand | undefined,
-		context: IContext,
+		context: IContextKeyService,
 		localization: LocalizationContext,
 		private readonly commandService: ICommandService,
-		private readonly forwardedArguments: readonly unknown[]
+		private readonly options: MenuActionOptions | undefined
 	) {
 		this.id = command.id;
-		this.enabled = command.precondition?.evaluate(context) ?? true;
+		this.enabled = context.contextMatchesRules(command.precondition);
 		const toggled = command.toggled;
-		this.checked = toggled === undefined ? undefined : toggled.condition.evaluate(context);
-		this.label = localize(localization, this.checked && toggled?.title ? toggled.title : command.title);
+		this.checked = toggled === undefined ? undefined : context.contextMatchesRules(toggled.condition);
+		const title = options?.renderShortTitle && command.shortTitle ? command.shortTitle : command.title;
+		this.label = localize(localization, this.checked && toggled?.title ? toggled.title : title);
 		this.tooltip = localizeOptional(localization, this.checked && toggled?.tooltip ? toggled.tooltip : command.tooltip);
 		this.semanticIconId = this.checked && toggled?.icon ? toggled.icon : command.icon;
-		this.alt = alt === undefined ? undefined : new CommandMenuAction(alt, undefined, context, localization, commandService, forwardedArguments);
+		this.alt = alt === undefined ? undefined : new CommandMenuAction(alt, undefined, context, localization, commandService, options);
 	}
 
 	run(...arguments_: unknown[]): Promise<unknown> {
-		return this.commandService.executeCommand(this.id, ...this.forwardedArguments, ...arguments_);
+		let runArgs: unknown[] = [];
+		if (this.options?.args) {
+			runArgs = [...this.options.args];
+		} else if (this.options?.arg) {
+			runArgs = [this.options.arg];
+		}
+		if (this.options?.shouldForwardArgs) {
+			runArgs.push(...arguments_);
+		}
+		return this.commandService.executeCommand(this.id, ...runArgs);
 	}
 }
 
@@ -241,67 +254,6 @@ export class ResolvedSubmenuAction extends SubmenuAction {
 
 export type MenuActionGroup = readonly [group: string, actions: readonly (ResolvedMenuAction | ResolvedSubmenuAction)[]];
 
-export class MenuService {
-	constructor(
-		private readonly commandService: ICommandService,
-		private readonly localization: LocalizationContext,
-		private readonly visibility = new MenuVisibilityState()
-	) { }
-
-	getActions(id: MenuId, context: IContext, forwardedArguments: readonly unknown[] = []): readonly MenuActionGroup[] {
-		return this.resolve(id, context, forwardedArguments, new Set());
-	}
-
-	private resolve(id: MenuId, context: IContext, forwardedArguments: readonly unknown[], stack: Set<MenuId>): readonly MenuActionGroup[] {
-		if (stack.has(id)) throw new Error(`Menu cycle detected at ${id.id}`);
-		stack.add(id);
-		try {
-			const visible = MenuRegistry.getMenuItems(id).filter(item => {
-				if (item.when !== undefined && !item.when.evaluate(context)) return false;
-				const itemId = isMenuItem(item) ? item.command.id : item.submenu.id;
-				return !this.visibility.isHidden(id, itemId, item.isHiddenByDefault === true);
-			}).sort(compareMenuItems);
-			const groups: Array<[string, Array<ResolvedMenuAction | ResolvedSubmenuAction>]> = [];
-			for (const item of visible) {
-				const group = item.group ?? '';
-				let target = groups.at(-1);
-				if (target?.[0] !== group) {
-					target = [group, []];
-					groups.push(target);
-				}
-				if (isMenuItem(item)) {
-					target[1].push(new CommandMenuAction(item.command, item.alt, context, this.localization, this.commandService, forwardedArguments));
-				} else {
-					const submenuGroups = this.resolve(item.submenu, context, forwardedArguments, stack);
-					const actions = Separator.join(...submenuGroups.map(([, actions]) => [...actions]));
-					if (actions.length > 0) target[1].push(new ResolvedSubmenuAction(item, localize(this.localization, item.title), actions, item.icon));
-				}
-			}
-			return groups.filter(([, actions]) => actions.length > 0);
-		} finally {
-			stack.delete(id);
-		}
-	}
-}
-
-function compareMenuItems(a: MenuContribution, b: MenuContribution): number {
-	if (a.group !== b.group) {
-		if (!a.group) return 1;
-		if (!b.group) return -1;
-		if (a.group === 'navigation') return -1;
-		if (b.group === 'navigation') return 1;
-		const group = a.group.localeCompare(b.group);
-		if (group !== 0) return group;
-	}
-	const order = (a.order ?? 0) - (b.order ?? 0);
-	if (order !== 0) return order;
-	return titleOf(a).defaultMessage.localeCompare(titleOf(b).defaultMessage);
-}
-
-function titleOf(item: MenuContribution): MessageDescriptor {
-	return isMenuItem(item) ? item.command.title : item.title;
-}
-
 function localize(localization: LocalizationContext, descriptor: MessageDescriptor): string {
 	if (descriptor.placeholders.length > 0) throw new TypeError(`Static menu label ${descriptor.id} cannot require runtime placeholders.`);
 	return localization.format(descriptor);
@@ -315,9 +267,16 @@ function assertContribution(item: MenuContribution): void {
 	if (isMenuItem(item)) {
 		assertStaticCommand(item.command);
 		if (item.alt) assertStaticCommand(item.alt);
-	} else if (item.title.placeholders.length > 0) {
-		throw new TypeError(`Static submenu label ${item.title.id} cannot require runtime placeholders.`);
+	} else {
+		assertMenuId(item.submenu);
+		if (item.title.placeholders.length > 0) {
+			throw new TypeError(`Static submenu label ${item.title.id} cannot require runtime placeholders.`);
+		}
 	}
+}
+
+function assertMenuId(id: MenuId): void {
+	if (!allMenuIds.includes(id)) throw new TypeError('Menu IDs must belong to the static Proctor catalog.');
 }
 
 function assertStaticCommand(command: MenuCommand): void {

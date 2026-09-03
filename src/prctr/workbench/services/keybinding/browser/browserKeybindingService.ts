@@ -37,7 +37,7 @@ const NULL_LOG_SERVICE: IKeybindingLogService = Object.freeze({ info: () => unde
 export class BrowserKeybindingService extends AbstractKeybindingService {
 	#resolver: KeybindingResolver | undefined;
 	#keybindingHoldMode: DeferredPromise<void> | undefined;
-	readonly #schemaContributions = new Set<KeybindingsSchemaContribution>();
+	readonly #schemaContributions = new Set<{ readonly contribution: KeybindingsSchemaContribution; readonly listener: IDisposable | undefined }>();
 	constructor(private readonly document: Document, contextKeyService: IContextKeyService, commandService: ICommandService, feedbackService: IKeybindingFeedbackService, logService: IKeybindingLogService = NULL_LOG_SERVICE) {
 		super(contextKeyService, commandService, feedbackService, logService);
 		this._register(KeybindingsRegistry.onDidChangeKeybindings(() => { this.#resolver = undefined; this._onDidUpdateKeybindings.fire(); }));
@@ -49,7 +49,11 @@ export class BrowserKeybindingService extends AbstractKeybindingService {
 	resolveKeybinding(keybinding: Keybinding): ResolvedKeybinding[] { return USLayoutResolvedKeybinding.resolveKeybinding(keybinding, OS); }
 	resolveKeyboardEvent(event: IKeyboardEvent): ResolvedKeybinding { return new USLayoutResolvedKeybinding([new KeyCodeChord(event.ctrlKey, event.shiftKey, event.altKey, event.metaKey, event.keyCode)], OS); }
 	resolveUserBinding(userBinding: string): ResolvedKeybinding[] { const parsed = KeybindingParser.parseKeybinding(userBinding); return parsed === null ? [] : this.resolveKeybinding(parsed); }
-	registerSchemaContribution(contribution: KeybindingsSchemaContribution): IDisposable { this.#schemaContributions.add(contribution); const listener = contribution.onDidChange?.(() => this._onDidUpdateKeybindings.fire()); return toDisposable(() => { listener?.dispose(); this.#schemaContributions.delete(contribution); }); }
+	registerSchemaContribution(contribution: KeybindingsSchemaContribution): IDisposable {
+		const entry = { contribution, listener: contribution.onDidChange?.(() => this._onDidUpdateKeybindings.fire()) };
+		this.#schemaContributions.add(entry);
+		return toDisposable(() => { if (this.#schemaContributions.delete(entry)) entry.listener?.dispose(); });
+	}
 	enableKeybindingHoldMode(commandId: string): Promise<void> | undefined {
 		if (this._currentlyDispatchingCommandId !== commandId) return undefined;
 		this.#resetKeybindingHoldMode();
@@ -60,7 +64,12 @@ export class BrowserKeybindingService extends AbstractKeybindingService {
 		return hold.p;
 	}
 	#resetKeybindingHoldMode(): void { const hold = this.#keybindingHoldMode; if (hold === undefined) return; this.#keybindingHoldMode = undefined; void hold.complete(); }
-	override dispose(): void { this.#resetKeybindingHoldMode(); super.dispose(); }
+	override dispose(): void {
+		for (const entry of this.#schemaContributions) entry.listener?.dispose();
+		this.#schemaContributions.clear();
+		this.#resetKeybindingHoldMode();
+		super.dispose();
+	}
 	_dumpDebugInfo(): string { return this._getResolver().getKeybindings().map(item => `${item.resolvedKeybinding?.getLabel() ?? '<unbound>'}: ${item.command ?? '<none>'}${item.when === undefined ? '' : ` when ${item.when.serialize()}`}`).join('\n'); }
 	_dumpDebugInfoJSON(): string { return JSON.stringify(this._getResolver().getKeybindings().map(item => ({ command: item.command, key: item.resolvedKeybinding?.getUserSettingsLabel(), when: item.when?.serialize() })), null, 2); }
 	#resolveItems(items: readonly IKeybindingItem[]): ResolvedKeybindingItem[] {

@@ -2,11 +2,18 @@ import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import process from 'node:process';
 import { FileSystemRepository } from './repository.ts';
+import { verifyCopiedSource } from './upstreamCopy.ts';
 
 type Manifest = {
 	readonly clusterId: string;
 	readonly upstream: { readonly revision: string };
-	readonly items: readonly { readonly upstreamPath: string; readonly upstreamBlob: string }[];
+	readonly items: readonly {
+		readonly upstreamPath: string;
+		readonly upstreamBlob: string;
+		readonly disposition: string;
+		readonly localPath?: string;
+		readonly mechanicalTransforms?: readonly string[];
+	}[];
 };
 
 const repository = new FileSystemRepository(process.cwd());
@@ -45,6 +52,7 @@ if (manifests.length === 0 && arguments_.length === 0) {
 	let failures = 0;
 	for (const entry of selected) {
 		try {
+			let copied = 0;
 			const revision = execFileSync(
 				'git',
 				['rev-parse', `${entry.value.upstream.revision}^{commit}`],
@@ -62,8 +70,32 @@ if (manifests.length === 0 && arguments_.length === 0) {
 					throw new Error(
 						`${item.upstreamPath} expected ${item.upstreamBlob}, found ${blob}`
 					);
+				if (item.disposition === 'copied') {
+					if (item.localPath === undefined)
+						throw new Error('Copied item has no local path.');
+					const upstream = execFileSync(
+						'git',
+						['show', `${revision}:${item.upstreamPath}`],
+						{ cwd: checkout, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }
+					);
+					try {
+						verifyCopiedSource(
+							upstream,
+							repository.read(item.localPath),
+							entry.value.clusterId,
+							item.mechanicalTransforms ?? []
+						);
+					} catch (error) {
+						throw new Error(
+							`${item.localPath}: ${error instanceof Error ? error.message : String(error)}`
+						);
+					}
+					copied++;
+				}
 			}
-			process.stdout.write(`Audited ${entry.value.clusterId} at ${revision}.\n`);
+			process.stdout.write(
+				`Verified ${entry.value.clusterId} at ${revision}: pinned blobs and ${copied} reconstructed copies. Adapted behavior requires separate review.\n`
+			);
 		} catch (error) {
 			failures++;
 			process.stderr.write(
