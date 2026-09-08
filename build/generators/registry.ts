@@ -8,7 +8,6 @@ import { nativeCapabilityRegistryGenerator } from './nativeCapabilityRegistry.ts
 import { localizationCatalogGenerator } from './localizationCatalog.ts';
 import { settingsRegistryGenerator } from './settingsRegistry.ts';
 import { createFormatOwnershipGenerator } from './formatOwnership.ts';
-import { brandAssetsGenerator } from './brandAssets.ts';
 
 export interface Generator {
 	readonly id: string;
@@ -19,7 +18,6 @@ export interface Generator {
 }
 
 const productGenerators: readonly Generator[] = [
-	brandAssetsGenerator,
 	localizationCatalogGenerator,
 	settingsRegistryGenerator,
 	nativeProtocolGenerator,

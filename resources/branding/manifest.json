@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "authority": "Proctor shared brand assets",
   "brandColors": {
     "purple": "#5C00AA",
@@ -7,50 +7,64 @@
     "white": "#FFFFFF"
   },
   "sources": {
-    "appIcon": {
-      "path": "resources/branding/source/app-icon/proctor-app-icon.svg",
-      "canonicalPath": "assets/brand/app-icon/proctor-app-icon.svg",
-      "sha256": "687c32db1ff55025fbb49a709dae4eabd2003eb63fba57aefe65a145909edebe"
-    },
     "mark": {
       "path": "resources/branding/source/mark/proctor-mark.svg",
-      "canonicalPath": "assets/brand/mark/proctor-mark.svg",
-      "sha256": "6b487126608c51d871c35f64b5cf488b6055f23b8c9c3d4fb637334368f246f3"
+      "canonicalPath": "brand/marks/svg/proctor-mark-flat-purple.svg",
+      "sha256": "4b11197e607310c2e122fb1d68ad3f397d06877d4a0a8e351a1892fa4271ed29"
     },
     "markWhite": {
       "path": "resources/branding/source/mark/proctor-mark-white.svg",
-      "canonicalPath": "assets/brand/mark/proctor-mark-white.svg",
-      "sha256": "2428d3e1d5b37e24f4300d87360cc5ac28121a5337bd63ccf947293010f88880"
+      "canonicalPath": "brand/marks/svg/proctor-mark-flat-white.svg",
+      "sha256": "599018f167d63fbc0e0e437e2702590f807b73aa4c9ceba34fde9cede027451c"
     },
     "lockupLight": {
       "path": "resources/branding/source/lockup/proctor-lockup.svg",
-      "canonicalPath": "assets/brand/lockup/proctor-lockup.svg",
-      "sha256": "135c80050a078b8dc18b3291c72b30b35165ad852851654cf7b13dd7fd16a5db"
+      "canonicalPath": "brand/lockups/horizontal/svg/proctor-lockup-horizontal-flat-light.svg",
+      "sha256": "136a2a4e3e53f0cb95d045a3d1f34d3cdb2fd453df0a95ea5059b97cd1483c8d"
     },
     "lockupDark": {
       "path": "resources/branding/source/lockup/proctor-lockup-purple-white.svg",
-      "canonicalPath": "assets/brand/lockup/proctor-lockup-purple-white.svg",
+      "canonicalPath": "brand/lockups/horizontal/svg/proctor-lockup-horizontal-flat-purple-white.svg",
       "sha256": "78440824573f68970786fdc110859588d9f52dac2fd21a9df728f0a73fde6f82"
     },
     "lockupMonochrome": {
       "path": "resources/branding/source/lockup/proctor-lockup-white.svg",
-      "canonicalPath": "assets/brand/lockup/proctor-lockup-white.svg",
-      "sha256": "13ca8d2b548f7c8ba1b40f8b19aeb69fcaae691c007736d93f97f0c1b5d05a4a"
+      "canonicalPath": "brand/lockups/horizontal/svg/proctor-lockup-horizontal-flat-dark.svg",
+      "sha256": "7cfdff6148d53eac69b5aa56794bedc5f290800f298bdc65bf09b23de9e39e6f"
+    },
+    "windowsIcon": {
+      "path": "resources/branding/platform/win32/proctor.ico",
+      "canonicalPath": "brand/app-icons/windows/ico/proctor-app-icon-light.ico",
+      "sha256": "45392caf42f1ebe9c1d6ba302c8efe20a60c03b1f9aecea3eb0fac28252f29c2"
+    },
+    "macosIcon": {
+      "path": "resources/branding/platform/darwin/proctor.icns",
+      "canonicalPath": "brand/app-icons/apple/Proctor.icns",
+      "sha256": "99bb7acc6bc7005b44d2929943f765edd02826ffff007ad08bfef863de39877f"
+    },
+    "linuxIcon": {
+      "path": "resources/branding/platform/linux/proctor.png",
+      "canonicalPath": "brand/app-icons/linux/png/proctor-app-icon-light-512.png",
+      "sha256": "841aff7a546647fece8f9276c418187b4d0c037ff60bc3e05043a3b550ea728b"
     }
   },
   "platforms": {
     "windows": {
       "format": "ico",
-      "sizes": [16, 20, 24, 32, 40, 48, 64, 256]
+      "sizes": [16, 24, 32, 48, 64, 128, 256],
+      "source": "windowsIcon"
     },
     "macos": {
       "format": "icns",
-      "sizes": [16, 32, 64, 128, 256, 512, 1024]
+      "sizes": [16, 32, 64, 128, 256, 512, 1024],
+      "source": "macosIcon"
     },
     "linux": {
       "format": "png",
       "sizes": [512],
-      "releaseStatus": "development-only"
+      "releaseStatus": "development-only",
+      "source": "linuxIcon"
     }
-  }
+  },
+  "sourceRevision": "e8dd82ac9e9a106623095bdb9900079eddd1066b"
 }

@@ -1,4 +1,8 @@
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdtempSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { test } from 'node:test';
 import {
 	FileSystemRepository,
@@ -25,6 +29,30 @@ void test('real repository preserves canonical agent alias topology', () => {
 	assert.equal(repository.readLink('.github/copilot-instructions.md'), '../AGENTS.md');
 	assert.equal(repository.readLink('.github/skills'), '../.agents/skills');
 	assert.equal(repository.readLink('.claude/skills'), '../.agents/skills');
+});
+
+void test('real repository excludes unstaged deletions without changing the index', () => {
+	const root = mkdtempSync(join(tmpdir(), 'proctor-repository-deletions-'));
+	const git = (...args: string[]) => execFileSync('git', args, { cwd: root });
+	try {
+		git('init', '--quiet');
+		writeFileSync(join(root, 'kept.txt'), 'kept\n');
+		writeFileSync(join(root, 'removed.txt'), 'removed\n');
+		git('add', '--', 'kept.txt', 'removed.txt');
+		const indexBefore = git('ls-files', '--stage');
+		unlinkSync(join(root, 'removed.txt'));
+		writeFileSync(join(root, 'new.txt'), 'new\n');
+		const repository = new FileSystemRepository(root);
+		assert.deepEqual(repository.files(), ['kept.txt', 'new.txt']);
+		assert.deepEqual(
+			repository.files().map((path) => repository.read(path)),
+			['kept\n', 'new\n']
+		);
+		assert.equal(repository.exists('removed.txt'), false);
+		assert.deepEqual(git('ls-files', '--stage'), indexBefore);
+	} finally {
+		rmSync(root, { recursive: true, force: true });
+	}
 });
 
 void test('check and generator registries reject duplicate ownership', () => {

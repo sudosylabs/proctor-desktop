@@ -22,7 +22,14 @@ export class FileSystemRepository implements Repository {
 			['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
 			{ cwd: this.#root }
 		);
-		this.#files = output.toString('utf8').split('\0').filter(Boolean).map(normalize).sort();
+		this.#files = output
+			.toString('utf8')
+			.split('\0')
+			.filter(Boolean)
+			.map(normalize)
+			// The index still lists tracked files deleted from the working tree.
+			.filter((path) => this.kind(path) !== undefined)
+			.sort();
 	}
 
 	files(): readonly string[] {

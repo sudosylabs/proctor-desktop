@@ -415,16 +415,6 @@
       "removalOwner": "native-capabilities"
     },
     {
-      "package": "@resvg/resvg-wasm",
-      "version": "2.6.2",
-      "kind": "development",
-      "purpose": "Render the accepted Proctor app-icon SVG into deterministic cross-platform PNG layers used by the reviewed ICO and ICNS package assets.",
-      "owner": "toolchain",
-      "source": "https://www.npmjs.com/package/@resvg/resvg-wasm/v/2.6.2",
-      "license": "MPL-2.0",
-      "lifecycleScripts": "none"
-    },
-    {
       "package": "@vscode/codicons",
       "version": "0.0.46-38",
       "kind": "production",
