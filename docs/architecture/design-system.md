@@ -276,3 +276,32 @@ The toolchain architecture chooses the Control Explorer runner and baseline
 platform. The repository-enforcement track turns the accepted contracts into
 automated checks. This architecture decision does not itself admit a VS Code
 source cluster; exact admitted relationships live in the ports registry.
+
+## Notification verification boundary
+
+Notifications retain the upstream center/header/action-bar and notification row
+hierarchy, base notification CSS, and Modern UI notification/typography rules.
+Adaptations map the owner namespace and Proctor tokens, with shell insets supplied
+by the window. Row details precede the main row for keyboard access; the original
+progress bar retains delayed display and long-running animation throttling.
+Menus and plain-text hovers use the window-owned effect adapters. The list's per-instance
+constructed stylesheet is scoped to its owner and removed on disposal, so focus
+and selection styling work with `style-src 'self'`. There is no arbitrary global
+theme participant. The workbench notification bell stays in its status-area anchor
+when toast position changes. Accessible reading uses a labelled, read-only native
+text area with navigation and actions; the global workbench sound engine is not
+part of this cluster.
+
+The notification Control Explorer fixture and imported list/scrollbar suites
+provide real Chromium behavior evidence. The development-only
+`npm run preview:notifications` displays production presenters with sample
+ordinary, sticky and indefinite-progress messages. The preview is unreachable
+from packaged product compositions.
+
+Manual evidence exception: Windows/macOS screen-reader workflows, Windows forced
+colors, and reviewed platform pixel baselines remain required before release of
+this new pattern. The current development environment supplies macOS Chromium
+interaction and visual inspection, not Windows or assistive-technology evidence.
+The design-system owner owns the follow-up; release approval must include those
+results. Automated semantics and theme/zoom checks are partial evidence and do
+not establish accessibility conformance.

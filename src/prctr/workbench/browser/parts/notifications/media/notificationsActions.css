@@ -1,0 +1,33 @@
+/* @proctor-vscode-port workbench-notifications */
+@layer workbench {
+	/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+	.prctr-notifications
+		.notifications-list-container
+		.notification-list-item
+		.notification-list-item-toolbar-container
+		.action-item,
+	.prctr-notifications
+		> .notifications-center
+		> .notifications-center-header
+		> .notifications-center-header-toolbar
+		.action-item {
+		margin-right: 4px;
+	}
+
+	.prctr-notifications
+		.notifications-list-container
+		.notification-list-item
+		.notification-list-item-toolbar-container
+		.action-item:first-child,
+	.prctr-notifications
+		> .notifications-center
+		> .notifications-center-header
+		> .notifications-center-header-toolbar
+		.action-item:first-child {
+		margin-left: 4px;
+	}
+}

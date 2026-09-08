@@ -279,3 +279,43 @@ Verify through the owning interfaces:
 
 Implementation, manifests, tests, and this architecture must describe the same
 three windows and transition behavior.
+
+## In-app notifications
+
+AuthenticatedWindow and CandidateWindow each own one notification model/service and its nonmodal toast, retained
+center, status indicator, progress and accessible-reading presenters. Ordinary
+producers use handles to update severity, text, actions and progress, then close
+the handle when their operation ends. Prompt actions retain their separate
+keep-open and cancellation outcomes. Notification progress is available through
+the window's explicitly registered progress service.
+
+Sticky means no automatic toast timeout. Active progress additionally prevents
+ordinary row, keyboard, Clear All and Accessible View dismissal. Escape hides
+presentation while retaining the notification in the center. A producer's close
+or an explicit operation-owned cancellation action can end progress. Duplicate
+notifications consolidate; burst limiting affects toasts without discarding
+center entries. Hidden ongoing progress remains discoverable in the status area.
+
+Notification presentation sits below modal/security gates. Candidate interaction
+state and overlay visibility disable it synchronously. Notifications neither
+replace gates nor grant permission. Producers supply safe localized text and
+bounded source identifiers. A composition must explicitly supply and authorize
+link or copy effects; the current window compositions expose neither a generic
+external opener nor unrestricted clipboard access. An absent link adapter renders
+plain text. Failed actions show bounded feedback without logging raw errors.
+
+The model, message content and action closures are `windowSession` state and are
+disposed with the window. The private preference adapter stores only versioned
+booleans, bounded source-filter records and one validated position. Application
+suppression and placement use `device`; profile suppression is bound to
+Institution/principal `principalComposition`; workspace suppression is bound to
+Institution/principal/Attempt `attemptPresentation`. Missing bindings or storage
+failures use window memory. These records never restore authority or shadow
+server User Settings. Account/Attempt bindings prevent cross-context preference
+reuse; stale records are inert and are removed with application browser storage.
+
+LaunchWindow keeps readiness and authentication feedback within its central task.
+It does not mount a notification center, toast layer, or notification bell, and its
+`workbench/common` prohibition has no notification exception.
+The source relationship and complete selected dependency closure are owned by
+[the notification port](../upstream/vscode-ports/workbench-notifications.json).

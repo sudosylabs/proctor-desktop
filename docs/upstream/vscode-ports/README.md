@@ -26,6 +26,7 @@ revision, disposition, dependencies, divergence, and evidence):
 - [`shared-browser-controls`](./shared-browser-controls.json) — reusable native-DOM controls and deterministic Control Explorer evidence.
 - [`themes-design-tokens`](./themes-design-tokens.json) — static semantic tokens and four immutable Proctor themes.
 - [`user-settings-common`](./user-settings-common.json) — bounded JSONC settings, typed resolution, and frozen Attempt Configuration.
+- [`workbench-notifications`](./workbench-notifications.json) — window-owned notifications, prompts, progress, retained center, accessibility, and complete virtual list/scrollbar mechanics.
 - [`workbench-kernel`](./workbench-kernel.json) — executable compositions, lifecycle, shell, layout, items, panes, restoration, and overlays.
 
 ## Record identity

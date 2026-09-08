@@ -25,6 +25,7 @@ export interface ModalOverlayOptions {
 
 export class WorkbenchOverlayHost extends Disposable {
 	readonly element: HTMLDivElement;
+	readonly notificationLayer: HTMLDivElement;
 	readonly #visibility = this._register(new Emitter<boolean>());
 	readonly onDidChangeVisibility: Event<boolean> = this.#visibility.event;
 	#active: IDisposable | undefined;
@@ -39,6 +40,9 @@ export class WorkbenchOverlayHost extends Disposable {
 		this.element.className = 'prctr-overlay-host';
 		this.element.hidden = true;
 		host.append(this.element);
+		this.notificationLayer = host.ownerDocument.createElement('div');
+		this.notificationLayer.className = 'prctr-notification-layer';
+		host.append(this.notificationLayer);
 	}
 	get visible(): boolean {
 		return this.#visible;
@@ -88,6 +92,7 @@ export class WorkbenchOverlayHost extends Disposable {
 		this.element.replaceChildren(surface);
 		this.element.hidden = false;
 		this.#inertRoot.inert = true;
+		this.notificationLayer.inert = true;
 		this.#setVisible(true);
 		store.add(
 			addDisposableListener(document, 'keydown', (event) => {
@@ -130,6 +135,7 @@ export class WorkbenchOverlayHost extends Disposable {
 				this.element.replaceChildren();
 				this.element.hidden = true;
 				this.#inertRoot.inert = false;
+				this.notificationLayer.inert = false;
 				if (!this.#replacing) this.#setVisible(false);
 				this.#restoreFocus(priorFocus);
 			}
@@ -161,6 +167,7 @@ export class WorkbenchOverlayHost extends Disposable {
 		this.#active?.dispose();
 		super.dispose();
 		this.element.remove();
+		this.notificationLayer.remove();
 	}
 }
 function isRestorableFocusTarget(element: HTMLElement): boolean {

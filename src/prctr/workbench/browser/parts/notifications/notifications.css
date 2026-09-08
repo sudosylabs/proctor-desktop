@@ -1,0 +1,105 @@
+/* Copyright (c) Microsoft Corporation. Licensed under the MIT License. */
+/* @proctor-vscode-port workbench-notifications */
+@layer workbench {
+	.prctr-notifications {
+		position: absolute;
+		isolation: isolate;
+		inset: 0;
+		pointer-events: none;
+		font: var(--prctr-typography-label-size) var(--prctr-typography-font-application);
+		color: var(--prctr-color-text-primary);
+		--prctr-notification-radius-small: var(--prctr-shape-radius-medium);
+		--prctr-notification-radius-medium: 6px;
+		--prctr-notification-radius-large: var(--prctr-shape-radius-large);
+		--prctr-notification-icon-size: 16px;
+		--prctr-notification-label-size: var(--prctr-typography-label-small-size);
+		--prctr-notification-spacing-20: 2px;
+		--prctr-notification-spacing-40: 4px;
+		--prctr-notification-spacing-60: 6px;
+		--prctr-notification-spacing-80: 8px;
+		--prctr-notification-spacing-120: 12px;
+		--prctr-notification-spacing-160: 16px;
+		--prctr-notification-spacing-200: 20px;
+		--prctr-notification-spacing-240: 24px;
+		--prctr-notification-spacing-320: 32px;
+		--prctr-notification-spacing-360: 36px;
+	}
+	.prctr-notifications > .notifications-center,
+	.prctr-notifications > .notifications-toasts {
+		max-width: calc(100% - 16px);
+	}
+	.prctr-notifications > .notifications-center,
+	.prctr-notifications .notification-toast {
+		pointer-events: auto;
+	}
+	.prctr-notifications > .notifications-center > .notifications-center-header {
+		color: var(--prctr-color-text-secondary);
+		background-color: var(--prctr-color-background-surface);
+	}
+	.prctr-notifications
+		> .notifications-center
+		> .notifications-center-header
+		> .notifications-center-header-title {
+		text-transform: capitalize;
+		font-size: var(--prctr-notification-label-size);
+		font-weight: var(--prctr-typography-weight-semibold);
+	}
+	.prctr-notifications .prctr-notifications__reader {
+		position: absolute;
+		pointer-events: auto;
+		z-index: 2550;
+		inset: var(--prctr-notifications-top) var(--prctr-spacing-region)
+			var(--prctr-notifications-bottom);
+		display: flex;
+		flex-direction: column;
+		gap: var(--prctr-spacing-content-medium);
+		padding: var(--prctr-spacing-content-medium);
+		background: var(--prctr-color-background-raised);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border-radius: var(--prctr-shape-radius-medium);
+		box-shadow: var(--prctr-elevation-overlay);
+	}
+	.prctr-notifications .prctr-notifications__reading-text {
+		flex: 1;
+		min-block-size: 0;
+		resize: none;
+		background: inherit;
+		color: inherit;
+		font: inherit;
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		padding: var(--prctr-spacing-content-medium);
+	}
+	.prctr-notifications .prctr-notifications__reading-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--prctr-spacing-content-small);
+	}
+	.prctr-notifications .prctr-notifications__announcements {
+		position: absolute;
+		inline-size: 1px;
+		block-size: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+	.prctr-notifications [hidden] {
+		display: none;
+	}
+}
+@layer workbench {
+	:where([data-prctr-motion='reduced'])
+		.prctr-notifications
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast {
+		transition: none;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.prctr-notifications
+			> .notifications-toasts
+			.notification-toast-container
+			> .notification-toast {
+			transition: none;
+		}
+	}
+}

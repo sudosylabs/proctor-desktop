@@ -1,0 +1,250 @@
+/* @proctor-vscode-port workbench-notifications */
+@layer workbench {
+	/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+	.prctr-notifications .prctr-notification-text-button {
+		box-sizing: border-box;
+		display: flex;
+		width: 100%;
+		padding: 4px 8px;
+		border-radius: 4px;
+		text-align: center;
+		cursor: pointer;
+		justify-content: center;
+		align-items: center;
+		border: 1px solid var(--prctr-color-border-default, transparent);
+		line-height: 16px;
+		font-size: 12px;
+		overflow-wrap: normal;
+	}
+
+	.prctr-notifications .prctr-notification-text-button.secondary {
+		border-color: var(
+			--prctr-color-border-default,
+			var(--prctr-color-border-default, transparent)
+		);
+	}
+
+	.prctr-notifications .prctr-notification-text-button.small {
+		line-height: 14px;
+		font-size: 11px;
+		padding: 3px 6px;
+	}
+
+	.prctr-notifications .prctr-notification-text-button:focus {
+		outline-offset: 2px;
+	}
+
+	.prctr-notifications .prctr-notification-text-button:hover {
+		text-decoration: none;
+	}
+
+	.prctr-notifications .prctr-notification-button.disabled:focus,
+	.prctr-notifications .prctr-notification-button.disabled {
+		opacity: 0.4;
+		cursor: default;
+	}
+
+	.prctr-notifications .prctr-notification-text-button .codicon {
+		margin: 0 0.2em;
+		color: inherit;
+	}
+
+	.prctr-notifications
+		.prctr-notification-text-button.prctr-notification-text-button-with-short-label {
+		flex-direction: row;
+		flex-wrap: wrap;
+		padding: 0 4px;
+		overflow: hidden;
+		height: 28px;
+	}
+
+	.prctr-notifications
+		.prctr-notification-text-button.prctr-notification-text-button-with-short-label
+		> .prctr-notification-button-label {
+		flex-basis: 100%;
+	}
+
+	.prctr-notifications
+		.prctr-notification-text-button.prctr-notification-text-button-with-short-label
+		> .prctr-notification-button-label-short {
+		flex-grow: 1;
+		width: 0;
+		overflow: hidden;
+	}
+
+	.prctr-notifications
+		.prctr-notification-text-button.prctr-notification-text-button-with-short-label
+		> .prctr-notification-button-label,
+	.prctr-notifications
+		.prctr-notification-text-button.prctr-notification-text-button-with-short-label
+		> .prctr-notification-button-label-short {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-weight: normal;
+		font-style: inherit;
+		line-height: 18px;
+		padding: 4px 0;
+	}
+
+	.prctr-notifications .prctr-notification-button-dropdown {
+		display: flex;
+		cursor: pointer;
+	}
+
+	.prctr-notifications .prctr-notification-button-dropdown.disabled {
+		cursor: default;
+	}
+
+	.prctr-notifications .prctr-notification-button-dropdown > .prctr-notification-button:focus {
+		outline-offset: -1px;
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown.disabled
+		> .prctr-notification-button.disabled,
+	.prctr-notifications
+		.prctr-notification-button-dropdown.disabled
+		> .prctr-notification-button.disabled:focus,
+	.prctr-notifications
+		.prctr-notification-button-dropdown.disabled
+		> .prctr-notification-button-dropdown-separator {
+		opacity: 0.4;
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown
+		> .prctr-notification-button.prctr-notification-text-button {
+		border-right-width: 0;
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown
+		.prctr-notification-button-dropdown-separator {
+		padding: 4px 0;
+		cursor: default;
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown
+		.prctr-notification-button-dropdown-separator
+		> div {
+		height: 100%;
+		width: 1px;
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown
+		> .prctr-notification-button.prctr-dropdown-button {
+		border: 1px solid var(--prctr-color-border-default, transparent);
+		border-left-width: 0;
+		border-radius: 0 4px 4px 0;
+		padding: 0 4px;
+		display: flex;
+		align-items: center;
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown
+		> .prctr-notification-button.prctr-dropdown-button.secondary {
+		border-color: var(
+			--prctr-color-border-default,
+			var(--prctr-color-border-default, transparent)
+		);
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown
+		> .prctr-notification-button.prctr-notification-text-button {
+		border-radius: 4px 0 0 4px;
+	}
+
+	.prctr-notifications .prctr-description-button {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin: 4px 5px; /* allows button focus outline to be visible */
+	}
+
+	.prctr-notifications .prctr-description-button .prctr-notification-button-description {
+		font-style: italic;
+		font-size: 11px;
+		padding: 4px 20px;
+	}
+
+	.prctr-notifications .prctr-description-button .prctr-notification-button-label,
+	.prctr-notifications .prctr-description-button .prctr-notification-button-description {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.prctr-notifications .prctr-description-button .prctr-notification-button-label > .codicon,
+	.prctr-notifications
+		.prctr-description-button
+		.prctr-notification-button-description
+		> .codicon {
+		margin: 0 0.2em;
+		color: inherit;
+	}
+
+	/* default color styles - based on CSS variables */
+
+	.prctr-notifications .prctr-notification-button.default-colors,
+	.prctr-notifications
+		.prctr-notification-button-dropdown.default-colors
+		> .prctr-notification-button {
+		color: var(--prctr-color-text-inverse);
+		background-color: var(--prctr-color-interaction-accent);
+	}
+
+	.prctr-notifications .prctr-notification-button.default-colors:hover,
+	.prctr-notifications
+		.prctr-notification-button-dropdown.default-colors
+		> .prctr-notification-button:hover {
+		background-color: var(--prctr-color-interaction-accentHover);
+	}
+
+	.prctr-notifications .prctr-notification-button.default-colors.secondary,
+	.prctr-notifications
+		.prctr-notification-button-dropdown.default-colors
+		> .prctr-notification-button.secondary {
+		color: var(--prctr-color-text-primary);
+		background-color: var(--prctr-color-background-raised);
+	}
+
+	.prctr-notifications .prctr-notification-button.default-colors.secondary:hover,
+	.prctr-notifications
+		.prctr-notification-button-dropdown.default-colors
+		> .prctr-notification-button.secondary:hover {
+		background-color: var(--prctr-color-interaction-hover);
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown.default-colors
+		.prctr-notification-button-dropdown-separator {
+		background-color: var(--prctr-color-interaction-accent);
+		border-top: 1px solid var(--prctr-color-border-default);
+		border-bottom: 1px solid var(--prctr-color-border-default);
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown.default-colors
+		.prctr-notification-button.secondary
+		+ .prctr-notification-button-dropdown-separator {
+		background-color: var(--prctr-color-background-raised);
+		border-top-color: var(--prctr-color-border-default, var(--prctr-color-border-default));
+		border-bottom-color: var(--prctr-color-border-default, var(--prctr-color-border-default));
+	}
+
+	.prctr-notifications
+		.prctr-notification-button-dropdown.default-colors
+		.prctr-notification-button-dropdown-separator
+		> div {
+		background-color: var(--prctr-color-text-inverse);
+	}
+}

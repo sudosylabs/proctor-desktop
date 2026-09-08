@@ -29,6 +29,13 @@ export async function runControlExplorer(parent: HTMLElement): Promise<ControlEx
 	const document = iframe.contentDocument;
 	if (document === null) throw new Error('Control Explorer requires a same-origin frame');
 	const store = new DisposableStore();
+	const themeService = store.add(
+		new BrowserThemeService(document, 'light', {
+			density: 'default',
+			motion: 'reduced',
+			transparency: 'reduced'
+		})
+	);
 	let states = 0;
 	let interactions = 0;
 	for (const fixture of controlExplorerFixtures) {
@@ -44,13 +51,7 @@ export async function runControlExplorer(parent: HTMLElement): Promise<ControlEx
 		interactions += await result.verify();
 	}
 	const themes: readonly ThemeId[] = ['light', 'dark', 'highContrastLight', 'highContrastDark'];
-	const themeService = store.add(
-		new BrowserThemeService(document, 'light', {
-			density: 'default',
-			motion: 'reduced',
-			transparency: 'reduced'
-		})
-	);
+
 	for (const theme of themes) {
 		themeService.setTheme(theme);
 		if (document.documentElement.dataset.prctrTheme !== theme)

@@ -1,0 +1,13 @@
+@layer workbench {
+	.prctr-notifications-status {
+		font: var(--prctr-typography-label-small-size)/var(
+				--prctr-typography-label-small-lineHeight
+			)
+			var(--prctr-typography-font-application);
+		color: var(--prctr-color-text-secondary);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		max-inline-size: 240px;
+	}
+}

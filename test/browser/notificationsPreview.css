@@ -1,0 +1,38 @@
+@layer workbench {
+	.prctr-notification-preview {
+		position: relative;
+		block-size: 100%;
+		background: var(--prctr-color-background-canvas);
+		color: var(--prctr-color-text-primary);
+		font: var(--prctr-typography-body-size)/var(--prctr-typography-body-lineHeight)
+			var(--prctr-typography-font-application);
+	}
+	.prctr-notification-preview > header {
+		height: 38px;
+		text-align: center;
+		line-height: 38px;
+		-webkit-app-region: drag;
+		font-size: var(--prctr-typography-label-small-size);
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-notification-preview > section {
+		padding: 48px;
+	}
+	.prctr-notification-preview > section > div {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.prctr-notification-preview > section > p {
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-notification-preview > footer {
+		position: absolute;
+		inset-inline: 0;
+		bottom: 0;
+		height: 30px;
+		display: flex;
+		align-items: center;
+		justify-content: end;
+	}
+}

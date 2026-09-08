@@ -1,0 +1,125 @@
+/* @proctor-vscode-port workbench-notifications */
+@layer workbench {
+	/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+	.prctr-notifications > .notifications-toasts {
+		position: absolute;
+		z-index: 2545; /* above modal editor backdrop (2540), below quick input (2550) and dialogs (2575) */
+		right: 3px;
+		bottom: 25px; /* 22px status bar height + 3px */
+		display: none;
+		border-radius: var(--prctr-notification-radius-small);
+	}
+
+	.prctr-notifications.nostatusbar > .notifications-toasts {
+		bottom: 3px;
+	}
+
+	.prctr-notifications > .notifications-toasts.bottom-left {
+		right: auto;
+		left: 3px;
+	}
+
+	.prctr-notifications > .notifications-toasts.top-right {
+		bottom: auto;
+		top: 3px;
+	}
+
+	.prctr-notifications
+		> .notifications-toasts.top-right
+		.notification-toast-container
+		> .notification-toast {
+		transform: translate3d(100%, 0px, 0px); /* slide in from right */
+	}
+
+	.prctr-notifications > .notifications-toasts.visible {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.prctr-notifications
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast {
+		margin: 4px; /* enables separation and drop shadows around toasts */
+		transform: translate3d(
+			0px,
+			100%,
+			0px
+		); /* move the notification 50px to the bottom (to prevent bleed through) */
+		opacity: 0; /*  fade the toast in */
+		transition:
+			transform 300ms ease-out,
+			opacity 300ms ease-out;
+	}
+
+	.prctr-notifications > .notifications-toasts .notifications-list-container {
+		box-shadow: var(--prctr-elevation-overlay);
+	}
+
+	.prctr-notifications > .notifications-toasts .notifications-list-container,
+	.prctr-notifications
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast,
+	.prctr-notifications
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast
+		.prctr-scrollable-element,
+	.prctr-notifications
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast
+		.prctr-list:not(.element-focused):focus:before,
+	.prctr-notifications
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast
+		.prctr-list-row {
+		border-radius: 4px;
+	}
+
+	.prctr-notifications.prctr-reduce-motion
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast {
+		transition:
+			transform 0ms ease-out,
+			opacity 0ms ease-out;
+	}
+
+	.prctr-notifications
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast.notification-fade-in {
+		opacity: 1;
+		transform: none;
+	}
+
+	.prctr-notifications
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast.notification-fade-in-done {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+
+	/* Icons */
+
+	.prctr-notifications > .notifications-toasts .codicon.codicon-error {
+		color: var(--prctr-color-feedback-error);
+	}
+
+	.prctr-notifications > .notifications-toasts .codicon.codicon-warning {
+		color: var(--prctr-color-feedback-warning);
+	}
+
+	.prctr-notifications > .notifications-toasts .codicon.codicon-info {
+		color: var(--prctr-color-feedback-info);
+	}
+}

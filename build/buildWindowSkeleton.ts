@@ -9,7 +9,7 @@ await Promise.all([
 		bundle: true,
 		entryPoints: { launch: 'src/prctr/code/electron-browser/launch.main.ts' },
 		format: 'esm',
-		loader: { '.svg': 'file' },
+		loader: { '.svg': 'file', '.ttf': 'file' },
 		outdir,
 		platform: 'browser',
 		target: chromiumTarget,
@@ -53,7 +53,7 @@ writeFileSync(
 );
 writeFileSync(
 	`${outdir}/launch.html`,
-	'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; style-src \'self\'; img-src \'self\'; connect-src \'none\'; base-uri \'none\'; form-action \'none\'"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="./launch.css"><title>Proctor</title></head><body><script type="module" src="./launch.js"></script></body></html>\n',
+	'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'self\'; style-src \'self\'; img-src \'self\'; font-src \'self\'; connect-src \'none\'; base-uri \'none\'; form-action \'none\'"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="./launch.css"><title>Proctor</title></head><body><script type="module" src="./launch.js"></script></body></html>\n',
 	'utf8'
 );
 writeFileSync(

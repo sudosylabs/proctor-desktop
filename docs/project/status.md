@@ -2,6 +2,12 @@
 
 ## Accepted foundation
 
+- In-app notifications now have a shared model/service, retained center, toast
+  scheduling, prompts, source filtering, progress and accessible reading. The
+  [workbench architecture](../architecture/workbench.md) owns composition and
+  security behavior; the [design system](../architecture/design-system.md) records
+  the remaining manual release evidence.
+
 - `AGENTS.md` is the concise always-loaded guide; stable deep procedure lives
   in triggered repository skills and unresolved work stays ignored under
   `.scratch/`.

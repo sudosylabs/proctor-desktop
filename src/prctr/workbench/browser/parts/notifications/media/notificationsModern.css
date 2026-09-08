@@ -1,0 +1,170 @@
+/* @proctor-vscode-port workbench-notifications */
+@layer workbench {
+	/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+	/*
+ * Modern UI module: "Notifications and Dialogs".
+ *
+ * Shared notification and dialog presentation used by the regular workbench
+ * and the Agents window. Shell-specific notification insets are customizable
+ * through the properties used below.
+ *
+ * All rules are gated behind the module-specific
+ * `.modern-ui-notifications-dialogs` class.
+ */
+
+	.prctr-notifications.modern-ui-notifications-dialogs
+		.notifications-list-container
+		.notification-list-item {
+		padding: var(--prctr-notification-spacing-60) var(--prctr-notification-spacing-20);
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs
+		.notifications-list-container
+		.notification-list-item
+		.notification-list-item-icon {
+		font-size: var(--prctr-notification-icon-size);
+		margin: 0 var(--prctr-notification-spacing-80) 0 var(--prctr-notification-spacing-60);
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs
+		.notifications-list-container
+		.notification-list-item
+		.notification-list-item-buttons-container
+		> .prctr-notification-button-dropdown,
+	.prctr-notifications.modern-ui-notifications-dialogs
+		.notifications-list-container
+		.notification-list-item
+		.notification-list-item-buttons-container
+		> .prctr-notification-button {
+		margin: 0 var(--prctr-notification-spacing-40) 0 0;
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs
+		.notifications-list-container
+		.notification-list-item
+		.notification-list-item-source {
+		color: var(--prctr-color-text-secondary);
+		margin-left: var(--prctr-notification-spacing-240);
+	}
+
+	/*
+ * Reposition the notification center to sit within the Modern UI outer gutter:
+ * an 8px horizontal inset, and a bottom inset that clears the 28px status bar
+ * plus the 4px gutter (32px total). `!important` is required to win over the base
+ * positioning rules (which vary with the status bar) and, for `top-right`, over
+ * the inline `top` offset the notification controller applies in JS.
+ *
+ * `top-right` uses a fixed 35px — the height of the custom title bar
+ * (DEFAULT_CUSTOM_TITLEBAR_HEIGHT), which the Modern UI experiment always shows
+ * — so the center tucks directly beneath it.
+ */
+	.prctr-notifications.modern-ui-notifications-dialogs > .notifications-center {
+		right: var(--prctr-notifications-inline, var(--prctr-notification-spacing-80));
+		bottom: var(--prctr-notifications-bottom, var(--prctr-notification-spacing-320));
+		border-radius: var(--prctr-notification-radius-large);
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs.nostatusbar
+		> .notifications-center:not(.top-right) {
+		bottom: var(--prctr-notifications-bottom, var(--prctr-notification-spacing-320));
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs > .notifications-center.bottom-left {
+		right: auto;
+		left: var(--prctr-notifications-inline, var(--prctr-notification-spacing-80));
+		bottom: var(--prctr-notifications-bottom, var(--prctr-notification-spacing-320));
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs > .notifications-center.top-right {
+		bottom: auto;
+		top: var(--prctr-notifications-top, var(--prctr-notification-spacing-360));
+	}
+
+	/*
+ * Toasts mirror the center, but each toast carries a 4px margin, so every
+ * container offset is reduced by 4px to keep the visible toast surface aligned
+ * with the center (8px / 32px / 35px once the margin is added back).
+ */
+	.prctr-notifications.modern-ui-notifications-dialogs > .notifications-toasts {
+		right: calc(
+			var(--prctr-notifications-inline, var(--prctr-notification-spacing-80)) -
+				var(--prctr-notification-spacing-40)
+		);
+		bottom: calc(
+			var(--prctr-notifications-bottom, var(--prctr-notification-spacing-320)) -
+				var(--prctr-notification-spacing-40)
+		);
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs.nostatusbar
+		> .notifications-toasts:not(.top-right) {
+		bottom: calc(
+			var(--prctr-notifications-bottom, var(--prctr-notification-spacing-320)) -
+				var(--prctr-notification-spacing-40)
+		);
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs > .notifications-toasts.bottom-left {
+		right: auto;
+		left: calc(
+			var(--prctr-notifications-inline, var(--prctr-notification-spacing-80)) -
+				var(--prctr-notification-spacing-40)
+		);
+		bottom: calc(
+			var(--prctr-notifications-bottom, var(--prctr-notification-spacing-320)) -
+				var(--prctr-notification-spacing-40)
+		);
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs > .notifications-toasts.top-right {
+		bottom: auto;
+		top: calc(
+			var(--prctr-notifications-top, var(--prctr-notification-spacing-360)) -
+				var(--prctr-notification-spacing-40)
+		);
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs
+		> .notifications-center
+		> .notifications-center-header {
+		padding-right: var(--prctr-notification-spacing-20);
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs
+		> .notifications-center
+		.notifications-list-container
+		.prctr-list-row:last-child {
+		border-radius: 0 0 var(--prctr-notification-radius-large)
+			var(--prctr-notification-radius-large);
+	}
+
+	.prctr-notifications.modern-ui-notifications-dialogs > .notifications-toasts,
+	.prctr-notifications.modern-ui-notifications-dialogs
+		> .notifications-toasts
+		.notifications-list-container,
+	.prctr-notifications.modern-ui-notifications-dialogs
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast,
+	.prctr-notifications.modern-ui-notifications-dialogs
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast
+		.prctr-scrollable-element,
+	.prctr-notifications.modern-ui-notifications-dialogs
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast
+		.prctr-list:not(.element-focused):focus::before,
+	.prctr-notifications.modern-ui-notifications-dialogs
+		> .notifications-toasts
+		.notification-toast-container
+		> .notification-toast
+		.prctr-list-row {
+		border-radius: var(--prctr-notification-radius-large);
+	}
+}

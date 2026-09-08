@@ -4,7 +4,7 @@ type Assert = {
 	deepStrictEqual(actual: unknown, expected: unknown, message?: string): void;
 	ok(value: unknown, message?: string): asserts value;
 	doesNotThrow(body: () => unknown, message?: string): void;
-	throws(body: () => unknown, message?: string): void;
+	throws(body: () => unknown, expected?: string | RegExp): void;
 };
 function fail(message: string): never {
 	throw new Error(message);
@@ -36,11 +36,13 @@ assert.doesNotThrow = (body, message) => {
 	}
 };
 export default assert;
-assert.throws = (body, message) => {
+assert.throws = (body, expected) => {
 	try {
 		body();
-	} catch {
+	} catch (error) {
+		if (expected instanceof RegExp && !expected.test(String(error)))
+			fail(`Expected ${String(error)} to match ${expected}`);
 		return;
 	}
-	fail(message ?? 'Expected the callback to throw.');
+	fail(typeof expected === 'string' ? expected : 'Expected the callback to throw.');
 };

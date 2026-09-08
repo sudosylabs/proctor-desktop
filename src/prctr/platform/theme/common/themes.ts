@@ -98,7 +98,9 @@ const lightColors = {
 	'color.terminal.background': '#ffffff',
 	'color.terminal.foreground': '#24292f',
 	'color.overlay.backdrop': '#1f232866',
-	'color.scrollbar.thumb': '#8c959f99'
+	'color.scrollbar.thumb': '#8c959f99',
+	'color.scrollbar.thumbHover': '#8c959fb3',
+	'color.scrollbar.thumbActive': '#646464cc'
 } as const;
 
 const darkColors = {
@@ -134,7 +136,9 @@ const darkColors = {
 	'color.terminal.background': '#0d1117',
 	'color.terminal.foreground': '#e6edf3',
 	'color.overlay.backdrop': '#00000099',
-	'color.scrollbar.thumb': '#6e768199'
+	'color.scrollbar.thumb': '#6e768199',
+	'color.scrollbar.thumbHover': '#8b949eb3',
+	'color.scrollbar.thumbActive': '#b1bac4b3'
 } as const;
 
 const highContrastLightColors = {
@@ -171,7 +175,9 @@ const highContrastLightColors = {
 	'color.terminal.background': '#ffffff',
 	'color.terminal.foreground': '#000000',
 	'color.overlay.backdrop': '#ffffffcc',
-	'color.scrollbar.thumb': '#000000'
+	'color.scrollbar.thumb': '#000000',
+	'color.scrollbar.thumbHover': '#000000',
+	'color.scrollbar.thumbActive': '#000000'
 } as const;
 
 const highContrastDarkColors = {
@@ -208,7 +214,9 @@ const highContrastDarkColors = {
 	'color.terminal.background': '#000000',
 	'color.terminal.foreground': '#ffffff',
 	'color.overlay.backdrop': '#000000cc',
-	'color.scrollbar.thumb': '#ffffff'
+	'color.scrollbar.thumb': '#ffffff',
+	'color.scrollbar.thumbHover': '#ffffff',
+	'color.scrollbar.thumbActive': '#ffffff'
 } as const;
 
 const themeSources = {

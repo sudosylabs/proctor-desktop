@@ -85,6 +85,8 @@ const tokenDefinitions = [
 	{ id: 'color.terminal.foreground', kind: 'color', description: 'Terminal text.' },
 	{ id: 'color.overlay.backdrop', kind: 'color', description: 'Modal backdrop.' },
 	{ id: 'color.scrollbar.thumb', kind: 'color', description: 'Scrollbar thumb.' },
+	{ id: 'color.scrollbar.thumbHover', kind: 'color', description: 'Hovered scrollbar thumb.' },
+	{ id: 'color.scrollbar.thumbActive', kind: 'color', description: 'Dragged scrollbar thumb.' },
 	{
 		id: 'typography.font.application',
 		kind: 'font-family',

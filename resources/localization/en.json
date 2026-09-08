@@ -1112,6 +1112,149 @@
       "placeholders": [],
       "source": "src/prctr/workbench/browser/bootstrap.ts"
     },
+    "workbench.notifications.actionfailed": {
+      "message": "The action could not be completed.",
+      "description": "Safe failure text; diagnostic details remain privileged.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.bottomleft": {
+      "message": "Bottom left",
+      "description": "Bottom-left notification placement.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.bottomright": {
+      "message": "Bottom right",
+      "description": "Bottom-right notification placement.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.cancel": {
+      "message": "Cancel",
+      "description": "Request cancellation of a notification operation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.clearall": {
+      "message": "Clear all notifications",
+      "description": "Clear notifications without active progress.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.close": {
+      "message": "Clear notification",
+      "description": "Dismiss an inactive notification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.collapse": {
+      "message": "Collapse notification",
+      "description": "Collapse notification details.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.copy": {
+      "message": "Copy text",
+      "description": "Copy safe notification text through the authorized clipboard.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.empty": {
+      "message": "No new notifications",
+      "description": "Empty notification center.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.expand": {
+      "message": "Expand notification",
+      "description": "Expand message and source.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.hide": {
+      "message": "Hide notifications",
+      "description": "Hide notification presentation without clearing records.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.more": {
+      "message": "More actions",
+      "description": "Notification secondary actions menu.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.mute": {
+      "message": "Do Not Disturb",
+      "description": "Silence ordinary information and warning toasts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.next": {
+      "message": "Next notification",
+      "description": "Read next notification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.position": {
+      "message": "Notification position",
+      "description": "Choose notification placement.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.previous": {
+      "message": "Previous notification",
+      "description": "Read previous notification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.progress": {
+      "message": "In progress",
+      "description": "Accessible name for running notification progress.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.read": {
+      "message": "Read notification",
+      "description": "Open full notification in accessible reading view.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.source": {
+      "message": "Source: {label}",
+      "description": "Notification source.",
+      "placeholders": [
+        "label"
+      ],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.sources": {
+      "message": "Notification sources",
+      "description": "Choose sources for ordinary notifications.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.title": {
+      "message": "Notifications",
+      "description": "Notification center name.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.topright": {
+      "message": "Top right",
+      "description": "Top-right notification placement.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
+    "workbench.notifications.unread": {
+      "message": "Notifications: {count} new, {progress} in progress",
+      "description": "Accessible notification indicator and tooltip.",
+      "placeholders": [
+        "count",
+        "progress"
+      ],
+      "source": "src/prctr/workbench/browser/parts/notifications/notificationMessages.ts"
+    },
     "workbench.part.banner": {
       "message": "Important notices",
       "description": "Accessible name for the persistent notice region.",

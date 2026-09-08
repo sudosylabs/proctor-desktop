@@ -1,3 +1,4 @@
+import { notificationsFixture } from './notificationsFixture.ts';
 import { controlsFixture } from './sharedControlsFixture.ts';
 import { brandLockupFixture } from './brandLockupFixture.ts';
 import { productWindowChromeFixture } from './productWindowChromeFixture.ts';
@@ -17,6 +18,7 @@ export interface ControlFixture {
 
 /** Development-only literal manifest. Production compositions cannot reach this test root. */
 export const controlExplorerFixtures: readonly ControlFixture[] = Object.freeze([
+	Object.freeze({ id: 'notifications', title: 'Notifications', mount: notificationsFixture }),
 	Object.freeze({ id: 'shared-controls', title: 'Shared controls', mount: controlsFixture }),
 	Object.freeze({ id: 'brand-lockup', title: 'Brand lockup', mount: brandLockupFixture }),
 	Object.freeze({

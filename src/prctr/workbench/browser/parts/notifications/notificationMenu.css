@@ -1,0 +1,47 @@
+@layer workbench {
+	.prctr-notification-menu {
+		position: absolute;
+		z-index: 2575;
+		pointer-events: auto;
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+		inline-size: max-content;
+		max-inline-size: calc(100% - 16px);
+		max-block-size: calc(100% - 16px);
+		overflow: hidden auto;
+		padding: var(--prctr-spacing-content-small);
+		background: var(--prctr-color-background-raised);
+		color: var(--prctr-color-text-primary);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border-radius: var(--prctr-shape-radius-medium);
+		box-shadow: var(--prctr-elevation-overlay);
+	}
+	.prctr-notification-menu button {
+		flex: none;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font: inherit;
+		color: inherit;
+		background: none;
+		border: 0;
+		text-align: start;
+		padding: var(--prctr-spacing-content-small) var(--prctr-spacing-content-medium);
+		min-block-size: 28px;
+		cursor: pointer;
+	}
+	.prctr-notification-menu button:hover,
+	.prctr-notification-menu button:focus-visible {
+		background: var(--prctr-color-interaction-hover);
+		outline: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-focus);
+		outline-offset: -1px;
+	}
+	.prctr-notification-menu button[aria-disabled='true'] {
+		color: var(--prctr-color-text-disabled);
+		cursor: default;
+	}
+	.prctr-notification-menu button[aria-checked='true']::before {
+		content: '✓ ';
+	}
+}

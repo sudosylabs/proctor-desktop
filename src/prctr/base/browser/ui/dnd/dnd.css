@@ -1,0 +1,33 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* @proctor-vscode-port workbench-notifications */
+@layer controls {
+
+
+.prctr-drag-image {
+	display: inline-block;
+	padding: 1px 7px;
+	border-radius: 10px;
+	font-size: 12px;
+	position: absolute;
+	z-index: 1000;
+
+	/* Default styles */
+	background-color: var(--prctr-color-interaction-selected);
+	color: var(--prctr-color-text-primary);
+	outline: 1px solid var(--prctr-color-border-focus);
+	outline-offset: -1px;
+
+	/*
+	 * Browsers apply an effect to the drag image when the div becomes too
+	 * large which makes them unreadable. Use max width so it does not happen
+	 */
+	max-width: 120px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+}

@@ -2,6 +2,11 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { installWorkbenchNotifications } from '../../workbench/browser/parts/notifications/notificationWindow.js';
+import {
+	WORKBENCH_LIFECYCLE_SERVICE,
+	type WorkbenchLifecycleService
+} from '../../workbench/common/lifecycle.js';
 import type {
 	ProductWindowDescriptor,
 	ProductWindowKind
@@ -44,6 +49,15 @@ export function createDesktopWorkbenchContribution(
 					'Privileged window descriptor was not established before workbench activation'
 				);
 			context.setWindowBinding(descriptor);
+			const notifications = installWorkbenchNotifications(context, descriptor);
+			const lifecycle = context.getService<WorkbenchLifecycleService>(
+				WORKBENCH_LIFECYCLE_SERVICE
+			);
+			context.disposables.add(
+				lifecycle.onDidAdvancePhase((phase) => {
+					if (phase === 'restored') notifications.start();
+				})
+			);
 			if (windowChrome !== undefined) {
 				const chrome = context.disposables.add(
 					await ProductWindowChrome.create(

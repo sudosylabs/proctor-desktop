@@ -1,0 +1,23 @@
+@layer workbench {
+	.prctr-notifications-indicator {
+		background: none;
+		color: var(--prctr-color-text-secondary);
+		border: 0;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-block-size: 28px;
+		min-inline-size: 28px;
+		cursor: pointer;
+		-webkit-app-region: no-drag;
+		border-radius: var(--prctr-shape-radius-small);
+	}
+
+	.prctr-notifications-indicator:focus-visible {
+		outline: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-focus);
+		outline-offset: -1px;
+	}
+	.prctr-notifications-indicator:hover {
+		background: var(--prctr-color-interaction-hover);
+	}
+}

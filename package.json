@@ -42,6 +42,7 @@
     "build:editor-core-tests": "node build/buildEditorCoreTests.ts",
     "build:window-skeleton": "node build/buildWindowSkeleton.ts",
     "preview:launch": "node scripts/previewLaunch.ts",
+    "preview:notifications": "node scripts/previewNotifications.ts",
     "generate": "node build/generators/main.ts --write",
     "inspect": "node build/checks/main.ts --inspect",
     "test": "npm run test:unit",

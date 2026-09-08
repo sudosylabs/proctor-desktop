@@ -1,0 +1,8 @@
+@layer workbench {
+	.prctr-notification-layer {
+		position: absolute;
+		inset: 0;
+		z-index: 90;
+		pointer-events: none;
+	}
+}

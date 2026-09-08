@@ -1,0 +1,11 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* @proctor-vscode-port workbench-notifications */
+@layer controls {
+	/* Scrollbar sliders (panels, editor, lists — all consistent) */
+	.prctr-scrollable-element > .scrollbar > .slider {
+		border-radius: var(--prctr-shape-radius-medium);
+	}
+}

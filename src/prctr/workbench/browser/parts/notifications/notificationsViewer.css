@@ -1,0 +1,50 @@
+@layer workbench {
+	.prctr-notifications .notification-offset-helper {
+		visibility: hidden;
+		pointer-events: none;
+	}
+	.prctr-notifications .notification-list-item-message {
+		white-space: nowrap;
+	}
+	.prctr-notifications .notification-list-item-icon[data-severity='1'] {
+		color: var(--prctr-color-feedback-info);
+	}
+	.prctr-notifications .notification-list-item-icon[data-severity='2'] {
+		color: var(--prctr-color-feedback-warning);
+	}
+	.prctr-notifications .notification-list-item-icon[data-severity='3'] {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-notifications .prctr-action-bar .action-label {
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-notifications .prctr-action-bar .action-label:hover {
+		background: var(--prctr-color-interaction-hover);
+	}
+	.prctr-notifications .prctr-action-bar .action-label:focus-visible,
+	.prctr-notifications .prctr-notification-button:focus-visible {
+		outline: 1px solid var(--prctr-color-border-focus);
+	}
+}
+@layer workbench {
+	.prctr-notifications .prctr-action-bar button.action-label {
+		border: 0;
+		background: transparent;
+		cursor: pointer;
+		line-height: normal;
+		box-sizing: content-box;
+	}
+	.prctr-notifications .prctr-action-bar button.action-label:disabled {
+		opacity: 0.6;
+		cursor: default;
+	}
+	.prctr-notifications .prctr-action-bar button.action-label:hover {
+		background: var(--prctr-color-interaction-hover);
+	}
+	.prctr-notifications .prctr-notification-button {
+		font-family: inherit;
+	}
+	.prctr-notifications .prctr-notification-dropdown-button {
+		cursor: pointer;
+	}
+}

@@ -1,0 +1,18 @@
+@layer workbench {
+	.prctr-notification-hover {
+		position: absolute;
+		z-index: 2576;
+		pointer-events: auto;
+		box-sizing: border-box;
+		max-block-size: calc(100% - 16px);
+		overflow: auto;
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+		padding: var(--prctr-spacing-content-small);
+		color: var(--prctr-color-text-primary);
+		background: var(--prctr-color-background-raised);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border-radius: var(--prctr-shape-radius-small);
+		box-shadow: var(--prctr-elevation-overlay);
+	}
+}
