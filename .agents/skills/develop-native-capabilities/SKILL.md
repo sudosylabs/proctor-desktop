@@ -37,6 +37,12 @@ Inspect the generated source manifest and
 family or sub-capability. Observation and helper wire changes start in
 `native/schemas/`; generated Rust/TypeScript files are never edited directly.
 
+For effective policy, live reset binding or protected delivery changes, load the
+[security policy](../../../docs/contracts/security-policy.md),
+[live participation](../../../docs/contracts/secure-participation.md), and
+[delivery](../../../docs/contracts/protected-delivery.md) contracts. These govern
+server-facing provenance; native observation packages retain their passive seam.
+
 ## 2. Classify the capability
 
 First classify the exact sub-capability, policy mode, and target claim. The
@@ -226,7 +232,10 @@ either side acquiring the other's authority.
 Block on required source, permission, process, port, heartbeat, topology, or
 effect-verification loss. Permit one bounded automatic restart, create a new
 source instance/generation and gap, then repeat all preflight checks; restart
-never restores readiness alone and repeated failure cannot loop.
+never restores readiness alone and repeated failure cannot loop. Retain the reset
+edge through live control before the new source establishes server-usable
+continuity; historical delivery may follow later. A capacity-refused reset stays
+contained while valid lease renewal continues.
 
 On authoritative departure, stop callback intake, fence the generation, drain
 accepted facts, remove subscriptions, close handles and ports, emit terminal

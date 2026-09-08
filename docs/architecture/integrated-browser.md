@@ -15,6 +15,9 @@ navigation intents only.
 
 ## Browser Policy
 
+The [browser contract](../contracts/browser.md) owns exact wire models,
+canonicalization fixtures, source operations, evidence grouping and retention.
+
 One typed policy is authored by an authorized Exam Manager with the Exam, frozen
 in the Exam Revision, and returned through the candidate presentation. Each rule
 contains a stable ID and uses a closed grammar:
@@ -34,9 +37,16 @@ custom schemes, external-application launches, and unlisted downloads.
 Draft edits never affect an open Sitting. Only an immutable live correction may
 advance Browser Policy; CandidateWindow presents a persistent summary and
 requires acknowledgement only when the correction declares it.
-Applying a correction seals and flushes the prior policy-bound Browser Activity
-source before a new source is created with the corrected revision and digest;
-activity never crosses policy scope.
+Applying a correction closes the prior source's navigation authority immediately.
+A successor waits for the current policy and applicable acknowledgements, while
+old-source records may deliver under their frozen policy and closure deadline.
+Closure does not wait for flushing or a client final declaration.
+
+Matching uses longest path prefix, exact host before wildcard, longest configured
+hostname, then rule ID. Preserve repeated path slashes, percent-encoded unreserved
+bytes and percent-triplet case. Redirect destinations must match independently,
+and the preceding hop's rule must allow the redirect. The contract fixes the
+admitted HTTP exception and rejects unsupported host/path forms.
 
 ## Privileged enforcement
 
@@ -85,40 +95,47 @@ Collect only these Attempt-scoped event kinds:
 
 Each record carries browser source-session ID, monotonic sequence,
 Participation generation, event kind, normalized scheme/host/port/path, matched
-rule ID, client occurrence time, and server receive time after ingestion. Query
-values are removed by default; a future policy may retain only explicitly safe
-parameter names. User-info and fragments are always removed. A digest of the
-complete normalized URL may be used for bounded correlation without exposing
-it.
+rule ID, client occurrence time, and server receive time after ingestion. Query and fragments are absent from retained activity. User-info is never
+retained. No full-URL digest is sent. Block reason and prior redirect-hop sequence
+must survive protected spooling. Invalid URLs and denied schemes use the exact
+minimized reason-specific wire shapes.
 
 Do not collect subresource requests, DOM/page content, screenshots, cookies,
 headers, form values, credentials, or general system-browser history. An
 allowed navigation is ordinary Browser Activity, not Integrity Evidence. A
-blocked attempt becomes Evidence/Flag input only when the frozen policy selects
-that consequence.
+blocked attempt creates evidence only when its validated frozen rule selects
+integrity_evidence. Flags group by Attempt, Participation, Browser Policy revision
+and rule; detail and overflow follow the finite contract budgets. Every new
+qualifying evidence/overflow change invalidates the review inventory. Missing
+redirect provenance remains unresolved and cannot manufacture a verified Flag.
 
 ## Ordered protected delivery
 
-One source session returns its instance ID and begins at a known sequence.
-Delivery is at-least-once and idempotent by source instance/sequence. The server
-acknowledges the highest contiguous sequence and reports gaps. Desktop retains
-unacknowledged records in a bounded encrypted spool distinct from Workspace
-Recovery and the general integrity spool. Acknowledgements are serialized per
-source and advance the durable watermark in the same atomic protected-store
-mutation that removes acknowledged records; a failed mutation leaves those
-records replayable after restart.
+One canonical UUIDv4 source binds one policy and Participation. Panel open/close
+retains that source. Initial, correction and runtime-reset starts have separate
+validated allowances. A valid runtime reset whose successor is refused still
+commits predecessor closure and browser unavailability; it cannot roll back that
+closure or reopen the unusable source. Metadata is reserved before new owners.
 
-Reconnect resends from the authoritative acknowledgement. Submission and
-automatic sealing report final browser source/sequence/gap facts but cannot
-wait indefinitely for a missing client record. Corruption, overflow, lost key,
-or terminal gap becomes an explicit minimized discrepancy, never invented
-activity.
+The [protected-delivery contract](../contracts/protected-delivery.md) owns receipt,
+settlement, replay, quota and spool rules. Exact per-event receipts authorize
+atomic local payload cleanup even behind a gap. Active and closed sources advance
+receive windows across terminal gaps without acknowledging missing bytes.
+Authoritative closure starts the historical deadline; a one-time bounded final
+declaration is separate. Same-User/key historical delivery grants no navigation.
+
+Summary-only mode retains enforcement and explicit incomplete provenance. New
+source creation cannot refill Attempt quotas. Submission settles every source
+across Participations and does not wait indefinitely for an absent client.
 
 Exact Attempt managers with the dedicated current action may inspect activity.
 General User search, Class membership, or broad staff visibility is
 insufficient. Every read is audited without copying URLs into ordinary audit or
 logs. Candidate disclosure and Institution-configured Browser Activity
-retention are separate from Integrity Evidence retention.
+retention are separate from Integrity Evidence retention. Generic override
+permission does not bypass exact manager membership plus the dedicated action.
+Ordinary history and minimized integrity evidence retire independently; holds,
+late delivery and category completion are rechecked transactionally.
 
 ## Module and process seams
 

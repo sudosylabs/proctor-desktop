@@ -24,6 +24,10 @@ for sources/effects. Load browser/execution skills when those gates change. The
 step is complete when caller, process, authority, scope, sensitive fields, and
 failure outcome are explicit.
 
+For wire models, preflight, policy lifetime, control ordering, quotas or
+correction gates, load the matching [server contract](../../../docs/contracts/README.md).
+Use that accepted contract when existing adapters or fixtures still differ.
+
 ## 2. Choose the privileged owner
 
 Put readiness/auth/key/credential/Session lifecycle in the privileged
@@ -76,9 +80,11 @@ cross-User/Institution/key/token replay and all redaction paths are covered.
 
 Keep disabled account, no current affiliation, no assigned access, product
 areas, manageable Academic Units, unresolved Attempt, and account/session
-management as separate self-context facts. Current student is exclusive;
-non-student responsibilities may overlap. Never map Role names directly to UI
-or treat navigation/realtime projections as grants.
+management as separate self-context facts. Institutional affiliations are
+non-exclusive, including simultaneous student and teacher affiliations. Present
+every server-authorized product area while keeping relationship and operation
+authorization separate. Never map Role names directly to UI or treat
+navigation/realtime projections as grants.
 
 Refresh is single-flight. Ambiguous rotation verifies rather than retries.
 Changing Institution/User/Session destroys bound windows and locks protected
@@ -105,9 +111,10 @@ non-authorizing outcomes.
 
 ## 7. Contain before presentation
 
-Validate one canonical effective-policy envelope containing resolved exception
-provenance, packaged capability/schema requirements, bounded configuration,
-expiry/admission bounds, and digest. Reject unknown, conflicting, prohibited,
+Validate the canonical effective policy, packaged capability/schema requirements,
+bounded configuration, admission scope and digest. Initial exception references
+are empty; preserve the contract's resolver exclusions. Use current Participation
+lease/Sitting authority, with no independent policy timeout. Reject unknown, conflicting, prohibited,
 oversized, or unsupported requirements before permission/source startup. Keep
 server policy resolution out of Desktop and bind preflight/evidence to the
 verified digest and signed capability matrix.
@@ -142,11 +149,17 @@ spools. Project only authorized minimized state and keep content/evidence/
 credentials out of ordinary audit, diagnostics, renderer state, and logs.
 
 Let main canonicalize and authenticate minimized batches with the registered
-installation credential; helpers and the utility never receive it. Bind batch
+installation credential; helpers and the utility never receive it. Separate
+content receipts from settlement and final declarations from server closure.
+Honor Attempt-wide detail/metadata budgets and reserved lifecycle capacity. Bind batch
 sequence, prior acknowledgement, idempotency key, policy digest, release,
 matrix, and source generations. Send one aggregate coverage heartbeat rather
 than recurring normal observations. Separate safe live manager state from
-authorized detailed review and use server-defined retention.
+authorized detailed review and use server-defined retention. Process successful
+and faulted controls through one durable ordering boundary. Reset edges reach
+live coverage independently of delayed evidence; stale responses never undo
+containment. Lease renewal remains available while interaction gates are closed.
+Confirm actual guest freeze/thaw through the current execution fence.
 
 The step is complete when every collected field has a purpose, classification,
 scope, delivery/access/retention rule, and failure behavior without becoming a

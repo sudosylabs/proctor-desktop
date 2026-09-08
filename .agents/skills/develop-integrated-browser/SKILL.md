@@ -25,12 +25,17 @@ The step is complete when the policy revision, Attempt/Participation scope,
 privileged owner, collected fields, retention/access owner, and failure result
 are explicit.
 
+For DTOs, rule selection, source operations, evidence or retention changes, load
+[the browser contract](../../../docs/contracts/browser.md) and
+[protected delivery](../../../docs/contracts/protected-delivery.md).
+
 ## 2. Preserve the closed policy grammar
 
 Accept only stable rule ID, exact HTTPS origin, optional normalized path prefix,
 explicit subdomain wildcard, redirect permission, blocked consequence, and a
-narrowly accepted HTTP exception. Share canonicalization fixtures with the
-server. Reject ambiguous wildcard/IDN/port/path forms, user-info, fragment
+narrowly accepted HTTP exception. Use deterministic specificity, preserve the
+contract's exact path bytes, and validate each redirect against both source and
+destination rules. Share canonicalization fixtures with the server. Reject ambiguous wildcard/IDN/port/path forms, user-info, fragment
 selectors, regex, unsafe/custom schemes, external apps, and unlisted downloads.
 
 Only an immutable live correction may replace policy for an open Sitting. The
@@ -56,22 +61,27 @@ scheme can bypass the policy owner.
 Record only browser open/close, successful top-level navigation, top-level
 redirect, and blocked top-level attempt. Carry source instance, sequence,
 Participation generation, kind, normalized scheme/host/port/path, matched rule,
-and bounded times. Strip user-info/fragments and query values by default. Keep
+and bounded times. Exclude user-info, fragments and query from retained activity. Preserve the
+bounded block reason and redirect-source selector before spooling. Keep
 subresources, page/DOM content, screenshots, cookies, headers, form values,
 credentials, and system-browser history absent.
 
 Allowed activity remains ordinary activity. Promote a blocked attempt only when
-frozen policy explicitly chooses evidence. The step is complete when every
+frozen policy explicitly chooses evidence. Use the agreed Flag group, detail
+caps, overflow counts and review invalidation; unknown provenance stays unresolved. The step is complete when every
 retained field has a purpose and no forbidden field reaches DTOs, logs, audit,
 or fixtures.
 
 ## 5. Deliver ordered protected records
 
-Use one source-session identity and monotonic sequence. Spool unacknowledged
-records in bounded encrypted storage and deliver at least once. Deduplicate by
-source/sequence, follow highest-contiguous acknowledgement, resend gaps, and
-seal final source/sequence/gap facts without indefinitely blocking submission.
-Keep this spool distinct from Workspace Recovery and general integrity data.
+Bind each UUIDv4 source to one policy and Participation. Keep panel open/close
+within that source; validate initial/correction/reset counters and metadata
+reservations. A valid reset refused a successor still commits predecessor closure.
+Spool bounded encrypted records, deduplicate by source/sequence/digest, and clean
+up on exact durable receipts or explicit terminal loss. Settlement is not receipt.
+Use server-owned closure/deadlines, bounded final declarations and historical-key
+ownership. Submission accounts for every source across Participations. Keep
+summary-only loss truthful and this spool separate from Workspace Recovery.
 
 The step is complete when reconnect, duplicate, reordering, gap, overflow,
 corruption, lost key, and automatic seal each yield one explicit outcome.

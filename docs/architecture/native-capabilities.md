@@ -338,10 +338,11 @@ accepted capability scope.
 
 Sources report mechanical facts only. The coordinator normalizes those facts
 and evaluates one authenticated canonical effective-policy envelope through a
-private policy evaluator. The server resolves Exam Revision rules,
-accommodations, manager grants, and candidate exceptions before delivery. The
-envelope binds registry/schema versions, target requirements, expiry/admission
-bounds, and a policy digest. Unknown, conflicting, oversized, prohibited, or
+private policy evaluator. The [security-policy contract](../contracts/security-policy.md)
+defines the initial published-selection/baseline/artifact resolver and its
+explicit exclusions. The envelope binds registry/schema identities, target
+requirements, admission scope, and a policy digest; the Participation lease
+supplies live time authority. Unknown, conflicting, oversized, prohibited, or
 unsupported requirements fail before permission or source startup.
 
 ```text

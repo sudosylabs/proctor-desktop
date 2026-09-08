@@ -29,10 +29,11 @@ focuses a previous CandidateWindow: the User signs in and navigates from the
 normal authenticated home again.
 
 Account and settings are pages in `AuthenticatedWindow`, not separate window
-kinds. A current student sees student exam activity plus account/settings. A
-non-student User may have overlapping teacher, Exam Manager, Academic Unit, and
-system-administration responsibilities; the server projects available areas and
-each operation reauthorizes its actual Action and Resource.
+kinds. A User may see student exam activity alongside authorized teacher,
+Exam Manager, Academic Unit, or system-administration areas. Institutional
+affiliations are non-exclusive; the server projects all available areas and each
+operation reauthorizes its actual Action and Resource. Entering CandidateWindow
+still closes the entire AuthenticatedWindow regardless of those responsibilities.
 
 ## Authenticated product areas
 
@@ -260,7 +261,8 @@ a production candidate Attempt. Diagnostics remain bounded and redacted.
 Verify through the owning interfaces:
 
 - manifest and preload allowlists for all three windows;
-- student, mixed non-student, disabled, unaffiliated, and no-access navigation;
+- student, overlapping student/teacher/management, disabled, unaffiliated, and
+  no-access navigation;
 - item resolution, cancellation, pane lifecycle, focus, zoom, and restoration;
 - LaunchWindow unavailable/incompatible/change-server/authentication states;
 - first join, pause, suspension ordering, ready rejoin, submission, and relaunch;

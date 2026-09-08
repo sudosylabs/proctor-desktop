@@ -26,6 +26,9 @@ the settings registry. Use [`adapt-vscode`](../adapt-vscode/SKILL.md) before
 adopting a VS Code key/implementation. The step is complete when one authority,
 scope, window set, and candidate treatment are explicit.
 
+For Attempt Configuration models, hashes, approved IDs or re-entry, load the
+[configuration contract](../../../docs/contracts/attempt-configuration.md).
+
 ## 2. Declare one packaged setting
 
 Add one immutable typed declaration through the owning capability and literal
@@ -60,10 +63,14 @@ target, or arbitrary string-key lookup.
 At initial join derive only the closed candidate-safe subset: theme/high
 contrast, bounded zoom/font/line height, reduced motion, screen-reader/
 announcement mode, cursor, and approved Candidate command/keybinding IDs. Include
-schema, registry, build/target, and User Settings revision provenance.
+exact manifest SHA-256, registry FNV, build/target and User Settings revision
+provenance. Approved keybindings are catalog IDs associated with selected
+Candidate-safe command IDs, never raw chords. Preserve pixel line-height units.
 
 Submit it for server validation/freeze on the Attempt. Re-entry applies the
-exact stored object, never current User Settings. Stronger current platform,
+exact stored object, never current User Settings. Hash the complete candidate
+object and preserve original provenance; a later verified build may re-enter
+when its admitted manifest reproduces that object. Stronger current platform,
 accessibility, or safety constraints may narrow only the effective projection.
 Candidate preload receives no source/cache/draft/mutation interface.
 

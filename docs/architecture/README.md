@@ -2,6 +2,9 @@
 
 These files contain accepted current-state rules:
 
+- [Desktop/server contract](../contracts/README.md) — exact wire models,
+  operations, bounds, authorization and failure semantics for server integration
+
 - [Overview](./overview.md) — product and process boundaries
 - [Module system](./module-system.md) — module and dependency vocabulary
 - [Workbench](./workbench.md) — compositions, shell, contributions, content,

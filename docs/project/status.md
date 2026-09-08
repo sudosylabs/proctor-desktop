@@ -20,8 +20,9 @@
 - Authoritative Attempt states are ready, active, suspended, and submitted.
   Only active binds one Desktop Session/Participation generation; reallow
   produces ready and successful secure join produces active.
-- A current student is exclusively student, while non-student academic/
-  management/administration responsibilities may overlap. One candidate has at
+- Institutional affiliations are non-exclusive, including concurrent student
+  and teacher affiliations. AuthenticatedWindow presents all server-authorized
+  academic, management, administration, and account areas. One candidate has at
   most one unresolved Attempt across all Sittings.
 - The Attempt Workspace boundary separates server snapshot, Desktop Working
   Overlay, protected recovery/cache, and Execution Environment projection. The
@@ -150,7 +151,7 @@ source-level behavior must not be reported as packaged production behavior.
 
 ## Server integration baseline
 
-The current server already has versioned `/api/v1` and realtime contracts for
+The current server already exposes `/api/v1` and realtime contracts for
 discovery/authentication, Sessions, candidate Attempts, Participation and
 connections, workspaces/resources/submissions, User Settings, integrity review,
 and remote execution/terminal transport. Desktop work should characterize and
@@ -161,26 +162,50 @@ The LaunchWindow readiness adapter now uses the existing public
 `/api/v1/system/ping` and `/api/v1/discovery` contracts. It does not require a
 combined ping response.
 
-The remaining integration areas below require separate contract verification
-with the server owner; they are not claims that current server implementations
-are absent:
+The [Desktop/server agreement](../contracts/README.md) is accepted. The server
+agent is implementing it, as reported by the user on 2026-09-08. Delivery has not
+yet been verified here. The exact DTOs and failure rules are settled; implementation
+conformance and activation evidence remain separate.
+
+Existing identity and product integration still requires verification of:
 
 - method-agnostic hosted Desktop Authorization and registered-key/DPoP binding;
-- current-student exclusivity and bounded self-context/activity projections;
+- overlapping institutional responsibilities and bounded self-context/activity
+  projections;
 - ready state, candidate-wide unresolved-Attempt exclusion, and active Session
   lock across every Session-creation path;
 - manager aggregate/board invalidation and safe Candidate presentation;
-- server validation/freezing of Attempt Configuration;
-- revision-frozen Browser Policy, Browser Activity ingestion/acknowledgement,
-  and exact manager access;
-- canonical effective Exam Security Policy with resolved exceptions, native
-  sub-capability/schema requirements, signed capability-matrix compatibility,
-  preflight admission binding, emergency strengthening, and anti-rollback;
-- minimized native occurrence/health/recovery ingestion with idempotent
-  watermarks, coverage heartbeats, safe live manager projection, authorized
-  detailed review, and server-defined retention;
-- correction acknowledgement and ready-state sealing/manager-end completion;
-- agreement repairs where server domain, OpenAPI, and public projections differ.
+- ready-state sealing and manager-end completion.
+
+The agreed server work and matching Desktop follow-through cover:
+
+- typed native policy and verified artifacts, with lease-based authority and
+  suspension-based emergency blocking;
+- bounded preflight, atomic Connect/configuration freeze and metadata reservation;
+- exact receipts, active gap progression, closure-based replay, finite quotas and
+  metadata capacity refusal across rejoining;
+- processed-control ordering for successful and failed coverage updates, live
+  reset receipts and confirmed execution freeze/thaw;
+- complete browser source lifecycle, committed closure on replacement refusal,
+  grouped evidence, all-source settlement and independent manager access/retention;
+- oldest-first correction acknowledgement with transactional per-capability gates;
+- opaque execution-host fencing, semantic observations and incremental projection
+  preserving the existing PTY.
+
+Desktop adapters, validators and fixtures must adopt those exact contracts.
+Known follow-through includes removing independent policy expiry, preserving
+configuration provenance across compatible patched builds, using approved catalog
+IDs, browser specificity/path parity, retaining redirect/block provenance, and
+implementing delivery/control ordering and capacity states. Existing source-level
+tests do not demonstrate agreement conformance. Signed production releases and
+matrices/catalogs, privileged adapters, packaged native verification and a verified
+pinned execution host remain activation dependencies.
+
+Initial resolver exclusions are Institution inheritance, accommodations and
+exception authoring/revocation, plus selective live native-policy strengthening.
+Nonempty Institution allowlists remain unavailable until their catalog owner
+exists. These capabilities must not be presented as part of implemented policy
+resolution.
 
 Desktop features depending on those areas must expose an unavailable or
 compatibility-gated state until their adapters match the verified server contract.
@@ -196,7 +221,7 @@ compatibility-gated state until their adapters match the verified server contrac
 3. **Authenticated product** — self-context, student exam activity,
    teacher/manager/admin destinations, account, settings, navigation
    invalidation, and authorization-safe empty/restricted states.
-4. **Attempt Workspace/editor** — v1 adapter, file tree/editor provider, Working
+4. **Attempt Workspace/editor** — current server adapter, file tree/editor provider, Working
    Overlay, mutation scheduler, protected recovery/cache, reconciliation,
    conflicts, Exam Resources, and submission readiness.
 5. **Candidate identity/security** — admission, Attempt Configuration,
@@ -234,7 +259,8 @@ packaged evidence, architecture, skills, and project status agree.
   resolution, journal mutation keys, and per-entry capability snapshots.
 - Isolation requirements for untrusted exam code beyond the current Execution
   Environment boundary.
-- Protected-record and Browser Activity retention periods.
+- Institution choices for independent protected-record and Browser Activity retention
+  periods; their fields, access boundaries and retirement semantics are agreed.
 - Signing providers, artifact publication details, and support-artifact
   retention.
 - Product-level extensibility beyond compile-time contributions.

@@ -148,7 +148,7 @@ change.
     renderer state and authoritative Attempt `ready` never establish it.
 55. `security.online-only` Candidate interaction requires continuous authenticated participation and has
     no offline editing grace; brief reconnect may retain active state only inside
-    the authoritative lease.
+    the authoritative lease. Frozen policy has no separate expiry authority.
 56. `security.containment-before-presentation` Capability denial and work protection precede blocked-state presentation
     and authoritative refetch; recovery requires fresh complete gates.
 57. `security.pause-suspension` Pause keeps CandidateWindow, Participation, and Session lock while blocking
@@ -222,8 +222,8 @@ change.
     redirect/blocked attempts with sensitive URL components removed; allowed
     activity is not Integrity Evidence.
 78. `browser.ordered-delivery` Activity uses source-instance monotonic sequences, encrypted protected
-    spooling, at-least-once idempotent delivery, contiguous acknowledgements,
-    explicit gaps, and exact Attempt-manager access.
+    spooling, at-least-once idempotent delivery, exact content receipts distinct
+    from settlement, terminal gaps, and exact Attempt-manager-plus-action access.
 
 ## Execution Environment
 
@@ -234,6 +234,7 @@ change.
     Participation generation and is gated on pause, suspension, and completion.
 81. `execution.workspace-projection` The Execution Environment projects acknowledged Workspace state; VM paths
     and terminal output never establish Workspace authority or durability.
+    Opaque host grant/epoch/revision fences keep exam identity in Proctor.
 
 ## Toolchain and release
 

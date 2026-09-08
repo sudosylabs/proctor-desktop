@@ -112,11 +112,11 @@ metadata but never source JSONC, values, comments, drafts, or conflicts.
 
 ## Attempt Configuration
 
-Attempt Configuration replaces the former Candidate Settings Baseline. At
-initial secure join, Desktop derives a closed object from:
+At initial secure join, Desktop derives the closed
+[Attempt Configuration contract](../contracts/attempt-configuration.md) from:
 
-- Attempt Configuration schema version;
-- packaged registry version and Desktop build/target;
+- the exact admitted configuration manifest fingerprint;
+- packaged FNV registry fingerprint and verified Desktop build/target;
 - current acknowledged User Settings revision;
 - normalized eligible preferences;
 - current server/Exam constraints and packaged bounds.
@@ -124,6 +124,13 @@ initial secure join, Desktop derives a closed object from:
 The server validates and freezes the exact object/digest on the Attempt. The
 Desktop applies that stored object on renderer restart and successful join from
 ready. It never recomputes an existing Attempt from newer User Settings.
+The digest binds the complete candidate object, including source revision and
+build/target provenance. Re-entry preserves that provenance and admits a later
+verified build when its manifest reproduces the frozen configuration. SHA-256
+artifact/document digests and the FNV registry selector have distinct meanings.
+Approved commands/keybindings are release-catalog IDs with validated command
+relationships; raw key chords cannot enter the wire object. Pixel line height
+retains its own unit and bound.
 
 The first accepted fields are:
 

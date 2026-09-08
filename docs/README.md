@@ -11,6 +11,10 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
 
 ## Architecture
 
+- [Desktop/server contract](./contracts/README.md) — accepted wire models,
+  operations, canonical bytes, delivery budgets, and failure semantics; load
+  before implementing adapters or cross-language agreement fixtures
+
 - [Development environment](./project/development.md) — local setup, editor project
   discovery, formatting ownership, verification commands, and optional commit checks
 

@@ -4,7 +4,7 @@ This is the canonical desktop-facing subset of Proctor's product language. Add
 terms when a real desktop workflow needs them; do not mirror the entire server
 model preemptively.
 
-Versioned Proctor Server contracts govern transferred data while this document
+The accepted [server contract](../contracts/README.md) governs transferred data while this document
 governs the language used in the Desktop codebase. A server implementation or
 wire name does not silently change these accepted product relationships.
 
@@ -207,11 +207,13 @@ _Avoid_: Login state, renderer context key, cheating verdict
 
 **Exam Security Policy**
 
-The canonical server-frozen effective envelope for one Exam Attempt. It combines
-the Exam Revision's declared rules with resolved accommodations and exceptions,
-selects only packaged Desktop capability identifiers and bounded configuration,
-and is bound to a digest used by preflight and integrity delivery. The Desktop
-evaluates it but does not author, weaken, or resolve it.
+The canonical server-frozen effective envelope for one Participation generation.
+It resolves published rules, the mandatory baseline and verified capability/catalog
+bindings under current admission authority. The initial resolver excludes
+Institution inheritance, accommodations and exception authoring; exception
+references are empty. Its digest binds preflight and integrity delivery. Live
+authority uses the Participation lease and current server gates. The Desktop
+evaluates the policy but does not author, weaken, or resolve it.
 
 _Avoid_: User Settings, renderer configuration, local exception
 
@@ -227,7 +229,7 @@ _Avoid_: Exam Attempt, Session, application window
 
 A local period in which required privileged client continuity is uncertain or
 lost. Brief transport recovery inside the server Participation lease may retain
-the active generation; confirmed lease, policy, or bound-Session loss causes
+the active generation; confirmed lease expiry, policy-use revocation, or bound-Session loss causes
 the server to suspend the Attempt. It is never submission, an Integrity Flag,
 or guilt.
 
@@ -311,10 +313,12 @@ _Avoid_: Cheating verdict, automatic violation
   successful secure joins from ready, but never more than one current generation.
 - One candidate may have at most one unresolved Exam Attempt (`ready`, `active`,
   or `suspended`) across all Exam Sittings.
-- A current student cannot simultaneously hold current teacher/staff,
-  Academic Unit membership, Role Binding, Exam Manager, or system-administrator
-  relationships. Those non-student responsibilities may overlap with each
-  other. Historical ended relationships do not conflict.
+- Institutional affiliations are non-exclusive: a User may simultaneously be
+  a student and teacher or hold other current relationships. Affiliations,
+  Academic Unit membership, Role Bindings, and Exam Manager relationships remain
+  distinct; each operation checks its required current authority. Desktop
+  presents every server-authorized product area without making student status
+  an exclusion rule.
 - Disabled account, no current affiliation, and no assigned access are distinct
   states.
 - A Participation Interruption never establishes guilt or submission; confirmed

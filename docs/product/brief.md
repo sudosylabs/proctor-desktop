@@ -36,14 +36,11 @@ affected by it.
 The current phase turns the accepted application platform into the first
 end-to-end Desktop slices. Existing server contracts already cover identity,
 Sessions, realtime, Attempts, workspaces, submissions, User Settings, integrity
-review, and remote execution. Desktop implementation pins those contracts while
-coordinated server work adds readiness/compatibility, method-agnostic Desktop
-Authorization, registered-installation proof, complete Attempt re-entry,
-candidate/manager projections, Attempt Configuration, and browser policy and
-activity. It also adds the canonical effective Exam Security Policy, signed
-native capability-matrix admission, minimized integrity delivery, coverage
-heartbeats, and safe live manager projections required by the accepted native
-families.
+review, and remote execution. The accepted
+[Desktop/server contract](../contracts/README.md) defines coordinated policy,
+secure admission, configuration, delivery, browser, correction and execution work.
+[Project status](../project/status.md) distinguishes implementation progress,
+remaining adapters and verified release capability.
 
 ## Non-goals
 

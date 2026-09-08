@@ -26,6 +26,12 @@ The step is complete when environment/PTY authority, transport process,
 Workspace prerequisite, generation scope, and terminal content classification
 are explicit.
 
+For projection, observation, cursor or host-fence changes, load the exact
+[execution contract](../../../docs/contracts/execution.md). Use
+[live participation](../../../docs/contracts/secure-participation.md) for
+containment effects and [corrections](../../../docs/contracts/live-corrections.md)
+for per-capability acknowledgement gates.
+
 ## 2. Preserve the initial PTY seam
 
 Expose only open, input, resize, output, and close for one PTY on the active
@@ -43,9 +49,14 @@ WebSocket.
 Bind open and subsequent frames to current Attempt, Desktop Session,
 Connection, and Participation generation. Require active Attempt, open Sitting,
 usable Secure Exam Posture, admitted execution profile, and ready environment.
-Reject stale renderer/session/connection/generation.
+Reject stale renderer/session/connection/generation. The reusable host sees only
+opaque grant/epoch/fence revision; Proctor owns exam identity mapping. Persist
+same-epoch fencing or retire the epoch, and match every effect acknowledgement
+against the current durable decision.
 
-Pause gates input/resize/open. Suspension, submission, manager end, Sitting
+Pause gates input/resize/open. Required native/terminal-correction containment
+freezes the running guest; retain pending/unavailable state until its current
+fence confirms the effect. Confirm authorized thaw before reopening input. Suspension, submission, manager end, Sitting
 close, Session invalidation, or supersession closes the model/transport. Ready
 rejoin creates a new generation and new PTY on demand without replay. The step
 is complete when each lifecycle transition has one server-authoritative and one
@@ -61,6 +72,12 @@ parallel file model. Never infer durability from terminal output or VM paths.
 
 The step is complete when Workspace tests can replace the execution adapter
 without changing acknowledgement semantics.
+
+Apply acknowledged saves incrementally without replacing the watcher baseline
+or retiring a healthy PTY. Bind guest observations to immutable event-time bytes,
+stable identities, semantic directory operations and projected expected versions.
+Wait for the acknowledged Workspace cursor to reach the host before execution.
+Preserve protective refusals until the pinned reusable host passes conformance.
 
 ## 5. Bound terminal transport and UI
 

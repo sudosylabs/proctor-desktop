@@ -34,7 +34,7 @@ when every domain state and action has one authority outside shell presentation.
 Place behavior in exactly one window:
 
 - LaunchWindow: signed-out server selection/readiness and start/cancel auth;
-- AuthenticatedWindow: student activity, authorized non-student areas, account,
+- AuthenticatedWindow: student activity, all authorized management areas, account,
   and settings;
 - CandidateWindow: one active secure Attempt only.
 

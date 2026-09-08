@@ -58,15 +58,17 @@ OS timing. Unknown, contradictory, oversized, prohibited, or unsupported
 requirements fail before permission prompts and source startup. Observe mode
 cannot select an enforcement-only effect: private clipboard and candidate
 print-command denial remain inactive while their observation-only siblings may
-collect bounded facts. The server
-resolves Institution rules, Exam Revision policy, roles, accommodations,
-manager grants, and candidate exceptions before delivering the policy; Desktop
-has no local bypass or policy-precedence engine.
+collect bounded facts. The server resolves the
+[accepted security-policy contract](../contracts/security-policy.md); Desktop
+has no local bypass or policy-precedence engine. Initial resolution includes
+published selections, mandatory baseline, verified artifacts/catalogs and
+existing admission fences. Institution inheritance, accommodations and exception
+authoring/revocation are excluded; exception references are empty.
 
 Ordinary live policy mutation is absent. A changed policy requires suspension
-and a fresh join. A separately authenticated emergency message may only
-strengthen restrictions or block participation; it cannot weaken the frozen
-policy.
+and a fresh join. Emergency blocking uses authorized Attempt suspension.
+Selective live strengthening is outside the initial contract. Policy has no
+independent expiry; current Participation and Sitting authority govern use.
 
 ## Common mechanical envelope
 

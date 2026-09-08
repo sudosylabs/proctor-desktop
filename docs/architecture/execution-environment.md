@@ -20,6 +20,11 @@ automation are outside the initial contract.
 
 ## Capability and lifecycle
 
+The [execution contract](../contracts/execution.md) owns exact projection,
+observation, cursor, terminal identity and host-fence records. The reusable host
+receives only an opaque execution grant, environment epoch and monotonic fence
+revision; Proctor retains Attempt/Participation/Session mapping and authorization.
+
 Candidate presentation explicitly reports whether terminal access is enabled,
 disabled, or temporarily unavailable without exposing host/image secrets.
 Terminal opens only after:
@@ -36,8 +41,12 @@ cannot reopen or write to the PTY. The renderer receives a terminal-session
 selector and bounded stream events, not a host, port, credential, process ID,
 filesystem path, or generic WebSocket.
 
-Pause closes input/resize/open gates and presents the CandidateWindow overlay;
-the server decides whether the PTY process is retained or closed. Suspension,
+Pause closes input/resize/open gates and presents the CandidateWindow overlay.
+Required native containment and terminal correction gates freeze the actual
+guest. Server state remains freeze_pending until the current host fence confirms
+it; failed effects keep gates closed. Recovery requires current authority and
+confirmed thaw before input. Delayed effects and callbacks cannot affect a newer
+grant, epoch or fencing decision. Suspension,
 submission, manager End Attempt, Sitting close, Session invalidation, or stale
 generation closes the Desktop terminal surface and its transport. Rejoining
 ready creates a new Participation generation and opens a new PTY on demand;
@@ -46,7 +55,10 @@ there is no client-side replay of the old terminal.
 ## Workspace projection boundary
 
 Before execution, the server projects acknowledged Attempt Workspace state into
-the remote environment. Server-side watchers may persist permitted environment
+the remote environment. Desktop waits for overlay persistence and supplies its
+acknowledged expected Workspace cursor when opening the terminal. Projection lag
+is distinct from denial or host unavailability. Ordinary saves update the same
+environment and PTY without restarting running commands. Server-side watchers may persist permitted environment
 changes back through canonical Workspace mutations. Desktop observes resulting
 authoritative cursors/journal changes through `AttemptWorkspaceSession`; it does
 not read the VM filesystem directly or infer acknowledgement from terminal
@@ -58,6 +70,13 @@ work first settles the relevant local generation to authoritative persistence.
 Watch-back conflicts, ignored/build paths, unknown outcomes, and projection
 failure surface through Workspace reconciliation rather than a parallel file
 model.
+
+Projection Apply is idempotent and cursor/version fenced. It preserves unrelated
+guest changes and the watcher baseline. Observations carry immutable event-time
+content, stable node identity and semantic directory operations; expected versions
+come from the projected baseline. A current live file read cannot substitute for
+observed bytes. Preserve safe refusals until the pinned reusable host passes real
+conformance. The host fence survives same-epoch restart, or the epoch is retired.
 
 ## Terminal presentation
 
