@@ -178,8 +178,8 @@ export async function runLaunchWindowTests(
 			'Hidden server form was made visible by the cascade'
 		);
 		check(
-			owner.activeElement?.getAttribute('role') === 'status',
-			'Pending selection must not leave focus in hidden input'
+			owner.activeElement === action('Change server'),
+			'Pending selection must focus the available action instead of hidden input or message text'
 		);
 		check(
 			!action('Change server').disabled &&
@@ -190,6 +190,21 @@ export async function runLaunchWindowTests(
 			!owner.querySelector('footer') && !owner.body.textContent?.includes('Exit Proctor'),
 			'Native exit must not be repeated in the content'
 		);
+		const spinner = owner.querySelector<HTMLElement>(
+			'[data-prctr-semantic-icon="state.loading"]'
+		);
+		check(spinner, 'Server checks must show the loading glyph');
+		if (!owner.defaultView!.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			await new Promise<void>((resolve) =>
+				owner.defaultView!.requestAnimationFrame(() => resolve())
+			);
+			const before = owner.defaultView!.getComputedStyle(spinner).transform;
+			await new Promise((resolve) => owner.defaultView!.setTimeout(resolve, 100));
+			check(
+				owner.defaultView!.getComputedStyle(spinner).transform !== before,
+				'The loading spinner must visibly rotate while checking'
+			);
+		}
 		action('Change server').click();
 		await tick();
 		check(
@@ -203,6 +218,24 @@ export async function runLaunchWindowTests(
 			input.getAttribute('aria-invalid') === 'true' &&
 				input.getAttribute('aria-describedby')?.includes('-error'),
 			'Invalid origin needs associated field error'
+		);
+		const feedback = owner.querySelector<HTMLElement>('.prctr-launch-window__feedback')!;
+		const feedbackMessage = owner.getElementById('prctr-launch-feedback-error')!;
+		check(
+			feedback.getBoundingClientRect().top >
+				action('Continue').getBoundingClientRect().bottom &&
+				feedbackMessage.getBoundingClientRect().height > 0 &&
+				input.getAttribute('aria-describedby')?.split(' ').includes(feedbackMessage.id) &&
+				!form.querySelector('.prctr-text-field__error')?.textContent,
+			'Invalid address feedback must appear once below Continue and remain associated with the field'
+		);
+		check(
+			feedback.dataset.tone === 'error' &&
+				feedback
+					.querySelector('[data-prctr-semantic-icon="state.error"]')
+					?.getAttribute('aria-hidden') === 'true' &&
+				owner.defaultView!.getComputedStyle(feedback).textAlign === 'start',
+			'Errors need readable text and a decorative severity mark in the feedback surface'
 		);
 		const stale = projection;
 		publish('ready', {
@@ -229,7 +262,7 @@ export async function runLaunchWindowTests(
 		check(
 			Array.from(
 				owner.querySelectorAll<HTMLButtonElement>("button[data-variant='primary']")
-			).filter((button) => button.closest('[hidden]') === null).length === 1,
+			).filter((button) => button.getBoundingClientRect().height > 0).length === 1,
 			'Ready Launch state must expose one primary task action'
 		);
 		listener?.(stale);
@@ -267,6 +300,14 @@ export async function runLaunchWindowTests(
 				!owner.body.textContent?.includes('Opens your browser'),
 			'The verified Institution should supply context without the origin or browser hint'
 		);
+		check(
+			action('Retry').getBoundingClientRect().height === 0,
+			'Ready state must not paint the hidden Retry action'
+		);
+		check(
+			!launch.element.querySelector('.prctr-notifications-indicator, .prctr-notifications'),
+			'Launch must not mount the workbench notification UI'
+		);
 		const signInBounds = action('Sign in').getBoundingClientRect();
 		const changeBounds = action('Change server').getBoundingClientRect();
 		check(
@@ -292,6 +333,12 @@ export async function runLaunchWindowTests(
 			owner.querySelector('[role=alert]')?.textContent?.includes('could not be completed'),
 			'Failed sign-in must provide recoverable feedback'
 		);
+		check(
+			feedback.getBoundingClientRect().top >
+				action('Change server').getBoundingClientRect().bottom &&
+				feedback.dataset.announcementOnly === 'false',
+			'Action failures must paint below the action group'
+		);
 		for (const state of launchStates) {
 			const selection = state === 'selectingServer' || state === 'invalidServer';
 			publish(
@@ -312,6 +359,26 @@ export async function runLaunchWindowTests(
 			check(
 				(action('Change server').closest('[hidden]') !== null) === selection,
 				'Change server must only be offered after a server has been submitted'
+			);
+			if (state !== 'ready' && state !== 'selectingServer') {
+				const lastAction = selection ? action('Continue') : action('Change server');
+				check(
+					feedback.getBoundingClientRect().top >
+						lastAction.getBoundingClientRect().bottom,
+					'Feedback must follow the actions in state: ' + state
+				);
+			}
+			const loading = owner.querySelector(
+				'[data-prctr-semantic-icon="state.loading"][data-prctr-icon-modifier="spin"]'
+			);
+			check(
+				!!loading === ['checking', 'authorizing'].includes(state),
+				'Spinner must follow pending work and stop for settled states: ' + state
+			);
+			check(
+				feedback.getAttribute('tabindex') === null &&
+					owner.querySelector('[role=status]')?.getAttribute('tabindex') === null,
+				'Message text must not become a focus target'
 			);
 			const status = owner.querySelector('[role=status]');
 			check(
@@ -343,12 +410,52 @@ export async function runLaunchWindowTests(
 		);
 		const scroller = launch.element.querySelector<HTMLElement>('.prctr-launch-window__page');
 		check(scroller !== null, 'Launch scroll container is missing');
+		const slider = launch.element.querySelector<HTMLElement>('.scrollbar.vertical > .slider');
+		check(slider !== null, 'Launch must use the admitted VS Code scrollbar');
+		check(
+			getComputedStyle(scroller).overflowY === 'hidden' &&
+				getComputedStyle(slider).borderRadius === '4px',
+			'Launch must use the shared rounded scrollbar without a native scrollbar'
+		);
 		scroller.scrollTop = scroller.scrollHeight;
+		await new Promise<void>((resolve) =>
+			requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+		);
 		check(scroller.scrollTop > 0, 'Long Launch state must remain vertically scrollable');
+		const bottomPosition = slider.getBoundingClientRect().top;
+		check(
+			slider.getBoundingClientRect().height > 0 &&
+				slider.getBoundingClientRect().height < scroller.getBoundingClientRect().height,
+			'Scrollbar must measure the zoomed content and viewport'
+		);
 		check(
 			action('Retry').getBoundingClientRect().bottom <=
 				scroller.getBoundingClientRect().bottom,
 			'Recovery action cannot be reached at 200% zoom'
+		);
+		action('Retry').dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+		check(
+			scroller.scrollTop === 0 && slider.getBoundingClientRect().top < bottomPosition,
+			'Keyboard scrolling must move both the page and the thumb'
+		);
+		action('Retry').focus();
+		await new Promise<void>((resolve) =>
+			requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+		);
+		check(
+			scroller.scrollTop > 0 &&
+				slider.getBoundingClientRect().top > scroller.getBoundingClientRect().top,
+			'Focus must reveal an off-screen action and synchronize the thumb'
+		);
+		const previousTop = scroller.scrollTop;
+		const wheel = new WheelEvent('wheel', { deltaY: -100, bubbles: true, cancelable: true });
+		// Chromium's synthetic event leaves the legacy delta with the modern sign.
+		// Match real wheel input, which supplies opposite signs for these two fields.
+		Object.defineProperty(wheel, 'wheelDeltaY', { value: 120 });
+		scroller.dispatchEvent(wheel);
+		check(
+			scroller.scrollTop < previousTop,
+			`Wheel input must scroll the Launch page (${previousTop} -> ${scroller.scrollTop})`
 		);
 	} finally {
 		launch.disposables.dispose();

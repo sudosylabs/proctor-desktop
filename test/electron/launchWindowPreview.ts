@@ -26,7 +26,7 @@ void app
 				realtimeProtocol: 1,
 				authorizationProtocol: 1
 			},
-			allowDevelopmentLoopback: false,
+			allowDevelopmentLoopback: true,
 			transport: {
 				probe: async (selectedOrigin): Promise<ServerReadinessProbe> => {
 					await new Promise((resolve) => setTimeout(resolve, 500));

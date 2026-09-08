@@ -5,6 +5,8 @@
 import { addDisposableListener } from '../../base/browser/dom.js';
 import { ButtonControl } from '../../base/browser/ui/button/button.js';
 import { TextFieldControl } from '../../base/browser/ui/field/textField.js';
+import { DomScrollableElement } from '../../base/browser/ui/scrollbar/scrollableElement.js';
+import { ScrollbarVisibility } from '../../base/common/scrollable.js';
 import { createLocalization } from '../../base/common/localization.js';
 import { DisposableStore } from '../../base/common/lifecycle.js';
 import {
@@ -12,6 +14,7 @@ import {
 	type LaunchIdentityClient,
 	type LaunchIdentityProjection
 } from '../../platform/identity/common/launchIdentity.js';
+import { createSemanticIcon } from '../../platform/theme/browser/semanticIcon.js';
 import { BrowserThemeService } from '../../platform/theme/browser/themeService.js';
 import type { LaunchWindowDescriptor } from '../../platform/windows/common/windowProtocol.js';
 import { ProductWindowChrome } from '../../platform/windows/browser/productWindowChrome.js';
@@ -92,17 +95,25 @@ export async function bootstrapLaunchWindow(
 		const development = document.createElement('p');
 		development.textContent = localization.format(messages.development);
 		server.append(institution, development);
+		const feedback = document.createElement('div');
+		feedback.className = 'prctr-launch-window__feedback';
+		const feedbackIcon = presentation.add(createSemanticIcon(document, { id: 'state.error' }));
+		const feedbackMark = document.createElement('span');
+		feedbackMark.className = 'prctr-launch-window__feedback-mark';
+		feedbackMark.append(feedbackIcon.element);
+		const feedbackBody = document.createElement('div');
+		feedbackBody.className = 'prctr-launch-window__feedback-body';
+		feedback.append(feedbackMark, feedbackBody);
 		const status = document.createElement('p');
 		status.className = 'prctr-launch-window__status';
+		status.id = 'prctr-launch-feedback-error';
 		status.setAttribute('role', 'status');
 		status.setAttribute('aria-atomic', 'true');
-		status.tabIndex = -1;
 		const administrator = document.createElement('p');
 		administrator.className = 'prctr-launch-window__administrator';
 		administrator.dir = 'auto';
 		const retryTime = document.createElement('p');
 		const authUnavailable = document.createElement('p');
-		authUnavailable.tabIndex = -1;
 		authUnavailable.textContent = localization.format(messages.authUnavailable);
 		const actionError = document.createElement('p');
 		actionError.className = 'prctr-launch-window__error';
@@ -164,19 +175,67 @@ export async function bootstrapLaunchWindow(
 				label: localization.format(messages.changeServer)
 			})
 		);
-		task.append(
-			heading,
-			server,
-			status,
-			administrator,
-			retryTime,
-			authUnavailable,
-			form,
-			actionError,
-			actions
-		);
+		feedbackBody.append(status, administrator, retryTime, authUnavailable, actionError);
+		const flow = document.createElement('div');
+		flow.className = 'prctr-launch-window__flow';
+		flow.append(form, actions, feedback);
+		task.append(heading, server, flow);
 		page.append(task);
-		root.append(titlebar, page);
+		const scrollable = disposables.add(
+			new DomScrollableElement(page, {
+				className: 'prctr-launch-window__scrollable',
+				horizontal: ScrollbarVisibility.Hidden,
+				vertical: ScrollbarVisibility.Auto,
+				useShadows: false
+			})
+		);
+		root.append(titlebar, scrollable.getDomNode());
+		// Observe both the viewport and content: messages, zoom, and window resizing
+		// can change the scroll range independently.
+		const resizeObserver = new ResizeObserver(() => scrollable.scanDomNode());
+		disposables.add({ dispose: () => resizeObserver.disconnect() });
+		resizeObserver.observe(page);
+		resizeObserver.observe(task);
+		// Browser focus navigation can scroll the DOM without going through the control.
+		disposables.add(addDisposableListener(page, 'scroll', () => scrollable.scanDomNode()));
+		disposables.add(
+			addDisposableListener(page, 'keydown', (event: KeyboardEvent) => {
+				if (
+					event.defaultPrevented ||
+					event.altKey ||
+					event.ctrlKey ||
+					event.metaKey ||
+					event.shiftKey
+				)
+					return;
+				if (event.target === field.input) return;
+				let scrollTop: number;
+				switch (event.key) {
+					case 'PageDown':
+						scrollTop = page.scrollTop + page.clientHeight;
+						break;
+					case 'PageUp':
+						scrollTop = page.scrollTop - page.clientHeight;
+						break;
+					case 'Home':
+						scrollTop = 0;
+						break;
+					case 'End':
+						scrollTop = page.scrollHeight;
+						break;
+					case 'ArrowDown':
+						scrollTop = page.scrollTop + 40;
+						break;
+					case 'ArrowUp':
+						scrollTop = page.scrollTop - 40;
+						break;
+					default:
+						return;
+				}
+				scrollable.setScrollPosition({ scrollTop });
+				event.preventDefault();
+			})
+		);
 		let disposed = false;
 		let revision = -1;
 		let projection: LaunchIdentityProjection | undefined;
@@ -188,6 +247,31 @@ export async function bootstrapLaunchWindow(
 				root.remove();
 			}
 		});
+		const updateFeedback = (value: LaunchIdentityProjection): void => {
+			const visible =
+				!['selectingServer', 'ready'].includes(value.state) ||
+				!authUnavailable.hidden ||
+				!administrator.hidden ||
+				!retryTime.hidden ||
+				!!actionError.textContent;
+			feedback.dataset.announcementOnly = String(!visible);
+			let tone: 'error' | 'warning' | 'info' = 'info';
+			if (value.state === 'invalidServer' || retryableStates.has(value.state)) tone = 'error';
+			if (
+				['maintenance', 'unavailable', 'updateRequired'].includes(value.state) ||
+				!authUnavailable.hidden
+			)
+				tone = 'warning';
+			if (actionError.textContent) tone = 'error';
+			feedback.dataset.tone = tone;
+			const busy =
+				!actionError.textContent &&
+				(value.state === 'checking' || value.state === 'authorizing');
+			feedbackIcon.setState(
+				busy ? { id: 'state.loading', modifier: 'spin' } : { id: `state.${tone}` }
+			);
+			scrollable.scanDomNode();
+		};
 		const render = (value: LaunchIdentityProjection): void => {
 			if (disposed) return;
 			const next = validateLaunchIdentityProjection(value);
@@ -207,7 +291,9 @@ export async function bootstrapLaunchWindow(
 			development.hidden = !next.developmentOrigin;
 			// Keep readiness announcements without repeating the form label or ready action.
 			status.textContent = localization.format(messages[next.state]);
-			status.dataset.announcementOnly = String(selection || next.state === 'ready');
+			status.dataset.announcementOnly = String(
+				next.state === 'selectingServer' || next.state === 'ready'
+			);
 			administrator.hidden = next.administratorMessage === undefined;
 			administrator.textContent = next.administratorMessage ?? '';
 			retryTime.hidden = next.retryAt === undefined;
@@ -242,24 +328,27 @@ export async function bootstrapLaunchWindow(
 					next.state === 'selectingServer' && previousState !== 'selectingServer'
 						? ''
 						: field.input.value,
-				required: true,
-				...(next.state === 'invalidServer'
-					? { error: localization.format(messages.invalidServer) }
-					: {})
+				required: true
 			});
+			if (next.state === 'invalidServer') {
+				field.input.setAttribute('aria-invalid', 'true');
+				field.input.setAttribute(
+					'aria-describedby',
+					`${field.input.getAttribute('aria-describedby') ?? ''} ${status.id}`.trim()
+				);
+			}
+			updateFeedback(next);
 			if (root.isConnected && selection && previousState !== next.state) field.focus();
 			else if (
 				root.isConnected &&
 				!selection &&
 				(focusWasHidden ||
-					(focused === status && status.dataset.announcementOnly === 'true') ||
-					(focused === authUnavailable && authUnavailable.hidden) ||
 					(focused === signIn.element && signIn.element.disabled) ||
 					(focused === retry.element && retry.element.hidden))
 			) {
 				if (next.canSignIn) signIn.focus();
-				else if (next.state === 'ready') authUnavailable.focus();
-				else status.focus();
+				else if (!retry.element.hidden) retry.focus();
+				else change.focus();
 			}
 		};
 		// Subscribe before the snapshot so an older invoke reply cannot overwrite an event.
@@ -277,11 +366,14 @@ export async function bootstrapLaunchWindow(
 			pendingAction = sequence;
 			submit.element.disabled = true;
 			actionError.textContent = '';
+			if (projection) updateFeedback(projection);
 			try {
 				await operation();
 			} catch {
-				if (!disposed && sequence === actionSequence)
+				if (!disposed && sequence === actionSequence) {
 					actionError.textContent = localization.format(messages.failed);
+					if (projection) updateFeedback(projection);
+				}
 			} finally {
 				if (!disposed && sequence === actionSequence) {
 					pendingAction = undefined;
@@ -312,6 +404,7 @@ export async function bootstrapLaunchWindow(
 		);
 		disposables.add(presentation);
 		document.body.replaceChildren(root);
+		scrollable.scanDomNode();
 		if (!form.hidden) field.focus();
 		else if (projection?.canSignIn) signIn.focus();
 		return Object.freeze({ element: root, disposables });

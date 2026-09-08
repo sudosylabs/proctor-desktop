@@ -34,7 +34,7 @@ export const launchMessages = Object.freeze({
 	}),
 	checking: defineMessage({
 		id: 'launch.checking',
-		defaultMessage: 'Checking server availability and compatibility…',
+		defaultMessage: 'Checking server…',
 		description: 'Readiness check in progress.'
 	}),
 	ready: defineMessage({
@@ -63,13 +63,12 @@ export const launchMessages = Object.freeze({
 	}),
 	unreachable: defineMessage({
 		id: 'launch.unreachable',
-		defaultMessage:
-			'Proctor could not reach this server. Check the address and your connection, then retry.',
+		defaultMessage: 'Couldn’t connect to the server. Check the address and your connection.',
 		description: 'Server request failed.'
 	}),
 	timedOut: defineMessage({
 		id: 'launch.timed.out',
-		defaultMessage: 'The server did not respond in time. Check your connection and retry.',
+		defaultMessage: 'The server isn’t responding. Check your connection and try again.',
 		description: 'Server request deadline elapsed.'
 	}),
 	invalidResponse: defineMessage({
@@ -122,7 +121,7 @@ export const launchMessages = Object.freeze({
 	}),
 	authorizing: defineMessage({
 		id: 'launch.authorizing',
-		defaultMessage: 'Continue signing in in your system browser.',
+		defaultMessage: 'Complete sign-in in your browser.',
 		description: 'Privileged hosted authorization is in progress.'
 	}),
 	authorizationFailed: defineMessage({

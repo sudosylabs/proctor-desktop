@@ -340,7 +340,7 @@
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
     "launch.authorizing": {
-      "message": "Continue signing in in your system browser.",
+      "message": "Complete sign-in in your browser.",
       "description": "Privileged hosted authorization is in progress.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
@@ -358,7 +358,7 @@
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
     "launch.checking": {
-      "message": "Checking server availability and compatibility…",
+      "message": "Checking server…",
       "description": "Readiness check in progress.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
@@ -565,7 +565,7 @@
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
     "launch.timed.out": {
-      "message": "The server did not respond in time. Check your connection and retry.",
+      "message": "The server isn’t responding. Check your connection and try again.",
       "description": "Server request deadline elapsed.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
@@ -583,7 +583,7 @@
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
     "launch.unreachable": {
-      "message": "Proctor could not reach this server. Check the address and your connection, then retry.",
+      "message": "Couldn’t connect to the server. Check the address and your connection.",
       "description": "Server request failed.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"

@@ -17,6 +17,9 @@
 		padding: var(--prctr-spacing-control-block) var(--prctr-spacing-control-inline);
 		position: relative;
 	}
+	.prctr-button[hidden] {
+		display: none;
+	}
 	.prctr-button[data-size='large'] {
 		font-size: var(--prctr-typography-body-size);
 		line-height: var(--prctr-typography-body-lineHeight);
