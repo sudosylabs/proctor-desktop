@@ -57,8 +57,9 @@ effects. Remove decoration that competes with examination work.
 
 For LaunchWindow, cover submitted-server, ready, maintenance, temporarily
 unavailable, incompatible, authenticating, cancelled, and change-server states.
-For AuthenticatedWindow, cover student exam activity and every authorized
-non-student/account/settings area without exposing Role names as UI authority.
+For AuthenticatedWindow, cover overlapping student/teacher responsibilities and
+every authorized management/account/settings area without exposing Role names
+as UI authority.
 For CandidateWindow, cover admission, active, pause overlay, suspension handoff,
 ready rejoin, correction, submission, and safe departure.
 
