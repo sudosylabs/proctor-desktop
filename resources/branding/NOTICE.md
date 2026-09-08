@@ -5,7 +5,9 @@ approved `brand/` pack. The [manifest](manifest.json) records each package-local
 path, canonical source path, accepted SHA-256 digest, and source revision.
 Desktop builds and tests use only these copies and never read another checkout.
 
-Application surfaces use the flat marks and horizontal lockups under `source/`.
+LaunchWindow uses the supplied vertical 2.5D lockups under `source/`, matching
+the dark or light surface. The flat marks and horizontal lockups remain in the
+approved asset inventory.
 The Windows and Linux default icons use the supplied purple `light` 2.5D exports;
 `light` describes the surface behind the artwork. The macOS ICNS is the supplied
 export of the Apple Icon Composer artwork, preserving its native material

@@ -14,7 +14,7 @@ revision, disposition, dependencies, divergence, and evidence):
 - [`browser-interaction`](./browser-interaction.json) — DOM lifecycle, focus, input, geometry, scheduling, resize, touch, and safe CSS values.
 - [`codicons-semantic-icons`](./codicons-semantic-icons.json) — complete pinned Codicon assets behind Proctor semantic icon identifiers.
 - [`editor-core`](./editor-core.json) — positions, ranges, selections, piece-tree text, edits, EOL, word boundaries, and search.
-- [`electron-window-skeleton`](./electron-window-skeleton.json) — trusted product windows, immutable descriptors, preloads, and secure transitions.
+- [`electron-window-skeleton`](./electron-window-skeleton.json) — trusted product windows, immutable descriptors, native integrated chrome, preloads, and secure transitions.
 - [`integrated-browser-client`](./integrated-browser-client.json) — policy-enforced Candidate browser and minimized ordered activity.
 - [`localization-runtime`](./localization-runtime.json) — named messages, packaged catalogs, and the private upstream compatibility seam.
 - [`performance-foundation`](./performance-foundation.json) — monotonic marks and static local performance budgets.

@@ -20,6 +20,8 @@ void test('three product windows use isolated capability-specific preloads and l
 		readonly transactionalRollback: Record<string, any>;
 		readonly candidateSurface: Record<string, any>;
 		readonly candidateContentBounds: Record<string, any>;
+		readonly chromeUpdateRecovery: Record<string, any>;
+		readonly windowChromeOptions: Record<string, Record<string, any>>;
 		readonly applicationMenuRemoved: boolean;
 		readonly runtimeIconForwarded: boolean;
 	};
@@ -61,7 +63,69 @@ void test('three product windows use isolated capability-specific preloads and l
 			webSecurity: true,
 			webviewTag: false
 		});
+		if (item.kind === 'candidate') assert.equal(item.renderer.windowChrome, undefined);
+		else {
+			assert.equal(item.renderer.windowChrome.protocolVersion, 1);
+			assert.equal(
+				item.renderer.windowChrome.platform,
+				process.platform === 'darwin' || process.platform === 'win32'
+					? process.platform
+					: 'linux'
+			);
+			assert.equal(
+				item.renderer.windowChrome.mode,
+				process.platform === 'darwin' ? 'nativeTrafficLights' : 'nativeOverlay'
+			);
+			assert.equal(item.renderer.windowChrome.fullscreen, false);
+			assert.ok(item.renderer.windowChrome.titlebarHeight >= 24);
+		}
 	}
+	assert.deepEqual(result.windowChromeOptions.darwin, {
+		width: 600,
+		height: 500,
+		minWidth: 360,
+		minHeight: 360,
+		title: 'Proctor',
+		backgroundColor: '#0d1117',
+		titleBarStyle: 'hidden',
+		titleBarOverlay: true,
+		acceptFirstMouse: true
+	});
+	assert.deepEqual(result.windowChromeOptions.darwinRtl, result.windowChromeOptions.darwin);
+	for (const platform of ['win32', 'linux']) {
+		const options = result.windowChromeOptions[platform]!;
+		assert.equal(options.frame, false);
+		assert.equal(options.title, 'Proctor');
+		assert.equal(options.backgroundColor, '#0d1117');
+		assert.equal(options.titleBarStyle, 'hidden');
+		assert.deepEqual(options.titleBarOverlay, {
+			color: '#0d1117',
+			symbolColor: '#f0f6fc',
+			height: 34
+		});
+	}
+	assert.deepEqual(result.windowChromeOptions.candidate, {
+		width: 1280,
+		height: 800,
+		titleBarStyle: 'hidden',
+		closable: false,
+		frame: false,
+		fullscreenable: false,
+		maximizable: false,
+		minimizable: false,
+		movable: false,
+		resizable: false
+	});
+	assert.deepEqual(result.chromeUpdateRecovery, {
+		overlayAttempts: 4,
+		dimmedOverlay: {
+			color: 'rgb(7, 9, 12)',
+			symbolColor: 'rgb(120, 123, 126)',
+			height: 35
+		},
+		trafficLightAttempts: 3,
+		sheetAttempts: 3
+	});
 	assert.equal(result.applicationMenuRemoved, true);
 	assert.equal(result.runtimeIconForwarded, true);
 	assert.equal(

@@ -13,6 +13,7 @@ import {
 	validateUserSettingsPreviewIntent,
 	validateUserSettingsProjection
 } from '../../platform/settings/common/settingsRendererProtocol.js';
+import { createWindowChromePreloadClient } from './windowChromePreload.js';
 
 contextBridge.exposeInMainWorld(
 	'proctorAuthenticated',
@@ -25,6 +26,7 @@ contextBridge.exposeInMainWorld(
 				throw new TypeError('Authenticated bootstrap returned the wrong window kind');
 			return descriptor;
 		},
+		windowChrome: createWindowChromePreloadClient('authenticated'),
 		signOut: (): Promise<void> =>
 			ipcRenderer.invoke(WINDOW_CHANNELS.authenticated.intent, {
 				kind: 'authenticated.signOut'

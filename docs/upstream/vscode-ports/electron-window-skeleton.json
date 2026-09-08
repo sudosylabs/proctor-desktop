@@ -3,8 +3,12 @@
   "schemaVersion": 1,
   "clusterId": "electron-window-skeleton",
   "admission": {
-    "workflow": "Create one trusted Proctor product window with an immutable sender-bound descriptor, a capability-specific preload, locked production preferences, and main-owned secure transitions.",
-    "callers": ["src/prctr/code/electron-main/productWindowComposition.ts"],
+    "workflow": "Create one trusted Proctor product window with an immutable sender-bound descriptor, a capability-specific preload, locked production preferences, VS Code-fidelity native window chrome, and main-owned secure transitions.",
+    "callers": [
+      "src/prctr/code/electron-main/productWindowComposition.ts",
+      "src/prctr/code/electron-browser/workbench.desktop.main.ts",
+      "src/prctr/workbench/browser/launchWindow.ts"
+    ],
     "interface": "src/prctr/platform/windows/common/windowCoordinator.ts",
     "decision": "docs/architecture/workbench.md"
   },
@@ -48,6 +52,92 @@
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts"
     },
     {
+      "upstreamPath": "src/vs/platform/windows/electron-main/windows.ts",
+      "upstreamBlob": "7c4f02efdfa374b2d8712f2892bc8c5b5e697064",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve VS Code's hidden-titlebar BrowserWindow topology: macOS keeps native traffic lights, Windows and Linux use the native Window Controls Overlay, frame suppression remains platform-specific, and CandidateWindow retains its separate control-free security posture.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
+      "localSha256": "5d9408ee70fd83b999c48c611058a8154396dce6b2e1daf47bc89561a85c0a9b",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/windows/electron-main/windowImpl.ts",
+      "upstreamBlob": "94aee9da97656e4f8d9cfe837ef67bcc4edcc999",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve native titlebar color, modal dimming, and physical-height synchronization, the one-pixel Windows border correction, macOS traffic-light centering, Tahoe button geometry, sheet offset, fullscreen notification, retry-safe native update caching, sender authorization, and deterministic teardown behind a product-window-scoped bridge.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/windows/electron-main/electronWindowChrome.ts",
+      "localSha256": "87d7a16811296d86234e4ea46e399e5c6d62c262baedfca9fec3b93eb8cec9ac",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/window/common/window.ts",
+      "upstreamBlob": "d073d011d56c24b8ab0205d5f97c348c8c8cd189",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "The titlebar-style, native-titlebar, and Window Controls Overlay decisions define the reviewed behavior; Proctor exposes only the fixed native-overlay modes its two general product windows require.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/sessions/electron-browser/parts/titlebarPart.ts",
+      "upstreamBlob": "ae368d1bf22c1cbd90091ba4d087c23597fe5e01",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve renderer-to-main theme, modal-dimming, and zoom-aware titlebar updates, forced-color synchronization, disposal fencing, and the macOS first-title workaround while replacing VS Code service decorators and general workbench title services with Proctor's closed chrome client and browser theme service.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/windows/browser/productWindowChrome.ts",
+      "localSha256": "8f6ca2447ce8387ab3c3e0373a5efaf64e4c634333f6fe58a6b5c0b8e083e4ec",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/sessions/browser/parts/titlebarPart.ts",
+      "upstreamBlob": "d643be71cbbcb58b3c0d9d3fe86875f69c18559d",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "The Sessions titlebar supplies the reviewed native-control spacer, RTL placement, fullscreen suppression, and draggable-region behavior consolidated into Proctor's product window chrome control.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/parts/titlebar/media/titlebarpart.css",
+      "upstreamBlob": "16d2fa44996ae751b1c5bf6095c53050b44581c1",
+      "category": "style",
+      "disposition": "adapted",
+      "rationale": "Preserve the renderer-owned drag region, native-control exclusion space, no-drag interactive descendants, the fixed zoom-aware Windows control width, and Linux Window Controls Overlay environment-variable geometry under Proctor-owned selectors and semantic tokens.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/windows/browser/productWindowChrome.css",
+      "localSha256": "44c99c389b9dae3c468fef347bc5c7652884242a98da34289ba650c2ed491eb6",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/sessions/browser/parts/media/titlebarpart.css",
+      "upstreamBlob": "d717e4087a89e90d9ab57ca05ebbfbad7734b275",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "The Sessions-specific native macOS spacer and draggable-control treatment informs Proctor's product chrome; its session command center and toolbars are outside LaunchWindow scope.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
       "upstreamPath": "src/vs/platform/windows/electron-main/windowsMainService.ts",
       "upstreamBlob": "d8428b529b26fa9ad5a1ad56f57677f2b086a991",
       "category": "source",
@@ -77,6 +167,24 @@
       "kind": "external-package",
       "reference": "electron@44.0.0",
       "rationale": "The pinned Electron runtime supplies BrowserWindow, contextBridge, and IPC primitives."
+    },
+    {
+      "id": "product-window-chrome",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/windows/common/windowChrome.ts",
+      "rationale": "Proctor owns the closed, validated renderer/main contract for fixed chrome modes, native fullscreen projection, theme, and measured titlebar height. Signed-out native menus use a separate Proctor-owned Electron adapter."
+    },
+    {
+      "id": "browser-theme-service",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/browser/themeService.ts",
+      "rationale": "The browser theme service supplies the active semantic theme and presentation changes without importing VS Code's workbench service graph."
+    },
+    {
+      "id": "launch-native-menu",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts",
+      "rationale": "Proctor-owned signed-out menu adapter uses Electron roles and native dialogs directly. It owns localized bounded diagnostics, guarded exit, focus activation, and deterministic menu cleanup without importing the VS Code menubar subsystem."
     }
   ],
   "divergences": [
@@ -109,12 +217,30 @@
     },
     {
       "id": "minimal-launch-window",
-      "summary": "LaunchWindow is a small localized, themed sign-in surface and deliberately does not instantiate the Proctor workbench kernel.",
+      "summary": "LaunchWindow opens normally at a compact, resizable size and places its original Proctor lockup, verified Institution, quiet Change server action, and compact Sign in button in one centered group. The native drag region shares the canvas with no visible separator. Ready/form instructions remain accessible without duplicating visible copy. Proctor-owned native menus provide signed-out editing, zoom, window actions, safe connection diagnostics, and exit; the VS Code menubar implementation remains excluded.",
       "localPaths": [
         "src/prctr/workbench/browser/launchWindow.ts",
-        "src/prctr/code/electron-browser/launch.main.ts"
+        "src/prctr/workbench/browser/launchWindow.css",
+        "src/prctr/code/electron-browser/launch.main.ts",
+        "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
       ],
-      "verificationRefs": ["real-electron-test", "composition-check"]
+      "verificationRefs": ["launch-browser-tests", "real-electron-test", "composition-check"]
+    },
+    {
+      "id": "native-controls-only",
+      "summary": "LaunchWindow and AuthenticatedWindow use the operating system's controls inside a VS Code-style hidden titlebar: native macOS traffic lights and Electron's native Window Controls Overlay on Windows/Linux. Proctor does not copy VS Code's optional custom-drawn Windows/Linux buttons, menus, command center, or titlebar action toolbars. CandidateWindow remains separately frameless and control-free by security design.",
+      "localPaths": [
+        "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
+        "src/prctr/platform/windows/electron-main/electronWindowChrome.ts",
+        "src/prctr/platform/windows/browser/productWindowChrome.ts",
+        "src/prctr/platform/windows/browser/productWindowChrome.css"
+      ],
+      "verificationRefs": [
+        "launch-browser-tests",
+        "product-window-chrome-fixture",
+        "real-electron-test",
+        "target-native-electron-ci"
+      ]
     },
     {
       "id": "candidate-no-relaunch",
@@ -134,7 +260,7 @@
       "id": "launch-browser-tests",
       "kind": "test",
       "path": "test/browser/launchWindowTests.ts",
-      "obligation": "Verify server entry, safe state presentation, cancellation/exit during checks, keyboard focus, stale snapshots, 200% zoom, and disposal through the production LaunchWindow interface."
+      "obligation": "Verify centered lockup/action geometry, compact controls, seamless chrome, server entry, safe state presentation, cancellation during checks, focus restoration, stale snapshots, 200% zoom, and disposal through the production LaunchWindow interface. Native-menu exit is covered in real Electron."
     },
     {
       "id": "window-contract-tests",
@@ -143,10 +269,22 @@
       "obligation": "Verify exact descriptors/intents, binding preservation, destruction order, close veto, and Candidate relaunch exclusion."
     },
     {
+      "id": "product-window-chrome-fixture",
+      "kind": "test",
+      "path": "test/browser/controlExplorer/productWindowChromeFixture.ts",
+      "obligation": "Exercise both native chrome modes, computed physical control placement under LTR and RTL, all four themes, forced colors, modal dimming with identical-state retry after failure, constrained width, fullscreen projection, 100% and 200% zoom geometry and physical-height synchronization, macOS title synchronization, setup/subscription and initial-update failure rollback, queued-update disposal fencing, and complete owned-DOM disposal through the production control interface."
+    },
+    {
       "id": "real-electron-test",
       "kind": "test",
       "path": "test/electron/windowSkeleton.real.test.ts",
-      "obligation": "Verify all three isolated globals, sender-bound bootstrap, bounded intents, sandbox, Node absence, popup denial, and production DevTools exclusion in real Electron."
+      "obligation": "Verify all three isolated globals, sender-bound bootstrap, bounded intents, sandbox, Node absence, popup denial, production DevTools exclusion, platform-specific BrowserWindow chrome and rendered inset geometry, capability-specific chrome preload access, zoom synchronization, titlebar update authorization, modal color dimming, retry after native update failure, and transactional handler rollback in real Electron."
+    },
+    {
+      "id": "target-native-electron-ci",
+      "kind": "test",
+      "path": ".github/workflows/foundation.yml",
+      "obligation": "Run the real Electron browser and window-skeleton suites on pinned Windows and macOS jobs and the same window-skeleton suite under Linux/Xvfb so platform-selected native chrome is exercised on every supported desktop operating-system family."
     },
     {
       "id": "composition-check",

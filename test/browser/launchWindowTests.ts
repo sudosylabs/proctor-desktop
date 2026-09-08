@@ -40,9 +40,11 @@ export async function runLaunchWindowTests(
 		)
 	);
 	let listener: ((value: LaunchIdentityProjection) => void) | undefined;
+	let fullscreenListener: ((value: boolean) => unknown) | undefined;
 	let released = false;
+	let chromeReleased = false;
 	let selected = '';
-	let exits = 0;
+	const chromeUpdates: unknown[] = [];
 	let finish!: () => void;
 	let projection: LaunchIdentityProjection = {
 		protocolVersion: 1,
@@ -100,18 +102,56 @@ export async function runLaunchWindowTests(
 			windowId: 'launch-ui-test',
 			institutionOrigin: 'https://not-readiness.example.test'
 		}),
+		windowChrome: {
+			configuration: async () => {
+				fullscreenListener?.(true);
+				return {
+					protocolVersion: 1,
+					platform: 'win32',
+					mode: 'nativeOverlay',
+					controlsLocation: 'right',
+					titlebarHeight: 35,
+					fullscreen: false
+				};
+			},
+			zoomFactor: () => 1,
+			onDidChangeFullscreen: (accept) => {
+				fullscreenListener = accept;
+				return {
+					dispose: () => {
+						chromeReleased = true;
+						fullscreenListener = undefined;
+					}
+				};
+			},
+			update: async (value) => {
+				chromeUpdates.push(value);
+			}
+		},
 		identity,
-		exit: async () => {
-			exits++;
-		}
+		exit: async () => {}
 	});
 	try {
+		check(
+			launch.element.firstElementChild?.classList.contains('prctr-product-window-chrome') &&
+				chromeUpdates.length > 0,
+			'Launch must initialize the product-owned native window chrome'
+		);
+		check(
+			launch.element.firstElementChild?.getAttribute('data-fullscreen') === 'true',
+			'Launch window chrome lost a fullscreen change racing its initial snapshot'
+		);
+		fullscreenListener?.(false);
+		check(
+			launch.element.firstElementChild?.getAttribute('data-fullscreen') === 'false',
+			'Launch window chrome did not track later native fullscreen changes'
+		);
 		const brand = owner.querySelector<HTMLElement>('.prctr-brand-lockup');
 		check(
 			brand?.getAttribute('aria-hidden') === 'true' &&
 				brand.querySelector('img')?.alt === '' &&
-				owner.querySelector('h1')?.textContent === 'Connect to your Institution',
-			'Launch branding must remain decorative beside a task-oriented heading'
+				owner.querySelector('h1')?.getAttribute('aria-label') === 'Proctor',
+			'Launch lockup must supply the accessible product heading without repeated copy'
 		);
 		const input = owner.querySelector('input')!;
 		const form = owner.querySelector('form')!;
@@ -142,12 +182,14 @@ export async function runLaunchWindowTests(
 			'Pending selection must not leave focus in hidden input'
 		);
 		check(
-			!action('Change server').disabled && !action('Exit Proctor').disabled,
-			'Cancellation and exit must remain available'
+			!action('Change server').disabled &&
+				action('Change server').closest('[hidden]') === null,
+			'Changing server must remain available during a pending check'
 		);
-		action('Exit Proctor').click();
-		await tick();
-		check(exits === 1, 'Exit blocked behind pending check');
+		check(
+			!owner.querySelector('footer') && !owner.body.textContent?.includes('Exit Proctor'),
+			'Native exit must not be repeated in the content'
+		);
 		action('Change server').click();
 		await tick();
 		check(
@@ -175,22 +217,86 @@ export async function runLaunchWindowTests(
 			'Server text became markup'
 		);
 		check(
-			action('Sign in to <img src=x onerror=alert(1)>').disabled,
+			action('Sign in').disabled &&
+				action('Sign in').getAttribute('aria-label') ===
+					'Sign in to <img src=x onerror=alert(1)>',
 			'Unavailable auth owner must keep sign-in disabled'
 		);
 		check(
 			owner.body.textContent?.includes('Sign-in is not available in this build.'),
 			'Unwired auth must be explained'
 		);
+		check(
+			Array.from(
+				owner.querySelectorAll<HTMLButtonElement>("button[data-variant='primary']")
+			).filter((button) => button.closest('[hidden]') === null).length === 1,
+			'Ready Launch state must expose one primary task action'
+		);
 		listener?.(stale);
 		check(
 			launch.element.dataset.state === 'ready',
 			'Stale projection replaced current readiness'
 		);
+		publish('ready', {
+			origin: 'https://example.edu',
+			institutionName: 'Example University',
+			canSignIn: true,
+			authorizationAvailable: true
+		});
+		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+		const readyTask = launch.element.querySelector<HTMLElement>('main')!;
+		const readyPage = launch.element.querySelector<HTMLElement>('.prctr-launch-window__page')!;
+		const taskBounds = readyTask.getBoundingClientRect();
+		const pageBounds = readyPage.getBoundingClientRect();
+		check(
+			Math.abs(
+				taskBounds.top + taskBounds.height / 2 - pageBounds.top - pageBounds.height / 2
+			) <= 1,
+			'The entire brand and action group must be vertically centered'
+		);
+		check(
+			Math.abs(action('Sign in').getBoundingClientRect().width - 240) <= 1,
+			'The main launch action must retain its intended visual width'
+		);
+		check(
+			action('Sign in').getBoundingClientRect().height >= 40,
+			'The main launch action must use the large control size'
+		);
+		check(
+			!owner.body.textContent?.includes('https://example.edu') &&
+				!owner.body.textContent?.includes('Opens your browser'),
+			'The verified Institution should supply context without the origin or browser hint'
+		);
+		const signInBounds = action('Sign in').getBoundingClientRect();
+		const changeBounds = action('Change server').getBoundingClientRect();
+		check(
+			action('Change server').dataset.variant === 'secondary' &&
+				changeBounds.top > signInBounds.bottom &&
+				Math.abs(changeBounds.width - signInBounds.width) <= 1,
+			'Change server must be a compact muted button directly below Sign in'
+		);
+		check(
+			owner.defaultView!.getComputedStyle(launch.element.firstElementChild!)
+				.backgroundColor ===
+				owner.defaultView!.getComputedStyle(launch.element).backgroundColor,
+			'Native chrome must blend into the window canvas'
+		);
+		check(
+			owner.querySelector<HTMLElement>('[role=status]')?.dataset.announcementOnly === 'true',
+			'Ready status must not repeat the sign-in action visually'
+		);
+		action('Sign in').focus();
+		action('Sign in').click();
+		await tick();
+		check(
+			owner.querySelector('[role=alert]')?.textContent?.includes('could not be completed'),
+			'Failed sign-in must provide recoverable feedback'
+		);
 		for (const state of launchStates) {
+			const selection = state === 'selectingServer' || state === 'invalidServer';
 			publish(
 				state,
-				state === 'selectingServer' || state === 'invalidServer'
+				selection
 					? {}
 					: {
 							origin: 'https://example.edu',
@@ -202,6 +308,10 @@ export async function runLaunchWindowTests(
 			check(
 				launch.element.dataset.state === state,
 				'Missing rendered readiness state: ' + state
+			);
+			check(
+				(action('Change server').closest('[hidden]') !== null) === selection,
+				'Change server must only be offered after a server has been submitted'
 			);
 			const status = owner.querySelector('[role=status]');
 			check(
@@ -220,6 +330,10 @@ export async function runLaunchWindowTests(
 			owner.body.textContent?.includes('Development server'),
 			'HTTP development selection must be visible'
 		);
+		check(
+			action('Retry').dataset.variant === 'primary',
+			'Retryable Launch state must promote Retry as its primary task action'
+		);
 		owner.documentElement.dir = 'rtl';
 		owner.documentElement.style.zoom = '2';
 		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
@@ -227,17 +341,19 @@ export async function runLaunchWindowTests(
 			owner.documentElement.scrollWidth <= owner.documentElement.clientWidth + 1,
 			'Launch surface overflows at narrow width and 200% zoom'
 		);
-		launch.element.scrollTop = launch.element.scrollHeight;
-		check(launch.element.scrollTop > 0, 'Long Launch state must remain vertically scrollable');
+		const scroller = launch.element.querySelector<HTMLElement>('.prctr-launch-window__page');
+		check(scroller !== null, 'Launch scroll container is missing');
+		scroller.scrollTop = scroller.scrollHeight;
+		check(scroller.scrollTop > 0, 'Long Launch state must remain vertically scrollable');
 		check(
-			action('Exit Proctor').getBoundingClientRect().bottom <=
-				launch.element.getBoundingClientRect().bottom,
-			'Exit cannot be reached at 200% zoom'
+			action('Retry').getBoundingClientRect().bottom <=
+				scroller.getBoundingClientRect().bottom,
+			'Recovery action cannot be reached at 200% zoom'
 		);
 	} finally {
 		launch.disposables.dispose();
 		check(
-			released && owner.body.querySelector('main') === null,
+			released && chromeReleased && owner.body.querySelector('main') === null,
 			'Launch disposal leaked subscription or surface'
 		);
 		frame.remove();
@@ -257,6 +373,19 @@ async function verifySnapshotRace(document: Document): Promise<void> {
 	};
 	const launch = await bootstrapLaunchWindow(owner, {
 		bootstrap: async () => ({ protocolVersion: 1, kind: 'launch', windowId: 'launch-race' }),
+		windowChrome: {
+			configuration: async () => ({
+				protocolVersion: 1,
+				platform: 'win32',
+				mode: 'nativeOverlay',
+				controlsLocation: 'right',
+				titlebarHeight: 35,
+				fullscreen: false
+			}),
+			zoomFactor: () => 1,
+			onDidChangeFullscreen: () => ({ dispose() {} }),
+			update: async () => {}
+		},
 		identity: {
 			onDidChange: (listener) => {
 				listener({

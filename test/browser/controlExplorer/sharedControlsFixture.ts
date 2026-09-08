@@ -24,6 +24,15 @@ export function controlsFixture(host: HTMLElement): ControlFixtureResult {
 		})
 	);
 	store.add(new ButtonControl(buttons, { variant: 'secondary', label: 'Change server' }));
+	for (const variant of ['primary', 'secondary'] as const) {
+		store.add(
+			new ButtonControl(buttons, {
+				variant,
+				size: 'large',
+				label: variant === 'primary' ? 'Sign in' : 'Change server'
+			})
+		);
+	}
 	const disabled = store.add(
 		new ButtonControl(buttons, {
 			variant: 'secondary',
@@ -106,7 +115,7 @@ export function controlsFixture(host: HTMLElement): ControlFixtureResult {
 	store.add(disabled.onDidRequest(() => disabledRequests++));
 	store.add(toggle.onDidRequestChange(() => toggleRequests++));
 	return {
-		states: 13,
+		states: 15,
 		disposable: {
 			dispose: () => {
 				store.dispose();

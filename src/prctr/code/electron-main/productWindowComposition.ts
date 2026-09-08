@@ -1,3 +1,4 @@
+import { nativeTheme } from 'electron';
 import {
 	ElectronProductWindowFactory,
 	type ElectronProductWindowFactoryOptions
@@ -12,5 +13,6 @@ export function createProductWindowComposition(
 	options: ElectronProductWindowFactoryOptions,
 	intentSink: TrustedWindowIntentSink
 ): ProductWindowCoordinator {
+	nativeTheme.themeSource = 'dark';
 	return new ProductWindowCoordinator(new ElectronProductWindowFactory(options), intentSink);
 }

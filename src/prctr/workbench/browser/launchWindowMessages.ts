@@ -3,8 +3,8 @@ import { defineMessage } from '../../base/common/localization.js';
 export const launchMessages = Object.freeze({
 	title: defineMessage({
 		id: 'launch.title',
-		defaultMessage: 'Connect to your Institution',
-		description: 'Task heading for the signed-out Proctor launch surface.'
+		defaultMessage: 'Proctor',
+		description: 'Accessible heading for the LaunchWindow brand lockup.'
 	}),
 	serverLabel: defineMessage({
 		id: 'launch.server.label',
@@ -138,7 +138,7 @@ export const launchMessages = Object.freeze({
 	signInGeneric: defineMessage({
 		id: 'launch.sign.in.generic',
 		defaultMessage: 'Sign in',
-		description: 'Unavailable sign-in action before server identity is known.'
+		description: 'Compact sign-in action; the adjacent Institution supplies context.'
 	}),
 	authUnavailable: defineMessage({
 		id: 'launch.auth.unavailable',

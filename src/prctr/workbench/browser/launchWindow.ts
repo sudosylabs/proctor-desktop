@@ -14,6 +14,8 @@ import {
 } from '../../platform/identity/common/launchIdentity.js';
 import { BrowserThemeService } from '../../platform/theme/browser/themeService.js';
 import type { LaunchWindowDescriptor } from '../../platform/windows/common/windowProtocol.js';
+import { ProductWindowChrome } from '../../platform/windows/browser/productWindowChrome.js';
+import type { ProductWindowChromeClient } from '../../platform/windows/common/windowChrome.js';
 import { prepareWorkbenchDocument } from './documentLayout.js';
 import { BrandLockup, brandLockupAppearance } from './brandLockup.js';
 import { launchMessages as messages } from './launchWindowMessages.js';
@@ -22,6 +24,7 @@ import './launchWindow.css';
 
 export interface LaunchRendererClient {
 	bootstrap(): Promise<LaunchWindowDescriptor>;
+	readonly windowChrome: ProductWindowChromeClient;
 	readonly identity: LaunchIdentityClient;
 	exit(): Promise<void>;
 }
@@ -41,7 +44,7 @@ export async function bootstrapLaunchWindow(
 		(themeService ??= presentation.add(
 			new BrowserThemeService(
 				document,
-				'light',
+				'dark',
 				{ density: 'default', motion: 'full', transparency: 'full' },
 				{ followSystemColorScheme: true }
 			)
@@ -59,8 +62,16 @@ export async function bootstrapLaunchWindow(
 		const descriptor = await client.bootstrap();
 		if (descriptor.kind !== 'launch')
 			throw new Error('Launch renderer received a non-launch descriptor');
-		const root = document.createElement('main');
+		const root = document.createElement('div');
 		root.className = 'prctr-launch-window';
+		const titlebar = document.createElement('header');
+		titlebar.className = 'prctr-launch-window__titlebar';
+		titlebar.setAttribute('aria-hidden', 'true');
+		const page = document.createElement('div');
+		page.className = 'prctr-launch-window__page';
+		const task = document.createElement('main');
+		task.className = 'prctr-launch-window__task';
+		task.setAttribute('aria-labelledby', 'prctr-launch-title');
 		const brand = presentation.add(
 			new BrandLockup(document, brandLockupAppearance(activeTheme.theme))
 		);
@@ -70,15 +81,17 @@ export async function bootstrapLaunchWindow(
 			)
 		);
 		const heading = document.createElement('h1');
-		heading.textContent = localization.format(messages.title);
+		heading.id = 'prctr-launch-title';
+		heading.className = 'prctr-launch-window__brand';
+		heading.setAttribute('aria-label', localization.format(messages.title));
+		heading.append(brand.element);
 		const server = document.createElement('section');
 		server.className = 'prctr-launch-window__server';
-		const institution = document.createElement('h2');
-		const origin = document.createElement('p');
-		origin.dir = 'ltr';
+		const institution = document.createElement('p');
+		institution.className = 'prctr-launch-window__institution';
 		const development = document.createElement('p');
 		development.textContent = localization.format(messages.development);
-		server.append(institution, origin, development);
+		server.append(institution, development);
 		const status = document.createElement('p');
 		status.className = 'prctr-launch-window__status';
 		status.setAttribute('role', 'status');
@@ -89,8 +102,10 @@ export async function bootstrapLaunchWindow(
 		administrator.dir = 'auto';
 		const retryTime = document.createElement('p');
 		const authUnavailable = document.createElement('p');
+		authUnavailable.tabIndex = -1;
 		authUnavailable.textContent = localization.format(messages.authUnavailable);
 		const actionError = document.createElement('p');
+		actionError.className = 'prctr-launch-window__error';
 		actionError.setAttribute('role', 'alert');
 		const form = document.createElement('form');
 		form.className = 'prctr-launch-window__form';
@@ -108,42 +123,48 @@ export async function bootstrapLaunchWindow(
 		field.input.spellcheck = false;
 		field.input.autocapitalize = 'none';
 		field.input.dir = 'ltr';
+		const submitHost = document.createElement('div');
+		submitHost.className = 'prctr-launch-window__primary';
+		form.append(submitHost);
 		const submit = disposables.add(
-			new ButtonControl(form, {
+			new ButtonControl(submitHost, {
 				variant: 'primary',
+				size: 'large',
 				type: 'submit',
 				label: localization.format(messages.check)
 			})
 		);
 		const actions = document.createElement('div');
 		actions.className = 'prctr-launch-window__actions';
+		const primary = document.createElement('div');
+		primary.className = 'prctr-launch-window__primary';
+		actions.append(primary);
 		const signIn = disposables.add(
-			new ButtonControl(actions, {
+			new ButtonControl(primary, {
 				variant: 'primary',
+				size: 'large',
 				label: localization.format(messages.signInGeneric),
 				disabled: true
 			})
 		);
 		const retry = disposables.add(
-			new ButtonControl(actions, {
-				variant: 'secondary',
+			new ButtonControl(primary, {
+				variant: 'primary',
+				size: 'large',
 				label: localization.format(messages.retry)
 			})
 		);
+		const secondary = document.createElement('div');
+		secondary.className = 'prctr-launch-window__button-host';
+		actions.append(secondary);
 		const change = disposables.add(
-			new ButtonControl(actions, {
+			new ButtonControl(secondary, {
 				variant: 'secondary',
+				size: 'large',
 				label: localization.format(messages.changeServer)
 			})
 		);
-		const exit = disposables.add(
-			new ButtonControl(actions, {
-				variant: 'secondary',
-				label: localization.format(messages.exit)
-			})
-		);
-		root.append(
-			brand.element,
+		task.append(
 			heading,
 			server,
 			status,
@@ -154,6 +175,8 @@ export async function bootstrapLaunchWindow(
 			actionError,
 			actions
 		);
+		page.append(task);
+		root.append(titlebar, page);
 		let disposed = false;
 		let revision = -1;
 		let projection: LaunchIdentityProjection | undefined;
@@ -177,13 +200,14 @@ export async function bootstrapLaunchWindow(
 			projection = next;
 			root.dataset.state = next.state;
 			form.hidden = !selection;
-			server.hidden = next.origin === undefined;
+			server.hidden = next.institutionName === undefined && !next.developmentOrigin;
 			institution.hidden = next.institutionName === undefined;
 			institution.textContent = next.institutionName ?? '';
 			institution.dir = 'auto';
-			origin.textContent = next.origin ?? '';
 			development.hidden = !next.developmentOrigin;
+			// Keep readiness announcements without repeating the form label or ready action.
 			status.textContent = localization.format(messages[next.state]);
+			status.dataset.announcementOnly = String(selection || next.state === 'ready');
 			administrator.hidden = next.administratorMessage === undefined;
 			administrator.textContent = next.administratorMessage ?? '';
 			retryTime.hidden = next.retryAt === undefined;
@@ -197,9 +221,10 @@ export async function bootstrapLaunchWindow(
 							}).format(next.retryAt)
 						});
 			authUnavailable.hidden = next.state !== 'ready' || next.authorizationAvailable;
-			signIn.element.hidden = selection;
+			signIn.element.hidden = next.state !== 'ready';
 			signIn.setState({
-				label:
+				label: localization.format(messages.signInGeneric),
+				accessibleLabel:
 					next.institutionName === undefined
 						? localization.format(messages.signInGeneric)
 						: localization.format(messages.signIn, {
@@ -207,9 +232,10 @@ export async function bootstrapLaunchWindow(
 							}),
 				disabled: !next.canSignIn
 			});
-			retry.element.hidden =
-				selection || next.state === 'checking' || next.state === 'authorizing';
-			change.element.hidden = selection;
+			retry.element.hidden = !retryableStates.has(next.state);
+			primary.hidden = signIn.element.hidden && retry.element.hidden;
+			secondary.hidden = selection;
+			actions.hidden = primary.hidden && secondary.hidden;
 			actionError.textContent = '';
 			field.setState({
 				value:
@@ -223,17 +249,25 @@ export async function bootstrapLaunchWindow(
 			});
 			if (root.isConnected && selection && previousState !== next.state) field.focus();
 			else if (
-				focusWasHidden ||
-				(focused === signIn.element && signIn.element.disabled) ||
-				(focused === retry.element && retry.element.hidden)
-			)
-				status.focus();
+				root.isConnected &&
+				!selection &&
+				(focusWasHidden ||
+					(focused === status && status.dataset.announcementOnly === 'true') ||
+					(focused === authUnavailable && authUnavailable.hidden) ||
+					(focused === signIn.element && signIn.element.disabled) ||
+					(focused === retry.element && retry.element.hidden))
+			) {
+				if (next.canSignIn) signIn.focus();
+				else if (next.state === 'ready') authUnavailable.focus();
+				else status.focus();
+			}
 		};
 		// Subscribe before the snapshot so an older invoke reply cannot overwrite an event.
 		disposables.add(client.identity.onDidChange(render));
 		render(await client.identity.projection());
-		document.body.replaceChildren(root);
-		if (!form.hidden) field.focus();
+		presentation.add(
+			await ProductWindowChrome.create(titlebar, client.windowChrome, activeTheme)
+		);
 		const request = async (
 			operation: () => Promise<void>,
 			interrupt = false
@@ -276,12 +310,10 @@ export async function bootstrapLaunchWindow(
 				void request(() => client.identity.changeServer(), true);
 			})
 		);
-		disposables.add(
-			exit.onDidRequest(() => {
-				void request(() => client.exit(), true);
-			})
-		);
 		disposables.add(presentation);
+		document.body.replaceChildren(root);
+		if (!form.hidden) field.focus();
+		else if (projection?.canSignIn) signIn.focus();
 		return Object.freeze({ element: root, disposables });
 	} catch (error) {
 		disposables.dispose();
@@ -292,3 +324,20 @@ export async function bootstrapLaunchWindow(
 		throw error;
 	}
 }
+
+const retryableStates = new Set<LaunchIdentityProjection['state']>([
+	'identityChanged',
+	'maintenance',
+	'unavailable',
+	'unreachable',
+	'timedOut',
+	'invalidResponse',
+	'redirectBlocked',
+	'originMismatch',
+	'updateRequired',
+	'serverIncompatible',
+	'unsupportedTarget',
+	'authorizationDisabled',
+	'authorizationUnsupported',
+	'authorizationFailed'
+]);

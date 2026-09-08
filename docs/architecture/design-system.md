@@ -42,8 +42,9 @@ must be local, justified, and verified.
 ## Themes and presentation
 
 Proctor owns four resolved themes: light, dark, high-contrast light, and
-high-contrast dark. A follow-system preference resolves to one of them rather
-than creating another theme. Authenticated and Candidate preferences may select
+high-contrast dark. Dark is the initial product default. A follow-system
+preference resolves to one of them rather than creating another theme.
+Authenticated and Candidate preferences may select
 approved presentation options but cannot redefine feedback, examination, or
 integrity semantics.
 

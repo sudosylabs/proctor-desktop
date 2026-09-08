@@ -1,3 +1,4 @@
+import type { ChromeCapableProductWindowKind } from './windowChrome.js';
 import type { ProductWindowKind } from './windowProtocol.js';
 
 export const WINDOW_CHANNELS = Object.freeze({
@@ -11,6 +12,26 @@ export const WINDOW_CHANNELS = Object.freeze({
 		intent: 'prctr:candidate:intent'
 	})
 } satisfies Record<ProductWindowKind, { readonly bootstrap: string; readonly intent: string }>);
+
+export const WINDOW_CHROME_CHANNELS = Object.freeze({
+	launch: Object.freeze({
+		configuration: 'prctr:launch:window-chrome:configuration',
+		update: 'prctr:launch:window-chrome:update',
+		fullscreenChanged: 'prctr:launch:window-chrome:fullscreen-changed'
+	}),
+	authenticated: Object.freeze({
+		configuration: 'prctr:authenticated:window-chrome:configuration',
+		update: 'prctr:authenticated:window-chrome:update',
+		fullscreenChanged: 'prctr:authenticated:window-chrome:fullscreen-changed'
+	})
+} satisfies Record<
+	ChromeCapableProductWindowKind,
+	{
+		readonly configuration: string;
+		readonly update: string;
+		readonly fullscreenChanged: string;
+	}
+>);
 
 export const LAUNCH_IDENTITY_CHANNELS = Object.freeze({
 	projection: 'prctr:launch:identity:projection',

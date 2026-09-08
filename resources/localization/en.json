@@ -405,6 +405,89 @@
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
+    "launch.menu.application": {
+      "message": "Proctor",
+      "description": "Native Launch application menu.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.close": {
+      "message": "Close",
+      "description": "Dismiss native diagnostics.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.diagnostics": {
+      "message": "Connection Diagnostics…",
+      "description": "Open bounded connection information in a native dialog.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.diagnostics.detail": {
+      "message": "Proctor {version}\nPlatform: {platform}\nInstitution: {institution}\nServer: {origin}",
+      "description": "Bounded support details; no credentials or private server payloads.",
+      "placeholders": [
+        "version",
+        "platform",
+        "institution",
+        "origin"
+      ],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.diagnostics.title": {
+      "message": "Connection diagnostics",
+      "description": "Native diagnostics dialog title.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.edit": {
+      "message": "Edit",
+      "description": "Native Launch editing menu.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.file": {
+      "message": "File",
+      "description": "Native Launch file menu.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.help": {
+      "message": "Help",
+      "description": "Native Launch help menu.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.none": {
+      "message": "Not selected",
+      "description": "Diagnostics value before selecting a server.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.quit": {
+      "message": "Quit Proctor",
+      "description": "Exit through the owning Launch composition.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.unknown": {
+      "message": "Not verified",
+      "description": "Diagnostics value when the Institution has not been verified.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.view": {
+      "message": "View",
+      "description": "Native Launch presentation menu.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
+    "launch.menu.window": {
+      "message": "Window",
+      "description": "Native Launch window menu.",
+      "placeholders": [],
+      "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
+    },
     "launch.origin.mismatch": {
       "message": "The server identifies itself with a different address. Confirm the correct address with your Institution.",
       "description": "Canonical server origin mismatch.",
@@ -477,7 +560,7 @@
     },
     "launch.sign.in.generic": {
       "message": "Sign in",
-      "description": "Unavailable sign-in action before server identity is known.",
+      "description": "Compact sign-in action; the adjacent Institution supplies context.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
@@ -488,8 +571,8 @@
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
     "launch.title": {
-      "message": "Connect to your Institution",
-      "description": "Task heading for the signed-out Proctor launch surface.",
+      "message": "Proctor",
+      "description": "Accessible heading for the LaunchWindow brand lockup.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },

@@ -12,6 +12,18 @@
 		padding: var(--prctr-spacing-region);
 		text-align: center;
 	}
+	.prctr-startup-surface[data-launch-recovery='true'],
+	.prctr-startup-surface[data-window-kind='authenticated'] {
+		position: relative;
+	}
+	.prctr-startup-surface[data-launch-recovery='true']::before,
+	.prctr-startup-surface[data-window-kind='authenticated']::before {
+		block-size: 35px;
+		content: '';
+		inset: 0 0 auto;
+		position: absolute;
+		-webkit-app-region: drag;
+	}
 	@media (forced-colors: active) {
 		.prctr-startup-surface {
 			background: Canvas;

@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { WINDOW_CHANNELS, LAUNCH_IDENTITY_CHANNELS } from '../../platform/windows/common/windowChannels.js';
 import { validateWindowDescriptor, type LaunchWindowDescriptor } from '../../platform/windows/common/windowProtocol.js';
 import { validateLaunchIdentityIntent, validateLaunchIdentityProjection, type LaunchIdentityClient } from '../../platform/identity/common/launchIdentity.js';
+import { createWindowChromePreloadClient } from './windowChromePreload.js';
 
 const identity: LaunchIdentityClient = Object.freeze({
 	projection: async () => validateLaunchIdentityProjection(await ipcRenderer.invoke(LAUNCH_IDENTITY_CHANNELS.projection)),
@@ -18,6 +19,7 @@ const identity: LaunchIdentityClient = Object.freeze({
 
 contextBridge.exposeInMainWorld('proctorLaunch', Object.freeze({
   bootstrap: async (): Promise<LaunchWindowDescriptor> => { const descriptor = validateWindowDescriptor(await ipcRenderer.invoke(WINDOW_CHANNELS.launch.bootstrap)); if (descriptor.kind !== 'launch') throw new TypeError('Launch bootstrap returned the wrong window kind'); return descriptor; },
+	windowChrome: createWindowChromePreloadClient('launch'),
   identity,
   exit: (): Promise<void> => ipcRenderer.invoke(WINDOW_CHANNELS.launch.intent, { kind: 'launch.exit' })
 }));

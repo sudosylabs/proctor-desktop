@@ -68,3 +68,20 @@ void test('compact density uses explicit scale mappings without changing hit-are
 	});
 	assert.strictEqual(getTheme('light').values['icon.size.medium'], '16px');
 });
+
+void test('primary button text remains readable in rest, hover, and pressed states in every theme', () => {
+	for (const theme of getThemes()) {
+		const foreground = Color.Format.CSS.parseHex(theme.values['color.text.inverse'])!;
+		for (const token of [
+			'color.interaction.accent',
+			'color.interaction.accentHover',
+			'color.interaction.accentActive'
+		] as const) {
+			const background = Color.Format.CSS.parseHex(theme.values[token])!;
+			assert.ok(
+				background.getContrastRatio(foreground) >= 4.5,
+				`${theme.id} ${token} text contrast`
+			);
+		}
+	}
+});

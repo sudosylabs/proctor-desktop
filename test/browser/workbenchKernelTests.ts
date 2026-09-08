@@ -38,6 +38,10 @@ import type {
 } from '../../src/prctr/platform/integratedBrowser/common/browserProtocol.ts';
 import type { UserSettingsProjection } from '../../src/prctr/platform/settings/common/settingsRendererProtocol.ts';
 import { BrowserThemeService } from '../../src/prctr/platform/theme/browser/themeService.ts';
+import type {
+	ProductWindowChromeClient,
+	ProductWindowChromeUpdate
+} from '../../src/prctr/platform/windows/common/windowChrome.ts';
 import { ContextKeyService } from '../../src/prctr/platform/contextkey/browser/contextKeyService.ts';
 import type { IContextKeyService } from '../../src/prctr/platform/contextkey/common/contextkey.ts';
 import { isMacintosh } from '../../src/prctr/base/common/platform.ts';
@@ -66,6 +70,25 @@ const labels: WorkbenchShellLabels = {
 	resizeSidebar: 'Resize sidebar',
 	resizePanel: 'Resize panel'
 };
+
+function testWindowChromeClient(updates?: ProductWindowChromeUpdate[]): ProductWindowChromeClient {
+	return Object.freeze({
+		configuration: async () =>
+			Object.freeze({
+				protocolVersion: 1,
+				platform: 'win32',
+				mode: 'nativeOverlay',
+				controlsLocation: 'right',
+				titlebarHeight: 35,
+				fullscreen: false
+			}),
+		onDidChangeFullscreen: () => ({ dispose() {} }),
+		zoomFactor: () => 1,
+		update: async (update: ProductWindowChromeUpdate) => {
+			updates?.push(update);
+		}
+	});
+}
 
 export async function runWorkbenchKernelBrowserTests(document: Document): Promise<number> {
 	await runThemePreferenceTest(document);
@@ -436,6 +459,7 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 				institutionOrigin: 'https://institution.example.test'
 			};
 		},
+		windowChrome: testWindowChromeClient(),
 		identity: {
 			projection: async () => ({
 				protocolVersion: 1,
@@ -467,7 +491,12 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 	const launchActions = launchSurface.querySelectorAll<HTMLButtonElement>(
 		'.prctr-launch-window__actions button'
 	);
-	if (launchActions.length !== 4 || launchActions[0]?.disabled)
+	if (
+		launchActions.length !== 3 ||
+		launchActions[0]?.disabled ||
+		!launchActions[1]?.hidden ||
+		launchActions[2]?.dataset.variant !== 'secondary'
+	)
 		throw new Error('LaunchWindow did not render its executable actions');
 	launchActions[0]?.click();
 	await Promise.resolve();
@@ -480,6 +509,7 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		bootstrap: async () => {
 			throw new Error('failed');
 		},
+		windowChrome: testWindowChromeClient(),
 		identity: {
 			projection: async () => {
 				throw new Error('unavailable');
@@ -545,17 +575,22 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		resolveSettingsSnapshot = resolve;
 	});
 	let notifySettings: ((projection: UserSettingsProjection) => void) | undefined;
+	const authenticatedChromeUpdates: ProductWindowChromeUpdate[] = [];
 	const authenticatedPromise = bootstrapWorkbench(settingsDocument, authenticatedComposition, [
 		...commonWorkbenchContributions,
-		createDesktopWorkbenchContribution('authenticated', async () => ({
-			protocolVersion: 1,
-			kind: 'authenticated',
-			windowId: 'window:settings',
-			institutionOrigin: 'https://institution.example.test',
-			principalId: 'principal:one',
-			sessionId: 'session:one',
-			initialDestination: 'settings'
-		})),
+		createDesktopWorkbenchContribution(
+			'authenticated',
+			async () => ({
+				protocolVersion: 1,
+				kind: 'authenticated',
+				windowId: 'window:settings',
+				institutionOrigin: 'https://institution.example.test',
+				principalId: 'principal:one',
+				sessionId: 'session:one',
+				initialDestination: 'settings'
+			}),
+			testWindowChromeClient(authenticatedChromeUpdates)
+		),
 		createAuthenticatedContribution({
 			signOut: async () => {
 				throw new Error('sign-out unavailable');
@@ -618,6 +653,20 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		throw new Error('Settings is not a real AuthenticatedWindow destination');
 	const settingsStatus = settingsPage.querySelector<HTMLElement>('[role="status"]');
 	if (settingsStatus === null) throw new Error('Settings status region is missing');
+	const dimmingDialog = authenticated.shell.overlayHost.show({
+		kind: 'dialog',
+		title: 'Confirm',
+		message: 'Confirm native control dimming.',
+		accessibleLabel: 'Confirm native control dimming',
+		actions: [{ id: 'close', label: 'Close', variant: 'secondary', onRequest: () => undefined }]
+	});
+	await waitFor(() => authenticatedChromeUpdates.at(-1)?.dimmed === true);
+	if (authenticatedChromeUpdates.at(-1)?.dimmed !== true)
+		throw new Error('Authenticated modal did not dim native window controls');
+	dimmingDialog.dispose();
+	await waitFor(() => authenticatedChromeUpdates.at(-1)?.dimmed === false);
+	if (authenticatedChromeUpdates.at(-1)?.dimmed !== false)
+		throw new Error('Authenticated modal did not restore native window controls');
 	const signOut = authenticated.shell
 		.part('titlebar')
 		.querySelector<HTMLButtonElement>('[data-region="signout"]');

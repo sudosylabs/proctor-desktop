@@ -4,9 +4,10 @@ import { addDisposableListener } from '../../dom.js';
 import './button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger';
+export type ButtonSize = 'default' | 'large';
 export interface ButtonIcon { readonly element: HTMLElement; dispose(): void }
 export interface ButtonState { readonly label: string; readonly accessibleLabel?: string; readonly disabled?: boolean; readonly busy?: boolean; readonly icon?: (document: Document) => ButtonIcon; }
-export interface ButtonOptions extends ButtonState { readonly variant: ButtonVariant; readonly type?: 'button' | 'submit'; }
+export interface ButtonOptions extends ButtonState { readonly variant: ButtonVariant; readonly size?: ButtonSize; readonly type?: 'button' | 'submit'; }
 
 export class ButtonControl extends Disposable {
   readonly element: HTMLButtonElement;
@@ -19,6 +20,7 @@ export class ButtonControl extends Disposable {
     super();
     const document = host.ownerDocument; this.element = document.createElement('button');
     this.element.className = 'prctr-button'; this.element.type = options.type ?? 'button'; this.element.dataset.variant = options.variant;
+    this.element.dataset.size = options.size ?? 'default';
     this._register(addDisposableListener(this.element, 'click', event => { if (this.element.disabled || this.element.dataset.busy === 'true') { event.preventDefault(); return; } this.#intent.fire(); }));
     host.append(this.element); this.setState(options);
   }

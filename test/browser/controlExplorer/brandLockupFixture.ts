@@ -1,13 +1,14 @@
 import { DisposableStore } from '../../../src/prctr/base/common/lifecycle.ts';
 import {
 	BrandLockup,
-	type BrandLockupAppearance
+	brandLockupAppearance
 } from '../../../src/prctr/workbench/browser/brandLockup.ts';
+import { getThemes } from '../../../src/prctr/platform/theme/common/themes.ts';
 import type { ControlFixtureResult } from './manifest.ts';
 
 export function brandLockupFixture(host: HTMLElement): ControlFixtureResult {
 	const store = new DisposableStore();
-	const appearances: readonly BrandLockupAppearance[] = ['light', 'dark', 'monochrome'];
+	const appearances = getThemes().map(brandLockupAppearance);
 	const lockups = appearances.map((appearance) =>
 		store.add(new BrandLockup(host.ownerDocument, appearance))
 	);
@@ -15,7 +16,7 @@ export function brandLockupFixture(host: HTMLElement): ControlFixtureResult {
 	return {
 		states: appearances.length,
 		disposable: store,
-		verify(): number {
+		async verify(): Promise<number> {
 			const lockups = host.querySelectorAll<HTMLElement>('.prctr-brand-lockup');
 			if (lockups.length !== appearances.length)
 				throw new Error('Brand lockup fixture did not render every appearance');
@@ -27,6 +28,15 @@ export function brandLockupFixture(host: HTMLElement): ControlFixtureResult {
 					lockup.querySelector('img')?.alt !== ''
 				)
 					throw new Error(`Brand lockup ${appearance} lost its decorative contract`);
+				const image = lockup.querySelector('img')!;
+				await image.decode();
+				if (
+					!image.src.includes(`proctor-lockup-vertical-25d-${appearance}`) ||
+					image.naturalWidth / image.naturalHeight !== 4 / 3
+				)
+					throw new Error(
+						`Brand lockup ${appearance} must preserve the supplied vertical artwork`
+					);
 			}
 			return appearances.length;
 		}

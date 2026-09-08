@@ -73,18 +73,37 @@ content-item resolution, pane ownership, overlays, responsive sidebar/panel
 collapse, keyboard sashes, and localized accessible parts. Capability-specific
 sandboxed preloads and Electron-main IPC authorize the bound main frame. The real
 Electron window harness verifies the locked renderer preferences and three-window
-capability separation. This is a development-runtime skeleton; it is not yet a
-Forge-packaged, signed, updateable application.
+capability separation. LaunchWindow and AuthenticatedWindow now use the admitted
+VS Code native-chrome topology: macOS retains native traffic lights, Windows and
+Linux use Electron's native Window Controls Overlay, and the renderer owns the
+integrated drag region, control inset, theme/zoom synchronization, and fullscreen
+spacing. CandidateWindow remains separately frameless and control-free. This is
+a development-runtime skeleton; it is not yet a Forge-packaged, signed,
+updateable application.
 
 LaunchWindow now implements server selection and split public readiness through
 a privileged Desktop Identity Coordinator. The real HTTP adapter consumes system
 ping for availability/build/realtime compatibility and discovery for verified
 Institution/origin and Desktop Authorization compatibility. Bounded IPC,
 revision-fenced projections, cancellation, retry, localized failure states, and
-keyboard focus are exercised through unit, browser, and Electron tests. Sign-in
-remains disabled when no complete hosted-authentication owner is connected; the
-readiness slice does not implement loopback authorization, OS-backed key custody,
-credentials, Sessions, or the authenticated transition.
+keyboard focus are exercised through unit, browser, and Electron tests. Its
+visual surface uses one centered group containing the Proctor lockup, Institution,
+and compact sign-in action, with integrated native chrome on a continuous canvas.
+Native Launch menus provide editing, zoom, window actions, exit, and bounded
+connection diagnostics. A development-only Electron preview mounts the production
+renderer with sample readiness data. Sign-in remains disabled when no complete
+hosted-authentication owner is connected; the readiness slice does not implement
+loopback authorization, OS-backed key custody, credentials, Sessions, or the
+authenticated transition.
+
+ProductWindowChrome currently has one scoped design-system evidence exception.
+The missing evidence is deterministic pixel-baseline comparison for every
+supported renderer/platform matrix entry; computed-geometry browser fixtures
+and target-native Electron assertions exist, but the repository has no pinned
+golden-image capture and approval runner yet. The design-system/toolchain owners
+own this gap. Landing that baseline runner, recording reviewed Windows, macOS,
+and Linux images, and making comparison a required CI check blocks any claim of
+pixel-level visual conformance for this reusable control.
 
 Attempt Workspace now has canonical URI/path validation, hierarchy and content
 models, a provider boundary, mutation scheduling, late-result fencing, retry and

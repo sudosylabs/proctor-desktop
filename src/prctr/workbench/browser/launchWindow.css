@@ -1,46 +1,129 @@
 @layer workbench {
 	.prctr-launch-window {
-		align-content: safe center;
-		block-size: 100%;
 		background: var(--prctr-color-background-canvas);
-		box-sizing: border-box;
+		block-size: 100%;
 		color: var(--prctr-color-text-primary);
 		display: grid;
 		font-family: var(--prctr-typography-font-application);
-		gap: var(--prctr-spacing-region);
-		margin-inline: auto;
-		max-inline-size: 640px;
-		overflow: auto;
-		padding: var(--prctr-spacing-region);
+		grid-template-rows: auto minmax(0, 1fr);
+		inline-size: 100%;
+		overflow: hidden;
 		overflow-wrap: anywhere;
 	}
-	.prctr-launch-window h1 {
-		font-size: var(--prctr-typography-heading-large-size);
-		margin: 0;
+
+	.prctr-launch-window .prctr-launch-window__titlebar {
+		inline-size: 100%;
 	}
-	.prctr-launch-window h2,
+
+	.prctr-launch-window .prctr-launch-window__page {
+		display: grid;
+		min-block-size: 0;
+		overflow: auto;
+		overscroll-behavior: contain;
+	}
+
+	.prctr-launch-window .prctr-launch-window__task {
+		align-self: safe center;
+		box-sizing: border-box;
+		display: grid;
+		gap: var(--prctr-spacing-region);
+		inline-size: min(100%, 368px);
+		justify-self: center;
+		min-inline-size: 0;
+		padding: var(--prctr-spacing-region);
+		text-align: center;
+	}
+
+	.prctr-launch-window .prctr-launch-window__brand {
+		display: flex;
+		justify-content: center;
+		margin: 0 0 var(--prctr-spacing-content-large);
+	}
+
 	.prctr-launch-window p {
 		margin: 0;
 	}
-	.prctr-launch-window .prctr-launch-window__server,
+
+	.prctr-launch-window .prctr-launch-window__server {
+		display: grid;
+		gap: var(--prctr-spacing-content-small);
+		justify-items: center;
+		min-inline-size: 0;
+	}
+
+	.prctr-launch-window .prctr-launch-window__server p {
+		color: var(--prctr-color-text-secondary);
+		font-size: var(--prctr-typography-label-size);
+		line-height: var(--prctr-typography-label-lineHeight);
+	}
+
+	.prctr-launch-window .prctr-launch-window__server .prctr-launch-window__institution {
+		color: var(--prctr-color-text-primary);
+		font-size: var(--prctr-typography-heading-small-size);
+		line-height: var(--prctr-typography-heading-small-lineHeight);
+		font-weight: var(--prctr-typography-weight-semibold);
+	}
+
 	.prctr-launch-window .prctr-launch-window__form {
+		display: grid;
+		gap: var(--prctr-spacing-content-large);
+		min-inline-size: 0;
+		text-align: start;
+	}
+
+	.prctr-launch-window .prctr-launch-window__primary,
+	.prctr-launch-window .prctr-launch-window__button-host {
+		display: grid;
+		inline-size: min(100%, 240px);
+		justify-self: center;
+		min-inline-size: 0;
+	}
+
+	.prctr-launch-window .prctr-launch-window__actions {
 		display: grid;
 		gap: var(--prctr-spacing-content-medium);
 		min-inline-size: 0;
 	}
-	.prctr-launch-window .prctr-launch-window__actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--prctr-spacing-content-medium);
+
+	.prctr-launch-window .prctr-launch-window__status,
+	.prctr-launch-window .prctr-launch-window__administrator,
+	.prctr-launch-window .prctr-launch-window__task > p {
+		color: var(--prctr-color-text-secondary);
+		font-size: var(--prctr-typography-label-size);
+		line-height: var(--prctr-typography-label-lineHeight);
 	}
-	.prctr-launch-window .prctr-launch-window__status:focus-visible {
+
+	.prctr-launch-window .prctr-launch-window__error:empty {
+		display: none;
+	}
+
+	.prctr-launch-window .prctr-launch-window__status[data-announcement-only='true'] {
+		block-size: 1px;
+		clip-path: inset(50%);
+		inline-size: 1px;
+		overflow: hidden;
+		position: absolute;
+		white-space: nowrap;
+	}
+
+	.prctr-launch-window .prctr-launch-window__status:focus-visible,
+	.prctr-launch-window .prctr-launch-window__task > p:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: 2px;
 	}
+
 	.prctr-launch-window .prctr-launch-window__administrator {
 		white-space: pre-wrap;
 	}
+
 	.prctr-launch-window [hidden] {
 		display: none;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-launch-window {
+			background: Canvas;
+			color: CanvasText;
+		}
 	}
 }

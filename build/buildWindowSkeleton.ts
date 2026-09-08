@@ -18,7 +18,10 @@ await Promise.all([
 	build({
 		absWorkingDir: repositoryRoot,
 		bundle: true,
-		entryPoints: { main: 'test/electron/windowSkeletonMain.ts' },
+		entryPoints: {
+			main: 'test/electron/windowSkeletonMain.ts',
+			preview: 'test/electron/launchWindowPreview.ts'
+		},
 		external: ['electron', 'electron/main'],
 		format: 'esm',
 		outdir,

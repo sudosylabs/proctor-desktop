@@ -190,8 +190,11 @@ native/Cargo.lock
 /src/prctr/platform/theme/browser/semanticIcon.css
 /src/prctr/platform/theme/browser/themeService.ts
 /src/prctr/platform/theme/common/theme.ts
+/src/prctr/platform/windows/browser/productWindowChrome.css
+/src/prctr/platform/windows/browser/productWindowChrome.ts
 /src/prctr/platform/windows/common/windowCoordinator.ts
 /src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts
+/src/prctr/platform/windows/electron-main/electronWindowChrome.ts
 /src/prctr/workbench/browser/paneHost.ts
 /src/prctr/workbench/browser/workbenchShell.ts
 /src/prctr/workbench/common/contentGroups.ts

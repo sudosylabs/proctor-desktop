@@ -1,5 +1,6 @@
 import { controlsFixture } from './sharedControlsFixture.ts';
 import { brandLockupFixture } from './brandLockupFixture.ts';
+import { productWindowChromeFixture } from './productWindowChromeFixture.ts';
 import { runLaunchWindowTests } from '../launchWindowTests.ts';
 import { launchStates } from '../../../src/prctr/platform/identity/common/launchIdentity.ts';
 
@@ -18,6 +19,11 @@ export interface ControlFixture {
 export const controlExplorerFixtures: readonly ControlFixture[] = Object.freeze([
 	Object.freeze({ id: 'shared-controls', title: 'Shared controls', mount: controlsFixture }),
 	Object.freeze({ id: 'brand-lockup', title: 'Brand lockup', mount: brandLockupFixture }),
+	Object.freeze({
+		id: 'product-window-chrome',
+		title: 'Product window chrome',
+		mount: productWindowChromeFixture
+	}),
 	Object.freeze({
 		id: 'launch-window',
 		title: 'LaunchWindow readiness',

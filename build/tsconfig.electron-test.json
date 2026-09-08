@@ -14,6 +14,7 @@
     "../test/electron/browserHarness.real.test.ts",
     "../test/electron/windowSkeletonMain.ts",
     "../test/electron/launchWindowScenario.ts",
+    "../test/electron/launchWindowPreview.ts",
     "../test/electron/windowSkeleton.real.test.ts",
     "../test/electron/securityUtility.real.test.ts",
     "../test/electron/securityUtilityMain.ts"

@@ -1,0 +1,96 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+/* @proctor-vscode-port electron-window-skeleton */
+
+@layer workbench {
+	.prctr-product-window-chrome {
+		align-items: center;
+		background: var(--prctr-color-background-canvas);
+		block-size: var(--prctr-product-titlebar-height);
+		box-sizing: border-box;
+		display: flex;
+		flex: 0 0 var(--prctr-product-titlebar-height);
+		min-block-size: var(--prctr-product-titlebar-height);
+		position: relative;
+		user-select: none;
+		-webkit-app-region: drag;
+		-webkit-user-select: none;
+	}
+
+	.prctr-product-window-chrome
+		> :not(
+			.prctr-product-window-chrome__drag-region,
+			.prctr-product-window-chrome__controls-inset
+		) {
+		position: relative;
+		z-index: 1;
+		-webkit-app-region: no-drag;
+	}
+
+	.prctr-product-window-chrome .prctr-product-window-chrome__drag-region {
+		block-size: 100%;
+		inset: 0;
+		position: absolute;
+		-webkit-app-region: drag;
+	}
+
+	.prctr-product-window-chrome .prctr-product-window-chrome__controls-inset {
+		block-size: 100%;
+		flex: 0 0 auto;
+		order: 0;
+		position: relative;
+		z-index: 2;
+	}
+
+	.prctr-product-window-chrome[data-controls-location='left'][data-content-direction='ltr']
+		.prctr-product-window-chrome__controls-inset {
+		order: -1;
+	}
+
+	.prctr-product-window-chrome[data-controls-location='left'][data-content-direction='rtl']
+		.prctr-product-window-chrome__controls-inset {
+		margin-right: auto;
+		order: 1;
+	}
+
+	.prctr-product-window-chrome[data-controls-location='right'][data-content-direction='ltr']
+		.prctr-product-window-chrome__controls-inset {
+		margin-left: auto;
+		order: 1;
+	}
+
+	.prctr-product-window-chrome[data-controls-location='right'][data-content-direction='rtl']
+		.prctr-product-window-chrome__controls-inset {
+		order: -1;
+	}
+
+	.prctr-product-window-chrome[data-chrome-mode='nativeTrafficLights']
+		.prctr-product-window-chrome__controls-inset {
+		inline-size: var(--prctr-product-window-controls-inset);
+		-webkit-app-region: drag;
+	}
+
+	.prctr-product-window-chrome[data-chrome-platform='linux'][data-chrome-mode='nativeOverlay'][data-controls-location='right']
+		.prctr-product-window-chrome__controls-inset {
+		block-size: env(titlebar-area-height, var(--prctr-product-titlebar-height));
+		inline-size: calc(100vw - env(titlebar-area-width, 100vw) - env(titlebar-area-x, 0px));
+	}
+
+	.prctr-product-window-chrome[data-chrome-platform='linux'][data-chrome-mode='nativeOverlay'][data-controls-location='left']
+		.prctr-product-window-chrome__controls-inset {
+		block-size: env(titlebar-area-height, var(--prctr-product-titlebar-height));
+		inline-size: env(titlebar-area-x, 0px);
+	}
+
+	.prctr-product-window-chrome[data-chrome-platform='win32'][data-chrome-mode='nativeOverlay']
+		.prctr-product-window-chrome__controls-inset {
+		inline-size: calc(138px / var(--prctr-product-window-zoom-factor, 1));
+	}
+
+	.prctr-product-window-chrome[data-fullscreen='true']
+		.prctr-product-window-chrome__controls-inset {
+		display: none;
+	}
+}

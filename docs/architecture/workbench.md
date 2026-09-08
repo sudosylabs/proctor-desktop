@@ -6,9 +6,15 @@ Proctor Desktop ships one binary with three trusted window kinds:
 
 - `LaunchWindow` is the minimal signed-out surface. It accepts a Proctor Server
   URL, replaces the input with safe Institution availability and compatibility,
-  offers `Sign in to <Institution>` when usable, keeps `Change server`
-  available, and provides bounded diagnostics and exit. It renders no
+  offers a compact `Sign in` action below the verified Institution when usable,
+  and places a muted `Change server` button directly beneath it when a server has
+  been submitted. It provides bounded diagnostics and exit. It renders no
   authentication method, provider, password, recovery, MFA, or invitation form.
+  Its lockup, Institution, and action form one centered group on a continuous
+  canvas with integrated native window controls. Exit and bounded connection
+  diagnostics live in native application menus; its initial window is normal
+  and resizable. The initial theme is dark. The server origin remains available
+  in native diagnostics without repeating it in the main content.
 - `AuthenticatedWindow` is the normal signed-in application. It contains every
   currently authorized student, teacher/Exam Manager, administration, account,
   and settings area. Navigation and server projections never grant authority.

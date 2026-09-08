@@ -1,11 +1,26 @@
 import { join } from 'node:path';
 import { createServer } from 'node:http';
-import { app, BrowserWindow, ipcMain, Menu, type IpcMain, type WebContents } from 'electron';
+import {
+	app,
+	BrowserWindow,
+	dialog,
+	ipcMain,
+	Menu,
+	type IpcMain,
+	type IpcMainInvokeEvent,
+	type WebContents
+} from 'electron';
 import {
 	assertProductWindowIpcSender,
 	ElectronProductWindowFactory,
 	lockedBrowserWindowOptions
 } from '../../src/prctr/platform/windows/electron-main/electronProductWindowFactory.js';
+import {
+	ElectronWindowChromeBridge,
+	resolveProductWindowChromeConfiguration,
+	type ElectronWindowChromeTarget
+} from '../../src/prctr/platform/windows/electron-main/electronWindowChrome.js';
+import { WINDOW_CHROME_CHANNELS } from '../../src/prctr/platform/windows/common/windowChannels.js';
 import type {
 	ProductWindowDescriptor,
 	ProductWindowKind
@@ -34,6 +49,7 @@ import { ExamSecurityIpcBridge } from '../../src/prctr/workbench/services/examSe
 import { errorHandler, setUnexpectedErrorHandler } from '../../src/prctr/base/common/errors.js';
 import { DesktopIdentityCoordinator } from '../../src/prctr/platform/identity/electron-main/desktopIdentityCoordinator.js';
 import { verifyLaunchWindowScenario } from './launchWindowScenario.js';
+import { installLaunchWindowMenu } from '../../src/prctr/platform/windows/electron-main/launchWindowMenu.js';
 
 const timeout = setTimeout(() => fail(new Error('window skeleton timeout')), 15_000);
 // Keep this multi-scenario harness alive between the skeleton and real LaunchWindow.
@@ -150,6 +166,13 @@ async function run(): Promise<void> {
       const names = ['proctorLaunch', 'proctorAuthenticated', 'proctorCandidate'].filter(name => name in globalThis);
       const api = globalThis[names[0]];
       const bootstrap = await api.bootstrap();
+      let windowChrome;
+      if (bootstrap.kind !== 'candidate') {
+        windowChrome = await api.windowChrome.configuration();
+        const subscription = api.windowChrome.onDidChangeFullscreen(() => {});
+        await api.windowChrome.update({ protocolVersion: 1, theme: 'dark', titlebarHeight: windowChrome.titlebarHeight, dimmed: false });
+        subscription.dispose();
+      }
       if (bootstrap.kind === 'launch') {
         if ('changeServer' in api || 'signIn' in api) throw new Error('legacy Launch authority remains exposed');
         const events = []; const subscription = api.identity.onDidChange(value => events.push(value));
@@ -163,7 +186,7 @@ async function run(): Promise<void> {
       else if (bootstrap.kind === 'authenticated') await api.joinAttempt('attempt-2');
       else { await api.requestDeparture(); await api.browser.surface({ visible: true, focus: true, bounds: { x: -10, y: 10, width: 100000, height: 100000 } }); if (await api.browser.surfaceFocus() !== false) throw new Error('unexpected integrated browser focus'); }
       let browserSurfaceValidationRejected = false; if (bootstrap.kind === 'candidate') { try { await api.browser.surface({ visible: true, focus: false, bounds: { x: 0, y: 0, width: 10, height: 10 }, extra: true }); } catch { browserSurfaceValidationRejected = true; } }
-      return { names, bootstrap, browserSurfaceValidationRejected, hasNodeProcess: 'process' in globalThis, hasNodeRequire: 'require' in globalThis, popupDenied: window.open('https://example.com') === null };
+      return { names, bootstrap, windowChrome, browserSurfaceValidationRejected, hasNodeProcess: 'process' in globalThis, hasNodeRequire: 'require' in globalThis, popupDenied: window.open('https://example.com') === null };
     })()`,
 			true
 		)) as unknown;
@@ -215,11 +238,149 @@ async function run(): Promise<void> {
 	for (const managed of managedWindows.reverse()) managed.destroy();
 	launchIdentity.dispose();
 	await verifyLaunchWindowScenario(root);
+	await verifyLaunchWindowMenu();
+	const chromeUpdateRecovery = verifyWindowChromeUpdateRecovery();
 	clearTimeout(timeout);
 	process.stdout.write(
-		`${JSON.stringify({ results, integratedBrowser, transactionalRollback, candidateSurface, candidateContentBounds, runtimeIconForwarded: lockedBrowserWindowOptions('launch', 'preload.cjs', true, 'proctor.png').icon === 'proctor.png', applicationMenuRemoved: Menu.getApplicationMenu() === null })}\n`
+		`${JSON.stringify({
+			results,
+			integratedBrowser,
+			transactionalRollback,
+			candidateSurface,
+			candidateContentBounds,
+			chromeUpdateRecovery,
+			windowChromeOptions: {
+				darwin: pickChromeOptions(
+					lockedBrowserWindowOptions('launch', 'preload.cjs', true, undefined, {
+						platform: 'darwin',
+						locale: 'en',
+						macOsRelease: '24.0.0',
+						initialTheme: 'dark'
+					})
+				),
+				darwinRtl: pickChromeOptions(
+					lockedBrowserWindowOptions('launch', 'preload.cjs', true, undefined, {
+						platform: 'darwin',
+						locale: 'ar',
+						macOsRelease: '25.0.0',
+						initialTheme: 'dark'
+					})
+				),
+				win32: pickChromeOptions(
+					lockedBrowserWindowOptions('launch', 'preload.cjs', true, undefined, {
+						platform: 'win32',
+						locale: 'en',
+						macOsRelease: '',
+						initialTheme: 'dark'
+					})
+				),
+				linux: pickChromeOptions(
+					lockedBrowserWindowOptions('launch', 'preload.cjs', true, undefined, {
+						platform: 'linux',
+						locale: 'en',
+						macOsRelease: '',
+						initialTheme: 'dark'
+					})
+				),
+				candidate: pickChromeOptions(
+					lockedBrowserWindowOptions('candidate', 'preload.cjs', true, undefined, {
+						platform: 'darwin',
+						locale: 'en',
+						macOsRelease: '24.0.0',
+						initialTheme: 'dark'
+					})
+				)
+			},
+			runtimeIconForwarded:
+				lockedBrowserWindowOptions('launch', 'preload.cjs', true, 'proctor.png').icon ===
+				'proctor.png',
+			applicationMenuRemoved: Menu.getApplicationMenu() === null
+		})}\n`
 	);
 	app.exit(0);
+}
+
+async function verifyLaunchWindowMenu(): Promise<void> {
+	const window = new BrowserWindow({
+		show: false,
+		webPreferences: { sandbox: true, contextIsolation: true, nodeIntegration: false }
+	});
+	const originalBuild = Menu.buildFromTemplate;
+	const originalDialog = dialog.showMessageBox;
+	let menu: Menu | undefined;
+	let shown = 0;
+	let exits = 0;
+	let finishDialog!: (value: { response: number; checkboxChecked: boolean }) => void;
+	let details = '';
+	Menu.buildFromTemplate = (template) => {
+		menu = originalBuild(template);
+		return menu;
+	};
+	dialog.showMessageBox = ((_window: BrowserWindow, options: Electron.MessageBoxOptions) => {
+		shown++;
+		details = options.detail ?? '';
+		return new Promise((resolve) => {
+			finishDialog = resolve;
+		});
+	}) as typeof dialog.showMessageBox;
+	let owned: { dispose(): void } | undefined;
+	try {
+		owned = installLaunchWindowMenu(
+			window,
+			'en',
+			() => ({
+				protocolVersion: 1,
+				revision: 1,
+				state: 'checking',
+				origin: 'https://example.edu',
+				developmentOrigin: false,
+				canSignIn: false,
+				authorizationAvailable: false
+			}),
+			() => {
+				exits++;
+			}
+		);
+		if (!menu) throw new Error('Launch native menu was not created');
+		const items = menu.items.flatMap((item) => item.submenu?.items ?? []);
+		if (
+			!items.some((item) => item.role === 'paste') ||
+			!items.some((item) => item.role?.toLowerCase() === 'zoomin') ||
+			items.some((item) =>
+				['reload', 'forcereload', 'toggledevtools'].includes(item.role?.toLowerCase() ?? '')
+			)
+		)
+			throw new Error('Launch menu lost native editing/zoom or exposed developer actions');
+		if (process.platform !== 'darwin' && window.isMenuBarVisible())
+			throw new Error('Launch menubar must start collapsed');
+		const diagnostics = menu.getMenuItemById('prctr.launch.diagnostics');
+		const quit = menu.getMenuItemById('prctr.launch.quit');
+		if (!diagnostics || !quit) throw new Error('Launch native menu is missing its actions');
+		diagnostics.click();
+		diagnostics.click();
+		if (
+			shown !== 1 ||
+			!details.includes('https://example.edu') ||
+			!details.includes('Not verified')
+		)
+			throw new Error('Native diagnostics lost safe state or opened duplicate dialogs');
+		quit.click();
+		if (exits !== 1)
+			throw new Error('Native exit must remain available during a pending check');
+		owned.dispose();
+		owned.dispose();
+		quit.click();
+		diagnostics.click();
+		if (exits !== 1 || shown !== 1 || Menu.getApplicationMenu() === menu)
+			throw new Error('Disposed Launch menu retained authority');
+		finishDialog({ response: 0, checkboxChecked: false });
+		await Promise.resolve();
+	} finally {
+		owned?.dispose();
+		Menu.buildFromTemplate = originalBuild;
+		dialog.showMessageBox = originalDialog;
+		window.destroy();
+	}
 }
 
 async function verifyTransactionalRollback(
@@ -321,7 +482,7 @@ async function verifyTransactionalRollback(
 		securityRejected =
 			error instanceof Error && error.message === 'injected security subscription failure';
 	}
-	const productIpc = failingIpc(2);
+	const productIpc = failingIpc(4);
 	const windowsBefore = BrowserWindow.getAllWindows().length;
 	let productRejected = false;
 	try {
@@ -702,6 +863,158 @@ function pickPreferences(value: Record<string, unknown>): unknown {
 		sandbox: value.sandbox,
 		webSecurity: value.webSecurity,
 		webviewTag: value.webviewTag
+	};
+}
+
+function verifyWindowChromeUpdateRecovery(): {
+	readonly overlayAttempts: number;
+	readonly dimmedOverlay: unknown;
+	readonly trafficLightAttempts: number;
+	readonly sheetAttempts: number;
+} {
+	const overlay = createChromeBridgeFixture('win32');
+	overlay.failOverlay();
+	invokeChromeUpdate(overlay.handlers, 36);
+	invokeChromeUpdate(overlay.handlers, 36);
+	invokeChromeUpdate(overlay.handlers, 36, true);
+	overlay.bridge.dispose();
+
+	const trafficLights = createChromeBridgeFixture('darwin');
+	trafficLights.failSheet();
+	invokeChromeUpdate(trafficLights.handlers, 40);
+	invokeChromeUpdate(trafficLights.handlers, 40);
+	trafficLights.bridge.dispose();
+	return {
+		overlayAttempts: overlay.overlayAttempts(),
+		dimmedOverlay: overlay.lastOverlay(),
+		trafficLightAttempts: trafficLights.trafficLightAttempts(),
+		sheetAttempts: trafficLights.sheetAttempts()
+	};
+}
+
+function createChromeBridgeFixture(platform: 'darwin' | 'win32'): {
+	readonly bridge: ElectronWindowChromeBridge;
+	readonly handlers: Map<string, (event: IpcMainInvokeEvent, value: unknown) => unknown>;
+	failOverlay(): void;
+	failSheet(): void;
+	overlayAttempts(): number;
+	lastOverlay(): unknown;
+	trafficLightAttempts(): number;
+	sheetAttempts(): number;
+} {
+	const handlers = new Map<string, (event: IpcMainInvokeEvent, value: unknown) => unknown>();
+	let overlayAttempts = 0;
+	let lastOverlay: unknown;
+	let trafficLightAttempts = 0;
+	let sheetAttempts = 0;
+	let overlayMustFail = false;
+	let sheetMustFail = false;
+	const windowTarget: ElectronWindowChromeTarget['window'] = {
+		isFullScreen: () => false,
+		isDestroyed: () => false,
+		off: () => undefined,
+		on: () => undefined,
+		setSheetOffset: () => {
+			sheetAttempts++;
+			if (sheetMustFail) {
+				sheetMustFail = false;
+				throw new Error('injected sheet failure');
+			}
+		},
+		setTitleBarOverlay: (options) => {
+			overlayAttempts++;
+			lastOverlay = options;
+			if (overlayMustFail) {
+				overlayMustFail = false;
+				throw new Error('injected overlay failure');
+			}
+		},
+		setWindowButtonPosition: () => {
+			trafficLightAttempts++;
+		}
+	};
+	const target: ElectronWindowChromeTarget = {
+		window: windowTarget,
+		contents: {
+			id: 1,
+			isDestroyed: () => false,
+			mainFrame: {} as WebContents['mainFrame'],
+			send: () => undefined
+		}
+	};
+	const bridge = new ElectronWindowChromeBridge(
+		{
+			handle: (channel, listener) => {
+				handlers.set(channel, listener);
+			},
+			removeHandler: (channel) => {
+				handlers.delete(channel);
+			}
+		} as Pick<typeof ipcMain, 'handle' | 'removeHandler'>,
+		target,
+		'launch',
+		resolveProductWindowChromeConfiguration(platform, 'en', '24.0.0'),
+		'light',
+		() => undefined
+	);
+	return {
+		bridge,
+		handlers,
+		failOverlay: () => {
+			overlayMustFail = true;
+		},
+		failSheet: () => {
+			sheetMustFail = true;
+		},
+		overlayAttempts: () => overlayAttempts,
+		lastOverlay: () => lastOverlay,
+		trafficLightAttempts: () => trafficLightAttempts,
+		sheetAttempts: () => sheetAttempts
+	};
+}
+
+function invokeChromeUpdate(
+	handlers: ReadonlyMap<string, (event: IpcMainInvokeEvent, value: unknown) => unknown>,
+	titlebarHeight: number,
+	dimmed = false
+): void {
+	const update = handlers.get(WINDOW_CHROME_CHANNELS.launch.update);
+	if (update === undefined) throw new Error('Window chrome update handler is unavailable');
+	try {
+		update({} as IpcMainInvokeEvent, {
+			protocolVersion: 1,
+			theme: 'dark',
+			titlebarHeight,
+			dimmed
+		});
+	} catch (error) {
+		if (
+			!(error instanceof Error) ||
+			(error.message !== 'injected overlay failure' &&
+				error.message !== 'injected sheet failure')
+		)
+			throw error;
+	}
+}
+
+function pickChromeOptions(value: Electron.BrowserWindowConstructorOptions): unknown {
+	return {
+		width: value.width,
+		height: value.height,
+		minWidth: value.minWidth,
+		minHeight: value.minHeight,
+		title: value.title,
+		backgroundColor: value.backgroundColor,
+		frame: value.frame,
+		titleBarStyle: value.titleBarStyle,
+		titleBarOverlay: value.titleBarOverlay,
+		acceptFirstMouse: value.acceptFirstMouse,
+		closable: value.closable,
+		fullscreenable: value.fullscreenable,
+		maximizable: value.maximizable,
+		minimizable: value.minimizable,
+		movable: value.movable,
+		resizable: value.resizable
 	};
 }
 

@@ -6,6 +6,12 @@ import type {
 	ProductWindowDescriptor,
 	ProductWindowKind
 } from '../../platform/windows/common/windowProtocol.js';
+import { ProductWindowChrome } from '../../platform/windows/browser/productWindowChrome.js';
+import type { ProductWindowChromeClient } from '../../platform/windows/common/windowChrome.js';
+import {
+	BROWSER_THEME_SERVICE,
+	type BrowserThemeService
+} from '../../platform/theme/browser/themeService.js';
 import type {
 	WorkbenchBootstrapContext,
 	WorkbenchContributionRegistration
@@ -13,7 +19,8 @@ import type {
 
 export function createDesktopWorkbenchContribution(
 	expectedKind: ProductWindowKind,
-	bootstrap: () => Promise<ProductWindowDescriptor>
+	bootstrap: () => Promise<ProductWindowDescriptor>,
+	windowChrome?: ProductWindowChromeClient
 ): WorkbenchContributionRegistration {
 	let descriptor: ProductWindowDescriptor | undefined;
 	return Object.freeze({
@@ -31,12 +38,27 @@ export function createDesktopWorkbenchContribution(
 				);
 			descriptor = candidate;
 		},
-		activate(context: WorkbenchBootstrapContext): void {
+		async activate(context: WorkbenchBootstrapContext): Promise<void> {
 			if (descriptor === undefined)
 				throw new Error(
 					'Privileged window descriptor was not established before workbench activation'
 				);
 			context.setWindowBinding(descriptor);
+			if (windowChrome !== undefined) {
+				const chrome = context.disposables.add(
+					await ProductWindowChrome.create(
+						context.shell.part('titlebar'),
+						windowChrome,
+						context.getService<BrowserThemeService>(BROWSER_THEME_SERVICE)
+					)
+				);
+				context.disposables.add(
+					context.shell.overlayHost.onDidChangeVisibility((visible) => {
+						void chrome.setDimmed(visible).catch(() => undefined);
+					})
+				);
+				await chrome.setDimmed(context.shell.overlayHost.visible);
+			}
 		}
 	});
 }

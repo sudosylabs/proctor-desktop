@@ -28,6 +28,16 @@ const tokenDefinitions = [
 	{ id: 'color.border.strong', kind: 'color', description: 'Emphasized component boundary.' },
 	{ id: 'color.border.focus', kind: 'color', description: 'Keyboard focus indicator.' },
 	{ id: 'color.interaction.accent', kind: 'color', description: 'Primary action surface.' },
+	{
+		id: 'color.interaction.accentHover',
+		kind: 'color',
+		description: 'Hovered primary action surface.'
+	},
+	{
+		id: 'color.interaction.accentActive',
+		kind: 'color',
+		description: 'Pressed primary action surface.'
+	},
 	{ id: 'color.interaction.hover', kind: 'color', description: 'Hover feedback surface.' },
 	{ id: 'color.interaction.active', kind: 'color', description: 'Pressed feedback surface.' },
 	{ id: 'color.interaction.selected', kind: 'color', description: 'Selected item surface.' },

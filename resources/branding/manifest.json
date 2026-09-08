@@ -46,6 +46,16 @@
       "path": "resources/branding/platform/linux/proctor.png",
       "canonicalPath": "brand/app-icons/linux/png/proctor-app-icon-light-512.png",
       "sha256": "841aff7a546647fece8f9276c418187b4d0c037ff60bc3e05043a3b550ea728b"
+    },
+    "lockupVerticalDark": {
+      "path": "resources/branding/source/lockup/proctor-lockup-vertical-25d-dark.svg",
+      "canonicalPath": "brand/lockups/vertical/svg/proctor-lockup-vertical-25d-dark.svg",
+      "sha256": "73bddca694b9aeb77ff0e8e0e6c438eb411e01e8354ad9c1f2f62593cb93010e"
+    },
+    "lockupVerticalLight": {
+      "path": "resources/branding/source/lockup/proctor-lockup-vertical-25d-light.svg",
+      "canonicalPath": "brand/lockups/vertical/svg/proctor-lockup-vertical-25d-light.svg",
+      "sha256": "f0c1b3840fd456179c8bb2e85e4dce0e6b30803f25b3ee675c7327ce5874d320"
     }
   },
   "platforms": {
@@ -66,5 +76,5 @@
       "source": "linuxIcon"
     }
   },
-  "sourceRevision": "e8dd82ac9e9a106623095bdb9900079eddd1066b"
+  "sourceRevision": "0761fb8515aa52de818c710b66cdf48d7952cf1b"
 }

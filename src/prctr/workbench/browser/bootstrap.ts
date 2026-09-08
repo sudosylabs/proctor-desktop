@@ -123,7 +123,7 @@ export async function bootstrapWorkbench(
 		(themeService ??= presentation.add(
 			new BrowserThemeService(
 				document,
-				'light',
+				'dark',
 				{ density: 'default', motion: 'full', transparency: 'full' },
 				{ followSystemColorScheme: true }
 			)
@@ -160,6 +160,7 @@ export async function bootstrapWorkbench(
 			'workbenchLoading',
 			localization.format(messages.loading)
 		);
+		loading.dataset.windowKind = composition.windowKind;
 		document.body.replaceChildren(loading);
 		await desktop.prepareBeforeShell(composition);
 		loading.remove();
@@ -242,13 +243,13 @@ export async function bootstrapWorkbench(
 			messages: Object.values(messages),
 			catalogs: []
 		});
-		document.body.append(
-			createStartupSurface(
-				document,
-				'workbenchRecovery',
-				localization.format(messages.recovery)
-			)
+		const recovery = createStartupSurface(
+			document,
+			'workbenchRecovery',
+			localization.format(messages.recovery)
 		);
+		recovery.dataset.windowKind = composition.windowKind;
+		document.body.append(recovery);
 		throw error;
 	}
 }

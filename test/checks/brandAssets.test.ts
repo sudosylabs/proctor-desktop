@@ -45,7 +45,7 @@ void test('desktop brand copies match the accepted inventory and digests without
 		assert.ok(lstatSync(path).isFile(), `${source.path} must be a regular package-local copy`);
 		assert.equal(createHash('sha256').update(readFileSync(path)).digest('hex'), source.sha256);
 		if (source.path.endsWith('.svg')) {
-			assert.match(source.canonicalPath, /^brand\/(marks|lockups)\/.*-flat-/);
+			assert.match(source.canonicalPath, /^brand\/(marks|lockups)\/.*-(flat|25d)-/);
 			assert.match(readFileSync(path, 'utf8'), /<svg\s/);
 		}
 	}
