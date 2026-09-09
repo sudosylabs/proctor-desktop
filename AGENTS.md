@@ -119,6 +119,11 @@ subsystem first requires a boundary grill under `.scratch/`; an admitted cluster
 then receives one exact manifest in
 [`docs/upstream/vscode-ports/`](docs/upstream/vscode-ports/README.md).
 
+For VS Code UI transfers and reviews, use the required
+[Modern UI and floating panels baseline](docs/architecture/design-system.md#modern-ui-and-floating-panels),
+including the applicable styles and coordinated layout code. Load that decision
+before choosing a UI source revision or treating an existing port as a template.
+
 Admitted VS Code source clusters are listed only in
 [`docs/upstream/vscode-ports/`](docs/upstream/vscode-ports/README.md). Preserve
 meaningful architectural and runtime topology under `src/prctr/`, but keep

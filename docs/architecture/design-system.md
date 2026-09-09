@@ -17,8 +17,66 @@ Every surface should be:
   are represented honestly and predictably.
 
 Consistency and accessibility are system requirements. Delight is restrained,
-functional polish that cannot compete with clarity. Proctor adapts useful VS
-Code mechanics without inheriting its visual identity.
+functional polish that cannot compete with clarity. Proctor uses the VS Code
+Modern UI presentation baseline below, with Proctor branding and semantic tokens.
+
+## Modern UI and floating panels
+
+VS Code Modern UI is the required presentation target when copying, adapting,
+updating, or reviewing VS Code-derived UI. Include the applicable Modern UI code
+alongside the underlying control implementation and base styles. Preserve its
+composition, spacing relationships, typography hierarchy, states, interaction,
+and layout behavior; map branding, owner namespaces, and semantic tokens to
+Proctor. A token mapping is not permission to redesign the element or simplify
+its implementation because Proctor currently has fewer features. Any required
+product or security divergence must be explicit and verified under the
+[VS Code source policy](../upstream/vscode.md).
+
+Floating panels are the accepted workbench shell composition:
+
+- A continuous window background remains visible around inset workbench surfaces.
+- Sidebar, content/editor, and applicable panel surfaces have their own background,
+  subtle boundary, and rounded outer corners, with consistent inter-region gaps
+  and perimeter gutters.
+- Connected regions preserve the upstream shared-edge treatment: border ownership,
+  adjoining corners, activity-rail alignment, and density-dependent seams.
+- Headers, rows, hover/selection areas, and controls use the corresponding internal
+  insets. Scrollbars, resize targets, and content clipping remain correctly placed.
+- Layout measurements account for margins, borders, minimum sizes, and density
+  together with the CSS. Rounded corners alone do not implement this composition.
+
+This is Proctor's product baseline, not an opt-in upstream experiment. Apply it
+to the regions admitted by each workbench composition. LaunchWindow keeps its
+centered sign-in composition; this decision does not add editor/sidebar regions
+there or permit detached windows, arbitrary docking, or changes to Candidate
+security. Floating panels are surfaces inside the existing window.
+
+For source intake, inspect these upstream entry points at the selected cluster
+revision and follow their dependencies and registrations:
+
+- `src/vs/workbench/contrib/modernUI/browser/modernUI.contribution.ts` and its
+  applicable `media/` modules;
+- `src/vs/workbench/browser/media/floatingPanels.css`,
+  `src/vs/workbench/browser/layout.ts`,
+  `src/vs/workbench/browser/parts/paneCompositePart.ts`, and
+  `src/vs/workbench/services/layout/browser/layoutService.ts`;
+- the relevant workbench parts and Agents window composition under
+  `src/vs/sessions/browser/` where behavior differs by composition.
+
+A revision predating the applicable Modern UI implementation is insufficient
+visual evidence. Complete cluster intake at a suitable exact revision rather
+than combining unrecorded styles from another version. Existing ports must be
+checked against this target when their UI is changed; their current appearance
+is not authority for a new design. Non-visual source retains its own admission
+boundary and does not acquire UI dependencies.
+
+Verify the composed result against the upstream Modern UI at the recorded
+revision, using the Control Explorer matrix below and computer-use inspection
+of both applications. Cover default/compact density, exposed/shared edges,
+resizing, zoom, clipping, native window controls, menus, focus, all themes, and
+reduced motion/transparency. Record intentional differences. Source transfer
+and migration remain subject to exact manifests; this accepted design does not
+claim that floating panels have already been implemented.
 
 ## Accessibility contract
 

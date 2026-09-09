@@ -17,6 +17,11 @@ VS Code material. Use [`develop-accessible-ui`](../develop-accessible-ui/SKILL.m
 for interaction and [`develop-ui-layout`](../develop-ui-layout/SKILL.md) for CSS
 or layout changes.
 
+For VS Code-derived presentation, apply the required
+[Modern UI and floating panels baseline](../../../docs/architecture/design-system.md#modern-ui-and-floating-panels).
+Review token mappings against its composition and state behavior before changing
+shared primitives or accepting visual baselines.
+
 Classify the work as a foundation value, semantic token, domain/control token,
 theme, semantic icon, reusable control, fixture, or verification change. Keep a
 one-off visual surface with its contribution unless shared behavior or

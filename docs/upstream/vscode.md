@@ -34,6 +34,17 @@ behavior and evidence. A Proctor product or security constraint may require a
 stronger or intentionally different result; record that divergence and its
 verification in the cluster manifest.
 
+## UI presentation target
+
+For UI source, apply the required
+[Modern UI and floating panels baseline](../architecture/design-system.md#modern-ui-and-floating-panels).
+The intake must recover the relevant Modern UI styles, base-control dependencies,
+layout calculations, activation, states, and tests together. Use that baseline
+when choosing the source revision and reviewing an existing port; copying only
+the pre-Modern-UI implementation is incomplete. Record Proctor token/namespace
+adaptations and verified product divergences through the normal manifest process.
+A non-visual cluster does not need Modern UI dependencies.
+
 ## Admission gate
 
 Admit a behavior cluster only for a concrete Proctor workflow and caller after

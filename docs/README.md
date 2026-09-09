@@ -24,8 +24,9 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
   dependency rules
 - [Workbench](./architecture/workbench.md) — accepted composition, shell,
   contribution, content, lifecycle, and security-integration model
-- [Design system](./architecture/design-system.md) — product character,
-  accessibility, themes, tokens, controls, layout, and visual verification
+- [Design system](./architecture/design-system.md) — required Modern UI and
+  floating-panel baseline, product character, accessibility, themes, tokens,
+  controls, layout, and visual verification
 - [Attempt Workspace](./architecture/attempt-workspace.md) — remote workspace
   identity, working state, provider projection, durability, recovery, and
   read-only Exam Resources

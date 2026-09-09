@@ -25,6 +25,10 @@ browser items, and
 terminal panels. Use [`adapt-vscode`](../adapt-vscode/SKILL.md) before deriving
 from VS Code.
 
+For shell composition, apply the accepted
+[Modern UI and floating panels baseline](../../../docs/architecture/design-system.md#modern-ui-and-floating-panels)
+when mapping parts, shared edges, gutters, and layout sizing.
+
 For user-visible work, also load the design-system architecture and applicable
 product-UI, accessibility, design-system, and layout skills. The step is complete
 when every domain state and action has one authority outside shell presentation.

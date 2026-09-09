@@ -15,6 +15,11 @@ the relevant [product model](../../../docs/product/model.md), and the owning
 architecture topic. For shell or composition behavior, also use
 [`develop-workbench`](../develop-workbench/SKILL.md).
 
+Use the accepted
+[Modern UI and floating panels baseline](../../../docs/architecture/design-system.md#modern-ui-and-floating-panels)
+for shell composition and VS Code-derived UI. Inspect the relevant source and
+running surface through `adapt-vscode` before choosing a different arrangement.
+
 Identify the user, task, authoritative state owner, consequential decisions,
 latency and failure states, and what must remain visible. Continue an unresolved
 product or security question in `.scratch/` instead of deciding it visually.

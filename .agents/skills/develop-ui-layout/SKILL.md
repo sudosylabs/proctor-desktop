@@ -17,6 +17,10 @@ regions, panes, restoration, or composition behavior, also use
 [`develop-accessible-ui`](../develop-accessible-ui/SKILL.md) for interactive
 layout or overlays.
 
+For shell layout and VS Code-derived surfaces, load the required
+[Modern UI and floating panels baseline](../../../docs/architecture/design-system.md#modern-ui-and-floating-panels).
+Map the coordinated CSS and layout sizing before editing region geometry.
+
 Identify the module that owns each DOM node, stylesheet, external placement,
 internal geometry, overflow decision, and persisted layout value.
 

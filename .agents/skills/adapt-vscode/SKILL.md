@@ -14,6 +14,9 @@ Read [`docs/upstream/vscode.md`](../../../docs/upstream/vscode.md), the relevant
 product and architecture topics, and
 [`docs/project/status.md`](../../../docs/project/status.md). For an existing
 cluster, also read its manifest under `docs/upstream/vscode-ports/`.
+For UI, load the required
+[Modern UI and floating panels baseline](../../../docs/architecture/design-system.md#modern-ui-and-floating-panels)
+before choosing a source revision or using an existing port as evidence.
 
 Stop at an unresolved product or architecture decision. Open an ignored
 `.scratch/<effort>/` grill rather than letting nearby upstream code settle it.
@@ -47,7 +50,10 @@ manifest.
 Pin one full upstream commit for the proposed cluster. Inspect entrypoints,
 callers, exports, tests, registrations, configuration, localization, CSS,
 assets, generated inputs and outputs, environment APIs, errors, cancellation,
-disposal, performance, accessibility, and licenses.
+disposal, performance, accessibility, and licenses. For UI, recover the applicable
+Modern UI modules with base styles, activation and coordinated layout code;
+identify shell/Agents composition differences and density behavior. Completion
+requires this modern presentation closure, not only the legacy control source.
 
 Classify every discovered item using the dispositions defined by the
 [registry](../../../docs/upstream/vscode-ports/README.md). Continue until each
@@ -110,6 +116,10 @@ source relationship in the manifest. Application build and runtime remain
 independent of the checkout.
 
 ## 8. Verify and review
+
+For UI, compare the running Proctor surface with the recorded upstream Modern UI
+using computer-use inspection, and verify the design-system visual matrix.
+Explicitly account for every styling/layout difference before declaring fidelity.
 
 Test observable behavior through the Proctor interface. Compare upstream tests
 for missing cases while expressing Proctor requirements. Preserve applicable
