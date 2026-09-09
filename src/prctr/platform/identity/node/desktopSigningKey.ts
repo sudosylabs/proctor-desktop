@@ -23,7 +23,7 @@ export function installationKeyScope(origin: string, institutionId: string): str
 }
 export async function createDPoPProof(
 	key: DesktopSigningKey,
-	method: 'GET' | 'POST',
+	method: 'GET' | 'POST' | 'DELETE' | 'PUT',
 	target: string,
 	nonce: string,
 	accessToken?: string

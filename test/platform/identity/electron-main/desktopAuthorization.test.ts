@@ -732,3 +732,148 @@ void test('callback presentation embeds approved branding, escapes translations 
 		);
 	}
 });
+
+void test('account reads and actions are bound, DPoP signed, nonce retried once, and fenced after sign-out', async () => {
+	const key = softwareTestKey();
+	let started: Record<string, unknown> = {};
+	let stored: StoredDesktopSession | undefined;
+	const seen: { path: string; method: string; proof: Record<string, unknown> }[] = [];
+	let nonceRejected = false;
+	let revokeMode = 'strong';
+	let revokeCount = 0;
+	let opened = '';
+	const http = new DesktopAuthHttp(async (input, init) => {
+		const path = new URL(String(input)).pathname;
+		if (path.endsWith('/authorizations')) {
+			started = JSON.parse(String(init?.body));
+			return response(
+				{
+					authorization_url: 'https://example.edu/desktop/authorize',
+					expires_at: Date.now() + 60000
+				},
+				201
+			);
+		}
+		if (path.endsWith('/token') || path.endsWith('/refresh')) {
+			const value = tokens();
+			value.session.desktop_registration_id = 'd'.repeat(26);
+			return response(value);
+		}
+		if (path.endsWith('/context'))
+			return response({ ...context(), current_desktop_registration_id: 'd'.repeat(26) });
+		if (path.endsWith('/logout')) return new Response(null, { status: 204 });
+		const proof = JSON.parse(
+			Buffer.from(
+				new Headers(init?.headers).get('DPoP')!.split('.')[1]!,
+				'base64url'
+			).toString()
+		);
+		seen.push({ path, method: String(init?.method), proof });
+		assert.equal(proof.htm, init?.method);
+		assert.equal(proof.htu, `https://example.edu${path}`);
+		assert.equal(typeof proof.ath, 'string');
+		if (path === `/api/v1/users/me/desktop-registrations/${'d'.repeat(26)}`)
+			return new Response(null, { status: 204 });
+		if (path === '/api/v1/users/me') {
+			if (!nonceRejected) {
+				nonceRejected = true;
+				return response({ code: 'authentication.dpop.use_nonce' }, 401);
+			}
+			return response({
+				id,
+				username: 'candidate',
+				display_name: 'Candidate',
+				first_name: '',
+				last_name: '',
+				password_hash: 'never project'
+			});
+		}
+		if (path === '/api/v1/users/me/sessions/revoke') {
+			revokeCount++;
+			if (revokeMode === 'network') throw new Error('Lost response');
+			return response({ code: 'authentication.strong_required' }, 403);
+		}
+		throw new Error('Unexpected route');
+	});
+	const service = new DesktopAuthorizationService({
+		target,
+		keys: {
+			async loadOrCreate() {
+				return key;
+			},
+			async delete() {}
+		},
+		credentials: {
+			async read() {
+				return stored;
+			},
+			async write(_scope, value) {
+				stored = value;
+			},
+			async delete() {
+				stored = undefined;
+			}
+		},
+		http,
+		callbackPages,
+		async openBrowser(url) {
+			if (url.endsWith('/account/security')) {
+				opened = url;
+				return;
+			}
+			const callback = new URL(String(started.callback_url));
+			callback.searchParams.set('state', String(started.state));
+			callback.searchParams.set('code', random());
+			await fetch(callback);
+		},
+		async onAuthenticated() {}
+	});
+	try {
+		await service.start(identity, CancellationToken.None);
+		const binding = { principalId: id, sessionId };
+		assert.deepEqual(
+			await service.account(
+				{ ...binding, sessionId: 'foreign' },
+				{ kind: 'read', section: 'profile' }
+			),
+			{ kind: 'error', reason: 'sessionEnded' }
+		);
+		assert.equal(seen.length, 0);
+		const profile = await service.account(binding, { kind: 'read', section: 'profile' });
+		assert.equal(profile.kind, 'data');
+		assert.ok(!JSON.stringify(profile).includes('never project'));
+		assert.equal(seen.length, 2);
+		assert.notEqual(seen[0]!.proof.jti, seen[1]!.proof.jti);
+		await service.account(binding, { kind: 'openSecurity' });
+		assert.equal(opened, 'https://example.edu/account/security');
+		assert.deepEqual(
+			await service.account(binding, { kind: 'revokeSession', id: 'y'.repeat(26) }),
+			{ kind: 'error', reason: 'strongAuthenticationRequired' }
+		);
+		revokeMode = 'network';
+		assert.deepEqual(
+			await service.account(binding, { kind: 'revokeSession', id: 'y'.repeat(26) }),
+			{ kind: 'error', reason: 'unconfirmed' }
+		);
+		assert.equal(revokeCount, 2);
+		const outcomes: string[] = [];
+		const subscription = service.onDidEndSession((outcome) =>
+			outcomes.push(`${outcome.authentication}:${outcome.remoteRevocation}`)
+		);
+		assert.deepEqual(
+			await service.account(binding, { kind: 'revokeDesktop', id: 'd'.repeat(26) }),
+			{ kind: 'success' }
+		);
+		subscription.dispose();
+		assert.deepEqual(outcomes, ['ending:pending', 'signedOut:confirmed']);
+		assert.equal(stored, undefined);
+		const count = seen.length;
+		assert.deepEqual(await service.account(binding, { kind: 'read', section: 'profile' }), {
+			kind: 'error',
+			reason: 'sessionEnded'
+		});
+		assert.equal(seen.length, count);
+	} finally {
+		service.dispose();
+	}
+});

@@ -10,7 +10,26 @@ import {
 import type { DesktopReleaseTarget, VerifiedServerIdentity } from './serverReadiness.js';
 import { LoopbackAuthServer, type LoopbackCallbackPages } from '../node/loopbackAuthServer.js';
 import { DesktopAuthorizationError } from '../node/desktopAuthorizationError.js';
-import { DesktopAuthHttp, type DesktopHttpResult } from '../node/desktopAuthHttp.js';
+import {
+	DesktopAuthHttp,
+	desktopHttpMethod,
+	type DesktopHttpPath,
+	type DesktopPhotoRequest,
+	type DesktopHttpResult
+} from '../node/desktopAuthHttp.js';
+import {
+	validateAccountIntent,
+	validateAccountResponse,
+	type AccountBinding,
+	type AccountIntent,
+	type AccountResponse
+} from '../../account/common/accountProtocol.js';
+import {
+	readAccountProfile,
+	readAccountSecurity,
+	readAccountSessions,
+	readAccountDesktops
+} from '../../account/electron-main/accountWire.js';
 import {
 	createDPoPProof,
 	installationKeyScope,
@@ -61,6 +80,7 @@ export class DesktopAuthorizationService extends Disposable {
 	#signingOut: Promise<void> | undefined;
 	#shutdown: Promise<void> | undefined;
 	#outcomeSequence = 0;
+	#accountMutation: object | undefined;
 	constructor(private readonly options: DesktopAuthorizationOptions) {
 		super();
 	}
@@ -395,6 +415,197 @@ export class DesktopAuthorizationService extends Disposable {
 			noAssignedAccess: context.no_assigned_access
 		});
 	}
+
+	/** Closed account capability: credentials, URLs, and arbitrary requests never cross IPC. */
+	async account(binding: AccountBinding, raw: AccountIntent): Promise<AccountResponse> {
+		const intent = validateAccountIntent(raw);
+		const session = this.#session;
+		const generation = this.#generation;
+		if (
+			!session ||
+			this.#disposed ||
+			session.tokens.principalId !== binding.principalId ||
+			session.tokens.sessionId !== binding.sessionId
+		)
+			return { kind: 'error', reason: 'sessionEnded' };
+		const current = () => {
+			if (this.#disposed || this.#session !== session || this.#generation !== generation)
+				throw new DesktopAuthorizationError('cancelled');
+		};
+		const mutation =
+			intent.kind === 'revokeSession' ||
+			intent.kind === 'revokeDesktop' ||
+			intent.kind === 'uploadPhoto' ||
+			intent.kind === 'removePhoto';
+		if (mutation && this.#accountMutation) return { kind: 'error', reason: 'unavailable' };
+		const operation = {};
+		if (mutation) this.#accountMutation = operation;
+		try {
+			if (intent.kind === 'openSecurity') {
+				await this.options.openBrowser(
+					new URL('/account/security', session.identity.origin).href
+				);
+				current();
+				return { kind: 'success' };
+			}
+			if (this.#refresh || session.tokens.accessExpiresAt <= Date.now() + 5000)
+				await this.refresh();
+			current();
+			const request = async (
+				path: DesktopHttpPath,
+				body?: unknown,
+				photo?: DesktopPhotoRequest
+			): Promise<DesktopHttpResult> => {
+				const send = async (): Promise<DesktopHttpResult> => {
+					current();
+					const accessToken = session.tokens.accessToken;
+					const proof = await createDPoPProof(
+						session.key,
+						desktopHttpMethod(path, photo),
+						`${session.identity.origin}${path}`,
+						session.tokens.nonce,
+						accessToken
+					);
+					current();
+					const result = await this.options.http.request(
+						session.identity.origin,
+						path,
+						this.#operations.token,
+						{
+							proof,
+							credential: accessToken,
+							...(body === undefined ? {} : { body }),
+							...(photo ? { photo } : {})
+						}
+					);
+					current();
+					if (result.nonce) session.tokens = { ...session.tokens, nonce: result.nonce };
+					return result;
+				};
+				let result = await send();
+				if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce)
+					result = await send();
+				if (result.status === 401 && errorCode(result) === 'authentication.invalid_token') {
+					await this.refresh();
+					current();
+					result = await send();
+					if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce)
+						result = await send();
+				}
+				return result;
+			};
+			const failed = async (result: DesktopHttpResult): Promise<AccountResponse> => {
+				const code = errorCode(result);
+				if (result.status === 409) return { kind: 'error', reason: 'conflict' };
+				if (result.status === 400) return { kind: 'error', reason: 'invalid' };
+				if (result.status === 401) {
+					await this.signOut();
+					return { kind: 'error', reason: 'sessionEnded' };
+				}
+				if (code === 'authentication.reauthentication_required')
+					return { kind: 'error', reason: 'reauthenticationRequired' };
+				if (code === 'authentication.strong_required')
+					return { kind: 'error', reason: 'strongAuthenticationRequired' };
+				return {
+					kind: 'error',
+					reason:
+						result.status === 403
+							? 'denied'
+							: result.status === 404
+								? 'notFound'
+								: mutation && result.status >= 500
+									? 'unconfirmed'
+									: 'unavailable'
+				};
+			};
+			if (
+				intent.kind === 'readPhoto' ||
+				intent.kind === 'uploadPhoto' ||
+				intent.kind === 'removePhoto'
+			) {
+				const photo: DesktopPhotoRequest =
+					intent.kind === 'readPhoto'
+						? { operation: 'GET' }
+						: intent.kind === 'removePhoto'
+							? { operation: 'DELETE', etag: intent.etag }
+							: {
+									operation: 'PUT',
+									etag: intent.etag,
+									bytes: intent.bytes,
+									mediaType: intent.mediaType
+								};
+				const result = await request(
+					`/api/v1/users/${binding.principalId}/profile-picture`,
+					undefined,
+					photo
+				);
+				if (result.status !== 200) return failed(result);
+				return intent.kind === 'readPhoto'
+					? validateAccountResponse(result.value)
+					: { kind: 'success' };
+			}
+			if (intent.kind === 'revokeSession') {
+				if (intent.id === binding.sessionId) {
+					await this.signOut();
+					return { kind: 'success' };
+				}
+				const response = await request('/api/v1/users/me/sessions/revoke', {
+					session_id: intent.id
+				});
+				return response.status === 204 ? { kind: 'success' } : failed(response);
+			}
+			if (intent.kind === 'revokeDesktop') {
+				const response = await request(
+					`/api/v1/users/me/desktop-registrations/${intent.id}`
+				);
+				if (response.status !== 204) return failed(response);
+				if (intent.id === session.tokens.registrationId)
+					await (this.#signingOut ??= this.#signOutCurrent(true).finally(() => {
+						this.#signingOut = undefined;
+					}));
+				return { kind: 'success' };
+			}
+			const paths = {
+				profile: '/api/v1/users/me',
+				security: '/api/v1/authentication-methods',
+				sessions: '/api/v1/users/me/sessions',
+				desktops: '/api/v1/users/me/desktop-registrations'
+			} as const;
+			const response = await request(paths[intent.section]);
+			if (response.status !== 200) return failed(response);
+			if (intent.section === 'profile')
+				return { kind: 'data', data: readAccountProfile(response.value, binding) };
+			if (intent.section === 'sessions')
+				return { kind: 'data', data: readAccountSessions(response.value, binding) };
+			if (intent.section === 'desktops')
+				return {
+					kind: 'data',
+					data: readAccountDesktops(response.value, session.tokens.registrationId)
+				};
+			const mfa = await request('/api/v1/users/me/mfa');
+			if (mfa.status === 401) return failed(mfa);
+			return {
+				kind: 'data',
+				data: readAccountSecurity(
+					response.value,
+					mfa.status === 200 ? mfa.value : undefined
+				)
+			};
+		} catch {
+			return {
+				kind: 'error',
+				reason:
+					this.#session !== session || this.#generation !== generation
+						? 'sessionEnded'
+						: mutation
+							? 'unconfirmed'
+							: 'unavailable'
+			};
+		} finally {
+			if (this.#accountMutation === operation) this.#accountMutation = undefined;
+		}
+	}
+
 	#scheduleRefresh(): void {
 		clearTimeout(this.#refreshTimer);
 		if (!this.#session) return;
@@ -468,7 +679,7 @@ export class DesktopAuthorizationService extends Disposable {
 			this.#signingOut = undefined;
 		}));
 	}
-	async #signOutCurrent(): Promise<void> {
+	async #signOutCurrent(revocationConfirmed = false): Promise<void> {
 		const session = this.#session;
 		if (!session) return;
 		this.#drop();
@@ -488,7 +699,7 @@ export class DesktopAuthorizationService extends Disposable {
 		await this.#refresh?.catch(() => undefined);
 		const [local, remote] = await Promise.allSettled([
 			this.#forget(session),
-			this.#revoke(session)
+			revocationConfirmed ? Promise.resolve() : this.#revoke(session)
 		]);
 		this.#ended.fire({
 			...pending,
