@@ -301,6 +301,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "prctr-desktop-key-custody"
+version = "0.1.0"
+dependencies = [
+ "napi",
+ "napi-derive",
+]
+
+[[package]]
 name = "prctr-display-topology"
 version = "0.1.0"
 dependencies = [

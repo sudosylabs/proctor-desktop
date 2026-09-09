@@ -114,8 +114,12 @@ Load an optional packaged capability through a literal, statically discoverable
 import reachable from an approved window manifest. A remote value may select only
 among packaged capabilities; it never supplies a manifest or module path.
 
-Keep concrete adapter selection in the composition root. Create a separate
-native package only for an accepted passive observation family. Give policy
+Keep concrete adapter selection in the composition root. Create separate
+native packages for accepted passive observation families. For the explicitly
+accepted Electron-main identity key-custody adapter, follow the narrow exception
+in [identity architecture](../../../docs/architecture/identity-and-exam-security.md#desktop-authorization-and-installation-proof)
+and the [toolchain boundary](../../../docs/architecture/toolchain.md); keep that
+adapter separate from observation and policy packages. Give policy
 evaluation and product effects their existing privileged owners rather than
 adding them to that package. Use
 [`develop-native-capabilities`](../develop-native-capabilities/SKILL.md) for the

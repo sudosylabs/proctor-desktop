@@ -1,5 +1,6 @@
 [workspace]
 members = [
+  "crates/prctr-desktop-key-custody",
   "crates/prctr-native-protocol",
   "crates/prctr-native-source-runtime",
   "crates/prctr-native-helper-protocol",

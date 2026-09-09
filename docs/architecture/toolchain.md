@@ -132,8 +132,12 @@ channel and rejects excessive frames before parsing. Each capability manifest
 declares protocol and schema versions, bounds, compatibility fixtures, target
 tuple, build toolchain, source revision, artifact hash, and signature.
 
-Node-API is appropriate only for a passive source that belongs in the security
-utility process. Required privilege, entitlement, native stability, or a
+Observation Node-API modules belong only to passive sources in the security
+utility process. The separate identity key-custody adapter is the narrow
+Electron-main exception defined by the
+[identity architecture](./identity-and-exam-security.md#desktop-authorization-and-installation-proof):
+it exposes a public key, bounded digest signing and deletion, with no private-key
+export or observation/policy behavior. Required privilege, entitlement, native stability, or a
 materially different fault boundary justifies a signed helper. A small
 platform-native shim requires evidence that Rust cannot safely express the
 needed operating-system API. Native code is never compiled at runtime and no

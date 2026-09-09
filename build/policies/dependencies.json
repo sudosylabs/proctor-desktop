@@ -22,7 +22,7 @@
       "package": "napi",
       "version": "3.12.2",
       "kind": "production",
-      "purpose": "Expose the bounded passive native-source supervisor to the dedicated Electron security utility through Node-API.",
+      "purpose": "Expose the bounded passive native-source supervisor to the dedicated Electron security utility through Node-API. Also supplies the separate privileged identity key-custody adapter, with no private-key export API.",
       "owner": "native-capabilities",
       "source": "https://crates.io/crates/napi/3.12.2",
       "license": "MIT",
@@ -36,9 +36,18 @@
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-desktop-key-custody/Cargo.toml",
+          "alias": "napi",
+          "kind": "production",
+          "features": ["dyn-symbols", "napi8"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility"],
+      "processes": ["exam-security-utility", "electron-main"],
       "networkBehavior": "None at runtime; Node-API calls remain process-local.",
       "nativeBehavior": "Links the platform Node-API symbols and uses its reviewed registration build support; it does not bundle a helper executable.",
       "transitiveRisk": "Adds napi-sys, registration support, futures primitives, serde conversion, and dynamic-symbol loading; exact transitive versions are locked and license checked.",
@@ -52,7 +61,7 @@
       "package": "napi-derive",
       "version": "3.6.3",
       "kind": "production",
-      "purpose": "Generate the narrow exported Node-API registration shims for the native baseline bridge.",
+      "purpose": "Generate the narrow exported Node-API registration shims for the native baseline bridge. Also supplies the separate privileged identity key-custody adapter, with no private-key export API.",
       "owner": "native-capabilities",
       "source": "https://crates.io/crates/napi-derive/3.6.3",
       "license": "MIT",
@@ -60,6 +69,15 @@
       "declarations": [
         {
           "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
+          "alias": "napi-derive",
+          "kind": "production",
+          "features": ["strict"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-desktop-key-custody/Cargo.toml",
           "alias": "napi-derive",
           "kind": "production",
           "features": ["strict"],
