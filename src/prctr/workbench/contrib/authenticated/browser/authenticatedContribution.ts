@@ -38,6 +38,21 @@ const destinationMessages = Object.freeze({
 	})
 });
 const messages = Object.freeze({
+	noAffiliation: defineMessage({
+		id: 'authenticated.account.no.affiliation',
+		defaultMessage: 'You have no current institution affiliation.',
+		description: 'Server-confirmed account context.'
+	}),
+	noAccess: defineMessage({
+		id: 'authenticated.account.no.access',
+		defaultMessage: 'No examination or management access is assigned to your account.',
+		description: 'Server-confirmed absence of assigned access.'
+	}),
+	connected: defineMessage({
+		id: 'authenticated.account.connected',
+		defaultMessage: 'Signed in to {institution}.',
+		description: 'Verified account institution.'
+	}),
 	heading: defineMessage({
 		id: 'authenticated.heading',
 		defaultMessage: 'Authenticated workspace',
@@ -85,7 +100,8 @@ export function createAuthenticatedContribution(
 			page.className = 'prctr-authenticated';
 			page.dataset.region = 'page';
 			const heading = context.document.createElement('h1');
-			heading.textContent = context.localization.format(messages.heading);
+			heading.textContent =
+				descriptor.identity?.displayName ?? context.localization.format(messages.heading);
 			const destinationHeading = context.document.createElement('h2');
 			const status = context.document.createElement('p');
 			status.textContent = context.localization.format(messages.waiting);
@@ -100,12 +116,16 @@ export function createAuthenticatedContribution(
 				}
 			});
 			const destinationChange = context.disposables.add(new Emitter<string>());
-			let current = 'activity';
+			const destinations = context.composition.destinations.filter(
+				(destination) =>
+					destination !== 'activity' ||
+					!descriptor.identity ||
+					descriptor.identity.availableProductAreas.includes('student_activity')
+			);
+			let current = 'account';
 			const buttons = new Map<string, HTMLButtonElement>();
 			const select = (destination: string): void => {
-				const safe = context.composition.destinations.includes(destination)
-					? destination
-					: 'activity';
+				const safe = destinations.includes(destination) ? destination : 'account';
 				current = safe;
 				for (const [id, value] of buttons) {
 					const selected = id === safe;
@@ -114,6 +134,20 @@ export function createAuthenticatedContribution(
 				destinationHeading.textContent = context.localization.format(
 					destinationMessages[safe as keyof typeof destinationMessages]
 				);
+				if (descriptor.identity && safe === 'account') {
+					const identity = descriptor.identity;
+					status.textContent = [
+						context.localization.format(messages.connected, {
+							institution: identity.institutionName
+						}),
+						...(identity.noCurrentAffiliation
+							? [context.localization.format(messages.noAffiliation)]
+							: []),
+						...(identity.noAssignedAccess
+							? [context.localization.format(messages.noAccess)]
+							: [])
+					].join(' ');
+				} else status.textContent = context.localization.format(messages.waiting);
 				page.dataset.destination = safe;
 				page.hidden = safe === 'settings';
 				destinationChange.fire(safe);
@@ -126,7 +160,7 @@ export function createAuthenticatedContribution(
 				select
 			});
 			context.setService(AUTHENTICATED_NAVIGATION_SERVICE, navigationService);
-			for (const destination of context.composition.destinations) {
+			for (const destination of destinations) {
 				const descriptor =
 					destinationMessages[destination as keyof typeof destinationMessages];
 				if (descriptor === undefined)

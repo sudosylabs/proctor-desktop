@@ -77,7 +77,7 @@ or admission.
 
 After URL submission, LaunchWindow replaces the input with the verified
 Institution state regardless of availability when discovery verifies that
-identity; otherwise it displays the submitted origin and a safe failure. It
+identity; otherwise it displays a safe failure. It
 enables `Sign in to <Institution>` only while ready and compatible with an
 available privileged authorization owner, and always offers `Change server`
 after submission. Too old, too new, unsupported, maintenance, and temporary failure use
@@ -98,8 +98,14 @@ To start authorization, Electron main creates:
   Installation;
 - declared Desktop release and target metadata.
 
-The private installation key is non-exportable where supported and remains
-behind an approved OS-backed adapter. No hardware serial, MAC address, or global
+The private installation key is non-exportable and remains behind an approved
+OS-backed adapter. Development requires the same native custody and never falls
+back to an encrypted software private-key file. The separate
+`prctr-desktop-key-custody` Node-API module is loaded only by Electron main. macOS
+uses persistent Security.framework P-256 keys and verifies the non-extractable
+attribute; Windows uses a named CNG P-256 key and verifies an empty export policy.
+Only the public point, digest signing, and deletion are exported. This identity
+adapter is separate from passive exam-security observation packages. No hardware serial, MAC address, or global
 cross-Institution identifier is used.
 
 The Proctor Server returns the exact same-origin hosted authorization URL. Its
@@ -121,6 +127,25 @@ Cancel, timeout, mismatch, replay, server switch, proof failure, or ambiguous
 exchange invalidates the local transaction. If the callback cannot be reached,
 the hosted page gives a bounded retry instruction and a new transaction is
 required.
+
+The privileged identity service consumes the server's Desktop Authorization and
+token routes, refresh/logout routes, and `/api/v1/users/me/context`. It accepts
+JSON success and Problem Details failure responses, pins the origin, bounds body
+size and duration, and permits one fresh-proof retry only after an explicit DPoP
+nonce rejection. It never retries an ambiguously consumed code or refresh token.
+Before refresh it atomically saves an OS-encrypted `rotationPending` record; a
+crash or ambiguous rotation requires fresh verification rather than replay. A
+successful rotation replaces that barrier with the new refresh token. Access
+tokens remain in memory. Sign-out cancels and joins refresh work before clearing
+storage, so a late write cannot restore the Session. Self context must match the
+Session Principal and Desktop registration before window handoff. The application
+acquires exclusive ownership of its Electron user-data directory before creating
+the identity composition; a second process cannot read or rotate its credentials.
+Sign-out preserves separate local-cleanup and remote-revocation outcomes across
+the window replacement. Only a successful logout response confirms server
+revocation; an invalid old access token does not prove the Session ended.
+Ambiguous refresh returns to the selected Institution with explicit Session
+validity and credential-readiness facts, then uses a fresh interactive transaction.
 
 After enrollment, Desktop access/refresh credentials and protected requests are
 sender-constrained to the registered installation key with DPoP-compatible

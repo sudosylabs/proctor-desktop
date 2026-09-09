@@ -59,7 +59,7 @@
       "rationale": "Preserve VS Code's hidden-titlebar BrowserWindow topology: macOS keeps native traffic lights, Windows and Linux use the native Window Controls Overlay, frame suppression remains platform-specific, and CandidateWindow retains its separate control-free security posture.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "5d9408ee70fd83b999c48c611058a8154396dce6b2e1daf47bc89561a85c0a9b",
+      "localSha256": "5c67e85c12182f03d7cc357ba81db378ea993c2e0db4e53c849b6b327c107212",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -247,6 +247,16 @@
       "summary": "CandidateWindow cannot be an initial launch target, transitions preserve Principal/Session/Institution binding, and authorized departure destroys CandidateWindow before returning to AuthenticatedWindow.",
       "localPaths": ["src/prctr/platform/windows/common/windowCoordinator.ts"],
       "verificationRefs": ["window-contract-tests"]
+    },
+    {
+      "id": "verified-sign-in-transition",
+      "summary": "Only main may replace LaunchWindow with a validated credential-free authenticated identity, and sign-out replaces it with a new LaunchWindow. Explicit loopback HTTP is allowed solely in development AuthenticatedWindow; the production factory rejects the development flag and Candidate always requires HTTPS.",
+      "localPaths": [
+        "src/prctr/platform/windows/common/windowProtocol.ts",
+        "src/prctr/platform/windows/common/windowCoordinator.ts",
+        "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts"
+      ],
+      "verificationRefs": ["identity-handoff-tests"]
     }
   ],
   "verification": [
@@ -303,6 +313,12 @@
       "kind": "review",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Verify every reviewed VS Code blob at the admitted revision."
+    },
+    {
+      "id": "identity-handoff-tests",
+      "kind": "test",
+      "path": "test/electron/desktopIdentity.real.test.ts",
+      "obligation": "Real native key and encrypted refresh custody precede sandboxed authenticated rendering; sign-out returns to LaunchWindow."
     }
   ]
 }

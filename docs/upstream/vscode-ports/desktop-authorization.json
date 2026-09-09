@@ -1,0 +1,139 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "desktop-authorization",
+  "admission": {
+    "workflow": "Real Institution readiness, system-browser approval, native signing custody, Session rotation, and a credential-free authenticated window handoff.",
+    "callers": ["src/prctr/code/electron-main/desktopIdentityComposition.ts"],
+    "interface": "src/prctr/platform/identity/electron-main/desktopAuthorizationService.ts",
+    "decision": "docs/architecture/identity-and-exam-security.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Preserved Microsoft MIT attribution for the reviewed cluster.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/github-authentication/src/node/authServer.ts",
+      "upstreamBlob": "45dca93e2d0a6541c14523fcc8e54e9002e0eee2",
+      "category": "source",
+      "disposition": "behaviorally-reimplemented",
+      "rationale": "Retains ephemeral IPv4 binding, asynchronous start/result/stop, startup deadline and state-bound callback lifecycle. Proctor requires a random exact single route, constant-time independent state validation, one-use completion, cancellation, bounded requests/connections and idempotent bounded shutdown. GitHub signin redirect, arbitrary static files, portable environment and custom VS Code activation are explicitly excluded.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/identity/node/loopbackAuthServer.ts"
+    },
+    {
+      "upstreamPath": "extensions/github-authentication/src/test/node/authServer.test.ts",
+      "upstreamBlob": "0ea8d0353bdef49cea892098ae7d590e18347441",
+      "category": "test",
+      "disposition": "evidence-only",
+      "rationale": "Preserves ephemeral startup, missing callback parameters and successful state/code completion tests through the Proctor interface. Upstream signin redirect and callback-to-static-page redirect assertions are excluded with those routes. Adds wrong Host, duplicate state, replay, cancellation and deadline checks.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/github-authentication/src/flows.ts",
+      "upstreamBlob": "9e10072993c76966e2fddf8bef81d2e777d56ecd",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "The loopback caller supplies PKCE S256, a five-minute deadline, cancellation and finally cleanup. Other provider flows, device-code and manual fallback, provider login/account selection, extension telemetry/progress and GitHub exchange endpoints are excluded. Proctor consumes its server contract and opens only the returned same-origin hosted URL.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/encryption/electron-main/encryptionMainService.ts",
+      "upstreamBlob": "1b4b1e05f28c77e62ca5165a67aac27b678d488f",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Electron main safeStorage availability/encrypt/decrypt informs OS-encrypted refresh persistence. The generic service, command-line plaintext backend, buffer JSON representation and raw error logging are excluded. Native signing custody is independent, and never serializes a private key.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "node-runtime",
+      "kind": "platform-interface",
+      "reference": "Node.js HTTP, URL, crypto, timers and filesystem APIs",
+      "rationale": "Pinned Node/Electron APIs supply ephemeral loopback transport, bounded parsing, PKCE and atomic encrypted file replacement; no runtime upstream checkout."
+    },
+    {
+      "id": "electron-main",
+      "kind": "platform-interface",
+      "reference": "Electron shell.openExternal and safeStorage",
+      "rationale": "Only main opens the server-returned hosted URL and encrypts refresh storage. No plaintext backend or renderer credentials."
+    },
+    {
+      "id": "cancellation-lifecycle",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/cancellation.ts",
+      "rationale": "Accepted cancellation and disposable ownership fence listener, network, and Session effects."
+    },
+    {
+      "id": "native-signing",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/identity/node/desktopSigningKey.ts",
+      "rationale": "Native macOS Security.framework and Windows CNG key references supply P-256 signing and public JWK access with private export disabled."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "proctor-hosted-contract",
+      "summary": "Server-hosted authentication method choice and explicit approval replace provider-specific extensions. Exact callback state/path, PKCE, DPoP nonce challenges and no ambiguous one-use retry strengthen the transport. There is no local static file host, signin redirect, custom protocol, provider API or copyable-code fallback.",
+      "localPaths": [
+        "src/prctr/platform/identity/node/loopbackAuthServer.ts",
+        "src/prctr/platform/identity/electron-main/desktopAuthorizationService.ts"
+      ],
+      "verificationRefs": ["authorization-tests", "native-electron"]
+    },
+    {
+      "id": "native-key-required",
+      "summary": "Development and production both require non-exportable OS key custody; only public keys and signatures leave the native adapter. Refresh credentials alone use OS encryption, with a durable rotation-pending barrier. Access credentials remain in main memory and only validated public identity enters the renderer. Windows implementation still requires target-native conformance before a supported release claim.",
+      "localPaths": [
+        "src/prctr/platform/identity/electron-main/nativeDesktopKeyCustody.ts",
+        "src/prctr/platform/identity/electron-main/desktopCredentialStore.ts",
+        "native/crates/prctr-desktop-key-custody/src/lib.rs"
+      ],
+      "verificationRefs": ["authorization-tests", "native-electron"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "authorization-tests",
+      "kind": "test",
+      "path": "test/platform/identity/electron-main/desktopAuthorization.test.ts",
+      "obligation": "Exercise exact loopback, state validation, replay, cancellation, deadlines, PKCE, DPoP, nonce retry, ambiguous refresh fencing, and sign-out during a pending write."
+    },
+    {
+      "id": "native-electron",
+      "kind": "test",
+      "path": "test/electron/desktopIdentity.real.test.ts",
+      "obligation": "On the target OS, verify real native signing/key persistence, OS-encrypted refresh storage, credential-free sandboxed authenticated renderer and sign-out."
+    },
+    {
+      "id": "offline-provenance",
+      "kind": "check",
+      "path": "build/checks/provenance.ts",
+      "obligation": "Validate schema, path ownership, attribution and verification offline."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Verify every pinned upstream path/blob and review declared behavior divergences."
+    }
+  ]
+}

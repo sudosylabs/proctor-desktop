@@ -560,3 +560,60 @@ void test('partial Launch IPC registration rolls back only its installed handler
 	}
 	assert.deepEqual(removed, [LAUNCH_IDENTITY_CHANNELS.projection]);
 });
+
+void test('Session loss retains the Institution and separates validity, custody, and cleanup outcomes', async () => {
+	const coordinator = new DesktopIdentityCoordinator({
+		target,
+		allowDevelopmentLoopback: false,
+		transport: { probe: async () => probe() }
+	});
+	const ended = {
+		sequence: 1,
+		origin,
+		institutionName: 'Example Institution',
+		authentication: 'signedOut',
+		sessionValidity: 'verificationRequired',
+		credentialReadiness: 'locked',
+		reason: 'refreshFailed',
+		localCleanup: 'notRequested',
+		remoteRevocation: 'notRequested'
+	} as const;
+	try {
+		coordinator.acceptSessionOutcome(ended);
+		assert.equal(coordinator.projection().state, 'authorizationFailed');
+		assert.equal(coordinator.projection().origin, origin);
+		assert.equal(coordinator.projection().institutionName, ended.institutionName);
+		assert.equal(
+			coordinator.projection().sessionOutcome?.sessionValidity,
+			'verificationRequired'
+		);
+		assert.equal(coordinator.projection().sessionOutcome?.credentialReadiness, 'locked');
+		const pending = {
+			...ended,
+			sequence: 2,
+			authentication: 'ending',
+			reason: 'signOut',
+			localCleanup: 'pending',
+			remoteRevocation: 'pending'
+		} as const;
+		coordinator.acceptSessionOutcome(pending);
+		await coordinator.handleIntent({ kind: 'changeServer' });
+		assert.equal(coordinator.projection().sessionOutcome?.authentication, 'ending');
+		const settled = {
+			...pending,
+			authentication: 'signedOut',
+			credentialReadiness: 'unavailable',
+			localCleanup: 'failed',
+			remoteRevocation: 'unconfirmed'
+		} as const;
+		coordinator.acceptSessionOutcome(settled);
+		assert.deepEqual(coordinator.projection().sessionOutcome, settled);
+		coordinator.acceptSessionOutcome(ended);
+		assert.equal(coordinator.projection().sessionOutcome?.sequence, 2);
+		await coordinator.handleIntent({ kind: 'retry' });
+		assert.equal(coordinator.projection().state, 'ready');
+		assert.equal(coordinator.projection().sessionOutcome, undefined);
+	} finally {
+		coordinator.dispose();
+	}
+});

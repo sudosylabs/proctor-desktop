@@ -1,3 +1,7 @@
+import {
+	validateAuthenticatedIdentity,
+	type AuthenticatedIdentity
+} from '../../identity/common/authenticatedIdentity.js';
 export type ProductWindowKind = 'launch' | 'authenticated' | 'candidate';
 
 interface DescriptorBase {
@@ -18,6 +22,8 @@ export interface AuthenticatedWindowDescriptor extends DescriptorBase {
 	readonly principalId: string;
 	readonly sessionId: string;
 	readonly initialDestination: string;
+	readonly identity?: AuthenticatedIdentity;
+	readonly developmentOrigin?: true;
 }
 
 export interface CandidateWindowDescriptor extends DescriptorBase {
@@ -63,7 +69,10 @@ export function validateWindowDescriptor(value: unknown): ProductWindowDescripto
 		protocolVersion: 1 as const,
 		kind: value.kind,
 		windowId: value.windowId,
-		institutionOrigin: validateOrigin(value.institutionOrigin),
+		institutionOrigin: validateOrigin(
+			value.institutionOrigin,
+			value.kind === 'authenticated' && value.developmentOrigin === true
+		),
 		principalId: requireIdentifier(value.principalId),
 		sessionId: requireIdentifier(value.sessionId)
 	};
@@ -71,7 +80,11 @@ export function validateWindowDescriptor(value: unknown): ProductWindowDescripto
 		return Object.freeze({
 			...common,
 			kind: 'authenticated',
-			initialDestination: requireIdentifier(value.initialDestination)
+			initialDestination: requireIdentifier(value.initialDestination),
+			...(value.developmentOrigin === true ? { developmentOrigin: true as const } : {}),
+			...(value.identity === undefined
+				? {}
+				: { identity: validateBoundIdentity(value.identity, common) })
 		});
 	return Object.freeze({
 		...common,
@@ -127,13 +140,14 @@ function requireDigest(value: unknown): string {
 		throw new TypeError('Invalid digest');
 	return value;
 }
-function validateOrigin(value: unknown): string {
+function validateOrigin(value: unknown, development = false): string {
 	if (typeof value !== 'string' || value.length > 2048)
 		throw new TypeError('Invalid Institution origin');
 	const URLConstructor = (
 		globalThis as unknown as {
 			readonly URL: new (input: string) => {
 				readonly protocol: string;
+				readonly hostname: string;
 				readonly username: string;
 				readonly password: string;
 				readonly pathname: string;
@@ -145,7 +159,12 @@ function validateOrigin(value: unknown): string {
 	).URL;
 	const url = new URLConstructor(value);
 	if (
-		url.protocol !== 'https:' ||
+		(url.protocol !== 'https:' &&
+			!(
+				development &&
+				url.protocol === 'http:' &&
+				/^(?:127\.0\.0\.1|\[::1\]|localhost)$/.test(url.hostname)
+			)) ||
 		url.username !== '' ||
 		url.password !== '' ||
 		url.pathname !== '/' ||
@@ -154,4 +173,18 @@ function validateOrigin(value: unknown): string {
 	)
 		throw new TypeError('Institution origin must be an HTTPS origin');
 	return url.origin;
+}
+
+function validateBoundIdentity(
+	value: unknown,
+	binding: { principalId: string; sessionId: string; institutionOrigin: string }
+): AuthenticatedIdentity {
+	const identity = validateAuthenticatedIdentity(value);
+	if (
+		identity.principalId !== binding.principalId ||
+		identity.sessionId !== binding.sessionId ||
+		identity.institutionOrigin !== binding.institutionOrigin
+	)
+		throw new TypeError('Authenticated identity binding mismatch');
+	return identity;
 }

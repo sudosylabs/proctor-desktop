@@ -13,6 +13,7 @@ revision, disposition, dependencies, divergence, and evidence):
 - [`base-common-runtime`](./base-common-runtime.json) — lifecycle, events, cancellation, scheduling, resources, and observables.
 - [`browser-interaction`](./browser-interaction.json) — DOM lifecycle, focus, input, geometry, scheduling, resize, touch, and safe CSS values.
 - [`codicons-semantic-icons`](./codicons-semantic-icons.json) — complete pinned Codicon assets behind Proctor semantic icon identifiers.
+- [`desktop-authorization`](./desktop-authorization.json) — hosted browser callback lifecycle, native key custody, and privileged Session handoff.
 - [`editor-core`](./editor-core.json) — positions, ranges, selections, piece-tree text, edits, EOL, word boundaries, and search.
 - [`electron-window-skeleton`](./electron-window-skeleton.json) — trusted product windows, immutable descriptors, native integrated chrome, preloads, and secure transitions.
 - [`integrated-browser-client`](./integrated-browser-client.json) — policy-enforced Candidate browser and minimized ordered activity.

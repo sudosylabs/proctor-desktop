@@ -40,6 +40,18 @@ export class ProductWindowCoordinator {
     this.#replace(descriptor);
   }
 
+  completeSignIn(descriptorValue: unknown): void {
+    this.#requireCurrent('launch');
+    const descriptor=validateWindowDescriptor(descriptorValue);
+    if (descriptor.kind!=='authenticated' || !descriptor.identity) throw new Error('Sign-in requires a verified authenticated identity');
+    this.#replace(descriptor);
+  }
+
+  returnToLaunch(windowId: string): void {
+    this.#requireCurrent('authenticated');
+    this.#replace({protocolVersion:1,kind:'launch',windowId});
+  }
+
   enterCandidate(descriptorValue: unknown): void {
     const descriptor = validateWindowDescriptor(descriptorValue);
     const current = this.#requireCurrent('authenticated');

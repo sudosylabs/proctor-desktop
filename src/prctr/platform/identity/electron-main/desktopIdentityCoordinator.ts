@@ -1,4 +1,9 @@
 import {
+	validateDesktopSessionOutcome,
+	type DesktopSessionOutcome
+} from '../common/desktopSessionOutcome.js';
+import { DesktopAuthorizationError } from '../node/desktopAuthorizationError.js';
+import {
 	CancellationTokenSource,
 	type CancellationToken
 } from '../../../base/common/cancellation.js';
@@ -22,7 +27,7 @@ export interface DesktopIdentityCoordinatorOptions {
 	readonly target: DesktopReleaseTarget;
 	readonly transport: ServerReadinessTransport;
 	readonly allowDevelopmentLoopback: boolean;
-	/** The future hosted-auth owner supplies this only when its complete privileged flow is available. */
+	/** The hosted-auth owner supplies this only when its complete privileged flow is available. */
 	readonly authorization?: {
 		start(identity: VerifiedServerIdentity, token: CancellationToken): Promise<void>;
 	};
@@ -54,9 +59,25 @@ export class DesktopIdentityCoordinator extends Disposable {
 		return this.#projection;
 	}
 
+	acceptSessionOutcome(value: DesktopSessionOutcome): void {
+		if (this.#disposed) return;
+		const outcome = validateDesktopSessionOutcome(value);
+		const previous = this.#projection.sessionOutcome;
+		if (previous && outcome.sequence < previous.sequence) return;
+		this.#cancel();
+		this.#publish({
+			state: 'authorizationFailed',
+			origin: outcome.origin,
+			institutionName: outcome.institutionName,
+			sessionOutcome: outcome,
+			authorizationFailure: 'verificationRequired'
+		});
+	}
+
 	async handleIntent(value: unknown): Promise<void> {
 		if (this.#disposed) throw new Error('Launch identity is disposed');
 		const intent = validateLaunchIdentityIntent(value);
+		if (this.#projection.sessionOutcome?.authentication === 'ending') return;
 		switch (intent.kind) {
 			case 'changeServer':
 				this.#cancel();
@@ -139,9 +160,17 @@ export class DesktopIdentityCoordinator extends Disposable {
 				if (!current()) return;
 				try {
 					await this.options.authorization.start(identity, operation.token);
-				} catch {
+				} catch (error) {
 					if (current())
-						this.#publish({ ...presentation, state: 'authorizationFailed', origin });
+						this.#publish({
+							...presentation,
+							state: 'authorizationFailed',
+							origin,
+							authorizationFailure:
+								error instanceof DesktopAuthorizationError
+									? error.reason
+									: 'unavailable'
+						});
 					return;
 				}
 				if (!current()) return;

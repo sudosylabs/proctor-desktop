@@ -181,3 +181,75 @@ export const launchMessages = Object.freeze({
 		description: 'Minimal LaunchWindow startup recovery message.'
 	})
 });
+
+export const authorizationFailureMessages = Object.freeze({
+	cancelled: defineMessage({
+		id: 'launch.authorization.failure.cancelled',
+		defaultMessage: 'Sign-in was cancelled.',
+		description: 'Bounded privileged sign-in failure shown below the action.'
+	}),
+	timedOut: defineMessage({
+		id: 'launch.authorization.failure.timedout',
+		defaultMessage: 'Sign-in expired. Try again.',
+		description: 'Bounded privileged sign-in failure shown below the action.'
+	}),
+	callbackInvalid: defineMessage({
+		id: 'launch.authorization.failure.callbackinvalid',
+		defaultMessage: 'The sign-in response could not be verified. Try again.',
+		description: 'Bounded privileged sign-in failure shown below the action.'
+	}),
+	unavailable: defineMessage({
+		id: 'launch.authorization.failure.unavailable',
+		defaultMessage: 'Sign-in is unavailable. Check your connection and try again.',
+		description: 'Bounded privileged sign-in failure shown below the action.'
+	}),
+	rejected: defineMessage({
+		id: 'launch.authorization.failure.rejected',
+		defaultMessage: 'The server could not complete sign-in. Try again.',
+		description: 'Bounded privileged sign-in failure shown below the action.'
+	}),
+	verificationRequired: defineMessage({
+		id: 'launch.authorization.failure.verificationrequired',
+		defaultMessage: 'Your saved sign-in could not be verified. Sign in again.',
+		description: 'Bounded privileged sign-in failure shown below the action.'
+	}),
+	storageUnavailable: defineMessage({
+		id: 'launch.authorization.failure.storageunavailable',
+		defaultMessage: 'Proctor could not access secure key storage on this computer.',
+		description: 'Bounded privileged sign-in failure shown below the action.'
+	})
+});
+
+export const sessionOutcomeMessages = Object.freeze({
+	ending: defineMessage({
+		id: 'launch.session.ending',
+		defaultMessage: 'Signing out…',
+		description: 'Local access is closed while sign-out cleanup completes.'
+	}),
+	refreshFailed: defineMessage({
+		id: 'launch.session.verification.required',
+		defaultMessage: 'Your session could not be verified. Sign in again.',
+		description: 'A refresh failed or its result is ambiguous; the Institution stays selected.'
+	}),
+	cleared: defineMessage({
+		id: 'launch.session.signed.out',
+		defaultMessage: 'Signed out.',
+		description: 'Local credentials were removed and the server confirmed revocation.'
+	}),
+	remoteUnconfirmed: defineMessage({
+		id: 'launch.session.revocation.unconfirmed',
+		defaultMessage: 'Signed out on this computer. Server sign-out could not be confirmed.',
+		description: 'Local cleanup succeeded but the remote Session revocation is unconfirmed.'
+	}),
+	localUnconfirmed: defineMessage({
+		id: 'launch.session.cleanup.unconfirmed',
+		defaultMessage:
+			'The server session ended, but local sign-in cleanup could not be confirmed.',
+		description: 'Server revocation succeeded but protected credential cleanup failed.'
+	}),
+	bothUnconfirmed: defineMessage({
+		id: 'launch.session.cleanup.failed',
+		defaultMessage: 'Local sign-in cleanup and server sign-out could not be confirmed.',
+		description: 'Local capabilities are closed but neither cleanup outcome is confirmed.'
+	})
+});

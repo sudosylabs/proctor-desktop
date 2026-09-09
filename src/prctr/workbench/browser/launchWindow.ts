@@ -21,7 +21,11 @@ import { ProductWindowChrome } from '../../platform/windows/browser/productWindo
 import type { ProductWindowChromeClient } from '../../platform/windows/common/windowChrome.js';
 import { prepareWorkbenchDocument } from './documentLayout.js';
 import { BrandLockup, brandLockupAppearance } from './brandLockup.js';
-import { launchMessages as messages } from './launchWindowMessages.js';
+import {
+	launchMessages as messages,
+	authorizationFailureMessages,
+	sessionOutcomeMessages
+} from './launchWindowMessages.js';
 import { createStartupSurface } from './startupSurface.js';
 import './launchWindow.css';
 
@@ -54,7 +58,11 @@ export async function bootstrapLaunchWindow(
 		));
 	const localization = createLocalization({
 		requestedLocale: document.documentElement.lang || 'en',
-		messages: Object.values(messages),
+		messages: [
+			...Object.values(messages),
+			...Object.values(authorizationFailureMessages),
+			...Object.values(sessionOutcomeMessages)
+		],
 		catalogs: []
 	});
 	try {
@@ -262,11 +270,20 @@ export async function bootstrapLaunchWindow(
 				!authUnavailable.hidden
 			)
 				tone = 'warning';
+			if (value.sessionOutcome)
+				tone =
+					value.sessionOutcome.authentication === 'ending' ||
+					(value.sessionOutcome.sessionValidity === 'revoked' &&
+						value.sessionOutcome.localCleanup === 'cleared')
+						? 'info'
+						: 'warning';
 			if (actionError.textContent) tone = 'error';
 			feedback.dataset.tone = tone;
 			const busy =
 				!actionError.textContent &&
-				(value.state === 'checking' || value.state === 'authorizing');
+				(value.state === 'checking' ||
+					value.state === 'authorizing' ||
+					value.sessionOutcome?.authentication === 'ending');
 			feedbackIcon.setState(
 				busy ? { id: 'state.loading', modifier: 'spin' } : { id: `state.${tone}` }
 			);
@@ -290,7 +307,25 @@ export async function bootstrapLaunchWindow(
 			institution.dir = 'auto';
 			development.hidden = !next.developmentOrigin;
 			// Keep readiness announcements without repeating the form label or ready action.
-			status.textContent = localization.format(messages[next.state]);
+			status.textContent = localization.format(
+				next.sessionOutcome
+					? sessionOutcomeMessages[
+							next.sessionOutcome.reason === 'refreshFailed'
+								? 'refreshFailed'
+								: next.sessionOutcome.authentication === 'ending'
+									? 'ending'
+									: next.sessionOutcome.localCleanup === 'failed'
+										? next.sessionOutcome.remoteRevocation === 'unconfirmed'
+											? 'bothUnconfirmed'
+											: 'localUnconfirmed'
+										: next.sessionOutcome.remoteRevocation === 'unconfirmed'
+											? 'remoteUnconfirmed'
+											: 'cleared'
+						]
+					: next.authorizationFailure
+						? authorizationFailureMessages[next.authorizationFailure]
+						: messages[next.state]
+			);
 			status.dataset.announcementOnly = String(
 				next.state === 'selectingServer' || next.state === 'ready'
 			);
@@ -319,6 +354,8 @@ export async function bootstrapLaunchWindow(
 				disabled: !next.canSignIn
 			});
 			retry.element.hidden = !retryableStates.has(next.state);
+			retry.element.disabled = next.sessionOutcome?.authentication === 'ending';
+			change.element.disabled = next.sessionOutcome?.authentication === 'ending';
 			primary.hidden = signIn.element.hidden && retry.element.hidden;
 			secondary.hidden = selection;
 			actions.hidden = primary.hidden && secondary.hidden;

@@ -205,6 +205,7 @@ native/Cargo.lock
 /src/prctr/platform/contextkey/common/contextkey.ts
 /src/prctr/platform/contextkey/common/scanner.ts
 /src/prctr/platform/executionEnvironment/common/terminalProtocol.ts
+/src/prctr/platform/identity/node/loopbackAuthServer.ts
 /src/prctr/platform/instantiation/common/descriptors.ts
 /src/prctr/platform/instantiation/common/extensions.ts
 /src/prctr/platform/instantiation/common/graph.ts

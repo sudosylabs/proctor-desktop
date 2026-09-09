@@ -4,6 +4,26 @@
   "locale": "en",
   "direction": "ltr",
   "messages": {
+    "authenticated.account.connected": {
+      "message": "Signed in to {institution}.",
+      "description": "Verified account institution.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "authenticated.account.no.access": {
+      "message": "No examination or management access is assigned to your account.",
+      "description": "Server-confirmed absence of assigned access.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "authenticated.account.no.affiliation": {
+      "message": "You have no current institution affiliation.",
+      "description": "Server-confirmed account context.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
     "authenticated.action.failed": {
       "message": "The requested account action could not be completed.",
       "description": "Safe authenticated action failure.",
@@ -315,6 +335,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
     },
+    "identity.callback.return": {
+      "message": "Return to Proctor to finish signing in. You can close this tab.",
+      "description": "Plain-text loopback response; never echoes authorization parameters.",
+      "placeholders": [],
+      "source": "src/prctr/code/electron-main/desktopIdentityComposition.ts"
+    },
     "launch.auth.unavailable": {
       "message": "Sign-in is not available in this build.",
       "description": "Readiness is implemented but the hosted authentication owner is not connected.",
@@ -330,6 +356,48 @@
     "launch.authorization.failed": {
       "message": "Sign-in could not be completed. Retry to check this server again.",
       "description": "Safe hosted authorization failure.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.failure.callbackinvalid": {
+      "message": "The sign-in response could not be verified. Try again.",
+      "description": "Bounded privileged sign-in failure shown below the action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.failure.cancelled": {
+      "message": "Sign-in was cancelled.",
+      "description": "Bounded privileged sign-in failure shown below the action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.failure.rejected": {
+      "message": "The server could not complete sign-in. Try again.",
+      "description": "Bounded privileged sign-in failure shown below the action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.failure.storageunavailable": {
+      "message": "Proctor could not access secure key storage on this computer.",
+      "description": "Bounded privileged sign-in failure shown below the action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.failure.timedout": {
+      "message": "Sign-in expired. Try again.",
+      "description": "Bounded privileged sign-in failure shown below the action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.failure.unavailable": {
+      "message": "Sign-in is unavailable. Check your connection and try again.",
+      "description": "Bounded privileged sign-in failure shown below the action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.authorization.failure.verificationrequired": {
+      "message": "Your saved sign-in could not be verified. Sign in again.",
+      "description": "Bounded privileged sign-in failure shown below the action.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },
@@ -547,6 +615,42 @@
     "launch.server.label": {
       "message": "Institution server",
       "description": "Label for the server address input.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.session.cleanup.failed": {
+      "message": "Local sign-in cleanup and server sign-out could not be confirmed.",
+      "description": "Local capabilities are closed but neither cleanup outcome is confirmed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.session.cleanup.unconfirmed": {
+      "message": "The server session ended, but local sign-in cleanup could not be confirmed.",
+      "description": "Server revocation succeeded but protected credential cleanup failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.session.ending": {
+      "message": "Signing out…",
+      "description": "Local access is closed while sign-out cleanup completes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.session.revocation.unconfirmed": {
+      "message": "Signed out on this computer. Server sign-out could not be confirmed.",
+      "description": "Local cleanup succeeded but the remote Session revocation is unconfirmed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.session.signed.out": {
+      "message": "Signed out.",
+      "description": "Local credentials were removed and the server confirmed revocation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    },
+    "launch.session.verification.required": {
+      "message": "Your session could not be verified. Sign in again.",
+      "description": "A refresh failed or its result is ambiguous; the Institution stays selected.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
     },

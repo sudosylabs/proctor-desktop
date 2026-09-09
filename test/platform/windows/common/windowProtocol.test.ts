@@ -36,6 +36,40 @@ suite('Product window protocol', () => {
 		);
 	});
 
+	test('development HTTP is explicit, loopback-only, and cannot enter CandidateWindow', () => {
+		const descriptor = {
+			protocolVersion: 1,
+			kind: 'authenticated',
+			windowId: 'w-dev',
+			principalId: 'p1',
+			sessionId: 's1',
+			initialDestination: 'account',
+			institutionOrigin: 'http://127.0.0.1:8080'
+		};
+		assert.throws(() => validateWindowDescriptor(descriptor));
+		assert.strictEqual(
+			validateWindowDescriptor({ ...descriptor, developmentOrigin: true }).institutionOrigin,
+			descriptor.institutionOrigin
+		);
+		assert.throws(() =>
+			validateWindowDescriptor({
+				...descriptor,
+				developmentOrigin: true,
+				institutionOrigin: 'http://example.edu'
+			})
+		);
+		assert.throws(() =>
+			validateWindowDescriptor({
+				...descriptor,
+				developmentOrigin: true,
+				kind: 'candidate',
+				attemptId: 'a1',
+				attemptConfigurationRevision: 'r1',
+				attemptConfigurationDigest: 'a'.repeat(64)
+			})
+		);
+	});
+
 	test('accepts only exact capability-specific intents', () => {
 		assert.deepStrictEqual(
 			validateWindowIntent('authenticated', {

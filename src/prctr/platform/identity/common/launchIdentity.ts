@@ -1,3 +1,7 @@
+import {
+	validateDesktopSessionOutcome,
+	type DesktopSessionOutcome
+} from './desktopSessionOutcome.js';
 /** Public, credential-free LaunchWindow presentation. Server payloads never cross this seam. */
 export const launchStates = [
 	'selectingServer',
@@ -43,6 +47,15 @@ export interface LaunchIdentityProjection {
 		| 'unknown';
 	readonly canSignIn: boolean;
 	readonly authorizationAvailable: boolean;
+	readonly sessionOutcome?: DesktopSessionOutcome;
+	readonly authorizationFailure?:
+		| 'cancelled'
+		| 'timedOut'
+		| 'callbackInvalid'
+		| 'unavailable'
+		| 'rejected'
+		| 'verificationRequired'
+		| 'storageUnavailable';
 }
 
 export type LaunchIdentityIntent =
@@ -91,6 +104,20 @@ export function validateLaunchIdentityProjection(value: unknown): LaunchIdentity
 	) {
 		throw new TypeError('Invalid LaunchWindow projection');
 	}
+	if (
+		value.authorizationFailure !== undefined &&
+		(value.state !== 'authorizationFailed' ||
+			![
+				'cancelled',
+				'timedOut',
+				'callbackInvalid',
+				'unavailable',
+				'rejected',
+				'verificationRequired',
+				'storageUnavailable'
+			].includes(value.authorizationFailure as string))
+	)
+		throw new TypeError('Invalid authorization failure');
 	const origin = optionalText(value.origin, 2048);
 	const institutionName = optionalText(value.institutionName, 512);
 	const administratorMessage = optionalText(value.administratorMessage, 2048);
@@ -127,6 +154,16 @@ export function validateLaunchIdentityProjection(value: unknown): LaunchIdentity
 		developmentOrigin: value.developmentOrigin,
 		canSignIn: value.canSignIn,
 		authorizationAvailable: value.authorizationAvailable,
+		...(value.sessionOutcome === undefined
+			? {}
+			: { sessionOutcome: validateDesktopSessionOutcome(value.sessionOutcome) }),
+		...(value.authorizationFailure === undefined
+			? {}
+			: {
+					authorizationFailure: value.authorizationFailure as NonNullable<
+						LaunchIdentityProjection['authorizationFailure']
+					>
+				}),
 		...(origin === undefined ? {} : { origin }),
 		...(institutionName === undefined ? {} : { institutionName }),
 		...(administratorMessage === undefined ? {} : { administratorMessage }),

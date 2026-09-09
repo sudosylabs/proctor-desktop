@@ -169,6 +169,7 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 		onIntent: (intent: ProductWindowIntent) => void,
 		onTerminated: (reason: ProductWindowTerminationReason) => void
 	): ManagedProductWindow {
+		if (this.#options.production && descriptor.kind==='authenticated' && descriptor.developmentOrigin) throw new Error('Production windows cannot use development HTTP');
 		const channels = WINDOW_CHANNELS[descriptor.kind];
 		const chromeEnvironment =
 			this.#options.windowChromeEnvironment ?? electronWindowChromeEnvironment();

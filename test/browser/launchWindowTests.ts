@@ -339,6 +339,55 @@ export async function runLaunchWindowTests(
 				feedback.dataset.announcementOnly === 'false',
 			'Action failures must paint below the action group'
 		);
+		const ending = {
+			sequence: 1,
+			origin: 'https://example.edu',
+			institutionName: 'Example University',
+			authentication: 'ending',
+			sessionValidity: 'verificationRequired',
+			credentialReadiness: 'locked',
+			reason: 'signOut',
+			localCleanup: 'pending',
+			remoteRevocation: 'pending'
+		} as const;
+		publish('authorizationFailed', {
+			origin: ending.origin,
+			institutionName: ending.institutionName,
+			sessionOutcome: ending
+		});
+		check(
+			action('Retry').disabled && action('Change server').disabled,
+			'Sign-out cleanup must settle before a new identity action'
+		);
+		check(
+			owner.querySelector('[role=status]')?.textContent === 'Signing out…',
+			'Pending cleanup needs its own announcement'
+		);
+		publish('authorizationFailed', {
+			origin: ending.origin,
+			institutionName: ending.institutionName,
+			sessionOutcome: {
+				...ending,
+				authentication: 'signedOut',
+				localCleanup: 'cleared',
+				remoteRevocation: 'unconfirmed'
+			}
+		});
+		check(
+			!action('Retry').disabled && !action('Change server').disabled,
+			'Settled cleanup must restore recovery actions'
+		);
+		check(
+			owner
+				.querySelector('[role=status]')
+				?.textContent?.includes('Server sign-out could not be confirmed.'),
+			'A stale access token must never render successful remote sign-out'
+		);
+		check(
+			feedback.getBoundingClientRect().top >
+				action('Change server').getBoundingClientRect().bottom,
+			'Session cleanup feedback must stay below actions'
+		);
 		for (const state of launchStates) {
 			const selection = state === 'selectingServer' || state === 'invalidServer';
 			publish(
