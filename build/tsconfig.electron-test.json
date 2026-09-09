@@ -18,6 +18,8 @@
     "../test/electron/notificationsPreview.ts",
     "../test/electron/windowSkeleton.real.test.ts",
     "../test/electron/securityUtility.real.test.ts",
-    "../test/electron/securityUtilityMain.ts"
+    "../test/electron/securityUtilityMain.ts",
+    "../test/electron/desktopIdentityMain.ts",
+    "../test/electron/desktopIdentity.real.test.ts"
   ]
 }

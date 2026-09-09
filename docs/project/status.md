@@ -55,7 +55,7 @@
 ## Desktop implementation state
 
 The repository now contains a source-level Desktop application graph rather than
-only architecture and native foundations. Nineteen Proctor-owned VS Code port
+only architecture and native foundations. Twenty-one Proctor-owned VS Code port
 clusters have exact manifests under `docs/upstream/vscode-ports/`: localization,
 base-common runtime, performance, Codicons and semantic icons, themes and design
 tokens, browser interaction, shared browser controls, context conditions,
@@ -97,10 +97,18 @@ visual surface uses one centered group containing the Proctor lockup, Institutio
 and compact sign-in action, with integrated native chrome on a continuous canvas.
 Native Launch menus provide editing, zoom, window actions, exit, and bounded
 connection diagnostics. A development-only Electron preview mounts the production
-renderer with sample readiness data. Sign-in remains disabled when no complete
-hosted-authentication owner is connected; the readiness slice does not implement
-loopback authorization, OS-backed key custody, credentials, Sessions, or the
-authenticated transition.
+renderer with sample readiness data. The separate real-server development entrypoint
+connects readiness to hosted authorization, an exact ephemeral callback, native
+non-exportable installation signing, DPoP exchange/refresh/logout, encrypted
+refresh custody, and a sanitized AuthenticatedWindow account handoff. The identity
+owner fences cancellation, ambiguous refresh rotation, and sign-out. Native key
+custody is mandatory in development too. macOS native signing, key persistence,
+encrypted refresh storage and the actual sandboxed window transition have a
+runnable Electron conformance test. The Windows CNG implementation still requires
+Windows execution and both platforms require packaged conformance. A running
+Institution deployment has not yet been tested. Authenticated settings transport,
+exam destinations, realtime continuity and secure Attempt admission remain
+separate integrations; completing sign-in does not grant them.
 
 ProductWindowChrome currently has one scoped design-system evidence exception.
 The missing evidence is deterministic pixel-baseline comparison for every

@@ -60,3 +60,23 @@ and never rewrites files or changes staging. Tooling/configuration must match
 between the index and working copy so the executed policy is unambiguous.
 Type-aware analysis and the complete test suite belong to `npm run check` and
 CI, not to a misleading mixture of staged source and unstaged dependency types.
+
+## Real-server identity development
+
+`npm run dev -- --allow-http-loopback` builds the native identity adapter and
+opens LaunchWindow with real ping, discovery and authentication requests. Omit
+`--allow-http-loopback` for HTTPS-only operation. HTTP is limited to loopback,
+and cannot enter a production Candidate Attempt. Use `--release` and `--build-id`
+when the Institution build catalog requires specific selectors; `npm run dev --
+--help` describes their defaults. The server must advertise a compatible Desktop
+Authorization protocol and a matching canonical public origin.
+
+This entrypoint uses a separate Proctor Development application data directory.
+A single-instance lock protects its rotating credentials; another launch focuses
+the existing window.
+Native non-exportable key custody and OS-encrypted refresh storage are mandatory.
+`npm run preview:launch` remains a visual fixture with sample responses and cannot
+prove server sign-in. `npm run test:desktop-identity` builds and exercises actual
+native signing, encrypted storage and the sandboxed window transition against
+isolated contract responses. Run that gate on each supported target; macOS results
+do not establish Windows or signed-package conformance.

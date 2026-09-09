@@ -65,7 +65,9 @@
     "format": "node scripts/format.ts --write",
     "check:staged": "node scripts/staged.ts",
     "hooks:enable": "node scripts/hooks.ts --enable",
-    "hooks:disable": "node scripts/hooks.ts --disable"
+    "hooks:disable": "node scripts/hooks.ts --disable",
+    "dev": "node scripts/developDesktop.ts",
+    "test:desktop-identity": "node scripts/test.ts desktop-identity"
   },
   "allowScripts": {
     "esbuild": true

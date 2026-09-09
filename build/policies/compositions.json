@@ -154,6 +154,34 @@
       ],
       "forbidden": ["src/prctr/platform/native/electron-main"],
       "allowedDynamicImports": []
+    },
+    {
+      "id": "desktop-identity-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/desktopIdentityComposition.ts",
+      "required": [
+        "src/prctr/platform/identity/electron-main",
+        "src/prctr/platform/windows/electron-main"
+      ],
+      "forbidden": [
+        "src/prctr/platform/identity/browser",
+        "src/prctr/platform/native/electron-utility"
+      ],
+      "allowedDynamicImports": []
+    },
+    {
+      "id": "desktop-development-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/desktopDevelopmentMain.ts",
+      "required": [
+        "src/prctr/platform/identity/electron-main",
+        "src/prctr/platform/windows/electron-main"
+      ],
+      "forbidden": [
+        "src/prctr/platform/identity/browser",
+        "src/prctr/platform/native/electron-utility"
+      ],
+      "allowedDynamicImports": []
     }
   ]
 }

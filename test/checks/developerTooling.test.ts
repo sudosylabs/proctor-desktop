@@ -28,7 +28,12 @@ void test('test commands include every Node suite and close each Electron prereq
 		'editor',
 		'security-utility'
 	]);
-	assert.deepEqual(selectSuites('electron'), ['browser', 'window-skeleton', 'electron-security']);
+	assert.deepEqual(selectSuites('electron'), [
+		'browser',
+		'window-skeleton',
+		'desktop-identity',
+		'electron-security'
+	]);
 	assert.throws(() => selectSuites('typo'), /Unknown/);
 	const selected = new Set<string>();
 	for (const suite of Object.values(testSuites)) {
