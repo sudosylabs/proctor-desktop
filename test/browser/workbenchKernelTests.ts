@@ -1,3 +1,6 @@
+import { runModernWorkbenchTests } from './modernWorkbenchTests.ts';
+import { runAccountTests } from './accountTests.ts';
+import { createAccountContribution } from '../../src/prctr/workbench/contrib/account/browser/accountContribution.ts';
 import {
 	CancellationToken,
 	type CancellationToken as CancellationTokenType
@@ -91,6 +94,8 @@ function testWindowChromeClient(updates?: ProductWindowChromeUpdate[]): ProductW
 }
 
 export async function runWorkbenchKernelBrowserTests(document: Document): Promise<number> {
+	await runModernWorkbenchTests(document, labels);
+	await runAccountTests(document);
 	await runThemePreferenceTest(document);
 	await runExecutableKernelTest(document);
 	await runMigratedSettingsDestinationTest(document);
@@ -591,6 +596,9 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 			}),
 			testWindowChromeClient(authenticatedChromeUpdates)
 		),
+		createAccountContribution({
+			request: async () => ({ kind: 'error', reason: 'unavailable' })
+		}),
 		createAuthenticatedContribution({
 			signOut: async () => {
 				throw new Error('sign-out unavailable');
@@ -727,7 +735,7 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		throw new Error('Numeric Settings control did not survive deletion');
 	fontInput.value = '16';
 	fontInput.dispatchEvent(new Event('change'));
-	await Promise.resolve();
+	await waitFor(() => previewedSource.includes('16'));
 	if (!previewedSource.includes('16'))
 		throw new Error(
 			'Valid Settings drafts were not previewed in the current AuthenticatedWindow'
@@ -868,7 +876,7 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 	await runIntegratedBrowserPaneTest(document);
 	await runIntegratedBrowserGateLifecycleTest(document);
 	await runExamSecurityContributionTest(document);
-	return 27;
+	return 28;
 }
 
 async function runExecutableKernelTest(document: Document): Promise<void> {
@@ -1053,6 +1061,9 @@ async function runMigratedSettingsDestinationTest(document: Document): Promise<v
 			sessionId: 'session:migrated',
 			initialDestination: 'settings'
 		})),
+		createAccountContribution({
+			request: async () => ({ kind: 'error', reason: 'unavailable' })
+		}),
 		createAuthenticatedContribution({ signOut: async () => {}, close: async () => {} }),
 		createSettingsContribution({
 			projection: async () => projection,
@@ -1087,6 +1098,7 @@ async function runMigratedSettingsDestinationTest(document: Document): Promise<v
 	const save = result.shell
 		.part('content')
 		.querySelector<HTMLButtonElement>('.prctr-settings__actions button');
+	await waitFor(() => save?.disabled === false);
 	save?.click();
 	await waitFor(() => committed.length > 0);
 	if (
@@ -1388,6 +1400,9 @@ async function runSettingsCancelFailureTest(document: Document): Promise<void> {
 			sessionId: 'session:one',
 			initialDestination: 'settings'
 		})),
+		createAccountContribution({
+			request: async () => ({ kind: 'error', reason: 'unavailable' })
+		}),
 		createAuthenticatedContribution({ signOut: async () => {}, close: async () => {} }),
 		createSettingsContribution({
 			projection: async () => current,

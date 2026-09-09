@@ -78,7 +78,7 @@ await Promise.all([
 for (const kind of ['launch', 'authenticated'])
 	writeFileSync(
 		join(outdir, `${kind}.html`),
-		`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="./${kind}.css"><title>Proctor</title></head><body><script type="module" src="./${kind}.js"></script></body></html>\n`
+		`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'${kind === 'authenticated' ? ' data:' : ''}; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="./${kind}.css"><title>Proctor</title></head><body><script type="module" src="./${kind}.js"></script></body></html>\n`
 	);
 writeFileSync(
 	join(outdir, 'package.json'),

@@ -11,7 +11,10 @@ import type {
 	ProductWindowDescriptor,
 	ProductWindowKind
 } from '../../platform/windows/common/windowProtocol.js';
-import { ProductWindowChrome } from '../../platform/windows/browser/productWindowChrome.js';
+import {
+	ProductWindowChrome,
+	PRODUCT_WINDOW_CHROME_SERVICE
+} from '../../platform/windows/browser/productWindowChrome.js';
 import type { ProductWindowChromeClient } from '../../platform/windows/common/windowChrome.js';
 import {
 	BROWSER_THEME_SERVICE,
@@ -66,6 +69,7 @@ export function createDesktopWorkbenchContribution(
 						context.getService<BrowserThemeService>(BROWSER_THEME_SERVICE)
 					)
 				);
+				context.setService(PRODUCT_WINDOW_CHROME_SERVICE, chrome);
 				context.disposables.add(
 					context.shell.overlayHost.onDidChangeVisibility((visible) => {
 						void chrome.setDimmed(visible).catch(() => undefined);

@@ -52,6 +52,28 @@
   NodeNext/esbuild/Forge graph, and invariant-to-assurance mapping govern future
   implementation.
 
+## Accepted presentation migration
+
+[Modern UI and floating panels](../architecture/design-system.md#modern-ui-and-floating-panels)
+are the required UI target. AuthenticatedWindow now uses the admitted
+[Modern workbench cluster](../upstream/vscode-ports/modern-workbench.json): inset
+navigation and content surfaces, shared canvas, default/compact seams, fixed
+section sizing, and a narrow navigation disclosure. Profile, Sessions, and Settings
+use the contained layout and inset scrollable content. The compact account
+trigger sits in the right titlebar action area before native window controls,
+preceded by a sidebar toggle with synchronized icons and device-local restoration.
+The native macOS account popup remains outside clipped part surfaces.
+
+Real Chromium verification covers all four themes, both densities, exposed/shared
+edges, RTL, fixed sidebar sizing, constrained 200%-equivalent dimensions, focus restoration,
+and repeated layout. macOS computer-use comparison covers the running Insiders
+shell and the native Proctor profile/session surfaces and account popup. Proctor
+uses its own semantic colors, fixed product topology and account content; it does
+not claim pixel identity with the editor. Windows native chrome/forced-color and
+screen-reader release verification remain with the design-system owner.
+CandidateWindow's presentation migration remains outstanding; LaunchWindow keeps
+its accepted centered composition.
+
 ## Desktop implementation state
 
 The repository now contains a source-level Desktop application graph rather than

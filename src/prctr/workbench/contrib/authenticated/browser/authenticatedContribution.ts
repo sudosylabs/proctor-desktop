@@ -1,3 +1,6 @@
+import type { AccountMenuClient } from '../../../../platform/account/common/accountMenu.js';
+import type { AccountClient } from '../../../../platform/account/common/accountProtocol.js';
+import { activateAccountShellNavigation, accountShellMessages } from './accountShellNavigation.js';
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
@@ -17,6 +20,8 @@ import {
 import './authenticatedContribution.css';
 
 export interface AuthenticatedRendererClient {
+	readonly accountMenu?: AccountMenuClient;
+	readonly account?: AccountClient;
 	signOut(): Promise<void>;
 	close(): Promise<void>;
 }
@@ -77,13 +82,15 @@ const messages = Object.freeze({
 });
 
 export function createAuthenticatedContribution(
-	client: AuthenticatedRendererClient
+	client: AuthenticatedRendererClient,
+	accountManaged = false
 ): WorkbenchContributionRegistration {
 	return Object.freeze({
 		id: 'prctr.authenticated.navigation' as const,
 		phase: 'ready' as const,
 		dependencies: Object.freeze(['prctr.workbench.desktop' as const]),
 		messages: Object.freeze([
+			...Object.values(accountShellMessages),
 			...Object.values(destinationMessages),
 			...Object.values(messages)
 		] as MessageDescriptor[]),
@@ -93,6 +100,10 @@ export function createAuthenticatedContribution(
 				throw new Error(
 					'Authenticated contribution requires its privileged window binding'
 				);
+			if (accountManaged) {
+				activateAccountShellNavigation(context, client, descriptor);
+				return;
+			}
 			const navigation = context.document.createElement('div');
 			navigation.className = 'prctr-authenticated';
 			navigation.dataset.region = 'navigation';
@@ -149,7 +160,7 @@ export function createAuthenticatedContribution(
 					].join(' ');
 				} else status.textContent = context.localization.format(messages.waiting);
 				page.dataset.destination = safe;
-				page.hidden = safe === 'settings';
+				page.hidden = safe === 'settings' || (safe === 'account' && accountManaged);
 				destinationChange.fire(safe);
 			};
 			const navigationService: AuthenticatedNavigationService = Object.freeze({
@@ -187,7 +198,8 @@ export function createAuthenticatedContribution(
 			actionStatus.dataset.region = 'action-status';
 			actionStatus.role = 'status';
 			actionStatus.setAttribute('aria-live', 'polite');
-			context.shell.part('titlebar').prepend(signOut, actionStatus);
+			if (accountManaged) navigation.append(signOut, actionStatus);
+			else context.shell.part('titlebar').prepend(signOut, actionStatus);
 			context.disposables.add({
 				dispose: () => {
 					signOut.remove();

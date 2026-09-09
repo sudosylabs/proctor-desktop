@@ -6,6 +6,7 @@
 
 @layer workbench {
 	.prctr-product-window-chrome {
+		container: product-window-titlebar / inline-size;
 		align-items: center;
 		background: var(--prctr-color-background-canvas);
 		block-size: var(--prctr-product-titlebar-height);
@@ -20,12 +21,18 @@
 	}
 
 	.prctr-product-window-chrome
-		> :not(
+		> :where(:not(
 			.prctr-product-window-chrome__drag-region,
 			.prctr-product-window-chrome__controls-inset
-		) {
+		)) {
 		position: relative;
 		z-index: 1;
+		-webkit-app-region: drag;
+	}
+
+	/* Only interactive controls exclude native titlebar hit testing. */
+	.prctr-product-window-chrome :is(button, a, input, select, textarea),
+	.prctr-product-window-chrome .prctr-product-window-chrome__actions {
 		-webkit-app-region: no-drag;
 	}
 
@@ -92,5 +99,32 @@
 	.prctr-product-window-chrome[data-fullscreen='true']
 		.prctr-product-window-chrome__controls-inset {
 		display: none;
+	}
+
+	/* Match the right-side titlebar toolbar: center controls vertically, keep
+	 * native control reservations outside the interactive action container. */
+	.prctr-product-window-chrome .prctr-product-window-chrome__actions {
+		display: flex;
+		align-items: center;
+		block-size: 100%;
+		min-inline-size: 0;
+		flex: 0 1 auto;
+		order: 0;
+		padding-right: 4px;
+	}
+	.prctr-product-window-chrome .prctr-product-window-chrome__actions:empty {
+		display: none;
+	}
+	.prctr-product-window-chrome .prctr-product-window-chrome__actions:not(:empty) {
+		margin-left: auto;
+	}
+	.prctr-product-window-chrome[data-chrome-platform='darwin'] .prctr-product-window-chrome__actions {
+		margin-right: 8px;
+	}
+	.prctr-product-window-chrome[data-controls-location='right']:has(.prctr-product-window-chrome__actions:not(:empty)) .prctr-product-window-chrome__controls-inset {
+		margin-left: 0;
+	}
+	.prctr-product-window-chrome[data-controls-location='left'][data-content-direction='rtl']:has(.prctr-product-window-chrome__actions:not(:empty)) .prctr-product-window-chrome__controls-inset {
+		margin-right: 0;
 	}
 }

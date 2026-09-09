@@ -9,6 +9,11 @@ const authenticatedWorkbenchManifest = Object.freeze({
 	id: 'prctr.workbench.authenticated',
 	contributions: Object.freeze([
 		Object.freeze({
+			id: 'prctr.authenticated.account' as const,
+			phase: 'ready' as const,
+			dependencies: Object.freeze(['prctr.authenticated.navigation' as const])
+		}),
+		Object.freeze({
 			id: 'prctr.authenticated.navigation' as const,
 			phase: 'ready' as const,
 			dependencies: Object.freeze(['prctr.workbench.desktop' as const])
@@ -19,7 +24,7 @@ const authenticatedWorkbenchManifest = Object.freeze({
 			dependencies: Object.freeze(['prctr.authenticated.navigation' as const])
 		})
 	]),
-	itemTypes: Object.freeze(['prctr.authenticated.page']),
+	itemTypes: Object.freeze(['prctr.authenticated.page', 'prctr.authenticated.account']),
 	destinations: Object.freeze(['activity', 'account', 'settings'])
 });
 
@@ -29,10 +34,11 @@ export const authenticatedComposition = composeWorkbench(
 	[commonWorkbenchManifest, electronDesktopManifest, authenticatedWorkbenchManifest],
 	{
 		parts: commonParts,
-		maxContentGroups: 2,
-		allowHorizontalSplit: true,
-		allowVerticalSplit: true,
+		maxContentGroups: 1,
+		allowHorizontalSplit: false,
+		allowVerticalSplit: false,
 		sidebarInitiallyVisible: true,
+		allowRegionResize: false,
 		panelInitiallyVisible: false
 	},
 	{ entrypointRestorable: true, scope: 'principalComposition', restoreItems: true }

@@ -36,4 +36,8 @@
 	.prctr-authenticated[data-region='page'] h2 {
 		margin: 0;
 	}
+
+	.prctr-authenticated[hidden] {
+		display: none;
+	}
 }

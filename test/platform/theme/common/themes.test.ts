@@ -60,6 +60,8 @@ void test('theme foregrounds meet ordinary text contrast against their canvases'
 void test('compact density uses explicit scale mappings without changing hit-area tokens', () => {
 	assert.deepStrictEqual(getDensityTokenOverrides('default'), {});
 	assert.deepStrictEqual(getDensityTokenOverrides('compact'), {
+		'spacing.workbench.gap': '0px',
+		'spacing.workbench.rowInset': '2px',
 		'spacing.control.inline': '6px',
 		'spacing.control.block': '4px',
 		'spacing.content.medium': '6px',

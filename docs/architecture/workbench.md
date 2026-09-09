@@ -41,6 +41,43 @@ affiliations are non-exclusive; the server projects all available areas and each
 operation reauthorizes its actual Action and Resource. Entering CandidateWindow
 still closes the entire AuthenticatedWindow regardless of those responsibilities.
 
+## Own-account destination
+
+The titlebar displays Proctor. A compact account trigger on the right of the
+titlebar shows the user's photo and display name. It sits before right-side
+native window controls, using the chrome owner's reserved control space. At
+constrained widths it retains the avatar and accessible full name. A sidebar
+visibility toggle precedes the account trigger and uses the visible/hidden
+Codicon for the sidebar’s physical side. The shell owns actual visibility and
+notifies the control after responsive layout and navigation changes. Explicit
+choices persist as the non-sensitive device-scoped `prctr.authenticated.layout`
+category (schema 1), owned by authenticated navigation and cleared with local
+application data. Responsive hiding never overwrites that choice. Its menu
+contains Profile, Sessions, Settings, then a separated Log out action. macOS uses an Electron
+native popup so the OS owns material, selection, accessibility and dismissal;
+other platforms use the window-owned menu control. The native capability accepts
+only a bounded anchor and returns a closed action identifier, with sender
+validation and window-disposal cancellation. It cannot execute arbitrary commands
+or accept a renderer-defined menu tree.
+
+Account hosts Profile (including security) and Sessions & devices through one
+registered WorkbenchItem resolver and cancellable pane. Profile-photo reads,
+uploads, and removals use the signed-in User and exact image revision. Other
+presentation fields use the server’s administrative User management operation;
+the own-account destination presents them read-only. Account data is
+window-session state and is never restored as authoritative data.
+
+A capability specific to AuthenticatedWindow binds every read or action to its
+immutable Principal and Session. The privileged identity owner supplies DPoP
+proof and refresh; the renderer receives whitelisted account metadata. Passwords,
+MFA enrollment, and recovery stay on the pinned server's hosted security page.
+That browser session does not renew the desktop session's authentication assurance.
+
+Ending a session or revoking a desktop requires an explicit confirmation.
+Revoking the current desktop uses the same immediate window teardown and protected
+credential cleanup as sign-out, with server revocation already confirmed.
+Unknown mutation outcomes require a fresh read before another attempt.
+
 ## Authenticated product areas
 
 The student activity area derives these user-facing categories from the
@@ -119,6 +156,11 @@ update, branding, or cloud services through aggregate entrypoints.
 
 ## Shell topology
 
+The shell uses the accepted
+[Modern UI floating-panel composition](./design-system.md#modern-ui-and-floating-panels).
+That decision governs region surfaces, gutters, shared edges, internal insets,
+and coordinated layout sizing; the parts below retain their domain ownership.
+
 Every workbench uses these structural regions:
 
 - `TitlebarPart` owns window identity and trusted global window actions.
@@ -132,6 +174,12 @@ Every workbench uses these structural regions:
 
 `AuthenticatedWindow` configures these regions for its current authorized
 areas. Account/settings use ordinary destinations inside that composition.
+Its sections use fixed sizing with a single content group and no resize handles
+or split actions. Native titlebar dragging, double-click behavior and window-edge
+resizing remain available. At constrained viewport widths the sidebar becomes a
+titlebar disclosure, giving the active content the available width and restoring
+focus when a destination is chosen. The product sidebar destination list scrolls independently. Floating gutters and borders reduce each original
+grid slot once before the pane host measures its inner content.
 
 `CandidateWindow` additionally exposes a `PanelPart` for the policy-gated
 remote terminal. Candidate navigation initially has `Workspace` and `Exam

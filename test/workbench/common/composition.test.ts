@@ -23,6 +23,7 @@ test('composition validates static topology and freezes the result', () => {
 			allowHorizontalSplit: true,
 			allowVerticalSplit: false,
 			sidebarInitiallyVisible: false,
+			allowRegionResize: true,
 			panelInitiallyVisible: false
 		},
 		{ entrypointRestorable: true, restoreItems: true, scope: 'principalComposition' }
@@ -39,6 +40,7 @@ test('composition rejects late dependencies, cycles, duplicate registrations and
 		allowHorizontalSplit: false,
 		allowVerticalSplit: false,
 		sidebarInitiallyVisible: false,
+		allowRegionResize: true,
 		panelInitiallyVisible: false
 	};
 	assert.throws(

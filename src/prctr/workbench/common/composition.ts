@@ -24,6 +24,7 @@ export interface WorkbenchCompositionFragment {
 export interface WorkbenchLayoutPolicy {
 	readonly parts: readonly WorkbenchPart[];
 	readonly maxContentGroups: number;
+	readonly allowRegionResize: boolean;
 	readonly allowHorizontalSplit: boolean;
 	readonly allowVerticalSplit: boolean;
 	readonly sidebarInitiallyVisible: boolean;

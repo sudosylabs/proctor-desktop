@@ -1,3 +1,5 @@
+import { createAccountContribution } from '../../workbench/contrib/account/browser/accountContribution.js';
+import type { AccountClient } from '../../platform/account/common/accountProtocol.js';
 import type { AuthenticatedWindowDescriptor } from '../../platform/windows/common/windowProtocol.js';
 import type { ProductWindowChromeClient } from '../../platform/windows/common/windowChrome.js';
 import { bootstrapWorkbench } from '../../workbench/browser/bootstrap.js';
@@ -15,6 +17,7 @@ interface AuthenticatedPreloadApi extends AuthenticatedRendererClient {
 	bootstrap(): Promise<AuthenticatedWindowDescriptor>;
 	readonly windowChrome: ProductWindowChromeClient;
 	readonly settings: SettingsRendererClient;
+	readonly account: AccountClient;
 }
 const api = (globalThis as unknown as { readonly proctorAuthenticated?: AuthenticatedPreloadApi })
 	.proctorAuthenticated;
@@ -22,7 +25,8 @@ if (api === undefined) throw new Error('Authenticated preload API is unavailable
 const authenticatedWindow = await bootstrapWorkbench(document, authenticatedComposition, [
 	...commonWorkbenchContributions,
 	createDesktopWorkbenchContribution('authenticated', () => api.bootstrap(), api.windowChrome),
-	createAuthenticatedContribution(api),
+	createAuthenticatedContribution(api, true),
+	createAccountContribution(api.account),
 	createSettingsContribution(api.settings)
 ]);
 globalThis.addEventListener('pagehide', () => authenticatedWindow.disposables.dispose(), {

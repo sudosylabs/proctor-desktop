@@ -12,6 +12,21 @@ export interface DesignTokenDefinition<Id extends string = string> {
 }
 
 const tokenDefinitions = [
+	{
+		id: 'spacing.workbench.gutter',
+		kind: 'dimension',
+		description: 'Floating workbench perimeter gutter in both densities.'
+	},
+	{
+		id: 'spacing.workbench.gap',
+		kind: 'dimension',
+		description: 'Gap between floating workbench parts.'
+	},
+	{
+		id: 'spacing.workbench.rowInset',
+		kind: 'dimension',
+		description: 'Inset of workbench row boxes from the pane edge.'
+	},
 	{ id: 'color.background.canvas', kind: 'color', description: 'Window canvas.' },
 	{ id: 'color.background.surface', kind: 'color', description: 'Primary contained surface.' },
 	{ id: 'color.background.raised', kind: 'color', description: 'Raised contained surface.' },

@@ -4,6 +4,9 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port electron-window-skeleton
 
+import { AccountMenuIpcBridge } from '../../account/electron-main/accountMenuIpc.js';
+import { createElectronAccountMenu } from '../../account/electron-main/electronAccountMenu.js';
+
 import {
 	app,
 	BrowserWindow,
@@ -14,6 +17,7 @@ import {
 	type IpcMainInvokeEvent,
 	type WebContents
 } from 'electron';
+import { AccountIpcBridge, type AccountService } from '../../account/electron-main/accountIpc.js';
 import { release } from 'node:os';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
@@ -57,6 +61,7 @@ export interface ElectronProductWindowFactoryOptions extends ElectronProductWind
 	readonly runtimeIconPath?: string;
 	readonly ipc?: Pick<typeof ipcMain, 'handle' | 'removeHandler'>;
 	readonly launchIdentity?: DesktopIdentityCoordinator;
+	readonly account?: AccountService;
 	readonly windowChromeEnvironment?: ElectronWindowChromeEnvironment;
 }
 
@@ -207,7 +212,8 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 				onTerminated,
 				this.#options.ipc ?? ipcMain,
 				chromeEnvironment,
-				this.#options.launchIdentity
+				this.#options.launchIdentity,
+				this.#options.account
 			);
 			void window.loadFile(rendererPath).catch(() => {
 				managed.terminate('loadFailed');
@@ -230,6 +236,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 	#destroyed = false;
 	#launchIdentityBridge: LaunchIdentityIpcBridge | undefined;
 	#windowChromeBridge: ElectronWindowChromeBridge | undefined;
+	#accountBridge: AccountIpcBridge | undefined;
+	#accountMenuBridge: AccountMenuIpcBridge | undefined;
 	#launchMenu: { dispose(): void } | undefined;
 
 	constructor(
@@ -242,7 +250,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		private readonly onTerminated: (reason: ProductWindowTerminationReason) => void,
 		private readonly ipc: Pick<typeof ipcMain, 'handle' | 'removeHandler'>,
 		chromeEnvironment: ElectronWindowChromeEnvironment,
-		launchIdentity?: DesktopIdentityCoordinator
+		launchIdentity?: DesktopIdentityCoordinator,
+		account?: AccountService
 	) {
 		this.#window = window;
 		this.descriptor = descriptor;
@@ -282,6 +291,10 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 					window.webContents,
 					launchIdentity
 				);
+			if (descriptor.kind === 'authenticated' && chromeEnvironment.platform === 'darwin')
+				this.#accountMenuBridge = new AccountMenuIpcBridge(ipc, createElectronAccountMenu(window, descriptor, chromeEnvironment.locale), authorize);
+			if (descriptor.kind === 'authenticated' && account)
+				this.#accountBridge = new AccountIpcBridge(ipc, descriptor, account, authorize);
 			window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
 			const initialUrl = pathToFileURL(rendererPath).href;
 			let initialNavigation = true;
@@ -319,6 +332,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 			for (const disposable of [
 				this.#launchMenu,
 				this.#launchIdentityBridge,
+				this.#accountBridge,
+				this.#accountMenuBridge,
 				this.#windowChromeBridge
 			]) {
 				try {
@@ -388,6 +403,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		for (const disposable of [
 			this.#launchMenu,
 			this.#launchIdentityBridge,
+				this.#accountBridge,
+				this.#accountMenuBridge,
 			this.#windowChromeBridge
 		]) {
 			try {

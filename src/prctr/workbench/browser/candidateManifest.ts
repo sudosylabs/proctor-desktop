@@ -48,6 +48,7 @@ export const candidateComposition = composeWorkbench(
 		allowHorizontalSplit: true,
 		allowVerticalSplit: true,
 		sidebarInitiallyVisible: true,
+		allowRegionResize: true,
 		panelInitiallyVisible: true
 	},
 	{ entrypointRestorable: false, scope: 'attemptPresentation', restoreItems: true }

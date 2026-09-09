@@ -133,6 +133,22 @@ export function productWindowChromeFixture(host: HTMLElement): ControlFixtureRes
 					chrome.element.dataset.contentDirection !== variant.direction
 				)
 					throw new Error(`Window chrome fixture lost ${variant.id} geometry`);
+				const title = document.createElement('span');
+				title.textContent = 'Proctor';
+				const action = document.createElement('button');
+				action.textContent = 'Navigation';
+				chrome.element.append(title, action);
+				if (
+					getComputedStyle(chrome.element).getPropertyValue('-webkit-app-region') !==
+						'drag' ||
+					getComputedStyle(title).getPropertyValue('-webkit-app-region') !== 'drag' ||
+					getComputedStyle(action).getPropertyValue('-webkit-app-region') !== 'no-drag'
+				)
+					throw new Error(
+						`Window chrome fixture lost ${variant.id} native drag/control regions`
+					);
+				title.remove();
+				action.remove();
 				fullscreenListeners.get(variant.id)?.(true);
 				const inset = chrome.element.querySelector<HTMLElement>(
 					'.prctr-product-window-chrome__controls-inset'
@@ -145,6 +161,33 @@ export function productWindowChromeFixture(host: HTMLElement): ControlFixtureRes
 					throw new Error(`Window chrome fixture lost ${variant.id} fullscreen state`);
 				fullscreenListeners.get(variant.id)?.(false);
 				verifyControlInsetGeometry(chrome, variant);
+				// A titlebar account action must remain beside native controls in both
+				// text directions; it cannot move the controls away from their OS edge.
+				const account = document.createElement('button');
+				account.textContent = 'Account';
+				account.style.cssText = 'width:72px;height:24px;flex-shrink:0';
+				chrome.actions.append(account);
+				chrome.element.style.inlineSize = '640px';
+				verifyControlInsetGeometry(chrome, variant);
+				const actionBounds = account.getBoundingClientRect();
+				const controlsBounds = inset.getBoundingClientRect();
+				const titlebarBounds = chrome.element.getBoundingClientRect();
+				if (
+					Math.abs(
+						(actionBounds.top + actionBounds.bottom) / 2 -
+							(titlebarBounds.top + titlebarBounds.bottom) / 2
+					) > 1 ||
+					(variant.configuration.controlsLocation === 'right'
+						? actionBounds.right > controlsBounds.left
+						: actionBounds.left < controlsBounds.right) ||
+					actionBounds.left < titlebarBounds.left + titlebarBounds.width / 2 ||
+					getComputedStyle(account).getPropertyValue('-webkit-app-region') !== 'no-drag'
+				)
+					throw new Error(
+						`Window chrome ${variant.id} misplaced its interactive titlebar action`
+					);
+				account.remove();
+				chrome.element.style.inlineSize = '160px';
 			}
 
 			for (const theme of [

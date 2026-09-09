@@ -244,6 +244,8 @@ native/Cargo.lock
 /src/prctr/platform/windows/common/windowCoordinator.ts
 /src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts
 /src/prctr/platform/windows/electron-main/electronWindowChrome.ts
+/src/prctr/workbench/browser/floatingPanels.css
+/src/prctr/workbench/browser/floatingPanels.ts
 /src/prctr/workbench/browser/paneHost.ts
 /src/prctr/workbench/browser/parts/notifications/media/notificationActionbar.css
 /src/prctr/workbench/browser/parts/notifications/media/notificationButton.css

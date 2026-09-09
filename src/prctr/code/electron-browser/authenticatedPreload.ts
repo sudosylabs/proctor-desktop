@@ -1,3 +1,13 @@
+import {
+	ACCOUNT_MENU_CHANNEL,
+	validateAccountMenuAnchor,
+	validateAccountMenuAction
+} from '../../platform/account/common/accountMenu.js';
+import {
+	ACCOUNT_CHANNEL,
+	validateAccountIntent,
+	validateAccountResponse
+} from '../../platform/account/common/accountProtocol.js';
 import { contextBridge, ipcRenderer } from 'electron';
 import {
 	AUTHENTICATED_SETTINGS_CHANNELS,
@@ -40,6 +50,24 @@ contextBridge.exposeInMainWorld(
 			ipcRenderer.invoke(WINDOW_CHANNELS.authenticated.intent, {
 				kind: 'authenticated.close'
 			}),
+		accountMenu:
+			process.platform === 'darwin'
+				? Object.freeze({
+						show: async (anchor: unknown) =>
+							validateAccountMenuAction(
+								await ipcRenderer.invoke(
+									ACCOUNT_MENU_CHANNEL,
+									validateAccountMenuAnchor(anchor)
+								)
+							)
+					})
+				: undefined,
+		account: Object.freeze({
+			request: async (intent: unknown) =>
+				validateAccountResponse(
+					await ipcRenderer.invoke(ACCOUNT_CHANNEL, validateAccountIntent(intent))
+				)
+		}),
 		settings: Object.freeze({
 			projection: async () =>
 				validateUserSettingsProjection(

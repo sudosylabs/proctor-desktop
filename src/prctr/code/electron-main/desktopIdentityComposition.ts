@@ -23,7 +23,7 @@ import {
 
 export interface DesktopIdentityCompositionOptions {
 	readonly target: DesktopReleaseTarget;
-	readonly window: Omit<ElectronProductWindowFactoryOptions, 'launchIdentity'>;
+	readonly window: Omit<ElectronProductWindowFactoryOptions, 'launchIdentity' | 'account'>;
 	readonly nativeKeyModule: string;
 	readonly callbackBrandingDirectory: string;
 	readonly stateDirectory: string;
@@ -89,7 +89,11 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 			void shutdown().then(options.onExit);
 		};
 		windows = new ProductWindowCoordinator(
-			new ElectronProductWindowFactory({ ...options.window, launchIdentity: identity }),
+			new ElectronProductWindowFactory({
+				...options.window,
+				launchIdentity: identity,
+				account: authorization
+			}),
 			{
 				accept: (_descriptor, intent) => {
 					if (shutdownPromise) return;

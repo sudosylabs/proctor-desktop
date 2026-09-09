@@ -21,6 +21,9 @@ export interface ResolvedTheme {
 }
 
 const foundations = {
+	'spacing.workbench.gutter': '4px',
+	'spacing.workbench.gap': '4px',
+	'spacing.workbench.rowInset': '4px',
 	'typography.font.application': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 	'typography.font.monospace':
 		'ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace',
@@ -269,6 +272,8 @@ export function getDensityTokenOverrides(
 ): Readonly<Partial<Record<DesignTokenId, string>>> {
 	if (density === 'default') return Object.freeze({});
 	return Object.freeze({
+		'spacing.workbench.gap': '0px',
+		'spacing.workbench.rowInset': '2px',
 		'spacing.control.inline': '6px',
 		'spacing.control.block': '4px',
 		'spacing.content.medium': '6px',

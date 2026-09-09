@@ -1,0 +1,384 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "modern-workbench",
+  "admission": {
+    "workflow": "Restructure the complete AuthenticatedWindow presentation around Modern UI floating surfaces, coordinated geometry, density seams and contribution-owned insets.",
+    "callers": ["src/prctr/workbench/browser/workbenchShell.ts"],
+    "interface": "src/prctr/workbench/browser/floatingPanels.ts",
+    "decision": "docs/architecture/design-system.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Canonical MIT license.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/media/floatingPanels.css",
+      "upstreamBlob": "4f692abc60fb240e268237aa25f1f0e452cec4fe",
+      "category": "style",
+      "disposition": "adapted",
+      "rationale": "Preserve default/perimeter margins, rail seams, border-box cards, compact gradient edge/corner painting and centered sashes for the fixed admitted topology.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/workbench/browser/floatingPanels.css",
+      "localSha256": "1540d578e9c2a923c38dc0b14dd4736e65c35d9229de788cd279eae7d84e07f5",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/layout/browser/layoutService.ts",
+      "upstreamBlob": "6f4e681591b21dd1a7c713081aa889d9d5989a17",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Project the admitted fixed topology into the same exposed-edge state. Border-box Grid applies margin/border subtraction once; PaneHost measures the remaining content.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/workbench/browser/floatingPanels.ts",
+      "localSha256": "882549eb2dd8561a0890149d49ef6d849e4e6ad1ca5757e004eb101819f9f41a",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/layout.ts",
+      "upstreamBlob": "75f9238fd751f183b9d3dfca93f7b42483f1f9aa",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Visibility and layout invalidation; immutable Proctor compositions replace arbitrary positioning.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/part.ts",
+      "upstreamBlob": "059221692f5d6e38cd29b945d0898dd82d6e97ac",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Part title height and border-box content sizing.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/parts/paneCompositePart.ts",
+      "upstreamBlob": "28cde3b0a37e78c50b52b7b6c246da0051c48571",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Original grid dimension retention, inset subtraction, exposed-edge updates and relayout.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/parts/editor/editorPart.ts",
+      "upstreamBlob": "10e9454faa804aaa12b89704521b44b31f0ed747",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Editor border and floating content dimension coordination.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/parts/activitybar/activitybarPart.ts",
+      "upstreamBlob": "ce66e90c1952bdfe887d3c413a13e4730d6d7333",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Rail lane width, overflow, and shared-border ownership.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/layout/test/browser/layoutService.test.ts",
+      "upstreamBlob": "5199d2f99b6fec926c73966a6be51f4a64f24c41",
+      "category": "test",
+      "disposition": "evidence-only",
+      "rationale": "Outer ownership, density, visibility and margin behavior compared with production-shell browser tests.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/test/browser/modernUI.contribution.test.ts",
+      "upstreamBlob": "2ccf411fe14183f2ea973b8bd50a63372f67d927",
+      "category": "test",
+      "disposition": "evidence-only",
+      "rationale": "Density activation, part titles, rail seams, compact corners and sash-grip behavior.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/modernUI.contribution.ts",
+      "upstreamBlob": "3fd55793b50cec68fcb3c4e1364a3b3cb8735d30",
+      "category": "registration",
+      "disposition": "evidence-only",
+      "rationale": "Inspect all Modern UI modules and relayout activation. Proctor enables presentation at authenticated shell construction using its existing theme density; no upstream experiment or settings menu is imported.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/editorBorder.css",
+      "upstreamBlob": "c266a499e8fc990781f13c4ad14586648b8c5817",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: editorBorder. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/sashHandles.css",
+      "upstreamBlob": "2a8c06b80a1f9a3de7aa34526a6b349f75a568a7",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: sashHandles. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/roundedCorners.css",
+      "upstreamBlob": "61a5f5406dc7bf3b1b1cb2f6ddd35d3527d65464",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: roundedCorners. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/paneHeaders.css",
+      "upstreamBlob": "9fbd8306450eeb1efec71fe6c35e80c02cb46184",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: paneHeaders. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/fontRamp.css",
+      "upstreamBlob": "a1a8fc73898ba4c4b173943f092e277b9cbf56d3",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: fontRamp. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/padding.css",
+      "upstreamBlob": "4ce0e17f930210db7172d192920e812c669c5d77",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: padding. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/statusBar.css",
+      "upstreamBlob": "86e42ec687d4e3e6779a5f8828080d4e4488f052",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: statusBar. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/titlebar.css",
+      "upstreamBlob": "abe7dd5157ac615f0105fa643c00dbda35459817",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: titlebar. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/keyboardFocusOnly.css",
+      "upstreamBlob": "6b8ad6793c189f715865ea9c9a712066845a0ff8",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: keyboardFocusOnly. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/shadows.css",
+      "upstreamBlob": "d89e7dd0cc7f08df63cf3be12a6d16f6bd09587f",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: shadows. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/notificationsDialogs.css",
+      "upstreamBlob": "dafd2d8db21d5b07d628aa345c26417a7037c752",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: notificationsDialogs. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/activityBar.css",
+      "upstreamBlob": "9b9f5846634a784d5b6d79cf024daf884e71e6d1",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: activityBar. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/tabs.css",
+      "upstreamBlob": "728f40291c757e2489c9ac4ff3550f1880cafdd6",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: tabs. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/commandCenter.css",
+      "upstreamBlob": "91903274a6315b0c03fa47dd3ac473f6fc6b3927",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Review applicable module closure: commandCenter. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/sessions/browser/media/workbench.css",
+      "upstreamBlob": "30af118490c20726cf84dbaf0a529bdd0bb40b3c",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Compare Agents continuous background, inset part hierarchy and sidebar composition. Its chat/navigation products are not transferred.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/sessions/browser/media/style.css",
+      "upstreamBlob": "ab343c2293eed3cb76afc366dc14f692161aa3c7",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Compare Agents continuous background, inset part hierarchy and sidebar composition. Its chat/navigation products are not transferred.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/sessions/browser/parts/media/sidebarPart.css",
+      "upstreamBlob": "a2efe1dfdccfd1b568763f5fa0815c3749717e55",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Compare Agents continuous background, inset part hierarchy and sidebar composition. Its chat/navigation products are not transferred.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/ui/grid/grid.ts",
+      "upstreamBlob": "ce9a849430057ef929868869f3d78df75abb00aa",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Arbitrary docking/splits and persisted grid topology conflict with the existing immutable Proctor composition. CSS Grid preserves fixed AuthenticatedWindow sections and responsive reflow; user-requested fixed sizing excludes resize handles and content splits in this composition.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/webview/browser/overlayWebview.ts",
+      "upstreamBlob": "ad4e4e14cf36137685dd56ba56fe5e530a464a47",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Authenticated account/settings contain no overlay webviews. Candidate integrated browser stays with its separate privileged capability and migration.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/ui/sash/sash.css",
+      "upstreamBlob": "52419ac7d454939c41423b960c0d021cdc3df669",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Pointer hit region and active/hover highlight; local shell retains accessible keyboard separator, pointer capture, cancellation, Home and double-click reset.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/actions/layoutActions.ts",
+      "upstreamBlob": "f7b82f298f70692bf964532691a0f27f414af7c6",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Use the primary sidebar toggle action and its filled/outline left/right Codicons as evidence. Proctor keeps its fixed product sidebar, explicit local layout restoration, native action slot and shell-owned responsive visibility; no arbitrary docking or auxiliary sidebar commands are imported.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "shell-composition",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/common/composition.ts",
+      "rationale": "Existing workbench-kernel interface owns fixed regions, visibility, layout lifecycle, focus and composition-controlled resizing. AuthenticatedWindow disables region resizing. Compatible input state; no imported upstream service graph."
+    },
+    {
+      "id": "semantic-tokens",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/common/tokens.ts",
+      "rationale": "Existing theme service supplies four themes, semantic gap/gutter/inset tokens, density and preference lifecycle."
+    },
+    {
+      "id": "pane-measurement",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/browser/paneHost.ts",
+      "rationale": "Existing ResizeObserver measures the allocated inner content box and delegates dimensions through WorkbenchPane.layout."
+    },
+    {
+      "id": "browser-layout",
+      "kind": "platform-interface",
+      "reference": "CSS Grid, border-box sizing, ResizeObserver, MutationObserver and DOM pointer capture",
+      "rationale": "Browser layout preserves intrinsic reflow and subtracts insets before pane measurement; shell disposes observations and active drags."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "fixed-product-topology",
+      "summary": "Proctor retains its admitted fixed navigation/context sidebar/content topology and optional bottom panel. No arbitrary docking, auxiliary editor windows, extension views, agent panes, webviews or experiment settings are imported. AuthenticatedWindow is migrated here; Candidate and Launch behavior are preserved.",
+      "localPaths": [
+        "src/prctr/workbench/browser/workbenchShell.ts",
+        "src/prctr/workbench/browser/floatingPanels.ts",
+        "src/prctr/workbench/browser/floatingPanels.css"
+      ],
+      "verificationRefs": ["browser-layout", "composition-check"]
+    },
+    {
+      "id": "intrinsic-layout-adapter",
+      "summary": "CSS Grid and border-box apply floating margins/borders to each original grid slot before PaneHost measurement. This replaces upstream imperative grid dimension subtraction without losing density/seam/visibility geometry. At constrained width, product navigation has a focus-safe titlebar disclosure instead of squeezing account pages.",
+      "localPaths": [
+        "src/prctr/workbench/browser/workbenchShell.ts",
+        "src/prctr/workbench/browser/floatingPanels.ts"
+      ],
+      "verificationRefs": ["browser-layout"]
+    },
+    {
+      "id": "product-surfaces",
+      "summary": "Profile, Sessions and Settings remain Proctor-owned account pages. Their shell surface uses the semantic contained surface, their content shares one inset rhythm, custom scrollbars are 8px, and the bottom account menu remains a native macOS popup. No new user object editing or remote action is introduced.",
+      "localPaths": [
+        "src/prctr/workbench/contrib/account/browser/account.css",
+        "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.css",
+        "src/prctr/workbench/contrib/settings/browser/settingsContribution.css"
+      ],
+      "verificationRefs": ["browser-layout", "account-browser", "manual-comparison"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "browser-layout",
+      "kind": "test",
+      "path": "test/browser/modernWorkbenchTests.ts",
+      "obligation": "All themes, default/compact gaps, perimeter and corner painting, single rail seams, hidden sidebar, fixed section sizing without resize handles, RTL, narrow 200%-equivalent viewport, focus restoration and no repeated inset shrinkage."
+    },
+    {
+      "id": "account-browser",
+      "kind": "test",
+      "path": "test/browser/accountTests.ts",
+      "obligation": "Account loading, mutation confirmation/cancellation, focus, disposal and constrained-width profile behavior through production pane."
+    },
+    {
+      "id": "composition-check",
+      "kind": "check",
+      "path": "build/policies/compositions.json",
+      "obligation": "No new privileged capabilities, arbitrary imports, experiment or agent products."
+    },
+    {
+      "id": "manual-comparison",
+      "kind": "review",
+      "path": "docs/project/status.md",
+      "obligation": "Compare running VS Code Insiders with rebuilt native AuthenticatedWindow. Record unavailable platform/screen-reader release evidence without claiming pixel identity."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "review",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Resolve every source blob at the pinned revision and inspect adapted differences."
+    }
+  ]
+}

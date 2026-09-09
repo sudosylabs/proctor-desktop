@@ -19,6 +19,8 @@ import {
 } from '../common/windowChrome.js';
 import './productWindowChrome.css';
 
+export const PRODUCT_WINDOW_CHROME_SERVICE = 'prctr.window.chrome';
+
 export type ProductWindowChromeThemeService = Pick<
 	BrowserThemeService,
 	'theme' | 'forcedColorsActive' | 'onDidChangeTheme' | 'onDidChangePresentation'
@@ -26,6 +28,7 @@ export type ProductWindowChromeThemeService = Pick<
 
 export class ProductWindowChrome extends Disposable {
 	readonly element: HTMLElement;
+	readonly actions: HTMLElement;
 	readonly configuration: ProductWindowChromeConfiguration;
 	readonly #client: ProductWindowChromeClient;
 	readonly #themeService: ProductWindowChromeThemeService;
@@ -77,6 +80,9 @@ export class ProductWindowChrome extends Disposable {
 	) {
 		super();
 		this.element = host;
+		this.actions = host.ownerDocument.createElement('div');
+		this.actions.className = 'prctr-product-window-chrome__actions';
+		this.#ownedElements.push(this.actions);
 		this.#client = client;
 		this.#themeService = themeService;
 		this.configuration = configuration;
@@ -114,6 +120,7 @@ export class ProductWindowChrome extends Disposable {
 		}
 		this.#ownedElements.push(dragRegion, controlsInset);
 		host.prepend(dragRegion);
+		host.append(this.actions);
 		if (configuration.controlsLocation === 'left') host.prepend(controlsInset);
 		else host.append(controlsInset);
 		this._register(

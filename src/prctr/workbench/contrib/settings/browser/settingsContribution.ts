@@ -1,3 +1,5 @@
+import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
+import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { defineMessage, type MessageDescriptor } from '../../../../base/common/localization.js';
 import type {
@@ -29,6 +31,11 @@ export interface SettingsRendererClient {
 	onDidChange(listener: (projection: UserSettingsProjection) => void): () => void;
 }
 const messages = Object.freeze({
+	loadFailed: defineMessage({
+		id: 'settings.status.load.failed',
+		defaultMessage: 'Settings are unavailable. Close and reopen the window to try again.',
+		description: 'Settings backend failed before a document could be loaded.'
+	}),
 	heading: defineMessage({
 		id: 'settings.page.heading',
 		defaultMessage: 'Settings',
@@ -240,6 +247,7 @@ export function createSettingsContribution(
 			page.hidden = navigation.current !== 'settings';
 			const heading = context.document.createElement('h1');
 			heading.textContent = context.localization.format(messages.heading);
+			heading.tabIndex = -1;
 			const status = context.document.createElement('p');
 			status.role = 'status';
 			status.tabIndex = -1;
@@ -267,7 +275,30 @@ export function createSettingsContribution(
 			const save = button(context.document, context.localization.format(messages.save));
 			const cancel = button(context.document, context.localization.format(messages.cancel));
 			actions.append(save, cancel);
-			page.append(heading, status, switcher, structured, source, actions);
+			const content = context.document.createElement('div');
+			content.className = 'prctr-settings__content';
+			content.append(heading, status, switcher, structured, source, actions);
+			const viewport = context.document.createElement('div');
+			viewport.className = 'prctr-settings__viewport';
+			viewport.append(content);
+			const scroll = context.disposables.add(
+				new DomScrollableElement(viewport, {
+					className: 'prctr-settings__scroll',
+					vertical: ScrollbarVisibility.Auto,
+					horizontal: ScrollbarVisibility.Hidden,
+					verticalScrollbarSize: 8,
+					useShadows: false
+				})
+			);
+			page.append(scroll.getDomNode());
+			const resize = new ResizeObserver(() => scroll.scanDomNode());
+			resize.observe(viewport);
+			resize.observe(content);
+			context.disposables.add({ dispose: () => resize.disconnect() });
+			context.disposables.add(
+				addDisposableListener(viewport, 'focusin', () => scroll.scanDomNode())
+			);
+			save.dataset.variant = 'primary';
 			context.shell.part('content').append(page);
 			context.disposables.add({ dispose: () => page.remove() });
 			let projectionEventEpoch = 0;
@@ -278,7 +309,26 @@ export function createSettingsContribution(
 			};
 			const disposeProjection = client.onDidChange((next) => projectionHandler(next));
 			context.disposables.add({ dispose: disposeProjection });
-			const snapshot = await client.projection();
+			let snapshot: UserSettingsProjection;
+			try {
+				snapshot = await client.projection();
+			} catch {
+				status.textContent = context.localization.format(messages.loadFailed);
+				switcher.hidden = true;
+				structured.hidden = true;
+				source.hidden = true;
+				actions.hidden = true;
+				context.disposables.add(
+					navigation.onDidChange((destination) => {
+						page.hidden = destination !== 'settings';
+						if (!page.hidden) {
+							scroll.scanDomNode();
+							heading.focus();
+						}
+					})
+				);
+				return;
+			}
 			const initialLiveProjection = bufferedProjection;
 			bufferedProjection = undefined;
 			let projection = initialLiveProjection ?? snapshot;
@@ -291,6 +341,14 @@ export function createSettingsContribution(
 			let previewSuppressed = false;
 			let previewOperationEpoch = 0;
 			let commitInFlight = false;
+			let pendingEdits = 0;
+			let disposed = false;
+			context.disposables.add({
+				dispose: () => {
+					disposed = true;
+					draft.dispose();
+				}
+			});
 			const presentStatus = (
 				descriptor: MessageDescriptor,
 				values?: Record<string, string | number>
@@ -364,7 +422,12 @@ export function createSettingsContribution(
 					HTMLInputElement | HTMLSelectElement
 				>('input, select'))
 					control.disabled = !editable;
-				save.disabled = !editable || diagnostics.length > 0 || blockedByConflict;
+				save.disabled =
+					!editable ||
+					pendingEdits > 0 ||
+					diagnostics.length > 0 ||
+					blockedByConflict ||
+					structured.querySelector('[aria-invalid="true"]') !== null;
 				cancel.disabled = commitInFlight || draft.source === projection.source;
 				if (!projection.writable) presentStatus(messages.readonly);
 				else if (diagnostics.length > 0)
@@ -403,17 +466,32 @@ export function createSettingsContribution(
 					control.dataset.settingId = declaration.id;
 					control.disabled = !projection.writable || commitInFlight;
 					control.addEventListener('change', () => {
-						try {
-							draft.set(declaration.id, readControl(control, declaration.type));
-							control.removeAttribute('aria-invalid');
-							blockedByConflict = false;
-							previewSuppressed = false;
+						void (async () => {
+							const editingDraft = draft;
+							const value = readControl(control, declaration.type);
+							pendingEdits++;
+							let failed = false;
 							refreshValidation();
-						} catch {
-							control.setAttribute('aria-invalid', 'true');
-							save.disabled = true;
-							presentStatus(messages.invalid, { count: 1 });
-						}
+							try {
+								await editingDraft.set(declaration.id, value);
+								if (disposed || editingDraft !== draft) return;
+								control.removeAttribute('aria-invalid');
+								blockedByConflict = false;
+								previewSuppressed = false;
+								refreshValidation();
+							} catch {
+								failed = true;
+								if (!disposed && editingDraft === draft)
+									control.setAttribute('aria-invalid', 'true');
+							} finally {
+								pendingEdits--;
+								if (!disposed) {
+									refreshValidation();
+									if (failed && editingDraft === draft)
+										presentStatus(messages.invalid, { count: 1 });
+								}
+							}
+						})();
 					});
 					row.append(title, description, control);
 					structured.append(row);
@@ -434,6 +512,7 @@ export function createSettingsContribution(
 				projection = next;
 				acknowledgedPresentation = next.presentation;
 				applyPresentation(next);
+				draft.dispose();
 				draft = new SettingsDraft(next.source, next.revision);
 				blockedByConflict = false;
 				pendingIntent = undefined;
@@ -464,6 +543,7 @@ export function createSettingsContribution(
 				if (merge.merged !== undefined) {
 					const mergedDraft = new SettingsDraft(next.source, next.revision);
 					mergedDraft.replaceSource(merge.merged);
+					draft.dispose();
 					draft = mergedDraft;
 					blockedByConflict = false;
 					renderStructured();
@@ -493,6 +573,10 @@ export function createSettingsContribution(
 			context.disposables.add(
 				navigation.onDidChange((destination) => {
 					page.hidden = destination !== 'settings';
+					if (!page.hidden) {
+						scroll.scanDomNode();
+						heading.focus();
+					}
 					synchronizePreview();
 				})
 			);
@@ -571,6 +655,7 @@ export function createSettingsContribution(
 										projection.revision
 									);
 									next.replaceSource(merge.merged);
+									draft.dispose();
 									draft = next;
 									blockedByConflict = false;
 									renderStructured();

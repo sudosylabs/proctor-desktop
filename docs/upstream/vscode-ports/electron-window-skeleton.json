@@ -59,7 +59,7 @@
       "rationale": "Preserve VS Code's hidden-titlebar BrowserWindow topology: macOS keeps native traffic lights, Windows and Linux use the native Window Controls Overlay, frame suppression remains platform-specific, and CandidateWindow retains its separate control-free security posture.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "5c67e85c12182f03d7cc357ba81db378ea993c2e0db4e53c849b6b327c107212",
+      "localSha256": "da5f27d280a307d792d0ac2a8098d89fdcfb131f15fb3cbaedd653d58a25e81d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -98,7 +98,7 @@
       "rationale": "Preserve renderer-to-main theme, modal-dimming, and zoom-aware titlebar updates, forced-color synchronization, disposal fencing, and the macOS first-title workaround while replacing VS Code service decorators and general workbench title services with Proctor's closed chrome client and browser theme service.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/browser/productWindowChrome.ts",
-      "localSha256": "8f6ca2447ce8387ab3c3e0373a5efaf64e4c634333f6fe58a6b5c0b8e083e4ec",
+      "localSha256": "66fe73695b01e8dd91da14d0465f775e350522d0ef6a073f4b5b605ecc92a328",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -122,7 +122,7 @@
       "rationale": "Preserve the renderer-owned drag region, native-control exclusion space, no-drag interactive descendants, the fixed zoom-aware Windows control width, and Linux Window Controls Overlay environment-variable geometry under Proctor-owned selectors and semantic tokens.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/browser/productWindowChrome.css",
-      "localSha256": "44c99c389b9dae3c468fef347bc5c7652884242a98da34289ba650c2ed491eb6",
+      "localSha256": "be7c5cefcd179ee01e4964169da709961d0cecf840c40968043b91ea71b42f56",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -145,6 +145,22 @@
       "rationale": "Retain main-owned window creation, close control, and destruction ordering behind Proctor's three fixed window kinds and trusted transition contract.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/common/windowCoordinator.ts"
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/contextmenu/electron-browser/contextmenuService.ts",
+      "upstreamBlob": "c99f5309eeae4989066bd93732769fefb45f8633",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Native account popup evidence: Electron Menu.popup owns OS material, selection, keyboard and dismissal. Proctor uses a fixed, sender-bound local adapter; generic menu trees, telemetry and arbitrary action registration are outside the account capability.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/parts/contextmenu/electron-main/contextmenu.ts",
+      "upstreamBlob": "988c43285f1420da469caa6cb4d71414f7e6f3d8",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Native account popup evidence: Electron Menu.popup owns OS material, selection, keyboard and dismissal. Proctor uses a fixed, sender-bound local adapter; generic menu trees, telemetry and arbitrary action registration are outside the account capability.",
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
@@ -185,6 +201,12 @@
       "kind": "local-interface",
       "reference": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts",
       "rationale": "Proctor-owned signed-out menu adapter uses Electron roles and native dialogs directly. It owns localized bounded diagnostics, guarded exit, focus activation, and deterministic menu cleanup without importing the VS Code menubar subsystem."
+    },
+    {
+      "id": "native-account-menu",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/account/common/accountMenu.ts",
+      "rationale": "The fixed account menu accepts bounded placement and returns only an account destination or logout. Its main adapter owns native popup lifetime and sender revalidation."
     }
   ],
   "divergences": [
