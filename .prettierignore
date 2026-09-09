@@ -264,6 +264,8 @@ native/Cargo.lock
 /src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts
 /src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts
 /src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.ts
+/src/prctr/workbench/node/desktopAuthCallbackPage.css
+/src/prctr/workbench/node/desktopAuthCallbackPage.ts
 /src/prctr/workbench/services/actions/common/proctorActions.ts
 /src/prctr/workbench/services/commands/common/commandService.ts
 /src/prctr/workbench/services/executionEnvironment/common/remoteTerminalModel.ts

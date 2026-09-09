@@ -7,6 +7,14 @@ import type { CancellationToken } from '../../../base/common/cancellation.js';
 import type { IDisposable } from '../../../base/common/lifecycle.js';
 import { DesktopAuthorizationError } from './desktopAuthorizationError.js';
 
+/** Trusted, localized HTML supplied by the owning presentation composition. */
+export interface LoopbackCallbackPages {
+	readonly received: string;
+	readonly invalid: string;
+	readonly expired: string;
+	readonly styleHash: string;
+}
+
 /** Exact, single-use callback owned by one privileged authorization transaction. */
 export class LoopbackAuthServer {
 	readonly #server: Server;
@@ -23,7 +31,7 @@ export class LoopbackAuthServer {
 
 	private constructor(
 		private readonly state: string,
-		private readonly responseText: string
+		private readonly pages: LoopbackCallbackPages
 	) {
 		this.#result = new Promise<string>((resolve, reject) => {
 			this.#resolve = resolve;
@@ -34,11 +42,11 @@ export class LoopbackAuthServer {
 		this.#server = createServer(
 			{ maxHeaderSize: 8192, requestTimeout: 10000, headersTimeout: 10000 },
 			(request, response) => {
-				const finish = (status: number, text = ''): void => {
+				const finish = (status: number, text = this.pages.invalid): void => {
 					response.writeHead(status, {
-						'Content-Type': 'text/plain; charset=utf-8',
+						'Content-Type': 'text/html; charset=utf-8',
 						'Cache-Control': 'no-store',
-						'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
+						'Content-Security-Policy': `default-src 'none'; style-src 'sha256-${this.pages.styleHash}'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`,
 						'Referrer-Policy': 'no-referrer',
 						'X-Content-Type-Options': 'nosniff',
 						Connection: 'close'
@@ -46,7 +54,7 @@ export class LoopbackAuthServer {
 					response.end(text);
 				};
 				if (!this.#callbackURL || this.#settled || this.#stopped) {
-					finish(410);
+					finish(410, this.pages.expired);
 					return;
 				}
 				if (request.method !== 'GET') {
@@ -91,7 +99,7 @@ export class LoopbackAuthServer {
 					return;
 				}
 				this.#settled = true;
-				finish(200, this.responseText);
+				finish(200, this.pages.received);
 				this.#resolve(code[0]!);
 			}
 		);
@@ -102,20 +110,23 @@ export class LoopbackAuthServer {
 
 	static async start(
 		state: string,
-		responseText: string,
+		pages: LoopbackCallbackPages,
 		token: CancellationToken,
 		timeoutMs = 300000
 	): Promise<LoopbackAuthServer> {
 		if (
 			!/^[A-Za-z0-9_-]{43}$/.test(state) ||
-			responseText.length > 1024 ||
+			[pages.received, pages.invalid, pages.expired].some(
+				(page) => typeof page !== 'string' || Buffer.byteLength(page) > 131072
+			) ||
+			!/^[A-Za-z0-9+/]{43}=$/.test(pages.styleHash) ||
 			!Number.isSafeInteger(timeoutMs) ||
 			timeoutMs < 1 ||
 			timeoutMs > 300000
 		)
 			throw new TypeError('Invalid callback configuration');
 		if (token.isCancellationRequested) throw new DesktopAuthorizationError('cancelled');
-		const owner = new LoopbackAuthServer(state, responseText);
+		const owner = new LoopbackAuthServer(state, Object.freeze({ ...pages }));
 		owner.#cancellation = token.onCancellationRequested(() => owner.#fail('cancelled'));
 		owner.#deadline = setTimeout(() => owner.#fail('timedOut'), timeoutMs);
 		try {

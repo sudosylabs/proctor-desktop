@@ -1,0 +1,71 @@
+/*---------------------------------------------------------------------------------------------
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License. See docs/upstream/licenses/vscode-MIT.txt.
+ *--------------------------------------------------------------------------------------------*/
+/* @proctor-vscode-port desktop-authorization */
+
+@layer workbench {
+	.prctr-auth-callback {
+		margin: 0;
+		color: var(--prctr-color-text-primary);
+		background: var(--prctr-color-background-canvas);
+		font-family: var(--prctr-typography-font-application);
+	}
+
+	.prctr-auth-callback .prctr-auth-callback__container {
+		box-sizing: border-box;
+		min-block-size: 100svh;
+		padding: var(--prctr-spacing-region);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+
+	.prctr-auth-callback .prctr-auth-callback__content {
+		max-inline-size: 40rem;
+		min-inline-size: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.prctr-auth-callback .prctr-auth-callback__icon-container {
+		margin-block-end: var(--prctr-spacing-region);
+	}
+
+	.prctr-auth-callback .prctr-auth-callback__icon {
+		inline-size: min(240px, 100%);
+		block-size: auto;
+	}
+
+	.prctr-auth-callback .prctr-auth-callback__title {
+		font-size: var(--prctr-typography-heading-large-size);
+		line-height: var(--prctr-typography-heading-large-lineHeight);
+		font-weight: var(--prctr-typography-weight-regular);
+		margin: 0 0 var(--prctr-spacing-content-large);
+	}
+
+	.prctr-auth-callback .prctr-auth-callback__subtitle {
+		font-size: var(--prctr-typography-content-body-size);
+		line-height: var(--prctr-typography-content-body-lineHeight);
+		color: var(--prctr-color-text-secondary);
+		margin: 0 0 var(--prctr-spacing-region);
+	}
+
+	.prctr-auth-callback .prctr-auth-callback__detail {
+		font-size: var(--prctr-typography-body-size);
+		line-height: var(--prctr-typography-body-lineHeight);
+		color: var(--prctr-color-text-secondary);
+		margin: 0;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-auth-callback {
+			background: Canvas;
+			color: CanvasText;
+		}
+		.prctr-auth-callback .prctr-auth-callback__subtitle,
+		.prctr-auth-callback .prctr-auth-callback__detail {
+			color: CanvasText;
+		}
+	}
+}

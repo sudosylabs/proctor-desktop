@@ -52,6 +52,7 @@ await Promise.all([
 		entryPoints: { main: 'src/prctr/code/electron-main/desktopDevelopmentMain.ts' },
 		external: ['electron', 'electron/main'],
 		format: 'esm',
+		loader: { '.css': 'text' },
 		outdir,
 		platform: 'node',
 		target: nodeTarget,
@@ -88,3 +89,11 @@ writeFileSync(
 		main: 'main.js'
 	}) + '\n'
 );
+
+for (const appearance of ['dark', 'light']) {
+	const name = `proctor-lockup-vertical-25d-${appearance}.svg`;
+	cpSync(
+		repositoryPath(`resources/branding/source/lockup/${name}`),
+		join(outdir, 'branding', name)
+	);
+}

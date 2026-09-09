@@ -1,3 +1,8 @@
+import {
+	createDesktopAuthCallbackPages,
+	callbackPageMessages
+} from '../../src/prctr/workbench/node/desktopAuthCallbackPage.js';
+import { createLocalization } from '../../src/prctr/base/common/localization.js';
 import { acquireDesktopInstanceLock } from '../../src/prctr/platform/identity/electron-main/desktopInstanceLock.js';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -150,7 +155,13 @@ if (probe) {
 						keys,
 						credentials,
 						http,
-						callbackMessage: 'Return to Proctor.',
+						callbackPages: createDesktopAuthCallbackPages(
+							createLocalization({
+								requestedLocale: 'en',
+								messages: Object.values(callbackPageMessages)
+							}),
+							join(root, 'branding')
+						),
 						async openBrowser() {
 							browserOpens++;
 							const callback = new URL(String(started.callback_url));

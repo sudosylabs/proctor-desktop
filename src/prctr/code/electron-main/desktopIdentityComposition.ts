@@ -14,17 +14,18 @@ import {
 	ElectronProductWindowFactory,
 	type ElectronProductWindowFactoryOptions
 } from '../../platform/windows/electron-main/electronProductWindowFactory.js';
-import { createLocalization, defineMessage } from '../../base/common/localization.js';
+import { createLocalization } from '../../base/common/localization.js';
 
-const callback = defineMessage({
-	id: 'identity.callback.return',
-	defaultMessage: 'Return to Proctor to finish signing in. You can close this tab.',
-	description: 'Plain-text loopback response; never echoes authorization parameters.'
-});
+import {
+	callbackPageMessages,
+	createDesktopAuthCallbackPages
+} from '../../workbench/node/desktopAuthCallbackPage.js';
+
 export interface DesktopIdentityCompositionOptions {
 	readonly target: DesktopReleaseTarget;
 	readonly window: Omit<ElectronProductWindowFactoryOptions, 'launchIdentity'>;
 	readonly nativeKeyModule: string;
+	readonly callbackBrandingDirectory: string;
 	readonly stateDirectory: string;
 	readonly allowDevelopmentLoopback: boolean;
 	readonly locale: string;
@@ -41,7 +42,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 	try {
 		const localization = createLocalization({
 			requestedLocale: options.locale,
-			messages: [callback],
+			messages: Object.values(callbackPageMessages),
 			catalogs: []
 		});
 		let windows: ProductWindowCoordinator;
@@ -52,7 +53,10 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				credentials: new OsDesktopCredentialStore(join(options.stateDirectory, 'identity')),
 				http: new DesktopAuthHttp(),
 				openBrowser: async (url) => shell.openExternal(url),
-				callbackMessage: localization.format(callback),
+				callbackPages: createDesktopAuthCallbackPages(
+					localization,
+					options.callbackBrandingDirectory
+				),
 				onAuthenticated: async (identity) => {
 					windows.completeSignIn({
 						protocolVersion: 1,

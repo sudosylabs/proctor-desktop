@@ -335,11 +335,53 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
     },
-    "identity.callback.return": {
-      "message": "Return to Proctor to finish signing in. You can close this tab.",
-      "description": "Plain-text loopback response; never echoes authorization parameters.",
+    "identity.callback.expired.subtitle": {
+      "message": "Return to Proctor to check your sign-in.",
+      "description": "The app owns the final Session outcome, including a completed sign-in.",
       "placeholders": [],
-      "source": "src/prctr/code/electron-main/desktopIdentityComposition.ts"
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.expired.title": {
+      "message": "This sign-in link is no longer active",
+      "description": "An already consumed callback cannot be used again.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.invalid.subtitle": {
+      "message": "This sign-in link could not be verified.",
+      "description": "Safe callback failure, without echoing input.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.invalid.title": {
+      "message": "Unable to continue",
+      "description": "Invalid sign-in callback heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.received.detail": {
+      "message": "You can close this tab.",
+      "description": "No more browser interaction is needed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.received.subtitle": {
+      "message": "Your browser step is complete.",
+      "description": "The browser has delivered the one-use callback to Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.received.title": {
+      "message": "Continue in Proctor",
+      "description": "Callback received; Desktop still verifies the Session.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.retry.detail": {
+      "message": "Return to Proctor and sign in again.",
+      "description": "Fresh interactive sign-in is required.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
     },
     "launch.auth.unavailable": {
       "message": "Sign-in is not available in this build.",

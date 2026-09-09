@@ -26,7 +26,7 @@
       "upstreamBlob": "45dca93e2d0a6541c14523fcc8e54e9002e0eee2",
       "category": "source",
       "disposition": "behaviorally-reimplemented",
-      "rationale": "Retains ephemeral IPv4 binding, asynchronous start/result/stop, startup deadline and state-bound callback lifecycle. Proctor requires a random exact single route, constant-time independent state validation, one-use completion, cancellation, bounded requests/connections and idempotent bounded shutdown. GitHub signin redirect, arbitrary static files, portable environment and custom VS Code activation are explicitly excluded.",
+      "rationale": "Retains ephemeral IPv4 binding, asynchronous start/result/stop, startup deadline and state-bound callback lifecycle. Proctor requires a random exact single route, constant-time independent state validation, one-use completion, cancellation, bounded requests/connections and idempotent bounded shutdown. GitHub signin redirect, arbitrary static-file serving, portable environment and custom VS Code activation are explicitly excluded.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/identity/node/loopbackAuthServer.ts"
     },
@@ -52,6 +52,36 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Electron main safeStorage availability/encrypt/decrypt informs OS-encrypted refresh persistence. The generic service, command-line plaintext backend, buffer JSON representation and raw error logging are excluded. Native signing custody is independent, and never serializes a private key.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/github-authentication/media/index.html",
+      "upstreamBlob": "3292e2a08fc9f152278d4e9ba9f099eb6418891d",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserves centered container/content, brand, title and subordinate message composition. Static localized HTML is rendered by the privileged owner with escaped strings and embedded assets. Callback received is distinct from verified Session completion. URL-derived product/error/redirect values, script and custom-scheme fallback are excluded by the accepted exact loopback-only flow.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/workbench/node/desktopAuthCallbackPage.ts",
+      "localSha256": "9fe8496942c95e89d200ce9048f56ab1ff2c7ed26f810011f520b2582415d5f4",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "extensions/github-authentication/media/auth.css",
+      "upstreamBlob": "6220a2fc6a12a190f33321b07766186b9f835413",
+      "category": "style",
+      "disposition": "adapted",
+      "rationale": "Preserves centered flex layout, icon-container spacing and title/subtitle/detail hierarchy using Proctor semantic typography, spacing and color tokens. Scoped selectors and min-height support document scrolling at zoom. The vertical lockup keeps its approved aspect ratio. Decorative rise/glow and Insiders palette are excluded under Proctor motion/branding policy; static content honors reduced motion. Forced colors remain available.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/workbench/node/desktopAuthCallbackPage.css",
+      "localSha256": "9d5b7cd2cf2702764516772f06d20862e80689b1c12f2289bdf8bb38b1c80dc7",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "extensions/github-authentication/media/code-icon.svg",
+      "upstreamBlob": "cc61f81ea5a24c9af2be69565c82da531788efd6",
+      "category": "asset",
+      "disposition": "excluded",
+      "rationale": "Use the approved Proctor vertical 2.5D dark/light lockups, copied unchanged into the application artifact. Microsoft visual identity does not enter the product.",
       "licenseRefs": ["vscode-mit"]
     }
   ],
@@ -92,7 +122,7 @@
   "divergences": [
     {
       "id": "proctor-hosted-contract",
-      "summary": "Server-hosted authentication method choice and explicit approval replace provider-specific extensions. Exact callback state/path, PKCE, DPoP nonce challenges and no ambiguous one-use retry strengthen the transport. There is no local static file host, signin redirect, custom protocol, provider API or copyable-code fallback.",
+      "summary": "Server-hosted authentication method choice and explicit approval replace provider-specific extensions. Exact callback state/path, PKCE, DPoP nonce challenges and no ambiguous one-use retry strengthen the transport. The completion/error document embeds its styles and brand image so assets survive listener shutdown; there is no local static file host, signin redirect, custom protocol, provider API or copyable-code fallback.",
       "localPaths": [
         "src/prctr/platform/identity/node/loopbackAuthServer.ts",
         "src/prctr/platform/identity/electron-main/desktopAuthorizationService.ts"
@@ -134,6 +164,12 @@
       "kind": "review",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Verify every pinned upstream path/blob and review declared behavior divergences."
+    },
+    {
+      "id": "callback-page",
+      "kind": "test",
+      "path": "test/platform/identity/electron-main/desktopAuthorization.test.ts",
+      "obligation": "Verify branded HTML success/failure/replay responses, exact CSP style hash, no remote assets or script, escaped localization, all themes and no callback secret reflection. Real-browser inspection covers zoom, long content and reduced motion."
     }
   ]
 }

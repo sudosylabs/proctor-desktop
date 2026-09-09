@@ -17,6 +17,7 @@ export async function buildNodeTests(
 		outbase: 'test',
 		outdir: resetBuildOutput(outputName),
 		platform: 'node',
+		loader: { '.css': 'text' },
 		sourcemap: false,
 		target: nodeTarget,
 		tsconfig

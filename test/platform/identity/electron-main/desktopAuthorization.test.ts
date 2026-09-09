@@ -1,3 +1,9 @@
+import {
+	createDesktopAuthCallbackPages,
+	callbackPageMessages
+} from '../../../../src/prctr/workbench/node/desktopAuthCallbackPage.js';
+import { createLocalization } from '../../../../src/prctr/base/common/localization.js';
+import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
@@ -23,6 +29,11 @@ import {
 import { DesktopAuthorizationError } from '../../../../src/prctr/platform/identity/node/desktopAuthorizationError.js';
 import type { StoredDesktopSession } from '../../../../src/prctr/platform/identity/node/desktopCredentialStore.js';
 
+const callbackPages = createDesktopAuthCallbackPages(
+	createLocalization({ requestedLocale: 'en', messages: Object.values(callbackPageMessages) }),
+	resolve('resources/branding/source/lockup')
+);
+
 const random = (): string => randomBytes(32).toString('base64url');
 function softwareTestKey(): DesktopSigningKey {
 	const { privateKey, publicKey } = generateKeyPairSync('ec', { namedCurve: 'prime256v1' });
@@ -36,11 +47,7 @@ function softwareTestKey(): DesktopSigningKey {
 }
 void test('callback uses an exact random loopback route, rejects duplicates, and accepts one state-bound code', async () => {
 	const state = random();
-	const listener = await LoopbackAuthServer.start(
-		state,
-		'Return to Proctor.',
-		CancellationToken.None
-	);
+	const listener = await LoopbackAuthServer.start(state, callbackPages, CancellationToken.None);
 	try {
 		const url = new URL(listener.callbackURL);
 		assert.equal(url.hostname, '127.0.0.1');
@@ -51,9 +58,20 @@ void test('callback uses an exact random loopback route, rejects duplicates, and
 		url.searchParams.set('code', code);
 		const response = await fetch(url);
 		assert.equal(response.status, 200);
-		assert.equal(await response.text(), 'Return to Proctor.');
+		assert.equal(await response.text(), callbackPages.received);
+		assert.match(response.headers.get('content-type')!, /text\/html/);
+		assert.ok(
+			response.headers
+				.get('content-security-policy')!
+				.includes(`'sha256-${callbackPages.styleHash}'`)
+		);
+		assert.equal(response.headers.get('referrer-policy'), 'no-referrer');
+		assert.ok(!callbackPages.received.includes(code));
+		assert.ok(!callbackPages.received.includes(state));
 		assert.equal(await listener.waitForCode(), code);
-		assert.equal((await fetch(url)).status, 410);
+		const reused = await fetch(url);
+		assert.equal(reused.status, 410);
+		assert.equal(await reused.text(), callbackPages.expired);
 	} finally {
 		await listener.stop();
 		await listener.stop();
@@ -61,7 +79,7 @@ void test('callback uses an exact random loopback route, rejects duplicates, and
 });
 void test('callback rejects wrong Host without consuming the transaction and rejects duplicate state terminally', async () => {
 	const state = random();
-	const listener = await LoopbackAuthServer.start(state, 'Return.', CancellationToken.None);
+	const listener = await LoopbackAuthServer.start(state, callbackPages, CancellationToken.None);
 	try {
 		assert.equal(
 			await new Promise<number>((resolve, reject) => {
@@ -82,7 +100,9 @@ void test('callback rejects wrong Host without consuming the transaction and rej
 		url.searchParams.append('state', state);
 		url.searchParams.append('state', state);
 		url.searchParams.set('code', random());
-		assert.equal((await fetch(url)).status, 400);
+		const invalid = await fetch(url);
+		assert.equal(invalid.status, 400);
+		assert.equal(await invalid.text(), callbackPages.invalid);
 		await assert.rejects(listener.waitForCode(), /callbackInvalid/);
 	} finally {
 		await listener.stop();
@@ -90,7 +110,7 @@ void test('callback rejects wrong Host without consuming the transaction and rej
 });
 void test('cancellation closes the listener and settles its result', async () => {
 	const token = new CancellationTokenSource();
-	const listener = await LoopbackAuthServer.start(random(), 'Return.', token.token);
+	const listener = await LoopbackAuthServer.start(random(), callbackPages, token.token);
 	token.cancel();
 	await assert.rejects(listener.waitForCode(), /cancelled/);
 	await listener.stop();
@@ -100,7 +120,7 @@ void test('cancellation closes the listener and settles its result', async () =>
 void test('callback deadline closes unanswered transactions', async () => {
 	const listener = await LoopbackAuthServer.start(
 		random(),
-		'Return.',
+		callbackPages,
 		CancellationToken.None,
 		25
 	);
@@ -280,7 +300,7 @@ void test('hosted authorization uses exact wire fields, persists only refresh cu
 			}
 		},
 		http,
-		callbackMessage: 'Return.',
+		callbackPages,
 		async openBrowser() {
 			const url = new URL(String(started.callback_url));
 			url.searchParams.set('state', String(started.state));
@@ -372,7 +392,7 @@ void test('nonce challenge is retried once with a fresh proof, while ambiguous r
 				}
 			},
 			http,
-			callbackMessage: 'Return.',
+			callbackPages,
 			async openBrowser() {
 				const url = new URL(String(start.callback_url));
 				url.searchParams.set('state', String(start.state));
@@ -460,7 +480,7 @@ void test('ordinary shutdown drains pending rotation and sign-out without restor
 			}
 		},
 		http,
-		callbackMessage: 'Return.',
+		callbackPages,
 		async openBrowser() {
 			const url = new URL(String(started.callback_url));
 			url.searchParams.set('state', String(started.state));
@@ -503,7 +523,11 @@ void test('ordinary shutdown drains pending rotation and sign-out without restor
 });
 
 void test('server expiry shortens the callback deadline', async () => {
-	const listener = await LoopbackAuthServer.start(random(), 'Return.', CancellationToken.None);
+	const listener = await LoopbackAuthServer.start(
+		random(),
+		callbackPages,
+		CancellationToken.None
+	);
 	listener.expireAt(Date.now() + 20);
 	await assert.rejects(listener.waitForCode(), /timedOut/);
 	await listener.stop();
@@ -547,7 +571,7 @@ void test('native custody failure stops sign-in before authorization or browser 
 			crossedBoundary = true;
 			throw Error('Unexpected request');
 		}),
-		callbackMessage: 'Return.',
+		callbackPages,
 		async openBrowser() {
 			assert.fail('Unexpected browser');
 		},
@@ -631,7 +655,7 @@ void test('sign-out preserves separate local cleanup and remote revocation outco
 				}
 			},
 			http,
-			callbackMessage: 'Return.',
+			callbackPages,
 			async openBrowser() {
 				const url = new URL(String(started.callback_url));
 				url.searchParams.set('state', String(started.state));
@@ -665,5 +689,46 @@ void test('sign-out preserves separate local cleanup and remote revocation outco
 			subscription.dispose();
 			service.dispose();
 		}
+	}
+});
+
+void test('callback presentation embeds approved branding, escapes translations and supports every theme', () => {
+	for (const theme of ['dark', 'light', 'highContrastDark', 'highContrastLight'] as const) {
+		const localization = createLocalization({
+			requestedLocale: 'en',
+			messages: Object.values(callbackPageMessages),
+			catalogs: [
+				{
+					locale: 'en',
+					direction: 'rtl',
+					messages: {
+						'identity.callback.received.title':
+							'<script>alert("secret")</script> & Continue'
+					}
+				}
+			]
+		});
+		const pages = createDesktopAuthCallbackPages(
+			localization,
+			resolve('resources/branding/source/lockup'),
+			theme
+		);
+		for (const html of [pages.received, pages.invalid, pages.expired]) {
+			assert.match(html, /<main /);
+			assert.match(html, /<h1 /);
+			assert.match(html, /<img src="data:image\/svg\+xml;base64,/);
+			assert.match(html, /width="768" height="576" alt="" aria-hidden="true"/);
+			assert.ok(html.includes(`data-prctr-theme="${theme}"`));
+			assert.ok(html.includes('dir="rtl"'));
+			assert.doesNotMatch(html, /<script|<link|<iframe|<form|https?:/);
+			const css = html.match(/<style>([\s\S]*?)<\/style>/)![1]!;
+			assert.equal(createHash('sha256').update(css).digest('base64'), pages.styleHash);
+			assert.ok(Buffer.byteLength(html) < 131072);
+		}
+		assert.ok(
+			pages.received.includes(
+				'&lt;script&gt;alert(&quot;secret&quot;)&lt;/script&gt; &amp; Continue'
+			)
+		);
 	}
 });

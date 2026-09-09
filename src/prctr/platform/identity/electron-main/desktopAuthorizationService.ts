@@ -8,7 +8,7 @@ import {
 	type AuthenticatedIdentity
 } from '../common/authenticatedIdentity.js';
 import type { DesktopReleaseTarget, VerifiedServerIdentity } from './serverReadiness.js';
-import { LoopbackAuthServer } from '../node/loopbackAuthServer.js';
+import { LoopbackAuthServer, type LoopbackCallbackPages } from '../node/loopbackAuthServer.js';
 import { DesktopAuthorizationError } from '../node/desktopAuthorizationError.js';
 import { DesktopAuthHttp, type DesktopHttpResult } from '../node/desktopAuthHttp.js';
 import {
@@ -44,7 +44,7 @@ export interface DesktopAuthorizationOptions {
 	readonly credentials: DesktopCredentialStore;
 	readonly http: DesktopAuthHttp;
 	readonly openBrowser: (url: string) => Promise<void>;
-	readonly callbackMessage: string;
+	readonly callbackPages: LoopbackCallbackPages;
 	readonly onAuthenticated: (identity: AuthenticatedIdentity) => Promise<void>;
 }
 /** Owns credentials and exchange effects in main; emitted state never contains credentials. */
@@ -184,7 +184,7 @@ export class DesktopAuthorizationService extends Disposable {
 	): Promise<DesktopTokens> {
 		const state = randomBytes(32).toString('base64url');
 		const verifier = randomBytes(32).toString('base64url');
-		const listener = await LoopbackAuthServer.start(state, this.options.callbackMessage, token);
+		const listener = await LoopbackAuthServer.start(state, this.options.callbackPages, token);
 		try {
 			const target = this.#selectors();
 			const started = await this.options.http.request(

@@ -57,6 +57,7 @@ else {
 					}
 				},
 				nativeKeyModule: join(root, 'prctr_desktop_key_custody.node'),
+				callbackBrandingDirectory: join(root, 'branding'),
 				stateDirectory: app.getPath('userData'),
 				allowDevelopmentLoopback: allowHttp,
 				locale: app.getLocale(),

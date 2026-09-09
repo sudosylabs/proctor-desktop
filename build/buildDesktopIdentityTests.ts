@@ -13,6 +13,7 @@ await build({
 	format: 'esm',
 	outdir,
 	platform: 'node',
+	loader: { '.css': 'text' },
 	target: nodeTarget,
 	tsconfig: 'build/tsconfig.electron-test.json'
 });

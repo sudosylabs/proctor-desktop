@@ -6,6 +6,7 @@
     "types": ["node"]
   },
   "include": [
+    "../src/prctr/base/browser/styleSheets.d.ts",
     "../src/prctr/base/common/thenable.d.ts",
     "../src/prctr/**/node/**/*.ts",
     "../src/prctr/**/electron-main/**/*.ts",
