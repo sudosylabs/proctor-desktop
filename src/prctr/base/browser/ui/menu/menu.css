@@ -1,5 +1,5 @@
-@layer workbench {
-	.prctr-notification-menu {
+@layer controls {
+	.prctr-menu {
 		position: absolute;
 		z-index: 2575;
 		pointer-events: auto;
@@ -10,38 +10,52 @@
 		max-inline-size: calc(100% - 16px);
 		max-block-size: calc(100% - 16px);
 		overflow: hidden auto;
-		padding: var(--prctr-spacing-content-small);
+		padding: 4px 0;
 		background: var(--prctr-color-background-raised);
 		color: var(--prctr-color-text-primary);
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
 		border-radius: var(--prctr-shape-radius-medium);
 		box-shadow: var(--prctr-elevation-overlay);
 	}
-	.prctr-notification-menu button {
+	.prctr-menu button {
 		flex: none;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		font: inherit;
+		font: var(--prctr-typography-body-size)/1 var(--prctr-typography-font-application);
 		color: inherit;
 		background: none;
 		border: 0;
 		text-align: start;
-		padding: var(--prctr-spacing-content-small) var(--prctr-spacing-content-medium);
-		min-block-size: 28px;
-		cursor: pointer;
+		padding: 0 2em;
+		min-block-size: 24px;
+		cursor: default;
 	}
-	.prctr-notification-menu button:hover,
-	.prctr-notification-menu button:focus-visible {
+	.prctr-menu button:not([aria-disabled='true']):hover,
+	.prctr-menu button:focus {
 		background: var(--prctr-color-interaction-hover);
+		outline: none;
+	}
+	.prctr-menu[data-input='keyboard'] button:focus {
 		outline: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-focus);
 		outline-offset: -1px;
 	}
-	.prctr-notification-menu button[aria-disabled='true'] {
+	.prctr-menu button[aria-disabled='true'] {
 		color: var(--prctr-color-text-disabled);
 		cursor: default;
 	}
-	.prctr-notification-menu button[aria-checked='true']::before {
+	.prctr-menu button[aria-checked='true']::before {
 		content: '✓ ';
+	}
+
+	@media (forced-colors: active) {
+		.prctr-menu button:focus {
+			outline: 1px solid Highlight;
+		}
+	}
+	.prctr-menu [role='separator'] {
+		border-block-start: var(--prctr-shape-stroke-default) solid
+			var(--prctr-color-border-default);
+		margin: 5px 0;
 	}
 }

@@ -48,11 +48,11 @@ export async function verifyNotificationPopups(
 					{
 						label: 'A longer localized notification preference that must stay on one line'
 					},
-					{ label: 'Short preference' }
+					{ label: 'Short preference', separatorBefore: true }
 				],
 				'Notification preferences'
 			);
-			const popup = frame.querySelector<HTMLElement>('.prctr-notification-menu')!;
+			const popup = frame.querySelector<HTMLElement>('.prctr-menu')!;
 			const row = popup.querySelector('button')!;
 			const bounds = popup.getBoundingClientRect();
 			assert(
@@ -70,6 +70,18 @@ export async function verifyNotificationPopups(
 						popup.querySelectorAll('button')[1]!.getBoundingClientRect().height,
 				`long and short menu labels both occupy one line at zoom ${zoom}`
 			);
+			assert(
+				popup.querySelector('[role=separator]'),
+				'menu keeps a noninteractive group separator'
+			);
+			row.focus();
+			row.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+			assert(
+				document.activeElement === popup.querySelectorAll('button')[1],
+				'keyboard navigation skips the separator'
+			);
+			row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+			assert(!menu.visible, 'Escape dismisses the menu');
 			menu.hide(false);
 		}
 		frame.style.zoom = '';
