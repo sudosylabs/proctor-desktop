@@ -178,12 +178,33 @@ with a precise compatibility result instead of changing candidate behavior.
 
 ## Module and process seams
 
-Keep static declarations, JSONC grammar, migrations, resolution, inspection,
-schema inputs, and immutable projections under
-`src/prctr/platform/settings/common/`. Keep `UserSettingsCoordinator`,
+Keep Proctor static declarations, bounded validation, migrations, trusted
+constraints, schema inputs, and immutable projections under
+`src/prctr/platform/settings/common/`. The admitted VS Code configuration
+models, registry, default/policy configuration, and resource editing service
+retain their topology under `platform/configuration/common/`. Packaged Proctor
+declarations populate that registry; remote input never registers settings.
+The typed Proctor facade delegates preference resolution to the upstream models
+and applies trusted constraints afterward.
+
+The configuration engine addresses a settings URI through a resource adapter.
+Storage selection belongs to composition and does not require replacing the
+parser, models, override resolution, inspection, change events, or queued JSONC
+editing. The editing draft supplies a working-copy adapter; explicit Save
+commits its source through the privileged owner. Changing the configured
+persistence policy requires specifying its authority and synchronization
+semantics, but not a replacement configuration engine. The current server
+authority and protected acknowledged cache remain unchanged.
+
+Keep `UserSettingsCoordinator`,
 authenticated transport, and protected cache in Electron main. Put the settings
 destination under `src/prctr/workbench/contrib/settings/` and select it through
 the authenticated manifest and `authenticated.main.ts` composition root.
+
+The current Settings destination has structured controls and a shared JSONC
+textarea. The Monaco text editor and VS Code graphical Settings editor are not
+part of this configuration-service port; their UI and text-model dependency
+graphs must be admitted before claiming that editor experience.
 
 Candidate consumers depend on an Attempt Configuration projection contract,
 not the User Settings service. Editor, design system, workbench, terminal, and

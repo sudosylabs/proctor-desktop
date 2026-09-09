@@ -37,6 +37,9 @@
     "../src/prctr/workbench/services/examSecurity/common/**/*.ts",
     "../src/prctr/platform/notification/common/**/*.ts",
     "../src/prctr/workbench/common/notifications.ts",
-    "../src/prctr/workbench/services/notification/common/**/*.ts"
+    "../src/prctr/workbench/services/notification/common/**/*.ts",
+    "../src/prctr/platform/configuration/common/**/*.ts",
+    "../src/prctr/platform/jsonschemas/common/**/*.ts",
+    "../src/prctr/platform/policy/common/**/*.ts"
   ]
 }

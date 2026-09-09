@@ -20,6 +20,8 @@ declare module 'node:assert' {
 }
 
 declare module 'node:test' {
+	export const after: (...arguments_: any[]) => any;
+	export const before: (...arguments_: any[]) => any;
 	export const afterEach: (...arguments_: any[]) => any;
 	export const beforeEach: (...arguments_: any[]) => any;
 	export const suite: any;

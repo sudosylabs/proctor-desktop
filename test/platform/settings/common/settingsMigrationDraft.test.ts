@@ -19,13 +19,14 @@ suite('Settings migration and draft', () => {
 		assert.ok(first.source.includes('"future.key": true'));
 	});
 
-	test('structured and JSONC editing share one source', () => {
+	test('structured and JSONC editing share one source', async () => {
 		const draft = new SettingsDraft('{\n  // font\n  "editor.fontSize": 14\n}', 'rev-1');
-		draft.set('editor.fontSize', 18);
+		await draft.set('editor.fontSize', 18);
 		assert.ok(draft.source.includes('// font'));
 		assert.strictEqual(draft.validation.values.get('editor.fontSize'), 18);
 		draft.replaceSource('{"editor.fontSize":16}');
 		assert.strictEqual(draft.validation.values.get('editor.fontSize'), 16);
+		draft.dispose();
 	});
 
 	test('merges disjoint known paths and makes ambiguous conflicts explicit', () => {

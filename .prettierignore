@@ -91,6 +91,7 @@ native/Cargo.lock
 /src/prctr/base/common/date.ts
 /src/prctr/base/common/decorators.ts
 /src/prctr/base/common/decorators/cancelPreviousCalls.ts
+/src/prctr/base/common/defaultAccount.ts
 /src/prctr/base/common/equals.ts
 /src/prctr/base/common/errorMessage.ts
 /src/prctr/base/common/errors.ts
@@ -124,6 +125,7 @@ native/Cargo.lock
 /src/prctr/base/common/network.ts
 /src/prctr/base/common/normalization.ts
 /src/prctr/base/common/numbers.ts
+/src/prctr/base/common/objects.ts
 /src/prctr/base/common/observable.ts
 /src/prctr/base/common/observableInternal/base.ts
 /src/prctr/base/common/observableInternal/changeTracker.ts
@@ -164,6 +166,7 @@ native/Cargo.lock
 /src/prctr/base/common/path.ts
 /src/prctr/base/common/performance.ts
 /src/prctr/base/common/platform.ts
+/src/prctr/base/common/policy.ts
 /src/prctr/base/common/process.ts
 /src/prctr/base/common/range.ts
 /src/prctr/base/common/resources.ts
@@ -174,6 +177,7 @@ native/Cargo.lock
 /src/prctr/base/common/stream.ts
 /src/prctr/base/common/strings.ts
 /src/prctr/base/common/symbols.ts
+/src/prctr/base/common/ternarySearchTree.ts
 /src/prctr/base/common/themables.ts
 /src/prctr/base/common/thenable.d.ts
 /src/prctr/base/common/types.ts
@@ -200,6 +204,11 @@ native/Cargo.lock
 /src/prctr/platform/actions/common/menu.ts
 /src/prctr/platform/actions/common/menuService.ts
 /src/prctr/platform/commands/common/commands.ts
+/src/prctr/platform/configuration/common/configuration.ts
+/src/prctr/platform/configuration/common/configurationModels.ts
+/src/prctr/platform/configuration/common/configurationRegistry.ts
+/src/prctr/platform/configuration/common/configurationService.ts
+/src/prctr/platform/configuration/common/configurations.ts
 /src/prctr/platform/contextkey/browser/contextKeyService.ts
 /src/prctr/platform/contextkey/common/contextKeyEquality.ts
 /src/prctr/platform/contextkey/common/contextkey.ts
@@ -213,6 +222,7 @@ native/Cargo.lock
 /src/prctr/platform/instantiation/common/instantiationService.ts
 /src/prctr/platform/instantiation/common/serviceCollection.ts
 /src/prctr/platform/instantiation/common/strictServiceCollection.ts
+/src/prctr/platform/jsonschemas/common/jsonContributionRegistry.ts
 /src/prctr/platform/keybinding/common/abstractKeybindingService.ts
 /src/prctr/platform/keybinding/common/baseResolvedKeybinding.ts
 /src/prctr/platform/keybinding/common/keybinding.ts
@@ -224,9 +234,8 @@ native/Cargo.lock
 /src/prctr/platform/native/common/nativeCapabilityRegistry.generated.ts
 /src/prctr/platform/native/common/nativeObservation.generated.ts
 /src/prctr/platform/notification/common/notification.ts
+/src/prctr/platform/policy/common/policy.ts
 /src/prctr/platform/registry/common/platform.ts
-/src/prctr/platform/settings/common/settingsDraft.ts
-/src/prctr/platform/settings/common/settingsResolution.ts
 /src/prctr/platform/theme/browser/semanticIcon.css
 /src/prctr/platform/theme/browser/themeService.ts
 /src/prctr/platform/theme/common/theme.ts
@@ -298,6 +307,7 @@ native/Cargo.lock
 /test/base/common/upstream/linkedText.test.ts
 /test/base/common/upstream/map.test.ts
 /test/base/common/upstream/network.test.ts
+/test/base/common/upstream/objects.test.ts
 /test/base/common/upstream/observableInternal/logging/debugger/rpc.test.ts
 /test/base/common/upstream/observables/debug.test.ts
 /test/base/common/upstream/observables/observable.test.ts
@@ -307,6 +317,7 @@ native/Cargo.lock
 /test/base/common/upstream/resources.test.ts
 /test/base/common/upstream/scrollable.test.ts
 /test/base/common/upstream/strings.test.ts
+/test/base/common/upstream/ternarySearchtree.test.ts
 /test/base/common/upstream/timeTravelScheduler.ts
 /test/base/common/upstream/types.test.ts
 /test/base/common/upstream/upstreamTestUtils.ts
@@ -346,4 +357,10 @@ native/Cargo.lock
 /test/platform/keybinding/common/upstream/keybindingResolver.test.ts
 /test/platform/keybinding/common/upstream/keybindingsTestUtils.ts
 /test/platform/registry/common/upstream/platform.test.ts
+/test/platform/settings/common/upstream/configuration.test.ts
+/test/platform/settings/common/upstream/configurationModels.test.ts
+/test/platform/settings/common/upstream/configurationRegistry.test.ts
+/test/platform/settings/common/upstream/configurationService.test.ts
+/test/platform/settings/common/upstream/configurations.test.ts
+/test/platform/settings/common/upstream/workspaceFixture.ts
 /test/workbench/common/upstream/notifications.test.ts
