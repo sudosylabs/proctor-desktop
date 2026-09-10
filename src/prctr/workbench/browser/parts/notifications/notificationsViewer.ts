@@ -183,7 +183,7 @@ export class NotificationRenderer
 		const progress = data.input.add(
 			new ProgressBar(root.parentElement!, {
 				ariaLabel: this.labels.progress,
-				progressBarBackground: 'var(--prctr-color-interaction-accent)'
+				progressBarBackground: 'var(--prctr-theme-progressBar-background)'
 			})
 		);
 		data.input.add({ dispose: () => progress.getContainer().remove() });

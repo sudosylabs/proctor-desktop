@@ -7,7 +7,7 @@
 		inset: 0;
 		pointer-events: none;
 		font: var(--prctr-typography-label-size) var(--prctr-typography-font-application);
-		color: var(--prctr-color-text-primary);
+		color: var(--prctr-theme-notifications-foreground);
 		--prctr-notification-radius-small: var(--prctr-shape-radius-medium);
 		--prctr-notification-radius-medium: 6px;
 		--prctr-notification-radius-large: var(--prctr-shape-radius-large);
@@ -33,8 +33,8 @@
 		pointer-events: auto;
 	}
 	.prctr-notifications > .notifications-center > .notifications-center-header {
-		color: var(--prctr-color-text-secondary);
-		background-color: var(--prctr-color-background-surface);
+		color: var(--prctr-theme-notificationCenterHeader-foreground);
+		background-color: var(--prctr-theme-notificationCenterHeader-background);
 	}
 	.prctr-notifications
 		> .notifications-center
@@ -54,8 +54,8 @@
 		flex-direction: column;
 		gap: var(--prctr-spacing-content-medium);
 		padding: var(--prctr-spacing-content-medium);
-		background: var(--prctr-color-background-raised);
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		background: var(--prctr-theme-notifications-background);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-theme-notifications-border, transparent);
 		border-radius: var(--prctr-shape-radius-medium);
 		box-shadow: var(--prctr-elevation-overlay);
 	}
@@ -66,7 +66,7 @@
 		background: inherit;
 		color: inherit;
 		font: inherit;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-theme-notifications-border, transparent);
 		padding: var(--prctr-spacing-content-medium);
 	}
 	.prctr-notifications .prctr-notifications__reading-actions {

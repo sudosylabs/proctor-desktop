@@ -1,7 +1,7 @@
 @layer workbench {
 	.prctr-notifications-indicator {
 		background: none;
-		color: var(--prctr-color-text-secondary);
+		color: inherit;
 		border: 0;
 		display: inline-flex;
 		align-items: center;
@@ -18,6 +18,6 @@
 		outline-offset: -1px;
 	}
 	.prctr-notifications-indicator:hover {
-		background: var(--prctr-color-interaction-hover);
+		background: var(--prctr-theme-statusBarItem-hoverBackground);
 	}
 }

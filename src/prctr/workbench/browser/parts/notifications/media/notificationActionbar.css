@@ -80,7 +80,7 @@
 
 	.prctr-notifications .prctr-action-bar.vertical .action-item .action-label.separator {
 		display: block;
-		border-bottom: 1px solid var(--prctr-color-border-default, var(--prctr-color-text-disabled));
+		border-bottom: 1px solid var(--prctr-theme-notifications-border, var(--prctr-color-text-disabled));
 		padding-top: 1px;
 		margin: 4px 0.8em;
 		width: 100%;

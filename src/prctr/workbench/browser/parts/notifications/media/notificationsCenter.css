@@ -12,7 +12,7 @@
 		bottom: 29px; /* 22px status bar height + 7px (attempt to position at same location as a toast) */
 		display: none;
 		overflow: hidden;
-		border: 1px solid var(--prctr-color-border-default);
+		border: 1px solid var(--prctr-theme-notifications-border);
 		border-radius: var(--prctr-notification-radius-small);
 		box-shadow: var(--prctr-elevation-overlay);
 	}
@@ -73,7 +73,9 @@
 		.notifications-list-container
 		.prctr-list-row:not(:last-child)
 		> .notification-list-item {
-		border-bottom: 1px solid var(--prctr-color-border-default);
+		border-bottom: 1px solid var(--prctr-theme-notifications-border);
+		background: var(--prctr-theme-notificationCenterHeader-background);
+		color: var(--prctr-theme-notificationCenterHeader-foreground);
 	}
 
 	.prctr-notifications
@@ -87,14 +89,14 @@
 	/* Icons */
 
 	.prctr-notifications > .notifications-center .codicon.codicon-error {
-		color: var(--prctr-color-feedback-error);
+		color: var(--prctr-theme-notificationsErrorIcon-foreground);
 	}
 
 	.prctr-notifications > .notifications-center .codicon.codicon-warning {
-		color: var(--prctr-color-feedback-warning);
+		color: var(--prctr-theme-notificationsWarningIcon-foreground);
 	}
 
 	.prctr-notifications > .notifications-center .codicon.codicon-info {
-		color: var(--prctr-color-feedback-info);
+		color: var(--prctr-theme-notificationsInfoIcon-foreground);
 	}
 }

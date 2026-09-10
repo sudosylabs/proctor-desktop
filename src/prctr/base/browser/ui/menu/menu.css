@@ -11,9 +11,9 @@
 		max-block-size: calc(100% - 16px);
 		overflow: hidden auto;
 		padding: 4px 0;
-		background: var(--prctr-color-background-raised);
-		color: var(--prctr-color-text-primary);
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		background: var(--prctr-theme-menu-background);
+		color: var(--prctr-theme-menu-foreground);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-theme-menu-border, transparent);
 		border-radius: var(--prctr-shape-radius-medium);
 		box-shadow: var(--prctr-elevation-overlay);
 	}
@@ -33,7 +33,8 @@
 	}
 	.prctr-menu button:not([aria-disabled='true']):hover,
 	.prctr-menu button:focus {
-		background: var(--prctr-color-interaction-hover);
+		background: var(--prctr-theme-menu-selectionBackground);
+		color: var(--prctr-theme-menu-selectionForeground);
 		outline: none;
 	}
 	.prctr-menu[data-input='keyboard'] button:focus {
@@ -55,7 +56,7 @@
 	}
 	.prctr-menu [role='separator'] {
 		border-block-start: var(--prctr-shape-stroke-default) solid
-			var(--prctr-color-border-default);
+			var(--prctr-theme-menu-separatorBackground);
 		margin: 5px 0;
 	}
 }

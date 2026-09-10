@@ -137,7 +137,7 @@
       "id": "control-explorer-real-browser",
       "kind": "test",
       "path": "test/electron/browserHarness.real.test.ts",
-      "obligation": "Verify 13 semantic states, intent-only changes, accessible invalid state, determinate/indeterminate progress, four themes, RTL, reduced motion, 200% scaling, and disposal in real Chromium."
+      "obligation": "Verify 13 semantic states, intent-only changes, accessible invalid state, determinate/indeterminate progress, four color-scheme categories, RTL, reduced motion, 200% scaling, and disposal in real Chromium."
     },
     {
       "id": "source-css-check",

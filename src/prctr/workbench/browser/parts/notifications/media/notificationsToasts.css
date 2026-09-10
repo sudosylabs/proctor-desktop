@@ -112,14 +112,14 @@
 	/* Icons */
 
 	.prctr-notifications > .notifications-toasts .codicon.codicon-error {
-		color: var(--prctr-color-feedback-error);
+		color: var(--prctr-theme-notificationsErrorIcon-foreground);
 	}
 
 	.prctr-notifications > .notifications-toasts .codicon.codicon-warning {
-		color: var(--prctr-color-feedback-warning);
+		color: var(--prctr-theme-notificationsWarningIcon-foreground);
 	}
 
 	.prctr-notifications > .notifications-toasts .codicon.codicon-info {
-		color: var(--prctr-color-feedback-info);
+		color: var(--prctr-theme-notificationsInfoIcon-foreground);
 	}
 }

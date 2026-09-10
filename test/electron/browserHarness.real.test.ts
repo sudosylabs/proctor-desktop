@@ -43,7 +43,7 @@ void test('sandboxed Chromium renderer runs deterministic browser fixtures', () 
 	assert.deepEqual(renderer, {
 		activations: '1',
 		browserOwnerTests: '117',
-		controlExplorer: '{"fixtures":5,"states":62,"interactions":75,"themes":4}',
+		controlExplorer: '{"fixtures":5,"states":62,"interactions":77,"themes":4}',
 		direction: 'rtl',
 		fixture: 'browser-harness',
 		hasNodeProcess: false,

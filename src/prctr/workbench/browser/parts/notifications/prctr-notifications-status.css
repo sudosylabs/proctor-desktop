@@ -4,7 +4,7 @@
 				--prctr-typography-label-small-lineHeight
 			)
 			var(--prctr-typography-font-application);
-		color: var(--prctr-color-text-secondary);
+		color: inherit;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;

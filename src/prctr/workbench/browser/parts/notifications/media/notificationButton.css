@@ -15,17 +15,14 @@
 		cursor: pointer;
 		justify-content: center;
 		align-items: center;
-		border: 1px solid var(--prctr-color-border-default, transparent);
+		border: 1px solid var(--prctr-theme-button-border, transparent);
 		line-height: 16px;
 		font-size: 12px;
 		overflow-wrap: normal;
 	}
 
 	.prctr-notifications .prctr-notification-text-button.secondary {
-		border-color: var(
-			--prctr-color-border-default,
-			var(--prctr-color-border-default, transparent)
-		);
+		border-color: var(--prctr-theme-button-border, transparent);
 	}
 
 	.prctr-notifications .prctr-notification-text-button.small {
@@ -140,7 +137,7 @@
 	.prctr-notifications
 		.prctr-notification-button-dropdown
 		> .prctr-notification-button.prctr-dropdown-button {
-		border: 1px solid var(--prctr-color-border-default, transparent);
+		border: 1px solid var(--prctr-theme-button-border, transparent);
 		border-left-width: 0;
 		border-radius: 0 4px 4px 0;
 		padding: 0 4px;
@@ -151,10 +148,7 @@
 	.prctr-notifications
 		.prctr-notification-button-dropdown
 		> .prctr-notification-button.prctr-dropdown-button.secondary {
-		border-color: var(
-			--prctr-color-border-default,
-			var(--prctr-color-border-default, transparent)
-		);
+		border-color: var(--prctr-theme-button-border, transparent);
 	}
 
 	.prctr-notifications
@@ -198,53 +192,53 @@
 	.prctr-notifications
 		.prctr-notification-button-dropdown.default-colors
 		> .prctr-notification-button {
-		color: var(--prctr-color-text-inverse);
-		background-color: var(--prctr-color-interaction-accent);
+		color: var(--prctr-theme-button-foreground);
+		background-color: var(--prctr-theme-button-background);
 	}
 
 	.prctr-notifications .prctr-notification-button.default-colors:hover,
 	.prctr-notifications
 		.prctr-notification-button-dropdown.default-colors
 		> .prctr-notification-button:hover {
-		background-color: var(--prctr-color-interaction-accentHover);
+		background-color: var(--prctr-theme-button-hoverBackground);
 	}
 
 	.prctr-notifications .prctr-notification-button.default-colors.secondary,
 	.prctr-notifications
 		.prctr-notification-button-dropdown.default-colors
 		> .prctr-notification-button.secondary {
-		color: var(--prctr-color-text-primary);
-		background-color: var(--prctr-color-background-raised);
+		color: var(--prctr-theme-button-secondaryForeground);
+		background-color: var(--prctr-theme-button-secondaryBackground);
 	}
 
 	.prctr-notifications .prctr-notification-button.default-colors.secondary:hover,
 	.prctr-notifications
 		.prctr-notification-button-dropdown.default-colors
 		> .prctr-notification-button.secondary:hover {
-		background-color: var(--prctr-color-interaction-hover);
+		background-color: var(--prctr-theme-button-secondaryHoverBackground);
 	}
 
 	.prctr-notifications
 		.prctr-notification-button-dropdown.default-colors
 		.prctr-notification-button-dropdown-separator {
-		background-color: var(--prctr-color-interaction-accent);
-		border-top: 1px solid var(--prctr-color-border-default);
-		border-bottom: 1px solid var(--prctr-color-border-default);
+		background-color: var(--prctr-theme-button-background);
+		border-top: 1px solid var(--prctr-theme-button-border);
+		border-bottom: 1px solid var(--prctr-theme-button-border);
 	}
 
 	.prctr-notifications
 		.prctr-notification-button-dropdown.default-colors
 		.prctr-notification-button.secondary
 		+ .prctr-notification-button-dropdown-separator {
-		background-color: var(--prctr-color-background-raised);
-		border-top-color: var(--prctr-color-border-default, var(--prctr-color-border-default));
-		border-bottom-color: var(--prctr-color-border-default, var(--prctr-color-border-default));
+		background-color: var(--prctr-theme-button-secondaryBackground);
+		border-top-color: var(--prctr-theme-button-border, var(--prctr-theme-button-border));
+		border-bottom-color: var(--prctr-theme-button-border, var(--prctr-theme-button-border));
 	}
 
 	.prctr-notifications
 		.prctr-notification-button-dropdown.default-colors
 		.prctr-notification-button-dropdown-separator
 		> div {
-		background-color: var(--prctr-color-text-inverse);
+		background-color: var(--prctr-theme-button-foreground);
 	}
 }

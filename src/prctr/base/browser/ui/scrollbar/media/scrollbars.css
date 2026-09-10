@@ -72,15 +72,15 @@
 }
 
 .prctr-scrollable-element > .scrollbar > .slider {
-	background: var(--prctr-color-scrollbar-thumb);
+	background: var(--prctr-theme-scrollbarSlider-background);
 }
 
 .prctr-scrollable-element > .scrollbar > .slider:hover {
-	background: var(--prctr-color-scrollbar-thumbHover);
+	background: var(--prctr-theme-scrollbarSlider-hoverBackground);
 }
 
 .prctr-scrollable-element > .scrollbar > .slider.active {
-	background: var(--prctr-color-scrollbar-thumbActive);
+	background: var(--prctr-theme-scrollbarSlider-activeBackground);
 }
 
 }

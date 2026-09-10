@@ -7,16 +7,16 @@
 		white-space: nowrap;
 	}
 	.prctr-notifications .notification-list-item-icon[data-severity='1'] {
-		color: var(--prctr-color-feedback-info);
+		color: var(--prctr-theme-notificationsInfoIcon-foreground);
 	}
 	.prctr-notifications .notification-list-item-icon[data-severity='2'] {
-		color: var(--prctr-color-feedback-warning);
+		color: var(--prctr-theme-notificationsWarningIcon-foreground);
 	}
 	.prctr-notifications .notification-list-item-icon[data-severity='3'] {
-		color: var(--prctr-color-feedback-error);
+		color: var(--prctr-theme-notificationsErrorIcon-foreground);
 	}
 	.prctr-notifications .prctr-action-bar .action-label {
-		color: var(--prctr-color-text-secondary);
+		color: var(--prctr-theme-icon-foreground);
 	}
 	.prctr-notifications .prctr-action-bar .action-label:hover {
 		background: var(--prctr-color-interaction-hover);

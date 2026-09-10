@@ -26,32 +26,32 @@
 		min-block-size: 40px;
 	}
 	.prctr-button[data-variant='primary'] {
-		background: var(--prctr-color-interaction-accent);
-		border-color: var(--prctr-color-interaction-accent);
-		color: var(--prctr-color-text-inverse);
+		background: var(--prctr-theme-button-background);
+		border-color: var(--prctr-theme-button-border, var(--prctr-theme-button-background));
+		color: var(--prctr-theme-button-foreground);
 	}
 	.prctr-button[data-variant='secondary'] {
-		background: var(--prctr-color-background-surface);
-		border-color: var(--prctr-color-border-default);
-		color: var(--prctr-color-text-secondary);
+		background: var(--prctr-theme-button-secondaryBackground);
+		border-color: var(--prctr-theme-button-border, transparent);
+		color: var(--prctr-theme-button-secondaryForeground);
 	}
 	.prctr-button[data-variant='danger'] {
 		background: var(--prctr-color-feedback-errorBackground);
 		border-color: var(--prctr-color-feedback-error);
 	}
 	.prctr-button:hover:not(:disabled) {
-		background-color: var(--prctr-color-interaction-hover);
+		background-color: var(--prctr-theme-button-secondaryHoverBackground);
 	}
 	.prctr-button:active:not(:disabled) {
-		background-color: var(--prctr-color-interaction-active);
+		background-color: var(--prctr-theme-button-secondaryHoverBackground);
 	}
 	.prctr-button[data-variant='primary']:hover:not(:disabled) {
-		background-color: var(--prctr-color-interaction-accentHover);
-		border-color: var(--prctr-color-interaction-accentHover);
+		background-color: var(--prctr-theme-button-hoverBackground);
+		border-color: var(--prctr-theme-button-border, var(--prctr-theme-button-hoverBackground));
 	}
 	.prctr-button[data-variant='primary']:active:not(:disabled) {
-		background-color: var(--prctr-color-interaction-accentActive);
-		border-color: var(--prctr-color-interaction-accentActive);
+		background-color: var(--prctr-theme-button-hoverBackground);
+		border-color: var(--prctr-theme-button-border, var(--prctr-theme-button-hoverBackground));
 	}
 	.prctr-button:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);

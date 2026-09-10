@@ -69,7 +69,7 @@
 		block-size: 64px;
 		flex-shrink: 0;
 		border-radius: var(--prctr-shape-radius-circle);
-		background: var(--prctr-color-background-raised);
+		background: var(--prctr-theme-input-background);
 		font-size: 28px;
 		overflow: hidden;
 	}
@@ -104,7 +104,7 @@
 	.prctr-account .prctr-account__profile-section {
 		margin-inline: 0;
 		border-block-start: var(--prctr-shape-stroke-default) solid
-			var(--prctr-color-border-default);
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default));
 		padding-block-end: var(--prctr-spacing-content-medium);
 	}
 	.prctr-account .prctr-account__fields {
@@ -129,7 +129,8 @@
 		gap: var(--prctr-spacing-region);
 		padding: var(--prctr-spacing-content-large);
 		background: transparent;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border: var(--prctr-shape-stroke-default) solid
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default));
 		border-radius: var(--prctr-shape-radius-medium);
 	}
 	.prctr-account .prctr-account__current > div {
@@ -141,14 +142,16 @@
 		white-space: nowrap;
 		font-size: var(--prctr-typography-label-size);
 		color: var(--prctr-color-text-primary);
-		background: var(--prctr-color-background-raised);
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		background: var(--prctr-theme-input-background);
+		border: var(--prctr-shape-stroke-default) solid
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default));
 		border-radius: var(--prctr-shape-radius-medium);
 		padding: var(--prctr-spacing-content-small);
 	}
 	.prctr-account .prctr-account__table {
 		inline-size: 100%;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border: var(--prctr-shape-stroke-default) solid
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default));
 		border-radius: var(--prctr-shape-radius-medium);
 		border-spacing: 0;
 		overflow: hidden;
@@ -170,7 +173,7 @@
 	}
 	.prctr-account tr + tr td {
 		border-block-start: var(--prctr-shape-stroke-default) solid
-			var(--prctr-color-border-default);
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default));
 	}
 	.prctr-account th:first-child {
 		inline-size: 44%;

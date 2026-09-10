@@ -95,6 +95,19 @@ export function notificationsFixture(host: HTMLElement): ControlFixtureResult {
 			const header = notifications.center.element.querySelector<HTMLElement>(
 				'.notifications-center-header'
 			)!;
+			frame.style.setProperty('--prctr-theme-notificationCenterHeader-background', '#112233');
+			frame.style.setProperty('--prctr-theme-notificationCenterHeader-foreground', '#abcdef');
+			assert(
+				getComputedStyle(header).backgroundColor === 'rgb(17, 34, 51)',
+				'header consumes its independent background role'
+			);
+			assert(
+				getComputedStyle(header).color === 'rgb(171, 205, 239)',
+				'header consumes its independent foreground role'
+			);
+			frame.style.removeProperty('--prctr-theme-notificationCenterHeader-background');
+			frame.style.removeProperty('--prctr-theme-notificationCenterHeader-foreground');
+			checks += 2;
 			assert(
 				header.getBoundingClientRect().height === 35,
 				'center retains the upstream 35px header'

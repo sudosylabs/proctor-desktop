@@ -8,9 +8,9 @@
 	/** Notification: Container */
 
 	.prctr-notifications .notifications-list-container {
-		color: var(--prctr-color-text-primary);
-		background: var(--prctr-color-background-surface);
-		outline-color: var(--prctr-color-border-strong);
+		color: var(--prctr-theme-notifications-foreground);
+		background: var(--prctr-theme-notifications-background);
+		outline-color: var(--prctr-theme-contrastBorder);
 	}
 
 	.prctr-notifications .notifications-list-container .notification-list-item {

@@ -43,7 +43,8 @@
 		gap: var(--prctr-spacing-content-small);
 	}
 	.prctr-settings .prctr-settings__switcher {
-		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border-block-end: var(--prctr-shape-stroke-default) solid
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default));
 		padding-block-end: var(--prctr-spacing-content-medium);
 	}
 	.prctr-settings button,
@@ -58,7 +59,8 @@
 	.prctr-settings select {
 		min-block-size: 28px;
 		padding-inline: var(--prctr-spacing-control-inline);
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border: var(--prctr-shape-stroke-default) solid
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default));
 		background: var(--prctr-color-background-canvas);
 		min-inline-size: 0;
 		max-inline-size: 100%;
@@ -72,7 +74,8 @@
 	}
 	.prctr-settings button {
 		background: transparent;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border: var(--prctr-shape-stroke-default) solid
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default));
 		min-block-size: 28px;
 		padding: var(--prctr-spacing-content-small) var(--prctr-spacing-control-inline);
 		cursor: pointer;
@@ -140,7 +143,8 @@
 	}
 	.prctr-settings .prctr-settings__source {
 		background: var(--prctr-color-editor-background);
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border: var(--prctr-shape-stroke-default) solid
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default));
 		box-sizing: border-box;
 		font-family: var(--prctr-typography-font-monospace);
 		min-block-size: 20rem;

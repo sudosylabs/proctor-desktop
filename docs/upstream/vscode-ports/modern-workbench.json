@@ -29,7 +29,7 @@
       "rationale": "Preserve default/perimeter margins, rail seams, border-box cards, compact gradient edge/corner painting and centered sashes for the fixed admitted topology.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/browser/floatingPanels.css",
-      "localSha256": "1540d578e9c2a923c38dc0b14dd4736e65c35d9229de788cd279eae7d84e07f5",
+      "localSha256": "fdd2bb52c617567dd49879aa7a1f32e9dd7b1450825b44946eb86f705376580b",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -303,7 +303,7 @@
       "id": "semantic-tokens",
       "kind": "local-interface",
       "reference": "src/prctr/platform/theme/common/tokens.ts",
-      "rationale": "Existing theme service supplies four themes, semantic gap/gutter/inset tokens, density and preference lifecycle."
+      "rationale": "Existing theme service supplies the packaged catalog and four scheme classifications, semantic gap/gutter/inset tokens, density and preference lifecycle."
     },
     {
       "id": "pane-measurement",

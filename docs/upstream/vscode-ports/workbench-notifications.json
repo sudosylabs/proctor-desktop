@@ -131,7 +131,7 @@
       "upstreamBlob": "e9e55ad9b269c71f182d568551dda088b3208fc3",
       "category": "style",
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationActionbar.css",
-      "localSha256": "9dbfaa9cf23b6f84d31d7cb5d06bbcfdde7154a6d8b674ddf23562e0cab050a8",
+      "localSha256": "135ed50fa350f2be9363b46c07c0e95b536afde6fed3c31e357a6afc2d0db2dc",
       "disposition": "adapted",
       "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
@@ -183,7 +183,7 @@
       "upstreamBlob": "f8f02ab6152b64cfb667e5c11854fbfe0fb82185",
       "category": "style",
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationButton.css",
-      "localSha256": "68e4fa2d8c050ca42198f4d1acc2e6b73267d47e9932d33623265236b7067ea4",
+      "localSha256": "5f9142740c23b2668e5d4d299bc9fc5e2bb6441dd56b4d521afe3efc6385b2d4",
       "disposition": "adapted",
       "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
@@ -430,7 +430,7 @@
       "disposition": "adapted",
       "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
-      "localSha256": "ecd81f04ce01b38773ecb1ed7739ea0ab529c7b561ab1edb6f7858fca9caa28c",
+      "localSha256": "e489b3282376fec9533a2b0a043461b391e628e45736e971aa9c0f27413ef2ae",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1204,7 +1204,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/theme/browser/themeService.ts",
-      "rationale": "Four Proctor themes and live presentation preferences replace upstream theme participants.",
+      "rationale": "The packaged color-theme engine supplies role colors and static theming participants; live presentation preferences retain their Proctor owner.",
       "licenseRefs": ["vscode-mit"]
     },
     {
@@ -1240,7 +1240,7 @@
       "upstreamBlob": "a64eda866680f7a83743b69fa9a641fab4f153e5",
       "category": "style",
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationsCenter.css",
-      "localSha256": "c86104495b372833b3752c490e6635075bc10df1f06dc241b7ddb3c9787c50c8",
+      "localSha256": "8361dee651b440f2575c8afbf9a3afbb38b93f45ca970aa9c14e61e87b465a46",
       "disposition": "adapted",
       "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
@@ -1251,7 +1251,7 @@
       "upstreamBlob": "92da46b4dca812295a3f7cb93f99c240f9f64da9",
       "category": "style",
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationsList.css",
-      "localSha256": "87511f59ddd0e90ebacc6555f7abaad75319676a8be920613a86f3b768601493",
+      "localSha256": "74cc94bde2d29bf430692980751b17ad5a3e895fab5d0f279970c97de0d98884",
       "disposition": "adapted",
       "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
@@ -1262,7 +1262,7 @@
       "upstreamBlob": "d9185ce03f9fc3f1754b2b40f32cc8461276a8d2",
       "category": "style",
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationsToasts.css",
-      "localSha256": "82f745d4e3368457187b19332eec3ebd235d62758b9085050b0f9c5a8865a5c5",
+      "localSha256": "9f596c5fd44fe848590439a7e10c83ac70723816db3767f59fe5b1217ee9f3ba",
       "disposition": "adapted",
       "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
@@ -1397,7 +1397,7 @@
       "localPath": "src/prctr/workbench/browser/parts/notifications/notificationsViewer.ts",
       "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
-      "localSha256": "59661f1b0952948f087882ce49b20974752bfc25ea2659311111f6a156ab454c",
+      "localSha256": "ccbdf0c632d8b54f4732a09363a16e36c78c30a34413f81bde50c6436b5749e4",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1464,7 +1464,7 @@
       "category": "style",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notifications.css",
-      "localSha256": "4d4917b202a2ad5deafbd079284bca3a333e36a36b266942dcc689f6c6b85fdc",
+      "localSha256": "7652c8453904511b4cbd6cc5669030b582f80543aa6aabed7bb65e585e5785c4",
       "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the notification header capitalize, label1 size, and semibold declarations, mapping only Proctor tokens; all non-notification typography selectors are excluded. The same owner stylesheet contains existing shell/reader integration.",
       "mechanicalTransforms": ["provenance-marker-insertion"]
@@ -1984,7 +1984,7 @@
       "id": "local-seam-47",
       "kind": "local-interface",
       "reference": "src/prctr/platform/theme/browser/themeService.ts",
-      "rationale": "Four Proctor themes and live presentation preferences replace upstream theme participants."
+      "rationale": "The packaged color-theme engine supplies role colors and static theming participants; live presentation preferences retain their Proctor owner."
     },
     {
       "id": "local-seam-48",
