@@ -78,6 +78,23 @@ async function run(): Promise<void> {
 	});
 	const factory = new ElectronProductWindowFactory({
 		launchIdentity,
+		settings: {
+			async readSettings() {
+				return {
+					acknowledged: {
+						source: '{"workbench.colorTheme":"GitHub Dark Dimmed"}',
+						revision: 'r'.repeat(26),
+						registryVersion: 1
+					},
+					writable: true
+				};
+			},
+			async commitSettings(_binding, request) {
+				if (request.expectedRevision !== 'r'.repeat(26))
+					throw new Error('Settings revision lost');
+				return { kind: 'success', revision: 't'.repeat(26) };
+			}
+		},
 		production: true,
 		rendererByKind: { launch: html, authenticated: html, candidate: html },
 		preloadByKind: {
@@ -183,7 +200,18 @@ async function run(): Promise<void> {
         if (!rejected) throw new Error('unchecked sign-in accepted');
         await api.identity.changeServer(); subscription.dispose(); await api.exit();
       }
-      else if (bootstrap.kind === 'authenticated') await api.joinAttempt('attempt-2');
+      else if (bootstrap.kind === 'authenticated') {
+ const initial = await api.settings.projection();
+ if (initial.presentation.theme !== 'GitHub Dark Dimmed') throw new Error('Bound settings did not load on authenticated startup');
+ const source = JSON.stringify({'workbench.colorTheme':'GitHub Light Default','workbench.colorCustomizations':{'button.background':'#123456'}});
+ await api.settings.preview({source});
+ if ((await api.settings.projection()).presentation.colorCustomizations['button.background'] !== '#123456') throw new Error('Theme preview did not cross bound settings IPC');
+ await api.settings.cancelPreview();
+ if ((await api.settings.projection()).presentation.theme !== 'GitHub Dark Dimmed') throw new Error('Theme cancel did not restore server source');
+ const saved = await api.settings.commit({source,expectedRevision:initial.revision,idempotencyKey:'settings:test'});
+ if (saved.kind !== 'success' || saved.projection.presentation.theme !== 'GitHub Light Default') throw new Error('Theme commit failed through production window binding');
+ await api.joinAttempt('attempt-2');
+ }
       else { await api.requestDeparture(); await api.browser.surface({ visible: true, focus: true, bounds: { x: -10, y: 10, width: 100000, height: 100000 } }); if (await api.browser.surfaceFocus() !== false) throw new Error('unexpected integrated browser focus'); }
       let browserSurfaceValidationRejected = false; if (bootstrap.kind === 'candidate') { try { await api.browser.surface({ visible: true, focus: false, bounds: { x: 0, y: 0, width: 10, height: 10 }, extra: true }); } catch { browserSurfaceValidationRejected = true; } }
       return { names, bootstrap, windowChrome, browserSurfaceValidationRejected, hasNodeProcess: 'process' in globalThis, hasNodeRequire: 'require' in globalThis, popupDenied: window.open('https://example.com') === null };

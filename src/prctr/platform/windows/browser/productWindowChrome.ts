@@ -5,6 +5,7 @@
 // @proctor-vscode-port electron-window-skeleton
 
 import { Disposable } from '../../../base/common/lifecycle.js';
+import { getTheme } from '../../theme/common/themes.js';
 import type { BrowserThemeService } from '../../theme/browser/themeService.js';
 import {
 	MACOS_TRAFFIC_LIGHT_INSET,
@@ -179,16 +180,22 @@ export class ProductWindowChrome extends Disposable {
 			(Number.isFinite(documentZoom) && documentZoom > 0 ? documentZoom : 1);
 		this.element.style.setProperty('--prctr-product-window-zoom-factor', String(zoomFactor));
 		const measuredHeight = Math.round(this.element.getBoundingClientRect().height);
+		const chromeTheme = resolveProductWindowChromeTheme(this.#themeService);
+		const palette = chromeTheme === this.#themeService.theme.id ? this.#themeService.theme : getTheme(chromeTheme);
 		const update: ProductWindowChromeUpdate = Object.freeze({
 			protocolVersion: 1,
-			theme: resolveProductWindowChromeTheme(this.#themeService),
+			theme: chromeTheme,
+			colors: {
+				background: palette.colors['titleBar.activeBackground'] ?? palette.values['color.background.canvas'],
+				foreground: palette.colors['titleBar.activeForeground'] ?? palette.values['color.text.primary']
+			},
 			titlebarHeight:
 				measuredHeight >= 24 && measuredHeight <= 256
 					? measuredHeight
 					: this.configuration.titlebarHeight,
 			dimmed: this.#dimmed
 		});
-		const key = `${update.theme}:${update.titlebarHeight}:${update.dimmed}:${zoomFactor}`;
+		const key = `${update.theme}:${update.titlebarHeight}:${update.dimmed}:${zoomFactor}:${JSON.stringify(update.colors)}`;
 		if (key === this.#lastRequested) return this.#tail;
 		this.#lastRequested = key;
 		const task = this.#tail.then(() => {

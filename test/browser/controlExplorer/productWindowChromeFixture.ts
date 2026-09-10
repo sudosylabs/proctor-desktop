@@ -204,10 +204,26 @@ export function productWindowChromeFixture(host: HTMLElement): ControlFixtureRes
 				}
 			}
 
-			themeService.setTheme('light');
+			themeService.setTheme('light', {
+				'titleBar.activeBackground': '#123456',
+				'titleBar.activeForeground': '#abcdef'
+			});
+			await Promise.all(chromes.map((chrome) => chrome.synchronize()));
+			for (const variant of variants) {
+				const colors = updates.get(variant.id)?.at(-1)?.colors;
+				if (colors?.background !== '#123456' || colors.foreground !== '#abcdef')
+					throw new Error('Custom title-bar colors did not reach the native adapter');
+			}
 			themeService.setForcedColors(true);
 			await Promise.all(chromes.map((chrome) => chrome.synchronize()));
 			for (const variant of variants) {
+				if (
+					updates.get(variant.id)?.at(-1)?.colors?.background !==
+					getTheme('highContrastLight').colors['titleBar.activeBackground']
+				)
+					throw new Error(
+						'Forced colors retained the custom non-contrast native palette'
+					);
 				if (updates.get(variant.id)?.at(-1)?.theme !== 'highContrastLight')
 					throw new Error('Window chrome did not synchronize forced-color light');
 			}
@@ -268,8 +284,8 @@ class FixtureThemeService extends Disposable implements ProductWindowChromeTheme
 		return this.#forcedColors;
 	}
 
-	setTheme(id: ThemeId): void {
-		this.#theme = getTheme(id);
+	setTheme(id: ThemeId, colors: Parameters<typeof getTheme>[1] = {}): void {
+		this.#theme = getTheme(id, colors);
 		this.#themeEmitter.fire(this.#theme);
 		this.#presentationEmitter.fire();
 	}

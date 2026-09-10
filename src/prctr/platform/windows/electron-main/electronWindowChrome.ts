@@ -15,6 +15,7 @@ import {
 	type ChromeCapableProductWindowKind,
 	type ProductWindowChromeConfiguration,
 	type ProductWindowChromePlatform,
+	type ProductWindowChromeColors,
 	validateProductWindowChromeUpdate
 } from '../common/windowChrome.js';
 import { WINDOW_CHROME_CHANNELS } from '../common/windowChannels.js';
@@ -22,6 +23,7 @@ import { WINDOW_CHROME_CHANNELS } from '../common/windowChannels.js';
 export type ElectronPlatform = ProductWindowChromePlatform;
 
 export interface ElectronWindowChromeTarget {
+	readonly synchronizeTheme?: (scheme: 'light' | 'dark') => void;
 	readonly window: {
 		isFullScreen(): boolean;
 		isDestroyed(): boolean;
@@ -66,7 +68,7 @@ export class ElectronWindowChromeBridge {
 	readonly #authorize: (event: IpcMainInvokeEvent) => void;
 	#disposed = false;
 	#lastUpdate:
-		| { readonly theme: ThemeId; readonly titlebarHeight: number; readonly dimmed: boolean }
+		| { readonly theme: ThemeId; readonly titlebarHeight: number; readonly dimmed: boolean; readonly colors?: ProductWindowChromeColors }
 		| undefined;
 	readonly #onDidEnterFullScreen = (): void => this.#sendFullscreen(true);
 	readonly #onDidLeaveFullScreen = (): void => this.#sendFullscreen(false);
@@ -100,7 +102,7 @@ export class ElectronWindowChromeBridge {
 			ipc.handle(this.#channels.update, (event, value: unknown) => {
 				this.#authorize(event);
 				const update = validateProductWindowChromeUpdate(value);
-				this.#apply(update.theme, update.titlebarHeight, update.dimmed);
+				this.#apply(update.theme, update.titlebarHeight, update.dimmed, update.colors);
 			});
 			handled.push(this.#channels.update);
 		} catch (error) {
@@ -146,18 +148,19 @@ export class ElectronWindowChromeBridge {
 		this.#target.contents.send(this.#channels.fullscreenChanged, fullscreen);
 	}
 
-	#apply(themeId: ThemeId, titlebarHeight: number, dimmed: boolean): void {
+	#apply(themeId: ThemeId, titlebarHeight: number, dimmed: boolean, colors?: ProductWindowChromeColors): void {
 		if (this.#disposed || this.#target.window.isDestroyed()) return;
 		if (
 			this.#lastUpdate?.theme === themeId &&
 			this.#lastUpdate.titlebarHeight === titlebarHeight &&
-			this.#lastUpdate.dimmed === dimmed
+			this.#lastUpdate.dimmed === dimmed && JSON.stringify(this.#lastUpdate.colors) === JSON.stringify(colors)
 		)
 			return;
+		this.#target.synchronizeTheme?.(getTheme(themeId).isDark ? 'dark' : 'light');
 		if (this.#configuration.mode === 'nativeOverlay') {
 			const theme = getTheme(themeId);
-			const background = theme.values['color.background.canvas'];
-			const foreground = theme.values['color.text.primary'];
+			const background = colors?.background ?? theme.values['color.background.canvas'];
+			const foreground = colors?.foreground ?? theme.colors['titleBar.activeForeground'] ?? theme.values['color.text.primary'];
 			this.#target.window.setTitleBarOverlay({
 				color: dimmed ? dimColor(background) : background,
 				symbolColor: dimmed ? dimColor(foreground) : foreground,
@@ -171,7 +174,7 @@ export class ElectronWindowChromeBridge {
 			);
 			this.#target.window.setSheetOffset(this.#configuration.titlebarHeight);
 		}
-		this.#lastUpdate = Object.freeze({ theme: themeId, titlebarHeight, dimmed });
+		this.#lastUpdate = Object.freeze({ theme: themeId, titlebarHeight, dimmed, ...(colors ? { colors } : {}) });
 	}
 }
 

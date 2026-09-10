@@ -1,3 +1,13 @@
+import { validateUserSettingsCommitIntent } from '../../settings/common/settingsRendererProtocol.js';
+import {
+	readUserSettingsWire,
+	readUserSettingsRevision,
+	type UserSettingsSessionService
+} from '../../settings/common/userSettingsSession.js';
+import type {
+	SettingsCommitRequest,
+	SettingsCommitResult
+} from '../../settings/common/userSettingsService.js';
 import type { DesktopSessionOutcome } from '../common/desktopSessionOutcome.js';
 import { createHash, randomBytes } from 'node:crypto';
 import { CancellationToken, CancellationTokenSource } from '../../../base/common/cancellation.js';
@@ -15,6 +25,7 @@ import {
 	desktopHttpMethod,
 	type DesktopHttpPath,
 	type DesktopPhotoRequest,
+	type DesktopSettingsRequest,
 	type DesktopHttpResult
 } from '../node/desktopAuthHttp.js';
 import {
@@ -451,49 +462,12 @@ export class DesktopAuthorizationService extends Disposable {
 			if (this.#refresh || session.tokens.accessExpiresAt <= Date.now() + 5000)
 				await this.refresh();
 			current();
-			const request = async (
+			const request = (
 				path: DesktopHttpPath,
 				body?: unknown,
 				photo?: DesktopPhotoRequest
-			): Promise<DesktopHttpResult> => {
-				const send = async (): Promise<DesktopHttpResult> => {
-					current();
-					const accessToken = session.tokens.accessToken;
-					const proof = await createDPoPProof(
-						session.key,
-						desktopHttpMethod(path, photo),
-						`${session.identity.origin}${path}`,
-						session.tokens.nonce,
-						accessToken
-					);
-					current();
-					const result = await this.options.http.request(
-						session.identity.origin,
-						path,
-						this.#operations.token,
-						{
-							proof,
-							credential: accessToken,
-							...(body === undefined ? {} : { body }),
-							...(photo ? { photo } : {})
-						}
-					);
-					current();
-					if (result.nonce) session.tokens = { ...session.tokens, nonce: result.nonce };
-					return result;
-				};
-				let result = await send();
-				if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce)
-					result = await send();
-				if (result.status === 401 && errorCode(result) === 'authentication.invalid_token') {
-					await this.refresh();
-					current();
-					result = await send();
-					if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce)
-						result = await send();
-				}
-				return result;
-			};
+			): Promise<DesktopHttpResult> =>
+				this.protectedRequest(session, generation, path, body, photo);
 			const failed = async (result: DesktopHttpResult): Promise<AccountResponse> => {
 				const code = errorCode(result);
 				if (result.status === 409) return { kind: 'error', reason: 'conflict' };
@@ -603,6 +577,151 @@ export class DesktopAuthorizationService extends Disposable {
 			};
 		} finally {
 			if (this.#accountMutation === operation) this.#accountMutation = undefined;
+		}
+	}
+
+	private async protectedRequest(
+		session: CurrentSession,
+		generation: number,
+		path: DesktopHttpPath,
+		body?: unknown,
+		photo?: DesktopPhotoRequest,
+		settings?: DesktopSettingsRequest
+	): Promise<DesktopHttpResult> {
+		const current = () => {
+			if (this.#disposed || this.#session !== session || this.#generation !== generation)
+				throw new DesktopAuthorizationError('cancelled');
+		};
+		current();
+		if (this.#refresh || session.tokens.accessExpiresAt <= Date.now() + 5000)
+			await this.refresh();
+		current();
+		const send = async (): Promise<DesktopHttpResult> => {
+			current();
+			const accessToken = session.tokens.accessToken;
+			const proof = await createDPoPProof(
+				session.key,
+				desktopHttpMethod(path, photo, settings),
+				`${session.identity.origin}${path}`,
+				session.tokens.nonce,
+				accessToken
+			);
+			current();
+			const result = await this.options.http.request(
+				session.identity.origin,
+				path,
+				this.#operations.token,
+				{
+					proof,
+					credential: accessToken,
+					...(body === undefined ? {} : { body }),
+					...(photo ? { photo } : {}),
+					...(settings ? { settings } : {})
+				}
+			);
+			current();
+			if (result.nonce) session.tokens = { ...session.tokens, nonce: result.nonce };
+			return result;
+		};
+		let result = await send();
+		if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce)
+			result = await send();
+		if (result.status === 401 && errorCode(result) === 'authentication.invalid_token') {
+			await this.refresh();
+			current();
+			result = await send();
+			if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce)
+				result = await send();
+		}
+		return result;
+	}
+	async readSettings(
+		binding: AccountBinding
+	): ReturnType<UserSettingsSessionService['readSettings']> {
+		const session = this.#session,
+			generation = this.#generation;
+		if (
+			!session ||
+			this.#disposed ||
+			session.tokens.principalId !== binding.principalId ||
+			session.tokens.sessionId !== binding.sessionId
+		)
+			return undefined;
+		try {
+			const result = await this.protectedRequest(
+				session,
+				generation,
+				'/api/v1/users/me/settings',
+				undefined,
+				undefined,
+				{ operation: 'GET' }
+			);
+			if (result.status === 401) {
+				await this.signOut();
+				return undefined;
+			}
+			return result.status === 200 ? readUserSettingsWire(result.value) : undefined;
+		} catch {
+			return undefined;
+		}
+	}
+	async commitSettings(
+		binding: AccountBinding,
+		raw: SettingsCommitRequest
+	): Promise<SettingsCommitResult> {
+		const request = validateUserSettingsCommitIntent(raw);
+		const session = this.#session,
+			generation = this.#generation;
+		if (
+			!session ||
+			this.#disposed ||
+			session.tokens.principalId !== binding.principalId ||
+			session.tokens.sessionId !== binding.sessionId
+		)
+			return { kind: 'unavailable' };
+		try {
+			const result = await this.protectedRequest(
+				session,
+				generation,
+				'/api/v1/users/me/settings',
+				{
+					source: request.source,
+					format_version: 1,
+					expected_revision: request.expectedRevision
+				},
+				undefined,
+				{
+					operation: 'PUT',
+					idempotencyKey: createHash('sha256')
+						.update(request.idempotencyKey)
+						.digest('hex')
+				}
+			);
+			if (result.status === 200)
+				return { kind: 'success', revision: readUserSettingsRevision(result.value) };
+			if (result.status === 401) {
+				await this.signOut();
+				return { kind: 'unavailable' };
+			}
+			if (result.status === 409 && errorCode(result) === 'user_settings.revision_conflict') {
+				const latest = await this.readSettings(binding);
+				return latest
+					? { kind: 'conflict', latest: latest.acknowledged }
+					: { kind: 'unavailable' };
+			}
+			return {
+				kind:
+					result.status >= 500 || errorCode(result) === 'idempotency.in_progress'
+						? 'ambiguous'
+						: 'unavailable'
+			};
+		} catch {
+			return {
+				kind:
+					this.#session === session && this.#generation === generation
+						? 'ambiguous'
+						: 'unavailable'
+			};
 		}
 	}
 

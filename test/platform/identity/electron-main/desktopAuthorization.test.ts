@@ -742,6 +742,9 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 	let revokeMode = 'strong';
 	let revokeCount = 0;
 	let opened = '';
+	let settingsMode = 'success';
+	let settingsWrites = 0;
+	const settingsSource = '{\n  "workbench.colorTheme": "GitHub Dark Dimmed"\n}';
 	const http = new DesktopAuthHttp(async (input, init) => {
 		const path = new URL(String(input)).pathname;
 		if (path.endsWith('/authorizations')) {
@@ -774,6 +777,35 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		assert.equal(typeof proof.ath, 'string');
 		if (path === `/api/v1/users/me/desktop-registrations/${'d'.repeat(26)}`)
 			return new Response(null, { status: 204 });
+		if (path === '/api/v1/users/me/settings') {
+			if (init?.method === 'GET')
+				return response({
+					source: settingsSource,
+					revision: 'r'.repeat(26),
+					format_version: 1,
+					updated_at: Date.now(),
+					writable: true
+				});
+			settingsWrites++;
+			assert.equal(
+				new Headers(init?.headers).get('Idempotency-Key'),
+				createHash('sha256').update('settings:proof-test').digest('hex')
+			);
+			assert.deepEqual(JSON.parse(String(init?.body)), {
+				source: settingsSource,
+				format_version: 1,
+				expected_revision: 'r'.repeat(26)
+			});
+			if (settingsMode === 'conflict')
+				return response({ code: 'user_settings.revision_conflict' }, 409);
+			if (settingsMode === 'ambiguous') throw new Error('lost settings acknowledgement');
+			return response({
+				revision: 't'.repeat(26),
+				format_version: 1,
+				updated_at: Date.now(),
+				changed: true
+			});
+		}
 		if (path === '/api/v1/users/me') {
 			if (!nonceRejected) {
 				nonceRejected = true;
@@ -844,6 +876,26 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		assert.ok(!JSON.stringify(profile).includes('never project'));
 		assert.equal(seen.length, 2);
 		assert.notEqual(seen[0]!.proof.jti, seen[1]!.proof.jti);
+		assert.equal(await service.readSettings({ ...binding, sessionId: 'foreign' }), undefined);
+		const settings = await service.readSettings(binding);
+		assert.equal(settings?.acknowledged.source, settingsSource);
+		const write = {
+			source: settingsSource,
+			expectedRevision: 'r'.repeat(26),
+			idempotencyKey: 'settings:proof-test'
+		};
+		assert.deepEqual(await service.commitSettings(binding, write), {
+			kind: 'success',
+			revision: 't'.repeat(26)
+		});
+		settingsMode = 'conflict';
+		assert.deepEqual(await service.commitSettings(binding, write), {
+			kind: 'conflict',
+			latest: settings!.acknowledged
+		});
+		settingsMode = 'ambiguous';
+		assert.deepEqual(await service.commitSettings(binding, write), { kind: 'ambiguous' });
+		assert.equal(settingsWrites, 3);
 		await service.account(binding, { kind: 'openSecurity' });
 		assert.equal(opened, 'https://example.edu/account/security');
 		assert.deepEqual(
@@ -868,6 +920,8 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		assert.deepEqual(outcomes, ['ending:pending', 'signedOut:confirmed']);
 		assert.equal(stored, undefined);
 		const count = seen.length;
+		assert.equal(await service.readSettings(binding), undefined);
+		assert.deepEqual(await service.commitSettings(binding, write), { kind: 'unavailable' });
 		assert.deepEqual(await service.account(binding, { kind: 'read', section: 'profile' }), {
 			kind: 'error',
 			reason: 'sessionEnded'

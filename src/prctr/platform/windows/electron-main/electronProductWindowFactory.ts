@@ -4,6 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port electron-window-skeleton
 
+import { bindWindowUserSettings } from '../../settings/electron-main/userSettingsWindow.js';
+import type { UserSettingsSessionService } from '../../settings/common/userSettingsSession.js';
 import { AccountMenuIpcBridge } from '../../account/electron-main/accountMenuIpc.js';
 import { createElectronAccountMenu } from '../../account/electron-main/electronAccountMenu.js';
 
@@ -62,6 +64,7 @@ export interface ElectronProductWindowFactoryOptions extends ElectronProductWind
 	readonly ipc?: Pick<typeof ipcMain, 'handle' | 'removeHandler'>;
 	readonly launchIdentity?: DesktopIdentityCoordinator;
 	readonly account?: AccountService;
+	readonly settings?: UserSettingsSessionService;
 	readonly windowChromeEnvironment?: ElectronWindowChromeEnvironment;
 }
 
@@ -124,7 +127,7 @@ export function lockedBrowserWindowOptions(
 						titleBarStyle: 'hidden' as const,
 						titleBarOverlay: {
 							color: theme.values['color.background.canvas'],
-							symbolColor: theme.values['color.text.primary'],
+							symbolColor: theme.colors['titleBar.activeForeground'] ?? theme.values['color.text.primary'],
 							height: chrome.titlebarHeight - 1
 						}
 					}),
@@ -213,7 +216,8 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 				this.#options.ipc ?? ipcMain,
 				chromeEnvironment,
 				this.#options.launchIdentity,
-				this.#options.account
+				this.#options.account,
+				this.#options.settings
 			);
 			void window.loadFile(rendererPath).catch(() => {
 				managed.terminate('loadFailed');
@@ -237,6 +241,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 	#launchIdentityBridge: LaunchIdentityIpcBridge | undefined;
 	#windowChromeBridge: ElectronWindowChromeBridge | undefined;
 	#accountBridge: AccountIpcBridge | undefined;
+	#settings: {dispose(): void} | undefined;
 	#accountMenuBridge: AccountMenuIpcBridge | undefined;
 	#launchMenu: { dispose(): void } | undefined;
 
@@ -251,7 +256,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		private readonly ipc: Pick<typeof ipcMain, 'handle' | 'removeHandler'>,
 		chromeEnvironment: ElectronWindowChromeEnvironment,
 		launchIdentity?: DesktopIdentityCoordinator,
-		account?: AccountService
+		account?: AccountService,
+		settings?: UserSettingsSessionService
 	) {
 		this.#window = window;
 		this.descriptor = descriptor;
@@ -274,7 +280,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 			if (descriptor.kind !== 'candidate') {
 				this.#windowChromeBridge = new ElectronWindowChromeBridge(
 					ipc,
-					{ window, contents: window.webContents },
+					{ window, contents: window.webContents, synchronizeTheme: scheme => { nativeTheme.themeSource = scheme; } },
 					descriptor.kind,
 					resolveProductWindowChromeConfiguration(
 						chromeEnvironment.platform,
@@ -293,6 +299,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				);
 			if (descriptor.kind === 'authenticated' && chromeEnvironment.platform === 'darwin')
 				this.#accountMenuBridge = new AccountMenuIpcBridge(ipc, createElectronAccountMenu(window, descriptor, chromeEnvironment.locale), authorize);
+			if (descriptor.kind === 'authenticated' && settings)
+				this.#settings = bindWindowUserSettings(ipc, window.webContents, descriptor, settings);
 			if (descriptor.kind === 'authenticated' && account)
 				this.#accountBridge = new AccountIpcBridge(ipc, descriptor, account, authorize);
 			window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
@@ -333,6 +341,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#launchMenu,
 				this.#launchIdentityBridge,
 				this.#accountBridge,
+				this.#settings,
 				this.#accountMenuBridge,
 				this.#windowChromeBridge
 			]) {
@@ -404,6 +413,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 			this.#launchMenu,
 			this.#launchIdentityBridge,
 				this.#accountBridge,
+				this.#settings,
 				this.#accountMenuBridge,
 			this.#windowChromeBridge
 		]) {

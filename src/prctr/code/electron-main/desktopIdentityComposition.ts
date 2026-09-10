@@ -23,7 +23,10 @@ import {
 
 export interface DesktopIdentityCompositionOptions {
 	readonly target: DesktopReleaseTarget;
-	readonly window: Omit<ElectronProductWindowFactoryOptions, 'launchIdentity' | 'account'>;
+	readonly window: Omit<
+		ElectronProductWindowFactoryOptions,
+		'launchIdentity' | 'account' | 'settings'
+	>;
 	readonly nativeKeyModule: string;
 	readonly callbackBrandingDirectory: string;
 	readonly stateDirectory: string;
@@ -92,7 +95,8 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 			new ElectronProductWindowFactory({
 				...options.window,
 				launchIdentity: identity,
-				account: authorization
+				account: authorization,
+				settings: authorization
 			}),
 			{
 				accept: (_descriptor, intent) => {

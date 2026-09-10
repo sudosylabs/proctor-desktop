@@ -7,43 +7,67 @@ import {
 import type { UserSettingsCoordinator } from './userSettingsCoordinator.js';
 
 export class UserSettingsIpcBridge {
-	readonly #changeSubscription: { dispose(): void };
+	#changeSubscription: { dispose(): void } | undefined;
 	readonly #handled: string[];
 	#disposed = false;
 	constructor(
-		private readonly ipcMain: IpcMain,
+		private readonly ipcMain: Pick<IpcMain, 'handle' | 'removeHandler'>,
 		private readonly authenticatedContents: WebContents,
-		coordinator: UserSettingsCoordinator
+		coordinator: UserSettingsCoordinator | Promise<UserSettingsCoordinator>
 	) {
 		const handled: string[] = [];
-		let changeSubscription: { dispose(): void } | undefined;
 		try {
-			ipcMain.handle(AUTHENTICATED_SETTINGS_CHANNELS.projection, (event) => {
+			ipcMain.handle(AUTHENTICATED_SETTINGS_CHANNELS.projection, async (event) => {
 				this.#assertSender(event);
-				return coordinator.projection();
+				const ready = await coordinator;
+				this.#assertSender(event);
+				return ready.projection();
 			});
 			handled.push(AUTHENTICATED_SETTINGS_CHANNELS.projection);
-			ipcMain.handle(AUTHENTICATED_SETTINGS_CHANNELS.preview, (event, value: unknown) => {
-				this.#assertSender(event);
-				coordinator.preview(validateUserSettingsPreviewIntent(value));
-			});
+			ipcMain.handle(
+				AUTHENTICATED_SETTINGS_CHANNELS.preview,
+				async (event, value: unknown) => {
+					this.#assertSender(event);
+					const intent = validateUserSettingsPreviewIntent(value);
+					const ready = await coordinator;
+					this.#assertSender(event);
+					ready.preview(intent);
+				}
+			);
 			handled.push(AUTHENTICATED_SETTINGS_CHANNELS.preview);
-			ipcMain.handle(AUTHENTICATED_SETTINGS_CHANNELS.cancelPreview, (event) => {
+			ipcMain.handle(AUTHENTICATED_SETTINGS_CHANNELS.cancelPreview, async (event) => {
 				this.#assertSender(event);
-				coordinator.cancelPreview();
+				const ready = await coordinator;
+				this.#assertSender(event);
+				ready.cancelPreview();
 			});
 			handled.push(AUTHENTICATED_SETTINGS_CHANNELS.cancelPreview);
-			ipcMain.handle(AUTHENTICATED_SETTINGS_CHANNELS.commit, (event, value: unknown) => {
-				this.#assertSender(event);
-				return coordinator.commit(validateUserSettingsCommitIntent(value));
-			});
+			ipcMain.handle(
+				AUTHENTICATED_SETTINGS_CHANNELS.commit,
+				async (event, value: unknown) => {
+					this.#assertSender(event);
+					const intent = validateUserSettingsCommitIntent(value);
+					const ready = await coordinator;
+					this.#assertSender(event);
+					return ready.commit(intent);
+				}
+			);
 			handled.push(AUTHENTICATED_SETTINGS_CHANNELS.commit);
-			changeSubscription = coordinator.onDidChange((projection) => {
-				if (!authenticatedContents.isDestroyed())
-					authenticatedContents.send(AUTHENTICATED_SETTINGS_CHANNELS.changed, projection);
-			});
+			const subscribe = (ready: UserSettingsCoordinator): void => {
+				if (this.#disposed) return;
+				this.#changeSubscription = ready.onDidChange((projection) => {
+					if (!authenticatedContents.isDestroyed())
+						authenticatedContents.send(
+							AUTHENTICATED_SETTINGS_CHANNELS.changed,
+							projection
+						);
+				});
+			};
+			if (coordinator instanceof Promise)
+				void coordinator.then(subscribe).catch(() => undefined);
+			else subscribe(coordinator);
 		} catch (error) {
-			const cleanupErrors = rollbackSettingsIpc(ipcMain, handled, changeSubscription);
+			const cleanupErrors = rollbackSettingsIpc(ipcMain, handled, this.#changeSubscription);
 			if (cleanupErrors.length > 0)
 				throw new AggregateError(
 					[error, ...cleanupErrors],
@@ -52,10 +76,10 @@ export class UserSettingsIpcBridge {
 			throw error;
 		}
 		this.#handled = handled;
-		this.#changeSubscription = changeSubscription;
 	}
 	#assertSender(event: IpcMainInvokeEvent): void {
 		if (
+			this.#disposed ||
 			event.sender.id !== this.authenticatedContents.id ||
 			event.senderFrame !== this.authenticatedContents.mainFrame
 		)
@@ -70,7 +94,7 @@ export class UserSettingsIpcBridge {
 	}
 }
 function rollbackSettingsIpc(
-	ipcMain: IpcMain,
+	ipcMain: Pick<IpcMain, 'handle' | 'removeHandler'>,
 	handled: readonly string[],
 	changeSubscription: { dispose(): void } | undefined
 ): unknown[] {

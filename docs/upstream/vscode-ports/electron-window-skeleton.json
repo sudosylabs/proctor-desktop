@@ -59,7 +59,7 @@
       "rationale": "Preserve VS Code's hidden-titlebar BrowserWindow topology: macOS keeps native traffic lights, Windows and Linux use the native Window Controls Overlay, frame suppression remains platform-specific, and CandidateWindow retains its separate control-free security posture.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "da5f27d280a307d792d0ac2a8098d89fdcfb131f15fb3cbaedd653d58a25e81d",
+      "localSha256": "8d22406fc7c572b35ac4b8247e8807b388e8ec6f86dff725c0d0dc31b1ef26b4",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -74,7 +74,7 @@
       "rationale": "Preserve native titlebar color, modal dimming, and physical-height synchronization, the one-pixel Windows border correction, macOS traffic-light centering, Tahoe button geometry, sheet offset, fullscreen notification, retry-safe native update caching, sender authorization, and deterministic teardown behind a product-window-scoped bridge.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronWindowChrome.ts",
-      "localSha256": "87d7a16811296d86234e4ea46e399e5c6d62c262baedfca9fec3b93eb8cec9ac",
+      "localSha256": "f5033b4097a6766fc447a9c9de4751b7ffd663702bf3bc34db2c71fe1fbf9780",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -98,7 +98,7 @@
       "rationale": "Preserve renderer-to-main theme, modal-dimming, and zoom-aware titlebar updates, forced-color synchronization, disposal fencing, and the macOS first-title workaround while replacing VS Code service decorators and general workbench title services with Proctor's closed chrome client and browser theme service.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/browser/productWindowChrome.ts",
-      "localSha256": "66fe73695b01e8dd91da14d0465f775e350522d0ef6a073f4b5b605ecc92a328",
+      "localSha256": "a8b15fd3c1148dee7d25450829452d57f7678280367897e5ab0b6a81c6939d20",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -122,7 +122,7 @@
       "rationale": "Preserve the renderer-owned drag region, native-control exclusion space, no-drag interactive descendants, the fixed zoom-aware Windows control width, and Linux Window Controls Overlay environment-variable geometry under Proctor-owned selectors and semantic tokens.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/browser/productWindowChrome.css",
-      "localSha256": "be7c5cefcd179ee01e4964169da709961d0cecf840c40968043b91ea71b42f56",
+      "localSha256": "bbaaeb129b2ac0fa46a9d7961ae2562a2b9aa092f53672db6722e522afb0f7cb",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -304,7 +304,7 @@
       "id": "product-window-chrome-fixture",
       "kind": "test",
       "path": "test/browser/controlExplorer/productWindowChromeFixture.ts",
-      "obligation": "Exercise both native chrome modes, computed physical control placement under LTR and RTL, all four themes, forced colors, modal dimming with identical-state retry after failure, constrained width, fullscreen projection, 100% and 200% zoom geometry and physical-height synchronization, macOS title synchronization, setup/subscription and initial-update failure rollback, queued-update disposal fencing, and complete owned-DOM disposal through the production control interface."
+      "obligation": "Exercise both native chrome modes, computed physical control placement under LTR and RTL, all four color-scheme categories, forced colors, modal dimming with identical-state retry after failure, constrained width, fullscreen projection, 100% and 200% zoom geometry and physical-height synchronization, macOS title synchronization, setup/subscription and initial-update failure rollback, queued-update disposal fencing, and complete owned-DOM disposal through the production control interface."
     },
     {
       "id": "real-electron-test",

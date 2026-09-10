@@ -278,3 +278,62 @@ void test('native account menu accepts only an anchor and fences selection by se
 	bridge.dispose();
 	assert.equal(closed, 4);
 });
+
+void test('closing an authenticated window fences settings requests waiting for the initial server read', async () => {
+	const { bindWindowUserSettings } =
+		await import('../../../../src/prctr/platform/settings/electron-main/userSettingsWindow.js');
+	type InvokeEvent = import('electron/main').IpcMainInvokeEvent;
+	type Snapshot =
+		import('../../../../src/prctr/platform/settings/common/userSettingsSession.js').UserSettingsSnapshot;
+	let release!: (snapshot: Snapshot) => void;
+	const read = new Promise<Snapshot>((resolve) => {
+		release = resolve;
+	});
+	const handlers = new Map<string, (event: InvokeEvent, ...args: unknown[]) => unknown>();
+	const frame = {};
+	const contents = {
+		id: 32,
+		mainFrame: frame,
+		isDestroyed: () => false,
+		send: () => {
+			throw new Error('A closed window received settings');
+		}
+	} as unknown as import('electron/main').WebContents;
+	const event = { sender: contents, senderFrame: frame } as InvokeEvent;
+	let commits = 0;
+	const binding = bindWindowUserSettings(
+		{
+			handle: (name, handler) => {
+				handlers.set(name, handler);
+			},
+			removeHandler: (name) => {
+				handlers.delete(name);
+			}
+		},
+		contents,
+		{ principalId: id, sessionId: id },
+		{
+			readSettings: async () => read,
+			commitSettings: async () => {
+				commits++;
+				return { kind: 'success', revision: 'revision' };
+			}
+		}
+	);
+	const pending = Promise.resolve(
+		handlers.get('prctr:authenticated:settings:commit')!(event, {
+			source: '{}',
+			expectedRevision: 'before',
+			idempotencyKey: 'settings-pending'
+		})
+	);
+	const rejected = assert.rejects(pending, /bound AuthenticatedWindow/);
+	binding.dispose();
+	release({
+		acknowledged: { source: '{}', revision: 'before', registryVersion: 1 },
+		writable: true
+	});
+	await rejected;
+	assert.equal(commits, 0);
+	assert.equal(handlers.size, 0);
+});

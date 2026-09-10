@@ -6,6 +6,7 @@ export type DesktopHttpPath =
 	| '/api/v1/auth/desktop/token'
 	| '/api/v1/auth/refresh'
 	| '/api/v1/auth/logout'
+	| '/api/v1/users/me/settings'
 	| '/api/v1/users/me/context'
 	| '/api/v1/users/me'
 	| '/api/v1/authentication-methods'
@@ -15,6 +16,10 @@ export type DesktopHttpPath =
 	| '/api/v1/users/me/desktop-registrations'
 	| `/api/v1/users/me/desktop-registrations/${string}`
 	| `/api/v1/users/${string}/profile-picture`;
+export interface DesktopSettingsRequest {
+	readonly operation: 'GET' | 'PUT';
+	readonly idempotencyKey?: string;
+}
 export interface DesktopPhotoRequest {
 	readonly operation: 'GET' | 'PUT' | 'DELETE';
 	readonly bytes?: Uint8Array;
@@ -23,8 +28,23 @@ export interface DesktopPhotoRequest {
 }
 export function desktopHttpMethod(
 	path: DesktopHttpPath,
-	photo?: DesktopPhotoRequest
+	photo?: DesktopPhotoRequest,
+	settings?: DesktopSettingsRequest
 ): 'GET' | 'POST' | 'DELETE' | 'PUT' {
+	if (settings) {
+		if (
+			path !== '/api/v1/users/me/settings' ||
+			photo ||
+			(settings.operation !== 'GET' && settings.operation !== 'PUT')
+		)
+			throw new DesktopAuthorizationError('rejected');
+		if (
+			settings.operation === 'PUT' &&
+			!/^[A-Za-z0-9._~-]{1,128}$/u.test(settings.idempotencyKey ?? '')
+		)
+			throw new DesktopAuthorizationError('rejected');
+		return settings.operation;
+	}
 	if (/^\/api\/v1\/users\/[ybndrfg8ejkmcpqxot1uwisza345h769]{26}\/profile-picture$/u.test(path))
 		return photo?.operation ?? 'GET';
 	if (photo) throw new DesktopAuthorizationError('rejected');
@@ -74,9 +94,10 @@ export class DesktopAuthHttp {
 			readonly proof?: string;
 			readonly credential?: string;
 			readonly photo?: DesktopPhotoRequest;
+			readonly settings?: DesktopSettingsRequest;
 		} = {}
 	): Promise<DesktopHttpResult> {
-		const method = desktopHttpMethod(path, options.photo);
+		const method = desktopHttpMethod(path, options.photo, options.settings);
 		const url = new URL(path, origin);
 		if (url.origin !== origin) throw new DesktopAuthorizationError('rejected');
 		if (token.isCancellationRequested) throw new DesktopAuthorizationError('cancelled');
@@ -93,6 +114,9 @@ export class DesktopAuthHttp {
 						: {}),
 					...(options.photo?.etag ? { 'If-Match': options.photo.etag } : {}),
 					...(options.body === undefined ? {} : { 'Content-Type': 'application/json' }),
+					...(options.settings?.idempotencyKey
+						? { 'Idempotency-Key': options.settings.idempotencyKey }
+						: {}),
 					...(options.proof ? { DPoP: options.proof } : {}),
 					...(options.credential ? { Authorization: `DPoP ${options.credential}` } : {})
 				},
@@ -170,7 +194,8 @@ export class DesktopAuthHttp {
 						const next = await reader.read();
 						if (next.done) break;
 						length += next.value.byteLength;
-						if (length > 65536) throw new DesktopAuthorizationError('rejected');
+						if (length > (options.settings ? 2 * 1024 * 1024 : 65536))
+							throw new DesktopAuthorizationError('rejected');
 						chunks.push(next.value);
 					}
 					value = JSON.parse(

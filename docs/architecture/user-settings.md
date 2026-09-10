@@ -227,3 +227,26 @@ Verify:
 Implementation, generators, manifests, tests, and this architecture must agree
 on document authority, AuthenticatedWindow placement, and the closed Attempt
 Configuration subset.
+
+## Color theme settings
+
+`workbench.colorTheme` selects from the packaged GitHub theme catalog, retaining
+legacy scheme aliases. `workbench.colorCustomizations` is bounded object data
+with optional bracketed theme scopes; it is non-Candidate presentation. Both
+are edited in the JSONC destination. Preview and cancellation apply the complete
+selection and overrides together. Color schemas and registry metadata belong
+to the theme engine; a settings document cannot add a color registration.
+
+Authenticated startup binds the existing settings coordinator and IPC to the
+current User/Session before the renderer requests its projection. The privileged
+identity owner reads `GET /api/v1/users/me/settings` and conditionally writes
+`PUT` on that same fixed endpoint with DPoP and a stable SHA-256 encoding of the existing idempotency key, matching the server header alphabet without changing retry identity.
+Format version 1 is decoded separately from the local registry version.
+A revision conflict refetches the authoritative source; an uncertain write
+retains the existing retry identity. Closing the window disposes the binding,
+and sign-out fences all pending transport responses.
+
+The production adapter currently refetches on each authenticated window and
+keeps acknowledged source only in bound memory. It does not introduce an
+unencrypted host settings file or an offline mutation queue. Responses outside
+the supported document format or Desktop parser bounds remain unavailable.

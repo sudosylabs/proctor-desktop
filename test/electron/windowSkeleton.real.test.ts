@@ -100,7 +100,7 @@ void test('three product windows use isolated capability-specific preloads and l
 		assert.equal(options.titleBarStyle, 'hidden');
 		assert.deepEqual(options.titleBarOverlay, {
 			color: '#0d1117',
-			symbolColor: '#f0f6fc',
+			symbolColor: '#7d8590',
 			height: 34
 		});
 	}
@@ -120,7 +120,7 @@ void test('three product windows use isolated capability-specific preloads and l
 		overlayAttempts: 4,
 		dimmedOverlay: {
 			color: 'rgb(7, 9, 12)',
-			symbolColor: 'rgb(120, 123, 126)',
+			symbolColor: 'rgb(63, 67, 72)',
 			height: 35
 		},
 		trafficLightAttempts: 3,
