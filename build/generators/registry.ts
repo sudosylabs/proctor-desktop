@@ -1,3 +1,4 @@
+import { bundledThemesGenerator } from './bundledThemes.ts';
 import type { Repository } from '../checks/types.ts';
 import {
 	nativeProtocolGenerator,
@@ -18,6 +19,7 @@ export interface Generator {
 }
 
 const productGenerators: readonly Generator[] = [
+	bundledThemesGenerator,
 	localizationCatalogGenerator,
 	settingsRegistryGenerator,
 	nativeProtocolGenerator,

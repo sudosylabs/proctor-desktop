@@ -1,3 +1,4 @@
+import { colorCustomizationSchema } from '../../theme/common/colorCustomizations.js';
 import { Registry } from '../../registry/common/platform.js';
 import {
 	ConfigurationScope,
@@ -17,6 +18,7 @@ export function registerSettingsConfiguration(): void {
 		if (declaration.candidate === 'prohibited') continue;
 		properties[declaration.id] = {
 			type: declaration.type,
+			...(declaration.id === 'workbench.colorCustomizations' ? colorCustomizationSchema : {}),
 			default: declaration.default,
 			enum: declaration.enum === undefined ? undefined : [...declaration.enum],
 			minimum: declaration.minimum,

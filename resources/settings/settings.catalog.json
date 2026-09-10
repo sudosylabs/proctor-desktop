@@ -1,7 +1,7 @@
 {
   "generatedBy": "settings.registry",
   "registryVersion": 1,
-  "registryFingerprint": "fnv1a64:35ec2f0722dc930e",
+  "registryFingerprint": "fnv1a64:8f3a1142427b8b11",
   "settings": [
     {
       "id": "workbench.colorTheme",
@@ -9,7 +9,7 @@
       "titleMessageId": "settings.theme.title",
       "description": "Selects one packaged Proctor color theme.",
       "descriptionMessageId": "settings.theme.description",
-      "default": "dark",
+      "default": "GitHub Dark Default",
       "storage": "portableUser",
       "domain": "appearance",
       "windows": [
@@ -19,6 +19,22 @@
       "languageOverride": false,
       "activation": "immediate",
       "candidate": "eligible"
+    },
+    {
+      "id": "workbench.colorCustomizations",
+      "title": "Color customizations",
+      "titleMessageId": "settings.colors.title",
+      "description": "Overrides workbench colors in settings.json, globally or for a named theme.",
+      "descriptionMessageId": "settings.colors.description",
+      "default": {},
+      "storage": "portableUser",
+      "domain": "appearance",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
     },
     {
       "id": "workbench.preferHighContrast",

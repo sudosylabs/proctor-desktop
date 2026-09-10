@@ -52,7 +52,8 @@ interaction behavior, and [`develop-ui-layout`](../develop-ui-layout/SKILL.md)
 for DOM or layout mechanics.
 
 This step is complete when success, delay, restriction, recovery, and failure
-remain understandable in all four themes and without motion.
+remain understandable across the bundled palette matrix, all four color-scheme
+categories, and reduced motion.
 
 ## 4. Review product character
 

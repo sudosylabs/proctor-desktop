@@ -1490,6 +1490,18 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
+    "settings.colors.description": {
+      "message": "Overrides workbench colors in settings.json, globally or for a named theme.",
+      "description": "Description of data-only workbench color overrides.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.colors.title": {
+      "message": "Color customizations",
+      "description": "Title for workbench color overrides.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
     "settings.contrast.description": {
       "message": "Uses a packaged high-contrast theme when stronger accessibility requirements apply.",
       "description": "Description of the high contrast preference.",

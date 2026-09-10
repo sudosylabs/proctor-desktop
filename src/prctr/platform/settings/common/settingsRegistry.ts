@@ -1,3 +1,4 @@
+import { normalizeColorCustomizations } from '../../theme/common/colorCustomizations.js';
 import {
 	SETTINGS_MANIFEST,
 	SETTINGS_REGISTRY_VERSION,
@@ -45,6 +46,8 @@ export const settingsRegistry: SettingsRegistry = Object.freeze({
 	normalize<K extends EffectiveSettingId>(id: K, value: unknown): SettingValueMap[K] | undefined {
 		const declaration = byId.get(id);
 		if (declaration === undefined || declaration.candidate === 'prohibited') return undefined;
+		if (id === 'workbench.colorCustomizations')
+			return normalizeColorCustomizations(value) as SettingValueMap[K] | undefined;
 		if (declaration.type === 'boolean' && typeof value !== 'boolean') return undefined;
 		if (declaration.type === 'string' && typeof value !== 'string') return undefined;
 		if (

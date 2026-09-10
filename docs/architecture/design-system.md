@@ -99,17 +99,37 @@ must be local, justified, and verified.
 
 ## Themes and presentation
 
-Proctor owns four resolved themes: light, dark, high-contrast light, and
-high-contrast dark. Dark is the initial product default. A follow-system
-preference resolves to one of them rather than creating another theme.
-Authenticated and Candidate preferences may select
-approved presentation options but cannot redefine feedback, examination, or
-integrity semantics.
+Proctor bundles the GitHub VS Code theme collection. GitHub Dark Default is the
+initial selection. Theme names and JSON assets belong to the packaged catalog;
+light, dark, high-contrast light and high-contrast dark remain scheme categories,
+not a fixed list of four palettes. Legacy selection identifiers resolve through
+catalog aliases.
 
-Runtime plugins, examinations, and remote content cannot register tokens,
-inject CSS, provide themes, or override the application palette. The initial
-architecture has no third-party themes, arbitrary token overrides, file-icon
-themes, or product-icon themes.
+Users select `workbench.colorTheme` and edit `workbench.colorCustomizations` in
+`settings.json`. Overrides preserve VS Code global, theme-scoped, wildcard and
+`default` semantics. Packaged color registrations own names, descriptions,
+scheme defaults and derived-color relationships. User input supplies bounded
+hexadecimal colors or the default sentinel; it never registers a role, executes
+code, loads an extension or supplies CSS. Existing settings authority, explicit
+Save and preview/cancel behavior continue to apply.
+
+The color engine preserves VS Code identifiers in theme data and settings.
+Packaged theming participants use the upstream registry and pure CSS collector; the browser owner installs and disposes a constructed stylesheet. Participant code is static product source, never user-supplied CSS. Proctor retains its existing system forced-colors rules and non-color size registry rather than importing extension environment or editor size services.
+
+Renderer CSS uses the namespaced `--prctr-theme-<color-id>` projection, with dots
+replaced by hyphens. Controls consume their actual roles, including Modern UI
+surface colors, rather than collapsing distinct surfaces into a shared palette.
+The existing Proctor semantic aliases remain a compatibility interface for
+product-specific feedback and non-color presentation. Native window controls
+receive a closed, validated foreground/background projection. Native menus
+retain operating-system material and selection rendering.
+
+Custom color overrides apply to AuthenticatedWindow. The current server Attempt
+Configuration carries only four scheme identifiers: Candidate freezes that
+scheme and uses its packaged default palette, with no live user color overrides.
+Supporting a particular named palette or custom overrides in Candidate requires
+an explicit versioned server configuration contract. Editor syntax/semantic
+styles and file/product icon themes are separate capability admissions.
 
 Each window places its resolved theme on the document root, for example
 `data-prctr-theme="dark"`, and inherits the resolved custom properties from
@@ -204,8 +224,8 @@ icons never communicate state without text or another perceivable cue.
 Use the stable cascade order `reset`, `theme`, `base`, `controls`, `workbench`,
 `contributions`, and `overrides`. Global CSS is limited to the reset, document
 defaults, focus baseline, root theme/motion/density state, and shared overlay
-infrastructure. There is no registry that lets arbitrary theming participants
-emit global CSS.
+infrastructure. Only packaged component owners may provide theme styling. User settings cannot
+register participants or emit CSS.
 
 Co-locate CSS with the TypeScript module that owns the DOM. Give each control or
 contribution one `.prctr-*` root and keep internal selectors below it. A caller
@@ -296,7 +316,7 @@ motion. A diagnostic mode checks accidental stylesheet-order dependence.
 
 Use a risk-based review matrix rather than every Cartesian combination:
 
-- all four themes in the normal state;
+- all four scheme categories and every bundled palette in the normal state;
 - applicable interaction states in light and dark;
 - high-contrast focus, boundaries, selection, validation, and feedback;
 - every supported semantic variant and density;

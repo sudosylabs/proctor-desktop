@@ -40,6 +40,7 @@ import type {
 	IntegratedBrowserSurface
 } from '../../src/prctr/platform/integratedBrowser/common/browserProtocol.ts';
 import type { UserSettingsProjection } from '../../src/prctr/platform/settings/common/settingsRendererProtocol.ts';
+import { registerThemingParticipant } from '../../src/prctr/platform/theme/common/themeService.ts';
 import { BrowserThemeService } from '../../src/prctr/platform/theme/browser/themeService.ts';
 import type {
 	ProductWindowChromeClient,
@@ -693,20 +694,13 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		throw new Error(
 			'A Settings sign-out failure was not published in the always-visible titlebar status'
 		);
-	const selectOptions = [...settingsPage.querySelectorAll<HTMLOptionElement>('option')].map(
-		(option) => option.textContent
-	);
-	if (selectOptions.includes('hcLight') || !selectOptions.includes('High contrast light'))
-		throw new Error('Settings enum controls exposed raw tokens instead of localized labels');
-	const rows = [...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')];
-	const themeSelect = rows
-		.find((row) => row.querySelector('.prctr-settings__title')?.textContent === 'Color theme')
-		?.querySelector<HTMLSelectElement>('select');
-	if (themeSelect === null || themeSelect === undefined)
-		throw new Error('Structured theme control is missing');
-	themeSelect.value = 'light';
-	themeSelect.dispatchEvent(new Event('change'));
+	const themeEditor = settingsPage.querySelector<HTMLTextAreaElement>('textarea');
+	if (!themeEditor) throw new Error('JSONC theme editor is missing');
+	themeEditor.value =
+		'{\n  // retained\n  "editor.fontSize": 14,\n  "workbench.colorTheme": "light"\n}';
+	themeEditor.dispatchEvent(new Event('input'));
 	await waitFor(() => settingsDocument.documentElement.dataset.prctrTheme === 'light');
+	const rows = [...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')];
 	const zoomInput = rows
 		.find(
 			(row) => row.querySelector('.prctr-settings__title')?.textContent === 'Interface zoom'
@@ -1310,10 +1304,65 @@ async function runThemePreferenceTest(document: Document): Promise<void> {
 		throw new Error(
 			'Explicit packaged theme selection did not stop automatic scheme following'
 		);
+	service.setTheme('GitHub Dark Default', {
+		'menu.background': '#112233',
+		'notifications.background': '#223344',
+		'surface.background': '#334455'
+	});
+	const rootStyle = themeDocument.documentElement.style;
+	if (
+		rootStyle.getPropertyValue('--prctr-theme-menu-background') !== '#112233' ||
+		rootStyle.getPropertyValue('--prctr-theme-notifications-background') !== '#223344' ||
+		rootStyle.getPropertyValue('--prctr-theme-surface-background') !== '#334455'
+	)
+		throw new Error('Independent theme overrides did not reach browser CSS');
+	const participant = registerThemingParticipant((theme, collector) => {
+		collector.addRule(
+			`:root { --test-theme-participant: ${theme.getColor('menu.background')?.toString()}; }`
+		);
+	});
+	if (
+		!themeDocument
+			.defaultView!.getComputedStyle(themeDocument.documentElement)
+			.getPropertyValue('--test-theme-participant')
+			.includes('#112233')
+	)
+		throw new Error('A registered theming participant did not refresh the active document');
+	participant.dispose();
+	const previous = service.theme;
+	try {
+		service.setTheme('Missing');
+	} catch {
+		/* Expected rejected selection. */
+	}
+	if (service.theme !== previous) throw new Error('A failed selection replaced the active theme');
+	service.setTheme('GitHub Dark Default');
+	if (rootStyle.getPropertyValue('--prctr-theme-menu-background') === '#112233')
+		throw new Error('Removed overrides remained active');
+	for (const theme of ['GitHub Dark High Contrast', 'GitHub Light High Contrast']) {
+		service.setTheme(theme, { 'toolbar.hoverBackground': '#123456' });
+		if (rootStyle.getPropertyValue('--prctr-color-interaction-hover') !== '#123456')
+			throw new Error(
+				'Explicit high-contrast hover override did not reach the compatibility alias'
+			);
+		service.setTheme(theme);
+		if (
+			rootStyle.getPropertyValue('--prctr-theme-toolbar-hoverBackground') !== '' ||
+			rootStyle.getPropertyValue('--prctr-color-interaction-hover') !== 'transparent' ||
+			rootStyle.getPropertyValue('--prctr-color-interaction-active') !== 'transparent'
+		)
+			throw new Error(
+				'Unset high-contrast interaction fills became opaque or retained an override'
+			);
+	}
 	service.dispose();
+	if (themeDocument.adoptedStyleSheets.length)
+		throw new Error('Disposed theme retained generated CSS');
 	motion.setMatches(true);
 	if (motionPreference() !== undefined)
 		throw new Error('Disposed theme service retained operating-system preference listeners');
+	if (rootStyle.getPropertyValue('--prctr-theme-menu-background'))
+		throw new Error('Disposed theme retained CSS variables');
 	frame.remove();
 }
 
@@ -1432,14 +1481,11 @@ async function runSettingsCancelFailureTest(document: Document): Promise<void> {
 		})
 	]);
 	const page = result.shell.part('content').querySelector<HTMLElement>('.prctr-settings');
-	const theme = [...(page?.querySelectorAll<HTMLElement>('.prctr-settings__row') ?? [])]
-		.find((row) => row.querySelector('.prctr-settings__title')?.textContent === 'Color theme')
-		?.querySelector<HTMLSelectElement>('select');
+	const theme = page?.querySelector<HTMLTextAreaElement>('textarea');
 	const status = page?.querySelector<HTMLElement>('[role="status"]');
-	if (theme === null || theme === undefined || status === null || status === undefined)
-		throw new Error('Settings cancellation test controls are incomplete');
-	theme.value = 'light';
-	theme.dispatchEvent(new Event('change'));
+	if (!theme || !status) throw new Error('Settings cancellation test controls are incomplete');
+	theme.value = '{"workbench.colorTheme": "light"}';
+	theme.dispatchEvent(new Event('input'));
 	await waitFor(() => settingsDocument.documentElement.dataset.prctrTheme === 'light');
 	page?.querySelectorAll<HTMLButtonElement>('.prctr-settings__actions button')[1]?.click();
 	await waitFor(

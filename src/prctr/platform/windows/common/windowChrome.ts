@@ -24,7 +24,13 @@ export interface ProductWindowChromeConfiguration {
 	readonly fullscreen: boolean;
 }
 
+export interface ProductWindowChromeColors {
+	readonly background: string;
+	readonly foreground: string;
+}
+
 export interface ProductWindowChromeUpdate {
+	readonly colors?: ProductWindowChromeColors;
 	readonly protocolVersion: 1;
 	readonly theme: ProductWindowChromeTheme;
 	readonly titlebarHeight: number;
@@ -71,12 +77,16 @@ export function validateProductWindowChromeUpdate(value: unknown): ProductWindow
 		!isThemeId(value.theme) ||
 		!isPhysicalTitlebarHeight(value.titlebarHeight) ||
 		typeof value.dimmed !== 'boolean' ||
-		Object.keys(value).length !== 4
+		Object.keys(value).length !== (value.colors === undefined ? 4 : 5) ||
+		(value.colors !== undefined && !validChromeColors(value.colors))
 	)
 		throw new TypeError('Invalid product window chrome update');
 	return Object.freeze({
 		protocolVersion: 1,
 		theme: value.theme,
+		...(value.colors === undefined
+			? {}
+			: { colors: Object.freeze({ ...(value.colors as ProductWindowChromeColors) }) }),
 		titlebarHeight: value.titlebarHeight,
 		dimmed: value.dimmed
 	});
@@ -119,4 +129,14 @@ function isThemeId(value: unknown): value is ProductWindowChromeTheme {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function validChromeColors(value: unknown): value is ProductWindowChromeColors {
+	return (
+		isRecord(value) &&
+		Object.keys(value).length === 2 &&
+		[value.background, value.foreground].every(
+			(color) => typeof color === 'string' && /^#[\da-f]{6}(?:[\da-f]{2})?$/iu.test(color)
+		)
+	);
 }

@@ -1,7 +1,11 @@
+import type { IColorCustomizations } from '../../theme/common/colorThemeData.js';
+import { normalizeColorCustomizations } from '../../theme/common/colorCustomizations.js';
+import { BUNDLED_THEMES } from '../../theme/common/bundledThemes.js';
 import { SETTINGS_DOCUMENT_LIMITS } from './settingsDocument.js';
 
 export interface UserSettingsPresentationProjection {
-	readonly theme: 'dark' | 'highContrastDark' | 'highContrastLight' | 'light';
+	readonly theme: string;
+	readonly colorCustomizations?: IColorCustomizations;
 	readonly zoomPercent: number;
 	readonly reducedMotion: boolean;
 }
@@ -103,12 +107,20 @@ function boundedSource(value: unknown): value is string {
 function validatePresentation(value: unknown): UserSettingsPresentationProjection {
 	if (
 		!isRecord(value) ||
-		!exactKeys(value, ['reducedMotion', 'theme', 'zoomPercent']) ||
+		!exactKeys(value, [
+			'reducedMotion',
+			'theme',
+			'zoomPercent',
+			...(value.colorCustomizations === undefined ? [] : ['colorCustomizations'])
+		]) ||
+		(value.colorCustomizations !== undefined &&
+			!normalizeColorCustomizations(value.colorCustomizations)) ||
 		!isOneOf(value.theme, [
 			'dark',
 			'highContrastDark',
 			'highContrastLight',
-			'light'
+			'light',
+			...BUNDLED_THEMES.map((theme) => theme.name)
 		] as const) ||
 		!Number.isSafeInteger(value.zoomPercent) ||
 		(value.zoomPercent as number) < 80 ||
@@ -118,6 +130,9 @@ function validatePresentation(value: unknown): UserSettingsPresentationProjectio
 		throw new TypeError('User Settings presentation projection is invalid');
 	return Object.freeze({
 		theme: value.theme,
+		...(value.colorCustomizations === undefined
+			? {}
+			: { colorCustomizations: normalizeColorCustomizations(value.colorCustomizations)! }),
 		zoomPercent: value.zoomPercent as number,
 		reducedMotion: value.reducedMotion
 	});

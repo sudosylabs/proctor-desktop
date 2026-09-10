@@ -2,6 +2,11 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { generateColorThemeCSS } from './colorThemeCss.js';
+import { getThemingRegistry } from '../common/themeService.js';
+import { getColorRegistry } from '../common/colorRegistry.js';
+import type { IColorCustomizations } from '../common/colorThemeData.js';
+import { asCssVariableName as asThemeColorVariable } from '../common/colorUtils.js';
 import { Emitter, type Event } from '../../../base/common/event.js';
 import { Disposable } from '../../../base/common/lifecycle.js';
 import { asCssVariableName, getDesignTokenDefinitions } from '../common/tokens.js';
@@ -11,7 +16,6 @@ import {
 	type Density,
 	type MotionPreference,
 	type ResolvedTheme,
-	type ThemeId,
 	type TransparencyPreference
 } from '../common/themes.js';
 
@@ -33,6 +37,9 @@ export class BrowserThemeService extends Disposable {
 	private readonly presentationChangeEmitter = this._register(new Emitter<void>());
 	readonly onDidChangePresentation: Event<void> = this.presentationChangeEmitter.event;
 	private currentTheme: ResolvedTheme;
+	private readonly themeStyleSheet: CSSStyleSheet | undefined;
+	private customizations: IColorCustomizations = {};
+	private appliedColorVariables = new Set<string>();
 	private preferences: PresentationPreferences;
 	private zoomPercent = 100;
 	private readonly forcedColorsQuery: MediaQueryList | undefined;
@@ -43,11 +50,15 @@ export class BrowserThemeService extends Disposable {
 
 	constructor(
 		private readonly document: Document,
-		initialTheme: ThemeId,
+		initialTheme: string,
 		preferences: PresentationPreferences,
 		options: BrowserThemeServiceOptions = {}
 	) {
 		super();
+		this.themeStyleSheet = document.defaultView ? new document.defaultView.CSSStyleSheet() : undefined;
+		if (this.themeStyleSheet) document.adoptedStyleSheets = [...document.adoptedStyleSheets, this.themeStyleSheet];
+		this._register({ dispose: () => { document.adoptedStyleSheets = document.adoptedStyleSheets.filter(sheet => sheet !== this.themeStyleSheet); } });
+		this._register(getThemingRegistry().onThemingParticipantAdded(() => this.applyThemeRules()));
 		this.preferences = preferences;
 		this.followsSystemColorScheme = options.followSystemColorScheme === true;
 		const matchMedia = document.defaultView?.matchMedia?.bind(document.defaultView);
@@ -75,11 +86,12 @@ export class BrowserThemeService extends Disposable {
 		return this.preferences.motion === 'reduced' || this.reducedMotionQuery?.matches === true;
 	}
 
-	setTheme(id: ThemeId): void {
+	setTheme(id: string, customizations: IColorCustomizations = {}): void {
+		const theme = getTheme(id, customizations);
 		this.followsSystemColorScheme = false;
-		const theme = getTheme(id);
-		if (theme === this.currentTheme) return;
+		if (theme.settingsId === this.currentTheme.settingsId && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) return;
 		this.currentTheme = theme;
+		this.customizations = customizations;
 		this.apply();
 		this.changeEmitter.fire(theme);
 		this.presentationChangeEmitter.fire();
@@ -106,12 +118,27 @@ export class BrowserThemeService extends Disposable {
 		this.presentationChangeEmitter.fire();
 	}
 
+	private applyThemeRules(): void {
+		this.themeStyleSheet?.replaceSync(generateColorThemeCSS(this.currentTheme.colorTheme, ":root", getThemingRegistry().getThemingParticipants()).code);
+	}
+
 	private apply(): void {
+		this.applyThemeRules();
+		getColorRegistry().notifyThemeUpdate(this.currentTheme.colorTheme);
 		const root = this.document.documentElement;
 		for (const definition of getDesignTokenDefinitions()) {
 			root.style.setProperty(asCssVariableName(definition.id), this.currentTheme.values[definition.id]);
 		}
+		const nextVariables = new Set<string>();
+		for (const [id, color] of Object.entries(this.currentTheme.colors)) {
+			const variable = asThemeColorVariable(id);
+			root.style.setProperty(variable, color);
+			nextVariables.add(variable);
+		}
+		for (const variable of this.appliedColorVariables) if (!nextVariables.has(variable)) root.style.removeProperty(variable);
+		this.appliedColorVariables = nextVariables;
 		root.dataset.prctrTheme = this.currentTheme.id;
+		root.dataset.prctrThemeName = this.currentTheme.settingsId;
 		root.dataset.prctrThemeContrast = this.currentTheme.isHighContrast ? 'high' : 'normal';
 		root.style.colorScheme = this.currentTheme.isDark ? 'dark' : 'light';
 		this.applyPreferences();
@@ -138,8 +165,8 @@ export class BrowserThemeService extends Disposable {
 
 	private applySystemColorScheme(): void {
 		if (!this.followsSystemColorScheme || this.colorSchemeQuery === undefined) return;
-		const theme = getTheme(this.colorSchemeQuery.matches ? 'dark' : 'light');
-		if (theme === this.currentTheme) return;
+		const theme = getTheme(this.colorSchemeQuery.matches ? 'dark' : 'light', this.customizations);
+		if (theme.settingsId === this.currentTheme.settingsId && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) return;
 		this.currentTheme = theme;
 		this.apply();
 		this.changeEmitter.fire(theme);
@@ -161,6 +188,9 @@ export class BrowserThemeService extends Disposable {
 		for (const definition of getDesignTokenDefinitions()) {
 			root.style.removeProperty(asCssVariableName(definition.id));
 		}
+		for (const variable of this.appliedColorVariables) root.style.removeProperty(variable);
+		this.appliedColorVariables.clear();
+		delete root.dataset.prctrThemeName;
 		delete root.dataset.prctrTheme;
 		delete root.dataset.prctrThemeContrast;
 		delete root.dataset.prctrDensity;

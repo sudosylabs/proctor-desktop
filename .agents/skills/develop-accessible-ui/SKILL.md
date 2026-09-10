@@ -48,8 +48,9 @@ color, icon recognition, motion, or spatial inference.
 
 ## 4. Honor presentation preferences
 
-Review all four themes, browser forced colors, 100% and 200% zoom, constrained
-containers, reduced motion, and reduced transparency. Keep hit areas and focus
+Review the bundled palette matrix, all four color-scheme categories, browser
+forced colors, 100% and 200% zoom, constrained containers, reduced motion, and
+reduced transparency. Keep hit areas and focus
 usable in every supported density. Localize accessible text and test relevant
 content expansion and RTL behavior.
 

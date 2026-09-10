@@ -356,7 +356,10 @@ export function createSettingsContribution(
 				status.textContent = context.localization.format(descriptor, values);
 			};
 			const applyPresentation = (next: UserSettingsProjection): void => {
-				themeService.setTheme(next.presentation.theme);
+				themeService.setTheme(
+					next.presentation.theme,
+					next.presentation.colorCustomizations
+				);
 				themeService.setMotionPreference(
 					next.presentation.reducedMotion ? 'reduced' : 'full'
 				);
@@ -447,6 +450,8 @@ export function createSettingsContribution(
 				for (const declaration of settingsRegistry.declarations) {
 					if (
 						declaration.candidate === 'prohibited' ||
+						declaration.type === 'object' ||
+						declaration.id === 'workbench.colorTheme' ||
 						declaration.storage !== 'portableUser' ||
 						!declaration.windows.includes('authenticated')
 					)

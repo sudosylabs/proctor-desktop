@@ -21,7 +21,8 @@ const binding: UserSettingsBinding = Object.freeze({
 	sessionId: 'session:one'
 });
 const defaultPresentation = Object.freeze({
-	theme: 'dark',
+	theme: 'GitHub Dark Default',
+	colorCustomizations: {},
 	zoomPercent: 100,
 	reducedMotion: false
 });
@@ -245,7 +246,8 @@ suite('UserSettingsCoordinator', () => {
 		assert.strictEqual(coordinator.effective.get('editor.fontSize'), 19);
 		assert.strictEqual(coordinator.projection().source, '{}');
 		assert.deepStrictEqual(coordinator.projection().presentation, {
-			theme: 'light',
+			theme: 'GitHub Light Default',
+			colorCustomizations: {},
 			zoomPercent: 125,
 			reducedMotion: true
 		});
@@ -256,7 +258,12 @@ suite('UserSettingsCoordinator', () => {
 		assert.strictEqual(coordinator.effective.get('editor.fontSize'), 14);
 		assert.strictEqual(changes, 4);
 		assert.deepStrictEqual(presentations, [
-			{ theme: 'light', zoomPercent: 125, reducedMotion: true },
+			{
+				theme: 'GitHub Light Default',
+				colorCustomizations: {},
+				zoomPercent: 125,
+				reducedMotion: true
+			},
 			defaultPresentation,
 			defaultPresentation,
 			defaultPresentation

@@ -1,3 +1,4 @@
+import { getTheme } from '../../theme/common/themes.js';
 import type { EffectiveSettings, SettingConstraint } from './settingsResolution.js';
 import { SETTINGS_REGISTRY_VERSION } from './settingsManifest.js';
 import { settingsRegistry } from './settingsRegistry.js';
@@ -65,7 +66,7 @@ export function deriveAttemptConfiguration(
 		desktopTarget: boundedIdentity(identity.desktopTarget),
 		userSettingsRevision: boundedIdentity(identity.userSettingsRevision),
 		presentation: {
-			colorTheme: settings.get('workbench.colorTheme'),
+			colorTheme: candidateTheme(settings.get('workbench.colorTheme')),
 			preferHighContrast: settings.get('workbench.preferHighContrast'),
 			zoomPercent: settings.get('window.zoomLevel'),
 			editorFontSize: settings.get('editor.fontSize'),
@@ -270,7 +271,11 @@ export function validateFrozenAttemptConfiguration(value: unknown): FrozenAttemp
 	)
 		throw new TypeError('Frozen Attempt Configuration presentation is invalid');
 	const normalizedPresentation = {
-		colorTheme: settingsRegistry.normalize('workbench.colorTheme', presentation.colorTheme),
+		colorTheme: ['light', 'dark', 'hcLight', 'hcDark'].includes(
+			presentation.colorTheme as string
+		)
+			? (presentation.colorTheme as AttemptConfigurationCandidate['presentation']['colorTheme'])
+			: undefined,
 		preferHighContrast: settingsRegistry.normalize(
 			'workbench.preferHighContrast',
 			presentation.preferHighContrast
@@ -395,4 +400,15 @@ function deepFreeze<T>(value: T): T {
 		for (const child of Object.values(value)) deepFreeze(child);
 	}
 	return value;
+}
+
+function candidateTheme(selection: string): 'light' | 'dark' | 'hcLight' | 'hcDark' {
+	const theme = getTheme(selection);
+	return theme.isHighContrast
+		? theme.isDark
+			? 'hcDark'
+			: 'hcLight'
+		: theme.isDark
+			? 'dark'
+			: 'light';
 }

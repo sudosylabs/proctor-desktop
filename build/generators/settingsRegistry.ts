@@ -1,3 +1,4 @@
+import { colorCustomizationSchema } from '../../src/prctr/platform/theme/common/colorCustomizations.ts';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { Repository } from '../checks/types.ts';
@@ -18,7 +19,8 @@ export const settingsRegistryGenerator: Generator = {
 	id: 'settings.registry',
 	inputs: [
 		'src/prctr/platform/settings/common/settingsManifest.ts',
-		'src/prctr/platform/settings/common/settingsRegistryFingerprint.ts'
+		'src/prctr/platform/settings/common/settingsRegistryFingerprint.ts',
+		'src/prctr/platform/theme/common/colorCustomizations.ts'
 	],
 	committedOutputs: [SCHEMA, CATALOG, REJECTIONS, FINGERPRINT],
 	buildOutputs: [],
@@ -92,6 +94,7 @@ function schemaFor(item: SettingDeclaration): Readonly<Record<string, unknown>> 
 	return Object.fromEntries(
 		Object.entries({
 			type: item.type === 'integer' ? 'integer' : item.type,
+			...(item.id === 'workbench.colorCustomizations' ? colorCustomizationSchema : {}),
 			default: item.default,
 			enum: item.enum,
 			minimum: item.minimum,

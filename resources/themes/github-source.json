@@ -1,0 +1,70 @@
+{
+  "repository": "https://github.com/primer/github-vscode-theme",
+  "revision": "cd78e5e4e7bcf132a6f428ae0f32264bb1b729cf",
+  "version": "6.3.5",
+  "license": "MIT",
+  "buildDependencies": {
+    "@primer/primitives": "7.10.0",
+    "chroma-js": "2.1.2",
+    "color": "3.2.1"
+  },
+  "themes": [
+    {
+      "label": "GitHub Light Default",
+      "uiTheme": "vs",
+      "path": "./themes/light-default.json"
+    },
+    {
+      "label": "GitHub Light High Contrast",
+      "uiTheme": "hc-light",
+      "path": "./themes/light-high-contrast.json"
+    },
+    {
+      "label": "GitHub Light Colorblind (Beta)",
+      "uiTheme": "vs",
+      "path": "./themes/light-colorblind.json"
+    },
+    {
+      "label": "GitHub Dark Default",
+      "uiTheme": "vs-dark",
+      "path": "./themes/dark-default.json"
+    },
+    {
+      "label": "GitHub Dark High Contrast",
+      "uiTheme": "hc-black",
+      "path": "./themes/dark-high-contrast.json"
+    },
+    {
+      "label": "GitHub Dark Colorblind (Beta)",
+      "uiTheme": "vs-dark",
+      "path": "./themes/dark-colorblind.json"
+    },
+    {
+      "label": "GitHub Dark Dimmed",
+      "uiTheme": "vs-dark",
+      "path": "./themes/dark-dimmed.json"
+    },
+    {
+      "label": "GitHub Light",
+      "uiTheme": "vs",
+      "path": "./themes/light.json"
+    },
+    {
+      "label": "GitHub Dark",
+      "uiTheme": "vs-dark",
+      "path": "./themes/dark.json"
+    }
+  ],
+  "sha256": {
+    "dark-colorblind.json": "933e0599a5d533e69be8a44bc6283dea86df8733bbfb25b18f9f29c91aedbd2e",
+    "dark-default.json": "0c75b28c68b6c53225d5216859bdf779233ec3fee7bea0500e9870beb40a54af",
+    "dark-dimmed.json": "06995fa11a9026a216b0b88a4b5efe0007e2b8071c781c2404e686683d17427f",
+    "dark-high-contrast.json": "23928e300cf5fb3d571acb1564ab92265522bcaec5c6ae789ea8aeec99f57e00",
+    "dark.json": "bf7a5b8ce388cbf4d8939d6c024fe49a5c9b6cc7f606316d8d7f5ab34fded103",
+    "light-colorblind.json": "101a52a22f3974862004128dfaff875de69b55cda1441b6640a1c292ee30d6c6",
+    "light-default.json": "fc2c1ddde903c6f2e69aa1f2fdff5f024cf427fbc4657ff1e91813b734642303",
+    "light-high-contrast.json": "a44599734191572b2586c6319649fa953f4c8588ec044feecb8619f045ac98f5",
+    "light.json": "941d7f5f964010c82629da54b6d7a3769165ec0ad44366515bee75629b4c6b4f"
+  },
+  "transformations": ["Append final newline to generated JSON; color and token values unchanged."]
+}

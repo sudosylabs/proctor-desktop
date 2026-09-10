@@ -1,15 +1,24 @@
 {
   "generatedBy": "settings.registry",
   "registryVersion": 1,
-  "registryFingerprint": "fnv1a64:35ec2f0722dc930e",
+  "registryFingerprint": "fnv1a64:8f3a1142427b8b11",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": true,
   "properties": {
     "workbench.colorTheme": {
       "type": "string",
-      "default": "dark",
+      "default": "GitHub Dark Default",
       "enum": [
+        "GitHub Light Default",
+        "GitHub Light High Contrast",
+        "GitHub Light Colorblind (Beta)",
+        "GitHub Dark Default",
+        "GitHub Dark High Contrast",
+        "GitHub Dark Colorblind (Beta)",
+        "GitHub Dark Dimmed",
+        "GitHub Light",
+        "GitHub Dark",
         "light",
         "dark",
         "hcLight",
@@ -17,6 +26,29 @@
       ],
       "title": "Color theme",
       "description": "Selects one packaged Proctor color theme."
+    },
+    "workbench.colorCustomizations": {
+      "type": "object",
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[A-Za-z][A-Za-z0-9]*(\\.[A-Za-z][A-Za-z0-9]*)*$": {
+          "type": "string",
+          "pattern": "^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|default)$"
+        },
+        "^\\[[^\\]]+\\](\\s*\\[[^\\]]+\\])*$": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": {
+            "^[A-Za-z][A-Za-z0-9]*(\\.[A-Za-z][A-Za-z0-9]*)*$": {
+              "type": "string",
+              "pattern": "^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|default)$"
+            }
+          }
+        }
+      },
+      "default": {},
+      "title": "Color customizations",
+      "description": "Overrides workbench colors in settings.json, globally or for a named theme."
     },
     "workbench.preferHighContrast": {
       "type": "boolean",

@@ -1,3 +1,4 @@
+import type { IColorCustomizations } from '../../theme/common/colorCustomizations.js';
 export interface SettingMessageDescriptor {
 	readonly id: string;
 	readonly defaultMessage: string;
@@ -22,8 +23,8 @@ export type CandidateTreatment =
 
 export interface SettingDeclaration {
 	readonly id: string;
-	readonly type: 'boolean' | 'number' | 'integer' | 'string';
-	readonly default?: boolean | number | string;
+	readonly type: 'boolean' | 'number' | 'integer' | 'string' | 'object';
+	readonly default?: boolean | number | string | IColorCustomizations;
 	readonly enum?: readonly (boolean | number | string)[];
 	readonly minimum?: number;
 	readonly maximum?: number;
@@ -44,8 +45,22 @@ export const SETTINGS_MANIFEST = [
 	{
 		id: 'workbench.colorTheme',
 		type: 'string',
-		default: 'dark',
-		enum: ['light', 'dark', 'hcLight', 'hcDark'],
+		default: 'GitHub Dark Default',
+		enum: [
+			'GitHub Light Default',
+			'GitHub Light High Contrast',
+			'GitHub Light Colorblind (Beta)',
+			'GitHub Dark Default',
+			'GitHub Dark High Contrast',
+			'GitHub Dark Colorblind (Beta)',
+			'GitHub Dark Dimmed',
+			'GitHub Light',
+			'GitHub Dark',
+			'light',
+			'dark',
+			'hcLight',
+			'hcDark'
+		],
 		storage: 'portableUser',
 		domain: 'appearance',
 		windows: ['authenticated', 'candidate'],
@@ -61,6 +76,28 @@ export const SETTINGS_MANIFEST = [
 			id: 'settings.theme.description',
 			defaultMessage: 'Selects one packaged Proctor color theme.',
 			description: 'Description of the packaged color theme setting.'
+		})
+	},
+	{
+		id: 'workbench.colorCustomizations',
+		type: 'object',
+		default: {},
+		storage: 'portableUser',
+		domain: 'appearance',
+		windows: ['authenticated'],
+		languageOverride: false,
+		activation: 'immediate',
+		candidate: 'nonCandidateOnly',
+		title: defineMessage({
+			id: 'settings.colors.title',
+			defaultMessage: 'Color customizations',
+			description: 'Title for workbench color overrides.'
+		}),
+		description: defineMessage({
+			id: 'settings.colors.description',
+			defaultMessage:
+				'Overrides workbench colors in settings.json, globally or for a named theme.',
+			description: 'Description of data-only workbench color overrides.'
 		})
 	},
 	{
@@ -533,7 +570,8 @@ export type EffectiveSettingId = Exclude<
 >;
 
 export interface SettingValueMap {
-	readonly 'workbench.colorTheme': 'light' | 'dark' | 'hcLight' | 'hcDark';
+	readonly 'workbench.colorTheme': string;
+	readonly 'workbench.colorCustomizations': IColorCustomizations;
 	readonly 'workbench.preferHighContrast': boolean;
 	readonly 'window.zoomLevel': number;
 	readonly 'editor.fontSize': number;

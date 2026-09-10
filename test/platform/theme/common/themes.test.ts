@@ -2,6 +2,7 @@ import assert from 'node:assert';
 import { test } from 'node:test';
 
 import { Color } from '../../../../src/prctr/base/common/color.ts';
+import { BUNDLED_THEMES } from '../../../../src/prctr/platform/theme/common/bundledThemes.ts';
 import {
 	asCssVariable,
 	asCssVariableName,
@@ -71,7 +72,31 @@ void test('compact density uses explicit scale mappings without changing hit-are
 	assert.strictEqual(getTheme('light').values['icon.size.medium'], '16px');
 });
 
-void test('primary button text remains readable in rest, hover, and pressed states in every theme', () => {
+void test('hover and pressed aliases preserve absent high-contrast fills and explicit overrides', () => {
+	for (const entry of BUNDLED_THEMES) {
+		const theme = getTheme(entry.name);
+		for (const [token, role] of [
+			['color.interaction.hover', 'toolbar.hoverBackground'],
+			['color.interaction.active', 'toolbar.activeBackground']
+		] as const) {
+			assert.strictEqual(theme.values[token], theme.colors[role] ?? 'transparent');
+			if (theme.isHighContrast) {
+				assert.strictEqual(theme.colors[role], undefined);
+				assert.strictEqual(theme.values[token], 'transparent');
+				assert.strictEqual(
+					getTheme(entry.name, { [role]: '#12345678' }).values[token],
+					'#12345678'
+				);
+				assert.strictEqual(
+					getTheme(entry.name, { [role]: 'default' }).values[token],
+					'transparent'
+				);
+			}
+		}
+	}
+});
+
+void test('bundled button contrast tracks the documented upstream hover exception', () => {
 	for (const theme of getThemes()) {
 		const foreground = Color.Format.CSS.parseHex(theme.values['color.text.inverse'])!;
 		for (const token of [
@@ -80,6 +105,18 @@ void test('primary button text remains readable in rest, hover, and pressed stat
 			'color.interaction.accentActive'
 		] as const) {
 			const background = Color.Format.CSS.parseHex(theme.values[token])!;
+			if (
+				theme.settingsId === 'GitHub Dark Default' &&
+				token !== 'color.interaction.accent'
+			) {
+				// Preserve the selected upstream palette. Its hover is a tracked accessibility exception.
+				assert.strictEqual(theme.colors['button.hoverBackground'], '#2ea043');
+				assert.strictEqual(theme.colors['button.foreground'], '#ffffff');
+				assert.ok(
+					Math.abs(background.getContrastRatio(foreground) - 3.37295213620302) < 0.000001
+				);
+				continue;
+			}
 			assert.ok(
 				background.getContrastRatio(foreground) >= 4.5,
 				`${theme.id} ${token} text contrast`

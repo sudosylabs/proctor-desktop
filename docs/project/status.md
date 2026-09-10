@@ -64,7 +64,7 @@ trigger sits in the right titlebar action area before native window controls,
 preceded by a sidebar toggle with synchronized icons and device-local restoration.
 The native macOS account popup remains outside clipped part surfaces.
 
-Real Chromium verification covers all four themes, both densities, exposed/shared
+Real Chromium verification covers all four color-scheme categories, both densities, exposed/shared
 edges, RTL, fixed sidebar sizing, constrained 200%-equivalent dimensions, focus restoration,
 and repeated layout. macOS computer-use comparison covers the running Insiders
 shell and the native Proctor profile/session surfaces and account popup. Proctor

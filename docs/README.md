@@ -129,3 +129,6 @@ Use [`design-product-ui`](../.agents/skills/design-product-ui/SKILL.md),
 [`develop-accessible-ui`](../.agents/skills/develop-accessible-ui/SKILL.md), and
 [`develop-ui-layout`](../.agents/skills/develop-ui-layout/SKILL.md) for their
 distinct product-design, shared-system, accessibility, and CSS/layout branches.
+
+Bundled color assets and their source relationship are documented in
+[GitHub themes](./upstream/github-themes.md).

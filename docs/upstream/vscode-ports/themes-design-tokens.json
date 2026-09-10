@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "clusterId": "themes-design-tokens",
   "admission": {
-    "workflow": "Resolve four complete immutable Proctor themes over one static semantic-token catalog, retain mature color parsing and composition, and atomically project namespaced values plus density, motion, transparency, and contrast state into a renderer root.",
+    "workflow": "Supply existing color math and four scheme classifications to the packaged color-theme engine, while retaining Proctor non-color presentation tokens.",
     "callers": [
       "src/prctr/platform/theme/browser/themeService.ts",
       "test/browser/rendererHarness.ts"
@@ -67,17 +67,9 @@
       "upstreamBlob": "5cf50f913a8922889992b3892901dd38882c6a91",
       "category": "source",
       "disposition": "behaviorally-reimplemented",
-      "rationale": "Retain current-theme access, ordered change events, themable lifecycle, and root application behind a narrow browser service that has no file, product-icon, extension, environment, or dynamic participant authority.",
+      "rationale": "Retain current-theme access, ordered events and root application. The color-theme-engine supplies CSS generation and the packaged-only theming participant registry; no extension, product-icon or file access enters this browser owner.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/browser/themeService.ts"
-    },
-    {
-      "upstreamPath": "src/vs/platform/theme/common/colorUtils.ts",
-      "upstreamBlob": "6f725c9c9244a3cc715beb635c3ad3fd5b1d72a4",
-      "category": "registration",
-      "disposition": "excluded",
-      "rationale": "VS Code's mutable extension-facing color registry, theme JSON schema, and dynamic theming participants would violate Proctor's static packaged token authority; complete color math remains admitted through the base color module.",
-      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/theme/browser/defaultStyles.ts",
@@ -112,21 +104,6 @@
   ],
   "divergences": [
     {
-      "id": "static-proctor-token-authority",
-      "summary": "One immutable Proctor catalog owns lowercase dotted semantic tokens and deterministic --prctr-* names; extensions, remote content, settings documents, arbitrary registrants, and VS Code JSON theme contributions cannot add or override tokens.",
-      "localPaths": [
-        "src/prctr/platform/theme/common/tokens.ts",
-        "src/prctr/platform/theme/common/themes.ts"
-      ],
-      "verificationRefs": ["theme-contract-tests", "source-composition-check"]
-    },
-    {
-      "id": "four-packaged-themes",
-      "summary": "Only light, dark, high-contrast light, and high-contrast dark records are admitted; every record must resolve every token before any root mutation, and high-contrast elevation uses explicit boundaries instead of shadow.",
-      "localPaths": ["src/prctr/platform/theme/common/themes.ts"],
-      "verificationRefs": ["theme-contract-tests", "real-browser-theme-test"]
-    },
-    {
       "id": "presentation-only-preferences",
       "summary": "Density, motion, and transparency selections affect only resolved visual tokens and root attributes; reduced motion resolves duration roles to zero and reduced transparency removes backdrop alpha without changing product or security state.",
       "localPaths": ["src/prctr/platform/theme/browser/themeService.ts"],
@@ -144,7 +121,7 @@
       "id": "theme-contract-tests",
       "kind": "test",
       "path": "test/platform/theme/common/themes.test.ts",
-      "obligation": "Verify four immutable complete themes, stable namespaced CSS variables, contrast, high-contrast elevation, and explicit compact-density mappings."
+      "obligation": "Verify the four representative color-scheme themes, stable namespaced CSS variables, contrast, high-contrast elevation, and explicit compact-density mappings."
     },
     {
       "id": "real-browser-theme-test",

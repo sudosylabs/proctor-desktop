@@ -250,6 +250,8 @@ export const englishCatalog: LocalizationCatalog = Object.freeze({
     "settings.action.save": "Save",
     "settings.browser.zoom.description": "Sets integrated-browser presentation outside an Attempt.",
     "settings.browser.zoom.title": "Browser zoom",
+    "settings.colors.description": "Overrides workbench colors in settings.json, globally or for a named theme.",
+    "settings.colors.title": "Color customizations",
     "settings.contrast.description": "Uses a packaged high-contrast theme when stronger accessibility requirements apply.",
     "settings.contrast.title": "Prefer high contrast",
     "settings.editor.cursorblinking.description": "Selects the editor cursor animation.",

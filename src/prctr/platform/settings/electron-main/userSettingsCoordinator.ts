@@ -1,3 +1,4 @@
+import { getTheme } from '../../theme/common/themes.js';
 import { Emitter, type Event } from '../../../base/common/event.js';
 import { SETTINGS_REGISTRY_VERSION } from '../common/settingsManifest.js';
 import { parseSettingsDocument, SETTINGS_DOCUMENT_LIMITS } from '../common/settingsDocument.js';
@@ -236,18 +237,16 @@ export class UserSettingsCoordinator {
 	#presentationProjection(): UserSettingsProjection['presentation'] {
 		const requestedTheme = this.#effective.get('workbench.colorTheme');
 		const preferHighContrast = this.#effective.get('workbench.preferHighContrast');
+		const selected = getTheme(requestedTheme);
 		const theme =
-			requestedTheme === 'hcDark' || requestedTheme === 'hcLight'
-				? requestedTheme === 'hcDark'
-					? 'highContrastDark'
-					: 'highContrastLight'
-				: preferHighContrast
-					? requestedTheme === 'dark'
-						? 'highContrastDark'
-						: 'highContrastLight'
-					: requestedTheme;
+			preferHighContrast && !selected.isHighContrast
+				? selected.isDark
+					? 'GitHub Dark High Contrast'
+					: 'GitHub Light High Contrast'
+				: selected.settingsId;
 		return Object.freeze({
 			theme,
+			colorCustomizations: this.#effective.get('workbench.colorCustomizations'),
 			zoomPercent: this.#effective.get('window.zoomLevel'),
 			reducedMotion: this.#effective.get('accessibility.reducedMotion')
 		});

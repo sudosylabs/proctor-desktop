@@ -15,6 +15,7 @@ revision, disposition, dependencies, divergence, and evidence):
 - [`codicons-semantic-icons`](./codicons-semantic-icons.json) — complete pinned Codicon assets behind Proctor semantic icon identifiers.
 - [`desktop-authorization`](./desktop-authorization.json) — hosted browser callback lifecycle, native key custody, and privileged Session handoff.
 - [`editor-core`](./editor-core.json) — positions, ranges, selections, piece-tree text, edits, EOL, word boundaries, and search.
+- [`color-theme-engine`](./color-theme-engine.json) — bundled color-theme loading, registered defaults, scoped settings overrides, and Modern UI color roles.
 - [`electron-window-skeleton`](./electron-window-skeleton.json) — trusted product windows, immutable descriptors, native integrated chrome, preloads, and secure transitions.
 - [`integrated-browser-client`](./integrated-browser-client.json) — policy-enforced Candidate browser and minimized ordered activity.
 - [`localization-runtime`](./localization-runtime.json) — named messages, packaged catalogs, and the private upstream compatibility seam.
@@ -26,7 +27,7 @@ revision, disposition, dependencies, divergence, and evidence):
 - [`platform-keybindings`](./platform-keybindings.json) — platform keybinding resolution, conflicts, chords, IME, labels, and dispatch.
 - [`remote-terminal-client`](./remote-terminal-client.json) — one Workspace-fenced, policy-gated, xterm-backed remote PTY.
 - [`shared-browser-controls`](./shared-browser-controls.json) — reusable native-DOM controls and deterministic Control Explorer evidence.
-- [`themes-design-tokens`](./themes-design-tokens.json) — static semantic tokens and four immutable Proctor themes.
+- [`themes-design-tokens`](./themes-design-tokens.json) — static semantic tokens and the four color-scheme classifications and non-color presentation tokens.
 - [`user-settings-common`](./user-settings-common.json) — bounded JSONC settings, typed resolution, and frozen Attempt Configuration.
 - [`workbench-notifications`](./workbench-notifications.json) — window-owned notifications, prompts, progress, retained center, accessibility, and complete virtual list/scrollbar mechanics.
 - [`workbench-kernel`](./workbench-kernel.json) — executable compositions, lifecycle, shell, layout, items, panes, restoration, and overlays.
