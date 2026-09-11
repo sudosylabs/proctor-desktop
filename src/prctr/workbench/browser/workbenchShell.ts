@@ -8,6 +8,7 @@ import { addDisposableListener } from '../../base/browser/dom.js';
 import type { WorkbenchComposition, WorkbenchPart } from '../common/composition.js';
 import { WorkbenchOverlayHost } from './overlayHost.js';
 import './workbenchShell.css';
+import './media/style.css';
 import { layoutFloatingPanels } from './floatingPanels.js';
 
 export interface WorkbenchShellLabels {
@@ -24,17 +25,30 @@ export class WorkbenchShell extends Disposable {
 	readonly #navigationVisibility = this._register(new Emitter<boolean>());
 	readonly onDidChangeNavigationVisibility = this.#navigationVisibility.event;
 	#externalNavigationToggle = false;
+	readonly #layoutChange = this._register(new Emitter<void>());
+	readonly onDidChangeLayout = this.#layoutChange.event;
+	#primarySide: 'left' | 'right' = 'left';
+	get primarySide(): 'left' | 'right' { return this.#primarySide; }
+	get secondaryVisible(): boolean { return this.#parts.get('sidebar')?.hidden === false && !this.#compactSidebarOpen; }
+	setPrimarySide(side: 'left' | 'right'): void { this.#primarySide = side; this.element.dataset.primarySide = side; this.#applyLayout(); }
+	setSecondaryVisible(visible: boolean): void {
+		const part = this.part('sidebar');
+		const focused = !visible && part.contains(part.ownerDocument.activeElement);
+		part.hidden = !visible; if (visible) this.#compactSidebarOpen = false; this.#applyLayout();
+		if (focused) this.focusVisiblePart(['content']);
+	}
 	#lastNavigationVisible = false;
 	#resetLayoutAction: () => void | Promise<void> = () => this.resetLayout();
 	#sidebarSize = this.#initialSidebar; #panelSize = this.#initialPanel; #compactSidebarOpen = false; #compactPanelOpen = false; #disposed = false;
 	constructor(host: HTMLElement, composition: WorkbenchComposition, labels: WorkbenchShellLabels) {
 		super(); this.composition = composition; const document = host.ownerDocument; const shellId = `prctr-workbench-${++shellSequence}`; this.element = document.createElement('div'); this.element.className = 'prctr-workbench'; this.element.dataset.windowKind = composition.windowKind; this.element.dataset.presentation = composition.windowKind === 'authenticated' ? 'modern' : 'classic';
 		for (const part of composition.layout.parts) this.#createPart(part, labels[part], document);
+		if (composition.windowKind === 'authenticated') { this.part('navigation').id = `${shellId}-navigation`; this.part('sidebar').hidden = true; this.element.dataset.primarySide = 'left'; }
 		for (const region of ['sidebar', 'panel'] as const) { const part = this.#parts.get(region); if (part !== undefined) { part.id = `${shellId}-${region}`; this.#createCompactToggle(region, labels[region], part.id, document); } }
 		if (composition.layout.allowRegionResize && composition.layout.parts.includes('sidebar')) this.#createSash('sidebar', labels.resizeSidebar, document);
 		if (composition.layout.allowRegionResize && composition.layout.parts.includes('panel')) this.#createSash('panel', labels.resizePanel, document);
 		const reset = document.createElement('button'); reset.className = 'prctr-workbench__reset'; reset.type = 'button'; reset.textContent = labels.resetLayout; this.#resetButton = reset; if (composition.layout.allowRegionResize) this.part('titlebar').append(reset); this._register(addDisposableListener(reset, 'click', () => { void Promise.resolve(this.#resetLayoutAction()).catch(error => console.error('Reset layout action failed', error)); }));
-		host.append(this.element); this.overlayHost = this._register(new WorkbenchOverlayHost(host, this.element)); const observer = new ResizeObserver(() => this.#applyLayout()); observer.observe(this.element); this._register({ dispose: () => observer.disconnect() }); const preferences = new MutationObserver(() => this.#applyLayout()); preferences.observe(document.documentElement, { attributes: true, attributeFilter: ['data-prctr-density', 'data-prctr-theme-contrast', 'data-prctr-motion'] }); this._register({ dispose: () => preferences.disconnect() }); this.#applyLayout();
+		host.append(this.element); this.overlayHost = this._register(new WorkbenchOverlayHost(host, this.element)); const observer = new ResizeObserver(() => this.#applyLayout()); observer.observe(this.element); this._register({ dispose: () => observer.disconnect() }); const preferences = new MutationObserver(() => this.#applyLayout()); preferences.observe(document.documentElement, { attributes: true, attributeFilter: ['data-prctr-density', 'data-prctr-theme-contrast', 'data-prctr-motion', 'dir'] }); preferences.observe(this.element, { attributes: true, attributeFilter: ['dir'] }); this._register({ dispose: () => preferences.disconnect() }); this.#applyLayout();
 	}
 	part(part: WorkbenchPart): HTMLElement { const value = this.#parts.get(part); if (value === undefined) throw new Error(`Composition ${this.composition.id} does not contain ${part}`); return value; }
 	focusVisiblePart(preferred: readonly WorkbenchPart[] = []): void { const seen = new Set<WorkbenchPart>(); for (const part of [...preferred, 'content', 'sidebar', 'panel', 'titlebar'] as const) { if (seen.has(part)) continue; seen.add(part); const target = this.#parts.get(part); if (target !== undefined && isVisibleFocusTarget(target)) { target.focus(); if (target.ownerDocument.activeElement === target) return; } } }
@@ -126,12 +140,17 @@ export class WorkbenchShell extends Disposable {
 			const region = sash.dataset.sash as 'panel' | 'sidebar'; const target = region === 'sidebar' ? sidebar : this.#parts.get(region); sash.hidden = target?.hidden !== false || (region === 'sidebar' ? compactSidebar : compactPanel) || this.#compactSidebarOpen || this.#compactPanelOpen;
 			const size = region === 'sidebar' ? effectiveSidebarSize : effectivePanelSize; sash.setAttribute('aria-valuenow', String(size)); sash.setAttribute('aria-valuemax', String(Math.round(this.#sizeLimit(region))));
 		}
+		if (this.composition.windowKind === 'authenticated') {
+			this.element.style.setProperty('--prctr-workbench-secondary-size', this.secondaryVisible ? `${Math.min(300, this.element.clientWidth * .45)}px` : '0px');
+			this.element.dataset.secondaryVisible = String(this.secondaryVisible);
+		}
 		if (this.element.dataset.presentation === 'modern') layoutFloatingPanels(this.element, this.#parts, { navigationSidebar: this.element.dataset.navigationLayout === 'sidebar', compactSidebar, sidebarOpen: this.#compactSidebarOpen, panelOpen: this.#compactPanelOpen, compactPanel });
 		const navigationVisible = this.navigationVisible;
 		if (this.#lastNavigationVisible !== navigationVisible) {
 			this.#lastNavigationVisible = navigationVisible;
 			this.#navigationVisibility.fire(navigationVisible);
 		}
+		this.#layoutChange.fire();
 		if (focusAfterLayout !== undefined) { if (isVisibleFocusTarget(focusAfterLayout)) focusAfterLayout.focus(); else this.focusVisiblePart([this.#compactPanelOpen ? 'panel' : this.#compactSidebarOpen ? 'sidebar' : 'content']); }
 	}
 	override dispose(): void { if (this.#disposed) return; this.#disposed = true; super.dispose(); this.element.remove(); }

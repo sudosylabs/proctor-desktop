@@ -37,6 +37,22 @@ export function layoutFloatingPanels(
 	const navigationVisible = navigation?.hidden === false && (!state.navigationSidebar || !state.compactSidebar || state.sidebarOpen);
 	const sidebarVisible = !state.navigationSidebar && sidebar?.hidden === false && (!state.compactSidebar || state.sidebarOpen) && !state.panelOpen;
 	const panelVisible = panel?.hidden === false && (!state.compactPanel || state.panelOpen) && !state.sidebarOpen;
+	if (root.dataset.windowKind === 'authenticated') {
+		const primaryRight = root.dataset.primarySide === 'right';
+		const rtl = root.ownerDocument.defaultView?.getComputedStyle(root).direction === 'rtl';
+		const secondaryVisible = sidebar?.hidden === false;
+		const visible = state.sidebarOpen ? ['navigation'] as const : [primaryRight !== rtl ? 'sidebar' : 'navigation', 'content', primaryRight !== rtl ? 'navigation' : 'sidebar'] as const;
+		const ordered = visible.filter(part => part === 'content' || (part === 'navigation' ? navigationVisible : secondaryVisible));
+		root.dataset.joinedRail = 'false'; root.dataset.panelVisible = 'false';
+		for (const [index, part] of ordered.entries()) {
+			const element = parts.get(part)!;
+			element.dataset.outerStart = String(index === 0); element.dataset.outerEnd = String(index === ordered.length - 1);
+			element.dataset.outerLeft = String(rtl ? index === ordered.length - 1 : index === 0);
+			element.dataset.outerRight = String(rtl ? index === 0 : index === ordered.length - 1);
+			element.dataset.outerTop = 'true'; element.dataset.outerBottom = 'true';
+		}
+		return;
+	}
 	const joinedRail = !state.navigationSidebar && navigationVisible && sidebarVisible;
 	root.dataset.joinedRail = String(joinedRail);
 	root.dataset.panelVisible = String(panelVisible && !maximized);

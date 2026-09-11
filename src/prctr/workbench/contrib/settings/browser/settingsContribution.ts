@@ -57,7 +57,7 @@ export function createSettingsContribution(client: SettingsRendererClient, envir
 				readOffset: () => ({ top: context.shell.part('titlebar').getBoundingClientRect().height, quickPickTop: context.shell.part('titlebar').getBoundingClientRect().height }),
 				focusContent: () => context.shell.focusVisiblePart(['content']), isRestored: () => ['restored', 'eventually'].includes(context.getService<WorkbenchLifecycleService>(WORKBENCH_LIFECYCLE_SERVICE).phase ?? ''),
 				readPresentation: () => ({ floating: true, compact: presentation.presentationPreferences.density === 'compact', uppercaseHeaders: false }),
-				relayout: () => context.shell.layout(), readPositions: () => ({ sidebar: Position.LEFT, panel: Position.BOTTOM, panelAlignment: 'center' }),
+				relayout: () => context.shell.layout(), readPositions: () => ({ sidebar: context.shell.primarySide === 'left' ? Position.LEFT : Position.RIGHT, panel: Position.BOTTOM, panelAlignment: 'center' }),
 				setPartHidden(hidden, part) {
 					if (part === Parts.SIDEBAR_PART) context.shell.setNavigationVisible(!hidden);
 					else if (part === Parts.BANNER_PART) context.shell.setPartVisible('banner', !hidden);

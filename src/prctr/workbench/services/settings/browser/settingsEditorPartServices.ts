@@ -25,7 +25,6 @@ import { IEditorService } from '../../editor/common/editorService.js';
 import { EditorService } from '../../editor/browser/editorService.js';
 import { IEditorWorkbenchLayoutService } from '../../layout/browser/editorWorkbenchLayout.js';
 import { ModernUIContribution } from '../../../contrib/modernUI/browser/modernUI.contribution.js';
-import '../../../browser/media/style.css';
 import { isWindows, isLinux } from '../../../../base/common/platform.js';
 import { getThemeTypeSelector, IThemeService } from '../../../../platform/theme/common/themeService.js';
 import { ThemeTypeSelector } from '../../../../platform/theme/common/theme.js';

@@ -237,4 +237,23 @@
 	--prctr-floating-card-corner-bottom-right-border-image: radial-gradient(circle at top left, transparent calc(var(--prctr-shape-radius-large) - var(--prctr-shape-stroke-default) - 0.5px), var(--prctr-floating-card-stroke-color) calc(var(--prctr-shape-radius-large) - var(--prctr-shape-stroke-default)), var(--prctr-floating-card-stroke-color) var(--prctr-shape-radius-large), transparent calc(var(--prctr-shape-radius-large) + 0.5px));
 }
 
+
+	.prctr-workbench[data-window-kind='authenticated'][data-navigation-layout='sidebar'] {
+		grid-template-columns: var(--prctr-workbench-sidebar-size) minmax(0, 1fr) var(--prctr-workbench-secondary-size, 0px);
+		grid-template-rows: auto auto minmax(0, 1fr);
+	}
+	.prctr-workbench[data-window-kind='authenticated'][data-navigation-layout='sidebar'] .prctr-workbench__content { grid-column: 2; grid-row: 3; }
+	.prctr-workbench[data-window-kind='authenticated'][data-navigation-layout='sidebar'] .prctr-workbench__sidebar { grid-column: 3; grid-row: 3; }
+	.prctr-workbench[data-window-kind='authenticated'][data-navigation-layout='sidebar'] .prctr-workbench__navigation { grid-column: 1; grid-row: 3; }
+	.prctr-workbench[data-window-kind='authenticated'][data-primary-side='right']:dir(ltr),
+	.prctr-workbench[data-window-kind='authenticated'][data-primary-side='left']:dir(rtl) {
+		grid-template-columns: var(--prctr-workbench-secondary-size, 0px) minmax(0, 1fr) var(--prctr-workbench-sidebar-size);
+	}
+	.prctr-workbench[data-window-kind='authenticated'][data-primary-side='right']:dir(ltr) .prctr-workbench__navigation,
+	.prctr-workbench[data-window-kind='authenticated'][data-primary-side='left']:dir(rtl) .prctr-workbench__navigation { grid-column: 3; }
+	.prctr-workbench[data-window-kind='authenticated'][data-primary-side='right']:dir(ltr) .prctr-workbench__sidebar,
+	.prctr-workbench[data-window-kind='authenticated'][data-primary-side='left']:dir(rtl) .prctr-workbench__sidebar { grid-column: 1; }
+	.prctr-workbench[data-window-kind='authenticated'][data-secondary-visible='true']:not([data-compact-sidebar-open='true']) .prctr-workbench__sidebar { display: block; }
+	.prctr-workbench[data-window-kind='authenticated'][data-compact-sidebar-open='true'] .prctr-workbench__navigation { grid-column: 1 / -1; }
+	.prctr-workbench[data-window-kind='authenticated'][data-compact-sidebar-open='true'] .prctr-workbench__sidebar { display: none; }
 }
