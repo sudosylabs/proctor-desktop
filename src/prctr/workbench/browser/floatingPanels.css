@@ -257,3 +257,13 @@
 	.prctr-workbench[data-window-kind='authenticated'][data-compact-sidebar-open='true'] .prctr-workbench__navigation { grid-column: 1 / -1; }
 	.prctr-workbench[data-window-kind='authenticated'][data-compact-sidebar-open='true'] .prctr-workbench__sidebar { display: none; }
 }
+
+/* Adapt keyboardFocusOnly.css to the Proctor shell part names. Account content
+ * is a document panel here; source editor/overlay containers remain independent.
+ * Pointer focus must not erase keyboard or text-input focus indication. */
+@layer overrides {
+	.prctr-workbench[data-presentation='modern'] :is(.prctr-workbench__navigation, .prctr-workbench__sidebar, .prctr-workbench__content, .prctr-workbench__panel):focus:not(:focus-visible),
+	.prctr-workbench[data-presentation='modern'] :is(.prctr-workbench__navigation, .prctr-workbench__sidebar, .prctr-workbench__content, .prctr-workbench__panel) :focus:not(:focus-visible) {
+		outline-color: transparent !important;
+	}
+}

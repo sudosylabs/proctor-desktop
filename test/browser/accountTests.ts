@@ -1,3 +1,4 @@
+import { runAccountPhotoTests } from './accountPhotoTests.ts';
 import {
 	AccountPane,
 	type AccountModel
@@ -13,7 +14,9 @@ import type {
 } from '../../src/prctr/platform/account/common/accountProtocol.ts';
 
 export async function runAccountTests(document: Document): Promise<void> {
+	await runAccountPhotoTests(document);
 	const requests: AccountIntent[] = [];
+	let failure: 'strongAuthenticationRequired' | 'unconfirmed' = 'strongAuthenticationRequired';
 	let delayed: ((value: AccountResponse) => void) | undefined;
 	const pane = new AccountPane(
 		document,
@@ -51,7 +54,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 							security: { password: true, providers: [], mfa: undefined }
 						}
 					};
-				return { kind: 'error', reason: 'strongAuthenticationRequired' };
+				return { kind: 'error', reason: failure };
 			}
 		},
 		createLocalization({ requestedLocale: 'en', messages: Object.values(accountMessages) }),
@@ -98,7 +101,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 			if (predicate()) return;
 			await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 		}
-		throw new Error('Account view did not settle');
+		throw new Error('Account view did not settle: ' + pane.element.textContent);
 	};
 	try {
 		assign('profile');
@@ -131,12 +134,35 @@ export async function runAccountTests(document: Document): Promise<void> {
 			throw new Error('Cancel did not restore focus');
 		button('End session').click();
 		const confirm = pane.element.querySelector<HTMLButtonElement>(
-			'[data-confirmation] button:last-child'
+			'[data-confirmation] button:nth-child(2)'
 		);
 		confirm?.click();
-		await wait(() => pane.element.textContent!.includes('multi-factor authentication before'));
+		await wait(
+			() =>
+				!!pane.element
+					.querySelector('[data-confirmation] .prctr-account-feedback')
+					?.textContent?.includes('multi-factor authentication before')
+		);
 		if (requests.filter((intent) => intent.kind === 'revokeSession').length !== 1)
 			throw new Error('Revocation should run exactly once');
+		button('Cancel').click();
+		failure = 'unconfirmed';
+		button('End session').click();
+		pane.element
+			.querySelector<HTMLButtonElement>('[data-confirmation] button:nth-child(2)')!
+			.click();
+		await wait(() => pane.element.textContent!.includes('server did not confirm'));
+		button('Cancel').click();
+		button('End session').click();
+		const blocked = pane.element.querySelector<HTMLButtonElement>(
+			'[data-confirmation] button:nth-child(2)'
+		)!;
+		if (!blocked.disabled)
+			throw new Error('Closing confirmation bypassed uncertain-outcome reconciliation');
+		blocked.click();
+		if (requests.filter((intent) => intent.kind === 'revokeSession').length !== 2)
+			throw new Error('Uncertain mutation was retried without a read');
+		failure = 'strongAuthenticationRequired';
 		assign('security');
 		await wait(() => pane.element.textContent!.includes('Password sign-in'));
 		if (!pane.element.textContent!.includes('Not available'))
@@ -167,7 +193,11 @@ export async function runAccountTests(document: Document): Promise<void> {
 		const viewport = pane.element.querySelector<HTMLElement>('.prctr-account__viewport')!;
 		if (viewport.scrollWidth > viewport.clientWidth + 1)
 			throw new Error('Narrow account content overflows horizontally');
-		if (!pane.element.textContent!.includes('Email verified'))
+		if (
+			!pane.element
+				.querySelector('.prctr-account__email .prctr-account__verified')
+				?.textContent?.includes('Verified')
+		)
 			throw new Error('Email verification must stay next to account details');
 		assign('profile');
 		pane.dispose();

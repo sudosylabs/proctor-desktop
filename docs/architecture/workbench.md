@@ -70,12 +70,29 @@ only a bounded anchor and returns a closed action identifier, with sender
 validation and window-disposal cancellation. It cannot execute arbitrary commands
 or accept a renderer-defined menu tree.
 
-Account hosts Profile (including security) and Sessions & devices through one
+Account hosts Profile (including security) and Sessions through one
 registered WorkbenchItem resolver and cancellable pane. Profile-photo reads,
 uploads, and removals use the signed-in User and exact image revision. Other
 presentation fields use the server’s administrative User management operation;
 the own-account destination presents them read-only. Account data is
 window-session state and is never restored as authoritative data.
+
+Profile presents identity and photo actions, read-only account details, then
+sign-in and security. Photo selection uses the native image chooser and an
+ephemeral, bounded local crop draft before explicit Save. Cancellation before
+submission leaves the saved photo unchanged. The server's normalized rendition
+updates both the page and account trigger after confirmation. Revision conflicts
+require review of the refreshed photo; uncertain outcomes reconcile before retry.
+The current server projection does not distinguish custom and default photos,
+so Remove is shown only for a revision observed after a confirmed upload in this
+window session. Never infer that state from the image or its URL.
+
+Sessions separates the current session, other sessions, and registered desktops.
+Rows expose their own actions; the page-owned Secondary Side Bar discloses
+available metadata without inventing location or device facts. Profile does not
+provide secondary content. Section reads fail independently and refresh retains
+previously displayed information. Pending actions and their feedback stay local
+to the affected item; the privileged account service serializes mutations.
 
 A capability specific to AuthenticatedWindow binds every read or action to its
 immutable Principal and Session. The privileged identity owner supplies DPoP

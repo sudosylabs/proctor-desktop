@@ -143,25 +143,34 @@ export class AuthenticatedLayout extends Disposable {
 		);
 		const actions = [
 			[
-				'primary',
 				'prctr.authenticated.toggleSidebar',
-				'Toggle Primary Side Bar Visibility',
+				defineMessage({
+					id: 'authenticated.layout.primary',
+					defaultMessage: 'Toggle Primary Side Bar Visibility',
+					description: 'Authenticated window layout action.'
+				}),
 				KeyMod.CtrlCmd | KeyCode.KeyB,
 				() => this.togglePrimary(),
 				primary.button
 			],
 			[
-				'secondary',
 				'prctr.authenticated.toggleSecondarySidebar',
-				'Toggle Secondary Side Bar Visibility',
+				defineMessage({
+					id: 'authenticated.layout.secondary',
+					defaultMessage: 'Toggle Secondary Side Bar Visibility',
+					description: 'Authenticated window layout action.'
+				}),
 				KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KeyB,
 				() => this.toggleSecondary(),
 				secondary.button
 			],
 			[
-				'customize',
 				'prctr.authenticated.customizeLayout',
-				'Customize Layout',
+				defineMessage({
+					id: 'authenticated.layout.customize',
+					defaultMessage: 'Customize Layout',
+					description: 'Authenticated window layout action.'
+				}),
 				undefined,
 				() => {
 					void this.customize().catch((error) => {
@@ -179,16 +188,12 @@ export class AuthenticatedLayout extends Disposable {
 				customize.button
 			]
 		] as const;
-		for (const [key, id, label, binding, handler, button] of actions) {
+		for (const [id, title, binding, handler, button] of actions) {
 			this._register(
 				registerProctorAction({
 					command: {
 						id,
-						title: defineMessage({
-							id: `authenticated.layout.${key}`,
-							defaultMessage: label,
-							description: 'Authenticated window layout action.'
-						}),
+						title,
 						precondition: WorkbenchModalContext.toNegated()
 					},
 					handler,

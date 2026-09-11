@@ -22,6 +22,8 @@ const definitions = {
 	'action.settings': Codicon.settingsGear,
 	'action.signOut': Codicon.signOut,
 	'device.desktop': Codicon.deviceDesktop,
+	'session.desktop': Codicon.window,
+	'session.web': Codicon.globe,
 	'disclosure.collapsed': Codicon.chevronRight,
 	'disclosure.expanded': Codicon.chevronDown,
 	'identity.account': Codicon.account,

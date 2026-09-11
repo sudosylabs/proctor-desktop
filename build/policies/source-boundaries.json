@@ -51,6 +51,12 @@
 	"productionDynamicImportAllowlist": [],
 	"cssImportantOverrides": [
 		{
+			"path": "src/prctr/workbench/browser/floatingPanels.css",
+			"selector": ".prctr-workbench[data-presentation='modern'] :is(.prctr-workbench__navigation, .prctr-workbench__sidebar, .prctr-workbench__content, .prctr-workbench__panel):focus:not(:focus-visible),\n\t.prctr-workbench[data-presentation='modern'] :is(.prctr-workbench__navigation, .prctr-workbench__sidebar, .prctr-workbench__content, .prctr-workbench__panel) :focus:not(:focus-visible)",
+			"property": "outline-color",
+			"rationale": "Adapt the admitted Modern UI keyboardFocusOnly panel rule to Proctor shell owners. Suppress pointer outlines over imported workbench focus rules while retaining focus-visible and text-entry focus; source editor and modal overlays remain independent."
+		},
+		{
 			"path": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.css",
 			"selector": ".prctr-terminal .xterm-dim",
 			"property": "opacity",

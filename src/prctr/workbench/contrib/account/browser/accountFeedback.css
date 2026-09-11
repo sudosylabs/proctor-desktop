@@ -1,0 +1,15 @@
+@layer contributions {
+	.prctr-account-feedback {
+		display: flex;
+		align-items: center;
+		gap: var(--prctr-spacing-content-small);
+		margin-block-start: var(--prctr-spacing-content-medium);
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-account-feedback[data-kind='error'] {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-account-feedback[hidden] {
+		display: none;
+	}
+}

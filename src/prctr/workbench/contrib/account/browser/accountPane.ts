@@ -2,50 +2,83 @@ import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
 import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
+import {
+	Disposable,
+	DisposableStore,
+	MutableDisposable,
+	type IDisposable
+} from '../../../../base/common/lifecycle.js';
 import type { CancellationToken } from '../../../../base/common/cancellation.js';
 import type { LocalizationContext } from '../../../../base/common/localization.js';
 import type {
 	AccountClient,
 	AccountData,
+	AccountDesktop,
 	AccountIntent,
 	AccountSection,
-	AccountResponse
+	AccountResponse,
+	AccountSession
 } from '../../../../platform/account/common/accountProtocol.js';
 import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
 import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
 import type { ResolvedWorkbenchItem } from '../../../common/workbenchItem.js';
 import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
+import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
+import type { AuthenticatedLayout } from '../../authenticated/browser/authenticatedLayout.js';
+import { AccountPhotoEditor } from './accountPhotoEditor.js';
+import { AccountFeedback } from './accountFeedback.js';
 import { accountMessages as m } from './accountMessages.js';
 import './account.css';
 
+type Message = keyof typeof m;
+type AccountItem = AccountSession | AccountDesktop;
+interface SectionView {
+	readonly host: HTMLElement;
+	readonly content: HTMLElement;
+	readonly store: DisposableStore;
+	readonly feedback: AccountFeedback;
+	sequence: number;
+	data?: AccountData;
+	photoFeedback?: AccountFeedback;
+}
 export interface AccountModel extends ResolvedWorkbenchItem {
 	readonly section: AccountSection;
 }
+export interface AccountPaneServices {
+	readonly overlays: WorkbenchOverlayHost;
+	readonly layout: AuthenticatedLayout;
+	readonly customPhotos: Set<string>;
+	readonly hover: (target: HTMLElement, label: string) => IDisposable;
+}
 
-/** Owns presentation only. Every read and mutation goes through the bound account capability. */
+/** Owns transient page state. The bound account capability owns all server mutations. */
 export class AccountPane extends Disposable implements WorkbenchPane {
 	readonly element: HTMLElement;
 	readonly #page: HTMLElement;
 	readonly #body: HTMLElement;
 	readonly #heading: HTMLHeadingElement;
-	readonly #status: HTMLElement;
-	readonly #statusText: HTMLElement;
-	readonly #statusIcon;
+	readonly #subtitle: HTMLElement;
 	readonly #refresh: ButtonControl;
 	readonly #content = this._register(new DisposableStore());
+	readonly #editor = this._register(new MutableDisposable<AccountPhotoEditor>());
 	readonly #scroll: DomScrollableElement;
+	readonly #sections = new Map<AccountSection, SectionView>();
+	readonly #pending = new Set<string>();
+	readonly #unconfirmed = new Set<string>();
 	#section: AccountSection = 'profile';
 	#epoch = 0;
 	#disposed = false;
-	#busy = false;
-	#buttons: { control: ButtonControl; label: string }[] = [];
+	#refreshing = false;
+	#detail: { item: AccountItem; trigger: HTMLElement } | undefined;
+	#detailHost: HTMLElement | undefined;
+	#detailStore = this._register(new DisposableStore());
 	constructor(
 		document: Document,
 		private readonly client: AccountClient,
 		private readonly localization: LocalizationContext,
 		private readonly binding: AuthenticatedWindowDescriptor,
-		private readonly onPhoto?: (dataUrl: string) => void
+		private readonly onPhoto?: (dataUrl: string) => void,
+		private readonly services?: AccountPaneServices
 	) {
 		super();
 		this.element = document.createElement('section');
@@ -61,22 +94,19 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		this.#heading.tabIndex = -1;
 		header.append(this.#heading);
 		this.#refresh = this._register(
-			new ButtonControl(header, { variant: 'secondary', label: this.text('refresh') })
-		);
-		this._register(
-			this.#refresh.onDidRequest(() => {
-				void this.load();
+			new ButtonControl(header, {
+				variant: 'secondary',
+				label: this.text('refresh'),
+				icon: (doc) => createSemanticIcon(doc, { id: 'action.refresh' })
 			})
 		);
+		if (services) this._register(services.hover(this.#refresh.element, this.text('refresh')));
+		this._register(this.#refresh.onDidRequest(() => void this.refresh()));
+		this.#subtitle = document.createElement('p');
+		this.#subtitle.className = 'prctr-account__subtitle';
 		this.#body = document.createElement('div');
 		this.#body.className = 'prctr-account__body';
-		this.#status = document.createElement('div');
-		this.#status.className = 'prctr-account__status';
-		this.#status.role = 'status';
-		this.#statusIcon = this._register(createSemanticIcon(document, { id: 'state.info' }));
-		this.#statusText = document.createElement('span');
-		this.#status.append(this.#statusIcon.element, this.#statusText);
-		content.append(header, this.#body, this.#status);
+		content.append(header, this.#subtitle, this.#body);
 		this.#page.append(content);
 		this.#scroll = this._register(
 			new DomScrollableElement(this.#page, {
@@ -102,7 +132,9 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 					event.altKey ||
 					event.ctrlKey ||
 					event.metaKey ||
-					event.shiftKey
+					event.shiftKey ||
+					(event.target instanceof HTMLElement &&
+						event.target.closest('input,textarea,select,button'))
 				)
 					return;
 				const positions: Record<string, number> = {
@@ -118,23 +150,63 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			})
 		);
 	}
-	private text(key: keyof typeof m): string {
+	private text(key: Message): string {
 		return this.localization.format(m[key]);
 	}
 	setItem(model: ResolvedWorkbenchItem, token: CancellationToken): void {
+		this.clear();
+		if (token.isCancellationRequested) return;
 		this.#section = (model as AccountModel).section;
-		this.#heading.textContent = this.text(
-			this.#section === 'sessions' ? 'sessionsDevices' : this.#section
-		);
-		if (!token.isCancellationRequested) void this.load();
+		this.#heading.textContent = this.text(this.#section);
+		this.#subtitle.textContent =
+			this.#section === 'sessions' ? this.text('sessionsDevicesNote') : '';
+		this.#subtitle.hidden = !this.#subtitle.textContent;
+		const sections: AccountSection[] =
+			this.#section === 'profile'
+				? ['profile', 'security']
+				: this.#section === 'sessions'
+					? ['sessions', 'desktops']
+					: [this.#section];
+		for (const section of sections) {
+			const host = this.node('section', 'section', this.#body);
+			host.dataset.section = section;
+			const content = this.node('div', 'section-content', host);
+			const store = this.#content.add(new DisposableStore());
+			const feedback = this.#content.add(new AccountFeedback(host, this.localization));
+			this.#sections.set(section, { host, content, store, feedback, sequence: 0 });
+		}
+		if (this.#section === 'sessions' && this.services) {
+			this.#content.add(
+				this.services.layout.registerSecondary('account/sessions', (host) => {
+					const element = host.ownerDocument.createElement('section');
+					element.className = 'prctr-account prctr-account--details';
+					host.append(element);
+					this.#detailHost = element;
+					this.renderDetail();
+					return {
+						dispose: () => {
+							this.#detailStore.clear();
+							this.#detailHost = undefined;
+							element.remove();
+						}
+					};
+				})
+			);
+		}
+		this.#content.add(token.onCancellationRequested(() => this.clear()));
+		void this.refresh();
 	}
 	clear(): void {
 		this.#epoch++;
-		this.#buttons = [];
+		this.#editor.clear();
 		this.#content.clear();
+		this.#detailStore.clear();
+		this.#sections.clear();
+		this.#pending.clear();
+		this.#unconfirmed.clear();
 		this.#body.replaceChildren();
-		this.#statusText.textContent = '';
-		this.#busy = false;
+		this.#detail = undefined;
+		this.#refreshing = false;
 	}
 	setVisible(visible: boolean): void {
 		this.element.hidden = !visible;
@@ -145,7 +217,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 	focus(): void {
 		this.#heading.focus();
 	}
-	getViewState(): Readonly<Record<string, unknown>> | undefined {
+	getViewState(): undefined {
 		return undefined;
 	}
 	override dispose(): void {
@@ -155,98 +227,31 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		super.dispose();
 		this.element.remove();
 	}
-	private status(key: keyof typeof m, kind: 'info' | 'error' | 'loading' = 'info'): void {
-		this.#status.hidden = false;
-		this.#status.dataset.kind = kind;
-		this.#statusText.textContent = this.text(key);
-		this.#statusIcon.setState({
-			id:
-				kind === 'loading'
-					? 'state.loading'
-					: kind === 'error'
-						? 'state.error'
-						: 'state.info',
-			...(kind === 'loading' ? { modifier: 'spin' as const } : {})
-		});
+	private node<K extends keyof HTMLElementTagNameMap>(
+		tag: K,
+		name: string,
+		host: HTMLElement
+	): HTMLElementTagNameMap[K] {
+		const node = host.ownerDocument.createElement(tag);
+		if (name) node.className = `prctr-account__${name}`;
+		host.append(node);
+		return node;
 	}
-	private async request(intent: AccountIntent): Promise<AccountResponse> {
-		try {
-			return await this.client.request(intent);
-		} catch {
-			return {
-				kind: 'error',
-				reason:
-					intent.kind === 'read' ||
-					intent.kind === 'readPhoto' ||
-					intent.kind === 'openSecurity'
-						? 'unavailable'
-						: 'unconfirmed'
-			};
-		}
-	}
-	private async load(): Promise<void> {
-		if (this.#busy || this.#disposed) return;
-		const epoch = ++this.#epoch;
-		const section = this.#section;
-		this.#page.firstElementChild?.append(this.#status);
-		this.#buttons = [];
-		this.#content.clear();
-		this.#body.replaceChildren();
-		this.#refresh.setState({ label: this.text('refresh'), disabled: true });
-		this.#body.setAttribute('aria-busy', 'true');
-		this.status('loading', 'loading');
-		const [result, companion] = await Promise.all([
-			this.request({ kind: 'read', section }),
-			this.request({
-				kind: 'read',
-				section:
-					section === 'profile'
-						? 'security'
-						: section === 'sessions'
-							? 'desktops'
-							: section
-			})
-		]);
-		if (this.#disposed || epoch !== this.#epoch) return;
-		this.#body.setAttribute('aria-busy', 'false');
-		this.#refresh.setState({ label: this.text('refresh') });
-		if (result.kind !== 'data' || result.data.section !== section) {
-			this.status(result.kind === 'error' ? result.reason : 'unavailable', 'error');
-			return;
-		}
-		this.render(result.data);
-		if (section === 'profile' || section === 'sessions') {
-			if (companion.kind === 'data') this.render(companion.data);
-			else {
-				const message = this.paragraph(this.text('unavailable'));
-				message.setAttribute('role', 'status');
-			}
-		}
-		this.#statusText.textContent = '';
-		this.#status.hidden = true;
-		this.#scroll.scanDomNode();
-	}
-	private paragraph(text: string, host = this.#body): HTMLElement {
-		const p = host.ownerDocument.createElement('p');
+	private paragraph(text: string, host: HTMLElement, name = ''): HTMLElement {
+		const p = this.node('p', name, host);
 		p.textContent = text;
-		host.append(p);
 		return p;
 	}
-	private row(label: string, value: string, host = this.#body): void {
-		const row = host.ownerDocument.createElement('div');
-		row.className = 'prctr-account__row';
-		const term = host.ownerDocument.createElement('dt');
-		term.textContent = label;
-		const detail = host.ownerDocument.createElement('dd');
-		detail.textContent = value || this.text('notAvailable');
-		row.append(term, detail);
-		host.append(row);
+	private heading(key: Message, host: HTMLElement): HTMLHeadingElement {
+		const h = this.node('h2', '', host);
+		h.textContent = this.text(key);
+		h.tabIndex = -1;
+		return h;
 	}
-	private fields(host = this.#body): HTMLElement {
-		const list = host.ownerDocument.createElement('dl');
-		list.className = 'prctr-account__fields';
-		host.append(list);
-		return list;
+	private row(label: string, value: string, host: HTMLElement): void {
+		const row = this.node('div', 'row', host);
+		this.node('dt', '', row).textContent = label;
+		this.node('dd', '', row).textContent = value || this.text('notProvided');
 	}
 	private date(time: number): string {
 		return time === 0
@@ -260,65 +265,133 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		host: HTMLElement,
 		label: string,
 		run: (button: ButtonControl) => void,
-		store = this.#content
+		store: DisposableStore,
+		variant: 'primary' | 'secondary' = 'secondary'
 	): ButtonControl {
-		const button = store.add(new ButtonControl(host, { label, variant: 'secondary' }));
-		this.#buttons.push({ control: button, label });
+		const button = store.add(new ButtonControl(host, { label, variant }));
 		store.add(button.onDidRequest(() => run(button)));
-		store.add({
-			dispose: () => {
-				this.#buttons = this.#buttons.filter((entry) => entry.control !== button);
-			}
-		});
 		return button;
-	}
-	private heading(key: keyof typeof m, host = this.#body): void {
-		const heading = host.ownerDocument.createElement('h2');
-		heading.textContent = this.text(key);
-		host.append(heading);
 	}
 	private icon(
 		host: HTMLElement,
 		id: Parameters<typeof createSemanticIcon>[1]['id'],
-		size: 16 | 24 = 24
+		store: DisposableStore,
+		size: 16 | 24 = 16
 	): void {
-		host.append(
-			this.#content.add(createSemanticIcon(host.ownerDocument, { id, size })).element
-		);
+		host.append(store.add(createSemanticIcon(host.ownerDocument, { id, size })).element);
 	}
-	private render(data: AccountData): void {
-		this.#status.hidden = false;
+	private async request(intent: AccountIntent): Promise<AccountResponse> {
+		try {
+			return await this.client.request(intent);
+		} catch {
+			return {
+				kind: 'error',
+				reason: ['read', 'readPhoto', 'openSecurity'].includes(intent.kind)
+					? 'unavailable'
+					: 'unconfirmed'
+			};
+		}
+	}
+	private updateRefresh(): void {
+		this.#refresh.setState({
+			label: this.text('refresh'),
+			disabled: this.#refreshing || this.#pending.size > 0,
+			icon: (doc) => createSemanticIcon(doc, { id: 'action.refresh' })
+		});
+	}
+	private async refresh(): Promise<void> {
+		if (this.#refreshing || this.#pending.size || this.#disposed) return;
+		const epoch = this.#epoch;
+		this.#refreshing = true;
+		this.updateRefresh();
+		await Promise.all([...this.#sections.keys()].map((section) => this.loadSection(section)));
+		if (this.#disposed || epoch !== this.#epoch) return;
+		this.#refreshing = false;
+		this.updateRefresh();
+	}
+	private async loadSection(section: AccountSection): Promise<boolean> {
+		const view = this.#sections.get(section);
+		if (!view) return false;
+		const epoch = this.#epoch,
+			sequence = ++view.sequence;
+		view.feedback.set('loading', 'loading');
+		view.host.setAttribute('aria-busy', 'true');
+		const result = await this.request({ kind: 'read', section });
+		if (this.#disposed || epoch !== this.#epoch || sequence !== view.sequence) return false;
+		view.host.setAttribute('aria-busy', 'false');
+		if (result.kind !== 'data' || result.data.section !== section) {
+			if (!view.data && !view.content.childElementCount)
+				this.heading(section === 'profile' ? 'accountDetails' : section, view.content);
+			view.feedback.set(
+				result.kind === 'error' ? result.reason : 'sectionUnavailable',
+				'error'
+			);
+			return false;
+		}
+		for (const key of this.#unconfirmed) {
+			if (
+				(section === 'sessions' && key.startsWith('revokeSession')) ||
+				(section === 'desktops' && key.startsWith('revokeDesktop'))
+			)
+				this.#unconfirmed.delete(key);
+		}
+		view.data = result.data;
+		view.store.clear();
+		view.content.replaceChildren();
+		view.feedback.set();
+		this.render(result.data, view);
+		this.#scroll.scanDomNode();
+		if (this.#detail && (section === 'sessions' || section === 'desktops')) {
+			const items =
+				result.data.section === 'sessions'
+					? result.data.sessions
+					: result.data.section === 'desktops'
+						? result.data.desktops
+						: [];
+			const matchingType =
+				section === 'desktops'
+					? 'platform' in this.#detail.item
+					: 'client' in this.#detail.item;
+			if (matchingType) {
+				const item = items.find((item) => item.id === this.#detail?.item.id);
+				this.#detail = item
+					? {
+							item,
+							trigger:
+								view.content.querySelector<HTMLElement>(
+									`[data-item-id="${item.id}"] button`
+								) ?? this.#heading
+						}
+					: undefined;
+				this.renderDetail();
+			}
+		}
+		return true;
+	}
+	private render(data: AccountData, view: SectionView): void {
+		const host = view.content,
+			store = view.store;
 		if (data.section === 'profile') {
-			this.paragraph(this.text('profileSubtitle')).className = 'prctr-account__subtitle';
 			const profile = data.profile;
-			const hero = this.#body.ownerDocument.createElement('div');
-			hero.className = 'prctr-account__identity';
-			const avatar = hero.ownerDocument.createElement('div');
-			avatar.className = 'prctr-account__avatar';
+			const hero = this.node('div', 'identity', host);
+			const avatar = this.node('div', 'avatar', hero);
 			avatar.ariaHidden = 'true';
 			avatar.textContent = (profile.displayName || profile.username)
 				.split(/\s+/u)
 				.slice(0, 2)
-				.map((p) => [...p][0] ?? '')
+				.map((part) => [...part][0] ?? '')
 				.join('')
 				.toUpperCase();
-			const details = hero.ownerDocument.createElement('div');
-			const name = hero.ownerDocument.createElement('h2');
-			name.textContent = profile.displayName || profile.username;
-			details.append(name);
-			this.paragraph(this.binding.identity?.institutionName ?? '', details);
-			const photoActions = hero.ownerDocument.createElement('div');
-			photoActions.className = 'prctr-account__photo-actions';
-			hero.append(avatar, details, photoActions);
-			this.#body.append(hero);
-			void this.loadPhoto(avatar, photoActions, this.#epoch);
-			const detailsSection = this.#body.ownerDocument.createElement('section');
-			detailsSection.className = 'prctr-account__profile-section';
-			this.#body.append(detailsSection);
-			this.heading('accountDetails', detailsSection);
-			this.paragraph(this.text('profileNote'), detailsSection).className =
-				'prctr-account__section-note';
-			const fields = this.fields(detailsSection);
+			const identity = this.node('div', 'identity-text', hero);
+			this.node('h2', '', identity).textContent = profile.displayName || profile.username;
+			this.paragraph(profile.email || profile.username, identity);
+			if (this.binding.identity?.institutionName)
+				this.paragraph(this.binding.identity.institutionName, identity);
+			const photo = this.node('div', 'photo', host);
+			void this.loadPhoto(avatar, photo, view);
+			this.heading('accountDetails', host);
+			this.paragraph(this.text('profileNote'), host, 'section-note');
+			const fields = this.node('dl', 'fields', host);
 			this.row(
 				this.text('fullName'),
 				[profile.firstName, profile.lastName].filter(Boolean).join(' '),
@@ -326,31 +399,38 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			);
 			this.row(this.text('username'), profile.username, fields);
 			this.row(this.text('email'), profile.email ?? '', fields);
-			if (profile.emailVerified) {
+			if (profile.email && profile.emailVerified !== undefined) {
 				const value = fields.lastElementChild!.lastElementChild as HTMLElement;
-				const verified = value.ownerDocument.createElement('span');
-				verified.className = 'prctr-account__verified';
-				this.icon(verified, 'state.success', 16);
-				verified.append(value.ownerDocument.createTextNode(this.text('verified')));
-				value.append(verified);
+				value.classList.add('prctr-account__email');
+				const email = this.node('span', '', value);
+				email.textContent = profile.email;
+				value.replaceChildren(email);
+				const verified = this.node('span', 'verified', value);
+				this.icon(
+					verified,
+					profile.emailVerified ? 'state.success' : 'state.info',
+					store,
+					16
+				);
+				verified.append(
+					host.ownerDocument.createTextNode(
+						this.text(profile.emailVerified ? 'verified' : 'unverified')
+					)
+				);
 			}
-			this.row(this.text('locale'), profile.locale ?? '', fields);
-			this.row(this.text('timezone'), profile.timezone ?? '', fields);
+			if (profile.locale) this.row(this.text('locale'), profile.locale, fields);
+			if (profile.timezone) this.row(this.text('timezone'), profile.timezone, fields);
 			if (this.binding.identity?.noCurrentAffiliation)
-				this.paragraph(this.text('noAffiliation'), detailsSection);
+				this.paragraph(this.text('noAffiliation'), host);
 			if (this.binding.identity?.noAssignedAccess)
-				this.paragraph(this.text('noAccess'), detailsSection);
+				this.paragraph(this.text('noAccess'), host);
 			return;
 		}
 		if (data.section === 'security') {
-			const section = this.#body.ownerDocument.createElement('section');
-			section.className = 'prctr-account__profile-section';
-			this.#body.append(section);
-			this.heading('security', section);
-			this.paragraph(this.text('browserNote'), section).className =
-				'prctr-account__section-note';
-			const fields = this.fields(section);
-			const security = data.security;
+			this.heading('security', host);
+			this.paragraph(this.text('browserNote'), host, 'section-note');
+			const fields = this.node('dl', 'fields', host),
+				security = data.security;
 			this.row(
 				this.text('password'),
 				this.text(security.password ? 'enabled' : 'disabled'),
@@ -358,7 +438,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			);
 			this.row(
 				this.text('providers'),
-				security.providers.map((p) => p.name).join(', ') || this.text('none'),
+				security.providers.map((provider) => provider.name).join(', ') || this.text('none'),
 				fields
 			);
 			const mfa = security.mfa;
@@ -379,190 +459,293 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 				),
 				fields
 			);
-			const securityAction = section.ownerDocument.createElement('div');
-			securityAction.className = 'prctr-account__security-action';
-			section.append(securityAction);
-			this.action(securityAction, this.text('manageSecurity'), (button) => {
-				void this.perform({ kind: 'openSecurity' }, button);
-			});
+			const actions = this.node('div', 'security-action', host);
+			const feedback = store.add(new AccountFeedback(host, this.localization));
+			this.action(
+				actions,
+				this.text('manageSecurity'),
+				(button) => {
+					const epoch = this.#epoch;
+					button.setState({ label: this.text('manageSecurity'), disabled: true });
+					void this.request({ kind: 'openSecurity' }).then((result) => {
+						if (this.#disposed || epoch !== this.#epoch || !button.element.isConnected)
+							return;
+						button.setState({ label: this.text('manageSecurity') });
+						feedback.set(
+							result.kind === 'error' ? result.reason : 'browserOpened',
+							result.kind === 'error' ? 'error' : 'info'
+						);
+					});
+				},
+				store
+			);
 			return;
 		}
 		const desktops = data.section === 'desktops';
-		if (!desktops) {
-			this.paragraph(this.text('sessionsDevicesNote')).className = 'prctr-account__subtitle';
-			const current = data.sessions.find((s) => s.current);
+		if (data.section === 'sessions') {
+			const current = data.sessions.find((session) => session.current);
 			if (current) {
-				this.heading('currentSession');
-				const panel = this.#body.ownerDocument.createElement('section');
-				panel.className = 'prctr-account__current';
-				this.icon(panel, current.client === 'web' ? 'workbench.browser' : 'device.desktop');
-				const details = panel.ownerDocument.createElement('div');
-				const name = panel.ownerDocument.createElement('h3');
-				name.textContent = current.name || this.text('desktop');
-				details.append(name);
-				this.paragraph(
-					this.text(
-						current.client === 'web'
-							? 'web'
-							: current.client === 'cli'
-								? 'cli'
-								: 'desktop'
-					),
-					details
+				this.heading('currentSession', host);
+				const summary = this.node('div', 'current', host);
+				this.icon(
+					summary,
+					current.client === 'web' ? 'session.web' : 'session.desktop',
+					store
 				);
+				const identity = this.node('div', 'item-text', summary);
+				this.node('h3', '', identity).textContent = current.name || this.text('desktop');
 				this.paragraph(
 					this.text('lastActive') + ': ' + this.date(current.lastActivityAt),
-					details
+					identity
 				);
-				panel.append(details);
-				const badge = panel.ownerDocument.createElement('span');
-				badge.className = 'prctr-account__badge';
-				badge.textContent = this.text('thisSession');
-				panel.append(badge);
-				this.#body.append(panel);
+				this.node('span', 'badge', summary).textContent = this.text('thisSession');
+				this.detailsAction(summary, current, store);
 			}
-			this.heading('otherSessions');
-		} else this.heading('desktops');
-		const table = this.#body.ownerDocument.createElement('table');
-		table.className = 'prctr-account__table';
-		const head = table.createTHead().insertRow();
-		for (const label of [
-			this.text(desktops ? 'device' : 'client'),
-			this.text('lastActive'),
-			this.text('actions')
-		]) {
-			const th = table.ownerDocument.createElement('th');
-			th.scope = 'col';
-			th.textContent = label;
-			head.append(th);
+			this.heading('otherSessions', host);
+		} else {
+			this.heading('desktops', host);
+			this.paragraph(this.text('desktopsNote'), host, 'section-note');
 		}
-		const body = table.createTBody();
-		const items = desktops ? data.desktops : data.sessions.filter((s) => !s.current);
+		const items =
+			data.section === 'desktops'
+				? data.desktops
+				: data.sessions.filter((session) => !session.current);
+		if (!items.length) {
+			this.paragraph(this.text(desktops ? 'emptyDesktops' : 'emptySessions'), host, 'empty');
+			return;
+		}
+		const list = this.node('ul', 'items', host);
+		list.ariaLabel = this.text(desktops ? 'desktops' : 'otherSessions');
 		for (const item of items) {
-			const row = body.insertRow();
-			const name = row.insertCell();
-			const identity = name.ownerDocument.createElement('div');
-			identity.className = 'prctr-account__table-identity';
+			const row = this.node('li', 'item', list);
+			row.dataset.itemId = item.id;
+			const summary = this.node('div', 'item-summary', row);
 			this.icon(
-				identity,
-				'client' in item && item.client === 'web' ? 'workbench.browser' : 'device.desktop'
+				summary,
+				'client' in item && item.client === 'web' ? 'session.web' : 'session.desktop',
+				store
 			);
-			const label = name.ownerDocument.createElement('span');
-			label.textContent = item.name || this.text(desktops ? 'desktop' : 'otherClient');
-			identity.append(label);
-			if (item.current) {
-				const badge = name.ownerDocument.createElement('span');
-				badge.className = 'prctr-account__badge';
-				badge.textContent = this.text('thisDesktop');
-				identity.append(badge);
-			}
-			name.append(identity);
-			row.insertCell().textContent = this.date(
-				'lastUsedAt' in item ? item.lastUsedAt : item.lastActivityAt
+			const identity = this.node('div', 'item-text', summary);
+			const title = this.node('div', 'item-title', identity);
+			this.node('span', '', title).textContent =
+				item.name || this.text(desktops ? 'desktop' : 'otherClient');
+			if (item.current)
+				this.node('span', 'badge', title).textContent = this.text('thisDesktop');
+			const type =
+				'platform' in item ? this.platform(item.platform) : this.clientName(item.client);
+			this.paragraph(
+				type +
+					' · ' +
+					this.text(desktops ? 'lastUsed' : 'lastActive') +
+					': ' +
+					this.date('lastUsedAt' in item ? item.lastUsedAt : item.lastActivityAt),
+				identity
 			);
-			const actions = row.insertCell();
-			if ('revoked' in item && item.revoked) actions.textContent = this.text('revoked');
+			const actions = this.node('div', 'actions', summary);
+			this.detailsAction(actions, item, store);
+			if ('revoked' in item && item.revoked)
+				this.node('span', 'inactive', actions).textContent = this.text('revoked');
 			else
 				this.action(
 					actions,
 					this.text(desktops ? 'revokeDesktop' : 'endSession'),
 					(button) =>
 						this.confirm(
-							actions,
+							row,
 							button,
 							{ kind: desktops ? 'revokeDesktop' : 'revokeSession', id: item.id },
-							item.current
-						)
+							item.current,
+							item.name,
+							view
+						),
+					store
 				);
 		}
-		if (items.length === 0) {
-			const cell = body.insertRow().insertCell();
-			cell.colSpan = 3;
-			cell.textContent = this.text(desktops ? 'emptyDesktops' : 'emptySessions');
-		}
-		this.#body.append(table);
-		if (desktops) {
-			const note = this.paragraph(this.text('desktopsNote'));
-			note.className = 'prctr-account__explanation';
-		}
 	}
-	private async loadPhoto(avatar: HTMLElement, host: HTMLElement, epoch: number): Promise<void> {
-		const result = await this.request({ kind: 'readPhoto' });
-		if (this.#disposed || this.#epoch !== epoch) return;
-		if (result.kind !== 'photo') {
-			this.paragraph(this.text('photoUnavailable'), host);
+	private clientName(client: string): string {
+		return this.text(client === 'web' ? 'web' : client === 'cli' ? 'cli' : 'desktop');
+	}
+	private platform(platform: string): string {
+		return this.text(
+			platform === 'darwin' || platform === 'macos'
+				? 'mac'
+				: platform === 'win32' || platform === 'windows'
+					? 'windows'
+					: platform === 'linux'
+						? 'linux'
+						: 'otherPlatform'
+		);
+	}
+	private detailsAction(host: HTMLElement, item: AccountItem, store: DisposableStore): void {
+		if (!this.services) return;
+		this.action(
+			host,
+			this.text('details'),
+			(button) => {
+				this.#detail = { item, trigger: button.element };
+				this.services!.layout.showSecondary();
+				this.renderDetail();
+				this.#detailHost?.querySelector<HTMLElement>('h2')?.focus();
+			},
+			store
+		);
+	}
+	private renderDetail(): void {
+		const host = this.#detailHost;
+		if (!host) return;
+		this.#detailStore.clear();
+		host.replaceChildren();
+		const heading = this.heading('details', host);
+		if (!this.#detail) {
+			this.paragraph(this.text('selectDetails'), host);
 			return;
 		}
-		const image = avatar.ownerDocument.createElement('img');
-		image.alt = '';
-		image.src = result.dataUrl;
-		this.onPhoto?.(result.dataUrl);
-		avatar.replaceChildren(image);
-		const input = host.ownerDocument.createElement('input');
-		input.type = 'file';
-		input.accept = 'image/png,image/jpeg,image/webp';
-		input.hidden = true;
-		host.append(input);
-		const choose = this.action(host, this.text('changePhoto'), () => input.click());
-		this.action(host, this.text('removePhoto'), (button) =>
-			this.confirm(host, button, { kind: 'removePhoto', etag: result.etag }, false)
-		);
-		this.#content.add(
-			addDisposableListener(input, 'change', () => {
-				void (async () => {
-					const file = input.files?.[0];
-					input.value = '';
-					if (!file) return;
-					if (
-						file.size < 1 ||
-						file.size > 5 * 1024 * 1024 ||
-						!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)
-					) {
-						host.append(this.#status);
-						this.status('photoInvalid', 'error');
-						return;
-					}
-					try {
-						const bytes = new Uint8Array(await file.arrayBuffer());
-						if (this.#disposed || this.#epoch !== epoch) return;
-						await this.perform(
-							{
-								kind: 'uploadPhoto',
-								bytes,
-								mediaType: file.type as 'image/png' | 'image/jpeg' | 'image/webp',
-								etag: result.etag
-							},
-							choose
-						);
-					} catch {
-						if (!this.#disposed && this.#epoch === epoch) {
-							host.append(this.#status);
-							this.status('photoInvalid', 'error');
-						}
-					}
-				})();
-			})
+		const { item, trigger } = this.#detail;
+		heading.textContent = item.name || this.text('details');
+		const fields = this.node('dl', 'fields', host);
+		if ('platform' in item) {
+			this.row(this.text('platform'), this.platform(item.platform), fields);
+			this.row(this.text('version'), item.release, fields);
+			this.row(this.text('registered'), this.date(item.createdAt), fields);
+			this.row(this.text('lastUsed'), this.date(item.lastUsedAt), fields);
+			if (item.revoked) this.paragraph(this.text('revoked'), host);
+		} else {
+			this.row(this.text('client'), this.clientName(item.client), fields);
+			this.row(
+				this.text('method'),
+				this.text(
+					item.method === 'password'
+						? 'passwordMethod'
+						: item.method === 'oidc'
+							? 'oidcMethod'
+							: item.method === 'cas'
+								? 'casMethod'
+								: 'otherMethod'
+				),
+				fields
+			);
+			this.row(this.text('created'), this.date(item.createdAt), fields);
+			this.row(this.text('lastActive'), this.date(item.lastActivityAt), fields);
+			this.row(this.text('expires'), this.date(item.expiresAt), fields);
+		}
+		this.action(
+			host,
+			this.text('backToList'),
+			() => (trigger.isConnected ? trigger : this.#heading).focus(),
+			this.#detailStore
 		);
 	}
-
+	private async loadPhoto(
+		avatar: HTMLElement,
+		host: HTMLElement,
+		view: SectionView
+	): Promise<void> {
+		const epoch = this.#epoch,
+			sequence = view.sequence;
+		const actions = this.node('div', 'actions', host);
+		const feedback = view.store.add(new AccountFeedback(host, this.localization));
+		view.photoFeedback = feedback;
+		const input = this.node('input', '', host);
+		input.type = 'file';
+		input.accept = '.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp';
+		input.hidden = true;
+		let photo: Extract<AccountResponse, { kind: 'photo' }> | undefined;
+		const choose = this.action(
+			actions,
+			this.text('changePhoto'),
+			() => input.click(),
+			view.store
+		);
+		choose.setState({ label: this.text('changePhoto'), disabled: true });
+		const remove = this.action(
+			actions,
+			this.text('removePhoto'),
+			(button) => {
+				if (photo)
+					this.confirm(
+						host,
+						button,
+						{ kind: 'removePhoto', etag: photo.etag },
+						false,
+						'',
+						view
+					);
+			},
+			view.store
+		);
+		remove.element.hidden = true;
+		const apply = (next: Extract<AccountResponse, { kind: 'photo' }>): void => {
+			photo = next;
+			this.#unconfirmed.delete('photo');
+			const image = avatar.ownerDocument.createElement('img');
+			image.alt = '';
+			image.src = next.dataUrl;
+			avatar.replaceChildren(image);
+			this.onPhoto?.(next.dataUrl);
+			choose.setState({ label: this.text('changePhoto'), disabled: !this.services });
+			remove.element.hidden = !this.services?.customPhotos.has(next.etag);
+		};
+		view.store.add(addDisposableListener(input, 'cancel', () => choose.focus()));
+		view.store.add(
+			addDisposableListener(input, 'change', () => {
+				const file = input.files?.[0];
+				input.value = '';
+				if (!file || !photo || !this.services) return;
+				feedback.set();
+				this.#editor.value = new AccountPhotoEditor(
+					host.ownerDocument,
+					this.services.overlays,
+					this.client,
+					this.localization,
+					photo.etag,
+					file,
+					(next) => {
+						if (this.#disposed || epoch !== this.#epoch || sequence !== view.sequence)
+							return;
+						this.services!.customPhotos.add(next.etag);
+						apply(next);
+						feedback.set('photoUpdated');
+					},
+					(reconcile) => {
+						if (choose.element.isConnected) {
+							choose.focus();
+							if (reconcile) {
+								choose.setState({
+									label: this.text('changePhoto'),
+									disabled: true
+								});
+								void this.refresh();
+							}
+						}
+					}
+				);
+			})
+		);
+		const result = await this.request({ kind: 'readPhoto' });
+		if (this.#disposed || epoch !== this.#epoch || sequence !== view.sequence) return;
+		if (result.kind === 'photo') apply(result);
+		else feedback.set('photoUnavailable', 'error');
+	}
 	private confirm(
 		host: HTMLElement,
 		trigger: ButtonControl,
 		intent: AccountIntent,
-		current: boolean
+		current: boolean,
+		name: string,
+		view: SectionView
 	): void {
-		if (this.#busy || host.querySelector('[data-confirmation]')) return;
-		const owned = this.#content.add(new DisposableStore());
-		const confirmation = host.ownerDocument.createElement('div');
-		owned.add({ dispose: () => confirmation.remove() });
-		confirmation.className = 'prctr-account__confirmation';
-		confirmation.dataset.confirmation = 'true';
-		confirmation.role = 'group';
-		const desktop = intent.kind === 'revokeDesktop';
-		const photo = intent.kind === 'removePhoto';
-		confirmation.ariaLabel = this.text(
+		if (host.querySelector('[data-confirmation]')) return;
+		const owned = view.store.add(new DisposableStore());
+		const box = this.node('div', 'confirmation', host);
+		box.dataset.confirmation = 'true';
+		box.role = 'group';
+		owned.add({ dispose: () => box.remove() });
+		const desktop = intent.kind === 'revokeDesktop',
+			photo = intent.kind === 'removePhoto';
+		box.ariaLabel = this.text(
 			photo ? 'removePhoto' : desktop ? 'confirmDesktop' : 'confirmSession'
 		);
+		if (name) this.paragraph(name, box, 'confirmation-name');
 		this.paragraph(
 			this.text(
 				photo
@@ -571,69 +754,131 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 						? 'confirmDesktopDetail'
 						: 'confirmSessionDetail'
 			),
-			confirmation
+			box
 		);
-		if (current) this.paragraph(this.text('confirmCurrent'), confirmation);
-		const actions = host.ownerDocument.createElement('div');
-		actions.className = 'prctr-account__actions';
-		confirmation.append(actions);
-		const cancel = this.action(
+		if (current) this.paragraph(this.text('confirmCurrent'), box);
+		const actions = this.node('div', 'actions', box);
+		const feedback = owned.add(new AccountFeedback(box, this.localization));
+		const key = photo ? 'photo' : intent.kind + ('id' in intent ? intent.id : '');
+		let working = false,
+			needsRead = this.#unconfirmed.has(key);
+		const close = (): void => {
+			if (working) return;
+			view.store.delete(owned);
+			trigger.element.hidden = false;
+			trigger.focus();
+		};
+		const cancel = this.action(actions, this.text('cancel'), close, owned);
+		const label = this.text(photo ? 'removePhoto' : desktop ? 'revokeDesktop' : 'endSession');
+		const confirm = this.action(
 			actions,
-			this.text('cancel'),
+			label,
 			() => {
-				this.#page.firstElementChild?.append(this.#status);
-				this.#status.hidden = true;
-				this.#content.delete(owned);
-				trigger.element.hidden = false;
-				trigger.focus();
+				if (working || needsRead) return;
+				if (this.#pending.size) {
+					feedback.set('mutationWaiting');
+					return;
+				}
+				working = true;
+				const epoch = this.#epoch;
+				this.#pending.add(key);
+				this.updateRefresh();
+				cancel.setState({ label: this.text('cancel'), disabled: true });
+				confirm.setState({ label, disabled: true });
+				feedback.set('working', 'loading');
+				void (async () => {
+					const result = await this.request(intent);
+					if (this.#disposed || epoch !== this.#epoch) return;
+					if (result.kind === 'success') {
+						if (photo && intent.kind === 'removePhoto')
+							this.services?.customPhotos.delete(intent.etag);
+						const loaded = await this.loadSection(
+							photo ? 'profile' : desktop ? 'desktops' : 'sessions'
+						);
+						if (this.#disposed || epoch !== this.#epoch) return;
+						this.#pending.delete(key);
+						this.updateRefresh();
+						working = false;
+						if (loaded) {
+							(photo ? view.photoFeedback : view.feedback)?.set(
+								photo
+									? 'photoRemoved'
+									: desktop
+										? 'desktopRevokedSuccess'
+										: 'sessionEndedSuccess'
+							);
+							(
+								view.content.querySelector<HTMLElement>('h2') ?? this.#heading
+							).focus();
+						} else {
+							needsRead = true;
+							this.#unconfirmed.add(key);
+							feedback.set('unconfirmed', 'error');
+							recheck.element.hidden = false;
+							cancel.setState({ label: this.text('cancel') });
+							recheck.focus();
+						}
+						return;
+					}
+					this.#pending.delete(key);
+					this.updateRefresh();
+					working = false;
+					const reason = result.kind === 'error' ? result.reason : 'unconfirmed';
+					needsRead = ['unconfirmed', 'conflict', 'notFound'].includes(reason);
+					if (needsRead) this.#unconfirmed.add(key);
+					feedback.set(reason, 'error');
+					cancel.setState({ label: this.text('cancel') });
+					confirm.setState({ label, disabled: needsRead });
+					recheck.element.hidden = !needsRead;
+					(needsRead ? recheck : confirm).focus();
+				})();
 			},
 			owned
 		);
-		this.action(
+		const recheck = this.action(
 			actions,
-			this.text(photo ? 'removePhoto' : desktop ? 'revokeDesktop' : 'endSession'),
-			(button) => {
-				void this.perform(intent, button);
+			this.text('refresh'),
+			() => {
+				if (this.#pending.size) {
+					feedback.set('mutationWaiting');
+					return;
+				}
+				const epoch = this.#epoch;
+				working = true;
+				recheck.setState({ label: this.text('refresh'), disabled: true });
+				cancel.setState({ label: this.text('cancel'), disabled: true });
+				void this.loadSection(photo ? 'profile' : desktop ? 'desktops' : 'sessions').then(
+					(loaded) => {
+						if (this.#disposed || epoch !== this.#epoch) return;
+						if (loaded)
+							(
+								view.content.querySelector<HTMLElement>('h2') ?? this.#heading
+							).focus();
+						else {
+							working = false;
+							recheck.setState({ label: this.text('refresh') });
+							cancel.setState({ label: this.text('cancel') });
+						}
+					}
+				);
 			},
 			owned
 		);
-		host.append(confirmation);
+		recheck.element.hidden = !needsRead;
+		if (needsRead) {
+			confirm.setState({ label, disabled: true });
+			feedback.set('unconfirmed', 'error');
+		}
+		owned.add(
+			addDisposableListener(box, 'keydown', (event) => {
+				if (event.key === 'Escape') {
+					event.preventDefault();
+					event.stopPropagation();
+					close();
+				}
+			})
+		);
 		trigger.element.hidden = true;
 		cancel.focus();
-	}
-	private async perform(intent: AccountIntent, button: ButtonControl): Promise<void> {
-		if (this.#busy || this.#disposed) return;
-		const epoch = this.#epoch;
-		this.#busy = true;
-		for (const { control, label } of this.#buttons) control.setState({ label, disabled: true });
-		const feedbackHost =
-			button.element.closest<HTMLElement>('[data-confirmation]') ??
-			button.element.parentElement;
-		feedbackHost?.append(this.#status);
-		this.#refresh.setState({ label: this.text('refresh'), disabled: true });
-		this.#status.hidden = false;
-		this.status('working', 'loading');
-		const result = await this.request(intent);
-		if (this.#disposed || epoch !== this.#epoch) return;
-		this.#busy = false;
-		for (const { control, label } of this.#buttons) control.setState({ label });
-		this.#refresh.setState({ label: this.text('refresh') });
-		if (result.kind === 'error') {
-			this.status(result.reason, 'error');
-			if (result.reason === 'unconfirmed' || result.reason === 'conflict') {
-				for (const { control, label } of this.#buttons)
-					control.setState({ label, disabled: true });
-				this.#refresh.focus();
-			} else button.focus();
-			return;
-		}
-		if (intent.kind === 'openSecurity') this.status('browserOpened');
-		else {
-			await this.load();
-			if (!this.#disposed && this.#epoch === epoch + 1) {
-				if (this.#status.hidden) this.status('completed');
-				this.#heading.focus();
-			}
-		}
 	}
 }

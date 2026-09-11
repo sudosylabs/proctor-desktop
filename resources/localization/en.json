@@ -22,6 +22,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.adjust.photo": {
+      "message": "Adjust photo",
+      "description": "Own-account adjustPhoto presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.back.to.list": {
+      "message": "Back to list",
+      "description": "Own-account backToList presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.browser.note": {
       "message": "Manage your password, sign-in methods and multi-factor authentication.",
       "description": "Own-account browserNote presentation.",
@@ -52,6 +64,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.choose.another": {
+      "message": "Choose another",
+      "description": "Own-account chooseAnother presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.cli": {
       "message": "Command line",
       "description": "Own-account cli presentation.",
@@ -61,6 +79,12 @@
     "account.client": {
       "message": "Application",
       "description": "Own-account client presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.close": {
+      "message": "Close",
+      "description": "Close the completed photo editor.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -130,6 +154,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.desktop.revoked.success": {
+      "message": "Desktop access revoked.",
+      "description": "Own-account desktopRevokedSuccess presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.desktops": {
       "message": "Registered desktops",
       "description": "Own-account desktops presentation.",
@@ -139,6 +169,12 @@
     "account.desktops.note": {
       "message": "Revoking a desktop ends its sessions and prevents it from signing in until it is registered again.",
       "description": "Own-account desktopsNote presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.details": {
+      "message": "Details",
+      "description": "Own-account details presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -173,7 +209,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.empty.sessions": {
-      "message": "No active sessions.",
+      "message": "No other active sessions.",
       "description": "Own-account emptySessions presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -220,6 +256,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.last.used": {
+      "message": "Last used",
+      "description": "Own-account lastUsed presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.linux": {
       "message": "Linux",
       "description": "Own-account linux presentation.",
@@ -245,7 +287,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.manage.security": {
-      "message": "Manage security in browser",
+      "message": "Manage sign-in in browser",
       "description": "Own-account manageSecurity presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -286,6 +328,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.mutation.waiting": {
+      "message": "Another change is being applied. Try again when it finishes.",
+      "description": "Account mutations are serialized by the privileged service.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.name": {
       "message": "Name",
       "description": "Own-account name presentation.",
@@ -319,6 +367,12 @@
     "account.not.found": {
       "message": "This item is no longer available. Refresh to update the list.",
       "description": "Own-account notFound presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.not.provided": {
+      "message": "Not provided",
+      "description": "Own-account notProvided presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -376,15 +430,63 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.photo.checking": {
+      "message": "Checking the current photo…",
+      "description": "Own-account photoChecking presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.crop.help": {
+      "message": "Drag to position your photo, or use the arrow keys. Use Zoom to change the framing.",
+      "description": "Own-account photoCropHelp presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.crop.label": {
+      "message": "Photo framing. Use arrow keys to move the image; hold Shift for larger steps.",
+      "description": "Own-account photoCropLabel presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.current": {
+      "message": "Current saved photo",
+      "description": "Own-account photoCurrent presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.photo.hint": {
-      "message": "PNG, JPEG or WebP. Up to 5 MB.",
+      "message": "PNG, JPEG or WebP. You can adjust the framing before saving.",
       "description": "Own-account photoHint presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.photo.invalid": {
-      "message": "Choose a PNG, JPEG or WebP image smaller than 5 MB.",
+      "message": "Choose a valid, still PNG, JPEG or WebP image.",
       "description": "Own-account photoInvalid presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.keep.crop": {
+      "message": "Keep my crop",
+      "description": "Own-account photoKeepCrop presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.low.resolution": {
+      "message": "This crop is small and may look soft at larger sizes.",
+      "description": "Own-account photoLowResolution presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.preparing": {
+      "message": "Preparing photo…",
+      "description": "Own-account photoPreparing presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.recheck": {
+      "message": "Check current photo",
+      "description": "Own-account photoRecheck presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -394,9 +496,63 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.photo.removed": {
+      "message": "Default photo restored.",
+      "description": "Own-account photoRemoved presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.retry.safe": {
+      "message": "The current photo has been checked. You can try saving your crop again.",
+      "description": "Own-account photoRetrySafe presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.review": {
+      "message": "The photo changed while you were editing. Review the current photo before replacing it.",
+      "description": "Own-account photoReview presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.saved.unavailable": {
+      "message": "Your photo was saved, but its preview could not be loaded. Check again to update it.",
+      "description": "Own-account photoSavedUnavailable presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.saving": {
+      "message": "Saving photo…",
+      "description": "Own-account photoSaving presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.too.large": {
+      "message": "This image is too large to edit safely. Choose an image up to 32 MB and 64 megapixels, with neither side over 16,384 pixels.",
+      "description": "Own-account photoTooLarge presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.photo.unavailable": {
       "message": "Your profile photo is unavailable. Refresh to try again.",
       "description": "Own-account photoUnavailable presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.updated": {
+      "message": "Photo updated.",
+      "description": "Own-account photoUpdated presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.photo.zoom": {
+      "message": "Zoom",
+      "description": "Own-account photoZoom presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.platform": {
+      "message": "Platform",
+      "description": "Own-account platform presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -461,7 +617,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.revoke.desktop": {
-      "message": "Revoke desktop",
+      "message": "Revoke access",
       "description": "Own-account revokeDesktop presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -472,8 +628,20 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.save.photo": {
+      "message": "Save photo",
+      "description": "Own-account savePhoto presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.section.unavailable": {
+      "message": "This section could not be loaded. Refresh to try again.",
+      "description": "Own-account sectionUnavailable presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.security": {
-      "message": "Security",
+      "message": "Sign-in and security",
       "description": "Own-account security presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -481,6 +649,12 @@
     "account.security.note": {
       "message": "Review how you sign in and manage multi-factor authentication.",
       "description": "Own-account securityNote presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.select.details": {
+      "message": "Select a session or desktop to see its details.",
+      "description": "Own-account selectDetails presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -493,6 +667,12 @@
     "account.session.ended": {
       "message": "Your session has ended. Sign in again to continue.",
       "description": "Own-account sessionEnded presentation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.session.ended.success": {
+      "message": "Session ended.",
+      "description": "Own-account sessionEndedSuccess presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -581,7 +761,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.verified": {
-      "message": "Email verified",
+      "message": "Verified",
       "description": "Own-account verified presentation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -671,6 +851,24 @@
       "description": "Heading for the signed-in Proctor application.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+    },
+    "authenticated.layout.customize": {
+      "message": "Customize Layout",
+      "description": "Authenticated window layout action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts"
+    },
+    "authenticated.layout.primary": {
+      "message": "Toggle Primary Side Bar Visibility",
+      "description": "Authenticated window layout action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts"
+    },
+    "authenticated.layout.secondary": {
+      "message": "Toggle Secondary Side Bar Visibility",
+      "description": "Authenticated window layout action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts"
     },
     "authenticated.shell.account": {
       "message": "Account",
@@ -1466,18 +1664,6 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.action.cancel": {
-      "message": "Cancel changes",
-      "description": "Action that restores the acknowledged User Settings source.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.action.save": {
-      "message": "Save",
-      "description": "Action that conditionally saves User Settings.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
     "settings.browser.zoom.description": {
       "message": "Sets integrated-browser presentation outside an Attempt.",
       "description": "Description of the integrated browser zoom setting.",
@@ -1610,6 +1796,30 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
+    "settings.hoverDelay.description": {
+      "message": "Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change.",
+      "description": "Description of the source workbench hover delay.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.hoverDelay.title": {
+      "message": "Hover delay",
+      "description": "Title for the workbench hover delay setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.hoverReducedDelay.description": {
+      "message": "Controls the reduced delay in milliseconds used for showing hovers in specific contexts where faster feedback is beneficial.",
+      "description": "Description of the source reduced hover delay.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.hoverReducedDelay.title": {
+      "message": "Reduced hover delay",
+      "description": "Title for the reduced workbench hover delay setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
     "settings.navigation.indent.description": {
       "message": "Sets indentation for hierarchical navigation outside an Attempt.",
       "description": "Description of the tree indentation setting.",
@@ -1621,132 +1831,6 @@
       "description": "Title for the tree indentation setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
-    },
-    "settings.option.announcements.minimal": {
-      "message": "Minimal",
-      "description": "Label for minimal accessibility announcements.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.announcements.verbose": {
-      "message": "Verbose",
-      "description": "Label for verbose accessibility announcements.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.auto": {
-      "message": "Automatic",
-      "description": "Label for an automatic setting value.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.cursor.block": {
-      "message": "Block",
-      "description": "Label for a block editor cursor.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.cursor.line": {
-      "message": "Line",
-      "description": "Label for a line editor cursor.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.cursor.underline": {
-      "message": "Underline",
-      "description": "Label for an underline editor cursor.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.cursorblink.blink": {
-      "message": "Blink",
-      "description": "Label for the standard cursor blink animation.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.cursorblink.expand": {
-      "message": "Expand",
-      "description": "Label for the expanding cursor animation.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.cursorblink.phase": {
-      "message": "Phase",
-      "description": "Label for the phase cursor blink animation.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.cursorblink.smooth": {
-      "message": "Smooth",
-      "description": "Label for the smooth cursor blink animation.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.cursorblink.solid": {
-      "message": "Solid",
-      "description": "Label for a non-blinking cursor.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.linenumbers.relative": {
-      "message": "Relative",
-      "description": "Label for relative editor line numbers.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.off": {
-      "message": "Off",
-      "description": "Label for a disabled setting value.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.on": {
-      "message": "On",
-      "description": "Label for an enabled setting value.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.theme.dark": {
-      "message": "Dark",
-      "description": "Label for the dark color theme.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.theme.highcontrastdark": {
-      "message": "High contrast dark",
-      "description": "Label for the high-contrast dark color theme.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.theme.highcontrastlight": {
-      "message": "High contrast light",
-      "description": "Label for the high-contrast light color theme.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.theme.light": {
-      "message": "Light",
-      "description": "Label for the light color theme.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.wordwrap.bounded": {
-      "message": "At the smaller viewport or column",
-      "description": "Label for bounded editor word wrapping.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.option.wordwrap.column": {
-      "message": "At word-wrap column",
-      "description": "Label for wrapping at the configured word-wrap column.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.page.heading": {
-      "message": "Settings",
-      "description": "Heading for the AuthenticatedWindow User Settings destination.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
     },
     "settings.prohibited.autosave.description": {
       "message": "Workspace durability is not a User Setting.",
@@ -1820,79 +1904,17 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.source.label": {
-      "message": "User Settings JSONC",
-      "description": "Accessible label for the User Settings JSONC editor.",
+    "settings.semanticTokenColorCustomizations.description": {
+      "message": "Overrides semantic token colors and styles from the selected theme.",
+      "description": "Description of data-only editor token styles.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.status.ambiguous": {
-      "message": "Save completion is unknown. Retry uses the same protected request identity.",
-      "description": "Status for ambiguous User Settings completion.",
+    "settings.semanticTokenColorCustomizations.title": {
+      "message": "Semantic token color customizations",
+      "description": "Title for editor token theme customization.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.conflict": {
-      "message": "Remote settings conflict with this draft. Cancel changes to use the latest acknowledged source.",
-      "description": "Status for an explicit User Settings merge conflict.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.failed": {
-      "message": "Settings could not be saved.",
-      "description": "Safe User Settings failure status.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.invalid": {
-      "message": "{count} settings problem(s) must be resolved before saving.",
-      "description": "Bounded User Settings validation problem count.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.load.failed": {
-      "message": "Settings are unavailable. Close and reopen the window to try again.",
-      "description": "Settings backend failed before a document could be loaded.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.loading": {
-      "message": "Loading acknowledged settings…",
-      "description": "Status while User Settings load.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.merged": {
-      "message": "Remote changes were merged. Review and save again.",
-      "description": "Status after an unambiguous User Settings conflict merge.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.preview.revert.failed": {
-      "message": "The settings preview could not be reverted safely.",
-      "description": "Safe failure after a settings preview cancellation transport error.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.readonly": {
-      "message": "Settings are read-only while the server is unavailable.",
-      "description": "Status for server-unavailable User Settings.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.saved": {
-      "message": "Settings saved.",
-      "description": "Status after User Settings are acknowledged.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
-    },
-    "settings.status.valid": {
-      "message": "Settings are valid.",
-      "description": "Validation status for a valid User Settings draft.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.terminal.fontsize.description": {
       "message": "Sets terminal presentation outside an Attempt.",
@@ -1918,17 +1940,17 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.view.jsonc": {
-      "message": "JSONC",
-      "description": "Button that opens the User Settings JSONC view.",
+    "settings.tokenColorCustomizations.description": {
+      "message": "Overrides editor syntax colors and font style from the selected theme.",
+      "description": "Description of data-only editor token styles.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.view.structured": {
-      "message": "Controls",
-      "description": "Button that opens the structured User Settings view.",
+    "settings.tokenColorCustomizations.title": {
+      "message": "Token color customizations",
+      "description": "Title for editor token theme customization.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.zoom.description": {
       "message": "Sets bounded interface zoom as a percentage.",

@@ -1,3 +1,12 @@
+import {
+	AUTHENTICATED_LAYOUT_SERVICE,
+	type AuthenticatedLayout
+} from '../../authenticated/browser/authenticatedLayout.js';
+import {
+	AUTHENTICATED_WINDOW_CONTROLS_SERVICE,
+	type AuthenticatedWindowControls
+} from '../../authenticated/browser/authenticatedWindowControls.js';
+import { HoverPosition } from '../../../../base/browser/ui/hover/hoverWidget.js';
 import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Event } from '../../../../base/common/event.js';
@@ -39,6 +48,11 @@ export function createAccountContribution(
 			const navigation = context.getService<AuthenticatedNavigationService>(
 				AUTHENTICATED_NAVIGATION_SERVICE
 			);
+			const customPhotos = new Set<string>();
+			const layout = context.getService<AuthenticatedLayout>(AUTHENTICATED_LAYOUT_SERVICE);
+			const controls = context.getService<AuthenticatedWindowControls>(
+				AUTHENTICATED_WINDOW_CONTROLS_SERVICE
+			);
 			const host = context.getService<WorkbenchPaneHost>(WORKBENCH_PANE_HOST);
 			const registry =
 				context.getService<WorkbenchItemResolverRegistry>(WORKBENCH_ITEM_RESOLVERS);
@@ -78,7 +92,17 @@ export function createAccountContribution(
 							client,
 							context.localization,
 							binding,
-							navigation.setProfilePhoto
+							navigation.setProfilePhoto,
+							{
+								overlays: context.shell.overlayHost,
+								layout,
+								customPhotos,
+								hover: (target, label) =>
+									controls.hover.setupDelayedHover(target, () => ({
+										content: label,
+										position: { hoverPosition: HoverPosition.BELOW }
+									}))
+							}
 						);
 					}
 				})
@@ -162,8 +186,10 @@ export function createAccountContribution(
 					'sidebar',
 					!navigation.accountMenuNavigation && !navigation.accountHost && visible
 				);
-				if (visible) void open(selected, focus);
-				else {
+				if (visible) {
+					layout.setDestination(`account/${selected}`);
+					void open(selected, focus);
+				} else {
 					sequence++;
 					void host.clear().catch(() => {});
 				}

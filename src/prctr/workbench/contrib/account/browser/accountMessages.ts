@@ -1,6 +1,162 @@
 import { defineMessage } from '../../../../base/common/localization.js';
 
 export const accountMessages = Object.freeze({
+	close: defineMessage({
+		id: 'account.close',
+		defaultMessage: 'Close',
+		description: 'Close the completed photo editor.'
+	}),
+	mutationWaiting: defineMessage({
+		id: 'account.mutation.waiting',
+		defaultMessage: 'Another change is being applied. Try again when it finishes.',
+		description: 'Account mutations are serialized by the privileged service.'
+	}),
+	photoTooLarge: defineMessage({
+		id: 'account.photo.too.large',
+		defaultMessage:
+			'This image is too large to edit safely. Choose an image up to 32 MB and 64 megapixels, with neither side over 16,384 pixels.',
+		description: 'Own-account photoTooLarge presentation.'
+	}),
+	adjustPhoto: defineMessage({
+		id: 'account.adjust.photo',
+		defaultMessage: 'Adjust photo',
+		description: 'Own-account adjustPhoto presentation.'
+	}),
+	savePhoto: defineMessage({
+		id: 'account.save.photo',
+		defaultMessage: 'Save photo',
+		description: 'Own-account savePhoto presentation.'
+	}),
+	chooseAnother: defineMessage({
+		id: 'account.choose.another',
+		defaultMessage: 'Choose another',
+		description: 'Own-account chooseAnother presentation.'
+	}),
+	photoPreparing: defineMessage({
+		id: 'account.photo.preparing',
+		defaultMessage: 'Preparing photo…',
+		description: 'Own-account photoPreparing presentation.'
+	}),
+	photoSaving: defineMessage({
+		id: 'account.photo.saving',
+		defaultMessage: 'Saving photo…',
+		description: 'Own-account photoSaving presentation.'
+	}),
+	photoUpdated: defineMessage({
+		id: 'account.photo.updated',
+		defaultMessage: 'Photo updated.',
+		description: 'Own-account photoUpdated presentation.'
+	}),
+	photoRemoved: defineMessage({
+		id: 'account.photo.removed',
+		defaultMessage: 'Default photo restored.',
+		description: 'Own-account photoRemoved presentation.'
+	}),
+	photoCropHelp: defineMessage({
+		id: 'account.photo.crop.help',
+		defaultMessage:
+			'Drag to position your photo, or use the arrow keys. Use Zoom to change the framing.',
+		description: 'Own-account photoCropHelp presentation.'
+	}),
+	photoCropLabel: defineMessage({
+		id: 'account.photo.crop.label',
+		defaultMessage:
+			'Photo framing. Use arrow keys to move the image; hold Shift for larger steps.',
+		description: 'Own-account photoCropLabel presentation.'
+	}),
+	photoZoom: defineMessage({
+		id: 'account.photo.zoom',
+		defaultMessage: 'Zoom',
+		description: 'Own-account photoZoom presentation.'
+	}),
+	photoLowResolution: defineMessage({
+		id: 'account.photo.low.resolution',
+		defaultMessage: 'This crop is small and may look soft at larger sizes.',
+		description: 'Own-account photoLowResolution presentation.'
+	}),
+	photoReview: defineMessage({
+		id: 'account.photo.review',
+		defaultMessage:
+			'The photo changed while you were editing. Review the current photo before replacing it.',
+		description: 'Own-account photoReview presentation.'
+	}),
+	photoKeepCrop: defineMessage({
+		id: 'account.photo.keep.crop',
+		defaultMessage: 'Keep my crop',
+		description: 'Own-account photoKeepCrop presentation.'
+	}),
+	photoCurrent: defineMessage({
+		id: 'account.photo.current',
+		defaultMessage: 'Current saved photo',
+		description: 'Own-account photoCurrent presentation.'
+	}),
+	photoRecheck: defineMessage({
+		id: 'account.photo.recheck',
+		defaultMessage: 'Check current photo',
+		description: 'Own-account photoRecheck presentation.'
+	}),
+	photoSavedUnavailable: defineMessage({
+		id: 'account.photo.saved.unavailable',
+		defaultMessage:
+			'Your photo was saved, but its preview could not be loaded. Check again to update it.',
+		description: 'Own-account photoSavedUnavailable presentation.'
+	}),
+	photoRetrySafe: defineMessage({
+		id: 'account.photo.retry.safe',
+		defaultMessage: 'The current photo has been checked. You can try saving your crop again.',
+		description: 'Own-account photoRetrySafe presentation.'
+	}),
+	photoChecking: defineMessage({
+		id: 'account.photo.checking',
+		defaultMessage: 'Checking the current photo…',
+		description: 'Own-account photoChecking presentation.'
+	}),
+	details: defineMessage({
+		id: 'account.details',
+		defaultMessage: 'Details',
+		description: 'Own-account details presentation.'
+	}),
+	selectDetails: defineMessage({
+		id: 'account.select.details',
+		defaultMessage: 'Select a session or desktop to see its details.',
+		description: 'Own-account selectDetails presentation.'
+	}),
+	sessionEndedSuccess: defineMessage({
+		id: 'account.session.ended.success',
+		defaultMessage: 'Session ended.',
+		description: 'Own-account sessionEndedSuccess presentation.'
+	}),
+	desktopRevokedSuccess: defineMessage({
+		id: 'account.desktop.revoked.success',
+		defaultMessage: 'Desktop access revoked.',
+		description: 'Own-account desktopRevokedSuccess presentation.'
+	}),
+	platform: defineMessage({
+		id: 'account.platform',
+		defaultMessage: 'Platform',
+		description: 'Own-account platform presentation.'
+	}),
+	backToList: defineMessage({
+		id: 'account.back.to.list',
+		defaultMessage: 'Back to list',
+		description: 'Own-account backToList presentation.'
+	}),
+	lastUsed: defineMessage({
+		id: 'account.last.used',
+		defaultMessage: 'Last used',
+		description: 'Own-account lastUsed presentation.'
+	}),
+	notProvided: defineMessage({
+		id: 'account.not.provided',
+		defaultMessage: 'Not provided',
+		description: 'Own-account notProvided presentation.'
+	}),
+	sectionUnavailable: defineMessage({
+		id: 'account.section.unavailable',
+		defaultMessage: 'This section could not be loaded. Refresh to try again.',
+		description: 'Own-account sectionUnavailable presentation.'
+	}),
+
 	fullName: defineMessage({
 		id: 'account.full.name',
 		defaultMessage: 'Full name',
@@ -29,12 +185,12 @@ export const accountMessages = Object.freeze({
 	}),
 	photoInvalid: defineMessage({
 		id: 'account.photo.invalid',
-		defaultMessage: 'Choose a PNG, JPEG or WebP image smaller than 5 MB.',
+		defaultMessage: 'Choose a valid, still PNG, JPEG or WebP image.',
 		description: 'Own-account photoInvalid presentation.'
 	}),
 	photoHint: defineMessage({
 		id: 'account.photo.hint',
-		defaultMessage: 'PNG, JPEG or WebP. Up to 5 MB.',
+		defaultMessage: 'PNG, JPEG or WebP. You can adjust the framing before saving.',
 		description: 'Own-account photoHint presentation.'
 	}),
 	removePhoto: defineMessage({
@@ -104,7 +260,7 @@ export const accountMessages = Object.freeze({
 	}),
 	security: defineMessage({
 		id: 'account.security',
-		defaultMessage: 'Security',
+		defaultMessage: 'Sign-in and security',
 		description: 'Own-account security presentation.'
 	}),
 	sessions: defineMessage({
@@ -206,7 +362,7 @@ export const accountMessages = Object.freeze({
 	}),
 	verified: defineMessage({
 		id: 'account.verified',
-		defaultMessage: 'Email verified',
+		defaultMessage: 'Verified',
 		description: 'Own-account verified presentation.'
 	}),
 	unverified: defineMessage({
@@ -296,7 +452,7 @@ export const accountMessages = Object.freeze({
 	}),
 	manageSecurity: defineMessage({
 		id: 'account.manage.security',
-		defaultMessage: 'Manage security in browser',
+		defaultMessage: 'Manage sign-in in browser',
 		description: 'Own-account manageSecurity presentation.'
 	}),
 	browserNote: defineMessage({
@@ -318,7 +474,7 @@ export const accountMessages = Object.freeze({
 	}),
 	emptySessions: defineMessage({
 		id: 'account.empty.sessions',
-		defaultMessage: 'No active sessions.',
+		defaultMessage: 'No other active sessions.',
 		description: 'Own-account emptySessions presentation.'
 	}),
 	emptyDesktops: defineMessage({
@@ -348,7 +504,7 @@ export const accountMessages = Object.freeze({
 	}),
 	revokeDesktop: defineMessage({
 		id: 'account.revoke.desktop',
-		defaultMessage: 'Revoke desktop',
+		defaultMessage: 'Revoke access',
 		description: 'Own-account revokeDesktop presentation.'
 	}),
 	signOut: defineMessage({

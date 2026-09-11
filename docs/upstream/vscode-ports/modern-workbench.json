@@ -29,7 +29,7 @@
       "rationale": "Preserve default/perimeter margins, rail seams, border-box cards, compact gradient edge/corner painting and centered sashes for the fixed admitted topology.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/browser/floatingPanels.css",
-      "localSha256": "65dbf8c2585a1d10a5f89cf652a90d42353db6cfeb0fbc5a9b046ec0537db844",
+      "localSha256": "4823723a2e44b6aef4e6be08784cc745de1d427e41630dcdfe0a53f63f5e6b34",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -184,7 +184,7 @@
       "upstreamBlob": "6b8ad6793c189f715865ea9c9a712066845a0ff8",
       "category": "style",
       "disposition": "evidence-only",
-      "rationale": "Review applicable module closure: keyboardFocusOnly. Floating shell rules land in floatingPanels.css; contribution-owned headers/rows retain their own selectors. Native titlebar and notifications remain behind admitted interfaces. Product-specific editor tabs, command center and chat selectors do not select Proctor features.",
+      "rationale": "Pointer-only outline suppression is adapted in floatingPanels.css to Proctor navigation, secondary, document content and panel owners. Preserve focus-visible and text-input outlines; source editor and modal overlay owners retain their own behavior.",
       "licenseRefs": ["vscode-mit"]
     },
     {
@@ -299,7 +299,7 @@
       "rationale": "Retain CustomizeLayoutAction quick-picker items, eye/check icons, live selection refresh, item-button acceptance, persistent picker, reset/close and focus lifetime. Project state and actions through the authenticated layout owner; explicitly limit choices to Primary and Secondary Side Bars and primary position.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts",
-      "localSha256": "c3533d8db5028353906e7d7a148b1a84c250a4ecbb34d9b26bf23c9612d99325",
+      "localSha256": "0bfce50904a8d25fca439016fd60f425097fbdea778c949eaad15b6f79f38e82",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -313,6 +313,21 @@
       "disposition": "evidence-only",
       "rationale": "The account action consumer uses the admitted ContextMenuService, source Actions and Separators, workbench menu motion, anchor alignment and source action/focus lifecycle. Proctor supplies only its closed Profile, Sessions and Log out actions; no VS Code authentication provider or extension account behavior is imported.",
       "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/ui/button/button.css",
+      "upstreamBlob": "f8f02ab6152b64cfb667e5c11854fbfe0fb82185",
+      "category": "style",
+      "disposition": "adapted",
+      "rationale": "Text-button geometry, regular typography, secondary border fallback, hover colors, focus offset and disabled opacity on the existing native ButtonControl interface. The source Modern UI control-radius tier applies. Split/dropdown, markdown and short-label buttons remain in the already admitted source Button cluster; they are not selected by this interface.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/base/browser/ui/button/buttonControl.css",
+      "localSha256": "5166c697f6237889d5b062c932685576133c349635df0b32cf76dfe4bfbba4e0",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     }
   ],
   "licenses": [
@@ -400,6 +415,15 @@
         "src/prctr/workbench/browser/authenticatedManifest.ts"
       ],
       "verificationRefs": ["browser-layout", "authenticated-layout-controls", "manual-comparison"]
+    },
+    {
+      "id": "native-text-buttons",
+      "summary": "The existing native button interface keeps submit, disabled and busy semantics, intrinsic width, large Launch size and danger variant. Default text-button presentation follows the pinned source; source control dimensions are local geometry. Proctor account content is a document panel, so keyboard-only panel focus also applies to that region; source editor and overlay containers are independent.",
+      "localPaths": [
+        "src/prctr/base/browser/ui/button/buttonControl.css",
+        "src/prctr/workbench/browser/floatingPanels.css"
+      ],
+      "verificationRefs": ["account-browser", "browser-layout", "manual-comparison"]
     }
   ],
   "verification": [
