@@ -1,12 +1,9 @@
 import { validateProductWindowChromeUpdate } from '../../../../src/prctr/platform/windows/common/windowChrome.ts';
 import assert from 'node:assert';
 import { test } from 'node:test';
-import {
-	ColorThemeData,
-	loadColorTheme
-} from '../../../../src/prctr/platform/theme/common/colorThemeData.ts';
+import { ColorThemeData } from '../../../../src/prctr/platform/theme/common/colorThemeData.ts';
 import { normalizeColorCustomizations } from '../../../../src/prctr/platform/theme/common/colorCustomizations.ts';
-import { ColorScheme } from '../../../../src/prctr/platform/theme/common/theme.ts';
+import { loadPackagedTheme } from '../../../../src/prctr/platform/theme/common/packagedThemeLoader.ts';
 import { getTheme } from '../../../../src/prctr/platform/theme/common/themes.ts';
 import { BUNDLED_THEMES } from '../../../../src/prctr/platform/theme/common/bundledThemes.ts';
 import { parseSettingsDocument } from '../../../../src/prctr/platform/settings/common/settingsDocument.ts';
@@ -19,8 +16,8 @@ const hex = (theme: ColorThemeData, id: string) => {
 };
 
 void test('theme data preserves upstream global, scoped, wildcard and default precedence', () => {
-	const model = new ColorThemeData('GitHub Dark Default', ColorScheme.DARK);
-	model.setColors({ 'button.background': '#112233' });
+	const model = ColorThemeData.createUnloadedTheme('vs-dark', { 'button.background': '#112233' });
+	model.settingsId = 'GitHub Dark Default';
 	model.setCustomColors({
 		'button.background': '#223344',
 		'[GitHub*]': { 'button.background': '#334455' },
@@ -41,7 +38,7 @@ void test('theme data preserves upstream global, scoped, wildcard and default pr
 });
 
 void test('registered derived defaults resolve against overridden colors', () => {
-	const model = new ColorThemeData('Test', ColorScheme.DARK);
+	const model = ColorThemeData.createLoadedEmptyTheme('vs-dark', 'Test');
 	model.setCustomColors({ 'button.background': '#123456' });
 	assert.equal(
 		hex(model, 'button.hoverBackground'),
@@ -51,21 +48,35 @@ void test('registered derived defaults resolve against overridden colors', () =>
 	assert.equal(model.getColor('notRegistered'), undefined);
 });
 
-void test('theme resources preserve includes and default deletion, and reject invalid or cyclic input', () => {
+void test('theme resources preserve includes and default deletion, and reject invalid or cyclic input', async () => {
 	const resources: Record<string, string> = {
-		base: '{ "colors": { "button.background": "#123456", "foreground": "#abcdef" } }',
-		child: '{ // JSONC\n "include": "base", "colors": { "button.background": "default", "foreground": "#112233" }, }',
-		cycle: '{"include":"cycle"}',
-		invalid: '{"colors": []}'
+		'base.json': '{ "colors": { "button.background": "#123456", "foreground": "#abcdef" } }',
+		'child.json':
+			'{ // JSONC\n "include": "base.json", "colors": { "button.background": "default", "foreground": "#112233" }, }',
+		'cycle.json': '{"include":"cycle.json"}',
+		'invalid.json': '{"colors": 42}',
+		'empty-array.json': '{"colors": []}'
 	};
-	const loader = {
-		read: (path: string) => resources[path]!,
-		resolve: (_from: string, path: string) => path
-	};
-	assert.deepStrictEqual({ ...loadColorTheme(loader, 'child') }, { foreground: '#112233' });
-	assert.throws(() => loadColorTheme(loader, 'cycle'));
-	assert.throws(() => loadColorTheme(loader, 'invalid'));
-	assert.throws(() => loadColorTheme(loader, 'absent'));
+	const path = BUNDLED_THEMES[0]!.path;
+	const directory = path.slice(0, path.lastIndexOf('/') + 1);
+	const load = (name: string) =>
+		loadPackagedTheme(BUNDLED_THEMES[0]!.name, {
+			...Object.fromEntries(
+				Object.entries(resources).map(([key, value]) => [directory + key, value])
+			),
+			[path]: JSON.stringify({ include: name })
+		});
+	const child = await load('child.json');
+	assert.equal(child.getColor('button.background', false), undefined);
+	assert.equal(hex(child, 'foreground'), '#112233');
+	await assert.rejects(load('cycle.json'));
+	await assert.rejects(load('invalid.json'));
+	// The complete upstream loader treats an empty colors array as an empty object.
+	assert.strictEqual(
+		(await load('empty-array.json')).getColor('button.background', false),
+		undefined
+	);
+	await assert.rejects(load('absent.json'));
 });
 
 void test('all GitHub palettes load with independent workbench roles and no extension host', () => {

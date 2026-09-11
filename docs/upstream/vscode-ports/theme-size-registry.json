@@ -1,0 +1,256 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "theme-size-registry",
+  "admission": {
+    "workflow": "Supply complete pinned Modern UI geometry and typography variables to the admitted editor and control CSS, including hover radii and control spacing.",
+    "callers": [
+      "src/prctr/platform/theme/browser/colorThemeCss.ts",
+      "src/prctr/platform/theme/browser/themeService.ts"
+    ],
+    "interface": "src/prctr/platform/theme/common/sizeRegistry.ts",
+    "decision": "docs/architecture/design-system.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "src/vs/platform/theme/common/sizeRegistry.ts",
+      "localPath": "src/prctr/platform/theme/common/sizeRegistry.ts",
+      "upstreamBlob": "522cd4f5b3671a0b9c25b58e8878aeef2ca71f38",
+      "localSha256": "87fa5a34ae24b6060b7251077c8d2f649c8ad31f314c63b4aaa4e3e527573b6a",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete pinned file retained. Proctor namespace and schema URI relocation, packaged localization, erased type imports and Node test adapter are the only changes; registration, defaults, units, schema scheduling and theme resolution remain intact.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/sizeUtils.ts",
+      "localPath": "src/prctr/platform/theme/common/sizeUtils.ts",
+      "upstreamBlob": "0ac56dbca000dc361ef8ddc1424bdb1e7d00187c",
+      "localSha256": "e86d799506ae3582eebdb16c35f69ee1eaa0974089ed5f7acd363defa18c6ddb",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete pinned file retained. Proctor namespace and schema URI relocation, packaged localization, erased type imports and Node test adapter are the only changes; registration, defaults, units, schema scheduling and theme resolution remain intact.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/sizes/baseSizes.ts",
+      "localPath": "src/prctr/platform/theme/common/sizes/baseSizes.ts",
+      "upstreamBlob": "7c3ad9a5d875cb82d1a7463d522a2b59f1af8a3e",
+      "localSha256": "df1a8dac6ec8217f56e2447e41be45bf60abae4ec75c77ca13beafff4d7a311b",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete pinned file retained. Proctor namespace and schema URI relocation, packaged localization, erased type imports and Node test adapter are the only changes; registration, defaults, units, schema scheduling and theme resolution remain intact.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/test/common/sizeRegistry.test.ts",
+      "localPath": "test/platform/theme/common/upstream/sizeRegistry.test.ts",
+      "upstreamBlob": "eb2138790b83fb30d7c7671ec703ecdfb819fd5d",
+      "localSha256": "21d3089e8429d3307489953872b0d620e7735ab5c97a5750e5d69629e147412f",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Complete pinned file retained. Proctor namespace and schema URI relocation, packaged localization, erased type imports and Node test adapter are the only changes; registration, defaults, units, schema scheduling and theme resolution remain intact.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/event.ts",
+      "upstreamBlob": "cf5fd39b7389b12890a85fd2159e35326d5b7a60",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/event.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/jsonSchema.ts",
+      "upstreamBlob": "be69a92bf678d6d3e58fd80a6995c1b3349eacdd",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/jsonSchema.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/jsonschemas/common/jsonContributionRegistry.ts",
+      "upstreamBlob": "5f37ab3c5876a37db39bce0a29fd43f64836bd77",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/jsonschemas/common/jsonContributionRegistry.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/registry/common/platform.ts",
+      "upstreamBlob": "9beaaf7c25cbb340793fdf209d279abcfb2fa025",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/registry/common/platform.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/themeService.ts",
+      "upstreamBlob": "5cf50f913a8922889992b3892901dd38882c6a91",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/themeService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/lifecycle.ts",
+      "upstreamBlob": "a75cbb1cce3099e07bff3cc9c751d634ae30dfdd",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/lifecycle.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/async.ts",
+      "upstreamBlob": "510fc4a54049fda2dbd9454c2e5cfa3778be2fe0",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/async.ts"
+    },
+    {
+      "upstreamPath": "src/vs/nls.ts",
+      "upstreamBlob": "8383ae24d96d4d9361921b89bdf48519d13d4260",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/vscodeNls.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/test/common/utils.ts",
+      "upstreamBlob": "d07c2a595a619b82e32b820f72ba4f65cacc3d35",
+      "category": "test",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "test/base/common/upstream/upstreamTestUtils.ts"
+    },
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Retained Microsoft MIT notice.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": [
+        "LICENSE.txt"
+      ],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "theme-owner",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/browser/themeService.ts",
+      "rationale": "The existing theme owner emits packaged size defaults atomically with colors and updates schema defaults; no user CSS or extension loader is introduced."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "size-namespace",
+      "summary": "Preserve all size roles and defaults under --prctr-theme-* and the packaged schema URI. Proctor-owned controls retain their separate presentation tokens.",
+      "localPaths": [
+        "src/prctr/platform/theme/common/sizeRegistry.ts",
+        "src/prctr/platform/theme/common/sizeUtils.ts",
+        "src/prctr/platform/theme/common/sizes/baseSizes.ts",
+        "test/platform/theme/common/upstream/sizeRegistry.test.ts"
+      ],
+      "verificationRefs": [
+        "owner-tests",
+        "editor-geometry",
+        "upstream-audit"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "id": "owner-tests",
+      "kind": "test",
+      "path": "test/platform/theme/common/upstream/sizeRegistry.test.ts",
+      "obligation": "Preserve every original size registry test and default size role."
+    },
+    {
+      "id": "editor-geometry",
+      "kind": "test",
+      "path": "test/browser/editor/settingsWindowServices.test.ts",
+      "obligation": "Observe the actual editor hover radius under the production theme and stylesheet composition."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "check",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Verify exact pinned files, blobs and complete source-to-local differences."
+    }
+  ]
+}

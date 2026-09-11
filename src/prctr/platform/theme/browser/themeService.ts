@@ -2,10 +2,12 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import type { ITokenColorCustomizations, ISemanticTokenColorCustomizations } from '../common/workbenchThemeService.js';
 import { generateColorThemeCSS } from './colorThemeCss.js';
 import { getThemingRegistry } from '../common/themeService.js';
 import { getColorRegistry } from '../common/colorRegistry.js';
-import type { IColorCustomizations } from '../common/colorThemeData.js';
+import { getSizeRegistry } from '../common/sizeRegistry.js';
+import type { IColorCustomizations } from '../common/colorCustomizations.js';
 import { asCssVariableName as asThemeColorVariable } from '../common/colorUtils.js';
 import { Emitter, type Event } from '../../../base/common/event.js';
 import { Disposable } from '../../../base/common/lifecycle.js';
@@ -39,6 +41,9 @@ export class BrowserThemeService extends Disposable {
 	private currentTheme: ResolvedTheme;
 	private readonly themeStyleSheet: CSSStyleSheet | undefined;
 	private customizations: IColorCustomizations = {};
+	private tokenCustomizations: ITokenColorCustomizations = {};
+	private semanticCustomizations: ISemanticTokenColorCustomizations | undefined;
+	private customizationKey = JSON.stringify([{}, {}, undefined]);
 	private appliedColorVariables = new Set<string>();
 	private preferences: PresentationPreferences;
 	private zoomPercent = 100;
@@ -74,6 +79,8 @@ export class BrowserThemeService extends Disposable {
 		this.apply();
 	}
 
+	get presentationPreferences(): PresentationPreferences { return this.preferences; }
+
 	get theme(): ResolvedTheme {
 		return this.currentTheme;
 	}
@@ -86,12 +93,16 @@ export class BrowserThemeService extends Disposable {
 		return this.preferences.motion === 'reduced' || this.reducedMotionQuery?.matches === true;
 	}
 
-	setTheme(id: string, customizations: IColorCustomizations = {}): void {
-		const theme = getTheme(id, customizations);
+	setTheme(id: string, customizations: IColorCustomizations = {}, tokenCustomizations: ITokenColorCustomizations = {}, semanticCustomizations?: ISemanticTokenColorCustomizations): void {
+		const theme = getTheme(id, customizations, tokenCustomizations, semanticCustomizations);
+		const customizationKey = JSON.stringify([customizations, tokenCustomizations, semanticCustomizations]);
 		this.followsSystemColorScheme = false;
-		if (theme.settingsId === this.currentTheme.settingsId && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) return;
+		if (theme.settingsId === this.currentTheme.settingsId && customizationKey === this.customizationKey && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) return;
 		this.currentTheme = theme;
 		this.customizations = customizations;
+		this.tokenCustomizations = tokenCustomizations;
+		this.semanticCustomizations = semanticCustomizations;
+		this.customizationKey = customizationKey;
 		this.apply();
 		this.changeEmitter.fire(theme);
 		this.presentationChangeEmitter.fire();
@@ -125,6 +136,7 @@ export class BrowserThemeService extends Disposable {
 	private apply(): void {
 		this.applyThemeRules();
 		getColorRegistry().notifyThemeUpdate(this.currentTheme.colorTheme);
+		getSizeRegistry().notifyThemeUpdate(this.currentTheme.colorTheme);
 		const root = this.document.documentElement;
 		for (const definition of getDesignTokenDefinitions()) {
 			root.style.setProperty(asCssVariableName(definition.id), this.currentTheme.values[definition.id]);
@@ -165,7 +177,7 @@ export class BrowserThemeService extends Disposable {
 
 	private applySystemColorScheme(): void {
 		if (!this.followsSystemColorScheme || this.colorSchemeQuery === undefined) return;
-		const theme = getTheme(this.colorSchemeQuery.matches ? 'dark' : 'light', this.customizations);
+		const theme = getTheme(this.colorSchemeQuery.matches ? 'dark' : 'light', this.customizations, this.tokenCustomizations, this.semanticCustomizations);
 		if (theme.settingsId === this.currentTheme.settingsId && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) return;
 		this.currentTheme = theme;
 		this.apply();

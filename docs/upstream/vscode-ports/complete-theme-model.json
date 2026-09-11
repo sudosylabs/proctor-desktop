@@ -1,0 +1,595 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "complete-theme-model",
+  "admission": {
+    "workflow": "Provide the full upstream color, TextMate and semantic theme model to the Settings editor and existing Proctor chrome from one owner.",
+    "callers": [
+      "src/prctr/platform/theme/common/themes.ts",
+      "src/prctr/platform/theme/browser/themeService.ts"
+    ],
+    "interface": "src/prctr/platform/theme/common/colorThemeData.ts",
+    "decision": "docs/architecture/user-settings.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/colorThemeData.ts",
+      "upstreamBlob": "1131a3b40500bb52b7de7112d01dca6cac961c01",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original implementation retained. Namespace and dependency imports route to the shared platform theme owner; explicit resource/storage/configuration input adapters satisfy the actual consumed operations.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/colorThemeData.ts",
+      "localSha256": "1165fe38fc5e20075e5142410d2f47426f6b1f40e5fa9d5676c65aea77c0950f",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/workbenchThemeService.ts",
+      "upstreamBlob": "74edcddac8aa416cd9ee432e36b47b53c2bfbf4a",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original implementation retained. Namespace and dependency imports route to the shared platform theme owner; explicit resource/storage/configuration input adapters satisfy the actual consumed operations.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/workbenchThemeService.ts",
+      "localSha256": "4bae2faf21d92128da19595a1c976b2c735a3cba65a7068ac483406d8c8450ff",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/themeCompatibility.ts",
+      "upstreamBlob": "dd982615cdf8622ff7e4b113d376bcedcb506044",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original implementation retained. Namespace and dependency imports route to the shared platform theme owner; explicit resource/storage/configuration input adapters satisfy the actual consumed operations.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/themeCompatibility.ts",
+      "localSha256": "084840d5b09441355ca4fba62b09d4129d1cf6487c46705d04872c1d639309b4",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/themeService.ts",
+      "upstreamBlob": "5cf50f913a8922889992b3892901dd38882c6a91",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original implementation retained. Namespace and dependency imports route to the shared platform theme owner; explicit resource/storage/configuration input adapters satisfy the actual consumed operations.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/themeService.ts",
+      "localSha256": "4fae01346de0f2c2b3d48e5654cabcdf4ac27eb71227440cf9820bca8695e635",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/tokenClassificationRegistry.ts",
+      "upstreamBlob": "f3503dea201c3717e542973104bb5f50595c9d65",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original implementation retained. Namespace and dependency imports route to the shared platform theme owner; explicit resource/storage/configuration input adapters satisfy the actual consumed operations.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/tokenClassificationRegistry.ts",
+      "localSha256": "63e366bf444a022083f25c9c33cec031c9d0afe11804c73522f0345b8524664a",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/iconRegistry.ts",
+      "upstreamBlob": "9feac0c4ca494a1b344161f70b9f346876066d85",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original implementation retained. Namespace and dependency imports route to the shared platform theme owner; explicit resource/storage/configuration input adapters satisfy the actual consumed operations.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/iconRegistry.ts",
+      "localSha256": "d7048a31d8211a58c9eb93b7fd39203900de457a684675701c5aa0dabc12b12b",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/editorColorRegistry.ts",
+      "upstreamBlob": "e71205d88c27d2cab0f292a7aa5761ae7c59869f",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original implementation retained. Namespace and dependency imports route to the shared platform theme owner; explicit resource/storage/configuration input adapters satisfy the actual consumed operations.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/editorColorRegistry.ts",
+      "localSha256": "f0bb94088df732538890e655e861741fc9235ebc4e508830910e80e8fee8444b",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/test/node/tokenStyleResolving.test.ts",
+      "upstreamBlob": "2ded86bb38c72373f34893c534502b0c686128bb",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "All original test cases and assertions retained; real Node test adapter and exact local fixture loader replace unrelated extension/file service setup.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/node/themes/upstream/tokenStyleResolving.test.ts",
+      "localSha256": "a4ed9e31efda2afea8c0bbeb11d60d766c4c18a28308bba7ba6884c7a24fc66c",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/test/node/color-theme.json",
+      "upstreamBlob": "fc9f7098c440ea3fd91414e09def60e764ae99be",
+      "category": "asset",
+      "disposition": "copied",
+      "rationale": "Complete original non-comment-capable JSON fixture, byte for byte.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/node/themes/upstream/color-theme.json",
+      "localSha256": "c69db19cf35a2e7141aebc8ef81241b930edffbe578ccd7f844483ac310754c5",
+      "mechanicalTransforms": ["namespace-path-translation"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/path.ts",
+      "upstreamBlob": "c61fa5831cfe837e4934298c01b594567dbeecf8",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/path.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/json.ts",
+      "upstreamBlob": "d7ac069d3d162b3f69930404f7d698e990727de0",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/json.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/color.ts",
+      "upstreamBlob": "ce1143ac7b46e48689ec2bd5af3f6b1bc334531c",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/color.ts"
+    },
+    {
+      "upstreamPath": "src/vs/nls.ts",
+      "upstreamBlob": "8383ae24d96d4d9361921b89bdf48519d13d4260",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Explicit local adapter supplies the complete consumed input surface; source algorithms and state remain in the full transferred implementation.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/vscodeNls.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/types.ts",
+      "upstreamBlob": "154d8199690a162dfc37895125348e5a64b7d848",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/types.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/resources.ts",
+      "upstreamBlob": "089ee62de037ea92f0724171de53a16ecb505000",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/resources.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/colorRegistry.ts",
+      "upstreamBlob": "bc0b044b534a3c96b559eb39f5bb33a5532c3b76",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/colorRegistry.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/registry/common/platform.ts",
+      "upstreamBlob": "9beaaf7c25cbb340793fdf209d279abcfb2fa025",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/registry/common/platform.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/jsonErrorMessages.ts",
+      "upstreamBlob": "1a876fea5bada6e0316b91bea50aceb4fd751748",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/jsonErrorMessages.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/uri.ts",
+      "upstreamBlob": "d148dc10f26bf8a19615e052df3dde23c481099c",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/uri.ts"
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/plistParser.ts",
+      "upstreamBlob": "a9c83450b0edf15540207615b3ae8ebf4c33dd35",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/plistParser.ts"
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/textMateScopeMatcher.ts",
+      "upstreamBlob": "2bbe90caad4a70f017c3578704b6fce8da4b4796",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/textMateScopeMatcher.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/extensionResourceLoader/common/extensionResourceLoader.ts",
+      "upstreamBlob": "28a25db97f004f3c81c9aeca39053adc9428cf5a",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Explicit local adapter supplies the complete consumed input surface; source algorithms and state remain in the full transferred implementation.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/themeDataAdapters.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/charCode.ts",
+      "upstreamBlob": "de0a25badecd2a7694c303feddcfa555f8a46dab",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/charCode.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/storage/common/storage.ts",
+      "upstreamBlob": "2e967d799f77892580d9d195aa4b07a6fc4a7044",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Explicit local adapter supplies the complete consumed input surface; source algorithms and state remain in the full transferred implementation.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/themeDataAdapters.ts"
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/themeConfiguration.ts",
+      "upstreamBlob": "98c5d5b608c0bc95177d07b91d95c1f92ab5be9d",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Explicit local adapter supplies the complete consumed input surface; source algorithms and state remain in the full transferred implementation.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/themeDataAdapters.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/theme.ts",
+      "upstreamBlob": "0f298890998b4f0525fbcae4fd04296ffdea142c",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/theme.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/encodedTokenAttributes.ts",
+      "upstreamBlob": "22ee1417e559ad19afd5559c3b6ccb1a6f0bfa1e",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/encodedTokenAttributes.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/supports/tokenization.ts",
+      "upstreamBlob": "0545b34945d65f197aaacf989decc0a07626fbfe",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/tokenization.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/instantiation.ts",
+      "upstreamBlob": "b879acb0ee8da5a824321bd1b9925219fe07af94",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/event.ts",
+      "upstreamBlob": "cf5fd39b7389b12890a85fd2159e35326d5b7a60",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/event.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/configuration/common/configuration.ts",
+      "upstreamBlob": "55eaae5451c234878ee71f9245edb12a708a22ae",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/configuration/common/configuration.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/codicons.ts",
+      "upstreamBlob": "e73173e2d5e128e7bc4c0bc6a47c40f658bd7551",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/codicons.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/lifecycle.ts",
+      "upstreamBlob": "a75cbb1cce3099e07bff3cc9c751d634ae30dfdd",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/lifecycle.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/environment/common/environment.ts",
+      "upstreamBlob": "7c6a27cea9c7ae257d4643dbbc3b3da0510dd0a5",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "The unused third environment parameter is removed from the theming callback contract. No registered upstream callback consumes it; Proctor retains the original collector, ordering, registration and disposal machinery.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/async.ts",
+      "upstreamBlob": "510fc4a54049fda2dbd9454c2e5cfa3778be2fe0",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/async.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/jsonSchema.ts",
+      "upstreamBlob": "be69a92bf678d6d3e58fd80a6995c1b3349eacdd",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/jsonSchema.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/jsonschemas/common/jsonContributionRegistry.ts",
+      "upstreamBlob": "5f37ab3c5876a37db39bce0a29fd43f64836bd77",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/jsonschemas/common/jsonContributionRegistry.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/codiconsUtil.ts",
+      "upstreamBlob": "74177b0e760afd615bd13270b0cea2fa8816fd54",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/codiconsUtil.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/themables.ts",
+      "upstreamBlob": "dcc1369e5932df0c4206e8f0628c8b5386df11b3",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing complete lower-layer dependency; original exports consumed by the transferred theme implementation retain their signatures and behavior, verified by compilation and upstream token-style regression tests.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/themables.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/files/common/fileService.ts",
+      "upstreamBlob": "493471fe8560bf2c630a61ba47ec698c155a7bef",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Test fixture IO uses a bounded actual read of the same source fixture; extension discovery, disk provider registration and empty upstream mocks are not exercised by the preserved assertions.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/log/common/log.ts",
+      "upstreamBlob": "27e542896df074a88f1ee1f587b5695b12e2ca7e",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Test fixture IO uses a bounded actual read of the same source fixture; extension discovery, disk provider registration and empty upstream mocks are not exercised by the preserved assertions.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/files/node/diskFileSystemProvider.ts",
+      "upstreamBlob": "2e2e64bd6220aa5d8fedadc1c536f39c44a4dfc9",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Test fixture IO uses a bounded actual read of the same source fixture; extension discovery, disk provider registration and empty upstream mocks are not exercised by the preserved assertions.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/network.ts",
+      "upstreamBlob": "871560d2ab0eb9496824c44869580461e21c2b99",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Test fixture IO uses a bounded actual read of the same source fixture; extension discovery, disk provider registration and empty upstream mocks are not exercised by the preserved assertions.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/extensionResourceLoader/common/extensionResourceLoaderService.ts",
+      "upstreamBlob": "638db3465469ce455241de7d11069fd37c990d7a",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Test fixture IO uses a bounded actual read of the same source fixture; extension discovery, disk provider registration and empty upstream mocks are not exercised by the preserved assertions.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/test/common/workbenchTestServices.ts",
+      "upstreamBlob": "968eb2656bfd740bf844d419cbaa494c2a0c3766",
+      "category": "test",
+      "disposition": "excluded",
+      "rationale": "Test fixture IO uses a bounded actual read of the same source fixture; extension discovery, disk provider registration and empty upstream mocks are not exercised by the preserved assertions.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/platform/request/common/request.ts",
+      "upstreamBlob": "8d4dfc7a5383c499d5b4aecba2eb54fccf1e6c80",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Test fixture IO uses a bounded actual read of the same source fixture; extension discovery, disk provider registration and empty upstream mocks are not exercised by the preserved assertions.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/test/common/utils.ts",
+      "upstreamBlob": "d07c2a595a619b82e32b820f72ba4f65cacc3d35",
+      "category": "test",
+      "disposition": "locally-satisfied",
+      "rationale": "Explicit local adapter supplies the complete consumed input surface; source algorithms and state remain in the full transferred implementation.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "test/base/common/upstream/upstreamTestUtils.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/extensionManagement/common/extensionGalleryManifestService.ts",
+      "upstreamBlob": "53be55bdffd20fc62daa11f5be27db0922087a6a",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "Test fixture IO uses a bounded actual read of the same source fixture; extension discovery, disk provider registration and empty upstream mocks are not exercised by the preserved assertions.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Retained Microsoft MIT notice.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "packaged-inputs",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/common/themeDataAdapters.ts",
+      "rationale": "Exact resource, storage and customization operations consumed by the full model; no extension-host or generic filesystem capability."
+    },
+    {
+      "id": "packaged-loader",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/common/packagedThemeLoader.ts",
+      "rationale": "Bounded immutable resource catalog and one theme snapshot slot. Build uses the real loader and serializer; runtime restores the real model."
+    },
+    {
+      "id": "test-runner",
+      "kind": "local-interface",
+      "reference": "test/base/common/upstream/testAdapter.ts",
+      "rationale": "Actual Node suite lifecycle retaining all upstream assertions."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "platform-owner",
+      "summary": "Move the complete pure theme implementation and token primitives to platform/theme so both chrome and editor consumers share it without reverse-layer imports. Retain all algorithms, registrations, public data and loading/customization/storage methods.",
+      "localPaths": [
+        "src/prctr/platform/theme/common/colorThemeData.ts",
+        "src/prctr/platform/theme/common/workbenchThemeService.ts",
+        "src/prctr/platform/theme/common/themeCompatibility.ts",
+        "src/prctr/platform/theme/common/themeService.ts",
+        "src/prctr/platform/theme/common/tokenClassificationRegistry.ts",
+        "src/prctr/platform/theme/common/iconRegistry.ts",
+        "src/prctr/platform/theme/common/editorColorRegistry.ts"
+      ],
+      "verificationRefs": ["upstream-token-style", "packaged-theme-parity", "color-regression"]
+    },
+    {
+      "id": "bounded-packaged-resources",
+      "summary": "Original resource, storage and configuration inputs are injected through their exact consumed operations. Resources are immutable packaged strings, bounded to 256 reads per load. Snapshots use original toStorage/fromStorageData without a duplicate parser or runtime checkout access.",
+      "localPaths": [
+        "src/prctr/platform/theme/common/colorThemeData.ts",
+        "src/prctr/platform/theme/common/themeDataAdapters.ts",
+        "src/prctr/platform/theme/common/packagedThemeLoader.ts"
+      ],
+      "verificationRefs": ["packaged-theme-parity", "color-regression"]
+    },
+    {
+      "id": "participant-environment",
+      "summary": "Remove the unused environment argument from IThemingParticipant and preserve the existing Proctor registry accessor. No registered upstream callback reads that argument; all lifecycle and collector behavior is retained.",
+      "localPaths": ["src/prctr/platform/theme/common/themeService.ts"],
+      "verificationRefs": ["color-regression"]
+    },
+    {
+      "id": "node-test-fixture",
+      "summary": "Use the existing real test runner and a bounded read of the unchanged fixture in place of extension/file service mocks. Keep every upstream test and assertion.",
+      "localPaths": ["test/editor/node/themes/upstream/tokenStyleResolving.test.ts"],
+      "verificationRefs": ["upstream-token-style"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "upstream-token-style",
+      "kind": "test",
+      "path": "test/editor/node/themes/upstream/tokenStyleResolving.test.ts",
+      "obligation": "All original token style resolution cases including scopes, specificity, super type, language and semantic metadata pass unchanged."
+    },
+    {
+      "id": "packaged-theme-parity",
+      "kind": "test",
+      "path": "test/platform/theme/common/packagedThemeLoader.test.ts",
+      "obligation": "All nine themes retain full token rules, color/font maps and semantic resolution through actual resource load and storage restore. Customization invalidates caches and resets; adapters reject unsupported resources/storage operations."
+    },
+    {
+      "id": "color-regression",
+      "kind": "test",
+      "path": "test/platform/theme/common/colorThemeEngine.test.ts",
+      "obligation": "Preserve existing color precedence, wildcard/default overrides, derived values, includes, cycle/missing/invalid rejection and native projection boundaries."
+    }
+  ]
+}

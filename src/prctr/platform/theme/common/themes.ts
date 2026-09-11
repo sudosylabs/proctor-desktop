@@ -2,11 +2,15 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import type { IColorTheme } from './themeService.js';
+import { normalizeTokenColorCustomizations, normalizeSemanticTokenColorCustomizations } from './tokenCustomizations.js';
+import { resolveTokenColorCustomizations } from './tokenColorConfiguration.js';
+import type { ITokenColorCustomizations, ISemanticTokenColorCustomizations } from './workbenchThemeService.js';
+import type { IWorkbenchColorTheme } from './workbenchThemeService.js';
 import { Color } from '../../../base/common/color.js';
-import { ColorThemeData, loadColorTheme, type IColorCustomizations } from './colorThemeData.js';
+import type { IColorCustomizations } from './colorCustomizations.js';
+import { restorePackagedTheme } from './packagedThemeLoader.js';
 import { BUNDLED_THEMES, LEGACY_THEME_NAMES } from './bundledThemes.js';
-import { bundledThemeResources } from './bundledThemeResources.generated.js';
+import { bundledThemeSnapshots } from './bundledThemeSnapshots.generated.js';
 import { getColorRegistry } from './colorRegistry.js';
 import './workbenchColors.js';
 import { normalizeColorCustomizations } from './colorCustomizations.js';
@@ -21,7 +25,7 @@ export type TransparencyPreference = 'full' | 'reduced';
 export interface ResolvedTheme {
 	readonly id: ThemeId;
 	readonly settingsId: string;
-	readonly colorTheme: IColorTheme;
+	readonly colorTheme: IWorkbenchColorTheme;
 	readonly colors: Readonly<Record<string, string>>;
 	readonly scheme: ColorScheme;
 	readonly isDark: boolean;
@@ -116,42 +120,25 @@ const legacyColorRoles = {
 	'color.scrollbar.thumbActive': 'scrollbarSlider.activeBackground'
 } as const;
 
-const loader = {
-	read(path: string): string {
-		const source = bundledThemeResources[path];
-		if (source === undefined) throw new Error(`Unknown bundled theme resource: ${path}`);
-		return source;
-	},
-	resolve(from: string, include: string): string {
-		const parts = from.split('/');
-		parts.pop();
-		for (const part of include.split('/')) {
-			if (part === '..') {
-				if (!parts.length) throw new Error('Theme include escapes bundle');
-				parts.pop();
-			} else if (part !== '.' && part !== '') parts.push(part);
-		}
-		return parts.join('/');
-	}
-};
-const themeData = new Map<string, Readonly<Record<string, string>>>();
 export function getTheme(
 	selection: string,
-	customizations: IColorCustomizations = {}
+	customizations: IColorCustomizations = {},
+	tokenCustomizations: ITokenColorCustomizations = {},
+	semanticCustomizations?: ISemanticTokenColorCustomizations
 ): ResolvedTheme {
 	const name = LEGACY_THEME_NAMES[selection as keyof typeof LEGACY_THEME_NAMES] ?? selection;
 	const entry = BUNDLED_THEMES.find((theme) => theme.name === name);
 	if (!entry) throw new Error(`Unknown bundled theme: ${selection}`);
 	const custom = normalizeColorCustomizations(customizations);
 	if (!custom) throw new TypeError('Invalid theme color customizations');
-	let source = themeData.get(name);
-	if (!source) {
-		source = loadColorTheme(loader, entry.path);
-		themeData.set(name, source);
-	}
-	const model = new ColorThemeData(name, entry.scheme);
-	model.setColors(source);
+	const model = restorePackagedTheme(bundledThemeSnapshots[name]!);
+	const source = JSON.parse(bundledThemeSnapshots[name]!).colorMap as Record<string, string>;
 	model.setCustomColors(custom);
+	const tokens = normalizeTokenColorCustomizations(tokenCustomizations);
+	const semantic = semanticCustomizations === undefined ? undefined : normalizeSemanticTokenColorCustomizations(semanticCustomizations);
+	if (!tokens || semanticCustomizations !== undefined && !semantic) throw new TypeError('Invalid token customizations');
+	model.setCustomTokenColors(resolveTokenColorCustomizations(tokens));
+	model.setCustomSemanticTokenColors(semantic);
 	const colors: Record<string, string> = Object.create(null);
 	// Keep all packaged theme colors, even when their consuming capability is not yet registered.
 	for (const id of new Set([

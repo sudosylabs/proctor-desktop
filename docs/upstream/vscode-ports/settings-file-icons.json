@@ -1,0 +1,172 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "settings-file-icons",
+  "admission": {
+    "workflow": "Render the source Settings title and settings.json file labels with the complete built-in VS Code Seti theme.",
+    "callers": [
+      "src/prctr/workbench/services/editor/browser/editorThemeService.ts"
+    ],
+    "interface": "src/prctr/workbench/services/editor/browser/packagedFileIconTheme.ts",
+    "decision": "docs/architecture/design-system.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "extensions/theme-seti/icons/seti.woff",
+      "localPath": "resources/file-icons/seti/seti.woff",
+      "upstreamBlob": "6a8a3da7cf05b57901a2d75bfc7acf7067438f07",
+      "localSha256": "b127762058f89b37b08d76185e3b0558f5c28859e39a3840a27cb28b9739d6e2",
+      "category": "asset",
+      "disposition": "copied",
+      "rationale": "Exact packaged VS Code built-in Seti artifact; retain the full mapping and font rather than extracting selected glyphs.",
+      "licenseRefs": [
+        "vscode-mit",
+        "seti-mit"
+      ],
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/theme-seti/icons/vs-seti-icon-theme.json",
+      "localPath": "resources/file-icons/seti/vs-seti-icon-theme.json",
+      "upstreamBlob": "50e325eac8caf284853c84153e2e8bfa3b6fbec6",
+      "localSha256": "2088843e6f00a81870ed2890132fb658cf33406177a5dd58c9c7001e5184ca2a",
+      "category": "asset",
+      "disposition": "copied",
+      "rationale": "Exact packaged VS Code built-in Seti artifact; retain the full mapping and font rather than extracting selected glyphs.",
+      "licenseRefs": [
+        "vscode-mit",
+        "seti-mit"
+      ],
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/theme-seti/ThirdPartyNotices.txt",
+      "localPath": "resources/file-icons/seti/ThirdPartyNotices.txt",
+      "upstreamBlob": "5faf4bb5a8fe00f76db29c92d5f58b8e2a81b0ba",
+      "localSha256": "c67ddfeba3a0aaffe9e9f7165c155c06de5c8db609a92b3a1a29ee6ab316a0bb",
+      "category": "license",
+      "disposition": "copied",
+      "rationale": "Exact packaged VS Code built-in Seti artifact; retain the full mapping and font rather than extracting selected glyphs.",
+      "licenseRefs": [
+        "vscode-mit",
+        "seti-mit"
+      ],
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/browser/fileIconThemeData.ts",
+      "upstreamBlob": "48811cc86d26f44e6716f441a10f0681f7e74cb5",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/workbench/services/themes/browser/fileIconThemeData.ts",
+      "rationale": "Use the entire admitted source loader and mapping/variant/font semantics through a closed packaged resource adapter.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/browser/workbenchThemeService.ts",
+      "upstreamBlob": "69b32747767ab5d414d849571f974c78680e56a0",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/workbench/services/editor/browser/editorThemeService.ts",
+      "rationale": "The Proctor theme facade owns original file theme data/event semantics. Its composed workbench root applies the source file-icons-enabled flag; file CSS is mounted through a disposable constructed stylesheet under the editor scope.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/theme-seti/package.json",
+      "upstreamBlob": "4c0755674d52847964ff1d478f6d0ec3b06fd46f",
+      "category": "registration",
+      "disposition": "evidence-only",
+      "rationale": "No extension registration: the fixed bundled theme is selected in the Proctor composition.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/theme-seti/build/update-icon-theme.js",
+      "upstreamBlob": "5c26ac825348667d354e1028c956fcecf2fb497b",
+      "category": "generated-input",
+      "disposition": "evidence-only",
+      "rationale": "Upstream font/mapping generation remains upstream; Proctor packages the exact pinned generated artifacts and does not regenerate a glyph subset.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/theme-seti/cgmanifest.json",
+      "upstreamBlob": "0a12c2c7baa48eb53e609e8902dcc9b9a7a2f664",
+      "category": "configuration",
+      "disposition": "evidence-only",
+      "rationale": "Upstream dependency provenance retained as source evidence; local exact asset digests and MIT notices own packaged verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": [
+        "LICENSE.txt"
+      ],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    },
+    {
+      "id": "seti-mit",
+      "name": "Seti UI MIT License \u2014 Jesse Weed",
+      "upstreamPaths": [
+        "extensions/theme-seti/ThirdPartyNotices.txt"
+      ],
+      "localNoticePath": "resources/file-icons/seti/ThirdPartyNotices.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "packaged-resource-adapter",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/services/editor/browser/packagedFileIconTheme.ts",
+      "rationale": "Only the exact bundled mapping can be read. The font path is relocated to the esbuild-owned artifact; no file, network or extension resolver is exposed."
+    },
+    {
+      "id": "asset-build",
+      "kind": "local-interface",
+      "reference": "build/lib/packagedEditorDependencies.ts",
+      "rationale": "The same exact-font binding is used by production, preview and real Electron tests."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "closed-packaged-theme",
+      "summary": "Use the complete static Seti mapping through the original FileIconThemeLoader; replace only its font resource path with the bundled artifact URL. Mount the resulting CSS inside the existing editor scope with a disposable constructed sheet for CSP. No extension loading or configurable icon theme is introduced.",
+      "localPaths": [
+        "src/prctr/workbench/services/editor/browser/packagedFileIconTheme.ts",
+        "src/prctr/workbench/services/editor/browser/editorThemeService.ts"
+      ],
+      "verificationRefs": [
+        "settings-regressions"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "id": "settings-regressions",
+      "kind": "test",
+      "path": "test/browser/editor/settingsWindowServices.test.ts",
+      "obligation": "Real sandboxed Electron verification of completion acceptance and undo, diagnostics, computed hover/control geometry, Settings and JSON title icons, both view-switch tooltips, packaged font loading and theme transitions."
+    }
+  ]
+}

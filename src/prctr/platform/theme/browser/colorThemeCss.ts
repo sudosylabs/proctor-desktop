@@ -6,6 +6,7 @@
 // @proctor-vscode-port color-theme-engine
 import type { IColorTheme, ICssStyleCollector, IThemingParticipant } from '../common/themeService.js';
 import { asCssVariableName, getColorRegistry } from '../common/colorRegistry.js';
+import { asCssVariableName as asSizeCssVariableName, getSizeRegistry, sizeValueToCss } from '../common/sizeRegistry.js';
 
 /**
  * Generates CSS content (variables + theming participant rules) for a color theme.
@@ -47,7 +48,13 @@ export function generateColorThemeCSS(
 		}
 	}
 
-	// Non-color size tokens remain owned by the Proctor presentation registry.
+	// Size CSS variables
+	for (const item of getSizeRegistry().getSizes()) {
+		const sizeValue = getSizeRegistry().resolveDefaultSize(item.id, theme);
+		if (sizeValue) {
+			variables.push(`${asSizeCssVariableName(item.id)}: ${sizeValueToCss(sizeValue)};`);
+		}
+	}
 
 	ruleCollector.addRule(`${scopeSelector} { ${variables.join('\n')} }`);
 

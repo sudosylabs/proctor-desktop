@@ -1,0 +1,170 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "editor-token-themes",
+  "admission": {
+    "workflow": "Preserve the token-theme matching, encoded metadata, TextMate scope selectors and plist parsing required by the full Settings editor theme engine.",
+    "callers": [
+      "test/editor/common/upstream/languages/supports/tokenization.test.ts",
+      "test/editor/node/themes/tokenPrimitives.test.ts"
+    ],
+    "interface": "src/prctr/platform/theme/common/tokenization.ts",
+    "decision": "docs/architecture/user-settings.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "src/vs/editor/common/encodedTokenAttributes.ts",
+      "upstreamBlob": "22ee1417e559ad19afd5559c3b6ccb1a6f0bfa1e",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete original implementation; namespace relocation and marker only.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/encodedTokenAttributes.ts",
+      "localSha256": "a3d73ad952985b799001c89645a45253888a9e0c5e65e08810a6bcfcec70f198",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/supports/tokenization.ts",
+      "upstreamBlob": "0545b34945d65f197aaacf989decc0a07626fbfe",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete upstream token behavior now consumes the full shared theme-service font contract in platform/theme, with import relocation only.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/tokenization.ts",
+      "localSha256": "ce837f7584a19198b71d5a87ed7a362863e405bb65b55e4f7a6e36ad00c3d8ad",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/textMateScopeMatcher.ts",
+      "upstreamBlob": "2bbe90caad4a70f017c3578704b6fce8da4b4796",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete original implementation; namespace relocation and marker only.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/textMateScopeMatcher.ts",
+      "localSha256": "e0ee2ba6af8b1eddb0c0a88249a17ab023561190e8adb89e80c2562c89eb6bba",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/plistParser.ts",
+      "upstreamBlob": "a9c83450b0edf15540207615b3ae8ebf4c33dd35",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete original implementation; namespace relocation and marker only.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/platform/theme/common/plistParser.ts",
+      "localSha256": "cb21ce7361b9d743d6608f7ef5f52f8db3279f5cba9742d2125cac32ba8b1924",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "src/vs/editor/test/common/modes/supports/tokenization.test.ts",
+      "upstreamBlob": "69fe4beaac0f598ef00de81c8c5ee7a3572338fb",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Retain the complete upstream token matching/parsing/resolution assertions, using the existing Node suite, assertion and disposable-leak adapters.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/common/upstream/languages/supports/tokenization.test.ts",
+      "localSha256": "60b2d0116bd237651326dca42a2dc1f928ecab651c1e6a9e531c2e49d8258bd9",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/color.ts",
+      "upstreamBlob": "ce1143ac7b46e48689ec2bd5af3f6b1bc334531c",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "The admitted Color contract supplies unchanged hex parsing and color-map behavior exercised by every transferred token theme test.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/color.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/themeService.ts",
+      "upstreamBlob": "5cf50f913a8922889992b3892901dd38882c6a91",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Complete upstream token behavior now consumes the full shared theme-service font contract in platform/theme, with import relocation only.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/platform/theme/common/themeService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/test/common/utils.ts",
+      "upstreamBlob": "d07c2a595a619b82e32b820f72ba4f65cacc3d35",
+      "category": "test",
+      "disposition": "locally-satisfied",
+      "rationale": "The existing leak-test adapter supplies the only imported test helper.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "test/base/common/upstream/upstreamTestUtils.ts"
+    },
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Microsoft MIT notice retained for all transferred modules and tests.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "base-color",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/color.ts",
+      "rationale": "Existing complete Color implementation used by the upstream token color map."
+    },
+    {
+      "id": "font-options",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/common/themeService.ts",
+      "rationale": "Full upstream theme service contract shared with the complete theme model."
+    },
+    {
+      "id": "node-test-adapter",
+      "kind": "local-interface",
+      "reference": "test/base/common/upstream/testAdapter.ts",
+      "rationale": "Existing actual suite lifecycle and assertion/leak adapters preserve every enabled upstream token-theme case."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "node-test-registration",
+      "summary": "Register original suites with the existing Node test harness and route assertions/disposable tracking through its admitted adapters. Assertions and test cases remain intact.",
+      "localPaths": ["test/editor/common/upstream/languages/supports/tokenization.test.ts"],
+      "verificationRefs": ["token-theme-tests"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "token-theme-tests",
+      "kind": "test",
+      "path": "test/editor/common/upstream/languages/supports/tokenization.test.ts",
+      "obligation": "Run the complete upstream regression suite for priority, inheritance, defaults, colors, font flags, matching, raw parsing and token-theme resolution."
+    },
+    {
+      "id": "token-primitives",
+      "kind": "test",
+      "path": "test/editor/node/themes/tokenPrimitives.test.ts",
+      "obligation": "Exercise scope selector priority/conjunction/alternatives/subtraction, nested plist/scalar/entity/BOM parsing, metadata styles/identity and repeated font CSS class deduplication."
+    }
+  ]
+}
