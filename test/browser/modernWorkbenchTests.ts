@@ -355,25 +355,7 @@ export async function runModernWorkbenchTests(
 				);
 				close(action.height, 24, 'compact titlebar account hit area');
 			}
-			trigger.focus();
-			trigger.dispatchEvent(
-				new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
-			);
-			const menu = document.querySelector<HTMLElement>('.prctr-menu')!;
-			assert(
-				!!menu && trigger.getAttribute('aria-expanded') === 'true',
-				'titlebar account keyboard menu'
-			);
-			assert(
-				menu.getBoundingClientRect().top >= trigger.getBoundingClientRect().bottom,
-				'menu covers titlebar trigger'
-			);
-			menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
-			assert(
-				document.activeElement === trigger &&
-					trigger.getAttribute('aria-expanded') === 'false',
-				'account menu restores titlebar focus'
-			);
+			// Menu interactions run in authenticatedLayoutTests with the production service graph.
 		} finally {
 			accountStore.dispose();
 			for (const [key, value] of savedLayout) { if (value === null) document.defaultView!.localStorage.removeItem(key); else document.defaultView!.localStorage.setItem(key, value); }

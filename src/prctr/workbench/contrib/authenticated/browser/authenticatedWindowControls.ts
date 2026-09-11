@@ -57,10 +57,14 @@ import {
 import { WORKBENCH_NOTIFICATION_SERVICE } from '../../../browser/parts/notifications/notifications.js';
 import type { WorkbenchBootstrapContext } from '../../../browser/bootstrap.js';
 
-/** Window-owned source Quick Input controls. Layout never waits for a server Settings read. */
-export class AuthenticatedQuickInput extends Disposable {
+/** Source controls shared by the authenticated titlebar, layout picker and account menu. */
+export const AUTHENTICATED_WINDOW_CONTROLS_SERVICE = 'prctr.authenticated.windowControls';
+
+export class AuthenticatedWindowControls extends Disposable {
 	readonly input: QuickInputService;
 	readonly hover: IHoverService;
+	readonly contextMenu: IContextMenuService;
+	readonly contextView: IContextViewService;
 	readonly ready: Promise<void>;
 	constructor(context: WorkbenchBootstrapContext) {
 		super();
@@ -145,14 +149,10 @@ export class AuthenticatedQuickInput extends Disposable {
 			context.getService<INotificationService>(WORKBENCH_NOTIFICATION_SERVICE)
 		);
 		services.set(IMenuService, this._register(instantiation.createInstance(MenuService)));
-		services.set(
-			IContextViewService,
-			this._register(instantiation.createInstance(ContextViewService))
-		);
-		services.set(
-			IContextMenuService,
-			this._register(instantiation.createInstance(ContextMenuService))
-		);
+		this.contextView = this._register(instantiation.createInstance(ContextViewService));
+		services.set(IContextViewService, this.contextView);
+		this.contextMenu = this._register(instantiation.createInstance(ContextMenuService));
+		services.set(IContextMenuService, this.contextMenu);
 		services.set(
 			IAccessibilityService,
 			this._register(instantiation.createInstance(AccessibilityService))

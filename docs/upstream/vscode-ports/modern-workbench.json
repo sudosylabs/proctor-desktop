@@ -299,12 +299,20 @@
       "rationale": "Retain CustomizeLayoutAction quick-picker items, eye/check icons, live selection refresh, item-button acceptance, persistent picker, reset/close and focus lifetime. Project state and actions through the authenticated layout owner; explicitly limit choices to Primary and Secondary Side Bars and primary position.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts",
-      "localSha256": "2953b74f1c7cc054e4317a4e31f6fa4a9ee4a43eedde3d23766e322f275a1eb2",
+      "localSha256": "c3533d8db5028353906e7d7a148b1a84c250a4ecbb34d9b26bf23c9612d99325",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
         "provenance-marker-insertion"
       ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/parts/globalCompositeBar.ts",
+      "upstreamBlob": "6aec4cf96b3b03f4810f12c0f6056503a47044fa",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "The account action consumer uses the admitted ContextMenuService, source Actions and Separators, workbench menu motion, anchor alignment and source action/focus lifecycle. Proctor supplies only its closed Profile, Sessions and Log out actions; no VS Code authentication provider or extension account behavior is imported.",
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
@@ -343,8 +351,8 @@
     {
       "id": "authenticated-quick-input",
       "kind": "local-interface",
-      "reference": "src/prctr/workbench/contrib/authenticated/browser/authenticatedQuickInput.ts",
-      "rationale": "Window-owned dependency composition reuses admitted workbench QuickInputService, list/tree, menu/context view, hover delegates, markdown renderer, code-editor/opener services, accessibility, theme, base workbench styles, ModernUI and layout services. A closed opener validator prevents tooltip labels from becoming links. Active picker ownership routes source commands through the kernel graph and restores the Settings controller on hide. No server settings read is required."
+      "reference": "src/prctr/workbench/contrib/authenticated/browser/authenticatedWindowControls.ts",
+      "rationale": "Window-owned dependency composition reuses admitted workbench QuickInputService, list/tree, menu/context view, hover delegates, markdown renderer, code-editor/opener services, accessibility, theme, base workbench styles, ModernUI and layout services. A closed opener validator prevents tooltip labels from becoming links. Active picker ownership routes source commands through the kernel graph and restores the Settings controller on hide. No server settings read is required. The Windows/Linux account dropdown consumes the same source ContextMenuService and Menu controls; macOS keeps the bounded native account adapter."
     },
     {
       "id": "authenticated-titlebar-controls",
@@ -429,7 +437,7 @@
       "id": "authenticated-layout-controls",
       "kind": "test",
       "path": "test/browser/authenticatedLayoutTests.ts",
-      "obligation": "Actual authenticated composition, keyboard shortcuts, source Customize Layout without Settings runtime, disabled unsupported secondary, page disposal and focus, persistent picker after position changes, and modal blocking."
+      "obligation": "Actual authenticated composition, keyboard shortcuts, source Customize Layout without Settings runtime, disabled unsupported secondary, page disposal and focus, persistent picker after position changes, and modal blocking. Source account-menu hierarchy, Home/End/arrows/Enter/Escape, navigation, anchor placement, focus restoration and modal dismissal before opening Settings."
     }
   ]
 }

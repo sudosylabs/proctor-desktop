@@ -42,6 +42,7 @@ export async function exerciseAuthenticatedLayout(): Promise<void> {
 	let layout!: AuthenticatedLayout;
 	let services!: ServiceCollection;
 	let settingsRequests = 0;
+	let navigation!: AuthenticatedNavigationService;
 	const result = await bootstrapWorkbench(document, authenticatedComposition, [
 		...commonWorkbenchContributions,
 		createDesktopWorkbenchContribution(
@@ -85,6 +86,7 @@ export async function exerciseAuthenticatedLayout(): Promise<void> {
 				commands = context.getService(WORKBENCH_COMMAND_SERVICE);
 				layout = context.getService(AUTHENTICATED_LAYOUT_SERVICE);
 				services = context.getService(WORKBENCH_SERVICE_COLLECTION);
+				navigation = context.getService(AUTHENTICATED_NAVIGATION_SERVICE);
 				context.disposables.add(
 					context
 						.getService<AuthenticatedNavigationService>(
@@ -142,7 +144,74 @@ export async function exerciseAuthenticatedLayout(): Promise<void> {
 			),
 			'Settings remained in account menu.'
 		);
+		const sourceMenu = document.querySelector<HTMLElement>('.monaco-menu')!;
+		check(
+			sourceMenu && !document.querySelector('.prctr-menu'),
+			'Account did not use the source workbench menu.'
+		);
+		check(
+			sourceMenu.getBoundingClientRect().top >= account.getBoundingClientRect().bottom,
+			'Account menu overlaps its titlebar anchor.'
+		);
+		const menuKey = (key: string, code: number) =>
+			document.activeElement!.dispatchEvent(
+				new KeyboardEvent('keydown', {
+					key,
+					code: key,
+					keyCode: code,
+					bubbles: true,
+					cancelable: true
+				})
+			);
+		menuKey('End', 35);
+		check(
+			document.activeElement?.textContent?.includes('Log out'),
+			'Source menu End did not focus the last action.'
+		);
+		menuKey('Home', 36);
+		check(
+			document.activeElement?.textContent?.includes('Profile'),
+			'Source menu Home did not focus the first action.'
+		);
+		menuKey('Escape', 27);
+		await eventually(() => account.getAttribute('aria-expanded') === 'false');
+		check(
+			document.activeElement === account,
+			'Account menu Escape did not restore trigger focus.'
+		);
+		account.dispatchEvent(
+			new KeyboardEvent('keydown', {
+				key: 'ArrowDown',
+				code: 'ArrowDown',
+				keyCode: 40,
+				bubbles: true,
+				cancelable: true
+			})
+		);
+		check(
+			account.getAttribute('aria-expanded') === 'true',
+			'ArrowDown did not open the source account menu.'
+		);
+		menuKey('ArrowDown', 40);
+		menuKey('Enter', 13);
+		await eventually(() => navigation.accountSection === 'sessions');
+		check(
+			account.getAttribute('aria-expanded') === 'false',
+			'Menu action did not close its source popup.'
+		);
 		account.click();
+		const menuGate = result.shell.overlayHost.acquireExternalModal();
+		check(
+			account.getAttribute('aria-expanded') === 'false',
+			'Source account menu survived a modal gate.'
+		);
+		menuGate.dispose();
+		navigation.select('account');
+		// Restore the profile page used by the secondary-content assertions below.
+		account.click();
+		menuKey('Home', 36);
+		menuKey('Enter', 13);
+		await eventually(() => navigation.accountSection === 'profile');
 		primary.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
 		await eventually(
 			() =>

@@ -5,7 +5,14 @@ import {
 } from '../../../../platform/windows/browser/productWindowChrome.js';
 import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
 import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
+import { Action, Separator } from '../../../../base/common/actions.js';
+import { DisposableStore } from '../../../../base/common/lifecycle.js';
+import { AnchorAlignment } from '../../../../base/browser/ui/contextview/contextview.js';
+import { getWorkbenchMenuMotionContextMenuOptions } from '../../../browser/actions/menuMotion.js';
+import {
+	AUTHENTICATED_WINDOW_CONTROLS_SERVICE,
+	type AuthenticatedWindowControls
+} from './authenticatedWindowControls.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Emitter } from '../../../../base/common/event.js';
 import { defineMessage } from '../../../../base/common/localization.js';
@@ -227,28 +234,21 @@ export function activateAccountShellNavigation(
 	context.shell.part('banner').append(feedback);
 	let disposed = false;
 	let signingOut = false;
-	const interaction = context.disposables.add(new Emitter<void>());
+	let menuVisible = false;
+	const closeMenu = (): void => {
+		if (menuVisible)
+			context
+				.getService<AuthenticatedWindowControls>(AUTHENTICATED_WINDOW_CONTROLS_SERVICE)
+				.contextView.hideContextView(true);
+	};
 	context.disposables.add(
-		context.shell.overlayHost.onDidChangeVisibility(() => interaction.fire())
-	);
-	const menu = context.disposables.add(
-		new MenuControl(context.shell.overlayHost.notificationLayer, {
-			canInteract: () => !disposed && !signingOut && !context.shell.overlayHost.visible,
-			onDidChangeInteraction: interaction.event,
-			restoreFocus: () => trigger.focus(),
-			onActionError: () => {
-				feedback.textContent = text('failed');
-				context.shell.setPartVisible('banner', true);
-			}
+		context.shell.overlayHost.onDidChangeVisibility((visible) => {
+			if (visible) closeMenu();
 		})
 	);
-	context.disposables.add(
-		menu.onDidChangeVisibility((visible) =>
-			trigger.setAttribute('aria-expanded', String(visible))
-		)
-	);
+	context.disposables.add({ dispose: closeMenu });
 	const runAccountAction = async (action: string | undefined): Promise<void> => {
-		if (disposed || !action) return;
+		if (disposed || signingOut || context.shell.overlayHost.visible || !action) return;
 		if (action === 'profile' || action === 'sessions') {
 			accountSection = action;
 			select('account');
@@ -256,7 +256,7 @@ export function activateAccountShellNavigation(
 		else if (action === 'logout') {
 			signingOut = true;
 			trigger.disabled = true;
-			interaction.fire();
+			closeMenu();
 			try {
 				await client.signOut();
 			} catch {
@@ -268,7 +268,8 @@ export function activateAccountShellNavigation(
 		}
 	};
 	let nativeMenuVisible = false;
-	const openMenu = (): void => {
+	const openMenu = (keyboard = false): void => {
+		if (disposed || signingOut || context.shell.overlayHost.visible) return;
 		if (client.accountMenu) {
 			if (nativeMenuVisible || disposed || signingOut || context.shell.overlayHost.visible)
 				return;
@@ -292,33 +293,60 @@ export function activateAccountShellNavigation(
 				});
 			return;
 		}
-		if (menu.visible) {
-			menu.hide();
+		if (menuVisible) {
+			closeMenu();
 			return;
 		}
-		menu.show(
-			trigger,
-			[
-				{ label: text('profile'), run: () => runAccountAction('profile') },
-				{ label: text('sessions'), run: () => runAccountAction('sessions') },
-				{
-					label: text('signOut'),
-					separatorBefore: true,
-					run: () => runAccountAction('logout')
-				}
-			],
-			text('account')
+		const controls = context.getService<AuthenticatedWindowControls>(
+			AUTHENTICATED_WINDOW_CONTROLS_SERVICE
 		);
+		const actions = context.disposables.add(new DisposableStore());
+		const action = (id: 'profile' | 'sessions' | 'logout', label: string) =>
+			actions.add(
+				new Action(`prctr.account.${id}`, label, undefined, true, () =>
+					runAccountAction(id)
+				)
+			);
+		controls.hover.hideHover();
+		trigger.focus();
+		menuVisible = true;
+		trigger.setAttribute('aria-expanded', 'true');
+		try {
+			controls.contextMenu.showContextMenu({
+				...getWorkbenchMenuMotionContextMenuOptions(trigger),
+				anchorAlignment: AnchorAlignment.RIGHT,
+				autoSelectFirstItem: keyboard,
+				getActions: () => [
+					action('profile', text('profile')),
+					action('sessions', text('sessions')),
+					new Separator(),
+					action('logout', text('signOut'))
+				],
+				onHide: () => {
+					menuVisible = false;
+					trigger.setAttribute('aria-expanded', 'false');
+					context.disposables.delete(actions);
+				}
+			});
+		} catch (error) {
+			menuVisible = false;
+			trigger.setAttribute('aria-expanded', 'false');
+			context.disposables.delete(actions);
+			throw error;
+		}
 	};
-	context.disposables.add(addDisposableListener(trigger, 'click', openMenu));
+	context.disposables.add(
+		addDisposableListener(trigger, 'click', (event) => openMenu(event.detail === 0))
+	);
 	context.disposables.add(
 		addDisposableListener(trigger, 'keydown', (event) => {
-			if (event.key === 'ArrowDown' && !menu.visible) {
+			if (event.key === 'ArrowDown' && !menuVisible && !nativeMenuVisible) {
 				event.preventDefault();
-				openMenu();
+				openMenu(true);
 			}
 		})
 	);
+
 	const setProfilePhoto = (dataUrl: string): void => {
 		if (disposed || !/^data:image\/webp;base64,/u.test(dataUrl)) return;
 		const image = context.document.createElement('img');

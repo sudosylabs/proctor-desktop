@@ -59,7 +59,13 @@ never overwrites an explicit preference. The account menu
 contains Profile, Sessions, then a separated Log out action. Settings opens from
 its separate titlebar button or the registered Settings shortcut. macOS uses an Electron
 native popup so the OS owns material, selection, accessibility and dismissal;
-other platforms use the window-owned menu control. The native capability accepts
+Windows and Linux use the admitted VS Code ContextMenuService and Menu controls,
+including source theme tokens, Modern UI menu motion, row selection, keyboard
+navigation, dismissal, and focus restoration. Both paths expose the same account
+actions. macOS material follows the OS appearance and accessibility preferences;
+it is not simulated with browser CSS. Preview compositions must use the same
+production preload and native adapter when demonstrating this menu.
+The native capability accepts
 only a bounded anchor and returns a closed action identifier, with sender
 validation and window-disposal cancellation. It cannot execute arbitrary commands
 or accept a renderer-defined menu tree.

@@ -39,7 +39,10 @@ import type {
 	QuickPickInput
 } from '../../../../platform/quickinput/common/quickInput.js';
 import { AuthenticatedLayoutState } from './authenticatedLayoutState.js';
-import { AuthenticatedQuickInput } from './authenticatedQuickInput.js';
+import {
+	AUTHENTICATED_WINDOW_CONTROLS_SERVICE,
+	AuthenticatedWindowControls
+} from './authenticatedWindowControls.js';
 import './authenticatedLayout.css';
 
 export const AUTHENTICATED_LAYOUT_SERVICE = 'prctr.authenticated.layout';
@@ -51,7 +54,7 @@ export class AuthenticatedLayout extends Disposable {
 	private readonly secondary = this._register(new MutableDisposable<IDisposable>());
 	private readonly providers = new Map<string, SecondaryContent>();
 	private destination = '';
-	private quickInput: AuthenticatedQuickInput | undefined;
+	private quickInput: AuthenticatedWindowControls | undefined;
 	private picker: IQuickPick<IQuickPickItem, { useSeparators: true }> | undefined;
 	private opening = false;
 	private readonly titlebarHovers: { target: HTMLElement; command?: string }[] = [];
@@ -204,7 +207,8 @@ export class AuthenticatedLayout extends Disposable {
 	/** Start source controls in the production window graph, before any titlebar interaction. */
 	initializeControls(): void {
 		if (this.quickInput) return;
-		this.quickInput = this._register(new AuthenticatedQuickInput(this.context));
+		this.quickInput = this._register(new AuthenticatedWindowControls(this.context));
+		this.context.setService(AUTHENTICATED_WINDOW_CONTROLS_SERVICE, this.quickInput);
 		for (const { target, command } of this.titlebarHovers)
 			this.installTitlebarHover(target, command);
 	}
