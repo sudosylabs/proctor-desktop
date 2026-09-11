@@ -1,0 +1,495 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-presentation*//* header styling *//* Set padding for these two to zero for now, otherwise the ends of the lists get cut off. *//* High contrast theme support - ensure proper color visibility */@layer controls {:where(.prctr-editor-scope) .editor-instance.prctr-settings-editor-pane:focus {
+	outline: none;
+}:where(.prctr-editor-scope) .settings-editor {
+	height: 100%;
+	overflow: hidden;
+	max-width: 1400px;
+	margin: auto;
+}:where(.prctr-editor-scope) .settings-editor:focus {
+}:where(.prctr-editor-scope) .settings-editor > .settings-header {
+	box-sizing: border-box;
+	margin: auto;
+	overflow: hidden;
+	margin-top: 11px;
+	padding-top: 3px;
+	padding-left: 24px;
+	padding-right: 24px;
+	max-width: 1400px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .search-container {
+	position: relative;
+}:where(.prctr-editor-scope) .monaco-workbench.vs .settings-editor > .settings-header > .search-container > .suggest-input-container {
+	border: 1px solid #ddd;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .search-container > .search-container-widgets {
+	display: flex;
+	align-items: center;
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	margin-right: 1px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .search-container > .search-container-widgets .action-label {
+	padding: 3px;
+	margin-left: 0px;
+	box-sizing: content-box;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .search-container > .search-container-widgets .action-label.monaco-custom-toggle {
+	/* To offset the border width. */
+	padding: 2.3px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .search-container > .search-container-widgets > .settings-count-widget {
+	margin-right: 3px;
+	padding-bottom: 3px;
+	color: var(--prctr-theme-descriptionForeground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .search-container > .search-container-widgets > .settings-count-widget:empty {
+	visibility: hidden;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls {
+	display: flex;
+	flex-wrap: wrap;
+	border-bottom: solid 1px;
+	margin-top: 10px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-suggestions {
+	flex: 0 0 100%;
+	width: 100%;
+	min-height: 20px;
+	margin-bottom: 9px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-suggestions a {
+	color: var(--prctr-theme-badge-foreground);
+	background: var(--prctr-theme-badge-background);
+	cursor: pointer;
+	margin-right: 4px;
+	padding: 0px 4px 2px;
+	border-radius: 4px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-target-container {
+	flex: auto;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget .action-label {
+	opacity: 0.9;
+	border-radius: 0;
+	color: var(--prctr-theme-foreground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .last-synced-label {
+	opacity: 0.9;
+}:where(.prctr-editor-scope) .settings-editor .settings-tabs-widget > .monaco-action-bar .action-item .action-details {
+	opacity: 0.9;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget .action-label:hover {
+	opacity: 1;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget .action-label.checked {
+	opacity: 1;
+	color: var(--prctr-theme-settings-headerForeground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget .action-label.checked:not(:focus) {
+	border-bottom-color: var(--prctr-theme-settings-headerForeground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-header .settings-tabs-widget > .monaco-action-bar .action-item .action-label {
+	margin-right: 0px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header .settings-tabs-widget .monaco-action-bar .action-item .dropdown-icon {
+	/** The tab widget container height is shorter than elsewhere, need to tweak this */
+	padding-top: 3px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget > .monaco-action-bar .action-item {
+	padding: 0px;
+	/* padding must be on action-label because it has the bottom-border, because that's where the .checked class is */
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget > .monaco-action-bar .action-item .action-label {
+	text-transform: none;
+	font-size: 13px;
+	padding-bottom: 6.5px;
+	padding-top: 7px;
+	padding-left: 8px;
+	padding-right: 8px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget > .monaco-action-bar .action-item .action-label .dropdown-icon {
+	padding-top: 2px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget > .monaco-action-bar .action-item .action-label:not(.checked):not(:focus) {
+	/* Still maintain a border for alignment, but keep it transparent */
+	border-bottom: 1px solid transparent;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body {
+	position: relative;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body > .no-results-message {
+	display: none;
+	max-width: 1400px;
+	margin: auto;
+	margin-top: 20px;
+	padding-left: 24px;
+	padding-right: 24px;
+	box-sizing: border-box;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body > .monaco-split-view2 {
+	margin-top: 14px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body > .monaco-split-view2.separator-border .split-view-view:not(:first-child):before {
+	z-index: 16;
+	/* Above sticky scroll */
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container {
+	height: 100%;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .settings-group-title-label,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-label {
+	color: var(--prctr-theme-settings-headerForeground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-extension-toggle .setting-item-extension-toggle-button {
+	display: inline-block;
+	width: fit-content;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-extension-toggle .setting-item-extension-dismiss-button {
+	display: inline-block;
+	width: fit-content;
+	margin-left: 8px;
+}:where(.prctr-editor-scope) .settings-editor.no-results > .settings-body .settings-toc-container,:where(.prctr-editor-scope) .settings-editor.no-results > .settings-body .settings-tree-container {
+	display: none;
+}:where(.prctr-editor-scope) .settings-editor.no-results > .settings-body > .no-results-message {
+	display: block;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body > .no-results-message a.prominent {
+	text-decoration: underline;
+}:where(.prctr-editor-scope) .settings-editor.narrow-width > .settings-body .settings-tree-container .prctr-list-row .monaco-tl-contents {
+	padding-left: 33px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row {
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row .monaco-tl-twistie {
+	/* Hide twisties */
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row.focused .settings-row-inner-container {
+	background-color: var(--prctr-theme-settings-focusedRowBackground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .monaco-tree-sticky-container .prctr-list-row.focused .settings-row-inner-container {
+	background-color: unset;
+	/* Remove Sticky Scroll focus */
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row:not(.focused) .settings-row-inner-container:hover {
+	background-color: var(--prctr-theme-settings-rowHoverBackground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list:focus-within .prctr-list-row.focused .setting-item-contents,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list:focus-within .prctr-list-row.focused .settings-group-title-label {
+	outline: 1px solid var(--prctr-theme-settings-focusedRowBorder);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list:focus-within .monaco-tree-sticky-container .prctr-list-row.focused .settings-group-title-label {
+	outline: none;
+	/* Remove Sticky Scroll focus */
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .settings-editor-tree > .prctr-scrollable-element > .shadow.top {
+	z-index: 11;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-toolbar-container {
+	position: absolute;
+	left: -22px;
+	top: 8px;
+	bottom: 0px;
+	width: 22px;
+	height: 22px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row .mouseover .setting-toolbar-container > .monaco-toolbar .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row.focused .setting-item-contents .setting-toolbar-container > .monaco-toolbar .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row .setting-toolbar-container:hover > .monaco-toolbar .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row .setting-toolbar-container > .monaco-toolbar .active .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-header .search-container .search-container-widgets .action-label {
+	opacity: 1;
+}:where(.prctr-editor-scope) .settings-editor > .settings-header .search-container .search-container-widgets .monaco-custom-toggle.disabled {
+	pointer-events: initial;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-toolbar-container > .monaco-toolbar .codicon {
+	opacity: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}:where(.prctr-editor-scope) .monaco-workbench.monaco-enable-motion .settings-editor > .settings-body .settings-tree-container .setting-toolbar-container > .monaco-toolbar .codicon {
+	transition: opacity .3s;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container {
+	width: 100%;
+	pointer-events: none;
+	z-index: 10;
+	position: absolute;
+	box-shadow: var(--prctr-theme-shadow-sm);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-list {
+	pointer-events: initial;
+}:where(.prctr-editor-scope) .settings-editor.narrow-width > .settings-body .settings-toc-container {
+	display: none;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-list-row:not(.selected) {
+	color: var(--prctr-theme-foreground);
+	opacity: 0.9;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-list-row .monaco-tl-contents {
+	display: flex;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-list-row .settings-toc-entry {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 22px;
+	flex-shrink: 1;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-list-row .settings-toc-count {
+	display: none;
+	line-height: 22px;
+	opacity: 0.8;
+	margin-left: 3px;
+}:where(.prctr-editor-scope) .settings-editor.search-mode > .settings-body .settings-toc-container .prctr-list-row .settings-toc-count {
+	display: block;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-list-row.selected .settings-toc-entry {
+	font-weight: bold;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container {
+	border-spacing: 0;
+	border-collapse: separate;
+	position: relative;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-scrollable-element {
+	padding-top: 0px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-scrollable-element {
+	padding-top: 0px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-wrapper {
+	padding-left: 24px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-wrapper {
+	height: 100%;
+	max-width: 1400px;
+	margin: auto;
+}:where(.prctr-editor-scope) .settings-editor.narrow-width > .settings-body .settings-tree-container {
+	margin-left: 0px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row {
+
+	/* so validation messages don't get clipped */
+	overflow: visible;
+	cursor: default;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-rows {
+	min-height: 100%;
+	/* Avoid the hover being cut off. See #164602 and #165518 */
+	/* Allow validation errors to flow out of the tree container. Override inline style from ScrollableElement. */
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row .monaco-tl-contents {
+	max-width: min(100%, 1400px);
+	/* We don't want the widgets to be too long */
+	margin: auto;
+	box-sizing: border-box;
+	padding-left: 24px;
+	padding-right: 24px;
+	overflow: visible;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row .monaco-tl-contents.group-title {
+	max-width: min(100%, 1400px);
+	/* Cut off title if too long for window */
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .settings-group-title-label,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents {
+	outline-offset: -1px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents {
+	position: relative;
+	padding: 12px 14px 18px;
+	white-space: normal;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: inline-block;
+	/* size to contents for hover to show context button */
+	padding-bottom: 2px;
+	/* so that focus outlines wrap around nicely for indicators, especially ones with codicons */
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-modified-indicator {
+	display: none;
+	border-color: var(--prctr-theme-settings-modifiedItemIndicator);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents.is-configured .setting-item-modified-indicator {
+	display: block;
+	content: ' ';
+	position: absolute;
+	width: 6px;
+	border-left-width: 2px;
+	border-left-style: solid;
+	left: 5px;
+	top: 15px;
+	bottom: 18px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-item-contents.is-configured .setting-item-modified-indicator,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-list .setting-item-contents.is-configured .setting-item-modified-indicator {
+	bottom: 23px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title > .setting-indicators-container {
+	font-style: italic;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-overrides,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-ignored {
+	/* Hack for subpixel antialiasing */
+	color: var(--prctr-theme-foreground);
+	opacity: 0.9;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title > .setting-indicators-container .setting-indicator {
+	padding-bottom: 2px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title > .setting-indicators-container .setting-indicator.setting-item-preview {
+	color: var(--prctr-theme-badge-foreground);
+	background: var(--prctr-theme-badge-background);
+	font-style: italic;
+	margin-right: 4px;
+	padding: 0px 4px 2px;
+	border-radius: 4px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .codicon {
+	vertical-align: middle;
+	padding-left: 1px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-label .codicon {
+	vertical-align: middle;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-overrides a.modified-scope {
+	color: var(--prctr-theme-textLink-foreground);
+	text-decoration: var(--prctr-text-link-decoration);
+	cursor: pointer;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-label {
+	margin-right: 7px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-cat-label-container {
+	float: left;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-label,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-category {
+	font-weight: 600;
+	user-select: text;
+	-webkit-user-select: text;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-category {
+	opacity: 0.9;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-deprecation-message {
+	margin-top: 3px;
+	user-select: text;
+	-webkit-user-select: text;
+	display: none;
+	color: var(--prctr-theme-errorForeground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents.is-deprecated .setting-item-deprecation-message {
+	display: flex;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents.is-deprecated-info .setting-item-deprecation-message {
+	color: var(--prctr-theme-foreground);
+	margin-top: var(--prctr-theme-spacing-size60);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents.is-deprecated .setting-item-deprecation-message .codicon {
+	color: inherit;
+	margin-right: 4px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents.is-deprecated-info .setting-item-deprecation-message .codicon {
+	color: var(--prctr-theme-editorInfo-foreground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-description {
+	margin-top: -1px;
+	user-select: text;
+	-webkit-user-select: text;
+	color: var(--prctr-theme-foreground);
+	opacity: 0.9;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-validation-message {
+	display: none;
+	background-color: var(--prctr-theme-inputValidation-errorBackground);
+	color: var(--prctr-theme-inputValidation-errorForeground);
+	border: solid 1px var(--prctr-theme-inputValidation-errorBorder);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item .setting-item-contents.invalid-input .setting-item-validation-message {
+	display: block;
+	position: absolute;
+	padding: 5px;
+	box-sizing: border-box;
+	margin-top: -1px;
+	z-index: 1;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-item-contents.invalid-input .setting-item-validation-message {
+	position: static;
+	margin-top: 1rem;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-text .setting-item-validation-message {
+	width: 420px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-number .setting-item-validation-message {
+	width: 200px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-number input[type=number]::-webkit-inner-spin-button {
+	/* Hide arrow button that shows in type=number fields */
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-number input[type=number] {
+	/* Hide arrow button that shows in type=number fields */
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown * {
+	margin: 0px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown *:not(:last-child) {
+	margin-bottom: 8px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button {
+	opacity: 0.9;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .complex-object-edit-in-settings-button-container {
+	margin-top: 9px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .complex-object-edit-in-settings-button-container.hide {
+	display: none;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a > code {
+	color: var(--prctr-theme-textLink-foreground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button {
+	text-decoration: var(--prctr-text-link-decoration);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:focus,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+	text-decoration: underline;
+	outline-color: var(--prctr-theme-focusBorder);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:hover,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:active,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button:hover,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button:active,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:hover > code,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:active > code {
+	color: var(--prctr-theme-textLink-activeForeground);
+}:where(.prctr-editor-scope) .monaco-workbench.hc-light .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a > code,:where(.prctr-editor-scope) .monaco-workbench.hc-black .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a > code {
+	color: var(--prctr-theme-textPreformat-foreground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:hover,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .edit-in-settings-button:hover {
+	cursor: pointer;
+	text-decoration: underline;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown code {
+	line-height: 15px;
+	/** For some reason, this is needed, otherwise <code> will take up 20px height */
+	font-family: var(--prctr-editor-monospace-font);
+	font-size: 11px;
+	color: var(--prctr-theme-textPreformat-foreground);
+	background-color: var(--prctr-theme-textPreformat-background);
+	padding: 1px 3px;
+	border-radius: 4px;
+	border: 1px solid var(--prctr-theme-textPreformat-border);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown .monaco-tokenized-source {
+	font-family: var(--prctr-editor-monospace-font);
+	white-space: pre;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-enumDescription {
+	display: block;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-item-contents,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-list .setting-item-contents {
+	padding-bottom: 26px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-item-description {
+	display: flex;
+	cursor: pointer;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-item-description.disabled {
+	cursor: initial;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox {
+	height: 18px;
+	width: 18px;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	margin-right: 9px;
+	margin-left: 0px;
+	padding: 0px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox.codicon:not(.checked)::before {
+	opacity: 0;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-value {
+	margin-top: 9px;
+	display: flex;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-number .setting-item-value > .setting-item-control {
+	min-width: 200px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-text .setting-item-control {
+	width: 420px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-enum .setting-item-value > .setting-item-control,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-text .setting-item-value > .setting-item-control {
+	min-width: initial;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-enum .setting-item-value > .setting-item-control > select {
+	width: 320px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-contents .monaco-select-box {
+	width: initial;
+	font: inherit;
+	height: 26px;
+	padding: 2px 6px;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown code {
+	font-family: var(--prctr-editor-monospace-font);
+	font-size: 12px;
+	color: var(--prctr-theme-textPreformat-foreground);
+	background-color: var(--prctr-theme-textPreformat-background);
+	padding: 2px 5px;
+	border-radius: 4px;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a,:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a > code {
+	color: var(--prctr-theme-textLink-foreground);
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a:hover,:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a:active,:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a:hover > code,:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a:active > code {
+	color: var(--prctr-theme-textLink-activeForeground);
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-new-extensions {
+	display: flex;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-new-extensions .settings-new-extensions-button {
+	margin: auto;
+	margin-bottom: 15px;
+	width: initial;
+	padding: 4px 10px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .group-title {
+	cursor: default;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .settings-group-title-label {
+	display: inline-block;
+	margin: 0px;
+	font-weight: 600;
+	height: 100%;
+	box-sizing: border-box;
+	padding: 10px;
+	padding-left: 15px;
+	width: 100%;
+	position: relative;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .settings-group-title-label.settings-group-level-1 {
+	font-size: 26px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .settings-group-title-label.settings-group-level-2 {
+	font-size: 22px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .settings-group-title-label.settings-group-level-3 {
+	font-size: 18px;
+}:where(.prctr-editor-scope) .settings-editor.search-mode > .settings-body .settings-toc-container .prctr-list-row .settings-toc-count {
+	display: block;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-list-widget .setting-list-object-list-row.select-container {
+	width: 320px;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-list-widget .setting-list-object-list-row.select-container > select {
+	width: inherit;
+}:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-list-row.focused .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row.focused .setting-item-contents .codicon {
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .settings-editor:focus {
+	outline: none !important;
+}
+
+:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row {
+	outline: none !important;
+}
+
+:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row .monaco-tl-twistie {
+	display: none !important;
+}
+
+:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row {
+	line-height: 1.4em !important;
+}
+
+:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-rows {
+	overflow: visible !important;
+}
+
+:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-number input[type=number]::-webkit-inner-spin-button {
+	-webkit-appearance: none !important;
+}
+
+:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-number input[type=number] {
+	-moz-appearance: textfield !important;
+	appearance: textfield !important;
+}
+
+:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-list-row.focused .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row.focused .setting-item-contents .codicon {
+	color: inherit !important;
+}
+}

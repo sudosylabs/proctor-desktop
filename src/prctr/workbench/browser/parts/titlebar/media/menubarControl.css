@@ -1,0 +1,26 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//* @proctor-vscode-port settings-modal-composition */@layer workbench {:where(.prctr-editor-scope) .monaco-workbench .menubar > .menubar-menu-button,:where(.prctr-editor-scope) .monaco-workbench .menubar .toolbar-toggle-more {
+	color: var(--prctr-theme-titleBar-activeForeground);
+}:where(.prctr-editor-scope) .monaco-workbench .activitybar .menubar.compact > .menubar-menu-button,:where(.prctr-editor-scope) .monaco-workbench .activitybar .menubar.compact .toolbar-toggle-more {
+	color: var(--prctr-theme-activityBar-inactiveForeground);
+}:where(.prctr-editor-scope) .monaco-workbench .activitybar .menubar.compact > .menubar-menu-button.open,:where(.prctr-editor-scope) .monaco-workbench .activitybar .menubar.compact > .menubar-menu-button:focus,:where(.prctr-editor-scope) .monaco-workbench .activitybar .menubar.compact:not(:focus-within) > .menubar-menu-button:hover,:where(.prctr-editor-scope) .monaco-workbench .activitybar .menubar.compact > .menubar-menu-button.open .toolbar-toggle-more,:where(.prctr-editor-scope) .monaco-workbench .activitybar .menubar.compact > .menubar-menu-button:focus .toolbar-toggle-more,:where(.prctr-editor-scope) .monaco-workbench .activitybar .menubar.compact:not(:focus-within) > .menubar-menu-button:hover .toolbar-toggle-more {
+	color: var(--prctr-theme-activityBar-foreground);
+}:where(.prctr-editor-scope) .monaco-workbench .activitybar .menubar.compact > .menubar-menu-button:focus {
+	background-color: var(--prctr-theme-menubar-selectionBackground);
+}:where(.prctr-editor-scope) .monaco-workbench .menubar.inactive:not(.compact) > .menubar-menu-button,:where(.prctr-editor-scope) .monaco-workbench .menubar.inactive:not(.compact) > .menubar-menu-button .toolbar-toggle-more {
+	color: var(--prctr-theme-titleBar-inactiveForeground);
+}:where(.prctr-editor-scope) .monaco-workbench .menubar:not(.compact) > .menubar-menu-button.open,:where(.prctr-editor-scope) .monaco-workbench .menubar:not(.compact) > .menubar-menu-button:focus,:where(.prctr-editor-scope) .monaco-workbench .menubar:not(:focus-within):not(.compact) > .menubar-menu-button:hover,:where(.prctr-editor-scope) .monaco-workbench .menubar:not(.compact) > .menubar-menu-button.open .toolbar-toggle-more,:where(.prctr-editor-scope) .monaco-workbench .menubar:not(.compact) > .menubar-menu-button:focus .toolbar-toggle-more,:where(.prctr-editor-scope) .monaco-workbench .menubar:not(:focus-within):not(.compact) > .menubar-menu-button:hover .toolbar-toggle-more {
+	color: var(--prctr-theme-menubar-selectionForeground);
+}:where(.prctr-editor-scope) .monaco-workbench .menubar:not(.compact) > .menubar-menu-button.open .menubar-menu-title,:where(.prctr-editor-scope) .monaco-workbench .menubar:not(.compact) > .menubar-menu-button:focus .menubar-menu-title,:where(.prctr-editor-scope) .monaco-workbench .menubar:not(:focus-within):not(.compact) > .menubar-menu-button:hover .menubar-menu-title {
+	background-color: var(--prctr-theme-menubar-selectionBackground);
+}:where(.prctr-editor-scope) .monaco-workbench .menubar > .menubar-menu-button:hover .menubar-menu-title {
+	outline: dashed 1px var(--prctr-theme-menubar-selectionBorder);
+}:where(.prctr-editor-scope) .monaco-workbench .menubar > .menubar-menu-button.open .menubar-menu-title,:where(.prctr-editor-scope) .monaco-workbench .menubar > .menubar-menu-button:focus .menubar-menu-title {
+	outline: solid 1px var(--prctr-theme-menubar-selectionBorder);
+}:where(.prctr-editor-scope) .monaco-workbench .menubar > .menubar-menu-button.open .menubar-menu-title,:where(.prctr-editor-scope) .monaco-workbench .menubar > .menubar-menu-button:focus .menubar-menu-title,:where(.prctr-editor-scope) .monaco-workbench .menubar > .menubar-menu-button:hover .menubar-menu-title {
+	outline-color: var(--prctr-theme-menubar-selectionBorder);
+	outline-offset: -1px;
+}
+}

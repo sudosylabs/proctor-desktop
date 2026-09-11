@@ -1,0 +1,70 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-presentation*//* Title Label *//* Breadcrumbs (inline next to single editor tab) *//* Editor Actions Toolbar (via title actions) */@layer controls {:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title > .label-container {
+	height: var(--prctr-editor-group-tab-height);
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	overflow: hidden;
+	flex: auto;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title > .label-container > .title-label {
+	line-height: var(--prctr-editor-group-tab-height);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	position: relative;
+	padding-left: 20px;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title > .label-container > .title-label > .monaco-icon-label-container {
+	flex: initial; /* helps to show decorations right next to the label and not at the end while still preserving text overflow ellipsis */
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .single-tab.title-label {
+	flex: none;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control {
+	line-height: var(--prctr-editor-group-tab-height);
+	flex: 1 50%;
+	overflow: hidden;
+	margin-left: .45em;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control.preview .monaco-breadcrumb-item {
+	font-style: italic;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item::before {
+	content: '/';
+	opacity: 1;
+	height: inherit;
+	width: inherit;
+	background-image: none;
+	font-size: 0.9em;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control.backslash-path .monaco-breadcrumb-item::before {
+	content: '\\';
+	font-size: 0.9em;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item .outline-element-icon::before {
+	font-size: 0.9em;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item.root_folder::before,:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item.root_folder + .monaco-breadcrumb-item::before,:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control.relative-path .monaco-breadcrumb-item:nth-child(2)::before,:where(.prctr-editor-scope) .monaco-workbench.windows .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item:nth-child(2)::before {
+	display: none; /* workspace folder, item following workspace folder, or relative path -> hide first seperator */
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item.root_folder::after {
+	content: '\00a0•\00a0'; /* use dot separator for workspace folder */
+	font-size: 0.9em;
+	padding: 0;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item:last-child {
+	padding-right: 4px; /* does not have trailing separator*/
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item .codicon[class*='codicon-symbol-'] {
+	padding: 0 1px;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-breadcrumb-item .codicon:last-child {
+	display: none; /* hides chevrons when no tabs visible */
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-icon-label::before {
+	height: 18px;
+	padding-right: 2px;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title.breadcrumbs .breadcrumbs-control .monaco-icon-label .label-name {
+	font-size: 0.9em;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title > .title-actions {
+	display: flex;
+	flex: initial;
+	opacity: 0.5;
+	padding-right: 8px;
+	height: var(--prctr-editor-group-tab-height);
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title > .title-actions.hidden {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title > .title-actions .action-item {
+	margin-right: 4px;
+}:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container.active > .title > .title-actions {
+	opacity: 1;
+}
+}

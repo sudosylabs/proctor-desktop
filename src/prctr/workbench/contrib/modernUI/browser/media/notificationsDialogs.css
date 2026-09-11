@@ -1,0 +1,98 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-modern-ui*//*
+ * Modern UI module: "Notifications and Dialogs".
+ *
+ * Shared notification and dialog presentation used by the regular workbench
+ * and the Agents window. Shell-specific notification insets are customizable
+ * through the properties used below.
+ *
+ * All rules are gated behind the module-specific
+ * `.modern-ui-notifications-dialogs` class.
+ *//*
+ * Reposition the notification center to sit within the Modern UI outer gutter:
+ * an 8px horizontal inset, and a bottom inset that clears the 28px status bar
+ * plus the 4px gutter (32px total). `!important` is required to win over the base
+ * positioning rules (which vary with the status bar) and, for `top-right`, over
+ * the inline `top` offset the notification controller applies in JS.
+ *
+ * `top-right` uses a fixed 35px — the height of the custom title bar
+ * (DEFAULT_CUSTOM_TITLEBAR_HEIGHT), which the Modern UI experiment always shows
+ * — so the center tucks directly beneath it.
+ *//*
+ * Toasts mirror the center, but each toast carries a 4px margin, so every
+ * container offset is reduced by 4px to keep the visible toast surface aligned
+ * with the center (8px / 32px / 35px once the margin is added back).
+ */@layer workbench {:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench .notifications-list-container .notification-list-item {
+	padding: var(--prctr-theme-spacing-size60) var(--prctr-theme-spacing-size20);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-icon {
+	font-size: var(--prctr-theme-codiconFontSize);
+	margin: 0 var(--prctr-theme-spacing-size80) 0 var(--prctr-theme-spacing-size60);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-buttons-container > .monaco-button-dropdown,:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-buttons-container > .monaco-button {
+	margin: 0 var(--prctr-theme-spacing-size40) 0 0;
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-source {
+	color: var(--prctr-theme-descriptionForeground);
+	margin-left: var(--prctr-theme-spacing-size240);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-center {
+	right: var(--prctr-modern-ui-notifications-inline-inset, var(--prctr-theme-spacing-size80));
+	bottom: var(--prctr-modern-ui-notifications-block-end-inset, var(--prctr-theme-spacing-size320));
+	border-radius: var(--prctr-theme-cornerRadius-large);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench.nostatusbar > .notifications-center:not(.top-right) {
+	bottom: var(--prctr-modern-ui-notifications-block-end-inset, var(--prctr-theme-spacing-size320));
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-center.bottom-left {
+	right: auto;
+	left: var(--prctr-modern-ui-notifications-inline-inset, var(--prctr-theme-spacing-size80));
+	bottom: var(--prctr-modern-ui-notifications-block-end-inset, var(--prctr-theme-spacing-size320));
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-center.top-right {
+	bottom: auto;
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts {
+	right: calc(var(--prctr-modern-ui-notifications-inline-inset, var(--prctr-theme-spacing-size80)) - var(--prctr-theme-spacing-size40));
+	bottom: calc(var(--prctr-modern-ui-notifications-block-end-inset, var(--prctr-theme-spacing-size320)) - var(--prctr-theme-spacing-size40));
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench.nostatusbar > .notifications-toasts:not(.top-right) {
+	bottom: calc(var(--prctr-modern-ui-notifications-block-end-inset, var(--prctr-theme-spacing-size320)) - var(--prctr-theme-spacing-size40));
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts.bottom-left {
+	right: auto;
+	left: calc(var(--prctr-modern-ui-notifications-inline-inset, var(--prctr-theme-spacing-size80)) - var(--prctr-theme-spacing-size40));
+	bottom: calc(var(--prctr-modern-ui-notifications-block-end-inset, var(--prctr-theme-spacing-size320)) - var(--prctr-theme-spacing-size40));
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts.top-right {
+	bottom: auto;
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-center > .notifications-center-header {
+	padding-right: var(--prctr-theme-spacing-size20);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-center .notifications-list-container .prctr-list-row:last-child {
+	border-radius: 0 0 var(--prctr-theme-cornerRadius-large) var(--prctr-theme-cornerRadius-large);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts,:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts .notifications-list-container,:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast,:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .prctr-scrollable-element,:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .prctr-list:not(.element-focused):focus::before,:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .prctr-list-row {
+	border-radius: var(--prctr-theme-cornerRadius-large);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs .monaco-dialog-box {
+	padding: var(--prctr-theme-spacing-size40);
+	min-width: 440px;
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs .monaco-dialog-box:not(.align-vertical) .dialog-message-row .dialog-message-container {
+	padding-left: var(--prctr-theme-spacing-size80);
+	padding-right: var(--prctr-theme-spacing-size200);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs .monaco-dialog-box .dialog-message-row .dialog-message-container .dialog-message {
+	margin: var(--prctr-theme-spacing-size20) 0 var(--prctr-theme-spacing-size120) 0;
+	font-size: var(--prctr-theme-fontSize-heading3);
+	font-weight: var(--prctr-theme-fontWeight-semiBold);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs .monaco-dialog-box .dialog-message-row .dialog-message-container .dialog-message-detail {
+	color: var(--prctr-theme-descriptionForeground);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs .monaco-dialog-box .dialog-toolbar-row {
+	position: absolute;
+	top: var(--prctr-theme-spacing-size80);
+	right: var(--prctr-theme-spacing-size80);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs .monaco-dialog-box .dialog-footer-row {
+	padding: 0 var(--prctr-theme-spacing-size80);
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs .monaco-dialog-box .dialog-message-row {
+	padding: var(--prctr-theme-spacing-size160) var(--prctr-theme-spacing-size80) 0;
+}:where(.prctr-editor-scope) .modern-ui-notifications-dialogs .monaco-dialog-box > .dialog-buttons-row {
+	padding: var(--prctr-theme-spacing-size160) 0 0;
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-center.top-right {
+	top: var(--prctr-modern-ui-notifications-block-start-inset, var(--prctr-theme-spacing-size360)) !important;
+}
+
+:where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts.top-right {
+	top: calc(var(--prctr-modern-ui-notifications-block-start-inset, var(--prctr-theme-spacing-size360)) - var(--prctr-theme-spacing-size40)) !important;
+}
+}

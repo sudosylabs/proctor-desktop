@@ -1,0 +1,443 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/ /*@proctor-vscode-port settings-editor-modern-ui*/ /* Animations */ /* Font Families (with CJK support) */ /* Linux: add `system-ui` as first font and not `Ubuntu` to allow other distribution pick their standard OS font */ /* Global Styles */ /* Disable panel/part shadows when the setting is off (preserves floating modals, notifications, etc.) */ /* Custom Dropdown (select) Arrows */ /* Keyboard Focus Indication Styles */
+@layer base {
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.mac {
+		font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.mac:lang(zh-Hans) {
+		font-family:
+			-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.mac:lang(zh-Hant) {
+		font-family: -apple-system, BlinkMacSystemFont, 'PingFang TC', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.mac:lang(ja) {
+		font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic Pro', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.mac:lang(ko) {
+		font-family:
+			-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Nanum Gothic', 'AppleGothic',
+			sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.windows {
+		font-family: 'Segoe WPC', 'Segoe UI', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.windows:lang(zh-Hans) {
+		font-family: 'Segoe WPC', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.windows:lang(zh-Hant) {
+		font-family: 'Segoe WPC', 'Segoe UI', 'Microsoft Jhenghei', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.windows:lang(ja) {
+		font-family: 'Segoe WPC', 'Segoe UI', 'Yu Gothic UI', 'Meiryo UI', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.windows:lang(ko) {
+		font-family: 'Segoe WPC', 'Segoe UI', 'Malgun Gothic', 'Dotom', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.linux {
+		font-family: system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.linux:lang(zh-Hans) {
+		font-family:
+			system-ui, 'Ubuntu', 'Droid Sans', 'Source Han Sans SC', 'Source Han Sans CN',
+			'Source Han Sans', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.linux:lang(zh-Hant) {
+		font-family:
+			system-ui, 'Ubuntu', 'Droid Sans', 'Source Han Sans TC', 'Source Han Sans TW',
+			'Source Han Sans', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.linux:lang(ja) {
+		font-family:
+			system-ui, 'Ubuntu', 'Droid Sans', 'Source Han Sans J', 'Source Han Sans JP',
+			'Source Han Sans', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.linux:lang(ko) {
+		font-family:
+			system-ui, 'Ubuntu', 'Droid Sans', 'Source Han Sans K', 'Source Han Sans JR',
+			'Source Han Sans', 'UnDotum', 'FBaekmuk Gulim', sans-serif;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.mac {
+		--prctr-editor-monospace-font: 'SF Mono', Monaco, Menlo, Courier, monospace;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.windows {
+		--prctr-editor-monospace-font: Consolas, 'Courier New', monospace;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.linux {
+		--prctr-editor-monospace-font:
+			'Ubuntu Mono', 'Liberation Mono', 'DejaVu Sans Mono', 'Courier New', monospace;
+	}
+	:where(.prctr-editor-scope) body {
+		height: 100%;
+		width: 100%;
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+		font-size: 11px;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench {
+		font-size: 13px;
+		line-height: 1.4em;
+		position: relative;
+		inset: 0;
+		z-index: 1;
+		overflow: hidden;
+		color: var(--prctr-theme-foreground);
+
+		/* Elevation shadows */
+		--prctr-theme-shadow-sm: 0 0 4px rgba(0, 0, 0, 0.08);
+		--prctr-theme-shadow-md: 0 0 6px rgba(0, 0, 0, 0.08);
+		--prctr-theme-shadow-lg: 0 0 12px rgba(0, 0, 0, 0.14);
+		--prctr-theme-shadow-xl: 0 0 20px rgba(0, 0, 0, 0.15);
+		--prctr-theme-shadow-active-tab: 0 8px 12px rgba(0, 0, 0, 0.02);
+
+		/* Panel depth shadows cast onto the editor surface */
+		--prctr-theme-shadow-depth-x: 5px 0 10px -4px rgba(0, 0, 0, 0.05);
+		--prctr-theme-shadow-depth-y: 0 5px 10px -4px rgba(0, 0, 0, 0.04);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.no-shadows .part.titlebar,
+	:where(.prctr-editor-scope) .monaco-workbench.no-shadows .part.activitybar,
+	:where(.prctr-editor-scope) .monaco-workbench.no-shadows.nosidebar .part.activitybar,
+	:where(.prctr-editor-scope) .monaco-workbench.no-shadows.activitybar-right .part.activitybar,
+	:where(.prctr-editor-scope) .monaco-workbench.no-shadows .part.editor .tabs-container > .tab {
+		box-shadow: none;
+	}
+	:where(.prctr-editor-scope)
+		.monaco-workbench.no-shadows
+		.part.editor
+		.tabs-container
+		> .tab:hover:not(.active),
+	:where(.prctr-editor-scope)
+		.monaco-workbench.no-shadows
+		.part.editor
+		.tabs-container
+		> .tab.active {
+		box-shadow: none;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.no-shadows {
+		/* Use zero-offset transparent shadows instead of 'none' because these
+	 * variables are interpolated into multi-value box-shadow declarations. */
+		--prctr-theme-shadow-active-tab: 0 0 0 0 transparent;
+		--prctr-theme-shadow-depth-x: 0 0 0 0 transparent;
+		--prctr-theme-shadow-depth-y: 0 0 0 0 transparent;
+		--prctr-theme-shadow-sm: 0 0 0 0 transparent;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.web {
+		touch-action: none; /* Disable browser handling of all panning and zooming gestures. Removes 300ms touch delay. */
+		overscroll-behavior: none; /* Prevent bounce effect */
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.border:not(.fullscreen) {
+		box-sizing: border-box;
+		border: 1px solid var(--prctr-editor-window-border-color);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.border.mac {
+		border-radius: 10px;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.border.mac.macos-tahoe {
+		border-radius: 16px; /* macOS Tahoe increased rounded corners size */
+	}
+	:where(.prctr-editor-scope) .monaco-workbench img {
+		border: 0;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench label {
+		cursor: pointer;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench a {
+		text-decoration: none;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench p > a {
+		text-decoration: var(--prctr-text-link-decoration);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.underline-links {
+		--prctr-text-link-decoration: underline;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.hc-black p > a,
+	:where(.prctr-editor-scope) .monaco-workbench.hc-light p > a {
+	}
+	:where(.prctr-editor-scope) .monaco-workbench a:active {
+		color: inherit;
+		background-color: inherit;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench a.plain {
+		color: inherit;
+		text-decoration: none;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench a.plain:hover,
+	:where(.prctr-editor-scope) .monaco-workbench a.plain.hover {
+		color: inherit;
+		text-decoration: none;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench input {
+		color: inherit;
+		font-family: inherit;
+		font-size: 100%;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench table {
+		/*
+	 * Somehow this is required when tables show in floating windows
+	 * to override the user-agent style which sets a specific color
+	 * and font-size
+	 */
+		color: inherit;
+		font-size: inherit;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench input::placeholder {
+		color: var(--prctr-theme-input-placeholderForeground);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench input::-webkit-input-placeholder {
+		color: var(--prctr-theme-input-placeholderForeground);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench input::-moz-placeholder {
+		color: var(--prctr-theme-input-placeholderForeground);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench textarea::placeholder {
+		color: var(--prctr-theme-input-placeholderForeground);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench textarea::-webkit-input-placeholder {
+		color: var(--prctr-theme-input-placeholderForeground);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench textarea::-moz-placeholder {
+		color: var(--prctr-theme-input-placeholderForeground);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .pointer {
+		cursor: pointer;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.mac.monaco-font-aliasing-antialiased {
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.mac.monaco-font-aliasing-none {
+		-webkit-font-smoothing: none;
+		-moz-osx-font-smoothing: unset;
+	}
+	@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+		:where(.prctr-editor-scope) .monaco-workbench.mac.monaco-font-aliasing-auto {
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+		}
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .context-view {
+		-webkit-app-region: no-drag;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .codicon {
+		color: var(--prctr-theme-icon-foreground);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .codicon[class*='codicon-'] {
+		font-size: 16px; /* sets font-size for codicons in workbench (https://github.com/microsoft/vscode/issues/98495) */
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .predefined-file-icon[class*='codicon-']::before {
+		width: 16px;
+		padding-left: 3px; /* width (16px) - font-size (13px) = padding-left (3px) */
+		padding-right: 3px;
+	}
+	:where(.prctr-editor-scope) .predefined-file-icon::before {
+		/* do add additional specificity to this selector, so it can be overridden by product themes */
+		font-family: 'codicon';
+	}
+	:where(.prctr-editor-scope)
+		.monaco-workbench:not(.file-icons-enabled)
+		.predefined-file-icon[class*='codicon-']::before {
+	}
+	:where(.prctr-editor-scope)
+		.monaco-workbench.modal-dialog-visible
+		.monaco-progress-container.infinite
+		.progress-bit {
+		display: none; /* stop progress animations when dialogs are visible (https://github.com/microsoft/vscode/issues/138396) */
+	}
+	:where(.prctr-editor-scope) .monaco-workbench select {
+		font-family: inherit;
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		/* Hides inner border from FF */
+		border: 1px solid;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .select-container {
+		position: relative;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .select-container:after {
+		content: var(--prctr-theme-icon-chevron-down-content);
+		font-family: var(--prctr-theme-icon-chevron-down-font-family);
+		font-size: 16px;
+		width: 16px;
+		height: 16px;
+		line-height: 16px;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		right: 4px;
+		margin: auto;
+		pointer-events: none;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench [tabindex='0']:focus,
+	:where(.prctr-editor-scope) .monaco-workbench [tabindex='-1']:focus,
+	:where(.prctr-editor-scope) .monaco-workbench .synthetic-focus,
+	:where(.prctr-editor-scope) .monaco-workbench select:focus,
+	:where(.prctr-editor-scope) .monaco-workbench input[type='button']:focus,
+	:where(.prctr-editor-scope) .monaco-workbench input[type='text']:focus,
+	:where(.prctr-editor-scope) .monaco-workbench button:focus,
+	:where(.prctr-editor-scope) .monaco-workbench textarea:focus,
+	:where(.prctr-editor-scope) .monaco-workbench input[type='search']:focus,
+	:where(.prctr-editor-scope) .monaco-workbench input[type='checkbox']:focus {
+		outline-width: 1px;
+		outline-style: solid;
+		outline-offset: -1px;
+		outline-color: var(--prctr-theme-focusBorder);
+		opacity: 1;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.hc-black .synthetic-focus input,
+	:where(.prctr-editor-scope) .monaco-workbench.hc-light .synthetic-focus input {
+		background: transparent; /* Search input focus fix when in high contrast */
+	}
+	:where(.prctr-editor-scope) .monaco-workbench input[type='checkbox']:focus {
+		outline-offset: 2px;
+	}
+	:where(.prctr-editor-scope) .monaco-workbench [tabindex='0']:active,
+	:where(.prctr-editor-scope) .monaco-workbench [tabindex='-1']:active,
+	:where(.prctr-editor-scope) .monaco-workbench select:active,
+	:where(.prctr-editor-scope) .monaco-workbench input[type='button']:active,
+	:where(.prctr-editor-scope) .monaco-workbench input[type='checkbox']:active {
+		/* fixes some flashing outlines from showing up when clicking */
+	}
+	:where(.prctr-editor-scope) .monaco-workbench.mac select:focus {
+		border-color: transparent; /* outline is a square, but border has a radius, so we avoid this glitch when focused (https://github.com/microsoft/vscode/issues/26045) */
+	}
+	:where(.prctr-editor-scope)
+		.monaco-workbench.hc-black
+		.prctr-list:not(.element-focused):not(:active):focus:before,
+	:where(.prctr-editor-scope)
+		.monaco-workbench.hc-light
+		.prctr-list:not(.element-focused):not(:active):focus:before {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 15; /* make sure we are on top of the tree sticky scroll widget */
+		content: '';
+		pointer-events: none; /* enable click through */
+		outline: 1px solid; /* we still need to handle the empty tree or no focus item case */
+		outline-width: 1px;
+		outline-style: solid;
+		outline-offset: -1px;
+		outline-color: var(--prctr-theme-focusBorder);
+	}
+	:where(.prctr-editor-scope)
+		.monaco-workbench
+		.prctr-list:not(:focus)
+		.prctr-list-row.focused
+		.monaco-highlighted-label
+		.highlight,
+	:where(.prctr-editor-scope)
+		.monaco-workbench
+		.prctr-list
+		.prctr-list-row
+		.monaco-highlighted-label
+		.highlight {
+		color: var(--prctr-theme-list-highlightForeground);
+	}
+	:where(.prctr-editor-scope)
+		.monaco-workbench
+		.prctr-list
+		.prctr-list-row.focused
+		.monaco-highlighted-label
+		.highlight {
+		color: var(--prctr-theme-list-focusHighlightForeground);
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .synthetic-focus :focus {
+		/* elements within widgets that draw synthetic-focus should never show focus */
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.info.synthetic-focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.warning.synthetic-focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.error.synthetic-focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.info input[type='text']:focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.warning input[type='text']:focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.error input[type='text']:focus {
+		/* outline is not going well with decoration */
+	}
+	:where(.prctr-editor-scope) .monaco-workbench .prctr-list:focus {
+		/* tree indicates focus not via outline but through the focused item */
+	}
+	:where(.prctr-editor-scope) .monaco-workbench a.monaco-link:hover {
+		text-decoration: underline; /* render underline on hover for accessibility requirements */
+	}
+	:where(.prctr-editor-scope)
+		.monaco-workbench
+		.monaco-action-bar:not(.vertical)
+		.action-label:not(.disabled):hover,
+	:where(.prctr-editor-scope)
+		.monaco-workbench
+		.monaco-action-bar:not(.vertical)
+		.monaco-dropdown-with-primary:not(.disabled):hover {
+		background-color: var(--prctr-theme-toolbar-hoverBackground);
+	}
+	:where(.prctr-editor-scope)
+		.monaco-workbench
+		.monaco-action-bar:not(.vertical)
+		.action-item.active
+		.action-label:not(.disabled),
+	:where(.prctr-editor-scope)
+		.monaco-workbench
+		.monaco-action-bar:not(.vertical)
+		.monaco-dropdown.active
+		.action-label:not(.disabled) {
+		background-color: var(--prctr-theme-toolbar-activeBackground);
+	}
+	:where(.prctr-editor-scope)
+		.monaco-workbench
+		.monaco-action-bar:not(.vertical)
+		.action-item
+		.action-label:hover:not(.disabled) {
+		outline: 1px dashed var(--prctr-theme-toolbar-hoverOutline);
+		outline-offset: -1px;
+	}
+}
+@layer overrides {
+	:where(.prctr-editor-scope) .monaco-workbench.hc-black p > a,
+	:where(.prctr-editor-scope) .monaco-workbench.hc-light p > a {
+		text-decoration: underline !important;
+	}
+
+	:where(.prctr-editor-scope)
+		.monaco-workbench:not(.file-icons-enabled)
+		.predefined-file-icon[class*='codicon-']::before {
+		content: unset !important;
+	}
+
+	:where(.prctr-editor-scope) .monaco-workbench [tabindex='0']:active,
+	:where(.prctr-editor-scope) .monaco-workbench [tabindex='-1']:active,
+	:where(.prctr-editor-scope) .monaco-workbench select:active,
+	:where(.prctr-editor-scope) .monaco-workbench input[type='button']:active,
+	:where(.prctr-editor-scope) .monaco-workbench input[type='checkbox']:active {
+		outline: 0 !important;
+	}
+
+	:where(.prctr-editor-scope) .monaco-workbench .synthetic-focus :focus {
+		outline: 0 !important;
+	}
+
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.info.synthetic-focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.warning.synthetic-focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.error.synthetic-focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.info input[type='text']:focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.warning input[type='text']:focus,
+	:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.error input[type='text']:focus {
+		outline: 0 !important;
+	}
+
+	:where(.prctr-editor-scope) .monaco-workbench .prctr-list:focus {
+		outline: 0 !important;
+	}
+}

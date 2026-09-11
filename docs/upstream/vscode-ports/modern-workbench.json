@@ -282,6 +282,14 @@
       "disposition": "evidence-only",
       "rationale": "Use the primary sidebar toggle action and its filled/outline left/right Codicons as evidence. Proctor keeps its fixed product sidebar, explicit local layout restoration, native action slot and shell-owned responsive visibility; no arbitrary docking or auxiliary sidebar commands are imported.",
       "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/media/style.css",
+      "upstreamBlob": "b04b3c70daf610ce3a4fc1e10bbb60c4e4bc9ec5",
+      "category": "style",
+      "disposition": "evidence-only",
+      "rationale": "Preserve toolbar hover fill, active fill, disabled exclusion and inset dashed hover outline together in the Proctor-owned action surfaces. Keyboard focus retains its owning solid focus indicator.",
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
@@ -340,7 +348,7 @@
     },
     {
       "id": "product-surfaces",
-      "summary": "Profile, Sessions and Settings remain Proctor-owned account pages. Their shell surface uses the semantic contained surface, their content shares one inset rhythm, custom scrollbars are 8px, and the bottom account menu remains a native macOS popup. No new user object editing or remote action is introduced.",
+      "summary": "Profile, Sessions and Settings remain Proctor-owned account pages. Their shell surface uses the semantic contained surface, their content shares one inset rhythm, custom scrollbars are 8px, and the bottom account menu remains a native macOS popup. No new user object editing or remote action is introduced. Row hover uses the upstream contrastActiveBorder dashed inset outline; toolbar hover uses toolbar.hoverOutline, with solid keyboard-focus precedence.",
       "localPaths": [
         "src/prctr/workbench/contrib/account/browser/account.css",
         "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.css",

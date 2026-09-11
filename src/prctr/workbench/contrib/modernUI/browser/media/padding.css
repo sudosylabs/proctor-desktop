@@ -1,0 +1,242 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-modern-ui*//*
+ * Modern UI module: "Padding".
+ *
+ * Adjusts the internal padding of common workbench surfaces to give content
+ * more breathing room.
+ *
+ * All rules are gated behind the `.modern-ui` class, which the
+ * ModernUIContribution toggles onto the workbench container(s) when the
+ * `workbench.experimental.modernUI` (Modern UI Update) setting is enabled.
+ * Without that class these rules never apply.
+ *//*
+ * Inset view pane content (sidebar / panel / auxiliary bar sections) by a
+ * horizontal amount matching the Agents window panel padding
+ * (8px / --prctr-theme-spacing-size80) so content has breathing room from the edges.
+ *
+ * The pane *header* is padded, and each list/tree *row* box is inset so there is
+ * a real margin between the row (including its hover / selection highlight) and
+ * the pane edge. Rows are `position: absolute; width: 100%`, so insetting them
+ * with `left` / `right` (and `width: auto`) leaves a gap on both sides. The
+ * vertical scrollbar is a sibling of the rows inside `.prctr-scrollable-element`
+ * (not a child of the rows), so it stays pinned to the pane edge.
+ *
+ * The chat & agent-sessions UI is excluded: `ChatViewPane` adds the
+ * `chat-viewpane-container` class directly onto its `.pane`.
+ *//* Header: inset the section title / actions to line up with the rows below. *//* Body: inset each row box, leaving the scrollbar pinned to the pane edge. *//* Tighten part chrome from 35px to 32px.
+ * KEEP IN SYNC WITH: part.ts PartLayout.AREA_HEIGHT_MODERN_UI *//*
+ * In the Run and Debug view give the header actions (play button + launch
+ * configuration dropdown) the extra room by letting the actions grow while the
+ * title label stays non-greedy.
+ *//* Inset the part title label (e.g. "Explorer") to align with the content below. *//*
+ * Let the title label grow to fill the bar so its actions sit to the right,
+ * except in the Run and Debug view where the header actions (play button +
+ * launch configuration dropdown) need the horizontal space instead.
+ *//* Give the settings / profile (global) actions at the bottom of the default
+ * vertical activity bar a 4px bottom margin so they sit consistently above the
+ * window edge, matching the pane header margins. *//* Remove classic 1px top border that shifts 32px pills off-center (#331013) *//* Keep xterm row rounding below the content so the first line has a stable inset. */@layer workbench {:where(.prctr-editor-scope) .modern-ui .monaco-pane-view .pane:not(.chat-viewpane-container) > .pane-header {
+	padding-left: var(--prctr-theme-spacing-size40);
+	padding-right: 0;
+	margin: 0 var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui .monaco-pane-view .pane-body:not(.chat-viewpane) .prctr-list-row {
+	left: var(--prctr-theme-spacing-size40);
+	right: var(--prctr-theme-spacing-size40);
+	width: auto;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .title,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .header-or-footer {
+	height: 32px;
+	padding-left: var(--prctr-theme-spacing-size20);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .title {
+	padding-left: var(--prctr-theme-spacing-size40);
+	padding-right: var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .title > .title-label {
+	line-height: 32px;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .title > .title-actions {
+	height: 32px;
+	padding-left: var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui.modern-ui-compact .monaco-pane-view .pane-body:not(.chat-viewpane) .prctr-list-row {
+	left: var(--prctr-theme-spacing-size20);
+	right: var(--prctr-theme-spacing-size20);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .title.has-start-debug-action-item > .title-actions {
+	flex: 2;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.editor > .content .editor-group-container > .title .editor-actions {
+	padding: 0 var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.editor > .content .editor-group-container > .title .editor-actions .actions-container > li:last-child,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .title .title-actions .actions-container > li:last-child,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .title .global-actions .actions-container > li:last-child {
+	margin-right: 0;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .title > .title-label {
+	padding-left: var(--prctr-theme-spacing-size80, 8px);
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	min-width: 0;
+	flex: 1;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part > .title:not(.has-start-debug-action-item) > .title-label {
+	flex: 2;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .pane-body .agent-sessions-viewer .prctr-scrollable-element {
+	padding: 0 var(--prctr-theme-spacing-size80);
+}:where(.prctr-editor-scope) .modern-ui.modern-ui-compact.monaco-workbench .pane-body .agent-sessions-viewer .prctr-scrollable-element {
+	padding-left: var(--prctr-theme-spacing-size40);
+	padding-right: var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-list-row {
+	background-color: transparent;
+
+	> .monaco-tl-row {
+		border-radius: var(--prctr-theme-cornerRadius-small);
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-item-row {
+	padding-bottom: var(--prctr-theme-spacing-size40);
+
+	.agent-session-item {
+		padding-block: var(--prctr-theme-spacing-size60);
+
+		.agent-session-title-row {
+			padding-bottom: var(--prctr-theme-spacing-size20);
+		}
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-section-row {
+	padding-bottom: var(--prctr-theme-spacing-size40);
+
+	.agent-session-section {
+		line-height: 26px;
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-list-row:not(.drop-target).focused {
+	background-color: transparent;
+	outline: none;
+
+	> .monaco-tl-row {
+		background-color: var(--prctr-theme-list-inactiveFocusBackground);
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-list-row:not(.drop-target).selected {
+	background-color: transparent;
+	outline: none;
+
+	> .monaco-tl-row {
+		background-color: var(--prctr-theme-list-inactiveSelectionBackground);
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list:not(.drop-target):not(.dragging) .prctr-list-row.agent-session-list-row:not(.drop-target):hover:not(.selected):not(.focused) {
+	background-color: transparent;
+	outline: none;
+
+	> .monaco-tl-row {
+		background-color: var(--prctr-theme-list-hoverBackground);
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list:focus .prctr-list-row.agent-session-list-row:not(.drop-target).focused {
+	background-color: transparent;
+	outline: none;
+
+	> .monaco-tl-row {
+		background-color: var(--prctr-theme-list-focusBackground);
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list:focus .prctr-list-row.agent-session-list-row:not(.drop-target).selected {
+	background-color: transparent;
+	outline: none;
+
+	> .monaco-tl-row {
+		background-color: var(--prctr-theme-list-activeSelectionBackground);
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-list-row:is(.focused, .selected),:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-list-row:hover {
+	outline: none;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-list-row.focused > .monaco-tl-row {
+	outline: var(--prctr-theme-strokeThickness) dotted var(--prctr-theme-list-inactiveFocusOutline);
+	outline-offset: calc(var(--prctr-theme-strokeThickness) * -1);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-list-row.focused.selected > .monaco-tl-row {
+	outline-color: var(--prctr-theme-contrastActiveBorder, var(--prctr-theme-list-inactiveFocusOutline));
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list:focus .prctr-list-row.agent-session-list-row.focused > .monaco-tl-row,:where(.prctr-editor-scope) .context-menu-visible .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list.last-focused .prctr-list-row.agent-session-list-row.focused > .monaco-tl-row {
+	outline: var(--prctr-theme-strokeThickness) solid var(--prctr-theme-list-focusOutline);
+	outline-offset: calc(var(--prctr-theme-strokeThickness) * -1);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-list-row.selected:not(.focused) > .monaco-tl-row {
+	outline: var(--prctr-theme-strokeThickness) dotted var(--prctr-theme-contrastActiveBorder);
+	outline-offset: calc(var(--prctr-theme-strokeThickness) * -1);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list-row.agent-session-list-row:hover:not(.focused):not(.selected) > .monaco-tl-row {
+	outline: var(--prctr-theme-strokeThickness) dashed var(--prctr-theme-contrastActiveBorder);
+	outline-offset: calc(var(--prctr-theme-strokeThickness) * -1);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .agent-sessions-viewer .prctr-list:focus .prctr-list-row.agent-session-list-row.focused.selected > .monaco-tl-row {
+	outline-color: var(--prctr-theme-list-focusAndSelectionOutline, var(--prctr-theme-contrastActiveBorder, var(--prctr-theme-list-focusOutline)));
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .chat-viewpane {
+	.agent-session-item .agent-session-title-toolbar .actions-container {
+		gap: var(--prctr-theme-spacing-size40);
+	}
+	&.chat-view-location-auxiliarybar {
+		.chat-view-title-inner {
+			padding: var(--prctr-theme-spacing-size40);
+		}
+	}
+	&:is(.chat-view-location-sidebar, .chat-view-location-panel) {
+		.chat-view-title-inner {
+			padding: 0 var(--prctr-theme-spacing-size40) 0 var(--prctr-theme-spacing-size80);
+		}
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .monaco-pane-view .pane > .pane-header > .actions {
+	margin-right: 0px;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .chat-viewpane.has-sessions-control .agent-sessions-container {
+	.agent-sessions-title-container {
+		padding: 0 0 var(--prctr-theme-spacing-size40) var(--prctr-theme-spacing-size120);
+	}
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .activitybar:not(.top):not(.bottom) > .content > :not(.composite-bar):last-child {
+	margin-bottom: calc(var(--prctr-theme-spacing-size20) + var(--prctr-theme-strokeThickness));
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .activitybar:not(.top):not(.bottom) > .content > .composite-bar {
+	margin-top: calc(var(--prctr-theme-spacing-size20) + var(--prctr-theme-strokeThickness));
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.basepanel:is(.bottom, .top, .left, .right) .composite.title {
+	padding-right: var(--prctr-theme-spacing-size40);
+	padding-left: var(--prctr-theme-spacing-size20);
+	overflow: visible;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.panel.bottom .composite.title {
+	border-top: none;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.basepanel > .composite.title > .title-actions {
+	min-width: 0;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.basepanel > .composite.title > .global-actions {
+	position: relative;
+	z-index: 1;
+	flex: 0 0 auto;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .quick-input-titlebar {
+	padding: var(--prctr-theme-spacing-size20) 0 0;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .quick-input-widget-overlay .quick-input-titlebar {
+	padding-top: 0;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .quick-input-list .quick-input-list-entry-action-bar {
+	margin-right: 0;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .quick-input-list .quick-input-list-entry {
+	padding: 0 var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .quick-input-list .quick-input-list-entry .quick-input-list-entry-keybinding {
+	margin-right: 0;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .quick-input-list .quick-input-list-entry-action-bar .action-label:last-child {
+	margin-right: 0;
+	margin-left: var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .quick-input-list .quick-input-list-entry .quick-input-list-separator {
+	margin-right: 0;
+	margin-left: var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .scm-view .monaco-tl-contents > div {
+	padding-right: var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .search-view .search-widgets-container {
+	margin: 0 var(--prctr-theme-spacing-size80) 0 var(--prctr-theme-spacing-size20);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .extensions-viewlet > .header {
+	padding: var(--prctr-theme-spacing-size40) var(--prctr-theme-spacing-size80);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .extensions-viewlet > .extensions .extension-view-header .count-badge-wrapper {
+	margin-right: var(--prctr-theme-spacing-size60);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .monaco-count-badge {
+	padding: var(--prctr-theme-spacing-size40) var(--prctr-theme-spacing-size60);
+	min-width: 19px;
+	min-height: 19px;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .interactive-session .interactive-input-part {
+	padding-bottom: 0;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.panel .pane-body.integrated-terminal .xterm {
+	top: 0;
+	bottom: auto;
+	padding-block: var(--prctr-theme-spacing-size80);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.panel .pane-body.integrated-terminal .xterm .xterm-helpers {
+	top: var(--prctr-theme-spacing-size80);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .scm-view .prctr-list-row .resource-group .actions-container,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .scm-view .prctr-list-row .resource .actions-container {
+	gap: var(--prctr-theme-spacing-size20);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .scm-view .prctr-list-row .resource > .name > .monaco-icon-label::after {
+	margin-right: var(--prctr-theme-spacing-size40);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .monaco-count-badge.long {
+	padding: var(--prctr-theme-spacing-size20) var(--prctr-theme-spacing-size40);
+	min-height: 18px;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .debug-pane .debug-call-stack .session > .state.label {
+	margin-right: 0;
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .sidebar .has-composite-bar.header-or-footer .monaco-action-bar .actions-container {
+	gap: var(--prctr-theme-spacing-size20);
+}:where(.prctr-editor-scope) .modern-ui.monaco-workbench .monaco-pane-view .pane:not(.merged-header) .monaco-progress-container {
+	top: var(--prctr-theme-spacing-size240);
+}
+}
