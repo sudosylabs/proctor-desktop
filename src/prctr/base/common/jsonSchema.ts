@@ -2,7 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-// @proctor-vscode-port platform-commands
+// @proctor-vscode-port settings-editor-presentation
 
 export type JSONSchemaType = 'string' | 'number' | 'integer' | 'boolean' | 'null' | 'array' | 'object';
 
@@ -81,6 +81,7 @@ export interface IJSONSchema {
 	patternErrorMessage?: string;
 	deprecationMessage?: string;
 	markdownDeprecationMessage?: string;
+	deprecationMessageSeverity?: 'warning' | 'info';
 	enumDescriptions?: string[];
 	markdownEnumDescriptions?: string[];
 	markdownDescription?: string;
@@ -328,4 +329,3 @@ function traverseNodes(root: IJSONSchema, visit: (schema: IJSONSchema) => boolea
 		next = toWalk.pop();
 	}
 }
-

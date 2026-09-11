@@ -1,0 +1,381 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "editor-text-edits",
+  "admission": {
+    "workflow": "Preserve exact text-edit composition, inversion, rebasing and coordinate mapping required by the shared Settings UI/Monaco draft and editor model.",
+    "callers": [
+      "test/editor/common/upstream/core/textEdit.test.ts",
+      "test/editor/common/upstream/core/stringEdit.test.ts",
+      "test/editor/common/upstream/core/lineRange.test.ts",
+      "test/editor/common/upstream/core/positionOffsetTransformer.test.ts"
+    ],
+    "interface": "src/prctr/editor/common/core/edits/textEdit.ts",
+    "decision": "docs/architecture/user-settings.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Microsoft MIT license for transferred source and tests.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/arrays.ts",
+      "upstreamBlob": "9e12edbab2a0ce7c0ee88f2d35e11b9896272072",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing admitted dependency contract; verified through the complete transferred text-edit regression suite.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/arrays.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/arraysFind.ts",
+      "upstreamBlob": "8ed34987f633d6f1e4bf59deda5f18aec5938df4",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing admitted dependency contract; verified through the complete transferred text-edit regression suite.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/arraysFind.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/assert.ts",
+      "upstreamBlob": "b8f47aefd66d49d9a343348448a0e83bde57a183",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing admitted dependency contract; verified through the complete transferred text-edit regression suite.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/assert.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/equals.ts",
+      "upstreamBlob": "495d43d066b3361379d3fe9ea646a84bee2fe1b1",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing admitted dependency contract; verified through the complete transferred text-edit regression suite.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/equals.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/errors.ts",
+      "upstreamBlob": "35bb755608e5e9b2983a5d6de61364f8da0573ea",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing admitted dependency contract; verified through the complete transferred text-edit regression suite.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/errors.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/strings.ts",
+      "upstreamBlob": "1c50375d05ea7701229c8de87ae8281f750cb4af",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing admitted dependency contract; verified through the complete transferred text-edit regression suite.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/base/common/strings.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/editOperation.ts",
+      "upstreamBlob": "047330dc2ad1bd6dd2999a92f726deda404b4172",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/editOperation.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "9f8cf0fa661fb7b525ca63dfbd6cb0b8b95588b609c38e2942afaf277f463d76"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/edits/arrayEdit.ts",
+      "upstreamBlob": "5fbcbc597f7b425616289530f11fb9edce8d0260",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/edits/arrayEdit.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "cf9c700ec30260afa4b0b9dc23d641651016aad873ddb8cf3471dac3eacf668d"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/edits/edit.ts",
+      "upstreamBlob": "23c1597bbb2a618d7205f9369e7e02c80c357151",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/edits/edit.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "b6c38cbcbbe0b67ee9f8004359de4b3bbc310f08f1d40e6a3d636f1c54b4164c"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/edits/stringEdit.ts",
+      "upstreamBlob": "279006a2941ee0ce95eeaa6f9be15d69bd16586c",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/edits/stringEdit.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "6e38728356806bdbb89e928741a0043e5a1aefdda0cf3dc7468ac03091f74468"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/edits/textEdit.ts",
+      "upstreamBlob": "fe9b52b1afb20ab7f330f23923d2dda5b478db27",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/edits/textEdit.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "c8c1bb5e1ba6d60d49e7abfd1d62f05df59766498b9c47eca5648e46ea4d3cf0"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/position.ts",
+      "upstreamBlob": "713362dd70b444e92c05f0b91d4c4444d0448d21",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing admitted dependency contract; verified through the complete transferred text-edit regression suite.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/editor/common/core/position.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/range.ts",
+      "upstreamBlob": "b42088e53a10e0b9a8acf3babb4d91b9f5cb8052",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing admitted dependency contract; verified through the complete transferred text-edit regression suite.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/editor/common/core/range.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/ranges/lineRange.ts",
+      "upstreamBlob": "518dc2f824dbb66d88b89f2aed572179b6d9330b",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/ranges/lineRange.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "3d321913afecfbb6dd3f63b9687c47374efb7841ae47208033595d8389ba70f6"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/ranges/offsetRange.ts",
+      "upstreamBlob": "72d116282e2e629873eb4b13bbff1495c7a529e4",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/ranges/offsetRange.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "608c38353f3603e159d9c56474e0a2588e65b15b61f33411d58271bc973fec98"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/text/abstractText.ts",
+      "upstreamBlob": "eaa67df3acf1eb11798fdb716d12f7609d52b727",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/text/abstractText.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "889349f706c8889d42d960b03abd1278942b0860f6d0394c4fc6429a59b73837"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/text/positionToOffset.ts",
+      "upstreamBlob": "07447565fd66d6e54a745c85a7b9ed7c3058cf62",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/text/positionToOffset.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "108be1f124e831591b0b71df521b55d970af28a590c0826ea9dab22acb848653"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/text/positionToOffsetImpl.ts",
+      "upstreamBlob": "dfb30ff65da9c845b4b4c8e22dafd7cfc83ecade",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve the complete implementation and existing upstream dependency-injection cycle break. Explicit type-only imports describe references erased by TypeScript without changing emitted behavior.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/text/positionToOffsetImpl.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "e72b58f72e39a6b3d95385ecfe0f1c2a667f83fef9b976e8e13dee01c3b6d925"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/text/textLength.ts",
+      "upstreamBlob": "a401a556afccb11527de60eb70f8bc8bd0c691ec",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Complete pinned text-edit implementation; only namespace relocation and provenance insertion.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/core/text/textLength.ts",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
+      "localSha256": "cef6027ede3e5cff231d5b8a8cf58e1bb7ae8065450e5d5267782ee8fe8ec2f0"
+    },
+    {
+      "upstreamPath": "src/vs/editor/test/common/core/lineRange.test.ts",
+      "upstreamBlob": "d13ceb9fb205acf2e0cfd91a11acd48a68f82901",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Complete upstream assertions and seeded cases through the existing Node test/leak adapter; generated inverse test group registered as a suite for Node lifecycle.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/common/upstream/core/lineRange.test.ts",
+      "localSha256": "b812458baad5e8276e019b07a4c3c4e3ea56683a9d280b77eb1dd01332363ba0",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/test/common/core/positionOffsetTransformer.test.ts",
+      "upstreamBlob": "d1f2837d2a525691980b3a92bd4621580c7f8095",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Complete upstream assertions and seeded cases through the existing Node test/leak adapter; generated inverse test group registered as a suite for Node lifecycle.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/common/upstream/core/positionOffsetTransformer.test.ts",
+      "localSha256": "7bb6b86e47bea7f272e62edbcba29da432e2c41a49b7bbc3e53acd598435dbac",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/test/common/core/random.ts",
+      "upstreamBlob": "acf0371b8fe8dfd21f94f55ab4ef8e82e9d9e11e",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Complete upstream assertions and seeded cases through the existing Node test/leak adapter; generated inverse test group registered as a suite for Node lifecycle.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/common/upstream/core/random.ts",
+      "localSha256": "efad5bd99457c9fe41d40d15ac427769d81632284371723c09b1354a8cb4e710",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/test/common/core/stringEdit.test.ts",
+      "upstreamBlob": "e5d9484997bae1246b081b2d01141a9f62a4ef7c",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Complete upstream assertions and seeded cases through the existing Node test/leak adapter; generated inverse test group registered as a suite for Node lifecycle.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/common/upstream/core/stringEdit.test.ts",
+      "localSha256": "e42b1b3fbd91adb1e24af418e6efbdc4d3adf9b1d5e493468af30ac31e15e6e7",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/test/common/core/textEdit.test.ts",
+      "upstreamBlob": "c7be322804269272c07d50eeabcf231436281575",
+      "category": "test",
+      "disposition": "adapted",
+      "rationale": "Complete upstream assertions and seeded cases through the existing Node test/leak adapter; generated inverse test group registered as a suite for Node lifecycle.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "test/editor/common/upstream/core/textEdit.test.ts",
+      "localSha256": "a83f5ee162adc20ff8784819e89da3dcbbc1060e8fd8e486637c0989da4a2f9c",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "existing-editor-values",
+      "kind": "local-interface",
+      "reference": "src/prctr/editor/common/core/range.ts",
+      "rationale": "Existing Position/Range contracts remain unchanged; every composition, inversion and coordinate test exercises compatibility with the pinned edit machinery."
+    },
+    {
+      "id": "existing-base-runtime",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/arrays.ts",
+      "rationale": "Use admitted assertions, array comparison, strings and error contracts; exact direct dependency stopping points are listed in items."
+    },
+    {
+      "id": "node-test-adapter",
+      "kind": "local-interface",
+      "reference": "test/base/common/upstream/testAdapter.ts",
+      "rationale": "Existing test registration adapter preserves suite lifecycle and leak checks; generated cases run as registered suites."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "node-test-registration",
+      "summary": "Route upstream tests to Node assertion/test/leak utilities. Turn the upstream nested inverse registration into a suite so all 1000 generated cases execute under Node. Existing upstream brute-force skips remain labeled skips; enabled cases and assertions are retained.",
+      "localPaths": [
+        "test/editor/common/upstream/core/textEdit.test.ts",
+        "test/editor/common/upstream/core/stringEdit.test.ts",
+        "test/editor/common/upstream/core/lineRange.test.ts",
+        "test/editor/common/upstream/core/positionOffsetTransformer.test.ts"
+      ],
+      "verificationRefs": [
+        "text-edit-tests",
+        "string-edit-tests",
+        "range-tests",
+        "coordinate-tests"
+      ]
+    },
+    {
+      "id": "explicit-erased-import",
+      "summary": "Mark StringEdit/StringReplacement imports type-only to preserve the upstream runtime cycle break in the explicit Proctor source graph. Constructor injection through the original Deps object remains unchanged.",
+      "localPaths": ["src/prctr/editor/common/core/text/positionToOffsetImpl.ts"],
+      "verificationRefs": ["coordinate-tests", "text-edit-tests"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "text-edit-tests",
+      "kind": "test",
+      "path": "test/editor/common/upstream/core/textEdit.test.ts",
+      "obligation": "Run the complete transferred regression suite against the actual Proctor source; preserve seeded inversion/composition, range and coordinate invariants."
+    },
+    {
+      "id": "string-edit-tests",
+      "kind": "test",
+      "path": "test/editor/common/upstream/core/stringEdit.test.ts",
+      "obligation": "Run the complete transferred regression suite against the actual Proctor source; preserve seeded inversion/composition, range and coordinate invariants."
+    },
+    {
+      "id": "range-tests",
+      "kind": "test",
+      "path": "test/editor/common/upstream/core/lineRange.test.ts",
+      "obligation": "Run the complete transferred regression suite against the actual Proctor source; preserve seeded inversion/composition, range and coordinate invariants."
+    },
+    {
+      "id": "coordinate-tests",
+      "kind": "test",
+      "path": "test/editor/common/upstream/core/positionOffsetTransformer.test.ts",
+      "obligation": "Run the complete transferred regression suite against the actual Proctor source; preserve seeded inversion/composition, range and coordinate invariants."
+    }
+  ]
+}
