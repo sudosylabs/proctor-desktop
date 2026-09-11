@@ -1,0 +1,279 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-presentation*//* Suggest widget*//* Styles for status bar part *//* Styles for Message element for when widget is loading or is empty *//** Styles for the list element **//** Styles for each row in the list element **//** ReadMore Icon styles **//** signature, qualifier, type/details styling **//** Type Info and icon next to the label in the focused completion item **//** Details: if using CompletionItem#details, show on focus **//** Details: if using CompletionItemLabel#details, always show **//** Ellipsis on hover **//** When fitting the widget width to the inline detail, prioritize showing the full label: the label keeps its width and the detail truncates instead. **//** Do NOT display ReadMore when docs is side/below **//** Do NOT display ReadMore when using plain CompletionItemLabel (details/documentation might not be resolved) **//** Focused item can show ReadMore, but can't when docs is side/below **//** Styles for each row in the list **//** Styles for the docs of the completion item in focus **/@layer controls {:where(.prctr-editor-scope) .monaco-editor .suggest-widget {
+	width: 430px;
+	z-index: 40;
+	display: flex;
+	flex-direction: column;
+	border-radius: var(--prctr-theme-cornerRadius-large);
+	box-shadow: 0 2px 8px var(--prctr-theme-widget-shadow);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.message {
+	flex-direction: row;
+	align-items: center;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget,:where(.prctr-editor-scope) .monaco-editor .suggest-details {
+	flex: 0 1 auto;
+	width: 100%;
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--prctr-theme-editorSuggestWidget-border);
+	background-color: var(--prctr-theme-editorSuggestWidget-background);
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .suggest-widget,:where(.prctr-editor-scope) .monaco-editor.hc-black .suggest-details,:where(.prctr-editor-scope) .monaco-editor.hc-light .suggest-widget,:where(.prctr-editor-scope) .monaco-editor.hc-light .suggest-details {
+	border-width: 2px;
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .suggest-widget,:where(.prctr-editor-scope) .monaco-editor.hc-light .suggest-widget {
+	box-shadow: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .suggest-status-bar {
+	box-sizing: border-box;
+	display: none;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+	width: 100%;
+	font-size: 80%;
+	padding: 0 4px 0 4px;
+	border-top: 1px solid var(--prctr-theme-editorSuggestWidget-border);
+	overflow: hidden;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.with-status-bar .suggest-status-bar {
+	display: flex;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .suggest-status-bar .left {
+	padding-right: 8px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.with-status-bar .suggest-status-bar .action-label {
+	color: var(--prctr-theme-editorSuggestWidgetStatus-foreground);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.with-status-bar .suggest-status-bar .action-item:not(:last-of-type) .action-label {
+	margin-right: 0;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.with-status-bar .suggest-status-bar .action-item:not(:last-of-type) .action-label::after {
+	content: ', ';
+	margin-right: 0.3em;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.with-status-bar .prctr-list .prctr-list-row > .contents > .main > .right > .readMore,:where(.prctr-editor-scope) .monaco-editor .suggest-widget.with-status-bar .prctr-list .prctr-list-row.focused.string-label > .contents > .main > .right > .readMore {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.with-status-bar:not(.docs-side) .prctr-list .prctr-list-row:hover > .contents > .main > .right.can-expand-details > .details-label {
+	width: 100%;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget > .message {
+	padding-left: 22px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget > .tree {
+	height: 100%;
+	width: 100%;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list {
+	user-select: none;
+	-webkit-user-select: none;
+	border-radius: var(--prctr-theme-cornerRadius-large);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row {
+	display: flex;
+	-mox-box-sizing: border-box;
+	box-sizing: border-box;
+	padding-right: 10px;
+	background-repeat: no-repeat;
+	background-position: 2px 2px;
+	white-space: nowrap;
+	cursor: pointer;
+	touch-action: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row.focused {
+	color: var(--prctr-theme-editorSuggestWidget-selectedForeground);
+	outline: 1px solid var(--prctr-theme-editorSuggestWidget-focusOutline);
+	outline-offset: -1px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row.focused .codicon {
+	color: var(--prctr-theme-editorSuggestWidget-selectedIconForeground);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents {
+	flex: 1;
+	height: 100%;
+	overflow: hidden;
+	padding-left: 2px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main {
+	display: flex;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: pre;
+	justify-content: space-between;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .left,:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .right {
+	display: flex;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row:not(.focused) > .contents > .main .monaco-icon-label {
+	color: var(--prctr-theme-editorSuggestWidget-foreground);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget:not(.frozen) .monaco-highlighted-label .highlight {
+	font-weight: bold;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main .monaco-highlighted-label .highlight {
+	color: var(--prctr-theme-editorSuggestWidget-highlightForeground);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row.focused > .contents > .main .monaco-highlighted-label .highlight {
+	color: var(--prctr-theme-editorSuggestWidget-focusHighlightForeground);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .header > .codicon-close,:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .right > .readMore::before {
+	color: inherit;
+	opacity: 1;
+	font-size: 14px;
+	cursor: pointer;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .header > .codicon-close {
+	position: absolute;
+	top: 6px;
+	right: 2px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .header > .codicon-close:hover,:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .right > .readMore:hover {
+	opacity: 1;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .right > .details-label {
+	color: var(--prctr-theme-editorSuggestWidget-foreground);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row.focused > .contents > .main > .right > .details-label {
+	color: var(--prctr-theme-editorSuggestWidget-selectedForeground);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .left > .signature-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	opacity: 0.6;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .left > .qualifier-label {
+	margin-left: 12px;
+	opacity: 0.4;
+	font-size: 85%;
+	line-height: initial;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	align-self: center;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .right > .details-label {
+	font-size: 85%;
+	margin-left: 1.1em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .right > .details-label > .monaco-tokenized-source {
+	display: inline;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .right > .details-label {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget:not(.shows-details) .prctr-list .prctr-list-row.focused > .contents > .main > .right > .details-label {
+	display: inline;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row:not(.string-label) > .contents > .main > .right > .details-label,:where(.prctr-editor-scope) .monaco-editor .suggest-widget.docs-side .prctr-list .prctr-list-row.focused:not(.string-label) > .contents > .main > .right > .details-label {
+	display: inline;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget:not(.docs-side) .prctr-list .prctr-list-row.focused:hover > .contents > .main > .right.can-expand-details > .details-label {
+	width: calc(100% - 26px);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .left {
+	flex-shrink: 1;
+	flex-grow: 1;
+	overflow: hidden;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .left > .monaco-icon-label {
+	flex-shrink: 0;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row:not(.string-label) > .contents > .main > .left > .monaco-icon-label {
+	max-width: 100%;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row.string-label > .contents > .main > .left > .monaco-icon-label {
+	flex-shrink: 1;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .right {
+	overflow: hidden;
+	flex-shrink: 4;
+	max-width: 70%;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.fit-width-to-details .prctr-list .prctr-list-row > .contents > .main > .left {
+	flex-shrink: 0;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.fit-width-to-details .prctr-list .prctr-list-row > .contents > .main > .right {
+	max-width: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row > .contents > .main > .right > .readMore {
+	display: inline-block;
+	position: absolute;
+	right: 10px;
+	width: 18px;
+	height: 18px;
+	visibility: hidden;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.docs-side .prctr-list .prctr-list-row > .contents > .main > .right > .readMore {
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row.string-label > .contents > .main > .right > .readMore {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row.focused.string-label > .contents > .main > .right > .readMore {
+	display: inline-block;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row.focused:hover > .contents > .main > .right > .readMore {
+	visibility: visible;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row .monaco-icon-label.deprecated {
+	opacity: 0.66;
+	text-decoration: unset;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row .monaco-icon-label.deprecated > .monaco-icon-label-container > .monaco-icon-name-container {
+	text-decoration: line-through;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row .monaco-icon-label::before {
+	height: 100%;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row .icon {
+	display: block;
+	height: 16px;
+	width: 16px;
+	margin-left: 2px;
+	background-repeat: no-repeat;
+	background-size: 80%;
+	background-position: center;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row .icon.hide {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row .suggest-icon {
+	display: flex;
+	align-items: center;
+	margin-right: 4px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget.no-icons .prctr-list .prctr-list-row .icon,:where(.prctr-editor-scope) .monaco-editor .suggest-widget.no-icons .prctr-list .prctr-list-row .suggest-icon::before {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-widget .prctr-list .prctr-list-row .icon.customcolor .colorspan {
+	margin: 0 0 0 0.3em;
+	border: 0.1em solid #000;
+	width: 0.7em;
+	height: 0.7em;
+	display: inline-block;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details-container {
+	z-index: 41;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details {
+	display: flex;
+	flex-direction: column;
+	cursor: default;
+	color: var(--prctr-theme-editorSuggestWidget-foreground);
+	border-radius: var(--prctr-theme-cornerRadius-large);
+	overflow: hidden;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details:focus {
+	border-color: var(--prctr-theme-focusBorder);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details a {
+	color: var(--prctr-theme-textLink-foreground);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details a:hover {
+	color: var(--prctr-theme-textLink-activeForeground);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details code {
+	background-color: var(--prctr-theme-textCodeBlock-background);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details.no-docs {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element {
+	flex: 1;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body {
+	box-sizing: border-box;
+	height: 100%;
+	width: 100%;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .header > .type {
+	flex: 2;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	opacity: 0.7;
+	white-space: pre;
+	margin: 0 24px 0 0;
+	padding: 4px 0 4px 5px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details.detail-and-doc > .prctr-scrollable-element > .body > .header > .type {
+	padding-bottom: 12px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .header > .type.auto-wrap {
+	white-space: normal;
+	word-break: break-all;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .docs {
+	margin: 0;
+	padding: 4px 5px;
+	white-space: pre-wrap;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details.no-type > .prctr-scrollable-element > .body > .docs {
+	margin-right: 24px;
+	overflow: hidden;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .docs.markdown-docs {
+	padding: 0;
+	white-space: initial;
+	min-height: calc(1rem + 8px);
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .docs.markdown-docs > div,:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .docs.markdown-docs > span:not(:empty) {
+	padding: 4px 5px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .docs.markdown-docs > div > p:first-child {
+	margin-top: 0;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .docs.markdown-docs > div > p:last-child {
+	margin-bottom: 0;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .docs.markdown-docs .monaco-tokenized-source {
+	white-space: pre;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .docs .code {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > .docs.markdown-docs .codicon {
+	vertical-align: sub;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details > .prctr-scrollable-element > .body > p:empty {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details code {
+	border-radius: 3px;
+	padding: 0 0.4em;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details ul {
+	padding-left: 20px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details ol {
+	padding-left: 20px;
+}:where(.prctr-editor-scope) .monaco-editor .suggest-details p code {
+	font-family: var(--prctr-editor-monospace-font);
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .monaco-editor .suggest-widget.docs-side .prctr-list .prctr-list-row > .contents > .main > .right > .readMore {
+	display: none !important;
+}
+}

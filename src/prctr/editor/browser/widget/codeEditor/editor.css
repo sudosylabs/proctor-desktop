@@ -1,0 +1,81 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port editor-browser-core*//* -------------------- IE10 remove auto clear button -------------------- *//* All widgets *//* I am not a big fan of this rule *//* -------------------- Editor -------------------- *//* -------------------- Misc -------------------- *//*
+.monaco-editor .auto-closed-character {
+	opacity: 0.3;
+}
+*/@layer controls {:where(.prctr-editor-scope) ::-ms-clear {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-editor .editor-widget input {
+	color: inherit;
+}:where(.prctr-editor-scope) .monaco-editor {
+	position: relative;
+	overflow: visible;
+	-webkit-text-size-adjust: 100%;
+	text-spacing-trim: space-all;
+	color: var(--prctr-theme-editor-foreground);
+	background-color: var(--prctr-theme-editor-background);
+	overflow-wrap: initial;
+}:where(.prctr-editor-scope) .monaco-editor-background {
+	background-color: var(--prctr-theme-editor-background);
+}:where(.prctr-editor-scope) .monaco-editor .rangeHighlight {
+	background-color: var(--prctr-theme-editor-rangeHighlightBackground);
+	box-sizing: border-box;
+	border: 1px solid var(--prctr-theme-editor-rangeHighlightBorder);
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .rangeHighlight,:where(.prctr-editor-scope) .monaco-editor.hc-light .rangeHighlight {
+	border-style: dotted;
+}:where(.prctr-editor-scope) .monaco-editor .symbolHighlight {
+	background-color: var(--prctr-theme-editor-symbolHighlightBackground);
+	box-sizing: border-box;
+	border: 1px solid var(--prctr-theme-editor-symbolHighlightBorder);
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .symbolHighlight,:where(.prctr-editor-scope) .monaco-editor.hc-light .symbolHighlight {
+	border-style: dotted;
+}:where(.prctr-editor-scope) .monaco-editor .editorCanvas {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 0;
+	pointer-events: none;
+}:where(.prctr-editor-scope) .monaco-editor .overflow-guard {
+	position: relative;
+	overflow: hidden;
+}:where(.prctr-editor-scope) .monaco-editor .view-overlays {
+	position: absolute;
+	top: 0;
+}:where(.prctr-editor-scope) .monaco-editor .view-overlays > div,:where(.prctr-editor-scope) .monaco-editor .margin-view-overlays > div {
+	position: absolute;
+	width: 100%;
+}:where(.prctr-editor-scope) .monaco-editor .squiggly-error {
+	border-bottom: 4px double var(--prctr-theme-editorError-border);
+}:where(.prctr-editor-scope) .monaco-editor .squiggly-error::before {
+	display: block;
+	content: '';
+	width: 100%;
+	height: 100%;
+	background: var(--prctr-theme-editorError-background);
+}:where(.prctr-editor-scope) .monaco-editor .squiggly-warning {
+	border-bottom: 4px double var(--prctr-theme-editorWarning-border);
+}:where(.prctr-editor-scope) .monaco-editor .squiggly-warning::before {
+	display: block;
+	content: '';
+	width: 100%;
+	height: 100%;
+	background: var(--prctr-theme-editorWarning-background);
+}:where(.prctr-editor-scope) .monaco-editor .squiggly-info {
+	border-bottom: 4px double var(--prctr-theme-editorInfo-border);
+}:where(.prctr-editor-scope) .monaco-editor .squiggly-info::before {
+	display: block;
+	content: '';
+	width: 100%;
+	height: 100%;
+	background: var(--prctr-theme-editorInfo-background);
+}:where(.prctr-editor-scope) .monaco-editor .squiggly-hint {
+	border-bottom: 2px dotted var(--prctr-theme-editorHint-border);
+}:where(.prctr-editor-scope) .monaco-editor.showUnused .squiggly-unnecessary {
+	border-bottom: 2px dashed var(--prctr-theme-editorUnnecessaryCode-border);
+}:where(.prctr-editor-scope) .monaco-editor.showDeprecated .squiggly-inline-deprecated {
+	text-decoration: line-through;
+	text-decoration-color: var(--prctr-theme-editor-foreground, inherit);
+}
+}

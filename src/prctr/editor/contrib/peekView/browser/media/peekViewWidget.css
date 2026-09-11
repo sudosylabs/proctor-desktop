@@ -1,0 +1,60 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-presentation*/@layer controls {:where(.prctr-editor-scope) .monaco-editor .peekview-widget {
+	box-shadow: var(--prctr-theme-shadow-lg);
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head {
+	box-sizing: border-box;
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-title {
+	display: flex;
+	align-items: baseline;
+	font-size: 13px;
+	margin-left: 20px;
+	min-width: 0;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-title.clickable {
+	cursor: pointer;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-title .dirname:not(:empty) {
+	font-size: 0.9em;
+	margin-left: 0.5em;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-title .meta {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-title .dirname {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-title .filename {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-title .meta:not(:empty)::before {
+	content: '-';
+	padding: 0 0.3em;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-actions {
+	flex: 1;
+	text-align: right;
+	padding-right: 2px;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-actions > .monaco-action-bar {
+	display: inline-block;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-actions > .monaco-action-bar,:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-actions > .monaco-action-bar > .actions-container {
+	height: 100%;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget > .body {
+	border-top: 1px solid;
+	position: relative;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .head .peekview-title .codicon {
+	margin-right: 4px;
+	align-self: center;
+}:where(.prctr-editor-scope) .monaco-editor .peekview-widget .prctr-list .prctr-list-row.focused .codicon {
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .monaco-editor .peekview-widget .prctr-list .prctr-list-row.focused .codicon {
+	color: inherit !important;
+}
+}

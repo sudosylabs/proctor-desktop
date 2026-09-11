@@ -1,0 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port editor-browser-core*/@layer controls {:where(.prctr-editor-scope) .monaco-editor .monaco-decoration-css-rule-extractor {
+	visibility: hidden;
+	pointer-events: none;
+}
+}

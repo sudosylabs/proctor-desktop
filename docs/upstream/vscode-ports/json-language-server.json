@@ -1,0 +1,273 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "json-language-server",
+  "admission": {
+    "workflow": "Packaged JSONC language services for the shared Settings Monaco model without an extension host.",
+    "callers": [
+      "test/browser/editor/jsonWorker.test.ts",
+      "test/editor/node/languages/json/jsonServer.test.ts"
+    ],
+    "interface": "src/prctr/editor/common/languages/json/jsonServer.ts",
+    "decision": "docs/architecture/user-settings.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "extensions/json-language-features/server/src/jsonServer.ts",
+      "upstreamBlob": "1e109fac5a3ef475481d52a87eca00d3f820d342",
+      "category": "source",
+      "disposition": "copied",
+      "rationale": "Full upstream language server, all handlers and capabilities retained.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/languages/json/jsonServer.ts",
+      "localSha256": "02ce41dba23264de0091b39bc9d40a7d080061316b9ff449357040d0d91dc137",
+      "mechanicalTransforms": ["provenance-marker-insertion"]
+    },
+    {
+      "upstreamPath": "extensions/json-language-features/server/src/languageModelCache.ts",
+      "upstreamBlob": "e0f42f1fb872402fecb19b25e71cb8d31bd23fab",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Full upstream cache algorithm; timer handle annotation uses ReturnType for both browser and Node checks.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/languages/json/languageModelCache.ts",
+      "localSha256": "275a3a838c8cfabdf15cd733c45f974bf96d88f839fc8baec0ee571b5de16145",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/json-language-features/server/src/utils/runner.ts",
+      "upstreamBlob": "c09e49e56cd3003017ec0cc096162398fad42c51",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Full scheduling/error/cancellation algorithms; RuntimeEnvironment import marked type-only to expose the existing erased runtime edge.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/languages/json/utils/runner.ts",
+      "localSha256": "64cfd8ad0d058a960dcde1054128830b6f596119ea189ec83056749ee5d0d64f",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/json-language-features/server/src/utils/validation.ts",
+      "upstreamBlob": "7e938577f8d838b690141370e08dcfecd12b9e7c",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Full push/pull validation, debouncing and stale-result suppression; RuntimeEnvironment import explicitly type-only.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/common/languages/json/utils/validation.ts",
+      "localSha256": "ae382b18dc96e25f0b73d88d65e823c3e96f623766696964e10dc19512fc6265",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/json-language-features/server/src/browser/jsonServerMain.ts",
+      "upstreamBlob": "e419373e024a95c00b81f2573919d6ce696659db",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Full browser LSP transport, timer and console wiring. Relative server import follows the editor common/browser boundary.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/browser/languages/json/worker/jsonServerMain.ts",
+      "localSha256": "0ed0663914c145db4f700f7202c200badf34bd67fdf753effb645b02ef6a8ce8",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/json-language-features/server/src/browser/jsonServerWorkerMain.ts",
+      "upstreamBlob": "dd991a3c156942c2ab60286fa8d6c84df4ac2ca3",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Preserve asynchronous server import, initialization gate and pending-message replay. Replace extension-selected locale URI fetching with validated bounded packaged inline messages; retain source fallback.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/editor/browser/languages/json/worker/jsonServerWorkerMain.ts",
+      "localSha256": "44b3f6513332a537cd9c4963791dbab7d33722fe8cc1745227f5d5279b3e734f",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Microsoft MIT terms preserved in the repository notice.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/json-language-features/server/package.json",
+      "upstreamBlob": "a9315943e2dec8ec9cb18028c99e0786257e3d64",
+      "category": "configuration",
+      "disposition": "external",
+      "rationale": "Exact upstream JSON language server external package versions are admitted in the application graph.",
+      "licenseRefs": ["vscode-mit"],
+      "externalReference": "package.json"
+    },
+    {
+      "upstreamPath": "extensions/json-language-features/server/package-lock.json",
+      "upstreamBlob": "e8f28efa0c16e5efec06e080506f8264831f6747",
+      "category": "configuration",
+      "disposition": "evidence-only",
+      "rationale": "Compare all ten package version/integrity pairs with the application lock, including separate LSP and language-service protocol type versions.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/json-language-features/server/src/node/jsonServerMain.ts",
+      "upstreamBlob": "8f929ef5a5ff3cbd9bea7df709f19ba3aea88f5f",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "The accepted browser worker composition has no Node process bootstrap, filesystem, HTTP/proxy request adapter or extension-host environment. The shared server remains complete.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/json-language-features/server/src/node/jsonServerNodeMain.ts",
+      "upstreamBlob": "c30873e5b0e172858a73b1829a407784b86b85dc",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "The accepted browser worker composition has no Node process bootstrap, filesystem, HTTP/proxy request adapter or extension-host environment. The shared server remains complete.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "json-package-0",
+      "kind": "external-package",
+      "reference": "@vscode/l10n@0.0.18",
+      "rationale": "Exact upstream production package with locked transitive versions/integrities, reviewed license and scripts disabled. Browser entrypoints are bundled for the worker; Node transport is test-only."
+    },
+    {
+      "id": "json-package-1",
+      "kind": "external-package",
+      "reference": "vscode-json-languageservice@6.0.0-next.3",
+      "rationale": "Exact upstream production package with locked transitive versions/integrities, reviewed license and scripts disabled. Browser entrypoints are bundled for the worker; Node transport is test-only."
+    },
+    {
+      "id": "json-package-2",
+      "kind": "external-package",
+      "reference": "vscode-languageserver@10.0.0-next.18",
+      "rationale": "Exact upstream production package with locked transitive versions/integrities, reviewed license and scripts disabled. Browser entrypoints are bundled for the worker; Node transport is test-only."
+    },
+    {
+      "id": "json-package-3",
+      "kind": "external-package",
+      "reference": "vscode-uri@3.1.0",
+      "rationale": "Exact upstream production package with locked transitive versions/integrities, reviewed license and scripts disabled. Browser entrypoints are bundled for the worker; Node transport is test-only."
+    },
+    {
+      "id": "worker-initialization",
+      "kind": "local-interface",
+      "reference": "src/prctr/editor/common/languages/json/jsonWorkerProtocol.ts",
+      "rationale": "Bounded inline packaged translations replace the extension-host locale URI; no remote localization resource is acquired."
+    },
+    {
+      "id": "packaged-schema-catalog",
+      "kind": "local-interface",
+      "reference": "src/prctr/editor/common/languages/json/packagedJsonSchemas.ts",
+      "rationale": "Exact immutable packaged resources satisfy upstream vscode/content requests; all other references fail without IO."
+    },
+    {
+      "id": "browser-message-transport",
+      "kind": "platform-interface",
+      "reference": "Web Worker and MessageEvent",
+      "rationale": "Use the complete upstream browser reader/writer, worker postMessage startup gate, timers and worker lifetime. Chromium supplies no Node integration."
+    },
+    {
+      "id": "thenable",
+      "kind": "local-interface",
+      "reference": "src/prctr/base/common/thenable.d.ts",
+      "rationale": "Existing VS Code-compatible erased Thenable typing."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "runtime-type-annotations",
+      "summary": "Preserve complete upstream implementations while making the two erased runtime imports explicit and selecting a portable timer handle type.",
+      "localPaths": [
+        "src/prctr/editor/common/languages/json/languageModelCache.ts",
+        "src/prctr/editor/common/languages/json/utils/runner.ts",
+        "src/prctr/editor/common/languages/json/utils/validation.ts"
+      ],
+      "verificationRefs": ["server-contract", "runtime-contract"]
+    },
+    {
+      "id": "packaged-worker-startup",
+      "summary": "Replace extension URI-based localization with bounded inline packaged messages. Keep the initialization gate, async server module import, pending-message replay, source fallback and diagnostic console routing; relative imports follow local ownership.",
+      "localPaths": [
+        "src/prctr/editor/browser/languages/json/worker/jsonServerMain.ts",
+        "src/prctr/editor/browser/languages/json/worker/jsonServerWorkerMain.ts"
+      ],
+      "verificationRefs": ["runtime-contract", "sandbox-worker"]
+    },
+    {
+      "id": "browser-authority",
+      "summary": "Compose the complete server without HTTP/filesystem/proxy RuntimeEnvironment adapters. Schema content requests resolve only exact packaged catalog entries. The root npm graph locks the same package versions/integrities as upstream; Node LSP/CommonJS loading exists only in the contract-test harness.",
+      "localPaths": [
+        "src/prctr/editor/common/languages/json/packagedJsonSchemas.ts",
+        "build/lib/jsonWorker.ts",
+        "build/buildEditorCoreTests.ts"
+      ],
+      "verificationRefs": [
+        "server-contract",
+        "runtime-contract",
+        "sandbox-worker",
+        "dependency-licenses"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "id": "server-contract",
+      "kind": "test",
+      "path": "test/editor/node/languages/json/jsonServer.test.ts",
+      "obligation": "Exercise full LSP capability advertisement, JSONC/schema validation, changes, defaults, descriptions, completion, formatting, symbols, folding, selection, color and shutdown."
+    },
+    {
+      "id": "runtime-contract",
+      "kind": "test",
+      "path": "test/editor/node/languages/json/jsonRuntime.test.ts",
+      "obligation": "Exercise cancellation before scheduling and during async work, cache version/language identity, LRU expiry/removal/disposal, exact schema authorization and bounded non-URI startup messages."
+    },
+    {
+      "id": "sandbox-worker",
+      "kind": "test",
+      "path": "test/electron/editorWorker.real.test.ts",
+      "obligation": "Bundle and run the actual worker in sandboxed Chromium with immediate startup traffic, incremental changes, inline localization, in-flight cancellation, denied schema reads and repeated teardown/recreation."
+    },
+    {
+      "id": "browser-worker-cases",
+      "kind": "test",
+      "path": "test/browser/editor/jsonWorker.test.ts",
+      "obligation": "Provide the actual browser transport and user-observable language requests used by the Electron harness."
+    },
+    {
+      "id": "dependency-licenses",
+      "kind": "check",
+      "path": "build/checks/dependencyLicenses.ts",
+      "obligation": "Verify every installed dependency version/license against the reviewed admission and lock."
+    }
+  ]
+}

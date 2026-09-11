@@ -1,0 +1,24 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port editor-browser-core*/@layer controls {:where(.prctr-editor-scope) .monaco-editor .margin-view-overlays .line-numbers {
+	bottom: 0;
+	font-variant-numeric: tabular-nums;
+	position: absolute;
+	text-align: right;
+	display: inline-block;
+	vertical-align: middle;
+	box-sizing: border-box;
+	cursor: default;
+}:where(.prctr-editor-scope) .monaco-editor .relative-current-line-number {
+	text-align: left;
+	display: inline-block;
+	width: 100%;
+}:where(.prctr-editor-scope) .monaco-editor .margin-view-overlays .line-numbers.lh-odd {
+	margin-top: 1px;
+}:where(.prctr-editor-scope) .monaco-editor .line-numbers {
+	color: var(--prctr-theme-editorLineNumber-foreground);
+}:where(.prctr-editor-scope) .monaco-editor .line-numbers.active-line-number {
+	color: var(--prctr-theme-editorLineNumber-activeForeground);
+}
+}

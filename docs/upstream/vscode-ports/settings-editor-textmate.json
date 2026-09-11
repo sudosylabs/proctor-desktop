@@ -1,0 +1,993 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "settings-editor-textmate",
+  "admission": {
+    "workflow": "Full source TextMate tokenization, scope registration, line limits, state deltas, theme propagation and background model controllers with static packaged JSON grammars.",
+    "callers": [
+      "src/prctr/workbench/services/textMate/browser/textMateTokenizationFeature.ts"
+    ],
+    "interface": "src/prctr/workbench/services/textMate/browser/textMateTokenizationFeature.ts",
+    "decision": "docs/architecture/user-settings.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/textMateTokenizationFeature.ts",
+      "localPath": "src/prctr/workbench/services/textMate/browser/textMateTokenizationFeature.ts",
+      "upstreamBlob": "b271a9b9e92cd7a453e1a24ea0c4d40db30aa8d8",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "ad5fc864ee2d0fd226eb14dbcf2960633fdb4f62ebe38980551ab0e86072b2bd",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/tokenizationSupport/textMateTokenizationSupport.ts",
+      "localPath": "src/prctr/workbench/services/textMate/common/tokenizationSupport/textMateTokenizationSupport.ts",
+      "upstreamBlob": "37605fea5cbedfc974b13961323b7373bd630a93",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure. Shared renderer/worker code is located under common; relative imports follow the relocation without changing tokenization algorithms or host channel methods.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "21a65e2935ddca0c54d9739af2ace3098a87d4efb95b1fc16b42a3f7a57590f6",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/tokenizationSupport/tokenizationSupportWithLineLimit.ts",
+      "localPath": "src/prctr/workbench/services/textMate/common/tokenizationSupport/tokenizationSupportWithLineLimit.ts",
+      "upstreamBlob": "7a46a37cea4c707838f661e85280fe4ac9a5d7a8",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure. Shared renderer/worker code is located under common; relative imports follow the relocation without changing tokenization algorithms or host channel methods.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "535523298ec4861f62be7c3f57d91fd8c77d59612bc25f274313fbcb42b446cb",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/common/TMScopeRegistry.ts",
+      "localPath": "src/prctr/workbench/services/textMate/common/TMScopeRegistry.ts",
+      "upstreamBlob": "ace5da0d59a6f5e0220cb932f5d0bb69025ba8fd",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "068165e8ee6556c542490834c1cd60a85c08943a02420b8d4d4826c74459858b",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/common/TMGrammarFactory.ts",
+      "localPath": "src/prctr/workbench/services/textMate/common/TMGrammarFactory.ts",
+      "upstreamBlob": "229523802e3fd868527f3f170d3c01c79d2b792b",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "f38e15976491700908d45fb87defe9141fe1cd2d83c720baadd55638bc606702",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateWorkerTokenizer.ts",
+      "localPath": "src/prctr/workbench/services/textMate/browser/backgroundTokenization/worker/textMateWorkerTokenizer.ts",
+      "upstreamBlob": "f031be8574d2de1d0a897e37dfc4911499fff11f",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "26731d3cc5d43e3e4bd6fb2dd1fc771392f2251529822245c591b253d0aff520",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateWorkerHost.ts",
+      "localPath": "src/prctr/workbench/services/textMate/common/backgroundTokenization/textMateWorkerHost.ts",
+      "upstreamBlob": "c289c9b85e0cd88a9e15dbe016821042dc3066c1",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure. Shared renderer/worker code is located under common; relative imports follow the relocation without changing tokenization algorithms or host channel methods.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "03e422262fcd6fc6247cacbcb7d0a75c9fba2cb1ef1414ab0b01825afb4fc473",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.worker.ts",
+      "localPath": "src/prctr/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.worker.ts",
+      "upstreamBlob": "157e314ba7d527a14fcf3f15d510814595bb6507",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure. All DTOs and the complete eight-method renderer protocol are extracted to a common contract; the worker class implements it.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "9fb16cf4c0a15c8e271978559d5928392259e3c9503c36b54f21d84f09705835",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/indexTransformer.ts",
+      "localPath": "src/prctr/workbench/services/textMate/browser/indexTransformer.ts",
+      "upstreamBlob": "7d229aaccd7ad4c65b8d64e0e449b807f170b97e",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "a9c86fe5d6d8849c4555c48e068f114177ca6a8e68e6615af656fd808ad37423",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/backgroundTokenization/textMateWorkerTokenizerController.ts",
+      "localPath": "src/prctr/workbench/services/textMate/browser/backgroundTokenization/textMateWorkerTokenizerController.ts",
+      "upstreamBlob": "61fee6de827cfa7a6e5a9ffb0bb97f65459f3fe8",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "555f29f0ae4dcce60d1021ccecb0a608791876f865871d88b27946ac496ab579",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/backgroundTokenization/threadedBackgroundTokenizerFactory.ts",
+      "localPath": "src/prctr/workbench/services/textMate/browser/backgroundTokenization/threadedBackgroundTokenizerFactory.ts",
+      "upstreamBlob": "3ba89e08eda8a4426af729f7fa63c48743e6251a",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "6617b6e220aa4d809c6910c66178109e63d4a7e4c94a12a260973a34e9982907",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/common/TMGrammars.ts",
+      "localPath": "src/prctr/workbench/services/textMate/common/TMGrammars.ts",
+      "upstreamBlob": "5030c479fad003f07e0123c35518f46c15ed045c",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "3f063de3d90c9bdb39db7e9dd483b9135f9e7c1295e217df8831e00d7ca5cd68",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/textMateTokenizationFeatureImpl.ts",
+      "localPath": "src/prctr/workbench/services/textMate/browser/textMateTokenizationFeatureImpl.ts",
+      "upstreamBlob": "fc7f3e7fb310654421571f19c32e8d87c0358451",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "e522e3b8e2d07ccd076f66dc320bdce1538784725a7d8dd68d32468d5dcaa8e4",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.workerMain.ts",
+      "localPath": "src/prctr/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.workerMain.ts",
+      "upstreamBlob": "aaa4c4b5a4fc68443a7b510da512f8c538a4d53c",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "2fa9f9f96ffa5ec64f6cfd3b34c36797750f4fdfb30686f3613a63ff83632c81",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/json/syntaxes/JSON.tmLanguage.json",
+      "localPath": "src/prctr/workbench/services/textMate/common/json/syntaxes/JSON.tmLanguage.json",
+      "upstreamBlob": "b53febdc8ad188b23b2ff42d9f5ff4eca6997531",
+      "category": "asset",
+      "disposition": "copied",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "d7238f1cc9033993b9816b0945cab4bb8ea108de0399663c551f28f913e94c70",
+      "mechanicalTransforms": []
+    },
+    {
+      "upstreamPath": "extensions/json/syntaxes/JSONC.tmLanguage.json",
+      "localPath": "src/prctr/workbench/services/textMate/common/json/syntaxes/JSONC.tmLanguage.json",
+      "upstreamBlob": "ae5430630f65176c4d97999859d3c85a4f8d1b5b",
+      "category": "asset",
+      "disposition": "copied",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "9f927bb3aa53e66efc3cace9d2fa1185822b2adfa3f4a9299e7c078f136e1ee2",
+      "mechanicalTransforms": []
+    },
+    {
+      "upstreamPath": "extensions/json/language-configuration.json",
+      "localPath": "src/prctr/workbench/services/textMate/common/json/language-configuration.json",
+      "upstreamBlob": "b569cc4447cd0f55123a921db1fb4de6d231c7de",
+      "category": "asset",
+      "disposition": "copied",
+      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "0963af900927e3398cc4e40a853b4091d23361ef2d3f89f8f663c8219a2fc8ca",
+      "mechanicalTransforms": []
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/domStylesheets.ts",
+      "upstreamBlob": "72fa42df1a6a537fb1138c0729eef3531209b36b",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/browser/domStylesheets.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/arrays.ts",
+      "upstreamBlob": "9e12edbab2a0ce7c0ee88f2d35e11b9896272072",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/arrays.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/color.ts",
+      "upstreamBlob": "ce1143ac7b46e48689ec2bd5af3f6b1bc334531c",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/color.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/errors.ts",
+      "upstreamBlob": "35bb755608e5e9b2983a5d6de61364f8da0573ea",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/errors.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/lifecycle.ts",
+      "upstreamBlob": "a75cbb1cce3099e07bff3cc9c751d634ae30dfdd",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/lifecycle.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/network.ts",
+      "upstreamBlob": "871560d2ab0eb9496824c44869580461e21c2b99",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/network.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/observable.ts",
+      "upstreamBlob": "86ac5971a277983945586868dc1a2a05a6ac9e8f",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/observable.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/platform.ts",
+      "upstreamBlob": "bc542baa21ac6edd91eb485ca5694a66d0d0ada4",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/platform.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/resources.ts",
+      "upstreamBlob": "089ee62de037ea92f0724171de53a16ecb505000",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/resources.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/types.ts",
+      "upstreamBlob": "154d8199690a162dfc37895125348e5a64b7d848",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/types.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/uri.ts",
+      "upstreamBlob": "d148dc10f26bf8a19615e052df3dde23c481099c",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/uri.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/encodedTokenAttributes.ts",
+      "upstreamBlob": "22ee1417e559ad19afd5559c3b6ccb1a6f0bfa1e",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/encodedTokenAttributes.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages.ts",
+      "upstreamBlob": "44ae1380e4ba6159f94ee488f717f0b78f872941",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/languages.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/language.ts",
+      "upstreamBlob": "79e7d7bb3f7d2ae09ae96069dd9691d871f3f605",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/languages/language.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/supports/tokenization.ts",
+      "upstreamBlob": "0545b34945d65f197aaacf989decc0a07626fbfe",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/tokenization.ts"
+    },
+    {
+      "upstreamPath": "src/vs/nls.ts",
+      "upstreamBlob": "8383ae24d96d4d9361921b89bdf48519d13d4260",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/vscodeNls.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/configuration/common/configuration.ts",
+      "upstreamBlob": "55eaae5451c234878ee71f9245edb12a708a22ae",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/configuration/common/configuration.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/extensionResourceLoader/common/extensionResourceLoader.ts",
+      "upstreamBlob": "28a25db97f004f3c81c9aeca39053adc9428cf5a",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/extensionResourceLoader/common/extensionResourceLoader.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/instantiation.ts",
+      "upstreamBlob": "b879acb0ee8da5a824321bd1b9925219fe07af94",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/log/common/log.ts",
+      "upstreamBlob": "27e542896df074a88f1ee1f587b5695b12e2ca7e",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/log/common/log.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/notification/common/notification.ts",
+      "upstreamBlob": "a2f59a71fab89a3d8e92d477060698edd4d4e846",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/notification/common/notification.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/progress/common/progress.ts",
+      "upstreamBlob": "5780df6be3266104f6f13053ec80e99dfd7ca6dc",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/progress/common/progress.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/telemetry/common/telemetry.ts",
+      "upstreamBlob": "29b71ef796915366c23c9a7fa67f882e57c88832",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/telemetry/common/telemetry.ts"
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/environment/common/environmentService.ts",
+      "upstreamBlob": "3ad7edaa434056d60a8bd4a2892c24800e238d19",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/workbench/services/environment/common/environmentService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/extensions/common/extensionsRegistry.ts",
+      "upstreamBlob": "d5220dbd0c5dd79ed1e7f2c45085b5eb2a5149cd",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/workbench/services/extensions/common/extensionsRegistry.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/event.ts",
+      "upstreamBlob": "cf5fd39b7389b12890a85fd2159e35326d5b7a60",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/event.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/stopwatch.ts",
+      "upstreamBlob": "6b62b72aea9676170cb5933d72a125770b351ebc",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/stopwatch.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model.ts",
+      "upstreamBlob": "34c57f255760cfa7630139cf9300ad9c4889aaad",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/model.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/nullTokenize.ts",
+      "upstreamBlob": "2ed15d199fe6e084fb71204c6d83b928136123e7",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/languages/nullTokenize.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/environment/common/environment.ts",
+      "upstreamBlob": "7c6a27cea9c7ae257d4643dbbc3b3da0510dd0a5",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/environment/common/environment.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/mirrorTextModel.ts",
+      "upstreamBlob": "b047e8908941d804f6d2679e3ce19a14b96955ea",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/model/mirrorTextModel.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/async.ts",
+      "upstreamBlob": "510fc4a54049fda2dbd9454c2e5cfa3778be2fe0",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/async.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/ranges/lineRange.ts",
+      "upstreamBlob": "518dc2f824dbb66d88b89f2aed572179b6d9330b",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/core/ranges/lineRange.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/textModelTokens.ts",
+      "upstreamBlob": "e0422d36e07912d5bf4bf399e353329cf8b3397c",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/model/textModelTokens.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/tokens/contiguousMultilineTokensBuilder.ts",
+      "upstreamBlob": "f2b34cc9cd17b561d365c0c876b7061767f21f5f",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/tokens/contiguousMultilineTokensBuilder.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/tokens/lineTokens.ts",
+      "upstreamBlob": "ef2ec6cd6421b2e80b24b105f6488fd05784b317",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/tokens/lineTokens.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/textModelEvents.ts",
+      "upstreamBlob": "561feefda770509a216807779bac7832dfa42fc8",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/textModelEvents.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/tokens/annotations.ts",
+      "upstreamBlob": "61b660114366f877c1513434422c7c1717675194",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/model/tokens/annotations.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/ranges/offsetRange.ts",
+      "upstreamBlob": "72d116282e2e629873eb4b13bbff1495c7a529e4",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/core/ranges/offsetRange.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/worker/webWorker.ts",
+      "upstreamBlob": "0ad11b838aad9fed6798e0803da18e16bf1070db",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/worker/webWorker.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/range.ts",
+      "upstreamBlob": "b42088e53a10e0b9a8acf3babb4d91b9f5cb8052",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/core/range.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/observable/common/platformObservableUtils.ts",
+      "upstreamBlob": "e80d140d0fe9785426263872528e15917fdef3ca",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/observable/common/platformObservableUtils.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/edits/edit.ts",
+      "upstreamBlob": "23c1597bbb2a618d7205f9369e7e02c80c357151",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/core/edits/edit.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/textModelStringEdit.ts",
+      "upstreamBlob": "aee0272cb49cff860b45414f29fd9809eeaa98a0",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/model/textModelStringEdit.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/edits/stringEdit.ts",
+      "upstreamBlob": "279006a2941ee0ce95eeaa6f9be15d69bd16586c",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/core/edits/stringEdit.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/webWorker/browser/webWorkerDescriptor.ts",
+      "upstreamBlob": "1f579c85bb9bb423bb165f8931f160631a0160b9",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/webWorker/browser/webWorkerDescriptor.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/webWorker/browser/webWorkerService.ts",
+      "upstreamBlob": "fd5150435af63d461e1f33c1f9484a90e311567d",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/webWorker/browser/webWorkerService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/language/common/languageService.ts",
+      "upstreamBlob": "f25eaf50de321cd71f28be1fe9369e8838fcbfd1",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/workbench/services/language/common/languageService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/workbenchThemeService.ts",
+      "upstreamBlob": "74edcddac8aa416cd9ee432e36b47b53c2bfbf4a",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/workbenchThemeService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/themeService.ts",
+      "upstreamBlob": "5cf50f913a8922889992b3892901dd38882c6a91",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/themeService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/worker/webWorkerBootstrap.ts",
+      "upstreamBlob": "946c3e98be95ddb8d9a3948f4634ccb297a8573a",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/worker/webWorkerBootstrap.ts"
+    },
+    {
+      "upstreamPath": "src/vs/amdX.ts",
+      "upstreamBlob": "4f0c0528080acfad57de151601864e6258ee54ed",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "General module resolver is excluded; exact packaged runtime loaders replace its call sites.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
+    },
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Microsoft MIT attribution retained.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.worker.ts",
+      "localPath": "src/prctr/workbench/services/textMate/common/backgroundTokenization/textMateWorkerProtocol.ts",
+      "upstreamBlob": "157e314ba7d527a14fcf3f15d510814595bb6507",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Extract the original complete ICreateData, IValidGrammarDefinitionDTO, StateDeltas and IRawModelData declarations and all eight public worker method signatures into a common contract. Renderer and worker share the protocol without renderer imports of worker implementation. Worker algorithms and source create entrypoint are retained in the original owner.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "1081f24429f0cf63873b15830d126cfaaf877dd8b354eb49d524a5294adf1089",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": [
+        "LICENSE.txt"
+      ],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [],
+  "divergences": [
+    {
+      "id": "packaged-assets",
+      "summary": "Replace AMD/node_modules and URL fetch acquisition with the exact pinned TextMate/Oniguruma package and grammar assets; retain grammar factories and token/state algorithms. Worker descriptor identity selects only the bundled textMateWorker.",
+      "localPaths": [
+        "src/prctr/workbench/services/textMate/common/packagedTextMateAssets.ts",
+        "src/prctr/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.worker.ts",
+        "src/prctr/workbench/services/textMate/browser/backgroundTokenization/textMateWorkerTokenizerController.ts",
+        "src/prctr/workbench/services/textMate/browser/backgroundTokenization/worker/textMateWorkerTokenizer.ts",
+        "src/prctr/workbench/services/textMate/browser/backgroundTokenization/threadedBackgroundTokenizerFactory.ts"
+      ],
+      "verificationRefs": [
+        "real-textmate"
+      ]
+    },
+    {
+      "id": "static-grammar-contributions",
+      "summary": "X-01 removes dynamic extension-point registration and external grammar validation from the feature; a literal grammar catalog supplies the original complete grammar definitions. Scope/injection registry and supported/absent-language semantics are preserved. TMGrammars remains recovered source evidence, not an activated extension registration.",
+      "localPaths": [
+        "src/prctr/workbench/services/textMate/browser/textMateTokenizationFeatureImpl.ts"
+      ],
+      "verificationRefs": [
+        "real-textmate"
+      ]
+    },
+    {
+      "id": "no-source-debugging",
+      "summary": "EDIT-13 excludes startDebugMode and its notification/progress dependency: enabling Oniguruma debug printing would disclose Settings source. No logging command or replacement stub is registered. Tokenization timing uses the original disabled telemetry service in composition.",
+      "localPaths": [
+        "src/prctr/workbench/services/textMate/browser/textMateTokenizationFeatureImpl.ts",
+        "src/prctr/workbench/services/textMate/browser/textMateTokenizationFeature.ts"
+      ],
+      "verificationRefs": [
+        "real-textmate"
+      ]
+    },
+    {
+      "id": "theme-and-lifetime",
+      "summary": "Use the same full resolved window theme and a constructed stylesheet compatible with production CSP. Explicitly dispose the lazy grammar factory, stylesheet and background tokenizer factory with the feature.",
+      "localPaths": [
+        "src/prctr/workbench/services/textMate/browser/textMateTokenizationFeatureImpl.ts",
+        "src/prctr/workbench/services/editor/browser/editorThemeService.ts"
+      ],
+      "verificationRefs": [
+        "real-textmate"
+      ]
+    },
+    {
+      "id": "shared-worker-contract",
+      "summary": "Move complete environment-neutral tokenization helpers and worker host channel to common. Extract the full renderer-facing protocol from the worker class into an interface implemented by that class; renderer callers use the shared contract. The packaged grammar adapter remains the sole static asset and npm-loader boundary. Worker-only compiler coverage includes the actual TextMate worker entrypoint. No tokenization method or algorithm is removed.",
+      "localPaths": [
+        "src/prctr/workbench/services/textMate/common/packagedTextMateAssets.ts",
+        "src/prctr/workbench/services/textMate/common/tokenizationSupport/textMateTokenizationSupport.ts",
+        "src/prctr/workbench/services/textMate/common/tokenizationSupport/tokenizationSupportWithLineLimit.ts",
+        "src/prctr/workbench/services/textMate/common/backgroundTokenization/textMateWorkerHost.ts",
+        "src/prctr/workbench/services/textMate/common/backgroundTokenization/textMateWorkerProtocol.ts",
+        "src/prctr/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.worker.ts",
+        "src/prctr/workbench/services/textMate/browser/backgroundTokenization/textMateWorkerTokenizerController.ts",
+        "src/prctr/workbench/services/textMate/browser/backgroundTokenization/threadedBackgroundTokenizerFactory.ts"
+      ],
+      "verificationRefs": [
+        "real-textmate"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "id": "real-textmate",
+      "kind": "test",
+      "path": "test/browser/editor/textMateAssets.test.ts",
+      "obligation": "Verify the source mechanism and explicit product seams; production integration and complete specification review are separate mandatory acceptance gates."
+    }
+  ]
+}

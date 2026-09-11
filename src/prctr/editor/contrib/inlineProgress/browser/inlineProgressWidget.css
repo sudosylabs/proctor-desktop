@@ -1,0 +1,31 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-contributions*/@layer controls {:where(.prctr-editor-scope) .inline-editor-progress-decoration {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+}:where(.prctr-editor-scope) .inline-progress-widget  {
+	justify-content: center;
+	align-items: center;
+}:where(.prctr-editor-scope) .inline-progress-widget .icon {
+}:where(.prctr-editor-scope) .inline-progress-widget:hover .icon {
+	animation: none;
+}:where(.prctr-editor-scope) .inline-progress-widget:hover .icon::before {
+	content: var(--prctr-theme-icon-x-content);
+	font-family: var(--prctr-theme-icon-x-font-family);
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .inline-progress-widget  {
+	display: flex !important;
+}
+
+:where(.prctr-editor-scope) .inline-progress-widget .icon {
+	font-size: 80% !important;
+}
+
+:where(.prctr-editor-scope) .inline-progress-widget:hover .icon {
+	font-size: 90% !important;
+}
+}

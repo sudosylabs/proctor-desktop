@@ -1,0 +1,952 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "editor-browser-services",
+  "admission": {
+    "workflow": "Supply the concrete upstream code-editor, accessibility, interaction, marker, icon-theme and worker services behind Proctor-owned window configuration and resource boundaries.",
+    "callers": [
+      "src/prctr/workbench/services/editor/browser/editorThemeService.ts",
+      "src/prctr/workbench/services/editor/browser/codeEditorService.ts",
+      "src/prctr/workbench/services/editor/browser/editorWorkerService.ts"
+    ],
+    "interface": "src/prctr/workbench/services/editor/browser/codeEditorService.ts",
+    "decision": "docs/architecture/user-settings.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "src/vs/editor/browser/services/abstractCodeEditorService.ts",
+      "localPath": "src/prctr/editor/browser/services/abstractCodeEditorService.ts",
+      "upstreamBlob": "abb76fe6ebfb51e7e99c7e92b464ce9cf7392ffb",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "94d0e85dd67b4a052781380be6220de0c186689069f142c06c9864e567eea436",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/layout/browser/layoutService.ts",
+      "localPath": "src/prctr/platform/layout/browser/layoutService.ts",
+      "upstreamBlob": "8f5ecfb47ce0209d325cbcaa7f8a0b046f57a0b6",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "10ffdc1e18c0d3b780ec1dff00f0fff29c6fb56b6b5be1ccf775d0f1cda7604a",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/accessibility/browser/accessibilityService.ts",
+      "localPath": "src/prctr/platform/accessibility/browser/accessibilityService.ts",
+      "upstreamBlob": "2cc0559cbd87de904af382edc99f5a65e49f4826",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "e57d855e5f35f22de47acb3fafc0ed8fa5ebb3d187a955b184ef63046ba30291",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/userInteraction/browser/userInteractionServiceImpl.ts",
+      "localPath": "src/prctr/platform/userInteraction/browser/userInteractionServiceImpl.ts",
+      "upstreamBlob": "e0431c43297d6fecb6d09fe761c13f91a40e6746",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "eb994a5aacc03424cbdd38fa06affe5d5adc895b16db1dd5f2a0244f2c06e5d0",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/markers/common/markerService.ts",
+      "localPath": "src/prctr/platform/markers/common/markerService.ts",
+      "upstreamBlob": "f5ef229288a0354851777ac054b03f8e06e50386",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "7bd91264396b6b7b2ac90133cfe26ee97dd759652988778752b3014094f96471",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/services/markerDecorationsService.ts",
+      "localPath": "src/prctr/editor/common/services/markerDecorationsService.ts",
+      "upstreamBlob": "c25a85a6915b49de62a73082ef578ca8512bb92f",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "44843aae57f060158f463cc2aca2372641743f994d26bf28924404351813eec1",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/browser/productIconThemeData.ts",
+      "localPath": "src/prctr/workbench/services/themes/browser/productIconThemeData.ts",
+      "upstreamBlob": "26b01f4101ab7278d1435d3a4495c9574359dfa7",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "9058a84fd29b30e2c05c3466ac540cb942ff4694f66cba6f92a98aeb72c5c041",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/services/getIconClasses.ts",
+      "localPath": "src/prctr/editor/common/services/getIconClasses.ts",
+      "upstreamBlob": "cb60d8b7bf52c36831ee980e72301bcb9415dbe6",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "b1cf357b49abe74e24f2658adf024cc60284b489a3346845b3bb9fe4dc11bdf0",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/browser/fileIconThemeData.ts",
+      "localPath": "src/prctr/workbench/services/themes/browser/fileIconThemeData.ts",
+      "upstreamBlob": "48811cc86d26f44e6716f441a10f0681f7e74cb5",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "f8e36e05645c87d21c6a1f6143212f61c3333bb030187f3bf96925417eef5390",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/platform/webWorker/browser/webWorkerServiceImpl.ts",
+      "localPath": "src/prctr/platform/webWorker/browser/webWorkerServiceImpl.ts",
+      "upstreamBlob": "b60b03f8606946855f8a5f9a4ce33f20970691ff",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "dedfdb7be62492dd5e42ecc5c444ec3c991f4f2d86772c32e24dc6331562cfc3",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/base/common/worker/webWorkerBootstrap.ts",
+      "localPath": "src/prctr/base/common/worker/webWorkerBootstrap.ts",
+      "upstreamBlob": "946c3e98be95ddb8d9a3948f4634ccb297a8573a",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "07d1deea02d892032fa6eeb5fc0cf16da1284c94f5e30eedc741dd938a9ae529",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/services/editorWebWorkerMain.ts",
+      "localPath": "src/prctr/editor/browser/worker/editorWebWorkerMain.ts",
+      "upstreamBlob": "2094b0f73b58c5fb3f3d19b554bb103f1ff34c98",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "d6e5ce6d7d85d64b4034a9935e5a1c62722fddcd5045601676219c9e240288ba",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/dom.ts",
+      "upstreamBlob": "6d7ea0fbd8ee3e0f68cf8feaaaa6f090aaee5742",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/browser/dom.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/domStylesheets.ts",
+      "upstreamBlob": "72fa42df1a6a537fb1138c0729eef3531209b36b",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/browser/domStylesheets.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/cssValue.ts",
+      "upstreamBlob": "84cee8522ae9db2c7d4773e4a60ca6f7f9e695e2",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/browser/cssValue.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/event.ts",
+      "upstreamBlob": "cf5fd39b7389b12890a85fd2159e35326d5b7a60",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/event.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/lifecycle.ts",
+      "upstreamBlob": "a75cbb1cce3099e07bff3cc9c751d634ae30dfdd",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/lifecycle.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/linkedList.ts",
+      "upstreamBlob": "b436c611717b15d89154d7f059e00164dc98ec37",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/linkedList.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/strings.ts",
+      "upstreamBlob": "1c50375d05ea7701229c8de87ae8281f750cb4af",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/strings.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/uri.ts",
+      "upstreamBlob": "d148dc10f26bf8a19615e052df3dde23c481099c",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/uri.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/browser/editorBrowser.ts",
+      "upstreamBlob": "2f185f48f093a3ad44fbb18e6e6e181eed411037",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/browser/editorBrowser.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/browser/services/codeEditorService.ts",
+      "upstreamBlob": "570d91f6c2f0449d38300d698ad2fa216e7f4ac3",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/browser/services/codeEditorService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/editorCommon.ts",
+      "upstreamBlob": "df56a1beab5d8217131df121e2802a1f9318ead1",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/editorCommon.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model.ts",
+      "upstreamBlob": "34c57f255760cfa7630139cf9300ad9c4889aaad",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/model.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/editor/common/editor.ts",
+      "upstreamBlob": "2de7cfda6ae63fd6a289580fedac7e58e7fc0485",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/editor/common/editor.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/themeService.ts",
+      "upstreamBlob": "5cf50f913a8922889992b3892901dd38882c6a91",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/themeService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/themables.ts",
+      "upstreamBlob": "dcc1369e5932df0c4206e8f0628c8b5386df11b3",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/themables.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/ui/aria/aria.ts",
+      "upstreamBlob": "f4f9ef9688aad0c44b547ba28bc6c29781d2a980",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/browser/ui/aria/aria.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/window.ts",
+      "upstreamBlob": "ab920e18349ace49c32f92eb5d0c946abfbfe366",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/browser/window.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/accessibility/common/accessibility.ts",
+      "upstreamBlob": "741d5fffc5b34361b6e5bb75d0d1c88380cf3ae8",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/accessibility/common/accessibility.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/configuration/common/configuration.ts",
+      "upstreamBlob": "55eaae5451c234878ee71f9245edb12a708a22ae",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/configuration/common/configuration.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/contextkey/common/contextkey.ts",
+      "upstreamBlob": "598b2ccb6c37ed0dca560082d8650e05ecbf12d6",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/contextkey/common/contextkey.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/instantiation.ts",
+      "upstreamBlob": "b879acb0ee8da5a824321bd1b9925219fe07af94",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/observable.ts",
+      "upstreamBlob": "86ac5971a277983945586868dc1a2a05a6ac9e8f",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/observable.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/instantiation/common/extensions.ts",
+      "upstreamBlob": "e59cc837cc633dac0445d59b7d03dbc6c9dc783a",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/instantiation/common/extensions.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/userInteraction/browser/userInteractionService.ts",
+      "upstreamBlob": "bb505bedd7485e1a2592f00214966983b70896f1",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/userInteraction/browser/userInteractionService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/arrays.ts",
+      "upstreamBlob": "9e12edbab2a0ce7c0ee88f2d35e11b9896272072",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/arrays.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/iterator.ts",
+      "upstreamBlob": "1e8c84d9af9e08d9e380ad82fb4fc7f5df6fd493",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/iterator.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/map.ts",
+      "upstreamBlob": "1bbb7acf94ec7cd1bec2f12a7a4d8e7f6d0fea61",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/map.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/network.ts",
+      "upstreamBlob": "871560d2ab0eb9496824c44869580461e21c2b99",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/network.ts"
+    },
+    {
+      "upstreamPath": "src/vs/nls.ts",
+      "upstreamBlob": "8383ae24d96d4d9361921b89bdf48519d13d4260",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/vscodeNls.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/markers/common/markers.ts",
+      "upstreamBlob": "5e5408eb57e2aaa9873a28d22e337ec2a8d1e20b",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/markers/common/markers.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/model/intervalTree.ts",
+      "upstreamBlob": "ada8cbdffd181260c7244b6f59873631a21e7b96",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/model/intervalTree.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/editorColorRegistry.ts",
+      "upstreamBlob": "e71205d88c27d2cab0f292a7aa5761ae7c59869f",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/editorColorRegistry.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/services/model.ts",
+      "upstreamBlob": "10372165683512c362ae22a4a4d6bd460031012f",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/services/model.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/core/range.ts",
+      "upstreamBlob": "b42088e53a10e0b9a8acf3babb4d91b9f5cb8052",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/core/range.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/services/markerDecorations.ts",
+      "upstreamBlob": "97325a684412fb8c2bb692e5517a7d2b5f39d65e",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/services/markerDecorations.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/colorRegistry.ts",
+      "upstreamBlob": "bc0b044b534a3c96b559eb39f5bb33a5532c3b76",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/colorRegistry.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/collections.ts",
+      "upstreamBlob": "de1b28914548a9e77d5abbc40ebc2de275fc34c9",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/collections.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/path.ts",
+      "upstreamBlob": "c61fa5831cfe837e4934298c01b594567dbeecf8",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/path.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/resources.ts",
+      "upstreamBlob": "089ee62de037ea92f0724171de53a16ecb505000",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/resources.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/json.ts",
+      "upstreamBlob": "d7ac069d3d162b3f69930404f7d698e990727de0",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/json.ts"
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/themes/common/workbenchThemeService.ts",
+      "upstreamBlob": "74edcddac8aa416cd9ee432e36b47b53c2bfbf4a",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/workbenchThemeService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/jsonErrorMessages.ts",
+      "upstreamBlob": "1a876fea5bada6e0316b91bea50aceb4fd751748",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/jsonErrorMessages.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/storage/common/storage.ts",
+      "upstreamBlob": "2e967d799f77892580d9d195aa4b07a6fc4a7044",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Exact consumed resource/storage input operations; icon defaults use original model factories without activating user extension/theme discovery.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/themeDataAdapters.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/types.ts",
+      "upstreamBlob": "154d8199690a162dfc37895125348e5a64b7d848",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/types.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/log/common/log.ts",
+      "upstreamBlob": "27e542896df074a88f1ee1f587b5695b12e2ca7e",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/log/common/log.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/iconRegistry.ts",
+      "upstreamBlob": "9feac0c4ca494a1b344161f70b9f346876066d85",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/iconRegistry.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/extensionResourceLoader/common/extensionResourceLoader.ts",
+      "upstreamBlob": "28a25db97f004f3c81c9aeca39053adc9428cf5a",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Exact consumed resource/storage input operations; icon defaults use original model factories without activating user extension/theme discovery.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/theme/common/themeDataAdapters.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/language.ts",
+      "upstreamBlob": "79e7d7bb3f7d2ae09ae96069dd9691d871f3f605",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/languages/language.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/modesRegistry.ts",
+      "upstreamBlob": "a61af971493bdc5a3bf82c5e07d250f98fa93a98",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/languages/modesRegistry.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/files/common/files.ts",
+      "upstreamBlob": "4181a930379caa56bcdd02202162685decddbd22",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/files/common/files.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/trustedTypes.ts",
+      "upstreamBlob": "310ce79f0f917c4084a19de04e6fe8cbfc27b0af",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/browser/trustedTypes.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/errors.ts",
+      "upstreamBlob": "35bb755608e5e9b2983a5d6de61364f8da0573ea",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/errors.ts"
+    },
+    {
+      "upstreamPath": "src/vs/base/common/worker/webWorker.ts",
+      "upstreamBlob": "0ad11b838aad9fed6798e0803da18e16bf1070db",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/base/common/worker/webWorker.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/webWorker/browser/webWorkerDescriptor.ts",
+      "upstreamBlob": "1f579c85bb9bb423bb165f8931f160631a0160b9",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/webWorker/browser/webWorkerDescriptor.ts"
+    },
+    {
+      "upstreamPath": "src/vs/platform/webWorker/browser/webWorkerService.ts",
+      "upstreamBlob": "fd5150435af63d461e1f33c1f9484a90e311567d",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/platform/webWorker/browser/webWorkerService.ts"
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/services/editorWebWorker.ts",
+      "upstreamBlob": "79102411cb8abeeecf6d8534eee7355f1230dc9e",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localInterface": "src/prctr/editor/common/services/editorWebWorker.ts"
+    },
+    {
+      "upstreamPath": "LICENSE.txt",
+      "upstreamBlob": "0ac28ee234d232ac0691f39cebf95bf6b2a763a5",
+      "category": "license",
+      "disposition": "evidence-only",
+      "rationale": "Retained Microsoft MIT notice.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": [
+        "LICENSE.txt"
+      ],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "window-theme",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/services/editor/browser/editorThemeService.ts",
+      "rationale": "Forward the real window color/token model. Original default icon factories provide immutable packaged icon behavior; no user icon extension discovery."
+    },
+    {
+      "id": "window-layout",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/services/editor/browser/editorLayoutService.ts",
+      "rationale": "Project the real container geometry, observers, offsets, focus and styles readiness for one authenticated renderer. Foreign windows are rejected."
+    },
+    {
+      "id": "packaged-worker",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/services/editor/browser/editorWorkerService.ts",
+      "rationale": "Retain the upstream startup/localization/transport/disposal protocol, mapping only the exact accepted descriptor to its packaged worker file."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "resource-inputs",
+      "summary": "Use the consumed storage/resource interfaces already owned by the full Proctor theme model. Original icon parsing and matching remain intact. Only original no-icon/default-product factories are selected for this product.",
+      "localPaths": [
+        "src/prctr/workbench/services/themes/browser/fileIconThemeData.ts",
+        "src/prctr/workbench/services/themes/browser/productIconThemeData.ts"
+      ],
+      "verificationRefs": [
+        "browser-contracts"
+      ]
+    },
+    {
+      "id": "worker-entrypoint",
+      "summary": "Relocate the complete editor worker startup module under the explicit browser/worker owner. The workbench adapter rejects unknown or forged descriptors and uses the existing worker bootstrap without a general resource resolver.",
+      "localPaths": [
+        "src/prctr/editor/browser/worker/editorWebWorkerMain.ts",
+        "src/prctr/workbench/services/editor/browser/editorWorkerService.ts"
+      ],
+      "verificationRefs": [
+        "real-worker"
+      ]
+    },
+    {
+      "id": "explicit-type-imports",
+      "summary": "Express erased upstream imports as type-only without changing emitted runtime code; keep concrete callbacks, event ownership and lifecycle.",
+      "localPaths": [
+        "src/prctr/editor/browser/services/abstractCodeEditorService.ts",
+        "src/prctr/platform/layout/browser/layoutService.ts",
+        "src/prctr/platform/accessibility/browser/accessibilityService.ts",
+        "src/prctr/platform/userInteraction/browser/userInteractionServiceImpl.ts",
+        "src/prctr/platform/markers/common/markerService.ts",
+        "src/prctr/editor/common/services/markerDecorationsService.ts",
+        "src/prctr/workbench/services/themes/browser/productIconThemeData.ts",
+        "src/prctr/editor/common/services/getIconClasses.ts",
+        "src/prctr/workbench/services/themes/browser/fileIconThemeData.ts",
+        "src/prctr/platform/webWorker/browser/webWorkerServiceImpl.ts",
+        "src/prctr/base/common/worker/webWorkerBootstrap.ts",
+        "src/prctr/editor/browser/worker/editorWebWorkerMain.ts"
+      ],
+      "verificationRefs": [
+        "browser-contracts"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "id": "browser-contracts",
+      "kind": "check",
+      "path": "build/tsconfig.browser.json",
+      "obligation": "Compile full concrete services with the actual editor and theme contracts; actual rendered integration remains required separately."
+    },
+    {
+      "id": "real-worker",
+      "kind": "test",
+      "path": "test/browser/editor/editorWorker.test.ts",
+      "obligation": "Exercise repeated actual sandboxed worker startup, descriptor rejection, model mirroring/incremental updates/removal, and exact legacy/advanced/external JS/WASM diff backends."
+    }
+  ]
+}

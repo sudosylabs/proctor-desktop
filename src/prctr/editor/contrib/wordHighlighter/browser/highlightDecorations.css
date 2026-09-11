@@ -1,0 +1,29 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-contributions*/@layer controls {:where(.prctr-editor-scope) .monaco-editor .focused .selectionHighlight {
+	background-color: var(--prctr-theme-editor-selectionHighlightBackground);
+	box-sizing: border-box;
+	border: 1px solid var(--prctr-theme-editor-selectionHighlightBorder);
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .focused .selectionHighlight,:where(.prctr-editor-scope) .monaco-editor.hc-light .focused .selectionHighlight {
+	border-style: dotted;
+}:where(.prctr-editor-scope) .monaco-editor .wordHighlight {
+	background-color: var(--prctr-theme-editor-wordHighlightBackground);
+	box-sizing: border-box;
+	border: 1px solid var(--prctr-theme-editor-wordHighlightBorder);
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .wordHighlight,:where(.prctr-editor-scope) .monaco-editor.hc-light .wordHighlight {
+	border-style: dotted;
+}:where(.prctr-editor-scope) .monaco-editor .wordHighlightStrong {
+	background-color: var(--prctr-theme-editor-wordHighlightStrongBackground);
+	box-sizing: border-box;
+	border: 1px solid var(--prctr-theme-editor-wordHighlightStrongBorder);
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .wordHighlightStrong,:where(.prctr-editor-scope) .monaco-editor.hc-light .wordHighlightStrong {
+	border-style: dotted;
+}:where(.prctr-editor-scope) .monaco-editor .wordHighlightText {
+	background-color: var(--prctr-theme-editor-wordHighlightTextBackground);
+	box-sizing: border-box;
+	border: 1px solid var(--prctr-theme-editor-wordHighlightTextBorder);
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .wordHighlightText,:where(.prctr-editor-scope) .monaco-editor.hc-light .wordHighlightText {
+	border-style: dotted;
+}
+}

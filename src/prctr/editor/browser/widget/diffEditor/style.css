@@ -1,0 +1,296 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-presentation*//* ---------- DiffEditor ---------- *//* colors not externalized: using transparancy on background *//* ---------- Diff ---------- *//* ---------- Inline Diff ---------- */@layer controls {:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines-widget {
+	width: 100%;
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines {
+	height: 0px; /* The children each have a fixed height, the transform confuses the browser */
+	transform: translate(0px, -10px);
+	font-size: 13px;
+	line-height: 14px;
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines:not(.dragging) .top:hover,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines:not(.dragging) .bottom:hover,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top.dragging,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom.dragging {
+	background-color: var(--prctr-theme-focusBorder);
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom {
+	transition: background-color 0.1s ease-out;
+	height: 4px;
+	background-color: transparent;
+	background-clip: padding-box;
+	border-bottom: 2px solid transparent;
+	border-top: 4px solid transparent;
+	/*cursor: n-resize;*/
+}:where(.prctr-editor-scope) .monaco-editor.draggingUnchangedRegion.canMoveTop:not(.canMoveBottom) *,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top.canMoveTop:not(.canMoveBottom),:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom.canMoveTop:not(.canMoveBottom) {
+}:where(.prctr-editor-scope) .monaco-editor.draggingUnchangedRegion:not(.canMoveTop).canMoveBottom *,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top:not(.canMoveTop).canMoveBottom,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom:not(.canMoveTop).canMoveBottom {
+}:where(.prctr-editor-scope) .monaco-editor.draggingUnchangedRegion.canMoveTop.canMoveBottom *,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top.canMoveTop.canMoveBottom,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom.canMoveTop.canMoveBottom {
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top {
+	transform: translate(0px, 4px);
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom {
+	transform: translate(0px, -6px);
+}:where(.prctr-editor-scope) .monaco-editor .diff-unchanged-lines {
+	background: var(--prctr-theme-diffEditor-unchangedCodeBackground);
+}:where(.prctr-editor-scope) .monaco-editor .noModificationsOverlay {
+	z-index: 1;
+	background: var(--prctr-theme-editor-background);
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .center {
+	background: var(--prctr-theme-diffEditor-unchangedRegionBackground);
+	color: var(--prctr-theme-diffEditor-unchangedRegionForeground);
+	overflow: hidden;
+	display: block;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	height: 24px;
+	box-shadow: inset 0 -5px 5px -7px var(--prctr-theme-diffEditor-unchangedRegionShadow), inset 0 5px 5px -7px var(--prctr-theme-diffEditor-unchangedRegionShadow);
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .first {
+	justify-content: center;
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .center span.codicon {
+	vertical-align: middle;
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .center a:hover .codicon {
+	cursor: pointer;
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines div.breadcrumb-item {
+	cursor: pointer;
+}:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines div.breadcrumb-item:hover {
+	color: var(--prctr-theme-editorLink-activeForeground);
+}:where(.prctr-editor-scope) .monaco-editor .movedOriginal {
+	border: 2px solid var(--prctr-theme-diffEditor-move-border);
+}:where(.prctr-editor-scope) .monaco-editor .movedModified {
+	border: 2px solid var(--prctr-theme-diffEditor-move-border);
+}:where(.prctr-editor-scope) .monaco-editor .movedOriginal.currentMove,:where(.prctr-editor-scope) .monaco-editor .movedModified.currentMove {
+	border: 2px solid var(--prctr-theme-diffEditor-moveActive-border);
+}:where(.prctr-editor-scope) .monaco-diff-editor .moved-blocks-lines path.currentMove {
+	stroke: var(--prctr-theme-diffEditor-moveActive-border);
+}:where(.prctr-editor-scope) .monaco-diff-editor .moved-blocks-lines path {
+	pointer-events: visiblestroke;
+}:where(.prctr-editor-scope) .monaco-diff-editor .moved-blocks-lines .arrow {
+	fill: var(--prctr-theme-diffEditor-move-border);
+}:where(.prctr-editor-scope) .monaco-diff-editor .moved-blocks-lines .arrow.currentMove {
+	fill: var(--prctr-theme-diffEditor-moveActive-border);
+}:where(.prctr-editor-scope) .monaco-diff-editor .moved-blocks-lines .arrow-rectangle {
+	fill: var(--prctr-theme-editor-background);
+}:where(.prctr-editor-scope) .monaco-diff-editor .moved-blocks-lines {
+	position: absolute;
+	pointer-events: none;
+}:where(.prctr-editor-scope) .monaco-diff-editor .moved-blocks-lines path {
+	fill: none;
+	stroke: var(--prctr-theme-diffEditor-move-border);
+	stroke-width: 2;
+}:where(.prctr-editor-scope) .monaco-editor .char-delete.diff-range-empty {
+	margin-left: -1px;
+	border-left: solid var(--prctr-theme-diffEditor-removedTextBackground) 3px;
+}:where(.prctr-editor-scope) .monaco-editor .char-insert.diff-range-empty {
+	border-left: solid var(--prctr-theme-diffEditor-insertedTextBackground) 3px;
+}:where(.prctr-editor-scope) .monaco-editor .fold-unchanged {
+	cursor: pointer;
+}:where(.prctr-editor-scope) .monaco-diff-editor .diff-moved-code-block {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: -4px;
+}:where(.prctr-editor-scope) .monaco-diff-editor .diff-moved-code-block .action-bar .action-label.codicon {
+	width: 12px;
+	height: 12px;
+	font-size: 12px;
+}:where(.prctr-editor-scope) .monaco-diff-editor .diffOverview {
+	z-index: 9;
+}:where(.prctr-editor-scope) .monaco-diff-editor .diffOverview .diffViewport {
+	z-index: 10;
+}:where(.prctr-editor-scope) .monaco-diff-editor.vs			.diffOverview { background: rgba(0, 0, 0, 0.03); }:where(.prctr-editor-scope) .monaco-diff-editor.vs-dark		.diffOverview { background: rgba(255, 255, 255, 0.01); }:where(.prctr-editor-scope) .prctr-scrollable-element.modified-in-monaco-diff-editor.vs		.scrollbar { background: rgba(0,0,0,0); }:where(.prctr-editor-scope) .prctr-scrollable-element.modified-in-monaco-diff-editor.vs-dark	.scrollbar { background: rgba(0,0,0,0); }:where(.prctr-editor-scope) .prctr-scrollable-element.modified-in-monaco-diff-editor.hc-black	.scrollbar { background: none; }:where(.prctr-editor-scope) .prctr-scrollable-element.modified-in-monaco-diff-editor.hc-light	.scrollbar { background: none; }:where(.prctr-editor-scope) .prctr-scrollable-element.modified-in-monaco-diff-editor .slider {
+	z-index: 10;
+}:where(.prctr-editor-scope) .modified-in-monaco-diff-editor				.slider.active { background: rgba(171, 171, 171, .4); }:where(.prctr-editor-scope) .modified-in-monaco-diff-editor.hc-black	.slider.active { background: none; }:where(.prctr-editor-scope) .modified-in-monaco-diff-editor.hc-light	.slider.active { background: none; }:where(.prctr-editor-scope) .monaco-editor .insert-sign,:where(.prctr-editor-scope) .monaco-diff-editor .insert-sign,:where(.prctr-editor-scope) .monaco-editor .delete-sign,:where(.prctr-editor-scope) .monaco-diff-editor .delete-sign {
+	align-items: center;
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .insert-sign,:where(.prctr-editor-scope) .monaco-diff-editor.hc-black .insert-sign,:where(.prctr-editor-scope) .monaco-editor.hc-black .delete-sign,:where(.prctr-editor-scope) .monaco-diff-editor.hc-black .delete-sign,:where(.prctr-editor-scope) .monaco-editor.hc-light .insert-sign,:where(.prctr-editor-scope) .monaco-diff-editor.hc-light .insert-sign,:where(.prctr-editor-scope) .monaco-editor.hc-light .delete-sign,:where(.prctr-editor-scope) .monaco-diff-editor.hc-light .delete-sign {
+	opacity: 1;
+}:where(.prctr-editor-scope) .monaco-editor .inline-deleted-margin-view-zone {
+	text-align: right;
+}:where(.prctr-editor-scope) .monaco-editor .inline-added-margin-view-zone {
+	text-align: right;
+}:where(.prctr-editor-scope) .monaco-editor .arrow-revert-change {
+	z-index: 10;
+	position: absolute;
+}:where(.prctr-editor-scope) .monaco-editor .arrow-revert-change:hover {
+	cursor: pointer;
+}:where(.prctr-editor-scope) .monaco-editor .view-zones .view-lines .view-line span {
+	display: inline-block;
+}:where(.prctr-editor-scope) .monaco-editor .margin-view-zones .lightbulb-glyph:hover {
+	cursor: pointer;
+}:where(.prctr-editor-scope) .monaco-editor .char-insert,:where(.prctr-editor-scope) .monaco-diff-editor .char-insert {
+	background-color: var(--prctr-theme-diffEditor-insertedTextBackground);
+}:where(.prctr-editor-scope) .monaco-editor .line-insert,:where(.prctr-editor-scope) .monaco-diff-editor .line-insert {
+	background-color: var(--prctr-theme-diffEditor-insertedLineBackground, var(--prctr-theme-diffEditor-insertedTextBackground));
+}:where(.prctr-editor-scope) .monaco-editor .line-insert,:where(.prctr-editor-scope) .monaco-editor .char-insert {
+	box-sizing: border-box;
+	border: 1px solid var(--prctr-theme-diffEditor-insertedTextBorder);
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .line-insert,:where(.prctr-editor-scope) .monaco-editor.hc-light .line-insert,:where(.prctr-editor-scope) .monaco-editor.hc-black .char-insert,:where(.prctr-editor-scope) .monaco-editor.hc-light .char-insert {
+	border-style: dashed;
+}:where(.prctr-editor-scope) .monaco-editor .line-delete,:where(.prctr-editor-scope) .monaco-editor .char-delete {
+	box-sizing: border-box;
+	border: 1px solid var(--prctr-theme-diffEditor-removedTextBorder);
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .line-delete,:where(.prctr-editor-scope) .monaco-editor.hc-light .line-delete,:where(.prctr-editor-scope) .monaco-editor.hc-black .char-delete,:where(.prctr-editor-scope) .monaco-editor.hc-light .char-delete {
+	border-style: dashed;
+}:where(.prctr-editor-scope) .monaco-editor .inline-added-margin-view-zone,:where(.prctr-editor-scope) .monaco-editor .gutter-insert,:where(.prctr-editor-scope) .monaco-diff-editor .gutter-insert {
+	background-color: var(--prctr-theme-diffEditorGutter-insertedLineBackground, var(--prctr-theme-diffEditor-insertedLineBackground), var(--prctr-theme-diffEditor-insertedTextBackground));
+}:where(.prctr-editor-scope) .monaco-editor .char-delete,:where(.prctr-editor-scope) .monaco-diff-editor .char-delete,:where(.prctr-editor-scope) .monaco-editor .inline-deleted-text {
+	background-color: var(--prctr-theme-diffEditor-removedTextBackground);
+}:where(.prctr-editor-scope) .monaco-editor .inline-deleted-text {
+	text-decoration: line-through;
+}:where(.prctr-editor-scope) .monaco-editor .line-delete,:where(.prctr-editor-scope) .monaco-diff-editor .line-delete {
+	background-color: var(--prctr-theme-diffEditor-removedLineBackground, var(--prctr-theme-diffEditor-removedTextBackground));
+}:where(.prctr-editor-scope) .monaco-editor .inline-deleted-margin-view-zone,:where(.prctr-editor-scope) .monaco-editor .gutter-delete,:where(.prctr-editor-scope) .monaco-diff-editor .gutter-delete {
+	background-color: var(--prctr-theme-diffEditorGutter-removedLineBackground, var(--prctr-theme-diffEditor-removedLineBackground), var(--prctr-theme-diffEditor-removedTextBackground));
+}:where(.prctr-editor-scope) .monaco-diff-editor.side-by-side .editor.modified {
+	box-shadow: -6px 0 5px -5px var(--prctr-theme-scrollbar-shadow);
+	border-left: 1px solid var(--prctr-theme-diffEditor-border);
+}:where(.prctr-editor-scope) .monaco-diff-editor.side-by-side .editor.original {
+	box-shadow: 6px 0 5px -5px var(--prctr-theme-scrollbar-shadow);
+	border-right: 1px solid var(--prctr-theme-diffEditor-border);
+}:where(.prctr-editor-scope) .monaco-diff-editor .diffViewport {
+	background: var(--prctr-theme-scrollbarSlider-background);
+}:where(.prctr-editor-scope) .monaco-diff-editor .diffViewport:hover {
+	background: var(--prctr-theme-scrollbarSlider-hoverBackground);
+}:where(.prctr-editor-scope) .monaco-diff-editor .diffViewport:active {
+	background: var(--prctr-theme-scrollbarSlider-activeBackground);
+}:where(.prctr-editor-scope) .monaco-editor .diagonal-fill {
+	background-image: linear-gradient(
+		-45deg,
+		var(--prctr-theme-diffEditor-diagonalFill) 12.5%,
+		#0000 12.5%, #0000 50%,
+		var(--prctr-theme-diffEditor-diagonalFill) 50%, var(--prctr-theme-diffEditor-diagonalFill) 62.5%,
+		#0000 62.5%, #0000 100%
+	);
+	background-size: 8px 8px;
+}:where(.prctr-editor-scope) .monaco-diff-editor .gutter {
+	position: relative;
+	overflow: hidden;
+	flex-shrink: 0;
+	flex-grow: 0;
+
+	& > div {
+		position: absolute;
+	}
+
+	.gutterItem {
+		opacity: 0;
+		transition: opacity 0.7s;
+
+		&.showAlways {
+			opacity: 1;
+			transition: none;
+		}
+
+		&.noTransition {
+			transition: none;
+		}
+	}
+
+	&:hover .gutterItem {
+		opacity: 1;
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	.gutterItem {
+		.background {
+			position: absolute;
+			height: 100%;
+			left: 50%;
+			width: 1px;
+
+			border-left: 2px var(--prctr-theme-menu-separatorBackground) solid;
+		}
+
+		.buttons {
+			position: absolute;
+			/*height: 100%;*/
+			width: 100%;
+
+			display: flex;
+			justify-content: center;
+			align-items: center;
+
+			.monaco-toolbar {
+				height: fit-content;
+				.monaco-action-bar  {
+					line-height: 1;
+
+					.actions-container {
+						width: fit-content;
+						border-radius: 4px;
+						background: var(--prctr-theme-editorGutter-itemBackground);
+
+						.action-item {
+							&:hover {
+								background: var(--prctr-theme-toolbar-hoverBackground);
+							}
+
+							.action-label {
+								color: var(--prctr-theme-editorGutter-itemGlyphForeground);
+								padding: 1px 2px;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}:where(.prctr-editor-scope) .monaco-diff-editor .diff-hidden-lines-compact {
+	display: flex;
+	height: 11px;
+	.line-left, .line-right {
+		height: 1px;
+		border-top: 1px solid;
+		border-color: var(--prctr-theme-editorCodeLens-foreground);
+		opacity: 0.5;
+		margin: auto;
+		width: 100%;
+	}
+
+	.line-left {
+		width: 20px;
+	}
+
+	.text {
+		color: var(--prctr-theme-editorCodeLens-foreground);
+		text-wrap: nowrap;
+		font-size: 11px;
+		line-height: 11px;
+		margin: 0 4px;
+	}
+}:where(.prctr-editor-scope) .monaco-editor .line-delete-selectable {
+}:where(.prctr-editor-scope) .line-delete-selectable .view-line {
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .monaco-editor.draggingUnchangedRegion.canMoveTop:not(.canMoveBottom) *,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top.canMoveTop:not(.canMoveBottom),:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom.canMoveTop:not(.canMoveBottom) {
+	cursor: n-resize !important;
+}
+
+:where(.prctr-editor-scope) .monaco-editor.draggingUnchangedRegion:not(.canMoveTop).canMoveBottom *,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top:not(.canMoveTop).canMoveBottom,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom:not(.canMoveTop).canMoveBottom {
+	cursor: s-resize !important;
+}
+
+:where(.prctr-editor-scope) .monaco-editor.draggingUnchangedRegion.canMoveTop.canMoveBottom *,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top.canMoveTop.canMoveBottom,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom.canMoveTop.canMoveBottom {
+	cursor: ns-resize !important;
+}
+
+:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .center a:hover .codicon {
+	color: var(--prctr-theme-editorLink-activeForeground) !important;
+}
+
+:where(.prctr-editor-scope) .monaco-editor .insert-sign,:where(.prctr-editor-scope) .monaco-diff-editor .insert-sign,:where(.prctr-editor-scope) .monaco-editor .delete-sign,:where(.prctr-editor-scope) .monaco-diff-editor .delete-sign {
+	font-size: 11px !important;
+	opacity: 0.7 !important;
+	display: flex !important;
+}
+
+:where(.prctr-editor-scope) .monaco-editor .line-delete-selectable {
+	user-select: text !important;
+	-webkit-user-select: text !important;
+	z-index: 1 !important;
+}
+
+:where(.prctr-editor-scope) .line-delete-selectable .view-line {
+	user-select: text !important;
+	-webkit-user-select: text !important;
+}
+}

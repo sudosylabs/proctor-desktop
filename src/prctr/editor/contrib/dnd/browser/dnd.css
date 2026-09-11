@@ -1,0 +1,18 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-contributions*/@layer controls {:where(.prctr-editor-scope) .monaco-editor.vs .dnd-target,:where(.prctr-editor-scope) .monaco-editor.hc-light .dnd-target {
+	border-right: 2px dotted black;
+	color: white; /* opposite of black */
+}:where(.prctr-editor-scope) .monaco-editor.vs-dark .dnd-target {
+	border-right: 2px dotted #AEAFAD;
+	color: #51504f; /* opposite of #AEAFAD */
+}:where(.prctr-editor-scope) .monaco-editor.hc-black .dnd-target {
+	border-right: 2px dotted #fff;
+	color: #000; /* opposite of #fff */
+}:where(.prctr-editor-scope) .monaco-editor.mouse-default .view-lines,:where(.prctr-editor-scope) .monaco-editor.vs-dark.mac.mouse-default .view-lines,:where(.prctr-editor-scope) .monaco-editor.hc-black.mac.mouse-default .view-lines,:where(.prctr-editor-scope) .monaco-editor.hc-light.mac.mouse-default .view-lines {
+	cursor: default;
+}:where(.prctr-editor-scope) .monaco-editor.mouse-copy .view-lines,:where(.prctr-editor-scope) .monaco-editor.vs-dark.mac.mouse-copy .view-lines,:where(.prctr-editor-scope) .monaco-editor.hc-black.mac.mouse-copy .view-lines,:where(.prctr-editor-scope) .monaco-editor.hc-light.mac.mouse-copy .view-lines {
+	cursor: copy;
+}
+}
