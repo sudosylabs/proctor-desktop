@@ -10,11 +10,11 @@ void test('the admitted Codicon package and font asset are exact', () => {
 		readonly license?: unknown;
 		readonly version?: unknown;
 	};
-	assert.equal(packageMetadata.version, '0.0.46-38');
+	assert.equal(packageMetadata.version, '0.0.46-39');
 	assert.equal(packageMetadata.license, 'CC-BY-4.0');
 	const font = readFileSync('node_modules/@vscode/codicons/dist/codicon.ttf');
 	assert.equal(
 		createHash('sha256').update(font).digest('hex'),
-		'a832273ce3a515050017a0ffb36b1b8cbd9c9cfa11b025cdd9dfc0d456940225'
+		'7f8ca3f24941bbec04dc5adb0e3e65a8e50cf9a0c76ac12af5a2e74acccda3ab'
 	);
 });

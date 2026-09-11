@@ -75,5 +75,5 @@ export function resolveSemanticIcon(id: SemanticIconId): SemanticIconGlyph {
 }
 
 export function getSemanticIconIds(): readonly SemanticIconId[] {
-	return Object.freeze(Object.keys(definitions) as SemanticIconId[]);
+	return Object.freeze(Object.keys(definitions).sort() as SemanticIconId[]);
 }
