@@ -1,14 +1,8 @@
 {
   "extends": "./tsconfig.base-common.json",
   "compilerOptions": {
-    "lib": [
-      "ES2024",
-      "ESNext.Disposable",
-      "WebWorker"
-    ],
-    "customConditions": [
-      "browser"
-    ],
+    "lib": ["ES2024", "ESNext.Disposable", "WebWorker"],
+    "customConditions": ["browser"],
     "types": []
   },
   "include": [

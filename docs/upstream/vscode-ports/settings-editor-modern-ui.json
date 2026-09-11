@@ -4,9 +4,7 @@
   "clusterId": "settings-editor-modern-ui",
   "admission": {
     "workflow": "Full pinned Modern UI activation, fourteen stylesheet modules and coordinated pane-header, scrollbar and notification density metrics.",
-    "callers": [
-      "src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts"
-    ],
+    "callers": ["src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts"],
     "interface": "src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts",
     "decision": "docs/architecture/user-settings.md"
   },
@@ -22,9 +20,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3907bf34fd95f3bf4b7a2206864e6139b84222c4626d20583829850ab33ebda6",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -40,9 +36,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d4e9dcbcb83b6a708b3d996b399831e3569ca75b6ae2e17bef74f67a4bc86aac",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -58,9 +52,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b83f8a6e8dc8a09d93b396501b48eea8f09d224fbadb0c60d0a9bc9d541e2bbe",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -76,9 +68,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "1fd3af5d862a16af25c468b1784b1f1c269a44780b9bb297fd473f0d1f51cc9a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -94,9 +84,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d5a3ff412194c7f8cb0f3693b6af065e260ecfe94fdd9d80ebb9c1526d4d8b6b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -112,9 +100,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "771f08dafdf290bdceb0e241aea83d35698e585270434c50146a3b0d68394f9a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -130,9 +116,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "8ac6af507306ff4d792446f41450f73d4b6bf10b2b9a5d04e1cbec4a80836727",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -148,9 +132,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "c34fdf5e4440aac1232332642ecd08ebd4695aa313576b30b27230a5f6f63b8e",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -166,9 +148,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "9c2983227cc4ff17e634336f85e0cbb4e45ead2fdc297f322e9227033b61d4d1",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -184,9 +164,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "0b517b55d96361de0b703b4853e23cf3d43b2bfdd83090d00561733bcfb148d7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -202,9 +180,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "db7419910be10d312ba8bac857bd10afc5d04f499d536ed201a467eab4d5ec39",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -220,9 +196,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "fb47b0f65842aa6b8d85da72ae81dc58121cb82687f9feffed3d4d40da581cf3",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -238,9 +212,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6d6284b288d23b6a1c4895d2d624fca527f7410f372e114b672a6e81c6a4888e",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -256,9 +228,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "bff3f9ad50152993ee9814cbdb54e098d0a0ecc0d0e9acb491bfa6742cce1d01",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -274,9 +244,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d94052e8a749c6ba352320d231398162a448e622021ffed3eb2ab488dd8c4553",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -292,9 +260,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a4b8feb811d86dc1d6ce345a47a002461e488f0e950b5ce5f45db2fa4b091c3e",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -310,9 +276,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "21f26d55d5be556ffc859aafb3d15703a3e5e48879836ccb74ed48e2fc872626",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -328,9 +292,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve all Modern UI module updates and layout-affecting-state calculations. Proctor layout presentation events select always-on floating panels and density; menu registration is explicit and does not expose the upstream experiment.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "c8b551b7fa203fd318befadf6d42e57a3daced8c1e5f7d2aaacb16a48a7e58da",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -345,9 +307,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/lifecycle.ts"
     },
     {
@@ -356,9 +316,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/vscodeNls.ts"
     },
     {
@@ -367,9 +325,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/actions/common/actions.ts"
     },
     {
@@ -378,9 +334,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/configuration/common/configuration.ts"
     },
     {
@@ -389,9 +343,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/contextkey/common/contextkey.ts"
     },
     {
@@ -400,9 +352,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts"
     },
     {
@@ -411,9 +361,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/workbench/services/layout/browser/layoutService.ts"
     },
     {
@@ -422,9 +370,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/workbench/common/contributions.ts"
     },
     {
@@ -433,9 +379,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/scrollbar/scrollableElement.ts"
     },
     {
@@ -444,9 +388,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationsViewer.ts"
     },
     {
@@ -455,9 +397,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/browser.ts"
     },
     {
@@ -466,9 +406,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/dnd.ts"
     },
     {
@@ -477,9 +415,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/dom.ts"
     },
     {
@@ -488,9 +424,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/event.ts"
     },
     {
@@ -499,9 +433,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/keyboardEvent.ts"
     },
     {
@@ -510,9 +442,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/touch.ts"
     },
     {
@@ -521,9 +451,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/sash/sash.ts"
     },
     {
@@ -532,9 +460,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/color.ts"
     },
     {
@@ -543,9 +469,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/event.ts"
     },
     {
@@ -554,9 +478,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/keyCodes.ts"
     },
     {
@@ -565,9 +487,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/scrollable.ts"
     },
     {
@@ -576,9 +496,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/splitview/splitview.ts"
     },
     {
@@ -587,9 +505,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/dnd/dnd.ts"
     },
     {
@@ -598,9 +514,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colorRegistry.ts"
     },
     {
@@ -609,9 +523,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/themeService.ts"
     },
     {
@@ -620,9 +532,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/workbench/common/theme.ts"
     },
     {
@@ -631,9 +541,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colorThemeData.ts"
     },
     {
@@ -642,9 +550,7 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "Microsoft MIT attribution retained.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/browser/media/style.css",
@@ -654,9 +560,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Complete pinned shared workbench stylesheet. Preserve platform/CJK fonts, icon font rules, select arrows, shadows, focus and contrast states. Adapt only Proctor CSS namespaces, zero-specificity editor scope, existing list/scroll classes and cascade-layer ownership of original important rules.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -668,9 +572,7 @@
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -679,12 +581,8 @@
     {
       "id": "owned-cascade",
       "summary": "Keep original rule state, geometry and specificity within a zero-specificity editor scope and repository cascade layers. Distinct custom properties are renamed consistently across producers and consumers.",
-      "localPaths": [
-        "src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts"
-      ],
-      "verificationRefs": [
-        "browser-matrix"
-      ]
+      "localPaths": ["src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts"],
+      "verificationRefs": ["browser-matrix"]
     },
     {
       "id": "notification-measurement",
@@ -693,9 +591,7 @@
         "src/prctr/workbench/browser/parts/notifications/notificationsViewer.ts",
         "src/prctr/workbench/browser/parts/notifications/notificationsList.ts"
       ],
-      "verificationRefs": [
-        "browser-matrix"
-      ]
+      "verificationRefs": ["browser-matrix"]
     },
     {
       "id": "shared-workbench-presentation",
@@ -704,9 +600,7 @@
         "src/prctr/workbench/browser/media/style.css",
         "src/prctr/workbench/services/settings/browser/settingsEditorPartServices.ts"
       ],
-      "verificationRefs": [
-        "settings-regressions"
-      ]
+      "verificationRefs": ["settings-regressions"]
     }
   ],
   "verification": [

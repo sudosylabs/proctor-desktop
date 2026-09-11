@@ -22,26 +22,51 @@ let oniguruma: Promise<typeof import('vscode-oniguruma')> | undefined;
 export class PackagedTextMateAssets implements ITextMateAssets {
 	declare readonly _serviceBrand: undefined;
 	readonly grammars: readonly IValidGrammarDefinition[] = [
-		{ location: jsonResource, language: 'json', scopeName: 'source.json', embeddedLanguages: {}, tokenTypes: {}, balancedBracketSelectors: ['*'], unbalancedBracketSelectors: [] },
-		{ location: jsoncResource, language: 'jsonc', scopeName: 'source.json.comments', embeddedLanguages: {}, tokenTypes: {}, balancedBracketSelectors: ['*'], unbalancedBracketSelectors: [] }
+		{
+			location: jsonResource,
+			language: 'json',
+			scopeName: 'source.json',
+			embeddedLanguages: {},
+			tokenTypes: {},
+			balancedBracketSelectors: ['*'],
+			unbalancedBracketSelectors: []
+		},
+		{
+			location: jsoncResource,
+			language: 'jsonc',
+			scopeName: 'source.json.comments',
+			embeddedLanguages: {},
+			tokenTypes: {},
+			balancedBracketSelectors: ['*'],
+			unbalancedBracketSelectors: []
+		}
 	];
 
 	async readGrammar(resource: URI): Promise<string> {
 		switch (resource.toString()) {
-			case jsonResource.toString(): return JSON.stringify(json);
-			case jsoncResource.toString(): return JSON.stringify(jsonc);
-			default: throw new Error('Unregistered TextMate grammar resource.');
+			case jsonResource.toString():
+				return JSON.stringify(json);
+			case jsoncResource.toString():
+				return JSON.stringify(jsonc);
+			default:
+				throw new Error('Unregistered TextMate grammar resource.');
 		}
 	}
-	loadTextMate(): Promise<typeof import('vscode-textmate')> { return import('vscode-textmate'); }
+	loadTextMate(): Promise<typeof import('vscode-textmate')> {
+		return import('vscode-textmate');
+	}
 	loadOniguruma(): Promise<typeof import('vscode-oniguruma')> {
-		if (!oniguruma) oniguruma = (async () => {
-			try {
-				const library = await import('vscode-oniguruma');
-				await library.loadWASM(new Uint8Array(onigurumaWasm).buffer);
-				return library;
-			} catch (error) { oniguruma = undefined; throw error; }
-		})();
+		if (!oniguruma)
+			oniguruma = (async () => {
+				try {
+					const library = await import('vscode-oniguruma');
+					await library.loadWASM(new Uint8Array(onigurumaWasm).buffer);
+					return library;
+				} catch (error) {
+					oniguruma = undefined;
+					throw error;
+				}
+			})();
 		return oniguruma;
 	}
 }

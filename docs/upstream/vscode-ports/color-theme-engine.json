@@ -22,9 +22,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/baseColors.ts",
       "localSha256": "6d73c918ec51d58e8ab61d242c82d6af01a18c68bc559069176456972f89d85c",
       "mechanicalTransforms": [
@@ -40,9 +38,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/chartsColors.ts",
       "localSha256": "0918d51967a5f6a08aa825bc2bf9ed74fcc14f9f9a28edd0beacca68dd6eb449",
       "mechanicalTransforms": [
@@ -58,9 +54,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/editorColors.ts",
       "localSha256": "31fddd20937c0a58a5f19bb2eb0849c8b33780747cd8168624cf98d7c4451e2a",
       "mechanicalTransforms": [
@@ -76,9 +70,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/inputColors.ts",
       "localSha256": "f04c6cb1c47725bcae37fefe2c2798c003dfc50362c44e3793669362412825a0",
       "mechanicalTransforms": [
@@ -94,9 +86,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/listColors.ts",
       "localSha256": "d0997bd1ea948ebf6601908b226f5927f897c7ac317973cc9ea23081f2d2c621",
       "mechanicalTransforms": [
@@ -112,9 +102,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/menuColors.ts",
       "localSha256": "a5eec1ec0f3474f023ac08766007b29a298525a10f561e997314d667be9e5094",
       "mechanicalTransforms": [
@@ -130,9 +118,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/minimapColors.ts",
       "localSha256": "f15cf8f73e6bf0ec6119d10e6d09bd029444d1887d42fa9a442db4efa871388b",
       "mechanicalTransforms": [
@@ -148,9 +134,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/miscColors.ts",
       "localSha256": "045a949e78560435862a70b2004759cf8f99e5d7fc406033b3ae97c091351769",
       "mechanicalTransforms": [
@@ -166,9 +150,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/quickpickColors.ts",
       "localSha256": "9827b93de47dcee7e7089fc4cb4e0681ab75221e5896c587925242c4e6075951",
       "mechanicalTransforms": [
@@ -184,9 +166,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colors/searchColors.ts",
       "localSha256": "dbbe2ce55930ab4ab39c5be02746e60e5f3e610dea415beb57b1c03b1f569162",
       "mechanicalTransforms": [
@@ -202,9 +182,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colorUtils.ts",
       "localSha256": "0a99d22a273358b338895c9fe7a9e0fcd66112a2c73bb9757b83dfb1e9da80b8",
       "mechanicalTransforms": [
@@ -220,9 +198,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/colorRegistry.ts",
       "localSha256": "4739db7ef42b931dc35a661a3023b8845ff71d29ec7da825e2686c055563abbc",
       "mechanicalTransforms": [
@@ -238,9 +214,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the admitted workbench color behavior and registered fallback graph; adapt namespace, packaged resource access and color-only interface. Editor token rendering and extension discovery are outside this color capability.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/workbenchColors.ts",
       "localSha256": "3e7b774445daf0103aa4bff9d8d33c85a8754639680125eff243d521f4e68e8b",
       "mechanicalTransforms": [
@@ -256,9 +230,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Complete source and token behavior now owned by complete-theme-model at the Settings editor source pin; existing color callers use the same full model.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colorThemeData.ts"
     },
     {
@@ -267,9 +239,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Complete source and token behavior now owned by complete-theme-model at the Settings editor source pin; existing color callers use the same full model.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/themeService.ts"
     },
     {
@@ -278,9 +248,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the original CSS collector, including the complete source size-variable loop. Proctor owns the constructed stylesheet, packaged participant/environment boundary and system forced-colors adjustment.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/browser/colorThemeCss.ts",
       "localSha256": "8e2ecb7b2ca35238891c3426bd060c02eac378ecf4659903898c5cb2aed074f4",
       "mechanicalTransforms": [
@@ -296,9 +264,7 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "Reference for the packaged Proctor configuration, CSS/native projection and Modern UI color boundary; extension and editor token behavior remains excluded.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/themes/common/themeConfiguration.ts",
@@ -306,9 +272,7 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Reference for the packaged Proctor configuration, CSS/native projection and Modern UI color boundary; extension and editor token behavior remains excluded.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/themes/common/colorThemeSchema.ts",
@@ -316,9 +280,7 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Reference for the packaged Proctor configuration, CSS/native projection and Modern UI color boundary; extension and editor token behavior remains excluded.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/themes/browser/workbenchThemeService.ts",
@@ -326,9 +288,7 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Reference for the packaged Proctor configuration, CSS/native projection and Modern UI color boundary; extension and editor token behavior remains excluded.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/theme/electron-main/themeMainServiceImpl.ts",
@@ -336,9 +296,7 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Reference for the packaged Proctor configuration, CSS/native projection and Modern UI color boundary; extension and editor token behavior remains excluded.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/themes/browser/modernTabColorCustomizations.ts",
@@ -346,9 +304,7 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Reference for the packaged Proctor configuration, CSS/native projection and Modern UI color boundary; extension and editor token behavior remains excluded.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/themes/test/node/tokenStyleResolving.test.ts",
@@ -356,9 +312,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Complete source and token behavior now owned by complete-theme-model at the Settings editor source pin; existing color callers use the same full model.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "test/editor/node/themes/upstream/tokenStyleResolving.test.ts"
     },
     {
@@ -367,18 +321,14 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Reference for the packaged Proctor configuration, CSS/native projection and Modern UI color boundary; extension and editor token behavior remains excluded.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -422,19 +372,13 @@
         "src/prctr/platform/theme/common/workbenchColors.ts",
         "src/prctr/platform/theme/browser/colorThemeCss.ts"
       ],
-      "verificationRefs": [
-        "theme-resolution-tests"
-      ]
+      "verificationRefs": ["theme-resolution-tests"]
     },
     {
       "id": "packaged-theme-css",
       "summary": "Preserve the upstream CSS collector, full size-variable generation and static participant registration/removal. The theme-size-registry cluster owns all original size defaults. Participants have no extension environment argument; the renderer owns a constructed stylesheet and retains OS forced-colors adjustment.",
-      "localPaths": [
-        "src/prctr/platform/theme/browser/colorThemeCss.ts"
-      ],
-      "verificationRefs": [
-        "browser-theme-projection"
-      ]
+      "localPaths": ["src/prctr/platform/theme/browser/colorThemeCss.ts"],
+      "verificationRefs": ["browser-theme-projection"]
     }
   ],
   "verification": [

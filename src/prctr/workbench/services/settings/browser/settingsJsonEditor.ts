@@ -18,16 +18,27 @@ export class SettingsJsonEditor extends Disposable {
 	) {
 		super();
 		const readOptions = (): IEditorConstructionOptions => ({
-			...configuration.getValue<IEditorConstructionOptions>('editor', { resource: document.model.uri, overrideIdentifier: document.model.getLanguageId() }),
+			...configuration.getValue<IEditorConstructionOptions>('editor', {
+				resource: document.model.uri,
+				overrideIdentifier: document.model.getLanguageId()
+			}),
 			ariaLabel: localize('proctorSettingsJsonEditor', 'Settings JSON'),
 			automaticLayout: true
 		});
-		this.control = this._register(instantiation.createInstance(CodeEditorWidget, container, readOptions(), {}));
+		this.control = this._register(
+			instantiation.createInstance(CodeEditorWidget, container, readOptions(), {})
+		);
 		this.control.setModel(document.model);
-		this._register(configuration.onDidChangeConfiguration(event => {
-			if (event.affectsConfiguration('editor', { resource: document.model.uri, overrideIdentifier: document.model.getLanguageId() }))
-				this.control.updateOptions(readOptions());
-		}));
-
+		this._register(
+			configuration.onDidChangeConfiguration((event) => {
+				if (
+					event.affectsConfiguration('editor', {
+						resource: document.model.uri,
+						overrideIdentifier: document.model.getLanguageId()
+					})
+				)
+					this.control.updateOptions(readOptions());
+			})
+		);
 	}
 }

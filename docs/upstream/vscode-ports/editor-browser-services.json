@@ -24,9 +24,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; use disposable constructed stylesheet handles under the strict renderer CSP. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "2986520246dc49a7eceac1a85faf1524889586d567a1db24d32f691e2ce19c09",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -42,9 +40,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "10ffdc1e18c0d3b780ec1dff00f0fff29c6fb56b6b5be1ccf775d0f1cda7604a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -60,9 +56,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "e57d855e5f35f22de47acb3fafc0ed8fa5ebb3d187a955b184ef63046ba30291",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -78,9 +72,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "eb994a5aacc03424cbdd38fa06affe5d5adc895b16db1dd5f2a0244f2c06e5d0",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -96,9 +88,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "7bd91264396b6b7b2ac90133cfe26ee97dd759652988778752b3014094f96471",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -114,9 +104,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "44843aae57f060158f463cc2aca2372641743f994d26bf28924404351813eec1",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -132,9 +120,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "9058a84fd29b30e2c05c3466ac540cb942ff4694f66cba6f92a98aeb72c5c041",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -150,9 +136,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b1cf357b49abe74e24f2658adf024cc60284b489a3346845b3bb9fe4dc11bdf0",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -168,9 +152,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f8e36e05645c87d21c6a1f6143212f61c3333bb030187f3bf96925417eef5390",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -186,9 +168,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6a28f1ff18a0e1260fbfdc7a08f7affe1346a700905a7d24e334aa8d4550db1e",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -204,9 +184,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "07d1deea02d892032fa6eeb5fc0cf16da1284c94f5e30eedc741dd938a9ae529",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -222,9 +200,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d6e5ce6d7d85d64b4034a9935e5a1c62722fddcd5045601676219c9e240288ba",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -239,9 +215,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/dom.ts"
     },
     {
@@ -250,9 +224,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/domStylesheets.ts"
     },
     {
@@ -261,9 +233,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/cssValue.ts"
     },
     {
@@ -272,9 +242,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/event.ts"
     },
     {
@@ -283,9 +251,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/lifecycle.ts"
     },
     {
@@ -294,9 +260,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/linkedList.ts"
     },
     {
@@ -305,9 +269,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/strings.ts"
     },
     {
@@ -316,9 +278,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/uri.ts"
     },
     {
@@ -327,9 +287,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/browser/editorBrowser.ts"
     },
     {
@@ -338,9 +296,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/browser/services/codeEditorService.ts"
     },
     {
@@ -349,9 +305,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/editorCommon.ts"
     },
     {
@@ -360,9 +314,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/model.ts"
     },
     {
@@ -371,9 +323,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/editor/common/editor.ts"
     },
     {
@@ -382,9 +332,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/themeService.ts"
     },
     {
@@ -393,9 +341,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/themables.ts"
     },
     {
@@ -404,9 +350,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/aria/aria.ts"
     },
     {
@@ -415,9 +359,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/window.ts"
     },
     {
@@ -426,9 +368,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/accessibility/common/accessibility.ts"
     },
     {
@@ -437,9 +377,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/configuration/common/configuration.ts"
     },
     {
@@ -448,9 +386,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/contextkey/common/contextkey.ts"
     },
     {
@@ -459,9 +395,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts"
     },
     {
@@ -470,9 +404,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observable.ts"
     },
     {
@@ -481,9 +413,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/extensions.ts"
     },
     {
@@ -492,9 +422,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/userInteraction/browser/userInteractionService.ts"
     },
     {
@@ -503,9 +431,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/arrays.ts"
     },
     {
@@ -514,9 +440,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/iterator.ts"
     },
     {
@@ -525,9 +449,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/map.ts"
     },
     {
@@ -536,9 +458,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/network.ts"
     },
     {
@@ -547,9 +467,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/vscodeNls.ts"
     },
     {
@@ -558,9 +476,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/markers/common/markers.ts"
     },
     {
@@ -569,9 +485,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/model/intervalTree.ts"
     },
     {
@@ -580,9 +494,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/editorColorRegistry.ts"
     },
     {
@@ -591,9 +503,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/services/model.ts"
     },
     {
@@ -602,9 +512,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/range.ts"
     },
     {
@@ -613,9 +521,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/services/markerDecorations.ts"
     },
     {
@@ -624,9 +530,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colorRegistry.ts"
     },
     {
@@ -635,9 +539,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/collections.ts"
     },
     {
@@ -646,9 +548,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/path.ts"
     },
     {
@@ -657,9 +557,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/resources.ts"
     },
     {
@@ -668,9 +566,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/json.ts"
     },
     {
@@ -679,9 +575,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/workbenchThemeService.ts"
     },
     {
@@ -690,9 +584,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/jsonErrorMessages.ts"
     },
     {
@@ -701,9 +593,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Exact consumed resource/storage input operations; icon defaults use original model factories without activating user extension/theme discovery.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/themeDataAdapters.ts"
     },
     {
@@ -712,9 +602,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/types.ts"
     },
     {
@@ -723,9 +611,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/log/common/log.ts"
     },
     {
@@ -734,9 +620,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/iconRegistry.ts"
     },
     {
@@ -745,9 +629,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Exact consumed resource/storage input operations; icon defaults use original model factories without activating user extension/theme discovery.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/themeDataAdapters.ts"
     },
     {
@@ -756,9 +638,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/languages/language.ts"
     },
     {
@@ -767,9 +647,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/languages/modesRegistry.ts"
     },
     {
@@ -778,9 +656,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/files/common/files.ts"
     },
     {
@@ -789,9 +665,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/trustedTypes.ts"
     },
     {
@@ -800,9 +674,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/errors.ts"
     },
     {
@@ -811,9 +683,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/worker/webWorker.ts"
     },
     {
@@ -822,9 +692,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/webWorker/browser/webWorkerDescriptor.ts"
     },
     {
@@ -833,9 +701,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/webWorker/browser/webWorkerService.ts"
     },
     {
@@ -844,9 +710,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing complete shared contract and implementation in its current owner; editor source and actual worker verification exercise their composed behavior.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/services/editorWebWorker.ts"
     },
     {
@@ -855,18 +719,14 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "Retained Microsoft MIT notice.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -898,9 +758,7 @@
         "src/prctr/workbench/services/themes/browser/fileIconThemeData.ts",
         "src/prctr/workbench/services/themes/browser/productIconThemeData.ts"
       ],
-      "verificationRefs": [
-        "browser-contracts"
-      ]
+      "verificationRefs": ["browser-contracts"]
     },
     {
       "id": "worker-entrypoint",
@@ -909,9 +767,7 @@
         "src/prctr/editor/browser/worker/editorWebWorkerMain.ts",
         "src/prctr/workbench/services/editor/browser/editorWorkerService.ts"
       ],
-      "verificationRefs": [
-        "real-worker"
-      ]
+      "verificationRefs": ["real-worker"]
     },
     {
       "id": "explicit-type-imports",
@@ -930,9 +786,7 @@
         "src/prctr/base/common/worker/webWorkerBootstrap.ts",
         "src/prctr/editor/browser/worker/editorWebWorkerMain.ts"
       ],
-      "verificationRefs": [
-        "browser-contracts"
-      ]
+      "verificationRefs": ["browser-contracts"]
     }
   ],
   "verification": [

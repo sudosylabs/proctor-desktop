@@ -31,9 +31,13 @@ export function installWorkbenchNotifications(
 	const notifications = createWindowNotifications(
 		context.document,
 		context.shell.overlayHost.notificationLayer,
-		context.composition.layout.parts.includes('status') ? context.shell.part('status') : undefined,
+		context.composition.layout.parts.includes('status')
+			? context.shell.part('status')
+			: undefined,
 		context.shell.part('titlebar'),
-		context.composition.layout.parts.includes('status') ? context.shell.part('status') : undefined,
+		context.composition.layout.parts.includes('status')
+			? context.shell.part('status')
+			: undefined,
 		binding,
 		() =>
 			!context.shell.overlayHost.visible &&
@@ -45,7 +49,13 @@ export function installWorkbenchNotifications(
 	context.disposables.add(notifications);
 	context.setService(WORKBENCH_NOTIFICATION_SERVICE, notifications.service);
 	context.setService(WORKBENCH_NOTIFICATION_PROGRESS_SERVICE, notifications.progress);
-	context.disposables.add(registerNotificationCommands(notifications, keys, context.composition.windowKind !== 'authenticated'));
+	context.disposables.add(
+		registerNotificationCommands(
+			notifications,
+			keys,
+			context.composition.windowKind !== 'authenticated'
+		)
+	);
 	context.disposables.add({
 		dispose: () => context.shell.overlayHost.notificationLayer.replaceChildren()
 	});

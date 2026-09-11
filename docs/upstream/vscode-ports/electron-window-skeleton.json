@@ -48,9 +48,7 @@
       "category": "source",
       "disposition": "behaviorally-reimplemented",
       "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs the authorized Settings native IPC bridge and disposes it on close and creation failure.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
       "localSha256": "85e3df2998688439ebb4a76c262fb37561f28d6f8b264b35541c95c0abdc8cf5"
     },

@@ -73,12 +73,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "path",
-          "selector",
-          "property",
-          "rationale"
-        ],
+        "required": ["path", "selector", "property", "rationale"],
         "properties": {
           "path": {
             "$ref": "#/$defs/path"
@@ -104,12 +99,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "importer",
-          "resource",
-          "kind",
-          "rationale"
-        ],
+        "required": ["importer", "resource", "kind", "rationale"],
         "properties": {
           "importer": {
             "$ref": "#/$defs/path"
@@ -118,10 +108,7 @@
             "$ref": "#/$defs/path"
           },
           "kind": {
-            "enum": [
-              "data",
-              "font"
-            ]
+            "enum": ["data", "font"]
           },
           "rationale": {
             "type": "string",

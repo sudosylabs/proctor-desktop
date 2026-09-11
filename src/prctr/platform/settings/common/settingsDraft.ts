@@ -36,19 +36,29 @@ export class SettingsDraft extends Disposable {
 	readonly #edits = this._register(new Queue<void>());
 	#disposed = false;
 
-	constructor(source: string, revision: string, document?: SettingsWorkingDocument, private readonly isReadonly: () => boolean = () => false) {
+	constructor(
+		source: string,
+		revision: string,
+		document?: SettingsWorkingDocument,
+		private readonly isReadonly: () => boolean = () => false
+	) {
 		super();
 		this.base = { source, revision };
 		this.#document = document ?? this._register(new SettingsDraftStorage(source));
-		if (this.#document.value !== source) throw new Error('Settings document does not match its base source');
+		if (this.#document.value !== source)
+			throw new Error('Settings document does not match its base source');
 		this._register(this.#document.onDidChange(() => this.#sourceVersion++));
 	}
 
 	get source(): string {
 		return this.#document.value;
 	}
-	get baseSource(): string { return this.base.source; }
-	get baseRevision(): string { return this.base.revision; }
+	get baseSource(): string {
+		return this.base.source;
+	}
+	get baseRevision(): string {
+		return this.base.revision;
+	}
 	/** Advance only the acknowledged base; edits made while saving remain in the same working document. */
 	acknowledge(source: string, revision: string): void {
 		if (this.#disposed) throw new Error('Settings draft is disposed');
@@ -81,7 +91,7 @@ export class SettingsDraft extends Disposable {
 			try {
 				const storage = disposables.add(new SettingsDraftStorage(source));
 				const transactions: (readonly Edit[])[] = [];
-				disposables.add(storage.onDidApplyEdits(edits => transactions.push(edits)));
+				disposables.add(storage.onDidApplyEdits((edits) => transactions.push(edits)));
 				const files = disposables.add(new SettingsResourceFileService(storage));
 				const service = disposables.add(
 					new ConfigurationService(

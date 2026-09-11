@@ -2,7 +2,12 @@ import { Emitter, Event } from '../../../../base/common/event.js';
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 import type { IWorkbenchColorTheme } from '../../../../platform/theme/common/workbenchThemeService.js';
 import type { BrowserThemeService } from '../../../../platform/theme/browser/themeService.js';
-import type { IColorTheme, IFileIconTheme, IProductIconTheme, IThemeService } from '../../../../platform/theme/common/themeService.js';
+import type {
+	IColorTheme,
+	IFileIconTheme,
+	IProductIconTheme,
+	IThemeService
+} from '../../../../platform/theme/common/themeService.js';
 import { FileIconThemeData } from '../../themes/browser/fileIconThemeData.js';
 import { ProductIconThemeData } from '../../themes/browser/productIconThemeData.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
@@ -26,26 +31,46 @@ export class EditorThemeService extends Disposable implements IEditorThemeServic
 	readonly onDidProductIconThemeChange = Event.None;
 	private readonly fileIcons: PackagedFileIconTheme;
 
-	constructor(private readonly presentation: BrowserThemeService, document: Document) {
+	constructor(
+		private readonly presentation: BrowserThemeService,
+		document: Document
+	) {
 		super();
 		this.fileIcons = this._register(new PackagedFileIconTheme(document));
-		this.onDidColorThemeChange = Event.map(presentation.onDidChangeTheme, theme => theme.colorTheme);
+		this.onDidColorThemeChange = Event.map(
+			presentation.onDidChangeTheme,
+			(theme) => theme.colorTheme
+		);
 		// Keep WorkbenchThemeService's registry/theme invalidation and coalescing;
 		// constructed sheets preserve the renderer's no-inline-style CSP.
 		const sheet = new document.defaultView!.CSSStyleSheet();
 		document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
-		this._register({ dispose: () => { document.adoptedStyleSheets = document.adoptedStyleSheets.filter(value => value !== sheet); } });
+		this._register({
+			dispose: () => {
+				document.adoptedStyleSheets = document.adoptedStyleSheets.filter(
+					(value) => value !== sheet
+				);
+			}
+		});
 		const icons = this._register(getIconsStyleSheet(this));
-		const update = this._register(new RunOnceScheduler(() => sheet.replaceSync(icons.getCSS()), 0));
+		const update = this._register(
+			new RunOnceScheduler(() => sheet.replaceSync(icons.getCSS()), 0)
+		);
 		this._register(icons.onDidChange(() => update.schedule()));
 		update.schedule();
 	}
 
-	getColorTheme(): IWorkbenchColorTheme { return this.presentation.theme.colorTheme; }
+	getColorTheme(): IWorkbenchColorTheme {
+		return this.presentation.theme.colorTheme;
+	}
 	async initialize(languages: ILanguageService): Promise<void> {
 		await this.fileIcons.initialize(languages);
 		this.fileIconThemeChange.fire(this.getFileIconTheme());
 	}
-	getFileIconTheme(): IFileIconTheme { return this.fileIcons.data.isLoaded ? this.fileIcons.data : FileIconThemeData.noIconTheme; }
-	getProductIconTheme(): IProductIconTheme { return ProductIconThemeData.defaultTheme; }
+	getFileIconTheme(): IFileIconTheme {
+		return this.fileIcons.data.isLoaded ? this.fileIcons.data : FileIconThemeData.noIconTheme;
+	}
+	getProductIconTheme(): IProductIconTheme {
+		return ProductIconThemeData.defaultTheme;
+	}
 }

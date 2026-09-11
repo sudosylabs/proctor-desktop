@@ -1,7 +1,15 @@
 import assert from '../upstream/assert.ts';
 import { suite, test } from '../upstream/testAdapter.ts';
-import { createCSSRule, createStyleSheet, removeCSSRulesContainingSelector, cloneGlobalStylesheets } from '../../../src/prctr/base/browser/domStylesheets.ts';
-import { DefaultStyleController, unthemedListStyles } from '../../../src/prctr/base/browser/ui/list/listWidget.ts';
+import {
+	createCSSRule,
+	createStyleSheet,
+	removeCSSRulesContainingSelector,
+	cloneGlobalStylesheets
+} from '../../../src/prctr/base/browser/domStylesheets.ts';
+import {
+	DefaultStyleController,
+	unthemedListStyles
+} from '../../../src/prctr/base/browser/ui/list/listWidget.ts';
 import { acquireEditorStyleScope } from '../../../src/prctr/workbench/services/editor/browser/editorStyleScope.ts';
 
 suite('Editor stylesheet ownership under production CSP', () => {
@@ -22,7 +30,10 @@ suite('Editor stylesheet ownership under production CSP', () => {
 			assert.strictEqual(getComputedStyle(child).backgroundColor, 'rgb(7, 8, 9)');
 			removeCSSRulesContainingSelector('prctr-style-test', style);
 			assert.strictEqual(style.sheet.cssRules.length, 0);
-		} finally { style.dispose(); host.remove(); }
+		} finally {
+			style.dispose();
+			host.remove();
+		}
 		assert.strictEqual(document.adoptedStyleSheets.length, initialSheets);
 	});
 
@@ -39,7 +50,10 @@ suite('Editor stylesheet ownership under production CSP', () => {
 			sheet.remove();
 			sheet.remove();
 			assert.strictEqual(shadow.adoptedStyleSheets.length, 0);
-		} finally { sheet.dispose(); host.remove(); }
+		} finally {
+			sheet.dispose();
+			host.remove();
+		}
 	});
 
 	test('global clones follow text and CSSOM changes and release with their source', () => {
@@ -63,7 +77,11 @@ suite('Editor stylesheet ownership under production CSP', () => {
 			source.dispose();
 			clones.dispose();
 			assert.strictEqual(target.document.adoptedStyleSheets.length, initial);
-		} finally { source.dispose(); clones.dispose(); frame.remove(); }
+		} finally {
+			source.dispose();
+			clones.dispose();
+			frame.remove();
+		}
 	});
 
 	test('Settings custom list styling owns and disposes the same constructed sheet', () => {
@@ -81,7 +99,10 @@ suite('Editor stylesheet ownership under production CSP', () => {
 			assert.strictEqual(getComputedStyle(row).backgroundColor, 'rgb(1, 2, 3)');
 			controller.style({ ...unthemedListStyles, listInactiveFocusBackground: '#040506' });
 			assert.strictEqual(getComputedStyle(row).backgroundColor, 'rgb(4, 5, 6)');
-		} finally { controller.dispose(); host.remove(); }
+		} finally {
+			controller.dispose();
+			host.remove();
+		}
 		assert.strictEqual(document.adoptedStyleSheets.length, initial);
 	});
 
@@ -92,7 +113,10 @@ suite('Editor stylesheet ownership under production CSP', () => {
 		first.dispose();
 		assert.strictEqual(isolated.documentElement.classList.contains('prctr-editor-scope'), true);
 		second.dispose();
-		assert.strictEqual(isolated.documentElement.classList.contains('prctr-editor-scope'), false);
+		assert.strictEqual(
+			isolated.documentElement.classList.contains('prctr-editor-scope'),
+			false
+		);
 		isolated.documentElement.classList.add('prctr-editor-scope');
 		acquireEditorStyleScope(isolated).dispose();
 		assert.strictEqual(isolated.documentElement.classList.contains('prctr-editor-scope'), true);

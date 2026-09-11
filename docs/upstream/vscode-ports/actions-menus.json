@@ -23,9 +23,7 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "The canonical Microsoft MIT text is preserved as the local notice for the admitted action source.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/common/actions.ts",
@@ -33,9 +31,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve Action state-change events, ActionRunner ordering/error capture, separators, submenus, empty-submenu behavior, and lightweight action creation while routing the one fallback string through the admitted localization seam.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/actions.ts",
       "localSha256": "0f30c36ccee140875eb41e7b18fffe0a90df9f35d048a1f293894e48c678db4d",
       "mechanicalTransforms": [
@@ -51,9 +47,7 @@
       "category": "registration",
       "disposition": "adapted",
       "rationale": "Adapt the registry and immutable menu actions behind the finite Proctor catalog, preserving implicit palette completion, alternate/toggle metadata, short-title selection, and explicit invocation argument options.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/actions/common/menu.ts",
       "localSha256": "c6979631d60178c9eedd352dd4009e42de225429e87b76e0f3d7b12048578886",
       "mechanicalTransforms": [
@@ -69,9 +63,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Adapt MenuInfoSnapshot, MenuInfo, and MenuImpl: cached sorted structure, context-key dependency sets, optional recursive submenu invalidation, lazy listeners, debounced change flags, visibility changes, and deterministic disposal. Proctor supplies localized descriptors and window-owned hidden state rather than VS Code profile storage or keybinding-customization UI.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/actions/common/contributionMenuService.ts",
       "localSha256": "20e941b71ebce25c58fb5c23d12eec5db9bdb5f6db74c1c6661101c28b1f5dde",
       "mechanicalTransforms": [
@@ -87,9 +79,7 @@
       "category": "test",
       "disposition": "evidence-only",
       "rationale": "Defines upstream sorting, command-palette, and unique menu identity obligations reproduced through Proctor-owned interface tests without importing VS Code storage and mock-service graphs.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/actions/common/actions.ts",
@@ -97,9 +87,7 @@
       "category": "registration",
       "disposition": "adapted",
       "rationale": "Adapt registerAction2's unique-command guard, metadata validation, menu-only precondition override, opt-in palette registration, and conjunctive keybinding preconditions. Proctor uses a typed contribution object and transactional rollback rather than an Action2 subclass.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/services/actions/common/proctorActions.ts",
       "localSha256": "83d114c1b4f6cb426bfccab1e4f19290c0e52bc00515fb9a38087923fa625cd6",
       "mechanicalTransforms": [
@@ -123,9 +111,7 @@
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -171,54 +157,32 @@
     {
       "id": "finite-product-menu-catalog",
       "summary": "Only nine Proctor-owned menu identities are accepted at registration; forged or independently constructed IDs are rejected. Extensions and remote content cannot register executable behavior.",
-      "localPaths": [
-        "src/prctr/platform/actions/common/menu.ts"
-      ],
-      "verificationRefs": [
-        "menu-contract-tests",
-        "source-composition-check"
-      ]
+      "localPaths": ["src/prctr/platform/actions/common/menu.ts"],
+      "verificationRefs": ["menu-contract-tests", "source-composition-check"]
     },
     {
       "id": "localized-semantic-metadata",
       "summary": "Menu labels are placeholder-free named localization descriptors and icons are semantic Proctor IDs; raw CSS classes, glyph names, and unlocalized product strings do not cross the contribution interface.",
-      "localPaths": [
-        "src/prctr/platform/actions/common/menu.ts"
-      ],
-      "verificationRefs": [
-        "menu-contract-tests"
-      ]
+      "localPaths": ["src/prctr/platform/actions/common/menu.ts"],
+      "verificationRefs": ["menu-contract-tests"]
     },
     {
       "id": "closed-action-contribution",
       "summary": "A typed static contribution replaces the Action2 subclass while preserving unique action IDs, command metadata validation, opt-in palette membership, placement-only precondition overrides, and precondition-constrained keybindings. Failed registration rolls back the complete partial contribution.",
-      "localPaths": [
-        "src/prctr/workbench/services/actions/common/proctorActions.ts"
-      ],
-      "verificationRefs": [
-        "proctor-action-tests"
-      ]
+      "localPaths": ["src/prctr/workbench/services/actions/common/proctorActions.ts"],
+      "verificationRefs": ["proctor-action-tests"]
     },
     {
       "id": "non-authoritative-visibility",
       "summary": "Menu visibility, hidden state, enablement, and checked state are presentation projections only; privileged command handlers remain responsible for validation and authorization.",
-      "localPaths": [
-        "src/prctr/platform/actions/common/menu.ts",
-        "docs/architecture/workbench.md"
-      ],
-      "verificationRefs": [
-        "menu-contract-tests"
-      ]
+      "localPaths": ["src/prctr/platform/actions/common/menu.ts", "docs/architecture/workbench.md"],
+      "verificationRefs": ["menu-contract-tests"]
     },
     {
       "id": "window-owned-display-ready-menus",
       "summary": "The existing exclusion of VS Code profile storage and customization/keybinding-editor UI leaves hidden state window-owned. The public facade returns display-ready actions, filtering hidden commands and empty submenus before presentation while preserving default-relative visibility, reset, and change notifications.",
-      "localPaths": [
-        "src/prctr/platform/actions/common/contributionMenuService.ts"
-      ],
-      "verificationRefs": [
-        "menu-contract-tests"
-      ]
+      "localPaths": ["src/prctr/platform/actions/common/contributionMenuService.ts"],
+      "verificationRefs": ["menu-contract-tests"]
     },
     {
       "id": "bounded-menu-invalidation",
@@ -227,9 +191,7 @@
         "src/prctr/platform/actions/common/menu.ts",
         "src/prctr/platform/actions/common/contributionMenuService.ts"
       ],
-      "verificationRefs": [
-        "menu-contract-tests"
-      ]
+      "verificationRefs": ["menu-contract-tests"]
     }
   ],
   "verification": [

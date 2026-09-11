@@ -17,8 +17,10 @@ export class StyleSheetHandle extends Disposable {
 	constructor(container: HTMLElement) {
 		super();
 		const root = container.getRootNode();
-		this.root = root.nodeType === Node.DOCUMENT_FRAGMENT_NODE && 'host' in root
-			? root as ShadowRoot : container.ownerDocument;
+		this.root =
+			root.nodeType === Node.DOCUMENT_FRAGMENT_NODE && 'host' in root
+				? (root as ShadowRoot)
+				: container.ownerDocument;
 		this.sheet = new (getWindow(container).CSSStyleSheet)({ media: 'screen' });
 		// An empty anchor retains DOM ownership and auxiliary-window clone classification.
 		this.anchor = container.ownerDocument.createComment('');
@@ -26,7 +28,9 @@ export class StyleSheetHandle extends Disposable {
 		this.root.adoptedStyleSheets = [...this.root.adoptedStyleSheets, this.sheet];
 	}
 
-	get textContent(): string { return this.value; }
+	get textContent(): string {
+		return this.value;
+	}
 	set textContent(value: string | null) {
 		if (this.disposed) throw new Error('Stylesheet has been disposed.');
 		this.value = value ?? '';
@@ -34,12 +38,16 @@ export class StyleSheetHandle extends Disposable {
 		this.changed.fire(this.value);
 	}
 
-	remove(): void { this.dispose(); }
+	remove(): void {
+		this.dispose();
+	}
 
 	override dispose(): void {
 		if (this.disposed) return;
 		this.disposed = true;
-		this.root.adoptedStyleSheets = this.root.adoptedStyleSheets.filter(sheet => sheet !== this.sheet);
+		this.root.adoptedStyleSheets = this.root.adoptedStyleSheets.filter(
+			(sheet) => sheet !== this.sheet
+		);
 		this.anchor.remove();
 		this.removed.fire();
 		super.dispose();

@@ -16,8 +16,16 @@ import {
 import { PackagedJsonSchemas } from '../../../src/prctr/editor/common/languages/json/packagedJsonSchemas.js';
 
 const runtimeErrors: string[] = [];
-window.addEventListener('error', event => runtimeErrors.push(String(event.error ?? event.message)));
-window.addEventListener('unhandledrejection', event => runtimeErrors.push(event.reason instanceof Error ? event.reason.stack ?? event.reason.message : String(event.reason)));
+window.addEventListener('error', (event) =>
+	runtimeErrors.push(String(event.error ?? event.message))
+);
+window.addEventListener('unhandledrejection', (event) =>
+	runtimeErrors.push(
+		event.reason instanceof Error
+			? (event.reason.stack ?? event.reason.message)
+			: String(event.reason)
+	)
+);
 
 const schemaUri = 'prctr-schema://settings/worker-test';
 const schemas = new PackagedJsonSchemas(
@@ -176,7 +184,7 @@ void (async () => {
 		await exerciseSettingsWindowServices();
 		await exerciseSettingsProduction();
 		await exerciseAuthenticatedLayout();
-		await new Promise<void>(resolve => setTimeout(resolve, 50));
+		await new Promise<void>((resolve) => setTimeout(resolve, 50));
 		check(runtimeErrors.length === 0, `Unexpected runtime errors: ${runtimeErrors.join('; ')}`);
 		document.body.dataset.result = JSON.stringify({
 			passed: true,

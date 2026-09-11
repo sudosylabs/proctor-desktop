@@ -1,13 +1,9 @@
 {
   "extends": "./tsconfig.electron-main.json",
   "compilerOptions": {
-    "lib": [
-      "ES2024"
-    ],
+    "lib": ["ES2024"],
     "skipLibCheck": true,
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
   "include": [
     "../src/prctr/base/browser/styleSheets.d.ts",

@@ -30,18 +30,25 @@ function effectiveSelector(rule: Rule): string {
 	if (!parent) return rule.selector;
 	const parentSelector = effectiveSelector(parent as Rule);
 	const parentNode = selectorParser().astSync(`:is(${parentSelector})`).first.nodes[0]!;
-	return selectorParser(selectors => selectors.each(selector => {
-		let nested = false;
-		selector.walkNesting(node => { nested = true; node.replaceWith(parentNode.clone()); });
-		if (!nested) {
-			selector.prepend(selectorParser.combinator({ value: ' ' }));
-			selector.prepend(parentNode.clone());
-		}
-	})).processSync(rule.selector);
+	return selectorParser((selectors) =>
+		selectors.each((selector) => {
+			let nested = false;
+			selector.walkNesting((node) => {
+				nested = true;
+				node.replaceWith(parentNode.clone());
+			});
+			if (!nested) {
+				selector.prepend(selectorParser.combinator({ value: ' ' }));
+				selector.prepend(parentNode.clone());
+			}
+		})
+	).processSync(rule.selector);
 }
 
 /** Only positive alternatives that all require the same owner establish a root. */
-function selectorOwnership(selector: selectorParser.Selector): { owner: string; descended: boolean } | undefined {
+function selectorOwnership(
+	selector: selectorParser.Selector
+): { owner: string; descended: boolean } | undefined {
 	let owner: string | undefined;
 	let descended = false;
 	for (const node of selector.nodes) {
@@ -55,15 +62,24 @@ function selectorOwnership(selector: selectorParser.Selector): { owner: string; 
 		if (node.type === 'class') {
 			if (!node.value.startsWith('prctr-')) return undefined;
 			owner = node.value;
-		} else if (node.type === 'pseudo' && [':is', ':where'].includes(node.value) && node.nodes?.length) {
+		} else if (
+			node.type === 'pseudo' &&
+			[':is', ':where'].includes(node.value) &&
+			node.nodes?.length
+		) {
 			let hasClass = false;
-			node.walkClasses(() => { hasClass = true; });
+			node.walkClasses(() => {
+				hasClass = true;
+			});
 			if (!hasClass) continue;
-			const branches = node.nodes.map(branch => branch.type === 'selector' ? selectorOwnership(branch) : undefined);
+			const branches = node.nodes.map((branch) =>
+				branch.type === 'selector' ? selectorOwnership(branch) : undefined
+			);
 			const first = branches[0];
-			if (!first || !branches.every(branch => branch?.owner === first.owner)) return undefined;
+			if (!first || !branches.every((branch) => branch?.owner === first.owner))
+				return undefined;
 			owner = first.owner;
-			descended = branches.every(branch => branch?.descended);
+			descended = branches.every((branch) => branch?.descended);
 		}
 	}
 	return owner === undefined ? undefined : { owner, descended };
@@ -72,7 +88,8 @@ function selectorOwnership(selector: selectorParser.Selector): { owner: string; 
 function isInOverridesLayer(rule: Container | undefined): boolean {
 	const layers: string[] = [];
 	for (let node: Container | CssDocument | undefined = rule; node; node = node.parent) {
-		if (node.type === 'atrule' && (node as AtRule).name === 'layer') layers.unshift((node as AtRule).params.trim());
+		if (node.type === 'atrule' && (node as AtRule).name === 'layer')
+			layers.unshift((node as AtRule).params.trim());
 	}
 	return layers.length === 1 && layers[0] === 'overrides';
 }
@@ -120,19 +137,35 @@ export function analyzeSource(repository: Repository): Graph {
 	const assetKeys = new Set<string>();
 	for (const admission of assetImports) {
 		const key = `${admission.importer}\0${admission.resource}`;
-		if (assetKeys.has(key)) diagnostics.push(diagnostic(checkId, admission.importer, 'Duplicate static asset import admission.', 'Keep one exact importer/resource admission.'));
+		if (assetKeys.has(key))
+			diagnostics.push(
+				diagnostic(
+					checkId,
+					admission.importer,
+					'Duplicate static asset import admission.',
+					'Keep one exact importer/resource admission.'
+				)
+			);
 		assetKeys.add(key);
-		if (!(admission.kind === 'data' ? admission.resource.endsWith('.json') : admission.resource.endsWith('.woff'))) {
-			diagnostics.push(diagnostic(checkId, admission.importer, 'Static asset kind does not match its resource suffix.', 'Admit JSON data or WOFF fonts only; executable modules remain source graph edges.'));
+		if (
+			!(admission.kind === 'data'
+				? admission.resource.endsWith('.json')
+				: admission.resource.endsWith('.woff'))
+		) {
+			diagnostics.push(
+				diagnostic(
+					checkId,
+					admission.importer,
+					'Static asset kind does not match its resource suffix.',
+					'Admit JSON data or WOFF fonts only; executable modules remain source graph edges.'
+				)
+			);
 		}
 	}
 	const packageManifest = readJson<{
 		readonly dependencies?: Readonly<Record<string, string>>;
 		readonly devDependencies?: Readonly<Record<string, string>>;
-	}>(
-		repository,
-		'package.json'
-	);
+	}>(repository, 'package.json');
 	const productionDependencies = new Set(Object.keys(packageManifest.dependencies ?? {}));
 	const developmentDependencies = new Set(Object.keys(packageManifest.devDependencies ?? {}));
 	const sourceFiles = repository
@@ -209,10 +242,17 @@ export function analyzeSource(repository: Repository): Graph {
 		visit(source);
 		for (const imported of imports) {
 			const specifier = imported.specifier;
-			const exactAsset = specifier.startsWith('.') ? assetImports.find(admission => admission.importer === path && admission.resource === posix.normalize(posix.join(posix.dirname(path), specifier))) : undefined;
-			const staticAsset = exactAsset !== undefined || STATIC_ASSET_EXTENSIONS.some((extension) =>
-				specifier.endsWith(extension)
-			);
+			const exactAsset = specifier.startsWith('.')
+				? assetImports.find(
+						(admission) =>
+							admission.importer === path &&
+							admission.resource ===
+								posix.normalize(posix.join(posix.dirname(path), specifier))
+					)
+				: undefined;
+			const staticAsset =
+				exactAsset !== undefined ||
+				STATIC_ASSET_EXTENSIONS.some((extension) => specifier.endsWith(extension));
 			if (
 				specifier.startsWith('.') &&
 				!specifier.endsWith('.js') &&
@@ -233,8 +273,10 @@ export function analyzeSource(repository: Repository): Graph {
 					const packageName = specifier.startsWith('@')
 						? specifier.split('/').slice(0, 2).join('/')
 						: (specifier.split('/')[0] as string);
-					if (!productionDependencies.has(packageName) &&
-						!(imported.typeOnly && developmentDependencies.has(packageName)))
+					if (
+						!productionDependencies.has(packageName) &&
+						!(imported.typeOnly && developmentDependencies.has(packageName))
+					)
 						diagnostics.push(
 							diagnostic(
 								checkId,
@@ -284,7 +326,10 @@ export function analyzeSource(repository: Repository): Graph {
 				edges.push({ from: path, to: target, typeOnly: false, dynamic: false });
 				const fromEnvironment = environment(path, policy);
 				if (exactAsset) usedAssetImports.add(exactAsset);
-				if (exactAsset?.kind !== 'data' && !['browser', 'electron-browser'].includes(fromEnvironment))
+				if (
+					exactAsset?.kind !== 'data' &&
+					!['browser', 'electron-browser'].includes(fromEnvironment)
+				)
 					diagnostics.push(
 						diagnostic(
 							checkId,
@@ -347,7 +392,15 @@ export function analyzeSource(repository: Repository): Graph {
 		}
 	}
 	for (const admission of assetImports) {
-		if (!usedAssetImports.has(admission)) diagnostics.push(diagnostic(checkId, admission.importer, 'Static asset import admission is stale or unresolved.', 'Remove the stale entry or restore its exact static import.'));
+		if (!usedAssetImports.has(admission))
+			diagnostics.push(
+				diagnostic(
+					checkId,
+					admission.importer,
+					'Static asset import admission is stale or unresolved.',
+					'Remove the stale entry or restore its exact static import.'
+				)
+			);
 	}
 
 	const adjacency = new Map<string, string[]>();

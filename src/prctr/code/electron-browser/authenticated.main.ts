@@ -30,7 +30,10 @@ const authenticatedWindow = await bootstrapWorkbench(document, authenticatedComp
 	createDesktopWorkbenchContribution('authenticated', () => api.bootstrap(), api.windowChrome),
 	createAuthenticatedContribution(api, true),
 	createAccountContribution(api.account),
-	createSettingsContribution(api.settings, createElectronSettingsEditorEnvironment(api.settingsNative))
+	createSettingsContribution(
+		api.settings,
+		createElectronSettingsEditorEnvironment(api.settingsNative)
+	)
 ]);
 globalThis.addEventListener('pagehide', () => authenticatedWindow.disposables.dispose(), {
 	once: true

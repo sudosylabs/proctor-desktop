@@ -7,18 +7,37 @@ function deferRenderedStyles(html: string): string {
 	let quote = '';
 	for (let index = 0; index < html.length; index++) {
 		const character = html[index]!;
-		if (!inTag) { if (character === '<') inTag = true; continue; }
-		if (quote) { if (character === quote) quote = ''; continue; }
-		if (character === '"' || character === "'") { quote = character; continue; }
-		if (character === '>') { inTag = false; continue; }
-		if (/\s/u.test(character) && html.slice(index + 1, index + 6).toLowerCase() === 'style' && /[\s=]/u.test(html[index + 6] ?? '')) {
+		if (!inTag) {
+			if (character === '<') inTag = true;
+			continue;
+		}
+		if (quote) {
+			if (character === quote) quote = '';
+			continue;
+		}
+		if (character === '"' || character === "'") {
+			quote = character;
+			continue;
+		}
+		if (character === '>') {
+			inTag = false;
+			continue;
+		}
+		if (
+			/\s/u.test(character) &&
+			html.slice(index + 1, index + 6).toLowerCase() === 'style' &&
+			/[\s=]/u.test(html[index + 6] ?? '')
+		) {
 			edits.push(index + 1);
 		}
 	}
 	if (edits.length === 0) return html;
 	const parts: string[] = [];
 	let offset = 0;
-	for (const edit of edits) { parts.push(html.slice(offset, edit), 'data-prctr-rendered-style'); offset = edit + 5; }
+	for (const edit of edits) {
+		parts.push(html.slice(offset, edit), 'data-prctr-rendered-style');
+		offset = edit + 5;
+	}
 	parts.push(html.slice(offset));
 	return parts.join('');
 }
@@ -31,11 +50,16 @@ const policy = createTrustedTypesPolicy('editorRenderedLines', { createHTML: def
  * deferral leaves the original bulk-rendering output intact after CSSOM applies
  * the generated declarations, without enabling inline styles in the page CSP.
  */
-export function createRenderedLinesFragment(document: Document, html: string | TrustedHTML): DocumentFragment {
+export function createRenderedLinesFragment(
+	document: Document,
+	html: string | TrustedHTML
+): DocumentFragment {
 	const template = document.createElement('template');
 	const source = String(html);
 	template.innerHTML = (policy?.createHTML(source) ?? deferRenderedStyles(source)) as string;
-	for (const element of template.content.querySelectorAll<HTMLElement | SVGElement>('[data-prctr-rendered-style]')) {
+	for (const element of template.content.querySelectorAll<HTMLElement | SVGElement>(
+		'[data-prctr-rendered-style]'
+	)) {
 		const declarations = element.getAttribute('data-prctr-rendered-style')!;
 		element.removeAttribute('data-prctr-rendered-style');
 		element.style.cssText = declarations;

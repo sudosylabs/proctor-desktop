@@ -17,29 +17,47 @@ export class EditorWindowHostService extends Disposable implements IEditorWindow
 	private readonly focusEmitter = this._register(new Emitter<boolean>());
 	readonly onDidChangeFocus = this.focusEmitter.event;
 	private closed = false;
-	constructor(private readonly window: Window, private readonly bindings: EditorWindowHostBindings) {
+	constructor(
+		private readonly window: Window,
+		private readonly bindings: EditorWindowHostBindings
+	) {
 		super();
 		for (const event of ['focus', 'blur']) {
-			this._register(addDisposableListener(window, event, () => this.focusEmitter.fire(this.hasFocus)));
+			this._register(
+				addDisposableListener(window, event, () => this.focusEmitter.fire(this.hasFocus))
+			);
 		}
 	}
-	get hasFocus(): boolean { return !this.closed && this.window.document.hasFocus(); }
+	get hasFocus(): boolean {
+		return !this.closed && this.window.document.hasFocus();
+	}
 	private assertWindow(window = this.window): void {
 		if (this.closed || window !== this.window) throw new Error('Editor window is unavailable');
 	}
 	async focus(window: Window, options?: { mode?: FocusMode }): Promise<void> {
-		this.assertWindow(window); await this.bindings.focus(options); this.assertWindow(window);
+		this.assertWindow(window);
+		await this.bindings.focus(options);
+		this.assertWindow(window);
 	}
 	async moveTop(window: Window): Promise<void> {
-		this.assertWindow(window); await this.bindings.moveTop(); this.assertWindow(window);
+		this.assertWindow(window);
+		await this.bindings.moveTop();
+		this.assertWindow(window);
 	}
 	async setWindowDimmed(window: Window, dimmed: boolean): Promise<void> {
 		// Releasing an overlay during window teardown is idempotent and has no native effect.
 		if (this.closed && !dimmed) return;
-		this.assertWindow(window); await this.bindings.setDimmed(dimmed);
+		this.assertWindow(window);
+		await this.bindings.setDimmed(dimmed);
 	}
 	async getCursorScreenPoint(): ReturnType<IEditorWindowHost['getCursorScreenPoint']> {
-		this.assertWindow(); const result = await this.bindings.getCursorScreenPoint(); this.assertWindow(); return result;
+		this.assertWindow();
+		const result = await this.bindings.getCursorScreenPoint();
+		this.assertWindow();
+		return result;
 	}
-	override dispose(): void { this.closed = true; super.dispose(); }
+	override dispose(): void {
+		this.closed = true;
+		super.dispose();
+	}
 }

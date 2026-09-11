@@ -9,7 +9,10 @@ import type { EditorWindowHostBindings } from '../../host/browser/editorWindowHo
 /** Platform acquisition is selected by the authenticated composition, outside editor mechanisms. */
 export interface SettingsEditorEnvironment {
 	createClipboard(layout: ILayoutService): IClipboardService;
-	createContextMenu(services: ServiceCollection, instantiation: IInstantiationService): IContextMenuService & IDisposable;
+	createContextMenu(
+		services: ServiceCollection,
+		instantiation: IInstantiationService
+	): IContextMenuService & IDisposable;
 	readonly window: Omit<EditorWindowHostBindings, 'setDimmed'>;
 	readonly isDevelopment: boolean;
 }

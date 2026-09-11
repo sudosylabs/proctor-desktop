@@ -142,8 +142,14 @@ export function createAuthenticatedContribution(
 			const settingsRequests = context.disposables.add(new Emitter<void>());
 			let settingsRequested = false;
 			const select = (destination: string): void => {
-				if (destination === 'settings') { settingsRequested = true; settingsRequests.fire(); return; }
-				const safe = destinations.includes(destination) ? destination : destinations.find(value => value !== 'settings') ?? 'account';
+				if (destination === 'settings') {
+					settingsRequested = true;
+					settingsRequests.fire();
+					return;
+				}
+				const safe = destinations.includes(destination)
+					? destination
+					: (destinations.find((value) => value !== 'settings') ?? 'account');
 				current = safe;
 				for (const [id, value] of buttons) {
 					const selected = id === safe;
@@ -176,8 +182,10 @@ export function createAuthenticatedContribution(
 					return current;
 				},
 				onDidChange: destinationChange.event,
-			onDidRequestSettings: settingsRequests.event,
-			get settingsRequested() { return settingsRequested; },
+				onDidRequestSettings: settingsRequests.event,
+				get settingsRequested() {
+					return settingsRequested;
+				},
 				select
 			});
 			context.setService(AUTHENTICATED_NAVIGATION_SERVICE, navigationService);
@@ -228,7 +236,11 @@ export function createAuthenticatedContribution(
 					});
 				})
 			);
-			select(descriptor.initialDestination === 'settings' ? 'account' : descriptor.initialDestination);
+			select(
+				descriptor.initialDestination === 'settings'
+					? 'account'
+					: descriptor.initialDestination
+			);
 			if (descriptor.initialDestination === 'settings') select('settings');
 		}
 	});

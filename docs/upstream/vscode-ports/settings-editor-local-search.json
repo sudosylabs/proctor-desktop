@@ -4,9 +4,7 @@
   "clusterId": "settings-editor-local-search",
   "admission": {
     "workflow": "Complete local Settings matching, filter parsing, TF-IDF ranking and provider caching with no online/AI search service.",
-    "callers": [
-      "src/prctr/workbench/contrib/preferences/browser/preferencesSearch.ts"
-    ],
+    "callers": ["src/prctr/workbench/contrib/preferences/browser/preferencesSearch.ts"],
     "interface": "src/prctr/workbench/contrib/preferences/browser/preferencesSearch.ts",
     "decision": "docs/architecture/user-settings.md"
   },
@@ -22,9 +20,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "c53c25b7109505aab3f47ae178c46278f6dd40e16dd03602a179b027299c0a09",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -40,9 +36,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "5dbe556f360168d02e55b80da007a012e5730e3bad60a65d4e955d1ba7fc982b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -58,9 +52,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "0c96eb6f319b00704c38b24a616235529bac4712f0f2d8bd7eff362807cb54ce",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -75,9 +67,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/arrays.ts"
     },
     {
@@ -86,9 +76,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/cancellation.ts"
     },
     {
@@ -97,9 +85,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/collections.ts"
     },
     {
@@ -108,9 +94,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/filters.ts"
     },
     {
@@ -119,9 +103,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/lifecycle.ts"
     },
     {
@@ -130,9 +112,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/strings.ts"
     },
     {
@@ -141,9 +121,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/range.ts"
     },
     {
@@ -152,9 +130,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/configuration/common/configuration.ts"
     },
     {
@@ -163,9 +139,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/extensions.ts"
     },
     {
@@ -174,9 +148,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts"
     },
     {
@@ -185,9 +157,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/event.ts"
     },
     {
@@ -196,9 +166,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/workbench/services/preferences/common/preferences.ts"
     },
     {
@@ -207,9 +175,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/workbench/services/preferences/common/preferencesModels.ts"
     },
     {
@@ -218,9 +184,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/workbench/contrib/preferences/common/preferences.ts"
     },
     {
@@ -229,18 +193,14 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "Microsoft MIT attribution retained.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -249,22 +209,14 @@
     {
       "id": "exclude-ai",
       "summary": "X-03 excludes EmbeddingsSearchProvider, AiSearchProvider and their SettingsRecordProvider cache, service import and singleton registration. The existing optional getAiSearchProvider contract returns absence. LocalSearchProvider, SettingMatches, TfIdfSearchProvider and the locally computed RemoteSearchProvider are retained.",
-      "localPaths": [
-        "src/prctr/workbench/contrib/preferences/browser/preferencesSearch.ts"
-      ],
-      "verificationRefs": [
-        "settings-search-types"
-      ]
+      "localPaths": ["src/prctr/workbench/contrib/preferences/browser/preferencesSearch.ts"],
+      "verificationRefs": ["settings-search-types"]
     },
     {
       "id": "packaged-search-default",
       "summary": "Read the exact registered natural-language setting directly with the upstream true default while the static registry initializes, avoiding an assumption that an unrelated workbench.settings object already exists.",
-      "localPaths": [
-        "src/prctr/workbench/contrib/preferences/browser/preferencesSearch.ts"
-      ],
-      "verificationRefs": [
-        "settings-search-types"
-      ]
+      "localPaths": ["src/prctr/workbench/contrib/preferences/browser/preferencesSearch.ts"],
+      "verificationRefs": ["settings-search-types"]
     }
   ],
   "verification": [

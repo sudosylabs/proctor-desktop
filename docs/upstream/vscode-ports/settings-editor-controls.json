@@ -23,9 +23,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "41d6cfd7b981b2909f4bf381f54cae43ea6e8371a1f245195b007a00f952a8be",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -41,9 +39,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "57729112c4f268f932244d34b312cb2ab924e927b28b9f7ddc2427d0f91ef832",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -59,9 +55,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; use disposable constructed stylesheet handles under the strict renderer CSP; translate CSS variable and DOM class owners together. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ae5120f1befc7ff6f745dbd78be0ae01c58d5fa82db621a9c64b774326981919",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -77,9 +71,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6cf9a4e157a852479b1ab48655a51437a637279241ab895e72ed1708eefe6728",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -95,9 +87,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ab75b8e58f1ec53f31ab5c4d65b6857fc0032a893aef12e1078f1055af04572a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -113,9 +103,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d080101b5acb7be74abf4470b26df65ae3dd64b9a6bb155b84c980b8694c1ee8",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -131,9 +119,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6d8d37ba94854e2eb6770d75a8c923f7dad1513340059a99b40e31af54ed0756",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -149,9 +135,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor. Retain the original hover delegation and cached default behavior. Proctor bindings are disposable and store live owner records so teardown in either order never restores a disposed service. Instant delegates remain consumer-owned; shared defaults are window-owned.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "dda46edc8bd95605b21c950b223a38a16804c956e2fb26c28a0ee5d58004eb4f",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -167,9 +151,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a6675f01e901f5fc258ae63e4f7faa9673b05991bf5856b793cf1b5015885515",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -185,9 +167,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "marked"
-      ],
+      "licenseRefs": ["marked"],
       "localSha256": "6df8c9cad5119e3cbaf60c46d452a413bd401f15863bea3226c785f9f4ae61bb",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -203,9 +183,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "dompurify"
-      ],
+      "licenseRefs": ["dompurify"],
       "localSha256": "44d047f860729fdd9ccf6bfc78655d90e6ea88caf6f4402c8c036e149ac64775",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -221,9 +199,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "5558814f7fb45aaf5600e37adaed72f4c4969e3f907e8ce5ee03c5ea0ee5317d",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -239,9 +215,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "417686289cd3c9fe119fd5c85029af1cad4ef1211ba4e1607a6b2fb1a7ad4466",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -257,9 +231,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "88868460643799d02304f1c7710bfcebf7bdfd4d782cae7c801d5b04184b6c01",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -275,9 +247,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f407a1244ceb829eb30f780f4c6d2cfe7c420bdfe031c6df881b77642b3a2384",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -293,9 +263,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor. Retain the original hover delegation and cached default behavior. Proctor bindings are disposable and store live owner records so teardown in either order never restores a disposed service. Instant delegates remain consumer-owned; shared defaults are window-owned.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "76a1d88e31b00ee8b0cf6a9721557df484982e788becdb8f4400392801dd57e4",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -311,9 +279,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "abcbfbefe89ce0da821cf888642905af1a32387df07a2d81e39b7d2259a00496",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -329,9 +295,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; use disposable constructed stylesheet handles under the strict renderer CSP; translate CSS variable and DOM class owners together. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "0a30fb186f548b057fe5482eacfabb01f0860af7dadb0edb1310db27aa3cea87",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -347,9 +311,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "774a1f44914b3d56d0c65a1a01e49e0c4f814ed2b86dd9c138124bdf162146f9",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -365,9 +327,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "56f519f814f8eee138fb4b5323426c9b5772f3290f34278aaccc4161a961e43f",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -383,9 +343,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ea2066410e7dab5ad884f8d8b2aabdbbf0053bde7a14d64dee7e21e47b4a5424",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -401,9 +359,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "85eddac89316e1453019e4011c2a76fc88549b4d92c1c4325b5f1673ed6dcfca",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -419,9 +375,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ac5ec5b993e4fb0731bc2c05fef855b7ebce5849c52528a2eb4794cd0e5e8129",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -437,9 +391,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "936c4f9c3116445bbc211e147b8b887d668e800ee4c58f3b75325810063cbf1a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -455,9 +407,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "e6516626349c3dda89ed5a13e8870fd2cc5fec8a73e0bd967cf06d6dbf5a2c68",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -473,9 +423,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f3bc914a1bd6ad28d8081c3082ee87d0a5b6cfe200b4212e9aa9715d99bc66b3",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -491,9 +439,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "fab230c17e05c06e502df9efa020d5c65815068529a6bb88a63acb328306f8d4",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -509,9 +455,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "4a8b6b091c7a13f40e4456eaff3835691ee8d1b964d139cc68f5584dc1143073",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -527,9 +471,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "de1a6d56e696b19011aa5f357c9ad3b2f340b814447df0f02542aaaf37a3cee2",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -545,9 +487,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "63e291c383772db472d2f911e55be3312d2484ff10af9d315a20e00fac615b89",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -563,9 +503,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "62bf3ad88dc93c3bd4ccd4a5633ea083c6254c62da541a78cc42c0ae27281de6",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -581,9 +519,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "cd6063dd58654b8bd347542687435789da56c1b862787178f6c1df909b530fa4",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -599,9 +535,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a7fc63f1e3787d8a9c2bc29145a253e88520b4828db11dd39254037f921897a7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -617,9 +551,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d65c519a39447c5eaf582edf32ff29767241789651044a376a9fab7a3ccc2b7d",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -635,9 +567,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d395a3d57b59d4953205b8ea18c9cbd48caf52334d8f10c82aa6a00c5118eebc",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -653,9 +583,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "1e99188f6df02fee531ff8f2d3cd8a5cb3cad29cea02e0eaea00007ed2aa514a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -671,9 +599,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "277b111dcc4d302f1ad29fc30c01f392214e7158b86bc6311b9aa09dcdc7ebea",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -689,9 +615,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "c30b4d62c088111c8d2ea001d2fe921c1eee2d34e6faafb284c44c282f72a316",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -707,9 +631,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "63c40a7ab257f30986196e9a35e5dd906308470e0e3feadeb9cd3778e0f01514",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -725,9 +647,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f4490a102c68813a2580d5c4b873ead048fedac853cc38874a676257ce56d1fa",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -743,9 +663,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ba7b239b702d46ffe408c95f30c5d519719696c45c0188c3d8e2722429c9f6b7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -761,9 +679,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "275f6d6960a0df46bd062b218d1423514051431d173d1934384a84eb443b9567",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -779,9 +695,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "528f0683c3b54514a81984be61d20b14eee414104b67894d86e010b7f912bb34",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -797,9 +711,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "aafcf3c0d65bd83b11dfbb31a2adf4e46f0b51b38624d5df9ad3d4a2fa4cf789",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -815,9 +727,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "480a352c3de3e302eb12ec2a6af4caa0d770839968ed78fb6e6291d172530c9b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -833,9 +743,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b20c020297dd5af67106d764986dd3674ae4e1af889c6dd80934f6b74fa74400",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -851,9 +759,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b1c3aeae6bb1f81ebe42315e51476fc2d148943c827cd85a3e3bc7c4cca082fd",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -869,9 +775,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; use disposable constructed stylesheet handles under the strict renderer CSP; translate CSS variable and DOM class owners together. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "de97fc0ae4084d4727a15770ecca072baa1cd306c1027ae0e89033d30ad92a66",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -887,9 +791,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "05cb93d470752acafb7fb84b80b075b7a700da0f65de9aa993d98bb9e0a5c74e",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -905,9 +807,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ff2df7299021c491b99a699b9f8cbd96f7e1efac0285cc2bd10d04763f29ee7b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -923,9 +823,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "290257b32bdd83a67b3d792e9ff29fa1524654a9c3c187c2d3f093655ee756dd",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -941,9 +839,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "8792d9fdc8c017b5f4ba5687dfad8f64422cfd036afc940cfbe7e4235deeda06",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -959,9 +855,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "4bc66db4d21696bb2ff3b7abb1fce38d1328e22fa60b53cfccc7c713e27ad624",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -977,9 +871,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d8c239d31f914499770dffc7e5300ef11fc2e4240e5322175ac6ab569ee2e3d8",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -995,9 +887,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "36dc2887dbcc983291767729902031b8848bf9998aa2806e1c9f8a89458baba7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1013,9 +903,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "93f29540efefa5470829ca75f57126bcfca373a27fd56abf3e3cdd2f0a4b536c",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1031,9 +919,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "47ea86993abd3f6666d6078d64ecd17c602972344b2e8d0b8eeba792652b0569",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1049,9 +935,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "8fcfae8ced8167db2e1171af0dc95b01073fe99ec453a07afaaf347609e37033",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1067,9 +951,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "9af8acfe6ed8540a0e1eedd85d9e1b74fb0492eca9fd43cf5d99b6ec7bc89477",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1085,9 +967,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b1d5c24e3b05f2b4dc9cf398b66f20e12a9b2dbf1bccdaadfcb1269920ed7254",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1103,9 +983,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "fa8679b6821a5cdec6603226785e76cd679909a8b36dbb9b68a9ce464be7ddc0",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1121,9 +999,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6f4e16da71bc8a10df89a7f7f92da03156f7f160baf05335c0419268b98b9cf5",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1139,9 +1015,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6745c37869425f40defec950cf34e814f38f9533d524b09a6805a752b7b50418",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1157,9 +1031,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a7dc076d9f443c2be2379e69f74974b4d594d5387a6b456c18a19ce1d71f1e2b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1175,13 +1047,9 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Exact pinned nested runtime and notice; retained without a substitute library or changed algorithm.",
-      "licenseRefs": [
-        "marked"
-      ],
+      "licenseRefs": ["marked"],
       "localSha256": "75746ae6ff08f4e9b94090ed018e5ac1bf7dbb7e8fcdb4ec48784bd6569d9fda",
-      "mechanicalTransforms": [
-        "namespace-path-translation"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation"]
     },
     {
       "upstreamPath": "src/vs/base/common/marked/marked.license.txt",
@@ -1190,9 +1058,7 @@
       "category": "license",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "marked"
-      ],
+      "licenseRefs": ["marked"],
       "localSha256": "6ab3a4a6a465cf7dc4185d0befb57a8b6a3227f7425a1f2a7336b682139e421a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1208,9 +1074,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "dompurify"
-      ],
+      "licenseRefs": ["dompurify"],
       "localSha256": "6f8568f0368d4eebdd28da1c2709cebaa7d5e1e16866fb99f7c8b4fa56d47e61",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1226,13 +1090,9 @@
       "category": "license",
       "disposition": "copied",
       "rationale": "Exact pinned nested runtime and notice; retained without a substitute library or changed algorithm.",
-      "licenseRefs": [
-        "dompurify"
-      ],
+      "licenseRefs": ["dompurify"],
       "localSha256": "125e902252d137a2ce6902726d340b9e4f76b7f0466794c9b68b3cbd955449ce",
-      "mechanicalTransforms": [
-        "namespace-path-translation"
-      ]
+      "mechanicalTransforms": ["namespace-path-translation"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/menu/menu.ts",
@@ -1241,9 +1101,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve source menu rendering and menu item behavior with Proctor class/color namespaces and owned constructed styles; native macOS popup selection remains behind the separate bounded transport.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "67418b34c097dde6c5708c815ccf58d33059dbb778da277abbcf2bae70944e67",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1259,9 +1117,7 @@
       "category": "style",
       "disposition": "adapted",
       "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "9e7c850db07fe619a1dc24ed870f4aa2d84ab076f12cf7b7e47d55248d6f0bf9",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1277,9 +1133,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; use disposable constructed stylesheet handles under the strict renderer CSP. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3ae7a114a617d719dd7ee475bae02cb22f164f8ca44305ebffe61bc21f965cd0",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1295,9 +1149,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f536f4c6fd1e856187f149110bf3299585d121cf11fff47d639173eaa69cb490",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1313,9 +1165,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "41d9589bfa9c6d5339b4d7f9b6a1dbbdc83beaeeca68e01f32c7e2c3c734a1d9",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1331,9 +1181,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "52d8d03c6da5b2fae1ee75c3f680095af90592dd9fcf887b24ab2d334f03fcb5",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1348,9 +1196,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/vscodeNls.ts"
     },
     {
@@ -1359,9 +1205,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/dom.ts"
     },
     {
@@ -1370,9 +1214,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/keyboardEvent.ts"
     },
     {
@@ -1381,9 +1223,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/browser.ts"
     },
     {
@@ -1392,9 +1232,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/dnd.ts"
     },
     {
@@ -1403,9 +1241,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/touch.ts"
     },
     {
@@ -1414,9 +1250,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/canIUse.ts"
     },
     {
@@ -1425,9 +1259,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/domStylesheets.ts"
     },
     {
@@ -1436,9 +1268,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/mouseEvent.ts"
     },
     {
@@ -1447,9 +1277,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/lifecycle.ts"
     },
     {
@@ -1458,9 +1286,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/layout.ts"
     },
     {
@@ -1469,9 +1295,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/platform.ts"
     },
     {
@@ -1480,9 +1304,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/types.ts"
     },
     {
@@ -1491,9 +1313,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/scrollbar/scrollableElement.ts"
     },
     {
@@ -1502,9 +1322,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/keyCodes.ts"
     },
     {
@@ -1513,9 +1331,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/cancellation.ts"
     },
     {
@@ -1524,9 +1340,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/htmlContent.ts"
     },
     {
@@ -1535,9 +1349,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/lazy.ts"
     },
     {
@@ -1546,9 +1358,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/event.ts"
     },
     {
@@ -1557,9 +1367,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/errors.ts"
     },
     {
@@ -1568,9 +1376,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/iconLabels.ts"
     },
     {
@@ -1579,9 +1385,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/marshalling.ts"
     },
     {
@@ -1590,9 +1394,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/network.ts"
     },
     {
@@ -1601,9 +1403,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/objects.ts"
     },
     {
@@ -1612,9 +1412,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/path.ts"
     },
     {
@@ -1623,9 +1421,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/resources.ts"
     },
     {
@@ -1634,9 +1430,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/strings.ts"
     },
     {
@@ -1645,9 +1439,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/uri.ts"
     },
     {
@@ -1656,9 +1448,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/trustedTypes.ts"
     },
     {
@@ -1667,9 +1457,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/themables.ts"
     },
     {
@@ -1678,9 +1466,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/list/listWidget.ts"
     },
     {
@@ -1689,9 +1475,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/widget.ts"
     },
     {
@@ -1700,9 +1484,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/arrays.ts"
     },
     {
@@ -1711,9 +1493,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/scrollable.ts"
     },
     {
@@ -1722,9 +1502,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/cssValue.ts"
     },
     {
@@ -1733,9 +1511,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/event.ts"
     },
     {
@@ -1744,9 +1520,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/list/list.ts"
     },
     {
@@ -1755,9 +1529,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/actions.ts"
     },
     {
@@ -1766,9 +1538,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/codicons.ts"
     },
     {
@@ -1777,9 +1547,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/keybindings.ts"
     },
     {
@@ -1788,9 +1556,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/color.ts"
     },
     {
@@ -1799,9 +1565,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/aria/aria.ts"
     },
     {
@@ -1810,9 +1574,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/collections.ts"
     },
     {
@@ -1821,9 +1583,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/extpath.ts"
     },
     {
@@ -1832,9 +1592,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/list/listView.ts"
     },
     {
@@ -1843,9 +1601,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/async.ts"
     },
     {
@@ -1854,9 +1610,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/symbols.ts"
     },
     {
@@ -1865,9 +1619,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/diff/diff.ts"
     },
     {
@@ -1876,9 +1628,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/iterator.ts"
     },
     {
@@ -1887,9 +1637,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/map.ts"
     },
     {
@@ -1898,9 +1646,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/filters.ts"
     },
     {
@@ -1909,9 +1655,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/numbers.ts"
     },
     {
@@ -1920,9 +1664,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observable.ts"
     },
     {
@@ -1931,9 +1673,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/decorators.ts"
     },
     {
@@ -1942,9 +1682,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/browser/ui/sash/sash.ts"
     },
     {
@@ -1953,9 +1691,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/codiconsUtil.ts"
     },
     {
@@ -1964,9 +1700,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Shared dependency in the existing owner. Browser type integration and preserved control suites verify consumed interfaces; final composed Modern UI verification remains required.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/sequence.ts"
     },
     {
@@ -1975,34 +1709,26 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "Microsoft MIT notice retained.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     },
     {
       "id": "marked",
       "name": "MIT License",
-      "upstreamPaths": [
-        "src/vs/base/common/marked/marked.license.txt"
-      ],
+      "upstreamPaths": ["src/vs/base/common/marked/marked.license.txt"],
       "localNoticePath": "src/prctr/base/common/marked/marked.license.txt"
     },
     {
       "id": "dompurify",
       "name": "Apache License 2.0 OR Mozilla Public License 2.0",
-      "upstreamPaths": [
-        "src/vs/base/browser/dompurify/dompurify.license.txt"
-      ],
+      "upstreamPaths": ["src/vs/base/browser/dompurify/dompurify.license.txt"],
       "localNoticePath": "src/prctr/base/browser/dompurify/dompurify.license.txt"
     }
   ],
@@ -2044,10 +1770,7 @@
         "src/prctr/base/browser/ui/grid/gridview.css",
         "src/prctr/base/browser/ui/table/table.css"
       ],
-      "verificationRefs": [
-        "source-audit",
-        "browser-types"
-      ]
+      "verificationRefs": ["source-audit", "browser-types"]
     },
     {
       "id": "existing-product-controls",
@@ -2057,9 +1780,7 @@
         "src/prctr/base/browser/ui/toggle/toggleControl.ts",
         "src/prctr/base/browser/ui/menu/menuControl.ts"
       ],
-      "verificationRefs": [
-        "browser-types"
-      ]
+      "verificationRefs": ["browser-types"]
     },
     {
       "id": "window-hover-binding-lifetime",
@@ -2069,9 +1790,7 @@
         "src/prctr/base/browser/ui/hover/hoverDelegate2.ts",
         "src/prctr/workbench/services/settings/browser/settingsEditorControlServices.ts"
       ],
-      "verificationRefs": [
-        "hover-lifetime"
-      ]
+      "verificationRefs": ["hover-lifetime"]
     },
     {
       "id": "owned-control-styles",
@@ -2103,10 +1822,7 @@
         "src/prctr/base/browser/ui/table/table.css",
         "src/prctr/base/browser/ui/table/tableWidget.ts"
       ],
-      "verificationRefs": [
-        "settings-regressions",
-        "hover-lifetime"
-      ]
+      "verificationRefs": ["settings-regressions", "hover-lifetime"]
     }
   ],
   "verification": [

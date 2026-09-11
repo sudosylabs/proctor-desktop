@@ -4,9 +4,7 @@
   "clusterId": "workbench-notifications",
   "admission": {
     "workflow": "Per-window nonmodal notification feedback, retained notification center, prompts/actions, progress and accessibility in AuthenticatedWindow and CandidateWindow.",
-    "callers": [
-      "src/prctr/code/electron-browser/workbench.desktop.main.ts"
-    ],
+    "callers": ["src/prctr/code/electron-browser/workbench.desktop.main.ts"],
     "interface": "src/prctr/platform/notification/common/notification.ts",
     "decision": "docs/architecture/workbench.md"
   },
@@ -21,9 +19,7 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "Applicable upstream MIT license retained in the canonical notices.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/browser/browser.ts",
@@ -31,9 +27,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/browser/browser.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -42,9 +36,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/browser/cssValue.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -53,14 +45,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/dnd.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "910747a5ecd3918e7aff4dad8ef32817c5e71624e1d5ab2595ddd5dfcb9c362c",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/dom.ts",
@@ -68,9 +56,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/browser/dom.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -78,9 +64,7 @@
       "upstreamBlob": "72fa42df1a6a537fb1138c0729eef3531209b36b",
       "category": "source",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The only selected call site is list styling. An owned scoped constructed stylesheet preserves dynamic list styles under strict CSP; the unused upstream global stylesheet-cloning registry is not transferred.",
       "localInterface": "src/prctr/base/browser/ui/list/listWidget.ts"
     },
@@ -90,14 +74,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/event.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "fa33f43bcfe3ffa6fad205a469c6ac080d7aaa4e2b4225a111785e3caf837155",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/fastDomNode.ts",
@@ -105,9 +85,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/browser/fastDomNode.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -116,14 +94,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/globalPointerMoveMonitor.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "e383e43afd1797530c8c04bf98b57b5e70945d89f978fb93c46ce9bf85b11c05",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/keyboardEvent.ts",
@@ -131,9 +105,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/browser/keyboardEvent.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -142,9 +114,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/browser/mouseEvent.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -153,9 +123,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/browser/touch.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -165,13 +133,9 @@
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationActionbar.css",
       "localSha256": "135ed50fa350f2be9363b46c07c0e95b536afde6fed3c31e357a6afc2d0db2dc",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/actionbar/actionbar.ts",
@@ -180,9 +144,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationsViewer.ts",
       "rationale": "Native buttons retain activation, enabled state, labels, focus, menus, errors and disposal; DOM order follows the visual reading order.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/aria/aria.css",
@@ -190,9 +152,7 @@
       "category": "style",
       "localPath": "src/prctr/base/browser/ui/aria/aria.css",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "9eec7e67d7344b3abf69c8c13418f14f8a34341d19d6f267a1c228c6387afa8e",
       "mechanicalTransforms": [
@@ -208,9 +168,7 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/aria/aria.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "101da1f34cd388cfffe3a52f27a4849911db2c57b6027739a0e6791280919b0e",
       "mechanicalTransforms": [
@@ -227,13 +185,9 @@
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationButton.css",
       "localSha256": "5f9142740c23b2668e5d4d299bc9fc5e2bb6441dd56b4d521afe3efc6385b2d4",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/button/button.ts",
@@ -241,9 +195,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/browser/ui/button/buttonControl.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -252,9 +204,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "Dialog progress is a separate modal workflow and must not be implicitly admitted by a notification progress service.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/dnd/dnd.css",
@@ -262,9 +212,7 @@
       "category": "style",
       "localPath": "src/prctr/base/browser/ui/dnd/dnd.css",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "d186762b7639002d5929e800171ba4bd71c249f9a9d7d40e96b3a8ef94481f1c",
       "mechanicalTransforms": [
@@ -280,9 +228,7 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/dnd/dnd.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "a4f6310f37905ed2efc19350248188c052b93747aa1c6fcf14d8b1c07d767702",
       "mechanicalTransforms": [
@@ -299,9 +245,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationMenu.ts",
       "rationale": "Primary split choices and secondary menus share the full owned menu interaction implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/hover/hover.ts",
@@ -310,9 +254,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationHover.ts",
       "rationale": "Full plain-text notification message/source hovers update from the current item; no HTML or markdown hover renderer is needed by this call site.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/hover/hoverDelegateFactory.ts",
@@ -321,9 +263,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationHover.ts",
       "rationale": "Plain-text notification hovers own timing, pointer persistence, focus, Escape, viewport placement, descriptions and cleanup.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/list/list.css",
@@ -331,9 +271,7 @@
       "category": "style",
       "localPath": "src/prctr/base/browser/ui/list/list.css",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "6c43b08c54619a3771da03bd21d16f172627a3c0d79d7e57d915af7c5c7b6d48",
       "mechanicalTransforms": [
@@ -349,9 +287,7 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/list/list.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "fb20541d059421b6937c4e93d4ab4f843f59c108f77f95551ab149c2d3ce9f1e",
       "mechanicalTransforms": [
@@ -367,9 +303,7 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/list/listView.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "ba4ecb69c071b6f8764860fab28bbae94f7005a30db581fc65594d11a53fe759",
       "mechanicalTransforms": [
@@ -385,9 +319,7 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/list/listWidget.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Preserve list layout, events, navigation and style rules. DefaultStyleController accepts an owned CSP stylesheet handle, disposes it with the list, and keeps externally supplied CSSStyleSheet ownership unchanged.",
       "localSha256": "ac241fcf610c34e93ab1ccd3295614c8dacbe9042e06c41c70e808f787311359",
       "mechanicalTransforms": [
@@ -403,14 +335,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/list/rangeMap.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "4946729f2099e5194b09b5ef440a5def38fb4df690955957dc36303d852eeb02",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/list/rowCache.ts",
@@ -418,9 +346,7 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/list/rowCache.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "3e8bc4dd968d0b8c6bbb40524060d17b6cb09698b3d390d235e03d7155dcef59",
       "mechanicalTransforms": [
@@ -436,14 +362,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/list/splice.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Preserve splice semantics and add the repository-required final newline.",
       "localSha256": "70c81cfbdd0762db4b79a1f3ba14aa82d326c362b2506ea3457d181a78145e60",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/progressbar/progressAccessibilitySignal.ts",
@@ -452,13 +374,9 @@
       "localPath": "src/prctr/base/browser/ui/progressbar/progressAccessibilitySignal.ts",
       "localSha256": "e3eebe9fcfa7883ceb34eb576924f29d18a24b54be78816e15f773fdd51b3381",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/progressbar/progressbar.css",
@@ -467,13 +385,9 @@
       "localPath": "src/prctr/base/browser/ui/progressbar/progressbar.css",
       "localSha256": "7ee74ad5242d094667e9665c1cfa5b62b5a89dda7780a69de7830d04c034a1ac",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/progressbar/progressbar.ts",
@@ -482,13 +396,9 @@
       "localPath": "src/prctr/base/browser/ui/progressbar/progressbar.ts",
       "localSha256": "de7b4bfa8ee05d2c1c94dcb4a0a809df70407676bdddbb72a880bad89393264f",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/scrollbar/abstractScrollbar.ts",
@@ -496,14 +406,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/scrollbar/abstractScrollbar.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "0b4d2be6c8f61d1dcc8d4695583deb985d25b2da30d0c0077b391f7857cc5a1e",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/scrollbar/horizontalScrollbar.ts",
@@ -511,14 +417,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/scrollbar/horizontalScrollbar.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "c2bca555ad84e7fffa64429a37b64a4d169067e7a7a8061afcd84cc753df5cc6",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/scrollbar/media/scrollbars.css",
@@ -526,9 +428,7 @@
       "category": "style",
       "localPath": "src/prctr/base/browser/ui/scrollbar/media/scrollbars.css",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "e489b3282376fec9533a2b0a043461b391e628e45736e971aa9c0f27413ef2ae",
       "mechanicalTransforms": [
@@ -544,9 +444,7 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/scrollbar/scrollableElement.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "b80f2cd7be3ccc81814c2359e76e6b2c70623835e2bc7558c35cfb9318a70fe4",
       "mechanicalTransforms": [
@@ -562,14 +460,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/scrollbar/scrollableElementOptions.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "1a2f78818c53d7078bccb20d692f0ac9da900d61d2c88d9d3d2138d3d7a2ed34",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/scrollbar/scrollbarArrow.ts",
@@ -577,14 +471,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/scrollbar/scrollbarArrow.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "1dd78ffb84c148777c62eb5c1b1eb629fff16753b0b5b67078a1373c033afa5c",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/scrollbar/scrollbarState.ts",
@@ -592,14 +482,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/scrollbar/scrollbarState.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "710056f10f8c1cfd4520cb1d21dce9bfb410259dd68296fb98ad200922b01c01",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/scrollbar/scrollbarVisibilityController.ts",
@@ -607,14 +493,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/scrollbar/scrollbarVisibilityController.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "755fff234aaf74c36f142f96a84c52b5e3e483035cd8538df2a0dcf45503146b",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/scrollbar/verticalScrollbar.ts",
@@ -622,14 +504,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/scrollbar/verticalScrollbar.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "bceb511ad18e19cb1c2d197f6ae86f93b41baf479c03dce96580c6791348c4e8",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/widget.ts",
@@ -637,14 +515,10 @@
       "category": "source",
       "localPath": "src/prctr/base/browser/ui/widget.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "3ebd4a3ad7c12a32b8c074973c59a51c173a353b65a250f5a2b9c6b0add8bdc2",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/window.ts",
@@ -652,9 +526,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/browser/window.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -663,9 +535,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/actions.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -674,9 +544,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/arrays.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -685,9 +553,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/async.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -696,9 +562,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/charCode.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -707,9 +571,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/codicons.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -718,9 +580,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/color.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -729,9 +589,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/decorators.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -740,9 +598,7 @@
       "category": "source",
       "localPath": "src/prctr/base/common/errorMessage.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "f428edc04e8eb0da1dc3b51a6c2a9cf02b8d3e6add958dadb693a370b51ec2aa",
       "mechanicalTransforms": [
@@ -758,9 +614,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/errors.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -769,9 +623,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/event.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -780,14 +632,10 @@
       "category": "source",
       "localPath": "src/prctr/base/common/filters.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "7e1c5ba7b5125492dfd3708f707fb1982abe96c6c35761d479696c3a2f28aaa8",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/iconLabels.ts",
@@ -796,9 +644,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/linkedText.ts",
       "rationale": "Progress producers supply plain localized text; embedded Codicon label syntax is not part of Proctor notification messages.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/common/keyCodes.ts",
@@ -806,9 +652,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/keyCodes.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -817,9 +661,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/lifecycle.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -828,14 +670,10 @@
       "category": "source",
       "localPath": "src/prctr/base/common/linkedText.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "21fae1188881f9f6569ff3ec83124896ad5759ec491d193f733ecdc5c0112897",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/map.ts",
@@ -843,9 +681,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/map.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -854,14 +690,10 @@
       "category": "source",
       "localPath": "src/prctr/base/common/mime.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "b563e26a66ad13a6dfddf8a94c28e4fb32b1efe477a5d90bcb9c0bf9a984a98b",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/naturalLanguage/korean.ts",
@@ -869,14 +701,10 @@
       "category": "source",
       "localPath": "src/prctr/base/common/naturalLanguage/korean.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "529934fddf5d57dd998a16d6075006dd921e72ef77f0615d11a3f991c6e3d624",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/normalization.ts",
@@ -884,14 +712,10 @@
       "category": "source",
       "localPath": "src/prctr/base/common/normalization.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "e15cb5b6f62101dcacebac3d02ba44d51a03d6c0574b5bc167b2b51a196f9726",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/numbers.ts",
@@ -899,9 +723,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/numbers.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -910,9 +732,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/observable.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -921,9 +741,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/path.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -932,9 +750,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/platform.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -943,14 +759,10 @@
       "category": "source",
       "localPath": "src/prctr/base/common/range.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "820f6445a864a4b6510d6486c182f408e382812d8862d5fbc24fd5c2d7ed3991",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/scrollable.ts",
@@ -958,14 +770,10 @@
       "category": "source",
       "localPath": "src/prctr/base/common/scrollable.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "57db5be6332206fc102cc35c086f6e306a9b71677f35019ccf70b9b5fa5b4be4",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/sequence.ts",
@@ -973,9 +781,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/sequence.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -984,14 +790,10 @@
       "category": "source",
       "localPath": "src/prctr/base/common/severity.ts",
       "disposition": "copied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "06f1dead702388fdd817bee3815c0e913efbb9eb32ac6d5aad26accfd2367569",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/strings.ts",
@@ -999,9 +801,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/strings.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1010,9 +810,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/themables.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1021,9 +819,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/types.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1032,9 +828,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/uri.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1043,9 +837,7 @@
       "category": "test",
       "disposition": "adapted",
       "localPath": "test/browser/upstream/notifications/listView.test.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "58704860e5657770fd8f1c37053a2cbf2130a09c6a28e01fae7d58efbea5db23",
       "mechanicalTransforms": [
@@ -1061,9 +853,7 @@
       "category": "test",
       "disposition": "adapted",
       "localPath": "test/browser/upstream/notifications/listWidget.test.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "0ed527d620f73562f1366fea77fd7c8fc36996953301fe20693b410f07dd2829",
       "mechanicalTransforms": [
@@ -1079,9 +869,7 @@
       "category": "test",
       "disposition": "adapted",
       "localPath": "test/browser/upstream/notifications/rangeMap.test.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "68e13bb2065545acd72e16ba39212fe5194aa91d78e3dfa8f81c0f32396677a0",
       "mechanicalTransforms": [
@@ -1097,9 +885,7 @@
       "category": "test",
       "disposition": "adapted",
       "localPath": "test/browser/upstream/notifications/scrollableElement.test.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "a3c11f425f813064b234212bca0649904414578d4986d1175801ec0d43244b95",
       "mechanicalTransforms": [
@@ -1115,9 +901,7 @@
       "category": "test",
       "disposition": "adapted",
       "localPath": "test/browser/upstream/notifications/scrollbarState.test.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "8d7fa577fbd76e95d0c0f8d382fda222dc82da974c2500a9a34dfcd2e06893f3",
       "mechanicalTransforms": [
@@ -1133,9 +917,7 @@
       "category": "test",
       "disposition": "adapted",
       "localPath": "test/base/common/upstream/filters.test.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "29a4feaefb8c1f1cb636d3cf2fb18b9f37ee67cdcd82264e7998e2ea3d800797",
       "mechanicalTransforms": [
@@ -1151,9 +933,7 @@
       "category": "test",
       "disposition": "adapted",
       "localPath": "test/base/common/upstream/linkedText.test.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "b7768e8ff19bf65542fc25179fe45726faf62062154ff305111764cff01b4334",
       "mechanicalTransforms": [
@@ -1169,9 +949,7 @@
       "category": "test",
       "disposition": "adapted",
       "localPath": "test/base/common/upstream/scrollable.test.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "c42080cc00889f8e3cd58191bef88b103ca5b3ed155272bdc09608fbbaaa87c7",
       "mechanicalTransforms": [
@@ -1188,9 +966,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "test/base/common/upstream/upstreamTestUtils.ts",
       "rationale": "Admitted test adapters enforce disposable ownership in Node; the browser adapter applies the same test lifecycle through browserOwnerTests.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/nls.ts",
@@ -1198,9 +974,7 @@
       "category": "source",
       "localInterface": "src/prctr/base/common/vscodeNls.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1210,9 +984,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationAccessibleView.ts",
       "rationale": "A labelled read-only text view provides the full original message, severity, source, navigation and actions, with focus restoration.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/accessibility/browser/accessibleViewRegistry.ts",
@@ -1221,9 +993,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationsCommands.ts",
       "rationale": "Accessible notification reading is registered literally through the Proctor command seam.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/accessibility/common/accessibility.ts",
@@ -1232,9 +1002,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationsAlerts.ts",
       "rationale": "Severity-aware live announcements and accessible names are available without requiring a global screen-reader-mode registry.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/accessibilitySignal/browser/accessibilitySignalService.ts",
@@ -1242,9 +1010,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "The configurable global workbench sound engine is outside the admitted notification cluster. Visible state, explicit action labels, live text and Accessible View carry notification outcomes.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/actions/browser/menuEntryActionViewItem.ts",
@@ -1253,9 +1019,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationMenu.ts",
       "rationale": "Static Proctor menu entries provide the actions without upstream contribution aggregation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/actions/common/actions.ts",
@@ -1264,9 +1028,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/actions/common/proctorActions.ts",
       "rationale": "Only literal Proctor action registrations and conditions are admitted.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/commands/common/commands.ts",
@@ -1274,9 +1036,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/commands/common/commands.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1285,9 +1045,7 @@
       "category": "source",
       "localInterface": "src/prctr/workbench/services/notification/common/notificationPreferences.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1296,9 +1054,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/contextkey/common/contextkey.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1308,9 +1064,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationMenu.ts",
       "rationale": "Window-owned menus provide submenus, typeahead, roving focus, single-line labels, upstream anchor layout, outside dismissal and safe focus restoration. Popup stacking stays above notifications within the window-owned notification layer.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/hover/browser/hover.ts",
@@ -1319,9 +1073,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationHover.ts",
       "rationale": "Notification-owned hover lifetime is scoped to the row and window interaction gate.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/instantiation/common/extensions.ts",
@@ -1329,9 +1081,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/instantiation/common/extensions.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1340,9 +1090,7 @@
       "category": "source",
       "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts",
       "disposition": "locally-satisfied",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1351,9 +1099,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/keybinding/common/keybinding.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1362,9 +1108,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/keybinding/common/keybindingsRegistry.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1374,9 +1118,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationPresentation.ts",
       "rationale": "Notification layout is scoped to the owning window.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/list/browser/listService.ts",
@@ -1385,9 +1127,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationsList.ts",
       "rationale": "The complete upstream base List is retained. Proctor binds notification labels, focus, keyboard selection, geometry and theme directly; WorkbenchList tree/table/configuration aggregates do not activate.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/notification/common/notification.ts",
@@ -1395,9 +1135,7 @@
       "category": "source",
       "localPath": "src/prctr/platform/notification/common/notification.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "810d606dcb9dcbad7a09907eaaa005f28365c4d9c744c89ae1cbaa49fb44ea9c",
       "mechanicalTransforms": [
@@ -1414,9 +1152,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationPresentation.ts",
       "rationale": "Links require an explicitly supplied capability adapter that authorizes at execution; absent adapters render safe text. No command URI or generic external opener is introduced into Candidate.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/progress/common/progress.ts",
@@ -1425,9 +1161,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/notification/common/notificationProgress.ts",
       "rationale": "Notification progress exposes delayed display, reporting, action/cancel ownership and task lifetime through a small explicit interface.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/quickinput/common/quickInput.ts",
@@ -1436,9 +1170,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationMenu.ts",
       "rationale": "All source filters remain available in a scrollable keyboard/typeahead menu rather than importing Quick Pick and its unrelated product registries.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/storage/common/storage.ts",
@@ -1447,9 +1179,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/notification/common/notificationStorage.ts",
       "rationale": "Validated suppression and source-filter preferences map to declared Proctor device/principal/Attempt scopes; notification content is window-session only.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/telemetry/common/telemetry.ts",
@@ -1457,9 +1187,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "Notification actions do not emit upstream telemetry or log raw messages/errors.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/theme/browser/defaultStyles.ts",
@@ -1468,9 +1196,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/theme/common/tokens.ts",
       "rationale": "Shared semantic tokens supply every admitted list/notification appearance.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/theme/common/themeService.ts",
@@ -1479,9 +1205,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/theme/browser/themeService.ts",
       "rationale": "The packaged color-theme engine supplies role colors and static theming participants; live presentation preferences retain their Proctor owner.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/window/common/window.ts",
@@ -1490,9 +1214,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationPresentation.ts",
       "rationale": "Measured composition titlebar geometry replaces an upstream global constant.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/browser/parts/dialogs/dialog.ts",
@@ -1500,9 +1222,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "Modal progress dialogs are excluded from ordinary notification presentation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/browser/parts/notifications/media/notificationsActions.css",
@@ -1511,13 +1231,9 @@
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationsActions.css",
       "localSha256": "ea4e7fd269c8612f404767d463372358624be0e23666b87aaa63c91bbca68d19",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/workbench/browser/parts/notifications/media/notificationsCenter.css",
@@ -1526,13 +1242,9 @@
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationsCenter.css",
       "localSha256": "8361dee651b440f2575c8afbf9a3afbb38b93f45ca970aa9c14e61e87b465a46",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/workbench/browser/parts/notifications/media/notificationsList.css",
@@ -1541,13 +1253,9 @@
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationsList.css",
       "localSha256": "74cc94bde2d29bf430692980751b17ad5a3e895fab5d0f279970c97de0d98884",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/workbench/browser/parts/notifications/media/notificationsToasts.css",
@@ -1556,13 +1264,9 @@
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationsToasts.css",
       "localSha256": "9f596c5fd44fe848590439a7e10c83ac70723816db3767f59fe5b1217ee9f3ba",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/workbench/browser/parts/notifications/notificationAccessibleView.ts",
@@ -1570,9 +1274,7 @@
       "category": "source",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notificationAccessibleView.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "d01b16677d1277f9536781f5e67f36cb81f0d93ed6c01b93856cb4b4ca5ac893",
       "mechanicalTransforms": [
@@ -1589,9 +1291,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationsViewer.ts",
       "rationale": "Shared execution methods preserve close guards, expand/collapse, keepOpen, source configuration, copying through an authorized adapter, and action failures.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/browser/parts/notifications/notificationsAlerts.ts",
@@ -1599,9 +1299,7 @@
       "category": "source",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notificationsAlerts.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "c45c23f483bcd16e067434e7e863a10cc27e42a0ca50f717c6d471bea1667f40",
       "mechanicalTransforms": [
@@ -1617,9 +1315,7 @@
       "category": "source",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notificationsCenter.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "b762acedd3396174bb5125ba4346186cf2c321bfd4648fd7f314e81d5c3e500c",
       "mechanicalTransforms": [
@@ -1635,9 +1331,7 @@
       "category": "source",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notificationsCommands.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "7703eb55ddf6666e771afedb139b7b194e047c05644fe66181a156385b7294a1",
       "mechanicalTransforms": [
@@ -1653,9 +1347,7 @@
       "category": "source",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notificationsList.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Keep the notification list adaptation and remeasure rows on the shared density metric event; dispose the listener with the list.",
       "localSha256": "5a8dc30c252a66a27ef36cc1b8824c715538e5132ffdb4551adb3b3914277557",
       "mechanicalTransforms": [
@@ -1671,9 +1363,7 @@
       "category": "source",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notificationsStatus.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "418cc858b8b398a1ed6e4a2ebce43124782cc3a56e51cc4f8adca76986c04f37",
       "mechanicalTransforms": [
@@ -1689,9 +1379,7 @@
       "category": "source",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notificationsToasts.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "5674a319c20ac91bdef5f0ce1f1cd53e55e662facadae3def6171824e24ebd7e",
       "mechanicalTransforms": [
@@ -1707,9 +1395,7 @@
       "category": "source",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notificationsViewer.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Keep the admitted Proctor notification row renderer. Export default/compact row metrics and an event so Modern UI density changes remeasure existing lists.",
       "localSha256": "36973ac08d8726f8fbe4f01e09b2c72f45e135621b6f0c0bafb508a05a9653c1",
       "mechanicalTransforms": [
@@ -1725,14 +1411,10 @@
       "category": "source",
       "disposition": "copied",
       "localPath": "src/prctr/workbench/browser/parts/notifications/pendingNotificationToasts.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "08f7aa9252b94e0fdc7ce6cd94fc60e5accb40209404096679ae35f35e02e008",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/workbench/common/contextkeys.ts",
@@ -1740,9 +1422,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/common/contextKeys.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "The existing admitted Proctor module supplies this dependency through its established interface."
     },
     {
@@ -1751,9 +1431,7 @@
       "category": "source",
       "localPath": "src/prctr/workbench/common/notifications.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "30eb8f804e2d0b3406405e4f1c6e0f74765382082a94e9c54ebb998faaa479de",
       "mechanicalTransforms": [
@@ -1770,9 +1448,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/theme/common/tokens.ts",
       "rationale": "Semantic notification surfaces, borders, feedback and focus use the shared Proctor token registry.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/common/views.ts",
@@ -1780,9 +1456,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "View progress and arbitrary registered workbench views are outside notification ownership.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/fontRamp.css",
@@ -1791,13 +1465,9 @@
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/browser/parts/notifications/notifications.css",
       "localSha256": "7652c8453904511b4cbd6cc5669030b582f80543aa6aabed7bb65e585e5785c4",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the notification header capitalize, label1 size, and semibold declarations, mapping only Proctor tokens; all non-notification typography selectors are excluded. The same owner stylesheet contains existing shell/reader integration.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/notificationsDialogs.css",
@@ -1806,13 +1476,9 @@
       "localPath": "src/prctr/workbench/browser/parts/notifications/media/notificationsModern.css",
       "localSha256": "f1b6a9cefb2e9482ec5d34e50338bd37ac59fd102b1ef2b1985099e490e8426d",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain upstream notification presentation and control behavior. CSS changes are owner namespace, cascade wrapping and Proctor token substitutions; scoped rules need no upstream important overrides. Dialog selectors are excluded from the Modern UI module. Progress accepts caller-localized labels and owns its fade timer.",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/activity/common/activity.ts",
@@ -1820,9 +1486,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "Activity-badge progress belongs to unrelated view/container progress locations; this cluster admits notification progress and its status fallback.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/editor/common/editorGroupsService.ts",
@@ -1831,9 +1495,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationComposition.ts",
       "rationale": "Focus returns to the still-visible originating control or composition fallback without importing editor-group ownership.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/environment/common/environmentService.ts",
@@ -1841,9 +1503,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "Upstream development/test flags are not used to choose production behavior; isolated Proctor fixtures supply their own environment.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/host/browser/host.ts",
@@ -1852,9 +1512,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationsToasts.ts",
       "rationale": "Each window supplies its own document focus and events; timeout resumes only after focus returns.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/layout/browser/layoutService.ts",
@@ -1863,9 +1521,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationPresentation.ts",
       "rationale": "Composition supplies actual window geometry and reserved native titlebar/status heights.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/lifecycle/common/lifecycle.ts",
@@ -1874,9 +1530,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/common/lifecycle.ts",
       "rationale": "Authenticated and Candidate notifications start at Restored. Launch does not compose this subsystem.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/notification/common/notificationService.ts",
@@ -1884,9 +1538,7 @@
       "category": "source",
       "localPath": "src/prctr/workbench/services/notification/common/notificationService.ts",
       "disposition": "adapted",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "b21293f1ca644845e0d733b45ef551789402755bdec4d3bdba0b052c8a63cb29",
       "mechanicalTransforms": [
@@ -1902,9 +1554,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "Pane-composite progress is outside the notification progress contract.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/progress/browser/media/progressService.css",
@@ -1912,9 +1562,7 @@
       "category": "style",
       "disposition": "excluded",
       "rationale": "Styles for excluded view/dialog/window aggregate progress are not transferred; notification bars/status consume owning Proctor styles.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/progress/browser/progressService.ts",
@@ -1922,9 +1570,7 @@
       "category": "source",
       "disposition": "adapted",
       "localPath": "src/prctr/workbench/services/notification/common/notificationProgress.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "445d9764ea8a72fd6144f751134794053db8662d7d90d981575a26ee19fcf657",
       "mechanicalTransforms": [
@@ -1941,9 +1587,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/browser/parts/notifications/notificationsStatus.ts",
       "rationale": "An owned status indicator tracks unread and active progress, timed status messages and hidden-progress fallback.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/userActivity/common/userActivityService.ts",
@@ -1951,9 +1595,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "Notification progress does not keep a candidate participation or user-activity authority alive.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/views/common/viewsService.ts",
@@ -1961,9 +1603,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "View-container progress is excluded; explicit Proctor window compositions remain authoritative.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/test/browser/notificationsList.test.ts",
@@ -1971,9 +1611,7 @@
       "category": "test",
       "disposition": "evidence-only",
       "rationale": "Reviewed scheduling, deduplication, removal, live row sizing/focus, severity/source labels, progress affordances and position expectations; Proctor browser fixtures exercise the admitted interface. Fixed bell placement and semantic icon geometry are explicit composition divergences.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/test/browser/notificationsPosition.test.ts",
@@ -1981,9 +1619,7 @@
       "category": "test",
       "disposition": "evidence-only",
       "rationale": "Reviewed scheduling, deduplication, removal, live row sizing/focus, severity/source labels, progress affordances and position expectations; Proctor browser fixtures exercise the admitted interface. Fixed bell placement and semantic icon geometry are explicit composition divergences.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/test/browser/notificationsToasts.test.ts",
@@ -1991,9 +1627,7 @@
       "category": "test",
       "disposition": "evidence-only",
       "rationale": "Reviewed scheduling, deduplication, removal, live row sizing/focus, severity/source labels, progress affordances and position expectations; Proctor browser fixtures exercise the admitted interface. Fixed bell placement and semantic icon geometry are explicit composition divergences.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/test/common/notifications.test.ts",
@@ -2001,9 +1635,7 @@
       "category": "test",
       "disposition": "adapted",
       "localPath": "test/workbench/common/upstream/notifications.test.ts",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
       "localSha256": "d8c24cc1eb83790076a4b906f7e27c189405f5761e27ae5b676a4be2ba238605",
       "mechanicalTransforms": [
@@ -2019,14 +1651,10 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve complete upstream anchor alignment, flipping, overlap handling and two-dimensional placement for notification menus and hovers.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/common/layout.ts",
       "localSha256": "59efba1a96187b6c0b197febf326d1c0cbb25a501fa05596078a2482b12929ab",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/test/common/layout.test.ts",
@@ -2034,14 +1662,10 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Retain all upstream layout cases through the existing local test harness and imports.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/base/common/upstream/layout.test.ts",
       "localSha256": "8dff9d7239508d2f71d64a79fb8a4106bb19bc3acda55103dc2f8cd6d6eb7bb0",
-      "mechanicalTransforms": [
-        "provenance-marker-insertion"
-      ]
+      "mechanicalTransforms": ["provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/contextview/contextview.ts",
@@ -2049,9 +1673,7 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Context view z-index 2575 establishes popup stacking above notification centers and toasts. The local window-owned popup controls use this level within an isolated notification stacking context.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/hover/browser/hoverWidget.ts",
@@ -2059,9 +1681,7 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Hover positioning defaults above the target, flips at viewport edges and bounds overflow. Notification hovers use the admitted layout algorithm and avoid the enclosing notification surface.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/media/roundedCorners.css",
@@ -2069,13 +1689,8 @@
       "category": "style",
       "disposition": "adapted",
       "localPath": "src/prctr/base/browser/ui/scrollbar/media/scrollbarsModern.css",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "provenance-marker-insertion"
-      ],
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"],
       "rationale": "Retain the complete shared scrollbar-slider rounding rule with the Proctor radius token and controls layer. Proctor enables this treatment consistently without an optional Modern UI flag. Unrelated widget, minimap, terminal and diff-slider rules are outside this selected scrollbar surface and are explicitly excluded.",
       "localSha256": "dd2075b4fee1e23a1a6cc41d56cd99145f59d807fab0c008318401633d94ea9e"
     },
@@ -2085,18 +1700,14 @@
       "category": "style",
       "disposition": "evidence-only",
       "rationale": "Preserve toolbar hover fill, active fill, disabled exclusion and inset dashed hover outline together in the Proctor-owned action surfaces. Keyboard focus retains its owning solid focus indicator.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -2542,9 +2153,7 @@
         "src/prctr/workbench/browser/parts/notifications/notificationWindow.ts",
         "build/policies/compositions.json"
       ],
-      "verificationRefs": [
-        "browser-tests"
-      ]
+      "verificationRefs": ["browser-tests"]
     },
     {
       "id": "safe-presentation-effects",
@@ -2554,10 +2163,7 @@
         "src/prctr/workbench/browser/parts/notifications/notificationsViewer.ts",
         "src/prctr/workbench/browser/parts/notifications/notificationsAlerts.ts"
       ],
-      "verificationRefs": [
-        "browser-tests",
-        "presentation-review"
-      ]
+      "verificationRefs": ["browser-tests", "presentation-review"]
     },
     {
       "id": "owned-list-and-native-controls",
@@ -2567,11 +2173,7 @@
         "src/prctr/workbench/browser/parts/notifications/notificationsViewer.ts",
         "src/prctr/base/browser/ui/list/listWidget.ts"
       ],
-      "verificationRefs": [
-        "list-tests",
-        "browser-tests",
-        "source-check"
-      ]
+      "verificationRefs": ["list-tests", "browser-tests", "source-check"]
     },
     {
       "id": "declared-preferences",
@@ -2580,10 +2182,7 @@
         "src/prctr/workbench/services/notification/browser/notificationPreferenceStore.ts",
         "src/prctr/workbench/services/notification/common/notificationStorage.ts"
       ],
-      "verificationRefs": [
-        "service-tests",
-        "browser-tests"
-      ]
+      "verificationRefs": ["service-tests", "browser-tests"]
     },
     {
       "id": "consistent-progress-guard",
@@ -2592,10 +2191,7 @@
         "src/prctr/workbench/browser/parts/notifications/notificationAccessibleView.ts",
         "src/prctr/workbench/services/notification/common/notificationProgress.ts"
       ],
-      "verificationRefs": [
-        "browser-tests",
-        "service-tests"
-      ]
+      "verificationRefs": ["browser-tests", "service-tests"]
     },
     {
       "id": "proctor-position-and-accessibility",
@@ -2606,10 +2202,7 @@
         "src/prctr/workbench/browser/parts/notifications/notificationAccessibleView.ts",
         "src/prctr/workbench/browser/parts/notifications/notificationMenu.ts"
       ],
-      "verificationRefs": [
-        "browser-tests",
-        "presentation-review"
-      ]
+      "verificationRefs": ["browser-tests", "presentation-review"]
     },
     {
       "id": "launch-scrollbar-reuse",
@@ -2620,11 +2213,7 @@
         "src/prctr/base/browser/ui/scrollbar/media/scrollbars.css",
         "src/prctr/base/browser/ui/scrollbar/media/scrollbarsModern.css"
       ],
-      "verificationRefs": [
-        "launch-scrollbar-tests",
-        "list-tests",
-        "source-check"
-      ]
+      "verificationRefs": ["launch-scrollbar-tests", "list-tests", "source-check"]
     },
     {
       "id": "live-density-metrics",

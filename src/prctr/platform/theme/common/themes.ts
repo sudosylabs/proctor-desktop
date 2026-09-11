@@ -2,9 +2,15 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { normalizeTokenColorCustomizations, normalizeSemanticTokenColorCustomizations } from './tokenCustomizations.js';
+import {
+	normalizeTokenColorCustomizations,
+	normalizeSemanticTokenColorCustomizations
+} from './tokenCustomizations.js';
 import { resolveTokenColorCustomizations } from './tokenColorConfiguration.js';
-import type { ITokenColorCustomizations, ISemanticTokenColorCustomizations } from './workbenchThemeService.js';
+import type {
+	ITokenColorCustomizations,
+	ISemanticTokenColorCustomizations
+} from './workbenchThemeService.js';
 import type { IWorkbenchColorTheme } from './workbenchThemeService.js';
 import { Color } from '../../../base/common/color.js';
 import type { IColorCustomizations } from './colorCustomizations.js';
@@ -135,8 +141,12 @@ export function getTheme(
 	const source = JSON.parse(bundledThemeSnapshots[name]!).colorMap as Record<string, string>;
 	model.setCustomColors(custom);
 	const tokens = normalizeTokenColorCustomizations(tokenCustomizations);
-	const semantic = semanticCustomizations === undefined ? undefined : normalizeSemanticTokenColorCustomizations(semanticCustomizations);
-	if (!tokens || semanticCustomizations !== undefined && !semantic) throw new TypeError('Invalid token customizations');
+	const semantic =
+		semanticCustomizations === undefined
+			? undefined
+			: normalizeSemanticTokenColorCustomizations(semanticCustomizations);
+	if (!tokens || (semanticCustomizations !== undefined && !semantic))
+		throw new TypeError('Invalid token customizations');
 	model.setCustomTokenColors(resolveTokenColorCustomizations(tokens));
 	model.setCustomSemanticTokenColors(semantic);
 	const colors: Record<string, string> = Object.create(null);

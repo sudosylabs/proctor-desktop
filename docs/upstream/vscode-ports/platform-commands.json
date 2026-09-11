@@ -22,9 +22,7 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "The canonical Microsoft MIT text is preserved as the local notice for this cluster.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/base/common/jsonSchema.ts",
@@ -32,9 +30,7 @@
       "category": "schema",
       "disposition": "locally-satisfied",
       "rationale": "The complete original shared contract is now owned by settings-editor-presentation; existing callers use the same canonical path.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/jsonSchema.ts"
     },
     {
@@ -52,9 +48,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the complete service contract, event, registry stacking, aliases, metadata, argument validation, disposal, and lookup behavior while satisfying the localized-string type through the admitted packaged seam.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/commands/common/commands.ts",
       "localSha256": "38a16062ce8194edbdcd6df1767e21fcad9c83d14d0e3086452a962461fe3f0b",
       "mechanicalTransforms": [
@@ -70,9 +64,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Run the complete command-registry owner suite through Node's built-in runner and admitted Proctor paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "test/platform/commands/common/upstream/commands.test.ts",
       "localSha256": "a66563884a856353635f4f6d4951f05e7dbd695e6fccc50f3941898c0dd7e1d6",
       "mechanicalTransforms": [
@@ -88,9 +80,7 @@
       "category": "test",
       "disposition": "excluded",
       "rationale": "The null helper is not owner behavior; Proctor service tests exercise the real command service and registry interface.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/commands/common/commandService.ts",
@@ -98,9 +88,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve synchronous handler invocation, service access, ordered before/after events, promise normalization, failure propagation, and delayed service registration while removing extension-host activation and telemetry logging that do not exist in Proctor's closed composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/services/commands/common/commandService.ts",
       "localSha256": "fce03134a102be131257429a76cfe8fde44c3b0a1f8568d64eba2b14c098c31c",
       "mechanicalTransforms": [
@@ -116,9 +104,7 @@
       "category": "test",
       "disposition": "evidence-only",
       "rationale": "Its synchronous execution, ordering, missing-command, event, and result/error cases are retained in focused Proctor service tests; extension activation cases are excluded by the closed product model.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/extensions/common/extensions.ts",
@@ -126,9 +112,7 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "Proctor has no extension host or public extension interface; all executable contributions and commands are packaged and statically selected.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/platform/log/common/log.ts",
@@ -136,18 +120,14 @@
       "category": "source",
       "disposition": "excluded",
       "rationale": "The broad VS Code logging service is not admitted as a hidden dependency of command execution; later Proctor diagnostics must be bounded and redacted by their own interface.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -180,10 +160,7 @@
         "src/prctr/workbench/services/commands/common/commandService.ts",
         "docs/architecture/workbench.md"
       ],
-      "verificationRefs": [
-        "proctor-command-service-tests",
-        "source-composition-check"
-      ]
+      "verificationRefs": ["proctor-command-service-tests", "source-composition-check"]
     }
   ],
   "verification": [

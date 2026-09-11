@@ -4,9 +4,7 @@
   "clusterId": "settings-file-icons",
   "admission": {
     "workflow": "Render the source Settings title and settings.json file labels with the complete built-in VS Code Seti theme.",
-    "callers": [
-      "src/prctr/workbench/services/editor/browser/editorThemeService.ts"
-    ],
+    "callers": ["src/prctr/workbench/services/editor/browser/editorThemeService.ts"],
     "interface": "src/prctr/workbench/services/editor/browser/packagedFileIconTheme.ts",
     "decision": "docs/architecture/design-system.md"
   },
@@ -23,13 +21,8 @@
       "category": "asset",
       "disposition": "copied",
       "rationale": "Exact packaged VS Code built-in Seti artifact; retain the full mapping and font rather than extracting selected glyphs.",
-      "licenseRefs": [
-        "vscode-mit",
-        "seti-mit"
-      ],
-      "mechanicalTransforms": [
-        "namespace-path-translation"
-      ]
+      "licenseRefs": ["vscode-mit", "seti-mit"],
+      "mechanicalTransforms": ["namespace-path-translation"]
     },
     {
       "upstreamPath": "extensions/theme-seti/icons/vs-seti-icon-theme.json",
@@ -39,13 +32,8 @@
       "category": "asset",
       "disposition": "copied",
       "rationale": "Exact packaged VS Code built-in Seti artifact; retain the full mapping and font rather than extracting selected glyphs.",
-      "licenseRefs": [
-        "vscode-mit",
-        "seti-mit"
-      ],
-      "mechanicalTransforms": [
-        "namespace-path-translation"
-      ]
+      "licenseRefs": ["vscode-mit", "seti-mit"],
+      "mechanicalTransforms": ["namespace-path-translation"]
     },
     {
       "upstreamPath": "extensions/theme-seti/ThirdPartyNotices.txt",
@@ -55,13 +43,8 @@
       "category": "license",
       "disposition": "copied",
       "rationale": "Exact packaged VS Code built-in Seti artifact; retain the full mapping and font rather than extracting selected glyphs.",
-      "licenseRefs": [
-        "vscode-mit",
-        "seti-mit"
-      ],
-      "mechanicalTransforms": [
-        "namespace-path-translation"
-      ]
+      "licenseRefs": ["vscode-mit", "seti-mit"],
+      "mechanicalTransforms": ["namespace-path-translation"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/themes/browser/fileIconThemeData.ts",
@@ -70,9 +53,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/themes/browser/fileIconThemeData.ts",
       "rationale": "Use the entire admitted source loader and mapping/variant/font semantics through a closed packaged resource adapter.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "src/vs/workbench/services/themes/browser/workbenchThemeService.ts",
@@ -81,9 +62,7 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/editor/browser/editorThemeService.ts",
       "rationale": "The Proctor theme facade owns original file theme data/event semantics. Its composed workbench root applies the source file-icons-enabled flag; file CSS is mounted through a disposable constructed stylesheet under the editor scope.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "extensions/theme-seti/package.json",
@@ -91,9 +70,7 @@
       "category": "registration",
       "disposition": "evidence-only",
       "rationale": "No extension registration: the fixed bundled theme is selected in the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "extensions/theme-seti/build/update-icon-theme.js",
@@ -101,9 +78,7 @@
       "category": "generated-input",
       "disposition": "evidence-only",
       "rationale": "Upstream font/mapping generation remains upstream; Proctor packages the exact pinned generated artifacts and does not regenerate a glyph subset.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     },
     {
       "upstreamPath": "extensions/theme-seti/cgmanifest.json",
@@ -111,26 +86,20 @@
       "category": "configuration",
       "disposition": "evidence-only",
       "rationale": "Upstream dependency provenance retained as source evidence; local exact asset digests and MIT notices own packaged verification.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     },
     {
       "id": "seti-mit",
       "name": "Seti UI MIT License \u2014 Jesse Weed",
-      "upstreamPaths": [
-        "extensions/theme-seti/ThirdPartyNotices.txt"
-      ],
+      "upstreamPaths": ["extensions/theme-seti/ThirdPartyNotices.txt"],
       "localNoticePath": "resources/file-icons/seti/ThirdPartyNotices.txt"
     }
   ],
@@ -156,9 +125,7 @@
         "src/prctr/workbench/services/editor/browser/packagedFileIconTheme.ts",
         "src/prctr/workbench/services/editor/browser/editorThemeService.ts"
       ],
-      "verificationRefs": [
-        "settings-regressions"
-      ]
+      "verificationRefs": ["settings-regressions"]
     }
   ],
   "verification": [

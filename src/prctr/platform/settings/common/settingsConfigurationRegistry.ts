@@ -20,10 +20,15 @@ export function registerSettingsConfiguration(): void {
 		if (declaration.candidate === 'prohibited') continue;
 		properties[declaration.id] = {
 			type: declaration.type,
-			editPresentation: declaration.id === 'workbench.colorTheme' ? EditPresentationTypes.Json : undefined,
+			editPresentation:
+				declaration.id === 'workbench.colorTheme' ? EditPresentationTypes.Json : undefined,
 			...(declaration.id === 'workbench.colorCustomizations' ? colorCustomizationSchema : {}),
-			...(declaration.id === 'editor.tokenColorCustomizations' ? { allOf: [{ $ref: 'prctr-schema://themes/token-customizations' }] } : {}),
-			...(declaration.id === 'editor.semanticTokenColorCustomizations' ? { allOf: [{ $ref: 'prctr-schema://themes/semantic-token-customizations' }] } : {}),
+			...(declaration.id === 'editor.tokenColorCustomizations'
+				? { allOf: [{ $ref: 'prctr-schema://themes/token-customizations' }] }
+				: {}),
+			...(declaration.id === 'editor.semanticTokenColorCustomizations'
+				? { allOf: [{ $ref: 'prctr-schema://themes/semantic-token-customizations' }] }
+				: {}),
 			default: settingDefault(declaration),
 			enum: declaration.enum === undefined ? undefined : [...declaration.enum],
 			minimum: declaration.minimum,

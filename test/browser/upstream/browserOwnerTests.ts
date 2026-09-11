@@ -18,7 +18,11 @@ import { runRegisteredBrowserTests } from './testAdapter.ts';
 export async function runBrowserInteractionOwnerTests(): Promise<number> {
 	const scope = acquireEditorStyleScope(document);
 	let result;
-	try { result = await runRegisteredBrowserTests(); } finally { scope.dispose(); }
+	try {
+		result = await runRegisteredBrowserTests();
+	} finally {
+		scope.dispose();
+	}
 	if (result.failures.length > 0)
 		throw new Error(`Browser interaction owner tests failed:\n${result.failures.join('\n')}`);
 	return result.passed;

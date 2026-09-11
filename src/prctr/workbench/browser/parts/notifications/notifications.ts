@@ -118,15 +118,18 @@ export class WorkbenchNotifications extends Disposable {
 			)
 		);
 		this._register(new NotificationsAlerts(this.element, this.service.model));
-		this.#status = options.indicatorHost === undefined ? undefined : this._register(
-			new NotificationsStatus(
-				options.indicatorHost,
-				this.service.model,
-				this.service,
-				labels,
-				() => this.toggleCenter()
-			)
-		);
+		this.#status =
+			options.indicatorHost === undefined
+				? undefined
+				: this._register(
+						new NotificationsStatus(
+							options.indicatorHost,
+							this.service.model,
+							this.service,
+							labels,
+							() => this.toggleCenter()
+						)
+					);
 		this._register(
 			this.center.onDidChangeVisibility(() => {
 				this.toasts.setBlocked(this.center.visible || !this.#effects.canInteract());

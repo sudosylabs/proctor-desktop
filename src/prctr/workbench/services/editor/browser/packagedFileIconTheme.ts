@@ -15,10 +15,14 @@ export class PackagedFileIconTheme extends Disposable {
 		super();
 		this.sheet = new document.defaultView!.CSSStyleSheet();
 		document.adoptedStyleSheets = [...document.adoptedStyleSheets, this.sheet];
-		this._register({ dispose: () => {
-			this.disposed = true;
-			document.adoptedStyleSheets = document.adoptedStyleSheets.filter(value => value !== this.sheet);
-		} });
+		this._register({
+			dispose: () => {
+				this.disposed = true;
+				document.adoptedStyleSheets = document.adoptedStyleSheets.filter(
+					(value) => value !== this.sheet
+				);
+			}
+		});
 	}
 
 	async initialize(languages: ILanguageService): Promise<void> {
@@ -28,10 +32,16 @@ export class PackagedFileIconTheme extends Disposable {
 		packaged.fonts[0].src[0].path = setiFont;
 		const location = URI.parse(new URL('vs-seti-icon-theme.json', this.document.baseURI).href);
 		this.data.location = location;
-		const loader = new FileIconThemeLoader({ readExtensionResource: async resource => {
-			if (resource.toString() !== location.toString()) throw new Error('Unknown packaged file icon resource.');
-			return JSON.stringify(packaged);
-		} }, languages);
+		const loader = new FileIconThemeLoader(
+			{
+				readExtensionResource: async (resource) => {
+					if (resource.toString() !== location.toString())
+						throw new Error('Unknown packaged file icon resource.');
+					return JSON.stringify(packaged);
+				}
+			},
+			languages
+		);
 		const css = await this.data.ensureLoaded(loader);
 		if (this.disposed) return;
 		// Keep the source stylesheet intact; contain its selectors within the

@@ -19,7 +19,10 @@ export class EditorRegistrations extends Disposable implements IEditorRegistrati
 	private readonly changed = this._register(new Emitter<void>());
 	readonly onDidRegister = this.changed.event;
 	private closed = false;
-	constructor() { super(); void this.whenReady.catch(() => undefined); }
+	constructor() {
+		super();
+		void this.whenReady.catch(() => undefined);
+	}
 	complete(): void {
 		if (this.closed) throw new CancellationError();
 		if (this.ready.isSettled) return;

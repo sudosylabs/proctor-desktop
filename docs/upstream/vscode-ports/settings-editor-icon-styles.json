@@ -4,9 +4,7 @@
   "clusterId": "settings-editor-icon-styles",
   "admission": {
     "workflow": "Generate dynamic registered Codicon CSS and font dependencies within the editor theme scope.",
-    "callers": [
-      "src/prctr/platform/theme/browser/iconsStyleSheet.ts"
-    ],
+    "callers": ["src/prctr/platform/theme/browser/iconsStyleSheet.ts"],
     "interface": "src/prctr/platform/theme/browser/iconsStyleSheet.ts",
     "decision": "docs/architecture/user-settings.md"
   },
@@ -23,9 +21,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain icon stylesheet generation and default font lookup. Scope generated selectors to the editor owner and map CSS custom properties to the Proctor theme namespace.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -37,9 +33,7 @@
       "upstreamPath": "src/vs/base/browser/cssValue.ts",
       "upstreamBlob": "84cee8522ae9db2c7d4773e4a60ca6f7f9e695e2",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/browser/cssValue.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -48,9 +42,7 @@
       "upstreamPath": "src/vs/base/common/event.ts",
       "upstreamBlob": "cf5fd39b7389b12890a85fd2159e35326d5b7a60",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/event.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -59,9 +51,7 @@
       "upstreamPath": "src/vs/base/common/lifecycle.ts",
       "upstreamBlob": "a75cbb1cce3099e07bff3cc9c751d634ae30dfdd",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/lifecycle.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -70,9 +60,7 @@
       "upstreamPath": "src/vs/base/common/themables.ts",
       "upstreamBlob": "dcc1369e5932df0c4206e8f0628c8b5386df11b3",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/themables.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -81,9 +69,7 @@
       "upstreamPath": "src/vs/platform/theme/common/iconRegistry.ts",
       "upstreamBlob": "9feac0c4ca494a1b344161f70b9f346876066d85",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/theme/common/iconRegistry.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -92,9 +78,7 @@
       "upstreamPath": "src/vs/platform/theme/common/themeService.ts",
       "upstreamBlob": "5cf50f913a8922889992b3892901dd38882c6a91",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/theme/common/themeService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -104,9 +88,7 @@
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -128,14 +110,8 @@
     {
       "id": "settings-only-composition",
       "summary": "Keep the accepted virtual user document, explicit Save, readonly/disposal fences and sandboxed capability clients. Exclude extension loading, workspace/remote/profile targets, AI search, arbitrary files/execution and auxiliary OS windows. Per-file rationale identifies retained symbols and non-mechanical adaptations; generic source contracts retained for dependency compatibility do not activate those products.",
-      "localPaths": [
-        "src/prctr/platform/theme/browser/iconsStyleSheet.ts"
-      ],
-      "verificationRefs": [
-        "settings-regressions",
-        "settings-lifecycle",
-        "source-boundaries"
-      ]
+      "localPaths": ["src/prctr/platform/theme/browser/iconsStyleSheet.ts"],
+      "verificationRefs": ["settings-regressions", "settings-lifecycle", "source-boundaries"]
     }
   ],
   "verification": [

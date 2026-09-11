@@ -1,4 +1,8 @@
-import type { UserSettingsCommitIntent, UserSettingsCommitResponse, UserSettingsProjection } from '../../../../platform/settings/common/settingsRendererProtocol.js';
+import type {
+	UserSettingsCommitIntent,
+	UserSettingsCommitResponse,
+	UserSettingsProjection
+} from '../../../../platform/settings/common/settingsRendererProtocol.js';
 
 /** Authenticated, capability-specific transport supplied by the renderer composition root. */
 export interface SettingsRendererClient {

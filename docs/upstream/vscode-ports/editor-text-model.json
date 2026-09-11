@@ -24,9 +24,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "57fa5efa411d076332bcedc9939264ccf24c74fc649e2c7c0c01ce4b6805c6dc",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -42,9 +40,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "84069f3a688b7012d5b6e39b642939c05d79e2f7a8bd7a108aa3f0caaa20de61",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -60,9 +56,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "cf9f838b875e99e37f0062f9b948c9de114fa1e8bf48e16ae71c16fbda3fcde7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -78,9 +72,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "c5037f456a7756096353293a08cdfa0f92067da998ad6dd6223fda44aa496ecc",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -96,9 +88,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "37afbaf3abc3cf7d7e7e916265b0fe2a62873f1161f71d29281dd40ff132038c",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -114,9 +104,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "966ed8063918139012c90136cf814dbdd15f15113aebf25d9eef40b605eadef2",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -132,9 +120,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d233b1a2466f609e4f8cb1b7e5c313bea6db2f6965edcb46d4ea626be412c9e7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -150,9 +136,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "66e4ed8fe06c56d44b66b4c4f619a9465768ca2b8bc77b58bb83fe3b72db80fb",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -168,9 +152,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "8a1f10af127970156d4c31e72772e9a111ae9ad9c92a50b71adc99863dcaead7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -186,9 +168,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "40ab20dee0d1b1c8ac7e46adcc99ecea2a68d09c9b534a56db1157b3213f994d",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -204,9 +184,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "43151229a5666047b2e37ca8bbbb98f513d48e9d3b0d3618be7f352465155784",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -222,9 +200,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "66ad9750b0aa99e04221ddf069807e14f9aa6f9cb65376302e5d3546d06a99e8",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -240,9 +216,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "94de48d94d76fd27eab4156f829167a5ceec3e271075b65b6827f2d8d7f212be",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -258,9 +232,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "544859ef505d37605822a58af03bb77c193ca56dbfb49d995cd9129d22e1bf7e",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -276,9 +248,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a3d1141eb0b9659505d07926aed4ff70440b19caff1bd4ffff80592b30087713",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -294,9 +264,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "bb581d38a5fd80ef91e547100b824b3efb9c7a154c668e7c2cd3bd261a028751",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -312,9 +280,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b4b815aa5318d3b89c970ef014957fa7b28512c456f26ebf5ff48634c130c95d",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -330,9 +296,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "9c88702c0942aa94e121846881351e099a81f0f9079ee3aad88b68c3765b4efc",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -348,9 +312,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3fc110c3f45f5cce03b7b9bea57a611be3d7afa37883262374a3081caaa8685d",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -366,9 +328,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3a89ec0c32605fc4f50ac05abefb037456074eb9df1af75e3c6017bfeddc2642",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -384,9 +344,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "9dd93b2fde3260df5979bdccc333848dbe8c6bca666313e6ea3ceb63ecf59c4b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -402,9 +360,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "600c0cef8b4762b10fdf5df00e245ff48c1543addf6b43631992d20ae7e31704",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -420,9 +376,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ce17dc768fad4092ab183100da314c394014ebd6fb9b4577fa08d989436fbff7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -438,9 +392,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ea5a34606692f02cc16af8bd37e2fcbf2111af34bd83fd21a3e30026b5b88111",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -456,9 +408,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ac9c840d9b18b1fe910a4b52aaf30dd54f8e5fa8ace28d5b1a7a82bb76034436",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -474,9 +424,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6721b1df79220f642abaabb31ca848697d58cc8f2b21b1eefa19ee076bbba86b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -492,9 +440,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d4d9717262c60c990373bce7c56dc34e954cfd4b1df78b852119f0f25d3fe0fc",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -510,9 +456,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "8f1011ba50901e3424dc87179ecbe264c2775eb9393d3a96b41504810650de7d",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -528,9 +472,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "8ba4771f5e42958b39f1663d5b108af7e3a2c2b37c49fab937e74f184639b0d7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -546,9 +488,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6fc6bcb387ca60cefa2d7710403cae528639b6e19501c2ae7da5bc9f4269b9b4",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -564,9 +504,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "8cf40db06a701d3ef70c8889bb12a9d3a60be86b8d016713aceaac24b1219765",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -582,9 +520,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "fe6c1fe330c8f61b24e4d6db10acf1892b71020b48b938dcb9f724856383ccf2",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -600,9 +536,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "89e12d25e28adc7f3ccb5c9c729a72e5b78996a1c8d9ed221791b686d3ef05ed",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -618,9 +552,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d14e07ceff64c2fe5c577687ab9c9a62d694cddee2f5cd40ab43b4cb4fd9308b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -636,9 +568,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "7a7fa193f2206722a3f77d9944010f750a4f497099929ca450b64610d1cfedad",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -654,9 +584,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b5e9c13e339be02460347085c06958055138ef7f6ae239f373088d50645d40cb",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -672,9 +600,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "28ff6c8c31b3b61a826fd7c5a05d7d31b6c4bc8ec5a29abd5cf5dff3b0c0e850",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -690,9 +616,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "84e0c451c3c392271ef9874e330ac8c6960b71952a161d954fbc5830fc207867",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -708,9 +632,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "7f0ee101f377a4011dfeab33358c9c5aab79db8ec954afe2c4f9be28d19cb5b4",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -726,9 +648,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "254f3b97cabc03be671fa823c4c88f356371cb5193b1d119334d84c859d09be9",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -744,9 +664,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3d587ed7eece14ac2ea5496f15fca7e25e82ceae7f8a15abe5e2e809b0715354",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -762,9 +680,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a77fe5afd11be9dc6c83c10e6dfc30faa9be2220622ab51411bef9d25f957ce2",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -780,9 +696,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f128461b597e56c1edeef37a27357963a03a1adbf9187fc9fbd6e8744e38be72",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -798,9 +712,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b056d94f2f5af1299436bee4e9790a96ebc68005ddc717d4538bad4ae372dfb4",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -816,9 +728,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "73243ed638ed13f0f9509940a945c24e24ac5602559fd62acb30ecb2826ff042",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -834,9 +744,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "fda64007858c72be0eabb68e7b527cd5593cdde7728d62bb635172c503e4af36",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -852,9 +760,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d05c0eccebbe9eb16ce4016cc2bb0b12c3334244e53b69cd63ec6f89585e291e",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -870,9 +776,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3774cbead0a4b4d6923e5dc1c7c40ccb75965b3743de426ccea0c98750ad98f5",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -888,9 +792,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f3acb14abe83b824c268ab652f758eacfd684019284bfe3c63e6ec5e03948b43",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -906,9 +808,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "5e3406c6f87da545f9dbc4e7f2b54d2b058416201c4192558c7aa2e8c4a3f9b7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -924,9 +824,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "1d2b9577c3317f2f3e62e205ad5b8e99df05f61ac390939f162f45c9ed36cddd",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -942,9 +840,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "11feffa11c5e3727929d0dc8feaeb4c034536acdd419c6ea9d39e985cb398d5c",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -960,9 +856,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d510ccfdd69ad2c28c0ff199ab7998f890d8e71e53043a38d3fc25849f23bb51",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -978,9 +872,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3a25ca4d28974abb324461b9a50d5f532237ae4019020cbc1aba6986ce377900",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -996,9 +888,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "810125eaa8e94e338d7f3f30318d61697e6562e6b9880dc79e8a8cc268bd2993",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1014,9 +904,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "bbca7b4c935e63536bf742fd0f212d8e84ddda00372e9a3d14eeb1750e38fd65",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1032,9 +920,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "ce342ff12bc7e109bcbe7ac5696fe3ce1fcb6ce8b91dac39fa95e992bf7e6695",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1050,9 +936,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "e808e037077aa91b8115b7cdecfb9e85ad254471ed35e42b5c9f9b614d3e917b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1068,9 +952,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "e0006c69c07a41e10710e9d4f391866fcb887b1215b2342b9be9c2ea20076cd6",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1086,9 +968,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Expose before/after alternative version IDs from either live or serialized undo data for exact saved-draft state recognition, preserving the original edit stack representation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "5ec843072ba427d922f262995f1be597fe208e668faca3eb728a30ff82660896",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1104,9 +984,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "063a09d45ccba12e309ca81d34d1382b40adde164913a4308f9961608cbf2270",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1122,9 +1000,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "cae4330861aa830b92b13e96c8a8e564eea8a1830709256c22e60fa1c0ea051e",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1140,9 +1016,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a4ea32fe380186602633c7ed267faa7deac68b0e72c90af66a2d4b34349cdf50",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1158,9 +1032,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "53001cf50092c8b95ba8c3803279d322013e23862098e6aaf5dbcd5647b5d359",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1176,9 +1048,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "40981ea000442654a978061eeaa09502edf6dbc71f1b736d8db0b24d73f49263",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1194,9 +1064,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "edd1f82fe93079c034deeebbc53abc73316ae22a8cf02dcc0569a1c22e727c4d",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1212,9 +1080,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "875c1ca7ecd0acef03a53a408e90cc2e1db843bf580bf0e4d8c0c18570011284",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1230,9 +1096,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "dd589eb0ec2806eee8a7c19134410ae292ee47e8c0913d0c9aa9b5a3575715f6",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1248,9 +1112,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a5e43180581938a8accb231ac095b5387b7db9d7c0b271cd45dd4c28f2ae14ac",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1266,9 +1128,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b3eb9fe4a19d4df6dc214325819ee72ef93086c73d223b096ca5dba040da86a0",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1284,9 +1144,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "2a67d5430155c0c0d710a430edc31cf817b0e021faf9fe0fa38aa538f53123e3",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1302,9 +1160,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3b35aa8d45de555193c47a99c7ad9e80f2784e3a13028eb4fcf7f0207fadb5d3",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1320,9 +1176,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "12c7f6cf6a2e94792d2bd949f10600fe200b990b967deedebeb92d67fb7fe364",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1338,9 +1192,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "df9ab95279ce8fdecb495a563f8355383c707a2592f82fe5db7f57c0420e5091",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1356,9 +1208,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "03812be0724d75ff542189c02f8a4b32561abfb9c5b32c2e73203fdc717e6f5a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1374,9 +1224,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "4aa1039ab04b78569426189117e04b020ac92a2c1ffba22d08c164ff955dd5f2",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1392,9 +1240,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "2f5e04b439f1afe6ac2e0ed90a5b1ddd66aa29a736254014d166adf5a861da5b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1410,9 +1256,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3c198fbaeb94a99e6fa85d386f3df5e86469afcf6f7a2b4960f3b46b52880e08",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1428,9 +1272,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "4cb2134d7e19de8e4e181a4f9573ead21e10b2e86f77bab0831b8271ebefddaa",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1446,9 +1288,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "96ab19b73238d905469eb0d41dfd2c3bae49c8e56113493912bbd92deebcfd13",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1464,9 +1304,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "7499d05fccb12dcc2bb531eccc4699259f1a3593f75cecdf3cf4e4c8832c8d34",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1482,9 +1320,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6849eb730f62da9a96f8d34567d40e1282681b3e3752a85457a97cde100d9b38",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1500,9 +1336,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a9a13e05a51b7f4d63a1103011977ed76a80886fdef5758f9f8d254ce95a53e0",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1518,9 +1352,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "68f5dc5aac0aaba99c294d8de6ab44a2e2b647fe1cef1495c161c875b7289eba",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1536,9 +1368,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d346a5eaa9a6c5a509370dba093db5ea23b015d065b7a2a32f88832bfce27d93",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1554,9 +1384,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a2aeafba2965f4371a4a5faf7e8f8a3ffe5a8f3c09e8a099f75223df345d0881",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1572,9 +1400,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "65a35d5ebb6261d07de3b6e496d92480aef94352e00ad815921b7b1597a5019a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1590,9 +1416,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "bbbf863566cf1f3e783767e380d45188608aa662cb1b678ef542f13b5b0e1f8c",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1608,9 +1432,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "5140d377355c06797c19d297f75960e04e18f13260afc6a119618f9cdb7c3770",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1626,9 +1448,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "123ce590705be382151c77703cbef369bb677371b1b17e8a29f72c46041103d4",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1644,9 +1464,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "e2a43256ac264a25571665f71106bd1d73ce5395208914fd8840ab5b5e51f344",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1662,9 +1480,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "0f4646c654a58b08523c92310f1dfe27b1662c1e9a5560849838f3557f0f95cd",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1680,9 +1496,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "547c6d2f79ce6d01aac465e09e74f179ec84fe4b0307ce68db55ebc37de04320",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1698,9 +1512,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "82970afe716130b5326c7e01838282e0a04020a0e7211107d16dab239fb59b16",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1716,9 +1528,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "c21091d24fc2f7f229cf389963a6409e63d4c8247117923294ef157e41d79866",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1734,9 +1544,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "2f1ad2bd4de52050b5798a9eae4c65fac547aa20ce5731032987bbdab0d84898",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1752,9 +1560,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "5345fd8d18a42ade2935919cdaa7ce4d75cb341a242e7a8bef4be535409afd99",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1770,9 +1576,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "53e7aaf65df19940c1e01bfcd51e0765874c82daeaab41839023c5689efbdf9f",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1788,9 +1592,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "dabb06b483ec4dd20e8fd29f1ad9efb31598897d542b36993a0a04f73ed2fc41",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1806,9 +1608,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "199ed05a08b21d17f4becb446d0880b44672750926bdece0d5031abff2777137",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1824,9 +1624,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "c0f08af3ab4ba9be44c86c96ae80b5f994bdc678764af9e427f4993a352e8eda",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1842,9 +1640,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "372447aa0db0dbffe8cab7bccabaf32a20c5a6f1e5b9f793402ade0b7e3e4f65",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1860,9 +1656,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3d227315f49afeb9ba04c1ca7429f08f69e8acfbba22e82b9bd3112f03aa0233",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1878,9 +1672,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "5e9c525856fe618256d00cdb06c891bc8eeafd78bb1c1acc64d10f7c021d9961",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1896,9 +1688,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "1bad5a543f9ccdda29d6f6b688d03306cfaf73af0e65552b072df0e53f5e0b4c",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1914,9 +1704,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "dfcc73acde2b19f8c3872f6598c28549531cf698736f910d4c113295a45e5884",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1932,9 +1720,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "75be8969f0c5c86b7c9fcff57f898d68b407b98719993f0eac2e50b274b49c03",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1950,9 +1736,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "99726347db69376d0cbd40adcfa7ee2e8cb1f726ee6074ba451a685eddb86437",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1968,9 +1752,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f459c93468d3546f5640ea65570baa26cbaa66ad8d88fad7ce62acb3fdf4367b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -1986,9 +1768,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "0f5695b16765bf9a8ea0f11640be30c602ae2b92ad5f596026220a83b8933d3f",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2004,9 +1784,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "9ffb9725fdb1db366ed607d34c116183783976f50e34154fd9e684e77c7a76ca",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2022,9 +1800,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "26958da639e31b1bcafa8963f3b29d3e8c8176e77c7e639cdea26790331d2f7c",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2040,9 +1816,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "367d39aed67b9199d5659582904a6d4626e058a5959fffa7cc381bf255225fec",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2058,9 +1832,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d6089b3e1cd3d5c1b33b7e6b162c446c2cedac675c3304f25a9a01a2cd43c188",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2076,9 +1848,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "44180fcace9acff97ab21f1cf75725b7015e282accfc5b71606a0537d0f117b2",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2094,9 +1864,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "96c2a5d44f4e8c45ddbb39f8f959e07e26958d25a1d904ea1a2d1bb906eb08b2",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2112,9 +1880,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "a46364405c6bf4518b331898c6cff6dffb4ff7f19ff05fc85d895a0cede04885",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2130,9 +1896,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "dca671993ab62df9dbbd86571327f4b673d91ec5d355c3631f7b4270b612da45",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2148,9 +1912,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "93dd4f67bd2bca240ba7dc079fb70bcb8a579682c3a9ff39c2b53259098c42db",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2166,9 +1928,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "88802a7b6e8a911edddc79833e1ad2df4a28bab4c448b76ca00e57abedf1508e",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2184,9 +1944,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "65d7fa245dacfff64fbe4536b84cc0b31890cf3486e6d06129f0d27e2ebfb80b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2202,9 +1960,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "08ce2241c958fd68667ecf22ec005aca424717030e0102180912ae5b378590d9",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2220,9 +1976,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Replace upstream build-time product injection with immutable packaged Proctor product metadata; no environment-provided product object or remote product lookup.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b89fdd2f0cd6089890f2901b2e1ff35ad60c8749bb6070e7e9ac0c1635ba6b72",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2238,9 +1992,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "64e768f57a245015b02eb62541f126e1052e1d76de579aa06dea5845019485fb",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2256,9 +2008,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "0d9e1f9d0904aa2d9a7b5f1504147213da518f1783ae2365e74cd7cc25844a50",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2274,9 +2024,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "3fab73f8ded453b729eafcb0b926ecd807842db98ea6e80c0fd7a23c6345eb3a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2292,9 +2040,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f305bcb709fa46231d195f57604a60e6ad1609f80de8ac706d1b06874f514b60",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2310,9 +2056,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "32a4ea052c20eef1ccdff85f3bd3191669d13fcb4388c66d6494e32f00ecb396",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2328,9 +2072,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "d1844ab9310bea82e35efa578988ab2f047283e80fffaeb7706ce2cc8b401558",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2346,9 +2088,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "6c0d829f376359125a7acc5b33d52b5390445bef1d68a20f0e44956c19db39ef",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2364,9 +2104,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "2e4531f50e3ae7437c55f8895323abefbdcc0b01e319509c6f6b757ed14e35e9",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2382,9 +2120,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Inject the closed editor runtime environment and register the complete debounce service in the product composition rather than upstream aggregate registration.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "4155b6c952974014d3618a19c64cefa02a96458b6d6535a6600c02bd7705fa27",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2400,9 +2136,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "0da46b771df52bdc570246161585ca15b07c05ba2574aca0fea8e6fb5825687f",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2418,9 +2152,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f3f9d60d2b2b18c5364f473881c5fa232535b577207444b4e8d505e7135bc09b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2436,9 +2168,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "f7e5e44d913acba2ca0ce6b845929020ab403e6fa0f6956a40daede0f263e229",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2454,9 +2184,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "8636f6687da5b99d8302b5f6510be66209464a25daac795cc5bb1497a222e723",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2472,9 +2200,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "2c1241278bedc02f851b16ff7f42a0b72061c5ceb6288bd886a1faf7330a532b",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2490,9 +2216,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "caed367a2639116ebd964d8c1afe064084dadb40596b57be1c453d52f5b652f7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2508,9 +2232,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "1587bffb152e06a7189edc793b8bdb17c6d2de2769b9699ba2cd8d0d27d66cd7",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2526,9 +2248,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "0ebf75553a9cc800a176fe51b4e5e8ee75f9de2c56e99f6ac8b110f677119cda",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2544,9 +2264,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "7b42ff8b59aa6936b2d6773e331be3b98204096c827d48a12a794028cd34cbe3",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2562,9 +2280,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "e66610e64bb921b6350e40aa6c8b0b279ca2db655b8a914c9c75fb62e81dddb3",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2580,9 +2296,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "b08279a0b66b8cb9bbd1fb0da3dc208ab1547644c594e23796e92b0657b7d79f",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2598,9 +2312,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "2ab37a5161f78d5157a3fd8dcda4ccd8dbe11d257f493613ec8dfdd1b694af9f",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2616,9 +2328,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Full upstream assertions and helper behavior retained; namespace imports and real Node suite registration are adapted to Proctor test ownership. Test doubles are not production services.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localSha256": "0baa281a1dde6b5676b19a38bbcb74e7db8f5f93fffe64a751abe8864d398335",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -2633,9 +2343,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/actions.ts"
     },
     {
@@ -2644,9 +2352,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/arrays.ts"
     },
     {
@@ -2655,9 +2361,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/arraysFind.ts"
     },
     {
@@ -2666,9 +2370,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/assert.ts"
     },
     {
@@ -2677,9 +2379,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/async.ts"
     },
     {
@@ -2688,9 +2388,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/buffer.ts"
     },
     {
@@ -2699,9 +2397,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/cache.ts"
     },
     {
@@ -2710,9 +2406,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/cancellation.ts"
     },
     {
@@ -2721,9 +2415,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/charCode.ts"
     },
     {
@@ -2732,9 +2424,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/codicons.ts"
     },
     {
@@ -2743,9 +2433,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/codiconsLibrary.ts"
     },
     {
@@ -2754,9 +2442,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/codiconsUtil.ts"
     },
     {
@@ -2765,9 +2451,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/collections.ts"
     },
     {
@@ -2776,9 +2460,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/color.ts"
     },
     {
@@ -2787,9 +2469,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/date.ts"
     },
     {
@@ -2798,9 +2478,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/defaultAccount.ts"
     },
     {
@@ -2809,9 +2487,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/equals.ts"
     },
     {
@@ -2820,9 +2496,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/errorMessage.ts"
     },
     {
@@ -2831,9 +2505,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/errors.ts"
     },
     {
@@ -2842,9 +2514,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/event.ts"
     },
     {
@@ -2853,9 +2523,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/extpath.ts"
     },
     {
@@ -2864,9 +2532,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/filters.ts"
     },
     {
@@ -2875,9 +2541,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/functional.ts"
     },
     {
@@ -2886,9 +2550,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/hash.ts"
     },
     {
@@ -2897,9 +2559,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/iterator.ts"
     },
     {
@@ -2908,9 +2568,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/jsonSchema.ts"
     },
     {
@@ -2919,9 +2577,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/keyCodes.ts"
     },
     {
@@ -2930,9 +2586,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/keybindings.ts"
     },
     {
@@ -2941,9 +2595,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/lazy.ts"
     },
     {
@@ -2952,9 +2604,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/lifecycle.ts"
     },
     {
@@ -2963,9 +2613,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/linkedList.ts"
     },
     {
@@ -2974,9 +2622,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/map.ts"
     },
     {
@@ -2985,9 +2631,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/marshallingIds.ts"
     },
     {
@@ -2996,9 +2640,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/mime.ts"
     },
     {
@@ -3007,9 +2649,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/naturalLanguage/korean.ts"
     },
     {
@@ -3018,9 +2658,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/network.ts"
     },
     {
@@ -3029,9 +2667,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/normalization.ts"
     },
     {
@@ -3040,9 +2676,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/objects.ts"
     },
     {
@@ -3051,9 +2685,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observable.ts"
     },
     {
@@ -3062,9 +2694,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/base.ts"
     },
     {
@@ -3073,9 +2703,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/changeTracker.ts"
     },
     {
@@ -3084,9 +2712,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/commonFacade/cancellation.ts"
     },
     {
@@ -3095,9 +2721,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/commonFacade/deps.ts"
     },
     {
@@ -3106,9 +2730,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/debugLocation.ts"
     },
     {
@@ -3117,9 +2739,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/debugName.ts"
     },
     {
@@ -3128,9 +2748,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/experimental/utils.ts"
     },
     {
@@ -3139,9 +2757,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/index.ts"
     },
     {
@@ -3150,9 +2766,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/logging/consoleObservableLogger.ts"
     },
     {
@@ -3161,9 +2775,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/logging/debugGetDependencyGraph.ts"
     },
     {
@@ -3172,9 +2784,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/logging/debugger/debuggerApi.d.ts"
     },
     {
@@ -3183,9 +2793,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/logging/debugger/debuggerRpc.ts"
     },
     {
@@ -3194,9 +2802,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/logging/debugger/devToolsLogger.ts"
     },
     {
@@ -3205,9 +2811,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/logging/debugger/rpc.ts"
     },
     {
@@ -3216,9 +2820,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/logging/debugger/utils.ts"
     },
     {
@@ -3227,9 +2829,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/logging/logging.ts"
     },
     {
@@ -3238,9 +2838,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/map.ts"
     },
     {
@@ -3249,9 +2847,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/baseObservable.ts"
     },
     {
@@ -3260,9 +2856,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/constObservable.ts"
     },
     {
@@ -3271,9 +2865,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/derived.ts"
     },
     {
@@ -3282,9 +2874,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/derivedImpl.ts"
     },
     {
@@ -3293,9 +2883,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/lazyObservableValue.ts"
     },
     {
@@ -3304,9 +2892,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/observableFromEvent.ts"
     },
     {
@@ -3315,9 +2901,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/observableSignal.ts"
     },
     {
@@ -3326,9 +2910,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/observableSignalFromEvent.ts"
     },
     {
@@ -3337,9 +2919,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/observableValue.ts"
     },
     {
@@ -3348,9 +2928,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/observables/observableValueOpts.ts"
     },
     {
@@ -3359,9 +2937,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/reactions/autorun.ts"
     },
     {
@@ -3370,9 +2946,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/reactions/autorunImpl.ts"
     },
     {
@@ -3381,9 +2955,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/set.ts"
     },
     {
@@ -3392,9 +2964,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/transaction.ts"
     },
     {
@@ -3403,9 +2973,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/utils/promise.ts"
     },
     {
@@ -3414,9 +2982,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/utils/runOnChange.ts"
     },
     {
@@ -3425,9 +2991,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/utils/utils.ts"
     },
     {
@@ -3436,9 +3000,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/utils/utilsCancellation.ts"
     },
     {
@@ -3447,9 +3009,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/observableInternal/utils/valueWithChangeEvent.ts"
     },
     {
@@ -3458,9 +3018,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/path.ts"
     },
     {
@@ -3469,9 +3027,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/platform.ts"
     },
     {
@@ -3480,9 +3036,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/policy.ts"
     },
     {
@@ -3491,9 +3045,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/process.ts"
     },
     {
@@ -3502,9 +3054,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/resources.ts"
     },
     {
@@ -3513,9 +3063,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/scrollable.ts"
     },
     {
@@ -3524,9 +3072,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/sequence.ts"
     },
     {
@@ -3535,9 +3081,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/severity.ts"
     },
     {
@@ -3546,9 +3090,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/stopwatch.ts"
     },
     {
@@ -3557,9 +3099,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/stream.ts"
     },
     {
@@ -3568,9 +3108,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/strings.ts"
     },
     {
@@ -3579,9 +3117,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/symbols.ts"
     },
     {
@@ -3590,9 +3126,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/ternarySearchTree.ts"
     },
     {
@@ -3601,9 +3135,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/themables.ts"
     },
     {
@@ -3612,9 +3144,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/types.ts"
     },
     {
@@ -3623,9 +3153,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/uint.ts"
     },
     {
@@ -3634,9 +3162,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/uri.ts"
     },
     {
@@ -3645,9 +3171,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/characterClassifier.ts"
     },
     {
@@ -3656,9 +3180,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/editOperation.ts"
     },
     {
@@ -3667,9 +3189,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/editorColorRegistry.ts"
     },
     {
@@ -3678,9 +3198,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/edits/edit.ts"
     },
     {
@@ -3689,9 +3207,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/edits/stringEdit.ts"
     },
     {
@@ -3700,9 +3216,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/edits/textEdit.ts"
     },
     {
@@ -3711,9 +3225,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/misc/eolCounter.ts"
     },
     {
@@ -3722,9 +3234,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/position.ts"
     },
     {
@@ -3733,9 +3243,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/range.ts"
     },
     {
@@ -3744,9 +3252,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/ranges/lineRange.ts"
     },
     {
@@ -3755,9 +3261,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/ranges/offsetRange.ts"
     },
     {
@@ -3766,9 +3270,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/selection.ts"
     },
     {
@@ -3777,9 +3279,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/stringBuilder.ts"
     },
     {
@@ -3788,9 +3288,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/text/abstractText.ts"
     },
     {
@@ -3799,9 +3297,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/text/positionToOffsetImpl.ts"
     },
     {
@@ -3810,9 +3306,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/text/textLength.ts"
     },
     {
@@ -3821,9 +3315,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/textChange.ts"
     },
     {
@@ -3832,9 +3324,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/wordCharacterClassifier.ts"
     },
     {
@@ -3843,9 +3333,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/core/wordHelper.ts"
     },
     {
@@ -3854,9 +3342,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/encodedTokenAttributes.ts"
     },
     {
@@ -3865,9 +3351,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/tokenization.ts"
     },
     {
@@ -3876,9 +3360,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeBase.ts"
     },
     {
@@ -3887,9 +3369,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts"
     },
     {
@@ -3898,9 +3378,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBufferBuilder.ts"
     },
     {
@@ -3909,9 +3387,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/model/pieceTreeTextBuffer/rbTreeBase.ts"
     },
     {
@@ -3920,9 +3396,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/editor/common/model/textModelSearch.ts"
     },
     {
@@ -3931,9 +3405,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/vscodeNls.ts"
     },
     {
@@ -3942,9 +3414,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/commands/common/commands.ts"
     },
     {
@@ -3953,9 +3423,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/configuration/common/configuration.ts"
     },
     {
@@ -3964,9 +3432,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/configuration/common/configurationRegistry.ts"
     },
     {
@@ -3975,9 +3441,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/contextkey/common/contextkey.ts"
     },
     {
@@ -3986,9 +3450,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/contextkey/common/scanner.ts"
     },
     {
@@ -3997,9 +3459,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/descriptors.ts"
     },
     {
@@ -4008,9 +3468,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/extensions.ts"
     },
     {
@@ -4019,9 +3477,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts"
     },
     {
@@ -4030,9 +3486,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/serviceCollection.ts"
     },
     {
@@ -4041,9 +3495,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/jsonschemas/common/jsonContributionRegistry.ts"
     },
     {
@@ -4052,9 +3504,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/keybinding/common/keybindingsRegistry.ts"
     },
     {
@@ -4063,9 +3513,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/notification/common/notification.ts"
     },
     {
@@ -4074,9 +3522,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/registry/common/platform.ts"
     },
     {
@@ -4085,9 +3531,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colorRegistry.ts"
     },
     {
@@ -4096,9 +3540,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colorUtils.ts"
     },
     {
@@ -4107,9 +3549,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/baseColors.ts"
     },
     {
@@ -4118,9 +3558,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/chartsColors.ts"
     },
     {
@@ -4129,9 +3567,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/editorColors.ts"
     },
     {
@@ -4140,9 +3576,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/inputColors.ts"
     },
     {
@@ -4151,9 +3585,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/listColors.ts"
     },
     {
@@ -4162,9 +3594,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/menuColors.ts"
     },
     {
@@ -4173,9 +3603,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/minimapColors.ts"
     },
     {
@@ -4184,9 +3612,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/miscColors.ts"
     },
     {
@@ -4195,9 +3621,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/quickpickColors.ts"
     },
     {
@@ -4206,9 +3630,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/colors/searchColors.ts"
     },
     {
@@ -4217,9 +3639,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/iconRegistry.ts"
     },
     {
@@ -4228,9 +3648,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/theme.ts"
     },
     {
@@ -4239,9 +3657,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing admitted contract retained under its current owner. Complete original model and token tests exercise the composed dependency; source compile checks its full consumed signatures. No filename match substitutes a partial implementation.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/themeService.ts"
     },
     {
@@ -4250,9 +3666,7 @@
       "category": "test",
       "disposition": "locally-satisfied",
       "rationale": "Existing actual test disposal/instantiation implementation retains every helper operation consumed by the original regression suites.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "test/base/common/upstream/upstreamTestUtils.ts"
     },
     {
@@ -4261,9 +3675,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing actual test disposal/instantiation implementation retains every helper operation consumed by the original regression suites.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/graph.ts"
     },
     {
@@ -4272,9 +3684,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing actual test disposal/instantiation implementation retains every helper operation consumed by the original regression suites.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/instantiation/common/instantiationService.ts"
     },
     {
@@ -4283,18 +3693,14 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "Microsoft MIT notice retained for every source and test.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -4481,11 +3887,7 @@
         "test/platform/notification/common/upstream/testNotificationService.ts",
         "test/platform/theme/common/upstream/testThemeService.ts"
       ],
-      "verificationRefs": [
-        "model-suite-0",
-        "model-suite-1",
-        "model-suite-2"
-      ]
+      "verificationRefs": ["model-suite-0", "model-suite-1", "model-suite-2"]
     },
     {
       "id": "node-tests",
@@ -4495,11 +3897,7 @@
         "test/editor/common/upstream/model/textModelTokens.test.ts",
         "test/editor/common/upstream/model/textModelWithTokens.test.ts"
       ],
-      "verificationRefs": [
-        "model-suite-0",
-        "model-suite-1",
-        "model-suite-2"
-      ]
+      "verificationRefs": ["model-suite-0", "model-suite-1", "model-suite-2"]
     }
   ],
   "verification": [

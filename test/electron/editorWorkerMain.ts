@@ -17,7 +17,7 @@ void app.whenReady().then(async () => {
 			webSecurity: true
 		}
 	});
-	window.webContents.on('console-message', details => {
+	window.webContents.on('console-message', (details) => {
 		if (details.level === 'error') process.stderr.write(`Worker fixture: ${details.message}\n`);
 	});
 	try {

@@ -1,12 +1,7 @@
 {
   "extends": "./tsconfig.base-common.json",
   "compilerOptions": {
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "../src/prctr/base/common/thenable.d.ts",
-    "../test/editor/node/**/*.ts"
-  ]
+  "include": ["../src/prctr/base/common/thenable.d.ts", "../test/editor/node/**/*.ts"]
 }

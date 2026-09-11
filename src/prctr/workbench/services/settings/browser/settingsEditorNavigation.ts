@@ -3,7 +3,9 @@ import type { IEditorPane } from '../../../common/editor.js';
 import type { IOpenSettingsOptions } from '../../preferences/common/preferences.js';
 
 /** Routing within the current Settings modal; it has no file, workspace or remote target authority. */
-export const ISettingsEditorNavigation = createDecorator<ISettingsEditorNavigation>('settingsEditorNavigation');
+export const ISettingsEditorNavigation = createDecorator<ISettingsEditorNavigation>(
+	'settingsEditorNavigation'
+);
 export interface ISettingsEditorNavigation {
 	readonly _serviceBrand: undefined;
 	openSettingsUi(options: IOpenSettingsOptions): Promise<IEditorPane | undefined>;

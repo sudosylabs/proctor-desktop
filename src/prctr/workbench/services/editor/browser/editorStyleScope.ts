@@ -6,7 +6,10 @@ const scopes = new WeakMap<Document, { references: number; owned: boolean }>();
 export function acquireEditorStyleScope(document: Document): IDisposable {
 	let scope = scopes.get(document);
 	if (!scope) {
-		scope = { references: 0, owned: !document.documentElement.classList.contains('prctr-editor-scope') };
+		scope = {
+			references: 0,
+			owned: !document.documentElement.classList.contains('prctr-editor-scope')
+		};
 		scopes.set(document, scope);
 		document.documentElement.classList.add('prctr-editor-scope');
 	}

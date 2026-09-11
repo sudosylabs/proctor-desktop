@@ -51,7 +51,8 @@ export class SettingsResourceFileService extends Disposable implements IFileServ
 	}
 	async writeEdits(resource: URI, source: string, edits: readonly Edit[]): Promise<void> {
 		this.assertResource(resource);
-		if (await this.storage.read() !== source) throw new Error('Settings changed during the edit.');
+		if ((await this.storage.read()) !== source)
+			throw new Error('Settings changed during the edit.');
 		if (this.storage.applyEdits) this.storage.applyEdits(edits);
 		else await this.storage.write(applyEdits(source, [...edits]));
 	}

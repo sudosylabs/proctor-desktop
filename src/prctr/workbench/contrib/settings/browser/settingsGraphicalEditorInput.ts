@@ -7,19 +7,44 @@ import type { SettingsEditorInputHost } from '../../../services/settings/common/
 /** The original Settings catalog input projects the shared document's dirty/authority state. */
 export class SettingsGraphicalEditorInput extends SettingsEditor2Input {
 	override readonly closeHandler: IEditorCloseHandler;
-	constructor(model: Settings2EditorModel, private readonly host: SettingsEditorInputHost, private readonly isValid: () => boolean) {
+	constructor(
+		model: Settings2EditorModel,
+		private readonly host: SettingsEditorInputHost,
+		private readonly isValid: () => boolean
+	) {
 		super(model);
 		this.closeHandler = { showConfirm: () => true, confirm: () => this.host.confirmClose() };
-		this._register(host.onDidChangeState(() => { this._onDidChangeDirty.fire(); this._onDidChangeCapabilities.fire(); }));
+		this._register(
+			host.onDidChangeState(() => {
+				this._onDidChangeDirty.fire();
+				this._onDidChangeCapabilities.fire();
+			})
+		);
 	}
 	override get capabilities(): EditorInputCapabilities {
-		return EditorInputCapabilities.RequiresModal | (this.host.isReadonly() || !this.isValid() ? EditorInputCapabilities.Readonly : EditorInputCapabilities.None);
+		return (
+			EditorInputCapabilities.RequiresModal |
+			(this.host.isReadonly() || !this.isValid()
+				? EditorInputCapabilities.Readonly
+				: EditorInputCapabilities.None)
+		);
 	}
-	override isDirty(): boolean { return this.host.isDirty(); }
-	override isSaving(): boolean { return this.host.isSaving(); }
-	override async save(): Promise<EditorInput | undefined> { return await this.host.save() ? this : undefined; }
-	override async revert(): Promise<void> { await this.host.revert(); }
+	override isDirty(): boolean {
+		return this.host.isDirty();
+	}
+	override isSaving(): boolean {
+		return this.host.isSaving();
+	}
+	override async save(): Promise<EditorInput | undefined> {
+		return (await this.host.save()) ? this : undefined;
+	}
+	override async revert(): Promise<void> {
+		await this.host.revert();
+	}
 	override matches(other: EditorInput | IUntypedEditorInput): boolean {
-		return other === this || other instanceof SettingsGraphicalEditorInput && other.host === this.host;
+		return (
+			other === this ||
+			(other instanceof SettingsGraphicalEditorInput && other.host === this.host)
+		);
 	}
 }

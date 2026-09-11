@@ -6,9 +6,18 @@ import type { SettingsEditorEnvironment } from '../../../src/prctr/workbench/ser
 /** Browser-only fixture acquisition; Electron production uses its authenticated native capability. */
 export const browserSettingsEditorEnvironment: SettingsEditorEnvironment = {
 	isDevelopment: false,
-	createClipboard: layout => new BrowserClipboardService(layout, new NullLogService()),
-	createContextMenu: (_services, instantiation) => instantiation.createInstance(ContextMenuService),
+	createClipboard: (layout) => new BrowserClipboardService(layout, new NullLogService()),
+	createContextMenu: (_services, instantiation) =>
+		instantiation.createInstance(ContextMenuService),
 	window: {
-		async focus() { window.focus(); }, async moveTop() { window.focus(); }, async getCursorScreenPoint() { return undefined; }
+		async focus() {
+			window.focus();
+		},
+		async moveTop() {
+			window.focus();
+		},
+		async getCursorScreenPoint() {
+			return undefined;
+		}
 	}
 };

@@ -1560,10 +1560,7 @@
         "src/prctr/base/common/resourceRoot.ts",
         "src/prctr/base/common/vscodeNls.ts"
       ],
-      "verificationRefs": [
-        "base-common-runtime-tests",
-        "real-browser-base-common"
-      ]
+      "verificationRefs": ["base-common-runtime-tests", "real-browser-base-common"]
     },
     {
       "id": "node-test-harness",
@@ -1574,10 +1571,7 @@
         "test/base/common/upstream/upstreamTestUtils.ts",
         "build/buildBaseCommonTests.ts"
       ],
-      "verificationRefs": [
-        "base-common-runtime-tests",
-        "base-common-test-typecheck"
-      ]
+      "verificationRefs": ["base-common-runtime-tests", "base-common-test-typecheck"]
     },
     {
       "id": "experimental-observable-exclusion",
@@ -1587,10 +1581,7 @@
         "test/base/common/upstream/observables/observable.test.ts",
         "test/base/common/upstream/observables/throttledObservable.test.ts"
       ],
-      "verificationRefs": [
-        "base-common-runtime-tests",
-        "upstream-audit"
-      ]
+      "verificationRefs": ["base-common-runtime-tests", "upstream-audit"]
     },
     {
       "id": "upstream-compiler-semantics",
@@ -1613,10 +1604,7 @@
         "src/prctr/base/common/observableInternal/logging/debugger/rpc.ts",
         "test/browser/rendererHarness.ts"
       ],
-      "verificationRefs": [
-        "real-browser-base-common",
-        "source-graph-enforcement"
-      ]
+      "verificationRefs": ["real-browser-base-common", "source-graph-enforcement"]
     },
     {
       "id": "explicit-type-only-dependencies",
@@ -1633,17 +1621,12 @@
         "src/prctr/base/common/observableInternal/set.ts",
         "src/prctr/base/common/observableInternal/transaction.ts"
       ],
-      "verificationRefs": [
-        "source-graph-enforcement",
-        "base-common-runtime-tests"
-      ]
+      "verificationRefs": ["source-graph-enforcement", "base-common-runtime-tests"]
     },
     {
       "id": "owned-stylesheets",
       "summary": "The source DOM stylesheet bridge uses CSP-compatible StyleSheetHandle change/removal events; each cloned sheet is owned and disposed with its source/target window. No inline-style or HTML sink fallback is introduced.",
-      "localPaths": [
-        "src/prctr/base/browser/domStylesheets.ts"
-      ],
+      "localPaths": ["src/prctr/base/browser/domStylesheets.ts"],
       "verificationRefs": [
         "base-common-runtime-tests",
         "real-browser-base-common",

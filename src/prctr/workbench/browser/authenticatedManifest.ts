@@ -33,7 +33,7 @@ export const authenticatedComposition = composeWorkbench(
 	'authenticated',
 	[commonWorkbenchManifest, electronDesktopManifest, authenticatedWorkbenchManifest],
 	{
-		parts: Object.freeze(commonParts.filter(part => part !== 'status')),
+		parts: Object.freeze(commonParts.filter((part) => part !== 'status')),
 		maxContentGroups: 1,
 		allowHorizontalSplit: false,
 		allowVerticalSplit: false,

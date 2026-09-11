@@ -12,15 +12,19 @@ const sourcePolicy = JSON.stringify({
 });
 
 void test('only fully erased imports and exports may use development dependencies', () => {
-	const check = (source: string) => analyzeSource(new VirtualRepository({
-		'build/policies/source-boundaries.json': sourcePolicy,
-		'package.json': JSON.stringify({ devDependencies: { contract: '1.0.0' } }),
-		'src/prctr/base/common/owner.ts': source
-	})).diagnostics;
+	const check = (source: string) =>
+		analyzeSource(
+			new VirtualRepository({
+				'build/policies/source-boundaries.json': sourcePolicy,
+				'package.json': JSON.stringify({ devDependencies: { contract: '1.0.0' } }),
+				'src/prctr/base/common/owner.ts': source
+			})
+		).diagnostics;
 	for (const source of [
 		"import type { Contract } from 'contract';",
 		"export type { Contract } from 'contract';"
-	]) assert.deepEqual(check(source), []);
+	])
+		assert.deepEqual(check(source), []);
 	for (const source of [
 		"import { Contract } from 'contract';",
 		"import { type Contract } from 'contract';",
@@ -132,16 +136,28 @@ void test('CSS important declarations require one exact override-layer exception
 
 void test('CSS ownership resolves nested selectors across conditional rules', async () => {
 	const path = 'src/prctr/workbench/browser/owner.css';
-	const run = (css: string) => cssCheck.run({
-		repository: new VirtualRepository({
-			'build/policies/source-boundaries.json': sourcePolicy,
-			'package.json': '{"dependencies":{}}',
-			'src/prctr/workbench/browser/owner.ts': "import './owner.css';\n",
-			[path]: css
-		}), registeredCheckIds: new Set([cssCheck.id])
-	});
-	assert.deepEqual(await run('@layer controls { .prctr-owner { & .child + .sibling, & > .child ~ .sibling { opacity: .5; } } }'), []);
-	assert.deepEqual(await run('@layer controls { .prctr-owner { &.active, &:focus { opacity: 1; } @media (width > 400px) { .child { &:hover { opacity: .5; } } } } }'), []);
+	const run = (css: string) =>
+		cssCheck.run({
+			repository: new VirtualRepository({
+				'build/policies/source-boundaries.json': sourcePolicy,
+				'package.json': '{"dependencies":{}}',
+				'src/prctr/workbench/browser/owner.ts': "import './owner.css';\n",
+				[path]: css
+			}),
+			registeredCheckIds: new Set([cssCheck.id])
+		});
+	assert.deepEqual(
+		await run(
+			'@layer controls { .prctr-owner { & .child + .sibling, & > .child ~ .sibling { opacity: .5; } } }'
+		),
+		[]
+	);
+	assert.deepEqual(
+		await run(
+			'@layer controls { .prctr-owner { &.active, &:focus { opacity: 1; } @media (width > 400px) { .child { &:hover { opacity: .5; } } } } }'
+		),
+		[]
+	);
 	for (const css of [
 		'@layer controls { .prctr-owner { & + .foreign { opacity: .5; } } }',
 		'@layer controls { .prctr-owner { & ~ .foreign { opacity: .5; } } }',
@@ -153,20 +169,34 @@ void test('CSS ownership resolves nested selectors across conditional rules', as
 		'@layer controls { .prctr-owner { .unowned & { opacity: 1; } } }',
 		'@layer controls { .prctr-owner, .unowned { & .child { opacity: 1; } } }',
 		'@layer controls { .prctr-owner { @supports (display: grid) { #unowned { opacity: 1; } } } }'
-	]) assert.notEqual((await run(css)).length, 0, css);
+	])
+		assert.notEqual((await run(css)).length, 0, css);
 });
 
 void test('conditional nested important rules require the global overrides layer and exact evidence', async () => {
 	const path = 'src/prctr/workbench/browser/owner.css';
-	const run = (css: string, selector = '&:focus') => cssCheck.run({
-		repository: new VirtualRepository({
-			'build/policies/source-boundaries.json': JSON.stringify({ ...JSON.parse(sourcePolicy), cssImportantOverrides: [{ path, selector, property: 'outline', rationale: 'Preserve the reviewed nested focus override.' }] }),
-			'package.json': '{"dependencies":{}}',
-			'src/prctr/workbench/browser/owner.ts': "import './owner.css';\n",
-			[path]: css
-		}), registeredCheckIds: new Set([cssCheck.id])
-	});
-	const valid = '@layer overrides { .prctr-owner { @media (width > 400px) { &:focus { outline: 0 !important; } } } }';
+	const run = (css: string, selector = '&:focus') =>
+		cssCheck.run({
+			repository: new VirtualRepository({
+				'build/policies/source-boundaries.json': JSON.stringify({
+					...JSON.parse(sourcePolicy),
+					cssImportantOverrides: [
+						{
+							path,
+							selector,
+							property: 'outline',
+							rationale: 'Preserve the reviewed nested focus override.'
+						}
+					]
+				}),
+				'package.json': '{"dependencies":{}}',
+				'src/prctr/workbench/browser/owner.ts': "import './owner.css';\n",
+				[path]: css
+			}),
+			registeredCheckIds: new Set([cssCheck.id])
+		});
+	const valid =
+		'@layer overrides { .prctr-owner { @media (width > 400px) { &:focus { outline: 0 !important; } } } }';
 	assert.deepEqual(await run(valid), []);
 	assert.notEqual((await run(valid, '&:hover')).length, 0);
 	assert.notEqual((await run(valid.replace('@layer overrides', '@layer controls'))).length, 0);
@@ -176,16 +206,28 @@ void test('conditional nested important rules require the global overrides layer
 void test('static assets require an exact importer and resource with the correct environment', () => {
 	const importer = 'src/prctr/base/common/owner.ts';
 	const resource = 'resources/grammar.json';
-	const admission = { importer, resource, kind: 'data', rationale: 'Packaged grammar data for the closed worker adapter.' };
-	const run = (source: string, admissions: object[] = [admission], owner = importer) => analyzeSource(new VirtualRepository({
-		'build/policies/source-boundaries.json': JSON.stringify({ ...JSON.parse(sourcePolicy), staticAssetImports: admissions }),
-		'package.json': '{}',
-		[owner]: source,
-		[resource]: '{}',
-		'resources/neighbor.json': '{}',
-		'resources/font.woff': 'font'
-	})).diagnostics;
-	const source = "import grammar from '../../../../resources/grammar.json' with { type: 'json' };";
+	const admission = {
+		importer,
+		resource,
+		kind: 'data',
+		rationale: 'Packaged grammar data for the closed worker adapter.'
+	};
+	const run = (source: string, admissions: object[] = [admission], owner = importer) =>
+		analyzeSource(
+			new VirtualRepository({
+				'build/policies/source-boundaries.json': JSON.stringify({
+					...JSON.parse(sourcePolicy),
+					staticAssetImports: admissions
+				}),
+				'package.json': '{}',
+				[owner]: source,
+				[resource]: '{}',
+				'resources/neighbor.json': '{}',
+				'resources/font.woff': 'font'
+			})
+		).diagnostics;
+	const source =
+		"import grammar from '../../../../resources/grammar.json' with { type: 'json' };";
 	assert.deepEqual(run(source), []);
 	assert.notEqual(run(source, []).length, 0);
 	assert.notEqual(run(source, [admission], 'src/prctr/base/common/other.ts').length, 0);
@@ -193,5 +235,10 @@ void test('static assets require an exact importer and resource with the correct
 	assert.notEqual(run('', [admission]).length, 0);
 	assert.notEqual(run(source, [admission, admission]).length, 0);
 	assert.notEqual(run(source, [{ ...admission, kind: 'font' }]).length, 0);
-	assert.notEqual(run(source.replace('grammar.json', 'font.woff'), [{ ...admission, resource: 'resources/font.woff', kind: 'font' }]).length, 0);
+	assert.notEqual(
+		run(source.replace('grammar.json', 'font.woff'), [
+			{ ...admission, resource: 'resources/font.woff', kind: 'font' }
+		]).length,
+		0
+	);
 });

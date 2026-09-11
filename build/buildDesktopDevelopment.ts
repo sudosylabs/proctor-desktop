@@ -36,7 +36,9 @@ cpSync(
 	join(outdir, 'prctr_desktop_key_custody.node')
 );
 await Promise.all([
-	buildEditorWorker(outdir), buildJsonWorker(outdir), buildTextMateWorker(outdir),
+	buildEditorWorker(outdir),
+	buildJsonWorker(outdir),
+	buildTextMateWorker(outdir),
 	build({
 		absWorkingDir: repositoryRoot,
 		bundle: true,

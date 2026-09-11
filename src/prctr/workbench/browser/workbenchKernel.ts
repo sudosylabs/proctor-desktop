@@ -39,8 +39,9 @@ import {
 	WORKBENCH_COMMAND_SERVICE,
 	WORKBENCH_CONTEXT_KEY_SERVICE,
 	WORKBENCH_KEYBINDING_SERVICE,
-	WORKBENCH_MENU_SERVICE
-	, WORKBENCH_SERVICE_COLLECTION, WORKBENCH_INSTANTIATION_SERVICE
+	WORKBENCH_MENU_SERVICE,
+	WORKBENCH_SERVICE_COLLECTION,
+	WORKBENCH_INSTANTIATION_SERVICE
 } from '../common/serviceIds.js';
 import { registerProctorAction } from '../services/actions/common/proctorActions.js';
 import { CommandService } from '../services/commands/common/commandService.js';
@@ -121,7 +122,9 @@ export function activateWorkbenchKernel(context: WorkbenchBootstrapContext): voi
 	const feedbackElement = context.document.createElement('span');
 	feedbackElement.className = 'prctr-workbench__keybinding-feedback';
 	feedbackElement.role = 'status';
-	context.shell.part(context.composition.windowKind === 'authenticated' ? 'titlebar' : 'status').append(feedbackElement);
+	context.shell
+		.part(context.composition.windowKind === 'authenticated' ? 'titlebar' : 'status')
+		.append(feedbackElement);
 	context.disposables.add({ dispose: () => feedbackElement.remove() });
 	const keybindingService = context.disposables.add(
 		new BrowserKeybindingService(

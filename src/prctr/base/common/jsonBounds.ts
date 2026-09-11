@@ -9,7 +9,10 @@ export function findJsonDepthOverflow(source: string, maxDepth: number): number 
 			nesting.push(token);
 			if (nesting.length > maxDepth) return scanner.getTokenOffset();
 		} else if (token === SyntaxKind.CloseBraceToken || token === SyntaxKind.CloseBracketToken) {
-			const opening = token === SyntaxKind.CloseBraceToken ? SyntaxKind.OpenBraceToken : SyntaxKind.OpenBracketToken;
+			const opening =
+				token === SyntaxKind.CloseBraceToken
+					? SyntaxKind.OpenBraceToken
+					: SyntaxKind.OpenBracketToken;
 			// The recursive parser recovers past a wrong-kind closer. Such a token
 			// cannot make an enclosing array/object shallower for this preflight.
 			if (nesting.at(-1) === opening) nesting.pop();

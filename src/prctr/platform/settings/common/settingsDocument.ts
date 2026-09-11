@@ -63,7 +63,12 @@ export function parseSettingsDocument(source: string): ParsedSettingsDocument {
 	const syntaxErrors: ParseError[] = [];
 	const depthOverflow = findJsonDepthOverflow(source, SETTINGS_DOCUMENT_LIMITS.maxDepth);
 	if (depthOverflow !== undefined) {
-		diagnostics.push({ code: 'too-deep', offset: depthOverflow, length: 1, message: `Settings nesting exceeds ${SETTINGS_DOCUMENT_LIMITS.maxDepth} levels.` });
+		diagnostics.push({
+			code: 'too-deep',
+			offset: depthOverflow,
+			length: 1,
+			message: `Settings nesting exceeds ${SETTINGS_DOCUMENT_LIMITS.maxDepth} levels.`
+		});
 		return freezeResult(source, diagnostics, undefined, new Map(), new Map());
 	}
 	const node = parseTree(source, syntaxErrors, {

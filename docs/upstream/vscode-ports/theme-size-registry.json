@@ -24,9 +24,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned file retained. Proctor namespace and schema URI relocation, packaged localization, erased type imports and Node test adapter are the only changes; registration, defaults, units, schema scheduling and theme resolution remain intact.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -42,9 +40,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned file retained. Proctor namespace and schema URI relocation, packaged localization, erased type imports and Node test adapter are the only changes; registration, defaults, units, schema scheduling and theme resolution remain intact.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -60,9 +56,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Complete pinned file retained. Proctor namespace and schema URI relocation, packaged localization, erased type imports and Node test adapter are the only changes; registration, defaults, units, schema scheduling and theme resolution remain intact.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -78,9 +72,7 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Complete pinned file retained. Proctor namespace and schema URI relocation, packaged localization, erased type imports and Node test adapter are the only changes; registration, defaults, units, schema scheduling and theme resolution remain intact.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -94,9 +86,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/event.ts"
     },
     {
@@ -105,9 +95,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/jsonSchema.ts"
     },
     {
@@ -116,9 +104,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/jsonschemas/common/jsonContributionRegistry.ts"
     },
     {
@@ -127,9 +113,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/registry/common/platform.ts"
     },
     {
@@ -138,9 +122,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/platform/theme/common/themeService.ts"
     },
     {
@@ -149,9 +131,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/lifecycle.ts"
     },
     {
@@ -160,9 +140,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/async.ts"
     },
     {
@@ -171,9 +149,7 @@
       "category": "source",
       "disposition": "locally-satisfied",
       "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "src/prctr/base/common/vscodeNls.ts"
     },
     {
@@ -182,9 +158,7 @@
       "category": "test",
       "disposition": "locally-satisfied",
       "rationale": "Existing shared owner supplies the consumed contract. The complete size registry owner tests exercise registration, resolution, schema and lifecycle through these interfaces.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "localInterface": "test/base/common/upstream/upstreamTestUtils.ts"
     },
     {
@@ -193,18 +167,14 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "Retained Microsoft MIT notice.",
-      "licenseRefs": [
-        "vscode-mit"
-      ]
+      "licenseRefs": ["vscode-mit"]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -226,11 +196,7 @@
         "src/prctr/platform/theme/common/sizes/baseSizes.ts",
         "test/platform/theme/common/upstream/sizeRegistry.test.ts"
       ],
-      "verificationRefs": [
-        "owner-tests",
-        "editor-geometry",
-        "upstream-audit"
-      ]
+      "verificationRefs": ["owner-tests", "editor-geometry", "upstream-audit"]
     }
   ],
   "verification": [

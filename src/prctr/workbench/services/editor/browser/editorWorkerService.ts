@@ -14,7 +14,8 @@ export class PackagedEditorWorkerService extends WebWorkerService {
 	}
 	override getWorkerUrl(descriptor: WebWorkerDescriptor): string {
 		if (descriptor === EditorWorkerService.workerDescriptor) return this.workerUrl;
-		if (descriptor === ThreadedBackgroundTokenizerFactory.workerDescriptor) return this.textMateWorkerUrl;
+		if (descriptor === ThreadedBackgroundTokenizerFactory.workerDescriptor)
+			return this.textMateWorkerUrl;
 		throw new Error('Worker descriptor is not packaged for this window.');
 	}
 }

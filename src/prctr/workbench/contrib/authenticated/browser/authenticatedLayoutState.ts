@@ -19,10 +19,20 @@ export class AuthenticatedLayoutState {
 		}
 	}
 	get primarySide(): 'left' | 'right' {
-		try { return this.storage?.getItem('prctr.authenticated.layout.v2.primarySide') === 'right' ? 'right' : 'left'; } catch { return 'left'; }
+		try {
+			return this.storage?.getItem('prctr.authenticated.layout.v2.primarySide') === 'right'
+				? 'right'
+				: 'left';
+		} catch {
+			return 'left';
+		}
 	}
 	set primarySide(side: 'left' | 'right') {
-		try { this.storage?.setItem('prctr.authenticated.layout.v2.primarySide', side); } catch { /* Session-only fallback. */ }
+		try {
+			this.storage?.setItem('prctr.authenticated.layout.v2.primarySide', side);
+		} catch {
+			/* Session-only fallback. */
+		}
 	}
 	set sidebarVisible(visible: boolean) {
 		try {

@@ -2,7 +2,12 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { Disposable, DisposableStore, toDisposable, type IDisposable } from '../../base/common/lifecycle.js';
+import {
+	Disposable,
+	DisposableStore,
+	toDisposable,
+	type IDisposable
+} from '../../base/common/lifecycle.js';
 import { Emitter, type Event } from '../../base/common/event.js';
 import { addDisposableListener } from '../../base/browser/dom.js';
 import { ButtonControl } from '../../base/browser/ui/button/buttonControl.js';

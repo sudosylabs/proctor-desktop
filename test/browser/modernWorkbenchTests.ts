@@ -1,4 +1,7 @@
-import { AuthenticatedLayout, AUTHENTICATED_LAYOUT_SERVICE } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts';
+import {
+	AuthenticatedLayout,
+	AUTHENTICATED_LAYOUT_SERVICE
+} from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts';
 import type { WorkbenchBootstrapContext } from '../../src/prctr/workbench/browser/bootstrap.ts';
 import { AuthenticatedLayoutState } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedLayoutState.ts';
 import { DisposableStore } from '../../src/prctr/base/common/lifecycle.ts';
@@ -33,7 +36,8 @@ export async function runModernWorkbenchTests(
 	const initialLayout = new AuthenticatedLayoutState(persistence);
 	if (!initialLayout.sidebarVisible) throw new Error('Sidebar must initially be visible');
 	initialLayout.primarySide = 'right';
-	if (new AuthenticatedLayoutState(persistence).primarySide !== 'right') throw new Error('Position preference failed restoration');
+	if (new AuthenticatedLayoutState(persistence).primarySide !== 'right')
+		throw new Error('Position preference failed restoration');
 	initialLayout.sidebarVisible = false;
 	if (new AuthenticatedLayoutState(persistence).sidebarVisible)
 		throw new Error('Sidebar preference failed restoration');
@@ -113,11 +117,7 @@ export async function runModernWorkbenchTests(
 				close(bounds.right - c.right, 4, 'outer content gutter');
 				close(c.left - n.right, density === 'compact' ? 0 : 4, 'density gap');
 				close(n.bottom, c.bottom, 'part bottom alignment');
-				close(
-					bounds.bottom - c.bottom,
-					4,
-					'window bottom gutter without a status bar'
-				);
+				close(bounds.bottom - c.bottom, 4, 'window bottom gutter without a status bar');
 				const style = view.getComputedStyle(content);
 				assert(
 					style.boxSizing === 'border-box' && style.overflow === 'hidden',
@@ -182,13 +182,28 @@ export async function runModernWorkbenchTests(
 		host.style.inlineSize = '1024px';
 		host.style.blockSize = '720px';
 		shell.layout();
-		assert(!shell.element.querySelector('[data-part="status"]'), 'AuthenticatedWindow has no status bar');
+		assert(
+			!shell.element.querySelector('[data-part="status"]'),
+			'AuthenticatedWindow has no status bar'
+		);
 		shell.setSecondaryVisible(true);
 		const side = shell.part('sidebar');
-		close(side.getBoundingClientRect().left - content.getBoundingClientRect().right, 4, 'secondary gap');
+		close(
+			side.getBoundingClientRect().left - content.getBoundingClientRect().right,
+			4,
+			'secondary gap'
+		);
 		shell.setPrimarySide('right');
-		close(nav.getBoundingClientRect().left - content.getBoundingClientRect().right, 4, 'right primary gap');
-		close(content.getBoundingClientRect().left - side.getBoundingClientRect().right, 4, 'left secondary gap');
+		close(
+			nav.getBoundingClientRect().left - content.getBoundingClientRect().right,
+			4,
+			'right primary gap'
+		);
+		close(
+			content.getBoundingClientRect().left - side.getBoundingClientRect().right,
+			4,
+			'left secondary gap'
+		);
 		shell.setPrimarySide('left');
 		shell.setSecondaryVisible(false);
 		const widthBefore = content.getBoundingClientRect().width;
@@ -199,9 +214,15 @@ export async function runModernWorkbenchTests(
 			'repeated layout must not compound insets'
 		);
 		const accountStore = new DisposableStore();
-		const savedLayout = new Map(['prctr.authenticated.layout.v1.sidebarVisible', 'prctr.authenticated.layout.v2.primarySide'].map(key => [key, document.defaultView!.localStorage.getItem(key)]));
+		const savedLayout = new Map(
+			[
+				'prctr.authenticated.layout.v1.sidebarVisible',
+				'prctr.authenticated.layout.v2.primarySide'
+			].map((key) => [key, document.defaultView!.localStorage.getItem(key)])
+		);
 		const preferences = new AuthenticatedLayoutState(document.defaultView!.localStorage);
-		preferences.primarySide = 'left'; preferences.sidebarVisible = true;
+		preferences.primarySide = 'left';
+		preferences.sidebarVisible = true;
 		try {
 			const chrome = accountStore.add(
 				await ProductWindowChrome.create(
@@ -224,24 +245,25 @@ export async function runModernWorkbenchTests(
 			);
 			const services = new Map<string, unknown>([[PRODUCT_WINDOW_CHROME_SERVICE, chrome]]);
 			const context: WorkbenchBootstrapContext = {
-					document,
-					shell,
-					composition: authenticatedComposition,
-					disposables: accountStore,
-					localization: createLocalization({
-						requestedLocale: 'en',
-						messages: Object.values(accountShellMessages)
-					}),
-					getService: <T>(id: string) => services.get(id) as T,
-					setService: (id, value) => {
-						services.set(id, value);
-					},
-					setWindowBinding() {},
-					getWindowBinding() {}
-				};
+				document,
+				shell,
+				composition: authenticatedComposition,
+				disposables: accountStore,
+				localization: createLocalization({
+					requestedLocale: 'en',
+					messages: Object.values(accountShellMessages)
+				}),
+				getService: <T>(id: string) => services.get(id) as T,
+				setService: (id, value) => {
+					services.set(id, value);
+				},
+				setWindowBinding() {},
+				getWindowBinding() {}
+			};
 			const layout = accountStore.add(new AuthenticatedLayout(context));
 			services.set(AUTHENTICATED_LAYOUT_SERVICE, layout);
-			activateAccountShellNavigation(context,
+			activateAccountShellNavigation(
+				context,
 				{ signOut: async () => {}, close: async () => {} },
 				{
 					protocolVersion: 1,
@@ -266,8 +288,17 @@ export async function runModernWorkbenchTests(
 			const sidebarToggle = chrome.actions.querySelector<HTMLButtonElement>(
 				'[data-layout-action="primary"]'
 			)!;
-			assert(sidebarToggle.parentElement!.nextElementSibling?.nextElementSibling?.getAttribute('data-region') === 'settings-trigger', 'layout controls precede Settings');
-			assert(trigger.previousElementSibling?.getAttribute('data-region') === 'titlebar-separator', 'account follows its separator');
+			assert(
+				sidebarToggle.parentElement!.nextElementSibling?.nextElementSibling?.getAttribute(
+					'data-region'
+				) === 'settings-trigger',
+				'layout controls precede Settings'
+			);
+			assert(
+				trigger.previousElementSibling?.getAttribute('data-region') ===
+					'titlebar-separator',
+				'account follows its separator'
+			);
 			const checkSidebar = (visible: boolean): void => {
 				assert(
 					shell.navigationVisible === visible &&
@@ -282,18 +313,39 @@ export async function runModernWorkbenchTests(
 					'sidebar icon follows actual visibility'
 				);
 			};
-			const secondaryToggle = chrome.actions.querySelector<HTMLButtonElement>('[data-layout-action="secondary"]')!;
+			const secondaryToggle = chrome.actions.querySelector<HTMLButtonElement>(
+				'[data-layout-action="secondary"]'
+			)!;
 			assert(secondaryToggle.disabled, 'secondary toggle unavailable without page content');
 			let releases = 0;
-			const registration = layout.registerSecondary('account/profile', container => {
-				const detail = document.createElement('button'); detail.textContent = 'Item detail'; container.append(detail);
-				return { dispose() { releases++; detail.remove(); } };
+			const registration = layout.registerSecondary('account/profile', (container) => {
+				const detail = document.createElement('button');
+				detail.textContent = 'Item detail';
+				container.append(detail);
+				return {
+					dispose() {
+						releases++;
+						detail.remove();
+					}
+				};
 			});
-			assert(!secondaryToggle.disabled && !shell.secondaryVisible, 'page enables secondary without opening it');
+			assert(
+				!secondaryToggle.disabled && !shell.secondaryVisible,
+				'page enables secondary without opening it'
+			);
 			secondaryToggle.click();
-			assert(shell.secondaryVisible && side.textContent === 'Item detail', 'secondary reveals page-owned content');
+			assert(
+				shell.secondaryVisible && side.textContent === 'Item detail',
+				'secondary reveals page-owned content'
+			);
 			layout.setDestination('activity');
-			assert(!shell.secondaryVisible && secondaryToggle.disabled && releases === 1 && !side.textContent, 'navigation releases secondary content');
+			assert(
+				!shell.secondaryVisible &&
+					secondaryToggle.disabled &&
+					releases === 1 &&
+					!side.textContent,
+				'navigation releases secondary content'
+			);
 			layout.setDestination('account/profile');
 			assert(!shell.secondaryVisible, 'returning to page starts with secondary closed');
 			registration.dispose();
@@ -358,7 +410,10 @@ export async function runModernWorkbenchTests(
 			// Menu interactions run in authenticatedLayoutTests with the production service graph.
 		} finally {
 			accountStore.dispose();
-			for (const [key, value] of savedLayout) { if (value === null) document.defaultView!.localStorage.removeItem(key); else document.defaultView!.localStorage.setItem(key, value); }
+			for (const [key, value] of savedLayout) {
+				if (value === null) document.defaultView!.localStorage.removeItem(key);
+				else document.defaultView!.localStorage.setItem(key, value);
+			}
 		}
 	} finally {
 		shell.dispose();

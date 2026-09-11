@@ -46,7 +46,14 @@ export const colorCustomizationSchema = {
 	patternProperties: {
 		'^[A-Za-z][A-Za-z0-9]*(\\.[A-Za-z][A-Za-z0-9]*)*$': {
 			type: 'string' as const,
-			oneOf: [{ type: 'string' as const, format: 'color-hex', defaultSnippets: [{ body: '${1:#ff0000}' }] }, { const: 'default' }],
+			oneOf: [
+				{
+					type: 'string' as const,
+					format: 'color-hex',
+					defaultSnippets: [{ body: '${1:#ff0000}' }]
+				},
+				{ const: 'default' }
+			],
 			pattern: '^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|default)$'
 		},
 		'^\\[[^\\]]+\\](\\s*\\[[^\\]]+\\])*$': {
@@ -55,7 +62,14 @@ export const colorCustomizationSchema = {
 			patternProperties: {
 				'^[A-Za-z][A-Za-z0-9]*(\\.[A-Za-z][A-Za-z0-9]*)*$': {
 					type: 'string' as const,
-					oneOf: [{ type: 'string' as const, format: 'color-hex', defaultSnippets: [{ body: '${1:#ff0000}' }] }, { const: 'default' }],
+					oneOf: [
+						{
+							type: 'string' as const,
+							format: 'color-hex',
+							defaultSnippets: [{ body: '${1:#ff0000}' }]
+						},
+						{ const: 'default' }
+					],
 					pattern:
 						'^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|default)$'
 				}

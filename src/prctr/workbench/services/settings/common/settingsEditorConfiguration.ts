@@ -22,7 +22,9 @@ import {
 } from '../../../../platform/settings/common/settingsResource.js';
 import type { SettingsDraft } from '../../../../platform/settings/common/settingsDraft.js';
 
-export const ISettingsEditorConfiguration = createDecorator<SettingsEditorConfiguration>('settingsEditorConfiguration');
+export const ISettingsEditorConfiguration = createDecorator<SettingsEditorConfiguration>(
+	'settingsEditorConfiguration'
+);
 
 /** Derived configuration is never the editable source. Unknown JSON properties cannot activate services. */
 class SettingsConfigurationInput extends Disposable implements SettingsStorage {
@@ -36,14 +38,22 @@ class SettingsConfigurationInput extends Disposable implements SettingsStorage {
 		const active: Record<string, unknown> = Object.create(null);
 		for (const [key, value] of document.values) {
 			const declaration = settingsRegistry.declaration(key);
-			if (declaration && declaration.candidate !== 'prohibited' && declaration.windows.includes('authenticated'))
+			if (
+				declaration &&
+				declaration.candidate !== 'prohibited' &&
+				declaration.windows.includes('authenticated')
+			)
 				active[key] = value;
 		}
 		for (const [language, values] of document.languageValues) {
 			const overrides: Record<string, unknown> = Object.create(null);
 			for (const [key, value] of values) {
 				const declaration = settingsRegistry.declaration(key);
-				if (declaration?.languageOverride && declaration.candidate !== 'prohibited' && declaration.windows.includes('authenticated'))
+				if (
+					declaration?.languageOverride &&
+					declaration.candidate !== 'prohibited' &&
+					declaration.windows.includes('authenticated')
+				)
 					overrides[key] = value;
 			}
 			if (Object.keys(overrides).length) active[`[${language}]`] = overrides;
@@ -54,8 +64,12 @@ class SettingsConfigurationInput extends Disposable implements SettingsStorage {
 		this.changed.fire();
 	}
 
-	async read(): Promise<string> { return this.source; }
-	async write(): Promise<void> { throw new Error('Edit the Settings working document to change configuration.'); }
+	async read(): Promise<string> {
+		return this.source;
+	}
+	async write(): Promise<void> {
+		throw new Error('Edit the Settings working document to change configuration.');
+	}
 }
 
 /** Retains original reads, inspection and change events; edits target the shared draft only. */
@@ -90,7 +104,9 @@ export class SettingsEditorConfiguration extends ConfigurationService {
 	}
 
 	async refresh(): Promise<void> {
-		this.input.update(this.previewEnabled && this.draft ? this.draft.source : this.acknowledgedSource);
+		this.input.update(
+			this.previewEnabled && this.draft ? this.draft.source : this.acknowledgedSource
+		);
 		await this.reloadConfiguration();
 	}
 
@@ -99,17 +115,23 @@ export class SettingsEditorConfiguration extends ConfigurationService {
 		await this.refresh();
 	}
 
-	acknowledge(source: string): void { this.acknowledgedSource = source; }
+	acknowledge(source: string): void {
+		this.acknowledgedSource = source;
+	}
 
-	get hasPendingEdits(): boolean { return this.pendingEdits.size > 0; }
+	get hasPendingEdits(): boolean {
+		return this.pendingEdits.size > 0;
+	}
 
 	async flushPendingEdits(): Promise<void> {
 		const failures: unknown[] = [];
 		while (this.pendingEdits.size) {
 			const results = await Promise.allSettled([...this.pendingEdits]);
-			for (const result of results) if (result.status === 'rejected') failures.push(result.reason);
+			for (const result of results)
+				if (result.status === 'rejected') failures.push(result.reason);
 		}
-		if (failures.length) throw new AggregateError(failures, 'A Settings edit could not be applied.');
+		if (failures.length)
+			throw new AggregateError(failures, 'A Settings edit could not be applied.');
 	}
 
 	override updateValue(
@@ -122,7 +144,10 @@ export class SettingsEditorConfiguration extends ConfigurationService {
 		const operation = this.updateDraftValue(key, value, arg3, arg4, options);
 		this.pendingEdits.add(operation);
 		this.pendingChanged.fire();
-		const settled = (): void => { this.pendingEdits.delete(operation); this.pendingChanged.fire(); };
+		const settled = (): void => {
+			this.pendingEdits.delete(operation);
+			this.pendingChanged.fire();
+		};
 		void operation.then(settled, settled);
 		return operation;
 	}
@@ -136,17 +161,31 @@ export class SettingsEditorConfiguration extends ConfigurationService {
 	): Promise<void> {
 		const draft = this.draft;
 		if (!draft) throw new Error('No Settings working document is open.');
-		const overrides = isConfigurationUpdateOverrides(arg3) ? arg3
+		const overrides = isConfigurationUpdateOverrides(arg3)
+			? arg3
 			: isConfigurationOverrides(arg3)
-				? { resource: arg3.resource, overrideIdentifiers: arg3.overrideIdentifier ? [arg3.overrideIdentifier] : undefined }
+				? {
+						resource: arg3.resource,
+						overrideIdentifiers: arg3.overrideIdentifier
+							? [arg3.overrideIdentifier]
+							: undefined
+					}
 				: undefined;
 		const target = overrides ? arg4 : arg3;
-		if (target !== undefined && target !== ConfigurationTarget.USER && target !== ConfigurationTarget.USER_LOCAL)
+		if (
+			target !== undefined &&
+			target !== ConfigurationTarget.USER &&
+			target !== ConfigurationTarget.USER_LOCAL
+		)
 			throw new Error('This Settings window has one user target.');
-		if (overrides?.resource && overrides.resource.toString() !== userSettingsResource.toString())
+		if (
+			overrides?.resource &&
+			overrides.resource.toString() !== userSettingsResource.toString()
+		)
 			throw new Error('Configuration resource does not belong to this Settings window.');
 		const languages = [...new Set(overrides?.overrideIdentifiers ?? [])];
-		if (languages.length > 1) throw new Error('Edit one registered language override at a time.');
+		if (languages.length > 1)
+			throw new Error('Edit one registered language override at a time.');
 		await draft.set(key, value, languages[0]);
 		await this.refresh();
 	}

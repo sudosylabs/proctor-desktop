@@ -1,7 +1,13 @@
 import { CodeEditorService } from '../../editor/browser/codeEditorService.js';
 import { registerModalEditorCommands } from '../../../browser/parts/editor/editorCommands.js';
-import { IActionViewItemService, ActionViewItemService } from '../../../../platform/actions/browser/actionViewItemService.js';
-import { IBreadcrumbsService, BreadcrumbsService } from '../../../browser/parts/editor/breadcrumbs.js';
+import {
+	IActionViewItemService,
+	ActionViewItemService
+} from '../../../../platform/actions/browser/actionViewItemService.js';
+import {
+	IBreadcrumbsService,
+	BreadcrumbsService
+} from '../../../browser/parts/editor/breadcrumbs.js';
 import { Disposable, DisposableStore, toDisposable } from '../../../../base/common/lifecycle.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { ServiceCollection } from '../../../../platform/instantiation/common/serviceCollection.js';
@@ -15,8 +21,14 @@ import { TreeViewsDnDService } from '../../../../editor/common/services/treeView
 import { ITreeViewsDnDService } from '../../../../editor/common/services/treeViewsDndService.js';
 import { IQuickInputService } from '../../../../platform/quickinput/common/quickInput.js';
 import { QuickInputService } from '../../quickinput/browser/quickInputService.js';
-import { IEditorSaveConfirmation, EditorSaveConfirmation } from '../../dialogs/browser/editorSaveConfirmation.js';
-import { IEditorRegistrations, EditorRegistrations } from '../../editor/common/editorRegistrations.js';
+import {
+	IEditorSaveConfirmation,
+	EditorSaveConfirmation
+} from '../../dialogs/browser/editorSaveConfirmation.js';
+import {
+	IEditorRegistrations,
+	EditorRegistrations
+} from '../../editor/common/editorRegistrations.js';
 import { IEditorGroupsService } from '../../editor/common/editorGroupsService.js';
 import { EditorParts } from '../../../browser/parts/editor/editorParts.js';
 import { IEditorResolverService } from '../../editor/common/editorResolverService.js';
@@ -26,7 +38,10 @@ import { EditorService } from '../../editor/browser/editorService.js';
 import { IEditorWorkbenchLayoutService } from '../../layout/browser/editorWorkbenchLayout.js';
 import { ModernUIContribution } from '../../../contrib/modernUI/browser/modernUI.contribution.js';
 import { isWindows, isLinux } from '../../../../base/common/platform.js';
-import { getThemeTypeSelector, IThemeService } from '../../../../platform/theme/common/themeService.js';
+import {
+	getThemeTypeSelector,
+	IThemeService
+} from '../../../../platform/theme/common/themeService.js';
 import { ThemeTypeSelector } from '../../../../platform/theme/common/theme.js';
 
 /** Original editor parts, resolver and scoped service graph for the Settings modal. */
@@ -38,7 +53,12 @@ export class SettingsEditorPartServices extends Disposable {
 	readonly editorService: EditorService;
 	readonly resolver: EditorResolverService;
 	readonly registrations: EditorRegistrations;
-	constructor(services: ServiceCollection, instantiation: IInstantiationService, layout: IEditorWorkbenchLayoutService, codeEditors: CodeEditorService) {
+	constructor(
+		services: ServiceCollection,
+		instantiation: IInstantiationService,
+		layout: IEditorWorkbenchLayoutService,
+		codeEditors: CodeEditorService
+	) {
 		super();
 		try {
 			services.set(IEditorWorkbenchLayoutService, layout);
@@ -47,50 +67,104 @@ export class SettingsEditorPartServices extends Disposable {
 			const hadWorkbenchClass = sourceRoot.classList.contains('monaco-workbench');
 			const hadFloatingClass = sourceRoot.classList.contains('floating-panels');
 			const platformClass = isWindows ? 'windows' : isLinux ? 'linux' : 'mac';
-			const theme = instantiation.invokeFunction(accessor => accessor.get(IThemeService));
-			const managedClasses = [platformClass, 'chromium', 'file-icons-enabled', ...Object.values(ThemeTypeSelector)];
-			const previousClasses = new Set(managedClasses.filter(value => sourceRoot.classList.contains(value)));
+			const theme = instantiation.invokeFunction((accessor) => accessor.get(IThemeService));
+			const managedClasses = [
+				platformClass,
+				'chromium',
+				'file-icons-enabled',
+				...Object.values(ThemeTypeSelector)
+			];
+			const previousClasses = new Set(
+				managedClasses.filter((value) => sourceRoot.classList.contains(value))
+			);
 			sourceRoot.classList.add('monaco-workbench', platformClass, 'chromium');
 			const updateTheme = (): void => {
-				for (const selector of Object.values(ThemeTypeSelector)) sourceRoot.classList.toggle(selector, selector === getThemeTypeSelector(theme.getColorTheme().type));
+				for (const selector of Object.values(ThemeTypeSelector))
+					sourceRoot.classList.toggle(
+						selector,
+						selector === getThemeTypeSelector(theme.getColorTheme().type)
+					);
 			};
-			const updateFileIcons = (): void => { sourceRoot.classList.toggle('file-icons-enabled', theme.getFileIconTheme().hasFileIcons); };
-			updateTheme(); updateFileIcons();
+			const updateFileIcons = (): void => {
+				sourceRoot.classList.toggle(
+					'file-icons-enabled',
+					theme.getFileIconTheme().hasFileIcons
+				);
+			};
+			updateTheme();
+			updateFileIcons();
 			this.dependencies.add(theme.onDidColorThemeChange(updateTheme));
 			this.dependencies.add(theme.onDidFileIconThemeChange(updateFileIcons));
-			const updatePresentation = (): void => { sourceRoot.classList.toggle('floating-panels', layout.isFloatingPanelsEnabled()); };
+			const updatePresentation = (): void => {
+				sourceRoot.classList.toggle('floating-panels', layout.isFloatingPanelsEnabled());
+			};
 			updatePresentation();
 			this.dependencies.add(layout.onDidChangePresentation(updatePresentation));
-			this.dependencies.add(toDisposable(() => {
-				sourceRoot.classList.toggle('monaco-workbench', hadWorkbenchClass);
-				sourceRoot.classList.toggle('floating-panels', hadFloatingClass);
-				for (const value of managedClasses) sourceRoot.classList.toggle(value, previousClasses.has(value));
-			}));
+			this.dependencies.add(
+				toDisposable(() => {
+					sourceRoot.classList.toggle('monaco-workbench', hadWorkbenchClass);
+					sourceRoot.classList.toggle('floating-panels', hadFloatingClass);
+					for (const value of managedClasses)
+						sourceRoot.classList.toggle(value, previousClasses.has(value));
+				})
+			);
 			this.dependencies.add(instantiation.createInstance(ModernUIContribution));
 			// No disk, remote-file or arbitrary-scheme provider is installed in this graph.
-			services.set(IFileService, this.dependencies.add(instantiation.createInstance(FileService)));
-			services.set(IUriIdentityService, this.dependencies.add(instantiation.createInstance(UriIdentityService)));
-			services.set(IDecorationsService, this.dependencies.add(instantiation.createInstance(DecorationsService)));
+			services.set(
+				IFileService,
+				this.dependencies.add(instantiation.createInstance(FileService))
+			);
+			services.set(
+				IUriIdentityService,
+				this.dependencies.add(instantiation.createInstance(UriIdentityService))
+			);
+			services.set(
+				IDecorationsService,
+				this.dependencies.add(instantiation.createInstance(DecorationsService))
+			);
 			services.set(ITreeViewsDnDService, new TreeViewsDnDService());
 			services.set(IBreadcrumbsService, new BreadcrumbsService());
-			services.set(IActionViewItemService, this.dependencies.add(new ActionViewItemService()));
-			services.set(IQuickInputService, this.dependencies.add(instantiation.createInstance(QuickInputService)));
-			services.set(IEditorSaveConfirmation, instantiation.createInstance(EditorSaveConfirmation));
+			services.set(
+				IActionViewItemService,
+				this.dependencies.add(new ActionViewItemService())
+			);
+			services.set(
+				IQuickInputService,
+				this.dependencies.add(instantiation.createInstance(QuickInputService))
+			);
+			services.set(
+				IEditorSaveConfirmation,
+				instantiation.createInstance(EditorSaveConfirmation)
+			);
 			this.registrations = this.dependencies.add(new EditorRegistrations());
 			services.set(IEditorRegistrations, this.registrations);
 			this.parts = this.editors.add(instantiation.createInstance(EditorParts));
 			services.set(IEditorGroupsService, this.parts);
-			this.resolver = this.dependencies.add(instantiation.createInstance(EditorResolverService));
+			this.resolver = this.dependencies.add(
+				instantiation.createInstance(EditorResolverService)
+			);
 			services.set(IEditorResolverService, this.resolver);
-			this.editorService = this.editors.add(instantiation.createInstance(EditorService, undefined));
+			this.editorService = this.editors.add(
+				instantiation.createInstance(EditorService, undefined)
+			);
 			services.set(IEditorService, this.editorService);
 			this.editors.add(codeEditors.bindEditorService(this.editorService));
-			const main = layout.mainContainer.appendChild(layout.mainContainer.ownerDocument.createElement('div'));
+			const main = layout.mainContainer.appendChild(
+				layout.mainContainer.ownerDocument.createElement('div')
+			);
 			main.className = 'part editor';
 			main.hidden = true;
 			this.editors.add(toDisposable(() => main.remove()));
-			this.editors.add(this.parts.mainPart.enforcePartOptions({ showTabs: 'none', dragToOpenWindow: false }));
+			this.editors.add(
+				this.parts.mainPart.enforcePartOptions({
+					showTabs: 'none',
+					dragToOpenWindow: false
+				})
+			);
 			this.parts.mainPart.create(main, { restorePreviousState: false });
-		} catch (error) { this.dispose(); throw error; }
+		} catch (error) {
+			this.dispose();
+			throw error;
+		}
 	}
 }
