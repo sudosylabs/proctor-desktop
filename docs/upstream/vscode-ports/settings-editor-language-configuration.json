@@ -1,0 +1,266 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "settings-editor-language-configuration",
+  "admission": {
+    "workflow": "Validate and register the complete packaged JSON/JSONC language configuration through the source extraction algorithms.",
+    "callers": [
+      "src/prctr/workbench/services/settings/browser/packagedLanguageConfiguration.ts"
+    ],
+    "interface": "src/prctr/workbench/services/settings/browser/packagedLanguageConfiguration.ts",
+    "decision": "docs/architecture/user-settings.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "src/vs/workbench/contrib/codeEditor/common/languageConfigurationExtensionPoint.ts",
+      "upstreamBlob": "a91f1a28aaec3f36e3f054f86d18d3f8c86863a8",
+      "localPath": "src/prctr/workbench/services/settings/browser/packagedLanguageConfiguration.ts",
+      "localSha256": "2c13f63a045e8cf41a0f3addbb330e1d86e566050b45348a3228ce3d61b65e71",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Extract LanguageConfigurationFileHandler.extractValidConfig and all validation/regexp/comment/bracket/indentation/on-enter helpers. Replace extension discovery, file reads and reload registration with immutable packaged configuration registration; preserve validation semantics.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/nls.ts",
+      "upstreamBlob": "8383ae24d96d4d9361921b89bdf48519d13d4260",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/vscodeNls.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/json.ts",
+      "upstreamBlob": "d7ac069d3d162b3f69930404f7d698e990727de0",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/json.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/jsonSchema.ts",
+      "upstreamBlob": "be69a92bf678d6d3e58fd80a6995c1b3349eacdd",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/jsonSchema.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/types.ts",
+      "upstreamBlob": "154d8199690a162dfc37895125348e5a64b7d848",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/types.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/uri.ts",
+      "upstreamBlob": "d148dc10f26bf8a19615e052df3dde23c481099c",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/uri.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/languageConfiguration.ts",
+      "upstreamBlob": "c812db7b62b09f131a4e9d6df0012d7e955f824c",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/editor/common/languages/languageConfiguration.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/languageConfigurationRegistry.ts",
+      "upstreamBlob": "fe8a8eeff8cb4ec240324d88eec02f90b18ff2a1",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/editor/common/languages/languageConfigurationRegistry.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/editor/common/languages/language.ts",
+      "upstreamBlob": "79e7d7bb3f7d2ae09ae96069dd9691d871f3f605",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/editor/common/languages/language.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/platform/jsonschemas/common/jsonContributionRegistry.ts",
+      "upstreamBlob": "5f37ab3c5876a37db39bce0a29fd43f64836bd77",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/platform/jsonschemas/common/jsonContributionRegistry.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/platform/registry/common/platform.ts",
+      "upstreamBlob": "9beaaf7c25cbb340793fdf209d279abcfb2fa025",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/platform/registry/common/platform.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/workbench/services/extensions/common/extensions.ts",
+      "upstreamBlob": "c7fee71a2e23b0bdc0f38f68c4e7ebbe8634e4a4",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/workbench/services/extensions/common/extensions.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/jsonErrorMessages.ts",
+      "upstreamBlob": "1a876fea5bada6e0316b91bea50aceb4fd751748",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/jsonErrorMessages.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/platform/extensionResourceLoader/common/extensionResourceLoader.ts",
+      "upstreamBlob": "28a25db97f004f3c81c9aeca39053adc9428cf5a",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/platform/extensionResourceLoader/common/extensionResourceLoader.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/hash.ts",
+      "upstreamBlob": "80372db8d71bcef166fddd6866c3ab0eaae15143",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/hash.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/lifecycle.ts",
+      "upstreamBlob": "a75cbb1cce3099e07bff3cc9c751d634ae30dfdd",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/lifecycle.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": [
+        "LICENSE.txt"
+      ],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "product-composition",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/services/settings/browser/packagedLanguageConfiguration.ts",
+      "rationale": "Closed product owner injects capabilities and registers admitted source mechanics; no upstream aggregate selects the product."
+    },
+    {
+      "id": "modern-presentation",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts",
+      "rationale": "Complete admitted Modern UI presentation and floating/modal layout apply with the separately owned base styles."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "settings-only-composition",
+      "summary": "Keep the accepted virtual user document, explicit Save, readonly/disposal fences and sandboxed capability clients. Exclude extension loading, workspace/remote/profile targets, AI search, arbitrary files/execution and auxiliary OS windows. Per-file rationale identifies retained symbols and non-mechanical adaptations; generic source contracts retained for dependency compatibility do not activate those products.",
+      "localPaths": [
+        "src/prctr/workbench/services/settings/browser/packagedLanguageConfiguration.ts"
+      ],
+      "verificationRefs": [
+        "settings-regressions",
+        "settings-lifecycle",
+        "source-boundaries"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "id": "source-audit",
+      "kind": "check",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Verify every exact pinned source blob. Adapted file rationale and explicit exclusions own source-to-local differences; this check alone does not establish behavior."
+    },
+    {
+      "id": "settings-regressions",
+      "kind": "test",
+      "path": "test/browser/editor/settingsWindowServices.test.ts",
+      "obligation": "Exercise the sandboxed Settings composition: completion, diagnostics, styles, icons and browser-service ownership boundaries."
+    },
+    {
+      "id": "settings-lifecycle",
+      "kind": "test",
+      "path": "test/browser/editor/settingsEditorSession.test.ts",
+      "obligation": "Verify modal draft, explicit Save, discard, model identity, cancellation and disposal through the production services."
+    },
+    {
+      "id": "source-boundaries",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Check imports, executable cycles, runtime direction, CSS ownership and closed product composition."
+    }
+  ]
+}

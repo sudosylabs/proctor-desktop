@@ -37,10 +37,10 @@
       "upstreamBlob": "74edcddac8aa416cd9ee432e36b47b53c2bfbf4a",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Complete original implementation retained. Namespace and dependency imports route to the shared platform theme owner; explicit resource/storage/configuration input adapters satisfy the actual consumed operations.",
+      "rationale": "Move the complete customization type declarations into tokenCustomizationTypes.ts and re-export the same contracts; theme-service and extension metadata declarations remain in this owner.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/theme/common/workbenchThemeService.ts",
-      "localSha256": "4bae2faf21d92128da19595a1c976b2c735a3cba65a7068ac483406d8c8450ff",
+      "localSha256": "8c3b92e652a7bd10adfd1a1350723a151e7611483173ee102d54a3692aa762cf",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",

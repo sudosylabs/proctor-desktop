@@ -1,0 +1,167 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "settings-editor-icon-styles",
+  "admission": {
+    "workflow": "Generate dynamic registered Codicon CSS and font dependencies within the editor theme scope.",
+    "callers": [
+      "src/prctr/platform/theme/browser/iconsStyleSheet.ts"
+    ],
+    "interface": "src/prctr/platform/theme/browser/iconsStyleSheet.ts",
+    "decision": "docs/architecture/user-settings.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "src/vs/platform/theme/browser/iconsStyleSheet.ts",
+      "upstreamBlob": "7215f066d452abf58849fb9f290fcadd6c096f2e",
+      "localPath": "src/prctr/platform/theme/browser/iconsStyleSheet.ts",
+      "localSha256": "93456edf142c6f3e64d227eb97dba757b2186680e43bd1c1886de6d70048edd8",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain icon stylesheet generation and default font lookup. Scope generated selectors to the editor owner and map CSS custom properties to the Proctor theme namespace.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "src/vs/base/browser/cssValue.ts",
+      "upstreamBlob": "84cee8522ae9db2c7d4773e4a60ca6f7f9e695e2",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/browser/cssValue.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/event.ts",
+      "upstreamBlob": "cf5fd39b7389b12890a85fd2159e35326d5b7a60",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/event.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/lifecycle.ts",
+      "upstreamBlob": "a75cbb1cce3099e07bff3cc9c751d634ae30dfdd",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/lifecycle.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/base/common/themables.ts",
+      "upstreamBlob": "dcc1369e5932df0c4206e8f0628c8b5386df11b3",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/base/common/themables.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/iconRegistry.ts",
+      "upstreamBlob": "9feac0c4ca494a1b344161f70b9f346876066d85",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/platform/theme/common/iconRegistry.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    },
+    {
+      "upstreamPath": "src/vs/platform/theme/common/themeService.ts",
+      "upstreamBlob": "5cf50f913a8922889992b3892901dd38882c6a91",
+      "category": "source",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "disposition": "locally-satisfied",
+      "localInterface": "src/prctr/platform/theme/common/themeService.ts",
+      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": [
+        "LICENSE.txt"
+      ],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "product-composition",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/theme/browser/iconsStyleSheet.ts",
+      "rationale": "Closed product owner injects capabilities and registers admitted source mechanics; no upstream aggregate selects the product."
+    },
+    {
+      "id": "modern-presentation",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts",
+      "rationale": "Complete admitted Modern UI presentation and floating/modal layout apply with the separately owned base styles."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "settings-only-composition",
+      "summary": "Keep the accepted virtual user document, explicit Save, readonly/disposal fences and sandboxed capability clients. Exclude extension loading, workspace/remote/profile targets, AI search, arbitrary files/execution and auxiliary OS windows. Per-file rationale identifies retained symbols and non-mechanical adaptations; generic source contracts retained for dependency compatibility do not activate those products.",
+      "localPaths": [
+        "src/prctr/platform/theme/browser/iconsStyleSheet.ts"
+      ],
+      "verificationRefs": [
+        "settings-regressions",
+        "settings-lifecycle",
+        "source-boundaries"
+      ]
+    }
+  ],
+  "verification": [
+    {
+      "id": "source-audit",
+      "kind": "check",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Verify every exact pinned source blob. Adapted file rationale and explicit exclusions own source-to-local differences; this check alone does not establish behavior."
+    },
+    {
+      "id": "settings-regressions",
+      "kind": "test",
+      "path": "test/browser/editor/settingsWindowServices.test.ts",
+      "obligation": "Exercise the sandboxed Settings composition: completion, diagnostics, styles, icons and browser-service ownership boundaries."
+    },
+    {
+      "id": "settings-lifecycle",
+      "kind": "test",
+      "path": "test/browser/editor/settingsEditorSession.test.ts",
+      "obligation": "Verify modal draft, explicit Save, discard, model identity, cancellation and disposal through the production services."
+    },
+    {
+      "id": "source-boundaries",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Check imports, executable cycles, runtime direction, CSS ownership and closed product composition."
+    }
+  ]
+}

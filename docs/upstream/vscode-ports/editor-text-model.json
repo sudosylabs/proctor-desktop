@@ -149,11 +149,11 @@
       "upstreamBlob": "caa0b4ab95c0273ebbaf01332233b083fbbe6748",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "74cefba26185efdbe403b1bef8e626d6190d9a7fd7fae9d1e17eb3b31ce11cd2",
+      "localSha256": "66e4ed8fe06c56d44b66b4c4f619a9465768ca2b8bc77b58bb83fe3b72db80fb",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1085,11 +1085,11 @@
       "upstreamBlob": "078fac10a27b3ddd31df8b147bc59d8717743884",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
+      "rationale": "Expose before/after alternative version IDs from either live or serialized undo data for exact saved-draft state recognition, preserving the original edit stack representation.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "c6f0a9c565abd8552eb983886715956f53ac39ab71e2424fde7462d615f4d9c8",
+      "localSha256": "5ec843072ba427d922f262995f1be597fe208e668faca3eb728a30ff82660896",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2219,11 +2219,11 @@
       "upstreamBlob": "36d8d370f6936905714587b3a88900ad08f5f855",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
+      "rationale": "Replace upstream build-time product injection with immutable packaged Proctor product metadata; no environment-provided product object or remote product lookup.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "6a2bf847d214a4f758407f97c24497ca1aee3747927267e3b0b9f8f7f8fa5954",
+      "localSha256": "b89fdd2f0cd6089890f2901b2e1ff35ad60c8749bb6070e7e9ac0c1635ba6b72",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2381,11 +2381,11 @@
       "upstreamBlob": "f4a2b3b4d55d029fd7de945c6570ca3b1f1a24f2",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Complete pinned implementation with namespace, localization and shared theme dependency relocation. Preserve model, undo, tokens, decorations, bracket state, language services, all original contracts and failure/disposal paths.",
+      "rationale": "Inject the closed editor runtime environment and register the complete debounce service in the product composition rather than upstream aggregate registration.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "5c1c28c844e2a57b33d26999641e9689f926db6c8fb1c4e519dec20b726f92b7",
+      "localSha256": "4155b6c952974014d3618a19c64cefa02a96458b6d6535a6600c02bd7705fa27",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",

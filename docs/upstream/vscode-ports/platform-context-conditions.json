@@ -69,10 +69,10 @@
       "upstreamBlob": "a865e8a47ca90f17fcfc566b7f035e62ed686345",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Preserve root, scoped DOM, overlay, inherited-value, buffered-event, parent-update and deterministic disposal behavior for the executable workbench while excluding VS Code configuration-backed and inspect-command product inputs that Proctor's static namespaced context authority forbids.",
+      "rationale": "Proctor-owned scoped context-key service implements the admitted context inheritance, buffering and events. Current change is an erased type-import declaration; no context behavior changed.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/contextkey/browser/contextKeyService.ts",
-      "localSha256": "879e400c18f565e2bc0889fc3870b69c6eff15721bee2a2884affb2b95ae1a98",
+      "localSha256": "285bcc271d66bea2259172d118ca8bde2e154866fbed1361d592cb62f8d2ac0e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",

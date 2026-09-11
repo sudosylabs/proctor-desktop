@@ -21,11 +21,11 @@
       "upstreamBlob": "05c7312e983beceb3e85a5e914912770e15313a9",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "333e8ccad42a8f7442bacc5a7510b725417fc2f3ffadf79c5c18132c3e1524bb",
+      "localSha256": "3907bf34fd95f3bf4b7a2206864e6139b84222c4626d20583829850ab33ebda6",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -57,11 +57,11 @@
       "upstreamBlob": "9b9f5846634a784d5b6d79cf024daf884e71e6d1",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "d0065405618e012f3b780ca66ee2a2059452bf0e107c35a947527f955b6fc3a0",
+      "localSha256": "b83f8a6e8dc8a09d93b396501b48eea8f09d224fbadb0c60d0a9bc9d541e2bbe",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -75,11 +75,11 @@
       "upstreamBlob": "91903274a6315b0c03fa47dd3ac473f6fc6b3927",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "ae6b09ea781244d5dde978d3621862eb8de48277ea9990c865d92cf2e587ee3b",
+      "localSha256": "1fd3af5d862a16af25c468b1784b1f1c269a44780b9bb297fd473f0d1f51cc9a",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -93,11 +93,11 @@
       "upstreamBlob": "c266a499e8fc990781f13c4ad14586648b8c5817",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "1f979146ee881a2fda15c7db9d8dc7187530cfec0371321f931ee500a2f44868",
+      "localSha256": "d5a3ff412194c7f8cb0f3693b6af065e260ecfe94fdd9d80ebb9c1526d4d8b6b",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -111,11 +111,11 @@
       "upstreamBlob": "a1a8fc73898ba4c4b173943f092e277b9cbf56d3",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "5e5787e844c81cfc9072c0d20834ac97d7709f1017b7ed35320ac8c22650fa2d",
+      "localSha256": "771f08dafdf290bdceb0e241aea83d35698e585270434c50146a3b0d68394f9a",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -129,11 +129,11 @@
       "upstreamBlob": "6b8ad6793c189f715865ea9c9a712066845a0ff8",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "eba7c614423aa882c367ab76c9b7173d2e0072d4cbe348143b5c18fa54a07fb4",
+      "localSha256": "8ac6af507306ff4d792446f41450f73d4b6bf10b2b9a5d04e1cbec4a80836727",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -147,11 +147,11 @@
       "upstreamBlob": "dafd2d8db21d5b07d628aa345c26417a7037c752",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "1d64d79ff1f025508020c544c0d9e4cec81666835031911bd6d7c0e36fa28907",
+      "localSha256": "c34fdf5e4440aac1232332642ecd08ebd4695aa313576b30b27230a5f6f63b8e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -165,11 +165,11 @@
       "upstreamBlob": "4ce0e17f930210db7172d192920e812c669c5d77",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "b6bc01e0e353741783d647a123c50b590423070531fd77706fe2cd6f2508eec7",
+      "localSha256": "9c2983227cc4ff17e634336f85e0cbb4e45ead2fdc297f322e9227033b61d4d1",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -183,11 +183,11 @@
       "upstreamBlob": "9fbd8306450eeb1efec71fe6c35e80c02cb46184",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "4728b9c3e98b1518e6cb6a56dc5cc5584e37f0f6a19d505b074a3a963a9218e1",
+      "localSha256": "0b517b55d96361de0b703b4853e23cf3d43b2bfdd83090d00561733bcfb148d7",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -201,11 +201,11 @@
       "upstreamBlob": "61a5f5406dc7bf3b1b1cb2f6ddd35d3527d65464",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "d98e67f125c1cc10d7c805ebca0d546e92bf189c8881da2bc792eb24e6d235d8",
+      "localSha256": "db7419910be10d312ba8bac857bd10afc5d04f499d536ed201a467eab4d5ec39",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -219,11 +219,11 @@
       "upstreamBlob": "2a8c06b80a1f9a3de7aa34526a6b349f75a568a7",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "1f5458006d3d140bde6b145af76ec7805bebe3d733f454664c80768d75d1ad0c",
+      "localSha256": "fb47b0f65842aa6b8d85da72ae81dc58121cb82687f9feffed3d4d40da581cf3",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -237,11 +237,11 @@
       "upstreamBlob": "d89e7dd0cc7f08df63cf3be12a6d16f6bd09587f",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "1e0171c5d98a1c9f2d0a79f7091e3c77e9ca19d16a721fcc3504e7ee27c745c1",
+      "localSha256": "6d6284b288d23b6a1c4895d2d624fca527f7410f372e114b672a6e81c6a4888e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -255,11 +255,11 @@
       "upstreamBlob": "86e42ec687d4e3e6779a5f8828080d4e4488f052",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "4072beb31d4191acdb59c2c6a4a639d7f8084ff67cee4450c0d958803b64926d",
+      "localSha256": "bff3f9ad50152993ee9814cbdb54e098d0a0ecc0d0e9acb491bfa6742cce1d01",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -273,11 +273,11 @@
       "upstreamBlob": "728f40291c757e2489c9ac4ff3550f1880cafdd6",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "8b42d37ad5a59313cfee3c6746f87c6b2201040185bab3a73914e52cf1ac4557",
+      "localSha256": "d94052e8a749c6ba352320d231398162a448e622021ffed3eb2ab488dd8c4553",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -291,11 +291,11 @@
       "upstreamBlob": "abe7dd5157ac615f0105fa643c00dbda35459817",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "0a06f54683cf1c46b9c9db045e2ea798b183ee673832692a7ee6afc6fe2b8f9d",
+      "localSha256": "a4b8feb811d86dc1d6ce345a47a002461e488f0e950b5ce5f45db2fa4b091c3e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -327,11 +327,11 @@
       "upstreamBlob": "3fd55793b50cec68fcb3c4e1364a3b3cb8735d30",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Preserve all Modern UI module updates and layout-affecting-state calculations. Proctor layout presentation events select always-on floating panels and density; menu registration is explicit and does not expose the upstream experiment.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f17a51e5ceeee2bbb303ab0bfafedb1dbf5204e1aaefcb80938dbfaa78becdb2",
+      "localSha256": "c8b551b7fa203fd318befadf6d42e57a3daced8c1e5f7d2aaacb16a48a7e58da",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",

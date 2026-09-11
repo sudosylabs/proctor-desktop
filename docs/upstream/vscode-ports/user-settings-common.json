@@ -594,11 +594,11 @@
       "upstreamBlob": "ed1315b68f1374590a4ef7b95f0d593279a95276",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Retain the complete registry, defaults, schema, override, delta, policy-reference, and event machinery. Proctor composition supplies packaged declarations; the VS Code chat-extension unification product list is empty.",
+      "rationale": "Keep the full configuration registry with a Json edit-presentation option for values edited in JSON. Upstream chat-extension unification IDs remain an empty product allowlist.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "5d5599efd7f1c0f81f78bb3fb7c84c09fa022868b27c33eecdf15ac8afab2217",
+      "localSha256": "54e92f52c73a6d15980648bc7e424fd0aa6bc5f99225abfa7b50137dc067b556",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -630,11 +630,11 @@
       "upstreamBlob": "f832d9fd3593648b83cf62fa196fc901cf946abd",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
+      "rationale": "Retain configuration edit generation. Delegate edits to an optional resource writeEdits adapter so the shared Monaco working copy preserves undo and version identity; retain the original write-file fallback.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "74055ca48ca05f7db91dd1a89e28ccd5c4687ececef6002b53698ee1903c6700",
+      "localSha256": "bd38d243aefd0a617feeadcaabfaac1ae6840c1a36c651b0c8136299bc582a1d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1014,6 +1014,22 @@
         "src/prctr/workbench/services/settings/browser/settingsJsonLanguageServices.ts"
       ],
       "verificationRefs": [
+        "settings-hover-defaults"
+      ]
+    },
+    {
+      "id": "structured-working-copy-edits",
+      "summary": "The registry exposes JSON-only edit presentation. Configuration edits can be delegated to the authorized resource writeEdits adapter to preserve Monaco model identity and undo; ordinary write-file behavior remains the fallback.",
+      "localPaths": [
+        "src/prctr/platform/configuration/common/configurationRegistry.ts",
+        "src/prctr/platform/configuration/common/configurationService.ts"
+      ],
+      "verificationRefs": [
+        "json-owner-tests",
+        "settings-contract-tests",
+        "real-settings-destination",
+        "configuration-owner-tests",
+        "configuration-adapter-tests",
         "settings-hover-defaults"
       ]
     }

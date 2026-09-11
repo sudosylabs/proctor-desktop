@@ -57,11 +57,11 @@
       "upstreamBlob": "6073d25b93523e500d5bdd5fabebc09a3b508fba",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Retain queued dialog items and close promises. Make close idempotent, remove the exact item, and settle queued items with cancellation on owner disposal.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "46d52220cca3abcb4e094bbfaba0750fa8a49693774ccb3cf15ea7fab2200897",
+      "localSha256": "8dd7dc2f4e43b5a8b7b5b87672d6e64aeccc0cf5ec026625c332a90d8a1d6a3a",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -93,11 +93,11 @@
       "upstreamBlob": "d45f6d770d063fce0262de11f726b36ba9163ff8",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Retain source algorithms and interaction state; inject the bounded editor window/layout/document-trust interfaces. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "1e6772bf1b11fadeabbb2ba5359cd3cf62bd0455f2e304b494e917795723d575",
+      "localSha256": "ddb5f178352b55fcb0a5c66188b75048745d0d3314094915cfa1fd7dc473a454",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -111,11 +111,11 @@
       "upstreamBlob": "ae595e8ab3e95c1486bfe4e4853514c5f1e705b1",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
+      "rationale": "Keep source dialog options and rendering behind the closed Settings window host, with explicit disposable dialog ownership and no generic native host access.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "dcff8196d12b340025f88d783ddf2b3c5e6e25cd3bdd0bb77b333814dae40ed7",
+      "localSha256": "6f89e0ac7bb57f76eba3d429965aa9f8c0ca672dc32c856129d825441843b153",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -206,7 +206,9 @@
         "vscode-mit"
       ],
       "localSha256": "2fe8e39a1b0b4e8f82f82f464e618d23be7325ddf2a431d15b8dd205cbf4eebb",
-      "mechanicalTransforms": []
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
     },
     {
       "upstreamPath": "src/vs/editor/common/languages/highlights/typescript.scm",
@@ -219,7 +221,9 @@
         "vscode-mit"
       ],
       "localSha256": "fc3d24706daa63b470559f64796933a10d266742053aeeb4c069a598543a1510",
-      "mechanicalTransforms": []
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
     },
     {
       "upstreamPath": "src/vs/editor/common/languages/highlights/ini.scm",
@@ -232,7 +236,9 @@
         "vscode-mit"
       ],
       "localSha256": "9e24373ab17005ef68352d4d0c9808d5c3ce89c2f756f281b1f2ab40bbc6edca",
-      "mechanicalTransforms": []
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
     },
     {
       "upstreamPath": "src/vs/editor/common/languages/highlights/regex.scm",
@@ -245,7 +251,9 @@
         "vscode-mit"
       ],
       "localSha256": "ddcabf2a41b97510c3858d9d875827438234ba6d7a76eeadd74f6620649e046d",
-      "mechanicalTransforms": []
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
     },
     {
       "upstreamPath": "src/vs/editor/common/languages/injections/typescript.scm",
@@ -258,7 +266,9 @@
         "vscode-mit"
       ],
       "localSha256": "fafe89b257aea11810d0d5e67eb8a69870205a4d3ed140981bdc75bfe5b4ae30",
-      "mechanicalTransforms": []
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/arrays.ts",
@@ -829,6 +839,24 @@
       "licenseRefs": [
         "vscode-mit"
       ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/parts/dialogs/dialog.web.contribution.ts",
+      "localPath": "src/prctr/workbench/browser/parts/dialogs/dialogContribution.ts",
+      "upstreamBlob": "7e0e5ce8e9d2f32b388d36dea519388343b712b0",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Extract the source DialogHandlerContribution queue pump for the explicit Settings window owner. Retain confirm/input/prompt/about dispatch and lazy handler creation; use concrete owned services, normalize thrown values, stop processing on disposal, dispose the handler and cancel every remaining queued item.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localSha256": "ce174339a8819ebb2e7d1d4b48a979c172381d62b35f1fb520ad122efcdaf372",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     }
   ],
   "licenses": [
@@ -845,14 +873,16 @@
   "divergences": [
     {
       "id": "dialog-registration",
-      "summary": "Remove only aggregate contribution/singleton registration and extension-test automatic confirmation. Explicit composition owns the real queue and dialog pump.",
+      "summary": "Explicit composition owns the source queue and dialog pump instead of aggregate registration. The owned dialogContribution variant stops its pump, disposes the lazy handler and cancels queued promises on disposal; dialog item close is idempotent. Extension-test automatic confirmation is excluded.",
       "localPaths": [
         "src/prctr/workbench/services/dialogs/common/dialogService.ts",
-        "src/prctr/workbench/browser/parts/dialogs/dialog.web.contribution.ts"
+        "src/prctr/workbench/browser/parts/dialogs/dialog.web.contribution.ts",
+        "src/prctr/workbench/browser/parts/dialogs/dialogContribution.ts"
       ],
       "verificationRefs": [
         "sandbox-parsers",
-        "real-model"
+        "real-model",
+        "dialog-lifecycle"
       ]
     },
     {
@@ -902,6 +932,12 @@
       "kind": "test",
       "path": "test/browser/editor/settingsJsonEditor.test.ts",
       "obligation": "Verify the source mechanism and explicit product seams; production integration and complete specification review are separate mandatory acceptance gates."
+    },
+    {
+      "id": "dialog-lifecycle",
+      "kind": "test",
+      "path": "test/browser/editor/settingsWindowServices.test.ts",
+      "obligation": "Exercise the production Settings dialog pump and queued cancellation on disposal."
     }
   ]
 }

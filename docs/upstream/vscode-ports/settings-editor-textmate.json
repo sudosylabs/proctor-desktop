@@ -278,7 +278,9 @@
         "vscode-mit"
       ],
       "localSha256": "d7238f1cc9033993b9816b0945cab4bb8ea108de0399663c551f28f913e94c70",
-      "mechanicalTransforms": []
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
     },
     {
       "upstreamPath": "extensions/json/syntaxes/JSONC.tmLanguage.json",
@@ -291,7 +293,9 @@
         "vscode-mit"
       ],
       "localSha256": "9f927bb3aa53e66efc3cace9d2fa1185822b2adfa3f4a9299e7c078f136e1ee2",
-      "mechanicalTransforms": []
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
     },
     {
       "upstreamPath": "extensions/json/language-configuration.json",
@@ -304,7 +308,9 @@
         "vscode-mit"
       ],
       "localSha256": "0963af900927e3398cc4e40a853b4091d23361ef2d3f89f8f663c8219a2fc8ca",
-      "mechanicalTransforms": []
+      "mechanicalTransforms": [
+        "namespace-path-translation"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/browser/domStylesheets.ts",

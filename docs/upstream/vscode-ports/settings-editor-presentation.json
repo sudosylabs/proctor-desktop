@@ -58,11 +58,11 @@
       "upstreamBlob": "52729ea66ab07e0023b7efec33d5f5d0cabf7d08",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; move aggregate service/configuration registration into explicit product composition. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "fb2a9c872698c02c1d11901198f045e41230452f810e0ae506a94180325514eb",
+      "localSha256": "765a4d299225e7fe7185c76048ba3480b87e010ffb8dd5d15ea00b409f7c1f02",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -148,11 +148,11 @@
       "upstreamBlob": "b528d495fb94932a24918ee97f993dea31f940a2",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "e5e9d78b4ccf6975d31b4661b09857340ed64bcf8009f6327fad543fadb9462a",
+      "localSha256": "0e4c3672ca8f0522aa859abd18d6ef60a28335f450657c5a6ee1af728635507d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -184,11 +184,11 @@
       "upstreamBlob": "4a3cf074790b3b68d097e129256fde47cea531f0",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "b885f03e38f8432c2bb0597fbf775b1ea77f4de6284d1b67f4eca5d6ccab55f6",
+      "localSha256": "1354fa2c50345dea54dc3c15b3cd6eaa67756f065805f3d76b8e02b30f24c9c4",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -202,11 +202,11 @@
       "upstreamBlob": "4b4eff2378d2013a1d09f9a6aa59f18838e566ec",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; use disposable constructed stylesheet handles under the strict renderer CSP. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "11628d46803f74555893962746450212f79963cf8887ae1f58977af5735eb8f8",
+      "localSha256": "670ded9f9df8060f047f29b7015c9f25f124e4ec3e7960c424a510524a8c4fea",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -328,11 +328,11 @@
       "upstreamBlob": "04c2b8de2ef207d97547f6c81e03aeb933163781",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "17ad0e91b8353a4e6b1d307c18c18337464491a945ef52c2ca54fc057ceeaf5c",
+      "localSha256": "15d37288a7fd1cee122d8803e6d69b0695eccf8763da6fea0c085f284156e748",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -382,11 +382,11 @@
       "upstreamBlob": "af2dbd92790433c64090f96e85c3d49818b6915c",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; move aggregate service/configuration registration into explicit product composition. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "3abd17ac8364faa123b92e58823cac8829faf89d90f80b34d54e31b03fb14947",
+      "localSha256": "6e457c76ff8a57debe173c60f7d9d2eb4499e92c3c6cd1119381453d193499ca",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1336,11 +1336,11 @@
       "upstreamBlob": "8d4dfc7a5383c499d5b4aecba2eb54fccf1e6c80",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "951bfe6ec11308b35ae647801b78e1e30609720a3d8d448be7541094bc1db337",
+      "localSha256": "f3a42c00ad31362042fedd2866ff853860d260cdd410a8fb39cfbb1d74809013",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1354,11 +1354,11 @@
       "upstreamBlob": "1c62eb7cfef77db7b162048991c93ec3e67fc0b6",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "689f8f9cd18832ef802f02357394b7777ae7482bafd6b3d1905d734b21dfa11e",
+      "localSha256": "e5a6ae42c69784574bbda2d9afe39d762605e8060e4e55b355070236dbbc9d86",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1372,11 +1372,11 @@
       "upstreamBlob": "332f16c7859142db9971a08dc7b2b2af31f17c23",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "e4f77ea8612ccd869d2c3a27a9f9ee5c500bcd3f7ef5cdabb3081e3f1aa94f7e",
+      "localSha256": "a14f1e7d8bf596c0be9d8372411c1241d9b11b997066b63f2d5073fc020f7186",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1732,11 +1732,11 @@
       "upstreamBlob": "a9cd407de3c413733c333f25c2a77a588bdffeeb",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "13e074b358cd1e05203e19411c57e74f8840bc43860a7929ad81e9d758359137",
+      "localSha256": "15f95da01ef93a0a1a7ccceb365d98e452551dd4f529adac464c158831101971",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1750,11 +1750,11 @@
       "upstreamBlob": "4f692abc60fb240e268237aa25f1f0e452cec4fe",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "75f1c8ebcf1527c7759f3272b0072cf4d68b53568cfc2711508964c107cee24b",
+      "localSha256": "41c2047508cd9b942c061353d0b099c9b4342cdc885bcfe8945199e766602885",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1768,11 +1768,11 @@
       "upstreamBlob": "059221692f5d6e38cd29b945d0898dd82d6e97ac",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f5fb03a9ebc9a647f33b3e7afc4cea5dde00bb74cea6ed9fba01d7193e7b6e8b",
+      "localSha256": "f82bcecaa72011c886e004de0cf0c5aced240212d35ddf0536f2d167ac354ddb",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1786,11 +1786,11 @@
       "upstreamBlob": "6f4e681591b21dd1a7c713081aa889d9d5989a17",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Extract narrow structural layout geometry and part-registration interfaces while retaining all floating margin and exposed-edge calculations; the full source layout contract remains available to admitted consumers.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "8f7848ef4d6ef1b6823579912121c1b40e5b9e7bff316158cb6a83bcc1d10f4c",
+      "localSha256": "06e123ae0daac5affd11a6429ecfe3d6eb228c5c6a8f69ff53df1404b859ac25",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1912,11 +1912,11 @@
       "upstreamBlob": "7f3536363077164fc17673f97a98e8f6d180181e",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "95e9fec388a1e048221de8d9d1f940fe3dc00a8deb230963fb4d8ca47aa2c0c4",
+      "localSha256": "db3158094a904bb04a839b70aa8dcb72a3ad56b65c13f92f8116b5d8a3689391",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2290,11 +2290,11 @@
       "upstreamBlob": "56b36e15fc85a8c86c16a1ff2cc90c836855bb15",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "c04e2dd0222894bab492d4c255cb06f987f258a8f6ffd06ad425c9c700e7ffc7",
+      "localSha256": "ff72819aeadae158ee0f103fdaa9ff01ac5397e9c8dc48f5de9260ab9d23f6d6",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2362,11 +2362,11 @@
       "upstreamBlob": "7b5530e7fa75e13f90a067d14ec77984404ed431",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "bbf74484e5579188c3e9ebd0f6c25d0849c2c161e42bcc6210e08f88c4aecb03",
+      "localSha256": "462e507695fc8ef0d0c68eca9648841735b9092bac7307da93d9630c504b11b2",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2380,11 +2380,11 @@
       "upstreamBlob": "830f8668f9473a292bdf44e610010d937e88b0b2",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "da7b7d3fde97d18362740538b38e2b8a0d5336a446be7663394a82a66a26b609",
+      "localSha256": "d0de9285a51c564277c17ebccae21ca63f6a0fbc94a5eefeb75aba421221dc9e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2416,11 +2416,11 @@
       "upstreamBlob": "955ab926a618fe1c5f3d9c20befd2331b1d30ab9",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "cca7452b8ee14816cba24ac8ed008d5d09dd058cce00347880da9678bc1bbccf",
+      "localSha256": "d42443bac7a74371d8f91aafde1c5557c42f7f09f674895cdd886a05cb20a821",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2758,11 +2758,11 @@
       "upstreamBlob": "67edd0e78d51ca0eb60683957fa7992bf8fe6b4b",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "62f4f377fd8e84a42c00a4c4510c2d959e11f08628824e7ce01dc54510d2cc4e",
+      "localSha256": "192a5a83492329c559e9e1088e027b2bff9c6d0b03f83f2316f60dbc42f7e00f",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2776,11 +2776,11 @@
       "upstreamBlob": "6dcab18c0175c4d35b96cfe55b4d10d854bb7e9e",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "5921e911d9f769e8dfb475074f6cad44ba347f091287dd79586cae32c9d681fd",
+      "localSha256": "fe76f10c7d7b2ae91f1d58b3e783314fceb86d663fbdce09563277dba20d839c",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2794,11 +2794,11 @@
       "upstreamBlob": "b9d960656edf36a7550fde8d7b8f8f0ea8a320ec",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "162ef01875590c626c83f2172b6c9c52d0b7d7b19fcdfe414995623c158e47b7",
+      "localSha256": "c423eb977dd4702710fc453e6b35fc36783bf007783c0fa29a4c42ac651ead6d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2848,11 +2848,11 @@
       "upstreamBlob": "31095f8938c24fd912c072425b69e2dd20f3ad99",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "119a55f35cab96fdedd5a55d22e27cea356cdb91bf5c906e2668abd54029598f",
+      "localSha256": "e9eeb09d9700670cd7fc193663fcd9b94081efeed1db79e174b003fe20b625e0",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2902,11 +2902,11 @@
       "upstreamBlob": "0e0a140a89c794f32fb93d6375c5c1c52ca600a9",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "ea7fc2f9677476f1fc405221022d2267a0699050fa147f5cd83ec6a0458bc8c9",
+      "localSha256": "5a3db534f8a2a16ab48914838f8eb8556bfaf21c26c0f58ff9fa4a363465ff4d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3010,11 +3010,11 @@
       "upstreamBlob": "41cdd033fdc9318165d0ddd696171da17e1e2740",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "9ff3855c423bf9651b6a7e95dd1aa246a7b09ed81348f5efccca179a85d24407",
+      "localSha256": "9f106874eb5828269db6db8aa3923d568718e566771b25b899d981a4390b9588",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3082,11 +3082,11 @@
       "upstreamBlob": "bc598e830b782e7a680fb765367aa60733cd0f58",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; move aggregate service/configuration registration into explicit product composition. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "e6179ad2d2ee280a6002dadf69339443c65a5290a702f61836c0d8836ba1d088",
+      "localSha256": "c129f949cd1a310c1b66d70ecb62e7a918fce6acbe58f57c690504ba854012eb",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3550,11 +3550,11 @@
       "upstreamBlob": "94020ce96b9d031719c84b988f2ce6960b48eb66",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; move aggregate service/configuration registration into explicit product composition. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "674ef451da5d696e0b573e39da87244eeb7773bbf6d234a37e0f67fb00962aa6",
+      "localSha256": "caa117b4cc9460539dc3f62666b1059c6299df0b64145c05476dd58a86128f5d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3586,11 +3586,11 @@
       "upstreamBlob": "6ea335781ce0df57917f086974bed027421f8411",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "9bd2d6baa17a031ed4190eee810a36d256413dbb80abdeb1345a98a5876b2a45",
+      "localSha256": "6f630bb466cb8c0174e8196e931d33075cde7d807428829b6f0534b534ddea5b",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3640,11 +3640,11 @@
       "upstreamBlob": "9acce9a4b7154cfc5c6b70cc97076fc096786c8c",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "b16be9ac01da0c1b41fed950d0b20481cb7fce135f2203be2f0a842d094183a1",
+      "localSha256": "d315a1056012a422cdc31ce1aa29aa3f7f1bf8f0bf8ba7a21ecd0655ab18feec",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3748,11 +3748,11 @@
       "upstreamBlob": "0f52c3d5943c6324edf306ae4bb34b01c6737316",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "466ab104b5784bf9d0690fde66b0494b17a7ad08e31b3db1896ade278a70cea3",
+      "localSha256": "b74faa3f14d5c7e57d465df8113556b941f8baa4d828f043170977f17bb47a2c",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3820,11 +3820,11 @@
       "upstreamBlob": "7aa97af48e1e637d5e533766c0826b143984a4a5",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; move aggregate service/configuration registration into explicit product composition. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f466962d167e8b3286b29a745308d6c6337ab7c57633648f1d94cef78b48018b",
+      "localSha256": "42b10ba99b7d0e8a90e01ea0ea567b61c91776ff04de135e66e3510eb53ce22c",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3910,11 +3910,11 @@
       "upstreamBlob": "d7f257db9341e27bf5d3fe9f6d2d0305812124d2",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "9f64afd9763b2ab1e7e216af737ac8a74d182f99e4663ddd0da3bd2f9edfeb6a",
+      "localSha256": "aba2f3fc23c01db7dac83ffe165b4f21968aba03a6913210f3bb9d0022b5cc05",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3928,11 +3928,11 @@
       "upstreamBlob": "1f5e70c95c00639657964120be7b24a7c8bbfe30",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "a026ac2dee6c745803d889438409db681449f7142234968dafb1082918f9f624",
+      "localSha256": "bd6d283a7ba88d72b2f6751580c8371f49456755e2b69fc05e925d69449981e3",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -3964,11 +3964,11 @@
       "upstreamBlob": "62ce8bd5efa881b2a5803e518fdb891a3de2fe59",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "3a184829cd8ee0a48c9beda30fea3eb6d6fa895c2a17e976db974e0bef66a292",
+      "localSha256": "b8a122138ff61a3a3cd414822cfc035d32a1e8c2c3c716837a450fda5f65603c",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4000,11 +4000,11 @@
       "upstreamBlob": "5f6dd96f2626efcd4a414ae1dd021fd46b45b739",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "7f01a9b2af17b57a0117f428c796509fcb7f78840dfd3c0e0cfe3646705d1f62",
+      "localSha256": "7aeeb3c9448e831712bd04380a62c0d70bc141708d4fe33a85c1d3d3103471f0",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4054,11 +4054,11 @@
       "upstreamBlob": "e82cd75fcfcd6c15636d1c5dfe4d99aa965f309e",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "94d20ba8fea4db3b819cb3e0f83e957b86e59aa2c6878a46a8c3f6be395b7e0c",
+      "localSha256": "4dce7d239200b61648916d3bac0808598f4c1f6a5c770cd062a0ee151f566051",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4324,11 +4324,11 @@
       "upstreamBlob": "777f09a9e2791a120bf144bda36dee213c893e9a",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; translate CSS variable and DOM class owners together. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "fddf01c0436cbc936ad6ce8c4227ec4bc031dcecbdb449ff5065562a571b03b5",
+      "localSha256": "2a2e1eb0ec193c68ce9f6a653ecbcf05c8791c47b947bbfe36d74d82d133f493",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4342,11 +4342,11 @@
       "upstreamBlob": "49a13e40f9e901db42f51ddffa621735838e4dd6",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "26385d75f79269fe89fb599ad48492d19685c704735227dadd5efcc751914c9c",
+      "localSha256": "51025b07dd088cf0850134b9d0bfcdec37576adab6ddbece02a26388a0f655b1",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4414,11 +4414,11 @@
       "upstreamBlob": "e46dca6d726d5ea0dc1c3ee0de97a98862c472c9",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "de121db46769a5d56fe26f842ea000849bddca5670c3ee95a95faaa5a5db14df",
+      "localSha256": "9924252891a2b1d404b0dacead36e7131b4cd8f28bc3359a0fd7df15e2d6a3ef",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4450,11 +4450,11 @@
       "upstreamBlob": "ee0c2ae26a455d027eb457315769fb86c42aba00",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; materialize the unchanged source rendered-line grammar through the validated DOM fragment builder instead of HTML sinks. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "af961978235c7d647eec1cffea5fed0f0cb934dc2f43a5b255c8227a5c272992",
+      "localSha256": "f58f274c20547ac5120ae6d7c6cd6623faed895b83d45e410b265678a7b63689",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4522,11 +4522,11 @@
       "upstreamBlob": "26288189fc535447a6b9b7addc36f8575d66e75a",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "a7dd7bbd131e9d4af6da6afcbe50c2a709aa81d8a9425dcf47e2d434549de74b",
+      "localSha256": "86401b0f2d5ea2ae336b87ca8d027886d395cf80884c919bbc8753cfb03f6fed",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4594,11 +4594,11 @@
       "upstreamBlob": "ecc59245decf80102324d31128af25843a108cb9",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "37fdf98f4b2f8bd204fc3e35f5d9a473e0a59b755c65fcda73347ab922a27745",
+      "localSha256": "4ad3f50db3e765ea2fd2df30d17b6f9c47f1702a8de2ad4cb7f6a144cdf37252",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4612,11 +4612,11 @@
       "upstreamBlob": "11ee8010be44daf620f027ad67403e1a5ee6b0e5",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "816f36d3508366bfcf3ddd7060a86c8a35d4a117b1ff0d196545f474e9eb9cfa",
+      "localSha256": "7b763abe709b7fb540a641e4febf24663be61cec26654bdf49ebc1e455fb453d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4756,11 +4756,11 @@
       "upstreamBlob": "5d3894e79aef9a16043b1da2a91707b72202ff44",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; materialize the unchanged source rendered-line grammar through the validated DOM fragment builder instead of HTML sinks; translate CSS variable and DOM class owners together. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "43f5684bdbb472924bfff0614484c475e7d6a6ace196dcaa44a8e68a52a94dd8",
+      "localSha256": "6c0bac66ccf6503bfb626b330f33209169910d532039f3e18dcae85084c49101",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -4900,11 +4900,11 @@
       "upstreamBlob": "76040e347a63947b336c92b0108a415415e7db38",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "7d53de7f1838e9285faf64f05f15d1b4fb20410185e82857999b7a6c0e608482",
+      "localSha256": "b90573632f1d82ee75851dba824776605b2acc422ef96e6607f265bbcc9e93e0",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -5224,11 +5224,11 @@
       "upstreamBlob": "87b6bf5c49051f1c470a05f90210e0342348403f",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; materialize the unchanged source rendered-line grammar through the validated DOM fragment builder instead of HTML sinks. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "22dd17045910ab2ec826ed10e38e8a410067e17ef8776fc5b578c5cd28101c29",
+      "localSha256": "5c48b2bc0c1c6a18ed60e3f25a748cee522166a1d3241f2e27f812bc30770672",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -5332,11 +5332,11 @@
       "upstreamBlob": "9e89061045de889503564169f83340c09c912e20",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "8012a07cb7726167078d5f234474a566f28f17d6dea65c2b9db95a9f58093f04",
+      "localSha256": "76fc8d5f1bbc9cee467ed1576adb889cfce20a6fc78be689ccc3dbe0a42b5c9a",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -5350,11 +5350,11 @@
       "upstreamBlob": "9660b641fddbdd7b0abf65556f80202e6d08427c",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; materialize the unchanged source rendered-line grammar through the validated DOM fragment builder instead of HTML sinks. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "467b5b03cb0936660842626351b837acd944ddca83e4384451f788e9453f6fd5",
+      "localSha256": "6cd94d36ed8a8c4ccfa28e68d8c507957de96ed694d6faee12f9b318ff7e5089",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -5494,11 +5494,11 @@
       "upstreamBlob": "56d3850c945ef230220eb601b881daa9dabb36db",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "1e2221230e0a0bc8b78f600844cfc387669b56f8a224cb21ad6db6c934744a60",
+      "localSha256": "b30cbf4e4953258a755ea1700cfd5a955947335ba6a5f3e3dfe61ee75d98795f",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -5674,11 +5674,11 @@
       "upstreamBlob": "7ef8d1d64ea2b81b8b709f0dc66c53f6199fa51b",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "d04233eeb1965aa14305a7dd5964f3b645fe83fa380cba349cf952d885504512",
+      "localSha256": "1fbe8d20a994016dce3bee1adf8651fdac22e07df48a84a866010ff8cf0303a0",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -5944,11 +5944,11 @@
       "upstreamBlob": "5359dc95b9d5f7954a5b42d7ed791e05ce7b61e8",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "eb2714b4175800ae5982ec41f5d1216dc9f8fe1d1919081203c051d381848e66",
+      "localSha256": "7d0f4f5ed01ef9b87719418b0b350132d32db5bfe797a7e470f74c012d83e492",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6052,11 +6052,11 @@
       "upstreamBlob": "2b93dc5bf877f19df6e20648b0c8c13f14e3b47e",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "bc275f1e69b342e763a5e477405d39b75ccd0f2d54b79c443ee06691687aa6d5",
+      "localSha256": "b2875c53dc64551cbdf63b6492fb329d80704797b265145611efaebdab5ac368",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6268,11 +6268,11 @@
       "upstreamBlob": "1e6db4d54c18fe22eef14e1818dbb8b26511163f",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "90d593ea427dbc6698d8033bf2ebbfc8dcccfd16e19a28a63e387f4786852e88",
+      "localSha256": "2a157b72d0d676f52f2a15d9900c8b1f7fc8090ecd3ead9f730d886f96da00e9",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6376,11 +6376,11 @@
       "upstreamBlob": "067ca61be161b93799c7128ae0ce8602cce1cce1",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "daf4c91f0a7c279ce6999438e2ef9c1116aba2f3f44b9c5cca7960925ab256a0",
+      "localSha256": "f50d6619d99f04ee8ae89356211b07b095635c411e2eb157992741585a1590bc",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6430,11 +6430,11 @@
       "upstreamBlob": "4db6d89a2c070e951ce0a013684a2cd092444802",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Adapt preferences widgets to packaged registry and user-only targets; omit extension/remote target rows, retain widget interactions and Proctor readonly/pending-edit behavior.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "5bc56e9dcce754aef128551b18f542ea4391b134c7283486fec294ca69430ccb",
+      "localSha256": "726b4d3afdcf117958fc846dad512535c4666a6c38fbddf8858a9a48e9fa964e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6466,11 +6466,11 @@
       "upstreamBlob": "2c363f1517f98042c6000b18b5ead8fdce8d3ebf",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f7e0450e15d779745aa160208050aa68807ccf1ef97a49c268091da22c5d51c8",
+      "localSha256": "c94503ebebdf056a05f574a5af80f97319547c2d033a16ffe85df6692463878c",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6484,11 +6484,11 @@
       "upstreamBlob": "df7fb9e9c47100bea4e4f3e3fea90172c24f9063",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve setting-tree models and validation; packaged user settings replace extension/workspace targets and controls reflect readonly document state.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "0fd58ff717779c344c8a5bc5ac029cc2e1832cc52694e592e67cb6ac30e66552",
+      "localSha256": "b993df8b294f21ccd52c0d5d23f5b4c7d916c21484d5487e8c29b13876e98a08",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6502,11 +6502,11 @@
       "upstreamBlob": "6a44d5bdde058838837dcd874420ef945cfa2aa3",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain setting indicators for admitted user settings; remove extension/Synchronize Settings/profile-policy actions and project the authoritative readonly state.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "58b972f33f79ef4205cf31d0f1e8c04525432adfaadbfdafada3e6ce7e0ffd81",
+      "localSha256": "0806a61f73c6d7a0d395edcefe8dd4e5c0562fa04aef666ddcfb1a2145b1f740",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6628,11 +6628,11 @@
       "upstreamBlob": "946683f7f4c28d46a31e902a1f3e656581fa63b3",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "860175c4ae01cad8b011623fb35201ee85eb2aaf08b7cc868be00b41dcd09e96",
+      "localSha256": "5b3914455b11f6db62db699f3995bb6e553c1eb0b9b7bb2b9cbec583b97bf598",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6646,11 +6646,11 @@
       "upstreamBlob": "a0619bb4e2be49679da88f47e4b07d3756acab34",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; project authoritative readonly model state into editing controls. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f607670e9b2a121fe7adcc56904458fd65a284a82366bbe79887eb32d1c52d64",
+      "localSha256": "9c46bc9c45627a9d45f3bb9328d26a574f6123f026e863bac6edc28fcf9e871b",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6664,11 +6664,11 @@
       "upstreamBlob": "0e659275eeb55f5ad481d9533d4d8fa49f05a23f",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the source settings tree and all applicable renderers. Exclude extension/workspace/AI product rows and use explicit draft pending/readonly state; JSON-only settings keep an Edit in settings.json affordance.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "262568af837c27a3b2b8a697c4e5e2588fb00d0c7f556222789011248d72932c",
+      "localSha256": "4daa7d294c83662e5a150c9ac427b39e00f078f690eadb441f3fa16604602c26",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6682,11 +6682,11 @@
       "upstreamBlob": "0078e1ea0f569c7ee2eb4c97cf3cf02b0c5b6c93",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "beef05f93cb7be3095ea98540e2ea9c58a881dd6dd483b34f739f6bce454c006",
+      "localSha256": "f1c1942ee6a14c3e0add692556f709832de81cbd169e1c1d8b7cc609b3d7494c",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6700,11 +6700,11 @@
       "upstreamBlob": "6dc88cdd94a425e71c20f56e1a4af5e33ca8273f",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve graphical settings search, tree, state and editor behavior. Explicitly exclude extension installation, workspace/remote/profile target selection, Settings Sync and AI search. Proctor working-copy write completion, readonly state, discard and error feedback replace immediate persistence.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "8ec5feeccdf85ef4f76a0a7c0dbd707bfb10a7dd12b05f0a1880d5a08379ce18",
+      "localSha256": "895dd77cbd8e4c64c1de196e6a5df964fae08172728fba42329366b08c10f750",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6844,11 +6844,11 @@
       "upstreamBlob": "f04786f5babb017783f8f4be3553bec605a76e13",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source preference rendering and edit actions for the user document; target resolution and writes use the owned virtual working copy, with readonly and disposal fencing.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "66505509d4127996ddda3f452be333d94dffa2e84e57e6035aa86b4c38de7114",
+      "localSha256": "a48e3e5a91c86f7ef676320a96c1bda554e6378d482ed388a494372b7f559fb8",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6862,11 +6862,11 @@
       "upstreamBlob": "b838cbed36aab074ea39f4bb5a69dd3eea2823bc",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "3943220057e0dbfd8c5e056ee25211d2f70174c4aac0b8d93cc7cfd5368f0327",
+      "localSha256": "dda8358764bd0d7df6cd066439d320e2441f9dd222c49299b6fc45df6e27d955",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6940,11 +6940,11 @@
       "upstreamBlob": "86c87f9d3ed126d754cc06f733ca0c2ed6974143",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f0efe1bda00840dfd0bf06dc8e0eb037c615c2a9e24cf730ff707ba805f8d9d8",
+      "localSha256": "9783b4cbf300ca09172598ff35a8a461f24110b8bd08d28e07fd0a35e5498860",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -6976,11 +6976,11 @@
       "upstreamBlob": "b7c1b96fc9a59e79d696cd3ca8c814b63f5857fa",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "e38a90d4522ef3a3fbe764c18aa1c57554f30e964a191b479b2a3eb335e4266c",
+      "localSha256": "18f17760cf93e114a846c45423452e453921b4f83daac268ca5c2b2a8b8b04c1",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7030,11 +7030,11 @@
       "upstreamBlob": "6eea8320a2470cd078c2d24dba3a96fb31886039",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Use the source editor pane lifecycle with Proctor document-trust and window/layout contracts; do not infer host workspace trust or open unsupported resources.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f19d08e6f8d3169e2e0b912f9c614df77270466be09249b878dc1781e4acaf37",
+      "localSha256": "a83fb46bc71f93731ce56ddbaac449d6ec2ae59752126c2d8a9a8d3c1ba9933d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7048,11 +7048,11 @@
       "upstreamBlob": "184d3b36c0350b013894c29ffcbf8f8b177e382d",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "eea0325d54e33cb518765b9b1b04c0d867ade7cd6cec4f1c1b9abe7a938ca36e",
+      "localSha256": "5644eb360e145003d72b0f7b8104491d4603ad602c8c1fad13a38a5b6efa723f",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7156,11 +7156,11 @@
       "upstreamBlob": "2e25284a83e083a6d02d2346abaef8d7cdc1e1ff",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "43471c75bed7a2d178a87d50515dbcc10b8f0b35c331a919300b3a3bce430755",
+      "localSha256": "86aa0eb580fca03719981e1b21796dc4cbeda85635abbd9422d92483f27131bf",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7210,11 +7210,11 @@
       "upstreamBlob": "430d22e542bb96bfd25c893b917771e567a67ba8",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "cc5c93d3fe313f1a9201f99c029dc1120040c75403a3fce6d261a1e91a6777a1",
+      "localSha256": "c184a5f9832522c2283639e10dd5e816afb41b99c68d92f9f15e7e84e27ffb68",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7498,11 +7498,11 @@
       "upstreamBlob": "7538dd869be42f7e2a117b3de7fb4a3737818c08",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain editor group command implementations with explicit registration and closed composition services; unavailable detached-window/product actions are not selected.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f81437fad94c3ae6cd42ead701cdb9fcd53fce816e9c9b641dc79c1d86e0f04a",
+      "localSha256": "0720c8e3421c8e25b5508da00185b74257fdacaf26ba880eec9258902f4d0a5a",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7552,11 +7552,11 @@
       "upstreamBlob": "a24f76131a86b81665958ddac26ce433abfeed1f",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "dd2df12f139cd4d4706b662425297ed1f283da330ce24de37f54512b340a5944",
+      "localSha256": "e25444c7f665b8e61e3df3a398f5f09b008e286b0d0856de1124d0df323bef6d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7570,11 +7570,11 @@
       "upstreamBlob": "57ab8ca5e2b3c8495b6dce0e8117c1fc513159d1",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "e6abcab8f309acfc411bb1d94d1b6dcb72d493eaa5ec713aa3220d27e96743fc",
+      "localSha256": "8fe153311d59d74c0daaf36ad57a0b8db366a109583e52cfc34e7d1e6d0c5826",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7696,11 +7696,11 @@
       "upstreamBlob": "e475eff20153bc19783d40ed063c9d5dbf076058",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; translate CSS variable and DOM class owners together; inject the bounded editor window/layout/document-trust interfaces. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "ec9f514a4fdee51fa94ac3ed3b54ea37029744aab59a9913b0eed234f27a4ee7",
+      "localSha256": "391641445a294b5024ad63b2c5606fae8fee6fcb7f7257139d3e9caf38638c77",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7714,11 +7714,11 @@
       "upstreamBlob": "c1e576e5a9ca3a65a71e1ed2503c40cfbce93fac",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f630b76cf22ef42da4dc1b5366ee98e78f1812b76db04dba12f74f7a78182c03",
+      "localSha256": "7552fad3ad3ac8ad39f83ffaa9e41480e7323c934b15d777fc258b15dc056928",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7768,11 +7768,11 @@
       "upstreamBlob": "06ccb75b5612adc930b342fc632736fc71e1c8b0",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain resource-label formatting and rendering; inject the narrow label environment instead of host workspace/extension environment and keep static product icon/font scope.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "41f895410c865222ce79e73bd4ca87be3b702957e7dc4c1fe644963c8aa5f53a",
+      "localSha256": "287a4ad2d2c720c37ec2010f4b765f302833ec5e862423a0e80692c683f25e2d",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7858,11 +7858,11 @@
       "upstreamBlob": "ed5f02ab8d6aa310125c049aba465915fc1c285a",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; translate CSS variable and DOM class owners together; inject the bounded editor window/layout/document-trust interfaces. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "a6fee7bd6a59dce9a7c6de5dd0cba790aa5099192c84eca6c8cdf204cf52cc6d",
+      "localSha256": "3dbd31628ce47edc870cd2f028b776dd0f6bf406df76e9991e13295c408b2897",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7876,11 +7876,11 @@
       "upstreamBlob": "2c3cee55f9a927de4218cd0e334de844fdef3ad1",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "c5a5c4c68234687c3d70a90cd4ce2b0409c8dbdf2eaa1d08deeafd5ef07f5b54",
+      "localSha256": "15aca9ce5baed000627756d2d32dca417869504e5cefff55afbc238965161765",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -7966,11 +7966,11 @@
       "upstreamBlob": "6ecaf6b0c00c3e068584f60b67284d09cc630f3e",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "b77af5b1b85073e0577a717843ff272386d8e41331b5e92a5d01ef85da5cfa53",
+      "localSha256": "237619bde45505c3ce0e14b1ddba4d5b1e39e1fadbfccefeb5d8880024eff06e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -8002,11 +8002,11 @@
       "upstreamBlob": "1cd83779b09dd307885028f7827c7df07066ce76",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "a103880ef4faebb8a74220ed58694ee69e0ec905b3fb44a089c25023c8818b59",
+      "localSha256": "3acfb5a45779959d9404806821890ebff98dbbae672563d5f6384b2fcb0a4abc",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -8020,11 +8020,11 @@
       "upstreamBlob": "0e9c593237298c7ff612f97cc7c320c7762e2c9f",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "4e5a0af440678be7f2dcce7b9d674b2488647cdaa29e04de0fa3310597b0d195",
+      "localSha256": "edf60bd21da2d680a8ef400528017820640999c6f82eaaeea26ccf879f4b222e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -8056,11 +8056,11 @@
       "upstreamBlob": "22765db223266de3a938a7275a4ad83c0d03db40",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "720d446a6595b37f52745348226ada40a443029873a587f99885a338b9140155",
+      "localSha256": "697d6023d575523aeb5c38c79138b2db9b31e52f2b29ee12ced44d321ea628fa",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -8110,11 +8110,11 @@
       "upstreamBlob": "3792926104f65137d55f3d6093ed5415f0208dca",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve editor-group open/close/dirty handling and layout. Use the extracted save-confirmation interface and Proctor window/layout seams, excluding filesystem pickers and detached destinations.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "aee5c6256c555ddf0d021133e1ed9c3fe7ae8ad607ece60db571a8b9aa8471bb",
+      "localSha256": "219f504b5ae0bfce157cc03eeb2b9534e3e352807263f3af4bcdaf47780c368e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -8128,11 +8128,11 @@
       "upstreamBlob": "deb238a8de88e134b8764e901621cfa382546634",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve the pinned stylesheet declarations, nested selectors, media conditions and state rules. Adapt editor scope, CSS variable/class ownership, packaged font URLs and cascade layers; original important rules retain conditional ancestry. Modal footer layout is documented separately where applicable.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "f36e57f4625845f71d619c9f6a51c7961a1397d135baea8b1c79c2e43f1768de",
+      "localSha256": "1b55996fee83e3716a6ad8e1d5c0bd727b2979ea242db78592b8a4ab06cc3e9e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -8146,11 +8146,11 @@
       "upstreamBlob": "154633ebab7737b9add60beed1abee8bf4dc1491",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "fd0068d8011c96a5b95d537872a02d3692901dff3d07d7f7fa0512713f89bb51",
+      "localSha256": "8e94328195e9d4b68e5e9ddbd9deea626735365c86d8cb663827f7e666a9c3c2",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -8200,11 +8200,11 @@
       "upstreamBlob": "10e9454faa804aaa12b89704521b44b31f0ed747",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Retain source algorithms and interaction state; inject the bounded editor window/layout/document-trust interfaces. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "6bafd4bbc839713aeca3535e967f6deff30f26136a6de728949d9e2d8804e9f4",
+      "localSha256": "31e46966a2296352d1492c4d4e57502064a75193251e0e5e85680c8c444f5ca1",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -8218,11 +8218,11 @@
       "upstreamBlob": "ca467f2902a3d0d3d93a83b6f62b5c207a270b49",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
+      "rationale": "Preserve modal drag, resize, maximize, scoped focus, Escape and disposal. Add the owned explicit-save footer, subtract its measured height from editor/sidebar layout and dispose the footer ResizeObserver.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "04802f92b0b74e9273c137e08151ead5ad309b3d4226dbfdabf6b0bb67d218d0",
+      "localSha256": "b4341768105fe02e530aad795d6165666bf052059c3c88702bb523c96d9421d4",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -11485,6 +11485,102 @@
         "src/prctr/editor/contrib/snippet/browser/snippetSession.ts",
         "src/prctr/editor/common/services/snippetWorkspaceContext.ts",
         "src/prctr/workbench/services/settings/browser/settingsEditorControlServices.ts"
+      ],
+      "verificationRefs": [
+        "settings-regressions"
+      ]
+    },
+    {
+      "id": "explicit-settings-draft",
+      "summary": "Keep local and TF-IDF search, tree renderers and JSON edit affordances. The single Principal document replaces workspace/remote/profile/extension/AI destinations. Readonly capability events, pending draft flush/discard/error events and lifecycle cancellation integrate with explicit Save. The modal footer participates in layout measurement and disposal.",
+      "localPaths": [
+        "src/prctr/platform/extensionManagement/common/extensionManagement.ts",
+        "src/prctr/base/browser/ui/keybindingLabel/keybindingLabel.css",
+        "src/prctr/base/browser/ui/breadcrumbs/breadcrumbsWidget.css",
+        "src/prctr/base/browser/ui/breadcrumbs/breadcrumbsWidget.ts",
+        "src/prctr/base/browser/ui/list/listPaging.ts",
+        "src/prctr/platform/list/browser/listService.ts",
+        "src/prctr/platform/request/common/request.ts",
+        "src/prctr/platform/native/common/native.ts",
+        "src/prctr/workbench/services/host/browser/host.ts",
+        "src/prctr/workbench/browser/media/part.css",
+        "src/prctr/workbench/browser/media/floatingPanels.css",
+        "src/prctr/workbench/browser/part.ts",
+        "src/prctr/workbench/services/layout/browser/layoutService.ts",
+        "src/prctr/workbench/browser/window.ts",
+        "src/prctr/workbench/services/preferences/common/preferencesEditorInput.ts",
+        "src/prctr/workbench/contrib/codeEditor/browser/suggestEnabledInput/suggestEnabledInput.css",
+        "src/prctr/editor/contrib/contextmenu/browser/contextmenu.ts",
+        "src/prctr/base/browser/ui/findinput/replaceInput.ts",
+        "src/prctr/editor/contrib/gotoError/browser/media/gotoErrorWidget.css",
+        "src/prctr/editor/contrib/peekView/browser/media/peekViewWidget.css",
+        "src/prctr/editor/contrib/zoneWidget/browser/zoneWidget.css",
+        "src/prctr/platform/actions/browser/menuEntryActionViewItem.css",
+        "src/prctr/base/browser/ui/severityIcon/media/severityIcon.css",
+        "src/prctr/editor/contrib/indentation/common/indentUtils.ts",
+        "src/prctr/platform/actions/browser/actionViewItemService.ts",
+        "src/prctr/editor/contrib/editorState/browser/keybindingCancellation.ts",
+        "src/prctr/editor/contrib/message/browser/messageController.css",
+        "src/prctr/editor/contrib/rename/browser/renameWidget.css",
+        "src/prctr/editor/contrib/snippet/browser/snippetSession.css",
+        "src/prctr/editor/contrib/suggest/browser/suggestMemory.ts",
+        "src/prctr/base/browser/ui/codicons/codicon/codicon.css",
+        "src/prctr/base/browser/ui/codicons/codicon/codicon-modifiers.css",
+        "src/prctr/editor/contrib/suggest/browser/media/suggest.css",
+        "src/prctr/editor/contrib/symbolIcons/browser/symbolIcons.css",
+        "src/prctr/base/browser/ui/iconLabel/iconlabel.css",
+        "src/prctr/editor/contrib/inlineCompletions/browser/model/inlineCompletionsModel.ts",
+        "src/prctr/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget.css",
+        "src/prctr/editor/contrib/inlineCompletions/browser/view/ghostText/ghostTextView.css",
+        "src/prctr/editor/contrib/inlineCompletions/browser/view/ghostText/ghostTextView.ts",
+        "src/prctr/platform/hover/browser/hover.css",
+        "src/prctr/editor/contrib/stickyScroll/browser/stickyScroll.css",
+        "src/prctr/editor/contrib/folding/browser/folding.css",
+        "src/prctr/editor/contrib/stickyScroll/browser/stickyScrollWidget.ts",
+        "src/prctr/editor/contrib/gotoSymbol/browser/peek/referencesWidget.css",
+        "src/prctr/editor/browser/widget/diffEditor/components/diffEditorViewZones/renderLines.ts",
+        "src/prctr/editor/browser/widget/diffEditor/components/accessibleDiffViewer.css",
+        "src/prctr/editor/browser/widget/diffEditor/components/accessibleDiffViewer.ts",
+        "src/prctr/editor/browser/widget/diffEditor/components/diffEditorViewZones/diffEditorViewZones.ts",
+        "src/prctr/editor/browser/widget/diffEditor/style.css",
+        "src/prctr/editor/contrib/inlineCompletions/browser/view/inlineEdits/view.css",
+        "src/prctr/editor/contrib/suggest/browser/suggestModel.ts",
+        "src/prctr/workbench/contrib/snippets/browser/tabCompletion.ts",
+        "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+        "src/prctr/workbench/contrib/preferences/browser/preferencesWidgets.ts",
+        "src/prctr/workbench/contrib/preferences/browser/settingsLayout.ts",
+        "src/prctr/workbench/contrib/preferences/browser/settingsTreeModels.ts",
+        "src/prctr/workbench/contrib/preferences/browser/settingsEditorSettingIndicators.ts",
+        "src/prctr/workbench/contrib/preferences/browser/media/settingsWidgets.css",
+        "src/prctr/workbench/contrib/preferences/browser/settingsWidgets.ts",
+        "src/prctr/workbench/contrib/preferences/browser/settingsTree.ts",
+        "src/prctr/workbench/contrib/preferences/browser/tocTree.ts",
+        "src/prctr/workbench/contrib/preferences/browser/settingsEditor2.ts",
+        "src/prctr/workbench/contrib/preferences/browser/preferencesRenderers.ts",
+        "src/prctr/workbench/browser/parts/editor/media/modalEditorPart.css",
+        "src/prctr/workbench/browser/parts/editor/media/editorgroupview.css",
+        "src/prctr/workbench/browser/parts/editor/media/editorplaceholder.css",
+        "src/prctr/workbench/browser/parts/editor/editorPanes.ts",
+        "src/prctr/workbench/services/progress/browser/progressIndicator.ts",
+        "src/prctr/workbench/browser/parts/editor/media/editorquickaccess.css",
+        "src/prctr/workbench/browser/parts/editor/media/sidebysideeditor.css",
+        "src/prctr/workbench/browser/parts/editor/editorCommands.ts",
+        "src/prctr/workbench/browser/parts/editor/media/editortitlecontrol.css",
+        "src/prctr/workbench/browser/parts/editor/media/editortabscontrol.css",
+        "src/prctr/workbench/browser/parts/editor/editorTabsControl.ts",
+        "src/prctr/workbench/browser/parts/editor/media/multieditortabscontrol.css",
+        "src/prctr/workbench/browser/labels.ts",
+        "src/prctr/workbench/browser/parts/editor/multiEditorTabsControl.ts",
+        "src/prctr/workbench/browser/parts/editor/media/singleeditortabscontrol.css",
+        "src/prctr/workbench/browser/parts/editor/media/breadcrumbscontrol.css",
+        "src/prctr/workbench/browser/parts/editor/breadcrumbsControl.ts",
+        "src/prctr/workbench/browser/parts/editor/singleEditorTabsControl.ts",
+        "src/prctr/workbench/browser/parts/editor/noEditorTabsControl.ts",
+        "src/prctr/workbench/browser/parts/editor/editorGroupView.ts",
+        "src/prctr/workbench/browser/parts/editor/media/editordroptarget.css",
+        "src/prctr/workbench/browser/parts/editor/editorDropTarget.ts",
+        "src/prctr/workbench/browser/parts/editor/editorPart.ts",
+        "src/prctr/workbench/browser/parts/editor/modalEditorPart.ts"
       ],
       "verificationRefs": [
         "settings-regressions"

@@ -37,6 +37,26 @@ revision, disposition, dependencies, divergence, and evidence):
 - [`workbench-notifications`](./workbench-notifications.json) — window-owned notifications, prompts, progress, retained center, accessibility, and complete virtual list/scrollbar mechanics.
 - [`workbench-kernel`](./workbench-kernel.json) — executable compositions, lifecycle, shell, layout, items, panes, restoration, and overlays.
 
+- [`complete-theme-model`](./complete-theme-model.json) — Provide the full upstream color, TextMate and semantic theme model to the Settings editor and existing Proctor chrome from one owner.
+- [`editor-browser-core`](./editor-browser-core.json) — Provide the actual Monaco browser editor for virtual Settings JSONC, retaining original DOM, keyboard/composition input, cursor/selection, rendering, scroll/minimap/decorations and worker contracts.
+- [`editor-browser-services`](./editor-browser-services.json) — Supply the concrete upstream code-editor, accessibility, interaction, marker, icon-theme and worker services behind Proctor-owned window configuration and resource boundaries.
+- [`editor-text-model`](./editor-text-model.json) — Provide one complete Monaco text-model mechanism for Settings JSONC and graphical edits, preserving versioned events, edits, undo/redo, search, tokenization, decorations, bracket state and language-service ownership.
+- [`settings-editor-browser-host`](./settings-editor-browser-host.json) — Provide source native menu and clipboard behavior through capability-specific isolated Settings transports.
+- [`settings-editor-contributions`](./settings-editor-contributions.json) — Retain the Monaco editing contributions and provider machinery selected by the closed Settings composition.
+- [`settings-editor-controls`](./settings-editor-controls.json) — Supply the actual control hierarchy consumed by SettingsEditor2 and modal editor services, preserving complete tree, input, selection, button, toolbar, hover, menu, dialog and layout implementations.
+- [`settings-editor-icon-styles`](./settings-editor-icon-styles.json) — Generate dynamic registered Codicon CSS and font dependencies within the editor theme scope.
+- [`settings-editor-json-navigation`](./settings-editor-json-navigation.json) — Reveal and edit a setting in the same authorized JSON working copy using source Preferences navigation and renderer behavior.
+- [`settings-editor-language-configuration`](./settings-editor-language-configuration.json) — Validate and register the complete packaged JSON/JSONC language configuration through the source extraction algorithms.
+- [`settings-editor-local-search`](./settings-editor-local-search.json) — Complete local Settings matching, filter parsing, TF-IDF ranking and provider caching with no online/AI search service.
+- [`settings-editor-modal-services`](./settings-editor-modal-services.json) — Supply editor resolution, resource labels, dialogs, Quick Input and explicit Settings commands to the modal composition.
+- [`settings-editor-model-host`](./settings-editor-model-host.json) — Resolve, retain and edit the authorized virtual Settings text model, including model references, undo/redo and bounded bulk text edits.
+- [`settings-editor-modern-ui`](./settings-editor-modern-ui.json) — Full pinned Modern UI activation, fourteen stylesheet modules and coordinated pane-header, scrollbar and notification density metrics.
+- [`settings-editor-presentation`](./settings-editor-presentation.json) — Preserve complete SettingsEditor2, renderers and modal EditorPart/group presentation with their exact source contracts and dependency topology. Product-specific exclusions and service adapters remain explicit; copying source alone is not runtime completion.
+- [`settings-editor-runtime-services`](./settings-editor-runtime-services.json) — Full file, dialog, text-resource and optional Tree-sitter mechanisms behind settings-only resource and native window boundaries.
+- [`settings-editor-textmate`](./settings-editor-textmate.json) — Full source TextMate tokenization, scope registration, line limits, state deltas, theme propagation and background model controllers with static packaged JSON grammars.
+- [`settings-modal-composition`](./settings-modal-composition.json) — Host graphical Settings and JSON in the source modal editor with scoped editor groups, services and disposal.
+- [`settings-token-customization`](./settings-token-customization.json) — Preserve theme-scoped TextMate and semantic token configuration schemas, types and font-size inheritance for bundled themes.
+
 ## Record identity
 
 Each manifest validates against [`schema.json`](./schema.json) and uses a

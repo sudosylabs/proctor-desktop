@@ -47,19 +47,22 @@
       "upstreamBlob": "c9736ff355fa22791e95f12c9d38b2a26ece4832",
       "category": "source",
       "disposition": "behaviorally-reimplemented",
-      "rationale": "Retain navigation and popup denial, permission denial, trusted main lifecycle, and production hardening without VS Code protocols, auxiliary windows, shell integration, telemetry, updates, or developer surfaces.",
-      "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts"
+      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs the authorized Settings native IPC bridge and disposes it on close and creation failure.",
+      "licenseRefs": [
+        "vscode-mit"
+      ],
+      "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
+      "localSha256": "85e3df2998688439ebb4a76c262fb37561f28d6f8b264b35541c95c0abdc8cf5"
     },
     {
       "upstreamPath": "src/vs/platform/windows/electron-main/windows.ts",
       "upstreamBlob": "7c4f02efdfa374b2d8712f2892bc8c5b5e697064",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Preserve VS Code's hidden-titlebar BrowserWindow topology: macOS keeps native traffic lights, Windows and Linux use the native Window Controls Overlay, frame suppression remains platform-specific, and CandidateWindow retains its separate control-free security posture.",
+      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs the authorized Settings native IPC bridge and disposes it on close and creation failure.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "8d22406fc7c572b35ac4b8247e8807b388e8ec6f86dff725c0d0dc31b1ef26b4",
+      "localSha256": "85e3df2998688439ebb4a76c262fb37561f28d6f8b264b35541c95c0abdc8cf5",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",

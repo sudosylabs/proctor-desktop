@@ -388,8 +388,8 @@
       "licenseRefs": [
         "vscode-mit"
       ],
-      "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
-      "localSha256": "0990a4e4103562b810d108fd293a16dec80dae59c0368ed3c2f4b33d29bec3b8",
+      "rationale": "Preserve list layout, events, navigation and style rules. DefaultStyleController accepts an owned CSP stylesheet handle, disposes it with the list, and keeps externally supplied CSSStyleSheet ownership unchanged.",
+      "localSha256": "ac241fcf610c34e93ab1ccd3295614c8dacbe9042e06c41c70e808f787311359",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1656,8 +1656,8 @@
       "licenseRefs": [
         "vscode-mit"
       ],
-      "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
-      "localSha256": "0c9b161d2e284c14e214b6097fd8ee24941973783764881f90f67070e77355d1",
+      "rationale": "Keep the notification list adaptation and remeasure rows on the shared density metric event; dispose the listener with the list.",
+      "localSha256": "5a8dc30c252a66a27ef36cc1b8824c715538e5132ffdb4551adb3b3914277557",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -1710,8 +1710,8 @@
       "licenseRefs": [
         "vscode-mit"
       ],
-      "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
-      "localSha256": "ccbdf0c632d8b54f4732a09363a16e36c78c30a34413f81bde50c6436b5749e4",
+      "rationale": "Keep the admitted Proctor notification row renderer. Export default/compact row metrics and an event so Modern UI density changes remeasure existing lists.",
+      "localSha256": "36973ac08d8726f8fbe4f01e09b2c72f45e135621b6f0c0bafb508a05a9653c1",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -2624,6 +2624,22 @@
         "launch-scrollbar-tests",
         "list-tests",
         "source-check"
+      ]
+    },
+    {
+      "id": "live-density-metrics",
+      "summary": "The retained source-derived notification renderer exposes default/compact row metrics. Lists subscribe to the density event and remeasure existing rows; listener lifetime belongs to the list.",
+      "localPaths": [
+        "src/prctr/base/browser/ui/list/listWidget.ts",
+        "src/prctr/workbench/browser/parts/notifications/notificationsList.ts",
+        "src/prctr/workbench/browser/parts/notifications/notificationsViewer.ts"
+      ],
+      "verificationRefs": [
+        "model-tests",
+        "service-tests",
+        "browser-tests",
+        "list-tests",
+        "launch-scrollbar-tests"
       ]
     }
   ],

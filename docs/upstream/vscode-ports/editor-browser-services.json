@@ -23,11 +23,11 @@
       "upstreamBlob": "abb76fe6ebfb51e7e99c7e92b464ce9cf7392ffb",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "rationale": "Retain source algorithms and interaction state; use disposable constructed stylesheet handles under the strict renderer CSP. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "94d0e85dd67b4a052781380be6220de0c186689069f142c06c9864e567eea436",
+      "localSha256": "2986520246dc49a7eceac1a85faf1524889586d567a1db24d32f691e2ce19c09",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -185,11 +185,11 @@
       "upstreamBlob": "b60b03f8606946855f8a5f9a4ce33f20970691ff",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
+      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
       "licenseRefs": [
         "vscode-mit"
       ],
-      "localSha256": "dedfdb7be62492dd5e42ecc5c444ec3c991f4f2d86772c32e24dc6331562cfc3",
+      "localSha256": "6a28f1ff18a0e1260fbfdc7a08f7affe1346a700905a7d24e334aa8d4550db1e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
