@@ -4,7 +4,7 @@ import type { PresentationCategory } from '../../../common/restoration.js';
 export const authenticatedLayoutCategory: PresentationCategory = Object.freeze({
 	id: 'prctr.authenticated.layout',
 	scope: 'device',
-	schemaVersion: 1,
+	schemaVersion: 2,
 	sensitivity: 'nonSensitive',
 	cleanupOwner: 'prctr.authenticated.navigation'
 });
@@ -17,6 +17,12 @@ export class AuthenticatedLayoutState {
 		} catch {
 			return true;
 		}
+	}
+	get primarySide(): 'left' | 'right' {
+		try { return this.storage?.getItem('prctr.authenticated.layout.v2.primarySide') === 'right' ? 'right' : 'left'; } catch { return 'left'; }
+	}
+	set primarySide(side: 'left' | 'right') {
+		try { this.storage?.setItem('prctr.authenticated.layout.v2.primarySide', side); } catch { /* Session-only fallback. */ }
 	}
 	set sidebarVisible(visible: boolean) {
 		try {

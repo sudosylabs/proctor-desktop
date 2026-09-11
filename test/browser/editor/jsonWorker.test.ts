@@ -1,3 +1,4 @@
+import { exerciseAuthenticatedLayout } from '../authenticatedLayoutTests.js';
 import { exerciseSettingsProduction } from './settingsProduction.test.js';
 import { exerciseSettingsWindowServices } from './settingsWindowServices.test.js';
 import { exerciseTreeSitterAssets } from './treeSitterAssets.test.js';
@@ -174,6 +175,7 @@ void (async () => {
 		await exerciseTextMateDisposal();
 		await exerciseSettingsWindowServices();
 		await exerciseSettingsProduction();
+		await exerciseAuthenticatedLayout();
 		await new Promise<void>(resolve => setTimeout(resolve, 50));
 		check(runtimeErrors.length === 0, `Unexpected runtime errors: ${runtimeErrors.join('; ')}`);
 		document.body.dataset.result = JSON.stringify({

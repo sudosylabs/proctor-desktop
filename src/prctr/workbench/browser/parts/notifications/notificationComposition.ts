@@ -8,7 +8,7 @@ import { WorkbenchNotifications } from './notifications.js';
 export function createWindowNotifications(
 	document: Document,
 	host: HTMLElement,
-	indicator: HTMLElement,
+	indicator: HTMLElement | undefined,
 	titlebar: HTMLElement,
 	status: HTMLElement | undefined,
 	binding: NotificationPreferenceBinding,
@@ -26,13 +26,14 @@ export function createWindowNotifications(
 	let prior: HTMLElement | undefined;
 	const listener = (event: FocusEvent): void => {
 		const target = event.target;
-		if (target instanceof HTMLElement && !host.contains(target) && !indicator.contains(target))
+		if (target instanceof HTMLElement && !host.contains(target) && !indicator?.contains(target))
 			prior = target;
 	};
 	document.addEventListener('focusin', listener, true);
 	const notifications = new WorkbenchNotifications({
 		host,
 		indicatorHost: indicator,
+		centerEnabled: indicator !== undefined,
 		preferences,
 		position: preferences.position,
 		effects: {

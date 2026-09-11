@@ -46,14 +46,18 @@ still closes the entire AuthenticatedWindow regardless of those responsibilities
 The titlebar displays Proctor. A compact account trigger on the right of the
 titlebar shows the user's photo and display name. It sits before right-side
 native window controls, using the chrome owner's reserved control space. At
-constrained widths it retains the avatar and accessible full name. A sidebar
-visibility toggle precedes the account trigger and uses the visible/hidden
-Codicon for the sidebar’s physical side. The shell owns actual visibility and
-notifies the control after responsive layout and navigation changes. Explicit
-choices persist as the non-sensitive device-scoped `prctr.authenticated.layout`
-category (schema 1), owned by authenticated navigation and cleared with local
-application data. Responsive hiding never overwrites that choice. Its menu
-contains Profile, Sessions, Settings, then a separated Log out action. macOS uses an Electron
+constrained widths it retains the avatar and accessible full name. Primary Side
+Bar, Secondary Side Bar and Customize Layout controls precede Settings and the
+account trigger, with vertical separators around Settings. Each titlebar action
+has a source workbench tooltip, including its registered shortcut when available.
+Their icons reflect each bar's physical side and actual visibility.
+Primary visibility and physical position persist in the non-sensitive
+device-scoped `prctr.authenticated.layout` category (schema 2), owned by the
+authenticated layout service and cleared with local application data. The
+schema-1 primary visibility preference remains readable. Responsive hiding
+never overwrites an explicit preference. The account menu
+contains Profile, Sessions, then a separated Log out action. Settings opens from
+its separate titlebar button or the registered Settings shortcut. macOS uses an Electron
 native popup so the OS owns material, selection, accessibility and dismissal;
 other platforms use the window-owned menu control. The native capability accepts
 only a bounded anchor and returns a closed action identifier, with sender
@@ -168,18 +172,38 @@ Every workbench uses these structural regions:
 - `NavigationPart` selects composition-approved product destinations.
 - `SidebarPart` presents hierarchy or context for the active destination.
 - `ContentPart` hosts workbench-pane groups and policy-controlled splits.
-- `StatusPart` presents concise connection and relevant product state.
+- `StatusPart` presents concise connection and relevant product state in CandidateWindow; AuthenticatedWindow has no status bar.
 - `OverlayHost` owns dialogs, notifications, context menus, gates, quick input,
   and blocking overlays; it is not a grid part.
 
-`AuthenticatedWindow` configures these regions for its current authorized
-areas. Account/settings use ordinary destinations inside that composition.
-Its sections use fixed sizing with a single content group and no resize handles
-or split actions. Native titlebar dragging, double-click behavior and window-edge
-resizing remain available. At constrained viewport widths the sidebar becomes a
-titlebar disclosure, giving the active content the available width and restoring
-focus when a destination is chosen. The product sidebar destination list scrolls independently. Floating gutters and borders reduce each original
-grid slot once before the pane host measures its inner content.
+`AuthenticatedWindow` uses `NavigationPart` as the **Primary Side Bar**, a single
+central `ContentPart`, and `SidebarPart` as the **Secondary Side Bar**. Primary
+navigation selects permitted destinations. The selected valid destination is
+shown; an unavailable selection falls back to the first permitted navigation
+destination. Settings opens its existing modal, preserving the underlying page.
+
+The Primary Side Bar starts on the physical left and can move right; the
+Secondary Side Bar always occupies the opposite side, including in RTL. The
+secondary starts closed and only the active page can provide its content. Page
+registrations own disposable renderers; navigating away releases rendered DOM
+and selection state. Own-account subpages have separate page identities. Returning
+to a page starts its secondary closed. An explicit detail-selection intent can
+reveal it. Unsupported pages keep the titlebar secondary toggle disabled.
+
+The titlebar exposes both visibility toggles and the source Customize Layout
+quick picker, narrowed to Visibility and Primary Side Bar Position. It preserves
+item icons, eye/check states, keyboard operation, persistent selection, Close
+and Restore Defaults. Restore Defaults puts Primary left and visible and closes
+Secondary. Primary uses Ctrl/Cmd+B; Secondary uses Ctrl/Cmd+Alt+B. These actions
+are blocked by modal/security gates. This window has no status bar or notification
+center entrypoint; no notification bell is relocated to the titlebar.
+
+The regions have fixed sizes, one content group, and no sashes or split actions.
+Native titlebar dragging, double-click behavior and window-edge resizing remain
+available. At constrained widths Primary becomes a titlebar disclosure; choosing
+a destination restores focus to content. The destination list scrolls
+independently. Floating gutters and borders reduce each grid slot once before
+its content is measured. CandidateWindow layout policy is independent.
 
 `CandidateWindow` additionally exposes a `PanelPart` for the policy-gated
 remote terminal. Candidate navigation initially has `Workspace` and `Exam
@@ -330,8 +354,11 @@ three windows and transition behavior.
 
 ## In-app notifications
 
-AuthenticatedWindow and CandidateWindow each own one notification model/service and its nonmodal toast, retained
-center, status indicator, progress and accessible-reading presenters. Ordinary
+Each window owns its notification model/service, nonmodal toasts, progress and
+accessible reading. CandidateWindow additionally exposes the retained center and
+status indicator. AuthenticatedWindow omits the indicator and center command; its
+ordinary feedback remains on the owning surface or in toasts. Ongoing operations
+in that window must retain their own visible progress/cancellation affordance. Ordinary
 producers use handles to update severity, text, actions and progress, then close
 the handle when their operation ends. Prompt actions retain their separate
 keep-open and cancellation outcomes. Notification progress is available through
@@ -342,7 +369,7 @@ ordinary row, keyboard, Clear All and Accessible View dismissal. Escape hides
 presentation while retaining the notification in the center. A producer's close
 or an explicit operation-owned cancellation action can end progress. Duplicate
 notifications consolidate; burst limiting affects toasts without discarding
-center entries. Hidden ongoing progress remains discoverable in the status area.
+center entries. In CandidateWindow, hidden ongoing progress remains discoverable in the status area.
 
 Notification presentation sits below modal/security gates. Candidate interaction
 state and overlay visibility disable it synchronously. Notifications neither

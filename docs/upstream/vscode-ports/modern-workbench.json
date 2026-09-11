@@ -29,7 +29,7 @@
       "rationale": "Preserve default/perimeter margins, rail seams, border-box cards, compact gradient edge/corner painting and centered sashes for the fixed admitted topology.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/browser/floatingPanels.css",
-      "localSha256": "fdd2bb52c617567dd49879aa7a1f32e9dd7b1450825b44946eb86f705376580b",
+      "localSha256": "65dbf8c2585a1d10a5f89cf652a90d42353db6cfeb0fbc5a9b046ec0537db844",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -44,7 +44,7 @@
       "rationale": "Project the admitted fixed topology into the same exposed-edge state. Border-box Grid applies margin/border subtraction once; PaneHost measures the remaining content.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/browser/floatingPanels.ts",
-      "localSha256": "882549eb2dd8561a0890149d49ef6d849e4e6ad1ca5757e004eb101819f9f41a",
+      "localSha256": "19822774b351eb77117798ac817fc94bea69447758605fdcf27ae5f21da76db8",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -290,6 +290,21 @@
       "disposition": "evidence-only",
       "rationale": "Preserve toolbar hover fill, active fill, disabled exclusion and inset dashed hover outline together in the Proctor-owned action surfaces. Keyboard focus retains its owning solid focus indicator.",
       "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/actions/layoutActions.ts",
+      "upstreamBlob": "f7b82f298f70692bf964532691a0f27f414af7c6",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain CustomizeLayoutAction quick-picker items, eye/check icons, live selection refresh, item-button acceptance, persistent picker, reset/close and focus lifetime. Project state and actions through the authenticated layout owner; explicitly limit choices to Primary and Secondary Side Bars and primary position.",
+      "licenseRefs": ["vscode-mit"],
+      "localPath": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts",
+      "localSha256": "2953b74f1c7cc054e4317a4e31f6fa4a9ee4a43eedde3d23766e322f275a1eb2",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
     }
   ],
   "licenses": [
@@ -324,6 +339,18 @@
       "kind": "platform-interface",
       "reference": "CSS Grid, border-box sizing, ResizeObserver, MutationObserver and DOM pointer capture",
       "rationale": "Browser layout preserves intrinsic reflow and subtracts insets before pane measurement; shell disposes observations and active drags."
+    },
+    {
+      "id": "authenticated-quick-input",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/contrib/authenticated/browser/authenticatedQuickInput.ts",
+      "rationale": "Window-owned dependency composition reuses admitted workbench QuickInputService, list/tree, menu/context view, hover delegates, markdown renderer, code-editor/opener services, accessibility, theme, base workbench styles, ModernUI and layout services. A closed opener validator prevents tooltip labels from becoming links. Active picker ownership routes source commands through the kernel graph and restores the Settings controller on hide. No server settings read is required."
+    },
+    {
+      "id": "authenticated-titlebar-controls",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.css",
+      "rationale": "Proctor titlebar mounting and token-based hit areas; existing ProductWindowChrome owns native control reservations and drag regions."
     }
   ],
   "divergences": [
@@ -348,13 +375,23 @@
     },
     {
       "id": "product-surfaces",
-      "summary": "Profile, Sessions and Settings remain Proctor-owned account pages. Their shell surface uses the semantic contained surface, their content shares one inset rhythm, custom scrollbars are 8px, and the bottom account menu remains a native macOS popup. No new user object editing or remote action is introduced. Row hover uses the upstream contrastActiveBorder dashed inset outline; toolbar hover uses toolbar.hoverOutline, with solid keyboard-focus precedence.",
+      "summary": "Profile, Sessions and Settings remain Proctor-owned account pages. Their shell surface uses the semantic contained surface, their content shares one inset rhythm, custom scrollbars are 8px, and the titlebar account menu remains a native macOS popup. No new user object editing or remote action is introduced. Row hover uses the upstream contrastActiveBorder dashed inset outline; toolbar hover uses toolbar.hoverOutline, with solid keyboard-focus precedence.",
       "localPaths": [
         "src/prctr/workbench/contrib/account/browser/account.css",
         "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.css",
-        "src/prctr/workbench/contrib/settings/browser/settingsContribution.css"
+        "src/prctr/workbench/contrib/settings/browser/settingsModal.ts"
       ],
       "verificationRefs": ["browser-layout", "account-browser", "manual-comparison"]
+    },
+    {
+      "id": "authenticated-two-bars",
+      "summary": "AuthenticatedWindow exposes two fixed-size bars only, with Primary default left and Secondary opposite. Visibility and primary position are device-local; Secondary belongs to an explicitly registered active page and is closed on navigation. Customize Layout excludes status, activity bar, bottom panel, density, modes and resizing. The existing account/Settings workflow remains independent. Status bar and notification-center entrypoint are absent.",
+      "localPaths": [
+        "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts",
+        "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayoutState.ts",
+        "src/prctr/workbench/browser/authenticatedManifest.ts"
+      ],
+      "verificationRefs": ["browser-layout", "authenticated-layout-controls", "manual-comparison"]
     }
   ],
   "verification": [
@@ -387,6 +424,12 @@
       "kind": "review",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Resolve every source blob at the pinned revision and inspect adapted differences."
+    },
+    {
+      "id": "authenticated-layout-controls",
+      "kind": "test",
+      "path": "test/browser/authenticatedLayoutTests.ts",
+      "obligation": "Actual authenticated composition, keyboard shortcuts, source Customize Layout without Settings runtime, disabled unsupported secondary, page disposal and focus, persistent picker after position changes, and modal blocking."
     }
   ]
 }

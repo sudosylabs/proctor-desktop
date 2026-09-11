@@ -1,5 +1,4 @@
-import { AuthenticatedLayoutState } from './authenticatedLayoutState.js';
-import { registerProctorAction } from '../../../services/actions/common/proctorActions.js';
+import { AUTHENTICATED_LAYOUT_SERVICE, type AuthenticatedLayout } from './authenticatedLayout.js';
 import {
 	PRODUCT_WINDOW_CHROME_SERVICE,
 	type ProductWindowChrome
@@ -139,14 +138,18 @@ export function activateAccountShellNavigation(
 	const settingsRequests = context.disposables.add(new Emitter<void>());
 	let settingsRequested = false;
 	const select = (destination: string): void => {
-		if (destination === 'settings') { settingsRequested = true; settingsRequests.fire(); return; }
-		current =
-			destination === 'activity' && exams
-				? destination
-				: 'account';
+		if (destination === 'settings') {
+			settingsRequested = true;
+			settingsRequests.fire();
+			return;
+		}
+		current = destination === 'account' ? 'account' : exams ? 'activity' : 'account';
 		exams?.setAttribute('aria-current', current === 'activity' ? 'page' : 'false');
 		waiting.hidden = current !== 'activity';
 		context.shell.revealContent();
+		context
+			.getService<AuthenticatedLayout>(AUTHENTICATED_LAYOUT_SERVICE)
+			.setDestination(current === 'account' ? `account/${accountSection}` : current);
 		changes.fire(current);
 	};
 	if (binding.identity?.availableProductAreas.includes('student_activity')) {
@@ -185,76 +188,43 @@ export function activateAccountShellNavigation(
 	trigger.ariaLabel = name + ', ' + text('account');
 	trigger.append(avatar, userName);
 	const chrome = context.getService<ProductWindowChrome>(PRODUCT_WINDOW_CHROME_SERVICE);
-	const sidebarToggle = context.document.createElement('button');
-	sidebarToggle.className = 'prctr-account-shell';
-	sidebarToggle.dataset.region = 'sidebar-toggle';
-	sidebarToggle.type = 'button';
-	sidebarToggle.setAttribute('aria-controls', context.shell.part('navigation').id);
-	const sidebarIcon = context.disposables.add(
-		createSemanticIcon(context.document, { id: 'workbench.sidebarLeft', size: 16 })
+	const layout = context.getService<AuthenticatedLayout>(AUTHENTICATED_LAYOUT_SERVICE);
+	const settings = context.document.createElement('button');
+	settings.className = 'prctr-account-shell';
+	settings.dataset.region = 'settings-trigger';
+	settings.type = 'button';
+	settings.ariaLabel = text('settings');
+	settings.setAttribute('aria-haspopup', 'dialog');
+	settings.append(
+		context.disposables.add(
+			createSemanticIcon(context.document, { id: 'action.settings', size: 16 })
+		).element
 	);
-	sidebarToggle.append(sidebarIcon.element);
-	chrome.actions.append(sidebarToggle, trigger);
-	let storage: Storage | undefined;
-	try {
-		storage = context.document.defaultView?.localStorage;
-	} catch {
-		/* Ephemeral renderer. */
-	}
-	const layoutState = new AuthenticatedLayoutState(storage);
-	if (!layoutState.sidebarVisible) context.shell.setNavigationVisible(false);
-	const updateSidebarToggle = (): void => {
-		const visible = context.shell.navigationVisible;
-		const rtl =
-			context.document.defaultView?.getComputedStyle(context.shell.element).direction ===
-			'rtl';
-		sidebarIcon.setState({
-			id: rtl
-				? visible
-					? 'workbench.sidebarRight'
-					: 'workbench.sidebarRightHidden'
-				: visible
-					? 'workbench.sidebarLeft'
-					: 'workbench.sidebarLeftHidden',
-			size: 16
-		});
-		sidebarToggle.setAttribute('aria-expanded', String(visible));
-		sidebarToggle.ariaLabel = text(visible ? 'hideSidebar' : 'showSidebar');
-		sidebarToggle.title = sidebarToggle.ariaLabel;
-	};
-	context.disposables.add(context.shell.onDidChangeNavigationVisibility(updateSidebarToggle));
-	const directionObserver = new MutationObserver(updateSidebarToggle);
-	directionObserver.observe(context.document.documentElement, {
-		attributes: true,
-		attributeFilter: ['dir']
+	const separators = Array.from({ length: 2 }, () => {
+		const separator = context.document.createElement('span');
+		separator.className = 'prctr-account-shell';
+		separator.dataset.region = 'titlebar-separator';
+		separator.ariaHidden = 'true';
+		return separator;
 	});
-	directionObserver.observe(context.shell.element, {
-		attributes: true,
-		attributeFilter: ['dir']
-	});
-	context.disposables.add({ dispose: () => directionObserver.disconnect() });
-	const toggleSidebar = (): void => {
-		if (context.shell.overlayHost.visible) return;
-		const visible = !context.shell.navigationVisible;
-		context.shell.setNavigationVisible(visible);
-		layoutState.sidebarVisible = visible;
-	};
+	chrome.actions.append(separators[0]!, settings, separators[1]!, trigger);
+	layout.registerTitlebarHover(settings, 'workbench.action.openSettings');
+	layout.registerTitlebarHover(trigger);
 	context.disposables.add(
-		registerProctorAction({
-			command: {
-				id: 'prctr.authenticated.toggleSidebar',
-				title: accountShellMessages.toggleSidebar
-			},
-			handler: toggleSidebar
+		addDisposableListener(settings, 'click', () => {
+			if (!context.shell.overlayHost.visible) select('settings');
 		})
 	);
-	context.disposables.add(addDisposableListener(sidebarToggle, 'click', toggleSidebar));
-	updateSidebarToggle();
+	context.disposables.add(
+		context.shell.overlayHost.onDidChangeVisibility((visible) => {
+			settings.disabled = visible;
+		})
+	);
 	const feedback = context.document.createElement('span');
 	feedback.className = 'prctr-account-shell';
 	feedback.dataset.region = 'feedback';
 	feedback.role = 'status';
-	context.shell.part('status').append(feedback);
+	context.shell.part('banner').append(feedback);
 	let disposed = false;
 	let signingOut = false;
 	const interaction = context.disposables.add(new Emitter<void>());
@@ -268,6 +238,7 @@ export function activateAccountShellNavigation(
 			restoreFocus: () => trigger.focus(),
 			onActionError: () => {
 				feedback.textContent = text('failed');
+				context.shell.setPartVisible('banner', true);
 			}
 		})
 	);
@@ -292,6 +263,7 @@ export function activateAccountShellNavigation(
 				signingOut = false;
 				trigger.disabled = false;
 				feedback.textContent = text('failed');
+				context.shell.setPartVisible('banner', true);
 			}
 		}
 	};
@@ -312,6 +284,7 @@ export function activateAccountShellNavigation(
 				})
 				.catch(() => {
 					if (!disposed) feedback.textContent = text('failed');
+					context.shell.setPartVisible('banner', true);
 				})
 				.finally(() => {
 					nativeMenuVisible = false;
@@ -328,7 +301,6 @@ export function activateAccountShellNavigation(
 			[
 				{ label: text('profile'), run: () => runAccountAction('profile') },
 				{ label: text('sessions'), run: () => runAccountAction('sessions') },
-				{ label: text('settings'), run: () => runAccountAction('settings') },
 				{
 					label: text('signOut'),
 					separatorBefore: true,
@@ -365,7 +337,9 @@ export function activateAccountShellNavigation(
 		onDidChange: changes.event,
 		select,
 		onDidRequestSettings: settingsRequests.event,
-		get settingsRequested() { return settingsRequested; },
+		get settingsRequested() {
+			return settingsRequested;
+		},
 		setProfilePhoto
 	};
 	context.setService(AUTHENTICATED_NAVIGATION_SERVICE, navigation);
@@ -381,11 +355,18 @@ export function activateAccountShellNavigation(
 			root.remove();
 			title.remove();
 			trigger.remove();
-			sidebarToggle.remove();
+			settings.remove();
+			for (const separator of separators) separator.remove();
 			waiting.remove();
 			feedback.remove();
 		}
 	});
-	select(binding.initialDestination === 'settings' ? 'account' : binding.initialDestination);
+	select(
+		binding.initialDestination === 'settings'
+			? exams
+				? 'activity'
+				: 'account'
+			: (binding.initialDestination ?? (exams ? 'activity' : 'account'))
+	);
 	if (binding.initialDestination === 'settings') select('settings');
 }

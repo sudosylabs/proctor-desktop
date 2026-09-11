@@ -1,0 +1,36 @@
+@layer workbench {
+	.prctr-authenticated-layout {
+		display: flex;
+		direction: ltr;
+		align-items: center;
+		gap: 2px;
+		flex: 0 0 auto;
+		-webkit-app-region: no-drag;
+	}
+	.prctr-authenticated-layout button {
+		display: grid;
+		place-items: center;
+		width: 24px;
+		height: 24px;
+		padding: 0;
+		border: 0;
+		border-radius: var(--prctr-shape-radius-medium);
+		background: transparent;
+		color: var(--prctr-theme-icon-foreground);
+		cursor: pointer;
+		-webkit-app-region: no-drag;
+	}
+	.prctr-authenticated-layout button:hover:not(:disabled) {
+		background: var(--prctr-theme-toolbar-hoverBackground);
+		outline: var(--prctr-theme-toolbar-hoverOutline, none) dashed 1px;
+		outline-offset: -1px;
+	}
+	.prctr-authenticated-layout button:focus-visible {
+		outline: 1px solid var(--prctr-color-border-focus);
+		outline-offset: -1px;
+	}
+	.prctr-authenticated-layout button:disabled {
+		opacity: 0.4;
+		cursor: default;
+	}
+}

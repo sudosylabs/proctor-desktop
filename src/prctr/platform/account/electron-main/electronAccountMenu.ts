@@ -52,6 +52,7 @@ export function createElectronAccountMenu(
 				);
 			let disposed = false;
 			for (const action of accountMenuActions) {
+				if (action === 'settings') continue; // Settings has its own titlebar action.
 				if (action === 'logout') template.push({ type: 'separator' });
 				template.push({
 					label: localization.format(messages[action]),

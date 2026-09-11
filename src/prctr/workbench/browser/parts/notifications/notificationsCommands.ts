@@ -21,7 +21,8 @@ const notificationFocused = new RawContextKey<boolean>('prctr.notifications.focu
 const notificationVisible = new RawContextKey<boolean>('prctr.notifications.visible', false);
 export function registerNotificationCommands(
 	notifications: WorkbenchNotifications,
-	context: IContextKeyService
+	context: IContextKeyService,
+	centerEnabled = true
 ): DisposableStore {
 	const store = new DisposableStore();
 	const available = notificationAvailable.bindTo(context),
@@ -74,7 +75,7 @@ export function registerNotificationCommands(
 			key: KeyMod.Alt | KeyCode.F2
 		}
 	] as const)
-		store.add(
+		if (centerEnabled || action.id !== 'prctr.notifications.show') store.add(
 			registerProctorAction({
 				command: {
 					id: action.id,

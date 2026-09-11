@@ -41,6 +41,7 @@ const definitions = {
 	'state.success': Codicon.check,
 	'state.warning': Codicon.warning,
 	'workbench.browser': Codicon.browser,
+	'workbench.configureLayout': Codicon.layout,
 	'workbench.panel': Codicon.layoutPanel,
 	'workbench.sidebarLeft': Codicon.layoutSidebarLeft,
 	'workbench.sidebarLeftHidden': Codicon.layoutSidebarLeftOff,

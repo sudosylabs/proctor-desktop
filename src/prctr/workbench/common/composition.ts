@@ -116,7 +116,7 @@ export function composeWorkbench(
 	if (
 		!layout.parts.includes('content') ||
 		!layout.parts.includes('titlebar') ||
-		!layout.parts.includes('status')
+		(windowKind !== 'authenticated' && !layout.parts.includes('status'))
 	)
 		throw new Error('Workbench layout is missing a required structural part');
 	if (

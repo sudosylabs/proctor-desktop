@@ -1,3 +1,4 @@
+import { AUTHENTICATED_LAYOUT_SERVICE, AuthenticatedLayout } from './authenticatedLayout.js';
 import type { AccountMenuClient } from '../../../../platform/account/common/accountMenu.js';
 import type { AccountClient } from '../../../../platform/account/common/accountProtocol.js';
 import { activateAccountShellNavigation, accountShellMessages } from './accountShellNavigation.js';
@@ -100,6 +101,9 @@ export function createAuthenticatedContribution(
 				throw new Error(
 					'Authenticated contribution requires its privileged window binding'
 				);
+			const layout = context.disposables.add(new AuthenticatedLayout(context));
+			context.setService(AUTHENTICATED_LAYOUT_SERVICE, layout);
+			layout.initializeControls();
 			if (accountManaged) {
 				activateAccountShellNavigation(context, client, descriptor);
 				return;
@@ -139,7 +143,7 @@ export function createAuthenticatedContribution(
 			let settingsRequested = false;
 			const select = (destination: string): void => {
 				if (destination === 'settings') { settingsRequested = true; settingsRequests.fire(); return; }
-				const safe = destinations.includes(destination) ? destination : 'account';
+				const safe = destinations.includes(destination) ? destination : destinations.find(value => value !== 'settings') ?? 'account';
 				current = safe;
 				for (const [id, value] of buttons) {
 					const selected = id === safe;
@@ -164,6 +168,7 @@ export function createAuthenticatedContribution(
 				} else status.textContent = context.localization.format(messages.waiting);
 				page.dataset.destination = safe;
 				page.hidden = safe === 'settings' || (safe === 'account' && accountManaged);
+				layout.setDestination(safe);
 				destinationChange.fire(safe);
 			};
 			const navigationService: AuthenticatedNavigationService = Object.freeze({

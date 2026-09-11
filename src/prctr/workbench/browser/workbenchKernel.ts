@@ -120,7 +120,8 @@ export function activateWorkbenchKernel(context: WorkbenchBootstrapContext): voi
 	context.disposables.add(actionRegistration);
 	const feedbackElement = context.document.createElement('span');
 	feedbackElement.className = 'prctr-workbench__keybinding-feedback';
-	context.shell.part('status').append(feedbackElement);
+	feedbackElement.role = 'status';
+	context.shell.part(context.composition.windowKind === 'authenticated' ? 'titlebar' : 'status').append(feedbackElement);
 	context.disposables.add({ dispose: () => feedbackElement.remove() });
 	const keybindingService = context.disposables.add(
 		new BrowserKeybindingService(

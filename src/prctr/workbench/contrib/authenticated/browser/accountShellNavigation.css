@@ -46,9 +46,7 @@
 		inline-size: 100%;
 		cursor: pointer;
 	}
-	.prctr-account-shell .prctr-account-shell__destination:hover,
-	.prctr-account-shell[data-region='trigger']:hover,
-	.prctr-account-shell[data-region='sidebar-toggle']:hover {
+	.prctr-account-shell .prctr-account-shell__destination:hover {
 		background: var(--prctr-color-interaction-hover);
 	}
 	.prctr-account-shell .prctr-account-shell__destination:hover {
@@ -56,8 +54,9 @@
 			var(--prctr-theme-contrastActiveBorder, transparent);
 		outline-offset: -1px;
 	}
-	.prctr-account-shell[data-region='trigger']:hover,
-	.prctr-account-shell[data-region='sidebar-toggle']:hover {
+	.prctr-account-shell[data-region='trigger']:hover:not(:disabled),
+	.prctr-account-shell[data-region='settings-trigger']:hover:not(:disabled) {
+		background: var(--prctr-theme-toolbar-hoverBackground);
 		outline: var(--prctr-shape-stroke-default) dashed
 			var(--prctr-theme-toolbar-hoverOutline, transparent);
 		outline-offset: -1px;
@@ -67,7 +66,7 @@
 	}
 	.prctr-account-shell .prctr-account-shell__destination:focus-visible,
 	.prctr-account-shell[data-region='trigger']:focus-visible,
-	.prctr-account-shell[data-region='sidebar-toggle']:focus-visible {
+	.prctr-account-shell[data-region='settings-trigger']:focus-visible {
 		outline: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-focus);
 		outline-offset: -1px;
 	}
@@ -124,14 +123,24 @@
 		flex: 0 1 auto;
 		-webkit-app-region: no-drag;
 	}
-	.prctr-account-shell[data-region='sidebar-toggle'] {
+	.prctr-account-shell[data-region='titlebar-separator'] {
+		inline-size: 1px;
+		block-size: 16px;
+		margin-inline: 4px;
+		flex: 0 0 1px;
+		background: var(
+			--prctr-theme-titleBar-border,
+			var(--prctr-theme-widget-border, var(--prctr-color-border-default))
+		);
+	}
+	.prctr-account-shell[data-region='settings-trigger'] {
 		display: grid;
 		place-items: center;
 		inline-size: 24px;
 		block-size: 24px;
 		flex: 0 0 24px;
 		padding: 0;
-		margin-inline-end: 4px;
+		margin-inline-end: 0;
 		border: 0;
 		border-radius: var(--prctr-shape-radius-medium);
 		background: transparent;
@@ -180,27 +189,15 @@
 			display: none;
 		}
 	}
+	.prctr-account-shell[data-region='settings-trigger']:disabled {
+		opacity: 0.4;
+		cursor: default;
+	}
 	@media (forced-colors: active) {
+		.prctr-account-shell[data-region='titlebar-separator'] {
+			background: GrayText;
+		}
 		.prctr-account-shell .prctr-account-shell__destination[aria-current='page'],
-		.prctr-account-shell[data-region='sidebar-toggle'] {
-			display: grid;
-			place-items: center;
-			inline-size: 24px;
-			block-size: 24px;
-			flex: 0 0 24px;
-			padding: 0;
-			margin-inline-end: 4px;
-			border: 0;
-			border-radius: var(--prctr-shape-radius-medium);
-			background: transparent;
-			color: var(--prctr-color-text-secondary);
-			cursor: pointer;
-			-webkit-app-region: no-drag;
-		}
-		.prctr-account-shell[data-region='trigger'] .prctr-account-shell__name {
-			font-size: var(--prctr-typography-label-small-size);
-			line-height: var(--prctr-typography-label-small-lineHeight);
-		}
 		.prctr-account-shell[data-region='trigger'][aria-expanded='true'] {
 			outline: 1px solid Highlight;
 			outline-offset: -1px;

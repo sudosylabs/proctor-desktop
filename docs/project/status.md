@@ -2,6 +2,13 @@
 
 ## Accepted foundation
 
+- AuthenticatedWindow uses a movable Primary Side Bar, one central content region,
+  and an optional page-owned Secondary Side Bar. The titlebar provides visibility
+  controls and the source Customize Layout picker. Its status bar and notification
+  center entrypoint are omitted; CandidateWindow retains its separate layout.
+  See [workbench layout](../architecture/workbench.md) for ownership, persistence,
+  keyboard behavior, and fixed-size regions.
+
 - In-app notifications now have a shared model/service, retained center, toast
   scheduling, prompts, source filtering, progress and accessible reading. The
   [workbench architecture](../architecture/workbench.md) owns composition and

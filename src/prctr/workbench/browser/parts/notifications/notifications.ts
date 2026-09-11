@@ -35,7 +35,8 @@ export const WORKBENCH_NOTIFICATION_SERVICE = 'prctr.workbench.notifications';
 export const WORKBENCH_NOTIFICATION_PROGRESS_SERVICE = 'prctr.workbench.notificationProgress';
 export interface NotificationsOptions {
 	readonly host: HTMLElement;
-	readonly indicatorHost: HTMLElement;
+	readonly indicatorHost?: HTMLElement;
+	readonly centerEnabled?: boolean;
 	readonly effects: Omit<NotificationEffects, 'onActionError'>;
 	readonly geometry: () => NotificationGeometry;
 	readonly preferences?: NotificationPreferenceStore;
@@ -51,7 +52,7 @@ export class WorkbenchNotifications extends Disposable {
 	readonly toasts: NotificationsToasts;
 	readonly reader: NotificationAccessibleView;
 	readonly #menu: NotificationMenu;
-	readonly #status: NotificationsStatus;
+	readonly #status: NotificationsStatus | undefined;
 	readonly #effects: NotificationEffects;
 	constructor(private readonly options: NotificationsOptions) {
 		super();
@@ -117,7 +118,7 @@ export class WorkbenchNotifications extends Disposable {
 			)
 		);
 		this._register(new NotificationsAlerts(this.element, this.service.model));
-		this.#status = this._register(
+		this.#status = options.indicatorHost === undefined ? undefined : this._register(
 			new NotificationsStatus(
 				options.indicatorHost,
 				this.service.model,
@@ -142,7 +143,7 @@ export class WorkbenchNotifications extends Disposable {
 					this.#menu.hide(false);
 				}
 				this.element.inert = !allowed;
-				this.#status.element.disabled = !allowed;
+				if (this.#status) this.#status.element.disabled = !allowed;
 				this.toasts.setBlocked(!allowed || this.center.visible);
 			})
 		);
@@ -191,12 +192,12 @@ export class WorkbenchNotifications extends Disposable {
 		this._register({ dispose: () => presentationObserver.disconnect() });
 		this._register(this.preferences.onDidChange(() => this.layout()));
 		this.element.inert = !this.#effects.canInteract();
-		this.#status.element.disabled = !this.#effects.canInteract();
+		if (this.#status) this.#status.element.disabled = !this.#effects.canInteract();
 		this.toasts.setBlocked(!this.#effects.canInteract());
 		this.layout();
 	}
 	private updateStatus(): void {
-		this.#status.update(this.center.visible, this.toasts.visible);
+		this.#status?.update(this.center.visible, this.toasts.visible);
 	}
 	get canInteract(): boolean {
 		return this.#effects.canInteract();
@@ -212,6 +213,7 @@ export class WorkbenchNotifications extends Disposable {
 		else this.showCenter();
 	}
 	showCenter(): void {
+		if (this.options.centerEnabled === false) return;
 		if (!this.#effects.canInteract()) return;
 		this.toasts.hide();
 		this.center.show();

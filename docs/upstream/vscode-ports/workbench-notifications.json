@@ -1639,7 +1639,7 @@
         "vscode-mit"
       ],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
-      "localSha256": "008d87b4f04a43858a0d712e1c5abbf44f3a828246d7d2c740fe57ee49692df8",
+      "localSha256": "7703eb55ddf6666e771afedb139b7b194e047c05644fe66181a156385b7294a1",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
