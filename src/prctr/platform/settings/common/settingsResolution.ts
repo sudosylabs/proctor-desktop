@@ -1,5 +1,6 @@
 import type { ParsedSettingsDocument } from './settingsDocument.js';
 import { activeSettingIds, settingsRegistry } from './settingsRegistry.js';
+import { settingDefault } from './settingsDefaults.js';
 import type { EffectiveSettingId, SettingValueMap, SettingWindow } from './settingsManifest.js';
 import {
 	Configuration,
@@ -126,7 +127,7 @@ function requestedConfiguration(
 	const raw: Record<string, unknown> = Object.create(null);
 	for (const id of activeSettingIds()) {
 		const declaration = settingsRegistry.declaration(id)!;
-		defaults.setValue(id, declaration.default);
+		defaults.setValue(id, settingDefault(declaration));
 		const value = settingsRegistry.normalize(
 			id,
 			declaration.storage === 'portableUser'

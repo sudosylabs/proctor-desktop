@@ -6,7 +6,7 @@ import {
 } from '../../../../platform/windows/browser/productWindowChrome.js';
 import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
 import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import { MenuControl } from '../../../../base/browser/ui/menu/menu.js';
+import { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Emitter } from '../../../../base/common/event.js';
 import { defineMessage } from '../../../../base/common/localization.js';
@@ -136,9 +136,12 @@ export function activateAccountShellNavigation(
 	let current = 'account';
 	let accountSection: 'profile' | 'sessions' = 'profile';
 	let exams: HTMLButtonElement | undefined;
+	const settingsRequests = context.disposables.add(new Emitter<void>());
+	let settingsRequested = false;
 	const select = (destination: string): void => {
+		if (destination === 'settings') { settingsRequested = true; settingsRequests.fire(); return; }
 		current =
-			destination === 'settings' || (destination === 'activity' && exams)
+			destination === 'activity' && exams
 				? destination
 				: 'account';
 		exams?.setAttribute('aria-current', current === 'activity' ? 'page' : 'false');
@@ -361,6 +364,8 @@ export function activateAccountShellNavigation(
 		accountMenuNavigation: true,
 		onDidChange: changes.event,
 		select,
+		onDidRequestSettings: settingsRequests.event,
+		get settingsRequested() { return settingsRequested; },
 		setProfilePhoto
 	};
 	context.setService(AUTHENTICATED_NAVIGATION_SERVICE, navigation);
@@ -381,5 +386,6 @@ export function activateAccountShellNavigation(
 			feedback.remove();
 		}
 	});
-	select(binding.initialDestination);
+	select(binding.initialDestination === 'settings' ? 'account' : binding.initialDestination);
+	if (binding.initialDestination === 'settings') select('settings');
 }

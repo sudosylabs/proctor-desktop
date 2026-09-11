@@ -8,5 +8,7 @@ export interface AuthenticatedNavigationService {
 	readonly accountMenuNavigation?: boolean;
 	setProfilePhoto?(dataUrl: string): void;
 	readonly onDidChange: Event<string>;
+	readonly onDidRequestSettings: Event<void>;
+	readonly settingsRequested: boolean;
 	select(destination: string): void;
 }

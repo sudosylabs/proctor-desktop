@@ -1,11 +1,47 @@
 {
   "generatedBy": "settings.registry",
   "registryVersion": 1,
-  "registryFingerprint": "fnv1a64:8f3a1142427b8b11",
+  "registryFingerprint": "fnv1a64:cca72c3ff616b688",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": true,
   "properties": {
+    "workbench.hover.delay": {
+      "type": "number",
+      "default": 500,
+      "minimum": 0,
+      "title": "Hover delay",
+      "description": "Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change."
+    },
+    "workbench.hover.reducedDelay": {
+      "type": "number",
+      "default": 500,
+      "minimum": 0,
+      "title": "Reduced hover delay",
+      "description": "Controls the reduced delay in milliseconds used for showing hovers in specific contexts where faster feedback is beneficial."
+    },
+    "editor.semanticTokenColorCustomizations": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "prctr-schema://themes/semantic-token-customizations"
+        }
+      ],
+      "default": {},
+      "title": "Semantic token color customizations",
+      "description": "Overrides semantic token colors and styles from the selected theme."
+    },
+    "editor.tokenColorCustomizations": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "prctr-schema://themes/token-customizations"
+        }
+      ],
+      "default": {},
+      "title": "Token color customizations",
+      "description": "Overrides editor syntax colors and font style from the selected theme."
+    },
     "workbench.colorTheme": {
       "type": "string",
       "default": "GitHub Dark Default",
@@ -33,6 +69,20 @@
       "patternProperties": {
         "^[A-Za-z][A-Za-z0-9]*(\\.[A-Za-z][A-Za-z0-9]*)*$": {
           "type": "string",
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "color-hex",
+              "defaultSnippets": [
+                {
+                  "body": "${1:#ff0000}"
+                }
+              ]
+            },
+            {
+              "const": "default"
+            }
+          ],
           "pattern": "^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|default)$"
         },
         "^\\[[^\\]]+\\](\\s*\\[[^\\]]+\\])*$": {
@@ -41,6 +91,20 @@
           "patternProperties": {
             "^[A-Za-z][A-Za-z0-9]*(\\.[A-Za-z][A-Za-z0-9]*)*$": {
               "type": "string",
+              "oneOf": [
+                {
+                  "type": "string",
+                  "format": "color-hex",
+                  "defaultSnippets": [
+                    {
+                      "body": "${1:#ff0000}"
+                    }
+                  ]
+                },
+                {
+                  "const": "default"
+                }
+              ],
               "pattern": "^(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{4}|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|default)$"
             }
           }

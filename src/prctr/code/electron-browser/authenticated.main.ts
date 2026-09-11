@@ -1,3 +1,5 @@
+import { createElectronSettingsEditorEnvironment } from './settingsEditorEnvironment.js';
+import type { SettingsNativeClient } from '../../platform/settings/common/settingsNativeHost.js';
 import { createAccountContribution } from '../../workbench/contrib/account/browser/accountContribution.js';
 import type { AccountClient } from '../../platform/account/common/accountProtocol.js';
 import type { AuthenticatedWindowDescriptor } from '../../platform/windows/common/windowProtocol.js';
@@ -17,6 +19,7 @@ interface AuthenticatedPreloadApi extends AuthenticatedRendererClient {
 	bootstrap(): Promise<AuthenticatedWindowDescriptor>;
 	readonly windowChrome: ProductWindowChromeClient;
 	readonly settings: SettingsRendererClient;
+	readonly settingsNative: SettingsNativeClient;
 	readonly account: AccountClient;
 }
 const api = (globalThis as unknown as { readonly proctorAuthenticated?: AuthenticatedPreloadApi })
@@ -27,7 +30,7 @@ const authenticatedWindow = await bootstrapWorkbench(document, authenticatedComp
 	createDesktopWorkbenchContribution('authenticated', () => api.bootstrap(), api.windowChrome),
 	createAuthenticatedContribution(api, true),
 	createAccountContribution(api.account),
-	createSettingsContribution(api.settings)
+	createSettingsContribution(api.settings, createElectronSettingsEditorEnvironment(api.settingsNative))
 ]);
 globalThis.addEventListener('pagehide', () => authenticatedWindow.disposables.dispose(), {
 	once: true

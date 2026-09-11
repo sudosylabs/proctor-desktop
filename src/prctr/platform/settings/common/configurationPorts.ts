@@ -1,4 +1,5 @@
 import type { VSBuffer } from '../../../base/common/buffer.js';
+import type { Edit } from '../../../base/common/jsonFormatter.js';
 import type { Event } from '../../../base/common/event.js';
 import type { IDisposable } from '../../../base/common/lifecycle.js';
 import type { URI } from '../../../base/common/uri.js';
@@ -14,6 +15,7 @@ export interface IFileService {
 	watch(resource: URI): IDisposable;
 	readFile(resource: URI): Promise<{ readonly value: VSBuffer }>;
 	writeFile(resource: URI, value: VSBuffer): Promise<void>;
+	writeEdits?(resource: URI, source: string, edits: readonly Edit[]): Promise<void>;
 }
 
 export enum FileOperation {

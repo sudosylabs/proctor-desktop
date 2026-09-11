@@ -159,6 +159,9 @@
 	}
 	.prctr-account tbody tr:hover {
 		background: var(--prctr-color-interaction-hover);
+		outline: var(--prctr-shape-stroke-default) dashed
+			var(--prctr-theme-contrastActiveBorder, transparent);
+		outline-offset: -1px;
 	}
 	.prctr-account th {
 		text-align: start;

@@ -1,0 +1,11 @@
+@layer contributions {
+	.prctr-settings-modal-status {
+		box-sizing: border-box;
+		padding: var(--prctr-spacing-content-small) var(--prctr-spacing-content-medium);
+		border-block-start: 1px solid var(--prctr-theme-editorWidget-border, var(--prctr-theme-contrastBorder, transparent));
+		color: var(--prctr-theme-descriptionForeground);
+		font-size: var(--prctr-typography-body-size);
+		line-height: var(--prctr-typography-body-lineHeight);
+		overflow-wrap: anywhere;
+	}
+}

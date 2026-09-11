@@ -51,6 +51,17 @@
 	.prctr-account-shell[data-region='sidebar-toggle']:hover {
 		background: var(--prctr-color-interaction-hover);
 	}
+	.prctr-account-shell .prctr-account-shell__destination:hover {
+		outline: var(--prctr-shape-stroke-default) dashed
+			var(--prctr-theme-contrastActiveBorder, transparent);
+		outline-offset: -1px;
+	}
+	.prctr-account-shell[data-region='trigger']:hover,
+	.prctr-account-shell[data-region='sidebar-toggle']:hover {
+		outline: var(--prctr-shape-stroke-default) dashed
+			var(--prctr-theme-toolbar-hoverOutline, transparent);
+		outline-offset: -1px;
+	}
 	.prctr-account-shell .prctr-account-shell__destination[aria-current='page'] {
 		background: var(--prctr-color-interaction-selected);
 	}

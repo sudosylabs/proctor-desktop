@@ -9,12 +9,14 @@ import { NullPolicyService } from '../../policy/common/policy.js';
 import { NullLogService } from './configurationPorts.js';
 import {
 	SettingsDraftStorage,
+	type SettingsWorkingDocument,
 	SettingsResourceFileService,
 	userSettingsResource
 } from './settingsResource.js';
 import { registerSettingsConfiguration } from './settingsConfigurationRegistry.js';
 import { Queue } from '../../../base/common/async.js';
 import { Disposable, DisposableStore } from '../../../base/common/lifecycle.js';
+import type { Edit } from '../../../base/common/jsonFormatter.js';
 
 export interface SettingsMergeConflict {
 	readonly path: readonly string[];
@@ -28,32 +30,37 @@ export interface SettingsMergeResult {
 }
 
 export class SettingsDraft extends Disposable {
-	readonly baseSource: string;
-	readonly baseRevision: string;
-	#source: string;
+	private base: { readonly source: string; readonly revision: string };
+	readonly #document: SettingsWorkingDocument;
 	#sourceVersion = 0;
 	readonly #edits = this._register(new Queue<void>());
 	#disposed = false;
 
-	constructor(source: string, revision: string) {
+	constructor(source: string, revision: string, document?: SettingsWorkingDocument, private readonly isReadonly: () => boolean = () => false) {
 		super();
-		this.baseSource = source;
-		this.baseRevision = revision;
-		this.#source = source;
+		this.base = { source, revision };
+		this.#document = document ?? this._register(new SettingsDraftStorage(source));
+		if (this.#document.value !== source) throw new Error('Settings document does not match its base source');
+		this._register(this.#document.onDidChange(() => this.#sourceVersion++));
 	}
 
 	get source(): string {
-		return this.#source;
+		return this.#document.value;
+	}
+	get baseSource(): string { return this.base.source; }
+	get baseRevision(): string { return this.base.revision; }
+	/** Advance only the acknowledged base; edits made while saving remain in the same working document. */
+	acknowledge(source: string, revision: string): void {
+		if (this.#disposed) throw new Error('Settings draft is disposed');
+		this.base = { source, revision };
 	}
 	get validation() {
-		return parseSettingsDocument(this.#source);
+		return parseSettingsDocument(this.#document.value);
 	}
 
 	replaceSource(source: string): void {
 		if (this.#disposed) throw new Error('Settings draft is disposed');
-		if (this.#source === source) return;
-		this.#source = source;
-		this.#sourceVersion++;
+		this.#document.replace(source);
 	}
 
 	async set(id: string, value: unknown, language?: string): Promise<void> {
@@ -66,12 +73,15 @@ export class SettingsDraft extends Disposable {
 			throw new Error(`Invalid value for ${id}`);
 		return this.#edits.queue(async () => {
 			if (this.#disposed) throw new Error('Settings draft is disposed');
+			if (this.isReadonly()) throw new Error('Settings draft is read-only');
 			registerSettingsConfiguration();
-			const source = this.#source;
+			const source = this.#document.value;
 			const sourceVersion = this.#sourceVersion;
 			const disposables = new DisposableStore();
 			try {
 				const storage = disposables.add(new SettingsDraftStorage(source));
+				const transactions: (readonly Edit[])[] = [];
+				disposables.add(storage.onDidApplyEdits(edits => transactions.push(edits)));
 				const files = disposables.add(new SettingsResourceFileService(storage));
 				const service = disposables.add(
 					new ConfigurationService(
@@ -88,9 +98,10 @@ export class SettingsDraft extends Disposable {
 					language === undefined ? {} : { overrideIdentifiers: [language.toLowerCase()] }
 				);
 				if (this.#disposed) throw new Error('Settings draft is disposed');
+				if (this.isReadonly()) throw new Error('Settings draft is read-only');
 				if (this.#sourceVersion !== sourceVersion)
 					throw new Error('Settings draft changed during the edit');
-				this.replaceSource(storage.value);
+				for (const edits of transactions) this.#document.applyEdits(edits);
 			} finally {
 				disposables.dispose();
 			}
@@ -98,7 +109,7 @@ export class SettingsDraft extends Disposable {
 	}
 
 	mergeLatest(latestSource: string): SettingsMergeResult {
-		return mergeSettingsSources(this.baseSource, this.#source, latestSource);
+		return mergeSettingsSources(this.baseSource, this.#document.value, latestSource);
 	}
 
 	override dispose(): void {

@@ -15,6 +15,11 @@ revision, disposition, dependencies, divergence, and evidence):
 - [`codicons-semantic-icons`](./codicons-semantic-icons.json) — complete pinned Codicon assets behind Proctor semantic icon identifiers.
 - [`desktop-authorization`](./desktop-authorization.json) — hosted browser callback lifecycle, native key custody, and privileged Session handoff.
 - [`editor-core`](./editor-core.json) — positions, ranges, selections, piece-tree text, edits, EOL, word boundaries, and search.
+- [`settings-file-icons`](./settings-file-icons.json) — complete bundled Seti font and file associations through the source file-icon theme loader, without extension loading.
+- [`theme-size-registry`](./theme-size-registry.json) — complete Modern UI size registry, default typography, spacing and corner-radius variables.
+- [`editor-text-edits`](./editor-text-edits.json) — complete text/string/array edit composition, inversion, rebasing, ranges and position-offset transformations for the Monaco settings working copy.
+- [`json-language-server`](./json-language-server.json) — complete JSON/JSONC server and browser-worker startup, validation, completion, formatting and structural language providers with bounded packaged schema/localization adapters.
+- [`editor-token-themes`](./editor-token-themes.json) — complete token-theme parser and matching trie, encoded token metadata, TextMate scope matching and plist parsing with upstream token-theme regression tests.
 - [`color-theme-engine`](./color-theme-engine.json) — bundled color-theme loading, registered defaults, scoped settings overrides, and Modern UI color roles.
 - [`electron-window-skeleton`](./electron-window-skeleton.json) — trusted product windows, immutable descriptors, native integrated chrome, preloads, and secure transitions.
 - [`integrated-browser-client`](./integrated-browser-client.json) — policy-enforced Candidate browser and minimized ordered activity.

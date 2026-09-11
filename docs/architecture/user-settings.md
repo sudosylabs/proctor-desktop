@@ -40,6 +40,12 @@ drift through duplicated algorithms. Remote schemas and workspace content cannot
 register behavior. Unknown keys are preserved but inactive; known prohibited
 keys have no effective value.
 
+Platform-specific defaults are explicit data in the same immutable declaration
+and fingerprint. The configuration model, effective-value resolution and JSON
+language schema select the current platform's default from that data; explicit
+user values remain portable. Generators retain the complete platform map so
+building on one OS cannot silently change another OS's defaults.
+
 Keep credentials, tokens, keys, arbitrary paths, commands, code, visual
 injection, extension identifiers, formatters, file associations, autosave
 semantics, execution/terminal configuration, browser/network/proxy policy,
@@ -201,10 +207,35 @@ authenticated transport, and protected cache in Electron main. Put the settings
 destination under `src/prctr/workbench/contrib/settings/` and select it through
 the authenticated manifest and `authenticated.main.ts` composition root.
 
-The current Settings destination has structured controls and a shared JSONC
-textarea. The Monaco text editor and VS Code graphical Settings editor are not
-part of this configuration-service port; their UI and text-model dependency
-graphs must be admitted before claiming that editor experience.
+The accepted Settings presentation uses the VS Code Modern UI modal editor host,
+graphical Settings editor, and Monaco JSONC editor inside AuthenticatedWindow.
+Graphical/JSON switching preserves the modal group and one working-copy draft.
+The modal retains upstream resize, maximize, focus, command and close mechanics;
+this does not make the surrounding workbench sections resizable. Dirty closure
+uses Save, Discard and Cancel, while authentication teardown still revokes the
+editing owner immediately. Structured edits and JSON editing share undo history
+through precise text edits rather than replacing the entire model on each change.
+
+Transfer complete upstream files and their dependency, registration, test, asset
+and Modern UI closure before making documented product adaptations. The existing
+server persistence, static registry, explicit Save and frozen Candidate boundary
+remain the adapter seams. Extension installation, remote/AI settings search,
+workspace/profile settings targets, arbitrary schema/file access and detached
+windows are excluded product integrations, not reasons to simplify admitted
+editor behavior. Packaged JSON language services and syntax/semantic token theme
+machinery are part of the editor admission. Existing ports require explicit
+compatibility verification rather than assuming their interfaces are complete.
+
+The text-edit foundation now preserves upstream composition, inversion, rebasing
+and coordinate transformations with the corresponding seeded regression suites.
+The JSON language server and browser-worker foundation retains upstream provider,
+cache, cancellation and startup behavior. Its schema reader accepts only exact
+packaged resources; worker localization receives bounded inline packaged messages
+instead of fetching an extension-selected URI. The Node transport is test-only.
+The production Settings surface still uses structured controls and a JSONC
+textarea until the modal, graphical editor and browser-editor integration passes
+its full behavioral and visual verification. Foundation source alone does not
+establish delivery of the editor experience.
 
 Candidate consumers depend on an Attempt Configuration projection contract,
 not the User Settings service. Editor, design system, workbench, terminal, and

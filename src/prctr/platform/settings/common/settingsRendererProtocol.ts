@@ -1,4 +1,4 @@
-import type { IColorCustomizations } from '../../theme/common/colorThemeData.js';
+import type { IColorCustomizations } from '../../theme/common/colorCustomizations.js';
 import { normalizeColorCustomizations } from '../../theme/common/colorCustomizations.js';
 import { BUNDLED_THEMES } from '../../theme/common/bundledThemes.js';
 import { SETTINGS_DOCUMENT_LIMITS } from './settingsDocument.js';

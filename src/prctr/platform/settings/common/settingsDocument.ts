@@ -1,6 +1,7 @@
 import { getNodeValue, parseTree, type Node, type ParseError } from '../../../base/common/json.js';
 import { getParseErrorMessage } from '../../../base/common/jsonErrorMessages.js';
 import { settingsRegistry } from './settingsRegistry.js';
+import { findJsonDepthOverflow } from '../../../base/common/jsonBounds.js';
 
 export const SETTINGS_DOCUMENT_LIMITS = Object.freeze({
 	maxBytes: 128 * 1024,
@@ -60,6 +61,11 @@ export function parseSettingsDocument(source: string): ParsedSettingsDocument {
 		return freezeResult(source, diagnostics, undefined, new Map(), new Map());
 	}
 	const syntaxErrors: ParseError[] = [];
+	const depthOverflow = findJsonDepthOverflow(source, SETTINGS_DOCUMENT_LIMITS.maxDepth);
+	if (depthOverflow !== undefined) {
+		diagnostics.push({ code: 'too-deep', offset: depthOverflow, length: 1, message: `Settings nesting exceeds ${SETTINGS_DOCUMENT_LIMITS.maxDepth} levels.` });
+		return freezeResult(source, diagnostics, undefined, new Map(), new Map());
+	}
 	const node = parseTree(source, syntaxErrors, {
 		allowTrailingComma: true,
 		allowEmptyContent: false

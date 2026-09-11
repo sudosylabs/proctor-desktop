@@ -22,7 +22,9 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "Canonical Microsoft MIT notice for transferred source and owner tests.",
-      "licenseRefs": ["vscode-mit"]
+      "licenseRefs": [
+        "vscode-mit"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/json.ts",
@@ -30,10 +32,15 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the complete current scanner, tolerant parser, visitor, syntax tree, location, navigation, and value behavior.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/base/common/json.ts",
       "localSha256": "1d7169002c387f8f0eda460b0ace70f5dcfc301cfe3bf0dedec890c1691b5ea9",
-      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/jsonEdit.ts",
@@ -41,10 +48,15 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve complete syntax-aware property insertion, replacement, removal, and formatting edits.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/base/common/jsonEdit.ts",
       "localSha256": "65b7f032e0e8a5ef2bf6f196bb57cd8c62e32e20c5467a45dc17a4d334b7dd46",
-      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/jsonFormatter.ts",
@@ -52,10 +64,15 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve complete JSONC document and range formatting behavior.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/base/common/jsonFormatter.ts",
       "localSha256": "accca419003d3997c564d3633328c04ca9e2557d7cd82529579fcfc45b623132",
-      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/jsonc.ts",
@@ -63,10 +80,15 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve the compatibility comment and trailing-comma stripping parser.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/base/common/jsonc.ts",
       "localSha256": "a3592fcf04c75f17661ae44398c601c3fd83bd1289a05fb795105b4422a38c0a",
-      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/jsonErrorMessages.ts",
@@ -74,7 +96,9 @@
       "category": "localization",
       "disposition": "adapted",
       "rationale": "Preserve parse error messages through the admitted VS Code NLS compatibility seam.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/base/common/jsonErrorMessages.ts",
       "localSha256": "b42147b7881172799e7989a8ff0bbca132b6ef029b5769c5dd415adac2c75dfb",
       "mechanicalTransforms": [
@@ -90,7 +114,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Run the complete parser and scanner owner suite through the admitted Node test adapter.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "test/base/common/upstream/json.test.ts",
       "localSha256": "a517e84ce82fb146ae70a6394cbbe9c78f28c000d8aa0d605499cf55253b3446",
       "mechanicalTransforms": [
@@ -106,7 +132,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Run the complete JSONC compatibility parser owner suite.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "test/base/common/upstream/jsonParse.test.ts",
       "localSha256": "f50cab7354641d51986c0ecd5f2f2126a87ebc7f4ccc485a57016c9577a0107e",
       "mechanicalTransforms": [
@@ -122,7 +150,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Run the complete syntax-aware JSONC editing owner suite.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "test/base/common/upstream/jsonEdit.test.ts",
       "localSha256": "a8777b771b64da0aead63f056029de774b4b4bdb3208de4990980e36a8c61970",
       "mechanicalTransforms": [
@@ -138,7 +168,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Run the complete JSONC formatter owner suite.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "test/base/common/upstream/jsonFormatter.test.ts",
       "localSha256": "018384ad2cdcdfa3c08a53e9a5a27dce66dc3c74c54d3fc934086d6ad1f04f0b",
       "mechanicalTransforms": [
@@ -154,13 +186,17 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "The current SettingsDraft caller uses the transferred platform ConfigurationService and its complete ConfigurationEditing implementation. The workbench JSONEditingService requires a resolved editor text model and text-file service; it is not represented by a custom replacement or claimed as transferred.",
-      "licenseRefs": ["vscode-mit"]
+      "licenseRefs": [
+        "vscode-mit"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/assert.ts",
       "upstreamBlob": "b8f47aefd66d49d9a343348448a0e83bde57a183",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/assert.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -169,7 +205,9 @@
       "upstreamPath": "src/vs/base/common/collections.ts",
       "upstreamBlob": "de1b28914548a9e77d5abbc40ebc2de275fc34c9",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/collections.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -178,7 +216,9 @@
       "upstreamPath": "src/vs/base/common/event.ts",
       "upstreamBlob": "cf5fd39b7389b12890a85fd2159e35326d5b7a60",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/event.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -187,7 +227,9 @@
       "upstreamPath": "src/vs/base/common/types.ts",
       "upstreamBlob": "154d8199690a162dfc37895125348e5a64b7d848",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/types.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -196,7 +238,9 @@
       "upstreamPath": "src/vs/base/common/uri.ts",
       "upstreamBlob": "d148dc10f26bf8a19615e052df3dde23c481099c",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/uri.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -205,7 +249,9 @@
       "upstreamPath": "src/vs/platform/instantiation/common/instantiation.ts",
       "upstreamBlob": "b879acb0ee8da5a824321bd1b9925219fe07af94",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -214,7 +260,9 @@
       "upstreamPath": "src/vs/base/common/arrays.ts",
       "upstreamBlob": "9e12edbab2a0ce7c0ee88f2d35e11b9896272072",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/arrays.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -223,7 +271,9 @@
       "upstreamPath": "src/vs/base/common/lifecycle.ts",
       "upstreamBlob": "a75cbb1cce3099e07bff3cc9c751d634ae30dfdd",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/lifecycle.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -232,7 +282,9 @@
       "upstreamPath": "src/vs/base/common/map.ts",
       "upstreamBlob": "1bbb7acf94ec7cd1bec2f12a7a4d8e7f6d0fea61",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/map.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -241,7 +293,9 @@
       "upstreamPath": "src/vs/base/common/resources.ts",
       "upstreamBlob": "089ee62de037ea92f0724171de53a16ecb505000",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/resources.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -250,7 +304,9 @@
       "upstreamPath": "src/vs/platform/files/common/files.ts",
       "upstreamBlob": "4181a930379caa56bcdd02202162685decddbd22",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/settings/common/configurationPorts.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -259,7 +315,9 @@
       "upstreamPath": "src/vs/platform/log/common/log.ts",
       "upstreamBlob": "27e542896df074a88f1ee1f587b5695b12e2ca7e",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/settings/common/configurationPorts.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -268,7 +326,9 @@
       "upstreamPath": "src/vs/platform/registry/common/platform.ts",
       "upstreamBlob": "9beaaf7c25cbb340793fdf209d279abcfb2fa025",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/registry/common/platform.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -277,7 +337,9 @@
       "upstreamPath": "src/vs/base/common/jsonSchema.ts",
       "upstreamBlob": "3a674ccdd0f0b23365e07d05ba9f993da1450081",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/jsonSchema.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -286,7 +348,9 @@
       "upstreamPath": "src/vs/nls.ts",
       "upstreamBlob": "8383ae24d96d4d9361921b89bdf48519d13d4260",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/vscodeNls.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -295,7 +359,9 @@
       "upstreamPath": "src/vs/platform/product/common/product.ts",
       "upstreamBlob": "36d8d370f6936905714587b3a88900ad08f5f855",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "excluded",
       "rationale": "VS Code product metadata is not Proctor authority. Only the chat-extension unification allowlist is consumed here, and Proctor supplies an empty set."
     },
@@ -303,7 +369,9 @@
       "upstreamPath": "src/vs/base/common/errors.ts",
       "upstreamBlob": "35bb755608e5e9b2983a5d6de61364f8da0573ea",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/errors.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -312,7 +380,9 @@
       "upstreamPath": "src/vs/base/common/async.ts",
       "upstreamBlob": "510fc4a54049fda2dbd9454c2e5cfa3778be2fe0",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/async.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -321,7 +391,9 @@
       "upstreamPath": "src/vs/base/common/buffer.ts",
       "upstreamBlob": "b105bdfeb86762f2b53f66afa92821a123d8424f",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/buffer.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -330,7 +402,9 @@
       "upstreamPath": "src/vs/base/common/platform.ts",
       "upstreamBlob": "d2072dea83c8b4f3e25a145a763f6482a6201bfa",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/platform.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -339,7 +413,9 @@
       "upstreamPath": "src/vs/base/common/iterator.ts",
       "upstreamBlob": "1e8c84d9af9e08d9e380ad82fb4fc7f5df6fd493",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/iterator.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -348,7 +424,9 @@
       "upstreamPath": "src/vs/base/test/common/utils.ts",
       "upstreamBlob": "d07c2a595a619b82e32b820f72ba4f65cacc3d35",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "test/base/common/upstream/upstreamTestUtils.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -357,7 +435,9 @@
       "upstreamPath": "src/vs/base/common/path.ts",
       "upstreamBlob": "c61fa5831cfe837e4934298c01b594567dbeecf8",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/path.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -366,7 +446,9 @@
       "upstreamPath": "src/vs/platform/workspace/test/common/testWorkspace.ts",
       "upstreamBlob": "9c1be0e54d28e419487e3671f01f1cff5cff284d",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "test/platform/settings/common/upstream/workspaceFixture.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -375,7 +457,9 @@
       "upstreamPath": "src/vs/base/common/charCode.ts",
       "upstreamBlob": "de0a25badecd2a7694c303feddcfa555f8a46dab",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/charCode.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -384,7 +468,9 @@
       "upstreamPath": "src/vs/base/common/strings.ts",
       "upstreamBlob": "1c50375d05ea7701229c8de87ae8281f750cb4af",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/strings.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -393,7 +479,9 @@
       "upstreamPath": "src/vs/base/common/network.ts",
       "upstreamBlob": "5cc244cc109669f5767e6b53c8facff407e2c49b",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/network.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -402,7 +490,9 @@
       "upstreamPath": "src/vs/base/test/common/timeTravelScheduler.ts",
       "upstreamBlob": "445247624d736b74a842bc38039bd0cb52719004",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "test/base/common/upstream/timeTravelScheduler.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -411,7 +501,9 @@
       "upstreamPath": "src/vs/platform/files/common/fileService.ts",
       "upstreamBlob": "493471fe8560bf2c630a61ba47ec698c155a7bef",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "test/platform/settings/common/upstream/storageFixture.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -420,7 +512,9 @@
       "upstreamPath": "src/vs/platform/files/common/inMemoryFilesystemProvider.ts",
       "upstreamBlob": "ac062a8b22ec316d9fae8803ab759b1b893be337",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "test/platform/settings/common/upstream/storageFixture.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -429,7 +523,9 @@
       "upstreamPath": "src/vs/platform/policy/common/filePolicyService.ts",
       "upstreamBlob": "78c1860c918b5f923b3e94ee2cb62b171d36758c",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "test/platform/settings/common/upstream/storageFixture.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -438,7 +534,9 @@
       "upstreamPath": "src/vs/base/common/extpath.ts",
       "upstreamBlob": "44477dcb606ac532eaa1334ad61bbd219e02979e",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/extpath.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -447,7 +545,9 @@
       "upstreamPath": "src/vs/base/common/stopwatch.ts",
       "upstreamBlob": "6b62b72aea9676170cb5933d72a125770b351ebc",
       "category": "source",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/stopwatch.ts",
       "rationale": "Compatible admitted module or explicit Proctor interface satisfies this dependency; configuration owner and adapter tests exercise the consumed behavior."
@@ -459,7 +559,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "d1f4694fea769a6eb74f91cd75f82dad341dc53cbe5817ce3371fa6b72d262b1",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -475,7 +577,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "e3e05b8a3cbe92ce1969c6a29fa8d97336c4d751bbb575225f6d0206ceea21dd",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -491,7 +595,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain the complete registry, defaults, schema, override, delta, policy-reference, and event machinery. Proctor composition supplies packaged declarations; the VS Code chat-extension unification product list is empty.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "5d5599efd7f1c0f81f78bb3fb7c84c09fa022868b27c33eecdf15ac8afab2217",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -507,7 +613,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "83b81ad34fbb6b4703c57107cd95593977e7ff7197869eb934ec158ac6587051",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -523,7 +631,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "74055ca48ca05f7db91dd1a89e28ccd5c4687ececef6002b53698ee1903c6700",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -539,7 +649,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "fa6e6f9bd51ce5eb5de18764c09e2ac6b533429245d0fe050c4aa6a2276035b0",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -555,7 +667,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "e7805baa922e67005ba539bcd62636b5ab78db053929787ea4e98339c2a445d8",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -571,7 +685,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "9e109b38592ff8af284f7369552fee9a0994e770554447b14de06830bc0fda45",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -587,7 +703,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "841d4386b371c59ac47a19fd72fa7640666076bf4eaa33305ad0dbad54f58398",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -603,7 +721,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "96d62f3b3faaa640847fb8a7dbad1f3a43d8e1cafd5025a79a6151975b4dd7cb",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -619,7 +739,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Retain the complete upstream owner suite with Node test registration and Proctor resource/policy fixtures.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "180ea432389b0ae8e1c014329871e59e6ac8895ec78bde864b50062fcf91acc4",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -635,7 +757,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Retain the complete upstream owner suite with Node test registration and Proctor resource/policy fixtures.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "1bfe1161d3af4d52bb3efd14ca3428d4921e50a8e3250e48935d2d33dd8ef1ca",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -651,7 +775,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Retain the complete upstream owner suite with Node test registration and Proctor resource/policy fixtures.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "dd2f35d166aad551b67039b72626f79de0ddf4aa2dea329b812b5c1f35ceebca",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -667,7 +793,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Retain upstream Workspace and WorkspaceFolder resource lookup implementations as owner-test fixtures, with test constructor defaults. Production models consume only the structural getFolder interface; this admits no host workspace composition.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "5ee9299508efef8fbf16cdb99e90282f6638b8f2c9fe3de65dd7bb9610cc8d88",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -683,7 +811,9 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain upstream implementation and runtime topology; translate imports to admitted modules and the Proctor settings resource, logging, and resource-scope interfaces.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "18d2c575ef9b304e81b72578bb7af6ae4de515e2536acaa24bed92bcf794e93a",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -699,7 +829,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Retain the complete upstream owner suite with Node test registration and Proctor resource/policy fixtures.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "8d6c06f6975c7be26fb3cded840c1d4249487bdc94bb802ffe190e3c232e7b95",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -715,7 +847,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Retain the complete upstream owner suite with Node test registration and Proctor resource/policy fixtures.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "72142e47836d80d832aa762059338c3797b21aa9bacba5c0a49fdd5c09c17348",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -731,7 +865,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Retain the complete upstream owner suite with Node test registration and Proctor resource/policy fixtures.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "190e6469d7115af96a209cee17d97b361f43e82961789485ed09296d18c7e5aa",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -747,7 +883,9 @@
       "category": "test",
       "disposition": "adapted",
       "rationale": "Retain the complete upstream owner suite with Node test registration and Proctor resource/policy fixtures.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localSha256": "3480d880f81f5fb1e94b1f52a81a2695fdf2afec5a53c35fde8aebbc25a47fb0",
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -755,13 +893,25 @@
         "accepted-dependency-substitution",
         "provenance-marker-insertion"
       ]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/browser/workbench.contribution.ts",
+      "upstreamBlob": "e813c53fc54376f031767274d5c5f058b8310609",
+      "category": "registration",
+      "disposition": "evidence-only",
+      "rationale": "Preserve the admitted workbench.hover.delay and workbench.hover.reducedDelay number schemas, nonnegative bounds and defaults (macOS 1500ms; Windows/Linux 500ms; reduced delay 500ms) in the static Proctor manifest. Platform defaults are explicit portable metadata; unrelated aggregate registrations are not imported.",
+      "licenseRefs": [
+        "vscode-mit"
+      ]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": ["LICENSE.txt"],
+      "upstreamPaths": [
+        "LICENSE.txt"
+      ],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -788,7 +938,10 @@
         "src/prctr/platform/settings/common/settingsRegistryFingerprint.ts",
         "build/generators/settingsRegistry.ts"
       ],
-      "verificationRefs": ["settings-contract-tests", "generated-parity"]
+      "verificationRefs": [
+        "settings-contract-tests",
+        "generated-parity"
+      ]
     },
     {
       "id": "server-document-authority",
@@ -798,7 +951,10 @@
         "src/prctr/platform/settings/electron-main/userSettingsIpc.ts",
         "src/prctr/platform/settings/common/settingsRendererProtocol.ts"
       ],
-      "verificationRefs": ["settings-contract-tests", "real-settings-destination"]
+      "verificationRefs": [
+        "settings-contract-tests",
+        "real-settings-destination"
+      ]
     },
     {
       "id": "authenticated-settings-destination",
@@ -808,13 +964,19 @@
         "src/prctr/workbench/contrib/authenticated/browser/authenticatedNavigation.ts",
         "src/prctr/workbench/browser/authenticatedManifest.ts"
       ],
-      "verificationRefs": ["real-settings-destination"]
+      "verificationRefs": [
+        "real-settings-destination"
+      ]
     },
     {
       "id": "closed-attempt-configuration",
       "summary": "Candidate consumers receive only an immutable server-frozen closed projection and never receive User Settings source, draft, cache, or mutation operations.",
-      "localPaths": ["src/prctr/platform/settings/common/attemptConfiguration.ts"],
-      "verificationRefs": ["settings-contract-tests"]
+      "localPaths": [
+        "src/prctr/platform/settings/common/attemptConfiguration.ts"
+      ],
+      "verificationRefs": [
+        "settings-contract-tests"
+      ]
     },
     {
       "id": "configuration-storage-adapter",
@@ -824,7 +986,10 @@
         "src/prctr/platform/settings/common/settingsResource.ts",
         "src/prctr/platform/settings/common/settingsDraft.ts"
       ],
-      "verificationRefs": ["configuration-adapter-tests", "configuration-owner-tests"]
+      "verificationRefs": [
+        "configuration-adapter-tests",
+        "configuration-owner-tests"
+      ]
     },
     {
       "id": "packaged-registry-composition",
@@ -833,7 +998,24 @@
         "src/prctr/platform/settings/common/settingsConfigurationRegistry.ts",
         "src/prctr/platform/settings/common/settingsResolution.ts"
       ],
-      "verificationRefs": ["settings-contract-tests", "configuration-owner-tests"]
+      "verificationRefs": [
+        "settings-contract-tests",
+        "configuration-owner-tests"
+      ]
+    },
+    {
+      "id": "platform-specific-hover-defaults",
+      "summary": "The static registry records original platform-specific hover defaults as data instead of evaluating the build host platform. Configuration, effective resolution and JSON language schemas use the same runtime projection. Extension-provider wording is excluded from the description because Proctor has no user extensions.",
+      "localPaths": [
+        "src/prctr/platform/settings/common/settingsManifest.ts",
+        "src/prctr/platform/settings/common/settingsDefaults.ts",
+        "src/prctr/platform/settings/common/settingsConfigurationRegistry.ts",
+        "src/prctr/platform/settings/common/settingsResolution.ts",
+        "src/prctr/workbench/services/settings/browser/settingsJsonLanguageServices.ts"
+      ],
+      "verificationRefs": [
+        "settings-hover-defaults"
+      ]
     }
   ],
   "verification": [
@@ -890,6 +1072,12 @@
       "kind": "test",
       "path": "test/platform/settings/common/settingsConfiguration.test.ts",
       "obligation": "Verify real configuration service use, queued structured edits, default removal, comments, language overrides, source replacement/disposal fencing, resource changes and storage failures."
+    },
+    {
+      "id": "settings-hover-defaults",
+      "kind": "test",
+      "path": "test/browser/editor/settingsWindowServices.test.ts",
+      "obligation": "Verify real action tooltips start from the original platform delay and preserve their source icon presentation."
     }
   ]
 }

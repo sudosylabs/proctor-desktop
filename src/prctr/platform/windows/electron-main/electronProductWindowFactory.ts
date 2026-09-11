@@ -7,6 +7,8 @@
 import { bindWindowUserSettings } from '../../settings/electron-main/userSettingsWindow.js';
 import type { UserSettingsSessionService } from '../../settings/common/userSettingsSession.js';
 import { AccountMenuIpcBridge } from '../../account/electron-main/accountMenuIpc.js';
+import { SettingsNativeIpcBridge } from '../../settings/electron-main/settingsNativeIpc.js';
+import { createElectronSettingsNativeHost } from '../../settings/electron-main/electronSettingsNativeHost.js';
 import { createElectronAccountMenu } from '../../account/electron-main/electronAccountMenu.js';
 
 import {
@@ -243,6 +245,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 	#accountBridge: AccountIpcBridge | undefined;
 	#settings: {dispose(): void} | undefined;
 	#accountMenuBridge: AccountMenuIpcBridge | undefined;
+	#settingsNativeBridge: SettingsNativeIpcBridge | undefined;
 	#launchMenu: { dispose(): void } | undefined;
 
 	constructor(
@@ -301,6 +304,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#accountMenuBridge = new AccountMenuIpcBridge(ipc, createElectronAccountMenu(window, descriptor, chromeEnvironment.locale), authorize);
 			if (descriptor.kind === 'authenticated' && settings)
 				this.#settings = bindWindowUserSettings(ipc, window.webContents, descriptor, settings);
+			if (descriptor.kind === 'authenticated')
+				this.#settingsNativeBridge = new SettingsNativeIpcBridge(ipc, createElectronSettingsNativeHost(window), authorize);
 			if (descriptor.kind === 'authenticated' && account)
 				this.#accountBridge = new AccountIpcBridge(ipc, descriptor, account, authorize);
 			window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
@@ -343,6 +348,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#accountBridge,
 				this.#settings,
 				this.#accountMenuBridge,
+				this.#settingsNativeBridge,
 				this.#windowChromeBridge
 			]) {
 				try {
@@ -415,6 +421,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#accountBridge,
 				this.#settings,
 				this.#accountMenuBridge,
+				this.#settingsNativeBridge,
 			this.#windowChromeBridge
 		]) {
 			try {

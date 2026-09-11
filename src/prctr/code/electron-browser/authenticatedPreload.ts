@@ -24,10 +24,12 @@ import {
 	validateUserSettingsProjection
 } from '../../platform/settings/common/settingsRendererProtocol.js';
 import { createWindowChromePreloadClient } from './windowChromePreload.js';
+import { createSettingsNativePreloadClient } from './settingsNativePreload.js';
 
 contextBridge.exposeInMainWorld(
 	'proctorAuthenticated',
 	Object.freeze({
+		settingsNative: createSettingsNativePreloadClient(),
 		bootstrap: async (): Promise<AuthenticatedWindowDescriptor> => {
 			const descriptor = validateWindowDescriptor(
 				await ipcRenderer.invoke(WINDOW_CHANNELS.authenticated.bootstrap)

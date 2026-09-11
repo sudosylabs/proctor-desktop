@@ -2,11 +2,13 @@ import { colorCustomizationSchema } from '../../theme/common/colorCustomizations
 import { Registry } from '../../registry/common/platform.js';
 import {
 	ConfigurationScope,
+	EditPresentationTypes,
 	Extensions,
 	type IConfigurationRegistry,
 	type IConfigurationPropertySchema
 } from '../../configuration/common/configurationRegistry.js';
 import { settingsRegistry } from './settingsRegistry.js';
+import { settingDefault } from './settingsDefaults.js';
 
 let registered = false;
 
@@ -18,8 +20,11 @@ export function registerSettingsConfiguration(): void {
 		if (declaration.candidate === 'prohibited') continue;
 		properties[declaration.id] = {
 			type: declaration.type,
+			editPresentation: declaration.id === 'workbench.colorTheme' ? EditPresentationTypes.Json : undefined,
 			...(declaration.id === 'workbench.colorCustomizations' ? colorCustomizationSchema : {}),
-			default: declaration.default,
+			...(declaration.id === 'editor.tokenColorCustomizations' ? { allOf: [{ $ref: 'prctr-schema://themes/token-customizations' }] } : {}),
+			...(declaration.id === 'editor.semanticTokenColorCustomizations' ? { allOf: [{ $ref: 'prctr-schema://themes/semantic-token-customizations' }] } : {}),
+			default: settingDefault(declaration),
 			enum: declaration.enum === undefined ? undefined : [...declaration.enum],
 			minimum: declaration.minimum,
 			maximum: declaration.maximum,

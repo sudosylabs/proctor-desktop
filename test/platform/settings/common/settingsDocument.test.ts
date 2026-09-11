@@ -77,3 +77,25 @@ suite('User Settings JSONC document', () => {
 		);
 	});
 });
+
+suite('User Settings recursive work limits', () => {
+	test('rejects extreme nesting before recursive parsing and retains the editable source', () => {
+		const source = '{"unknown":' + '['.repeat(10000) + '0' + ']'.repeat(10000) + '}';
+		const result = parseSettingsDocument(source);
+		assert.strictEqual(result.valid, false);
+		assert.strictEqual(result.diagnostics[0]?.code, 'too-deep');
+		assert.strictEqual(result.source, source);
+		assert.strictEqual(parseSettingsDocument('{"unknown":[0]}').valid, true);
+	});
+	test('does not count brackets within strings or JSONC comments as nesting', () => {
+		const source = '{ /* ' + '['.repeat(1000) + ' */ "unknown": "' + '['.repeat(1000) + '"}';
+		assert.strictEqual(parseSettingsDocument(source).valid, true);
+	});
+	test('wrong-kind closing delimiters cannot bypass the recursive work limit', () => {
+		const source = '{"unknown":' + '[},'.repeat(10000) + '0' + ']'.repeat(10000) + '}';
+		const result = parseSettingsDocument(source);
+		assert.strictEqual(result.valid, false);
+		assert.strictEqual(result.diagnostics[0]?.code, 'too-deep');
+		assert.strictEqual(result.source, source);
+	});
+});

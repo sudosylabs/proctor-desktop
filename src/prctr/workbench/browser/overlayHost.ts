@@ -2,10 +2,10 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { Disposable, DisposableStore, type IDisposable } from '../../base/common/lifecycle.js';
+import { Disposable, DisposableStore, toDisposable, type IDisposable } from '../../base/common/lifecycle.js';
 import { Emitter, type Event } from '../../base/common/event.js';
 import { addDisposableListener } from '../../base/browser/dom.js';
-import { ButtonControl } from '../../base/browser/ui/button/button.js';
+import { ButtonControl } from '../../base/browser/ui/button/buttonControl.js';
 import './overlayHost.css';
 
 export interface OverlayAction {
@@ -30,6 +30,7 @@ export class WorkbenchOverlayHost extends Disposable {
 	readonly onDidChangeVisibility: Event<boolean> = this.#visibility.event;
 	#active: IDisposable | undefined;
 	#visible = false;
+	#externalModals = 0;
 	#replacing = false;
 	readonly #inertRoot: HTMLElement;
 	constructor(host: HTMLElement, inertRoot: HTMLElement) {
@@ -45,7 +46,18 @@ export class WorkbenchOverlayHost extends Disposable {
 		host.append(this.notificationLayer);
 	}
 	get visible(): boolean {
-		return this.#visible;
+		return this.#visible || this.#externalModals > 0;
+	}
+	/** A source-owned modal shares global gating without replacing its DOM or focus owner. */
+	acquireExternalModal(): IDisposable {
+		this.#externalModals++;
+		this.notificationLayer.inert = true;
+		this.#visibility.fire(this.visible);
+		return toDisposable(() => {
+			this.#externalModals--;
+			this.notificationLayer.inert = this.visible;
+			this.#visibility.fire(this.visible);
+		});
 	}
 	show(options: ModalOverlayOptions): IDisposable {
 		if (options.actions.length === 0 && options.kind === 'dialog')
@@ -135,7 +147,7 @@ export class WorkbenchOverlayHost extends Disposable {
 				this.element.replaceChildren();
 				this.element.hidden = true;
 				this.#inertRoot.inert = false;
-				this.notificationLayer.inert = false;
+				this.notificationLayer.inert = this.#externalModals > 0;
 				if (!this.#replacing) this.#setVisible(false);
 				this.#restoreFocus(priorFocus);
 			}
@@ -161,7 +173,7 @@ export class WorkbenchOverlayHost extends Disposable {
 	#setVisible(visible: boolean): void {
 		if (this.#visible === visible) return;
 		this.#visible = visible;
-		this.#visibility.fire(visible);
+		this.#visibility.fire(this.visible);
 	}
 	override dispose(): void {
 		this.#active?.dispose();

@@ -24,6 +24,9 @@
 	}
 	.prctr-account-navigation button:hover {
 		background: var(--prctr-color-interaction-hover);
+		outline: var(--prctr-shape-stroke-default) dashed
+			var(--prctr-theme-contrastActiveBorder, transparent);
+		outline-offset: -1px;
 	}
 	.prctr-account-navigation button[aria-current='page'] {
 		background: color-mix(in srgb, var(--prctr-color-interaction-accent) 25%, transparent);

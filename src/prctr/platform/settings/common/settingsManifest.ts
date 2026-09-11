@@ -1,3 +1,4 @@
+import type { ITokenColorCustomizations, ISemanticTokenColorCustomizations } from '../../theme/common/tokenCustomizationTypes.js';
 import type { IColorCustomizations } from '../../theme/common/colorCustomizations.js';
 export interface SettingMessageDescriptor {
 	readonly id: string;
@@ -25,6 +26,7 @@ export interface SettingDeclaration {
 	readonly id: string;
 	readonly type: 'boolean' | 'number' | 'integer' | 'string' | 'object';
 	readonly default?: boolean | number | string | IColorCustomizations;
+	readonly platformDefaults?: Readonly<Partial<Record<'mac' | 'windows' | 'linux', boolean | number | string>>>;
 	readonly enum?: readonly (boolean | number | string)[];
 	readonly minimum?: number;
 	readonly maximum?: number;
@@ -42,6 +44,30 @@ export interface SettingDeclaration {
 
 /** Literal packaged authority. No runtime or remote contribution may append declarations. */
 export const SETTINGS_MANIFEST = [
+	{
+		id: 'workbench.hover.delay', type: 'number', default: 500, platformDefaults: { mac: 1500 }, minimum: 0,
+		storage: 'portableUser', domain: 'appearance', windows: ['authenticated'], languageOverride: false, activation: 'immediate', candidate: 'nonCandidateOnly',
+		title: defineMessage({ id: 'settings.hoverDelay.title', defaultMessage: 'Hover delay', description: 'Title for the workbench hover delay setting.' }),
+		description: defineMessage({ id: 'settings.hoverDelay.description', defaultMessage: 'Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change.', description: 'Description of the source workbench hover delay.' })
+	},
+	{
+		id: 'workbench.hover.reducedDelay', type: 'number', default: 500, minimum: 0,
+		storage: 'portableUser', domain: 'appearance', windows: ['authenticated'], languageOverride: false, activation: 'immediate', candidate: 'nonCandidateOnly',
+		title: defineMessage({ id: 'settings.hoverReducedDelay.title', defaultMessage: 'Reduced hover delay', description: 'Title for the reduced workbench hover delay setting.' }),
+		description: defineMessage({ id: 'settings.hoverReducedDelay.description', defaultMessage: 'Controls the reduced delay in milliseconds used for showing hovers in specific contexts where faster feedback is beneficial.', description: 'Description of the source reduced hover delay.' })
+	},
+	{
+		id: 'editor.semanticTokenColorCustomizations', type: 'object', default: {}, storage: 'portableUser', domain: 'appearance',
+		windows: ['authenticated'], languageOverride: false, activation: 'immediate', candidate: 'nonCandidateOnly',
+		title: defineMessage({ id: 'settings.semanticTokenColorCustomizations.title', defaultMessage: 'Semantic token color customizations', description: 'Title for editor token theme customization.' }),
+		description: defineMessage({ id: 'settings.semanticTokenColorCustomizations.description', defaultMessage: 'Overrides semantic token colors and styles from the selected theme.', description: 'Description of data-only editor token styles.' })
+	},
+	{
+		id: 'editor.tokenColorCustomizations', type: 'object', default: {}, storage: 'portableUser', domain: 'appearance',
+		windows: ['authenticated'], languageOverride: false, activation: 'immediate', candidate: 'nonCandidateOnly',
+		title: defineMessage({ id: 'settings.tokenColorCustomizations.title', defaultMessage: 'Token color customizations', description: 'Title for editor token theme customization.' }),
+		description: defineMessage({ id: 'settings.tokenColorCustomizations.description', defaultMessage: 'Overrides editor syntax colors and font style from the selected theme.', description: 'Description of data-only editor token styles.' })
+	},
 	{
 		id: 'workbench.colorTheme',
 		type: 'string',
@@ -570,6 +596,10 @@ export type EffectiveSettingId = Exclude<
 >;
 
 export interface SettingValueMap {
+	readonly 'workbench.hover.delay': number;
+	readonly 'workbench.hover.reducedDelay': number;
+	readonly 'editor.tokenColorCustomizations': ITokenColorCustomizations;
+	readonly 'editor.semanticTokenColorCustomizations': ISemanticTokenColorCustomizations;
 	readonly 'workbench.colorTheme': string;
 	readonly 'workbench.colorCustomizations': IColorCustomizations;
 	readonly 'workbench.preferHighContrast': boolean;

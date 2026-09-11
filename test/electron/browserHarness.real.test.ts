@@ -42,7 +42,7 @@ void test('sandboxed Chromium renderer runs deterministic browser fixtures', () 
 	assert.match(userAgent, /\bElectron\/44\.0\.0\b/u);
 	assert.deepEqual(renderer, {
 		activations: '1',
-		browserOwnerTests: '117',
+		browserOwnerTests: '138',
 		controlExplorer: '{"fixtures":5,"states":62,"interactions":77,"themes":4}',
 		direction: 'rtl',
 		fixture: 'browser-harness',

@@ -1,3 +1,4 @@
+import { normalizeTokenColorCustomizations, normalizeSemanticTokenColorCustomizations } from '../../theme/common/tokenCustomizations.js';
 import { normalizeColorCustomizations } from '../../theme/common/colorCustomizations.js';
 import {
 	SETTINGS_MANIFEST,
@@ -42,10 +43,12 @@ export const settingsRegistry: SettingsRegistry = Object.freeze({
 	declarations,
 	declaration: (id: string) => byId.get(id),
 	isKnown: (id: string): id is SettingId => byId.has(id),
-	isEffective: (id: string): id is EffectiveSettingId => byId.get(id)?.candidate !== 'prohibited',
+	isEffective: (id: string): id is EffectiveSettingId => byId.has(id) && byId.get(id)?.candidate !== 'prohibited',
 	normalize<K extends EffectiveSettingId>(id: K, value: unknown): SettingValueMap[K] | undefined {
 		const declaration = byId.get(id);
 		if (declaration === undefined || declaration.candidate === 'prohibited') return undefined;
+		if (id === 'editor.tokenColorCustomizations') return normalizeTokenColorCustomizations(value) as SettingValueMap[K] | undefined;
+		if (id === 'editor.semanticTokenColorCustomizations') return normalizeSemanticTokenColorCustomizations(value) as SettingValueMap[K] | undefined;
 		if (id === 'workbench.colorCustomizations')
 			return normalizeColorCustomizations(value) as SettingValueMap[K] | undefined;
 		if (declaration.type === 'boolean' && typeof value !== 'boolean') return undefined;

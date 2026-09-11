@@ -1,8 +1,75 @@
 {
   "generatedBy": "settings.registry",
   "registryVersion": 1,
-  "registryFingerprint": "fnv1a64:8f3a1142427b8b11",
+  "registryFingerprint": "fnv1a64:cca72c3ff616b688",
   "settings": [
+    {
+      "id": "workbench.hover.delay",
+      "title": "Hover delay",
+      "titleMessageId": "settings.hoverDelay.title",
+      "description": "Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change.",
+      "descriptionMessageId": "settings.hoverDelay.description",
+      "default": 500,
+      "platformDefaults": {
+        "mac": 1500
+      },
+      "storage": "portableUser",
+      "domain": "appearance",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
+      "id": "workbench.hover.reducedDelay",
+      "title": "Reduced hover delay",
+      "titleMessageId": "settings.hoverReducedDelay.title",
+      "description": "Controls the reduced delay in milliseconds used for showing hovers in specific contexts where faster feedback is beneficial.",
+      "descriptionMessageId": "settings.hoverReducedDelay.description",
+      "default": 500,
+      "storage": "portableUser",
+      "domain": "appearance",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
+      "id": "editor.semanticTokenColorCustomizations",
+      "title": "Semantic token color customizations",
+      "titleMessageId": "settings.semanticTokenColorCustomizations.title",
+      "description": "Overrides semantic token colors and styles from the selected theme.",
+      "descriptionMessageId": "settings.semanticTokenColorCustomizations.description",
+      "default": {},
+      "storage": "portableUser",
+      "domain": "appearance",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
+      "id": "editor.tokenColorCustomizations",
+      "title": "Token color customizations",
+      "titleMessageId": "settings.tokenColorCustomizations.title",
+      "description": "Overrides editor syntax colors and font style from the selected theme.",
+      "descriptionMessageId": "settings.tokenColorCustomizations.description",
+      "default": {},
+      "storage": "portableUser",
+      "domain": "appearance",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
     {
       "id": "workbench.colorTheme",
       "title": "Color theme",

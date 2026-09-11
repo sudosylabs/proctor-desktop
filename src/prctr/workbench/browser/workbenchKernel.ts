@@ -5,7 +5,7 @@
 import { addDisposableListener } from '../../base/browser/dom.js';
 import { KeyCode, KeyMod } from '../../base/common/keyCodes.js';
 import { MenuId, type Menu, type ResolvedMenuAction } from '../../platform/actions/common/menu.js';
-import { MenuService } from '../../platform/actions/common/menuService.js';
+import { MenuService } from '../../platform/actions/common/contributionMenuService.js';
 import { ICommandService } from '../../platform/commands/common/commands.js';
 import { ContextKeyService } from '../../platform/contextkey/browser/contextKeyService.js';
 import {
@@ -40,6 +40,7 @@ import {
 	WORKBENCH_CONTEXT_KEY_SERVICE,
 	WORKBENCH_KEYBINDING_SERVICE,
 	WORKBENCH_MENU_SERVICE
+	, WORKBENCH_SERVICE_COLLECTION, WORKBENCH_INSTANTIATION_SERVICE
 } from '../common/serviceIds.js';
 import { registerProctorAction } from '../services/actions/common/proctorActions.js';
 import { CommandService } from '../services/commands/common/commandService.js';
@@ -154,6 +155,8 @@ export function activateWorkbenchKernel(context: WorkbenchBootstrapContext): voi
 	context.setService(WORKBENCH_COMMAND_SERVICE, commandService);
 	context.setService(WORKBENCH_KEYBINDING_SERVICE, keybindingService);
 	context.setService(WORKBENCH_MENU_SERVICE, menuService);
+	context.setService(WORKBENCH_SERVICE_COLLECTION, services);
+	context.setService(WORKBENCH_INSTANTIATION_SERVICE, instantiationService);
 }
 
 interface BoundWorkbenchContextKeys {

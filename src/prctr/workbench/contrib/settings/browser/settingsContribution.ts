@@ -1,758 +1,168 @@
-import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
-import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { defineMessage, type MessageDescriptor } from '../../../../base/common/localization.js';
-import type {
-	UserSettingsCommitIntent,
-	UserSettingsCommitResponse,
-	UserSettingsProjection
-} from '../../../../platform/settings/common/settingsRendererProtocol.js';
-import { SettingsDraft } from '../../../../platform/settings/common/settingsDraft.js';
+import { parseSettingsDocument } from '../../../../platform/settings/common/settingsDocument.js';
 import { settingsRegistry } from '../../../../platform/settings/common/settingsRegistry.js';
-import {
-	BROWSER_THEME_SERVICE,
-	BrowserThemeService
-} from '../../../../platform/theme/browser/themeService.js';
-import type {
-	WorkbenchBootstrapContext,
-	WorkbenchContributionRegistration
-} from '../../../browser/bootstrap.js';
-import {
-	AUTHENTICATED_NAVIGATION_SERVICE,
-	type AuthenticatedNavigationService
-} from '../../authenticated/browser/authenticatedNavigation.js';
-import './settingsContribution.css';
+import type { UserSettingsProjection } from '../../../../platform/settings/common/settingsRendererProtocol.js';
+import { WORKBENCH_LIFECYCLE_SERVICE, type WorkbenchLifecycleService } from '../../../common/lifecycle.js';
+import { Event } from '../../../../base/common/event.js';
+import { DisposableStore, toDisposable, isDisposable, type IDisposable } from '../../../../base/common/lifecycle.js';
+import { localize } from '../../../../base/common/vscodeNls.js';
+import { ProgressBar } from '../../../../base/browser/ui/progressbar/progressbar.js';
+import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
+import { ServiceCollection } from '../../../../platform/instantiation/common/serviceCollection.js';
+import { InMemoryStorageService } from '../../../../platform/storage/common/storage.js';
+import { defaultProgressBarStyles } from '../../../../platform/theme/browser/defaultStyles.js';
+import { BROWSER_THEME_SERVICE, BrowserThemeService } from '../../../../platform/theme/browser/themeService.js';
+import type { INotificationService } from '../../../../platform/notification/common/notification.js';
+import { userSettingsResource } from '../../../../platform/settings/common/settingsResource.js';
+import { OpenerService } from '../../../../editor/browser/services/openerService.js';
+import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
+import type { WorkbenchPart } from '../../../common/composition.js';
+import { WORKBENCH_SERVICE_COLLECTION, WORKBENCH_INSTANTIATION_SERVICE } from '../../../common/serviceIds.js';
+import { WORKBENCH_NOTIFICATION_SERVICE } from '../../../browser/parts/notifications/notifications.js';
+import { EditorWorkbenchLayoutService } from '../../../services/layout/browser/editorWorkbenchLayoutService.js';
+import { Parts, Position } from '../../../services/layout/browser/layoutService.js';
+import { EditorWindowHostService } from '../../../services/host/browser/editorWindowHostService.js';
+import { ScopedProgressIndicator } from '../../../services/progress/browser/progressIndicator.js';
+import { SettingsEditorWindowServices } from '../../../services/settings/browser/settingsEditorWindowServices.js';
+import { SettingsEditorControlServices } from '../../../services/settings/browser/settingsEditorControlServices.js';
+import { SettingsEditorPartServices } from '../../../services/settings/browser/settingsEditorPartServices.js';
+import type { SettingsEditorEnvironment } from '../../../services/settings/browser/settingsEditorEnvironment.js';
+import type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
+import { AUTHENTICATED_NAVIGATION_SERVICE, type AuthenticatedNavigationService } from '../../authenticated/browser/authenticatedNavigation.js';
+import { SettingsModal } from './settingsModal.js';
+import { SettingsOpenActions } from './settingsEditorActions.js';
+export type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
 
-export interface SettingsRendererClient {
-	projection(): Promise<UserSettingsProjection>;
-	preview(intent: { readonly source: string }): Promise<void>;
-	cancelPreview(): Promise<void>;
-	commit(intent: UserSettingsCommitIntent): Promise<UserSettingsCommitResponse>;
-	onDidChange(listener: (projection: UserSettingsProjection) => void): () => void;
-}
-const messages = Object.freeze({
-	loadFailed: defineMessage({
-		id: 'settings.status.load.failed',
-		defaultMessage: 'Settings are unavailable. Close and reopen the window to try again.',
-		description: 'Settings backend failed before a document could be loaded.'
-	}),
-	heading: defineMessage({
-		id: 'settings.page.heading',
-		defaultMessage: 'Settings',
-		description: 'Heading for the AuthenticatedWindow User Settings destination.'
-	}),
-	structured: defineMessage({
-		id: 'settings.view.structured',
-		defaultMessage: 'Controls',
-		description: 'Button that opens the structured User Settings view.'
-	}),
-	jsonc: defineMessage({
-		id: 'settings.view.jsonc',
-		defaultMessage: 'JSONC',
-		description: 'Button that opens the User Settings JSONC view.'
-	}),
-	sourceLabel: defineMessage({
-		id: 'settings.source.label',
-		defaultMessage: 'User Settings JSONC',
-		description: 'Accessible label for the User Settings JSONC editor.'
-	}),
-	save: defineMessage({
-		id: 'settings.action.save',
-		defaultMessage: 'Save',
-		description: 'Action that conditionally saves User Settings.'
-	}),
-	cancel: defineMessage({
-		id: 'settings.action.cancel',
-		defaultMessage: 'Cancel changes',
-		description: 'Action that restores the acknowledged User Settings source.'
-	}),
-	loading: defineMessage({
-		id: 'settings.status.loading',
-		defaultMessage: 'Loading acknowledged settings…',
-		description: 'Status while User Settings load.'
-	}),
-	saved: defineMessage({
-		id: 'settings.status.saved',
-		defaultMessage: 'Settings saved.',
-		description: 'Status after User Settings are acknowledged.'
-	}),
-	readonly: defineMessage({
-		id: 'settings.status.readonly',
-		defaultMessage: 'Settings are read-only while the server is unavailable.',
-		description: 'Status for server-unavailable User Settings.'
-	}),
-	valid: defineMessage({
-		id: 'settings.status.valid',
-		defaultMessage: 'Settings are valid.',
-		description: 'Validation status for a valid User Settings draft.'
-	}),
-	invalid: defineMessage({
-		id: 'settings.status.invalid',
-		defaultMessage: '{count} settings problem(s) must be resolved before saving.',
-		description: 'Bounded User Settings validation problem count.'
-	}),
-	merged: defineMessage({
-		id: 'settings.status.merged',
-		defaultMessage: 'Remote changes were merged. Review and save again.',
-		description: 'Status after an unambiguous User Settings conflict merge.'
-	}),
-	conflict: defineMessage({
-		id: 'settings.status.conflict',
-		defaultMessage:
-			'Remote settings conflict with this draft. Cancel changes to use the latest acknowledged source.',
-		description: 'Status for an explicit User Settings merge conflict.'
-	}),
-	ambiguous: defineMessage({
-		id: 'settings.status.ambiguous',
-		defaultMessage:
-			'Save completion is unknown. Retry uses the same protected request identity.',
-		description: 'Status for ambiguous User Settings completion.'
-	}),
-	previewFailed: defineMessage({
-		id: 'settings.status.preview.revert.failed',
-		defaultMessage: 'The settings preview could not be reverted safely.',
-		description: 'Safe failure after a settings preview cancellation transport error.'
-	}),
-	failed: defineMessage({
-		id: 'settings.status.failed',
-		defaultMessage: 'Settings could not be saved.',
-		description: 'Safe User Settings failure status.'
-	})
-});
-const enumLabels = Object.freeze({
-	auto: defineMessage({
-		id: 'settings.option.auto',
-		defaultMessage: 'Automatic',
-		description: 'Label for an automatic setting value.'
-	}),
-	on: defineMessage({
-		id: 'settings.option.on',
-		defaultMessage: 'On',
-		description: 'Label for an enabled setting value.'
-	}),
-	off: defineMessage({
-		id: 'settings.option.off',
-		defaultMessage: 'Off',
-		description: 'Label for a disabled setting value.'
-	}),
-	light: defineMessage({
-		id: 'settings.option.theme.light',
-		defaultMessage: 'Light',
-		description: 'Label for the light color theme.'
-	}),
-	dark: defineMessage({
-		id: 'settings.option.theme.dark',
-		defaultMessage: 'Dark',
-		description: 'Label for the dark color theme.'
-	}),
-	hcLight: defineMessage({
-		id: 'settings.option.theme.highcontrastlight',
-		defaultMessage: 'High contrast light',
-		description: 'Label for the high-contrast light color theme.'
-	}),
-	hcDark: defineMessage({
-		id: 'settings.option.theme.highcontrastdark',
-		defaultMessage: 'High contrast dark',
-		description: 'Label for the high-contrast dark color theme.'
-	}),
-	wordWrapColumn: defineMessage({
-		id: 'settings.option.wordwrap.column',
-		defaultMessage: 'At word-wrap column',
-		description: 'Label for wrapping at the configured word-wrap column.'
-	}),
-	bounded: defineMessage({
-		id: 'settings.option.wordwrap.bounded',
-		defaultMessage: 'At the smaller viewport or column',
-		description: 'Label for bounded editor word wrapping.'
-	}),
-	relative: defineMessage({
-		id: 'settings.option.linenumbers.relative',
-		defaultMessage: 'Relative',
-		description: 'Label for relative editor line numbers.'
-	}),
-	line: defineMessage({
-		id: 'settings.option.cursor.line',
-		defaultMessage: 'Line',
-		description: 'Label for a line editor cursor.'
-	}),
-	block: defineMessage({
-		id: 'settings.option.cursor.block',
-		defaultMessage: 'Block',
-		description: 'Label for a block editor cursor.'
-	}),
-	underline: defineMessage({
-		id: 'settings.option.cursor.underline',
-		defaultMessage: 'Underline',
-		description: 'Label for an underline editor cursor.'
-	}),
-	blink: defineMessage({
-		id: 'settings.option.cursorblink.blink',
-		defaultMessage: 'Blink',
-		description: 'Label for the standard cursor blink animation.'
-	}),
-	smooth: defineMessage({
-		id: 'settings.option.cursorblink.smooth',
-		defaultMessage: 'Smooth',
-		description: 'Label for the smooth cursor blink animation.'
-	}),
-	phase: defineMessage({
-		id: 'settings.option.cursorblink.phase',
-		defaultMessage: 'Phase',
-		description: 'Label for the phase cursor blink animation.'
-	}),
-	expand: defineMessage({
-		id: 'settings.option.cursorblink.expand',
-		defaultMessage: 'Expand',
-		description: 'Label for the expanding cursor animation.'
-	}),
-	solid: defineMessage({
-		id: 'settings.option.cursorblink.solid',
-		defaultMessage: 'Solid',
-		description: 'Label for a non-blinking cursor.'
-	}),
-	verbose: defineMessage({
-		id: 'settings.option.announcements.verbose',
-		defaultMessage: 'Verbose',
-		description: 'Label for verbose accessibility announcements.'
-	}),
-	minimal: defineMessage({
-		id: 'settings.option.announcements.minimal',
-		defaultMessage: 'Minimal',
-		description: 'Label for minimal accessibility announcements.'
-	})
-});
+const shellParts: readonly (readonly [Parts, WorkbenchPart])[] = [
+	[Parts.TITLEBAR_PART, 'titlebar'], [Parts.BANNER_PART, 'banner'], [Parts.SIDEBAR_PART, 'navigation'],
+	[Parts.PANEL_PART, 'panel'], [Parts.STATUSBAR_PART, 'status']
+];
 
-export function createSettingsContribution(
-	client: SettingsRendererClient
-): WorkbenchContributionRegistration {
-	return Object.freeze({
-		id: 'prctr.authenticated.settings' as const,
-		phase: 'ready' as const,
-		dependencies: Object.freeze(['prctr.authenticated.navigation' as const]),
-		messages: Object.freeze([
-			...Object.values(messages),
-			...Object.values(enumLabels),
-			...settingsRegistry.declarations.flatMap((declaration) => [
-				declaration.title,
-				declaration.description
-			])
-		] as MessageDescriptor[]),
-		async activate(context: WorkbenchBootstrapContext): Promise<void> {
-			const navigation = context.getService<AuthenticatedNavigationService>(
-				AUTHENTICATED_NAVIGATION_SERVICE
-			);
-			const themeService = context.getService<BrowserThemeService>(BROWSER_THEME_SERVICE);
-			const page = context.document.createElement('section');
-			page.className = 'prctr-settings';
-			page.hidden = navigation.current !== 'settings';
-			const heading = context.document.createElement('h1');
-			heading.textContent = context.localization.format(messages.heading);
-			heading.tabIndex = -1;
-			const status = context.document.createElement('p');
-			status.role = 'status';
-			status.tabIndex = -1;
-			status.textContent = context.localization.format(messages.loading);
-			const switcher = context.document.createElement('div');
-			switcher.className = 'prctr-settings__switcher';
-			const structuredButton = button(
-				context.document,
-				context.localization.format(messages.structured)
-			);
-			const jsoncButton = button(
-				context.document,
-				context.localization.format(messages.jsonc)
-			);
-			switcher.append(structuredButton, jsoncButton);
-			const structured = context.document.createElement('div');
-			structured.className = 'prctr-settings__structured';
-			const source = context.document.createElement('textarea');
-			source.className = 'prctr-settings__source';
-			source.setAttribute('aria-label', context.localization.format(messages.sourceLabel));
-			source.spellcheck = false;
-			source.hidden = true;
-			const actions = context.document.createElement('div');
-			actions.className = 'prctr-settings__actions';
-			const save = button(context.document, context.localization.format(messages.save));
-			const cancel = button(context.document, context.localization.format(messages.cancel));
-			actions.append(save, cancel);
-			const content = context.document.createElement('div');
-			content.className = 'prctr-settings__content';
-			content.append(heading, status, switcher, structured, source, actions);
-			const viewport = context.document.createElement('div');
-			viewport.className = 'prctr-settings__viewport';
-			viewport.append(content);
-			const scroll = context.disposables.add(
-				new DomScrollableElement(viewport, {
-					className: 'prctr-settings__scroll',
-					vertical: ScrollbarVisibility.Auto,
-					horizontal: ScrollbarVisibility.Hidden,
-					verticalScrollbarSize: 8,
-					useShadows: false
-				})
-			);
-			page.append(scroll.getDomNode());
-			const resize = new ResizeObserver(() => scroll.scanDomNode());
-			resize.observe(viewport);
-			resize.observe(content);
-			context.disposables.add({ dispose: () => resize.disconnect() });
-			context.disposables.add(
-				addDisposableListener(viewport, 'focusin', () => scroll.scanDomNode())
-			);
-			save.dataset.variant = 'primary';
-			context.shell.part('content').append(page);
-			context.disposables.add({ dispose: () => page.remove() });
-			let projectionEventEpoch = 0;
-			let bufferedProjection: UserSettingsProjection | undefined;
-			let projectionHandler = (next: UserSettingsProjection): void => {
-				projectionEventEpoch++;
-				bufferedProjection = next;
-			};
-			const disposeProjection = client.onDidChange((next) => projectionHandler(next));
-			context.disposables.add({ dispose: disposeProjection });
-			let snapshot: UserSettingsProjection;
-			try {
-				snapshot = await client.projection();
-			} catch {
-				status.textContent = context.localization.format(messages.loadFailed);
-				switcher.hidden = true;
-				structured.hidden = true;
-				source.hidden = true;
-				actions.hidden = true;
-				context.disposables.add(
-					navigation.onDidChange((destination) => {
-						page.hidden = destination !== 'settings';
-						if (!page.hidden) {
-							scroll.scanDomNode();
-							heading.focus();
-						}
-					})
-				);
-				return;
-			}
-			const initialLiveProjection = bufferedProjection;
-			bufferedProjection = undefined;
-			let projection = initialLiveProjection ?? snapshot;
-			let acknowledgedPresentation = projection.presentation;
-			let draft = new SettingsDraft(projection.source, projection.revision);
-			let blockedByConflict = false;
-			let pendingIntent: UserSettingsCommitIntent | undefined;
-			let previewActive = false;
-			let previewSource: string | undefined;
-			let previewSuppressed = false;
-			let previewOperationEpoch = 0;
-			let commitInFlight = false;
-			let pendingEdits = 0;
-			let disposed = false;
-			context.disposables.add({
-				dispose: () => {
-					disposed = true;
-					draft.dispose();
+/** Authenticated composition of the source editor, with one privileged Settings client. */
+export function createSettingsContribution(client: SettingsRendererClient, environment: SettingsEditorEnvironment): WorkbenchContributionRegistration {
+	return {
+		id: 'prctr.authenticated.settings', phase: 'ready', dependencies: ['prctr.authenticated.navigation'],
+		async activate(context) {
+			const store = context.disposables.add(new DisposableStore());
+			// Editors release model references before their window services are destroyed.
+			const editors = store.add(new DisposableStore());
+			const dependencies = store.add(new DisposableStore());
+			const navigation = context.getService<AuthenticatedNavigationService>(AUTHENTICATED_NAVIGATION_SERVICE);
+			const presentation = context.getService<BrowserThemeService>(BROWSER_THEME_SERVICE);
+			const notifications = context.getService<INotificationService>(WORKBENCH_NOTIFICATION_SERVICE);
+			const services = context.getService<ServiceCollection>(WORKBENCH_SERVICE_COLLECTION);
+			const instantiation = context.getService<IInstantiationService>(WORKBENCH_INSTANTIATION_SERVICE);
+			const parts = new Map(shellParts.filter(([, local]) => context.composition.layout.parts.includes(local)).map(([part, local]) => [part, context.shell.part(local)]));
+			const layout = dependencies.add(new EditorWorkbenchLayoutService(context.shell.element, {
+				parts, onDidChangePresentation: presentation.onDidChangePresentation,
+				readOffset: () => ({ top: context.shell.part('titlebar').getBoundingClientRect().height, quickPickTop: context.shell.part('titlebar').getBoundingClientRect().height }),
+				focusContent: () => context.shell.focusVisiblePart(['content']), isRestored: () => ['restored', 'eventually'].includes(context.getService<WorkbenchLifecycleService>(WORKBENCH_LIFECYCLE_SERVICE).phase ?? ''),
+				readPresentation: () => ({ floating: true, compact: presentation.presentationPreferences.density === 'compact', uppercaseHeaders: false }),
+				relayout: () => context.shell.layout(), readPositions: () => ({ sidebar: Position.LEFT, panel: Position.BOTTOM, panelAlignment: 'center' }),
+				setPartHidden(hidden, part) {
+					if (part === Parts.SIDEBAR_PART) context.shell.setNavigationVisible(!hidden);
+					else if (part === Parts.BANNER_PART) context.shell.setPartVisible('banner', !hidden);
+					else if (part === Parts.PANEL_PART) context.shell.setPartVisible('panel', !hidden);
+					else throw new Error('Settings cannot hide this shell part.');
 				}
-			});
-			const presentStatus = (
-				descriptor: MessageDescriptor,
-				values?: Record<string, string | number>
-			): void => {
-				status.textContent = context.localization.format(descriptor, values);
-			};
-			const applyPresentation = (next: UserSettingsProjection): void => {
-				themeService.setTheme(
-					next.presentation.theme,
-					next.presentation.colorCustomizations
-				);
-				themeService.setMotionPreference(
-					next.presentation.reducedMotion ? 'reduced' : 'full'
-				);
-				themeService.setZoomPercent(next.presentation.zoomPercent);
-			};
-			const applyAcknowledgedPresentation = (): void => {
-				applyPresentation({ ...projection, presentation: acknowledgedPresentation });
-			};
-			applyPresentation(projection);
-			const synchronizePreview = (): void => {
-				const shouldPreview =
-					projection.writable &&
-					!previewSuppressed &&
-					!page.hidden &&
-					draft.source !== projection.source &&
-					draft.validation.diagnostics.length === 0;
-				if (shouldPreview && previewSource === draft.source) return;
-				if (!shouldPreview && !previewActive) return;
-				const requestedSource = shouldPreview ? draft.source : undefined;
-				const operationEpoch = ++previewOperationEpoch;
-				previewActive = shouldPreview;
-				previewSource = requestedSource;
-				const operation = shouldPreview
-					? client.preview({ source: draft.source })
-					: client.cancelPreview();
-				void operation.catch(async () => {
-					if (operationEpoch !== previewOperationEpoch) return;
-					previewSuppressed = true;
-					previewActive = false;
-					previewSource = undefined;
-					try {
-						await client.cancelPreview();
-						if (operationEpoch !== previewOperationEpoch) return;
-						const restored = await client.projection();
-						if (operationEpoch !== previewOperationEpoch) return;
-						const sameAcknowledgedDocument =
-							restored.source === projection.source &&
-							restored.revision === projection.revision;
-						receiveProjection(
-							sameAcknowledgedDocument
-								? { ...restored, presentation: acknowledgedPresentation }
-								: restored
-						);
-					} catch {
-						if (operationEpoch !== previewOperationEpoch) return;
-						applyAcknowledgedPresentation();
+			}, context.document.fonts.ready.then(() => undefined)));
+			const clipboard = environment.createClipboard(layout);
+			if (isDisposable(clipboard)) dependencies.add(clipboard);
+			const leases: IDisposable[] = [];
+			const originalInert = new Map<HTMLElement, boolean>();
+			let previousFocus: HTMLElement | undefined;
+			const host = dependencies.add(new EditorWindowHostService(context.document.defaultView!, {
+				...environment.window,
+				async setDimmed(dimmed) {
+					if (dimmed) {
+						if (!leases.length) previousFocus = context.document.activeElement instanceof context.document.defaultView!.HTMLElement ? context.document.activeElement : undefined;
+						if (!leases.length) for (const part of context.composition.layout.parts) {
+							const element = context.shell.part(part); originalInert.set(element, element.inert); element.inert = true;
+						}
+						leases.push(context.shell.overlayHost.acquireExternalModal());
+					} else {
+						leases.pop()?.dispose();
+						if (!leases.length) {
+							for (const [element, inert] of originalInert) element.inert = inert;
+							originalInert.clear();
+							// Original modal focus restoration occurs before its disposal releases
+							// Proctor's inert background. Complete that restoration after releasing it.
+							if (previousFocus?.isConnected) previousFocus.focus();
+							else context.shell.focusVisiblePart(['content']);
+							previousFocus = undefined;
+						}
 					}
-					if (operationEpoch === previewOperationEpoch)
-						presentStatus(messages.previewFailed);
+				}
+			}));
+			dependencies.add(toDisposable(() => { for (const lease of leases.splice(0)) lease.dispose(); for (const [element, inert] of originalInert) element.inert = inert; }));
+			let modal: SettingsModal | undefined;
+			let openingRuntime: Promise<SettingsModal> | undefined;
+			let latestProjection: UserSettingsProjection | undefined;
+			let projectionSequence = 0;
+			let projectionRequest: Promise<UserSettingsProjection> | undefined;
+			const applyPresentation = (source: string, next: UserSettingsProjection): void => {
+				const parsed = parseSettingsDocument(source);
+				const tokens = settingsRegistry.normalize('editor.tokenColorCustomizations', parsed.values.get('editor.tokenColorCustomizations') ?? {});
+				const semantic = settingsRegistry.normalize('editor.semanticTokenColorCustomizations', parsed.values.get('editor.semanticTokenColorCustomizations') ?? {});
+				presentation.setTheme(next.presentation.theme, next.presentation.colorCustomizations, tokens, semantic);
+				presentation.setMotionPreference(next.presentation.reducedMotion ? 'reduced' : 'full');
+				presentation.setZoomPercent(next.presentation.zoomPercent);
+			};
+			store.add(toDisposable(client.onDidChange(next => {
+				if (store.isDisposed) return;
+				projectionSequence++; latestProjection = next;
+				if (!modal) applyPresentation(next.source, next);
+			})));
+			const loadProjection = (): Promise<UserSettingsProjection> => projectionRequest ??= (async () => {
+				const sequence = projectionSequence;
+				const snapshot = await client.projection();
+				if (store.isDisposed) throw new Error('Settings window is closed.');
+				const next = sequence === projectionSequence ? snapshot : latestProjection!;
+				latestProjection = next;
+				if (!modal) applyPresentation(next.source, next);
+				return next;
+			})().finally(() => { projectionRequest = undefined; });
+			void loadProjection().catch(() => { if (!store.isDisposed) notifications.error(localize('settings.loadFailed', 'Settings are unavailable. Open Settings to try again.')); });
+			let assemblingRuntime = false;
+			const initialize = (): Promise<SettingsModal> => openingRuntime ??= (async () => {
+				const initial = await loadProjection();
+				if (store.isDisposed) throw new Error('Settings window is closed.');
+				assemblingRuntime = true;
+				const runtime = dependencies.add(new SettingsEditorWindowServices(services, instantiation, {
+					source: initial.source, document: context.document, presentation, layout, clipboard, notifications,
+					isSettingsReadonly: () => modal?.isReadonly ?? true
+				}));
+				await runtime.initialize();
+				if (store.isDisposed) throw new Error('Settings window is closed.');
+				const progressBar = dependencies.add(new ProgressBar(context.shell.element, { ...defaultProgressBarStyles, ariaLabel: localize('settings.progress', 'Settings progress') }));
+				const progress = dependencies.add(new ScopedProgressIndicator(progressBar, { onDidChangeActive: Event.None, isActive: true }));
+				dependencies.add(new SettingsEditorControlServices(services, instantiation, {
+					storage: dependencies.add(new InMemoryStorageService()), isDevelopment: environment.isDevelopment, progress, windowHost: host,
+					createContextMenu: owner => environment.createContextMenu(services, owner),
+					createOpener: owner => {
+						const opener = owner.createInstance(OpenerService);
+						dependencies.add(opener.registerValidator({ shouldOpen: async resource => resource.toString() === userSettingsResource.toString() }));
+						return opener;
+					}
+				}));
+				const editorParts = editors.add(new SettingsEditorPartServices(services, instantiation, layout, runtime.editors));
+				modal = editors.add(new SettingsModal(services, instantiation, editorParts, client, context.document, initial, applyPresentation));
+				return modal;
+			})().catch(error => {
+				// A transient server read must not permanently disable the Settings entrypoint.
+				if (!assemblingRuntime) openingRuntime = undefined;
+				throw error;
+			});
+			store.add(new SettingsOpenActions(async (json, options) => {
+				const owner = await initialize();
+				return json ? owner.openSettingsJson(options) : owner.openSettingsUi(options);
+			}));
+			const open = (): void => {
+				void initialize().then(owner => owner.openSettingsUi()).catch(() => {
+					if (!store.isDisposed) notifications.error(localize('settings.openFailed', 'Settings could not be opened.'));
 				});
 			};
-			const refreshValidation = (): void => {
-				const diagnostics = draft.validation.diagnostics;
-				const editable = projection.writable && !commitInFlight;
-				const active = context.document.activeElement;
-				const focusNeedsFallback =
-					!editable &&
-					active !== null &&
-					(active === source || active === save || structured.contains(active));
-				if (source.value !== draft.source) source.value = draft.source;
-				source.disabled = !editable;
-				for (const control of structured.querySelectorAll<
-					HTMLInputElement | HTMLSelectElement
-				>('input, select'))
-					control.disabled = !editable;
-				save.disabled =
-					!editable ||
-					pendingEdits > 0 ||
-					diagnostics.length > 0 ||
-					blockedByConflict ||
-					structured.querySelector('[aria-invalid="true"]') !== null;
-				cancel.disabled = commitInFlight || draft.source === projection.source;
-				if (!projection.writable) presentStatus(messages.readonly);
-				else if (diagnostics.length > 0)
-					presentStatus(messages.invalid, { count: diagnostics.length });
-				else presentStatus(messages.valid);
-				if (focusNeedsFallback) status.focus();
-				synchronizePreview();
-			};
-			const renderStructured = (): void => {
-				const active = context.document.activeElement as HTMLElement | null;
-				const focusedSettingId =
-					active !== null && structured.contains(active)
-						? active.dataset.settingId
-						: undefined;
-				structured.replaceChildren();
-				const values = draft.validation.values;
-				for (const declaration of settingsRegistry.declarations) {
-					if (
-						declaration.candidate === 'prohibited' ||
-						declaration.type === 'object' ||
-						declaration.id === 'workbench.colorTheme' ||
-						declaration.storage !== 'portableUser' ||
-						!declaration.windows.includes('authenticated')
-					)
-						continue;
-					const row = context.document.createElement('label');
-					row.className = 'prctr-settings__row';
-					const title = context.document.createElement('span');
-					title.className = 'prctr-settings__title';
-					title.textContent = context.localization.format(declaration.title);
-					const description = context.document.createElement('span');
-					description.className = 'prctr-settings__description';
-					description.textContent = context.localization.format(declaration.description);
-					const value = values.get(declaration.id) ?? declaration.default;
-					const control = settingControl(context.document, declaration, value, (option) =>
-						context.localization.format(enumLabel(option))
-					);
-					control.dataset.settingId = declaration.id;
-					control.disabled = !projection.writable || commitInFlight;
-					control.addEventListener('change', () => {
-						void (async () => {
-							const editingDraft = draft;
-							const value = readControl(control, declaration.type);
-							pendingEdits++;
-							let failed = false;
-							refreshValidation();
-							try {
-								await editingDraft.set(declaration.id, value);
-								if (disposed || editingDraft !== draft) return;
-								control.removeAttribute('aria-invalid');
-								blockedByConflict = false;
-								previewSuppressed = false;
-								refreshValidation();
-							} catch {
-								failed = true;
-								if (!disposed && editingDraft === draft)
-									control.setAttribute('aria-invalid', 'true');
-							} finally {
-								pendingEdits--;
-								if (!disposed) {
-									refreshValidation();
-									if (failed && editingDraft === draft)
-										presentStatus(messages.invalid, { count: 1 });
-								}
-							}
-						})();
-					});
-					row.append(title, description, control);
-					structured.append(row);
-				}
-				if (focusedSettingId !== undefined) {
-					if (!projection.writable || commitInFlight) status.focus();
-					else
-						[
-							...structured.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
-								'input, select'
-							)
-						]
-							.find((control) => control.dataset.settingId === focusedSettingId)
-							?.focus();
-				}
-			};
-			const reset = (next: UserSettingsProjection): void => {
-				projection = next;
-				acknowledgedPresentation = next.presentation;
-				applyPresentation(next);
-				draft.dispose();
-				draft = new SettingsDraft(next.source, next.revision);
-				blockedByConflict = false;
-				pendingIntent = undefined;
-				previewSuppressed = false;
-				renderStructured();
-				refreshValidation();
-			};
-			const receiveProjection = (next: UserSettingsProjection): void => {
-				const acknowledgedDocumentChanged =
-					next.source !== projection.source || next.revision !== projection.revision;
-				if (!previewActive || acknowledgedDocumentChanged || !next.writable)
-					acknowledgedPresentation = next.presentation;
-				applyPresentation(next);
-				if (!acknowledgedDocumentChanged) {
-					projection = next;
-					if (!next.writable) previewSuppressed = true;
-					refreshValidation();
-					return;
-				}
-				if (draft.source === projection.source || draft.source === next.source) {
-					reset(next);
-					return;
-				}
-				const merge = draft.mergeLatest(next.source);
-				projection = next;
-				pendingIntent = undefined;
-				previewSuppressed = false;
-				if (merge.merged !== undefined) {
-					const mergedDraft = new SettingsDraft(next.source, next.revision);
-					mergedDraft.replaceSource(merge.merged);
-					draft.dispose();
-					draft = mergedDraft;
-					blockedByConflict = false;
-					renderStructured();
-					refreshValidation();
-					presentStatus(messages.merged);
-				} else {
-					blockedByConflict = true;
-					renderStructured();
-					refreshValidation();
-					presentStatus(messages.conflict);
-				}
-			};
-			const selectView = (view: 'jsonc' | 'structured'): void => {
-				const json = view === 'jsonc';
-				source.hidden = !json;
-				structured.hidden = json;
-				structuredButton.setAttribute('aria-pressed', String(!json));
-				jsoncButton.setAttribute('aria-pressed', String(json));
-				if (!json) renderStructured();
-			};
-			const duringSetup = bufferedProjection;
-			projectionHandler = (next) => {
-				projectionEventEpoch++;
-				receiveProjection(next);
-			};
-			if (duringSetup !== undefined) receiveProjection(duringSetup);
-			context.disposables.add(
-				navigation.onDidChange((destination) => {
-					page.hidden = destination !== 'settings';
-					if (!page.hidden) {
-						scroll.scanDomNode();
-						heading.focus();
-					}
-					synchronizePreview();
-				})
-			);
-			context.disposables.add({
-				dispose: () => {
-					if (previewActive) void client.cancelPreview().catch(() => {});
-				}
-			});
-			context.disposables.add(
-				addDisposableListener(structuredButton, 'click', () => selectView('structured'))
-			);
-			context.disposables.add(
-				addDisposableListener(jsoncButton, 'click', () => selectView('jsonc'))
-			);
-			context.disposables.add(
-				addDisposableListener(source, 'input', () => {
-					draft.replaceSource(source.value);
-					blockedByConflict = false;
-					previewSuppressed = false;
-					refreshValidation();
-				})
-			);
-			context.disposables.add(
-				addDisposableListener(cancel, 'click', () =>
-					reset({ ...projection, presentation: acknowledgedPresentation })
-				)
-			);
-			context.disposables.add(
-				addDisposableListener(save, 'click', () => {
-					if (commitInFlight) return;
-					commitInFlight = true;
-					refreshValidation();
-					void (async () => {
-						try {
-							const intent =
-								pendingIntent ??
-								Object.freeze({
-									source: draft.source,
-									expectedRevision: projection.revision,
-									idempotencyKey: `settings:${globalThis.crypto.randomUUID()}`
-								});
-							const commitProjectionEpoch = projectionEventEpoch;
-							pendingIntent = intent;
-							const result = await client.commit(intent);
-							commitInFlight = false;
-							if (
-								(result.kind === 'success' || result.kind === 'conflict') &&
-								commitProjectionEpoch !== projectionEventEpoch &&
-								(result.projection.source !== projection.source ||
-									result.projection.revision !== projection.revision)
-							) {
-								pendingIntent = undefined;
-								refreshValidation();
-								return;
-							}
-							if (result.kind === 'success') {
-								if (draft.source === intent.source) {
-									reset(result.projection);
-									presentStatus(messages.saved);
-								} else {
-									pendingIntent = undefined;
-									receiveProjection(result.projection);
-								}
-								return;
-							}
-							if (result.kind === 'conflict') {
-								const merge = draft.mergeLatest(result.projection.source);
-								projection = result.projection;
-								acknowledgedPresentation = result.projection.presentation;
-								applyPresentation(result.projection);
-								pendingIntent = undefined;
-								previewSuppressed = false;
-								if (merge.merged !== undefined) {
-									const next = new SettingsDraft(
-										projection.source,
-										projection.revision
-									);
-									next.replaceSource(merge.merged);
-									draft.dispose();
-									draft = next;
-									blockedByConflict = false;
-									renderStructured();
-									refreshValidation();
-									presentStatus(messages.merged);
-								} else {
-									blockedByConflict = true;
-									refreshValidation();
-									presentStatus(messages.conflict);
-								}
-								return;
-							}
-							if (result.kind === 'ambiguous') {
-								refreshValidation();
-								presentStatus(messages.ambiguous);
-								return;
-							}
-							projection = {
-								...projection,
-								availability: 'unavailable',
-								writable: false
-							};
-							pendingIntent = undefined;
-							previewSuppressed = true;
-							refreshValidation();
-						} catch {
-							commitInFlight = false;
-							pendingIntent = undefined;
-							previewSuppressed = true;
-							previewActive = false;
-							previewSource = undefined;
-							await client.cancelPreview().catch(() => {});
-							applyAcknowledgedPresentation();
-							refreshValidation();
-							presentStatus(messages.failed);
-						}
-					})();
-				})
-			);
-			selectView('structured');
-			renderStructured();
-			refreshValidation();
+			store.add(navigation.onDidRequestSettings(open));
+			if (navigation.settingsRequested) open();
 		}
-	});
-}
-
-function button(document: Document, label: string): HTMLButtonElement {
-	const value = document.createElement('button');
-	value.type = 'button';
-	value.textContent = label;
-	return value;
-}
-function settingControl(
-	document: Document,
-	declaration: (typeof settingsRegistry.declarations)[number],
-	value: unknown,
-	localizeOption: (value: string) => string
-): HTMLInputElement | HTMLSelectElement {
-	if (declaration.type === 'boolean') {
-		const control = document.createElement('input');
-		control.type = 'checkbox';
-		control.checked = value === true;
-		return control;
-	}
-	if (declaration.enum !== undefined) {
-		const control = document.createElement('select');
-		for (const optionValue of declaration.enum) {
-			const option = document.createElement('option');
-			option.value = String(optionValue);
-			option.textContent = localizeOption(String(optionValue));
-			option.selected = optionValue === value;
-			control.append(option);
-		}
-		return control;
-	}
-	const control = document.createElement('input');
-	control.type = declaration.type === 'string' ? 'text' : 'number';
-	control.value = String(value ?? '');
-	if (declaration.minimum !== undefined) control.min = String(declaration.minimum);
-	if (declaration.maximum !== undefined) control.max = String(declaration.maximum);
-	return control;
-}
-function readControl(control: HTMLInputElement | HTMLSelectElement, type: string): unknown {
-	if (control.tagName === 'INPUT' && (control as HTMLInputElement).type === 'checkbox')
-		return (control as HTMLInputElement).checked;
-	if (type === 'integer' || type === 'number')
-		return control.value.trim() === '' ? undefined : Number(control.value);
-	return control.value;
-}
-function enumLabel(value: string): MessageDescriptor {
-	const descriptor = enumLabels[value as keyof typeof enumLabels];
-	if (descriptor === undefined)
-		throw new TypeError(`Packaged setting option ${value} has no localized label`);
-	return descriptor;
+	};
 }

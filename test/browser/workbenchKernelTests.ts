@@ -1,3 +1,6 @@
+import { browserSettingsEditorEnvironment } from './editor/settingsEditorEnvironment.js';
+import type { SettingsRendererClient } from '../../src/prctr/workbench/services/settings/common/settingsRendererClient.js';
+const createSettingsContribution = (client: SettingsRendererClient) => createSettingsWithEnvironment(client, browserSettingsEditorEnvironment);
 import { runModernWorkbenchTests } from './modernWorkbenchTests.ts';
 import { runAccountTests } from './accountTests.ts';
 import { createAccountContribution } from '../../src/prctr/workbench/contrib/account/browser/accountContribution.ts';
@@ -31,7 +34,7 @@ import type {
 import { createAuthenticatedContribution } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts';
 import { createExamSecurityContribution } from '../../src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts';
 import { createIntegratedBrowserContribution } from '../../src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts';
-import { createSettingsContribution } from '../../src/prctr/workbench/contrib/settings/browser/settingsContribution.ts';
+import { createSettingsContribution as createSettingsWithEnvironment } from '../../src/prctr/workbench/contrib/settings/browser/settingsContribution.ts';
 import { commonWorkbenchContributions } from '../../src/prctr/workbench/workbench.common.main.ts';
 import { createDesktopWorkbenchContribution } from '../../src/prctr/code/electron-browser/workbench.desktop.main.ts';
 import type {

@@ -114,7 +114,7 @@ code, loads an extension or supplies CSS. Existing settings authority, explicit
 Save and preview/cancel behavior continue to apply.
 
 The color engine preserves VS Code identifiers in theme data and settings.
-Packaged theming participants use the upstream registry and pure CSS collector; the browser owner installs and disposes a constructed stylesheet. Participant code is static product source, never user-supplied CSS. Proctor retains its existing system forced-colors rules and non-color size registry rather than importing extension environment or editor size services.
+Packaged theming participants use the upstream registry and pure CSS collector; the browser owner installs and disposes a constructed stylesheet. Participant code is static product source, never user-supplied CSS. Admitted Modern UI styles also consume the complete pinned size registry through the same collector, preserving typography, spacing, radius, and stroke roles under the Proctor CSS namespace. The existing presentation tokens continue to serve Proctor-owned controls. Proctor retains its system forced-colors rules; no extension environment or user-provided CSS enters this path.
 
 Renderer CSS uses the namespaced `--prctr-theme-<color-id>` projection, with dots
 replaced by hyphens. Controls consume their actual roles, including Modern UI
