@@ -2,6 +2,7 @@
   "$schema": "./schemas/dependencies.schema.json",
   "schemaVersion": 1,
   "allowedLicenseExpressions": [
+    "(Unlicense OR Apache-2.0)",
     "(MIT OR Apache-2.0) AND Unicode-3.0",
     "Apache-2.0",
     "Apache-2.0 OR MIT",
@@ -32,11 +33,7 @@
           "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
           "alias": "napi",
           "kind": "production",
-          "features": [
-            "dyn-symbols",
-            "napi8",
-            "serde-json"
-          ],
+          "features": ["dyn-symbols", "napi8", "serde-json"],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
@@ -45,19 +42,13 @@
           "manifest": "native/crates/prctr-desktop-key-custody/Cargo.toml",
           "alias": "napi",
           "kind": "production",
-          "features": [
-            "dyn-symbols",
-            "napi8"
-          ],
+          "features": ["dyn-symbols", "napi8"],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
         }
       ],
-      "processes": [
-        "exam-security-utility",
-        "electron-main"
-      ],
+      "processes": ["exam-security-utility", "electron-main"],
       "networkBehavior": "None at runtime; Node-API calls remain process-local.",
       "nativeBehavior": "Links the platform Node-API symbols and uses its reviewed registration build support; it does not bundle a helper executable.",
       "transitiveRisk": "Adds napi-sys, registration support, futures primitives, serde conversion, and dynamic-symbol loading; exact transitive versions are locked and license checked.",
@@ -81,9 +72,7 @@
           "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
           "alias": "napi-derive",
           "kind": "production",
-          "features": [
-            "strict"
-          ],
+          "features": ["strict"],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
@@ -92,17 +81,13 @@
           "manifest": "native/crates/prctr-desktop-key-custody/Cargo.toml",
           "alias": "napi-derive",
           "kind": "production",
-          "features": [
-            "strict"
-          ],
+          "features": ["strict"],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
         }
       ],
-      "processes": [
-        "native-build"
-      ],
+      "processes": ["native-build"],
       "networkBehavior": "None at runtime or build time after Cargo acquisition.",
       "nativeBehavior": "A compile-time procedural macro emits Node-API registration glue; it ships no standalone binary.",
       "transitiveRisk": "Adds exact locked syntax and case-conversion macro dependencies used only while compiling the bridge.",
@@ -126,9 +111,7 @@
           "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
           "alias": "serde",
           "kind": "production",
-          "features": [
-            "derive"
-          ],
+          "features": ["derive"],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": null
@@ -137,9 +120,7 @@
           "manifest": "native/crates/prctr-native-protocol/Cargo.toml",
           "alias": "serde",
           "kind": "production",
-          "features": [
-            "derive"
-          ],
+          "features": ["derive"],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": null
@@ -154,11 +135,7 @@
           "targetScope": null
         }
       ],
-      "processes": [
-        "exam-security-utility",
-        "native-build",
-        "native-security-helper"
-      ],
+      "processes": ["exam-security-utility", "native-build", "native-security-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust serialization traits and derive macros; no native library or helper process.",
       "transitiveRisk": "Adds the exact locked serde core and derive macro graph; generated DTO validation still runs independently after conversion.",
@@ -188,9 +165,7 @@
           "targetScope": null
         }
       ],
-      "processes": [
-        "native-security-helper"
-      ],
+      "processes": ["native-security-helper"],
       "networkBehavior": "None; all frames use private inherited process handles and are validated before nested allocation.",
       "nativeBehavior": "Pure Rust JSON encoding and decoding; ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Uses the exact locked itoa, memchr, serde_core, and zmij graph; fixed frame limits and generated protocol validation remain independent controls.",
@@ -220,9 +195,7 @@
           "targetScope": null
         }
       ],
-      "processes": [
-        "exam-security-utility"
-      ],
+      "processes": ["exam-security-utility"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust message-authentication construction; it ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Reuses the exact locked digest graph admitted for SHA-256 and activates the exact locked constant-time subtle primitive; neither adds runtime I/O or platform integration.",
@@ -252,9 +225,7 @@
           "targetScope": null
         }
       ],
-      "processes": [
-        "exam-security-utility"
-      ],
+      "processes": ["exam-security-utility"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust SHA-256 primitives; it ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Adds the exact locked digest, block-buffer, crypto-common, generic-array and typenum graph; the use is local HMAC derivation over bounded inputs.",
@@ -326,11 +297,7 @@
           "manifest": "native/crates/prctr-interactive-session-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_System_RemoteDesktop",
-            "Win32_System_Threading"
-          ],
+          "features": ["Win32_Foundation", "Win32_System_RemoteDesktop", "Win32_System_Threading"],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -339,9 +306,7 @@
           "manifest": "native/crates/prctr-clipboard-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": [
-            "Win32_System_DataExchange"
-          ],
+          "features": ["Win32_System_DataExchange"],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -365,10 +330,7 @@
           "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": [
-            "Win32_Storage_FileSystem",
-            "Win32_System_WindowsProgramming"
-          ],
+          "features": ["Win32_Storage_FileSystem", "Win32_System_WindowsProgramming"],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -462,9 +424,7 @@
           "targetScope": "cfg(target_os=\"macos\")"
         }
       ],
-      "processes": [
-        "exam-security-utility"
-      ],
+      "processes": ["exam-security-utility"],
       "networkBehavior": "None; the crate exposes platform C declarations only.",
       "nativeBehavior": "Links macOS system APIs already provided by the operating system and ships no helper or bundled native library.",
       "transitiveRisk": "No additional transitive runtime graph; the exact version is already locked by the native workspace.",
@@ -482,10 +442,7 @@
       "source": "https://www.npmjs.com/package/@vscode/codicons/v/0.0.46-39",
       "license": "CC-BY-4.0",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "authenticated-renderer",
-        "candidate-renderer"
-      ],
+      "processes": ["authenticated-renderer", "candidate-renderer"],
       "networkBehavior": "None; the font is bundled into renderer assets at build time.",
       "nativeBehavior": "Bundles one platform-neutral TrueType font and no executable or native library.",
       "transitiveRisk": "The production package has no runtime dependencies; its development-only source repository scripts are not admitted or executed.",
@@ -503,9 +460,7 @@
       "source": "https://www.npmjs.com/package/@xterm/xterm/v/6.1.0-beta.303",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "candidate-renderer"
-      ],
+      "processes": ["candidate-renderer"],
       "networkBehavior": "None; xterm parses and renders byte output already delivered through Proctor's closed terminal renderer API.",
       "nativeBehavior": "Platform-neutral TypeScript and browser assets only; no executable or native library is bundled.",
       "transitiveRisk": "The exact production package has no runtime dependencies and is imported only by the Candidate terminal panel.",
@@ -523,10 +478,7 @@
       "source": "https://www.npmjs.com/package/electron/v/44.0.0",
       "license": "MIT",
       "lifecycleScripts": "none",
-      "processes": [
-        "electron-main",
-        "exam-security-utility"
-      ],
+      "processes": ["electron-main", "exam-security-utility"],
       "networkBehavior": "The development package API acquires the checksum-verified exact Electron distribution on explicit tool invocation when it is absent; the packaged application uses its bundled runtime and product networking remains separately owned.",
       "nativeBehavior": "Installs the exact Electron runtime and its Chromium/Node native binaries for the host platform.",
       "transitiveRisk": "Acquisition and archive extraction dependencies are reachable only from explicit development tooling; the lockfile pins their resolved graph and the application does not import this package as an ordinary Node dependency.",
@@ -664,10 +616,7 @@
       "source": "https://www.npmjs.com/package/@vscode/l10n/v/0.0.18",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "authenticated-renderer",
-        "settings-json-worker"
-      ],
+      "processes": ["authenticated-renderer", "settings-json-worker"],
       "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
       "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
       "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
@@ -685,10 +634,7 @@
       "source": "https://www.npmjs.com/package/vscode-json-languageservice/v/6.0.0-next.3",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "authenticated-renderer",
-        "settings-json-worker"
-      ],
+      "processes": ["authenticated-renderer", "settings-json-worker"],
       "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
       "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
       "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
@@ -706,10 +652,7 @@
       "source": "https://www.npmjs.com/package/vscode-languageserver/v/10.0.0-next.18",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "authenticated-renderer",
-        "settings-json-worker"
-      ],
+      "processes": ["authenticated-renderer", "settings-json-worker"],
       "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
       "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
       "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
@@ -727,10 +670,7 @@
       "source": "https://www.npmjs.com/package/vscode-uri/v/3.1.0",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "authenticated-renderer",
-        "settings-json-worker"
-      ],
+      "processes": ["authenticated-renderer", "settings-json-worker"],
       "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
       "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
       "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
@@ -748,10 +688,7 @@
       "source": "https://www.npmjs.com/package/@vscode/tree-sitter-wasm/v/0.3.1",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "authenticated-renderer",
-        "settings-editor-worker"
-      ],
+      "processes": ["authenticated-renderer", "settings-editor-worker"],
       "networkBehavior": "Only immutable packaged worker/WASM resources may be loaded by the owning adapter. No remote package, grammar or service discovery is admitted.",
       "nativeBehavior": "JavaScript and WebAssembly only; no host-native addon or installation toolchain executes.",
       "transitiveRisk": "No package runtime dependencies. Exact archives must match the pinned upstream lock integrity digests; lifecycle scripts remain disabled.",
@@ -769,10 +706,7 @@
       "source": "https://www.npmjs.com/package/@vscode/diff/v/0.0.2-7",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "authenticated-renderer",
-        "settings-editor-worker"
-      ],
+      "processes": ["authenticated-renderer", "settings-editor-worker"],
       "networkBehavior": "Only immutable packaged worker/WASM resources may be loaded by the owning adapter. No remote package, grammar or service discovery is admitted.",
       "nativeBehavior": "JavaScript and WebAssembly only; no host-native addon or installation toolchain executes.",
       "transitiveRisk": "No package runtime dependencies. Exact archives must match the pinned upstream lock integrity digests; lifecycle scripts remain disabled.",
@@ -860,10 +794,7 @@
       "source": "https://www.npmjs.com/package/vscode-textmate/v/9.3.2",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "authenticated-renderer",
-        "settings-textmate-worker"
-      ],
+      "processes": ["authenticated-renderer", "settings-textmate-worker"],
       "networkBehavior": "Only literal bundled JavaScript, grammar data and WASM bytes are admitted. No network grammar, package resolution or remote source reads.",
       "nativeBehavior": "JavaScript and WebAssembly only; no Node integration, native addon or lifecycle script.",
       "transitiveRisk": "No runtime dependencies. Version and archive integrity match the immutable upstream lock; asset digests are verified during bundling.",
@@ -881,10 +812,7 @@
       "source": "https://www.npmjs.com/package/vscode-oniguruma/v/1.7.0",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": [
-        "authenticated-renderer",
-        "settings-textmate-worker"
-      ],
+      "processes": ["authenticated-renderer", "settings-textmate-worker"],
       "networkBehavior": "Only literal bundled JavaScript, grammar data and WASM bytes are admitted. No network grammar, package resolution or remote source reads.",
       "nativeBehavior": "JavaScript and WebAssembly only; no Node integration, native addon or lifecycle script.",
       "transitiveRisk": "No runtime dependencies. Version and archive integrity match the immutable upstream lock; asset digests are verified during bundling.",

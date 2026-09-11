@@ -136,7 +136,17 @@ void test('the editor discovers configured projects without Node ambient types i
 		const project = service.getDefaultProjectForFile(ts.server.toNormalizedPath(file), true);
 		assert.ok(project, path);
 		assert.ok(!project.getProjectName().includes('inferredProject'), project.getProjectName());
-		if (path.includes('/browser/')) assert.deepEqual(project.getCompilerOptions().types, []);
+		if (path.includes('/browser/')) {
+			assert.deepEqual(project.getCompilerOptions().types, [
+				'trusted-types',
+				'@webgpu/types',
+				'wicg-file-system-access'
+			]);
+			assert.ok(
+				!project.getFileNames().some((file) => /node_modules\/@types\/node\//.test(file)),
+				'Browser project acquired Node ambient declarations'
+			);
+		}
 		service.closeClientFile(file);
 	}
 	service.closeLog();
@@ -174,7 +184,7 @@ void test('lint rules reject unsafe forms and accept the supported counterparts'
 
 void test('upstream directive interpretation preserves locations and never rewrites fixtures', () => {
 	const literal = 'const fixture = "// eslint-disable-next-line local/code-no-any-casts";';
-	const original = `${literal}\n// eslint-disable-next-line local/code-no-potentially-unsafe-disposables\nlet store = new DisposableStore();\n// eslint-disable-next-line no-debugger\ndebugger;\n/* eslint-disable local/code-no-any-casts */\n`;
+	const original = `${literal}\n// eslint-disable-next-line local/code-no-potentially-unsafe-disposables\nlet store = new DisposableStore();\n// eslint-disable-next-line no-debugger\ndebugger;\n/* eslint-disable local/code-no-any-casts */\nif (value) {\n // eslint-disable-next-line local/code-no-any-casts\n} else if (other) {\n}\n`;
 	const processed = upstreamDirectives.preprocess?.(original, 'example.ts')[0];
 	assert.equal(typeof processed, 'string');
 	if (typeof processed !== 'string') throw new Error('Expected one textual lint input.');
@@ -185,6 +195,7 @@ void test('upstream directive interpretation preserves locations and never rewri
 	assert.ok(processed.includes('eslint-disable-next-line no-debugger'));
 	assert.ok(processed.includes('/* ported-disable local/code-no-any-casts */'));
 	assert.equal(processed.indexOf('let store'), original.indexOf('let store'));
+	assert.ok(processed.includes('ported-disable-next-line local/code-no-any-casts\n} else'));
 });
 
 void test('missing Electron runtime is diagnosed without acquisition or filesystem mutation', () => {

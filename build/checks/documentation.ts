@@ -1,7 +1,9 @@
+import { createHash } from 'node:crypto';
+import ts from 'typescript';
 import { posix } from 'node:path';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { parse as parseYaml } from 'yaml';
-import type { Check, Diagnostic } from './types.ts';
+import type { Check, Diagnostic, Repository } from './types.ts';
 import { diagnostic } from './types.ts';
 import { resolveRepositoryPath } from './repository.ts';
 
@@ -267,12 +269,61 @@ const TEXT_EXTENSIONS = new Set([
 	'.yaml',
 	'.yml'
 ]);
+/** Copied data assets retain their pinned whitespace and JSONC dialect. Byte drift
+ * loses this treatment; the provenance check also validates the complete record. */
+function copiedJsonAssets(repository: Repository): ReadonlySet<string> {
+	const assets = new Set<string>();
+	for (const path of repository
+		.files()
+		.filter(
+			(path) =>
+				path.startsWith('docs/upstream/vscode-ports/') &&
+				path.endsWith('.json') &&
+				!path.endsWith('/schema.json')
+		)) {
+		let manifest: {
+			items?: {
+				disposition?: string;
+				category?: string;
+				localPath?: string;
+				localSha256?: string;
+			}[];
+		};
+		try {
+			manifest = JSON.parse(repository.read(path));
+		} catch {
+			continue;
+		}
+		if (manifest === null || typeof manifest !== 'object' || !Array.isArray(manifest.items))
+			continue;
+		for (const item of manifest.items) {
+			if (
+				item === null ||
+				typeof item !== 'object' ||
+				item.disposition !== 'copied' ||
+				item.category !== 'asset' ||
+				typeof item.localPath !== 'string' ||
+				!item.localPath.endsWith('.json') ||
+				repository.kind(item.localPath) !== 'file'
+			)
+				continue;
+			if (
+				createHash('sha256').update(repository.readBytes(item.localPath)).digest('hex') ===
+				item.localSha256
+			)
+				assets.add(item.localPath);
+		}
+	}
+	return assets;
+}
+
 export const hygieneCheck: Check = {
 	id: 'repository.hygiene',
 	category: 'documentation',
 	contractRequired: true,
 	run: ({ repository }) => {
 		const diagnostics: Diagnostic[] = [];
+		const copiedAssets = copiedJsonAssets(repository);
 		for (const path of repository.files()) {
 			if (repository.kind(path) === 'symlink') continue;
 			const extension = posix.extname(path);
@@ -306,7 +357,7 @@ export const hygieneCheck: Check = {
 						'Encode repository text as UTF-8.'
 					)
 				);
-			if (!text.endsWith('\n'))
+			if (!copiedAssets.has(path) && !text.endsWith('\n'))
 				diagnostics.push(
 					diagnostic(
 						'repository.hygiene',
@@ -317,7 +368,7 @@ export const hygieneCheck: Check = {
 				);
 			const lines = text.split('\n');
 			lines.forEach((line, index) => {
-				if (/[ \t]+$/.test(line))
+				if (!copiedAssets.has(path) && /[ \t]+$/.test(line))
 					diagnostics.push(
 						diagnostic(
 							'repository.hygiene',
@@ -330,7 +381,13 @@ export const hygieneCheck: Check = {
 			});
 			if (extension === '.json')
 				try {
-					JSON.parse(text);
+					if (copiedAssets.has(path)) {
+						const result = ts.parseConfigFileTextToJson(path, text);
+						if (result.error)
+							throw new Error(
+								ts.flattenDiagnosticMessageText(result.error.messageText, '\n')
+							);
+					} else JSON.parse(text);
 				} catch (error) {
 					diagnostics.push(
 						diagnostic(

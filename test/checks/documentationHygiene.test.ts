@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { hygieneCheck } from '../../build/checks/documentation.ts';
@@ -47,4 +48,41 @@ void test('hygiene does not permit markers to exempt unrelated test locations', 
 	);
 	assert.ok(Array.isArray(diagnostics));
 	assert.match(diagnostics[0]?.problem ?? '', /machine-specific absolute path/);
+});
+
+void test('exact copied JSON assets preserve upstream JSONC and terminal whitespace without exempting drift', () => {
+	const asset = 'src/prctr/editor/common/example.json';
+	const source = '{\n // pinned comment\n "value": 1,\n}';
+	const record =
+		JSON.stringify({
+			items: [
+				{
+					disposition: 'copied',
+					category: 'asset',
+					localPath: asset,
+					localSha256: createHash('sha256').update(source).digest('hex')
+				}
+			]
+		}) + '\n';
+	const files = { 'docs/upstream/vscode-ports/example.json': record, [asset]: source };
+	assert.deepEqual(hygieneCheck.run(context(files)), []);
+	assert.notDeepEqual(hygieneCheck.run(context({ ...files, [asset]: source + ' ' })), []);
+	const invalid = '{not JSONC';
+	const invalidRecord =
+		JSON.stringify({
+			items: [
+				{
+					disposition: 'copied',
+					category: 'asset',
+					localPath: asset,
+					localSha256: createHash('sha256').update(invalid).digest('hex')
+				}
+			]
+		}) + '\n';
+	assert.notDeepEqual(
+		hygieneCheck.run(
+			context({ 'docs/upstream/vscode-ports/example.json': invalidRecord, [asset]: invalid })
+		),
+		[]
+	);
 });

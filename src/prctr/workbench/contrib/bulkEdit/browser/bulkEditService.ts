@@ -41,7 +41,7 @@ class BulkEdit {
 		private readonly _edits: ResourceEdit[],
 		private readonly _undoRedoGroup: UndoRedoGroup,
 		private readonly _undoRedoSource: UndoRedoSource | undefined,
-		
+
 		@IInstantiationService private readonly _instaService: IInstantiationService,
 		@ILogService private readonly _logService: ILogService,
 	) {

@@ -66,7 +66,9 @@ The text-hygiene check permits absolute-path and `file:` URI literals only in
 marked base-common port source and its transferred owner tests, where those
 literals are behavioral fixtures covered by an exact manifest digest. Unmarked
 files and all other repository areas retain the portable-path prohibition;
-runtime dependencies on another checkout remain forbidden.
+runtime dependencies on another checkout remain forbidden. Exact copied JSON
+assets preserve upstream whitespace and JSONC syntax only while their bytes
+match their provenance digest; syntax validation still applies.
 
 Static checks never claim keyboard behavior, visual meaning, authoritative
 server behavior, Electron isolation, packaged security, native capability, or

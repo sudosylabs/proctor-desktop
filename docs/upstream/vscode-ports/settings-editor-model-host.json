@@ -4,9 +4,7 @@
   "clusterId": "settings-editor-model-host",
   "admission": {
     "workflow": "Resolve, retain and edit the authorized virtual Settings text model, including model references, undo/redo and bounded bulk text edits.",
-    "callers": [
-      "src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts"
-    ],
+    "callers": ["src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts"],
     "interface": "src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts",
     "decision": "docs/architecture/user-settings.md"
   },
@@ -23,9 +21,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -41,9 +37,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -59,9 +53,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -77,9 +69,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve reference-counted model acquisition and provider mechanics with a closed virtual-model factory. Exclude disk/untitled file-service fallbacks; reject after disposal and dispose late-resolving model promises.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -95,9 +85,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -113,9 +101,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -131,9 +117,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -149,9 +133,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -167,9 +149,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -185,9 +165,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -203,9 +181,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -221,9 +197,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -239,9 +213,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -257,9 +229,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -275,9 +245,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -293,9 +261,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -311,9 +277,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -329,9 +293,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -347,9 +309,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -365,9 +325,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -383,9 +341,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -401,9 +357,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -419,9 +373,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -437,9 +389,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -455,9 +405,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -473,9 +421,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -491,9 +437,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -509,9 +453,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -527,9 +469,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -545,9 +485,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -563,9 +501,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -581,9 +517,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -595,13 +529,11 @@
       "upstreamPath": "src/vs/workbench/contrib/bulkEdit/browser/bulkEditService.ts",
       "upstreamBlob": "a4ba533e180c0b4e27b6e52dc9470b9d60bdedc6",
       "localPath": "src/prctr/workbench/contrib/bulkEdit/browser/bulkEditService.ts",
-      "localSha256": "b6814acbc320444d31120c51f98afe714ec98653e11c6a2b16443184b584d9b1",
+      "localSha256": "cd1521fc6a697b0ec032682674a15e92426c2fdfe4465cad9a4b6c85986d1b98",
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain bulk text edit conversion, version checks and undo grouping for authorized virtual models. Exclude filesystem/Notebook product mutation and workspace file operations; enforce readonly and disposed-model boundaries.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -617,9 +549,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -635,9 +565,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -653,9 +581,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve text edit grouping and application; check readonly/disposed model state and wait for every preparation promise before cleaning up and rethrowing a failure.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -671,9 +597,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -689,9 +613,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -707,9 +629,7 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -721,9 +641,7 @@
       "upstreamPath": "src/vs/editor/common/services/model.ts",
       "upstreamBlob": "10372165683512c362ae22a4a4d6bd460031012f",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/services/model.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -732,9 +650,7 @@
       "upstreamPath": "src/vs/editor/common/services/resolverService.ts",
       "upstreamBlob": "348f4b341212a38bfe387590e1680bb6e3d102a1",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/services/resolverService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -743,9 +659,7 @@
       "upstreamPath": "src/vs/base/common/lifecycle.ts",
       "upstreamBlob": "a75cbb1cce3099e07bff3cc9c751d634ae30dfdd",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/lifecycle.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -754,9 +668,7 @@
       "upstreamPath": "src/vs/platform/undoRedo/common/undoRedo.ts",
       "upstreamBlob": "bff14d68aeed1e3b3409cbcef229e3c78db87742",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/undoRedo/common/undoRedo.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -765,9 +677,7 @@
       "upstreamPath": "src/vs/editor/common/model/editStack.ts",
       "upstreamBlob": "078fac10a27b3ddd31df8b147bc59d8717743884",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/model/editStack.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -776,9 +686,7 @@
       "upstreamPath": "src/vs/base/common/arrays.ts",
       "upstreamBlob": "9e12edbab2a0ce7c0ee88f2d35e11b9896272072",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/arrays.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -787,9 +695,7 @@
       "upstreamPath": "src/vs/base/common/cancellation.ts",
       "upstreamBlob": "e04c9277b85f99cd0b1a0fedfa33e2c03b86caf3",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/cancellation.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -798,9 +704,7 @@
       "upstreamPath": "src/vs/base/common/glob.ts",
       "upstreamBlob": "78255e02110251341b33f4650e2f7b599689217b",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/glob.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -809,9 +713,7 @@
       "upstreamPath": "src/vs/base/common/objects.ts",
       "upstreamBlob": "ee35796736403682dde7d9384c05135bb3decc77",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/objects.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -820,9 +722,7 @@
       "upstreamPath": "src/vs/base/common/extpath.ts",
       "upstreamBlob": "44477dcb606ac532eaa1334ad61bbd219e02979e",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/extpath.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -831,9 +731,7 @@
       "upstreamPath": "src/vs/base/common/strings.ts",
       "upstreamBlob": "1c50375d05ea7701229c8de87ae8281f750cb4af",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/strings.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -842,9 +740,7 @@
       "upstreamPath": "src/vs/base/common/uri.ts",
       "upstreamBlob": "d148dc10f26bf8a19615e052df3dde23c481099c",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/uri.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -853,9 +749,7 @@
       "upstreamPath": "src/vs/platform/files/common/files.ts",
       "upstreamBlob": "4181a930379caa56bcdd02202162685decddbd22",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/files/common/files.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -864,9 +758,7 @@
       "upstreamPath": "src/vs/platform/instantiation/common/instantiation.ts",
       "upstreamBlob": "b879acb0ee8da5a824321bd1b9925219fe07af94",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/instantiation/common/instantiation.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -875,9 +767,7 @@
       "upstreamPath": "src/vs/platform/telemetry/common/telemetry.ts",
       "upstreamBlob": "29b71ef796915366c23c9a7fa67f882e57c88832",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/telemetry/common/telemetry.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -886,9 +776,7 @@
       "upstreamPath": "src/vs/base/common/event.ts",
       "upstreamBlob": "cf5fd39b7389b12890a85fd2159e35326d5b7a60",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/event.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -897,9 +785,7 @@
       "upstreamPath": "src/vs/base/common/path.ts",
       "upstreamBlob": "c61fa5831cfe837e4934298c01b594567dbeecf8",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/path.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -908,9 +794,7 @@
       "upstreamPath": "src/vs/base/common/errors.ts",
       "upstreamBlob": "35bb755608e5e9b2983a5d6de61364f8da0573ea",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/errors.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -919,9 +803,7 @@
       "upstreamPath": "src/vs/base/common/async.ts",
       "upstreamBlob": "510fc4a54049fda2dbd9454c2e5cfa3778be2fe0",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/async.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -930,9 +812,7 @@
       "upstreamPath": "src/vs/base/common/map.ts",
       "upstreamBlob": "1bbb7acf94ec7cd1bec2f12a7a4d8e7f6d0fea61",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/map.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -941,9 +821,7 @@
       "upstreamPath": "src/vs/platform/progress/common/progress.ts",
       "upstreamBlob": "5780df6be3266104f6f13053ec80e99dfd7ca6dc",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/progress/common/progress.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -952,9 +830,7 @@
       "upstreamPath": "src/vs/workbench/common/editor/textResourceEditorModel.ts",
       "upstreamBlob": "703848412c6cddac551fbfa68b6198dbceba7b8a",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/common/editor/textResourceEditorModel.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -963,9 +839,7 @@
       "upstreamPath": "src/vs/workbench/services/textfile/common/textfiles.ts",
       "upstreamBlob": "84c90a5581b4d6f33f5104f6bafe7c85de37219b",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/textfile/common/textfiles.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -974,9 +848,7 @@
       "upstreamPath": "src/vs/base/common/network.ts",
       "upstreamBlob": "871560d2ab0eb9496824c44869580461e21c2b99",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/network.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -985,9 +857,7 @@
       "upstreamPath": "src/vs/workbench/services/textfile/common/textFileEditorModel.ts",
       "upstreamBlob": "d7058ab39474b6b44e8914753121fe37fd49640e",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts",
       "rationale": "The closed virtual model factory replaces disk-backed text-file resolution; file/untitled fallback is excluded."
@@ -996,9 +866,7 @@
       "upstreamPath": "src/vs/platform/instantiation/common/extensions.ts",
       "upstreamBlob": "e59cc837cc633dac0445d59b7d03dbc6c9dc783a",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/instantiation/common/extensions.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1007,9 +875,7 @@
       "upstreamPath": "src/vs/platform/uriIdentity/common/uriIdentity.ts",
       "upstreamBlob": "8bd6be7dfeda01d0645c43f1dc3061dd9d128288",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/uriIdentity/common/uriIdentity.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1018,9 +884,7 @@
       "upstreamPath": "src/vs/workbench/services/untitled/common/untitledTextEditorModel.ts",
       "upstreamBlob": "d167c5dc4bd36d1aa4668e71279decc98b7ef343",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/untitled/common/untitledTextEditorModel.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1029,9 +893,7 @@
       "upstreamPath": "src/vs/editor/common/config/fontInfo.ts",
       "upstreamBlob": "fae3b6254dd30d566b2d7202b0f08450b0c750ea",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/config/fontInfo.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1040,9 +902,7 @@
       "upstreamPath": "src/vs/base/browser/pixelRatio.ts",
       "upstreamBlob": "1e11a248aa21fab165a07bd402d99d8ba0dbc851",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/browser/pixelRatio.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1051,9 +911,7 @@
       "upstreamPath": "src/vs/base/browser/window.ts",
       "upstreamBlob": "ab920e18349ace49c32f92eb5d0c946abfbfe366",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/browser/window.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1062,9 +920,7 @@
       "upstreamPath": "src/vs/base/common/observable.ts",
       "upstreamBlob": "86ac5971a277983945586868dc1a2a05a6ac9e8f",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/observable.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1073,9 +929,7 @@
       "upstreamPath": "src/vs/base/common/types.ts",
       "upstreamBlob": "154d8199690a162dfc37895125348e5a64b7d848",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/types.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1084,9 +938,7 @@
       "upstreamPath": "src/vs/editor/browser/config/fontMeasurements.ts",
       "upstreamBlob": "2df57fcc6368f98e97acc555a80117d2864dd94c",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/browser/config/fontMeasurements.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1095,9 +947,7 @@
       "upstreamPath": "src/vs/editor/browser/services/codeEditorService.ts",
       "upstreamBlob": "570d91f6c2f0449d38300d698ad2fa216e7f4ac3",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/browser/services/codeEditorService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1106,9 +956,7 @@
       "upstreamPath": "src/vs/editor/common/config/editorOptions.ts",
       "upstreamBlob": "22376e4115595065a48d7222e7e09d481b4a74c7",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/config/editorOptions.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1117,9 +965,7 @@
       "upstreamPath": "src/vs/editor/common/config/fontInfoFromSettings.ts",
       "upstreamBlob": "1da693947adcb1b3c11da31f2e0ada451e80e559",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/config/fontInfoFromSettings.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1128,9 +974,7 @@
       "upstreamPath": "src/vs/platform/configuration/common/configuration.ts",
       "upstreamBlob": "55eaae5451c234878ee71f9245edb12a708a22ae",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/configuration/common/configuration.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1139,9 +983,7 @@
       "upstreamPath": "src/vs/editor/browser/editorExtensions.ts",
       "upstreamBlob": "d5961dd4f1e5c461d6c3b61bd41fa81721c16093",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/browser/editorExtensions.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1150,9 +992,7 @@
       "upstreamPath": "src/vs/editor/common/editorCommon.ts",
       "upstreamBlob": "df56a1beab5d8217131df121e2802a1f9318ead1",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/editorCommon.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1161,9 +1001,7 @@
       "upstreamPath": "src/vs/editor/common/core/position.ts",
       "upstreamBlob": "713362dd70b444e92c05f0b91d4c4444d0448d21",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/core/position.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1172,9 +1010,7 @@
       "upstreamPath": "src/vs/editor/common/core/range.ts",
       "upstreamBlob": "b42088e53a10e0b9a8acf3babb4d91b9f5cb8052",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/core/range.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1183,9 +1019,7 @@
       "upstreamPath": "src/vs/editor/common/core/selection.ts",
       "upstreamBlob": "4dd6c645c47aa7d801829cfe821c0df851f59f9f",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/core/selection.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1194,9 +1028,7 @@
       "upstreamPath": "src/vs/editor/common/model.ts",
       "upstreamBlob": "34c57f255760cfa7630139cf9300ad9c4889aaad",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/model.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1205,9 +1037,7 @@
       "upstreamPath": "src/vs/platform/actions/common/actions.ts",
       "upstreamBlob": "68080fa1ac4ef39aa22b25f9f13454b21f7dc3e2",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/actions/common/actions.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1216,9 +1046,7 @@
       "upstreamPath": "src/vs/platform/editor/common/editor.ts",
       "upstreamBlob": "2de7cfda6ae63fd6a289580fedac7e58e7fc0485",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/editor/common/editor.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1227,9 +1055,7 @@
       "upstreamPath": "src/vs/workbench/common/editor.ts",
       "upstreamBlob": "38033cc00fde17c0d1b2d4bbd285cd4f3bfc4485",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/common/editor.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1238,9 +1064,7 @@
       "upstreamPath": "src/vs/platform/contextkey/common/contextkey.ts",
       "upstreamBlob": "598b2ccb6c37ed0dca560082d8650e05ecbf12d6",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/contextkey/common/contextkey.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1249,9 +1073,7 @@
       "upstreamPath": "src/vs/editor/browser/editorBrowser.ts",
       "upstreamBlob": "2f185f48f093a3ad44fbb18e6e6e181eed411037",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/browser/editorBrowser.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1260,9 +1082,7 @@
       "upstreamPath": "src/vs/workbench/common/editor/editorInput.ts",
       "upstreamBlob": "43ed2496a51f5de2be78bc9ea750110ab63bc0d6",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/common/editor/editorInput.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1271,9 +1091,7 @@
       "upstreamPath": "src/vs/base/common/resources.ts",
       "upstreamBlob": "089ee62de037ea92f0724171de53a16ecb505000",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/resources.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1282,9 +1100,7 @@
       "upstreamPath": "src/vs/platform/dialogs/common/dialogs.ts",
       "upstreamBlob": "cc27699b80dcc69f68a61adbe662475a883822b1",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/dialogs/common/dialogs.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1293,9 +1109,7 @@
       "upstreamPath": "src/vs/platform/label/common/label.ts",
       "upstreamBlob": "1541b3b84c02204477f02301e93aa45d6b045f30",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/label/common/label.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1304,9 +1118,7 @@
       "upstreamPath": "src/vs/workbench/common/editor/resourceEditorInput.ts",
       "upstreamBlob": "221d0f32db886e1cd1e0378c238c84964b22f78d",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/common/editor/resourceEditorInput.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1315,9 +1127,7 @@
       "upstreamPath": "src/vs/base/common/buffer.ts",
       "upstreamBlob": "b105bdfeb86762f2b53f66afa92821a123d8424f",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/buffer.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1326,9 +1136,7 @@
       "upstreamPath": "src/vs/workbench/services/workingCopy/common/workingCopy.ts",
       "upstreamBlob": "a33cf57efb1d432d1144f3d9d10eb063e9ded938",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/workingCopy/common/workingCopy.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1337,9 +1145,7 @@
       "upstreamPath": "src/vs/workbench/services/filesConfiguration/common/filesConfigurationService.ts",
       "upstreamBlob": "cdc2962fedb9e34568d1b943ef533c3633c1a4ad",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/filesConfiguration/common/filesConfigurationService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1348,9 +1154,7 @@
       "upstreamPath": "src/vs/workbench/services/extensions/common/extensions.ts",
       "upstreamBlob": "c7fee71a2e23b0bdc0f38f68c4e7ebbe8634e4a4",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/extensions/common/extensions.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1359,9 +1163,7 @@
       "upstreamPath": "src/vs/nls.ts",
       "upstreamBlob": "8383ae24d96d4d9361921b89bdf48519d13d4260",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/vscodeNls.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1370,9 +1172,7 @@
       "upstreamPath": "src/vs/workbench/services/editor/common/editorService.ts",
       "upstreamBlob": "6456852f0b9f69a09e0b11b6bfc4d7f4475e911b",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/editor/common/editorService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1381,9 +1181,7 @@
       "upstreamPath": "src/vs/base/common/htmlContent.ts",
       "upstreamBlob": "aa60d48ad348e36467711432291e487c03532295",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/htmlContent.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1392,9 +1190,7 @@
       "upstreamPath": "src/vs/editor/common/services/textResourceConfiguration.ts",
       "upstreamBlob": "a10748168e6d317ac7f96ebee93c2bd6d9b58c09",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/services/textResourceConfiguration.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1403,9 +1199,7 @@
       "upstreamPath": "src/vs/workbench/services/editor/common/customEditorLabelService.ts",
       "upstreamBlob": "4bafb2ff37066bbb979e8a513dc40cb730fe1f36",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/editor/common/customEditorLabelService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1414,9 +1208,7 @@
       "upstreamPath": "src/vs/workbench/services/environment/common/environmentService.ts",
       "upstreamBlob": "3ad7edaa434056d60a8bd4a2892c24800e238d19",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/environment/common/environmentService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1425,9 +1217,7 @@
       "upstreamPath": "src/vs/workbench/services/path/common/pathService.ts",
       "upstreamBlob": "3afbbbbed551413d6b83c6aef80ff0b9bd2fc51e",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/path/common/pathService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1436,9 +1226,7 @@
       "upstreamPath": "src/vs/workbench/services/workingCopy/common/fileWorkingCopy.ts",
       "upstreamBlob": "e4a56b2a51fa73b6fabe46f9ff9d887c205d97c1",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/workingCopy/common/fileWorkingCopy.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1447,9 +1235,7 @@
       "upstreamPath": "src/vs/base/common/diff/diff.ts",
       "upstreamBlob": "17e307165daa6f940e62e6a28a774e9da4a7797b",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/diff/diff.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1458,9 +1244,7 @@
       "upstreamPath": "src/vs/base/common/iterator.ts",
       "upstreamBlob": "1e8c84d9af9e08d9e380ad82fb4fc7f5df6fd493",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/iterator.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1469,9 +1253,7 @@
       "upstreamPath": "src/vs/base/common/mime.ts",
       "upstreamBlob": "78a1e0a9da8108316d4888b47e4d7151c548a8dc",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/mime.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1480,9 +1262,7 @@
       "upstreamPath": "src/vs/base/common/platform.ts",
       "upstreamBlob": "bc542baa21ac6edd91eb485ca5694a66d0d0ada4",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/platform.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1491,9 +1271,7 @@
       "upstreamPath": "src/vs/base/common/sequence.ts",
       "upstreamBlob": "4e02d7fb6f87721d59c24c290dfd7fac618c54f3",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/sequence.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1502,9 +1280,7 @@
       "upstreamPath": "src/vs/base/common/themables.ts",
       "upstreamBlob": "dcc1369e5932df0c4206e8f0628c8b5386df11b3",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/themables.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1513,9 +1289,7 @@
       "upstreamPath": "src/vs/editor/common/languages.ts",
       "upstreamBlob": "44ae1380e4ba6159f94ee488f717f0b78f872941",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/languages.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1524,9 +1298,7 @@
       "upstreamPath": "src/vs/platform/accessibility/common/accessibility.ts",
       "upstreamBlob": "741d5fffc5b34361b6e5bb75d0d1c88380cf3ae8",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/accessibility/common/accessibility.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1535,9 +1307,7 @@
       "upstreamPath": "src/vs/platform/extensions/common/extensions.ts",
       "upstreamBlob": "61af373dcd5ed2dfb5a6927ef83245521ee6115a",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/extensions/common/extensions.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1546,9 +1316,7 @@
       "upstreamPath": "src/vs/workbench/services/editor/common/editorResolverService.ts",
       "upstreamBlob": "de13324904d1121f456f817440104525edf6f807",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/editor/common/editorResolverService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1557,9 +1325,7 @@
       "upstreamPath": "src/vs/workbench/services/notebook/common/notebookDocumentService.ts",
       "upstreamBlob": "6015927f614ec38741e155785cf77801f19b2e71",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/notebook/common/notebookDocumentService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1568,9 +1334,7 @@
       "upstreamPath": "src/vs/base/common/actions.ts",
       "upstreamBlob": "18641db33f93e8f0619caf7a35f71d0c1d9ba010",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/actions.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1579,9 +1343,7 @@
       "upstreamPath": "src/vs/base/common/hash.ts",
       "upstreamBlob": "80372db8d71bcef166fddd6866c3ab0eaae15143",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/hash.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1590,9 +1352,7 @@
       "upstreamPath": "src/vs/base/common/uuid.ts",
       "upstreamBlob": "6174efbc99b09bcbfda851f0195a6b10f14d63dc",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/uuid.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1601,9 +1361,7 @@
       "upstreamPath": "src/vs/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts",
       "upstreamBlob": "f98a925a47a8a836eb23d4e7c1f4be7b09b885cb",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/model/pieceTreeTextBuffer/pieceTreeTextBuffer.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1612,9 +1370,7 @@
       "upstreamPath": "src/vs/editor/common/model/textModel.ts",
       "upstreamBlob": "ee6ad23b353b833556044ebbb06aaba7bc80cc76",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/model/textModel.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1623,9 +1379,7 @@
       "upstreamPath": "src/vs/editor/common/languages/modesRegistry.ts",
       "upstreamBlob": "a61af971493bdc5a3bf82c5e07d250f98fa93a98",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/languages/modesRegistry.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1634,9 +1388,7 @@
       "upstreamPath": "src/vs/editor/common/languages/language.ts",
       "upstreamBlob": "79e7d7bb3f7d2ae09ae96069dd9691d871f3f605",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/languages/language.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1645,9 +1397,7 @@
       "upstreamPath": "src/vs/workbench/services/languageDetection/common/languageDetectionWorkerService.ts",
       "upstreamBlob": "011d68d14aedbca2ce8ddbd756c7f6d61183cb92",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/languageDetection/common/languageDetectionWorkerService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1656,9 +1406,7 @@
       "upstreamPath": "src/vs/base/common/jsonFormatter.ts",
       "upstreamBlob": "2e431ca8db8c5a2fc5beaa55355b613b42a1d0c4",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/jsonFormatter.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1667,9 +1415,7 @@
       "upstreamPath": "src/vs/editor/common/textModelEvents.ts",
       "upstreamBlob": "561feefda770509a216807779bac7832dfa42fc8",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/textModelEvents.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1678,9 +1424,7 @@
       "upstreamPath": "src/vs/editor/common/model/textModelSearch.ts",
       "upstreamBlob": "ae259f035d5db2a25b17995352d8ea724b5dcd07",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/model/textModelSearch.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1689,9 +1433,7 @@
       "upstreamPath": "src/vs/editor/browser/widget/diffEditor/diffEditorViewModel.ts",
       "upstreamBlob": "9d9dfc2e7c12c643f7b13d6a99050063c19a968e",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/browser/widget/diffEditor/diffEditorViewModel.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1700,9 +1442,7 @@
       "upstreamPath": "src/vs/editor/common/services/editorWorker.ts",
       "upstreamBlob": "fd9efc5b2ce8da406aec52928e1219dd634fd6b3",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/services/editorWorker.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1711,9 +1451,7 @@
       "upstreamPath": "src/vs/editor/browser/widget/codeEditor/codeEditorWidget.ts",
       "upstreamBlob": "29d8394571114b00be80a2d11487313545a4083d",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/browser/widget/codeEditor/codeEditorWidget.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1722,9 +1460,7 @@
       "upstreamPath": "src/vs/base/browser/mouseEvent.ts",
       "upstreamBlob": "2873a56e1e40c27ffc14726c4ba8069994a3b90c",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/browser/mouseEvent.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1733,9 +1469,7 @@
       "upstreamPath": "src/vs/platform/actions/browser/toolbar.ts",
       "upstreamBlob": "998276050aa4432cd804241eed4052cb5dc06eff",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/actions/browser/toolbar.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1744,9 +1478,7 @@
       "upstreamPath": "src/vs/editor/browser/widget/diffEditor/diffEditorWidget.ts",
       "upstreamBlob": "854d67106d83896bdc05dc84217f5eba6bf09a90",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/browser/widget/diffEditor/diffEditorWidget.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1755,9 +1487,7 @@
       "upstreamPath": "src/vs/editor/common/model/prefixSumComputer.ts",
       "upstreamBlob": "04cf4ccc1e493d960d6108cf9070cc7981ebcdc2",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/model/prefixSumComputer.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1766,9 +1496,7 @@
       "upstreamPath": "src/vs/platform/workspace/common/workspace.ts",
       "upstreamBlob": "2fb3b6fba2c29c63a6e00b2c788e81bac942a96b",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/workspace/common/workspace.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1777,9 +1505,7 @@
       "upstreamPath": "src/vs/platform/configuration/common/configurationRegistry.ts",
       "upstreamBlob": "ed1315b68f1374590a4ef7b95f0d593279a95276",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/configuration/common/configurationRegistry.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1788,9 +1514,7 @@
       "upstreamPath": "src/vs/base/common/linkedList.ts",
       "upstreamBlob": "b436c611717b15d89154d7f059e00164dc98ec37",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/linkedList.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1799,9 +1523,7 @@
       "upstreamPath": "src/vs/editor/browser/services/bulkEditService.ts",
       "upstreamBlob": "282760016b24f39387c779b687ae1f19ea348482",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/browser/services/bulkEditService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1810,9 +1532,7 @@
       "upstreamPath": "src/vs/platform/log/common/log.ts",
       "upstreamBlob": "27e542896df074a88f1ee1f587b5695b12e2ca7e",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/log/common/log.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1821,9 +1541,7 @@
       "upstreamPath": "src/vs/platform/registry/common/platform.ts",
       "upstreamBlob": "9beaaf7c25cbb340793fdf209d279abcfb2fa025",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/registry/common/platform.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1832,9 +1550,7 @@
       "upstreamPath": "src/vs/workbench/services/lifecycle/common/lifecycle.ts",
       "upstreamBlob": "de7ce214df8cc5c101e6c7db79ce46455781cc1c",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/lifecycle/common/lifecycle.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1843,9 +1559,7 @@
       "upstreamPath": "src/vs/workbench/services/workingCopy/common/workingCopyService.ts",
       "upstreamBlob": "b303eb640595b0e73854643a56ae5689f9b7110f",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/workingCopy/common/workingCopyService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1854,9 +1568,7 @@
       "upstreamPath": "src/vs/editor/common/textModelEditSource.ts",
       "upstreamBlob": "09970e794641a73033d362c758c7b5c89a116b85",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/textModelEditSource.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1865,9 +1577,7 @@
       "upstreamPath": "src/vs/workbench/services/workingCopy/common/workingCopyFileService.ts",
       "upstreamBlob": "a9649dcc4cbe634c1450800cdea80929eead38ce",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/workingCopy/common/workingCopyFileService.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1876,9 +1586,7 @@
       "upstreamPath": "src/vs/editor/common/core/editOperation.ts",
       "upstreamBlob": "047330dc2ad1bd6dd2999a92f726deda404b4172",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/common/core/editOperation.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1887,9 +1595,7 @@
       "upstreamPath": "src/vs/editor/contrib/snippet/browser/snippetController2.ts",
       "upstreamBlob": "43611a9fc6287030687b4147a2dcfe1a4a7527d2",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/contrib/snippet/browser/snippetController2.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1898,9 +1604,7 @@
       "upstreamPath": "src/vs/editor/contrib/snippet/browser/snippetParser.ts",
       "upstreamBlob": "8a76e164db6b0e5fcff3f639330db3cfc5e23fa4",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/contrib/snippet/browser/snippetParser.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1909,9 +1613,7 @@
       "upstreamPath": "src/vs/editor/contrib/snippet/browser/snippetSession.ts",
       "upstreamBlob": "818139c2af37a7359e13c1d11f9e0115882fc0fd",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/editor/contrib/snippet/browser/snippetSession.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1920,9 +1622,7 @@
       "upstreamPath": "src/vs/platform/storage/common/storage.ts",
       "upstreamBlob": "2e967d799f77892580d9d195aa4b07a6fc4a7044",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/storage/common/storage.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1931,9 +1631,7 @@
       "upstreamPath": "src/vs/workbench/common/memento.ts",
       "upstreamBlob": "2e5cdcc2255dcff431fbdd0206f34784cdc6a99b",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/common/memento.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1942,9 +1640,7 @@
       "upstreamPath": "src/vs/platform/remote/common/remoteAgentConnection.ts",
       "upstreamBlob": "f87f8c67f14295bd2e322781c5e4cbdf2406fa3b",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/remote/common/remoteAgentConnection.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1953,9 +1649,7 @@
       "upstreamPath": "src/vs/platform/tunnel/common/tunnel.ts",
       "upstreamBlob": "49eb6191d2f5210df4d06060abc9119367b60f60",
       "category": "source",
-      "licenseRefs": [
-        "vscode-mit"
-      ],
+      "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/tunnel/common/tunnel.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
@@ -1965,9 +1659,7 @@
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": [
-        "LICENSE.txt"
-      ],
+      "upstreamPaths": ["LICENSE.txt"],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -1997,11 +1689,7 @@
         "src/prctr/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts",
         "src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts"
       ],
-      "verificationRefs": [
-        "settings-regressions",
-        "settings-lifecycle",
-        "source-boundaries"
-      ]
+      "verificationRefs": ["settings-regressions", "settings-lifecycle", "source-boundaries"]
     }
   ],
   "verification": [

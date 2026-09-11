@@ -24,7 +24,9 @@ export const upstreamDirectives: Linter.Processor = {
 				...(ts.getTrailingCommentRanges(text, node.end) ?? [])
 			])
 				comments.set(range.pos, range);
-			ts.forEachChild(node, visit);
+			// Include punctuation tokens: comments before a closing brace or else
+			// are not attached to the semantic children returned by forEachChild.
+			for (const child of node.getChildren(source)) visit(child);
 		}
 		visit(source);
 		for (const { pos, end } of [...comments.values()].sort((a, b) => b.pos - a.pos)) {
