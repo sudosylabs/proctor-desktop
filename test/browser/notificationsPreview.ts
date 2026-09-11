@@ -1,6 +1,6 @@
 import { DisposableStore } from '../../src/prctr/base/common/lifecycle.js';
 import { Event } from '../../src/prctr/base/common/event.js';
-import { ButtonControl } from '../../src/prctr/base/browser/ui/button/button.js';
+import { ButtonControl } from '../../src/prctr/base/browser/ui/button/buttonControl.js';
 import { BrowserThemeService } from '../../src/prctr/platform/theme/browser/themeService.js';
 import { Severity } from '../../src/prctr/platform/notification/common/notification.js';
 import { WorkbenchNotifications } from '../../src/prctr/workbench/browser/parts/notifications/notifications.js';

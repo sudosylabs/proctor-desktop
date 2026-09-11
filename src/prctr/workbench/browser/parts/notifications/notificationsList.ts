@@ -9,7 +9,7 @@ import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import { Emitter } from '../../../../base/common/event.js';
 import type { INotificationViewItem } from '../../../common/notifications.js';
-import { NotificationRenderer } from './notificationsViewer.js';
+import { NotificationRenderer, onDidChangeNotificationRowHeight } from './notificationsViewer.js';
 import type { NotificationLabels } from './notificationPresentation.js';
 
 /** The complete upstream virtual list handles rows, scrollbars, keyboard and type navigation. */
@@ -61,6 +61,10 @@ export class NotificationsList extends Disposable {
 			listInactiveFocusOutline: 'var(--prctr-color-border-strong)',
 			listHoverOutline: 'var(--prctr-color-border-default)'
 		});
+		this._register(onDidChangeNotificationRowHeight(() => {
+			this.remeasure();
+			this.#height.fire();
+		}));
 		this._register(
 			this.#list.onDidChangeSelection((event) => {
 				if (event.indexes.length) this.#list.setSelection([]);

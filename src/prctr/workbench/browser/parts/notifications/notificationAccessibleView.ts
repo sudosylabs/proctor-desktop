@@ -5,7 +5,7 @@
 // @proctor-vscode-port workbench-notifications
 import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { ButtonControl } from '../../../../base/browser/ui/button/button.js';
+import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import {
 	NotificationChangeType,
 	type INotificationViewItem,

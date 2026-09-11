@@ -19,13 +19,14 @@ import { memoize } from '../../../common/decorators.js';
 import { Emitter, Event, EventBufferer } from '../../../common/event.js';
 import { matchesFuzzy2, matchesPrefix } from '../../../common/filters.js';
 import { KeyCode } from '../../../common/keyCodes.js';
-import { DisposableStore, dispose, IDisposable } from '../../../common/lifecycle.js';
+import { Disposable, DisposableStore, dispose, IDisposable } from '../../../common/lifecycle.js';
 import { clamp } from '../../../common/numbers.js';
 import * as platform from '../../../common/platform.js';
 import { ScrollbarVisibility, ScrollEvent } from '../../../common/scrollable.js';
 import { ISpliceable } from '../../../common/sequence.js';
 import { isNumber } from '../../../common/types.js';
 import './list.css';
+import { StyleSheetHandle } from '../../styleSheetHandle.js';
 import { IIdentityProvider, IKeyboardNavigationDelegate, IKeyboardNavigationLabelProvider, IListContextMenuEvent, IListDragAndDrop, IListDragOverReaction, IListEvent, IListGestureEvent, IListMouseEvent, IListElementRenderDetails, IListRenderer, IListTouchEvent, IListVirtualDelegate, ListError, NotSelectableGroupId, NotSelectableGroupIdType } from './list.js';
 import { IListView, IListViewAccessibilityProvider, IListViewDragAndDrop, IListViewOptions, IListViewOptionsUpdate, ListViewTargetSector, ListView } from './listView.js';
 import { IMouseWheelEvent, StandardMouseEvent } from '../../mouseEvent.js';
@@ -894,9 +895,21 @@ export interface IListAccessibilityProvider<T> extends IListViewAccessibilityPro
 	getActiveDescendantId?(element: T): string | undefined;
 }
 
-export class DefaultStyleController implements IStyleController {
+export class DefaultStyleController implements IStyleController, IDisposable {
+	private readonly styleSheet: CSSStyleSheet;
+	private readonly releaseSheet: IDisposable;
 
-	constructor(private styleSheet: CSSStyleSheet, private selectorSuffix: string) { }
+	constructor(style: CSSStyleSheet | StyleSheetHandle, private selectorSuffix: string) {
+		if (style instanceof StyleSheetHandle) {
+			this.styleSheet = style.sheet;
+			this.releaseSheet = style;
+		} else {
+			this.styleSheet = style;
+			this.releaseSheet = Disposable.None;
+		}
+	}
+
+	dispose(): void { this.releaseSheet.dispose(); }
 
 	style(styles: IListStyles): void {
 		const suffix = this.selectorSuffix && `.${this.selectorSuffix}`;
@@ -1523,6 +1536,7 @@ export class List<T> implements ISpliceable<T>, IDisposable {
 
 		if (_options.styleController) {
 			this.styleController = _options.styleController(this.view.domId);
+			if (this.styleController instanceof DefaultStyleController) this.disposables.add(this.styleController);
 		} else {
 			// An owned constructed sheet honors the renderer's strict style-src policy.
 			const document = this.view.domNode.ownerDocument;

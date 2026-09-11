@@ -1,0 +1,99 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port editor-browser-core*//** Debug **/@layer controls {:root:where(.prctr-editor-scope) {
+	--prctr-theme-sash-size: 4px;
+	--prctr-theme-sash-hover-size: 4px;
+}:where(.prctr-editor-scope) .monaco-sash {
+	position: absolute;
+	z-index: 35;
+	touch-action: none;
+}:where(.prctr-editor-scope) .monaco-sash.disabled {
+	pointer-events: none;
+}:where(.prctr-editor-scope) .monaco-sash.mac.vertical {
+	cursor: col-resize;
+}:where(.prctr-editor-scope) .monaco-sash.vertical.minimum {
+	cursor: e-resize;
+}:where(.prctr-editor-scope) .monaco-sash.vertical.maximum {
+	cursor: w-resize;
+}:where(.prctr-editor-scope) .monaco-sash.mac.horizontal {
+	cursor: row-resize;
+}:where(.prctr-editor-scope) .monaco-sash.horizontal.minimum {
+	cursor: s-resize;
+}:where(.prctr-editor-scope) .monaco-sash.horizontal.maximum {
+	cursor: n-resize;
+}:where(.prctr-editor-scope) .monaco-sash.disabled {
+}:where(.prctr-editor-scope) .monaco-sash.vertical {
+	cursor: ew-resize;
+	top: 0;
+	width: var(--prctr-theme-sash-size);
+	height: 100%;
+}:where(.prctr-editor-scope) .monaco-sash.horizontal {
+	cursor: ns-resize;
+	left: 0;
+	width: 100%;
+	height: var(--prctr-theme-sash-size);
+}:where(.prctr-editor-scope) .monaco-sash:not(.disabled) > .orthogonal-drag-handle {
+	content: " ";
+	height: calc(var(--prctr-theme-sash-size) * 2);
+	width: calc(var(--prctr-theme-sash-size) * 2);
+	z-index: 100;
+	display: block;
+	cursor: all-scroll;
+	position: absolute;
+}:where(.prctr-editor-scope) .monaco-sash.horizontal.orthogonal-edge-north:not(.disabled)
+	> .orthogonal-drag-handle.start,:where(.prctr-editor-scope) .monaco-sash.horizontal.orthogonal-edge-south:not(.disabled)
+	> .orthogonal-drag-handle.end {
+	cursor: nwse-resize;
+}:where(.prctr-editor-scope) .monaco-sash.horizontal.orthogonal-edge-north:not(.disabled)
+	> .orthogonal-drag-handle.end,:where(.prctr-editor-scope) .monaco-sash.horizontal.orthogonal-edge-south:not(.disabled)
+	> .orthogonal-drag-handle.start {
+	cursor: nesw-resize;
+}:where(.prctr-editor-scope) .monaco-sash.vertical > .orthogonal-drag-handle.start {
+	left: calc(var(--prctr-theme-sash-size) * -0.5);
+	top: calc(var(--prctr-theme-sash-size) * -1);
+}:where(.prctr-editor-scope) .monaco-sash.vertical > .orthogonal-drag-handle.end {
+	left: calc(var(--prctr-theme-sash-size) * -0.5);
+	bottom: calc(var(--prctr-theme-sash-size) * -1);
+}:where(.prctr-editor-scope) .monaco-sash.horizontal > .orthogonal-drag-handle.start {
+	top: calc(var(--prctr-theme-sash-size) * -0.5);
+	left: calc(var(--prctr-theme-sash-size) * -1);
+}:where(.prctr-editor-scope) .monaco-sash.horizontal > .orthogonal-drag-handle.end {
+	top: calc(var(--prctr-theme-sash-size) * -0.5);
+	right: calc(var(--prctr-theme-sash-size) * -1);
+}:where(.prctr-editor-scope) .monaco-sash:before {
+	content: '';
+	pointer-events: none;
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: transparent;
+}:where(.prctr-editor-scope) .monaco-enable-motion .monaco-sash:before {
+	transition: background-color 0.1s ease-out;
+}:where(.prctr-editor-scope) .monaco-sash.hover:before,:where(.prctr-editor-scope) .monaco-sash.active:before {
+	background: var(--prctr-theme-sash-hoverBorder);
+}:where(.prctr-editor-scope) .monaco-sash.vertical:before {
+	width: var(--prctr-theme-sash-hover-size);
+	left: calc(50% - (var(--prctr-theme-sash-hover-size) / 2));
+}:where(.prctr-editor-scope) .monaco-sash.horizontal:before {
+	height: var(--prctr-theme-sash-hover-size);
+	top: calc(50% - (var(--prctr-theme-sash-hover-size) / 2));
+}:where(.prctr-editor-scope) .pointer-events-disabled {
+}:where(.prctr-editor-scope) .monaco-sash.debug {
+	background: cyan;
+}:where(.prctr-editor-scope) .monaco-sash.debug.disabled {
+	background: rgba(0, 255, 255, 0.2);
+}:where(.prctr-editor-scope) .monaco-sash.debug:not(.disabled) > .orthogonal-drag-handle {
+	background: red;
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .monaco-sash.disabled {
+	cursor: default !important;
+	pointer-events: none !important;
+}
+
+:where(.prctr-editor-scope) .pointer-events-disabled {
+	pointer-events: none !important;
+}
+}

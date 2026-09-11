@@ -19,7 +19,9 @@ import { Disposable } from '../../../base/common/lifecycle.js';
 
 export enum EditPresentationTypes {
 	Multiline = 'multilineText',
-	Singleline = 'singlelineText'
+	Singleline = 'singlelineText',
+	/** Proctor product choice: retain the setting in search, but edit its value in JSON. */
+	Json = 'json'
 }
 
 export const Extensions = {

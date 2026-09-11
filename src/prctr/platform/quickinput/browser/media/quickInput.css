@@ -1,0 +1,367 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//* @proctor-vscode-port settings-modal-composition *//* give some space between input and action bar *//* center horizontally *//* Links in descriptions & validations *//* preserve list-like styling instead of tree-like styling *//* preserve list-like styling instead of tree-like styling *//* focused items in quick pick *//* In light/dark themes the widget shadow can be transparent, leaving the key borders invisible
+	against the focus/hover background. Derive the border from the foreground instead. High contrast
+	themes are excluded so their stronger borders are preserved. *//* Quick input separators as full-row item *//* Hide border when the item becomes the sticky one *//* Give sticky row the same padding as the scrollable list *//* Hide the twistie containers so that there isn't blank indent *//* Tree */@layer controls {:where(.prctr-editor-scope) .quick-input-widget {
+	position: absolute;
+	width: 600px;
+	z-index: 2550;
+	left: 50%;
+	-webkit-app-region: no-drag;
+	border-radius: var(--prctr-theme-cornerRadius-xLarge);
+	box-shadow: var(--prctr-theme-shadow-xl);
+}:where(.prctr-editor-scope) .modern-ui.monaco-enable-motion .quick-input-widget:not(.quick-input-widget-overlay) {
+	animation: quick-input-widget-open 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	transform-origin: top center;
+	will-change: transform, opacity;
+}:where(.prctr-editor-scope) .modern-ui.monaco-enable-motion .quick-input-widget.quick-input-widget-closing:not(.quick-input-widget-overlay) {
+	animation: quick-input-widget-close 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	pointer-events: none;
+}@keyframes quick-input-widget-open {
+	0% {
+		opacity: 0;
+		transform: scale(0.97);
+	}
+
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}@keyframes quick-input-widget-close {
+	0% {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	100% {
+		opacity: 0;
+		transform: scale(0.99);
+	}
+}:where(.prctr-editor-scope) .quick-input-titlebar {
+	cursor: grab;
+	display: flex;
+	align-items: center;
+	border-top-right-radius: 5px;
+	border-top-left-radius: 5px;
+}:where(.prctr-editor-scope) .quick-input-widget.no-drag .quick-input-titlebar,:where(.prctr-editor-scope) .quick-input-widget.no-drag .quick-input-title,:where(.prctr-editor-scope) .quick-input-widget.no-drag .quick-input-header {
+	cursor: default;
+}:where(.prctr-editor-scope) .quick-input-widget .monaco-inputbox .monaco-action-bar {
+	top: 0;
+}:where(.prctr-editor-scope) .quick-input-widget .monaco-action-bar .monaco-custom-toggle {
+	margin-left: 0;
+	border-radius: 5px;
+	box-sizing: content-box;
+}:where(.prctr-editor-scope) .quick-input-left-action-bar {
+	display: flex;
+	margin-left: 4px;
+}:where(.prctr-editor-scope) .quick-input-inline-action-bar .actions-container > .action-item:first-child {
+	margin-left: 5px;
+}:where(.prctr-editor-scope) .quick-input-inline-action-bar .actions-container > .action-item {
+	margin-top: 2px;
+}:where(.prctr-editor-scope) .quick-input-title {
+	cursor: grab;
+	padding: 3px 0px;
+	text-align: center;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	flex: 1;
+}:where(.prctr-editor-scope) .quick-input-right-action-bar {
+	display: flex;
+	margin-right: 4px;
+}:where(.prctr-editor-scope) .quick-input-right-action-bar .actions-container {
+	justify-content: flex-end;
+}:where(.prctr-editor-scope) .quick-input-right-action-bar .actions-container > .action-item {
+	margin-left: 4px;
+}:where(.prctr-editor-scope) .quick-input-inline-action-bar .actions-container > .action-item {
+	margin-left: 4px;
+}:where(.prctr-editor-scope) .quick-input-titlebar .monaco-action-bar .action-label.codicon {
+	background-position: center;
+	background-repeat: no-repeat;
+	padding: 2px;
+}:where(.prctr-editor-scope) .quick-input-description {
+	margin: 6px 6px 6px 11px;
+}:where(.prctr-editor-scope) .quick-input-header .quick-input-description {
+	margin: 4px 2px;
+	flex: 1;
+}:where(.prctr-editor-scope) .quick-input-header {
+	cursor: grab;
+	display: flex;
+	padding: 6px 6px 4px 6px;
+}:where(.prctr-editor-scope) .quick-input-widget .quick-input-filter .monaco-inputbox {
+	border-radius: var(--prctr-theme-cornerRadius-medium);
+}:where(.prctr-editor-scope) .quick-input-widget.hidden-input .quick-input-header {
+	/* reduce margins and paddings when input box hidden */
+	padding: 0;
+	margin-bottom: 0;
+}:where(.prctr-editor-scope) .quick-input-and-message {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	min-width: 0;
+	position: relative;
+}:where(.prctr-editor-scope) .quick-input-check-all {
+	align-self: center;
+	margin: 0;
+}:where(.prctr-editor-scope) .quick-input-widget .quick-input-header .monaco-checkbox {
+	margin-top: 6px;
+}:where(.prctr-editor-scope) .quick-input-filter {
+	flex-grow: 1;
+	display: flex;
+	position: relative;
+}:where(.prctr-editor-scope) .quick-input-box {
+	flex-grow: 1;
+}:where(.prctr-editor-scope) .quick-input-widget.show-checkboxes .quick-input-box,:where(.prctr-editor-scope) .quick-input-widget.show-checkboxes .quick-input-message {
+	margin-left: 5px;
+}:where(.prctr-editor-scope) .quick-input-visible-count {
+	position: absolute;
+	left: -10000px;
+}:where(.prctr-editor-scope) .quick-input-count {
+	align-self: center;
+	position: absolute;
+	right: 4px;
+	display: flex;
+	align-items: center;
+}:where(.prctr-editor-scope) .quick-input-count .monaco-count-badge {
+	vertical-align: middle;
+	padding: 2px 4px;
+	border-radius: 2px;
+	min-height: auto;
+	line-height: normal;
+}:where(.prctr-editor-scope) .quick-input-action {
+	margin-left: 6px;
+}:where(.prctr-editor-scope) .quick-input-message {
+	margin-top: -1px;
+	padding: 5px;
+	overflow-wrap: break-word;
+}:where(.prctr-editor-scope) .quick-input-message > .codicon {
+	margin: 0 0.2em;
+	vertical-align: text-bottom;
+}:where(.prctr-editor-scope) .quick-input-message a {
+	color: inherit;
+}:where(.prctr-editor-scope) .quick-input-progress.monaco-progress-container {
+	position: relative;
+}:where(.prctr-editor-scope) .quick-input-list {
+	line-height: 22px;
+}:where(.prctr-editor-scope) .quick-input-widget.hidden-input .quick-input-list {
+	margin-top: 4px;
+	/* reduce margins when input box hidden */
+	padding-bottom: 4px;
+}:where(.prctr-editor-scope) .quick-input-list .prctr-list {
+	overflow: hidden;
+	max-height: calc(20 * 22px);
+	padding-bottom: 7px;
+}:where(.prctr-editor-scope) .quick-input-list .monaco-scrollable-element {
+	padding: 0px 6px;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry {
+	box-sizing: border-box;
+	overflow: hidden;
+	display: flex;
+	padding: 0 6px;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry.quick-input-list-separator-border {
+	border-top-width: 1px;
+	border-top-style: solid;
+}:where(.prctr-editor-scope) .quick-input-list .prctr-list-row {
+	border-radius: 3px;
+}:where(.prctr-editor-scope) .quick-input-list .prctr-list-row[data-index="0"] .quick-input-list-entry.quick-input-list-separator-border {
+	border-top-style: none;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-label {
+	overflow: hidden;
+	display: flex;
+	height: 100%;
+	flex: 1;
+}:where(.prctr-editor-scope) .quick-input-widget .monaco-checkbox {
+	margin-right: 0;
+}:where(.prctr-editor-scope) .quick-input-widget .quick-input-list .monaco-checkbox,:where(.prctr-editor-scope) .quick-input-widget .quick-input-tree .monaco-checkbox {
+	margin-top: 4px;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-icon {
+	background-size: 16px;
+	background-position: left center;
+	background-repeat: no-repeat;
+	padding-right: 6px;
+	width: 16px;
+	height: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-rows {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	flex: 1;
+	margin-left: 5px;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-rows > .quick-input-list-row {
+	display: flex;
+	align-items: center;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-rows > .quick-input-list-row .monaco-icon-label,:where(.prctr-editor-scope) .quick-input-list .quick-input-list-rows > .quick-input-list-row .monaco-icon-label .monaco-icon-label-container > .monaco-icon-name-container {
+	flex: 1;
+	/* make sure the icon label grows within the row */
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-rows > .quick-input-list-row .codicon[class*='codicon-'] {
+	vertical-align: text-bottom;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-rows .monaco-highlighted-label > span {
+	opacity: 1;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry .quick-input-list-entry-keybinding {
+	margin-right: 8px;
+	/* separate from the separator label or scrollbar if any */
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-label-meta {
+	opacity: 0.7;
+	line-height: normal;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}:where(.prctr-editor-scope) .quick-input-list .prctr-list-row.focused .quick-input-list-label-meta {
+	opacity: 1;
+}:where(.prctr-editor-scope) .quick-input-list .prctr-list .prctr-list-row .monaco-highlighted-label .highlight {
+	font-weight: bold;
+	background-color: unset;
+}:where(.prctr-editor-scope) .quick-input-list .prctr-list .prctr-list-row.focused .monaco-highlighted-label .highlight {
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry .quick-input-list-separator {
+	margin-right: 4px;
+	font-size: var(--prctr-theme-bodyFontSize-xSmall);
+	color: var(--prctr-theme-descriptionForeground);
+	/* separate from keybindings or actions */
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry-action-bar {
+	display: flex;
+	flex: 0;
+	overflow: visible;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry .quick-input-list-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry .quick-input-list-entry-action-bar .monaco-custom-toggle {
+	/*
+	 * Icon actions and toggles also match `.monaco-action-bar .action-item .codicon`,
+	 * whose equal-specificity `display: flex` would reveal them in the idle state
+	 * when loaded later. The hover, focus, and always-visible rules below remain
+	 * more specific and reveal the controls on intent.
+	 */
+	display: none;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry-action-bar .action-label.codicon {
+	margin-right: 4px;
+	padding: 2px;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry-action-bar .monaco-custom-toggle.codicon {
+	margin-right: 4px;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry-action-bar {
+	margin-top: 1px;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry-action-bar {
+	margin-right: 4px;
+	/* separate from scrollbar */
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry .quick-input-list-entry-action-bar .action-label.always-visible,:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry:hover .quick-input-list-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry.focus-inside .quick-input-list-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-list .prctr-list-row.focused .quick-input-list-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-list .prctr-list-row.passive-focused .quick-input-list-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry .quick-input-list-entry-action-bar .monaco-custom-toggle.always-visible,:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry:hover .quick-input-list-entry-action-bar .monaco-custom-toggle,:where(.prctr-editor-scope) .quick-input-list .quick-input-list-entry.focus-inside .quick-input-list-entry-action-bar .monaco-custom-toggle,:where(.prctr-editor-scope) .quick-input-list .prctr-list-row.focused .quick-input-list-entry-action-bar .monaco-custom-toggle,:where(.prctr-editor-scope) .quick-input-list .prctr-list-row.passive-focused .quick-input-list-entry-action-bar .monaco-custom-toggle {
+	display: flex;
+}:where(.prctr-editor-scope) .quick-input-list > .prctr-list:focus .prctr-list-row.focused {
+	outline-offset: -1px;
+}:where(.prctr-editor-scope) .quick-input-list > .prctr-list:focus .prctr-list-row.focused .quick-input-list-entry.quick-input-list-separator-border {
+	border-color: transparent;
+}:where(.prctr-editor-scope) .quick-input-list .prctr-list-row.focused .monaco-keybinding-key,:where(.prctr-editor-scope) .quick-input-list .prctr-list-row.focused .quick-input-list-entry .quick-input-list-separator {
+	color: inherit
+}:where(.prctr-editor-scope) .quick-input-list .prctr-list-row.focused .monaco-keybinding-key,:where(.prctr-editor-scope) .quick-input-list .prctr-list-row:hover .monaco-keybinding-key {
+	background: none;
+	border-color: var(--prctr-theme-widget-shadow);
+}:where(.prctr-editor-scope) :is(.vs, .vs-dark) .quick-input-list .prctr-list-row.focused .monaco-keybinding-key,:where(.prctr-editor-scope) :is(.vs, .vs-dark) .quick-input-list .prctr-list-row:hover .monaco-keybinding-key {
+	border-color: color-mix(in srgb, currentColor 30%, transparent);
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-separator-as-item {
+	padding: 4px 6px;
+	font-size: 12px;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-separator-as-item .label-name {
+	font-weight: 600;
+}:where(.prctr-editor-scope) .quick-input-list .quick-input-list-separator-as-item .label-description {
+	/* Override default description opacity so we don't have a contrast ratio issue. */
+}:where(.prctr-editor-scope) .quick-input-list .monaco-tree-sticky-row .quick-input-list-entry.quick-input-list-separator-as-item.quick-input-list-separator-border {
+	border-top-style: none;
+}:where(.prctr-editor-scope) .quick-input-list .monaco-tree-sticky-row {
+	padding: 0 5px;
+}:where(.prctr-editor-scope) .quick-input-list .monaco-tl-twistie {
+}:where(.prctr-editor-scope) .quick-input-tree .prctr-list {
+	overflow: hidden;
+	max-height: calc(20 * 22px);
+	padding-bottom: 5px;
+}:where(.prctr-editor-scope) .quick-input-tree.quick-input-tree-flat .monaco-tl-indent,:where(.prctr-editor-scope) .quick-input-tree.quick-input-tree-flat .monaco-tl-twistie {
+}:where(.prctr-editor-scope) .quick-input-tree.quick-input-tree-flat .monaco-checkbox {
+	margin-left: 6px;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry {
+	box-sizing: border-box;
+	overflow: hidden;
+	display: flex;
+	padding-right: 6px;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-label {
+	overflow: hidden;
+	display: flex;
+	height: 100%;
+	flex: 1;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-icon {
+	background-size: 16px;
+	background-position: left center;
+	background-repeat: no-repeat;
+	padding-right: 6px;
+	width: 16px;
+	height: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-rows {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	flex: 1;
+	margin-left: 5px;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-rows > .quick-input-tree-row {
+	display: flex;
+	align-items: center;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-rows > .quick-input-tree-row .monaco-icon-label,:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-rows > .quick-input-tree-row .monaco-icon-label .monaco-icon-label-container > .monaco-icon-name-container {
+	flex: 1;
+	/* make sure the icon label grows within the row */
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-rows > .quick-input-tree-row .codicon[class*='codicon-'] {
+	vertical-align: text-bottom;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-rows .monaco-highlighted-label > span {
+	opacity: 1;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry-action-bar {
+	display: flex;
+	flex: 0;
+	overflow: visible;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry-action-bar .monaco-custom-toggle {
+	/*
+	 * By default, actions in the quick input action bar are hidden
+	 * until hovered over them or selected.
+	 */
+	display: none;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry-action-bar .action-label.codicon {
+	margin-right: 4px;
+	padding: 2px;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry-action-bar .monaco-custom-toggle.codicon {
+	margin-right: 4px;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry-action-bar {
+	margin-top: 1px;
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry-action-bar {
+	margin-right: 4px;
+	/* separate from scrollbar */
+}:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry .quick-input-tree-entry-action-bar .action-label.always-visible,:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry:hover .quick-input-tree-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry.focus-inside .quick-input-tree-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-tree .prctr-list-row.focused .quick-input-tree-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-tree .prctr-list-row.passive-focused .quick-input-tree-entry-action-bar .action-label,:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry .quick-input-tree-entry-action-bar .monaco-custom-toggle.always-visible,:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry:hover .quick-input-tree-entry-action-bar .monaco-custom-toggle,:where(.prctr-editor-scope) .quick-input-tree .quick-input-tree-entry.focus-inside .quick-input-tree-entry-action-bar .monaco-custom-toggle,:where(.prctr-editor-scope) .quick-input-tree .prctr-list-row.focused .quick-input-tree-entry-action-bar .monaco-custom-toggle,:where(.prctr-editor-scope) .quick-input-tree .prctr-list-row.passive-focused .quick-input-tree-entry-action-bar .monaco-custom-toggle {
+	display: flex;
+}:where(.prctr-editor-scope) .quick-input-tree > .prctr-list:focus .prctr-list-row.focused {
+	outline-offset: -1px;
+}
+}@layer overrides {
+:where(.prctr-editor-scope) .quick-input-list .prctr-list .prctr-list-row .monaco-highlighted-label .highlight {
+	color: var(--prctr-theme-list-highlightForeground) !important;
+}
+:where(.prctr-editor-scope) .quick-input-list .prctr-list .prctr-list-row.focused .monaco-highlighted-label .highlight {
+	color: var(--prctr-theme-quickInputList-focusHighlightForeground) !important;
+}
+
+:where(.prctr-editor-scope) .quick-input-list > .prctr-list:focus .prctr-list-row.focused {
+	outline: 1px solid var(--prctr-theme-list-focusOutline) !important;
+}
+
+:where(.prctr-editor-scope) .quick-input-list .quick-input-list-separator-as-item .label-description {
+	opacity: 1 !important;
+}
+:where(.prctr-editor-scope) .quick-input-list .monaco-tl-twistie {
+	display: none !important;
+}
+
+:where(.prctr-editor-scope) .quick-input-tree.quick-input-tree-flat .monaco-tl-indent,:where(.prctr-editor-scope) .quick-input-tree.quick-input-tree-flat .monaco-tl-twistie {
+	display: none !important;
+}
+
+:where(.prctr-editor-scope) .quick-input-tree > .prctr-list:focus .prctr-list-row.focused {
+	outline: 1px solid var(--prctr-theme-list-focusOutline) !important;
+}
+}

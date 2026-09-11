@@ -24,7 +24,7 @@ import {
 import {
 	MenuService,
 	MenuVisibilityState
-} from '../../../../src/prctr/platform/actions/common/menuService.ts';
+} from '../../../../src/prctr/platform/actions/common/contributionMenuService.ts';
 import { ContextKeyService } from '../../../../src/prctr/platform/contextkey/browser/contextKeyService.ts';
 import type {
 	ICommandEvent,

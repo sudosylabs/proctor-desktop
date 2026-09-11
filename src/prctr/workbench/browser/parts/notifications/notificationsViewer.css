@@ -18,10 +18,14 @@
 	.prctr-notifications .prctr-action-bar .action-label {
 		color: var(--prctr-theme-icon-foreground);
 	}
-	.prctr-notifications .prctr-action-bar .action-label:hover {
+	.prctr-notifications .prctr-action-bar .action-label:hover:not(:disabled):not(.disabled) {
 		background: var(--prctr-color-interaction-hover);
+		outline: 1px dashed var(--prctr-theme-toolbar-hoverOutline, transparent);
+		outline-offset: -1px;
 	}
-	.prctr-notifications .prctr-action-bar .action-label:focus-visible,
+	.prctr-notifications
+		.prctr-action-bar
+		.action-label:focus-visible:not(:disabled):not(.disabled),
 	.prctr-notifications .prctr-notification-button:focus-visible {
 		outline: 1px solid var(--prctr-color-border-focus);
 	}

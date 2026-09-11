@@ -1,0 +1,18 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-presentation*/@layer controls {:where(.prctr-editor-scope) .codicon-wrench-subaction {
+	opacity: 0.5;
+}@keyframes codicon-spin {
+	100% {
+		transform:rotate(360deg);
+	}
+}:where(.prctr-editor-scope) .codicon-sync.codicon-modifier-spin,:where(.prctr-editor-scope) .codicon-loading.codicon-modifier-spin,:where(.prctr-editor-scope) .codicon-gear.codicon-modifier-spin,:where(.prctr-editor-scope) .codicon-notebook-state-executing.codicon-modifier-spin,:where(.prctr-editor-scope) .codicon-loading,:where(.prctr-editor-scope) .codicon-tree-item-loading::before {
+	/* Use steps to throttle FPS to reduce CPU usage */
+	animation: codicon-spin 1.5s steps(30) infinite;
+	/* Ensure rotation happens around exact center to prevent wobble */
+	transform-origin: center center;
+}:where(.prctr-editor-scope) .codicon-modifier-disabled {
+	opacity: 0.4;
+}
+}

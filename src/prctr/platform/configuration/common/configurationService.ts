@@ -224,6 +224,10 @@ class ConfigurationEditing {
 		}
 
 		const edits = this.getEdits(content, path, value);
+		if (this.fileService.writeEdits) {
+			await this.fileService.writeEdits(this.settingsResource, content, edits);
+			return;
+		}
 		content = applyEdits(content, edits);
 
 		await this.fileService.writeFile(this.settingsResource, VSBuffer.fromString(content));

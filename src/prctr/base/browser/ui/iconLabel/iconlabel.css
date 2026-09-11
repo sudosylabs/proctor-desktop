@@ -1,0 +1,84 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-presentation*//* ---------- Icon label ---------- *//* make sure selection color wins when a label is being selected */@layer controls {:where(.prctr-editor-scope) .monaco-icon-label {
+	display: flex; /* required for icons support :before rule */
+	overflow: hidden;
+	text-overflow: ellipsis;
+}:where(.prctr-editor-scope) .monaco-icon-label::before {
+
+	/* svg icons rendered as background image */
+	background-size: 16px;
+	background-position: left center;
+	background-repeat: no-repeat;
+	padding-right: 6px;
+	width: 16px;
+	height: 22px;
+	display: inline-block;
+
+	/* fonts icons */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	vertical-align: top;
+
+	flex-shrink: 0; /* fix for https://github.com/microsoft/vscode/issues/13787 */
+}:where(.prctr-editor-scope) .monaco-icon-label-iconpath {
+	width: 16px;
+	height: 22px;
+	margin-right: 6px;
+	display: flex;
+}:where(.prctr-editor-scope) .monaco-icon-label-container.disabled {
+	color: var(--prctr-theme-disabledForeground);
+}:where(.prctr-editor-scope) .monaco-icon-label > .monaco-icon-label-container {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	flex: 1;
+}:where(.prctr-editor-scope) .monaco-icon-label > .monaco-icon-label-container > .monaco-icon-name-container > .label-name {
+	color: inherit;
+	white-space: pre; /* enable to show labels that include multiple whitespaces */
+}:where(.prctr-editor-scope) .monaco-icon-label > .monaco-icon-label-container > .monaco-icon-name-container > .label-name > .label-separator {
+	margin: 0 2px;
+	opacity: 0.5;
+}:where(.prctr-editor-scope) .monaco-icon-label > .monaco-icon-label-container > .monaco-icon-suffix-container > .label-suffix {
+	opacity: .7;
+	white-space: pre;
+}:where(.prctr-editor-scope) .monaco-icon-label > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+	opacity: .7;
+	margin-left: 0.5em;
+	font-size: 0.9em;
+	white-space: pre; /* enable to show labels that include multiple whitespaces */
+}:where(.prctr-editor-scope) .monaco-icon-label.nowrap > .monaco-icon-label-container > .monaco-icon-description-container > .label-description{
+	white-space: nowrap
+}:where(.prctr-editor-scope) .vs .monaco-icon-label > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+	opacity: .95;
+}:where(.prctr-editor-scope) .monaco-icon-label.bold > .monaco-icon-label-container > .monaco-icon-name-container > .label-name,:where(.prctr-editor-scope) .monaco-icon-label.bold > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+	font-weight: bold;
+}:where(.prctr-editor-scope) .monaco-icon-label.italic > .monaco-icon-label-container > .monaco-icon-name-container > .label-name,:where(.prctr-editor-scope) .monaco-icon-label.italic > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+	font-style: italic;
+}:where(.prctr-editor-scope) .monaco-icon-label.deprecated {
+	text-decoration: line-through;
+	opacity: 0.66;
+}:where(.prctr-editor-scope) .monaco-icon-label.strikethrough > .monaco-icon-label-container > .monaco-icon-name-container > .label-name,:where(.prctr-editor-scope) .monaco-icon-label.strikethrough > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+	text-decoration: line-through;
+}:where(.prctr-editor-scope) .monaco-icon-label::after {
+	opacity: 0.75;
+	font-size: 90%;
+	font-weight: 600;
+	margin: auto 16px 0 5px; /* https://github.com/microsoft/vscode/issues/113223 */
+	text-align: center;
+}:where(.prctr-editor-scope) .prctr-list:focus .selected .monaco-icon-label,:where(.prctr-editor-scope) .prctr-list:focus .selected .monaco-icon-label::after
+{
+}:where(.prctr-editor-scope) .prctr-list-row.focused .monaco-icon-label > .monaco-icon-label-container > .monaco-icon-description-container > .label-description,:where(.prctr-editor-scope) .prctr-list-row.selected .monaco-icon-label > .monaco-icon-label-container > .monaco-icon-description-container > .label-description {
+	opacity: 1;
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .monaco-icon-label::before {
+	line-height: inherit !important;
+}
+:where(.prctr-editor-scope) .prctr-list:focus .selected .monaco-icon-label,:where(.prctr-editor-scope) .prctr-list:focus .selected .monaco-icon-label::after
+{
+	color: inherit !important;
+}
+}

@@ -3,7 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { addDisposableListener } from '../../base/browser/dom.js';
-import { ButtonControl } from '../../base/browser/ui/button/button.js';
+import { ButtonControl } from '../../base/browser/ui/button/buttonControl.js';
 import { TextFieldControl } from '../../base/browser/ui/field/textField.js';
 import { DomScrollableElement } from '../../base/browser/ui/scrollbar/scrollableElement.js';
 import { ScrollbarVisibility } from '../../base/common/scrollable.js';

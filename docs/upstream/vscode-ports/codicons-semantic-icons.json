@@ -13,7 +13,7 @@
   },
   "upstream": {
     "repository": "https://github.com/microsoft/vscode",
-    "revision": "c89cda63706360aa2fe45a0e5669c76fb20f29f8"
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
   },
   "items": [
     {
@@ -22,7 +22,9 @@
       "category": "license",
       "disposition": "evidence-only",
       "rationale": "The Microsoft MIT text covering the admitted TypeScript source is preserved locally.",
-      "licenseRefs": ["vscode-mit"]
+      "licenseRefs": [
+        "vscode-mit"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/codicons.ts",
@@ -30,21 +32,31 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve the complete built-in and derived Codicon catalog composition. Type-only import annotations make declaration dependencies explicit under Proctor's executable-cycle checks; the implementation is otherwise preserved.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/base/common/codicons.ts",
       "localSha256": "cd0c6b860483937a15ec8c9fea9e358a3034aa1f6f3cde4e7fa843904dc4fe35",
-      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/codiconsLibrary.ts",
-      "upstreamBlob": "2ace0d1f89647f2a92cb9976484ddea40be1d47a",
+      "upstreamBlob": "ce304ae89468aabf23561338e0170782a39f11a9",
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve every registered Codicon glyph identifier and exact font character from the pinned source.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/base/common/codiconsLibrary.ts",
-      "localSha256": "e6096ed547580f4edae830427ef3c7d8eccddc09cb1f79ba5fb5e0dddafabb7b",
-      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+      "localSha256": "0d003c135b33bca6eedb5c7f69f7fd2871bb90463471fdf5cfa60d14f46de329",
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/codiconsUtil.ts",
@@ -52,10 +64,15 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Preserve registration, aliases, validation, and font-character lookup for the complete library. Type-only import annotations make declaration dependencies explicit under Proctor's executable-cycle checks; the implementation is otherwise preserved.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/base/common/codiconsUtil.ts",
       "localSha256": "07a6640894c2276c1631c35c59d11d172677d68560859feb2aae07331456f53c",
-      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/common/themables.ts",
@@ -63,10 +80,15 @@
       "category": "source",
       "disposition": "copied",
       "rationale": "Preserve ThemeIcon parsing, modifier, equality, and classification behavior required by admitted icon consumers.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/base/common/themables.ts",
       "localSha256": "a914e81e4c69353c7dde58d1d7d1286eeea5583039ab661e9e3cfed09f01d34b",
-      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
+      "mechanicalTransforms": [
+        "namespace-path-translation",
+        "provenance-marker-insertion"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/codicons/codicon/codicon.css",
@@ -74,7 +96,9 @@
       "category": "style",
       "disposition": "behaviorally-reimplemented",
       "rationale": "Retain exact font loading, smoothing, sizing, and intrinsic inline behavior behind a single Proctor-owned root and semantic DOM contract.",
-      "licenseRefs": ["vscode-mit"],
+      "licenseRefs": [
+        "vscode-mit"
+      ],
       "localPath": "src/prctr/platform/theme/browser/semanticIcon.css"
     },
     {
@@ -83,7 +107,9 @@
       "category": "style",
       "disposition": "evidence-only",
       "rationale": "The disabled opacity and throttled centered spin behavior inform the semantic modifier implementation; reduced-motion suppression is added by Proctor policy.",
-      "licenseRefs": ["vscode-mit"]
+      "licenseRefs": [
+        "vscode-mit"
+      ]
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/codicons/codicon/README.md",
@@ -91,14 +117,18 @@
       "category": "source",
       "disposition": "evidence-only",
       "rationale": "Confirms that the font asset is supplied by the external @vscode/codicons package rather than the VS Code source tree.",
-      "licenseRefs": ["vscode-mit"]
+      "licenseRefs": [
+        "vscode-mit"
+      ]
     }
   ],
   "licenses": [
     {
       "id": "vscode-mit",
       "name": "MIT License",
-      "upstreamPaths": ["LICENSE.txt"],
+      "upstreamPaths": [
+        "LICENSE.txt"
+      ],
       "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
     }
   ],
@@ -106,7 +136,7 @@
     {
       "id": "codicons-font-package",
       "kind": "external-package",
-      "reference": "@vscode/codicons@0.0.46-38",
+      "reference": "@vscode/codicons@0.0.46-39",
       "rationale": "Supplies the exact unmodified CC-BY-4.0 font used by the pinned VS Code source; dependency admission, hash verification, and attribution are tracked separately."
     },
     {
@@ -124,7 +154,10 @@
         "src/prctr/platform/theme/common/semanticIcons.ts",
         "src/prctr/platform/theme/browser/semanticIcon.ts"
       ],
-      "verificationRefs": ["semantic-registry-tests", "real-browser-icon-test"]
+      "verificationRefs": [
+        "semantic-registry-tests",
+        "real-browser-icon-test"
+      ]
     },
     {
       "id": "owned-accessible-presentation",
@@ -133,13 +166,22 @@
         "src/prctr/platform/theme/browser/semanticIcon.ts",
         "src/prctr/platform/theme/browser/semanticIcon.css"
       ],
-      "verificationRefs": ["real-browser-icon-test", "css-ownership-check"]
+      "verificationRefs": [
+        "real-browser-icon-test",
+        "css-ownership-check"
+      ]
     },
     {
       "id": "explicit-type-only-dependencies",
       "summary": "Type-only import annotations preserve upstream compiler elision while making the runtime dependency graph explicit. These source edits are adaptations rather than undeclared copy transformations.",
-      "localPaths": ["src/prctr/base/common/codicons.ts", "src/prctr/base/common/codiconsUtil.ts"],
-      "verificationRefs": ["semantic-registry-tests", "real-browser-icon-test"]
+      "localPaths": [
+        "src/prctr/base/common/codicons.ts",
+        "src/prctr/base/common/codiconsUtil.ts"
+      ],
+      "verificationRefs": [
+        "semantic-registry-tests",
+        "real-browser-icon-test"
+      ]
     }
   ],
   "verification": [

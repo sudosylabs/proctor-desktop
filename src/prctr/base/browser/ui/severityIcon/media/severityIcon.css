@@ -1,0 +1,11 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-presentation*/@layer controls {:where(.prctr-editor-scope) .monaco-editor .zone-widget .codicon.codicon-error,:where(.prctr-editor-scope) .markers-panel .marker-icon.error,:where(.prctr-editor-scope) .markers-panel .marker-icon .codicon.codicon-error,:where(.prctr-editor-scope) .text-search-provider-messages .providerMessage .codicon.codicon-error,:where(.prctr-editor-scope) .extensions-viewlet > .extensions .codicon.codicon-error,:where(.prctr-editor-scope) .extension-editor .codicon.codicon-error,:where(.prctr-editor-scope) .chat-attached-context-attachment .codicon.codicon-error {
+	color: var(--prctr-theme-problemsErrorIcon-foreground);
+}:where(.prctr-editor-scope) .monaco-editor .zone-widget .codicon.codicon-warning,:where(.prctr-editor-scope) .markers-panel .marker-icon.warning,:where(.prctr-editor-scope) .markers-panel .marker-icon .codicon.codicon-warning,:where(.prctr-editor-scope) .text-search-provider-messages .providerMessage .codicon.codicon-warning,:where(.prctr-editor-scope) .extensions-viewlet > .extensions .codicon.codicon-warning,:where(.prctr-editor-scope) .extension-editor .codicon.codicon-warning,:where(.prctr-editor-scope) .preferences-editor .codicon.codicon-warning {
+	color: var(--prctr-theme-problemsWarningIcon-foreground);
+}:where(.prctr-editor-scope) .monaco-editor .zone-widget .codicon.codicon-info,:where(.prctr-editor-scope) .markers-panel .marker-icon.info,:where(.prctr-editor-scope) .markers-panel .marker-icon .codicon.codicon-info,:where(.prctr-editor-scope) .text-search-provider-messages .providerMessage .codicon.codicon-info,:where(.prctr-editor-scope) .extensions-viewlet > .extensions .codicon.codicon-info,:where(.prctr-editor-scope) .extension-editor .codicon.codicon-info {
+	color: var(--prctr-theme-problemsInfoIcon-foreground);
+}
+}

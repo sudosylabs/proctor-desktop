@@ -1,0 +1,118 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-controls*//* MarkupContent Layout *//**
+ * Add a slight margin to try vertically align codicons with any text
+ * https://github.com/microsoft/vscode/issues/221359
+ *//* Prevent text selection in all button-like elements within hovers */@layer controls {:where(.prctr-editor-scope) .monaco-hover {
+	cursor: default;
+	position: absolute;
+	overflow: hidden;
+	user-select: text;
+	-webkit-user-select: text;
+	box-sizing: border-box;
+	line-height: 1.5em;
+	white-space: var(--prctr-theme-hover-whiteSpace, normal);
+}:where(.prctr-editor-scope) .monaco-hover.fade-in {
+	animation: fadein 100ms linear;
+}:where(.prctr-editor-scope) .monaco-hover.hidden {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-hover a:hover:not(.disabled) {
+	cursor: pointer;
+}:where(.prctr-editor-scope) .monaco-hover .hover-contents:not(.html-hover-contents) {
+	padding: 4px 8px;
+}:where(.prctr-editor-scope) .monaco-hover .markdown-hover > .hover-contents:not(.code-hover-contents) {
+	max-width: var(--prctr-theme-hover-maxWidth, 500px);
+	word-wrap: break-word;
+}:where(.prctr-editor-scope) .monaco-hover .markdown-hover > .hover-contents:not(.code-hover-contents) hr {
+	min-width: 100%;
+}:where(.prctr-editor-scope) .monaco-hover p,:where(.prctr-editor-scope) .monaco-hover .code,:where(.prctr-editor-scope) .monaco-hover ul,:where(.prctr-editor-scope) .monaco-hover h1,:where(.prctr-editor-scope) .monaco-hover h2,:where(.prctr-editor-scope) .monaco-hover h3,:where(.prctr-editor-scope) .monaco-hover h4,:where(.prctr-editor-scope) .monaco-hover h5,:where(.prctr-editor-scope) .monaco-hover h6 {
+	margin: 8px 0;
+}:where(.prctr-editor-scope) .monaco-hover h1,:where(.prctr-editor-scope) .monaco-hover h2,:where(.prctr-editor-scope) .monaco-hover h3,:where(.prctr-editor-scope) .monaco-hover h4,:where(.prctr-editor-scope) .monaco-hover h5,:where(.prctr-editor-scope) .monaco-hover h6 {
+	line-height: 1.1;
+}:where(.prctr-editor-scope) .monaco-hover code {
+	font-family: var(--prctr-editor-monospace-font);
+}:where(.prctr-editor-scope) .monaco-hover hr {
+	box-sizing: border-box;
+	border-left: 0px;
+	border-right: 0px;
+	margin-top: 4px;
+	margin-bottom: -4px;
+	margin-left: -8px;
+	margin-right: -8px;
+	height: 1px;
+}:where(.prctr-editor-scope) .monaco-hover p:first-child,:where(.prctr-editor-scope) .monaco-hover .code:first-child,:where(.prctr-editor-scope) .monaco-hover ul:first-child {
+	margin-top: 0;
+}:where(.prctr-editor-scope) .monaco-hover p:last-child,:where(.prctr-editor-scope) .monaco-hover .code:last-child,:where(.prctr-editor-scope) .monaco-hover ul:last-child {
+	margin-bottom: 0;
+}:where(.prctr-editor-scope) .monaco-hover ul {
+	padding-left: 20px;
+}:where(.prctr-editor-scope) .monaco-hover ol {
+	padding-left: 20px;
+}:where(.prctr-editor-scope) .monaco-hover li > p {
+	margin-bottom: 0;
+}:where(.prctr-editor-scope) .monaco-hover li > ul {
+	margin-top: 0;
+}:where(.prctr-editor-scope) .monaco-hover code {
+	border-radius: 3px;
+	padding: 0 0.4em;
+}:where(.prctr-editor-scope) .monaco-hover .monaco-tokenized-source {
+	white-space: var(--prctr-theme-hover-sourceWhiteSpace, pre-wrap);
+}:where(.prctr-editor-scope) .monaco-hover .hover-row.status-bar {
+	font-size: 12px;
+	line-height: 22px;
+}:where(.prctr-editor-scope) .monaco-hover .hover-row.status-bar .info {
+	font-style: italic;
+	padding: 0px 8px;
+}:where(.prctr-editor-scope) .monaco-hover .hover-row.status-bar .actions {
+	display: flex;
+	padding: 0px 8px;
+	width: 100%;
+	box-sizing: border-box;
+}:where(.prctr-editor-scope) .monaco-hover .hover-row.status-bar .actions .action-container {
+	margin-right: 16px;
+	cursor: pointer;
+	overflow: hidden;
+	text-wrap: nowrap;
+	text-overflow: ellipsis;
+}:where(.prctr-editor-scope) .monaco-hover .hover-row.status-bar .actions .action-container .action .icon {
+	padding-right: 4px;
+	vertical-align: middle;
+	font-size: inherit;
+}:where(.prctr-editor-scope) .monaco-hover .hover-row.status-bar .actions .action-container a {
+	color: var(--prctr-theme-textLink-foreground);
+	text-decoration: var(--prctr-text-link-decoration);
+}:where(.prctr-editor-scope) .monaco-hover .hover-row.status-bar .actions .action-container a .icon.codicon {
+	color: var(--prctr-theme-textLink-foreground);
+}:where(.prctr-editor-scope) .monaco-hover .markdown-hover .hover-contents .codicon {
+	color: inherit;
+	font-size: inherit;
+	vertical-align: middle;
+}:where(.prctr-editor-scope) .monaco-hover .hover-contents a.code-link:hover,:where(.prctr-editor-scope) .monaco-hover .hover-contents a.code-link {
+	color: inherit;
+}:where(.prctr-editor-scope) .monaco-hover .hover-contents a.code-link:before {
+	content: '(';
+}:where(.prctr-editor-scope) .monaco-hover .hover-contents a.code-link:after {
+	content: ')';
+}:where(.prctr-editor-scope) .monaco-hover .hover-contents a.code-link > span {
+	text-decoration: underline;
+	/** Hack to force underline to show **/
+	border-bottom: 1px solid transparent;
+	text-underline-position: under;
+	color: var(--prctr-theme-textLink-foreground);
+}:where(.prctr-editor-scope) .monaco-hover .hover-contents a.code-link > span:hover {
+	color: var(--prctr-theme-textLink-activeForeground);
+}:where(.prctr-editor-scope) .monaco-hover .markdown-hover .hover-contents:not(.code-hover-contents):not(.html-hover-contents) span.codicon {
+	margin-bottom: 2px;
+}:where(.prctr-editor-scope) .monaco-hover-content .action-container a {
+	-webkit-user-select: none;
+	user-select: none;
+}:where(.prctr-editor-scope) .monaco-hover-content .action-container.disabled {
+	pointer-events: none;
+	opacity: 0.4;
+	cursor: default;
+}:where(.prctr-editor-scope) .monaco-hover .action-container,:where(.prctr-editor-scope) .monaco-hover .action,:where(.prctr-editor-scope) .monaco-hover button,:where(.prctr-editor-scope) .monaco-hover .monaco-button,:where(.prctr-editor-scope) .monaco-hover .monaco-text-button,:where(.prctr-editor-scope) .monaco-hover [role="button"] {
+	-webkit-user-select: none;
+	user-select: none;
+}
+}

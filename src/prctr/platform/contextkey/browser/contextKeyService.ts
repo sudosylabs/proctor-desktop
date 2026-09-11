@@ -7,17 +7,7 @@
 import { Event, PauseableEmitter } from '../../../base/common/event.js';
 import { Disposable, MutableDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import { equals } from '../common/contextKeyEquality.js';
-import {
-	type ContextKeyExpression,
-	type ContextKeyValue,
-	type IContext,
-	type IContextKey,
-	type IContextKeyChangeEvent,
-	type IContextKeyService,
-	type IContextKeyServiceTarget,
-	type IReadableSet,
-	type IScopedContextKeyService
-} from '../common/contextkey.js';
+import type { ContextKeyExpression, ContextKeyValue, IContext, IContextKey, IContextKeyChangeEvent, IContextKeyService, IContextKeyServiceTarget, IReadableSet, IScopedContextKeyService } from '../common/contextkey.js';
 
 const KEYBINDING_CONTEXT_ATTR = 'data-keybinding-context';
 

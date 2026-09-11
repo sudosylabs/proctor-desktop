@@ -1,0 +1,98 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-controls*//* Remove list-level focus ring — individual rows show their own focus indicators *//* Separator styling *//* Accepted CSS hiding technique for accessibility reader text  *//* https://webaim.org/techniques/css/invisiblecontent/ */@layer controls {:where(.prctr-editor-scope) .monaco-select-box-dropdown-container {
+	display: none;
+	box-sizing: border-box;
+	border-radius: var(--prctr-theme-cornerRadius-large);
+	box-shadow: var(--prctr-theme-shadow-lg);
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown * {
+	margin: 0;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown code {
+	line-height: 15px; /** For some reason, this is needed, otherwise <code> will take up 20px height */
+	font-family: var(--prctr-editor-monospace-font);
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container.visible {
+	display: flex;
+	flex-direction: column;
+	text-align: left;
+	width: 1px;
+	overflow: hidden;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container {
+	flex: 0 0 auto;
+	align-self: flex-start;
+	width: 100%;
+	overflow: hidden;
+	box-sizing: border-box;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-details-pane {
+	padding: 5px 6px;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list:focus::before {
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row {
+	cursor: pointer;
+	padding-left: 2px;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row > .option-text {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	padding-left: 6px;
+	white-space: nowrap;
+	float: left;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row > .option-detail {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	padding-left: 6px;
+	white-space: nowrap;
+	float: left;
+	opacity: 0.7;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row > .option-decorator-right {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	padding-right: 10px;
+	white-space: nowrap;
+	float: right;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row.option-separator {
+	cursor: default;
+	border-radius: 0;
+	padding: 0;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row.option-separator > .option-text {
+	visibility: hidden;
+	width: 0;
+	float: none;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row.option-separator > .option-detail {
+	display: none;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row.option-separator > .option-decorator-right {
+	color: var(--prctr-theme-descriptionForeground);
+	font-size: 12px;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row.option-separator::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	height: 1px;
+	background-color: var(--prctr-theme-menu-separatorBackground);
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list .prctr-list-row > .visually-hidden {
+	position: absolute;
+	left: -10000px;
+	top: auto;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-container-width-control {
+	flex: 1 1 auto;
+	align-self: flex-start;
+	opacity: 0;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-container-width-control > .width-control-div {
+	overflow: hidden;
+	max-height: 0px;
+}:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-container-width-control > .width-control-div > .option-text-width-control {
+	padding-left: 8px;
+	padding-right: 8px;
+	white-space: nowrap;
+}
+}@layer overrides {
+:where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list:focus::before {
+	outline: 0 !important;
+}
+}

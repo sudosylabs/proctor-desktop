@@ -1,0 +1,41 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-contributions*//* The workbench marks high contrast with `.hc-black` / `.hc-light`; `.vscode-high-contrast`
+ * is the webview equivalent, and the switch is rendered in both. */@layer controls {:where(.prctr-editor-scope) .monaco-switch {
+	position: relative;
+	flex: 0 0 auto;
+	width: var(--prctr-theme-spacing-size280);
+	height: var(--prctr-theme-spacing-size160);
+	padding: 0;
+	border: var(--prctr-theme-strokeThickness) solid transparent;
+	border-radius: var(--prctr-theme-cornerRadius-circle);
+	background: color-mix(in srgb, var(--prctr-theme-descriptionForeground) 36%, transparent);
+	cursor: pointer;
+	transition: background-color 120ms ease, border-color 120ms ease;
+}:where(.prctr-editor-scope) .monaco-switch.checked {
+	background: var(--prctr-theme-button-background);
+	border-color: var(--prctr-theme-button-background);
+}:where(.prctr-editor-scope) .monaco-switch:disabled {
+	cursor: default;
+	opacity: 0.5;
+}:where(.prctr-editor-scope) .monaco-switch:focus-visible {
+	outline: var(--prctr-theme-strokeThickness) solid var(--prctr-theme-focusBorder);
+	outline-offset: var(--prctr-theme-spacing-size20);
+}:where(.prctr-editor-scope) .monaco-switch-thumb {
+	position: absolute;
+	top: var(--prctr-theme-strokeThickness);
+	left: var(--prctr-theme-strokeThickness);
+	width: var(--prctr-theme-spacing-size120);
+	height: var(--prctr-theme-spacing-size120);
+	border-radius: var(--prctr-theme-cornerRadius-circle);
+	background: var(--prctr-theme-button-foreground);
+	transition: transform 120ms ease;
+}:where(.prctr-editor-scope) .monaco-switch.checked .monaco-switch-thumb {
+	transform: translateX(var(--prctr-theme-spacing-size120));
+}:where(.prctr-editor-scope) .hc-black .monaco-switch,:where(.prctr-editor-scope) .hc-light .monaco-switch,:where(.prctr-editor-scope) .vscode-high-contrast .monaco-switch {
+	border-color: var(--prctr-theme-contrastBorder);
+}:where(.prctr-editor-scope) .monaco-reduce-motion .monaco-switch,:where(.prctr-editor-scope) .monaco-reduce-motion .monaco-switch-thumb {
+	transition: none;
+}
+}

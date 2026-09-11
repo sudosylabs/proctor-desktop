@@ -8,6 +8,7 @@ import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ProgressBar } from '../../../../base/browser/ui/progressbar/progressbar.js';
 import type { IListRenderer } from '../../../../base/browser/ui/list/list.js';
 import { Action, type IAction } from '../../../../base/common/actions.js';
+import { Emitter } from '../../../../base/common/event.js';
 import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
 import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
 import {
@@ -24,6 +25,22 @@ import type { NotificationEffects, NotificationLabels } from './notificationPres
 import { NotificationMenu, type NotificationMenuEntry } from './notificationMenu.js';
 import { NotificationHover } from './notificationHover.js';
 import './notificationsViewer.css';
+
+/** Default height (px) of a single notification row. */
+export const DEFAULT_NOTIFICATION_ROW_HEIGHT = 42;
+/** Compact height (px) of a single notification row. */
+export const COMPACT_NOTIFICATION_ROW_HEIGHT = 34;
+let notificationRowHeight = DEFAULT_NOTIFICATION_ROW_HEIGHT;
+const onDidChangeNotificationRowHeightEmitter = new Emitter<number>();
+export const onDidChangeNotificationRowHeight = onDidChangeNotificationRowHeightEmitter.event;
+
+/** Updates the shared row metric before the notification lists remeasure their contents. */
+export function setNotificationRowHeight(height: number): void {
+	if (height !== notificationRowHeight) {
+		notificationRowHeight = height;
+		onDidChangeNotificationRowHeightEmitter.fire(height);
+	}
+}
 
 interface Template {
 	readonly element: HTMLElement;
@@ -61,7 +78,7 @@ export class NotificationRenderer
 		try {
 			this.renderElement(item, 0, template);
 			template.element.style.blockSize = 'auto';
-			return Math.ceil(template.element.getBoundingClientRect().height);
+			return Math.max(notificationRowHeight, Math.ceil(template.element.getBoundingClientRect().height));
 		} finally {
 			this.disposeTemplate(template);
 		}

@@ -1,0 +1,84 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-controls*//* Unable to change color of SVGs, hence opacity is used *//* Vertical actions *//* Action Items */@layer controls {:where(.prctr-editor-scope) .monaco-action-bar {
+	white-space: nowrap;
+	height: 100%;
+}:where(.prctr-editor-scope) .monaco-action-bar .actions-container {
+	display: flex;
+	margin: 0 auto;
+	padding: 0;
+	height: 100%;
+	width: 100%;
+	align-items: center;
+}:where(.prctr-editor-scope) .monaco-action-bar.vertical .actions-container {
+	display: inline-block;
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item {
+	display: block;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	position: relative;  /* DO NOT REMOVE - this is the key to preventing the ghosting icon bug in Chrome 42 */
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item.disabled {
+	cursor: default;
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item .icon,:where(.prctr-editor-scope) .monaco-action-bar .action-item .codicon {
+	display: block;
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item .codicon {
+	display: flex;
+	align-items: center;
+	width: 16px;
+	height: 16px;
+}:where(.prctr-editor-scope) .monaco-action-bar .action-label,:where(.prctr-editor-scope) .monaco-action-bar .action-item .keybinding  {
+	display: flex;
+	font-size: 11px;
+	padding: 3px;
+	border-radius: var(--prctr-theme-cornerRadius-medium);
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item.disabled .action-label:not(.icon),:where(.prctr-editor-scope) .monaco-action-bar .action-item.disabled .action-label:not(.icon)::before,:where(.prctr-editor-scope) .monaco-action-bar .action-item.disabled .action-label:not(.icon):hover {
+	color: var(--prctr-theme-disabledForeground);
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item.disabled .action-label.icon,:where(.prctr-editor-scope) .monaco-action-bar .action-item.disabled .action-label.icon::before,:where(.prctr-editor-scope) .monaco-action-bar .action-item.disabled .action-label.icon:hover {
+	opacity: 0.6;
+}:where(.prctr-editor-scope) .monaco-action-bar.vertical {
+	text-align: left;
+}:where(.prctr-editor-scope) .monaco-action-bar.vertical .action-item {
+	display: block;
+}:where(.prctr-editor-scope) .monaco-action-bar.vertical .action-item .action-label.separator {
+	display: block;
+	border-bottom: 1px solid var(--prctr-theme-menu-separatorBackground, var(--prctr-theme-disabledForeground));
+	padding-top: 1px;
+	margin: 4px .8em;
+	width: 100%;
+	height: 0;
+	background-color: transparent;
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item .action-label.separator {
+	width: 1px;
+	height: 16px;
+	cursor: default;
+	min-width: 1px;
+	padding: 0;
+	background-color: var(--prctr-theme-disabledForeground);
+}:where(.prctr-editor-scope) .secondary-actions .monaco-action-bar .action-label {
+	margin-left: 6px;
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item.select-container {
+	overflow: hidden; /* somehow the dropdown overflows its container, we prevent it here to not push */
+	flex: 1;
+	max-width: 170px;
+	min-width: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 10px;
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item.action-dropdown-item {
+	display: flex;
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item.action-dropdown-item > .action-dropdown-item-separator {
+	display: flex;
+	align-items: center;
+	cursor: default;
+}:where(.prctr-editor-scope) .monaco-action-bar .action-item.action-dropdown-item > .action-dropdown-item-separator > div {
+	width: 1px;
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .monaco-action-bar .action-item .action-label.separator {
+	margin: 5px 4px !important;
+}
+}

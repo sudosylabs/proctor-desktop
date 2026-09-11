@@ -1,0 +1,81 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-controls*//* default color styles - based on CSS variables *//* optional segmented appearance - opt in via IRadioOptions.className *//* Every segment carries the border box so the selected one can colour it without
+ * shifting the reel by a pixel as the selection moves. *//* Reserve the selected label's width without making unselected labels bold. *//* The fill only shifts the hue, so the border is what identifies the selection. */@layer controls {:where(.prctr-editor-scope) .monaco-custom-radio {
+	display: flex;
+}:where(.prctr-editor-scope) .monaco-custom-radio > .monaco-button {
+	border-radius: 0;
+	font-size: 0.9em;
+	line-height: 1em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}:where(.prctr-editor-scope) .monaco-custom-radio > .monaco-button:first-child {
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+}:where(.prctr-editor-scope) .monaco-custom-radio > .monaco-button:last-child {
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+}:where(.prctr-editor-scope) .monaco-custom-radio:not(.segmented) > .monaco-button:not(.active):not(:last-child) {
+	border-right: none;
+}:where(.prctr-editor-scope) .monaco-custom-radio:not(.segmented) > .monaco-button.previous-active {
+	border-left: none;
+}:where(.prctr-editor-scope) .monaco-custom-radio > .monaco-button {
+	color: var(--prctr-theme-radio-inactiveForeground);
+	background-color: var(--prctr-theme-radio-inactiveBackground);
+	border-color: var(--prctr-theme-radio-inactiveBorder, transparent);
+}:where(.prctr-editor-scope) .monaco-custom-radio > .monaco-button.active:hover,:where(.prctr-editor-scope) .monaco-custom-radio > .monaco-button.active {
+	color: var(--prctr-theme-radio-activeForeground);
+	background-color: var(--prctr-theme-radio-activeBackground);
+	border-color: var(--prctr-theme-radio-activeBorder, transparent);
+}:where(.prctr-editor-scope) .hc-black .monaco-custom-radio > .monaco-button.active,:where(.prctr-editor-scope) .hc-light .monaco-custom-radio > .monaco-button.active {
+	border-color: var(--prctr-theme-radio-activeBorder, transparent);
+}:where(.prctr-editor-scope) .hc-black .monaco-custom-radio > .monaco-button:not(.active),:where(.prctr-editor-scope) .hc-light .monaco-custom-radio > .monaco-button:not(.active) {
+	border-color: var(--prctr-theme-radio-inactiveBorder, transparent);
+}:where(.prctr-editor-scope) .hc-black .monaco-custom-radio > .monaco-button:not(.active):hover,:where(.prctr-editor-scope) .hc-light .monaco-custom-radio > .monaco-button:not(.active):hover {
+	outline: 1px dashed var(--prctr-theme-toolbar-hoverOutline);
+	outline-offset: -1px
+}:where(.prctr-editor-scope) .monaco-custom-radio > .monaco-button:hover:not(.active) {
+	background-color: var(--prctr-theme-radio-inactiveHoverBackground);
+}:where(.prctr-editor-scope) .monaco-custom-radio.segmented {
+	align-items: center;
+	gap: var(--prctr-theme-spacing-size20);
+	padding: var(--prctr-theme-spacing-size20);
+	border-radius: var(--prctr-theme-cornerRadius-circle);
+	background: color-mix(in srgb, var(--prctr-theme-foreground) 10%, transparent);
+}:where(.prctr-editor-scope) .monaco-custom-radio.segmented > .monaco-button {
+	flex: 1 1 0;
+	justify-content: center;
+	height: var(--prctr-theme-spacing-size240);
+	padding: var(--prctr-theme-spacing-sizeNone) var(--prctr-theme-spacing-size60);
+	border: var(--prctr-theme-strokeThickness) solid transparent;
+	border-radius: var(--prctr-theme-cornerRadius-circle);
+	color: var(--prctr-theme-descriptionForeground);
+	background: transparent;
+	font-size: var(--prctr-theme-fontSize-label2);
+	white-space: nowrap;
+}:where(.prctr-editor-scope) .monaco-custom-radio.segmented > .monaco-button > [data-label] {
+	display: inline-grid;
+	justify-items: center;
+}:where(.prctr-editor-scope) .monaco-custom-radio.segmented > .monaco-button > [data-label]::after {
+	content: attr(data-label);
+	height: 0;
+	font-weight: var(--prctr-theme-fontWeight-semiBold);
+	visibility: hidden;
+	pointer-events: none;
+}:where(.prctr-editor-scope) .monaco-custom-radio.segmented > .monaco-button:hover:not(.active) {
+	color: var(--prctr-theme-foreground);
+	background: transparent;
+}:where(.prctr-editor-scope) .monaco-custom-radio.segmented > .monaco-button.active,:where(.prctr-editor-scope) .monaco-custom-radio.segmented > .monaco-button.active:hover {
+	color: var(--prctr-theme-foreground);
+	background: color-mix(in srgb, var(--prctr-theme-button-background) 18%, var(--prctr-theme-menu-background));
+	border-color: var(--prctr-theme-radio-activeBorder, var(--prctr-theme-contrastActiveBorder));
+	box-shadow: var(--prctr-theme-shadow-sm);
+	font-weight: var(--prctr-theme-fontWeight-semiBold);
+}:where(.prctr-editor-scope) .monaco-custom-radio.segmented > .monaco-button:focus-visible {
+	outline: var(--prctr-theme-strokeThickness) solid var(--prctr-theme-focusBorder);
+	outline-offset: calc(-1 * var(--prctr-theme-strokeThickness));
+}:where(.prctr-editor-scope) .monaco-custom-radio.segmented > .monaco-button:focus:not(:focus-visible) {
+	outline: none;
+}
+}

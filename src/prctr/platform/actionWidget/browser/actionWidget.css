@@ -1,0 +1,462 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-contributions*//** Styles for each row in the list element **//* Separators with text labels (titled section headers) *//* Compact icon modifier: render the leading row codicon at the compact size *//* Toolbar codicons keep the regular codicon size even in compact lists *//* The submenu indicator keeps the regular codicon size even in compact lists *//* Action bar *//* Items with detail — show detail as subtext below the title *//* Items with an inline toggle — wrap so the toggle sits on its own row *//* Standalone toggles are peer settings, so the label and switch share one row. *//* Inline description mode — description rendered right after the label *//* Item toolbar - shows on hover/focus *//* Filter input *//* Filter action buttons remain quiet until the pointer reveals them. *//* Footer text *//* Header banner *//* Give widgets with a header banner more room so the banner text reads well. *//* Anchor for the absolutely-positioned submenu panel */@layer controls {:where(.prctr-editor-scope) .action-widget {
+	font-size: 13px;
+	min-width: 100px;
+	max-width: 80vw;
+	z-index: 40;
+	display: block;
+	width: 100%;
+	border-radius: var(--prctr-theme-cornerRadius-large);
+	background-color: var(--prctr-theme-menu-background);
+	color: var(--prctr-theme-menu-foreground);
+	padding: 4px;
+	box-shadow: var(--prctr-theme-shadow-lg);
+}:where(.prctr-editor-scope) .modern-ui.monaco-enable-motion .action-widget.action-widget-dropdown {
+	animation: action-widget-dropdown-open 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	transform-origin: bottom left;
+	will-change: transform, opacity;
+}:where(.prctr-editor-scope) .modern-ui.monaco-enable-motion .context-view.bottom .action-widget.action-widget-dropdown {
+	transform-origin: top left;
+}:where(.prctr-editor-scope) .modern-ui.monaco-enable-motion .action-widget.action-widget-dropdown.action-widget-dropdown-closing {
+	animation: action-widget-dropdown-close 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	pointer-events: none;
+}@keyframes action-widget-dropdown-open {
+	0% {
+		opacity: 0;
+		transform: scale(0.97);
+	}
+
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}@keyframes action-widget-dropdown-close {
+	0% {
+		opacity: var(--prctr-editor-action-widget-close-start-opacity, 1);
+		transform: var(--prctr-editor-action-widget-close-start-transform, scale(1));
+	}
+
+	100% {
+		opacity: 0;
+		transform: scale(0.99);
+	}
+}:where(.prctr-editor-scope) .context-view-block {
+	position: fixed;
+	cursor: initial;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: -1;
+}:where(.prctr-editor-scope) .context-view-pointerBlock {
+	position: fixed;
+	cursor: initial;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 2;
+}:where(.prctr-editor-scope) .action-widget .prctr-list {
+	user-select: none;
+	-webkit-user-select: none;
+}:where(.prctr-editor-scope) .action-widget .prctr-list:focus:before {
+}:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-scrollable-element {
+	overflow: visible;
+}:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row {
+	padding: 0 12px 0 6px;
+	white-space: nowrap;
+	cursor: pointer;
+	touch-action: none;
+	border-radius: var(--prctr-theme-cornerRadius-medium);
+}:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row.action.focused:not(.option-disabled) {
+	color: var(--prctr-theme-list-hoverForeground);
+	outline: 1px solid var(--prctr-theme-menu-selectionBorder, transparent);
+	outline-offset: -2px;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.group-header {
+	font-weight: var(--prctr-theme-fontWeight-semiBold);
+	font-size: 11px;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.group-header:not(:first-of-type) {
+	margin-top: 2px;
+}:where(.prctr-editor-scope) .action-widget .prctr-scrollable-element .prctr-list-rows .prctr-list-row.separator {
+	border-top: 1px solid var(--prctr-theme-editorHoverWidget-border);
+	color: var(--prctr-theme-descriptionForeground);
+	font-size: 12px;
+	margin: 4px 6px;
+	width: calc(100% - 12px);
+	cursor: default;
+	-webkit-user-select: none;
+	user-select: none;
+	border-radius: 0;
+	pointer-events: none;
+}:where(.prctr-editor-scope) .action-widget .prctr-scrollable-element .prctr-list-rows .prctr-list-row.separator:hover,:where(.prctr-editor-scope) .action-widget .prctr-scrollable-element .prctr-list-rows .prctr-list-row.separator.focused {
+	outline: 0 solid;
+	border-radius: 0;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.separator:first-of-type {
+	border-top: none;
+	margin-top: 0;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.separator > span:not(:empty) {
+	display: flex;
+	align-items: center;
+	height: 100%;
+	padding-left: 10px;
+}:where(.prctr-editor-scope) .action-widget .prctr-list .group-header,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled:before,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused:before {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .codicon {
+	font-size: 12px;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .action-list-item-toolbar .codicon {
+	font-size: 16px;
+}:where(.prctr-editor-scope) .action-widget .actionList.compact-icons .prctr-list-row.action .codicon {
+	font-size: var(--prctr-theme-codiconFontSize-compact, 12px);
+}:where(.prctr-editor-scope) .action-widget .actionList.compact-icons .prctr-list-row.action .action-list-item-toolbar .codicon {
+	font-size: var(--prctr-theme-codiconFontSize, 16px);
+}:where(.prctr-editor-scope) .action-widget .actionList.compact-icons .prctr-list-row.action .action-list-submenu-indicator.codicon {
+	font-size: var(--prctr-theme-codiconFontSize, 16px);
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action.option-disabled,:where(.prctr-editor-scope) .action-widget .prctr-list:focus .prctr-list-row.focused.action.option-disabled,:where(.prctr-editor-scope) .action-widget .prctr-list-row.action.option-disabled .codicon,:where(.prctr-editor-scope) .action-widget .prctr-list:not(.drop-target):not(.dragging) .prctr-list-row:hover:not(.selected):not(.focused).option-disabled {
+	color: var(--prctr-theme-disabledForeground);
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action:not(.option-disabled) .codicon {
+	color: inherit;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .title {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .detail {
+	order: 99;
+	width: 100%;
+	padding-left: 18px;
+	font-size: 11px;
+	line-height: 14px;
+	color: var(--prctr-theme-descriptionForeground);
+	opacity: 0.8;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row.action.focused:not(.option-disabled) .detail {
+	color: inherit;
+	opacity: 1;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .action-item-badge {
+	padding: 0px 6px;
+	border-radius: 10px;
+	background-color: var(--prctr-theme-badge-background);
+	color: var(--prctr-theme-badge-foreground);
+	font-size: 11px;
+	line-height: 18px;
+	flex-shrink: 0;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .monaco-keybinding > .monaco-keybinding-key {
+	background-color: var(--prctr-theme-keybindingLabel-background);
+	color: var(--prctr-theme-keybindingLabel-foreground);
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 3px;
+	border-color: var(--prctr-theme-keybindingLabel-border);
+	border-bottom-color: var(--prctr-theme-keybindingLabel-bottomBorder);
+	box-shadow: inset 0 -1px 0 var(--prctr-theme-widget-shadow);
+}:where(.prctr-editor-scope) .action-widget .action-widget-action-bar {
+	background-color: var(--prctr-theme-menu-background);
+	border-top: 1px solid var(--prctr-theme-editorHoverWidget-border);
+	margin-top: 4px;
+}:where(.prctr-editor-scope) .action-widget .action-widget-action-bar::before {
+	display: block;
+	content: "";
+	width: 100%;
+}:where(.prctr-editor-scope) .action-widget .action-widget-action-bar .actions-container {
+	padding: 2px 8px 0px 26px;
+	width: auto;
+}:where(.prctr-editor-scope) .action-widget-action-bar .action-label {
+	color: var(--prctr-theme-textLink-activeForeground);
+	font-size: 12px;
+	line-height: 22px;
+	padding: 0;
+	pointer-events: all;
+}:where(.prctr-editor-scope) .action-widget-action-bar .action-item {
+	margin-right: 16px;
+	pointer-events: none;
+}:where(.prctr-editor-scope) .action-widget-action-bar .action-label:hover {
+}:where(.prctr-editor-scope) .monaco-action-bar .actions-container.highlight-toggled .action-label.checked {
+	/* The important gives this rule precedence over the hover rule. */
+}:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row .description {
+	color: var(--prctr-theme-descriptionForeground);
+	margin-left: 0.5em;
+	font-size: 12px;
+}:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row .description a {
+	color: var(--prctr-theme-textLink-foreground);
+}:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row .description a:hover,:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row .description a:active {
+	color: var(--prctr-theme-textLink-activeForeground);
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .group-title {
+	color: var(--prctr-theme-descriptionForeground);
+	margin-left: 0.5em;
+	margin-right: 6px;
+	font-size: 12px;
+	flex-shrink: 0;
+}:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row.action.has-detail {
+	flex-wrap: wrap;
+	align-content: center;
+	padding-right: 6px;
+
+	.title {
+		line-height: 14px;
+	}
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action.has-inline-toggle {
+	flex-wrap: wrap;
+	align-content: center;
+	padding-right: 6px;
+
+	.title {
+		line-height: 14px;
+	}
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action.has-standalone-toggle .title {
+	font-size: var(--prctr-theme-fontSize-body1);
+	font-weight: var(--prctr-theme-fontWeight-regular);
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action.has-standalone-toggle .action-list-item-inline-toggle {
+	order: 100;
+	width: auto;
+	margin-left: auto;
+	padding: var(--prctr-theme-spacing-sizeNone);
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .action-list-item-inline-toggle {
+	order: 100;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding-left: 18px;
+	padding-top: 6px;
+	line-height: 16px;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .action-list-item-inline-toggle .action-list-item-inline-toggle-label {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 12px;
+	line-height: 16px;
+	color: var(--prctr-theme-foreground);
+}:where(.prctr-editor-scope) .action-widget .inline-description .prctr-list-row.action {
+	/* Override the row gap so group-title and toolbar sit flush */
+	gap: 0;
+
+	.title {
+		flex: 0 1 auto;
+		min-width: 0;
+		margin-left: 6px;
+	}
+
+	.description {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.group-title {
+		margin-left: auto;
+	}
+
+	.action-list-item-toolbar {
+		margin-left: 4px;
+		margin-right: 10px;
+	}
+
+	/* When description is hidden (e.g. items with only a submenu), push the
+	 * submenu chevron to the far right using an auto left margin. When
+	 * description is visible it already consumes all available space via
+	 * flex:1, so the auto margin has no additional effect. */
+	.action-list-submenu-indicator {
+		margin-left: auto;
+		margin-right: 10px;
+	}
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .action-list-item-toolbar {
+	display: none;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action.has-detail.has-toolbar .action-list-item-toolbar {
+	display: flex;
+	visibility: hidden;
+	margin-right: 10px;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.focused.action.has-toolbar .action-list-item-toolbar,:where(.prctr-editor-scope) .action-widget .prctr-list-row:hover.action.has-toolbar .action-list-item-toolbar {
+	display: flex;
+	visibility: visible;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row .action-list-item-toolbar .monaco-action-bar:not(.vertical) .action-label:not(.disabled):hover {
+	background-color: var(--prctr-theme-toolbar-hoverBackground);
+}:where(.prctr-editor-scope) .action-widget-delegate-label {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+}:where(.prctr-editor-scope) .action-widget .action-list-filter {
+	padding: 2px 2px 4px 2px;
+}:where(.prctr-editor-scope) .action-widget .action-list-filter-row {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding-right: 10px;
+}:where(.prctr-editor-scope) .action-widget .action-list-filter:first-child {
+	border-bottom: none;
+}:where(.prctr-editor-scope) .action-widget .action-list-filter:last-child {
+	border-top: 1px solid var(--prctr-theme-editorHoverWidget-border);
+}:where(.prctr-editor-scope) .action-widget .action-list-filter-input {
+	width: 100%;
+	flex: 1;
+	box-sizing: border-box;
+	padding: 4px 8px;
+	border: 1px solid var(--prctr-theme-input-border, transparent);
+	border-radius: 3px;
+	background-color: var(--prctr-theme-input-background);
+	color: var(--prctr-theme-input-foreground);
+	/* The themed border below replaces the browser's native focus outline. */
+	outline: none;
+}:where(.prctr-editor-scope) .action-widget .action-list-filter-input:focus {
+	border-color: var(--prctr-theme-focusBorder);
+}:where(.prctr-editor-scope) .action-widget .action-list-filter-input::placeholder {
+	color: var(--prctr-theme-input-placeholderForeground);
+}:where(.prctr-editor-scope) .action-widget .action-list-filter-actions .action-label {
+	padding: 3px;
+	border-radius: 3px;
+}:where(.prctr-editor-scope) .action-widget .action-list-filter-actions .action-label:hover {
+	background-color: var(--prctr-theme-toolbar-hoverBackground);
+}:where(.prctr-editor-scope) .action-widget .action-list-filter-label {
+	color: var(--prctr-theme-descriptionForeground);
+	font-size: 12px;
+	flex-shrink: 0;
+	margin-right: 2px;
+}:where(.prctr-editor-scope) .action-widget .action-list-footer {
+	color: var(--prctr-theme-descriptionForeground);
+	font-size: 11px;
+	/* Left padding matches the list row padding so the text aligns with the section headings. */
+	padding: 4px 10px 2px 6px;
+	/* Space between the last list item and the divider above the footer. */
+	margin-top: 4px;
+	border-top: 1px solid var(--prctr-theme-editorHoverWidget-border);
+}:where(.prctr-editor-scope) .action-widget .action-list-header {
+	display: flex;
+	align-items: flex-start;
+	/* Match the row gap so the text aligns with the item labels. */
+	gap: 6px;
+	color: var(--prctr-theme-foreground);
+	font-size: 12px;
+	line-height: 16px;
+	/* Match the row padding so the icon sits in the item icon column and the text aligns with the item labels. Top padding matches the left so the icon is evenly inset. */
+	padding: 6px 12px 6px 6px;
+	/* No horizontal margin so the rounded box matches the item hover outline. */
+	margin-bottom: 2px;
+	background-color: var(--prctr-theme-chat-requestBubbleBackground);
+	border-radius: var(--prctr-theme-cornerRadius-medium);
+}:where(.prctr-editor-scope) .action-widget:has(.action-list-header) {
+	min-width: 160px;
+}:where(.prctr-editor-scope) .action-widget .action-list-header .action-list-header-icon {
+	flex-shrink: 0;
+	/* Match the row icon column so the icon centers on the item icon column and the text lines up with the item labels. The filled info glyph reads optically heavier than the item check icon, so render it slightly smaller. */
+	width: 12px;
+	text-align: center;
+	line-height: 16px;
+	color: var(--prctr-theme-descriptionForeground);
+}:where(.prctr-editor-scope) .action-widget .action-list-header .action-list-header-text {
+	flex: 1;
+	font-size: 11px;
+}:where(.prctr-editor-scope) .action-widget .action-list-header .action-list-header-dismiss {
+	flex-shrink: 0;
+	cursor: pointer;
+	color: var(--prctr-theme-descriptionForeground);
+	font-size: 12px;
+	line-height: 16px;
+}:where(.prctr-editor-scope) .action-widget .action-list-header .action-list-header-dismiss:hover {
+	color: var(--prctr-theme-foreground);
+}:where(.prctr-editor-scope) .action-widget .action-list-header .action-list-header-dismiss:focus-visible {
+	outline: var(--prctr-theme-strokeThickness) solid var(--prctr-theme-focusBorder);
+	outline-offset: 2px;
+	border-radius: var(--prctr-theme-cornerRadius-small);
+}:where(.prctr-editor-scope) .action-widget .actionList {
+	position: relative;
+}:where(.prctr-editor-scope) .action-widget .action-list-submenu-indicator {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+	border-radius: 4px;
+}:where(.prctr-editor-scope) .action-widget .action-list-submenu-indicator.has-submenu {
+	opacity: 0.6;
+}:where(.prctr-editor-scope) .action-widget .prctr-list-row.action .action-list-submenu-indicator.codicon {
+	display: flex;
+	font-size: 16px;
+}:where(.prctr-editor-scope) .action-list-submenu-panel {
+	background-color: var(--prctr-theme-menu-background);
+	color: var(--prctr-theme-menu-foreground);
+	border: 1px solid var(--prctr-theme-menu-border, var(--prctr-theme-editorHoverWidget-border));
+	border-radius: 5px;
+	box-shadow: 0 2px 8px var(--prctr-theme-widget-shadow);
+	z-index: 50;
+	width: max-content;
+	outline: none;
+}:where(.prctr-editor-scope) .action-list-submenu-hover-header {
+	padding: 4px 8px;
+	line-height: 1.4em;
+	font-size: 12px;
+	max-width: 300px;
+	word-wrap: break-word;
+	-webkit-user-select: text;
+	user-select: text;
+}:where(.prctr-editor-scope) .action-list-submenu-hover-header a {
+	color: var(--prctr-theme-textLink-foreground);
+}:where(.prctr-editor-scope) .action-list-submenu-hover-header a:hover,:where(.prctr-editor-scope) .action-list-submenu-hover-header a:active {
+	color: var(--prctr-theme-textLink-activeForeground);
+}:where(.prctr-editor-scope) .action-list-submenu-hover-header.has-submenu {
+	border-bottom: 1px solid var(--prctr-theme-menu-separatorBackground, var(--prctr-theme-editorWidget-border));
+}:where(.prctr-editor-scope) .action-list-submenu-hover-header > p {
+	margin-left: 0;
+	margin-right: 0;
+}:where(.prctr-editor-scope) .action-list-submenu-hover-header > p:first-child {
+	margin-top: 0;
+}:where(.prctr-editor-scope) .action-list-submenu-hover-header > p:last-child {
+	margin-bottom: 0;
+}
+}@layer overrides {
+
+:where(.prctr-editor-scope) .action-widget {
+	border: 1px solid var(--prctr-theme-editorHoverWidget-border) !important;
+}
+
+:where(.prctr-editor-scope) .action-widget .prctr-list {
+	border: none !important;
+	border-width: 0 !important;
+}
+
+:where(.prctr-editor-scope) .action-widget .prctr-list:focus:before {
+	outline: 0 !important;
+}
+
+:where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row.action.focused:not(.option-disabled) {
+	background-color: var(--prctr-theme-list-hoverBackground) !important;
+}
+
+:where(.prctr-editor-scope) .action-widget .prctr-list-row.group-header {
+	color: var(--prctr-theme-descriptionForeground) !important;
+}
+
+:where(.prctr-editor-scope) .action-widget .prctr-scrollable-element .prctr-list-rows .prctr-list-row.separator:hover,:where(.prctr-editor-scope) .action-widget .prctr-scrollable-element .prctr-list-rows .prctr-list-row.separator.focused {
+	background-color: transparent !important;
+}
+
+:where(.prctr-editor-scope) .action-widget .prctr-list .group-header,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled:before,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused:before {
+	cursor: default !important;
+	background-color: transparent !important;
+	outline: 0 solid !important;
+}
+
+:where(.prctr-editor-scope) .action-widget-action-bar .action-label:hover {
+	background-color: transparent !important;
+}
+
+:where(.prctr-editor-scope) .monaco-action-bar .actions-container.highlight-toggled .action-label.checked {
+	background: var(--prctr-theme-actionBar-toggledBackground) !important;
+}
+
+:where(.prctr-editor-scope) .action-widget .action-list-header .action-list-header-icon {
+	font-size: 12px !important;
+}
+}

@@ -5,7 +5,7 @@
   "admission": {
     "workflow": "Render reusable production button, text-field, toggle, and progress behavior through small intent-only native-DOM interfaces and exercise every state through a development-only isolated Control Explorer.",
     "callers": ["test/browser/controlExplorer/sharedControlsFixture.ts"],
-    "interface": "src/prctr/base/browser/ui/button/button.ts",
+    "interface": "src/prctr/base/browser/ui/button/buttonControl.ts",
     "decision": "docs/architecture/design-system.md"
   },
   "upstream": {
@@ -28,7 +28,7 @@
       "disposition": "behaviorally-reimplemented",
       "rationale": "Retain native activation, focus, enabled/busy state, intent events, icon composition, and lifecycle behind a smaller Proctor interface.",
       "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/base/browser/ui/button/button.ts"
+      "localPath": "src/prctr/base/browser/ui/button/buttonControl.ts"
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/inputbox/inputBox.ts",
@@ -46,7 +46,7 @@
       "disposition": "behaviorally-reimplemented",
       "rationale": "Retain keyboard/pointer parity and requested-state events while preventing the control from silently owning authoritative checked state.",
       "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/base/browser/ui/toggle/toggle.ts"
+      "localPath": "src/prctr/base/browser/ui/toggle/toggleControl.ts"
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/progressbar/progressbar.ts",
@@ -115,9 +115,9 @@
       "id": "intent-only-native-controls",
       "summary": "Native elements own transient interaction and emit intent while callers retain authoritative asynchronous state; disabled, read-only, busy, unavailable, and invalid states remain distinct.",
       "localPaths": [
-        "src/prctr/base/browser/ui/button/button.ts",
+        "src/prctr/base/browser/ui/button/buttonControl.ts",
         "src/prctr/base/browser/ui/field/textField.ts",
-        "src/prctr/base/browser/ui/toggle/toggle.ts",
+        "src/prctr/base/browser/ui/toggle/toggleControl.ts",
         "src/prctr/base/browser/ui/progress/progress.ts"
       ],
       "verificationRefs": ["control-explorer-real-browser", "source-css-check"]

@@ -1,7 +1,7 @@
 import { DisposableStore } from '../../../src/prctr/base/common/lifecycle.ts';
-import { ButtonControl } from '../../../src/prctr/base/browser/ui/button/button.ts';
+import { ButtonControl } from '../../../src/prctr/base/browser/ui/button/buttonControl.ts';
 import { TextFieldControl } from '../../../src/prctr/base/browser/ui/field/textField.ts';
-import { ToggleControl } from '../../../src/prctr/base/browser/ui/toggle/toggle.ts';
+import { ToggleControl } from '../../../src/prctr/base/browser/ui/toggle/toggleControl.ts';
 import { ProgressControl } from '../../../src/prctr/base/browser/ui/progress/progress.ts';
 import { createSemanticIcon } from '../../../src/prctr/platform/theme/browser/semanticIcon.ts';
 import type { ControlFixtureResult } from './manifest.ts';

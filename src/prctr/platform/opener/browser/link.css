@@ -1,0 +1,9 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*//* @proctor-vscode-port settings-modal-composition */@layer controls {:where(.prctr-editor-scope) .monaco-link {
+	color: var(--prctr-theme-textLink-foreground);
+}:where(.prctr-editor-scope) .monaco-link:hover {
+	color: var(--prctr-theme-textLink-activeForeground);
+}
+}

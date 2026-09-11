@@ -18,6 +18,3 @@ interface TrustedTypePolicy {
 	createScript(input: string, ...arguments_: readonly unknown[]): TrustedScript;
 	createScriptURL(input: string, ...arguments_: readonly unknown[]): TrustedScriptURL;
 }
-interface HTMLElement {
-	editContext?: unknown;
-}
