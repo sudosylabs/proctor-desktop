@@ -32,7 +32,11 @@
           "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
           "alias": "napi",
           "kind": "production",
-          "features": ["dyn-symbols", "napi8", "serde-json"],
+          "features": [
+            "dyn-symbols",
+            "napi8",
+            "serde-json"
+          ],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
@@ -41,13 +45,19 @@
           "manifest": "native/crates/prctr-desktop-key-custody/Cargo.toml",
           "alias": "napi",
           "kind": "production",
-          "features": ["dyn-symbols", "napi8"],
+          "features": [
+            "dyn-symbols",
+            "napi8"
+          ],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility", "electron-main"],
+      "processes": [
+        "exam-security-utility",
+        "electron-main"
+      ],
       "networkBehavior": "None at runtime; Node-API calls remain process-local.",
       "nativeBehavior": "Links the platform Node-API symbols and uses its reviewed registration build support; it does not bundle a helper executable.",
       "transitiveRisk": "Adds napi-sys, registration support, futures primitives, serde conversion, and dynamic-symbol loading; exact transitive versions are locked and license checked.",
@@ -71,7 +81,9 @@
           "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
           "alias": "napi-derive",
           "kind": "production",
-          "features": ["strict"],
+          "features": [
+            "strict"
+          ],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
@@ -80,13 +92,17 @@
           "manifest": "native/crates/prctr-desktop-key-custody/Cargo.toml",
           "alias": "napi-derive",
           "kind": "production",
-          "features": ["strict"],
+          "features": [
+            "strict"
+          ],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
         }
       ],
-      "processes": ["native-build"],
+      "processes": [
+        "native-build"
+      ],
       "networkBehavior": "None at runtime or build time after Cargo acquisition.",
       "nativeBehavior": "A compile-time procedural macro emits Node-API registration glue; it ships no standalone binary.",
       "transitiveRisk": "Adds exact locked syntax and case-conversion macro dependencies used only while compiling the bridge.",
@@ -110,7 +126,9 @@
           "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
           "alias": "serde",
           "kind": "production",
-          "features": ["derive"],
+          "features": [
+            "derive"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": null
@@ -119,7 +137,9 @@
           "manifest": "native/crates/prctr-native-protocol/Cargo.toml",
           "alias": "serde",
           "kind": "production",
-          "features": ["derive"],
+          "features": [
+            "derive"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": null
@@ -134,7 +154,11 @@
           "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility", "native-build", "native-security-helper"],
+      "processes": [
+        "exam-security-utility",
+        "native-build",
+        "native-security-helper"
+      ],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust serialization traits and derive macros; no native library or helper process.",
       "transitiveRisk": "Adds the exact locked serde core and derive macro graph; generated DTO validation still runs independently after conversion.",
@@ -164,7 +188,9 @@
           "targetScope": null
         }
       ],
-      "processes": ["native-security-helper"],
+      "processes": [
+        "native-security-helper"
+      ],
       "networkBehavior": "None; all frames use private inherited process handles and are validated before nested allocation.",
       "nativeBehavior": "Pure Rust JSON encoding and decoding; ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Uses the exact locked itoa, memchr, serde_core, and zmij graph; fixed frame limits and generated protocol validation remain independent controls.",
@@ -194,7 +220,9 @@
           "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility"],
+      "processes": [
+        "exam-security-utility"
+      ],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust message-authentication construction; it ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Reuses the exact locked digest graph admitted for SHA-256 and activates the exact locked constant-time subtle primitive; neither adds runtime I/O or platform integration.",
@@ -224,7 +252,9 @@
           "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility"],
+      "processes": [
+        "exam-security-utility"
+      ],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust SHA-256 primitives; it ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Adds the exact locked digest, block-buffer, crypto-common, generic-array and typenum graph; the use is local HMAC derivation over bounded inputs.",
@@ -296,7 +326,11 @@
           "manifest": "native/crates/prctr-interactive-session-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_Foundation", "Win32_System_RemoteDesktop", "Win32_System_Threading"],
+          "features": [
+            "Win32_Foundation",
+            "Win32_System_RemoteDesktop",
+            "Win32_System_Threading"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -305,7 +339,9 @@
           "manifest": "native/crates/prctr-clipboard-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_System_DataExchange"],
+          "features": [
+            "Win32_System_DataExchange"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -329,7 +365,10 @@
           "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
-          "features": ["Win32_Storage_FileSystem", "Win32_System_WindowsProgramming"],
+          "features": [
+            "Win32_Storage_FileSystem",
+            "Win32_System_WindowsProgramming"
+          ],
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os=\"windows\")"
@@ -423,7 +462,9 @@
           "targetScope": "cfg(target_os=\"macos\")"
         }
       ],
-      "processes": ["exam-security-utility"],
+      "processes": [
+        "exam-security-utility"
+      ],
       "networkBehavior": "None; the crate exposes platform C declarations only.",
       "nativeBehavior": "Links macOS system APIs already provided by the operating system and ships no helper or bundled native library.",
       "transitiveRisk": "No additional transitive runtime graph; the exact version is already locked by the native workspace.",
@@ -434,14 +475,17 @@
     },
     {
       "package": "@vscode/codicons",
-      "version": "0.0.46-38",
+      "version": "0.0.46-39",
       "kind": "production",
       "purpose": "Supply the exact Codicon font asset used by the pinned VS Code source while Proctor exposes only static semantic icon identifiers.",
       "owner": "design-system",
-      "source": "https://www.npmjs.com/package/@vscode/codicons/v/0.0.46-38",
+      "source": "https://www.npmjs.com/package/@vscode/codicons/v/0.0.46-39",
       "license": "CC-BY-4.0",
       "lifecycleScripts": "blocked",
-      "processes": ["authenticated-renderer", "candidate-renderer"],
+      "processes": [
+        "authenticated-renderer",
+        "candidate-renderer"
+      ],
       "networkBehavior": "None; the font is bundled into renderer assets at build time.",
       "nativeBehavior": "Bundles one platform-neutral TrueType font and no executable or native library.",
       "transitiveRisk": "The production package has no runtime dependencies; its development-only source repository scripts are not admitted or executed.",
@@ -459,7 +503,9 @@
       "source": "https://www.npmjs.com/package/@xterm/xterm/v/6.1.0-beta.303",
       "license": "MIT",
       "lifecycleScripts": "blocked",
-      "processes": ["candidate-renderer"],
+      "processes": [
+        "candidate-renderer"
+      ],
       "networkBehavior": "None; xterm parses and renders byte output already delivered through Proctor's closed terminal renderer API.",
       "nativeBehavior": "Platform-neutral TypeScript and browser assets only; no executable or native library is bundled.",
       "transitiveRisk": "The exact production package has no runtime dependencies and is imported only by the Candidate terminal panel.",
@@ -477,7 +523,10 @@
       "source": "https://www.npmjs.com/package/electron/v/44.0.0",
       "license": "MIT",
       "lifecycleScripts": "none",
-      "processes": ["electron-main", "exam-security-utility"],
+      "processes": [
+        "electron-main",
+        "exam-security-utility"
+      ],
       "networkBehavior": "The development package API acquires the checksum-verified exact Electron distribution on explicit tool invocation when it is absent; the packaged application uses its bundled runtime and product networking remains separately owned.",
       "nativeBehavior": "Installs the exact Electron runtime and its Chromium/Node native binaries for the host platform.",
       "transitiveRisk": "Acquisition and archive extraction dependencies are reachable only from explicit development tooling; the lockfile pins their resolved graph and the application does not import this package as an ordinary Node dependency.",
@@ -605,6 +654,244 @@
       "source": "https://www.npmjs.com/package/prettier/v/3.9.6",
       "license": "MIT",
       "lifecycleScripts": "none"
+    },
+    {
+      "package": "@vscode/l10n",
+      "version": "0.0.18",
+      "kind": "production",
+      "purpose": "Retain the packaged VS Code JSON language server localization formatting API; only packaged message data is admitted.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/@vscode/l10n/v/0.0.18",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": [
+        "authenticated-renderer",
+        "settings-json-worker"
+      ],
+      "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
+      "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
+      "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Reimplementing the language parser, provider algorithms or LSP cancellation/synchronization would weaken the requested upstream behavior and create another engine to maintain.",
+      "updateOwner": "settings-editor",
+      "removalOwner": "settings-editor"
+    },
+    {
+      "package": "vscode-json-languageservice",
+      "version": "6.0.0-next.3",
+      "kind": "production",
+      "purpose": "Retain the exact JSON/JSONC parsing, schema completion, validation, formatting, color, folding and symbol algorithms used by the pinned VS Code JSON language server.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/vscode-json-languageservice/v/6.0.0-next.3",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": [
+        "authenticated-renderer",
+        "settings-json-worker"
+      ],
+      "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
+      "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
+      "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Reimplementing the language parser, provider algorithms or LSP cancellation/synchronization would weaken the requested upstream behavior and create another engine to maintain.",
+      "updateOwner": "settings-editor",
+      "removalOwner": "settings-editor"
+    },
+    {
+      "package": "vscode-languageserver",
+      "version": "10.0.0-next.18",
+      "kind": "production",
+      "purpose": "Retain the browser-compatible Language Server Protocol connection, incremental document synchronization, cancellation, diagnostics and transport used by the pinned JSON server.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/vscode-languageserver/v/10.0.0-next.18",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": [
+        "authenticated-renderer",
+        "settings-json-worker"
+      ],
+      "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
+      "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
+      "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Reimplementing the language parser, provider algorithms or LSP cancellation/synchronization would weaken the requested upstream behavior and create another engine to maintain.",
+      "updateOwner": "settings-editor",
+      "removalOwner": "settings-editor"
+    },
+    {
+      "package": "vscode-uri",
+      "version": "3.1.0",
+      "kind": "production",
+      "purpose": "Retain URI parsing and relative schema-reference resolution in the upstream JSON language server.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/vscode-uri/v/3.1.0",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": [
+        "authenticated-renderer",
+        "settings-json-worker"
+      ],
+      "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
+      "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
+      "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Reimplementing the language parser, provider algorithms or LSP cancellation/synchronization would weaken the requested upstream behavior and create another engine to maintain.",
+      "updateOwner": "settings-editor",
+      "removalOwner": "settings-editor"
+    },
+    {
+      "package": "@vscode/tree-sitter-wasm",
+      "version": "0.3.1",
+      "kind": "production",
+      "purpose": "Preserve the complete editor tokenization contracts and optional Tree-sitter backend without truncating text-model behavior; JSON composition selects its packaged TextMate grammar.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/@vscode/tree-sitter-wasm/v/0.3.1",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": [
+        "authenticated-renderer",
+        "settings-editor-worker"
+      ],
+      "networkBehavior": "Only immutable packaged worker/WASM resources may be loaded by the owning adapter. No remote package, grammar or service discovery is admitted.",
+      "nativeBehavior": "JavaScript and WebAssembly only; no host-native addon or installation toolchain executes.",
+      "transitiveRisk": "No package runtime dependencies. Exact archives must match the pinned upstream lock integrity digests; lifecycle scripts remain disabled.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "A handwritten diff or tokenizer would replace the original editor mechanism and weaken the approved source port.",
+      "updateOwner": "settings-editor",
+      "removalOwner": "settings-editor"
+    },
+    {
+      "package": "@vscode/diff",
+      "version": "0.0.2-7",
+      "kind": "production",
+      "purpose": "Preserve the upstream diff implementation used by editor workers and Settings conflict comparison.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/@vscode/diff/v/0.0.2-7",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": [
+        "authenticated-renderer",
+        "settings-editor-worker"
+      ],
+      "networkBehavior": "Only immutable packaged worker/WASM resources may be loaded by the owning adapter. No remote package, grammar or service discovery is admitted.",
+      "nativeBehavior": "JavaScript and WebAssembly only; no host-native addon or installation toolchain executes.",
+      "transitiveRisk": "No package runtime dependencies. Exact archives must match the pinned upstream lock integrity digests; lifecycle scripts remain disabled.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "A handwritten diff or tokenizer would replace the original editor mechanism and weaken the approved source port.",
+      "updateOwner": "settings-editor",
+      "removalOwner": "settings-editor"
+    },
+    {
+      "package": "@types/trusted-types",
+      "version": "2.0.7",
+      "kind": "development",
+      "purpose": "Exact upstream ambient type declarations for the browser editor; no runtime script or capability is emitted.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/@types/trusted-types/v/2.0.7",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "@webgpu/types",
+      "version": "0.1.66",
+      "kind": "development",
+      "purpose": "Exact upstream ambient type declarations for the browser editor; no runtime script or capability is emitted.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/@webgpu/types/v/0.1.66",
+      "license": "BSD-3-Clause",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "@types/wicg-file-system-access",
+      "version": "2023.10.7",
+      "kind": "development",
+      "purpose": "Exact upstream ambient type declarations for the browser editor; no runtime script or capability is emitted.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/@types/wicg-file-system-access/v/2023.10.7",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "sinon",
+      "version": "12.0.1",
+      "kind": "development",
+      "purpose": "Preserve the exact upstream model test helper mocking and service-instantiation behavior; not bundled into the product.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/sinon/v/12.0.1",
+      "license": "BSD-3-Clause",
+      "lifecycleScripts": "blocked"
+    },
+    {
+      "package": "@types/sinon",
+      "version": "10.0.2",
+      "kind": "development",
+      "purpose": "Preserve the exact upstream model test helper mocking and service-instantiation behavior; not bundled into the product.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/@types/sinon/v/10.0.2",
+      "license": "MIT",
+      "lifecycleScripts": "blocked"
+    },
+    {
+      "package": "tas-client",
+      "version": "0.4.6",
+      "kind": "development",
+      "purpose": "Compile complete upstream type-only service contracts. The Settings composition does not select experimentation or headless terminal runtime services; erased imports emit no package execution.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/tas-client/v/0.4.6",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "@xterm/headless",
+      "version": "6.1.0-beta.302",
+      "kind": "development",
+      "purpose": "Compile complete upstream type-only service contracts. The Settings composition does not select experimentation or headless terminal runtime services; erased imports emit no package execution.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/@xterm/headless/v/6.1.0-beta.302",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
+      "package": "vscode-textmate",
+      "version": "9.3.2",
+      "kind": "production",
+      "purpose": "Preserve the pinned TextMate grammar engine, injections, token metadata, rule stacks and theme matching for the static packaged JSONC language.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/vscode-textmate/v/9.3.2",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": [
+        "authenticated-renderer",
+        "settings-textmate-worker"
+      ],
+      "networkBehavior": "Only literal bundled JavaScript, grammar data and WASM bytes are admitted. No network grammar, package resolution or remote source reads.",
+      "nativeBehavior": "JavaScript and WebAssembly only; no Node integration, native addon or lifecycle script.",
+      "transitiveRisk": "No runtime dependencies. Version and archive integrity match the immutable upstream lock; asset digests are verified during bundling.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Replacing the original grammar or regex engine would lose source-compatible tokenization, language embedding and theme behavior.",
+      "updateOwner": "settings-editor",
+      "removalOwner": "settings-editor"
+    },
+    {
+      "package": "vscode-oniguruma",
+      "version": "1.7.0",
+      "kind": "production",
+      "purpose": "Preserve the pinned Oniguruma regular-expression engine and WASM implementation required by the packaged TextMate tokenizer.",
+      "owner": "settings-editor",
+      "source": "https://www.npmjs.com/package/vscode-oniguruma/v/1.7.0",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": [
+        "authenticated-renderer",
+        "settings-textmate-worker"
+      ],
+      "networkBehavior": "Only literal bundled JavaScript, grammar data and WASM bytes are admitted. No network grammar, package resolution or remote source reads.",
+      "nativeBehavior": "JavaScript and WebAssembly only; no Node integration, native addon or lifecycle script.",
+      "transitiveRisk": "No runtime dependencies. Version and archive integrity match the immutable upstream lock; asset digests are verified during bundling.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Replacing the original grammar or regex engine would lose source-compatible tokenization, language embedding and theme behavior.",
+      "updateOwner": "settings-editor",
+      "removalOwner": "settings-editor"
     }
   ]
 }

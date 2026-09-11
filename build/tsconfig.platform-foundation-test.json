@@ -4,7 +4,10 @@
     "allowImportingTsExtensions": true,
     "types": []
   },
-  "exclude": ["../test/platform/identity/electron-main/**"],
+  "exclude": [
+    "../test/platform/identity/electron-main/**",
+    "../test/platform/settings/electron-main/**"
+  ],
   "include": [
     "../src/prctr/base/common/**/*.ts",
     "../src/prctr/platform/instantiation/common/**/*.ts",

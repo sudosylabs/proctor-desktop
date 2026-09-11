@@ -891,3 +891,30 @@ void test('production dependency policy requires native and transitive risk owne
 		)
 	);
 });
+
+void test('upstream assets retain digest enforcement without requiring invalid JSON comments', async () => {
+	const fixture = 'test/editor/node/themes/upstream/color-theme.json';
+	const clean = await run(checkMap().get('upstream.provenance')!, snapshot());
+	assert.deepStrictEqual(
+		clean.filter((item) => item.path === fixture),
+		[]
+	);
+	const changed = await run(
+		checkMap().get('upstream.provenance')!,
+		snapshot((files) => {
+			files[fixture] = '{"colors":{"foreground":"#123456"}}';
+		})
+	);
+	assert.ok(changed.some((item) => item.path === fixture && /digest differs/.test(item.problem)));
+	const code = 'src/prctr/platform/theme/common/colorThemeData.ts';
+	const missingMarker = await run(
+		checkMap().get('upstream.provenance')!,
+		snapshot((files) => {
+			files[code] = String(files[code]).replace(
+				/\/\/ @proctor-vscode-port complete-theme-model/,
+				''
+			);
+		})
+	);
+	assert.ok(missingMarker.some((item) => item.path === code && /lacks/.test(item.problem)));
+});

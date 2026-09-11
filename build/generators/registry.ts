@@ -1,3 +1,5 @@
+import { tokenCustomizationsGenerator } from './tokenCustomizations.ts';
+import { productMetadataGenerator } from './productMetadata.ts';
 import { bundledThemesGenerator } from './bundledThemes.ts';
 import type { Repository } from '../checks/types.ts';
 import {
@@ -19,6 +21,8 @@ export interface Generator {
 }
 
 const productGenerators: readonly Generator[] = [
+	tokenCustomizationsGenerator,
+	productMetadataGenerator,
 	bundledThemesGenerator,
 	localizationCatalogGenerator,
 	settingsRegistryGenerator,

@@ -73,12 +73,25 @@
     "esbuild": true
   },
   "dependencies": {
-    "@vscode/codicons": "0.0.46-38",
+    "@vscode/codicons": "0.0.46-39",
+    "@vscode/diff": "0.0.2-7",
+    "@vscode/l10n": "0.0.18",
+    "@vscode/tree-sitter-wasm": "0.3.1",
     "@xterm/xterm": "6.1.0-beta.303",
-    "electron": "44.0.0"
+    "electron": "44.0.0",
+    "vscode-json-languageservice": "6.0.0-next.3",
+    "vscode-languageserver": "10.0.0-next.18",
+    "vscode-oniguruma": "1.7.0",
+    "vscode-textmate": "9.3.2",
+    "vscode-uri": "3.1.0"
   },
   "devDependencies": {
     "@types/node": "24.13.3",
+    "@types/sinon": "10.0.2",
+    "@types/trusted-types": "2.0.7",
+    "@types/wicg-file-system-access": "2023.10.7",
+    "@webgpu/types": "0.1.66",
+    "@xterm/headless": "6.1.0-beta.302",
     "ajv": "8.20.0",
     "esbuild": "0.28.2",
     "eslint": "10.8.0",
@@ -86,9 +99,37 @@
     "postcss": "8.5.26",
     "postcss-selector-parser": "7.1.5",
     "prettier": "3.9.6",
+    "sinon": "12.0.1",
     "smol-toml": "1.8.0",
+    "tas-client": "0.4.6",
     "typescript": "6.0.3",
     "typescript-eslint": "8.66.0",
     "yaml": "2.9.0"
+  },
+  "overrides": {
+    "vscode-json-languageservice": {
+      "vscode-languageserver-textdocument": "1.0.12",
+      "vscode-languageserver-types": "3.18.0"
+    },
+    "sinon": {
+      "@sinonjs/commons": "1.8.3",
+      "type-detect": "4.0.8",
+      "@sinonjs/fake-timers": "7.1.2",
+      "@sinonjs/samsam": "6.0.2",
+      "lodash.get": "4.4.2",
+      "diff": "5.2.2",
+      "nise": "5.1.0",
+      "@sinonjs/text-encoding": "0.7.1",
+      "just-extend": "4.2.1",
+      "path-to-regexp": "1.9.0",
+      "isarray": "0.0.1",
+      "supports-color": "7.2.0",
+      "has-flag": "4.0.0"
+    },
+    "@types/sinon": {
+      "@sinonjs/fake-timers": "7.1.2",
+      "@sinonjs/commons": "1.8.3",
+      "type-detect": "4.0.8"
+    }
   }
 }

@@ -1,9 +1,26 @@
 {
   "extends": "./tsconfig.base-common.json",
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2024", "ESNext.Disposable", "WebWorker.ImportScripts"],
-    "types": []
+    "customConditions": [
+      "browser"
+    ],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2024",
+      "ESNext.Disposable",
+      "WebWorker.ImportScripts"
+    ],
+    "types": [
+      "trusted-types",
+      "@webgpu/types",
+      "wicg-file-system-access"
+    ]
   },
+  "exclude": [
+    "../src/prctr/editor/browser/languages/json/worker/**",
+    "../src/prctr/editor/browser/worker/**"
+  ],
   "include": [
     "../src/prctr/base/common/thenable.d.ts",
     "../src/prctr/base/common/vscodeBaseCommonGlobals.d.ts",

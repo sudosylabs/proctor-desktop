@@ -41,6 +41,11 @@ export const testSuites = {
 		build: 'build/buildWindowSkeleton.ts',
 		runtime: 'electron'
 	},
+	'editor-worker': {
+		patterns: ['test/electron/editorWorker.real.test.ts'],
+		build: 'build/buildEditorWorkerTests.ts',
+		runtime: 'electron'
+	},
 	'desktop-identity': {
 		patterns: ['test/electron/desktopIdentity.real.test.ts'],
 		build: 'build/buildDesktopIdentityTests.ts',

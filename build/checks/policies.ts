@@ -10,6 +10,12 @@ export type SourcePolicy = {
 	readonly environmentOverrides?: Readonly<Record<string, string>>;
 	readonly testSegments: readonly string[];
 	readonly productionDynamicImportAllowlist: readonly string[];
+	readonly staticAssetImports?: readonly {
+		readonly importer: string;
+		readonly resource: string;
+		readonly kind: 'data' | 'font';
+		readonly rationale: string;
+	}[];
 	readonly cssImportantOverrides?: readonly {
 		readonly path: string;
 		readonly selector: string;

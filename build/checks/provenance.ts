@@ -179,7 +179,10 @@ export const provenanceCheck: Check = {
 								'Review the change and update provenance only if the adaptation remains admitted.'
 							)
 						);
-					if (marked.get(item.localPath) !== manifest.clusterId)
+					if (
+						/\.(?:ts|css)$/.test(item.localPath) &&
+						marked.get(item.localPath) !== manifest.clusterId
+					)
 						diagnostics.push(
 							diagnostic(
 								checkId,

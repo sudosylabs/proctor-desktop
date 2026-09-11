@@ -5,11 +5,13 @@ import { testSuites } from './testSuites.ts';
 export async function buildNodeTests(
 	suite: 'base' | 'platform' | 'editor' | 'security-utility',
 	outputName: string,
-	tsconfig: string
+	tsconfig: string,
+	external: string[] = []
 ): Promise<void> {
 	await build({
 		absWorkingDir: repositoryRoot,
 		bundle: true,
+		external,
 		entryNames: '[dir]/[name]',
 		entryPoints: selectFiles(testSuites[suite].patterns),
 		format: 'esm',

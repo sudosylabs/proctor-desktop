@@ -1,6 +1,7 @@
 import { posix } from 'node:path';
 import ts from 'typescript';
 import postcss from 'postcss';
+import type { Rule, Container, AtRule, Document as CssDocument } from 'postcss';
 import selectorParser from 'postcss-selector-parser';
 import type { Check, Diagnostic, Repository } from './types.ts';
 import { diagnostic } from './types.ts';
@@ -20,7 +21,61 @@ type Graph = {
 };
 
 const TS_EXTENSIONS = ['.ts', '.tsx', '.mts', '.cts'] as const;
-const STATIC_ASSET_EXTENSIONS = ['.png', '.svg'] as const;
+const STATIC_ASSET_EXTENSIONS = ['.png', '.svg', '.wasm', '.scm'] as const;
+
+/** Resolve CSS nesting for ownership checks without changing the emitted stylesheet. */
+function effectiveSelector(rule: Rule): string {
+	let parent: Container | CssDocument | undefined = rule.parent;
+	while (parent && parent.type !== 'rule') parent = parent.parent;
+	if (!parent) return rule.selector;
+	const parentSelector = effectiveSelector(parent as Rule);
+	const parentNode = selectorParser().astSync(`:is(${parentSelector})`).first.nodes[0]!;
+	return selectorParser(selectors => selectors.each(selector => {
+		let nested = false;
+		selector.walkNesting(node => { nested = true; node.replaceWith(parentNode.clone()); });
+		if (!nested) {
+			selector.prepend(selectorParser.combinator({ value: ' ' }));
+			selector.prepend(parentNode.clone());
+		}
+	})).processSync(rule.selector);
+}
+
+/** Only positive alternatives that all require the same owner establish a root. */
+function selectorOwnership(selector: selectorParser.Selector): { owner: string; descended: boolean } | undefined {
+	let owner: string | undefined;
+	let descended = false;
+	for (const node of selector.nodes) {
+		if (owner !== undefined) {
+			if (node.type === 'combinator') {
+				if (node.value.trim() === '' || node.value === '>') descended = true;
+				else if (!descended) return undefined;
+			}
+			continue;
+		}
+		if (node.type === 'class') {
+			if (!node.value.startsWith('prctr-')) return undefined;
+			owner = node.value;
+		} else if (node.type === 'pseudo' && [':is', ':where'].includes(node.value) && node.nodes?.length) {
+			let hasClass = false;
+			node.walkClasses(() => { hasClass = true; });
+			if (!hasClass) continue;
+			const branches = node.nodes.map(branch => branch.type === 'selector' ? selectorOwnership(branch) : undefined);
+			const first = branches[0];
+			if (!first || !branches.every(branch => branch?.owner === first.owner)) return undefined;
+			owner = first.owner;
+			descended = branches.every(branch => branch?.descended);
+		}
+	}
+	return owner === undefined ? undefined : { owner, descended };
+}
+
+function isInOverridesLayer(rule: Container | undefined): boolean {
+	const layers: string[] = [];
+	for (let node: Container | CssDocument | undefined = rule; node; node = node.parent) {
+		if (node.type === 'atrule' && (node as AtRule).name === 'layer') layers.unshift((node as AtRule).params.trim());
+	}
+	return layers.length === 1 && layers[0] === 'overrides';
+}
 const isTs = (path: string): boolean =>
 	TS_EXTENSIONS.some((extension) => path.endsWith(extension)) && !path.endsWith('.d.ts');
 const isTest = (path: string, policy: SourcePolicy): boolean =>
@@ -60,11 +115,26 @@ export function analyzeSource(repository: Repository): Graph {
 	const diagnostics: Diagnostic[] = [];
 	const edges: Edge[] = [];
 	const cssOwnersMutable = new Map<string, string[]>();
-	const packageManifest = readJson<{ readonly dependencies?: Readonly<Record<string, string>> }>(
+	const assetImports = policy.staticAssetImports ?? [];
+	const usedAssetImports = new Set<(typeof assetImports)[number]>();
+	const assetKeys = new Set<string>();
+	for (const admission of assetImports) {
+		const key = `${admission.importer}\0${admission.resource}`;
+		if (assetKeys.has(key)) diagnostics.push(diagnostic(checkId, admission.importer, 'Duplicate static asset import admission.', 'Keep one exact importer/resource admission.'));
+		assetKeys.add(key);
+		if (!(admission.kind === 'data' ? admission.resource.endsWith('.json') : admission.resource.endsWith('.woff'))) {
+			diagnostics.push(diagnostic(checkId, admission.importer, 'Static asset kind does not match its resource suffix.', 'Admit JSON data or WOFF fonts only; executable modules remain source graph edges.'));
+		}
+	}
+	const packageManifest = readJson<{
+		readonly dependencies?: Readonly<Record<string, string>>;
+		readonly devDependencies?: Readonly<Record<string, string>>;
+	}>(
 		repository,
 		'package.json'
 	);
 	const productionDependencies = new Set(Object.keys(packageManifest.dependencies ?? {}));
+	const developmentDependencies = new Set(Object.keys(packageManifest.devDependencies ?? {}));
 	const sourceFiles = repository
 		.files()
 		.filter((path) => path.startsWith(`${policy.sourceRoot}/`) && isTs(path));
@@ -139,7 +209,8 @@ export function analyzeSource(repository: Repository): Graph {
 		visit(source);
 		for (const imported of imports) {
 			const specifier = imported.specifier;
-			const staticAsset = STATIC_ASSET_EXTENSIONS.some((extension) =>
+			const exactAsset = specifier.startsWith('.') ? assetImports.find(admission => admission.importer === path && admission.resource === posix.normalize(posix.join(posix.dirname(path), specifier))) : undefined;
+			const staticAsset = exactAsset !== undefined || STATIC_ASSET_EXTENSIONS.some((extension) =>
 				specifier.endsWith(extension)
 			);
 			if (
@@ -162,7 +233,8 @@ export function analyzeSource(repository: Repository): Graph {
 					const packageName = specifier.startsWith('@')
 						? specifier.split('/').slice(0, 2).join('/')
 						: (specifier.split('/')[0] as string);
-					if (!productionDependencies.has(packageName))
+					if (!productionDependencies.has(packageName) &&
+						!(imported.typeOnly && developmentDependencies.has(packageName)))
 						diagnostics.push(
 							diagnostic(
 								checkId,
@@ -211,7 +283,8 @@ export function analyzeSource(repository: Repository): Graph {
 			if (staticAsset) {
 				edges.push({ from: path, to: target, typeOnly: false, dynamic: false });
 				const fromEnvironment = environment(path, policy);
-				if (!['browser', 'electron-browser'].includes(fromEnvironment))
+				if (exactAsset) usedAssetImports.add(exactAsset);
+				if (exactAsset?.kind !== 'data' && !['browser', 'electron-browser'].includes(fromEnvironment))
 					diagnostics.push(
 						diagnostic(
 							checkId,
@@ -273,6 +346,10 @@ export function analyzeSource(repository: Repository): Graph {
 				);
 		}
 	}
+	for (const admission of assetImports) {
+		if (!usedAssetImports.has(admission)) diagnostics.push(diagnostic(checkId, admission.importer, 'Static asset import admission is stale or unresolved.', 'Remove the stale entry or restore its exact static import.'));
+	}
+
 	const adjacency = new Map<string, string[]>();
 	// Type-only imports are erased by TypeScript and cannot form a runtime
 	// module cycle. Keep them in the architecture graph, but exclude them from
@@ -545,10 +622,7 @@ export const cssCheck: Check = {
 							override.selector === selector &&
 							override.property === declaration.prop
 					);
-					const inOverrideLayer =
-						declaration.parent?.parent?.type === 'atrule' &&
-						declaration.parent.parent.name === 'layer' &&
-						declaration.parent.parent.params.trim() === 'overrides';
+					const inOverrideLayer = isInOverridesLayer(declaration.parent);
 					if (overrideIndex < 0 || !inOverrideLayer)
 						diagnostics.push(
 							diagnostic(
@@ -609,7 +683,8 @@ export const cssCheck: Check = {
 										'Anchor relational matching below the owning control root.'
 									)
 								);
-							if (firstClass === undefined || !firstClass.startsWith('prctr-')) {
+							const owner = selectorOwnership(selector)?.owner;
+							if (owner === undefined) {
 								const selectorText = selector.toString().trim();
 								if (
 									path !== DOCUMENT_RESET_PATH ||
@@ -623,9 +698,9 @@ export const cssCheck: Check = {
 											'Give the owning control one Proctor root class or use the exact composition-owned document reset.'
 										)
 									);
-							} else roots.add(firstClass);
+							} else roots.add(owner);
 						})
-					).processSync(rule.selector);
+					).processSync(effectiveSelector(rule));
 				} catch (error) {
 					diagnostics.push(
 						diagnostic('source.css', path, String(error), 'Fix the selector syntax.')

@@ -1,3 +1,5 @@
+import { packagedEditorDependencies } from './lib/packagedEditorDependencies.ts';
+import { buildJsonWorker } from './lib/jsonWorker.ts';
 import { copyFileSync, writeFileSync } from 'node:fs';
 import { build } from 'esbuild';
 import {
@@ -11,13 +13,15 @@ import {
 const outputDirectory = resetBuildOutput('browser-harness');
 
 await Promise.all([
+	buildJsonWorker(outputDirectory),
 	build({
 		absWorkingDir: repositoryRoot,
 		bundle: true,
 		entryPoints: { renderer: 'test/browser/rendererHarness.ts' },
 		format: 'esm',
 		logLevel: 'info',
-		loader: { '.svg': 'file', '.ttf': 'file' },
+		loader: { '.svg': 'file', '.ttf': 'file', '.png': 'file' },
+		plugins: [packagedEditorDependencies()],
 		outdir: outputDirectory,
 		platform: 'browser',
 		sourcemap: false,

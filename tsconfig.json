@@ -9,6 +9,8 @@
     { "path": "./build/tsconfig.platform-foundation-test.json" },
     { "path": "./build/tsconfig.editor-core.json" },
     { "path": "./build/tsconfig.editor-core-test.json" },
+    { "path": "./build/tsconfig.editor-node-test.json" },
+    { "path": "./build/tsconfig.editor-worker.json" },
     { "path": "./build/tsconfig.common-test.json" },
     { "path": "./build/tsconfig.browser.json" },
     { "path": "./build/tsconfig.electron-browser.json" },

@@ -1,28 +1,1700 @@
 {
-  "$schema": "./schemas/source-boundaries.schema.json",
-  "schemaVersion": 1,
-  "sourceRoot": "src/prctr",
-  "layers": ["base", "platform", "editor", "workbench", "code"],
-  "environments": {
-    "common": ["common"],
-    "worker": ["common", "worker"],
-    "browser": ["common", "browser"],
-    "node": ["common", "node"],
-    "electron-browser": ["common", "browser", "electron-browser"],
-    "electron-utility": ["common", "node", "electron-utility"],
-    "electron-main": ["common", "node", "electron-utility", "electron-main"]
-  },
-  "environmentOverrides": {
-    "src/prctr/workbench/workbench.common.main.ts": "browser"
-  },
-  "testSegments": ["test"],
-  "productionDynamicImportAllowlist": [],
-  "cssImportantOverrides": [
-    {
-      "path": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.css",
-      "selector": ".prctr-terminal .xterm-dim",
-      "property": "opacity",
-      "rationale": "Preserve xterm dim rendering by preventing its generated foreground opacity from dimming cell backgrounds."
-    }
-  ]
+	"$schema": "./schemas/source-boundaries.schema.json",
+	"schemaVersion": 1,
+	"sourceRoot": "src/prctr",
+	"layers": [
+		"base",
+		"platform",
+		"editor",
+		"workbench",
+		"code"
+	],
+	"environments": {
+		"common": [
+			"common"
+		],
+		"worker": [
+			"common",
+			"worker"
+		],
+		"browser": [
+			"common",
+			"browser"
+		],
+		"node": [
+			"common",
+			"node"
+		],
+		"electron-browser": [
+			"common",
+			"browser",
+			"electron-browser"
+		],
+		"electron-utility": [
+			"common",
+			"node",
+			"electron-utility"
+		],
+		"electron-main": [
+			"common",
+			"node",
+			"electron-utility",
+			"electron-main"
+		]
+	},
+	"environmentOverrides": {
+		"src/prctr/workbench/workbench.common.main.ts": "browser"
+	},
+	"testSegments": [
+		"test"
+	],
+	"productionDynamicImportAllowlist": [],
+	"cssImportantOverrides": [
+		{
+			"path": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.css",
+			"selector": ".prctr-terminal .xterm-dim",
+			"property": "opacity",
+			"rationale": "Preserve xterm dim rendering by preventing its generated foreground opacity from dimming cell backgrounds."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/sash/sash.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-sash.disabled",
+			"property": "cursor",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/sash/sash.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-sash.disabled",
+			"property": "pointer-events",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/sash/sash.css",
+			"selector": ":where(.prctr-editor-scope) .pointer-events-disabled",
+			"property": "pointer-events",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/controller/editContext/native/nativeEditContext.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .ime-text-area",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/controller/editContext/textArea/textAreaEditContext.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .inputarea",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/viewParts/viewCursors/viewCursors.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .cursors-layer.cursor-block-outline-style > .cursor",
+			"property": "background",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/viewParts/viewCursors/viewCursors.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .cursors-layer.cursor-underline-style > .cursor",
+			"property": "background",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/viewParts/viewCursors/viewCursors.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .cursors-layer.cursor-underline-thin-style > .cursor",
+			"property": "background",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/viewParts/viewLines/viewLines.css",
+			"selector": ":where(.prctr-editor-scope) .mtkcontrol",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/viewParts/viewLines/viewLines.css",
+			"selector": ":where(.prctr-editor-scope) .mtkcontrol",
+			"property": "background",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/viewParts/viewLines/viewLines.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .mtkw",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/viewParts/viewLines/viewLines.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .mtkz",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/viewParts/whitespace/whitespace.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .mwh",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/dialog/dialog.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-dialog-box > .dialog-buttons-row > .dialog-buttons > .monaco-button",
+			"property": "outline-offset",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/dialog/dialog.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-dialog-box > .dialog-buttons-row > .dialog-buttons > .monaco-button-dropdown:focus-within",
+			"property": "outline-offset",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/selectBox/selectBoxCustom.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .prctr-list:focus::before",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/toggle/toggle.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-custom-toggle.monaco-checkbox",
+			"property": "background-size",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/actionbar/actionbar.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-action-bar .action-item .action-label.separator",
+			"property": "margin",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/button/button.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-text-button:focus",
+			"property": "outline-offset",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/button/button.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-text-button:hover",
+			"property": "text-decoration",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/button/button.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-button.disabled:focus,:where(.prctr-editor-scope) .monaco-button.disabled",
+			"property": "opacity",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/button/button.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-text-button .codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/button/button.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-button-dropdown > .monaco-button:focus",
+			"property": "outline-offset",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/button/button.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-button-dropdown.disabled > .monaco-button.disabled,:where(.prctr-editor-scope) .monaco-button-dropdown.disabled > .monaco-button.disabled:focus,:where(.prctr-editor-scope) .monaco-button-dropdown.disabled > .monaco-button-dropdown-separator",
+			"property": "opacity",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/button/button.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-button-dropdown > .monaco-button.monaco-text-button",
+			"property": "border-right-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/button/button.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-button-dropdown > .monaco-button.monaco-dropdown-button",
+			"property": "border-left-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/button/button.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-description-button .monaco-button-label > .codicon,:where(.prctr-editor-scope) .monaco-description-button .monaco-button-description > .codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/dropdown/dropdown.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-dropdown-with-primary",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/tree/media/tree.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-tl-twistie",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/tree/media/tree.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-tree-type-filter.disabled",
+			"property": "top",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/tree/media/tree.css",
+			"selector": ":where(.prctr-editor-scope) .prctr-list .prctr-scrollable-element .monaco-tree-sticky-container .monaco-tree-sticky-row.prctr-list-row",
+			"property": "opacity",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/tree/media/tree.css",
+			"selector": ":where(.prctr-editor-scope) .prctr-list .prctr-scrollable-element .monaco-tree-sticky-container .monaco-tree-sticky-row:hover",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/anchorSelect/browser/anchorSelect.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .selection-anchor",
+			"property": "width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineProgress/browser/inlineProgressWidget.css",
+			"selector": ":where(.prctr-editor-scope) .inline-progress-widget",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineProgress/browser/inlineProgressWidget.css",
+			"selector": ":where(.prctr-editor-scope) .inline-progress-widget .icon",
+			"property": "font-size",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineProgress/browser/inlineProgressWidget.css",
+			"selector": ":where(.prctr-editor-scope) .inline-progress-widget:hover .icon",
+			"property": "font-size",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget",
+			"property": "border",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .prctr-list",
+			"property": "border",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .prctr-list",
+			"property": "border-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .prctr-list:focus:before",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .prctr-list .prctr-list-row.action.focused:not(.option-disabled)",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .prctr-list-row.group-header",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .prctr-scrollable-element .prctr-list-rows .prctr-list-row.separator:hover,:where(.prctr-editor-scope) .action-widget .prctr-scrollable-element .prctr-list-rows .prctr-list-row.separator.focused",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .prctr-list .group-header,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled:before,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused:before",
+			"property": "cursor",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .prctr-list .group-header,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled:before,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused:before",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .prctr-list .group-header,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled:before,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused,:where(.prctr-editor-scope) .action-widget .prctr-list .option-disabled .focused:before",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget-action-bar .action-label:hover",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-action-bar .actions-container.highlight-toggled .action-label.checked",
+			"property": "background",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actionWidget/browser/actionWidget.css",
+			"selector": ":where(.prctr-editor-scope) .action-widget .action-list-header .action-list-header-icon",
+			"property": "font-size",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/dropOrPasteInto/browser/postEditWidget.css",
+			"selector": ":where(.prctr-editor-scope) .post-edit-widget .monaco-button:hover",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/find/browser/findWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .find-widget.narrow-find-widget",
+			"property": "max-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/find/browser/findWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .find-widget.collapsed-find-widget",
+			"property": "max-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/find/browser/findWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .findMatch",
+			"property": "animation-name",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/find/browser/findWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .find-widget .monaco-sash",
+			"property": "left",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/find/browser/findWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .find-widget .button:not(.disabled):hover,:where(.prctr-editor-scope) .monaco-editor .find-widget .codicon-find-selection:hover",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/gotoSymbol/browser/link/goToDefinitionAtPosition.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .goto-definition-link",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/links/browser/links.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .detected-link-active",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/splitview/paneview.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-reduce-motion .monaco-pane-view .split-view-view",
+			"property": "transition-duration",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/activityBar.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked .active-item-indicator:before",
+			"property": "border-left",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/activityBar.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked .action-label.codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/activityBar.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked .action-label.uri-icon",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/activityBar.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .activitybar > .content:not(.dragged-over):not(.dragged-over-head):not(.dragged-over-tail) :not(.monaco-menu) > .monaco-action-bar .action-item:not(.checked):hover .action-label.codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/activityBar.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .activitybar > .content:not(.dragged-over):not(.dragged-over-head):not(.dragged-over-tail) :not(.monaco-menu) > .monaco-action-bar .action-item:not(.checked):hover .action-label.uri-icon",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/activityBar.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui.monaco-workbench .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-label.codicon-more",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/commandCenter.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .agent-status-pill:not(.session-mode),:where(.prctr-editor-scope) .modern-ui .agent-status-pill .agent-status-input-area",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/commandCenter.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .agent-status-badge-section:not(.filtered),:where(.prctr-editor-scope) .modern-ui .agent-status-command-center-toolbar",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/editorBorder.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.modern-ui.floating-panels .part.editor",
+			"property": "border-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/editorBorder.css",
+			"selector": ".agent-sessions-container",
+			"property": "border-right-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/editorBorder.css",
+			"selector": ".agent-sessions-container",
+			"property": "border-left-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/fontRamp.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.auxiliarybar > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.auxiliarybar > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked.clicked:focus .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.auxiliarybar > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.auxiliarybar > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked.clicked:focus .active-item-indicator:before",
+			"property": "border-top-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/fontRamp.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.auxiliarybar > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.auxiliarybar > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked.clicked:focus .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.auxiliarybar > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.auxiliarybar > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked.clicked:focus .active-item-indicator:before",
+			"property": "border-bottom-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/keyboardFocusOnly.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui :is(.part.sidebar, .part.panel, .part.auxiliarybar) .prctr-list:focus:not(:focus-visible) .prctr-list-row.focused",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/keyboardFocusOnly.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui :is(.part.sidebar, .part.panel, .part.auxiliarybar, .part.statusbar):focus:not(:focus-visible),:where(.prctr-editor-scope) .modern-ui :is(.part.sidebar, .part.panel, .part.auxiliarybar, .part.statusbar) :focus:not(:focus-visible)",
+			"property": "outline-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/notificationsDialogs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-center.top-right",
+			"property": "top",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/notificationsDialogs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-notifications-dialogs.monaco-workbench > .notifications-toasts.top-right",
+			"property": "top",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/paneHeaders.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .monaco-pane-view .pane > .pane-header",
+			"property": "border",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/paneHeaders.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui :is(.part.sidebar, .part.auxiliarybar) .monaco-pane-view .pane,:where(.prctr-editor-scope) .modern-ui.floating-panels :is(.part.sidebar, .part.auxiliarybar)",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/paneHeaders.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .part.panel .monaco-pane-view .pane",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/paneHeaders.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui :is(.part.sidebar, .part.auxiliarybar) .monaco-pane-view .pane > .pane-header",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/paneHeaders.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .part.panel .monaco-pane-view .pane > .pane-header",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/paneHeaders.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .monaco-pane-view .pane > .pane-header:hover",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/paneHeaders.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui .monaco-pane-view .pane > .pane-header:focus:not(:focus-visible)",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/shadows.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.titlebar,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.activitybar,:where(.prctr-editor-scope) .modern-ui.monaco-workbench.nosidebar .part.activitybar,:where(.prctr-editor-scope) .modern-ui.monaco-workbench.activitybar-right .part.activitybar,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.editor .tabs-container > .tab,:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.editor .tabs-container > .tab:hover:not(.active),:where(.prctr-editor-scope) .modern-ui.monaco-workbench .part.editor .tabs-container > .tab.active",
+			"property": "box-shadow",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title.tabs",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title.tabs",
+			"property": "--prctr-editor-group-tab-height",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title.tabs.compact-height",
+			"property": "--prctr-editor-group-tab-height",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab,:where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab,:where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab",
+			"property": "border-right",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab,:where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab",
+			"property": "font-size",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab,:where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab",
+			"property": "box-shadow",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab,:where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab",
+			"property": "padding",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab,:where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab",
+			"property": "--prctr-tab-border-top-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container > .title.tabs:not(.show-file-icons) .tabs-container > .tab:not(.sticky-compact):not(.tab-actions-left)",
+			"property": "padding-left",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-and-actions-container.wrapping .tabs-container > .tab:last-child",
+			"property": "margin-right",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container.active > .title .tabs-container > .tab:not(.selected):hover,:where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container:not(.active) > .title .tabs-container > .tab:not(.selected):hover",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sticky-compact",
+			"property": "padding",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sticky-compact",
+			"property": "width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sticky-compact",
+			"property": "min-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sticky-compact",
+			"property": "max-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sticky-compact",
+			"property": "flex",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.tab-actions-left:not(.sticky-compact)",
+			"property": "padding",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.close-action-off:not(.sticky-compact)",
+			"property": "padding",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tab-actions-reserve-space .tabs-container > .tab:not(.sticky-compact):not(.tab-actions-left):not(.close-action-off),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.dirty:not(.sticky-compact):not(.tab-actions-left):not(.dirty-border-top),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sticky:not(.sticky-compact):not(.pinned-action-off):not(.tab-actions-left)",
+			"property": "padding-right",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tab-actions-reserve-space .tabs-container > .tab.tab-actions-left:not(.sticky-compact):not(.close-action-off),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.dirty.tab-actions-left:not(.sticky-compact):not(.dirty-border-top),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sticky.tab-actions-left:not(.sticky-compact):not(.pinned-action-off)",
+			"property": "padding-left",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tab-actions-reserve-space .tabs-container > .tab.tab-actions-left:not(.sticky-compact):not(.close-action-off),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.dirty.tab-actions-left:not(.sticky-compact):not(.dirty-border-top),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sticky.tab-actions-left:not(.sticky-compact):not(.pinned-action-off)",
+			"property": "padding-right",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sizing-fit:not(.sticky-compact)",
+			"property": "width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sizing-fit:not(.sticky-compact)",
+			"property": "min-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sizing-fit:not(.sticky-compact)",
+			"property": "flex",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-and-actions-container",
+			"property": "--prctr-tabs-border-bottom-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab .tab-border-bottom-container",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench:not(:is(.hc-black, .hc-light)) .part.editor .tabs-container > .tab.selected:not(.active).tab-border-top > .tab-fill",
+			"property": "--prctr-tab-border-top-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench:not(:is(.hc-black, .hc-light)) .part.editor .tabs-container > .tab.active.multi-selected.tab-border-top > .tab-fill",
+			"property": "--prctr-tab-border-top-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench .part.editor .tabs-container > .tab:is(.sizing-shrink, .sizing-fixed) > .tab-label > .monaco-icon-label-container",
+			"property": "flex",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench .part.editor .tabs-container > .tab:is(.sizing-shrink, .sizing-fixed) > .tab-label > .monaco-icon-label-container",
+			"property": "text-overflow",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab.sticky-compact",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor .tabs-container > .tab .tab-border-top-container",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container > .tab.dirty.dirty-border-top > .tab-border-top-container",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:not(.icon)",
+			"property": "text-transform",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:not(.icon).checked > .active-item-indicator",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:not(.icon).checked > .action-label",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs.monaco-workbench:not(.hc-black):not(.hc-light) .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container:not(.dragged-over):not(.dragged-over-head):not(.dragged-over-tail) > .composite-bar > .monaco-action-bar .action-item.icon.checked:not(:active) > .active-item-indicator",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon.checked > .action-label.codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon.checked > .action-label.uri-icon",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:not(.icon):not(.checked):hover > .action-label",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon:not(.checked):not(:active):hover > .action-label.codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > :is(.title, .header-or-footer) > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon:not(.checked):not(:active):hover > .action-label.uri-icon",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab.active,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab.selected,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab:hover",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab.active,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab.selected,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab:hover",
+			"property": "box-shadow",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab:hover > .tab-actions,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab > .tab-actions:focus-within",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab > .tab-actions .action-label",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .modern-ui-editor-tab",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab:is(.active, .selected):not(:focus) > .tab-fill,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .modern-ui-editor-tab.active:not(:focus) > .modern-ui-editor-tab-fill",
+			"property": "border",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab:not(.active):not(.selected):not(:focus):hover > .tab-fill,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .modern-ui-editor-tab:not(.active):not(:focus):hover > .modern-ui-editor-tab-fill",
+			"property": "border",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab:focus > .tab-fill,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .modern-ui-editor-tab:focus > .modern-ui-editor-tab-fill",
+			"property": "border",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab:not(.active):not(.selected):focus:hover",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab .tab-label,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab .tab-label a,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .modern-ui-editor-tab > .modern-ui-editor-tab-label",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab:not(.dirty):not(.sticky):not(:hover) > .tab-actions .action-label:not(:focus)",
+			"property": "opacity",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab.dirty > .tab-actions .action-label,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab.sticky:not(.pinned-action-off) > .tab-actions .action-label,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab:hover > .tab-actions .action-label,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-and-actions-container .tabs-container > .tab > .tab-actions .action-label:focus",
+			"property": "opacity",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked .action-label,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:hover .action-label,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked .action-label,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:hover .action-label",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator:before,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator:before",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:focus > .active-item-indicator,:where(.prctr-editor-scope) :is(.hc-black, .hc-light).modern-ui-tabs .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:focus > .active-item-indicator",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before",
+			"property": "border-top-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before",
+			"property": "border-top-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before",
+			"property": "border-bottom-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before,:where(.prctr-editor-scope) .modern-ui-tabs .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before",
+			"property": "border-bottom-width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container.active > .title .tabs-container > .tab:not(.active) .tab-label:not(.monaco-decoration-itemColor)",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab-group.modern-ui-editor-tab-group-active .modern-ui-editor-tab:not(.active)",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container:not(.active) > .title .tabs-container > .tab:not(.active) .tab-label:not(.monaco-decoration-itemColor),:where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab-group:not(.modern-ui-editor-tab-group-active) .modern-ui-editor-tab:not(.active)",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container.active > .title .tabs-container > .tab:hover:not(.selected):not(.active) .tab-label:not(.monaco-decoration-itemColor),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container.active > .title .tabs-container > .tab:hover:not(.selected):not(.active) > .tab-actions .action-label",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab-group.modern-ui-editor-tab-group-active .modern-ui-editor-tab:hover:not(.active)",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container:not(.active) > .title .tabs-container > .tab:hover:not(.selected):not(.active) .tab-label:not(.monaco-decoration-itemColor),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container:not(.active) > .title .tabs-container > .tab:hover:not(.selected):not(.active) > .tab-actions .action-label,:where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab-group:not(.modern-ui-editor-tab-group-active) .modern-ui-editor-tab:hover:not(.active)",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container.active > .title .tabs-container > .tab.active .tab-label:not(.monaco-decoration-itemColor),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container.active > .title .tabs-container > .tab.active > .tab-actions .action-label",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab-group.modern-ui-editor-tab-group-active .modern-ui-editor-tab.active",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container:not(.active) > .title .tabs-container > .tab.active .tab-label:not(.monaco-decoration-itemColor),:where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container:not(.active) > .title .tabs-container > .tab.active > .tab-actions .action-label,:where(.prctr-editor-scope) .modern-ui-tabs .modern-ui-editor-tab-group:not(.modern-ui-editor-tab-group-active) .modern-ui-editor-tab.active",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container > .title .tabs-container > .tab.selected:not(.active) .tab-label:not(.monaco-decoration-itemColor)",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container > .title .tabs-container > .tab .tab-label.monaco-decoration-itemColor a,:where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container > .title .tabs-container > .tab .tab-label.monaco-decoration-itemColor .label-description,:where(.prctr-editor-scope) .modern-ui-tabs .part.editor > .content .editor-group-container > .title .tabs-container > .tab .tab-label.monaco-decoration-itemColor .monaco-highlighted-label",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .settings-editor .settings-tabs-widget > .monaco-action-bar .action-item .action-label",
+			"property": "border-radius",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .settings-editor .settings-tabs-widget > .monaco-action-bar .action-item .action-label",
+			"property": "border-bottom",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .settings-editor .settings-tabs-widget > .monaco-action-bar .action-item .action-label",
+			"property": "padding",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .settings-editor .settings-tabs-widget > .monaco-action-bar .action-item .action-label.checked",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .settings-editor .settings-tabs-widget > .monaco-action-bar .action-item .action-label.checked",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .settings-editor .settings-tabs-widget > .monaco-action-bar .action-item .action-label:not(.checked):hover",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .settings-editor .settings-tabs-widget > .monaco-action-bar .action-item .action-label:not(.checked):hover",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .settings-editor .settings-tabs-widget > .monaco-action-bar .action-item .action-label.checked:not(:focus)",
+			"property": "border-bottom-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/modernUI/browser/media/tabs.css",
+			"selector": ":where(.prctr-editor-scope) .modern-ui-tabs .settings-editor > .settings-header > .settings-header-controls",
+			"property": "border-bottom",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/floatingPanels.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.sidebar,:where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.auxiliarybar",
+			"property": "border",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/floatingPanels.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.sidebar,:where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.auxiliarybar",
+			"property": "border-left-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/floatingPanels.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.sidebar,:where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.auxiliarybar",
+			"property": "border-right-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/floatingPanels.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.sidebar,:where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.auxiliarybar",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/floatingPanels.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.panel",
+			"property": "border",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/floatingPanels.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.panel",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/floatingPanels.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.auxiliarybar",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/floatingPanels.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.floating-panels .part.panel > .title",
+			"property": "border-top-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/codeEditor/browser/suggestEnabledInput/suggestEnabledInput.css",
+			"selector": ":where(.prctr-editor-scope) .suggest-input-container .monaco-editor,:where(.prctr-editor-scope) .suggest-input-container .monaco-editor .lines-content",
+			"property": "background",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/peekView/browser/media/peekViewWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .peekview-widget .prctr-list .prctr-list-row.focused .codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/actions/browser/menuEntryActionViewItem.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-dropdown-with-default",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/message/browser/messageController.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .monaco-editor-overlaymessage .anchor",
+			"property": "width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/message/browser/messageController.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .monaco-editor-overlaymessage .anchor",
+			"property": "height",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/suggest/browser/media/suggest.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .suggest-widget.docs-side .prctr-list .prctr-list-row > .contents > .main > .right > .readMore",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/iconLabel/iconlabel.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-icon-label::before",
+			"property": "line-height",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/iconLabel/iconlabel.css",
+			"selector": ":where(.prctr-editor-scope) .prctr-list:focus .selected .monaco-icon-label,:where(.prctr-editor-scope) .prctr-list:focus .selected .monaco-icon-label::after",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .inlineSuggestionsHints a",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineCompletions/browser/hintsWidget/inlineCompletionsHintsWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .inlineSuggestionsHints a:hover",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineCompletions/browser/view/ghostText/ghostTextView.css",
+			"selector": ".codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/stickyScroll/browser/stickyScroll.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .sticky-widget",
+			"property": "right",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/folding/browser/folding.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .cldr.codicon.codicon-folding-expanded,:where(.prctr-editor-scope) .monaco-editor .cldr.codicon.codicon-folding-collapsed,:where(.prctr-editor-scope) .monaco-editor .cldr.codicon.codicon-folding-manual-expanded,:where(.prctr-editor-scope) .monaco-editor .cldr.codicon.codicon-folding-manual-collapsed",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/gotoSymbol/browser/peek/referencesWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .reference-zone-widget .ref-tree .prctr-list:focus .selected .reference-file",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/gotoSymbol/browser/peek/referencesWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .reference-zone-widget .ref-tree .prctr-list:focus .prctr-list-rows > .prctr-list-row.selected:not(.highlighted)",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/gotoSymbol/browser/peek/referencesWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .reference-zone-widget .ref-tree .referenceMatch .highlight",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/gotoSymbol/browser/peek/referencesWidget.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .reference-zone-widget .ref-tree .referenceMatch .highlight",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/components/accessibleDiffViewer.css",
+			"selector": ".diff-review-spacer > .codicon",
+			"property": "font-size",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor.draggingUnchangedRegion.canMoveTop:not(.canMoveBottom) *,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top.canMoveTop:not(.canMoveBottom),:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom.canMoveTop:not(.canMoveBottom)",
+			"property": "cursor",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor.draggingUnchangedRegion:not(.canMoveTop).canMoveBottom *,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top:not(.canMoveTop).canMoveBottom,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom:not(.canMoveTop).canMoveBottom",
+			"property": "cursor",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor.draggingUnchangedRegion.canMoveTop.canMoveBottom *,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .top.canMoveTop.canMoveBottom,:where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .bottom.canMoveTop.canMoveBottom",
+			"property": "cursor",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .diff-hidden-lines .center a:hover .codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .insert-sign,:where(.prctr-editor-scope) .monaco-diff-editor .insert-sign,:where(.prctr-editor-scope) .monaco-editor .delete-sign,:where(.prctr-editor-scope) .monaco-diff-editor .delete-sign",
+			"property": "font-size",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .insert-sign,:where(.prctr-editor-scope) .monaco-diff-editor .insert-sign,:where(.prctr-editor-scope) .monaco-editor .delete-sign,:where(.prctr-editor-scope) .monaco-diff-editor .delete-sign",
+			"property": "opacity",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .insert-sign,:where(.prctr-editor-scope) .monaco-diff-editor .insert-sign,:where(.prctr-editor-scope) .monaco-editor .delete-sign,:where(.prctr-editor-scope) .monaco-diff-editor .delete-sign",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .line-delete-selectable",
+			"property": "user-select",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .line-delete-selectable",
+			"property": "-webkit-user-select",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor .line-delete-selectable",
+			"property": "z-index",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .line-delete-selectable .view-line",
+			"property": "user-select",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/browser/widget/diffEditor/style.css",
+			"selector": ":where(.prctr-editor-scope) .line-delete-selectable .view-line",
+			"property": "-webkit-user-select",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineCompletions/browser/view/inlineEdits/view.css",
+			"selector": ".inline-edit.ghost-text,\n\t.inline-edit.ghost-text-decoration,\n\t.inline-edit.ghost-text-decoration-preview,\n\t.inline-edit.suggest-preview-text .ghost-text",
+			"property": "font-style",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineCompletions/browser/view/inlineEdits/view.css",
+			"selector": "&.syntax-highlighted",
+			"property": "opacity",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineCompletions/browser/view/inlineEdits/view.css",
+			"selector": ".inline-edit.modified-background.ghost-text,\n\t.inline-edit.modified-background.ghost-text-decoration,\n\t.inline-edit.modified-background.ghost-text-decoration-preview,\n\t.inline-edit.modified-background.suggest-preview-text .ghost-text",
+			"property": "background",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineCompletions/browser/view/inlineEdits/view.css",
+			"selector": ".inline-edit.modified-background.ghost-text,\n\t.inline-edit.modified-background.ghost-text-decoration,\n\t.inline-edit.modified-background.ghost-text-decoration-preview,\n\t.inline-edit.modified-background.suggest-preview-text .ghost-text",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/editor/contrib/inlineCompletions/browser/view/inlineEdits/view.css",
+			"selector": ":where(.prctr-editor-scope) .inline-edit-alternative-action-label .codicon",
+			"property": "font-size",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor:focus",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row .monaco-tl-twistie",
+			"property": "display",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row",
+			"property": "line-height",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-rows",
+			"property": "overflow",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-number input[type=number]::-webkit-inner-spin-button",
+			"property": "-webkit-appearance",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-number input[type=number]",
+			"property": "-moz-appearance",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-number input[type=number]",
+			"property": "appearance",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsEditor2.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-toc-container .prctr-list-row.focused .codicon,:where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .prctr-list-row.focused .setting-item-contents .codicon",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsWidgets.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox",
+			"property": "background-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsWidgets.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox",
+			"property": "color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsWidgets.css",
+			"selector": ":where(.prctr-editor-scope) .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox",
+			"property": "border-color",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/contrib/preferences/browser/media/settingsWidgets.css",
+			"selector": ":where(.prctr-editor-scope) .settings-tabs-widget > .monaco-action-bar .action-item .action-label",
+			"property": "background",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/modalEditorPart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-modal-editor-block .modal-editor-sidebar .monaco-tl-twistie.force-no-twistie",
+			"property": "width",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/modalEditorPart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-modal-editor-block .modal-editor-sidebar .monaco-tl-twistie.force-no-twistie",
+			"property": "padding-left",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/modalEditorPart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-modal-editor-block .modal-editor-sidebar .monaco-tl-twistie.force-no-twistie",
+			"property": "padding-right",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/editorplaceholder.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor-pane-placeholder:focus",
+			"property": "outline",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/editorplaceholder.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor-pane-placeholder .editor-placeholder-icon-container .codicon",
+			"property": "font-size",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/editorplaceholder.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-editor-pane-placeholder .editor-placeholder-buttons-container > .monaco-button",
+			"property": "outline-offset",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/editortabscontrol.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title .title-label,:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container > .tab .tab-label",
+			"property": "white-space",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/multieditortabscontrol.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container.scroll",
+			"property": "overflow",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/multieditortabscontrol.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title > .tabs-and-actions-container.wrapping .tabs-container > .tab.last-in-row:not(:last-child)",
+			"property": "border-right",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/editor/media/multieditortabscontrol.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container.disable-sticky-tabs > .tab.sizing-fit.sticky-compact,:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container.disable-sticky-tabs > .tab.sizing-shrink.sticky-compact,:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container.disable-sticky-tabs > .tab.sizing-fixed.sticky-compact,:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container.disable-sticky-tabs > .tab.sizing-fit.sticky-shrink,:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container.disable-sticky-tabs > .tab.sizing-shrink.sticky-shrink,:where(.prctr-editor-scope) .monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container.disable-sticky-tabs > .tab.sizing-fixed.sticky-shrink",
+			"property": "left",
+			"rationale": "Preserve the pinned editor important declaration with its complete nested selector and conditional ancestry; retain source state precedence under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.hc-black p > a,\n\t:where(.prctr-editor-scope) .monaco-workbench.hc-light p > a",
+			"property": "text-decoration",
+			"rationale": "Preserve the exact pinned workbench focus, input validation, icon and high-contrast rule in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/style.css",
+			"selector": ":where(.prctr-editor-scope)\n\t\t.monaco-workbench:not(.file-icons-enabled)\n\t\t.predefined-file-icon[class*='codicon-']::before",
+			"property": "content",
+			"rationale": "Preserve the exact pinned workbench focus, input validation, icon and high-contrast rule in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench [tabindex='0']:active,\n\t:where(.prctr-editor-scope) .monaco-workbench [tabindex='-1']:active,\n\t:where(.prctr-editor-scope) .monaco-workbench select:active,\n\t:where(.prctr-editor-scope) .monaco-workbench input[type='button']:active,\n\t:where(.prctr-editor-scope) .monaco-workbench input[type='checkbox']:active",
+			"property": "outline",
+			"rationale": "Preserve the exact pinned workbench focus, input validation, icon and high-contrast rule in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .synthetic-focus :focus",
+			"property": "outline",
+			"rationale": "Preserve the exact pinned workbench focus, input validation, icon and high-contrast rule in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.info.synthetic-focus,\n\t:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.warning.synthetic-focus,\n\t:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.error.synthetic-focus,\n\t:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.info input[type='text']:focus,\n\t:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.warning input[type='text']:focus,\n\t:where(.prctr-editor-scope) .monaco-workbench .monaco-inputbox.error input[type='text']:focus",
+			"property": "outline",
+			"rationale": "Preserve the exact pinned workbench focus, input validation, icon and high-contrast rule in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/media/style.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .prctr-list:focus",
+			"property": "outline",
+			"rationale": "Preserve the exact pinned workbench focus, input validation, icon and high-contrast rule in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/menu/menubar.css",
+			"selector": ":where(.prctr-editor-scope) .menubar > .menubar-menu-button",
+			"property": "outline",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/menu/menubar.css",
+			"selector": ":where(.prctr-editor-scope) .menubar:not(.compact) .menubar-menu-button:first-child .toolbar-toggle-more::before,:where(.prctr-editor-scope) .menubar.compact .toolbar-toggle-more::before",
+			"property": "content",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/menu/menubar.css",
+			"selector": ":where(.prctr-editor-scope) .menubar:not(.compact) .menubar-menu-button:first-child .toolbar-toggle-more::before,:where(.prctr-editor-scope) .menubar.compact .toolbar-toggle-more::before",
+			"property": "font-family",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/menu/menubar.css",
+			"selector": ":where(.prctr-editor-scope) .menubar.compact > .menubar-menu-button.open .menubar-menu-title,:where(.prctr-editor-scope) .menubar.compact > .menubar-menu-button:focus .menubar-menu-title,:where(.prctr-editor-scope) .menubar.compact > .menubar-menu-button:hover .menubar-menu-title",
+			"property": "outline-width",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/base/browser/ui/menu/menubar.css",
+			"selector": ":where(.prctr-editor-scope) .menubar.compact > .menubar-menu-button.open .menubar-menu-title,:where(.prctr-editor-scope) .menubar.compact > .menubar-menu-button:focus .menubar-menu-title,:where(.prctr-editor-scope) .menubar.compact > .menubar-menu-button:hover .menubar-menu-title",
+			"property": "outline-offset",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/quickinput/browser/media/quickInput.css",
+			"selector": ":where(.prctr-editor-scope) .quick-input-list .prctr-list .prctr-list-row .monaco-highlighted-label .highlight",
+			"property": "color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/quickinput/browser/media/quickInput.css",
+			"selector": ":where(.prctr-editor-scope) .quick-input-list .prctr-list .prctr-list-row.focused .monaco-highlighted-label .highlight",
+			"property": "color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/quickinput/browser/media/quickInput.css",
+			"selector": ":where(.prctr-editor-scope) .quick-input-list > .prctr-list:focus .prctr-list-row.focused",
+			"property": "outline",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/quickinput/browser/media/quickInput.css",
+			"selector": ":where(.prctr-editor-scope) .quick-input-list .quick-input-list-separator-as-item .label-description",
+			"property": "opacity",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/quickinput/browser/media/quickInput.css",
+			"selector": ":where(.prctr-editor-scope) .quick-input-list .monaco-tl-twistie",
+			"property": "display",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/quickinput/browser/media/quickInput.css",
+			"selector": ":where(.prctr-editor-scope) .quick-input-tree.quick-input-tree-flat .monaco-tl-indent,:where(.prctr-editor-scope) .quick-input-tree.quick-input-tree-flat .monaco-tl-twistie",
+			"property": "display",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/platform/quickinput/browser/media/quickInput.css",
+			"selector": ":where(.prctr-editor-scope) .quick-input-tree > .prctr-list:focus .prctr-list-row.focused",
+			"property": "outline",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/panel/media/panelpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.nopanel .part.panel",
+			"property": "display",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/panel/media/panelpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench.nopanel .part.panel",
+			"property": "visibility",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/panel/media/panelpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.panel > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator:before,:where(.prctr-editor-scope) .monaco-workbench .part.panel > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked.clicked:focus .active-item-indicator:before",
+			"property": "border-top-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/panel/media/panelpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.panel > .title > .composite-bar-container >.composite-bar > .monaco-action-bar .action-item:focus .action-label,:where(.prctr-editor-scope) .monaco-workbench .part.panel > .title > .composite-bar-container >.composite-bar > .monaco-action-bar .action-item:hover .action-label",
+			"property": "color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/panel/media/panelpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.panel .monaco-inputbox",
+			"property": "border-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/statusbar/media/statusbarpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.statusbar > .items-container > .statusbar-item a:active:not(.disabled)",
+			"property": "outline",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/statusbar/media/statusbarpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench:not(.hc-light):not(.hc-black) .part.statusbar > .items-container > .statusbar-item a:active:not(.disabled)",
+			"property": "background-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/statusbar/media/statusbarpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.statusbar > .items-container > .statusbar-item a:hover:not(.disabled)",
+			"property": "background-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/statusbar/media/statusbarpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.statusbar > .items-container > .statusbar-item.warning-kind a:hover:not(.disabled)",
+			"property": "background-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/statusbar/media/statusbarpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.statusbar > .items-container > .statusbar-item.error-kind a:hover:not(.disabled)",
+			"property": "background-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/statusbar/media/statusbarpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.statusbar > .items-container > .statusbar-item.prominent-kind:not(.compact-right):not(.compact-left) a:hover:not(.disabled)",
+			"property": "background-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/statusbar/media/statusbarpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.statusbar > .items-container > .statusbar-item.remote-kind a:hover:not(.disabled)",
+			"property": "background-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/statusbar/media/statusbarpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.statusbar > .items-container > .statusbar-item.offline-kind a:hover:not(.disabled)",
+			"property": "background-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/titlebar/media/titlebarpart.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-workbench .part.titlebar.inactive > .titlebar-container > .titlebar-center > .window-title > .command-center .action-item.command-center-center",
+			"property": "border-color",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/views/media/paneviewlet.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-pane-view .split-view-view:first-of-type > .pane > .pane-header",
+			"property": "border-top",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		},
+		{
+			"path": "src/prctr/workbench/browser/parts/views/media/paneviewlet.css",
+			"selector": ":where(.prctr-editor-scope) .monaco-pane-view .split-view-view:first-of-type > .pane",
+			"property": "border-left",
+			"rationale": "Retain the exact pinned source declaration and its nested/conditional ancestry in the overrides layer under the editor scope."
+		}
+	],
+	"staticAssetImports": [
+		{
+			"importer": "src/prctr/workbench/services/editor/browser/packagedFileIconTheme.ts",
+			"resource": "resources/file-icons/seti/vs-seti-icon-theme.json",
+			"kind": "data",
+			"rationale": "Complete pinned Seti mapping loaded through the closed file-icon asset adapter."
+		},
+		{
+			"importer": "src/prctr/workbench/services/editor/browser/packagedFileIconTheme.ts",
+			"resource": "resources/file-icons/seti/seti.woff",
+			"kind": "font",
+			"rationale": "Pinned Seti font emitted by the exact digest-checked packaged-asset build loader."
+		},
+		{
+			"importer": "src/prctr/workbench/services/settings/browser/settingsEditorWindowServices.ts",
+			"resource": "src/prctr/workbench/services/textMate/common/json/language-configuration.json",
+			"kind": "data",
+			"rationale": "Complete bundled JSONC language configuration parsed by the original language configuration registry."
+		},
+		{
+			"importer": "src/prctr/workbench/services/textMate/common/packagedTextMateAssets.ts",
+			"resource": "src/prctr/workbench/services/textMate/common/json/syntaxes/JSON.tmLanguage.json",
+			"kind": "data",
+			"rationale": "Pinned grammar data shared by renderer and worker through the closed packaged grammar adapter."
+		},
+		{
+			"importer": "src/prctr/workbench/services/textMate/common/packagedTextMateAssets.ts",
+			"resource": "src/prctr/workbench/services/textMate/common/json/syntaxes/JSONC.tmLanguage.json",
+			"kind": "data",
+			"rationale": "Pinned grammar data shared by renderer and worker through the closed packaged grammar adapter."
+		}
+	]
 }

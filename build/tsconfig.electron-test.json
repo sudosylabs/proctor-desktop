@@ -1,9 +1,13 @@
 {
   "extends": "./tsconfig.electron-main.json",
   "compilerOptions": {
-    "lib": ["ES2024"],
+    "lib": [
+      "ES2024"
+    ],
     "skipLibCheck": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "../src/prctr/base/browser/styleSheets.d.ts",
@@ -12,6 +16,8 @@
     "../src/prctr/**/electron-main/**/*.ts",
     "../test/platform/identity/electron-main/**/*.ts",
     "../test/electron/browserHarnessMain.ts",
+    "../test/electron/editorWorkerMain.ts",
+    "../test/electron/editorWorker.real.test.ts",
     "../test/electron/browserHarness.real.test.ts",
     "../test/electron/windowSkeletonMain.ts",
     "../test/electron/launchWindowScenario.ts",
@@ -21,6 +27,7 @@
     "../test/electron/securityUtility.real.test.ts",
     "../test/electron/securityUtilityMain.ts",
     "../test/electron/desktopIdentityMain.ts",
-    "../test/electron/desktopIdentity.real.test.ts"
+    "../test/electron/desktopIdentity.real.test.ts",
+    "../test/platform/settings/electron-main/**/*.ts"
   ]
 }

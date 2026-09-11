@@ -1,3 +1,7 @@
+import { packagedEditorDependencies } from './lib/packagedEditorDependencies.ts';
+import { buildEditorWorker } from './lib/editorWorker.ts';
+import { buildJsonWorker } from './lib/jsonWorker.ts';
+import { buildTextMateWorker } from './lib/textMateWorker.ts';
 import { execFileSync } from 'node:child_process';
 import { cpSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -32,6 +36,7 @@ cpSync(
 	join(outdir, 'prctr_desktop_key_custody.node')
 );
 await Promise.all([
+	buildEditorWorker(outdir), buildJsonWorker(outdir), buildTextMateWorker(outdir),
 	build({
 		absWorkingDir: repositoryRoot,
 		bundle: true,
@@ -40,7 +45,8 @@ await Promise.all([
 			authenticated: 'src/prctr/code/electron-browser/authenticated.main.ts'
 		},
 		format: 'esm',
-		loader: { '.svg': 'file', '.ttf': 'file' },
+		loader: { '.svg': 'file', '.ttf': 'file', '.png': 'file' },
+		plugins: [packagedEditorDependencies()],
 		outdir,
 		platform: 'browser',
 		target: chromiumTarget,
@@ -78,7 +84,7 @@ await Promise.all([
 for (const kind of ['launch', 'authenticated'])
 	writeFileSync(
 		join(outdir, `${kind}.html`),
-		`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'${kind === 'authenticated' ? ' data:' : ''}; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="./${kind}.css"><title>Proctor</title></head><body><script type="module" src="./${kind}.js"></script></body></html>\n`
+		`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'${kind === 'authenticated' ? " 'wasm-unsafe-eval'; worker-src 'self' blob:" : ''}; style-src 'self'; img-src 'self'${kind === 'authenticated' ? ' data:' : ''}; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="./${kind}.css"><title>Proctor</title></head><body><script type="module" src="./${kind}.js"></script></body></html>\n`
 	);
 writeFileSync(
 	join(outdir, 'package.json'),

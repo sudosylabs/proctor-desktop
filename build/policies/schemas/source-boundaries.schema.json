@@ -15,14 +15,22 @@
     "cssImportantOverrides"
   ],
   "properties": {
-    "$schema": { "const": "./schemas/source-boundaries.schema.json" },
-    "schemaVersion": { "const": 1 },
-    "sourceRoot": { "$ref": "#/$defs/path" },
+    "$schema": {
+      "const": "./schemas/source-boundaries.schema.json"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "sourceRoot": {
+      "$ref": "#/$defs/path"
+    },
     "layers": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/name" }
+      "items": {
+        "$ref": "#/$defs/name"
+      }
     },
     "environments": {
       "type": "object",
@@ -31,42 +39,106 @@
         "type": "array",
         "minItems": 1,
         "uniqueItems": true,
-        "items": { "$ref": "#/$defs/name" }
+        "items": {
+          "$ref": "#/$defs/name"
+        }
       }
     },
     "environmentOverrides": {
       "type": "object",
-      "propertyNames": { "$ref": "#/$defs/path" },
-      "additionalProperties": { "$ref": "#/$defs/name" }
+      "propertyNames": {
+        "$ref": "#/$defs/path"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/name"
+      }
     },
     "testSegments": {
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/name" }
+      "items": {
+        "$ref": "#/$defs/name"
+      }
     },
     "productionDynamicImportAllowlist": {
       "type": "array",
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/path" }
+      "items": {
+        "$ref": "#/$defs/path"
+      }
     },
     "cssImportantOverrides": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["path", "selector", "property", "rationale"],
+        "required": [
+          "path",
+          "selector",
+          "property",
+          "rationale"
+        ],
         "properties": {
-          "path": { "$ref": "#/$defs/path" },
-          "selector": { "type": "string", "minLength": 1 },
-          "property": { "type": "string", "pattern": "^[a-z-]+$" },
-          "rationale": { "type": "string", "minLength": 24 }
+          "path": {
+            "$ref": "#/$defs/path"
+          },
+          "selector": {
+            "type": "string",
+            "minLength": 1
+          },
+          "property": {
+            "type": "string",
+            "pattern": "^[a-z-]+$"
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 24
+          }
+        }
+      }
+    },
+    "staticAssetImports": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "importer",
+          "resource",
+          "kind",
+          "rationale"
+        ],
+        "properties": {
+          "importer": {
+            "$ref": "#/$defs/path"
+          },
+          "resource": {
+            "$ref": "#/$defs/path"
+          },
+          "kind": {
+            "enum": [
+              "data",
+              "font"
+            ]
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 24
+          }
         }
       }
     }
   },
   "$defs": {
-    "name": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-    "path": { "type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$" }
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "path": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    }
   }
 }

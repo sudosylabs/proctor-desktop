@@ -1,14 +1,27 @@
 {
   "extends": "./tsconfig.base-common.json",
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2024"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2024",
+      "ESNext.Disposable",
+      "WebWorker.ImportScripts"
+    ],
     "skipLibCheck": true,
-    "types": ["node"]
+    "types": [
+      "node",
+      "trusted-types",
+      "@webgpu/types",
+      "wicg-file-system-access"
+    ]
   },
   "include": [
     "../src/prctr/base/common/thenable.d.ts",
     "../src/prctr/base/browser/**/*.d.ts",
+    "../src/prctr/editor/browser/typings/**/*.d.ts",
     "../src/prctr/platform/windows/common/**/*.ts",
-    "../src/prctr/**/electron-browser/**/*.ts"
+    "../src/prctr/**/electron-browser/**/*.ts",
+    "../src/prctr/**/browser/**/*.d.ts"
   ]
 }
