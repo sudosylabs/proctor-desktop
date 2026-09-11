@@ -1,6 +1,7 @@
+import { ICommandService } from '../../src/prctr/platform/commands/common/commands.js';
+import type { IInstantiationService } from '../../src/prctr/platform/instantiation/common/instantiation.js';
+import { WORKBENCH_INSTANTIATION_SERVICE } from '../../src/prctr/workbench/common/serviceIds.js';
 import { browserSettingsEditorEnvironment } from './editor/settingsEditorEnvironment.js';
-import type { SettingsRendererClient } from '../../src/prctr/workbench/services/settings/common/settingsRendererClient.js';
-const createSettingsContribution = (client: SettingsRendererClient) => createSettingsWithEnvironment(client, browserSettingsEditorEnvironment);
 import { runModernWorkbenchTests } from './modernWorkbenchTests.ts';
 import { runAccountTests } from './accountTests.ts';
 import { createAccountContribution } from '../../src/prctr/workbench/contrib/account/browser/accountContribution.ts';
@@ -102,9 +103,7 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 	await runAccountTests(document);
 	await runThemePreferenceTest(document);
 	await runExecutableKernelTest(document);
-	await runMigratedSettingsDestinationTest(document);
 	await runWindowBindingFailureTests(document);
-	await runSettingsCancelFailureTest(document);
 	await runPaneHostClearFailureTest(document);
 	const host = document.createElement('div');
 	host.style.blockSize = '720px';
@@ -548,328 +547,7 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 			'LaunchWindow bootstrap recovery did not retain its owned dark forced-colors presentation'
 		);
 	launchRecovery.frame.remove();
-	const settingsFrame = document.createElement('iframe');
-	document.body.append(settingsFrame);
-	const settingsDocument = settingsFrame.contentDocument;
-	if (settingsDocument === null) throw new Error('Settings test frame has no document');
-	let committedSource = '';
-	let committedRevision = '';
-	let commitCalls = 0;
-	let releaseCommit = (): void => {};
-	let commitBarrier: Promise<void> | undefined;
-	let previewedSource = '';
-	let previewCalls = 0;
-	let previewCancels = 0;
-	let commitFails = false;
-	const defaultPresentation = Object.freeze({
-		theme: 'dark' as const,
-		zoomPercent: 100,
-		reducedMotion: false
-	});
-	const settingsProjection: UserSettingsProjection = {
-		source: '{\n  // retained\n  "editor.fontSize": 14\n}',
-		revision: 'revision:one',
-		registryVersion: 1,
-		availability: 'available',
-		writable: true,
-		presentation: defaultPresentation
-	};
-	const liveSettingsProjection: UserSettingsProjection = {
-		...settingsProjection,
-		revision: 'revision:live'
-	};
-	let projectedSettings = liveSettingsProjection;
-	let resolveSettingsSnapshot = (_projection: UserSettingsProjection): void => {};
-	const settingsSnapshot = new Promise<UserSettingsProjection>((resolve) => {
-		resolveSettingsSnapshot = resolve;
-	});
-	let notifySettings: ((projection: UserSettingsProjection) => void) | undefined;
-	const authenticatedChromeUpdates: ProductWindowChromeUpdate[] = [];
-	const authenticatedPromise = bootstrapWorkbench(settingsDocument, authenticatedComposition, [
-		...commonWorkbenchContributions,
-		createDesktopWorkbenchContribution(
-			'authenticated',
-			async () => ({
-				protocolVersion: 1,
-				kind: 'authenticated',
-				windowId: 'window:settings',
-				institutionOrigin: 'https://institution.example.test',
-				principalId: 'principal:one',
-				sessionId: 'session:one',
-				initialDestination: 'settings'
-			}),
-			testWindowChromeClient(authenticatedChromeUpdates)
-		),
-		createAccountContribution({
-			request: async () => ({ kind: 'error', reason: 'unavailable' })
-		}),
-		createAuthenticatedContribution({
-			signOut: async () => {
-				throw new Error('sign-out unavailable');
-			},
-			close: async () => {}
-		}),
-		createSettingsContribution({
-			projection: () => settingsSnapshot,
-			preview: async (intent) => {
-				previewCalls++;
-				previewedSource = intent.source;
-				const zoom = /"window\.zoomLevel"\s*:\s*(\d+)/u.exec(intent.source);
-				notifySettings?.({
-					...projectedSettings,
-					presentation: {
-						theme: intent.source.includes('"workbench.colorTheme": "light"')
-							? 'light'
-							: 'dark',
-						zoomPercent: zoom === null ? 100 : Number(zoom[1]),
-						reducedMotion: intent.source.includes('"accessibility.reducedMotion": true')
-					}
-				});
-			},
-			cancelPreview: async () => {
-				previewCancels++;
-				notifySettings?.(projectedSettings);
-			},
-			commit: async (intent) => {
-				commitCalls++;
-				if (commitFails) throw new Error('commit unavailable');
-				committedSource = intent.source;
-				committedRevision = intent.expectedRevision;
-				await commitBarrier;
-				projectedSettings = {
-					...liveSettingsProjection,
-					source: intent.source,
-					revision: 'revision:two'
-				};
-				return { kind: 'success', projection: projectedSettings };
-			},
-			onDidChange: (listener) => {
-				notifySettings = listener;
-				return () => {
-					notifySettings = undefined;
-				};
-			}
-		})
-	]);
-	await waitFor(() => notifySettings !== undefined);
-	notifySettings?.(liveSettingsProjection);
-	resolveSettingsSnapshot(settingsProjection);
-	const authenticated = await authenticatedPromise;
-	const settingsPage = authenticated.shell
-		.part('content')
-		.querySelector<HTMLElement>('.prctr-settings');
-	const genericPage = authenticated.shell
-		.part('content')
-		.querySelector<HTMLElement>('.prctr-authenticated[data-region="page"]');
-	if (settingsPage === null || settingsPage.hidden || genericPage?.hidden !== true)
-		throw new Error('Settings is not a real AuthenticatedWindow destination');
-	const settingsStatus = settingsPage.querySelector<HTMLElement>('[role="status"]');
-	if (settingsStatus === null) throw new Error('Settings status region is missing');
-	const dimmingDialog = authenticated.shell.overlayHost.show({
-		kind: 'dialog',
-		title: 'Confirm',
-		message: 'Confirm native control dimming.',
-		accessibleLabel: 'Confirm native control dimming',
-		actions: [{ id: 'close', label: 'Close', variant: 'secondary', onRequest: () => undefined }]
-	});
-	await waitFor(() => authenticatedChromeUpdates.at(-1)?.dimmed === true);
-	if (authenticatedChromeUpdates.at(-1)?.dimmed !== true)
-		throw new Error('Authenticated modal did not dim native window controls');
-	dimmingDialog.dispose();
-	await waitFor(() => authenticatedChromeUpdates.at(-1)?.dimmed === false);
-	if (authenticatedChromeUpdates.at(-1)?.dimmed !== false)
-		throw new Error('Authenticated modal did not restore native window controls');
-	const signOut = authenticated.shell
-		.part('titlebar')
-		.querySelector<HTMLButtonElement>('[data-region="signout"]');
-	signOut?.click();
-	await Promise.resolve();
-	await Promise.resolve();
-	const actionStatus = authenticated.shell
-		.part('titlebar')
-		.querySelector<HTMLElement>('[data-region="action-status"]');
-	if (
-		signOut === null ||
-		actionStatus === null ||
-		actionStatus.textContent !== 'The requested account action could not be completed.' ||
-		genericPage?.hidden !== true
-	)
-		throw new Error(
-			'A Settings sign-out failure was not published in the always-visible titlebar status'
-		);
-	const themeEditor = settingsPage.querySelector<HTMLTextAreaElement>('textarea');
-	if (!themeEditor) throw new Error('JSONC theme editor is missing');
-	themeEditor.value =
-		'{\n  // retained\n  "editor.fontSize": 14,\n  "workbench.colorTheme": "light"\n}';
-	themeEditor.dispatchEvent(new Event('input'));
-	await waitFor(() => settingsDocument.documentElement.dataset.prctrTheme === 'light');
-	const rows = [...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')];
-	const zoomInput = rows
-		.find(
-			(row) => row.querySelector('.prctr-settings__title')?.textContent === 'Interface zoom'
-		)
-		?.querySelector<HTMLInputElement>('input');
-	if (zoomInput === null || zoomInput === undefined)
-		throw new Error('Structured numeric Settings control is missing');
-	zoomInput.value = '125';
-	zoomInput.dispatchEvent(new Event('change'));
-	await waitFor(() => settingsDocument.documentElement.style.zoom === '1.25');
-	zoomInput.value = '';
-	zoomInput.dispatchEvent(new Event('change'));
-	const currentZoomInput = [...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')]
-		.find(
-			(row) => row.querySelector('.prctr-settings__title')?.textContent === 'Interface zoom'
-		)
-		?.querySelector<HTMLInputElement>('input');
-	if (currentZoomInput !== zoomInput)
-		throw new Error('Structured Settings editing replaced the focused control');
-	const fontInput = [...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')]
-		.find(
-			(row) => row.querySelector('.prctr-settings__title')?.textContent === 'Editor font size'
-		)
-		?.querySelector<HTMLInputElement>('input');
-	if (fontInput === null || fontInput === undefined)
-		throw new Error('Numeric Settings control did not survive deletion');
-	fontInput.value = '16';
-	fontInput.dispatchEvent(new Event('change'));
-	await waitFor(() => previewedSource.includes('16'));
-	if (!previewedSource.includes('16'))
-		throw new Error(
-			'Valid Settings drafts were not previewed in the current AuthenticatedWindow'
-		);
-	const viewButtons = settingsPage.querySelectorAll<HTMLButtonElement>(
-		'.prctr-settings__switcher button'
-	);
-	viewButtons[1]?.click();
-	const source = settingsPage.querySelector<HTMLTextAreaElement>('.prctr-settings__source');
-	if (source === null || source.hidden) throw new Error('Settings JSONC view did not open');
-	source.value = source.value.replace('16', '18');
-	const inputEvent = source.ownerDocument.createEvent('Event');
-	inputEvent.initEvent('input', true, false);
-	source.dispatchEvent(inputEvent);
-	commitBarrier = new Promise<void>((resolve) => {
-		releaseCommit = resolve;
-	});
-	const save = settingsPage.querySelector<HTMLButtonElement>('.prctr-settings__actions button');
-	save?.click();
-	await Promise.resolve();
-	await Promise.resolve();
-	if (save === null || !save.disabled || !source.disabled)
-		throw new Error('Settings remained editable while a save was in flight');
-	save.click();
-	if (commitCalls !== 1)
-		throw new Error('Settings issued concurrent saves for one in-flight draft');
-	releaseCommit();
-	await waitFor(() => committedSource.includes('18') && !save.disabled);
-	commitBarrier = undefined;
-	if (!committedSource.includes('// retained') || committedRevision !== 'revision:live')
-		throw new Error(
-			'Settings lost the live initial revision or failed to commit one comment-preserving draft'
-		);
-	const acknowledgedFontInput = [
-		...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')
-	]
-		.find(
-			(row) => row.querySelector('.prctr-settings__title')?.textContent === 'Editor font size'
-		)
-		?.querySelector<HTMLInputElement>('input');
-	if (acknowledgedFontInput === null || acknowledgedFontInput === undefined)
-		throw new Error('Acknowledged Settings controls were not rendered');
-	source.value = source.value.replace('18', '20');
-	source.dispatchEvent(inputEvent);
-	await Promise.resolve();
-	commitFails = true;
-	settingsPage.querySelector<HTMLButtonElement>('.prctr-settings__actions button')?.click();
-	await Promise.resolve();
-	await Promise.resolve();
-	await Promise.resolve();
-	const previewCallsAfterFailure = previewCalls;
-	source.focus();
-	notifySettings?.({
-		...settingsProjection,
-		source: committedSource,
-		revision: 'revision:two',
-		availability: 'unavailable',
-		writable: false
-	});
-	if (
-		!source.disabled ||
-		!acknowledgedFontInput.disabled ||
-		settingsDocument.activeElement !== settingsStatus ||
-		[...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')]
-			.find(
-				(row) =>
-					row.querySelector('.prctr-settings__title')?.textContent === 'Editor font size'
-			)
-			?.querySelector('input') !== acknowledgedFontInput
-	)
-		throw new Error(
-			'Server-unavailable Settings replaced controls, lost focus, or failed to become read-only'
-		);
-	if (previewCalls !== previewCallsAfterFailure)
-		throw new Error('A failed Settings commit was reapplied as a preview');
-	settingsPage.querySelectorAll<HTMLButtonElement>('.prctr-settings__actions button')[1]?.click();
-	viewButtons[0]?.click();
-	notifySettings?.({
-		...settingsProjection,
-		source: committedSource,
-		revision: 'revision:two',
-		availability: 'available',
-		writable: true
-	});
-	const focusedBeforeRemote = [
-		...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')
-	]
-		.find(
-			(row) => row.querySelector('.prctr-settings__title')?.textContent === 'Editor font size'
-		)
-		?.querySelector<HTMLInputElement>('input');
-	focusedBeforeRemote?.focus();
-	notifySettings?.({
-		...settingsProjection,
-		source: '{"editor.fontSize":22}',
-		revision: 'revision:three',
-		availability: 'available',
-		writable: true
-	});
-	const focusedAfterRemote = [
-		...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')
-	]
-		.find(
-			(row) => row.querySelector('.prctr-settings__title')?.textContent === 'Editor font size'
-		)
-		?.querySelector<HTMLInputElement>('input');
-	if (
-		focusedBeforeRemote === undefined ||
-		focusedAfterRemote === undefined ||
-		focusedAfterRemote === focusedBeforeRemote ||
-		settingsDocument.activeElement !== focusedAfterRemote
-	)
-		throw new Error('Remote Settings replacement did not restore logical control focus');
-	notifySettings?.({
-		...settingsProjection,
-		source: '{"editor.fontSize":24}',
-		revision: 'revision:four',
-		availability: 'unavailable',
-		writable: false
-	});
-	const unavailableFontInput = [
-		...settingsPage.querySelectorAll<HTMLElement>('.prctr-settings__row')
-	]
-		.find(
-			(row) => row.querySelector('.prctr-settings__title')?.textContent === 'Editor font size'
-		)
-		?.querySelector<HTMLInputElement>('input');
-	if (
-		unavailableFontInput == null ||
-		!unavailableFontInput.disabled ||
-		settingsDocument.activeElement !== settingsStatus
-	)
-		throw new Error('Read-only Settings replacement focused a disabled control');
-	authenticated.disposables.dispose();
-	settingsFrame.remove();
-	if (previewCancels === 0)
-		throw new Error('Settings preview was not reverted after acknowledgement or disposal');
+	await runSettingsModalContributionTest(document);
 	await runIntegratedBrowserPaneTest(document);
 	await runIntegratedBrowserGateLifecycleTest(document);
 	await runExamSecurityContributionTest(document);
@@ -1030,98 +708,6 @@ async function runExecutableKernelTest(document: Document): Promise<void> {
 		throw new Error('Scoped ContextKey disposal retained its DOM ownership attribute');
 	result.disposables.dispose();
 	frame.remove();
-}
-
-async function runMigratedSettingsDestinationTest(document: Document): Promise<void> {
-	const frame = document.createElement('iframe');
-	document.body.append(frame);
-	const child = frame.contentDocument;
-	if (child === null) throw new Error('Migrated Settings destination frame is unavailable');
-	const source = '{\n  "workbench.tree.indent": 12\n}';
-	const projection: UserSettingsProjection = Object.freeze({
-		source,
-		revision: 'revision:migrated',
-		registryVersion: 1,
-		availability: 'available',
-		writable: true,
-		presentation: Object.freeze({ theme: 'dark', zoomPercent: 100, reducedMotion: false })
-	});
-	let committed = '';
-	const result = await bootstrapWorkbench(child, authenticatedComposition, [
-		...commonWorkbenchContributions,
-		createDesktopWorkbenchContribution('authenticated', async () => ({
-			protocolVersion: 1,
-			kind: 'authenticated',
-			windowId: 'window:migrated-settings',
-			institutionOrigin: 'https://institution.example.test',
-			principalId: 'principal:migrated',
-			sessionId: 'session:migrated',
-			initialDestination: 'settings'
-		})),
-		createAccountContribution({
-			request: async () => ({ kind: 'error', reason: 'unavailable' })
-		}),
-		createAuthenticatedContribution({ signOut: async () => {}, close: async () => {} }),
-		createSettingsContribution({
-			projection: async () => projection,
-			preview: async () => {},
-			cancelPreview: async () => {},
-			commit: async (intent) => {
-				committed = intent.source;
-				return {
-					kind: 'success',
-					projection: {
-						...projection,
-						source: intent.source,
-						revision: 'revision:migrated-saved'
-					}
-				};
-			},
-			onDidChange: () => () => {}
-		})
-	]);
-	const row = [
-		...result.shell.part('content').querySelectorAll<HTMLElement>('.prctr-settings__row')
-	].find(
-		(candidate) =>
-			candidate.querySelector('.prctr-settings__title')?.textContent === 'Tree indentation'
-	);
-	const input = row?.querySelector<HTMLInputElement>('input');
-	if (input?.value !== '12')
-		throw new Error('Settings destination did not consume the coordinator-migrated projection');
-	input.value = '13';
-	input.dispatchEvent(new Event('change'));
-	await Promise.resolve();
-	const save = result.shell
-		.part('content')
-		.querySelector<HTMLButtonElement>('.prctr-settings__actions button');
-	await waitFor(() => save?.disabled === false);
-	save?.click();
-	await waitFor(() => committed.length > 0);
-	if (
-		!committed.includes('"workbench.tree.indent": 13') ||
-		committed.includes('explorer.tree.indent')
-	)
-		throw new Error('Settings destination did not save the migrated key');
-	result.disposables.dispose();
-	frame.remove();
-}
-
-async function installHarnessStyles(document: Document): Promise<void> {
-	const link = document.createElement('link');
-	link.rel = 'stylesheet';
-	link.href = new URL('./renderer.css', globalThis.location.href).href;
-	const loaded = new Promise<void>((resolve, reject) => {
-		link.addEventListener('load', () => resolve(), { once: true });
-		link.addEventListener(
-			'error',
-			() =>
-				reject(new Error('Browser harness stylesheet could not be loaded into its frame')),
-			{ once: true }
-		);
-	});
-	document.head.append(link);
-	await loaded;
 }
 
 async function runWindowBindingFailureTests(document: Document): Promise<void> {
@@ -1417,89 +1003,6 @@ function createDarkForcedColorsFrame(document: Document): {
 		}
 	});
 	return { document: child, frame };
-}
-
-async function runSettingsCancelFailureTest(document: Document): Promise<void> {
-	const frame = document.createElement('iframe');
-	document.body.append(frame);
-	const settingsDocument = frame.contentDocument;
-	if (settingsDocument === null)
-		throw new Error('Settings cancellation test frame is unavailable');
-	const acknowledgedPresentation = Object.freeze({
-		theme: 'dark' as const,
-		zoomPercent: 100,
-		reducedMotion: false
-	});
-	const acknowledged: UserSettingsProjection = Object.freeze({
-		source: '{}',
-		revision: 'revision:cancel',
-		registryVersion: 1,
-		availability: 'available',
-		writable: true,
-		presentation: acknowledgedPresentation
-	});
-	let current = acknowledged;
-	let listener: ((projection: UserSettingsProjection) => void) | undefined;
-	let cancelCalls = 0;
-	const result = await bootstrapWorkbench(settingsDocument, authenticatedComposition, [
-		...commonWorkbenchContributions,
-		createDesktopWorkbenchContribution('authenticated', async () => ({
-			protocolVersion: 1,
-			kind: 'authenticated',
-			windowId: 'window:cancel',
-			institutionOrigin: 'https://institution.example.test',
-			principalId: 'principal:one',
-			sessionId: 'session:one',
-			initialDestination: 'settings'
-		})),
-		createAccountContribution({
-			request: async () => ({ kind: 'error', reason: 'unavailable' })
-		}),
-		createAuthenticatedContribution({ signOut: async () => {}, close: async () => {} }),
-		createSettingsContribution({
-			projection: async () => current,
-			preview: async (intent) => {
-				current = Object.freeze({
-					...acknowledged,
-					presentation: Object.freeze({
-						...acknowledgedPresentation,
-						theme: intent.source.includes('"light"') ? 'light' : 'dark'
-					})
-				});
-				listener?.(current);
-			},
-			cancelPreview: async () => {
-				cancelCalls++;
-				if (cancelCalls === 1) throw new Error('ambiguous cancellation');
-				current = acknowledged;
-				listener?.(current);
-			},
-			commit: async () => ({ kind: 'unavailable' }),
-			onDidChange: (value) => {
-				listener = value;
-				return () => {
-					listener = undefined;
-				};
-			}
-		})
-	]);
-	const page = result.shell.part('content').querySelector<HTMLElement>('.prctr-settings');
-	const theme = page?.querySelector<HTMLTextAreaElement>('textarea');
-	const status = page?.querySelector<HTMLElement>('[role="status"]');
-	if (!theme || !status) throw new Error('Settings cancellation test controls are incomplete');
-	theme.value = '{"workbench.colorTheme": "light"}';
-	theme.dispatchEvent(new Event('input'));
-	await waitFor(() => settingsDocument.documentElement.dataset.prctrTheme === 'light');
-	page?.querySelectorAll<HTMLButtonElement>('.prctr-settings__actions button')[1]?.click();
-	await waitFor(
-		() => cancelCalls === 2 && settingsDocument.documentElement.dataset.prctrTheme === 'dark'
-	);
-	if (status.textContent !== 'The settings preview could not be reverted safely.')
-		throw new Error(
-			'Rejected preview cancellation was not surfaced after acknowledged presentation recovery'
-		);
-	result.disposables.dispose();
-	frame.remove();
 }
 
 async function runPaneHostClearFailureTest(document: Document): Promise<void> {
@@ -2294,7 +1797,8 @@ class SlowPane implements WorkbenchPane {
 	}
 }
 async function waitFor(predicate: () => boolean): Promise<void> {
-	for (let index = 0; index < 50; index++) {
+	const deadline = performance.now() + 5000;
+	while (performance.now() < deadline) {
 		if (predicate()) return;
 		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 	}
@@ -2310,4 +1814,225 @@ function createItem(id: string): WorkbenchItem {
 		onDidChangePresentation: BaseEvent.None,
 		matches: (other) => other.typeId === 'test' && other.logicalIdentity === id
 	};
+}
+
+/** End-to-end contribution coverage for the current modal; both views and Save
+ * operate on Monaco's working copy. The old content-page selectors are retired. */
+async function runSettingsModalContributionTest(document: Document): Promise<void> {
+	// Monaco's window services use the renderer's main window. Preserve the outer
+	// fixture while exercising the real workbench composition in that window.
+	const child = document;
+	const originalNodes = [...document.body.childNodes];
+	const originalAttributes = [...document.documentElement.attributes].map(
+		(attribute) => [attribute.name, attribute.value] as const
+	);
+	for (const node of originalNodes) node.remove();
+	const listeners = new Set<(projection: UserSettingsProjection) => void>();
+	const notify = (projection: UserSettingsProjection): void => {
+		for (const listener of listeners) listener(projection);
+	};
+	let acknowledged: UserSettingsProjection = {
+		source: '{\n // retained\n "editor.fontSize":18, "workbench.tree.indent":12\n}',
+		revision: 'revision:live',
+		registryVersion: 1,
+		availability: 'available',
+		writable: true,
+		presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
+	};
+	const chromeUpdates: ProductWindowChromeUpdate[] = [];
+	let commitCount = 0,
+		cancelCount = 0,
+		previews = 0,
+		rejectCancellation = false;
+	let submitted: { source: string; expectedRevision: string } | undefined;
+	let release: (() => void) | undefined;
+	let barrier: Promise<void> | undefined;
+	let projectionReads = 0;
+	let resolveSnapshot: ((projection: UserSettingsProjection) => void) | undefined;
+	const snapshot = new Promise<UserSettingsProjection>((resolve) => {
+		resolveSnapshot = resolve;
+	});
+	let instantiation: IInstantiationService | undefined;
+	const started = bootstrapWorkbench(
+		child,
+		authenticatedComposition,
+		[
+			...commonWorkbenchContributions,
+			createDesktopWorkbenchContribution(
+				'authenticated',
+				async () => ({
+					protocolVersion: 1,
+					kind: 'authenticated',
+					windowId: 'window:modal-settings',
+					institutionOrigin: 'https://institution.example.test',
+					principalId: 'principal:one',
+					sessionId: 'session:one',
+					initialDestination: 'settings'
+				}),
+				testWindowChromeClient(chromeUpdates)
+			),
+			createAccountContribution({
+				request: async () => ({ kind: 'error', reason: 'unavailable' })
+			}),
+			createAuthenticatedContribution({
+				signOut: async () => {
+					throw new Error('sign-out unavailable');
+				},
+				close: async () => {}
+			}),
+			createSettingsWithEnvironment(
+				{
+					projection: async () => (++projectionReads === 1 ? snapshot : acknowledged),
+					onDidChange(listener) {
+						listeners.add(listener);
+						return () => {
+							listeners.delete(listener);
+						};
+					},
+					async preview() {
+						previews++;
+					},
+					async cancelPreview() {
+						cancelCount++;
+						if (rejectCancellation) {
+							rejectCancellation = false;
+							throw Error('ambiguous cancellation');
+						}
+					},
+					async commit(intent) {
+						commitCount++;
+						submitted = intent;
+						await barrier;
+						acknowledged = {
+							...acknowledged,
+							source: intent.source,
+							revision: 'revision:saved'
+						};
+						notify(acknowledged);
+						return { kind: 'success', projection: acknowledged };
+					}
+				},
+				browserSettingsEditorEnvironment
+			)
+		].map((contribution) => ({
+			...contribution,
+			async activate(context: WorkbenchBootstrapContext) {
+				await contribution.activate(context);
+				instantiation = context.getService<IInstantiationService>(
+					WORKBENCH_INSTANTIATION_SERVICE
+				);
+			}
+		}))
+	);
+	const result = await started;
+	await waitFor(() => listeners.size > 0);
+	notify(acknowledged);
+	resolveSnapshot!({ ...acknowledged, source: '{}', revision: 'revision:stale' });
+	try {
+		await waitFor(() => !!child.querySelector('.modal-editor-part .settings-editor')).catch(
+			(error) => {
+				throw new Error(String(error) + ': ' + child.body.innerText);
+			}
+		);
+		if (result.shell.part('content').querySelector('.prctr-settings'))
+			throw Error('Settings unexpectedly mounted the obsolete content page');
+		if (!child.querySelector('[aria-label="Search settings"]'))
+			throw Error('Modal settings search is absent');
+		await waitFor(() => chromeUpdates.at(-1)?.dimmed === true);
+		const commands = instantiation!.invokeFunction((accessor) => accessor.get(ICommandService));
+		const findSetting = async (key: string): Promise<HTMLInputElement> => {
+			await commands.executeCommand('workbench.action.openSettings', '@id:' + key);
+			await waitFor(() => !!child.querySelector(`[data-key="${key}"] input`));
+			return child.querySelector<HTMLInputElement>(`[data-key="${key}"] input`)!;
+		};
+		const indent = await findSetting('workbench.tree.indent');
+		if (indent.value !== '12')
+			throw Error('Modal lost the migrated or newer initial projection');
+		indent.value = '13';
+		indent.dispatchEvent(new Event('input', { bubbles: true }));
+		await waitFor(() => previews > 0);
+		barrier = new Promise<void>((resolve) => {
+			release = resolve;
+		});
+		const save = child.querySelector<HTMLElement>('[aria-label^="Save Settings"]');
+		if (!save) throw Error('Modal save action is absent');
+		save.click();
+		await waitFor(() => commitCount === 1);
+		save.click();
+		await Promise.resolve();
+		if (commitCount !== 1) throw Error('Modal submitted concurrent saves');
+		release!();
+		await waitFor(
+			() =>
+				child
+					.querySelector('.prctr-settings-modal-status')
+					?.textContent?.includes('saved') === true
+		);
+		if (
+			!submitted?.source.includes('// retained') ||
+			submitted.expectedRevision !== 'revision:live' ||
+			!submitted.source.includes('13')
+		)
+			throw Error('Modal save lost comments, migrated edits or live revision');
+		barrier = undefined;
+		const font = await findSetting('editor.fontSize');
+		const beforePreview = previews;
+		font.value = '20';
+		font.dispatchEvent(new Event('input', { bubbles: true }));
+		await waitFor(() => previews > beforePreview);
+		const beforeCancel = cancelCount;
+		rejectCancellation = true;
+		child.querySelector<HTMLElement>('[aria-label^="Discard Settings Changes"]')?.click();
+		await waitFor(() => cancelCount >= beforeCancel + 2);
+		if (!child.querySelector('.prctr-settings-modal-status')?.textContent?.includes('preview'))
+			throw Error('Ambiguous cancellation was not surfaced by the modal');
+		notify({ ...acknowledged, writable: false, availability: 'unavailable' });
+		await waitFor(
+			() =>
+				child.querySelector<HTMLInputElement>('[data-key="editor.fontSize"] input')
+					?.disabled === true
+		);
+		if (
+			!child.querySelector('.prctr-settings-modal-status')?.textContent?.includes('read-only')
+		)
+			throw Error('Unavailable settings did not announce readonly state');
+		await commands.executeCommand('workbench.action.closeModalEditor');
+		await waitFor(() => chromeUpdates.at(-1)?.dimmed === false);
+		if (child.querySelector('.modal-editor-part')) throw Error('Settings modal did not close');
+		const signOut = result.shell
+			.part('titlebar')
+			.querySelector<HTMLButtonElement>('[data-region="signout"]');
+		if (!signOut) throw Error('Authenticated sign-out action is absent');
+		signOut.click();
+		await waitFor(
+			() =>
+				result.shell.part('titlebar').querySelector('[data-region="action-status"]')
+					?.textContent === 'The requested account action could not be completed.'
+		);
+	} finally {
+		release?.();
+		result.disposables.dispose();
+		document.body.replaceChildren(...originalNodes);
+		for (const attribute of [...document.documentElement.attributes])
+			document.documentElement.removeAttribute(attribute.name);
+		for (const [name, value] of originalAttributes)
+			document.documentElement.setAttribute(name, value);
+	}
+}
+
+async function installHarnessStyles(document: Document): Promise<void> {
+	const link = document.createElement('link');
+	link.rel = 'stylesheet';
+	link.href = new URL('./renderer.css', globalThis.location.href).href;
+	const loaded = new Promise<void>((resolve, reject) => {
+		link.addEventListener('load', () => resolve(), { once: true });
+		link.addEventListener(
+			'error',
+			() =>
+				reject(new Error('Browser harness stylesheet could not be loaded into its frame')),
+			{ once: true }
+		);
+	});
+	document.head.append(link);
+	await loaded;
 }

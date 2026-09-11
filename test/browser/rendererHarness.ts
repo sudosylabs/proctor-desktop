@@ -80,26 +80,37 @@ globalThis.addEventListener('pagehide', () => disposables.dispose(), { once: tru
 main.append(heading, button, decorativeIcon.element, labelledIcon.element);
 document.body.append(main);
 await document.fonts.ready;
-try {
-	document.body.dataset.currentSuite = 'browser-owner';
+const failures: string[] = [];
+async function runGroup(name: string, run: () => Promise<void>): Promise<void> {
+	document.body.dataset.currentSuite = name;
+	try {
+		await run();
+	} catch (error) {
+		failures.push(
+			name + ': ' + (error instanceof Error ? (error.stack ?? error.message) : String(error))
+		);
+	}
+}
+await runGroup('browser-owner', async () => {
 	document.body.dataset.browserOwnerTests = String(await runBrowserInteractionOwnerTests());
-	document.body.dataset.currentSuite = 'control-explorer';
-	const explorer = await runControlExplorer(document.body);
-	document.body.dataset.controlExplorer = JSON.stringify(explorer);
-	document.body.dataset.currentSuite = 'workbench-kernel';
+});
+await runGroup('control-explorer', async () => {
+	document.body.dataset.controlExplorer = JSON.stringify(await runControlExplorer(document.body));
+});
+await runGroup('workbench-kernel', async () => {
 	document.body.dataset.workbenchKernelTests = String(
 		await runWorkbenchKernelBrowserTests(document)
 	);
+});
+await runGroup('keybindings', async () => {
 	await runBrowserKeybindingServiceTests(document);
-	document.body.dataset.currentSuite = 'terminal-panel';
+});
+await runGroup('terminal-panel', async () => {
 	document.body.dataset.terminalPanelTests = String(
 		await runRemoteTerminalPanelTests(document, themeService)
 	);
-} catch (error) {
-	document.body.dataset.browserOwnerError =
-		error instanceof Error ? (error.stack ?? error.message) : String(error);
-} finally {
-	delete document.body.dataset.currentSuite;
-	document.body.dataset.themeChanges = String(themeChanges);
-	document.body.dataset.ready = 'true';
-}
+});
+if (failures.length) document.body.dataset.browserOwnerError = failures.join('\n');
+delete document.body.dataset.currentSuite;
+document.body.dataset.themeChanges = String(themeChanges);
+document.body.dataset.ready = 'true';

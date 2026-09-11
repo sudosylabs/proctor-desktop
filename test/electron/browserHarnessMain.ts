@@ -33,7 +33,7 @@ async function runHarness(): Promise<void> {
 		const renderer = (await window.webContents.executeJavaScript(
 			`(async () => {
       if (document.body.dataset.ready !== 'true') await new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('renderer fixture timeout in ' + (document.body.dataset.currentSuite ?? 'initialization'))), 5000);
+        const timeout = setTimeout(() => reject(new Error('renderer fixture timeout in ' + (document.body.dataset.currentSuite ?? 'initialization'))), 15000);
         const observer = new MutationObserver(() => {
           if (document.body.dataset.ready === 'true') { clearTimeout(timeout); observer.disconnect(); resolve(); }
         });

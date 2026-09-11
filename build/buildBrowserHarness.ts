@@ -1,3 +1,5 @@
+import { buildEditorWorker } from './lib/editorWorker.ts';
+import { buildTextMateWorker } from './lib/textMateWorker.ts';
 import { packagedEditorDependencies } from './lib/packagedEditorDependencies.ts';
 import { buildJsonWorker } from './lib/jsonWorker.ts';
 import { copyFileSync, writeFileSync } from 'node:fs';
@@ -13,6 +15,8 @@ import {
 const outputDirectory = resetBuildOutput('browser-harness');
 
 await Promise.all([
+	buildEditorWorker(outputDirectory),
+	buildTextMateWorker(outputDirectory),
 	buildJsonWorker(outputDirectory),
 	build({
 		absWorkingDir: repositoryRoot,

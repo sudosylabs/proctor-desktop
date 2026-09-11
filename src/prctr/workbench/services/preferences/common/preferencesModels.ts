@@ -451,7 +451,8 @@ export class DefaultSettings extends Disposable {
 	constructor(
 		private _mostCommonlyUsedSettingsKeys: string[],
 		readonly target: ConfigurationTarget,
-		readonly configurationService: IConfigurationService
+		readonly configurationService: IConfigurationService,
+		private readonly includesSetting: (key: string) => boolean = () => true
 	) {
 		super();
 		this._register(configurationService.onDidChangeConfiguration(e => {
@@ -517,7 +518,7 @@ export class DefaultSettings extends Disposable {
 			}
 		}
 
-		const groups = this.removeEmptySettingsGroups(this.parseProperties(allConfigurations).sort(this.compareGroups));
+		const groups = this.removeEmptySettingsGroups(this.parseProperties(Object.fromEntries(Object.entries(allConfigurations).filter(([key]) => this.includesSetting(key)))).sort(this.compareGroups));
 		return this.sortGroups(groups);
 	}
 
