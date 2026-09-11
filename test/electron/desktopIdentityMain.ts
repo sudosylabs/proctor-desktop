@@ -1,3 +1,5 @@
+import { DesktopIdentityCoordinator } from '../../src/prctr/platform/identity/electron-main/desktopIdentityCoordinator.js';
+import { HttpServerReadinessTransport } from '../../src/prctr/platform/identity/electron-main/httpServerReadinessTransport.js';
 import {
 	createDesktopAuthCallbackPages,
 	callbackPageMessages
@@ -62,32 +64,50 @@ if (probe) {
 			let browserOpens = 0;
 			let service: DesktopAuthorizationService | undefined;
 			let windows: ProductWindowCoordinator | undefined;
+			let launch: DesktopIdentityCoordinator | undefined;
 			try {
 				const key = await keys.loadOrCreate(scope);
 				assert.deepEqual((await keys.loadOrCreate(scope)).publicJwk, key.publicJwk);
 				// createDPoPProof independently verifies the native signature against the public key.
 				await createDPoPProof(key, 'POST', `${origin}/api/v1/auth/refresh`, random());
-				windows = new ProductWindowCoordinator(
-					new ElectronProductWindowFactory({
-						production: false,
-						rendererByKind: {
-							launch: join(root, 'launch.html'),
-							authenticated: join(root, 'authenticated.html'),
-							candidate: join(root, 'unavailable.html')
+				const createWindows = (): ProductWindowCoordinator => {
+					if (!service) throw new Error('Authorization service is not initialized');
+					launch?.dispose();
+					launch = new DesktopIdentityCoordinator({
+						target: {
+							release: '1.0.0',
+							buildId: 'test',
+							platform: process.platform,
+							architecture: process.arch,
+							realtimeProtocol: 1,
+							authorizationProtocol: 1
 						},
-						preloadByKind: {
-							launch: join(root, 'launchPreload.cjs'),
-							authenticated: join(root, 'authenticatedPreload.cjs'),
-							candidate: join(root, 'unavailable.cjs')
-						}
-					}),
-					{ accept: () => {} }
-				);
-				windows.openInitial({
-					protocolVersion: 1,
-					kind: 'launch',
-					windowId: 'identity-test-launch'
-				});
+						transport: new HttpServerReadinessTransport(async () => {
+							throw Error('Readiness network is outside this authentication fixture');
+						}),
+						allowDevelopmentLoopback: false,
+						authorization: service
+					});
+					return new ProductWindowCoordinator(
+						new ElectronProductWindowFactory({
+							production: false,
+							account: service,
+							settings: service,
+							launchIdentity: launch,
+							rendererByKind: {
+								launch: join(root, 'launch.html'),
+								authenticated: join(root, 'authenticated.html'),
+								candidate: join(root, 'unavailable.html')
+							},
+							preloadByKind: {
+								launch: join(root, 'launchPreload.cjs'),
+								authenticated: join(root, 'authenticatedPreload.cjs'),
+								candidate: join(root, 'unavailable.cjs')
+							}
+						}),
+						{ accept: () => {} }
+					);
+				};
 				const http = new DesktopAuthHttp(async (input, init) => {
 					const path = new URL(String(input)).pathname;
 					const response = (value: unknown, status = 200): Response =>
@@ -139,6 +159,26 @@ if (probe) {
 							no_current_affiliation: true,
 							no_assigned_access: true
 						});
+					if (path === '/api/v1/users/me')
+						return response({
+							id: principalId,
+							username: 'identity-test',
+							display_name: 'Identity Test',
+							first_name: 'Identity',
+							last_name: 'Test'
+						});
+					if (path === '/api/v1/users/me/settings')
+						return response({
+							source: '{}',
+							revision: 'b'.repeat(26),
+							format_version: 1,
+							updated_at: 0,
+							writable: true
+						});
+					if (path === '/api/v1/authentication-methods')
+						return response({ password: true, providers: [] });
+					if (path === '/api/v1/users/me/mfa') return response({}, 404);
+					if (path.endsWith('/profile-picture')) return response({}, 404);
 					if (path.endsWith('/logout')) return new Response(null, { status: 204 });
 					throw new Error('Unexpected test route');
 				});
@@ -183,6 +223,12 @@ if (probe) {
 						}
 					});
 				service = createService();
+				windows = createWindows();
+				windows.openInitial({
+					protocolVersion: 1,
+					kind: 'launch',
+					windowId: 'identity-test-launch'
+				});
 				await service.start(
 					{
 						origin,
@@ -204,11 +250,7 @@ if (probe) {
 					const check = async (): Promise<void> => {
 						const text: string =
 							await window.webContents.executeJavaScript('document.body.innerText');
-						if (
-							text.includes('Identity Test') &&
-							text.includes('Signed in to Test Institution.')
-						)
-							resolve();
+						if (text.includes('Identity Test') && text.includes('Profile')) resolve();
 						else if (Date.now() > deadline)
 							reject(new Error('Authenticated view did not mount'));
 						else
@@ -232,12 +274,13 @@ if (probe) {
 				);
 				service.dispose();
 				windows.shutdown();
+				service = createService();
+				windows = createWindows();
 				windows.openInitial({
 					protocolVersion: 1,
 					kind: 'launch',
 					windowId: 'identity-test-relaunch'
 				});
-				service = createService();
 				await service.start(
 					{
 						origin,
@@ -264,12 +307,16 @@ if (probe) {
 						signedOut: true
 					})
 				);
-			} catch {
-				console.error('Desktop identity conformance failed.');
+			} catch (error) {
+				console.error(
+					'Desktop identity conformance failed.',
+					error instanceof Error ? error.stack : String(error)
+				);
 				process.exitCode = 1;
 			} finally {
 				service?.dispose();
 				windows?.shutdown();
+				launch?.dispose();
 				await keys.delete(scope);
 				await rm(stateDirectory, { recursive: true, force: true });
 				instanceLock.dispose();
