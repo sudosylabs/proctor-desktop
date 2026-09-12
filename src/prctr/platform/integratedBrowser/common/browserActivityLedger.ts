@@ -8,6 +8,7 @@ import type { BrowserActivityLocation, BrowserBlockedConsequence } from './brows
 import {
 	validateBrowserActivityRecord,
 	type BrowserActivityClock,
+	type BrowserBlockReason,
 	type BrowserActivityDeliveryPort,
 	type BrowserActivityGap,
 	type BrowserActivityIdentity,
@@ -128,6 +129,8 @@ export class BrowserActivityLedger extends Disposable {
 			readonly location?: BrowserActivityLocation;
 			readonly matchedRuleId?: string;
 			readonly blockedConsequence?: BrowserBlockedConsequence;
+			readonly blockReason?: BrowserBlockReason;
+			readonly redirectFromSequence?: number;
 		} = {}
 	): BrowserActivityRecord | undefined {
 		if (this.#state.sealed) throw new Error('Browser Activity source is sealed');

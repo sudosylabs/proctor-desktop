@@ -20,6 +20,12 @@ export interface BrowserActivityScope {
 	readonly policyRevision: string;
 	readonly policyDigest: string;
 }
+export type BrowserBlockReason =
+	| 'scheme_not_allowed'
+	| 'origin_not_allowed'
+	| 'path_not_allowed'
+	| 'redirect_not_allowed'
+	| 'invalid_url';
 export interface BrowserActivityRecord {
 	readonly sourceInstanceId: string;
 	readonly sequence: number;
@@ -29,6 +35,8 @@ export interface BrowserActivityRecord {
 	readonly location?: BrowserActivityLocation;
 	readonly matchedRuleId?: string;
 	readonly blockedConsequence?: BrowserBlockedConsequence;
+	readonly blockReason?: BrowserBlockReason;
+	readonly redirectFromSequence?: number;
 }
 export interface BrowserActivityGap {
 	readonly from: number;
@@ -112,6 +120,8 @@ export function validateBrowserActivityRecord(value: unknown): BrowserActivityRe
 	if (!lifecycle) keys.push('location');
 	if (value.matchedRuleId !== undefined) keys.push('matchedRuleId');
 	if (blocked) keys.push('blockedConsequence');
+	if (value.blockReason !== undefined) keys.push('blockReason');
+	if (value.redirectFromSequence !== undefined) keys.push('redirectFromSequence');
 	if (
 		!hasExactKeys(value, keys) ||
 		!boundedIdentifier(value.sourceInstanceId) ||
@@ -139,7 +149,33 @@ export function validateBrowserActivityRecord(value: unknown): BrowserActivityRe
 		throw new TypeError('Successful Browser Activity requires the matched Browser Policy rule');
 	if (blocked && !isBlockedConsequence(value.blockedConsequence))
 		throw new TypeError('Blocked Browser Activity requires a valid consequence');
+	if (
+		value.blockReason !== undefined &&
+		(!blocked ||
+			![
+				'scheme_not_allowed',
+				'origin_not_allowed',
+				'path_not_allowed',
+				'redirect_not_allowed',
+				'invalid_url'
+			].includes(String(value.blockReason)))
+	)
+		throw new TypeError('Browser block reason is invalid');
+	if (
+		value.redirectFromSequence !== undefined &&
+		((!blocked && value.kind !== 'topLevelRedirect') ||
+			!Number.isSafeInteger(value.redirectFromSequence) ||
+			Number(value.redirectFromSequence) < 1 ||
+			Number(value.redirectFromSequence) >= Number(value.sequence))
+	)
+		throw new TypeError('Browser redirect predecessor is invalid');
 	return Object.freeze({
+		...(value.blockReason === undefined
+			? {}
+			: { blockReason: value.blockReason as BrowserBlockReason }),
+		...(value.redirectFromSequence === undefined
+			? {}
+			: { redirectFromSequence: value.redirectFromSequence as number }),
 		sourceInstanceId: value.sourceInstanceId as string,
 		sequence: value.sequence as number,
 		participationGeneration: value.participationGeneration as number,

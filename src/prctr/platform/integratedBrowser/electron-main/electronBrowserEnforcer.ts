@@ -2,12 +2,15 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { randomUUID } from 'node:crypto';
+import type { BrowserHostFactory } from '../common/browserHostSupervisor.js';
 import {
 	WebContentsView,
 	session,
 	type CallbackResponse,
 	type Event as ElectronEvent,
 	type OnBeforeRequestListenerDetails,
+	type OnBeforeRedirectListenerDetails,
 	type OnCompletedListenerDetails,
 	type OnErrorOccurredListenerDetails,
 	type Session,
@@ -22,6 +25,8 @@ import type {
 } from '../common/browserEnforcement.js';
 import type { IntegratedBrowserSurface } from '../common/browserProtocol.js';
 
+const ownedSessions = new WeakSet<Session>();
+
 export interface ElectronBrowserViewHost {
 	updateSurface(view: WebContentsView, surface: IntegratedBrowserSurface): void;
 	detachAndDestroy(view: WebContentsView): void | Promise<void>;
@@ -29,6 +34,20 @@ export interface ElectronBrowserViewHost {
 export interface ElectronBrowserView {
 	readonly view: WebContentsView;
 	readonly engine: ElectronBrowserEnforcer;
+}
+
+/** Concrete factory selected by the privileged composition root. Each reconstruction has an
+ * unpersisted partition, so paused documents cannot retain a service worker or connection. */
+export function createElectronBrowserHostFactory(
+	host: ElectronBrowserViewHost
+): BrowserHostFactory {
+	return {
+		async create(delegate) {
+			return (
+				await createElectronBrowserView(`prctr-browser-${randomUUID()}`, host, delegate)
+			).engine;
+		}
+	};
 }
 
 export async function createElectronBrowserView(
@@ -39,6 +58,8 @@ export async function createElectronBrowserView(
 	if (!/^prctr-browser-[A-Za-z0-9_-]{16,128}$/u.test(partition))
 		throw new TypeError('Integrated browser partition identity is invalid');
 	const browserSession = session.fromPartition(partition, { cache: false });
+	if (ownedSessions.has(browserSession))
+		throw new Error('Integrated browser partition already has an owner');
 	const view = new WebContentsView({
 		webPreferences: {
 			partition,
@@ -54,6 +75,7 @@ export async function createElectronBrowserView(
 			autoplayPolicy: 'document-user-activation-required'
 		}
 	});
+	ownedSessions.add(browserSession);
 	try {
 		return Object.freeze({
 			view,
@@ -68,6 +90,7 @@ export async function createElectronBrowserView(
 				'Integrated browser view creation and rollback failed'
 			);
 		}
+		ownedSessions.delete(browserSession);
 		throw error;
 	}
 }
@@ -85,6 +108,7 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 	#closed = false;
 	#closePromise: Promise<void> | undefined;
 	#redirectFromRuleId: string | undefined;
+	#redirectPending = false;
 	#surface: IntegratedBrowserSurface = Object.freeze({
 		visible: false,
 		focus: false,
@@ -107,10 +131,31 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 		else this.#redirectFromRuleId = decision.rule.id;
 	};
 	readonly #didNavigate = (_event: ElectronEvent, url: string): void => {
+		this.#delegate.commitTopLevel(url, this.#redirectPending ? 'redirect' : 'navigation');
+		this.#redirectPending = false;
+	};
+	readonly #didNavigateInPage = (
+		_event: ElectronEvent,
+		url: string,
+		isMainFrame: boolean
+	): void => {
+		if (!isMainFrame || this.#blocked || this.#closed) return;
+		const decision = this.#delegate.checkTopLevel(url, 'navigation');
+		if (!decision.allowed) {
+			this.setInputBlocked(true);
+			return;
+		}
 		this.#delegate.commitTopLevel(url, 'navigation');
 	};
-	readonly #didRedirect = (event: ElectronEvent<WebContentsWillRedirectEventParams>): void => {
-		if (event.isMainFrame) this.#delegate.commitTopLevel(event.url, 'redirect');
+	readonly #beforeInput = (
+		event: ElectronEvent,
+		input: { control: boolean; meta: boolean; key: string }
+	): void => {
+		if (
+			this.#blocked ||
+			((input.control || input.meta) && ['p', 's', 'o'].includes(input.key.toLowerCase()))
+		)
+			event.preventDefault();
 	};
 	readonly #willAttachWebview = (event: ElectronEvent): void => {
 		event.preventDefault();
@@ -130,18 +175,14 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 	readonly #didBlur = (): void => {
 		this.#setFocused(false);
 	};
-	readonly #willDownload = (
-		event: ElectronEvent,
-		_item: unknown,
-		contents: WebContents
-	): void => {
-		if (contents.id === this.#contents.id) event.preventDefault();
+	readonly #willDownload = (event: ElectronEvent): void => {
+		event.preventDefault();
 	};
 	readonly #beforeRequest = (
 		details: OnBeforeRequestListenerDetails,
 		callback: (response: CallbackResponse) => void
 	): void => {
-		if (details.webContentsId !== this.#contents.id) {
+		if (this.#blocked || this.#closed || details.webContentsId !== this.#contents.id) {
 			callback({ cancel: true });
 			return;
 		}
@@ -160,6 +201,21 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 			this.#redirectFromRuleId = decision.rule.id;
 		} else this.#requestRuleIds.delete(details.id);
 		callback({ cancel: !decision.allowed });
+	};
+	readonly #beforeRedirect = (details: OnBeforeRedirectListenerDetails): void => {
+		if (
+			this.#blocked ||
+			this.#closed ||
+			details.webContentsId !== this.#contents.id ||
+			details.resourceType !== 'mainFrame'
+		)
+			return;
+		// The HTTP response establishes this successful hop before the destination is contacted.
+		this.#delegate.commitTopLevel(
+			details.url,
+			this.#redirectPending ? 'redirect' : 'navigation'
+		);
+		this.#redirectPending = true;
 	};
 	readonly #requestCompleted = (
 		details: OnCompletedListenerDetails | OnErrorOccurredListenerDetails
@@ -185,19 +241,25 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 			this.#contents.on('will-navigate', this.#willNavigate);
 			this.#contents.on('will-redirect', this.#willRedirect);
 			this.#contents.on('did-navigate', this.#didNavigate);
-			this.#contents.on('did-redirect-navigation', this.#didRedirect);
+			this.#contents.on('did-navigate-in-page', this.#didNavigateInPage);
+			this.#contents.on('before-input-event', this.#beforeInput);
 			this.#contents.on('will-attach-webview', this.#willAttachWebview);
 			this.#contents.on('devtools-opened', this.#devToolsOpened);
 			this.#contents.on('context-menu', this.#contextMenu);
 			this.#contents.on('will-prevent-unload', this.#willPreventUnload);
 			this.#contents.on('focus', this.#didFocus);
 			this.#contents.on('blur', this.#didBlur);
+			this.#session.setDevicePermissionHandler(() => false);
 			this.#session.setPermissionCheckHandler(() => false);
 			this.#session.setPermissionRequestHandler((_contents, _permission, callback) =>
 				callback(false)
 			);
 			this.#session.on('will-download', this.#willDownload);
 			this.#session.webRequest.onBeforeRequest({ urls: ['<all_urls>'] }, this.#beforeRequest);
+			this.#session.webRequest.onBeforeRedirect(
+				{ urls: ['<all_urls>'] },
+				this.#beforeRedirect
+			);
 			this.#session.webRequest.onCompleted({ urls: ['<all_urls>'] }, this.#requestCompleted);
 			this.#session.webRequest.onErrorOccurred(
 				{ urls: ['<all_urls>'] },
@@ -225,7 +287,10 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 		const decision = this.#delegate.checkTopLevel(url, 'navigation');
 		if (!decision.allowed) throw new Error('Integrated browser start location is blocked');
 		this.#redirectFromRuleId = decision.rule.id;
-		await this.#contents.loadURL(decision.navigationUrl);
+		this.#redirectPending = false;
+		await this.#contents.loadURL(decision.navigationUrl).catch(() => {
+			throw new Error('Integrated browser navigation failed');
+		});
 	}
 	async navigate(url: string): Promise<void> {
 		this.#assertLive();
@@ -233,7 +298,10 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 		const decision = this.#delegate.checkTopLevel(url, 'navigation');
 		if (!decision.allowed) return;
 		this.#redirectFromRuleId = decision.rule.id;
-		await this.#contents.loadURL(decision.navigationUrl);
+		this.#redirectPending = false;
+		await this.#contents.loadURL(decision.navigationUrl).catch(() => {
+			throw new Error('Integrated browser navigation failed');
+		});
 	}
 	async back(): Promise<void> {
 		this.#assertInteractive();
@@ -261,11 +329,40 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 	async #performClose(): Promise<void> {
 		this.setInputBlocked(true);
 		if (!this.#contents.isDestroyed()) this.#contents.stop();
+		let acknowledge = () => {};
+		const destroyed = new Promise<void>((resolve) => {
+			acknowledge = resolve;
+		});
+		if (this.#contents.isDestroyed()) acknowledge();
+		else this.#contents.once('destroyed', acknowledge);
+		let timeout: ReturnType<typeof setTimeout> | undefined;
 		try {
-			await this.#host.detachAndDestroy(this.#view);
-		} catch (error) {
-			if (!this.#contents.isDestroyed()) throw error;
+			await Promise.race([
+				(async () => {
+					try {
+						await this.#host.detachAndDestroy(this.#view);
+					} catch (error) {
+						if (!this.#contents.isDestroyed()) throw error;
+					}
+					// WebContents.close() initiates asynchronous native destruction.
+					await destroyed;
+				})(),
+				new Promise<never>((_resolve, reject) => {
+					timeout = setTimeout(
+						() => reject(new Error('Integrated browser native destruction timed out')),
+						5000
+					);
+				})
+			]);
+		} finally {
+			if (timeout) clearTimeout(timeout);
+			this.#contents.off('destroyed', acknowledge);
 		}
+		await this.#session.closeAllConnections();
+		await this.#session.clearStorageData();
+		await this.#session.clearCache();
+		this.#unregister();
+		ownedSessions.delete(this.#session);
 		this.#closed = true;
 	}
 	setSurface(surface: IntegratedBrowserSurface): void {
@@ -332,7 +429,8 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 		this.#contents.off('will-navigate', this.#willNavigate);
 		this.#contents.off('will-redirect', this.#willRedirect);
 		this.#contents.off('did-navigate', this.#didNavigate);
-		this.#contents.off('did-redirect-navigation', this.#didRedirect);
+		this.#contents.off('did-navigate-in-page', this.#didNavigateInPage);
+		this.#contents.off('before-input-event', this.#beforeInput);
 		this.#contents.off('will-attach-webview', this.#willAttachWebview);
 		this.#contents.off('devtools-opened', this.#devToolsOpened);
 		this.#contents.off('context-menu', this.#contextMenu);
@@ -343,14 +441,15 @@ export class ElectronBrowserEnforcer implements PrivilegedBrowserEngine {
 		this.#focusListeners.clear();
 		this.#session.off('will-download', this.#willDownload);
 		this.#session.webRequest.onBeforeRequest(null);
+		this.#session.webRequest.onBeforeRedirect(null);
 		this.#session.webRequest.onCompleted(null);
 		this.#session.webRequest.onErrorOccurred(null);
 		this.#requestRuleIds.clear();
+		this.#session.setDevicePermissionHandler(null);
 		this.#session.setPermissionCheckHandler(null);
 		this.#session.setPermissionRequestHandler(null);
 	}
 	dispose(): void {
-		this.#unregister();
-		void this.close().catch(() => {});
+		void this.close().catch(onUnexpectedError);
 	}
 }
