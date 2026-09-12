@@ -1,3 +1,4 @@
+import { DisposableStore } from '../../src/prctr/base/common/lifecycle.js';
 import { app, BrowserWindow, Menu } from 'electron';
 import {
 	createNativeSecurityComposition,
@@ -29,6 +30,7 @@ const selectedSourceCategories = [
 ] as const;
 const permissionSelection = { selectedSources, selectedSourceCategories } as const;
 
+const nativeCompositions = new DisposableStore();
 let connection: SecurityUtilityConnection | undefined;
 const failures: string[] = [];
 const candidateTrace: string[] = [];
@@ -38,6 +40,7 @@ const harnessTimeout = setTimeout(() => {
 	process.stdout.write(
 		`${JSON.stringify({ error: 'electron_harness_timeout', phase, failures })}\n`
 	);
+	nativeCompositions.dispose();
 	app.exit(1);
 }, 10_000);
 
@@ -50,7 +53,11 @@ void app
 async function runHarness(): Promise<void> {
 	try {
 		phase = 'checking_native_permissions';
-		const nativeSecurity = createNativeSecurityComposition();
+		const nativeSecurity = nativeCompositions.add(
+			createNativeSecurityComposition({
+				isParticipationOrCandidateActive: () => true
+			})
+		);
 		const permissionPreflight =
 			await nativeSecurity.inspectPermissionPreflight(permissionSelection);
 		await nativeSecurity.sealPermissionPreflight(permissionSelection);
@@ -104,7 +111,11 @@ async function runHarness(): Promise<void> {
 			},
 			onFailure: (failure) => failures.push(failure)
 		} as const satisfies Parameters<typeof nativeSecurity.launchSecurityUtility>[0];
-		const failedStartupSecurity = createNativeSecurityComposition();
+		const failedStartupSecurity = nativeCompositions.add(
+			createNativeSecurityComposition({
+				isParticipationOrCandidateActive: () => true
+			})
+		);
 		await failedStartupSecurity.inspectPermissionPreflight(permissionSelection);
 		await failedStartupSecurity.sealPermissionPreflight(permissionSelection);
 		let startupFailureRetainedSeal = false;
@@ -126,7 +137,13 @@ async function runHarness(): Promise<void> {
 		}
 		let unsealedLaunchRejected = false;
 		try {
-			await createNativeSecurityComposition().launchSecurityUtility(launchOptions);
+			await nativeCompositions
+				.add(
+					createNativeSecurityComposition({
+						isParticipationOrCandidateActive: () => true
+					})
+				)
+				.launchSecurityUtility(launchOptions);
 		} catch (error) {
 			unsealedLaunchRejected =
 				error instanceof NativeSecurityCompositionError &&
@@ -214,6 +231,7 @@ async function runHarness(): Promise<void> {
 			})}\n`
 		);
 		clearTimeout(harnessTimeout);
+		nativeCompositions.dispose();
 		app.exit(failures.length === 0 ? 0 : 1);
 	} catch (error) {
 		failHarness(error);
@@ -380,5 +398,6 @@ function failHarness(error?: unknown): void {
 			cause: error instanceof Error ? error.message : undefined
 		})}\n`
 	);
+	nativeCompositions.dispose();
 	app.exit(1);
 }

@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import {
+	NATIVE_BASELINE_CAPABILITIES,
 	NATIVE_CAPABILITY_REGISTRY,
+	NATIVE_CAPABILITY_REGISTRY_DIGEST,
 	NativeCapabilityMatrixError,
 	getNativeCapability,
 	nativeCoverageKeys,
@@ -200,8 +202,11 @@ void test('matrix verification rejects invalid signatures, unavailable claims, a
 	);
 
 	const invalidPermissionEntries = [...matrix.entries];
-	invalidPermissionEntries[0] = {
-		...invalidPermissionEntries[0]!,
+	const permissionIndex = invalidPermissionEntries.findIndex(
+		(entry) => entry.required_permissions.length > 0
+	);
+	invalidPermissionEntries[permissionIndex] = {
+		...invalidPermissionEntries[permissionIndex]!,
 		required_permissions: []
 	};
 	assert.throws(
@@ -248,26 +253,35 @@ void test('matrix verification rejects invalid signatures, unavailable claims, a
 
 function matrixFixture(): NativeCapabilityMatrix {
 	return {
-		schema_version: 2,
-		registry_version: 1,
+		registry_digest: NATIVE_CAPABILITY_REGISTRY_DIGEST,
 		matrix_id: 'development-matrix-v1',
 		release_id: 'desktop-test-v1',
 		target_tuple: 'macos-arm64-test',
-		entries: NATIVE_CAPABILITY_REGISTRY.flatMap((family) =>
-			family.subCapabilities.map((subCapability) => ({
-				coverage_key: subCapability.coverageKey,
-				schema_version: subCapability.schemaVersion,
-				claim: subCapability.permittedClaims.includes('unavailable')
-					? ('unavailable' as const)
-					: (subCapability.permittedClaims[0] ?? 'unavailable'),
-				component_id: `component-${family.id}`,
-				adapter_version: 'adapter-v1',
-				helper_build_id: null,
-				required_permissions: family.permissions.macos,
-				limitations: [],
-				verification: 'unavailable' as const
+		entries: [
+			...NATIVE_CAPABILITY_REGISTRY,
+			...NATIVE_BASELINE_CAPABILITIES.map((baseline) => ({
+				id: baseline.id,
+				permissions: baseline.permissions,
+				subCapabilities: [baseline]
 			}))
-		)
+		]
+			.flatMap((family) =>
+				family.subCapabilities.map((subCapability) => ({
+					coverage_key: subCapability.coverageKey,
+					source_schema_digest: subCapability.sourceSchemaDigest,
+					claim: subCapability.permittedClaims.includes('unavailable')
+						? ('unavailable' as const)
+						: (subCapability.permittedClaims[0] ?? 'unavailable'),
+					component_id: `component-${family.id}`,
+					adapter_version: 'adapter-v1',
+					required_permissions: family.permissions.macos,
+					limitations: [],
+					verification: 'unavailable' as const
+				}))
+			)
+			.sort((a, b) =>
+				a.coverage_key < b.coverage_key ? -1 : a.coverage_key > b.coverage_key ? 1 : 0
+			)
 	};
 }
 
@@ -279,7 +293,9 @@ function matrixExpectation(matrix: NativeCapabilityMatrix) {
 			coverage_key: entry.coverage_key,
 			component_id: entry.component_id,
 			adapter_version: entry.adapter_version,
-			helper_build_id: entry.helper_build_id
+			...(entry.helper_build_id === undefined
+				? {}
+				: { helper_build_id: entry.helper_build_id })
 		}))
 	} as const;
 }

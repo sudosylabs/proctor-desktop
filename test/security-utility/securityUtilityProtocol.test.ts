@@ -12,6 +12,8 @@ import {
 	SECURITY_UTILITY_STARTUP_TIMEOUT_MS,
 	SECURITY_UTILITY_HEARTBEAT_TIMEOUT_MS,
 	isNativeBridgeManifest,
+	isNativeSupervisorPoll,
+	isNativeSupervisorStop,
 	isSecurityUtilityBootstrap,
 	type NativeBaselineDriver
 } from '../../src/prctr/platform/native/common/securityUtilityProtocol.ts';
@@ -524,6 +526,7 @@ void test('main rejects later utility output from a source outside the sealed su
 		poll: {
 			state: 'healthy',
 			opened_snapshots: [snapshots[1]],
+			final_snapshots: [],
 			batches: [],
 			transitions: []
 		}
@@ -550,12 +553,14 @@ void test('main and utility complete the authenticated lifecycle over a private 
 		pollBaseline: () => ({
 			state: 'healthy',
 			opened_snapshots: [],
+			final_snapshots: [],
 			batches: [],
 			transitions: []
 		}),
 		stopBaseline: () => ({
 			state: 'stopped',
 			batches: [],
+			final_snapshots: [],
 			process_replacement_required: false
 		})
 	};
@@ -617,12 +622,14 @@ void test('candidate ingress stays bounded and reports the exact sender-side los
 		pollBaseline: () => ({
 			state: 'healthy',
 			opened_snapshots: [],
+			final_snapshots: [],
 			batches: [],
 			transitions: []
 		}),
 		stopBaseline: () => ({
 			state: 'stopped',
 			batches: [],
+			final_snapshots: [],
 			process_replacement_required: false
 		})
 	};
@@ -682,12 +689,14 @@ void test('shutdown compacts the maximum pending ingress into one exact loss mar
 		pollBaseline: () => ({
 			state: 'healthy',
 			opened_snapshots: [],
+			final_snapshots: [],
 			batches: [],
 			transitions: []
 		}),
 		stopBaseline: () => ({
 			state: 'stopped',
 			batches: [],
+			final_snapshots: [],
 			process_replacement_required: false
 		})
 	};
@@ -738,12 +747,14 @@ void test('native ingress drops remain ordered so a later event can expose the e
 		pollBaseline: () => ({
 			state: 'healthy',
 			opened_snapshots: [],
+			final_snapshots: [],
 			batches: [],
 			transitions: []
 		}),
 		stopBaseline: () => ({
 			state: 'stopped',
 			batches: [],
+			final_snapshots: [],
 			process_replacement_required: false
 		})
 	};
@@ -825,7 +836,13 @@ void test('supervisor polls do not conceal a missing utility heartbeat', async (
 			message_sequence: nextSequence,
 			participation_generation: 'participation-generation-0001',
 			delivered_at_wall_time_unix_ms: 1,
-			poll: { state: 'healthy', opened_snapshots: [], batches: [], transitions: [] }
+			poll: {
+				state: 'healthy',
+				opened_snapshots: [],
+				batches: [],
+				final_snapshots: [],
+				transitions: []
+			}
 		});
 		nextSequence += 1;
 	}, 100);
@@ -853,6 +870,7 @@ void test('utility fails closed when the main side does not acknowledge bounded 
 			return {
 				state: healthy ? 'healthy' : 'degraded',
 				opened_snapshots: [],
+				final_snapshots: [],
 				batches: [],
 				transitions: []
 			};
@@ -860,6 +878,7 @@ void test('utility fails closed when the main side does not acknowledge bounded 
 		stopBaseline: () => ({
 			state: 'stopped',
 			batches: [],
+			final_snapshots: [],
 			process_replacement_required: false
 		})
 	};
@@ -897,12 +916,14 @@ void test('main fails closed when a supervisor poll cannot be delivered', async 
 		pollBaseline: () => ({
 			state: 'healthy',
 			opened_snapshots: [],
+			final_snapshots: [],
 			batches: [],
 			transitions: []
 		}),
 		stopBaseline: () => ({
 			state: 'stopped',
 			batches: [],
+			final_snapshots: [],
 			process_replacement_required: false
 		})
 	};
@@ -1030,3 +1051,81 @@ async function waitUntil(predicate: () => boolean, timeoutMs = 2_000): Promise<v
 	}
 	await eventLoopTurn();
 }
+
+void test('supervisor final snapshots survive strict poll and stop validation', () => {
+	const final = {
+		...snapshots[0],
+		snapshot: { ...snapshots[0].snapshot, health: 'stopped', sequence: 3 }
+	};
+	const poll = {
+		state: 'degraded',
+		opened_snapshots: [],
+		final_snapshots: [final],
+		batches: [],
+		transitions: []
+	};
+	const stop = {
+		state: 'stopped',
+		final_snapshots: [final],
+		batches: [],
+		process_replacement_required: false
+	};
+	assert.equal(isNativeSupervisorPoll(poll), true);
+	assert.equal(isNativeSupervisorStop(stop), true);
+	for (const final_snapshots of [
+		undefined,
+		null,
+		Array(SECURITY_UTILITY_SOURCE_COUNT + 1).fill(final),
+		[{ ...final, snapshot: { ...final.snapshot, sequence: -1 } }]
+	]) {
+		assert.equal(isNativeSupervisorPoll({ ...poll, final_snapshots }), false);
+		assert.equal(isNativeSupervisorStop({ ...stop, final_snapshots }), false);
+	}
+});
+
+void test('a simultaneous failure poll retains both helper loss fences within its bounded envelope', () => {
+	const batches = snapshots.flatMap(({ source, snapshot }) => {
+		const drain = {
+			source,
+			batch: {
+				source_instance_id: snapshot.source_instance_id,
+				health: 'failed',
+				terminal_error: 'backend',
+				observations: [],
+				resets: []
+			}
+		};
+		if (source !== 'process-application' && source !== 'interactive-session') {
+			return [drain, drain];
+		}
+		return [
+			drain,
+			{
+				source,
+				batch: {
+					...drain.batch,
+					resets: [
+						{
+							source_instance_id: snapshot.source_instance_id,
+							sequence: 2,
+							observed_at: timestamp,
+							gap: { first_missing: 1, last_missing: 1 },
+							reason: 'native-helper-event-loss'
+						}
+					]
+				}
+			},
+			drain
+		];
+	});
+	const poll = {
+		state: 'degraded',
+		opened_snapshots: [],
+		final_snapshots: [],
+		transitions: [],
+		batches
+	};
+	assert.equal(batches.length, SECURITY_UTILITY_SOURCE_COUNT * 2 + 2);
+	assert.equal(isNativeSupervisorPoll(poll), true);
+	assert.equal(isNativeSupervisorPoll({ ...poll, batches: [...batches, batches[0]] }), false);
+});

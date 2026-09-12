@@ -64,15 +64,35 @@ checks the spawned child image path before the nonce handshake. macOS resolves
 the live child with Security.framework and checks its designated requirement;
 neither target trusts a path-only post-spawn verification. Helper output uses one
 generated discriminated envelope and source-owned lifecycle fences. The current
-helper binary
-returns explicit unavailable snapshots; it is transport scaffolding, not the
-Windows service or entitled macOS observation implementation, and it is not yet
-part of packaged process composition.
+helper binary's ordinary stdio entrypoint returns explicit unavailable snapshots
+and is not yet part of privileged packaged service composition. The macOS source
+also includes kernel audit-token peer verification, a bounded audit inventory and
+an ES notification adapter with generation-aware bootstrap reconciliation.
+Its bounded signing worker binds secured executable metadata to an exact kernel
+audit token and exec generation; absent required fields remain unavailable.
+Exec/exit transitions awaiting identity retain their ordered history under bounded
+source credits and publish Partial coverage until settlement completes. Poll limits
+cannot discard accepted transitions or replace their original terminal failure;
+an SDK timeout remains a cleanup failure even if the SDK later returns.
+Its passive startup requires natural event boundaries before and after inventory;
+quiet startup, gaps, muted lifecycle events and expired deadlines cannot produce
+a complete snapshot. Windows includes a bounded ETW notification feed and a
+service-owned WTS dispatcher with asynchronous session reconciliation, retained
+logon identity, minimized callbacks and bounded close tails. The helper bridge
+preserves event capture times and pending reconciliation. Kernel pipe/token
+binding accepts an already code-verified retained client process handle; it does
+not supply that executable proof. The Windows process inventory/reducer retains
+exact process lifetimes and account scope, but its unproved ETW prefix barrier
+remains unavailable. These components do not establish installed
+service activation, complete Windows executable identity, complete Windows process
+bootstrap or macOS all-interactive-session coverage.
 
-A generated family/sub-capability registry with authoritative per-family modes,
+A generated family/sub-capability registry with exact registry and source-schema
+digests, mandatory display/window/capture/content-protection baseline claims,
+authoritative per-family modes,
 bounded family-policy schema references and per-platform coverage keys,
 fail-closed signed-matrix parser
-and signature-verifier boundary, bounded CandidateWindow-only private clipboard,
+and privileged pinned-Ed25519-key verifier, bounded CandidateWindow-only private clipboard,
 and closed candidate print-command denial gate are implemented and interface-
 tested. Electron main also owns the implemented CandidateWindow
 constructor/enforcer and preflight-only permission broker. The Attempt-scoped
@@ -167,9 +187,13 @@ their state models, platform adapters, normalization, and focused tests.
 `prctr-native-helper-protocol` binds the generated process/session helper wire
 contract to a verified peer identity, fresh channel nonce, and frame boundary;
 it contains no executable or OS transport. `prctr-native-security-helper` owns
-the exact-path signature check, private inherited-pipe transport, packaged
-helper entrypoint, and its deliberately unavailable placeholder states until
-the privileged target adapters are implemented.
+the exact-path signature check, inherited-pipe and authenticated macOS service
+transports, fixed supervisor/worker entrypoints, and unavailable responses for
+unimplemented target sources. The macOS launchd service retains the worker process
+and acknowledges stop only after observing its exit. A nonce-free acceptance
+marker precedes reciprocal code verification; the marker conveys no authority.
+Explicit main-owned service registration is separate from permission and source
+readiness, and is blocked during preflight or active participation.
 The launcher generates each nonce internally, consumes one launch authority,
 applies one absolute startup deadline across path/signature verification,
 nonce generation, process creation, live-process verification, pipe setup, and
@@ -184,16 +208,16 @@ entries.
 Current source adapters make the following development-runtime claims. They are
 not signed release-matrix or packaged-support claims:
 
-| Family              | Windows source                                                                                                       | macOS source                                                                                               | Linux source                                                                                                                                                    |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Process/application | Current-session Toolhelp snapshot, partial, identity unavailable                                                     | Declared running-application snapshot, partial, identity unavailable                                       | Same-account `/proc` snapshot with session scope `unknown`, partial, identity unavailable                                                                       |
-| Interactive session | WTS human-session snapshot, partial                                                                                  | Unavailable until the approved helper exists                                                               | logind human-session snapshot when present, partial                                                                                                             |
-| Clipboard           | Content-free change counter, partial                                                                                 | Content-free pasteboard change counter, partial                                                            | Unavailable across generic X11/Wayland                                                                                                                          |
-| Print spooler       | Active local scheduler-job counts from field-selective owner/status notifications, partial                           | Unavailable until a bounded IPP query replaces unbounded CUPS enumeration                                  | Unavailable until a bounded IPP query replaces unbounded CUPS enumeration                                                                                       |
-| Removable storage   | Mounted removable-volume snapshot keyed internally by volume GUID and emitted with Attempt-keyed pseudonyms, partial | Mounted removable-volume snapshot with Attempt-keyed pseudonyms, partial                                   | Sysfs-marked removable block inventory and base/partition mount state with Attempt-keyed pseudonyms, partial; no generic portable/MTP claim                     |
-| Virtualization      | CPUID recognized-guest/Hyper-V-root classification                                                                   | Unavailable through public generic APIs                                                                    | Recognized-guest marker classification with explicit uncertainty                                                                                                |
-| Network             | Active tunnel classes, adapter-topology generation, and system-proxy presence, partial                               | Active tunnel classes and interface-topology generation, partial; route and system-proxy facts unavailable | Active tunnel classes plus IPv4 route/interface generation, partial                                                                                             |
-| Camera/microphone   | Endpoint presence only; permission/readiness/concurrent use remain unknown                                           | AVFoundation permission, device-input readiness probe, endpoint count, and documented concurrent use       | Camera unavailable until bounded V4L2 capture-capability inspection exists; microphone endpoint presence only, with permission/readiness/concurrent use unknown |
+| Family              | Windows source                                                                                                       | macOS source                                                                                                                                         | Linux source                                                                                                                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Process/application | Current-session Toolhelp snapshot, partial, identity unavailable                                                     | Declared running-application snapshot, partial, identity unavailable                                                                                 | Same-account `/proc` snapshot with session scope `unknown`, partial, identity unavailable                                                                       |
+| Interactive session | WTS human-session snapshot, partial                                                                                  | Unavailable until the approved helper exists                                                                                                         | logind human-session snapshot when present, partial                                                                                                             |
+| Clipboard           | Content-free change counter, partial                                                                                 | Content-free pasteboard change counter, partial                                                                                                      | Unavailable across generic X11/Wayland                                                                                                                          |
+| Print spooler       | Active local scheduler-job counts from field-selective owner/status notifications, partial                           | Unavailable until a bounded IPP query replaces unbounded CUPS enumeration                                                                            | Unavailable until a bounded IPP query replaces unbounded CUPS enumeration                                                                                       |
+| Removable storage   | Mounted removable-volume snapshot keyed internally by volume GUID and emitted with Attempt-keyed pseudonyms, partial | Mounted removable-volume snapshot with Attempt-keyed pseudonyms, partial                                                                             | Sysfs-marked removable block inventory and base/partition mount state with Attempt-keyed pseudonyms, partial; no generic portable/MTP claim                     |
+| Virtualization      | CPUID recognized-guest/Hyper-V-root classification                                                                   | Unavailable through public generic APIs                                                                                                              | Recognized-guest marker classification with explicit uncertainty                                                                                                |
+| Network             | Active tunnel classes, adapter-topology generation, and system-proxy presence, partial                               | Active tunnel classes, interface-topology generation, and bounded system-proxy enable flags, partial; actual route and managed-VPN facts unavailable | Active tunnel classes plus IPv4 route/interface generation, partial                                                                                             |
+| Camera/microphone   | Endpoint presence only; permission/readiness/concurrent use remain unknown                                           | AVFoundation permission, device-input readiness probe, endpoint count, and documented concurrent use                                                 | Camera unavailable until bounded V4L2 capture-capability inspection exists; microphone endpoint presence only, with permission/readiness/concurrent use unknown |
 
 Snapshot adapters start observation before their initial query, coalesce equal
 states, fence final snapshots, and fall back to explicit unavailable coverage
@@ -219,7 +243,13 @@ emitted.
 
 Raw source timestamps are process-local monotonic values. Wall-clock time is
 added only when the privileged utility delivers an initial snapshot or poll to
-Electron main. Inventory bounds fail with the distinct
+Electron main. Delayed process transitions retain a bounded `capture_delay_ns`:
+the original source-ingress capture is the enclosing observation timestamp minus
+this duration. This denotes adapter receipt, not kernel event-generation time.
+Publication remains monotonic while identity verification settles;
+translating or advancing the publication clock must preserve that capture time.
+Absent delay means no deferred capture, and delay may never precede the source
+time origin. Inventory bounds fail with the distinct
 `inventory_overflow` category rather than being collapsed into a backend
 failure.
 
@@ -228,11 +258,22 @@ endpoint categories only: any selected denial, restriction, undetermined, or
 unavailable state prevents an aggregate `granted` claim. Per-endpoint permission
 remains authoritative for camera- versus microphone-specific policy.
 
+Electron main invalidates a running native source lifetime on suspend, resume,
+screen lock/unlock, and interactive-user transitions. It terminally fences the
+utility before another heartbeat can be accepted, removes the OS callbacks,
+and requires a fresh admission/security lifetime. These are operational gaps,
+not misconduct observations.
+
 The snapshot-only process and session adapters cannot authorize an application,
 prove complete lifecycle coverage, or satisfy an enforced single-session gate.
 Those claims still require the signed ETW/WTS service or approved Endpoint
-Security helper. No such executable, authenticated OS transport, packaged
-capability matrix, or certified target tuple exists yet.
+Security helper. The macOS service transport and process-source composition exist
+in source, but no installed signed service, packaged capability matrix, or
+certified target tuple is established. Complete macOS interactive-session coverage
+and Windows service activation/complete ETW bootstrap remain unavailable.
+The helper-backed supervisor preserves capture timing, bounds retained observations
+and close tails together, reserves reset controls, and delivers terminal snapshots
+through the private Node and utility/main contracts.
 
 ## Passive observation sources
 
@@ -574,6 +615,14 @@ versions, static target-specific required permissions, each sub-capability's
 `enforce`/`observe`/`unavailable` result, known limitations, and verification
 result. A failed, skipped, flaky, stale, or absent required target test removes
 the claim or blocks release; it never inherits the prior matrix entry.
+The matrix uses the same `registry_digest`, `source_schema_digest`, sorted
+coverage entries, and optional helper identity as the server contract. The
+privileged verifier pins bounded Ed25519 public keys supplied by the release
+composition, verifies the exact signed UTF-8 payload, checks its release-manifest
+SHA-256 identity, then validates the target, complete coverage set, and running
+adapter identities. No network key discovery or unsigned development bypass is
+provided. Verifying an unavailable matrix does not qualify a target; preflight
+separately requires passed enforcement for every mandatory baseline claim.
 Current permission state is inspected separately during the candidate's frozen
 preflight selection; denial degrades observe mode or blocks enforce mode and is
 never signed into the release matrix.

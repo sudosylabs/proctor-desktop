@@ -1,9 +1,11 @@
 import {
+	NATIVE_BASELINE_CAPABILITIES_DATA,
 	NATIVE_CAPABILITY_REGISTRY_DATA,
+	NATIVE_CAPABILITY_REGISTRY_DIGEST,
 	NATIVE_CAPABILITY_REGISTRY_VERSION
 } from './nativeCapabilityRegistry.generated.js';
 
-export { NATIVE_CAPABILITY_REGISTRY_VERSION };
+export { NATIVE_CAPABILITY_REGISTRY_VERSION, NATIVE_CAPABILITY_REGISTRY_DIGEST };
 
 export type NativeCapabilityMode = 'disabled' | 'observe' | 'enforce';
 export type NativeCapabilityClaim = 'observe' | 'enforce' | 'unavailable';
@@ -18,6 +20,7 @@ export type NativeClosedEffect =
 export type NativeSubCapabilityDescriptor = {
 	readonly id: string;
 	readonly schemaVersion: number;
+	readonly sourceSchemaDigest: string;
 	readonly coverageKey: string;
 	readonly permittedClaims: readonly NativeCapabilityClaim[];
 	readonly platformCoverageKeys: Readonly<Record<'windows' | 'macos' | 'linux', string>>;
@@ -40,10 +43,21 @@ export type NativeCapabilityDescriptor = {
 export const NATIVE_CAPABILITY_REGISTRY =
 	NATIVE_CAPABILITY_REGISTRY_DATA satisfies readonly NativeCapabilityDescriptor[];
 
+export type NativeBaselineCapabilityDescriptor = NativeSubCapabilityDescriptor & {
+	readonly sourceId?: string;
+	readonly permissions: NativeCapabilityDescriptor['permissions'];
+};
+
+export const NATIVE_BASELINE_CAPABILITIES =
+	NATIVE_BASELINE_CAPABILITIES_DATA satisfies readonly NativeBaselineCapabilityDescriptor[];
+
 const registryById = new Map<string, NativeCapabilityDescriptor>(
 	NATIVE_CAPABILITY_REGISTRY.map((descriptor) => [descriptor.id, descriptor])
 );
 const subCapabilityByCoverageKey = new Map<string, NativeSubCapabilityDescriptor>();
+for (const descriptor of NATIVE_BASELINE_CAPABILITIES) {
+	subCapabilityByCoverageKey.set(descriptor.coverageKey, descriptor);
+}
 for (const descriptor of NATIVE_CAPABILITY_REGISTRY) {
 	for (const subCapabilityDescriptor of descriptor.subCapabilities) {
 		if (subCapabilityByCoverageKey.has(subCapabilityDescriptor.coverageKey)) {
@@ -70,26 +84,24 @@ export function nativeCoverageKeys(): readonly string[] {
 	return [...subCapabilityByCoverageKey.keys()];
 }
 
-export const NATIVE_CAPABILITY_MATRIX_SCHEMA_VERSION = 2;
 export const MAX_NATIVE_CAPABILITY_MATRIX_BYTES = 65_536;
 const MAX_SIGNATURE_LENGTH = 4_096;
 const IDENTIFIER_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,127})$/u;
 
 export type NativeCapabilityMatrixEntry = {
 	readonly coverage_key: string;
-	readonly schema_version: number;
+	readonly source_schema_digest: string;
 	readonly claim: NativeCapabilityClaim;
 	readonly component_id: string;
 	readonly adapter_version: string;
-	readonly helper_build_id: string | null;
+	readonly helper_build_id?: string;
 	readonly required_permissions: readonly Exclude<NativePermissionKind, 'none'>[];
 	readonly limitations: readonly string[];
 	readonly verification: 'passed' | 'unavailable';
 };
 
 export type NativeCapabilityMatrix = {
-	readonly schema_version: 2;
-	readonly registry_version: number;
+	readonly registry_digest: string;
 	readonly matrix_id: string;
 	readonly release_id: string;
 	readonly target_tuple: string;
@@ -182,15 +194,13 @@ export function isNativeCapabilityMatrix(value: unknown): value is NativeCapabil
 	if (
 		!isObject(value) ||
 		!hasOnlyKeys(value, [
-			'schema_version',
-			'registry_version',
+			'registry_digest',
 			'matrix_id',
 			'release_id',
 			'target_tuple',
 			'entries'
 		]) ||
-		value.schema_version !== NATIVE_CAPABILITY_MATRIX_SCHEMA_VERSION ||
-		value.registry_version !== NATIVE_CAPABILITY_REGISTRY_VERSION ||
+		value.registry_digest !== NATIVE_CAPABILITY_REGISTRY_DIGEST ||
 		!isIdentifier(value.matrix_id) ||
 		!isIdentifier(value.release_id) ||
 		!isIdentifier(value.target_tuple) ||
@@ -200,20 +210,23 @@ export function isNativeCapabilityMatrix(value: unknown): value is NativeCapabil
 		return false;
 
 	const coverageKeys = new Set<string>();
+	let previousCoverageKey = '';
 	for (const candidate of value.entries) {
 		if (
 			!isMatrixEntry(candidate, targetPlatform(value.target_tuple)) ||
-			coverageKeys.has(candidate.coverage_key)
+			coverageKeys.has(candidate.coverage_key) ||
+			candidate.coverage_key <= previousCoverageKey
 		)
 			return false;
 		const descriptor = getNativeSubCapabilityByCoverageKey(candidate.coverage_key);
 		if (
 			descriptor === undefined ||
-			descriptor.schemaVersion !== candidate.schema_version ||
+			descriptor.sourceSchemaDigest !== candidate.source_schema_digest ||
 			!descriptor.permittedClaims.includes(candidate.claim)
 		)
 			return false;
 		coverageKeys.add(candidate.coverage_key);
+		previousCoverageKey = candidate.coverage_key;
 	}
 	return nativeCoverageKeys().every((key) => coverageKeys.has(key));
 }
@@ -241,22 +254,23 @@ function isMatrixEntry(
 		platform !== undefined &&
 		hasOnlyKeys(value, [
 			'coverage_key',
-			'schema_version',
+			'source_schema_digest',
 			'claim',
 			'component_id',
 			'adapter_version',
-			'helper_build_id',
+			...(Object.hasOwn(value, 'helper_build_id') ? ['helper_build_id'] : []),
 			'required_permissions',
 			'limitations',
 			'verification'
 		]) &&
 		typeof value.coverage_key === 'string' &&
 		getNativeSubCapabilityByCoverageKey(value.coverage_key) !== undefined &&
-		Number.isSafeInteger(value.schema_version) &&
+		typeof value.source_schema_digest === 'string' &&
+		/^sha256:[a-f0-9]{64}$/u.test(value.source_schema_digest) &&
 		(value.claim === 'observe' || value.claim === 'enforce' || value.claim === 'unavailable') &&
 		isIdentifier(value.component_id) &&
 		isIdentifier(value.adapter_version) &&
-		(value.helper_build_id === null || isIdentifier(value.helper_build_id)) &&
+		(!Object.hasOwn(value, 'helper_build_id') || isIdentifier(value.helper_build_id)) &&
 		isRequiredPermissions(value.required_permissions, value.coverage_key, platform) &&
 		isBoundedIdentifierArray(value.limitations, 16) &&
 		(value.verification === 'passed' || value.verification === 'unavailable') &&
@@ -272,7 +286,9 @@ function isRequiredPermissions(
 	platform: 'windows' | 'macos' | 'linux'
 ): value is readonly Exclude<NativePermissionKind, 'none'>[] {
 	if (!Array.isArray(value) || value.length > 8) return false;
-	const capability = capabilityForCoverageKey(coverageKey);
+	const capability =
+		NATIVE_BASELINE_CAPABILITIES.find((entry) => entry.coverageKey === coverageKey) ??
+		capabilityForCoverageKey(coverageKey);
 	if (capability === undefined) return false;
 	const expected = capability.permissions[platform];
 	if (value.length !== expected.length) return false;

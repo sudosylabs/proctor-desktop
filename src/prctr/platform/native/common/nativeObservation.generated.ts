@@ -191,6 +191,11 @@ function hasCoherentProcessApplicationEvent(value: JsonObject): boolean {
     && value.process.process_instance_id === value.process_instance_id;
 }
 
+function hasCoherentProcessCaptureTime(event: unknown, timestamp: unknown): boolean {
+  return isProcessApplicationEvent(event) && typeof timestamp === "number"
+    && (event.capture_delay_ns ?? 0) <= timestamp;
+}
+
 function hasCoherentInteractiveSessionState(value: JsonObject): boolean {
   if (value.coverage === 'unavailable') return value.certainty === 'unknown'
     && value.console_ownership === 'unknown' && value.lock_state === 'unknown'
@@ -286,6 +291,7 @@ function hasCoherentHelperSourceOpen(value: JsonObject): boolean {
 function hasCoherentHelperObservation(value: JsonObject): boolean {
   return value.source_kind === 'process_application'
     ? isProcessApplicationEvent(value.process_event)
+      && hasCoherentProcessCaptureTime(value.process_event, value.monotonic_time_ns)
       && value.interactive_session_event === undefined
     : value.source_kind === 'interactive_session'
       && isInteractiveSessionEvent(value.interactive_session_event)
@@ -541,6 +547,63 @@ export function isDisplayTopologyDrain(value: unknown): value is DisplayTopology
     && Object.hasOwn(value, "resets") && isBoundedArray(value.resets, 1024, isSourceReset)
     && (!Object.hasOwn(value, "terminal_error") || isSourceFailureCode(value.terminal_error))
     && hasCoherentSourceBatch(value.source_instance_id, value.health, value.observations, value.resets, value.terminal_error, MAX_DISPLAY_TOPOLOGY_FACTS, isDisplayTopologyObservation)
+}
+
+export type HelperServiceRequestKind = "open" | "attach" | "stop";
+
+export function isHelperServiceRequestKind(value: unknown): value is HelperServiceRequestKind {
+  return value === "open" || value === "attach" || value === "stop";
+}
+
+export type HelperServiceResponseKind = "ready" | "started" | "stopped";
+
+export function isHelperServiceResponseKind(value: unknown): value is HelperServiceResponseKind {
+  return value === "ready" || value === "started" || value === "stopped";
+}
+
+export interface HelperServiceRequest {
+  readonly protocol_version: number;
+  readonly channel_nonce: string;
+  readonly kind: HelperServiceRequestKind;
+}
+
+export function isHelperServiceRequest(value: unknown): value is HelperServiceRequest {
+  return isJsonObject(value)
+    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "kind"])
+    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
+    && Object.hasOwn(value, "kind") && isHelperServiceRequestKind(value.kind)
+    && hasValidHelperChannelNonce(value)
+}
+
+export interface HelperServiceResponse {
+  readonly protocol_version: number;
+  readonly channel_nonce: string;
+  readonly kind: HelperServiceResponseKind;
+}
+
+export function isHelperServiceResponse(value: unknown): value is HelperServiceResponse {
+  return isJsonObject(value)
+    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "kind"])
+    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
+    && Object.hasOwn(value, "kind") && isHelperServiceResponseKind(value.kind)
+    && hasValidHelperChannelNonce(value)
+}
+
+export interface HelperServiceWorkerBootstrap {
+  readonly protocol_version: number;
+  readonly channel_nonce: string;
+  readonly client_designated_requirement: string;
+}
+
+export function isHelperServiceWorkerBootstrap(value: unknown): value is HelperServiceWorkerBootstrap {
+  return isJsonObject(value)
+    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "client_designated_requirement"])
+    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
+    && Object.hasOwn(value, "client_designated_requirement") && hasCodePointLength(value.client_designated_requirement, 1, 2048)
+    && hasValidHelperChannelNonce(value)
 }
 
 export type HelperKind = "windows_security_service" | "macos_endpoint_security_helper";
@@ -1120,6 +1183,7 @@ export function isProcessApplicationEventKind(value: unknown): value is ProcessA
 
 export interface ProcessApplicationEvent {
   readonly kind: ProcessApplicationEventKind;
+  readonly capture_delay_ns?: number;
   readonly process_instance_id?: string;
   readonly process?: ProcessApplicationProcess;
   readonly state?: ProcessApplicationState;
@@ -1127,8 +1191,9 @@ export interface ProcessApplicationEvent {
 
 export function isProcessApplicationEvent(value: unknown): value is ProcessApplicationEvent {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["kind", "process_instance_id", "process", "state"])
+    && hasOnlyKeys(value, ["kind", "capture_delay_ns", "process_instance_id", "process", "state"])
     && Object.hasOwn(value, "kind") && isProcessApplicationEventKind(value.kind)
+    && (!Object.hasOwn(value, "capture_delay_ns") || isBoundedInteger(value.capture_delay_ns, 0, 9007199254740991))
     && (!Object.hasOwn(value, "process_instance_id") || hasCodePointLength(value.process_instance_id, 16, 64))
     && (!Object.hasOwn(value, "process") || isProcessApplicationProcess(value.process))
     && (!Object.hasOwn(value, "state") || isProcessApplicationState(value.state))
@@ -1180,6 +1245,7 @@ export function isProcessApplicationObservation(value: unknown): value is Proces
     && (!Object.hasOwn(value, "gap") || isSequenceGap(value.gap))
     && Object.hasOwn(value, "event") && isProcessApplicationEvent(value.event)
     && gapEndsImmediatelyBeforeSequence(value.gap, value.sequence)
+    && isSourceTimestamp(value.observed_at) && hasCoherentProcessCaptureTime(value.event, value.observed_at.monotonic_time_ns)
 }
 
 export interface ProcessApplicationDrain {

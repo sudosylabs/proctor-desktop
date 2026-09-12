@@ -228,6 +228,7 @@ export class SecurityUtilityHost {
 		if (
 			!stateChanged &&
 			poll.opened_snapshots.length === 0 &&
+			poll.final_snapshots.length === 0 &&
 			poll.batches.length === 0 &&
 			poll.transitions.length === 0
 		)

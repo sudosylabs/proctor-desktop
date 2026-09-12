@@ -475,3 +475,44 @@ function osPermissionAdapter(
 function hasErrorCode(error: unknown, code: NativePermissionBrokerError['code']): boolean {
 	return error instanceof NativePermissionBrokerError && error.code === code;
 }
+
+void test('disposal permanently invalidates pending OS permission callbacks', async () => {
+	const pending = Promise.withResolvers<PermissionState>();
+	const broker = new NativePermissionBroker({
+		adapters: createBaselineNativePermissionAdapters('macos', {
+			inspect: () => pending.promise
+		})
+	});
+	const sealed = broker.sealPreflight(['camera']);
+	broker.dispose();
+	pending.resolve('granted');
+	await assert.rejects(
+		sealed,
+		(error: unknown) =>
+			error instanceof NativePermissionBrokerError && error.code === 'preflight_cancelled'
+	);
+	await assert.rejects(
+		broker.inspectPreflight(['camera']),
+		(error: unknown) =>
+			error instanceof NativePermissionBrokerError && error.code === 'disposed'
+	);
+	assert.throws(
+		() => broker.cancelPreflight(),
+		(error: unknown) =>
+			error instanceof NativePermissionBrokerError && error.code === 'disposed'
+	);
+	broker.dispose();
+});
+
+void test('disposing a sealed broker is not a reusable normal preflight release', async () => {
+	const broker = new NativePermissionBroker({
+		adapters: createBaselineNativePermissionAdapters('macos')
+	});
+	const { seal } = await broker.sealPreflight(['candidate-window']);
+	broker.dispose();
+	assert.throws(
+		() => broker.releasePreflightSeal(seal),
+		(error: unknown) =>
+			error instanceof NativePermissionBrokerError && error.code === 'disposed'
+	);
+});

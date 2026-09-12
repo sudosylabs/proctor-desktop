@@ -1,7 +1,30 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Proctor contributors. All rights reserved.
+ *--------------------------------------------------------------------------------------------*/
+
+import { createDecorator } from '../../instantiation/common/instantiation.js';
+
 export type SecurityUtilityLifecycleState =
 	'idle' | 'starting' | 'active' | 'stopping' | 'failed_closed';
 
-export class SecurityUtilityLifecycle {
+export const ISecurityUtilityLifecycle = createDecorator<ISecurityUtilityLifecycle>(
+	'securityUtilityLifecycle'
+);
+
+/** One monotonic utility lifetime. A failed generation can never become active again. */
+export interface ISecurityUtilityLifecycle {
+	readonly _serviceBrand: undefined;
+	readonly state: SecurityUtilityLifecycleState;
+	beginLaunch(): number | undefined;
+	activate(generation: number): boolean;
+	beginStopping(generation: number): boolean;
+	completeStop(generation: number): boolean;
+	fail(generation: number): boolean;
+	isActive(generation: number): boolean;
+}
+
+export class SecurityUtilityLifecycle implements ISecurityUtilityLifecycle {
+	declare readonly _serviceBrand: undefined;
 	#state: SecurityUtilityLifecycleState = 'idle';
 	#generation = 0;
 

@@ -33,6 +33,7 @@ export type SecurityUtilityClientFailure =
 	| 'candidate_ingress_overflow'
 	| 'candidate_ingress_stopped'
 	| 'port_closed'
+	| 'environment_interrupted'
 	| 'process_error'
 	| 'process_exit';
 
@@ -432,6 +433,7 @@ function pollMatchesSelection(
 ): boolean {
 	return (
 		poll.opened_snapshots.every((snapshot) => selectedSources.includes(snapshot.source)) &&
+		poll.final_snapshots.every((snapshot) => selectedSources.includes(snapshot.source)) &&
 		poll.batches.every((batch) => selectedSources.includes(batch.source)) &&
 		poll.transitions.every((transition) => selectedSources.includes(transition.source))
 	);
@@ -441,5 +443,8 @@ function stopMatchesSelection(
 	stop: NativeSupervisorStop,
 	selectedSources: readonly NativeSourceId[]
 ): boolean {
-	return stop.batches.every((batch) => selectedSources.includes(batch.source));
+	return (
+		stop.final_snapshots.every((snapshot) => selectedSources.includes(snapshot.source)) &&
+		stop.batches.every((batch) => selectedSources.includes(batch.source))
+	);
 }

@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { Repository } from '../checks/types.ts';
@@ -20,7 +21,24 @@ type PolicyAuthority = {
 
 export const nativeCapabilityRegistryGenerator: Generator = {
 	id: 'native-capability.registry',
-	inputs: [AUTHORITY, POLICY_AUTHORITY],
+	inputs: [
+		AUTHORITY,
+		POLICY_AUTHORITY,
+		'native/schemas/native-observation.schema.json',
+		'native/schemas/display-topology.schema.json',
+		'native/schemas/candidate-window-state.schema.json',
+		...[
+			'process-application',
+			'interactive-session',
+			'clipboard',
+			'print-spooler',
+			'removable-storage',
+			'virtualization',
+			'network-configuration',
+			'media-device',
+			'capture-session'
+		].map((source) => `native/schemas/${source}-state.schema.json`)
+	],
 	committedOutputs: [JAVASCRIPT_OUTPUT, TYPESCRIPT_OUTPUT],
 	buildOutputs: [],
 	generate(repository: Repository, outputRoot: string): void {
@@ -38,7 +56,7 @@ export const nativeCapabilityRegistryGenerator: Generator = {
 		}
 		const familyIds = new Set<string>();
 		const outputFamilies = authority.families.map((raw) =>
-			normalizeFamily(raw, familyIds, authority.family_modes, policy.$defs ?? {})
+			normalizeFamily(raw, familyIds, authority.family_modes, policy.$defs ?? {}, repository)
 		);
 		if (
 			Object.keys(authority.family_modes).length !== familyIds.size ||
@@ -48,6 +66,27 @@ export const nativeCapabilityRegistryGenerator: Generator = {
 		}
 		const header = `// @${'generated'} by native-capability.registry from ${AUTHORITY} and ${POLICY_AUTHORITY}.`;
 		const serializedFamilies = JSON.stringify(outputFamilies, null, 2);
+		const baselines = [
+			['display', 'display-topology', 'native/schemas/display-topology.schema.json'],
+			['window', 'candidate-window', 'native/schemas/candidate-window-state.schema.json'],
+			['capture', 'capture-session', 'native/schemas/capture-session-state.schema.json'],
+			['content_protection', undefined, 'native/schemas/candidate-window-state.schema.json']
+		].map(([id, sourceId, schema]) => ({
+			id,
+			...(sourceId === undefined ? {} : { sourceId }),
+			coverageKey: `baseline.${id}`,
+			schemaVersion: 1,
+			sourceSchemaDigest: `sha256:${createHash('sha256').update(repository.read(schema!)).digest('hex')}`,
+			permittedClaims: ['enforce', 'unavailable'],
+			platformCoverageKeys: {
+				windows: `baseline.${id}`,
+				macos: `baseline.${id}`,
+				linux: `baseline.${id}`
+			},
+			permissions: { windows: [], macos: [], linux: [] }
+		}));
+		const serializedBaselines = JSON.stringify(baselines, null, 2);
+		const registryDigest = `sha256:${createHash('sha256').update(repository.read(AUTHORITY)).digest('hex')}`;
 		const javascript = [
 			header,
 			'',
@@ -60,7 +99,9 @@ export const nativeCapabilityRegistryGenerator: Generator = {
 			'}',
 			'',
 			`export const NATIVE_CAPABILITY_REGISTRY_VERSION = ${authority.registry_version};`,
+			`export const NATIVE_CAPABILITY_REGISTRY_DIGEST = '${registryDigest}';`,
 			`export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze(${serializedFamilies});`,
+			`export const NATIVE_BASELINE_CAPABILITIES_DATA = deepFreeze(${serializedBaselines});`,
 			''
 		].join('\n');
 		write(outputRoot, JAVASCRIPT_OUTPUT, javascript);
@@ -76,7 +117,9 @@ export const nativeCapabilityRegistryGenerator: Generator = {
 			'}',
 			'',
 			`export const NATIVE_CAPABILITY_REGISTRY_VERSION = ${authority.registry_version} as const;`,
+			`export const NATIVE_CAPABILITY_REGISTRY_DIGEST = '${registryDigest}' as const;`,
 			`export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze(${serializedFamilies} as const);`,
+			`export const NATIVE_BASELINE_CAPABILITIES_DATA = deepFreeze(${serializedBaselines} as const);`,
 			''
 		].join('\n');
 		write(outputRoot, TYPESCRIPT_OUTPUT, typescript);
@@ -93,7 +136,8 @@ function normalizeFamily(
 	raw: Record<string, unknown>,
 	familyIds: Set<string>,
 	familyModes: Readonly<Record<string, unknown>>,
-	policyDefinitions: Readonly<Record<string, unknown>>
+	policyDefinitions: Readonly<Record<string, unknown>>,
+	repository: Repository
 ): object {
 	const id = requiredIdentifier(raw.id, 'family id');
 	if (familyIds.has(id)) throw new Error(`${AUTHORITY} duplicates family ${id}`);
@@ -138,6 +182,7 @@ function normalizeFamily(
 		return {
 			id: subId,
 			schemaVersion: 1,
+			sourceSchemaDigest: `sha256:${createHash('sha256').update(repository.read(factSchema)).digest('hex')}`,
 			coverageKey,
 			permittedClaims: [...claims, 'unavailable'],
 			platformCoverageKeys: {

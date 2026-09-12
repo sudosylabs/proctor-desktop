@@ -1,3 +1,10 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Proctor contributors. All rights reserved.
+ *--------------------------------------------------------------------------------------------*/
+
+import { Disposable, type IDisposable } from '../../../base/common/lifecycle.js';
+import { createDecorator } from '../../instantiation/common/instantiation.js';
+
 import {
 	isPermissionState,
 	isPlatformFamily,
@@ -85,7 +92,8 @@ export type NativePermissionBrokerErrorCode =
 	| 'preflight_operation_in_progress'
 	| 'preflight_sealed'
 	| 'no_active_preflight_seal'
-	| 'stale_preflight_seal';
+	| 'stale_preflight_seal'
+	| 'disposed';
 
 export class NativePermissionBrokerError extends Error {
 	public readonly code: NativePermissionBrokerErrorCode;
@@ -113,9 +121,27 @@ export interface NativeMediaPermissionServices {
 	) => PermissionState | Promise<PermissionState>;
 }
 
-type BrokerState = 'preflight' | 'inspecting' | 'requesting' | 'sealing' | 'sealed';
+type BrokerState = 'preflight' | 'inspecting' | 'requesting' | 'sealing' | 'sealed' | 'disposed';
 
-export class NativePermissionBroker {
+export const INativePermissionBroker =
+	createDecorator<INativePermissionBroker>('nativePermissionBroker');
+
+/** Owns permission scope and single-use preflight seals within one main-process graph. */
+export interface INativePermissionBroker extends IDisposable {
+	readonly _serviceBrand: undefined;
+	inspectPreflight(
+		capabilities: readonly NativePermissionCapability[]
+	): Promise<NativePermissionPreflightReceipt>;
+	requestDuringPreflight(capability: NativePermissionCapability): Promise<NativePermissionFact>;
+	sealPreflight(
+		capabilities: readonly NativePermissionCapability[]
+	): Promise<SealedNativePermissionPreflight>;
+	releasePreflightSeal(seal: NativePermissionPreflightSeal): void;
+	cancelPreflight(): void;
+}
+
+export class NativePermissionBroker extends Disposable implements INativePermissionBroker {
+	declare readonly _serviceBrand: undefined;
 	readonly #adapters: readonly NativePermissionAdapter[];
 	readonly #platform: PlatformFamily;
 	readonly #monotonicNow: () => number;
@@ -126,9 +152,21 @@ export class NativePermissionBroker {
 	#cancellationEpoch = 0;
 
 	public constructor(options: NativePermissionBrokerOptions) {
+		super();
 		this.#platform = validateAdapterManifest(options.adapters);
 		this.#adapters = Object.freeze(options.adapters.map(freezeAdapter));
 		this.#monotonicNow = options.monotonicNow ?? (() => performance.now());
+	}
+
+	public override dispose(): void {
+		if (this.#state === 'disposed') return;
+		// Disposal invalidates pending OS callbacks; it never acts as a normal stop receipt.
+		this.#cancellationEpoch++;
+		this.#state = 'disposed';
+		this.#activeSeal = undefined;
+		this.#releasedSeal = undefined;
+		this.#preflightScope = undefined;
+		super.dispose();
 	}
 
 	public async inspectPreflight(
@@ -203,6 +241,7 @@ export class NativePermissionBroker {
 	}
 
 	public releasePreflightSeal(seal: NativePermissionPreflightSeal): void {
+		this.#assertNotDisposed();
 		if (this.#state === 'preflight' && seal === this.#releasedSeal) return;
 		if (this.#state !== 'sealed' || this.#activeSeal === undefined) {
 			throw new NativePermissionBrokerError('no_active_preflight_seal');
@@ -217,6 +256,7 @@ export class NativePermissionBroker {
 	}
 
 	public cancelPreflight(): void {
+		this.#assertNotDisposed();
 		if (this.#state === 'sealed') {
 			throw new NativePermissionBrokerError('preflight_sealed');
 		}
@@ -287,7 +327,12 @@ export class NativePermissionBroker {
 		return adapter;
 	}
 
+	#assertNotDisposed(): void {
+		if (this.#state === 'disposed') throw new NativePermissionBrokerError('disposed');
+	}
+
 	#assertPreflightOpen(): void {
+		this.#assertNotDisposed();
 		if (this.#state === 'sealing' || this.#state === 'sealed') {
 			throw new NativePermissionBrokerError('preflight_sealed');
 		}

@@ -68,7 +68,9 @@ export const SECURITY_UTILITY_POLL_INTERVAL_MS = 100;
 export const SECURITY_UTILITY_HEARTBEAT_INTERVAL_MS = 500;
 export const SECURITY_UTILITY_HEARTBEAT_TIMEOUT_MS = 2_000;
 export const SECURITY_UTILITY_SOURCE_COUNT = SECURITY_UTILITY_SOURCE_MANIFEST.length;
-export const SECURITY_UTILITY_MAX_SOURCE_BATCHES = SECURITY_UTILITY_SOURCE_COUNT * 2;
+// A failed poll yields a drain and close batch per source. The two helper
+// sources may additionally retain a terminal-loss reset between those batches.
+export const SECURITY_UTILITY_MAX_SOURCE_BATCHES = SECURITY_UTILITY_SOURCE_COUNT * 2 + 2;
 export const SECURITY_UTILITY_NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS =
 	NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS;
 export const SECURITY_UTILITY_LIFECYCLE_MARGIN_MS = 2_000;
@@ -216,12 +218,14 @@ export type NativeLifecycleTransition =
 export interface NativeSupervisorPoll {
 	readonly state: NativeSupervisorState;
 	readonly opened_snapshots: readonly NativeSnapshotEnvelope[];
+	readonly final_snapshots: readonly NativeSnapshotEnvelope[];
 	readonly batches: readonly NativeBatchEnvelope[];
 	readonly transitions: readonly NativeLifecycleTransition[];
 }
 
 export interface NativeSupervisorStop {
 	readonly state: 'stopped';
+	readonly final_snapshots: readonly NativeSnapshotEnvelope[];
 	readonly batches: readonly NativeBatchEnvelope[];
 	readonly process_replacement_required: boolean;
 }
@@ -450,14 +454,32 @@ export function isNativeBaselineOpenResult(
 	);
 }
 
+function isNativeFinalSnapshotEnvelope(value: unknown): value is NativeSnapshotEnvelope {
+	return (
+		isNativeSnapshotEnvelope(value) &&
+		(value.snapshot.health === 'stopped' || value.snapshot.health === 'failed')
+	);
+}
+
 export function isNativeSupervisorPoll(value: unknown): value is NativeSupervisorPoll {
 	return (
-		isRecordWithKeys(value, ['state', 'opened_snapshots', 'batches', 'transitions']) &&
+		isRecordWithKeys(value, [
+			'state',
+			'opened_snapshots',
+			'final_snapshots',
+			'batches',
+			'transitions'
+		]) &&
 		isNativeSupervisorState(value.state) &&
 		isBoundedArray(
 			value.opened_snapshots,
 			SECURITY_UTILITY_SOURCE_COUNT,
 			isNativeSnapshotEnvelope
+		) &&
+		isBoundedArray(
+			value.final_snapshots,
+			SECURITY_UTILITY_SOURCE_COUNT,
+			isNativeFinalSnapshotEnvelope
 		) &&
 		isBoundedArray(value.batches, SECURITY_UTILITY_MAX_SOURCE_BATCHES, isNativeBatchEnvelope) &&
 		isBoundedArray(
@@ -470,8 +492,18 @@ export function isNativeSupervisorPoll(value: unknown): value is NativeSuperviso
 
 export function isNativeSupervisorStop(value: unknown): value is NativeSupervisorStop {
 	return (
-		isRecordWithKeys(value, ['state', 'batches', 'process_replacement_required']) &&
+		isRecordWithKeys(value, [
+			'state',
+			'final_snapshots',
+			'batches',
+			'process_replacement_required'
+		]) &&
 		value.state === 'stopped' &&
+		isBoundedArray(
+			value.final_snapshots,
+			SECURITY_UTILITY_SOURCE_COUNT,
+			isNativeFinalSnapshotEnvelope
+		) &&
 		isBoundedArray(value.batches, SECURITY_UTILITY_MAX_SOURCE_BATCHES, isNativeBatchEnvelope) &&
 		typeof value.process_replacement_required === 'boolean'
 	);

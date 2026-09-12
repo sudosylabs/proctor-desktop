@@ -1,4 +1,7 @@
 {
-  "extends": "./tsconfig.electron-utility.json",
-  "include": ["../test/security-utility/**/*.ts"]
+  "extends": "./tsconfig.electron-main.json",
+  "include": ["../src/prctr/base/common/thenable.d.ts", "../test/security-utility/**/*.ts"],
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2024"]
+  }
 }

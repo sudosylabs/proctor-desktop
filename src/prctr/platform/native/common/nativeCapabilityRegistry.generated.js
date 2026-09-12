@@ -9,6 +9,7 @@ function deepFreeze(value) {
 }
 
 export const NATIVE_CAPABILITY_REGISTRY_VERSION = 1;
+export const NATIVE_CAPABILITY_REGISTRY_DIGEST = 'sha256:79faa1141236b073dff2ff802ce67abce3082417a7a4fa2954615e4226acd1e0';
 export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
   {
     "id": "process_application",
@@ -36,6 +37,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "process_application_lifecycle",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:aa6a235df7dd33ebd223ba31f77fe848fdbd2a29158092a2a9116b511bf83fb2",
         "coverageKey": "native.process_application_lifecycle.v1",
         "permittedClaims": [
           "enforce",
@@ -76,6 +78,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "single_interactive_session",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:7e695ff1c04bbd9c3f64e98c0e8cdb6cd6b7b55743463a27f2892716499ba7a0",
         "coverageKey": "native.single_interactive_session.v1",
         "permittedClaims": [
           "enforce",
@@ -113,6 +116,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "candidate_private_clipboard",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:70d7fd18f0adc862d8d4d963518effdf5c0a0b5f444554227c92192c2ff26cf2",
         "coverageKey": "native.candidate_private_clipboard.v1",
         "permittedClaims": [
           "enforce",
@@ -127,6 +131,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "os_clipboard_change",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:70d7fd18f0adc862d8d4d963518effdf5c0a0b5f444554227c92192c2ff26cf2",
         "coverageKey": "native.os_clipboard_change.v1",
         "permittedClaims": [
           "observe",
@@ -164,6 +169,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "candidate_print_commands",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:bae240feff637bbf51b1403ad37e240dec74ca3f1b937907f60a6fdeb8c85bfa",
         "coverageKey": "native.candidate_print_commands.v1",
         "permittedClaims": [
           "enforce",
@@ -178,6 +184,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "monitored_spooler_job",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:bae240feff637bbf51b1403ad37e240dec74ca3f1b937907f60a6fdeb8c85bfa",
         "coverageKey": "native.monitored_spooler_job.v1",
         "permittedClaims": [
           "enforce",
@@ -193,6 +200,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "no_physical_printing",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:bae240feff637bbf51b1403ad37e240dec74ca3f1b937907f60a6fdeb8c85bfa",
         "coverageKey": "native.no_physical_printing.v1",
         "permittedClaims": [
           "unavailable"
@@ -228,6 +236,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "removable_block_storage",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:31c3588e8c6a77ecc534323ef4fbfabaca44ca9e68ac1a6f15db225d89856f28",
         "coverageKey": "native.removable_block_storage.v1",
         "permittedClaims": [
           "enforce",
@@ -243,6 +252,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "portable_mtp",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:31c3588e8c6a77ecc534323ef4fbfabaca44ca9e68ac1a6f15db225d89856f28",
         "coverageKey": "native.portable_mtp.v1",
         "permittedClaims": [
           "enforce",
@@ -280,6 +290,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "recognized_guest",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:d5590cdd41350a93f7f56ce27cc38424db73c573568c58d27365cf36b800545f",
         "coverageKey": "native.recognized_guest.v1",
         "permittedClaims": [
           "enforce",
@@ -295,6 +306,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "certified_physical_environment",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:d5590cdd41350a93f7f56ce27cc38424db73c573568c58d27365cf36b800545f",
         "coverageKey": "native.certified_physical_environment.v1",
         "permittedClaims": [
           "enforce",
@@ -332,6 +344,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "system_proxy_state",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
         "coverageKey": "native.system_proxy_state.v1",
         "permittedClaims": [
           "enforce",
@@ -347,6 +360,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "os_managed_vpn_state",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
         "coverageKey": "native.os_managed_vpn_state.v1",
         "permittedClaims": [
           "enforce",
@@ -362,6 +376,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "tunnel_interface_state",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
         "coverageKey": "native.tunnel_interface_state.v1",
         "permittedClaims": [
           "enforce",
@@ -377,6 +392,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "route_change",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
         "coverageKey": "native.route_change.v1",
         "permittedClaims": [
           "observe",
@@ -391,6 +407,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "network_source_health",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
         "coverageKey": "native.network_source_health.v1",
         "permittedClaims": [
           "enforce",
@@ -432,6 +449,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "camera_ready",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:2e5a9e295f0e867f67561d3ef16f43abcb239f51b00f3d3f6c8cf766cd165167",
         "coverageKey": "native.camera_ready.v1",
         "permittedClaims": [
           "enforce",
@@ -447,6 +465,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "camera_other_application_use",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:2e5a9e295f0e867f67561d3ef16f43abcb239f51b00f3d3f6c8cf766cd165167",
         "coverageKey": "native.camera_other_application_use.v1",
         "permittedClaims": [
           "enforce",
@@ -488,6 +507,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "microphone_ready",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:2e5a9e295f0e867f67561d3ef16f43abcb239f51b00f3d3f6c8cf766cd165167",
         "coverageKey": "native.microphone_ready.v1",
         "permittedClaims": [
           "enforce",
@@ -503,6 +523,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "microphone_other_stream_running",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:2e5a9e295f0e867f67561d3ef16f43abcb239f51b00f3d3f6c8cf766cd165167",
         "coverageKey": "native.microphone_other_stream_running.v1",
         "permittedClaims": [
           "enforce",
@@ -538,6 +559,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       {
         "id": "external_capture_detection",
         "schemaVersion": 1,
+        "sourceSchemaDigest": "sha256:291f420f209d04096a67bf3b58c8fcec5cb2a6f8a29b55b87ab568f5f0e62157",
         "coverageKey": "native.external_capture_detection.v1",
         "permittedClaims": [
           "unavailable"
@@ -549,5 +571,90 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
         }
       }
     ]
+  }
+]);
+export const NATIVE_BASELINE_CAPABILITIES_DATA = deepFreeze([
+  {
+    "id": "display",
+    "sourceId": "display-topology",
+    "coverageKey": "baseline.display",
+    "schemaVersion": 1,
+    "sourceSchemaDigest": "sha256:592cdd2f235e79c8d4f89bc573f72164d7dbbfa264f3d6ba8b7a357e7ac8d771",
+    "permittedClaims": [
+      "enforce",
+      "unavailable"
+    ],
+    "platformCoverageKeys": {
+      "windows": "baseline.display",
+      "macos": "baseline.display",
+      "linux": "baseline.display"
+    },
+    "permissions": {
+      "windows": [],
+      "macos": [],
+      "linux": []
+    }
+  },
+  {
+    "id": "window",
+    "sourceId": "candidate-window",
+    "coverageKey": "baseline.window",
+    "schemaVersion": 1,
+    "sourceSchemaDigest": "sha256:e7d24311166436f6a3f1fa02dff4827c4994b290a71c241f3f04197365afb15e",
+    "permittedClaims": [
+      "enforce",
+      "unavailable"
+    ],
+    "platformCoverageKeys": {
+      "windows": "baseline.window",
+      "macos": "baseline.window",
+      "linux": "baseline.window"
+    },
+    "permissions": {
+      "windows": [],
+      "macos": [],
+      "linux": []
+    }
+  },
+  {
+    "id": "capture",
+    "sourceId": "capture-session",
+    "coverageKey": "baseline.capture",
+    "schemaVersion": 1,
+    "sourceSchemaDigest": "sha256:291f420f209d04096a67bf3b58c8fcec5cb2a6f8a29b55b87ab568f5f0e62157",
+    "permittedClaims": [
+      "enforce",
+      "unavailable"
+    ],
+    "platformCoverageKeys": {
+      "windows": "baseline.capture",
+      "macos": "baseline.capture",
+      "linux": "baseline.capture"
+    },
+    "permissions": {
+      "windows": [],
+      "macos": [],
+      "linux": []
+    }
+  },
+  {
+    "id": "content_protection",
+    "coverageKey": "baseline.content_protection",
+    "schemaVersion": 1,
+    "sourceSchemaDigest": "sha256:e7d24311166436f6a3f1fa02dff4827c4994b290a71c241f3f04197365afb15e",
+    "permittedClaims": [
+      "enforce",
+      "unavailable"
+    ],
+    "platformCoverageKeys": {
+      "windows": "baseline.content_protection",
+      "macos": "baseline.content_protection",
+      "linux": "baseline.content_protection"
+    },
+    "permissions": {
+      "windows": [],
+      "macos": [],
+      "linux": []
+    }
   }
 ]);

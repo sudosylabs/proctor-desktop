@@ -109,6 +109,7 @@ type SemanticRule =
 	| 'coherent_process_application_state'
 	| 'unique_process_instance_ids'
 	| 'coherent_process_application_event'
+	| 'coherent_process_capture_time'
 	| 'coherent_interactive_session_state'
 	| 'coherent_clipboard_state'
 	| 'coherent_print_spooler_state'
@@ -735,6 +736,11 @@ function renderTypeScript(
 		'    && value.process.process_instance_id === value.process_instance_id;',
 		'}',
 		'',
+		'function hasCoherentProcessCaptureTime(event: unknown, timestamp: unknown): boolean {',
+		'  return isProcessApplicationEvent(event) && typeof timestamp === "number"',
+		'    && (event.capture_delay_ns ?? 0) <= timestamp;',
+		'}',
+		'',
 		'function hasCoherentInteractiveSessionState(value: JsonObject): boolean {',
 		"  if (value.coverage === 'unavailable') return value.certainty === 'unknown'",
 		"    && value.console_ownership === 'unknown' && value.lock_state === 'unknown'",
@@ -830,6 +836,7 @@ function renderTypeScript(
 		'function hasCoherentHelperObservation(value: JsonObject): boolean {',
 		"  return value.source_kind === 'process_application'",
 		'    ? isProcessApplicationEvent(value.process_event)',
+		'      && hasCoherentProcessCaptureTime(value.process_event, value.monotonic_time_ns)',
 		'      && value.interactive_session_event === undefined',
 		"    : value.source_kind === 'interactive_session'",
 		'      && isInteractiveSessionEvent(value.interactive_session_event)',
@@ -1281,6 +1288,15 @@ const semanticRuleEmitters = {
 		],
 		typescript: () => 'hasCoherentProcessApplicationEvent(value)'
 	},
+	coherent_process_capture_time: {
+		rust: (typeName) => [
+			'        if self.event.capture_delay_ns.is_some_and(|delay| delay > self.observed_at.monotonic_time_ns) {',
+			`            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "event", "capture delay cannot precede the source time origin"));`,
+			'        }'
+		],
+		typescript: () =>
+			'isSourceTimestamp(value.observed_at) && hasCoherentProcessCaptureTime(value.event, value.observed_at.monotonic_time_ns)'
+	},
 	coherent_interactive_session_state: {
 		rust: (typeName) => [
 			'        if matches!(self.coverage, InteractiveSessionCoverage::Unavailable)',
@@ -1533,6 +1549,9 @@ const semanticRuleEmitters = {
 			'        };',
 			'        if !coherent {',
 			`            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "source_kind", "exact matching event payload"));`,
+			'        }',
+			'        if self.process_event.as_ref().and_then(|event| event.capture_delay_ns).is_some_and(|delay| delay > self.monotonic_time_ns) {',
+			`            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "process_event", "capture delay cannot precede the source time origin"));`,
 			'        }'
 		],
 		typescript: () => 'hasCoherentHelperObservation(value)'
