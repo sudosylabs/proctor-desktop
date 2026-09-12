@@ -64,8 +64,9 @@ export const provenanceCheck: Check = {
 			.filter(
 				(candidate) =>
 					(candidate.startsWith('src/prctr/') ||
+						candidate.startsWith('resources/') ||
 						/^test\/.+\/upstream\//.test(candidate)) &&
-					/\.(?:ts|css)$/.test(candidate)
+					/\.(?:ts|js|css)$/.test(candidate)
 			)) {
 			const matches = [
 				...repository
@@ -180,7 +181,7 @@ export const provenanceCheck: Check = {
 							)
 						);
 					if (
-						/\.(?:ts|css)$/.test(item.localPath) &&
+						/\.(?:ts|js|css)$/.test(item.localPath) &&
 						marked.get(item.localPath) !== manifest.clusterId
 					)
 						diagnostics.push(

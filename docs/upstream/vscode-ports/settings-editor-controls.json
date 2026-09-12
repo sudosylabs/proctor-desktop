@@ -1048,8 +1048,8 @@
       "disposition": "copied",
       "rationale": "Exact pinned nested runtime and notice; retained without a substitute library or changed algorithm.",
       "licenseRefs": ["marked"],
-      "localSha256": "75746ae6ff08f4e9b94090ed018e5ac1bf7dbb7e8fcdb4ec48784bd6569d9fda",
-      "mechanicalTransforms": ["namespace-path-translation"]
+      "localSha256": "37f0f5568fdaacbf2c79e0240c3ed213159e0097721885817731e24d10ad7bd0",
+      "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {
       "upstreamPath": "src/vs/base/common/marked/marked.license.txt",
@@ -1075,7 +1075,7 @@
       "disposition": "adapted",
       "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
       "licenseRefs": ["dompurify"],
-      "localSha256": "6f8568f0368d4eebdd28da1c2709cebaa7d5e1e16866fb99f7c8b4fa56d47e61",
+      "localSha256": "29003287364db68a00741bab98fadd707a7d1a6e9af43abaf19681d36bb86bbe",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.base-common.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": [
+    "../src/prctr/base/common/thenable.d.ts",
+    "../test/workbench/services/resourcePreview/**/*.ts"
+  ]
+}

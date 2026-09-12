@@ -918,3 +918,23 @@ void test('upstream assets retain digest enforcement without requiring invalid J
 	);
 	assert.ok(missingMarker.some((item) => item.path === code && /lacks/.test(item.problem)));
 });
+
+void test('packaged preview assets retain source marker enforcement outside the application namespace', async () => {
+	const path = 'resources/resource-preview/markdown.css';
+	const check = checkMap().get('upstream.provenance')!;
+	const clean = await run(check, snapshot());
+	assert.deepEqual(
+		clean.filter((item) => item.path === path),
+		[]
+	);
+	const changed = await run(
+		check,
+		snapshot((files) => {
+			files[path] = String(files[path]).replace(
+				/@proctor-vscode-port resource-preview/,
+				'removed source marker'
+			);
+		})
+	);
+	assert.ok(changed.some((item) => item.path === path && /lacks/.test(item.problem)));
+});

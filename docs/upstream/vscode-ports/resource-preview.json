@@ -1,0 +1,623 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "clusterId": "resource-preview",
+  "admission": {
+    "workflow": "Read authorized images, Markdown and text inside reusable isolated document hosts; preview mutable Markdown from the existing editor model.",
+    "callers": [
+      "src/prctr/workbench/services/resourcePreview/browser/markdownPreviewSession.ts",
+      "src/prctr/workbench/services/resourcePreview/browser/resourcePreviewSession.ts"
+    ],
+    "interface": "src/prctr/workbench/services/resourcePreview/common/resourcePreview.ts",
+    "decision": "docs/architecture/attempt-workspace.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/microsoft/vscode",
+    "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
+  },
+  "items": [
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/messaging.ts",
+      "upstreamBlob": "0458cac997c5e2a47e299cc902ace3ebeefa5ce2",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/messaging.ts",
+      "localSha256": "9021712aed50156fcfae1fa70809703c75e595cb3ad357c74436cfd91deee9e6",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/strings.ts",
+      "upstreamBlob": "61524535b9b45d9e449106ab2436b47121670c50",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/strings.ts",
+      "localSha256": "08bdb651ae6a2de7151a55b25f888c4b075f985f6101dbd3acafb95a41eacac0",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/settings.ts",
+      "upstreamBlob": "fefdacaa620d8ab4cba66e1879c65b85aab7d667",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/settings.ts",
+      "localSha256": "8529671c47f4410ee11ed6bddaca7bf8b327ee4b7bed08e16bd79b100d432f34",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/pre.ts",
+      "upstreamBlob": "5de29c0de2b87d5da9861cf2495eecf58045a4a4",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/pre.ts",
+      "localSha256": "bee84e8c80204cbc964611c8d1db390582a991c6efaa309c9607960c596097a4",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/csp.ts",
+      "upstreamBlob": "5bddb6712101aa1132c625ba92b3461aaf5e665b",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/csp.ts",
+      "localSha256": "6e9e619863ef258447fdf56c952f011e10c0424f7faccab2e2a15d8e04612d85",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/events.ts",
+      "upstreamBlob": "81ce5c616406fecff8131bfa3da88dcf47a20a61",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/events.ts",
+      "localSha256": "7ca615393167fbb82dbe006e2277e7dae693dd72c81a42117b50c2255a35ce9a",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/index.ts",
+      "upstreamBlob": "77bc67f8a2f64f78aa93dd209c1af2a3894781e2",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/index.ts",
+      "localSha256": "368e06aa09ce21df0a65ed7d0ea4f90caed32af02ec4726f724aea635ecaa1ae",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/diffScrollSync.ts",
+      "upstreamBlob": "45dc9671f99ab810d3b753588e2a5c58c03107f9",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/diffScrollSync.ts",
+      "localSha256": "4e8d02ec0ba164ffead50c37dbc54ec3f05a7aad8cde50ea6937cf5ad3bcd8e6",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/loading.ts",
+      "upstreamBlob": "f3270b22214e2c9ac4d3e971209970554855d341",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/loading.ts",
+      "localSha256": "a9626c55a390a321650baff6b7b02fb8b8cc98e562329a2f5b11a515027bcd3b",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/activeLineMarker.ts",
+      "upstreamBlob": "0e63dad4599dfdb12fbcafe61671add31f40d2b1",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/activeLineMarker.ts",
+      "localSha256": "c512aa7a70d75a95b2a3eed36882756c8fe27cfd8088894e6326039d6382adf2",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/preview-src/scroll-sync.ts",
+      "upstreamBlob": "e16e632eca39ed50d0e89ec5a58e5025f209af05",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/scroll-sync.ts",
+      "localSha256": "1a365633756e9285a82c156c5d89f3fbd86c34af60bdcabb5a3349575bd34087",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/slugify.ts",
+      "upstreamBlob": "645d9ab6ae80e6707879c089e764593dc3876bbd",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/src/slugify.ts",
+      "localSha256": "be5a4b9c05315b88083376b2c67a0c90dda72c96a185930be371b89320dca137",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/util/dom.ts",
+      "upstreamBlob": "68cd47cdbf16c1e29ce95d2484875371ea626acf",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/src/util/dom.ts",
+      "localSha256": "5cd89769dd9bff2c42952ba26f27385c669f499b2f5352760222cff6bdc8f9df",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/util/schemes.ts",
+      "upstreamBlob": "dbb3d14d5e2ad0ff2abadcba182cadc1e20a9b18",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/src/util/schemes.ts",
+      "localSha256": "4bb41f461dfd39438c24983668c01e2a863b6f4bb29468ff55d08eb63b0d335c",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/extensions/yamlPreamble/yamlPreamble.ts",
+      "upstreamBlob": "7f827a4273eaf8153b86a96b3030281e78ddd466",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/src/extensions/yamlPreamble/yamlPreamble.ts",
+      "localSha256": "4182f263203b5e07df0754d277d46c0dbed359c970d60c2f98bb3c368f42ccd7",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/markdownEngine.ts",
+      "upstreamBlob": "d1aacf9a8b171658ad57432a3149129622bcb0b5",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/src/markdownEngine.ts",
+      "localSha256": "39ee948f77c32298fd90672622c78c2ee4a94df16e656fda7622d9d7521a97af",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/types/previewMessaging.d.ts",
+      "upstreamBlob": "2258f8ea23d49b18addc753eeaeb90b67344dea7",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/markdown/types/previewMessaging.d.ts",
+      "localSha256": "29906eb48b43ff598551ab0ae8da1ffc89141fbc04ce729f1bd622d1154795e5",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/media-preview/media/imagePreview.js",
+      "upstreamBlob": "6ff2b9f7f767e58ce9e442500d853f8a524bd5a3",
+      "localPath": "src/prctr/workbench/services/resourcePreview/browser/media/imagePreview.js",
+      "localSha256": "8b700f19439f1a3fa81b79343ce41b085bdcaecad9c38be000d2a659c33817a4",
+      "category": "source",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/media-preview/media/imagePreview.css",
+      "upstreamBlob": "3960b26f6dbbd86aabc9a00184e9705e696bff57",
+      "localPath": "resources/resource-preview/imagePreview.css",
+      "localSha256": "786682cc9f086167b29ae2f8688d8a8096f7f2303fc2e86c707c3dfa1f445673",
+      "category": "style",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/media-preview/media/loading.svg",
+      "upstreamBlob": "e762f06d5e6e8c7fb91e5072db4f36342da1c709",
+      "localPath": "resources/resource-preview/loading.svg",
+      "localSha256": "63f665bf3b266c12e6eb0c3c0636cc548251b4fdb76125999f2257f5a57dd475",
+      "category": "asset",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/media-preview/media/loading-dark.svg",
+      "upstreamBlob": "7dc1ebd8cf045f8bfa4c097fad38ef03057ccb87",
+      "localPath": "resources/resource-preview/loading-dark.svg",
+      "localSha256": "d0d75a874343c3805f25655fbec5c2f971780c6ae86c66ba7396f57d1a852def",
+      "category": "asset",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/media-preview/media/loading-hc.svg",
+      "upstreamBlob": "c3633c0ddabee926a9d9c0836395674f01848703",
+      "localPath": "resources/resource-preview/loading-hc.svg",
+      "localSha256": "f06fd8a491eee384d44c253bf1e5611fa4b79be723625bf64f787b1281326edb",
+      "category": "asset",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/media/markdown.css",
+      "upstreamBlob": "7e85317dc35a9e66d79371a53b4a9d7a1b6fefee",
+      "localPath": "resources/resource-preview/markdown.css",
+      "localSha256": "2c14c0debdff5c547eef4aee813cbee6b26e7b80043a54954cad05e762aa2bc2",
+      "category": "style",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/media/highlight.css",
+      "upstreamBlob": "6342ac12cd52aed5efb9d978bcef049c0e90edb4",
+      "localPath": "resources/resource-preview/highlight.css",
+      "localSha256": "11d95929b9c88189598608ea35a4d5777f123f43fcefb49bb851362f9e73501e",
+      "category": "style",
+      "disposition": "adapted",
+      "rationale": "Retain the complete applicable document-preview mechanics. Adapt module imports and host API to the closed Proctor document/lease boundary. Security-divergence details are recorded below.",
+      "licenseRefs": ["vscode-mit"],
+      "mechanicalTransforms": [
+        "relative-import-rewrite",
+        "accepted-dependency-substitution",
+        "provenance-marker-insertion"
+      ]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/preview/preview.ts",
+      "upstreamBlob": "6d5fb96dbcd11f8b9b5820c9180a3e601a3402d0",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Versioned updates, source selection/scroll, disposal and preview document identity inform the Proctor model-bound session.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/preview/previewManager.ts",
+      "upstreamBlob": "3d3836d3af365fe5ced5bda54b94c81ea2e87277",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Locked versus follow-active and explicit source binding inform the reusable session. Editor-group composition remains with Proctor panes.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/preview/documentRenderer.ts",
+      "upstreamBlob": "e29e37ede7456733a595472c98914fcf13f8a23b",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "HTML/settings/bootstrap/assets and CSP host behavior; Proctor replaces extension-controlled origins with an opaque sandbox and verified resources.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/preview/security.ts",
+      "upstreamBlob": "292e19563c90f176c24625ea5c6d64e70ae0a7bb",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "No per-document security relaxation or remote scripts/styles; the preview has one closed policy.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/extension.shared.ts",
+      "upstreamBlob": "85564580e5456e01c26c6b70a495d9d7a91673d7",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "No extension host aggregate, plugins, rich custom editor, notebooks, telemetry or unrestricted opener.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/markdownExtensions.ts",
+      "upstreamBlob": "d24b9108a042fe9ea8cd81d3aa3279b74f9af104",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "No third-party executable renderer contributions. The built-in Markdown engine features are retained.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/preview/previewConfig.ts",
+      "upstreamBlob": "821bbb7840595c72b06b2ad12bc193462cb10b43",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Caller-owned configuration replaces the VS Code extension API.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/workbench/services/resourcePreview/browser/markdownTypes.ts"
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/types/textDocument.ts",
+      "upstreamBlob": "d8809315c2e290879913b0dc2e36253210f448f0",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Existing editor models expose URI/version/text through a narrow snapshot adapter.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/workbench/services/resourcePreview/browser/markdownTypes.ts"
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/util/resources.ts",
+      "upstreamBlob": "1050954f96a81ec7583604d65dc9b3e21ae9bb81",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Only caller-authorized verified byte leases can create relative asset URLs.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/workbench/services/resourcePreview/browser/markdownTypes.ts"
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/src/logging.ts",
+      "upstreamBlob": "3364a06ca4b567571fbe248655602204a245ef6c",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "No document-content logging or telemetry in resource preview.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/media-preview/src/imagePreview/index.ts",
+      "upstreamBlob": "79cb70c9fa72a981eea07a1d301547713e222c56",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Image custom editor host settings and lifecycle are mapped to the Proctor read-only resource session.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/media-preview/src/mediaPreview.ts",
+      "upstreamBlob": "599484b07034717623b76a26894517ea17cb720e",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Loading/disposal and webview host lifecycle are mapped to opaque per-resource documents.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/media-preview/src/extension.ts",
+      "upstreamBlob": "31370d48fc66d18e6712a08098943d8fbe589c06",
+      "category": "source",
+      "disposition": "excluded",
+      "rationale": "No audio/video, system clipboard export, Git-LFS or external reopen commands.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "extensions/markdown-language-features/package.json",
+      "upstreamBlob": "5d53ed24343381f181408c03798436380d9da9a5",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Verify renderer dependencies and explicit exclusions without admitting aggregate activation.",
+      "licenseRefs": ["vscode-mit"]
+    },
+    {
+      "upstreamPath": "src/vs/workbench/contrib/modernUI/browser/modernUI.contribution.ts",
+      "upstreamBlob": "3fd55793b50cec68fcb3c4e1364a3b3cb8735d30",
+      "category": "source",
+      "disposition": "locally-satisfied",
+      "rationale": "Shell modern presentation is already admitted; sandbox document styles are the actual built-in preview CSS.",
+      "licenseRefs": ["vscode-mit"],
+      "localInterface": "src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts"
+    },
+    {
+      "upstreamPath": "extensions/esbuild-extension-common.mts",
+      "upstreamBlob": "5b967a9140e7472368bdaeded715dd04044d7488",
+      "category": "source",
+      "disposition": "evidence-only",
+      "rationale": "Browser language service bundling uses the same pure path-browserify substitution and browser environment constants. Explicit CommonJS-first resolution preserves the pinned language service default URI import; application source keeps strict relative imports.",
+      "licenseRefs": ["vscode-mit"]
+    }
+  ],
+  "licenses": [
+    {
+      "id": "vscode-mit",
+      "name": "MIT License",
+      "upstreamPaths": ["LICENSE.txt"],
+      "localNoticePath": "docs/upstream/licenses/vscode-MIT.txt"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "document-access",
+      "kind": "local-interface",
+      "reference": "src/prctr/workbench/services/resourcePreview/common/resourcePreview.ts",
+      "rationale": "Verified bytes, model updates, and closed link intents are injected by the resource/editor owner."
+    },
+    {
+      "id": "markdown-parsers",
+      "kind": "external-package",
+      "reference": "package.json",
+      "rationale": "Exact markdown-it, highlight.js, yaml, morphdom and throttle packages retain the upstream rendering dependency behavior."
+    },
+    {
+      "id": "isolated-dom",
+      "kind": "platform-interface",
+      "reference": "src/prctr/workbench/services/resourcePreview/browser/sandboxPreviewHost.ts",
+      "rationale": "Opaque iframe and MessagePort replace the extension webview host without exposing privileged handles."
+    },
+    {
+      "id": "markdown-language-service",
+      "kind": "external-package",
+      "reference": "package.json",
+      "rationale": "Exact vscode-markdown-languageservice 0.5.0 retains the complete typed document/workspace feature engine. Nested URI 3.0.7 preserves its supported default import; the application URI dependency remains separately pinned."
+    },
+    {
+      "id": "image-metadata",
+      "kind": "external-package",
+      "reference": "package.json",
+      "rationale": "image-size reads metadata only before native image decode, admitting the complete VS Code image format selector under byte, MIME and dimension limits."
+    },
+    {
+      "id": "markdown-browser-dependencies",
+      "kind": "local-interface",
+      "reference": "build/lib/resourcePreviewBrowser.ts",
+      "rationale": "Explicit browser-only bundler options are required for editor owners that consume the retained language service. The real Electron renderer fixture proves no Node runtime is acquired."
+    }
+  ],
+  "divergences": [
+    {
+      "id": "closed-resource-security",
+      "summary": "Forbid document scripts, remote embeds, document-chosen assets, unsafe links, trust relaxation, clipboard export and system openers. Preserve applicable rendering, source mapping, incremental updates and image zoom inside an opaque CSP sandbox. PDF.js is a separately admitted dependency and is not attributed to VS Code. Configurable token cache also includes typographer and re-resolves image URLs under every new lease scope. Image preview keeps the full upstream JPG/PNG/BMP/GIF/ICO/WebP/AVIF/SVG format selection, including animation; metadata-only bounds reject oversized content before decode. SVG is delivered only as an image in the opaque host, never as an active document. Color variables map to the existing --prctr-theme- registry and theme changes are sent through the private channel. Terminal resource revocation destroys hosts and discards pending leases.",
+      "localPaths": [
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/messaging.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/strings.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/settings.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/pre.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/csp.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/events.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/index.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/diffScrollSync.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/loading.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/activeLineMarker.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/scroll-sync.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/src/slugify.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/src/util/dom.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/src/util/schemes.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/src/extensions/yamlPreamble/yamlPreamble.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/src/markdownEngine.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/markdown/types/previewMessaging.d.ts",
+        "src/prctr/workbench/services/resourcePreview/browser/media/imagePreview.js",
+        "resources/resource-preview/imagePreview.css",
+        "resources/resource-preview/loading.svg",
+        "resources/resource-preview/loading-dark.svg",
+        "resources/resource-preview/loading-hc.svg",
+        "resources/resource-preview/markdown.css",
+        "resources/resource-preview/highlight.css"
+      ],
+      "verificationRefs": ["renderer-unit", "renderer-electron", "source-boundaries"]
+    }
+  ],
+  "verification": [
+    {
+      "id": "renderer-unit",
+      "kind": "test",
+      "path": "test/workbench/services/resourcePreview/resourcePreview.test.ts",
+      "obligation": "Source mapping, complete engine features, token cache/asset scope fences, raster dimensions and denied schemes."
+    },
+    {
+      "id": "renderer-electron",
+      "kind": "test",
+      "path": "test/electron/resourcePreview.real.test.ts",
+      "obligation": "Actual isolated Markdown update/link behavior, image decode and PDF worker/text layer under Electron; no Node or parent access."
+    },
+    {
+      "id": "source-boundaries",
+      "kind": "check",
+      "path": "build/checks/source.ts",
+      "obligation": "Runtime/module direction and closed composition."
+    },
+    {
+      "id": "upstream-audit",
+      "kind": "check",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Verify exact pinned upstream blobs and review each explicit adaptation."
+    },
+    {
+      "id": "markdown-language-features",
+      "kind": "test",
+      "path": "test/workbench/services/resourcePreview/markdownLanguageService.test.ts",
+      "obligation": "Real upstream heading resolution, symbols, cancellation and rename edits preserve fragments and protect current document versions."
+    }
+  ]
+}
