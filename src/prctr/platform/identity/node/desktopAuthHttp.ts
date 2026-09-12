@@ -1,7 +1,11 @@
+import { ServerHttpTransport, decodeJson } from '../../serverApi/node/serverHttpTransport.js';
+import { ServerApiError } from '../../serverApi/common/serverApi.js';
 import type { CancellationToken } from '../../../base/common/cancellation.js';
 import { DesktopAuthorizationError } from './desktopAuthorizationError.js';
 
 export type DesktopHttpPath =
+	| `/api/v1/users/me/exam-activity?limit=20${string}`
+	| `/api/v1/exam-attempts/${string}/result`
 	| '/api/v1/auth/desktop/authorizations'
 	| '/api/v1/auth/desktop/token'
 	| '/api/v1/auth/refresh'
@@ -48,6 +52,14 @@ export function desktopHttpMethod(
 	if (/^\/api\/v1\/users\/[ybndrfg8ejkmcpqxot1uwisza345h769]{26}\/profile-picture$/u.test(path))
 		return photo?.operation ?? 'GET';
 	if (photo) throw new DesktopAuthorizationError('rejected');
+	if (/^\/api\/v1\/exam-attempts\/[ybndrfg8ejkmcpqxot1uwisza345h769]{26}\/result$/u.test(path))
+		return 'GET';
+	if (
+		/^\/api\/v1\/users\/me\/exam-activity\?limit=20(?:&cursor=(?:[A-Za-z0-9_.!~*'()-]|%[0-9A-F]{2}){1,6144})?$/u.test(
+			path
+		)
+	)
+		return 'GET';
 	if (
 		/^\/api\/v1\/users\/me\/desktop-registrations\/[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/u.test(
 			path
@@ -78,13 +90,18 @@ export function desktopHttpMethod(
 	throw new DesktopAuthorizationError('rejected');
 }
 export interface DesktopHttpResult {
+	/** Privileged-only failure metadata; renderer projections never carry this field. */
+	readonly failure?: ServerApiError;
 	readonly status: number;
 	readonly value: unknown;
 	readonly nonce?: string;
 }
-/** Private to identity: callers choose only fixed contract paths; no renderer request surface. */
+/** Compatibility for the authentication handshake; all I/O belongs to ServerHttpTransport. */
 export class DesktopAuthHttp {
-	constructor(private readonly fetcher: typeof fetch = fetch) {}
+	readonly transport: ServerHttpTransport;
+	constructor(fetcher: typeof fetch = fetch) {
+		this.transport = new ServerHttpTransport(fetcher);
+	}
 	async request(
 		origin: string,
 		path: DesktopHttpPath,
@@ -100,13 +117,20 @@ export class DesktopAuthHttp {
 		const method = desktopHttpMethod(path, options.photo, options.settings);
 		const url = new URL(path, origin);
 		if (url.origin !== origin) throw new DesktopAuthorizationError('rejected');
-		if (token.isCancellationRequested) throw new DesktopAuthorizationError('cancelled');
 		const controller = new AbortController();
 		const cancellation = token.onCancellationRequested(() => controller.abort());
-		const timer = setTimeout(() => controller.abort(), 15000);
+		if (token.isCancellationRequested) controller.abort();
 		try {
-			const response = await this.fetcher(url.href, {
+			const response = await this.transport.send({
+				url: url.href,
 				method,
+				signal: controller.signal,
+				maxResponseBytes:
+					options.photo || options.settings
+						? 2 * 1024 * 1024
+						: path.startsWith('/api/v1/users/me/exam-activity?')
+							? 512 * 1024
+							: 65536,
 				headers: {
 					Accept: options.photo?.operation === 'GET' ? 'image/webp' : 'application/json',
 					...(options.photo?.mediaType
@@ -121,49 +145,16 @@ export class DesktopAuthHttp {
 					...(options.credential ? { Authorization: `DPoP ${options.credential}` } : {})
 				},
 				...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
-				...(options.photo?.bytes ? { body: Buffer.from(options.photo.bytes) } : {}),
-				redirect: 'manual',
-				credentials: 'omit',
-				cache: 'no-store',
-				signal: controller.signal
+				...(options.photo?.bytes ? { body: Buffer.from(options.photo.bytes) } : {})
 			});
-			if (
-				response.redirected ||
-				(response.url && response.url !== url.href) ||
-				(response.status >= 300 && response.status < 400)
-			) {
-				await response.body?.cancel();
+			const nonce = response.headers['dpop-nonce'];
+			if (nonce && !/^[A-Za-z0-9_-]{43}$/u.test(nonce))
 				throw new DesktopAuthorizationError('rejected');
-			}
-			const nonce = response.headers.get('DPoP-Nonce');
-			if (nonce !== null && !/^[A-Za-z0-9_-]{43}$/.test(nonce)) {
-				await response.body?.cancel();
-				throw new DesktopAuthorizationError('rejected');
-			}
 			let value: unknown;
 			if (options.photo?.operation === 'GET' && response.status === 200) {
-				if (response.headers.get('content-type') !== 'image/webp' || !response.body) {
-					await response.body?.cancel();
-					throw new DesktopAuthorizationError('rejected');
-				}
-				const reader = response.body.getReader();
-				const chunks: Uint8Array[] = [];
-				let length = 0;
-				try {
-					for (;;) {
-						const next = await reader.read();
-						if (next.done) break;
-						length += next.value.byteLength;
-						if (length > 2 * 1024 * 1024)
-							throw new DesktopAuthorizationError('rejected');
-						chunks.push(next.value);
-					}
-				} finally {
-					await reader.cancel().catch(() => {});
-					reader.releaseLock();
-				}
-				const bytes = Buffer.concat(chunks);
+				const bytes = Buffer.from(response.bytes);
 				if (
+					response.headers['content-type'] !== 'image/webp' ||
 					bytes.toString('ascii', 0, 4) !== 'RIFF' ||
 					bytes.toString('ascii', 8, 12) !== 'WEBP'
 				)
@@ -171,48 +162,20 @@ export class DesktopAuthHttp {
 				value = {
 					kind: 'photo',
 					dataUrl: `data:image/webp;base64,${bytes.toString('base64')}`,
-					etag: response.headers.get('ETag')
+					etag: response.headers.etag
 				};
-			} else if (response.status === 204) {
-				await response.body?.cancel();
-				value = undefined;
-			} else {
-				if (
-					!/^application\/(?:json|problem\+json)(?:\s*;|$)/i.test(
-						response.headers.get('content-type') ?? ''
-					) ||
-					!response.body
-				) {
-					await response.body?.cancel();
-					throw new DesktopAuthorizationError('rejected');
-				}
-				const reader = response.body.getReader();
-				const chunks: Uint8Array[] = [];
-				let length = 0;
-				try {
-					for (;;) {
-						const next = await reader.read();
-						if (next.done) break;
-						length += next.value.byteLength;
-						if (length > (options.settings ? 2 * 1024 * 1024 : 65536))
-							throw new DesktopAuthorizationError('rejected');
-						chunks.push(next.value);
-					}
-					value = JSON.parse(
-						new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks))
-					);
-				} finally {
-					await reader.cancel().catch(() => undefined);
-					reader.releaseLock();
-				}
-			}
-			return { status: response.status, value, ...(nonce === null ? {} : { nonce }) };
+			} else if (response.status !== 204) value = decodeJson(response);
+			return { status: response.status, value, ...(nonce ? { nonce } : {}) };
 		} catch (error) {
 			if (token.isCancellationRequested) throw new DesktopAuthorizationError('cancelled');
 			if (error instanceof DesktopAuthorizationError) throw error;
+			if (
+				error instanceof ServerApiError &&
+				['invalidRequest', 'invalidResponse', 'redirectBlocked'].includes(error.kind)
+			)
+				throw new DesktopAuthorizationError('rejected');
 			throw new DesktopAuthorizationError('verificationRequired');
 		} finally {
-			clearTimeout(timer);
 			cancellation.dispose();
 		}
 	}

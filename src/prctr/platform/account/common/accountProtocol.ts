@@ -1,3 +1,4 @@
+import type { ObservableApiCapability } from '../../serverApi/common/apiObservation.js';
 export const ACCOUNT_CHANNEL = 'prctr:authenticated:account';
 export const accountSections = ['profile', 'security', 'sessions', 'desktops'] as const;
 export type AccountSection = (typeof accountSections)[number];
@@ -77,7 +78,7 @@ export type AccountResponse =
 	| { readonly kind: 'data'; readonly data: AccountData }
 	| { readonly kind: 'success' }
 	| { readonly kind: 'error'; readonly reason: AccountFailure };
-export interface AccountClient {
+export interface AccountClient extends ObservableApiCapability<AccountIntent, AccountResponse> {
 	request(intent: AccountIntent): Promise<AccountResponse>;
 }
 export interface AccountBinding {

@@ -23,13 +23,19 @@ export function installationKeyScope(origin: string, institutionId: string): str
 }
 export async function createDPoPProof(
 	key: DesktopSigningKey,
-	method: 'GET' | 'POST' | 'DELETE' | 'PUT',
+	method: string,
 	target: string,
 	nonce: string,
 	accessToken?: string
 ): Promise<string> {
 	const url = new URL(target);
-	if (url.username || url.password || url.hash || !/^[A-Za-z0-9_-]{43}$/.test(nonce))
+	if (
+		!/^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS|TRACE)$/u.test(method) ||
+		url.username ||
+		url.password ||
+		url.hash ||
+		!/^[A-Za-z0-9_-]{43}$/.test(nonce)
+	)
 		throw new DesktopAuthorizationError('rejected');
 	url.search = '';
 	const publicJwk = key.publicJwk;

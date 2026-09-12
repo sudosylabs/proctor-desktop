@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port electron-window-skeleton
+import { ExamActivityIpcBridge, type ExamActivityService } from '../../examActivity/electron-main/examActivityIpc.js';
 
 import { bindWindowUserSettings } from '../../settings/electron-main/userSettingsWindow.js';
 import type { UserSettingsSessionService } from '../../settings/common/userSettingsSession.js';
@@ -66,6 +67,7 @@ export interface ElectronProductWindowFactoryOptions extends ElectronProductWind
 	readonly ipc?: Pick<typeof ipcMain, 'handle' | 'removeHandler'>;
 	readonly launchIdentity?: DesktopIdentityCoordinator;
 	readonly account?: AccountService;
+	readonly examActivity?: ExamActivityService;
 	readonly settings?: UserSettingsSessionService;
 	readonly windowChromeEnvironment?: ElectronWindowChromeEnvironment;
 }
@@ -219,7 +221,8 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 				chromeEnvironment,
 				this.#options.launchIdentity,
 				this.#options.account,
-				this.#options.settings
+				this.#options.settings,
+				this.#options.examActivity
 			);
 			void window.loadFile(rendererPath).catch(() => {
 				managed.terminate('loadFailed');
@@ -243,6 +246,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 	#launchIdentityBridge: LaunchIdentityIpcBridge | undefined;
 	#windowChromeBridge: ElectronWindowChromeBridge | undefined;
 	#accountBridge: AccountIpcBridge | undefined;
+	#examActivityBridge: ExamActivityIpcBridge | undefined;
 	#settings: {dispose(): void} | undefined;
 	#accountMenuBridge: AccountMenuIpcBridge | undefined;
 	#settingsNativeBridge: SettingsNativeIpcBridge | undefined;
@@ -260,7 +264,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		chromeEnvironment: ElectronWindowChromeEnvironment,
 		launchIdentity?: DesktopIdentityCoordinator,
 		account?: AccountService,
-		settings?: UserSettingsSessionService
+		settings?: UserSettingsSessionService,
+		examActivity?: ExamActivityService
 	) {
 		this.#window = window;
 		this.descriptor = descriptor;
@@ -306,8 +311,19 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#settings = bindWindowUserSettings(ipc, window.webContents, descriptor, settings);
 			if (descriptor.kind === 'authenticated')
 				this.#settingsNativeBridge = new SettingsNativeIpcBridge(ipc, createElectronSettingsNativeHost(window), authorize);
+			if (descriptor.kind === 'authenticated' && examActivity)
+				this.#examActivityBridge = new ExamActivityIpcBridge(ipc, descriptor, examActivity, authorize);
 			if (descriptor.kind === 'authenticated' && account)
 				this.#accountBridge = new AccountIpcBridge(ipc, descriptor, account, authorize);
+			if (descriptor.kind === 'authenticated' && account?.setApiFocused) {
+				const focused = (value: boolean) => {
+					try { account.setApiFocused!(descriptor, value); }
+					catch { /* Session teardown has already fenced the client. */ }
+				};
+				window.on('focus', () => focused(true));
+				window.on('blur', () => focused(false));
+				focused(window.isFocused());
+			}
 			window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
 			const initialUrl = pathToFileURL(rendererPath).href;
 			let initialNavigation = true;
@@ -346,6 +362,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#launchMenu,
 				this.#launchIdentityBridge,
 				this.#accountBridge,
+				this.#examActivityBridge,
 				this.#settings,
 				this.#accountMenuBridge,
 				this.#settingsNativeBridge,
@@ -419,6 +436,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 			this.#launchMenu,
 			this.#launchIdentityBridge,
 				this.#accountBridge,
+				this.#examActivityBridge,
 				this.#settings,
 				this.#accountMenuBridge,
 				this.#settingsNativeBridge,

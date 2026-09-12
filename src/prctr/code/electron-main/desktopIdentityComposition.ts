@@ -1,4 +1,4 @@
-import { nativeTheme, shell } from 'electron';
+import { nativeTheme, shell, net, powerMonitor } from 'electron';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { DisposableStore } from '../../base/common/lifecycle.js';
@@ -25,7 +25,7 @@ export interface DesktopIdentityCompositionOptions {
 	readonly target: DesktopReleaseTarget;
 	readonly window: Omit<
 		ElectronProductWindowFactoryOptions,
-		'launchIdentity' | 'account' | 'settings'
+		'launchIdentity' | 'account' | 'settings' | 'examActivity'
 	>;
 	readonly nativeKeyModule: string;
 	readonly callbackBrandingDirectory: string;
@@ -49,12 +49,13 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 			catalogs: []
 		});
 		let windows: ProductWindowCoordinator;
+		const http = new DesktopAuthHttp();
 		const authorization = owned.add(
 			new DesktopAuthorizationService({
 				target: options.target,
 				keys: loadNativeDesktopKeyCustody(options.nativeKeyModule),
 				credentials: new OsDesktopCredentialStore(join(options.stateDirectory, 'identity')),
-				http: new DesktopAuthHttp(),
+				http,
 				openBrowser: async (url) => shell.openExternal(url),
 				callbackPages: createDesktopAuthCallbackPages(
 					localization,
@@ -68,7 +69,15 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 						institutionOrigin: identity.institutionOrigin,
 						principalId: identity.principalId,
 						sessionId: identity.sessionId,
-						initialDestination: 'account',
+						initialDestination: identity.availableProductAreas.includes(
+							'student_activity'
+						)
+							? 'activity'
+							: identity.availableProductAreas.includes('exam_management')
+								? 'management'
+								: identity.availableProductAreas.includes('administration')
+									? 'administration'
+									: 'account',
 						identity,
 						...(identity.institutionOrigin.startsWith('http:')
 							? { developmentOrigin: true }
@@ -77,10 +86,21 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				}
 			})
 		);
+		const connectivity = () => authorization.setApiOnline(net.isOnline());
+		const connectivityTimer = setInterval(connectivity, 5000);
+		connectivityTimer.unref();
+		powerMonitor.on('resume', connectivity);
+		owned.add({
+			dispose: () => {
+				clearInterval(connectivityTimer);
+				powerMonitor.removeListener('resume', connectivity);
+			}
+		});
+		connectivity();
 		const identity = owned.add(
 			new DesktopIdentityCoordinator({
 				target: options.target,
-				transport: new HttpServerReadinessTransport(),
+				transport: new HttpServerReadinessTransport(http.transport),
 				allowDevelopmentLoopback: options.allowDevelopmentLoopback,
 				authorization
 			})
@@ -96,6 +116,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				...options.window,
 				launchIdentity: identity,
 				account: authorization,
+				examActivity: authorization,
 				settings: authorization
 			}),
 			{

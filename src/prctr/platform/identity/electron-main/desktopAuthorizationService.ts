@@ -1,3 +1,14 @@
+import { ServerApiClient, type ApiObservation } from '../../serverApi/node/serverApiClient.js';
+import { resolveApiRoute } from '../../serverApi/node/legacyApiRequest.js';
+import { ServerApiError } from '../../serverApi/common/serverApi.js';
+import { decodeJson, type HttpResponse } from '../../serverApi/node/serverHttpTransport.js';
+import type { PreparedApiRequest } from '../../serverApi/node/apiRequest.js';
+import {
+	validateExamActivityIntent,
+	type ExamActivityIntent,
+	type ExamActivityResponse
+} from '../../examActivity/common/examActivityProtocol.js';
+import { readExamActivityWire } from '../../examActivity/electron-main/examActivityWire.js';
 import { validateUserSettingsCommitIntent } from '../../settings/common/settingsRendererProtocol.js';
 import {
 	readUserSettingsWire,
@@ -92,6 +103,7 @@ export class DesktopAuthorizationService extends Disposable {
 	#shutdown: Promise<void> | undefined;
 	#outcomeSequence = 0;
 	#accountMutation: object | undefined;
+	#api: ServerApiClient | undefined;
 	constructor(private readonly options: DesktopAuthorizationOptions) {
 		super();
 	}
@@ -193,11 +205,47 @@ export class DesktopAuthorizationService extends Disposable {
 			await this.options.credentials.write(scope, session.stored);
 			current();
 			this.#session = session;
+			const activeSession = session;
+			this.#api = new ServerApiClient(
+				identity.origin,
+				(request) => this.executeApiRequest(activeSession, generation, request),
+				async (url, challenge) => {
+					if (
+						this.#session !== activeSession ||
+						this.#generation !== generation ||
+						this.#disposed
+					)
+						throw new ServerApiError('sessionEnded');
+					if (challenge?.nonce)
+						activeSession.tokens = { ...activeSession.tokens, nonce: challenge.nonce };
+					if (this.#refresh || activeSession.tokens.accessExpiresAt <= Date.now() + 5000)
+						await this.refresh();
+					const credential = activeSession.tokens.accessToken;
+					const proof = await createDPoPProof(
+						activeSession.key,
+						'GET',
+						url,
+						activeSession.tokens.nonce,
+						credential
+					);
+					if (
+						this.#session !== activeSession ||
+						this.#generation !== generation ||
+						this.#disposed
+					)
+						throw new ServerApiError('sessionEnded');
+					return { Authorization: `DPoP ${credential}`, DPoP: proof };
+				}
+			);
 			await this.options.onAuthenticated(projection);
 			current();
 			this.#scheduleRefresh();
 		} catch (error) {
-			if (this.#session === session) this.#session = undefined;
+			if (this.#session === session) {
+				this.#session = undefined;
+				this.#api?.dispose();
+				this.#api = undefined;
+			}
 			if (session) {
 				await this.options.credentials.delete(scope).catch(() => undefined);
 				await this.#revoke(session).catch(() => undefined);
@@ -430,6 +478,64 @@ export class DesktopAuthorizationService extends Disposable {
 	/** Closed account capability: credentials, URLs, and arbitrary requests never cross IPC. */
 	async account(binding: AccountBinding, raw: AccountIntent): Promise<AccountResponse> {
 		const intent = validateAccountIntent(raw);
+		if (intent.kind !== 'read' && intent.kind !== 'readPhoto') {
+			const result = await this.accountUncached(binding, intent);
+			if (result.kind === 'success') await this.#api?.invalidate(['account']);
+			return result;
+		}
+		try {
+			return await this.apiForSession(binding).fetchTask(['account', intent], (signal) =>
+				projectRead((capture) => this.accountUncached(binding, intent, signal, capture))
+			);
+		} catch (error) {
+			return error instanceof ProjectionFailure
+				? (error.response as AccountResponse)
+				: {
+						kind: 'error',
+						reason:
+							error instanceof ServerApiError && error.kind === 'sessionEnded'
+								? 'sessionEnded'
+								: 'unavailable'
+					};
+		}
+	}
+	observeAccount(
+		binding: AccountBinding,
+		raw: AccountIntent,
+		listener: (response: AccountResponse) => void
+	): ApiObservation {
+		const intent = validateAccountIntent(raw);
+		if (intent.kind !== 'read' && intent.kind !== 'readPhoto')
+			throw new ServerApiError('invalidRequest');
+		return this.apiForSession(binding).observeTask(
+			['account', intent],
+			(signal) =>
+				projectRead((capture) => this.accountUncached(binding, intent, signal, capture)),
+			(state) => {
+				if (state.error)
+					listener(
+						state.error instanceof ProjectionFailure
+							? (state.error.response as AccountResponse)
+							: { kind: 'error', reason: 'unavailable' }
+					);
+				else if (state.data) listener(state.data);
+			},
+			{ pollIntervalMs: 60_000 }
+		);
+	}
+	setApiOnline(online: boolean): void {
+		this.#api?.setOnline(online);
+	}
+	setApiFocused(binding: AccountBinding, focused: boolean): void {
+		this.apiForSession(binding).setFocused(focused);
+	}
+	private async accountUncached(
+		binding: AccountBinding,
+		raw: AccountIntent,
+		signal?: AbortSignal,
+		captureFailure?: (failure: ServerApiError) => void
+	): Promise<AccountResponse> {
+		const intent = validateAccountIntent(raw);
 		const session = this.#session;
 		const generation = this.#generation;
 		if (
@@ -462,12 +568,23 @@ export class DesktopAuthorizationService extends Disposable {
 			if (this.#refresh || session.tokens.accessExpiresAt <= Date.now() + 5000)
 				await this.refresh();
 			current();
-			const request = (
+			const request = async (
 				path: DesktopHttpPath,
 				body?: unknown,
 				photo?: DesktopPhotoRequest
-			): Promise<DesktopHttpResult> =>
-				this.protectedRequest(session, generation, path, body, photo);
+			): Promise<DesktopHttpResult> => {
+				const result = await this.protectedRequest(
+					session,
+					generation,
+					path,
+					body,
+					photo,
+					undefined,
+					signal
+				);
+				if (result.failure) captureFailure?.(result.failure);
+				return result;
+			};
 			const failed = async (result: DesktopHttpResult): Promise<AccountResponse> => {
 				const code = errorCode(result);
 				if (result.status === 409) return { kind: 'error', reason: 'conflict' };
@@ -565,7 +682,8 @@ export class DesktopAuthorizationService extends Disposable {
 					mfa.status === 200 ? mfa.value : undefined
 				)
 			};
-		} catch {
+		} catch (error) {
+			if (error instanceof ServerApiError) captureFailure?.(error);
 			return {
 				kind: 'error',
 				reason:
@@ -580,60 +698,245 @@ export class DesktopAuthorizationService extends Disposable {
 		}
 	}
 
+	/** Full typed client is available only to privileged, session-bound capability owners. */
+	apiForSession(binding: AccountBinding): ServerApiClient {
+		const session = this.#session;
+		if (
+			!session ||
+			!this.#api ||
+			this.#disposed ||
+			session.tokens.principalId !== binding.principalId ||
+			session.tokens.sessionId !== binding.sessionId
+		)
+			throw new ServerApiError('sessionEnded');
+		return this.#api;
+	}
+	private async executeApiRequest(
+		session: CurrentSession,
+		generation: number,
+		request: PreparedApiRequest
+	): Promise<HttpResponse> {
+		const current = () => {
+			if (this.#disposed || this.#session !== session || this.#generation !== generation)
+				throw new ServerApiError('sessionEnded');
+			if (request.signal?.aborted) throw new ServerApiError('cancelled');
+		};
+		current();
+		if (request.operation['x-proctor-auth'] === 'public')
+			return this.options.http.transport.send(request);
+		if (request.operation['x-proctor-auth'] === 'refresh_credential_required')
+			throw new ServerApiError('invalidRequest');
+		if (this.#refresh || session.tokens.accessExpiresAt <= Date.now() + 5000)
+			await this.refresh();
+		const send = async () => {
+			current();
+			const accessToken = session.tokens.accessToken;
+			const proof = await createDPoPProof(
+				session.key,
+				request.method,
+				request.url,
+				session.tokens.nonce,
+				accessToken
+			);
+			current();
+			const result = await this.options.http.transport.send({
+				...request,
+				headers: { ...request.headers, DPoP: proof, Authorization: `DPoP ${accessToken}` }
+			});
+			current();
+			const nonce = result.headers['dpop-nonce'];
+			if (nonce) {
+				if (!/^[A-Za-z0-9_-]{43}$/u.test(nonce))
+					throw new ServerApiError('invalidResponse');
+				session.tokens = { ...session.tokens, nonce };
+			}
+			return result;
+		};
+		const code = (result: HttpResponse): string | undefined => {
+			if (result.status < 400) return undefined;
+			try {
+				const value = decodeJson(result);
+				return value &&
+					typeof value === 'object' &&
+					'code' in value &&
+					typeof value.code === 'string'
+					? value.code
+					: undefined;
+			} catch {
+				return undefined;
+			}
+		};
+		let result = await send();
+		if (code(result) === 'authentication.dpop.use_nonce' && result.headers['dpop-nonce'])
+			result = await send();
+		if (result.status === 401 && code(result) === 'authentication.invalid_token') {
+			await this.refresh();
+			current();
+			result = await send();
+			if (code(result) === 'authentication.dpop.use_nonce' && result.headers['dpop-nonce'])
+				result = await send();
+		}
+		return result;
+	}
 	private async protectedRequest(
 		session: CurrentSession,
 		generation: number,
 		path: DesktopHttpPath,
 		body?: unknown,
 		photo?: DesktopPhotoRequest,
-		settings?: DesktopSettingsRequest
+		settings?: DesktopSettingsRequest,
+		signal?: AbortSignal
 	): Promise<DesktopHttpResult> {
-		const current = () => {
-			if (this.#disposed || this.#session !== session || this.#generation !== generation)
-				throw new DesktopAuthorizationError('cancelled');
+		if (this.#generation !== generation || this.#session !== session)
+			throw new ServerApiError('sessionEnded');
+		const headers = {
+			...(photo?.etag ? { 'If-Match': photo.etag } : {}),
+			...(settings?.idempotencyKey ? { 'Idempotency-Key': settings.idempotencyKey } : {})
 		};
-		current();
-		if (this.#refresh || session.tokens.accessExpiresAt <= Date.now() + 5000)
-			await this.refresh();
-		current();
-		const send = async (): Promise<DesktopHttpResult> => {
-			current();
-			const accessToken = session.tokens.accessToken;
-			const proof = await createDPoPProof(
-				session.key,
-				desktopHttpMethod(path, photo, settings),
-				`${session.identity.origin}${path}`,
-				session.tokens.nonce,
-				accessToken
-			);
-			current();
-			const result = await this.options.http.request(
-				session.identity.origin,
-				path,
-				this.#operations.token,
-				{
-					proof,
-					credential: accessToken,
-					...(body === undefined ? {} : { body }),
-					...(photo ? { photo } : {}),
-					...(settings ? { settings } : {})
-				}
-			);
-			current();
-			if (result.nonce) session.tokens = { ...session.tokens, nonce: result.nonce };
-			return result;
-		};
-		let result = await send();
-		if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce)
-			result = await send();
-		if (result.status === 401 && errorCode(result) === 'authentication.invalid_token') {
-			await this.refresh();
-			current();
-			result = await send();
-			if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce)
-				result = await send();
+		const { id, input } = resolveApiRoute(
+			session.identity.origin,
+			path,
+			desktopHttpMethod(path, photo, settings),
+			photo?.bytes ?? body,
+			headers,
+			photo?.mediaType
+		);
+		try {
+			const result = await this.apiForSession({
+				principalId: session.tokens.principalId,
+				sessionId: session.tokens.sessionId
+			}).request(id, input, { signal });
+			if (photo?.operation === 'GET' && result.status === 200) {
+				if (!(result.value instanceof Uint8Array))
+					throw new ServerApiError('invalidResponse');
+				const bytes = Buffer.from(result.value);
+				if (
+					bytes.toString('ascii', 0, 4) !== 'RIFF' ||
+					bytes.toString('ascii', 8, 12) !== 'WEBP'
+				)
+					throw new ServerApiError('invalidResponse');
+				return {
+					status: 200,
+					value: {
+						kind: 'photo',
+						dataUrl: `data:image/webp;base64,${bytes.toString('base64')}`,
+						etag: result.headers.etag
+					}
+				};
+			}
+			return { status: Number(result.status), value: result.value };
+		} catch (error) {
+			if (error instanceof ServerApiError && error.kind === 'server')
+				return { status: error.status!, value: error.problem, failure: error };
+			throw error;
 		}
-		return result;
+	}
+	async examActivity(
+		binding: AccountBinding,
+		raw: ExamActivityIntent
+	): Promise<ExamActivityResponse> {
+		const intent = validateExamActivityIntent(raw);
+		try {
+			return await this.apiForSession(binding).fetchTask(
+				['examActivity', intent],
+				(signal) =>
+					projectRead((capture) =>
+						this.examActivityUncached(binding, intent, signal, capture)
+					),
+				{ staleTime: intent.kind === 'context' ? 0 : 30_000 }
+			);
+		} catch (error) {
+			return error instanceof ProjectionFailure
+				? (error.response as ExamActivityResponse)
+				: {
+						kind: 'error',
+						reason:
+							error instanceof ServerApiError && error.kind === 'sessionEnded'
+								? 'sessionEnded'
+								: 'unavailable'
+					};
+		}
+	}
+	observeExamActivity(
+		binding: AccountBinding,
+		raw: ExamActivityIntent,
+		listener: (response: ExamActivityResponse) => void
+	): ApiObservation {
+		const intent = validateExamActivityIntent(raw);
+		return this.apiForSession(binding).observeTask(
+			['examActivity', intent],
+			(signal) =>
+				projectRead((capture) =>
+					this.examActivityUncached(binding, intent, signal, capture)
+				),
+			(state) => {
+				if (state.error)
+					listener(
+						state.error instanceof ProjectionFailure
+							? (state.error.response as ExamActivityResponse)
+							: { kind: 'error', reason: 'unavailable' }
+					);
+				else if (state.data) listener(state.data);
+			},
+			{ staleTime: intent.kind === 'context' ? 0 : 30_000, pollIntervalMs: 30_000 }
+		);
+	}
+	/** Read-only product capability bound to the same authenticated session as account/settings. */
+	private async examActivityUncached(
+		binding: AccountBinding,
+		raw: ExamActivityIntent,
+		signal?: AbortSignal,
+		captureFailure?: (failure: ServerApiError) => void
+	): Promise<ExamActivityResponse> {
+		const intent = validateExamActivityIntent(raw);
+		const session = this.#session,
+			generation = this.#generation;
+		const current = () =>
+			!this.#disposed && this.#session === session && this.#generation === generation;
+		if (
+			!session ||
+			!current() ||
+			session.tokens.principalId !== binding.principalId ||
+			session.tokens.sessionId !== binding.sessionId
+		)
+			return { kind: 'error', reason: 'sessionEnded' };
+		const path: DesktopHttpPath =
+			intent.kind === 'context'
+				? '/api/v1/users/me/context'
+				: intent.kind === 'result'
+					? `/api/v1/exam-attempts/${intent.attemptId}/result`
+					: `/api/v1/users/me/exam-activity?limit=20${intent.cursor ? `&cursor=${encodeURIComponent(intent.cursor)}` : ''}`;
+		try {
+			const result = await this.protectedRequest(
+				session,
+				generation,
+				path,
+				undefined,
+				undefined,
+				undefined,
+				signal
+			);
+			if (result.failure) captureFailure?.(result.failure);
+			if (result.status === 401) {
+				await this.signOut();
+				return { kind: 'error', reason: 'sessionEnded' };
+			}
+			if (result.status === 403) return { kind: 'error', reason: 'restricted' };
+			if (result.status === 404 && intent.kind === 'result')
+				return { kind: 'error', reason: 'notFound' };
+			if (result.status === 400 && intent.kind === 'activity' && intent.cursor)
+				return { kind: 'error', reason: 'invalidCursor' };
+			if (result.status !== 200) return { kind: 'error', reason: 'unavailable' };
+			return readExamActivityWire(
+				intent,
+				result.value,
+				session.tokens.principalId,
+				session.tokens.registrationId
+			);
+		} catch (error) {
+			if (error instanceof ServerApiError) captureFailure?.(error);
+			return { kind: 'error', reason: current() ? 'unavailable' : 'sessionEnded' };
+		}
 	}
 	async readSettings(
 		binding: AccountBinding
@@ -789,6 +1092,8 @@ export class DesktopAuthorizationService extends Disposable {
 	#drop(): void {
 		this.#generation++;
 		this.#session = undefined;
+		this.#api?.dispose();
+		this.#api = undefined;
 		clearTimeout(this.#refreshTimer);
 		this.#operations.dispose(true);
 		this.#operations = new CancellationTokenSource();
@@ -879,4 +1184,31 @@ export class DesktopAuthorizationService extends Disposable {
 function thumbprint(key: DesktopSigningKey): string {
 	const { crv, kty, x, y } = key.publicJwk;
 	return createHash('sha256').update(JSON.stringify({ crv, kty, x, y })).digest('base64url');
+}
+
+class ProjectionFailure extends ServerApiError {
+	constructor(
+		readonly response: AccountResponse | ExamActivityResponse,
+		failure?: ServerApiError
+	) {
+		super(
+			failure?.kind ??
+				(response.kind === 'error' && response.reason === 'sessionEnded'
+					? 'sessionEnded'
+					: 'invalidResponse'),
+			failure?.status,
+			failure?.problem,
+			failure?.retryAfterMs
+		);
+	}
+}
+async function projectRead<T extends AccountResponse | ExamActivityResponse>(
+	read: (capture: (failure: ServerApiError) => void) => Promise<T>
+): Promise<T> {
+	let failure: ServerApiError | undefined;
+	const result = await read((value) => {
+		failure = value;
+	});
+	if (result.kind === 'error') throw new ProjectionFailure(result, failure);
+	return result;
 }

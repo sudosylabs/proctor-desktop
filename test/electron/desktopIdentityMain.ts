@@ -92,6 +92,7 @@ if (probe) {
 						new ElectronProductWindowFactory({
 							production: false,
 							account: service,
+							examActivity: service,
 							settings: service,
 							launchIdentity: launch,
 							rendererByKind: {
@@ -153,19 +154,42 @@ if (probe) {
 					}
 					if (path.endsWith('/context'))
 						return response({
-							user: { id: principalId, display_name: 'Identity Test' },
+							user: {
+								id: principalId,
+								username: 'identity-test',
+								profile_picture_reference: '',
+								display_name: 'Identity Test',
+								locale: 'en',
+								timezone: 'UTC'
+							},
+							unresolved_attempt: null,
+							session_management_available: true,
 							current_desktop_registration_id: registrationId,
 							available_product_areas: ['account', 'settings'],
 							no_current_affiliation: true,
-							no_assigned_access: true
+							no_assigned_access: true,
+							management_scopes: [],
+							management_scopes_has_more: false
 						});
+					if (path === '/api/v1/users/me/exam-activity') {
+						assert.equal(new URL(String(input)).search, '?limit=20');
+						assert.equal(init?.method, 'GET');
+						const headers = new Headers(init?.headers);
+						assert.ok(headers.get('Authorization')?.startsWith('DPoP '));
+						assert.ok(headers.get('DPoP'));
+						return response({ server_time: '2026-09-11T08:00:00Z', items: [] });
+					}
 					if (path === '/api/v1/users/me')
 						return response({
 							id: principalId,
 							username: 'identity-test',
 							display_name: 'Identity Test',
 							first_name: 'Identity',
-							last_name: 'Test'
+							last_name: 'Test',
+							create_at: 0,
+							update_at: 0,
+							delete_at: 0,
+							profile_picture_url: ''
 						});
 					if (path === '/api/v1/users/me/settings')
 						return response({
@@ -177,8 +201,26 @@ if (probe) {
 						});
 					if (path === '/api/v1/authentication-methods')
 						return response({ password: true, providers: [] });
-					if (path === '/api/v1/users/me/mfa') return response({}, 404);
-					if (path.endsWith('/profile-picture')) return response({}, 404);
+					if (path === '/api/v1/users/me/mfa')
+						return response(
+							{
+								type: 'about:blank',
+								title: 'Not found',
+								status: 404,
+								code: 'resource.not_found'
+							},
+							404
+						);
+					if (path.endsWith('/profile-picture'))
+						return response(
+							{
+								type: 'about:blank',
+								title: 'Not found',
+								status: 404,
+								code: 'resource.not_found'
+							},
+							404
+						);
 					if (path.endsWith('/logout')) return new Response(null, { status: 204 });
 					throw new Error('Unexpected test route');
 				});
@@ -260,9 +302,33 @@ if (probe) {
 					};
 					void check().catch(reject);
 				});
+				assert.deepEqual(
+					await window.webContents.executeJavaScript(`new Promise((resolve, reject) => {
+     const timer = setTimeout(() => reject(new Error('Observation did not publish')), 5000);
+     const subscription = globalThis.proctorAuthenticated.examActivity.observe({kind:'activity'}, response => {
+      clearTimeout(timer); subscription.dispose(); resolve(response);
+     });
+    })`),
+					{ kind: 'activity', serverTime: '2026-09-11T08:00:00Z', items: [] }
+				);
 				assert.equal(
 					await window.webContents.executeJavaScript('typeof process'),
 					'undefined'
+				);
+				assert.deepEqual(
+					await window.webContents.executeJavaScript(
+						"globalThis.proctorAuthenticated.examActivity.request({kind:'activity'})"
+					),
+					{ kind: 'activity', serverTime: '2026-09-11T08:00:00Z', items: [] }
+				);
+				assert.equal(
+					(
+						await service.examActivity(
+							{ principalId: 'b'.repeat(26), sessionId },
+							{ kind: 'context' }
+						)
+					).kind,
+					'error'
 				);
 				assert.equal((await credentials.read(scope))?.refreshToken, refreshToken);
 				const file = (await readdir(join(stateDirectory, 'credentials')))[0]!;
@@ -294,6 +360,10 @@ if (probe) {
 				assert.equal(browserOpens, 1);
 				await service.refresh();
 				await service.signOut();
+				assert.deepEqual(
+					await service.examActivity({ principalId, sessionId }, { kind: 'activity' }),
+					{ kind: 'error', reason: 'sessionEnded' }
+				);
 				assert.equal(await credentials.read(scope), undefined);
 				windows.returnToLaunch('identity-test-signed-out');
 				assert.equal(windows.current?.kind, 'launch');

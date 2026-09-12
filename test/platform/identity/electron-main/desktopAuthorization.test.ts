@@ -742,6 +742,8 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 	let revokeMode = 'strong';
 	let revokeCount = 0;
 	let opened = '';
+	let profileMode = 'success';
+	let profileReads = 0;
 	let settingsMode = 'success';
 	let settingsWrites = 0;
 	const settingsSource = '{\n  "workbench.colorTheme": "GitHub Dark Dimmed"\n}';
@@ -797,7 +799,15 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 				expected_revision: 'r'.repeat(26)
 			});
 			if (settingsMode === 'conflict')
-				return response({ code: 'user_settings.revision_conflict' }, 409);
+				return response(
+					{
+						type: 'about:blank',
+						title: 'Conflict',
+						status: 409,
+						code: 'user_settings.revision_conflict'
+					},
+					409
+				);
 			if (settingsMode === 'ambiguous') throw new Error('lost settings acknowledgement');
 			return response({
 				revision: 't'.repeat(26),
@@ -807,6 +817,15 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 			});
 		}
 		if (path === '/api/v1/users/me') {
+			profileReads++;
+			if (profileMode === 'malformed') return response({});
+			if (profileMode === 'gateway') {
+				profileMode = 'success';
+				return new Response('<html>proxy</html>', {
+					status: 503,
+					headers: { 'Content-Type': 'text/html', 'Retry-After': '1' }
+				});
+			}
 			if (!nonceRejected) {
 				nonceRejected = true;
 				return response({ code: 'authentication.dpop.use_nonce' }, 401);
@@ -817,13 +836,25 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 				display_name: 'Candidate',
 				first_name: '',
 				last_name: '',
+				create_at: 0,
+				update_at: 0,
+				delete_at: 0,
+				profile_picture_url: '',
 				password_hash: 'never project'
 			});
 		}
 		if (path === '/api/v1/users/me/sessions/revoke') {
 			revokeCount++;
 			if (revokeMode === 'network') throw new Error('Lost response');
-			return response({ code: 'authentication.strong_required' }, 403);
+			return response(
+				{
+					type: 'about:blank',
+					title: 'Strong authentication required',
+					status: 403,
+					code: 'authentication.strong_required'
+				},
+				403
+			);
 		}
 		throw new Error('Unexpected route');
 	});
@@ -876,6 +907,30 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		assert.ok(!JSON.stringify(profile).includes('never project'));
 		assert.equal(seen.length, 2);
 		assert.notEqual(seen[0]!.proof.jti, seen[1]!.proof.jti);
+		await service.apiForSession(binding).invalidate();
+		profileMode = 'malformed';
+		const beforeMalformed = profileReads;
+		assert.deepEqual(await service.account(binding, { kind: 'read', section: 'profile' }), {
+			kind: 'error',
+			reason: 'unavailable'
+		});
+		assert.equal(
+			profileReads,
+			beforeMalformed + 1,
+			'invalid DTOs must not be retried as network failures'
+		);
+		profileMode = 'gateway';
+		const beforeGateway = profileReads;
+		const retrying = service.account(binding, { kind: 'read', section: 'profile' });
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		assert.equal(profileReads, beforeGateway + 1, 'Retry-After prevents immediate retries');
+		assert.equal((await retrying).kind, 'data');
+		assert.equal(
+			profileReads,
+			beforeGateway + 2,
+			'gateway failures remain classified as transient'
+		);
+
 		assert.equal(await service.readSettings({ ...binding, sessionId: 'foreign' }), undefined);
 		const settings = await service.readSettings(binding);
 		assert.equal(settings?.acknowledged.source, settingsSource);

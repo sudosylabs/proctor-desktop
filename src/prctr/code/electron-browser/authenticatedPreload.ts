@@ -1,3 +1,9 @@
+import { createApiObserver } from './apiObservationPreload.js';
+import {
+	EXAM_ACTIVITY_CHANNEL,
+	validateExamActivityIntent,
+	validateExamActivityResponse
+} from '../../platform/examActivity/common/examActivityProtocol.js';
 import {
 	ACCOUNT_MENU_CHANNEL,
 	validateAccountMenuAnchor,
@@ -64,7 +70,28 @@ contextBridge.exposeInMainWorld(
 							)
 					})
 				: undefined,
+		examActivity: Object.freeze({
+			observe: createApiObserver(
+				`${EXAM_ACTIVITY_CHANNEL}:observe`,
+				validateExamActivityIntent,
+				validateExamActivityResponse,
+				{ kind: 'error', reason: 'unavailable' }
+			),
+			request: async (intent: unknown) =>
+				validateExamActivityResponse(
+					await ipcRenderer.invoke(
+						EXAM_ACTIVITY_CHANNEL,
+						validateExamActivityIntent(intent)
+					)
+				)
+		}),
 		account: Object.freeze({
+			observe: createApiObserver(
+				`${ACCOUNT_CHANNEL}:observe`,
+				validateAccountIntent,
+				validateAccountResponse,
+				{ kind: 'error', reason: 'unavailable' }
+			),
 			request: async (intent: unknown) =>
 				validateAccountResponse(
 					await ipcRenderer.invoke(ACCOUNT_CHANNEL, validateAccountIntent(intent))

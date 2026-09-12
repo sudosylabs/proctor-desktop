@@ -47,20 +47,20 @@
       "upstreamBlob": "c9736ff355fa22791e95f12c9d38b2a26ece4832",
       "category": "source",
       "disposition": "behaviorally-reimplemented",
-      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs the authorized Settings native IPC bridge and disposes it on close and creation failure.",
+      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "85e3df2998688439ebb4a76c262fb37561f28d6f8b264b35541c95c0abdc8cf5"
+      "localSha256": "aa64ae7cbaddbbf545448241527ce43c388e79821be26a1e5f83b00534bda67e"
     },
     {
       "upstreamPath": "src/vs/platform/windows/electron-main/windows.ts",
       "upstreamBlob": "7c4f02efdfa374b2d8712f2892bc8c5b5e697064",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs the authorized Settings native IPC bridge and disposes it on close and creation failure.",
+      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "85e3df2998688439ebb4a76c262fb37561f28d6f8b264b35541c95c0abdc8cf5",
+      "localSha256": "aa64ae7cbaddbbf545448241527ce43c388e79821be26a1e5f83b00534bda67e",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -280,6 +280,20 @@
         "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts"
       ],
       "verificationRefs": ["identity-handoff-tests"]
+    },
+    {
+      "id": "candidate-exam-activity-capability",
+      "summary": "AuthenticatedWindow has a closed read-only context, own exam activity, and explicitly released result capability. It binds principal/session in main and revalidates the sender after awaits; no generic HTTP or exam-entry effect is exposed by this capability.",
+      "localPaths": [
+        "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
+        "src/prctr/platform/examActivity/electron-main/examActivityIpc.ts",
+        "src/prctr/code/electron-browser/authenticatedPreload.ts"
+      ],
+      "verificationRefs": [
+        "exam-activity-boundary-tests",
+        "identity-handoff-tests",
+        "composition-check"
+      ]
     }
   ],
   "verification": [
@@ -341,7 +355,13 @@
       "id": "identity-handoff-tests",
       "kind": "test",
       "path": "test/electron/desktopIdentity.real.test.ts",
-      "obligation": "Real native key and encrypted refresh custody precede sandboxed authenticated rendering; sign-out returns to LaunchWindow."
+      "obligation": "Real native key and encrypted refresh custody precede sandboxed authenticated rendering; sign-out returns to LaunchWindow. Verify exam-activity reads traverse the real sandboxed preload and DPoP transport and fail after the bound session ends."
+    },
+    {
+      "id": "exam-activity-boundary-tests",
+      "kind": "test",
+      "path": "test/platform/identity/electron-main/examActivity.test.ts",
+      "obligation": "Verify closed intents and HTTP paths, candidate-visible whitelist, response bounds, binding mismatch rejection, sender revalidation, and disposal fencing."
     }
   ]
 }
