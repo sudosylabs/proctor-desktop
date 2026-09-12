@@ -1438,7 +1438,7 @@ export interface paths {
         };
         /**
          * Get the protected current presentation for one candidate Attempt
-         * @description Returns the Exam title, bounded Markdown instructions, admitted capacity policy, and ordered resource manifest visible to the active candidate Attempt. The request rechecks the Session-bound Attempt credential and open Connection; no answer or manager-only state is included.
+         * @description Returns the Exam title, bounded Markdown instructions, admitted capacity policy, and ordered resource manifest visible to the active candidate Attempt. The request rechecks the Session-bound Attempt credential and open Connection; no answer or manager-only state is included. Capacity is frozen to the original admission Revision and does not change with Institution policy updates or live corrections. Instructions and resources follow the current Sitting Revision.
          */
         readonly get: operations["getCandidateExamPresentation"];
         readonly put?: never;
@@ -6164,6 +6164,8 @@ export interface components {
             readonly attempt_id: components["schemas"]["ID"];
             readonly browser_policy: components["schemas"]["CandidateBrowserPolicy"] | null;
             readonly candidate_runtime_capabilities: components["schemas"]["CandidateRuntimeCapabilities"];
+            /** @description Exam Capacity Policy frozen to the original admission Revision, including the enforced Workspace entry, per-file, and total-byte limits. */
+            readonly capacity: components["schemas"]["ExamCapacityPolicy"];
             readonly exam_sitting_id: components["schemas"]["ID"];
             /** @description Current Sitting Revision instructions as bounded authored Markdown. */
             readonly instructions_markdown: string;
@@ -7055,44 +7057,91 @@ export interface components {
             /** @description Exactly one family in this order: process_application, interactive_session, clipboard, printing, removable_storage, virtualization, network_configuration, camera, microphone, external_capture. */
             readonly capabilities: readonly [
                 {
+                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
+                    readonly allowed_application_ids: readonly string[];
                     /** @constant */
-                    readonly id?: "process_application";
+                    readonly id: "process_application";
+                    /** @enum {string} */
+                    readonly mode: "disabled" | "observe" | "enforce";
+                } & unknown,
+                {
+                    /** @constant */
+                    readonly id: "interactive_session";
+                    /** @enum {string} */
+                    readonly mode: "disabled" | "observe" | "enforce";
                 },
                 {
                     /** @constant */
-                    readonly id?: "interactive_session";
-                },
+                    readonly id: "clipboard";
+                    /** @enum {string} */
+                    readonly mode: "disabled" | "observe" | "enforce";
+                    readonly observe_os_clipboard_changes: boolean;
+                    /** @enum {string} */
+                    readonly strategy: "disabled" | "private_attempt";
+                } & (unknown & unknown & unknown),
+                {
+                    /** @enum {string} */
+                    readonly candidate_print_commands: "not_applied" | "deny";
+                    /** @constant */
+                    readonly id: "printing";
+                    /** @enum {string} */
+                    readonly mode: "disabled" | "observe" | "enforce";
+                    /** @enum {string} */
+                    readonly monitored_spooler: "not_required" | "required";
+                } & (unknown & unknown & unknown),
+                {
+                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
+                    readonly allowed_storage_function_class_ids: readonly string[];
+                    readonly enabled_sub_capabilities: readonly ("removable_block_storage" | "portable_mtp")[];
+                    /** @constant */
+                    readonly id: "removable_storage";
+                    /** @enum {string} */
+                    readonly mode: "disabled" | "observe" | "enforce";
+                } & (unknown & unknown & unknown),
                 {
                     /** @constant */
-                    readonly id?: "clipboard";
-                },
+                    readonly id: "virtualization";
+                    /** @enum {string} */
+                    readonly mode: "disabled" | "observe" | "enforce";
+                    /** @enum {string} */
+                    readonly rule: "not_applied" | "block_recognized_guest" | "require_certified_physical_environment";
+                } & (unknown & unknown & unknown),
+                {
+                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
+                    readonly allowed_adapter_class_ids: readonly string[];
+                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
+                    readonly allowed_managed_profile_ids: readonly string[];
+                    /** @description Sorted unique opaque catalog IDs; executable paths, names, commands and regular expressions are not accepted. */
+                    readonly allowed_tunnel_class_ids: readonly string[];
+                    readonly enabled_sub_capabilities: readonly ("system_proxy_state" | "os_managed_vpn_state" | "tunnel_interface_state" | "route_change" | "network_source_health")[];
+                    /** @constant */
+                    readonly id: "network_configuration";
+                    /** @enum {string} */
+                    readonly mode: "disabled" | "observe" | "enforce";
+                } & (unknown & unknown & unknown),
+                {
+                    /** @enum {string} */
+                    readonly concurrent_use_check: "not_required" | "supported_required";
+                    /** @constant */
+                    readonly id: "camera";
+                    /** @enum {string} */
+                    readonly mode: "disabled" | "observe" | "enforce";
+                    readonly require_ready: boolean;
+                } & (unknown & unknown),
+                {
+                    /** @enum {string} */
+                    readonly concurrent_use_check: "not_required" | "supported_required";
+                    /** @constant */
+                    readonly id: "microphone";
+                    /** @enum {string} */
+                    readonly mode: "disabled" | "observe" | "enforce";
+                    readonly require_ready: boolean;
+                } & (unknown & unknown),
                 {
                     /** @constant */
-                    readonly id?: "printing";
-                },
-                {
-                    /** @constant */
-                    readonly id?: "removable_storage";
-                },
-                {
-                    /** @constant */
-                    readonly id?: "virtualization";
-                },
-                {
-                    /** @constant */
-                    readonly id?: "network_configuration";
-                },
-                {
-                    /** @constant */
-                    readonly id?: "camera";
-                },
-                {
-                    /** @constant */
-                    readonly id?: "microphone";
-                },
-                {
-                    /** @constant */
-                    readonly id?: "external_capture";
+                    readonly id: "external_capture";
+                    /** @enum {string} */
+                    readonly mode: "disabled";
                 }
             ];
             /** @constant */

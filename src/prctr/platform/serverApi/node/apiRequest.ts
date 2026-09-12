@@ -214,7 +214,12 @@ export function readApiResponse(
 		const media = content[mediaType] ?? content['*/*'];
 		if (!media || !mediaType) throw new ServerApiError('invalidResponse');
 		if (mediaType === 'application/json' && !content['*/*']) {
-			value = decodeJson(response);
+			value = decodeJson(
+				response,
+				/(?:security-preflights|security-policy|security-batches|security-streams|browser-sources|browser-activity|delivery-limits)/u.test(
+					operation.path
+				)
+			);
 			if (media.schema) validateApiValue(media.schema, value, true);
 		} else value = response.bytes;
 	} else if (response.bytes.byteLength) throw new ServerApiError('invalidResponse');
