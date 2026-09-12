@@ -1,3 +1,4 @@
+import { runExamActivityTests } from './examActivityTests.js';
 import { createLocalization, defineMessage } from '../../src/prctr/base/common/localization.js';
 import { Emitter } from '../../src/prctr/base/common/event.js';
 import { DisposableStore } from '../../src/prctr/base/common/lifecycle.js';
@@ -91,6 +92,7 @@ async function runGroup(name: string, run: () => Promise<void>): Promise<void> {
 		);
 	}
 }
+await runGroup('exam-activity', runExamActivityTests);
 await runGroup('browser-owner', async () => {
 	document.body.dataset.browserOwnerTests = String(await runBrowserInteractionOwnerTests());
 });

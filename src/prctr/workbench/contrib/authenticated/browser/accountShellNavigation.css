@@ -1,4 +1,8 @@
 @layer contributions {
+	.prctr-account-shell .prctr-account-shell__access {
+		padding: var(--prctr-spacing-content-medium);
+		color: var(--prctr-color-text-secondary);
+	}
 	.prctr-account-shell[data-region='navigation'] {
 		display: flex;
 		flex-direction: column;
@@ -9,17 +13,14 @@
 		font: var(--prctr-typography-label-size)/var(--prctr-typography-label-lineHeight)
 			var(--prctr-typography-font-application);
 	}
-	.prctr-account-shell h1 {
-		/* Modern UI part title: 32px, sentence case, inset 4px + 8px. */
-		font: inherit;
+	.prctr-account-shell .prctr-account-shell__brand {
+		padding: var(--prctr-spacing-region) var(--prctr-spacing-content-large);
+		margin-block-end: var(--prctr-spacing-content-medium);
+		font-size: var(--prctr-typography-body-size);
+		line-height: var(--prctr-typography-body-lineHeight);
 		font-weight: var(--prctr-typography-weight-semibold);
-		min-block-size: 32px;
-		line-height: 32px;
-		margin: 0;
-		padding-inline: calc(var(--prctr-spacing-workbench-gutter) + 8px);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		overflow-wrap: anywhere;
 	}
 	.prctr-account-shell .prctr-account-shell__scroll {
 		flex: 1;
@@ -29,29 +30,78 @@
 		block-size: 100%;
 		overflow: hidden;
 		box-sizing: border-box;
-		padding-inline: var(--prctr-spacing-workbench-rowInset);
+		padding-inline: var(--prctr-spacing-content-medium);
 	}
-	.prctr-account-shell .prctr-account-shell__destination {
+	.prctr-account-shell .prctr-account-shell__group {
+		margin-block-end: var(--prctr-spacing-content-medium);
+	}
+	.prctr-account-shell .prctr-account-shell__group-header {
+		display: flex;
+		align-items: center;
+	}
+	.prctr-account-shell .prctr-account-shell__destination,
+	.prctr-account-shell .prctr-account-shell__child,
+	.prctr-account-shell .prctr-account-shell__disclosure {
 		display: flex;
 		align-items: center;
 		gap: var(--prctr-spacing-content-medium);
 		text-align: start;
 		background: transparent;
-		border: 1px solid transparent;
+		border: var(--prctr-shape-stroke-default) solid transparent;
 		border-radius: var(--prctr-shape-radius-medium);
-		color: inherit;
+		color: var(--prctr-color-text-secondary);
 		font: inherit;
-		min-block-size: 28px;
-		padding: var(--prctr-spacing-content-small) var(--prctr-spacing-content-medium);
-		inline-size: 100%;
+		min-block-size: 36px;
+		padding: var(--prctr-spacing-content-medium);
 		cursor: pointer;
+		box-sizing: border-box;
 	}
-	.prctr-account-shell .prctr-account-shell__destination:hover {
-		background: var(--prctr-color-interaction-hover);
+	.prctr-account-shell .prctr-account-shell__destination {
+		flex: 1;
+		min-inline-size: 0;
+		font-weight: var(--prctr-typography-weight-semibold);
 	}
-	.prctr-account-shell .prctr-account-shell__destination:hover {
+	.prctr-account-shell .prctr-account-shell__child {
+		inline-size: 100%;
+		padding-inline-start: var(--prctr-spacing-content-large);
+	}
+	.prctr-account-shell .prctr-account-shell__children {
+		margin-inline: var(--prctr-spacing-region) var(--prctr-spacing-content-small);
+		margin-block: var(--prctr-spacing-content-small) var(--prctr-spacing-content-large);
+		padding-inline-start: var(--prctr-spacing-content-small);
+		border-inline-start: var(--prctr-shape-stroke-default) solid
+			var(--prctr-color-border-default);
+	}
+	.prctr-account-shell .prctr-account-shell__children[hidden],
+	.prctr-account-shell .prctr-account-shell__access[hidden] {
+		display: none;
+	}
+	.prctr-account-shell .prctr-account-shell__disclosure {
+		justify-content: center;
+		inline-size: 28px;
+		flex: none;
+	}
+	.prctr-account-shell .prctr-account-shell__disclosure[aria-expanded='false'] {
+		transform: rotate(-90deg);
+	}
+	.prctr-account-shell .prctr-account-shell__destination:hover,
+	.prctr-account-shell .prctr-account-shell__child:hover,
+	.prctr-account-shell .prctr-account-shell__disclosure:hover {
+		background: var(--prctr-theme-list-hoverBackground);
+		color: var(--prctr-theme-list-hoverForeground, var(--prctr-color-text-primary));
 		outline: var(--prctr-shape-stroke-default) dashed
 			var(--prctr-theme-contrastActiveBorder, transparent);
+		outline-offset: -1px;
+	}
+	.prctr-account-shell .prctr-account-shell__child[aria-current='page'] {
+		background: var(--prctr-theme-list-inactiveSelectionBackground);
+		color: var(--prctr-theme-list-inactiveSelectionForeground, var(--prctr-color-text-primary));
+		font-weight: var(--prctr-typography-weight-semibold);
+		border-color: var(--prctr-theme-contrastActiveBorder, transparent);
+	}
+	.prctr-account-shell .prctr-account-shell__child:focus-visible,
+	.prctr-account-shell .prctr-account-shell__disclosure:focus-visible {
+		outline: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-focus);
 		outline-offset: -1px;
 	}
 	.prctr-account-shell[data-region='trigger']:hover:not(:disabled),
@@ -62,7 +112,8 @@
 		outline-offset: -1px;
 	}
 	.prctr-account-shell .prctr-account-shell__destination[aria-current='page'] {
-		background: var(--prctr-color-interaction-selected);
+		color: var(--prctr-color-text-primary);
+		background: var(--prctr-theme-toolbar-hoverBackground);
 	}
 	.prctr-account-shell .prctr-account-shell__destination:focus-visible,
 	.prctr-account-shell[data-region='trigger']:focus-visible,

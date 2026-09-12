@@ -39,7 +39,26 @@ export function createSemanticIcon(
 			throw new Error('Cannot update a disposed semantic icon.');
 		}
 		const glyph = resolveSemanticIcon(next.id);
-		element.textContent = String.fromCodePoint(glyph.fontCharacter);
+		element.replaceChildren();
+		if ('paths' in glyph) {
+			const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			svg.setAttribute('viewBox', '0 0 24 24');
+			svg.setAttribute('width', '100%');
+			svg.setAttribute('height', '100%');
+			svg.setAttribute('fill', 'none');
+			svg.setAttribute('stroke', 'currentColor');
+			svg.setAttribute('stroke-width', '1.6');
+			svg.setAttribute('stroke-linecap', 'round');
+			svg.setAttribute('stroke-linejoin', 'round');
+			svg.setAttribute('aria-hidden', 'true');
+			svg.setAttribute('focusable', 'false');
+			for (const d of glyph.paths) {
+				const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+				path.setAttribute('d', d);
+				svg.append(path);
+			}
+			element.append(svg);
+		} else element.textContent = String.fromCodePoint(glyph.fontCharacter);
 		element.dataset.prctrSemanticIcon = next.id;
 		element.dataset.prctrIconSize = String(next.size ?? 16);
 		if (next.modifier === undefined) {

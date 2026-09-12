@@ -59,6 +59,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 	readonly #heading: HTMLHeadingElement;
 	readonly #subtitle: HTMLElement;
 	readonly #refresh: ButtonControl;
+	readonly #observations = this._register(new DisposableStore());
 	readonly #content = this._register(new DisposableStore());
 	readonly #editor = this._register(new MutableDisposable<AccountPhotoEditor>());
 	readonly #scroll: DomScrollableElement;
@@ -69,6 +70,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 	#epoch = 0;
 	#disposed = false;
 	#refreshing = false;
+	readonly #failedSections = new Set<AccountSection>();
 	#detail: { item: AccountItem; trigger: HTMLElement } | undefined;
 	#detailHost: HTMLElement | undefined;
 	#detailStore = this._register(new DisposableStore());
@@ -96,12 +98,13 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		this.#refresh = this._register(
 			new ButtonControl(header, {
 				variant: 'secondary',
-				label: this.text('refresh'),
+				label: this.text('retry'),
 				icon: (doc) => createSemanticIcon(doc, { id: 'action.refresh' })
 			})
 		);
-		if (services) this._register(services.hover(this.#refresh.element, this.text('refresh')));
+		if (services) this._register(services.hover(this.#refresh.element, this.text('retry')));
 		this._register(this.#refresh.onDidRequest(() => void this.refresh()));
+		this.#refresh.element.hidden = true;
 		this.#subtitle = document.createElement('p');
 		this.#subtitle.className = 'prctr-account__subtitle';
 		this.#body = document.createElement('div');
@@ -194,22 +197,43 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			);
 		}
 		this.#content.add(token.onCancellationRequested(() => this.clear()));
-		void this.refresh();
+		if (this.client.observe) this.observeSections();
+		else void this.refresh();
 	}
 	clear(): void {
+		this.#observations.clear();
 		this.#epoch++;
 		this.#editor.clear();
 		this.#content.clear();
 		this.#detailStore.clear();
 		this.#sections.clear();
+		this.#failedSections.clear();
+		this.updateRefresh();
 		this.#pending.clear();
 		this.#unconfirmed.clear();
 		this.#body.replaceChildren();
 		this.#detail = undefined;
 		this.#refreshing = false;
 	}
+	private observeSections(): void {
+		this.#observations.clear();
+		if (!this.client.observe) return;
+		const epoch = this.#epoch;
+		for (const section of this.#sections.keys()) {
+			if (!this.#sections.get(section)?.data)
+				this.#sections.get(section)?.feedback.set('loading', 'loading');
+			this.#observations.add(
+				this.client.observe({ kind: 'read', section }, (result) => {
+					if (!this.#disposed && epoch === this.#epoch && !this.#pending.size)
+						this.applySection(section, result);
+				})
+			);
+		}
+	}
 	setVisible(visible: boolean): void {
 		this.element.hidden = !visible;
+		if (visible) this.observeSections();
+		else this.#observations.clear();
 	}
 	layout(): void {
 		this.#scroll.scanDomNode();
@@ -293,8 +317,9 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		}
 	}
 	private updateRefresh(): void {
+		this.#refresh.element.hidden = this.#failedSections.size === 0;
 		this.#refresh.setState({
-			label: this.text('refresh'),
+			label: this.text('retry'),
 			disabled: this.#refreshing || this.#pending.size > 0,
 			icon: (doc) => createSemanticIcon(doc, { id: 'action.refresh' })
 		});
@@ -314,12 +339,27 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		if (!view) return false;
 		const epoch = this.#epoch,
 			sequence = ++view.sequence;
-		view.feedback.set('loading', 'loading');
+		if (!view.data) view.feedback.set('loading', 'loading');
 		view.host.setAttribute('aria-busy', 'true');
 		const result = await this.request({ kind: 'read', section });
 		if (this.#disposed || epoch !== this.#epoch || sequence !== view.sequence) return false;
+		return this.applySection(section, result);
+	}
+	private applySection(section: AccountSection, result: AccountResponse): boolean {
+		const view = this.#sections.get(section);
+		if (!view) return false;
 		view.host.setAttribute('aria-busy', 'false');
 		if (result.kind !== 'data' || result.data.section !== section) {
+			this.#failedSections.add(section);
+			this.updateRefresh();
+			if (
+				result.kind === 'error' &&
+				['sessionEnded', 'denied', 'notFound'].includes(result.reason)
+			) {
+				view.data = undefined;
+				view.store.clear();
+				view.content.replaceChildren();
+			}
 			if (!view.data && !view.content.childElementCount)
 				this.heading(section === 'profile' ? 'accountDetails' : section, view.content);
 			view.feedback.set(
@@ -334,6 +374,12 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 				(section === 'desktops' && key.startsWith('revokeDesktop'))
 			)
 				this.#unconfirmed.delete(key);
+		}
+		this.#failedSections.delete(section);
+		this.updateRefresh();
+		if (JSON.stringify(view.data) === JSON.stringify(result.data)) {
+			view.feedback.set();
+			return true;
 		}
 		view.data = result.data;
 		view.store.clear();
@@ -837,7 +883,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		);
 		const recheck = this.action(
 			actions,
-			this.text('refresh'),
+			this.text('retry'),
 			() => {
 				if (this.#pending.size) {
 					feedback.set('mutationWaiting');
@@ -845,7 +891,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 				}
 				const epoch = this.#epoch;
 				working = true;
-				recheck.setState({ label: this.text('refresh'), disabled: true });
+				recheck.setState({ label: this.text('retry'), disabled: true });
 				cancel.setState({ label: this.text('cancel'), disabled: true });
 				void this.loadSection(photo ? 'profile' : desktop ? 'desktops' : 'sessions').then(
 					(loaded) => {
@@ -856,7 +902,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 							).focus();
 						else {
 							working = false;
-							recheck.setState({ label: this.text('refresh') });
+							recheck.setState({ label: this.text('retry') });
 							cancel.setState({ label: this.text('cancel') });
 						}
 					}

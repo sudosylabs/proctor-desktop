@@ -181,7 +181,7 @@ export function createAccountContribution(
 						'aria-current',
 						visible && section === selected ? 'page' : 'false'
 					);
-				host.element.hidden = !visible;
+				if (!navigation.productPages) host.element.hidden = !visible;
 				context.shell.setPartVisible(
 					'sidebar',
 					!navigation.accountMenuNavigation && !navigation.accountHost && visible
@@ -191,7 +191,7 @@ export function createAccountContribution(
 					void open(selected, focus);
 				} else {
 					sequence++;
-					void host.clear().catch(() => {});
+					if (!navigation.productPages) void host.clear().catch(() => {});
 				}
 			};
 			context.disposables.add(

@@ -1,3 +1,4 @@
+import type { ProductArea } from '../../../../platform/examActivity/common/examActivityProtocol.js';
 import { AUTHENTICATED_LAYOUT_SERVICE, type AuthenticatedLayout } from './authenticatedLayout.js';
 import {
 	PRODUCT_WINDOW_CHROME_SERVICE,
@@ -21,12 +22,54 @@ import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows
 import type { WorkbenchBootstrapContext } from '../../../browser/bootstrap.js';
 import {
 	AUTHENTICATED_NAVIGATION_SERVICE,
+	activityViews,
+	type ActivityView,
 	type AuthenticatedNavigationService
 } from './authenticatedNavigation.js';
 import type { AuthenticatedRendererClient } from './authenticatedContribution.js';
 import './accountShellNavigation.css';
 
 export const accountShellMessages = {
+	overview: defineMessage({
+		id: 'authenticated.nav.overview',
+		defaultMessage: 'Overview',
+		description: 'Exam overview navigation.'
+	}),
+	upcoming: defineMessage({
+		id: 'authenticated.nav.upcoming',
+		defaultMessage: 'Upcoming',
+		description: 'Upcoming exams navigation.'
+	}),
+	available: defineMessage({
+		id: 'authenticated.nav.available',
+		defaultMessage: 'Ready to join',
+		description: 'Available exams navigation, subject to admission checks.'
+	}),
+	in_progress: defineMessage({
+		id: 'authenticated.nav.progress',
+		defaultMessage: 'In progress',
+		description: 'Unfinished attempts navigation.'
+	}),
+	submitted: defineMessage({
+		id: 'authenticated.nav.submitted',
+		defaultMessage: 'Submitted',
+		description: 'Submitted exams navigation.'
+	}),
+	results_available: defineMessage({
+		id: 'authenticated.nav.results',
+		defaultMessage: 'Results',
+		description: 'Released results navigation.'
+	}),
+	past: defineMessage({
+		id: 'authenticated.nav.history',
+		defaultMessage: 'History',
+		description: 'Past exam activity navigation.'
+	}),
+	examViews: defineMessage({
+		id: 'authenticated.nav.exam.views',
+		defaultMessage: 'My exams sections',
+		description: 'Expand or collapse exam navigation children.'
+	}),
 	toggleSidebar: defineMessage({
 		id: 'authenticated.shell.toggle.sidebar',
 		defaultMessage: 'Toggle sidebar visibility',
@@ -67,6 +110,21 @@ export const accountShellMessages = {
 		defaultMessage: 'Settings',
 		description: 'User settings destination.'
 	}),
+	management: defineMessage({
+		id: 'authenticated.shell.management',
+		defaultMessage: 'Exam management',
+		description: 'Authorized exam management destination.'
+	}),
+	administration: defineMessage({
+		id: 'authenticated.shell.administration',
+		defaultMessage: 'Administration',
+		description: 'Authorized institution management destination.'
+	}),
+	retry: defineMessage({
+		id: 'authenticated.shell.retry',
+		defaultMessage: 'Refresh access',
+		description: 'Refresh permitted product areas from the server.'
+	}),
 	exams: defineMessage({
 		id: 'authenticated.shell.exams',
 		defaultMessage: 'My exams',
@@ -106,8 +164,9 @@ export function activateAccountShellNavigation(
 	root.className = 'prctr-account-shell';
 	root.dataset.region = 'navigation';
 	context.shell.part('navigation').append(root);
-	const brand = context.document.createElement('h1');
-	brand.textContent = text('product');
+	const brand = context.document.createElement('div');
+	brand.className = 'prctr-account-shell__brand';
+	brand.textContent = binding.identity?.institutionName ?? text('product');
 	root.append(brand);
 	const destinations = context.document.createElement('div');
 	destinations.className = 'prctr-account-shell__destinations';
@@ -137,11 +196,39 @@ export function activateAccountShellNavigation(
 	const description = context.document.createElement('p');
 	description.textContent = text('waiting');
 	waiting.append(heading, description);
-	context.shell.part('content').append(waiting);
+	if (!client.examActivity) context.shell.part('content').append(waiting);
 	const changes = context.disposables.add(new Emitter<string>());
+	const viewChanges = context.disposables.add(new Emitter<ActivityView>());
+	let activityView: ActivityView = 'overview';
+	let viewsExpanded = true;
+	const viewButtons = new Map<ActivityView, HTMLButtonElement>();
+	let viewList: HTMLElement | undefined;
+	let disclosure: HTMLButtonElement | undefined;
+	const updateViews = (): void => {
+		for (const [view, button] of viewButtons)
+			button.setAttribute(
+				'aria-current',
+				current === 'activity' && activityView === view ? 'page' : 'false'
+			);
+		if (viewList) viewList.hidden = !viewsExpanded;
+		disclosure?.setAttribute('aria-expanded', String(viewsExpanded));
+	};
+	const selectActivityView = (view: ActivityView): void => {
+		if (!activityViews.includes(view) || !destinationButtons.has('activity')) return;
+		activityView = view;
+		viewsExpanded = true;
+		updateViews();
+		if (current !== 'activity') select('activity');
+		else viewChanges.fire(view);
+	};
 	let current = 'account';
 	let accountSection: 'profile' | 'sessions' = 'profile';
-	let exams: HTMLButtonElement | undefined;
+	const destinationButtons = new Map<string, HTMLButtonElement>();
+	const destinationStore = context.disposables.add(new DisposableStore());
+	const statusStore = context.disposables.add(new DisposableStore());
+	const status = context.document.createElement('div');
+	status.className = 'prctr-account-shell__access';
+	root.append(status);
 	const settingsRequests = context.disposables.add(new Emitter<void>());
 	let settingsRequested = false;
 	const select = (destination: string): void => {
@@ -150,8 +237,17 @@ export function activateAccountShellNavigation(
 			settingsRequests.fire();
 			return;
 		}
-		current = destination === 'account' ? 'account' : exams ? 'activity' : 'account';
-		exams?.setAttribute('aria-current', current === 'activity' ? 'page' : 'false');
+		current =
+			destination === 'account' || destinationButtons.has(destination)
+				? destination
+				: (destinationButtons.keys().next().value ?? 'account');
+		for (const [key, button] of destinationButtons)
+			button.setAttribute(
+				'aria-current',
+				current === key && (key !== 'activity' || !client.examActivity) ? 'page' : 'false'
+			);
+		if (current === 'activity') viewsExpanded = true;
+		updateViews();
 		waiting.hidden = current !== 'activity';
 		context.shell.revealContent();
 		context
@@ -159,19 +255,140 @@ export function activateAccountShellNavigation(
 			.setDestination(current === 'account' ? `account/${accountSection}` : current);
 		changes.fire(current);
 	};
-	if (binding.identity?.availableProductAreas.includes('student_activity')) {
-		exams = context.document.createElement('button');
-		exams.type = 'button';
-		exams.className = 'prctr-account-shell__destination';
-		exams.append(
-			context.disposables.add(
-				createSemanticIcon(context.document, { id: 'workspace.file', size: 16 })
-			).element,
-			context.document.createTextNode(text('exams'))
-		);
-		destinations.append(exams);
-		context.disposables.add(addDisposableListener(exams, 'click', () => select('activity')));
-	}
+	const setProductAreas = (areas: readonly ProductArea[]): void => {
+		const focused = context.document.activeElement;
+		const focusedView = [...viewButtons].find(([, button]) => button === focused)?.[0];
+		const focusedDestination = [...destinationButtons].find(
+			([, button]) => button === focused
+		)?.[0];
+		destinationStore.clear();
+		destinations.replaceChildren();
+		destinationButtons.clear();
+		viewButtons.clear();
+		viewList = undefined;
+		disclosure = undefined;
+		for (const [area, destination, label] of [
+			['student_activity', 'activity', 'exams'],
+			['exam_management', 'management', 'management'],
+			['administration', 'administration', 'administration']
+		] as const) {
+			if (!areas.includes(area)) continue;
+			const button = context.document.createElement('button');
+			button.type = 'button';
+			button.className = 'prctr-account-shell__destination';
+			button.dataset.destination = destination;
+			button.append(
+				destinationStore.add(
+					createSemanticIcon(context.document, {
+						id:
+							area === 'student_activity'
+								? 'product.exams'
+								: area === 'exam_management'
+									? 'product.management'
+									: 'product.administration',
+						size: 20
+					})
+				).element,
+				context.document.createTextNode(text(label))
+			);
+			button.setAttribute(
+				'aria-current',
+				current === destination && (destination !== 'activity' || !client.examActivity)
+					? 'page'
+					: 'false'
+			);
+			const group = context.document.createElement('section');
+			group.className = 'prctr-account-shell__group';
+			const groupHeader = context.document.createElement('div');
+			groupHeader.className = 'prctr-account-shell__group-header';
+			groupHeader.append(button);
+			group.append(groupHeader);
+			destinations.append(group);
+			if (destination === 'activity' && client.examActivity) {
+				disclosure = context.document.createElement('button');
+				disclosure.type = 'button';
+				disclosure.className = 'prctr-account-shell__disclosure';
+				disclosure.ariaLabel = text('examViews');
+				disclosure.append(
+					destinationStore.add(
+						createSemanticIcon(context.document, {
+							id: 'disclosure.expanded',
+							size: 12
+						})
+					).element
+				);
+				viewList = context.document.createElement('div');
+				viewList.className = 'prctr-account-shell__children';
+				viewList.id = `${context.shell.element.id}-exam-views`;
+				disclosure.setAttribute('aria-controls', viewList.id);
+				groupHeader.append(disclosure);
+				group.append(viewList);
+				destinationStore.add(
+					addDisposableListener(disclosure, 'click', () => {
+						viewsExpanded = !viewsExpanded;
+						updateViews();
+						scroll.scanDomNode();
+					})
+				);
+				destinationStore.add(
+					context
+						.getService<AuthenticatedWindowControls>(
+							AUTHENTICATED_WINDOW_CONTROLS_SERVICE
+						)
+						.hover.setupDelayedHover(disclosure, () => ({ content: text('examViews') }))
+				);
+				for (const view of activityViews) {
+					const child = context.document.createElement('button');
+					child.type = 'button';
+					child.className = 'prctr-account-shell__child';
+					child.textContent = text(view);
+					child.dataset.activityView = view;
+					viewList.append(child);
+					viewButtons.set(view, child);
+					destinationStore.add(
+						addDisposableListener(child, 'click', () => selectActivityView(view))
+					);
+				}
+			}
+			destinationButtons.set(destination, button);
+			destinationStore.add(
+				addDisposableListener(button, 'click', () => {
+					if (destination === 'activity') activityView = 'overview';
+					select(destination);
+				})
+			);
+		}
+		if (current !== 'account' && !destinationButtons.has(current))
+			select(destinationButtons.keys().next().value ?? 'account');
+		updateViews();
+		if (focusedView)
+			(viewButtons.get(focusedView) ?? destinationButtons.values().next().value)?.focus();
+		else if (focusedDestination)
+			(
+				destinationButtons.get(focusedDestination) ??
+				destinationButtons.values().next().value
+			)?.focus();
+		scroll.scanDomNode();
+	};
+	setProductAreas(binding.identity?.availableProductAreas ?? []);
+	const setProductStatus = (message: string, retry?: () => void): void => {
+		statusStore.clear();
+		status.replaceChildren();
+		status.hidden = !message;
+		if (!message) return;
+		const note = context.document.createElement('p');
+		note.textContent = message;
+		note.role = 'status';
+		status.append(note);
+		if (retry) {
+			const button = context.document.createElement('button');
+			button.type = 'button';
+			button.className = 'prctr-account-shell__destination';
+			button.textContent = text('retry');
+			status.append(button);
+			statusStore.add(addDisposableListener(button, 'click', retry));
+		}
+	};
 	const trigger = context.document.createElement('button');
 	trigger.className = 'prctr-account-shell';
 	trigger.dataset.region = 'trigger';
@@ -355,6 +572,11 @@ export function activateAccountShellNavigation(
 		avatar.replaceChildren(image);
 	};
 	const navigation: AuthenticatedNavigationService = {
+		get activityView() {
+			return activityView;
+		},
+		onDidChangeActivityView: viewChanges.event,
+		selectActivityView,
 		get current() {
 			return current;
 		},
@@ -362,6 +584,9 @@ export function activateAccountShellNavigation(
 			return accountSection;
 		},
 		accountMenuNavigation: true,
+		productPages: !!client.examActivity,
+		setProductAreas,
+		setProductStatus,
 		onDidChange: changes.event,
 		select,
 		onDidRequestSettings: settingsRequests.event,
@@ -391,10 +616,8 @@ export function activateAccountShellNavigation(
 	});
 	select(
 		binding.initialDestination === 'settings'
-			? exams
-				? 'activity'
-				: 'account'
-			: (binding.initialDestination ?? (exams ? 'activity' : 'account'))
+			? (destinationButtons.keys().next().value ?? 'account')
+			: binding.initialDestination
 	);
 	if (binding.initialDestination === 'settings') select('settings');
 }

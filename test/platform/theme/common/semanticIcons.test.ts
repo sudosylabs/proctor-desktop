@@ -6,7 +6,7 @@ import {
 	resolveSemanticIcon
 } from '../../../../src/prctr/platform/theme/common/semanticIcons.js';
 
-void test('semantic icon identifiers are unique, stable, and backed by font characters', () => {
+void test('semantic icon identifiers are unique, stable, and backed by static glyphs', () => {
 	const identifiers = getSemanticIconIds();
 	assert.ok(identifiers.length >= 24);
 	assert.deepStrictEqual(identifiers, [...identifiers].sort());
@@ -14,8 +14,13 @@ void test('semantic icon identifiers are unique, stable, and backed by font char
 	for (const id of identifiers) {
 		const glyph = resolveSemanticIcon(id);
 		assert.strictEqual(glyph.id, id);
-		assert.ok(Number.isInteger(glyph.fontCharacter));
-		assert.ok(glyph.fontCharacter > 0);
+		if ('paths' in glyph) {
+			assert.ok(glyph.paths.length > 0);
+			for (const path of glyph.paths) assert.ok(/^[Mm]/u.test(path));
+		} else {
+			assert.ok(Number.isInteger(glyph.fontCharacter));
+			assert.ok(glyph.fontCharacter > 0);
+		}
 	}
 });
 

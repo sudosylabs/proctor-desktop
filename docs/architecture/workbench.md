@@ -114,12 +114,11 @@ authoritative projection:
 - Available;
 - In progress;
 - Submitted;
-- Under review;
 - Results available;
 - Past.
 
-Withheld review is coarse and does not expose private integrity evidence,
-remarks, or unreleased results. Teacher and Exam Manager areas span every
+Withheld review state is concealed. Student activity exposes only released
+results and never infers review progress, grades, or pass/fail outcomes. Teacher and Exam Manager areas span every
 currently manageable Academic Unit and guide the User through authoring,
 delivery, supervision, review, and permitted student search/actions without
 exposing Exam Draft, Exam Revision, and Exam Sitting as the primary navigation
@@ -204,6 +203,21 @@ central `ContentPart`, and `SidebarPart` as the **Secondary Side Bar**. Primary
 navigation selects permitted destinations. The selected valid destination is
 shown; an unavailable selection falls back to the first permitted navigation
 destination. Settings opens its existing modal, preserving the underlying page.
+
+The authenticated navigation is the union of the server's available product
+areas: My exams, Exam management, and Administration. Account and Settings remain
+independent of those areas. Context is a routing hint; every operation remains
+bound to the privileged current session and reauthorized by the server. Refresh
+and returning to the foreground refetch context, invalidate stale page actions,
+and remove destinations whose access was lost.
+
+My exams uses the candidate activity projection with opaque pagination and a
+page-owned secondary detail selection. Only explicitly released candidate
+remarks are displayed; withheld review state and private manager content are
+absent. Enter and Resume remain unavailable until the production secure
+participation composition is connected. Exam management and Administration
+currently identify their unavailable desktop functionality and show the bounded
+management-scope summary; they do not expose unfinished management actions.
 
 The Primary Side Bar starts on the physical left and can move right; the
 Secondary Side Bar always occupies the opposite side, including in RTL. The

@@ -17,8 +17,26 @@ Every surface should be:
   are represented honestly and predictably.
 
 Consistency and accessibility are system requirements. Delight is restrained,
-functional polish that cannot compete with clarity. Proctor uses the VS Code
-Modern UI presentation baseline below, with Proctor branding and semantic tokens.
+functional polish that cannot compete with clarity. VS Code-derived surfaces use
+its Modern UI baseline below. AuthenticatedWindow product navigation and pages
+use the institutional dashboard presentation described next, with the same
+Proctor semantic tokens, themes, accessibility, and lifecycle contracts.
+
+## Authenticated product presentation
+
+AuthenticatedWindow serves students and institutional staff, including people
+who do not use an IDE. Its product navigation and pages have a Proctor-owned
+presentation: comfortable navigation rows with domain icons, nested task
+categories, restrained inset selection, readable page headings, and purposeful
+spacing. Collection, overview, form, and detail layouts follow the task rather
+than an editor pane or file tree. Preserve the native titlebar, layout toggles,
+Settings and account controls, and Primary/Main/Secondary region behavior.
+
+This is an explicit visual exception to the VS Code baseline for these product
+surfaces. It does not authorize replacing admitted settings-editor, menu,
+scrollbar, theme, or accessibility machinery with simplified substitutes.
+CandidateWindow retains the IDE presentation. Verify desktop previews in the
+native Electron window; a website preview is not the visual acceptance surface.
 
 ## Modern UI and floating panels
 

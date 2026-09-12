@@ -24,8 +24,12 @@ const authenticatedWorkbenchManifest = Object.freeze({
 			dependencies: Object.freeze(['prctr.authenticated.navigation' as const])
 		})
 	]),
-	itemTypes: Object.freeze(['prctr.authenticated.page', 'prctr.authenticated.account']),
-	destinations: Object.freeze(['activity', 'account', 'settings'])
+	itemTypes: Object.freeze([
+		'prctr.authenticated.page',
+		'prctr.authenticated.account',
+		'prctr.authenticated.exams'
+	]),
+	destinations: Object.freeze(['activity', 'management', 'administration', 'account', 'settings'])
 });
 
 export const authenticatedComposition = composeWorkbench(

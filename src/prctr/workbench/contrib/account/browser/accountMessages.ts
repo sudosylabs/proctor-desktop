@@ -278,6 +278,11 @@ export const accountMessages = Object.freeze({
 		defaultMessage: 'Account',
 		description: 'Own-account account presentation.'
 	}),
+	retry: defineMessage({
+		id: 'account.retry',
+		defaultMessage: 'Retry',
+		description: 'Retry a failed automatic data request.'
+	}),
 	refresh: defineMessage({
 		id: 'account.refresh',
 		defaultMessage: 'Refresh',

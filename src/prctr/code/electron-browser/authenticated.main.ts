@@ -1,3 +1,4 @@
+import type { ExamActivityClient } from '../../platform/examActivity/common/examActivityProtocol.js';
 import { createElectronSettingsEditorEnvironment } from './settingsEditorEnvironment.js';
 import type { SettingsNativeClient } from '../../platform/settings/common/settingsNativeHost.js';
 import { createAccountContribution } from '../../workbench/contrib/account/browser/accountContribution.js';
@@ -21,6 +22,7 @@ interface AuthenticatedPreloadApi extends AuthenticatedRendererClient {
 	readonly settings: SettingsRendererClient;
 	readonly settingsNative: SettingsNativeClient;
 	readonly account: AccountClient;
+	readonly examActivity: ExamActivityClient;
 }
 const api = (globalThis as unknown as { readonly proctorAuthenticated?: AuthenticatedPreloadApi })
 	.proctorAuthenticated;

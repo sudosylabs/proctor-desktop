@@ -1,3 +1,6 @@
+import type { ExamActivityClient } from '../../../../platform/examActivity/common/examActivityProtocol.js';
+import { activateExamActivity } from '../../examActivity/browser/examActivityContribution.js';
+import { examActivityMessages } from '../../examActivity/browser/examActivityMessages.js';
 import { AUTHENTICATED_LAYOUT_SERVICE, AuthenticatedLayout } from './authenticatedLayout.js';
 import type { AccountMenuClient } from '../../../../platform/account/common/accountMenu.js';
 import type { AccountClient } from '../../../../platform/account/common/accountProtocol.js';
@@ -21,6 +24,7 @@ import {
 import './authenticatedContribution.css';
 
 export interface AuthenticatedRendererClient {
+	readonly examActivity?: ExamActivityClient;
 	readonly accountMenu?: AccountMenuClient;
 	readonly account?: AccountClient;
 	signOut(): Promise<void>;
@@ -92,6 +96,7 @@ export function createAuthenticatedContribution(
 		dependencies: Object.freeze(['prctr.workbench.desktop' as const]),
 		messages: Object.freeze([
 			...Object.values(accountShellMessages),
+			...Object.values(examActivityMessages),
 			...Object.values(destinationMessages),
 			...Object.values(messages)
 		] as MessageDescriptor[]),
@@ -106,6 +111,7 @@ export function createAuthenticatedContribution(
 			layout.initializeControls();
 			if (accountManaged) {
 				activateAccountShellNavigation(context, client, descriptor);
+				if (client.examActivity) activateExamActivity(context, client.examActivity);
 				return;
 			}
 			const navigation = context.document.createElement('div');
@@ -131,12 +137,14 @@ export function createAuthenticatedContribution(
 				}
 			});
 			const destinationChange = context.disposables.add(new Emitter<string>());
-			const destinations = context.composition.destinations.filter(
-				(destination) =>
-					destination !== 'activity' ||
-					!descriptor.identity ||
-					descriptor.identity.availableProductAreas.includes('student_activity')
-			);
+			const destinations = context.composition.destinations
+				.filter((destination) => Object.hasOwn(destinationMessages, destination))
+				.filter(
+					(destination) =>
+						destination !== 'activity' ||
+						!descriptor.identity ||
+						descriptor.identity.availableProductAreas.includes('student_activity')
+				);
 			let current = 'account';
 			const buttons = new Map<string, HTMLButtonElement>();
 			const settingsRequests = context.disposables.add(new Emitter<void>());
