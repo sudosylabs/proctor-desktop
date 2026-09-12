@@ -1,9 +1,9 @@
 import assert from 'node:assert';
 import { test } from '../../../../base/common/upstream/testAdapter.ts';
-import { WORKSPACE_V1_DEFAULT_LIMITS } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts';
-import { createAttemptWorkspaceSession } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts';
-import { workspacePath } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/path.ts';
-import { createExamResourceCatalog } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/examResourceCatalog.ts';
+import { WORKSPACE_V1_DEFAULT_LIMITS } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts';
+import { createAttemptWorkspaceSession } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspaceSession.ts';
+import { workspacePath } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/path.ts';
+import { createExamResourceCatalog } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/examResourceCatalog.ts';
 import {
 	AttemptWorkspaceFileSystemProvider,
 	ExamResourceFileSystemProvider,

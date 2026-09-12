@@ -5,8 +5,9 @@ import {
 	setUnexpectedErrorHandler
 } from '../../../../../src/prctr/base/common/errors.ts';
 import {
+	NATIVE_BASELINE_CAPABILITIES,
 	NATIVE_CAPABILITY_REGISTRY,
-	NATIVE_CAPABILITY_REGISTRY_VERSION,
+	NATIVE_CAPABILITY_REGISTRY_DIGEST,
 	type NativeCapabilityMatrix
 } from '../../../../../src/prctr/platform/native/common/nativeCapabilityRegistry.ts';
 import type { NativeSourceId } from '../../../../../src/prctr/platform/native/common/securityUtilityProtocol.ts';
@@ -42,17 +43,16 @@ function policyFixture(): EffectiveExamSecurityPolicy {
 		scope: { kind: 'attempt', attemptId: 'attempt:one' },
 		issuedAtUnixMs: 900,
 		activeFromUnixMs: 1_000,
-		expiresAtUnixMs: 20_000,
 		applicationReleaseId: 'desktop-test-v1',
 		matrixId: 'development-matrix-v1',
 		targetTuple: 'macos-arm64-test',
-		registryVersion: NATIVE_CAPABILITY_REGISTRY_VERSION,
+		registryDigest: NATIVE_CAPABILITY_REGISTRY_DIGEST,
 		focusLossMode: 'enforce',
 		connectionLossMode: 'enforce',
-		resolvedExceptionRefs: ['exception:approved'],
-		evidenceClassId: 'evidence:minimized',
-		visibilityClassId: 'visibility:review',
-		retentionClassId: 'retention:exam',
+		resolvedExceptionRefs: [],
+		evidenceClassId: 'native_integrity',
+		visibilityClassId: 'examiner_restricted',
+		retentionClassId: 'native_minimized',
 		capabilities: [
 			{
 				id: 'process_application',
@@ -106,33 +106,42 @@ function policyFixture(): EffectiveExamSecurityPolicy {
 
 function matrixFixture(): NativeCapabilityMatrix {
 	return {
-		schema_version: 2,
-		registry_version: NATIVE_CAPABILITY_REGISTRY_VERSION,
+		registry_digest: NATIVE_CAPABILITY_REGISTRY_DIGEST,
 		matrix_id: 'development-matrix-v1',
 		release_id: 'desktop-test-v1',
 		target_tuple: 'macos-arm64-test',
-		entries: NATIVE_CAPABILITY_REGISTRY.flatMap((family) =>
-			family.subCapabilities.map((sub) => {
-				const permitted: readonly string[] = sub.permittedClaims;
-				const claim = permitted.includes('enforce')
-					? ('enforce' as const)
-					: permitted.includes('observe')
-						? ('observe' as const)
-						: ('unavailable' as const);
-				return {
-					coverage_key: sub.coverageKey,
-					schema_version: sub.schemaVersion,
-					claim,
-					component_id: `component-${family.id}`,
-					adapter_version: 'adapter-v1',
-					helper_build_id: null,
-					required_permissions: family.permissions.macos,
-					limitations: [],
-					verification:
-						claim === 'unavailable' ? ('unavailable' as const) : ('passed' as const)
-				};
-			})
-		)
+		entries: [
+			...NATIVE_CAPABILITY_REGISTRY,
+			...NATIVE_BASELINE_CAPABILITIES.map((baseline) => ({
+				id: baseline.id,
+				permissions: baseline.permissions,
+				subCapabilities: [baseline]
+			}))
+		]
+			.flatMap((family) =>
+				family.subCapabilities.map((sub) => {
+					const permitted: readonly string[] = sub.permittedClaims;
+					const claim = permitted.includes('enforce')
+						? ('enforce' as const)
+						: permitted.includes('observe')
+							? ('observe' as const)
+							: ('unavailable' as const);
+					return {
+						coverage_key: sub.coverageKey,
+						source_schema_digest: sub.sourceSchemaDigest,
+						claim,
+						component_id: `component-${family.id}`,
+						adapter_version: 'adapter-v1',
+						required_permissions: family.permissions.macos,
+						limitations: [],
+						verification:
+							claim === 'unavailable' ? ('unavailable' as const) : ('passed' as const)
+					};
+				})
+			)
+			.sort((a, b) =>
+				a.coverage_key < b.coverage_key ? -1 : a.coverage_key > b.coverage_key ? 1 : 0
+			)
 	};
 }
 
@@ -380,12 +389,17 @@ test('effect-only clipboard and printing policy does not start an observation so
 	);
 });
 
-test('no-claim media policy does not open or widen the shared media source', () => {
+test('disabled media policy does not open or widen the shared media source', () => {
 	const matrix = matrixFixture();
 	const base = policyFixture();
 	const noClaimMedia = (family: EffectiveExamSecurityPolicy['capabilities'][number]) =>
 		family.id === 'camera' || family.id === 'microphone'
-			? { ...family, requireReady: false, concurrentUseCheck: 'not_required' as const }
+			? {
+					...family,
+					mode: 'disabled' as const,
+					requireReady: false,
+					concurrentUseCheck: 'not_required' as const
+				}
 			: family;
 	const isolatedPolicy = validateEffectiveExamSecurityPolicy({
 		...base,
@@ -401,7 +415,12 @@ test('no-claim media policy does not open or widen the shared media source', () 
 		...base,
 		capabilities: base.capabilities.map((family) =>
 			family.id === 'camera'
-				? { ...family, requireReady: false, concurrentUseCheck: 'not_required' as const }
+				? {
+						...family,
+						mode: 'disabled' as const,
+						requireReady: false,
+						concurrentUseCheck: 'not_required' as const
+					}
 				: family
 		)
 	});
@@ -435,7 +454,8 @@ test('coordinator rejects unauthenticated, rolled-back, stale and wrong-scope po
 	assert.throws(() => create(policy), /authenticity/u);
 	ports.authorityAccepted = true;
 	assert.throws(
-		() => create(policy, authoritative({ authoritativeTimeUnixMs: policy.expiresAtUnixMs })),
+		() =>
+			create(policy, authoritative({ authoritativeTimeUnixMs: policy.activeFromUnixMs - 1 })),
 		/not current/u
 	);
 	assert.throws(
@@ -2048,5 +2068,58 @@ test('focus-loss findings use the exact frozen focus policy mode without promoti
 		),
 		/finding is invalid/u
 	);
+	coordinator.dispose();
+});
+
+void test('native preflight requires certified baseline claims independently of optional family policy', () => {
+	const policy = policyFixture();
+	const matrix = matrixFixture();
+	for (const baseline of NATIVE_BASELINE_CAPABILITIES) {
+		assert.throws(
+			() =>
+				resolveExamSecurityNativeSelection(policy, {
+					...matrix,
+					entries: matrix.entries.filter(
+						(entry) => entry.coverage_key !== baseline.coverageKey
+					)
+				}),
+			/mandatory/
+		);
+		assert.throws(
+			() =>
+				resolveExamSecurityNativeSelection(policy, {
+					...matrix,
+					entries: matrix.entries.map((entry) =>
+						entry.coverage_key === baseline.coverageKey
+							? { ...entry, claim: 'unavailable', verification: 'unavailable' }
+							: entry
+					)
+				}),
+			/mandatory/
+		);
+	}
+});
+
+test('live lease authority remains valid beyond 24 hours without inventing policy expiry', async () => {
+	const { coordinator, selection } = coordinatorHarness();
+	await coordinator.start();
+	await coordinator.reconcile(cleanReconciliation(selection.selectedSources));
+	await coordinator.updateAuthoritativeState(
+		authoritative({ authoritativeTimeUnixMs: 32 * 24 * 60 * 60 * 1000, attemptRevision: 2 })
+	);
+	await coordinator.reconcile(
+		cleanReconciliation(selection.selectedSources, {
+			sources: coverageAt(selection.selectedSources, 2)
+		})
+	);
+	assert.equal(coordinator.observe().current.canWorkspaceMutate, true);
+	await coordinator.updateAuthoritativeState(
+		authoritative({
+			authoritativeTimeUnixMs: 32 * 24 * 60 * 60 * 1000 + 1,
+			attemptRevision: 3,
+			leasePhase: 'expired'
+		})
+	);
+	assert.equal(coordinator.observe().current.canWorkspaceMutate, false);
 	coordinator.dispose();
 });

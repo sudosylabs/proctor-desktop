@@ -1,0 +1,48 @@
+{
+  "schema": {
+    "candidate_fields": [
+      "manifest_fingerprint",
+      "registry_fingerprint",
+      "desktop_build",
+      "desktop_target",
+      "user_settings_revision",
+      "presentation",
+      "approved_commands",
+      "approved_keybindings"
+    ],
+    "digest": "sha256-of-complete-canonical-candidate",
+    "maximum_canonical_bytes": 16384,
+    "maximum_approved_commands": 128,
+    "maximum_approved_keybindings": 128,
+    "presentation": {
+      "color_theme": ["light", "dark", "hcLight", "hcDark"],
+      "prefer_high_contrast": "boolean",
+      "zoom_percent": {
+        "minimum": 80,
+        "maximum": 200,
+        "default": 100,
+        "unit": "percent"
+      },
+      "editor_font_size_px": {
+        "minimum": 12,
+        "maximum": 24,
+        "default": 14,
+        "unit": "pixels"
+      },
+      "editor_line_height_px": {
+        "minimum": 16,
+        "maximum": 40,
+        "default": 22,
+        "unit": "independent-pixels"
+      },
+      "reduced_motion": "boolean",
+      "screen_reader_mode": ["auto", "on", "off"],
+      "announcement_mode": ["auto", "verbose", "minimal"],
+      "cursor_style": ["line", "block", "underline"],
+      "cursor_blinking": ["blink", "smooth", "phase", "expand", "solid"]
+    },
+    "keybinding_selection": "catalog-ids-associated-with-selected-candidate-safe-commands"
+  },
+  "approved_commands": [],
+  "approved_keybindings": []
+}

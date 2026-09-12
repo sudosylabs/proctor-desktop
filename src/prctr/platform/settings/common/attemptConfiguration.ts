@@ -1,3 +1,8 @@
+import {
+	ATTEMPT_CONFIGURATION_MANIFEST_FINGERPRINT,
+	ATTEMPT_CONFIGURATION_COMMANDS,
+	ATTEMPT_CONFIGURATION_KEYBINDINGS
+} from './attemptConfigurationManifest.js';
 import { getTheme } from '../../theme/common/themes.js';
 import type { EffectiveSettings, SettingConstraint } from './settingsResolution.js';
 import { SETTINGS_REGISTRY_VERSION } from './settingsManifest.js';
@@ -8,6 +13,7 @@ const MAX_APPROVED_IDENTIFIERS = 128;
 
 export interface AttemptConfigurationCandidate {
 	readonly schemaVersion: 1;
+	readonly manifestFingerprint: string;
 	readonly registryVersion: number;
 	readonly registryFingerprint: string;
 	readonly desktopBuild: string;
@@ -45,7 +51,7 @@ export interface AttemptConfigurationProjection {
 
 export type AttemptConfigurationCompatibility =
 	| { readonly compatible: true }
-	| { readonly compatible: false; readonly reason: 'schema' | 'registry' | 'target' | 'build' };
+	| { readonly compatible: false; readonly reason: 'schema' | 'registry' | 'manifest' };
 
 export function deriveAttemptConfiguration(
 	settings: EffectiveSettings,
@@ -60,6 +66,7 @@ export function deriveAttemptConfiguration(
 ): AttemptConfigurationCandidate {
 	return deepFreeze({
 		schemaVersion: ATTEMPT_CONFIGURATION_SCHEMA_VERSION,
+		manifestFingerprint: ATTEMPT_CONFIGURATION_MANIFEST_FINGERPRINT,
 		registryVersion: SETTINGS_REGISTRY_VERSION,
 		registryFingerprint: identity.registryFingerprint,
 		desktopBuild: boundedIdentity(identity.desktopBuild),
@@ -78,7 +85,7 @@ export function deriveAttemptConfiguration(
 			cursorBlinking: settings.get('editor.cursorBlinking')
 		},
 		approvedCommands: normalizeCommands(approvedCommands),
-		approvedKeybindings: normalizeKeybindings(approvedKeybindings)
+		approvedKeybindings: normalizeKeybindings(approvedKeybindings, approvedCommands)
 	});
 }
 
@@ -200,6 +207,7 @@ export function projectFrozenAttemptConfiguration(
 export function checkAttemptConfigurationCompatibility(
 	frozen: FrozenAttemptConfiguration,
 	current: {
+		readonly manifestFingerprint: string;
 		readonly registryFingerprint: string;
 		readonly desktopBuild: string;
 		readonly desktopTarget: string;
@@ -208,15 +216,8 @@ export function checkAttemptConfigurationCompatibility(
 	if (frozen.schemaVersion !== ATTEMPT_CONFIGURATION_SCHEMA_VERSION)
 		return { compatible: false, reason: 'schema' };
 	const validated = validateFrozenAttemptConfiguration(frozen);
-	if (
-		validated.registryVersion !== SETTINGS_REGISTRY_VERSION ||
-		validated.registryFingerprint !== current.registryFingerprint
-	)
-		return { compatible: false, reason: 'registry' };
-	if (validated.desktopTarget !== current.desktopTarget)
-		return { compatible: false, reason: 'target' };
-	if (validated.desktopBuild !== current.desktopBuild)
-		return { compatible: false, reason: 'build' };
+	if (validated.manifestFingerprint !== current.manifestFingerprint)
+		return { compatible: false, reason: 'manifest' };
 	return { compatible: true };
 }
 
@@ -225,6 +226,7 @@ export function validateFrozenAttemptConfiguration(value: unknown): FrozenAttemp
 		!isRecord(value) ||
 		!hasExactKeys(value, [
 			'schemaVersion',
+			'manifestFingerprint',
 			'registryVersion',
 			'registryFingerprint',
 			'desktopBuild',
@@ -237,6 +239,8 @@ export function validateFrozenAttemptConfiguration(value: unknown): FrozenAttemp
 			'digest'
 		]) ||
 		value.schemaVersion !== ATTEMPT_CONFIGURATION_SCHEMA_VERSION ||
+		typeof value.manifestFingerprint !== 'string' ||
+		!/^sha256:[a-f0-9]{64}$/.test(value.manifestFingerprint) ||
 		!Number.isSafeInteger(value.registryVersion) ||
 		(value.registryVersion as number) <= 0 ||
 		typeof value.registryFingerprint !== 'string' ||
@@ -322,6 +326,7 @@ export function validateFrozenAttemptConfiguration(value: unknown): FrozenAttemp
 		throw new TypeError('Frozen Attempt Configuration approvals are not canonical');
 	return deepFreeze({
 		schemaVersion: 1,
+		manifestFingerprint: value.manifestFingerprint,
 		registryVersion: value.registryVersion as number,
 		registryFingerprint: value.registryFingerprint,
 		desktopBuild: value.desktopBuild,
@@ -338,32 +343,31 @@ export function validateFrozenAttemptConfiguration(value: unknown): FrozenAttemp
 function normalizeCommands(values: readonly string[]): readonly string[] {
 	if (values.length > MAX_APPROVED_IDENTIFIERS)
 		throw new Error('Attempt Configuration identifier set is too large');
-	const result = [
-		...new Set(
-			values
-				.map((value) => value.trim())
-				.filter((value) => /^[a-z][a-z0-9._-]{0,127}$/i.test(value))
-		)
-	].sort();
-	return Object.freeze(result);
+	if (
+		new Set(values).size !== values.length ||
+		values.some((value) => !ATTEMPT_CONFIGURATION_COMMANDS.includes(value))
+	)
+		throw new TypeError('Unapproved Candidate command');
+	return Object.freeze([...values].sort());
 }
-
-function normalizeKeybindings(values: readonly string[]): readonly string[] {
+function normalizeKeybindings(
+	values: readonly string[],
+	commands: readonly string[] = ATTEMPT_CONFIGURATION_COMMANDS
+): readonly string[] {
 	if (values.length > MAX_APPROVED_IDENTIFIERS)
 		throw new Error('Attempt Configuration identifier set is too large');
-	const result = [
-		...new Set(
-			values
-				.map((value) => value.trim())
-				.filter(
-					(value) =>
-						value.length > 0 &&
-						value.length <= 128 &&
-						/^[A-Za-z0-9+._\[\]-]+(?: [A-Za-z0-9+._\[\]-]+)*$/u.test(value)
+	if (
+		new Set(values).size !== values.length ||
+		values.some(
+			(value) =>
+				!ATTEMPT_CONFIGURATION_KEYBINDINGS.some(
+					(binding) =>
+						binding.keybindingId === value && commands.includes(binding.commandId)
 				)
 		)
-	].sort();
-	return Object.freeze(result);
+	)
+		throw new TypeError('Unapproved Candidate keybinding');
+	return Object.freeze([...values].sort());
 }
 
 function sameStrings(left: readonly string[], right: readonly string[]): boolean {

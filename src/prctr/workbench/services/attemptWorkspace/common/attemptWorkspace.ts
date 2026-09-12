@@ -13,7 +13,7 @@ export type WorkspaceViewGeneration = number & { readonly __workspaceViewGenerat
 export type WorkspaceCursor = number & { readonly __workspaceCursor: unique symbol };
 
 export interface WorkspaceEntry {
-	readonly reference: WorkspaceEntryReference; readonly path: WorkspacePath; readonly kind: 'directory' | 'file'; readonly contentVersion?: WorkspaceContentVersion; readonly mediaType?: string; readonly byteSize?: number;
+	readonly reference: WorkspaceEntryReference; readonly path: WorkspacePath; readonly kind: 'directory' | 'file'; readonly contentVersion?: WorkspaceContentVersion; readonly mediaType?: string; readonly byteSize?: number; readonly sha256?: string;
 }
 export interface WorkspaceStateFacts {
 	readonly contentRelation: 'modified' | 'unchanged';
@@ -35,7 +35,7 @@ export type WorkspaceChange =
 	| { readonly kind: 'createFile'; readonly path: string; readonly content: Uint8Array; readonly mediaType: string }
 	| { readonly kind: 'replaceContent'; readonly reference: WorkspaceEntryReference; readonly content: Uint8Array; readonly mediaType: string }
 	| { readonly kind: 'move'; readonly reference: WorkspaceEntryReference; readonly destination: string }
-	| { readonly kind: 'delete'; readonly reference: WorkspaceEntryReference }
+	| { readonly kind: 'delete'; readonly reference: WorkspaceEntryReference; readonly recursive?: boolean }
 	| { readonly kind: 'discard'; readonly reference: WorkspaceEntryReference }
 	| { readonly kind: 'resolveConflict'; readonly reference: WorkspaceEntryReference; readonly resolution: 'authoritative' | 'local' | { readonly content: Uint8Array; readonly mediaType: string } };
 export type WorkspaceChangeResult =
@@ -62,9 +62,9 @@ export interface ExamResourceObservation { readonly current: ExamResourceProject
 export interface ExamResourceReadResult extends ExamResourceEntry { readonly content: Uint8Array }
 export interface ExamResourceCatalog extends IDisposable { observe(): ExamResourceObservation; read(reference: string): Promise<ExamResourceReadResult> }
 
-export interface WorkspaceLimits { readonly effectiveFileBytes: number; readonly effectiveTotalBytes: number; readonly editorModelBytes: number }
-export const WORKSPACE_V1_DEFAULT_LIMITS: WorkspaceLimits = Object.freeze({ effectiveFileBytes: 10 * 1024 * 1024, effectiveTotalBytes: 50 * 1024 * 1024, editorModelBytes: 10 * 1024 * 1024 });
-export const WORKSPACE_V1_HARD_LIMITS: WorkspaceLimits = Object.freeze({ effectiveFileBytes: 100 * 1024 * 1024, effectiveTotalBytes: 1024 * 1024 * 1024, editorModelBytes: 10 * 1024 * 1024 });
+export interface WorkspaceLimits { readonly effectiveEntries: number; readonly effectiveFileBytes: number; readonly effectiveTotalBytes: number; readonly editorModelBytes: number }
+export const WORKSPACE_V1_DEFAULT_LIMITS: WorkspaceLimits = Object.freeze({ effectiveEntries: 500, effectiveFileBytes: 10 * 1024 * 1024, effectiveTotalBytes: 50 * 1024 * 1024, editorModelBytes: 10 * 1024 * 1024 });
+export const WORKSPACE_V1_HARD_LIMITS: WorkspaceLimits = Object.freeze({ effectiveEntries: 5000, effectiveFileBytes: 100 * 1024 * 1024, effectiveTotalBytes: 1024 * 1024 * 1024, editorModelBytes: 10 * 1024 * 1024 });
 /** Independent in-process safety ceiling; protected-storage retention policy remains server/product work. */
 export const WORKSPACE_V1_MAX_RECOVERY_RESTORE_BYTES = 512 * 1024 * 1024;
 export const WORKSPACE_V1_CAPABILITIES = Object.freeze({

@@ -1,3 +1,4 @@
+import { ATTEMPT_CONFIGURATION_MANIFEST_FINGERPRINT } from '../../../../src/prctr/platform/settings/common/attemptConfigurationManifest.ts';
 import assert from 'node:assert';
 import { suite, test } from '../../../base/common/upstream/testAdapter.ts';
 import {
@@ -25,14 +26,14 @@ suite('Attempt Configuration', () => {
 				desktopTarget: 'darwin-arm64',
 				userSettingsRevision: 'rev-1'
 			},
-			['candidate.submit', 'bad value'],
-			['ctrl+enter']
+			[],
+			[]
 		);
 		assert.strictEqual(candidate.presentation.editorFontSize, 18);
 		assert.strictEqual('tabSize' in candidate.presentation, false);
 		assert.strictEqual('source' in candidate, false);
-		assert.deepStrictEqual(candidate.approvedCommands, ['candidate.submit']);
-		assert.deepStrictEqual(candidate.approvedKeybindings, ['ctrl+enter']);
+		assert.deepStrictEqual(candidate.approvedCommands, []);
+		assert.deepStrictEqual(candidate.approvedKeybindings, []);
 		assert.ok(Object.isFrozen(candidate.presentation));
 		assert.throws(
 			() =>
@@ -66,7 +67,7 @@ suite('Attempt Configuration', () => {
 		);
 	});
 
-	test('re-entry checks exact build/target/registry and projection does not mutate frozen state', () => {
+	test('re-entry accepts compatible patched builds without changing frozen provenance', () => {
 		const effective = new EffectiveSettings(parseSettingsDocument('{}'), {
 			window: 'candidate'
 		});
@@ -89,6 +90,7 @@ suite('Attempt Configuration', () => {
 		assert.deepStrictEqual(validateFrozenAttemptConfiguration(frozen), frozen);
 		assert.deepStrictEqual(
 			checkAttemptConfigurationCompatibility(frozen, {
+				manifestFingerprint: ATTEMPT_CONFIGURATION_MANIFEST_FINGERPRINT,
 				registryFingerprint: settingsRegistry.fingerprint,
 				desktopBuild: '1',
 				desktopTarget: 'win32-x64'
@@ -97,11 +99,12 @@ suite('Attempt Configuration', () => {
 		);
 		assert.deepStrictEqual(
 			checkAttemptConfigurationCompatibility(frozen, {
+				manifestFingerprint: ATTEMPT_CONFIGURATION_MANIFEST_FINGERPRINT,
 				registryFingerprint: settingsRegistry.fingerprint,
 				desktopBuild: '2',
 				desktopTarget: 'win32-x64'
 			}),
-			{ compatible: false, reason: 'build' }
+			{ compatible: true }
 		);
 		const projection = projectFrozenAttemptConfiguration(frozen, [
 			{ id: 'accessibility.reducedMotion', value: true, reason: 'OS request' }
@@ -197,8 +200,8 @@ suite('Attempt Configuration', () => {
 				desktopTarget: 'darwin-arm64',
 				userSettingsRevision: 'r1'
 			},
-			['candidate.submit'],
-			['ctrl+enter']
+			[],
+			[]
 		);
 		const frozen = {
 			...base,

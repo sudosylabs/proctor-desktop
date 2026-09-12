@@ -360,15 +360,15 @@
         "workspace.v1-contract"
       ],
       "evidence": [
-        "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts",
-        "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts",
-        "src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts",
-        "src/prctr/workbench/contrib/attemptWorkspace/common/threeWayMerge.ts",
-        "src/prctr/workbench/contrib/attemptWorkspace/common/examResourceCatalog.ts",
+        "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts",
+        "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspaceSession.ts",
+        "src/prctr/workbench/services/attemptWorkspace/common/internalPorts.ts",
+        "src/prctr/workbench/services/attemptWorkspace/common/threeWayMerge.ts",
+        "src/prctr/workbench/services/attemptWorkspace/common/examResourceCatalog.ts",
         "src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts",
-        "test/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.test.ts",
-        "test/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.test.ts",
-        "test/workbench/contrib/attemptWorkspace/common/examResourceCatalog.test.ts",
+        "test/workbench/services/attemptWorkspace/common/attemptWorkspaceSession.test.ts",
+        "test/workbench/services/attemptWorkspace/common/workspaceFileSystemProvider.test.ts",
+        "test/workbench/services/attemptWorkspace/common/examResourceCatalog.test.ts",
         "docs/upstream/vscode-ports/attempt-workspace-core.json"
       ]
     },

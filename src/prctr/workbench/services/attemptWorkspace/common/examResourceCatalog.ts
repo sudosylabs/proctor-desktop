@@ -2,7 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { Emitter } from '../../../../base/common/event.js';
+import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import type {
 	ExamResourceCatalog,
@@ -20,39 +20,72 @@ export const EXAM_RESOURCE_CATALOG_LIMITS = Object.freeze({
 	titleLength: 512
 });
 
+export interface ExamResourceAuthorization {
+	readonly current: () => boolean;
+	readonly onDidChange: Event<void>;
+}
+
 export async function createExamResourceCatalog(
-	port: ExamResourcePort
+	port: ExamResourcePort,
+	authorization?: ExamResourceAuthorization
 ): Promise<ExamResourceCatalog> {
-	return new ExamResourceCatalogImpl(port, validateEntries(await port.list()));
+	return new ExamResourceCatalogImpl(port, validateEntries(await port.list()), authorization);
 }
 class ExamResourceCatalogImpl extends Disposable implements ExamResourceCatalog {
 	readonly #port: ExamResourcePort;
 	readonly #change = this._register(new Emitter<ExamResourceProjection>());
 	#projection: ExamResourceProjection;
 	#disposed = false;
-	constructor(port: ExamResourcePort, entries: ExamResourceProjection['entries']) {
+	constructor(
+		port: ExamResourcePort,
+		entries: ExamResourceProjection['entries'],
+		private readonly authorization?: ExamResourceAuthorization
+	) {
 		super();
 		this.#port = port;
 		this.#projection = Object.freeze({
-			available: true,
+			available: authorization?.current() ?? true,
 			entries: Object.freeze(
 				[...entries].sort(
 					(a, b) => (a.order ?? 0) - (b.order ?? 0) || a.path.localeCompare(b.path)
 				)
 			)
 		});
+		if (authorization)
+			this._register(
+				authorization.onDidChange(() => {
+					if (this.#disposed) return;
+					this.#projection = Object.freeze({
+						...this.#projection,
+						available: authorization.current()
+					});
+					this.#change.fire(this.#projection);
+				})
+			);
 	}
 	observe(): ExamResourceObservation {
 		this.#assertLive();
-		return Object.freeze({ current: this.#projection, onDidChange: this.#change.event });
+		return Object.freeze({
+			current: Object.freeze({
+				...this.#projection,
+				available: this.authorization?.current() ?? this.#projection.available
+			}),
+			onDidChange: this.#change.event
+		});
 	}
 	async read(reference: string): Promise<ExamResourceReadResult> {
 		this.#assertLive();
+		this.#assertAuthorized();
 		const authorized = this.#projection.entries.find((entry) => entry.reference === reference);
 		if (authorized === undefined) throw new Error('Exam Resource is not authorized');
 		const value = await this.#port.read(reference);
 		this.#assertLive();
+		this.#assertAuthorized();
 		return validateRead(value, authorized);
+	}
+	#assertAuthorized(): void {
+		if (!(this.authorization?.current() ?? this.#projection.available))
+			throw new Error('Exam Resource access is unavailable');
 	}
 	#assertLive(): void {
 		if (this.#disposed) throw new Error('ExamResourceCatalog is disposed');

@@ -3,7 +3,7 @@ import { test } from '../../../../base/common/upstream/testAdapter.ts';
 import {
 	decodeTextContent,
 	mergeNonOverlappingText
-} from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/threeWayMerge.ts';
+} from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/threeWayMerge.ts';
 
 test('three-way merge deterministically combines non-overlapping text changes', () => {
 	assert.deepStrictEqual(

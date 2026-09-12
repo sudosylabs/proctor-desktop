@@ -3,13 +3,13 @@ import { test } from '../../../../base/common/upstream/testAdapter.ts';
 import {
 	createExamResourceCatalog,
 	EXAM_RESOURCE_CATALOG_LIMITS
-} from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/examResourceCatalog.ts';
+} from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/examResourceCatalog.ts';
 import {
 	ExamResourceFileSystemProvider,
 	examResourceUri
 } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts';
-import type { ExamResourceEntry } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts';
-import type { ExamResourcePort } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts';
+import type { ExamResourceEntry } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts';
+import type { ExamResourcePort } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/internalPorts.ts';
 import { InMemoryExamResourcePort } from './inMemoryAdapters.ts';
 
 test('Exam Resources remain a separately authorized read-only catalog and URI provider', async () => {

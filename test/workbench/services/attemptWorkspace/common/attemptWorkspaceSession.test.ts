@@ -8,9 +8,9 @@ import {
 	type AttemptWorkspaceSession,
 	type WorkspaceAccess,
 	type WorkspaceEntryReference
-} from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts';
-import { createAttemptWorkspaceSession } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts';
-import type { RecoveryRecord } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts';
+} from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts';
+import { createAttemptWorkspaceSession } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspaceSession.ts';
+import type { RecoveryRecord } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/internalPorts.ts';
 import {
 	DeterministicWorkspaceIds,
 	InMemoryProtectedContent,
@@ -502,7 +502,8 @@ test('acknowledgement retains its protected mapping chain until dependent recove
 	});
 	if (!replaced.accepted) throw new Error('replace rejected');
 	await first.settle({ kind: 'protect', throughGeneration: replaced.generation });
-	protectedContent.failWriteOnCall = protectedContent.putCalls + 1;
+	// Skip the durable exact-command checkpoint; fail the dependent mapping rewrite.
+	protectedContent.failWriteOnCall = protectedContent.putCalls + 2;
 	const acknowledged = await first.settle({
 		kind: 'persist',
 		throughGeneration: created.generation
@@ -2052,3 +2053,114 @@ async function waitFor(predicate: () => boolean): Promise<void> {
 	}
 	throw new Error('Asynchronous Workspace operation did not reach the expected state');
 }
+
+test('participation gating denies cached content, edits and pending dispatch synchronously', async () => {
+	const { Emitter } = await import('../../../../../src/prctr/base/common/event.ts');
+	const changed = new Emitter<void>();
+	const authority = new InMemoryWorkspaceAuthority([
+		{ reference: 'entry:a', path: 'answer.txt', content: 'original' }
+	]);
+	const protectedContent = new InMemoryProtectedContent();
+	let allowed = true;
+	const session = await createAttemptWorkspaceSession({
+		authority,
+		protectedContent,
+		ids: new DeterministicWorkspaceIds(),
+		limits: WORKSPACE_V1_DEFAULT_LIMITS,
+		authorization: {
+			current: () => ({
+				read: allowed,
+				createDirectory: allowed,
+				createFile: allowed,
+				replaceContent: allowed,
+				move: allowed,
+				delete: allowed
+			}),
+			onDidChange: changed.event
+		}
+	});
+	const reference = entry(session, 'answer.txt').reference;
+	await session.read({ reference });
+	const edit = session.change({
+		kind: 'replaceContent',
+		reference,
+		content: encoder.encode('working'),
+		mediaType: 'text/plain'
+	});
+	assert.ok(edit.accepted);
+	allowed = false;
+	changed.fire();
+	assert.strictEqual(session.observe().current.access.read, false);
+	await assert.rejects(session.read({ reference }), /access/);
+	assert.deepStrictEqual(session.change({ kind: 'delete', reference }).accepted, false);
+	const result = await session.settle({ kind: 'persist', throughGeneration: edit.generation });
+	assert.strictEqual(result.acknowledged, false);
+	assert.strictEqual(result.protected, true);
+	assert.strictEqual(
+		decoder.decode((await authority.readCurrent(reference)).content),
+		'original'
+	);
+	allowed = true;
+	changed.fire();
+	assert.strictEqual(
+		(await session.settle({ kind: 'persist', throughGeneration: edit.generation }))
+			.acknowledged,
+		true
+	);
+	session.dispose();
+	changed.dispose();
+});
+
+test('failed durable dispatch checkpoint retains queued work without sending an unrepeatable command', async () => {
+	const { authority, protectedContent, session } = await harness();
+	const reference = entry(session, 'src/main.ts').reference;
+	const edit = session.change({
+		kind: 'replaceContent',
+		reference,
+		content: encoder.encode('working'),
+		mediaType: 'text/typescript'
+	});
+	assert.ok(edit.accepted);
+	await session.settle({ kind: 'protect', throughGeneration: edit.generation });
+	protectedContent.failWriteOnCall = protectedContent.putCalls + 1;
+	const result = await session.settle({ kind: 'persist', throughGeneration: edit.generation });
+	assert.strictEqual(result.acknowledged, false);
+	assert.strictEqual(
+		decoder.decode((await authority.readCurrent(reference)).content),
+		'const value = 1;'
+	);
+	assert.strictEqual(entry(session, 'src/main.ts').facts.remoteMutation, 'queued');
+	protectedContent.failWrites = true;
+	assert.strictEqual(
+		(await session.settle({ kind: 'persist', throughGeneration: edit.generation }))
+			.acknowledged,
+		false
+	);
+	assert.strictEqual(
+		decoder.decode((await authority.readCurrent(reference)).content),
+		'const value = 1;'
+	);
+	protectedContent.failWrites = false;
+	protectedContent.failWriteOnCall = undefined;
+	assert.strictEqual(
+		(await session.settle({ kind: 'persist', throughGeneration: edit.generation }))
+			.acknowledged,
+		true
+	);
+	session.dispose();
+});
+
+test('workspace paths follow server UTF-8 byte, depth, control and reserved-root bounds', async () => {
+	const { workspacePath } =
+		await import('../../../../../src/prctr/workbench/services/attemptWorkspace/common/path.ts');
+	assert.strictEqual(workspacePath('src/é😀.txt'), 'src/é😀.txt');
+	for (const path of [
+		'é'.repeat(128),
+		Array(17).fill('a').join('/'),
+		'.proctor/a',
+		'a\nb',
+		'a\u0085b',
+		'\ud800'
+	])
+		assert.throws(() => workspacePath(path));
+});

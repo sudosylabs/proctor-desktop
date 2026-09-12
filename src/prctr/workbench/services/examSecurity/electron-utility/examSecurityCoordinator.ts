@@ -401,7 +401,7 @@ class ExamSecurityCoordinatorModel implements ExamSecurityCoordinator {
 		const coverageBySource = new Map(
 			reconciliation.sources.map((source) => [source.source, source])
 		);
-		let observeDegraded = false;
+		let observeDegraded = this.#options.selection.unavailableCoverageKeys.length > 0;
 		for (const source of this.#options.selection.enforcedSourceIds) {
 			const coverage = coverageBySource.get(source);
 			if (
@@ -871,10 +871,7 @@ class ExamSecurityCoordinatorModel implements ExamSecurityCoordinator {
 		return queued;
 	}
 	#policyIsCurrent(): boolean {
-		return (
-			this.#authoritative.authoritativeTimeUnixMs >= this.#options.policy.activeFromUnixMs &&
-			this.#authoritative.authoritativeTimeUnixMs < this.#options.policy.expiresAtUnixMs
-		);
+		return this.#authoritative.authoritativeTimeUnixMs >= this.#options.policy.activeFromUnixMs;
 	}
 	#validateBinding(): void {
 		const attemptScope =

@@ -7,7 +7,7 @@ import type {
 	WorkspaceEntry,
 	WorkspaceEntryReference,
 	WorkspacePath
-} from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts';
+} from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts';
 import type {
 	AuthoritativeWorkspacePort,
 	AuthoritativeWorkspaceRead,
@@ -19,7 +19,7 @@ import type {
 	WorkspaceIdFactory,
 	WorkspaceMutationCommand,
 	WorkspaceMutationResult
-} from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts';
+} from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/internalPorts.ts';
 
 const fullAccess: WorkspaceAccess = Object.freeze({
 	read: true,

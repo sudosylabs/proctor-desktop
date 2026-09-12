@@ -93,7 +93,7 @@
     {
       "id": "attempt-workspace",
       "kind": "local-interface",
-      "reference": "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts",
+      "reference": "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts",
       "rationale": "Current Workspace persistence is acknowledged before the PTY may open against current content."
     },
     {

@@ -3,8 +3,9 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
+	NATIVE_BASELINE_CAPABILITIES,
 	NATIVE_CAPABILITY_REGISTRY,
-	NATIVE_CAPABILITY_REGISTRY_VERSION,
+	NATIVE_CAPABILITY_REGISTRY_DIGEST,
 	type NativeCapabilityMatrix,
 	type NativeCapabilityMode
 } from '../../../../platform/native/common/nativeCapabilityRegistry.js';
@@ -17,7 +18,6 @@ import type { NativeSourceId } from '../../../../platform/native/common/security
 
 const IDENTIFIER = /^[A-Za-z0-9](?:[A-Za-z0-9._:-]{0,127})$/u;
 const DIGEST = /^sha256:[a-f0-9]{64}$/u;
-const MAX_POLICY_LIFETIME_MS = 86_400_000;
 const MAX_CATALOG_IDS = 256;
 
 export type ProcessApplicationPolicy = {
@@ -100,11 +100,10 @@ export interface EffectiveExamSecurityPolicy {
 	readonly scope: EffectivePolicyScope;
 	readonly issuedAtUnixMs: number;
 	readonly activeFromUnixMs: number;
-	readonly expiresAtUnixMs: number;
 	readonly applicationReleaseId: string;
 	readonly matrixId: string;
 	readonly targetTuple: string;
-	readonly registryVersion: number;
+	readonly registryDigest: string;
 	readonly focusLossMode: NativeCapabilityMode;
 	readonly connectionLossMode: 'enforce';
 	readonly resolvedExceptionRefs: readonly string[];
@@ -117,7 +116,11 @@ export interface EffectiveExamSecurityPolicy {
 export interface ExamSecurityNativeSelection {
 	readonly selectedSources: readonly NativeSourceId[];
 	readonly selectedSourceCategories: readonly NativeSourceCategory[];
+	/** Policy-selected categories, including truthful unavailable coverage, for server preflight. */
+	readonly requestedSourceCategories: readonly NativeSourceCategory[];
 	readonly requiredCoverageKeys: readonly string[];
+	/** Selected observe claims omitted because the packaged target cannot provide them. */
+	readonly unavailableCoverageKeys: readonly string[];
 	readonly enforcedSourceIds: readonly NativeSourceId[];
 	readonly observeSourceIds: readonly NativeSourceId[];
 	readonly closedEffects: readonly (
@@ -142,11 +145,10 @@ export function validateEffectiveExamSecurityPolicy(value: unknown): EffectiveEx
 			'scope',
 			'issuedAtUnixMs',
 			'activeFromUnixMs',
-			'expiresAtUnixMs',
 			'applicationReleaseId',
 			'matrixId',
 			'targetTuple',
-			'registryVersion',
+			'registryDigest',
 			'focusLossMode',
 			'connectionLossMode',
 			'resolvedExceptionRefs',
@@ -161,7 +163,6 @@ export function validateEffectiveExamSecurityPolicy(value: unknown): EffectiveEx
 		value.schemaVersion !== 1 ||
 		!identifiers(value, [
 			'policyId',
-			'revision',
 			'institutionId',
 			'examRevisionId',
 			'sittingId',
@@ -172,27 +173,32 @@ export function validateEffectiveExamSecurityPolicy(value: unknown): EffectiveEx
 			'visibilityClassId',
 			'retentionClassId'
 		]) ||
+		typeof value.revision !== 'string' ||
+		!/^[\x20-\x7e]{1,128}$/u.test(value.revision) ||
 		typeof value.digest !== 'string' ||
 		!DIGEST.test(value.digest)
 	)
 		throw new TypeError('Effective Exam Security Policy identity is invalid');
 	if (
 		!integer(value.ordinal, 1) ||
-		value.registryVersion !== NATIVE_CAPABILITY_REGISTRY_VERSION ||
+		value.registryDigest !== NATIVE_CAPABILITY_REGISTRY_DIGEST ||
 		!integer(value.issuedAtUnixMs, 0) ||
 		!integer(value.activeFromUnixMs, 0) ||
-		!integer(value.expiresAtUnixMs, 1) ||
-		value.issuedAtUnixMs > value.activeFromUnixMs ||
-		value.activeFromUnixMs >= value.expiresAtUnixMs ||
-		value.expiresAtUnixMs - value.activeFromUnixMs > MAX_POLICY_LIFETIME_MS
+		value.issuedAtUnixMs > value.activeFromUnixMs
 	)
 		throw new TypeError('Effective Exam Security Policy bounds are invalid');
 	if (!isMode(value.focusLossMode) || value.connectionLossMode !== 'enforce')
 		throw new TypeError('Effective Exam Security Policy connectivity modes are invalid');
+	if (
+		value.evidenceClassId !== 'native_integrity' ||
+		value.visibilityClassId !== 'examiner_restricted' ||
+		value.retentionClassId !== 'native_minimized'
+	)
+		throw new TypeError('Effective Exam Security Policy evidence classes are invalid');
 	const scope = validateScope(value.scope);
 	const resolvedExceptionRefs = identifierArray(
 		value.resolvedExceptionRefs,
-		32,
+		0,
 		'resolved exception'
 	);
 	if (
@@ -216,7 +222,7 @@ export function resolveExamSecurityNativeSelection(
 	matrix: NativeCapabilityMatrix
 ): ExamSecurityNativeSelection {
 	if (
-		matrix.registry_version !== policy.registryVersion ||
+		matrix.registry_digest !== NATIVE_CAPABILITY_REGISTRY_DIGEST ||
 		matrix.matrix_id !== policy.matrixId ||
 		matrix.release_id !== policy.applicationReleaseId ||
 		matrix.target_tuple !== policy.targetTuple
@@ -235,7 +241,22 @@ export function resolveExamSecurityNativeSelection(
 	]);
 	const observedSources = new Set<NativeSourceId>();
 	const categories = new Set<NativeSourceCategory>();
+	const requestedCategories = new Set<NativeSourceCategory>();
 	const requiredCoverage = new Set<string>();
+	const unavailableCoverage = new Set<string>();
+	for (const baseline of NATIVE_BASELINE_CAPABILITIES) {
+		const entry = coverage.get(baseline.coverageKey);
+		if (
+			entry?.claim !== 'enforce' ||
+			entry.verification !== 'passed' ||
+			entry.source_schema_digest !== baseline.sourceSchemaDigest
+		) {
+			throw new TypeError(
+				`Capability matrix cannot satisfy mandatory ${baseline.coverageKey}`
+			);
+		}
+		requiredCoverage.add(baseline.coverageKey);
+	}
 	const effects = new Set<ExamSecurityNativeSelection['closedEffects'][number]>([
 		'candidate_content_protection'
 	]);
@@ -246,7 +267,15 @@ export function resolveExamSecurityNativeSelection(
 		if (descriptor === undefined)
 			throw new TypeError(`Unknown native family ${familyPolicy.id}`);
 		if (familyPolicy.mode === 'disabled') continue;
+		if (familyPolicy.id === 'clipboard' && familyPolicy.observeOsClipboardChanges)
+			requestedCategories.add('os-clipboard-change');
+		if (familyPolicy.id === 'removable_storage' || familyPolicy.id === 'network_configuration')
+			for (const id of familyPolicy.enabledSubCapabilities)
+				requestedCategories.add(id.replaceAll('_', '-') as NativeSourceCategory);
+		if (familyPolicy.id === 'camera' || familyPolicy.id === 'microphone')
+			requestedCategories.add(familyPolicy.id);
 		const required = requiredClaims(familyPolicy);
+		const available = new Set<string>();
 		for (const item of required) {
 			const sub = descriptor.subCapabilities.find((candidate) => candidate.id === item.id);
 			if (sub === undefined)
@@ -255,16 +284,23 @@ export function resolveExamSecurityNativeSelection(
 			if (
 				entry === undefined ||
 				entry.verification !== 'passed' ||
+				entry.source_schema_digest !== sub.sourceSchemaDigest ||
 				(item.claim === 'enforce'
 					? entry.claim !== 'enforce'
 					: entry.claim === 'unavailable')
-			)
+			) {
+				if (item.claim === 'observe') {
+					unavailableCoverage.add(sub.coverageKey);
+					continue;
+				}
 				throw new TypeError(
 					`Capability matrix cannot satisfy ${familyPolicy.id}.${item.id} as ${item.claim}`
 				);
+			}
+			available.add(item.id);
 			requiredCoverage.add(sub.coverageKey);
 		}
-		const sourceClaims = required.filter((item) => item.sourceBacked);
+		const sourceClaims = required.filter((item) => item.sourceBacked && available.has(item.id));
 		if (descriptor.sourceId !== undefined && sourceClaims.length > 0) {
 			const source = descriptor.sourceId as NativeSourceId;
 			sources.add(source);
@@ -272,16 +308,16 @@ export function resolveExamSecurityNativeSelection(
 			else observedSources.add(source);
 		}
 		if (familyPolicy.id === 'clipboard') {
-			if (familyPolicy.observeOsClipboardChanges) categories.add('os-clipboard-change');
+			if (available.has('os_clipboard_change')) categories.add('os-clipboard-change');
 			if (familyPolicy.strategy === 'private_attempt')
 				effects.add('candidate_private_clipboard');
 		} else if (familyPolicy.id === 'printing' && familyPolicy.candidatePrintCommands === 'deny')
 			effects.add('candidate_print_command_denial');
 		else if (familyPolicy.id === 'removable_storage')
-			for (const id of familyPolicy.enabledSubCapabilities)
+			for (const id of familyPolicy.enabledSubCapabilities.filter((id) => available.has(id)))
 				categories.add(id === 'portable_mtp' ? 'portable-mtp' : 'removable-block-storage');
 		else if (familyPolicy.id === 'network_configuration')
-			for (const id of familyPolicy.enabledSubCapabilities)
+			for (const id of familyPolicy.enabledSubCapabilities.filter((id) => available.has(id)))
 				categories.add(id.replaceAll('_', '-') as NativeSourceCategory);
 		else if (familyPolicy.id === 'camera' && sourceClaims.length > 0) categories.add('camera');
 		else if (familyPolicy.id === 'microphone' && sourceClaims.length > 0)
@@ -293,7 +329,11 @@ export function resolveExamSecurityNativeSelection(
 	return deepFreeze({
 		selectedSources: sourceOrder.filter((source) => sources.has(source)),
 		selectedSourceCategories: categoryOrder.filter((category) => categories.has(category)),
+		requestedSourceCategories: categoryOrder.filter((category) =>
+			requestedCategories.has(category)
+		),
 		requiredCoverageKeys: [...requiredCoverage].sort(),
+		unavailableCoverageKeys: [...unavailableCoverage].sort(),
 		enforcedSourceIds: sourceOrder.filter((source) => enforcedSources.has(source)),
 		observeSourceIds: sourceOrder.filter((source) => observedSources.has(source)),
 		closedEffects: [...effects].sort()
@@ -388,6 +428,12 @@ function validateFamilyPolicy(value: unknown, expectedId: string | undefined): N
 	switch (id) {
 		case 'process_application':
 			exact(value, ['id', 'mode', 'allowedApplicationIds']);
+			if (
+				value.mode === 'disabled' &&
+				(!Array.isArray(value.allowedApplicationIds) ||
+					value.allowedApplicationIds.length !== 0)
+			)
+				invalid(id);
 			return deepFreeze({
 				id,
 				mode: value.mode,
@@ -534,8 +580,9 @@ function validateFamilyPolicy(value: unknown, expectedId: string | undefined): N
 					'not_required',
 					'supported_required'
 				] as const) ||
-				(value.mode === 'disabled' &&
-					(value.requireReady || value.concurrentUseCheck !== 'not_required'))
+				(value.mode === 'disabled'
+					? value.requireReady || value.concurrentUseCheck !== 'not_required'
+					: !value.requireReady && value.concurrentUseCheck === 'not_required')
 			)
 				invalid(id);
 			return deepFreeze({
@@ -586,7 +633,12 @@ function identifierArray(value: unknown, maximum: number, label: string): readon
 	if (
 		!Array.isArray(value) ||
 		value.length > maximum ||
-		value.some((item) => typeof item !== 'string' || !IDENTIFIER.test(item)) ||
+		value.some(
+			(item, index) =>
+				typeof item !== 'string' ||
+				!IDENTIFIER.test(item) ||
+				(index > 0 && item <= value[index - 1])
+		) ||
 		new Set(value).size !== value.length
 	)
 		throw new TypeError(`${label} identifiers are invalid`);

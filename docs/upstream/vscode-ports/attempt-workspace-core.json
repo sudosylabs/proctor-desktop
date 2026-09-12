@@ -7,7 +7,7 @@
     "callers": [
       "src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts"
     ],
-    "interface": "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts",
+    "interface": "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts",
     "decision": "docs/architecture/attempt-workspace.md"
   },
   "upstream": {
@@ -37,7 +37,7 @@
       "upstreamBlob": "493471fe8560bf2c630a61ba47ec698c155a7bef",
       "category": "source",
       "disposition": "behaviorally-reimplemented",
-      "rationale": "Retain strict provider-boundary validation and error translation at the caller adapter without allowing registration or provider capability flags to grant authorization.",
+      "rationale": "The existing admitted FileService implementation is retained unchanged in platform/files; the domain facade and typed provider adapter translate its calls into Attempt-scoped authority. This historical behavioral comparison no longer substitutes for the actual FileService.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts"
     },
@@ -48,7 +48,7 @@
       "disposition": "behaviorally-reimplemented",
       "rationale": "Retain explicit working, dirty, save, revert, capability and event semantics while exposing Proctor's orthogonal content, mutation, protection, availability and access facts.",
       "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts"
+      "localPath": "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts"
     },
     {
       "upstreamPath": "src/vs/workbench/services/workingCopy/common/storedFileWorkingCopy.ts",
@@ -57,7 +57,7 @@
       "disposition": "behaviorally-reimplemented",
       "rationale": "Retain serialized overlapping saves, concurrent-edit preservation, conflict state, backup-first close and explicit revert, adapted to opaque server versions, exact mutation outcomes and protected local recovery.",
       "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts"
+      "localPath": "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspaceSession.ts"
     },
     {
       "upstreamPath": "src/vs/workbench/services/workingCopy/browser/workingCopyBackupService.ts",
@@ -66,7 +66,7 @@
       "disposition": "behaviorally-reimplemented",
       "rationale": "Retain durable backup records and discard-after-save behavior behind a privileged protected-content port using opaque storage identifiers rather than a renderer-visible backup filesystem.",
       "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts"
+      "localPath": "src/prctr/workbench/services/attemptWorkspace/common/internalPorts.ts"
     }
   ],
   "licenses": [
@@ -87,14 +87,20 @@
     {
       "id": "server-adapter",
       "kind": "platform-interface",
-      "reference": "src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts",
-      "rationale": "The production server transport remains unresolved behind the exact authoritative port."
+      "reference": "src/prctr/workbench/services/attemptWorkspace/node/serverWorkspaceAuthority.ts",
+      "rationale": "Shared API client transport validates current Participation binding, frozen limits, complete snapshots, verified content and exact mutation receipts."
     },
     {
       "id": "protected-content-adapter",
       "kind": "platform-interface",
-      "reference": "src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts",
-      "rationale": "Production encryption, key custody and atomic native storage remain unresolved behind the protected-content port."
+      "reference": "src/prctr/workbench/services/attemptWorkspace/node/protectedWorkspaceContent.ts",
+      "rationale": "Workspace-owned records use the shared bounded AES-GCM record store and an OS-wrapped data key; recovery remains distinct from server acknowledgement."
+    },
+    {
+      "id": "file-service",
+      "kind": "local-interface",
+      "reference": "src/prctr/platform/files/common/fileService.ts",
+      "rationale": "Reuse the already admitted VS Code FileService unchanged through the real provider interface."
     }
   ],
   "divergences": [
@@ -102,8 +108,8 @@
       "id": "remote-authority",
       "summary": "Stable entry references, opaque content versions, authoritative cursors, exact acknowledgements and submission blockers replace local URI, mtime and editor-cleanliness assumptions.",
       "localPaths": [
-        "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts",
-        "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts"
+        "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts",
+        "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspaceSession.ts"
       ],
       "verificationRefs": ["workspace-contract-tests"]
     },
@@ -111,15 +117,15 @@
       "id": "protected-overlay",
       "summary": "Recovery protection is an independent durability fact; scoped records reload the overlay after relaunch, while conflict, rejection, unknown outcome and authorization loss retain local work until acknowledgement or explicit discard.",
       "localPaths": [
-        "src/prctr/workbench/contrib/attemptWorkspace/common/internalPorts.ts",
-        "src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.ts"
+        "src/prctr/workbench/services/attemptWorkspace/common/internalPorts.ts",
+        "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspaceSession.ts"
       ],
       "verificationRefs": ["workspace-contract-tests"]
     },
     {
       "id": "closed-v1",
       "summary": "The public seam admits only whole current-file reads and five single mutation families; unsupported server batch, history, range, revert and conflict operations are explicit false capabilities.",
-      "localPaths": ["src/prctr/workbench/contrib/attemptWorkspace/common/attemptWorkspace.ts"],
+      "localPaths": ["src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts"],
       "verificationRefs": ["workspace-contract-tests", "source-check"]
     }
   ],
@@ -127,19 +133,19 @@
     {
       "id": "workspace-contract-tests",
       "kind": "test",
-      "path": "test/workbench/contrib/attemptWorkspace/common/attemptWorkspaceSession.test.ts",
+      "path": "test/workbench/services/attemptWorkspace/common/attemptWorkspaceSession.test.ts",
       "obligation": "Verify state separation, five mutations, stable identity, idempotency, cancellation, cursor gaps, overlay reapplication and relaunch recovery, bounded concurrency, subtree serialization, protected conflict sides, safe text rebase, revocation, dual-path durability gating, limits and submission blockers."
     },
     {
       "id": "provider-tests",
       "kind": "test",
-      "path": "test/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.test.ts",
+      "path": "test/workbench/services/attemptWorkspace/common/workspaceFileSystemProvider.test.ts",
       "obligation": "Verify scoped URI projection, acknowledged writes, hierarchy enumeration, watch-filtered invalidation events, rich-to-coarse error translation and retention of locally protected unacknowledged writes."
     },
     {
       "id": "exam-resource-tests",
       "kind": "test",
-      "path": "test/workbench/contrib/attemptWorkspace/common/examResourceCatalog.test.ts",
+      "path": "test/workbench/services/attemptWorkspace/common/examResourceCatalog.test.ts",
       "obligation": "Verify Exam Resources remain separately authorized and read only."
     },
     {
@@ -153,6 +159,12 @@
       "kind": "review",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Verify every reviewed filesystem and working-copy evidence blob at the exact pinned VS Code revision."
+    },
+    {
+      "id": "file-service-integration",
+      "kind": "test",
+      "path": "test/workbench/services/attemptWorkspace/common/fileServiceProviders.test.ts",
+      "obligation": "Exercise real FileService mutations and preview reads, closed roots, cancellation and lease revocation."
     }
   ]
 }
