@@ -1,0 +1,1687 @@
+{
+  "schemaVersion": 1,
+  "sha256": "687aca69d84a418e84a3cb766cce95117c366e522e4e3f4d4f939863bf23039e",
+  "paths": 228,
+  "operations": [
+    {
+      "operationId": "runAcademicAdministrationBatch",
+      "method": "POST",
+      "path": "/api/v1/academic-administration-batches",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAcademicPeriods",
+      "method": "GET",
+      "path": "/api/v1/academic-periods",
+      "transport": "http"
+    },
+    {
+      "operationId": "createAcademicPeriod",
+      "method": "POST",
+      "path": "/api/v1/academic-periods",
+      "transport": "http"
+    },
+    {
+      "operationId": "archiveAcademicPeriod",
+      "method": "DELETE",
+      "path": "/api/v1/academic-periods/{academic_period_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "getAcademicPeriod",
+      "method": "GET",
+      "path": "/api/v1/academic-periods/{academic_period_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateAcademicPeriod",
+      "method": "PATCH",
+      "path": "/api/v1/academic-periods/{academic_period_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "endAcademicUnitMember",
+      "method": "DELETE",
+      "path": "/api/v1/academic-unit-members/{academic_unit_member_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAcademicUnits",
+      "method": "GET",
+      "path": "/api/v1/academic-units",
+      "transport": "http"
+    },
+    {
+      "operationId": "createRootAcademicUnit",
+      "method": "POST",
+      "path": "/api/v1/academic-units",
+      "transport": "http"
+    },
+    {
+      "operationId": "archiveAcademicUnit",
+      "method": "DELETE",
+      "path": "/api/v1/academic-units/{academic_unit_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "getAcademicUnit",
+      "method": "GET",
+      "path": "/api/v1/academic-units/{academic_unit_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateAcademicUnit",
+      "method": "PATCH",
+      "path": "/api/v1/academic-units/{academic_unit_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAcademicUnitChildren",
+      "method": "GET",
+      "path": "/api/v1/academic-units/{academic_unit_id}/children",
+      "transport": "http"
+    },
+    {
+      "operationId": "createAcademicUnitChild",
+      "method": "POST",
+      "path": "/api/v1/academic-units/{academic_unit_id}/children",
+      "transport": "http"
+    },
+    {
+      "operationId": "searchClasses",
+      "method": "GET",
+      "path": "/api/v1/academic-units/{academic_unit_id}/classes",
+      "transport": "http"
+    },
+    {
+      "operationId": "issueAcademicUnitRoleInvitation",
+      "method": "POST",
+      "path": "/api/v1/academic-units/{academic_unit_id}/invitations/role",
+      "transport": "http"
+    },
+    {
+      "operationId": "issueTeacherAcademicUnitInvitation",
+      "method": "POST",
+      "path": "/api/v1/academic-units/{academic_unit_id}/invitations/teacher",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAcademicUnitMembers",
+      "method": "GET",
+      "path": "/api/v1/academic-units/{academic_unit_id}/members",
+      "transport": "http"
+    },
+    {
+      "operationId": "createAcademicUnitMember",
+      "method": "POST",
+      "path": "/api/v1/academic-units/{academic_unit_id}/members",
+      "transport": "http"
+    },
+    {
+      "operationId": "listProgrammes",
+      "method": "GET",
+      "path": "/api/v1/academic-units/{academic_unit_id}/programmes",
+      "transport": "http"
+    },
+    {
+      "operationId": "createProgramme",
+      "method": "POST",
+      "path": "/api/v1/academic-units/{academic_unit_id}/programmes",
+      "transport": "http"
+    },
+    {
+      "operationId": "getAccessPolicy",
+      "method": "GET",
+      "path": "/api/v1/access-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "replaceAccessPolicy",
+      "method": "PUT",
+      "path": "/api/v1/access-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "preflightAccessPolicy",
+      "method": "POST",
+      "path": "/api/v1/access-policy/preflight",
+      "transport": "http"
+    },
+    {
+      "operationId": "endAffiliation",
+      "method": "DELETE",
+      "path": "/api/v1/affiliations/{affiliation_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAuditEvents",
+      "method": "GET",
+      "path": "/api/v1/audits",
+      "transport": "http"
+    },
+    {
+      "operationId": "startBrowserInvitation",
+      "method": "POST",
+      "path": "/api/v1/auth/browser/invitations",
+      "transport": "http"
+    },
+    {
+      "operationId": "acceptBrowserInvitation",
+      "method": "POST",
+      "path": "/api/v1/auth/browser/invitations/accept",
+      "transport": "http"
+    },
+    {
+      "operationId": "acceptBrowserInvitationWithSession",
+      "method": "POST",
+      "path": "/api/v1/auth/browser/invitations/accept-session",
+      "transport": "http"
+    },
+    {
+      "operationId": "startDesktopAuthorization",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/authorizations",
+      "transport": "http"
+    },
+    {
+      "operationId": "resetDesktopAuthorizationAccount",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/authorizations/account/reset",
+      "transport": "http"
+    },
+    {
+      "operationId": "approveDesktopAuthorization",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/authorizations/approve",
+      "transport": "http"
+    },
+    {
+      "operationId": "authenticateDesktopAuthorizationWithPassword",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/authorizations/authenticate/password",
+      "transport": "http"
+    },
+    {
+      "operationId": "beginDesktopAuthorizationExternalAuthentication",
+      "method": "GET",
+      "path": "/api/v1/auth/desktop/authorizations/authenticate/providers/{provider_id}/login",
+      "transport": "http"
+    },
+    {
+      "operationId": "authenticateDesktopAuthorizationWithSession",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/authorizations/authenticate/session",
+      "transport": "http"
+    },
+    {
+      "operationId": "bindDesktopAuthorizationBrowser",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/authorizations/bind",
+      "transport": "http"
+    },
+    {
+      "operationId": "cancelDesktopAuthorization",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/authorizations/cancel",
+      "transport": "http"
+    },
+    {
+      "operationId": "getDesktopAuthorizationContext",
+      "method": "GET",
+      "path": "/api/v1/auth/desktop/authorizations/context",
+      "transport": "http"
+    },
+    {
+      "operationId": "exchangeDesktopAuthorizationCode",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/token",
+      "transport": "http"
+    },
+    {
+      "operationId": "completeEmailVerification",
+      "method": "POST",
+      "path": "/api/v1/auth/email-verification/complete",
+      "transport": "http"
+    },
+    {
+      "operationId": "requestEmailVerification",
+      "method": "POST",
+      "path": "/api/v1/auth/email-verification/request",
+      "transport": "http"
+    },
+    {
+      "operationId": "login",
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "transport": "http"
+    },
+    {
+      "operationId": "logout",
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "transport": "http"
+    },
+    {
+      "operationId": "completePasswordReset",
+      "method": "POST",
+      "path": "/api/v1/auth/password-reset/complete",
+      "transport": "http"
+    },
+    {
+      "operationId": "requestPasswordReset",
+      "method": "POST",
+      "path": "/api/v1/auth/password-reset/request",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAuthenticationProviders",
+      "method": "GET",
+      "path": "/api/v1/auth/providers",
+      "transport": "http"
+    },
+    {
+      "operationId": "completeExternalAuthentication",
+      "method": "GET",
+      "path": "/api/v1/auth/providers/{provider_id}/callback",
+      "transport": "http"
+    },
+    {
+      "operationId": "beginExternalAuthentication",
+      "method": "GET",
+      "path": "/api/v1/auth/providers/{provider_id}/login",
+      "transport": "http"
+    },
+    {
+      "operationId": "beginInvitationExternalAuthentication",
+      "method": "POST",
+      "path": "/api/v1/auth/providers/{provider_id}/login",
+      "transport": "http"
+    },
+    {
+      "operationId": "beginExternalReauthentication",
+      "method": "POST",
+      "path": "/api/v1/auth/reauthenticate/external",
+      "transport": "http"
+    },
+    {
+      "operationId": "reauthenticatePassword",
+      "method": "POST",
+      "path": "/api/v1/auth/reauthenticate/password",
+      "transport": "http"
+    },
+    {
+      "operationId": "refreshSession",
+      "method": "POST",
+      "path": "/api/v1/auth/refresh",
+      "transport": "http"
+    },
+    {
+      "operationId": "registerLocalUser",
+      "method": "POST",
+      "path": "/api/v1/auth/register",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAuthenticationMethods",
+      "method": "GET",
+      "path": "/api/v1/authentication-methods",
+      "transport": "http"
+    },
+    {
+      "operationId": "removePassword",
+      "method": "DELETE",
+      "path": "/api/v1/authentication-methods/password",
+      "transport": "http"
+    },
+    {
+      "operationId": "enrollPassword",
+      "method": "PUT",
+      "path": "/api/v1/authentication-methods/password",
+      "transport": "http"
+    },
+    {
+      "operationId": "unlinkExternalIdentity",
+      "method": "DELETE",
+      "path": "/api/v1/authentication-methods/providers/{external_identity_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "beginProviderConnection",
+      "method": "POST",
+      "path": "/api/v1/authentication-methods/providers/{provider_id}/connect",
+      "transport": "http"
+    },
+    {
+      "operationId": "getInstallationStatus",
+      "method": "GET",
+      "path": "/api/v1/bootstrap",
+      "transport": "http"
+    },
+    {
+      "operationId": "bootstrapInstallation",
+      "method": "POST",
+      "path": "/api/v1/bootstrap",
+      "transport": "http"
+    },
+    {
+      "operationId": "endClassMember",
+      "method": "DELETE",
+      "path": "/api/v1/class-members/{class_member_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "archiveClass",
+      "method": "DELETE",
+      "path": "/api/v1/classes/{class_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "getClass",
+      "method": "GET",
+      "path": "/api/v1/classes/{class_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateClass",
+      "method": "PATCH",
+      "path": "/api/v1/classes/{class_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "issueStudentClassInvitation",
+      "method": "POST",
+      "path": "/api/v1/classes/{class_id}/invitations/student",
+      "transport": "http"
+    },
+    {
+      "operationId": "listClassMembers",
+      "method": "GET",
+      "path": "/api/v1/classes/{class_id}/members",
+      "transport": "http"
+    },
+    {
+      "operationId": "enrollClassMember",
+      "method": "POST",
+      "path": "/api/v1/classes/{class_id}/members",
+      "transport": "http"
+    },
+    {
+      "operationId": "getDesktopCompatibilityPolicy",
+      "method": "GET",
+      "path": "/api/v1/desktop-compatibility-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "replaceDesktopCompatibilityPolicy",
+      "method": "PUT",
+      "path": "/api/v1/desktop-compatibility-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "getPublicAccessDiscovery",
+      "method": "GET",
+      "path": "/api/v1/discovery",
+      "transport": "http"
+    },
+    {
+      "operationId": "browserSourceList",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/browser-activity/sources",
+      "transport": "http"
+    },
+    {
+      "operationId": "browserSourceStatus",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/browser-activity/sources/{source_session_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "appendHistoricalBrowserDelivery",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/browser-activity/sources/{source_session_id}/events",
+      "transport": "http"
+    },
+    {
+      "operationId": "declareBrowserDeliveryGaps",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/browser-activity/sources/{source_session_id}/gaps",
+      "transport": "http"
+    },
+    {
+      "operationId": "browserDeliveryReceipts",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/browser-activity/sources/{source_session_id}/receipts",
+      "transport": "http"
+    },
+    {
+      "operationId": "sealBrowserDelivery",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/browser-activity/sources/{source_session_id}/seal",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateBrowserDeliverySummary",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/browser-activity/sources/{source_session_id}/summary",
+      "transport": "http"
+    },
+    {
+      "operationId": "acknowledgeExamAttemptCorrection",
+      "method": "PUT",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/corrections/{exam_revision_id}/acknowledgement",
+      "transport": "http"
+    },
+    {
+      "operationId": "deliveryBudget",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/delivery-limits",
+      "transport": "http"
+    },
+    {
+      "operationId": "stopDeliveryDetails",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/delivery-limits/stop-details",
+      "transport": "http"
+    },
+    {
+      "operationId": "getCandidateExamPresentation",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/presentation",
+      "transport": "http"
+    },
+    {
+      "operationId": "getCandidateExamResourceContent",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/resources/{exam_resource_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "getStudentExamResult",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/result",
+      "transport": "http"
+    },
+    {
+      "operationId": "appendNativeDelivery",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/security-batches",
+      "transport": "http"
+    },
+    {
+      "operationId": "recoverExamSecurityPolicy",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/security-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "nativeDeliveryStatus",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/security-streams/{stream_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "declareNativeDeliveryGaps",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/security-streams/{stream_id}/gaps",
+      "transport": "http"
+    },
+    {
+      "operationId": "nativeDeliveryReceipt",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/security-streams/{stream_id}/receipts/{batch_sequence}",
+      "transport": "http"
+    },
+    {
+      "operationId": "sealNativeDelivery",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/security-streams/{stream_id}/seal",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateNativeDeliverySummary",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/security-streams/{stream_id}/summary",
+      "transport": "http"
+    },
+    {
+      "operationId": "submitExamAttempt",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/submissions",
+      "transport": "http"
+    },
+    {
+      "operationId": "listCandidateExamWorkspace",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace",
+      "transport": "http"
+    },
+    {
+      "operationId": "listCandidateExamWorkspaceChanges",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/changes",
+      "transport": "http"
+    },
+    {
+      "operationId": "createCandidateExamWorkspaceDirectory",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/directories",
+      "transport": "http"
+    },
+    {
+      "operationId": "deleteCandidateExamWorkspaceEntry",
+      "method": "DELETE",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/entries/{attempt_workspace_entry_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "moveCandidateExamWorkspaceEntry",
+      "method": "PATCH",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/entries/{attempt_workspace_entry_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "createCandidateExamWorkspaceFile",
+      "method": "POST",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/files",
+      "transport": "http"
+    },
+    {
+      "operationId": "getCandidateExamWorkspaceContent",
+      "method": "GET",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/files/{attempt_workspace_entry_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "replaceCandidateExamWorkspaceFile",
+      "method": "PUT",
+      "path": "/api/v1/exam-attempts/{exam_attempt_id}/workspace/files/{attempt_workspace_entry_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "prepareSecurityPreflight",
+      "method": "POST",
+      "path": "/api/v1/exam-sittings/{exam_sitting_id}/security-preflights",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExams",
+      "method": "GET",
+      "path": "/api/v1/exams",
+      "transport": "http"
+    },
+    {
+      "operationId": "createExam",
+      "method": "POST",
+      "path": "/api/v1/exams",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExam",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "archiveExam",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/archive",
+      "transport": "http"
+    },
+    {
+      "operationId": "editExamDraftText",
+      "method": "PATCH",
+      "path": "/api/v1/exams/{exam_id}/draft",
+      "transport": "http"
+    },
+    {
+      "operationId": "configureExamDraftBrowserPolicy",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/draft/browser-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamExecutionImages",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/draft/execution-images",
+      "transport": "http"
+    },
+    {
+      "operationId": "configureExamDraftExecutionProfile",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/draft/execution-profile",
+      "transport": "http"
+    },
+    {
+      "operationId": "configureExamDraftFocusLoss",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/draft/policies/focus-loss",
+      "transport": "http"
+    },
+    {
+      "operationId": "configureExamDraftNativePolicy",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/draft/policies/native",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamDraftResources",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/draft/resources",
+      "transport": "http"
+    },
+    {
+      "operationId": "createExamDraftResource",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/draft/resources",
+      "transport": "http"
+    },
+    {
+      "operationId": "reorderExamDraftResources",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/draft/resources/order",
+      "transport": "http"
+    },
+    {
+      "operationId": "removeExamDraftResource",
+      "method": "DELETE",
+      "path": "/api/v1/exams/{exam_id}/draft/resources/{exam_resource_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "editExamDraftResourceMetadata",
+      "method": "PATCH",
+      "path": "/api/v1/exams/{exam_id}/draft/resources/{exam_resource_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamDraftResourceContent",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/draft/resources/{exam_resource_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "replaceExamDraftResourceContent",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/draft/resources/{exam_resource_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamDraftStarterWorkspace",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/draft/starter-workspace",
+      "transport": "http"
+    },
+    {
+      "operationId": "createExamDraftStarterWorkspaceDirectory",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/draft/starter-workspace/directories",
+      "transport": "http"
+    },
+    {
+      "operationId": "removeExamDraftStarterWorkspaceEntry",
+      "method": "DELETE",
+      "path": "/api/v1/exams/{exam_id}/draft/starter-workspace/entries/{starter_workspace_entry_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "moveExamDraftStarterWorkspaceEntry",
+      "method": "PATCH",
+      "path": "/api/v1/exams/{exam_id}/draft/starter-workspace/entries/{starter_workspace_entry_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "createExamDraftStarterWorkspaceFile",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/draft/starter-workspace/files",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamDraftStarterWorkspaceFileContent",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/draft/starter-workspace/files/{starter_workspace_entry_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "replaceExamDraftStarterWorkspaceFileContent",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/draft/starter-workspace/files/{starter_workspace_entry_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamManagers",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/managers",
+      "transport": "http"
+    },
+    {
+      "operationId": "addExamManager",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/managers",
+      "transport": "http"
+    },
+    {
+      "operationId": "removeExamManager",
+      "method": "DELETE",
+      "path": "/api/v1/exams/{exam_id}/managers/{user_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "transferExamOwnership",
+      "method": "PUT",
+      "path": "/api/v1/exams/{exam_id}/owner",
+      "transport": "http"
+    },
+    {
+      "operationId": "listRetentionHolds",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/retention-holds",
+      "transport": "http"
+    },
+    {
+      "operationId": "createRetentionHold",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/retention-holds",
+      "transport": "http"
+    },
+    {
+      "operationId": "releaseRetentionHold",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/retention-holds/{retention_hold_id}/release",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamRevisions",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/revisions",
+      "transport": "http"
+    },
+    {
+      "operationId": "publishExamRevision",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/revisions",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamRevision",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/revisions/{exam_revision_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamSittings",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings",
+      "transport": "http"
+    },
+    {
+      "operationId": "scheduleExamSitting",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamSitting",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateExamSittingSchedule",
+      "method": "PATCH",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamAttempts",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamAttempt",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamAttemptBrowserActivity",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/browser-activity",
+      "transport": "http"
+    },
+    {
+      "operationId": "endExamAttemptByManager",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/end",
+      "transport": "http"
+    },
+    {
+      "operationId": "reallowExamAttempt",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/reallow",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamSubmission",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/submissions/{submission_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamSubmissionFileContent",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/submissions/{submission_id}/files/{attempt_workspace_entry_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamSubmissionManifest",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/submissions/{submission_id}/manifest",
+      "transport": "http"
+    },
+    {
+      "operationId": "cancelExamSitting",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/cancel",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamSittingCandidateStatuses",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/candidate-statuses",
+      "transport": "http"
+    },
+    {
+      "operationId": "closeExamSitting",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/close",
+      "transport": "http"
+    },
+    {
+      "operationId": "stageExamSittingCorrectionResourceContent",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/correction-resource-stages",
+      "transport": "http"
+    },
+    {
+      "operationId": "applyExamSittingCorrection",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/corrections",
+      "transport": "http"
+    },
+    {
+      "operationId": "createSittingExport",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/exports",
+      "transport": "http"
+    },
+    {
+      "operationId": "getSittingExport",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/exports/{exam_export_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "downloadSittingExport",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/exports/{exam_export_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "extendExamSitting",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/extend",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamSittingNoShows",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/no-shows",
+      "transport": "http"
+    },
+    {
+      "operationId": "pauseExamSitting",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/pause",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamSittingRecords",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/records-completion",
+      "transport": "http"
+    },
+    {
+      "operationId": "completeExamSittingRecords",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/records-completion",
+      "transport": "http"
+    },
+    {
+      "operationId": "resumeExamSitting",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/resume",
+      "transport": "http"
+    },
+    {
+      "operationId": "createSubmissionExport",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/submissions/{submission_id}/exports",
+      "transport": "http"
+    },
+    {
+      "operationId": "getSubmissionExport",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/submissions/{submission_id}/exports/{exam_export_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "downloadSubmissionExport",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/submissions/{submission_id}/exports/{exam_export_id}/content",
+      "transport": "http"
+    },
+    {
+      "operationId": "getSubmissionReviewWaiver",
+      "method": "GET",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/submissions/{submission_id}/review-waiver",
+      "transport": "http"
+    },
+    {
+      "operationId": "waiveSubmissionReview",
+      "method": "POST",
+      "path": "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/submissions/{submission_id}/review-waiver",
+      "transport": "http"
+    },
+    {
+      "operationId": "getInstitution",
+      "method": "GET",
+      "path": "/api/v1/institution",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateInstitution",
+      "method": "PATCH",
+      "path": "/api/v1/institution",
+      "transport": "http"
+    },
+    {
+      "operationId": "issueInstitutionRoleInvitation",
+      "method": "POST",
+      "path": "/api/v1/institutions/{institution_id}/invitations/role",
+      "transport": "http"
+    },
+    {
+      "operationId": "runInvitationBatch",
+      "method": "POST",
+      "path": "/api/v1/invitation-batches",
+      "transport": "http"
+    },
+    {
+      "operationId": "listInvitations",
+      "method": "GET",
+      "path": "/api/v1/invitations",
+      "transport": "http"
+    },
+    {
+      "operationId": "acceptAcademicUnitRoleInvitation",
+      "method": "POST",
+      "path": "/api/v1/invitations/academic-unit-role/accept",
+      "transport": "http"
+    },
+    {
+      "operationId": "acceptInstitutionRoleInvitation",
+      "method": "POST",
+      "path": "/api/v1/invitations/institution-role/accept",
+      "transport": "http"
+    },
+    {
+      "operationId": "acceptStudentClassInvitation",
+      "method": "POST",
+      "path": "/api/v1/invitations/student-class/accept",
+      "transport": "http"
+    },
+    {
+      "operationId": "acceptTeacherAcademicUnitInvitation",
+      "method": "POST",
+      "path": "/api/v1/invitations/teacher-academic-unit/accept",
+      "transport": "http"
+    },
+    {
+      "operationId": "getInvitation",
+      "method": "GET",
+      "path": "/api/v1/invitations/{invitation_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "replaceInvitation",
+      "method": "POST",
+      "path": "/api/v1/invitations/{invitation_id}/replacement",
+      "transport": "http"
+    },
+    {
+      "operationId": "resendInvitation",
+      "method": "POST",
+      "path": "/api/v1/invitations/{invitation_id}/resend",
+      "transport": "http"
+    },
+    {
+      "operationId": "revokeInvitation",
+      "method": "POST",
+      "path": "/api/v1/invitations/{invitation_id}/revoke",
+      "transport": "http"
+    },
+    {
+      "operationId": "listJobs",
+      "method": "GET",
+      "path": "/api/v1/jobs",
+      "transport": "http"
+    },
+    {
+      "operationId": "getJob",
+      "method": "GET",
+      "path": "/api/v1/jobs/{job_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listJobAttempts",
+      "method": "GET",
+      "path": "/api/v1/jobs/{job_id}/attempts",
+      "transport": "http"
+    },
+    {
+      "operationId": "cancelJob",
+      "method": "POST",
+      "path": "/api/v1/jobs/{job_id}/cancel",
+      "transport": "http"
+    },
+    {
+      "operationId": "retryJob",
+      "method": "POST",
+      "path": "/api/v1/jobs/{job_id}/retry",
+      "transport": "http"
+    },
+    {
+      "operationId": "listMailDeliveries",
+      "method": "GET",
+      "path": "/api/v1/mail/deliveries",
+      "transport": "http"
+    },
+    {
+      "operationId": "getMailDelivery",
+      "method": "GET",
+      "path": "/api/v1/mail/deliveries/{mail_delivery_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "cancelMailDelivery",
+      "method": "POST",
+      "path": "/api/v1/mail/deliveries/{mail_delivery_id}/cancel",
+      "transport": "http"
+    },
+    {
+      "operationId": "retryMailDelivery",
+      "method": "POST",
+      "path": "/api/v1/mail/deliveries/{mail_delivery_id}/retry",
+      "transport": "http"
+    },
+    {
+      "operationId": "inspectMailKeyState",
+      "method": "GET",
+      "path": "/api/v1/mail/keys",
+      "transport": "http"
+    },
+    {
+      "operationId": "getMailMetrics",
+      "method": "GET",
+      "path": "/api/v1/mail/metrics",
+      "transport": "http"
+    },
+    {
+      "operationId": "startMailRekey",
+      "method": "POST",
+      "path": "/api/v1/mail/rekey",
+      "transport": "http"
+    },
+    {
+      "operationId": "getMailRekeyStatus",
+      "method": "GET",
+      "path": "/api/v1/mail/rekey/{job_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "sendControlledTestMail",
+      "method": "POST",
+      "path": "/api/v1/mail/test",
+      "transport": "http"
+    },
+    {
+      "operationId": "uploadOnboardingImport",
+      "method": "POST",
+      "path": "/api/v1/onboarding-imports",
+      "transport": "http"
+    },
+    {
+      "operationId": "getOnboardingImport",
+      "method": "GET",
+      "path": "/api/v1/onboarding-imports/{onboarding_import_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "cancelOnboardingImport",
+      "method": "POST",
+      "path": "/api/v1/onboarding-imports/{onboarding_import_id}/cancel",
+      "transport": "http"
+    },
+    {
+      "operationId": "commitOnboardingImport",
+      "method": "POST",
+      "path": "/api/v1/onboarding-imports/{onboarding_import_id}/commit",
+      "transport": "http"
+    },
+    {
+      "operationId": "downloadOnboardingImportReport",
+      "method": "GET",
+      "path": "/api/v1/onboarding-imports/{onboarding_import_id}/report",
+      "transport": "http"
+    },
+    {
+      "operationId": "archiveProgrammeLevel",
+      "method": "DELETE",
+      "path": "/api/v1/programme-levels/{programme_level_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "getProgrammeLevel",
+      "method": "GET",
+      "path": "/api/v1/programme-levels/{programme_level_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateProgrammeLevel",
+      "method": "PATCH",
+      "path": "/api/v1/programme-levels/{programme_level_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listClasses",
+      "method": "GET",
+      "path": "/api/v1/programme-levels/{programme_level_id}/classes",
+      "transport": "http"
+    },
+    {
+      "operationId": "createClass",
+      "method": "POST",
+      "path": "/api/v1/programme-levels/{programme_level_id}/classes",
+      "transport": "http"
+    },
+    {
+      "operationId": "archiveProgramme",
+      "method": "DELETE",
+      "path": "/api/v1/programmes/{programme_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "getProgramme",
+      "method": "GET",
+      "path": "/api/v1/programmes/{programme_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateProgramme",
+      "method": "PATCH",
+      "path": "/api/v1/programmes/{programme_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listProgrammeLevels",
+      "method": "GET",
+      "path": "/api/v1/programmes/{programme_id}/levels",
+      "transport": "http"
+    },
+    {
+      "operationId": "createProgrammeLevel",
+      "method": "POST",
+      "path": "/api/v1/programmes/{programme_id}/levels",
+      "transport": "http"
+    },
+    {
+      "operationId": "getRetentionPolicy",
+      "method": "GET",
+      "path": "/api/v1/retention-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "replaceRetentionPolicy",
+      "method": "PUT",
+      "path": "/api/v1/retention-policy",
+      "transport": "http"
+    },
+    {
+      "operationId": "getRetentionControl",
+      "method": "GET",
+      "path": "/api/v1/retention/control",
+      "transport": "http"
+    },
+    {
+      "operationId": "changeRetentionControl",
+      "method": "PUT",
+      "path": "/api/v1/retention/control",
+      "transport": "http"
+    },
+    {
+      "operationId": "createRetentionPreview",
+      "method": "POST",
+      "path": "/api/v1/retention/previews",
+      "transport": "http"
+    },
+    {
+      "operationId": "getRetentionPreview",
+      "method": "GET",
+      "path": "/api/v1/retention/previews/{retention_preview_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listRetentionRecords",
+      "method": "GET",
+      "path": "/api/v1/retention/records",
+      "transport": "http"
+    },
+    {
+      "operationId": "listRoleBindings",
+      "method": "GET",
+      "path": "/api/v1/role-bindings",
+      "transport": "http"
+    },
+    {
+      "operationId": "createRoleBinding",
+      "method": "POST",
+      "path": "/api/v1/role-bindings",
+      "transport": "http"
+    },
+    {
+      "operationId": "endRoleBinding",
+      "method": "DELETE",
+      "path": "/api/v1/role-bindings/{role_binding_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listRoles",
+      "method": "GET",
+      "path": "/api/v1/roles",
+      "transport": "http"
+    },
+    {
+      "operationId": "createRole",
+      "method": "POST",
+      "path": "/api/v1/roles",
+      "transport": "http"
+    },
+    {
+      "operationId": "deleteRole",
+      "method": "DELETE",
+      "path": "/api/v1/roles/{role_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "getRole",
+      "method": "GET",
+      "path": "/api/v1/roles/{role_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateRole",
+      "method": "PATCH",
+      "path": "/api/v1/roles/{role_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "reportSecurityPreflight",
+      "method": "POST",
+      "path": "/api/v1/security-preflights/{security_preflight_id}/report",
+      "transport": "http"
+    },
+    {
+      "operationId": "dryRunStudentProgression",
+      "method": "POST",
+      "path": "/api/v1/student-progressions",
+      "transport": "http"
+    },
+    {
+      "operationId": "getStudentProgression",
+      "method": "GET",
+      "path": "/api/v1/student-progressions/{student_progression_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "cancelStudentProgression",
+      "method": "POST",
+      "path": "/api/v1/student-progressions/{student_progression_id}/cancel",
+      "transport": "http"
+    },
+    {
+      "operationId": "commitStudentProgression",
+      "method": "POST",
+      "path": "/api/v1/student-progressions/{student_progression_id}/commit",
+      "transport": "http"
+    },
+    {
+      "operationId": "downloadStudentProgressionReport",
+      "method": "GET",
+      "path": "/api/v1/student-progressions/{student_progression_id}/report",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamIntegrityDiscrepancies",
+      "method": "GET",
+      "path": "/api/v1/submissions/{submission_id}/integrity-discrepancies",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamIntegrityFlags",
+      "method": "GET",
+      "path": "/api/v1/submissions/{submission_id}/integrity-flags",
+      "transport": "http"
+    },
+    {
+      "operationId": "listExamIntegrityEvidence",
+      "method": "GET",
+      "path": "/api/v1/submissions/{submission_id}/integrity-flags/{integrity_flag_id}/evidence",
+      "transport": "http"
+    },
+    {
+      "operationId": "listNativeConditions",
+      "method": "GET",
+      "path": "/api/v1/submissions/{submission_id}/native-conditions",
+      "transport": "http"
+    },
+    {
+      "operationId": "getExamIntegrityReview",
+      "method": "GET",
+      "path": "/api/v1/submissions/{submission_id}/review",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateExamIntegrityReview",
+      "method": "PUT",
+      "path": "/api/v1/submissions/{submission_id}/review",
+      "transport": "http"
+    },
+    {
+      "operationId": "saveExamIntegrityDecision",
+      "method": "PUT",
+      "path": "/api/v1/submissions/{submission_id}/review/decisions/{integrity_flag_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "finalizeExamIntegrityReview",
+      "method": "POST",
+      "path": "/api/v1/submissions/{submission_id}/review/finalize",
+      "transport": "http"
+    },
+    {
+      "operationId": "releaseStudentExamResult",
+      "method": "POST",
+      "path": "/api/v1/submissions/{submission_id}/review/release",
+      "transport": "http"
+    },
+    {
+      "operationId": "pingSystem",
+      "method": "GET",
+      "path": "/api/v1/system/ping",
+      "transport": "http"
+    },
+    {
+      "operationId": "getSystemVersion",
+      "method": "GET",
+      "path": "/api/v1/system/version",
+      "transport": "http"
+    },
+    {
+      "operationId": "searchUsers",
+      "method": "GET",
+      "path": "/api/v1/users",
+      "transport": "http"
+    },
+    {
+      "operationId": "getCurrentUserProfile",
+      "method": "GET",
+      "path": "/api/v1/users/me",
+      "transport": "http"
+    },
+    {
+      "operationId": "getCurrentUserContext",
+      "method": "GET",
+      "path": "/api/v1/users/me/context",
+      "transport": "http"
+    },
+    {
+      "operationId": "listDesktopRegistrations",
+      "method": "GET",
+      "path": "/api/v1/users/me/desktop-registrations",
+      "transport": "http"
+    },
+    {
+      "operationId": "revokeDesktopRegistration",
+      "method": "DELETE",
+      "path": "/api/v1/users/me/desktop-registrations/{desktop_registration_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listCandidateExamActivity",
+      "method": "GET",
+      "path": "/api/v1/users/me/exam-activity",
+      "transport": "http"
+    },
+    {
+      "operationId": "getMFAStatus",
+      "method": "GET",
+      "path": "/api/v1/users/me/mfa",
+      "transport": "http"
+    },
+    {
+      "operationId": "activateMFA",
+      "method": "POST",
+      "path": "/api/v1/users/me/mfa/activate",
+      "transport": "http"
+    },
+    {
+      "operationId": "challengeMFA",
+      "method": "POST",
+      "path": "/api/v1/users/me/mfa/challenge",
+      "transport": "http"
+    },
+    {
+      "operationId": "disableMFA",
+      "method": "POST",
+      "path": "/api/v1/users/me/mfa/disable",
+      "transport": "http"
+    },
+    {
+      "operationId": "regenerateMFARecoveryCodes",
+      "method": "POST",
+      "path": "/api/v1/users/me/mfa/recovery-codes/regenerate",
+      "transport": "http"
+    },
+    {
+      "operationId": "setupMFA",
+      "method": "POST",
+      "path": "/api/v1/users/me/mfa/setup",
+      "transport": "http"
+    },
+    {
+      "operationId": "listRetentionNotices",
+      "method": "GET",
+      "path": "/api/v1/users/me/retention-notices",
+      "transport": "http"
+    },
+    {
+      "operationId": "listCurrentUserSessions",
+      "method": "GET",
+      "path": "/api/v1/users/me/sessions",
+      "transport": "http"
+    },
+    {
+      "operationId": "revokeCurrentUserSession",
+      "method": "POST",
+      "path": "/api/v1/users/me/sessions/revoke",
+      "transport": "http"
+    },
+    {
+      "operationId": "revokeAllCurrentUserSessions",
+      "method": "POST",
+      "path": "/api/v1/users/me/sessions/revoke-all",
+      "transport": "http"
+    },
+    {
+      "operationId": "getCurrentUserSettings",
+      "method": "GET",
+      "path": "/api/v1/users/me/settings",
+      "transport": "http"
+    },
+    {
+      "operationId": "replaceCurrentUserSettings",
+      "method": "PUT",
+      "path": "/api/v1/users/me/settings",
+      "transport": "http"
+    },
+    {
+      "operationId": "listPersonalAccessTokens",
+      "method": "GET",
+      "path": "/api/v1/users/me/tokens",
+      "transport": "http"
+    },
+    {
+      "operationId": "createPersonalAccessToken",
+      "method": "POST",
+      "path": "/api/v1/users/me/tokens",
+      "transport": "http"
+    },
+    {
+      "operationId": "revokePersonalAccessToken",
+      "method": "DELETE",
+      "path": "/api/v1/users/me/tokens/{personal_access_token_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "disablePersonalAccessToken",
+      "method": "POST",
+      "path": "/api/v1/users/me/tokens/{personal_access_token_id}/disable",
+      "transport": "http"
+    },
+    {
+      "operationId": "enablePersonalAccessToken",
+      "method": "POST",
+      "path": "/api/v1/users/me/tokens/{personal_access_token_id}/enable",
+      "transport": "http"
+    },
+    {
+      "operationId": "getUserProfile",
+      "method": "GET",
+      "path": "/api/v1/users/{user_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "updateUserProfile",
+      "method": "PATCH",
+      "path": "/api/v1/users/{user_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAffiliations",
+      "method": "GET",
+      "path": "/api/v1/users/{user_id}/affiliations",
+      "transport": "http"
+    },
+    {
+      "operationId": "createAffiliation",
+      "method": "POST",
+      "path": "/api/v1/users/{user_id}/affiliations",
+      "transport": "http"
+    },
+    {
+      "operationId": "disableUser",
+      "method": "POST",
+      "path": "/api/v1/users/{user_id}/disable",
+      "transport": "http"
+    },
+    {
+      "operationId": "changeUserEmail",
+      "method": "PUT",
+      "path": "/api/v1/users/{user_id}/email",
+      "transport": "http"
+    },
+    {
+      "operationId": "verifyUserEmailPrivileged",
+      "method": "POST",
+      "path": "/api/v1/users/{user_id}/email/verify",
+      "transport": "http"
+    },
+    {
+      "operationId": "enableUser",
+      "method": "POST",
+      "path": "/api/v1/users/{user_id}/enable",
+      "transport": "http"
+    },
+    {
+      "operationId": "resetUserMFA",
+      "method": "POST",
+      "path": "/api/v1/users/{user_id}/mfa/reset",
+      "transport": "http"
+    },
+    {
+      "operationId": "removeUserProfilePicture",
+      "method": "DELETE",
+      "path": "/api/v1/users/{user_id}/profile-picture",
+      "transport": "http"
+    },
+    {
+      "operationId": "getUserProfilePicture",
+      "method": "GET",
+      "path": "/api/v1/users/{user_id}/profile-picture",
+      "transport": "http"
+    },
+    {
+      "operationId": "uploadUserProfilePicture",
+      "method": "PUT",
+      "path": "/api/v1/users/{user_id}/profile-picture",
+      "transport": "http"
+    },
+    {
+      "operationId": "listUserSessions",
+      "method": "GET",
+      "path": "/api/v1/users/{user_id}/sessions",
+      "transport": "http"
+    },
+    {
+      "operationId": "revokeUserSessions",
+      "method": "POST",
+      "path": "/api/v1/users/{user_id}/sessions/revoke-all",
+      "transport": "http"
+    },
+    {
+      "operationId": "revokeUserSession",
+      "method": "DELETE",
+      "path": "/api/v1/users/{user_id}/sessions/{session_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "connectWebSocket",
+      "method": "GET",
+      "path": "/api/v1/websocket",
+      "transport": "websocket"
+    },
+    {
+      "operationId": "getLiveness",
+      "method": "GET",
+      "path": "/health/live",
+      "transport": "http"
+    },
+    {
+      "operationId": "getReadiness",
+      "method": "GET",
+      "path": "/health/ready",
+      "transport": "http"
+    }
+  ]
+}

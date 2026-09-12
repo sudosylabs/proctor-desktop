@@ -67,35 +67,43 @@
     "hooks:enable": "node scripts/hooks.ts --enable",
     "hooks:disable": "node scripts/hooks.ts --disable",
     "dev": "node scripts/developDesktop.ts",
-    "test:desktop-identity": "node scripts/test.ts desktop-identity"
+    "test:desktop-identity": "node scripts/test.ts desktop-identity",
+    "api:sync": "node scripts/syncServerApi.ts"
   },
   "allowScripts": {
     "esbuild": true
   },
   "dependencies": {
+    "@tanstack/query-core": "5.102.8",
     "@vscode/codicons": "0.0.46-39",
     "@vscode/diff": "0.0.2-7",
     "@vscode/l10n": "0.0.18",
     "@vscode/tree-sitter-wasm": "0.3.1",
     "@xterm/xterm": "6.1.0-beta.303",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "electron": "44.0.0",
     "vscode-json-languageservice": "6.0.0-next.3",
     "vscode-languageserver": "10.0.0-next.18",
     "vscode-oniguruma": "1.7.0",
     "vscode-textmate": "9.3.2",
-    "vscode-uri": "3.1.0"
+    "vscode-uri": "3.1.0",
+    "ws": "8.21.3"
   },
   "devDependencies": {
+    "@types/js-yaml": "4.0.9",
     "@types/node": "24.13.3",
     "@types/sinon": "10.0.2",
     "@types/trusted-types": "2.0.7",
     "@types/wicg-file-system-access": "2023.10.7",
+    "@types/ws": "8.18.1",
     "@webgpu/types": "0.1.66",
     "@xterm/headless": "6.1.0-beta.302",
-    "ajv": "8.20.0",
     "esbuild": "0.28.2",
     "eslint": "10.8.0",
+    "json-schema-to-ts": "3.1.1",
     "mdast-util-from-markdown": "2.0.3",
+    "openapi-typescript": "7.13.0",
     "postcss": "8.5.26",
     "postcss-selector-parser": "7.1.5",
     "prettier": "3.9.6",
@@ -130,6 +138,9 @@
       "@sinonjs/fake-timers": "7.1.2",
       "@sinonjs/commons": "1.8.3",
       "type-detect": "4.0.8"
+    },
+    "openapi-typescript": {
+      "typescript": "$typescript"
     }
   }
 }

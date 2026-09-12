@@ -24,6 +24,7 @@
     "../test/electron/securityUtilityMain.ts",
     "../test/electron/desktopIdentityMain.ts",
     "../test/electron/desktopIdentity.real.test.ts",
-    "../test/platform/settings/electron-main/**/*.ts"
+    "../test/platform/settings/electron-main/**/*.ts",
+    "../test/platform/serverApi/**/*.ts"
   ]
 }

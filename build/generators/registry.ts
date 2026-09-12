@@ -1,4 +1,5 @@
 import { tokenCustomizationsGenerator } from './tokenCustomizations.ts';
+import { serverApiGenerator } from './serverApi.ts';
 import { productMetadataGenerator } from './productMetadata.ts';
 import { bundledThemesGenerator } from './bundledThemes.ts';
 import type { Repository } from '../checks/types.ts';
@@ -21,6 +22,7 @@ export interface Generator {
 }
 
 const productGenerators: readonly Generator[] = [
+	serverApiGenerator,
 	tokenCustomizationsGenerator,
 	productMetadataGenerator,
 	bundledThemesGenerator,

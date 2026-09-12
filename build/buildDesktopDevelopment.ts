@@ -1,3 +1,4 @@
+import { nodeEsmRuntime } from './lib/nodeEsmRuntime.ts';
 import { packagedEditorDependencies } from './lib/packagedEditorDependencies.ts';
 import { buildEditorWorker } from './lib/editorWorker.ts';
 import { buildJsonWorker } from './lib/jsonWorker.ts';
@@ -63,6 +64,7 @@ await Promise.all([
 		loader: { '.css': 'text' },
 		outdir,
 		platform: 'node',
+		...nodeEsmRuntime,
 		target: nodeTarget,
 		tsconfig: 'build/tsconfig.electron-main.json'
 	}),

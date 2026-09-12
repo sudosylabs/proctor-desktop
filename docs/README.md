@@ -33,6 +33,8 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
 - [Identity and exam security](./architecture/identity-and-exam-security.md) —
   readiness, privileged authentication/installation proof, Sessions, Attempt
   state, posture, participation, re-entry, and integrity boundaries
+- [Server API client](./architecture/server-api.md) — generated operation types,
+  privileged transport, errors, query observations and contract updates
 - [Integrated browser](./architecture/integrated-browser.md) — frozen browser
   policy, privileged navigation, minimized activity, protected delivery, and
   privacy

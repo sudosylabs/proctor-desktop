@@ -1,3 +1,4 @@
+import { nodeEsmRuntime } from './nodeEsmRuntime.ts';
 import { build } from 'esbuild';
 import { nodeTarget, repositoryRoot, resetBuildOutput, selectFiles } from './paths.ts';
 import { testSuites } from './testSuites.ts';
@@ -15,6 +16,7 @@ export async function buildNodeTests(
 		entryNames: '[dir]/[name]',
 		entryPoints: selectFiles(testSuites[suite].patterns),
 		format: 'esm',
+		...nodeEsmRuntime,
 		logLevel: 'info',
 		outbase: 'test',
 		outdir: resetBuildOutput(outputName),

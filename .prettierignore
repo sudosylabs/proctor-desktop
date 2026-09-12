@@ -13,6 +13,7 @@ artifacts/
 .github/copilot-instructions.md
 package-lock.json
 native/Cargo.lock
+resources/server-api/openapi.json
 /.prettierignore
 /build/generators/localizationCatalog.ts
 /native/crates/prctr-native-protocol/src/candidate_window.generated.rs
@@ -31,6 +32,7 @@ native/Cargo.lock
 /resources/file-icons/seti/seti.woff
 /resources/file-icons/seti/vs-seti-icon-theme.json
 /resources/localization/en.json
+/resources/server-api/coverage.generated.json
 /resources/settings/registry.fingerprint.json
 /resources/settings/settings.catalog.json
 /resources/settings/settings.rejections.json
@@ -1200,6 +1202,8 @@ native/Cargo.lock
 /src/prctr/platform/request/common/request.ts
 /src/prctr/platform/sandbox/common/settings.ts
 /src/prctr/platform/secrets/common/secrets.ts
+/src/prctr/platform/serverApi/common/serverApi.generated.ts
+/src/prctr/platform/serverApi/node/serverContract.generated.ts
 /src/prctr/platform/settings/common/settingsSchema.generated.ts
 /src/prctr/platform/sign/common/sign.ts
 /src/prctr/platform/storage/common/storage.ts

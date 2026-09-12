@@ -6,7 +6,8 @@
   },
   "exclude": [
     "../test/platform/identity/electron-main/**",
-    "../test/platform/settings/electron-main/**"
+    "../test/platform/settings/electron-main/**",
+    "../test/platform/serverApi/**"
   ],
   "include": [
     "../src/prctr/base/common/**/*.ts",

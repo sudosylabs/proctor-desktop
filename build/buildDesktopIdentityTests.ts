@@ -1,3 +1,4 @@
+import { nodeEsmRuntime } from './lib/nodeEsmRuntime.ts';
 import { writeFileSync } from 'node:fs';
 import { build } from 'esbuild';
 import { runNode } from './lib/process.ts';
@@ -11,6 +12,7 @@ await build({
 	entryPoints: { main: 'test/electron/desktopIdentityMain.ts' },
 	external: ['electron', 'electron/main'],
 	format: 'esm',
+	...nodeEsmRuntime,
 	outdir,
 	platform: 'node',
 	loader: { '.css': 'text' },

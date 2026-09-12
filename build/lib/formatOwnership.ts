@@ -37,6 +37,8 @@ export function formattingIgnore(
 		'.github/copilot-instructions.md',
 		'package-lock.json',
 		'native/Cargo.lock',
+		// Preserve the imported contract byte-for-byte against its source digest.
+		'resources/server-api/openapi.json',
 		...paths.map((path) => `/${path}`),
 		''
 	].join('\n');

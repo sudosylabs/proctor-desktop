@@ -2,8 +2,9 @@
   "$schema": "./schemas/dependencies.schema.json",
   "schemaVersion": 1,
   "allowedLicenseExpressions": [
-    "(Unlicense OR Apache-2.0)",
     "(MIT OR Apache-2.0) AND Unicode-3.0",
+    "(MIT OR CC0-1.0)",
+    "(Unlicense OR Apache-2.0)",
     "Apache-2.0",
     "Apache-2.0 OR MIT",
     "BSD-2-Clause",
@@ -15,6 +16,7 @@
     "MIT OR Apache-2.0",
     "MIT/Apache-2.0",
     "MPL-2.0",
+    "Python-2.0",
     "Unlicense OR MIT"
   ],
   "dependencies": [
@@ -520,12 +522,20 @@
     {
       "package": "ajv",
       "version": "8.20.0",
-      "kind": "development",
-      "purpose": "Draft 2020-12 JSON Schema validation for repository policies and provenance.",
-      "owner": "toolchain",
-      "source": "https://www.npmjs.com/package/ajv",
+      "kind": "production",
+      "purpose": "Validate server requests and responses against the packaged OpenAPI schemas; also validate build policies.",
+      "owner": "server-api",
+      "source": "https://www.npmjs.com/package/ajv/v/8.20.0",
       "license": "MIT",
-      "lifecycleScripts": "none"
+      "lifecycleScripts": "blocked",
+      "processes": ["electron-main"],
+      "networkBehavior": "Only the owning privileged client supplies same-origin server requests; no autonomous acquisition or telemetry.",
+      "nativeBehavior": "Pure JavaScript; ws optional native acceleration is disabled in bundled outputs.",
+      "transitiveRisk": "Exact npm lock and license audit cover dependencies. API credentials remain privileged. No install scripts execute.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Handwritten caching, schema validation or WebSocket framing would duplicate established implementations and their edge cases.",
+      "updateOwner": "server-api",
+      "removalOwner": "server-api"
     },
     {
       "package": "mdast-util-from-markdown",
@@ -820,6 +830,100 @@
       "localAlternative": "Replacing the original grammar or regex engine would lose source-compatible tokenization, language embedding and theme behavior.",
       "updateOwner": "settings-editor",
       "removalOwner": "settings-editor"
+    },
+    {
+      "package": "@tanstack/query-core",
+      "version": "5.102.8",
+      "kind": "production",
+      "purpose": "Own shared server-query cache, observers, freshness, deduplication and invalidation in the privileged API client.",
+      "owner": "server-api",
+      "source": "https://www.npmjs.com/package/@tanstack/query-core/v/5.102.8",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": ["electron-main"],
+      "networkBehavior": "Only the owning privileged client supplies same-origin server requests; no autonomous acquisition or telemetry.",
+      "nativeBehavior": "Pure JavaScript; ws optional native acceleration is disabled in bundled outputs.",
+      "transitiveRisk": "Exact npm lock and license audit cover dependencies. API credentials remain privileged. No install scripts execute.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Handwritten caching, schema validation or WebSocket framing would duplicate established implementations and their edge cases.",
+      "updateOwner": "server-api",
+      "removalOwner": "server-api"
+    },
+    {
+      "package": "ajv-formats",
+      "version": "3.0.1",
+      "kind": "production",
+      "purpose": "Validate standard string formats in the packaged server contract.",
+      "owner": "server-api",
+      "source": "https://www.npmjs.com/package/ajv-formats/v/3.0.1",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": ["electron-main"],
+      "networkBehavior": "Only the owning privileged client supplies same-origin server requests; no autonomous acquisition or telemetry.",
+      "nativeBehavior": "Pure JavaScript; ws optional native acceleration is disabled in bundled outputs.",
+      "transitiveRisk": "Exact npm lock and license audit cover dependencies. API credentials remain privileged. No install scripts execute.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Handwritten caching, schema validation or WebSocket framing would duplicate established implementations and their edge cases.",
+      "updateOwner": "server-api",
+      "removalOwner": "server-api"
+    },
+    {
+      "package": "ws",
+      "version": "8.21.3",
+      "kind": "production",
+      "purpose": "Execute the authenticated server WebSocket upgrade and bounded message transport in Electron main.",
+      "owner": "server-api",
+      "source": "https://www.npmjs.com/package/ws/v/8.21.3",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": ["electron-main"],
+      "networkBehavior": "Only the owning privileged client supplies same-origin server requests; no autonomous acquisition or telemetry.",
+      "nativeBehavior": "Pure JavaScript; ws optional native acceleration is disabled in bundled outputs.",
+      "transitiveRisk": "Exact npm lock and license audit cover dependencies. API credentials remain privileged. No install scripts execute.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Handwritten caching, schema validation or WebSocket framing would duplicate established implementations and their edge cases.",
+      "updateOwner": "server-api",
+      "removalOwner": "server-api"
+    },
+    {
+      "package": "openapi-typescript",
+      "version": "7.13.0",
+      "kind": "development",
+      "purpose": "Generate the complete typed operation and schema surface from the pinned local OpenAPI artifact. Its TypeScript peer is explicitly bound to the root TypeScript 6 compiler; generation and all generated types are checked on that compiler. Reviewed build-only transitive licenses: argparse retains its Python-2.0 notices unchanged; type-fest provides the MIT alternative in (MIT OR CC0-1.0). Neither enters the application bundle.",
+      "owner": "server-api",
+      "source": "https://www.npmjs.com/package/openapi-typescript/v/7.13.0",
+      "license": "MIT",
+      "lifecycleScripts": "blocked"
+    },
+    {
+      "package": "json-schema-to-ts",
+      "version": "3.1.1",
+      "kind": "development",
+      "purpose": "Supply required Redocly generator declarations without weakening build type checks.",
+      "owner": "server-api",
+      "source": "https://www.npmjs.com/package/json-schema-to-ts/v/3.1.1",
+      "license": "MIT",
+      "lifecycleScripts": "blocked"
+    },
+    {
+      "package": "@types/js-yaml",
+      "version": "4.0.9",
+      "kind": "development",
+      "purpose": "Supply the generator YAML parser declarations.",
+      "owner": "server-api",
+      "source": "https://www.npmjs.com/package/@types/js-yaml/v/4.0.9",
+      "license": "MIT",
+      "lifecycleScripts": "blocked"
+    },
+    {
+      "package": "@types/ws",
+      "version": "8.18.1",
+      "kind": "development",
+      "purpose": "Type the privileged WebSocket transport.",
+      "owner": "server-api",
+      "source": "https://www.npmjs.com/package/@types/ws/v/8.18.1",
+      "license": "MIT",
+      "lifecycleScripts": "blocked"
     }
   ]
 }

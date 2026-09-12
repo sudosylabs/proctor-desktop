@@ -1,3 +1,4 @@
+import { nodeEsmRuntime } from './lib/nodeEsmRuntime.ts';
 import { writeFileSync } from 'node:fs';
 import { build } from 'esbuild';
 import { chromiumTarget, nodeTarget, repositoryRoot, resetBuildOutput } from './lib/paths.ts';
@@ -26,6 +27,7 @@ await Promise.all([
 		format: 'esm',
 		outdir,
 		platform: 'node',
+		...nodeEsmRuntime,
 		target: nodeTarget,
 		tsconfig: 'build/tsconfig.electron-test.json'
 	}),

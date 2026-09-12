@@ -1,0 +1,34 @@
+import { ipcRenderer, type IpcRendererEvent } from 'electron';
+import type { ApiSubscription } from '../../platform/serverApi/common/apiObservation.js';
+
+let sequence = 0;
+/** Constructed only for literal, capability-specific channels by the owning preload. */
+export function createApiObserver<I, R>(
+	channel: string,
+	validateIntent: (value: unknown) => I,
+	validateResponse: (value: unknown) => R,
+	failure: R
+): (intent: I, listener: (response: R) => void) => ApiSubscription {
+	return (intent, listener) => {
+		const request = validateIntent(intent);
+		const id = ++sequence;
+		let disposed = false;
+		const changed = (_event: IpcRendererEvent, raw: unknown) => {
+			if (disposed || !raw || typeof raw !== 'object') return;
+			const value = raw as Record<string, unknown>;
+			if (value.id === id) listener(validateResponse(value.response));
+		};
+		ipcRenderer.on(`${channel}:change`, changed);
+		void ipcRenderer.invoke(channel, { kind: 'start', id, intent: request }).catch(() => {
+			if (!disposed) listener(failure);
+		});
+		return {
+			dispose: () => {
+				if (disposed) return;
+				disposed = true;
+				ipcRenderer.removeListener(`${channel}:change`, changed);
+				void ipcRenderer.invoke(channel, { kind: 'stop', id }).catch(() => {});
+			}
+		};
+	};
+}
