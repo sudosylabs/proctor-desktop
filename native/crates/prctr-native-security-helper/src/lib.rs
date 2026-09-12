@@ -1,5 +1,6 @@
 #![deny(unsafe_code)]
 
+use std::cell::RefCell;
 use std::collections::{BTreeMap, VecDeque};
 use std::fmt;
 use std::fmt::Write as _;
@@ -8,7 +9,7 @@ use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, SyncSender};
-use std::thread::{self, JoinHandle};
+use std::thread;
 use std::time::{Duration, Instant};
 
 use prctr_native_helper_protocol::{
@@ -24,13 +25,81 @@ use prctr_native_protocol::{
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
+#[cfg(any(target_os = "windows", test))]
+mod service_accept;
 #[cfg(target_os = "windows")]
 #[allow(unsafe_code)]
 mod windows;
+#[cfg(target_os = "windows")]
+#[allow(unsafe_code)]
+mod windows_launch_closure;
+#[cfg(any(target_os = "windows", test))]
+mod windows_launch_manifest;
+#[cfg(any(target_os = "windows", test))]
+mod windows_lifecycle_checks;
+#[cfg(any(target_os = "windows", test))]
+mod windows_service_package;
+#[cfg(target_os = "windows")]
+pub use windows_launch_closure::WindowsProtectedLaunchClosure;
+#[cfg(target_os = "windows")]
+pub use windows_service_package::{WindowsServicePackage, packaged_windows_service_configuration};
+#[cfg(target_os = "windows")]
+#[allow(unsafe_code)]
+mod windows_peer;
+#[cfg(target_os = "windows")]
+#[allow(unsafe_code)]
+mod windows_pipe;
+#[cfg(target_os = "windows")]
+pub use windows_pipe::{
+    WindowsPipeReader, WindowsPipeWriter, WindowsServicePipe,
+    accept as accept_windows_service_pipe, create_listener as create_windows_service_listener,
+};
+#[cfg(target_os = "windows")]
+#[allow(unsafe_code)]
+mod windows_scm;
+#[cfg(target_os = "windows")]
+pub use windows_launch_manifest::{WindowsLaunchFile, WindowsLaunchManifest};
+#[cfg(target_os = "windows")]
+pub use windows_peer::{
+    WindowsLaunchUser, candidate_session_for_verified_pipe_peer, user_for_windows_launch_request,
+};
+#[cfg(target_os = "windows")]
+#[allow(unsafe_code)]
+mod windows_controlled_client;
+#[cfg(target_os = "windows")]
+pub use windows_controlled_client::WindowsControlledClient;
+#[cfg(target_os = "windows")]
+pub use windows_scm::{WINDOWS_SERVICE_NAME, WindowsServiceBody, run_windows_service};
+
+#[cfg(target_os = "windows")]
+mod windows_service_connection;
+#[cfg(target_os = "windows")]
+#[allow(unsafe_code)]
+mod windows_service_installation;
+#[cfg(target_os = "windows")]
+pub use windows_service_connection::{
+    WINDOWS_LAUNCH_REQUEST, WINDOWS_SOURCE_REQUEST, WindowsConfiguredService, WindowsSourceChannel,
+    WindowsSourceHandler,
+};
 
 #[cfg(target_os = "macos")]
 #[allow(unsafe_code)]
 mod macos;
+#[cfg(target_os = "macos")]
+pub use macos::{
+    activated_macos_service_listeners, require_macos_service_privilege,
+    verify_candidate_socket_peer, verify_same_macos_socket_peer, verify_service_socket_peer,
+};
+
+#[cfg(target_os = "macos")]
+mod macos_service;
+#[cfg(target_os = "macos")]
+pub use macos_service::{
+    HELPER_SERVICE_FRAME_BYTES, MACOS_SERVICE_ACCEPTANCE_FRAME,
+    MacOsServiceConnectionConfiguration, MacOsServicePackage, PrivilegedMacOsWorker,
+    launch_macos_service_worker, packaged_macos_service_configuration,
+    verify_candidate_socket_peer_under_deadline,
+};
 
 pub const HELPER_BUILD_ID: &str = "prctr-native-helper-0.1.0";
 const MAX_PENDING_HELPER_OBSERVATIONS: usize = 2_048;
@@ -133,12 +202,28 @@ struct VerifiedPackagedHelper {
 }
 
 pub struct NativeHelperConnection {
-    child: Child,
+    owner: HelperOwner,
     transport: DeadlineFramedTransport,
     channel: VerifiedHelperChannel,
     active_sources: BTreeMap<String, ActiveHelperSource>,
     pending_events: VecDeque<NativeHelperSourceEvent>,
     fenced: bool,
+}
+
+enum HelperOwner {
+    Child(Child),
+    #[cfg(target_os = "macos")]
+    Service(macos_service::ConnectedService),
+}
+
+impl HelperOwner {
+    fn terminate(&mut self) -> Result<(), HelperTransportError> {
+        match self {
+            Self::Child(child) => terminate_child(child),
+            #[cfg(target_os = "macos")]
+            Self::Service(service) => service.terminate(),
+        }
+    }
 }
 
 struct ActiveHelperSource {
@@ -159,6 +244,88 @@ pub struct HelperSourceCloseResult {
 }
 
 impl NativeHelperConnection {
+    /// Builds a source request from the authenticated channel's authority.
+    /// # Errors
+    /// Rejects invalid identifiers, capacities or unnegotiated source kinds.
+    pub fn make_source_request(
+        &self,
+        kind: HelperSourceKind,
+        instance_id: String,
+        capacity: u16,
+    ) -> Result<HelperSourceOpen, HelperTransportError> {
+        self.assert_usable()?;
+        let (schema_version, event_classes) = match kind {
+            HelperSourceKind::ProcessApplication => (
+                prctr_native_protocol::PROCESS_APPLICATION_SCHEMA_VERSION,
+                vec![
+                    prctr_native_protocol::HelperEventClass::ProcessLifecycle,
+                    prctr_native_protocol::HelperEventClass::ProcessIdentity,
+                ],
+            ),
+            HelperSourceKind::InteractiveSession => (
+                prctr_native_protocol::INTERACTIVE_SESSION_SCHEMA_VERSION,
+                vec![prctr_native_protocol::HelperEventClass::InteractiveSessionLifecycle],
+            ),
+        };
+        let request = HelperSourceOpen {
+            protocol_version: prctr_native_helper_protocol::HELPER_PROTOCOL_VERSION,
+            channel_nonce: self.channel.channel_nonce().to_owned(),
+            helper_source_instance_id: instance_id,
+            source_kind: kind,
+            schema_version,
+            queue_capacity: capacity,
+            event_classes,
+        };
+        self.channel.open_source(&request)?;
+        Ok(request)
+    }
+
+    /// Builds a close request for an existing authenticated source.
+    /// # Errors
+    /// Rejects an inactive source or fenced connection.
+    pub fn make_source_close(
+        &self,
+        instance_id: &str,
+    ) -> Result<HelperSourceClose, HelperTransportError> {
+        self.assert_usable()?;
+        if !self.active_sources.contains_key(instance_id) {
+            return Err(HelperProtocolError::Lifecycle.into());
+        }
+        Ok(HelperSourceClose {
+            protocol_version: prctr_native_helper_protocol::HELPER_PROTOCOL_VERSION,
+            channel_nonce: self.channel.channel_nonce().to_owned(),
+            helper_source_instance_id: instance_id.to_owned(),
+        })
+    }
+
+    /// Proves owner termination and closes all framing workers.
+    /// # Errors
+    /// Missing termination proof poisons the utility rather than allowing reuse.
+    pub fn close_connection(&mut self) -> Result<(), HelperTransportError> {
+        self.fence()
+    }
+
+    /// Polls one event without treating an idle source as a deadline failure.
+    /// A partially received frame still has a fixed completion deadline.
+    /// # Errors
+    /// Rejects malformed, out-of-order, stalled or failed source messages.
+    pub fn poll_event(&mut self) -> Result<Option<NativeHelperSourceEvent>, HelperTransportError> {
+        let result = (|| {
+            self.assert_usable()?;
+            if let Some(event) = self.pending_events.pop_front() {
+                return Ok(Some(event));
+            }
+            let Some(bytes) = self.transport.poll_read_bytes(Duration::ZERO)? else {
+                return Ok(None);
+            };
+            let message = serde_json::from_slice(&bytes)?;
+            match route_server_message(message, &mut self.active_sources)? {
+                HelperServerPayload::Event(event) => Ok(Some(event)),
+                HelperServerPayload::Snapshot => Err(HelperProtocolError::Lifecycle.into()),
+            }
+        })();
+        self.finish_operation(result)
+    }
     /// Launches the exact packaged helper over private inherited pipes after
     /// platform code-signature verification and binds its handshake to the
     /// broker-generated single-use nonce.
@@ -212,7 +379,7 @@ impl NativeHelperConnection {
         })();
         match startup {
             Ok(channel) => Ok(Self {
-                child,
+                owner: HelperOwner::Child(child),
                 transport: startup_transport
                     .take()
                     .ok_or(HelperTransportError::ConnectionFenced)?,
@@ -229,6 +396,18 @@ impl NativeHelperConnection {
                 cleanup.map_or_else(Err, |()| Err(error))
             }
         }
+    }
+
+    /// Connects to the packaged privileged supervisor and binds its separately
+    /// owned observation worker. A socket disconnect is never worker-exit proof.
+    ///
+    /// # Errors
+    /// Rejects unavailable, unauthenticated, stale or unresponsive service peers.
+    #[cfg(target_os = "macos")]
+    pub fn connect_macos_service(
+        configuration: MacOsServiceConnectionConfiguration,
+    ) -> Result<Self, HelperTransportError> {
+        macos_service::connect(configuration)
     }
 
     /// Opens a negotiated helper source and validates its sequence-zero snapshot.
@@ -520,7 +699,12 @@ impl NativeHelperConnection {
             self.fenced = true;
             self.active_sources.clear();
             self.pending_events.clear();
-            fence_child_and_transport(&mut self.child, &mut self.transport)
+            let owner = self.owner.terminate();
+            let transport = self.transport.shutdown();
+            match (owner, transport) {
+                (_, Err(error)) | (Err(error), Ok(())) => Err(error),
+                (Ok(()), Ok(())) => Ok(()),
+            }
         }
     }
 }
@@ -694,11 +878,32 @@ struct DeadlineFramedTransport {
     reads: Option<SyncSender<ReadRequest>>,
     writer_worker: FrameWorker,
     reader_worker: FrameWorker,
+    pending_read: RefCell<Option<PendingRead>>,
+}
+
+struct PendingRead {
+    response: Receiver<CompletedRead>,
+    started: Receiver<Instant>,
+    frame_deadline: Option<Instant>,
+}
+
+struct CompletedRead {
+    completed_at: Instant,
+    result: Result<Vec<u8>, HelperTransportError>,
+}
+
+impl PendingRead {
+    fn refresh_deadline(&mut self) {
+        if self.frame_deadline.is_none()
+            && let Ok(started) = self.started.try_recv()
+        {
+            self.frame_deadline = Some(started + HELPER_REQUEST_DEADLINE);
+        }
+    }
 }
 
 struct FrameWorker {
-    completion: Receiver<()>,
-    handle: Option<JoinHandle<()>>,
+    join: Option<WorkerJoinReceipt>,
 }
 
 struct WriteRequest {
@@ -707,7 +912,8 @@ struct WriteRequest {
 }
 
 struct ReadRequest {
-    response: SyncSender<Result<Vec<u8>, HelperTransportError>>,
+    response: SyncSender<CompletedRead>,
+    started: SyncSender<Instant>,
 }
 
 impl FrameWorker {
@@ -715,52 +921,44 @@ impl FrameWorker {
         name: &str,
         task: impl FnOnce() + Send + 'static,
     ) -> Result<Self, HelperTransportError> {
-        let (completion_sender, completion) = mpsc::sync_channel(1);
-        let handle = thread::Builder::new()
-            .name(name.to_owned())
-            .spawn(move || {
-                task();
-                let _ = completion_sender.send(());
-            })?;
         Ok(Self {
-            completion,
-            handle: Some(handle),
+            join: Some(WorkerJoinReceipt::spawn(name, task)?),
         })
     }
 
     fn finish(&mut self, deadline: Instant) -> Result<(), ()> {
-        let Some(handle) = self.handle.take() else {
-            return Ok(());
-        };
-        match self.completion.try_recv() {
-            Ok(()) | Err(mpsc::TryRecvError::Disconnected) => {
-                return handle.join().map_err(|_panic_payload| ());
-            }
-            Err(mpsc::TryRecvError::Empty) => {}
-        }
-        let remaining = deadline.saturating_duration_since(Instant::now());
-        if !remaining.is_zero() {
-            match self.completion.recv_timeout(remaining) {
-                Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => {
-                    return handle.join().map_err(|_panic_payload| ());
-                }
-                Err(mpsc::RecvTimeoutError::Timeout) => {}
-            }
-        }
-        drop(handle);
-        Err(())
+        self.join
+            .take()
+            .map_or(Ok(()), |mut join| join.wait(deadline).map_err(|_error| ()))
     }
 }
 
 impl DeadlineFramedTransport {
     fn new(
+        writer: impl Write + Send + 'static,
+        reader: impl Read + Send + 'static,
+    ) -> Result<Self, HelperTransportError> {
+        Self::new_bounded(
+            writer,
+            reader,
+            prctr_native_helper_protocol::MAX_HELPER_FRAME_BYTES,
+        )
+    }
+
+    fn new_bounded(
         mut writer: impl Write + Send + 'static,
         mut reader: impl Read + Send + 'static,
+        maximum_bytes: usize,
     ) -> Result<Self, HelperTransportError> {
+        validate_helper_frame_size(maximum_bytes)?;
         let (write_sender, write_receiver) = mpsc::sync_channel::<WriteRequest>(1);
         let mut writer_worker = FrameWorker::spawn("prctr-helper-frame-writer", move || {
             while let Ok(request) = write_receiver.recv() {
-                let result = write_frame(&mut writer, &request.bytes);
+                let result = if request.bytes.len() > maximum_bytes {
+                    Err(HelperProtocolError::FrameSize.into())
+                } else {
+                    write_frame(&mut writer, &request.bytes)
+                };
                 let terminal = result.is_err();
                 let _ = request.response.send(result);
                 if terminal {
@@ -771,9 +969,12 @@ impl DeadlineFramedTransport {
         let (read_sender, read_receiver) = mpsc::sync_channel::<ReadRequest>(1);
         let reader_worker = match FrameWorker::spawn("prctr-helper-frame-reader", move || {
             while let Ok(request) = read_receiver.recv() {
-                let result = read_frame(&mut reader);
+                let result = read_frame_started(&mut reader, maximum_bytes, &request.started);
                 let terminal = result.is_err();
-                let _ = request.response.send(result);
+                let _ = request.response.send(CompletedRead {
+                    completed_at: Instant::now(),
+                    result,
+                });
                 if terminal {
                     break;
                 }
@@ -797,6 +998,7 @@ impl DeadlineFramedTransport {
             reads: Some(read_sender),
             writer_worker,
             reader_worker,
+            pending_read: RefCell::new(None),
         })
     }
 
@@ -824,6 +1026,7 @@ impl DeadlineFramedTransport {
     }
 
     fn write_bytes(&self, bytes: &[u8], timeout: Duration) -> Result<(), HelperTransportError> {
+        let deadline = Instant::now() + timeout;
         validate_helper_frame_size(bytes.len())?;
         let (response, result) = mpsc::sync_channel(1);
         self.writes
@@ -834,10 +1037,14 @@ impl DeadlineFramedTransport {
                 response,
             })
             .map_err(|_error| HelperTransportError::ConnectionFenced)?;
-        result.recv_timeout(timeout).map_err(|error| match error {
-            mpsc::RecvTimeoutError::Timeout => HelperTransportError::DeadlineExceeded,
-            mpsc::RecvTimeoutError::Disconnected => HelperTransportError::ConnectionFenced,
-        })?
+        let result = result
+            .recv_timeout(remaining(deadline)?)
+            .map_err(|error| match error {
+                mpsc::RecvTimeoutError::Timeout => HelperTransportError::DeadlineExceeded,
+                mpsc::RecvTimeoutError::Disconnected => HelperTransportError::ConnectionFenced,
+            })?;
+        remaining(deadline)?;
+        result
     }
 
     fn read_json<T: DeserializeOwned>(&self, timeout: Duration) -> Result<T, HelperTransportError> {
@@ -846,16 +1053,62 @@ impl DeadlineFramedTransport {
     }
 
     fn read_bytes(&self, timeout: Duration) -> Result<Vec<u8>, HelperTransportError> {
-        let (response, result) = mpsc::sync_channel(1);
-        self.reads
-            .as_ref()
-            .ok_or(HelperTransportError::ConnectionFenced)?
-            .try_send(ReadRequest { response })
-            .map_err(|_error| HelperTransportError::ConnectionFenced)?;
-        result.recv_timeout(timeout).map_err(|error| match error {
-            mpsc::RecvTimeoutError::Timeout => HelperTransportError::DeadlineExceeded,
-            mpsc::RecvTimeoutError::Disconnected => HelperTransportError::ConnectionFenced,
-        })?
+        let deadline = Instant::now() + timeout;
+        let result = self.poll_read_bytes(remaining(deadline)?)?;
+        remaining(deadline)?;
+        result.ok_or(HelperTransportError::DeadlineExceeded)
+    }
+
+    fn poll_read_bytes(&self, timeout: Duration) -> Result<Option<Vec<u8>>, HelperTransportError> {
+        let mut pending = self.pending_read.borrow_mut();
+        if pending.is_none() {
+            let (response, result) = mpsc::sync_channel(1);
+            let (started, progress) = mpsc::sync_channel(1);
+            self.reads
+                .as_ref()
+                .ok_or(HelperTransportError::ConnectionFenced)?
+                .try_send(ReadRequest { response, started })
+                .map_err(|_error| HelperTransportError::ConnectionFenced)?;
+            *pending = Some(PendingRead {
+                response: result,
+                started: progress,
+                frame_deadline: None,
+            });
+        }
+        let read = pending
+            .as_mut()
+            .ok_or(HelperTransportError::ConnectionFenced)?;
+        read.refresh_deadline();
+        let wait = match read.frame_deadline {
+            Some(deadline) => timeout.min(deadline.saturating_duration_since(Instant::now())),
+            None => timeout,
+        };
+        let response = read.response.recv_timeout(wait);
+        // The first byte may arrive while waiting for the completed frame.
+        read.refresh_deadline();
+        match response {
+            Ok(completed) => {
+                let deadline = read.frame_deadline;
+                *pending = None;
+                if deadline.is_some_and(|deadline| completed.completed_at > deadline) {
+                    return Err(HelperTransportError::DeadlineExceeded);
+                }
+                if completed.result.is_ok() && deadline.is_none() {
+                    return Err(HelperTransportError::ConnectionFenced);
+                }
+                completed.result.map(Some)
+            }
+            Err(mpsc::RecvTimeoutError::Timeout) => {
+                if let Some(deadline) = read.frame_deadline {
+                    remaining(deadline)?;
+                }
+                Ok(None)
+            }
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                *pending = None;
+                Err(HelperTransportError::ConnectionFenced)
+            }
+        }
     }
 }
 
@@ -914,7 +1167,10 @@ fn poison_after_termination_failure() -> Result<(), HelperTransportError> {
     Err(HelperTransportError::ChildTermination)
 }
 
-fn ensure_helper_utility_usable() -> Result<(), HelperTransportError> {
+/// Checks the process-wide helper ownership fence before admitting more work.
+/// # Errors
+/// A failed cleanup or overdue worker requires process replacement.
+pub fn ensure_helper_utility_usable() -> Result<(), HelperTransportError> {
     if HELPER_UTILITY_POISONED.load(Ordering::Acquire) {
         Err(HelperTransportError::UtilityPoisoned)
     } else {
@@ -972,14 +1228,118 @@ pub fn write_frame(writer: &mut impl Write, bytes: &[u8]) -> Result<(), HelperTr
 ///
 /// Returns a frame-size or transport I/O error.
 pub fn read_frame(reader: &mut impl Read) -> Result<Vec<u8>, HelperTransportError> {
+    read_frame_bounded(reader, prctr_native_helper_protocol::MAX_HELPER_FRAME_BYTES)
+}
+
+/// Reads a frame with a caller-owned smaller boundary, before allocating payload.
+///
+/// # Errors
+/// Rejects invalid bounds, excessive prefixes and incomplete I/O.
+pub fn read_frame_bounded(
+    reader: &mut impl Read,
+    maximum_bytes: usize,
+) -> Result<Vec<u8>, HelperTransportError> {
+    validate_helper_frame_size(maximum_bytes)?;
     let mut prefix = [0_u8; 4];
     reader.read_exact(&mut prefix)?;
     let length = usize::try_from(u32::from_be_bytes(prefix))
         .map_err(|_error| HelperTransportError::Protocol(HelperProtocolError::FrameSize))?;
     validate_helper_frame_size(length)?;
+    if length > maximum_bytes {
+        return Err(HelperProtocolError::FrameSize.into());
+    }
     let mut bytes = vec![0_u8; length];
     reader.read_exact(&mut bytes)?;
     Ok(bytes)
+}
+
+fn read_frame_started(
+    reader: &mut impl Read,
+    maximum_bytes: usize,
+    started: &SyncSender<Instant>,
+) -> Result<Vec<u8>, HelperTransportError> {
+    let mut prefix = [0_u8; 4];
+    reader.read_exact(&mut prefix[..1])?;
+    let _ = started.try_send(Instant::now());
+    reader.read_exact(&mut prefix[1..])?;
+    let length =
+        usize::try_from(u32::from_be_bytes(prefix)).map_err(|_| HelperProtocolError::FrameSize)?;
+    validate_helper_frame_size(length)?;
+    if length > maximum_bytes {
+        return Err(HelperProtocolError::FrameSize.into());
+    }
+    let mut bytes = vec![0; length];
+    reader.read_exact(&mut bytes)?;
+    Ok(bytes)
+}
+
+/// A receipt for the resource-owning thread's actual join, including TLS drops.
+/// The bounded waiter owns no SDK state and only joins once, then sends one
+/// acknowledgement. No caller joins that waiter or assumes `is_finished` proves
+/// native cleanup. A missed acknowledgement poisons the utility; it cannot start
+/// replacement workers while either original thread might still be running.
+struct WorkerJoinReceipt {
+    completion: Receiver<Result<(), ()>>,
+    observed: Option<Result<(), ()>>,
+}
+
+impl WorkerJoinReceipt {
+    fn spawn(
+        name: &str,
+        task: impl FnOnce() + Send + 'static,
+    ) -> Result<Self, HelperTransportError> {
+        let (start, gate) = mpsc::sync_channel(1);
+        let worker = thread::Builder::new()
+            .name(name.to_owned())
+            .spawn(move || {
+                if gate.recv().is_ok() {
+                    task();
+                }
+            })?;
+        let (acknowledge, completion) = mpsc::sync_channel(1);
+        // Establish the join owner before releasing work. If its creation fails,
+        // dropping the gate prevents SDK calls or an unowned spawned Child.
+        if thread::Builder::new()
+            .name("prctr-worker-join".to_owned())
+            .spawn(move || {
+                let joined = worker.join().map_err(|_panic_payload| ());
+                let _ = acknowledge.send(joined);
+            })
+            .is_err()
+        {
+            poison_helper_utility();
+            return Err(HelperTransportError::UtilityPoisoned);
+        }
+        start.send(()).map_err(|_disconnected| {
+            poison_helper_utility();
+            HelperTransportError::UtilityPoisoned
+        })?;
+        Ok(Self {
+            completion,
+            observed: None,
+        })
+    }
+
+    fn wait(&mut self, deadline: Instant) -> Result<(), HelperTransportError> {
+        if let Some(joined) = self.observed {
+            return joined.map_err(|()| HelperTransportError::UtilityPoisoned);
+        }
+        let joined = match self.completion.try_recv() {
+            Ok(joined) => joined,
+            Err(mpsc::TryRecvError::Disconnected) => {
+                return Err(HelperTransportError::UtilityPoisoned);
+            }
+            Err(mpsc::TryRecvError::Empty) => self
+                .completion
+                .recv_timeout(remaining(deadline)?)
+                .map_err(|error| match error {
+                    mpsc::RecvTimeoutError::Timeout => HelperTransportError::DeadlineExceeded,
+                    mpsc::RecvTimeoutError::Disconnected => HelperTransportError::UtilityPoisoned,
+                })?,
+        };
+        self.observed = Some(joined);
+        joined.map_err(|()| HelperTransportError::UtilityPoisoned)
+    }
 }
 
 fn run_startup_task<T: Send + 'static>(
@@ -989,11 +1349,9 @@ fn run_startup_task<T: Send + 'static>(
 ) -> Result<T, HelperTransportError> {
     remaining(deadline)?;
     let (sender, receiver) = mpsc::sync_channel(1);
-    let worker = thread::Builder::new()
-        .name(name.to_owned())
-        .spawn(move || {
-            let _ = sender.send(task());
-        })?;
+    let mut worker = WorkerJoinReceipt::spawn(name, move || {
+        let _ = sender.send(task());
+    })?;
     let wait = match remaining(deadline) {
         Ok(wait) => wait,
         Err(error) => {
@@ -1004,9 +1362,14 @@ fn run_startup_task<T: Send + 'static>(
     };
     match receiver.recv_timeout(wait) {
         Ok(result) => {
-            if worker.join().is_err() {
+            if let Err(error) = worker.wait(deadline) {
                 poison_helper_utility();
-                Err(HelperTransportError::UtilityPoisoned)
+                drop(result);
+                Err(error)
+            } else if let Err(error) = remaining(deadline) {
+                poison_helper_utility();
+                drop(result);
+                Err(error)
             } else {
                 result
             }
@@ -1018,8 +1381,32 @@ fn run_startup_task<T: Send + 'static>(
         }
         Err(mpsc::RecvTimeoutError::Disconnected) => {
             poison_helper_utility();
-            let _ = worker.join();
+            let _ = worker.wait(deadline);
             Err(HelperTransportError::UtilityPoisoned)
+        }
+    }
+}
+
+/// Retains kill-and-observed-exit ownership even while a successful spawn result
+/// is buffered in a channel whose receiver can time out before consuming it.
+struct PendingSpawnedChild(Option<Child>);
+
+impl PendingSpawnedChild {
+    fn into_child(mut self) -> Child {
+        self.0.take().expect("owned spawned child")
+    }
+
+    fn terminate(mut self) -> Result<(), HelperTransportError> {
+        self.0
+            .take()
+            .map_or(Ok(()), |mut child| terminate_child(&mut child))
+    }
+}
+
+impl Drop for PendingSpawnedChild {
+    fn drop(&mut self) {
+        if let Some(mut child) = self.0.take() {
+            let _ = terminate_child(&mut child);
         }
     }
 }
@@ -1031,20 +1418,19 @@ fn spawn_helper_before_deadline(
     remaining(deadline)?;
     let executable = executable.to_owned();
     let (sender, receiver) = mpsc::sync_channel(1);
-    let worker = thread::Builder::new()
-        .name("prctr-helper-spawn".to_owned())
-        .spawn(move || {
-            let result = Command::new(executable)
-                .env_clear()
-                .stdin(Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::null())
-                .spawn()
-                .map_err(HelperTransportError::Io);
-            if let Err(mpsc::SendError(Ok(mut child))) = sender.send(result) {
-                let _ = terminate_child(&mut child);
-            }
-        })?;
+    let mut worker = WorkerJoinReceipt::spawn("prctr-helper-spawn", move || {
+        let result = Command::new(executable)
+            .env_clear()
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .spawn()
+            .map(|child| PendingSpawnedChild(Some(child)))
+            .map_err(HelperTransportError::Io);
+        // Both a failed send and a successful but abandoned buffered result drop
+        // the ownership guard, terminating and observing the exact child.
+        let _ = sender.send(result);
+    })?;
     let wait = match remaining(deadline) {
         Ok(wait) => wait,
         Err(error) => {
@@ -1055,11 +1441,20 @@ fn spawn_helper_before_deadline(
     };
     match receiver.recv_timeout(wait) {
         Ok(result) => {
-            if worker.join().is_err() {
+            if let Err(error) = worker.wait(deadline) {
                 poison_helper_utility();
-                Err(HelperTransportError::UtilityPoisoned)
+                if let Ok(child) = result {
+                    child.terminate()?;
+                }
+                Err(error)
+            } else if let Err(error) = remaining(deadline) {
+                poison_helper_utility();
+                if let Ok(child) = result {
+                    child.terminate()?;
+                }
+                Err(error)
             } else {
-                result
+                result.map(PendingSpawnedChild::into_child)
             }
         }
         Err(mpsc::RecvTimeoutError::Timeout) => {
@@ -1069,7 +1464,7 @@ fn spawn_helper_before_deadline(
         }
         Err(mpsc::RecvTimeoutError::Disconnected) => {
             poison_helper_utility();
-            let _ = worker.join();
+            let _ = worker.wait(deadline);
             Err(HelperTransportError::UtilityPoisoned)
         }
     }
@@ -1198,6 +1593,61 @@ fn generate_channel_nonce() -> Result<String, HelperTransportError> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use prctr_native_protocol::ProcessApplicationObservation;
+
+    #[test]
+    fn delayed_process_capture_is_bounded_by_each_observation_clock() {
+        let source = serde_json::json!({
+            "source_instance_id": "process-source-0001",
+            "sequence": 1,
+            "observed_at": {"monotonic_time_ns": 10},
+            "event": {"kind": "exited", "process_instance_id": "process-instance-0001"}
+        });
+        let helper = serde_json::json!({
+            "protocol_version": 1,
+            "channel_nonce": "a".repeat(64),
+            "helper_source_instance_id": "process-source-0001",
+            "source_kind": "process_application",
+            "sequence": 1,
+            "monotonic_time_ns": 10,
+            "process_event": {"kind": "exited", "process_instance_id": "process-instance-0001"}
+        });
+        for delay in [None, Some(0), Some(7), Some(10)] {
+            let mut source = source.clone();
+            let mut helper = helper.clone();
+            if let Some(delay) = delay {
+                source["event"]["capture_delay_ns"] = serde_json::json!(delay);
+                helper["process_event"]["capture_delay_ns"] = serde_json::json!(delay);
+            }
+            let source: ProcessApplicationObservation = serde_json::from_value(source).unwrap();
+            let helper: HelperObservation = serde_json::from_value(helper).unwrap();
+            source.validate_protocol().expect("valid source capture");
+            helper.validate_protocol().expect("valid helper capture");
+            assert_eq!(source.event.capture_delay_ns, delay);
+            assert_eq!(helper.process_event.unwrap().capture_delay_ns, delay);
+        }
+        for delay in [
+            serde_json::json!(11),
+            serde_json::json!(-1),
+            serde_json::json!(1.5),
+            serde_json::json!(9_007_199_254_740_992_u64),
+            serde_json::Value::Null,
+        ] {
+            let mut source = source.clone();
+            let mut helper = helper.clone();
+            source["event"]["capture_delay_ns"] = delay.clone();
+            helper["process_event"]["capture_delay_ns"] = delay;
+            assert!(
+                !serde_json::from_value::<ProcessApplicationObservation>(source)
+                    .is_ok_and(|value| value.validate_protocol().is_ok())
+            );
+            assert!(
+                !serde_json::from_value::<HelperObservation>(helper)
+                    .is_ok_and(|value| value.validate_protocol().is_ok())
+            );
+        }
+    }
+
     use std::io::Cursor;
     use std::sync::{Arc, mpsc::Receiver};
 
@@ -1282,9 +1732,12 @@ mod tests {
     #[test]
     fn completed_worker_joins_after_a_shared_cleanup_deadline_is_exhausted() {
         let mut worker = FrameWorker::spawn("completed-frame-worker", || {}).expect("worker");
-        while !worker.handle.as_ref().expect("worker handle").is_finished() {
-            thread::yield_now();
-        }
+        worker
+            .join
+            .as_mut()
+            .expect("join receipt")
+            .wait(Instant::now() + Duration::from_secs(1))
+            .expect("actual worker join");
         let expired = Instant::now()
             .checked_sub(Duration::from_millis(1))
             .expect("expired cleanup deadline");
@@ -1524,6 +1977,7 @@ mod tests {
                 sequence,
                 monotonic_time_ns: sequence + 1,
                 process_event: Some(ProcessApplicationEvent {
+                    capture_delay_ns: None,
                     kind: ProcessApplicationEventKind::Reconciled,
                     process_instance_id: None,
                     process: None,
@@ -1577,6 +2031,7 @@ mod tests {
             sequence: 1,
             monotonic_time_ns: 2,
             process_event: Some(ProcessApplicationEvent {
+                capture_delay_ns: None,
                 kind: ProcessApplicationEventKind::Reconciled,
                 process_instance_id: None,
                 process: None,
@@ -1747,7 +2202,7 @@ mod tests {
             .spawn()
             .expect("test child");
         NativeHelperConnection {
-            child,
+            owner: HelperOwner::Child(child),
             transport: DeadlineFramedTransport::new(Vec::<u8>::new(), reader)
                 .expect("test transport"),
             channel,
@@ -1842,3 +2297,6 @@ mod tests {
         )
     }
 }
+
+#[cfg(test)]
+mod framed_transport_tests;

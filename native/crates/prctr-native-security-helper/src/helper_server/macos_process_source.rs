@@ -1,10 +1,12 @@
+use std::time::{Duration, Instant};
+
 use prctr_native_helper_protocol::{
     HELPER_PROTOCOL_VERSION, HelperEventClass, HelperFailureCode, HelperObservation,
     HelperSourceFailure, HelperSourceKind, HelperSourceOpen, HelperSourceSnapshot,
 };
 use prctr_native_protocol::{
-    MAX_PROTOCOL_SAFE_INTEGER, PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationState,
-    ProtocolValidatable,
+    MAX_PROTOCOL_SAFE_INTEGER, PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationEvent,
+    ProcessApplicationState, ProtocolValidatable,
 };
 use prctr_process_application_state::{
     MacOsLifecycleDrain, MacOsLifecycleFailure, MacOsLifecycleSubscription,
@@ -15,6 +17,10 @@ use super::{
     HelperSource, HelperSourceCloseOutput, HelperSourceEvent, HelperSourceOpenOutcome,
     HelperTransportError, OpenedHelperSource, unavailable_snapshot,
 };
+
+// Leave room for response/cleanup inside the transport's five-second request
+// deadline. Blocking SDK calls still require external helper supervision.
+const SOURCE_OPEN_BUDGET: Duration = Duration::from_secs(3);
 
 /// Owner-thread connector seam for the future signed Endpoint Security component.
 ///
@@ -29,6 +35,7 @@ pub(super) trait MacOsProcessLifecycleOpener {
         queue_capacity: u16,
         event_classes: &[HelperEventClass],
         time_origin: MacOsLifecycleTimeOrigin,
+        deadline: Instant,
     ) -> Result<
         (
             ProcessApplicationState,
@@ -38,6 +45,65 @@ pub(super) trait MacOsProcessLifecycleOpener {
     >;
 }
 
+/// Concrete source composition. The privileged socket bootstrap supplies the
+/// verified candidate; the wire never chooses an audit session or executable.
+pub(super) struct EndpointSecurityProcessOpener {
+    candidate: prctr_process_application_state::MacOsCandidateAuditSession,
+}
+
+impl EndpointSecurityProcessOpener {
+    pub(super) const fn new(
+        candidate: prctr_process_application_state::MacOsCandidateAuditSession,
+    ) -> Self {
+        Self { candidate }
+    }
+}
+
+impl MacOsProcessLifecycleOpener for EndpointSecurityProcessOpener {
+    type Subscription = prctr_process_application_state::EndpointSecuritySubscription;
+
+    fn open(
+        &mut self,
+        queue_capacity: u16,
+        event_classes: &[HelperEventClass],
+        time_origin: MacOsLifecycleTimeOrigin,
+        deadline: Instant,
+    ) -> Result<
+        (
+            ProcessApplicationState,
+            MacOsProcessLifecycle<Self::Subscription>,
+        ),
+        MacOsLifecycleFailure,
+    > {
+        // This source's lifecycle transitions include identity-generation facts.
+        // Do not subscribe a broader native set than the selected protocol set.
+        if event_classes
+            != [
+                HelperEventClass::ProcessLifecycle,
+                HelperEventClass::ProcessIdentity,
+            ]
+            || Instant::now() >= deadline
+        {
+            return Err(MacOsLifecycleFailure::Backend);
+        }
+        let feed = prctr_process_application_state::EndpointSecurityEventFeed::new(
+            self.candidate,
+            deadline,
+        );
+        let inventory = prctr_process_application_state::MacOsAuditProcessInventory::new(
+            self.candidate,
+            feed.bootstrap_registrar(),
+        );
+        MacOsProcessLifecycle::open_with_time_origin(
+            self.candidate,
+            queue_capacity,
+            time_origin,
+            feed,
+            inventory,
+        )
+    }
+}
+
 /// Opens the normalized helper source without selecting it as a packaged
 /// platform capability.
 pub(super) fn open_process_source<O: MacOsProcessLifecycleOpener>(
@@ -45,6 +111,7 @@ pub(super) fn open_process_source<O: MacOsProcessLifecycleOpener>(
     monotonic_time_ns: u64,
     opener: &mut O,
 ) -> HelperSourceOpenOutcome {
+    let deadline = Instant::now() + SOURCE_OPEN_BUDGET;
     let time_origin = MacOsLifecycleTimeOrigin::capture();
     let mut clock = SourceClock::new(monotonic_time_ns, time_origin.clone());
     if request.source_kind != HelperSourceKind::ProcessApplication
@@ -57,8 +124,25 @@ pub(super) fn open_process_source<O: MacOsProcessLifecycleOpener>(
             &MacOsLifecycleFailure::Protocol,
         ));
     }
-    match opener.open(request.queue_capacity, &request.event_classes, time_origin) {
-        Ok((initial_state, lifecycle)) => {
+    match opener.open(
+        request.queue_capacity,
+        &request.event_classes,
+        time_origin,
+        deadline,
+    ) {
+        Ok((initial_state, mut lifecycle)) => {
+            if Instant::now() >= deadline {
+                let failure = match lifecycle.close() {
+                    Ok(_) => MacOsLifecycleFailure::Backend,
+                    Err(_) => MacOsLifecycleFailure::Cleanup,
+                };
+                return HelperSourceOpenOutcome::Failed(source_failure(
+                    request,
+                    0,
+                    clock.now(),
+                    &failure,
+                ));
+            }
             let initial_time_ns = clock.at_source_elapsed(lifecycle.initial_monotonic_time_ns());
             HelperSourceOpenOutcome::Opened(OpenedHelperSource {
                 initial_snapshot: source_snapshot(request, 0, initial_time_ns, initial_state),
@@ -209,7 +293,11 @@ impl<S: MacOsLifecycleSubscription> MacOsLifecycleHelperSource<S> {
                 .len()
                 .saturating_add(usize::from(terminal.is_some())),
         );
-        for lifecycle_event in lifecycle_events {
+        for mut lifecycle_event in lifecycle_events {
+            let monotonic_time_ns = self.clock.event_time(
+                lifecycle_event.monotonic_time_ns,
+                &mut lifecycle_event.event,
+            )?;
             self.last_sequence = self
                 .last_sequence
                 .checked_add(1)
@@ -222,9 +310,7 @@ impl<S: MacOsLifecycleSubscription> MacOsLifecycleHelperSource<S> {
                     helper_source_instance_id: self.request.helper_source_instance_id.clone(),
                     source_kind: HelperSourceKind::ProcessApplication,
                     sequence: self.last_sequence,
-                    monotonic_time_ns: self
-                        .clock
-                        .at_source_elapsed(lifecycle_event.monotonic_time_ns),
+                    monotonic_time_ns,
                     process_event: Some(lifecycle_event.event),
                     interactive_session_event: None,
                 },
@@ -282,6 +368,32 @@ impl SourceClock {
             .saturating_add(elapsed_ns.min(MAX_PROTOCOL_SAFE_INTEGER))
             .min(MAX_PROTOCOL_SAFE_INTEGER);
         self.observe(observed)
+    }
+
+    fn event_time(
+        &mut self,
+        elapsed_ns: u64,
+        event: &mut ProcessApplicationEvent,
+    ) -> Result<u64, HelperTransportError> {
+        let captured_ns = elapsed_ns
+            .checked_sub(event.capture_delay_ns.unwrap_or(0))
+            .and_then(|elapsed| self.origin_ns.checked_add(elapsed))
+            .filter(|time| *time <= MAX_PROTOCOL_SAFE_INTEGER)
+            .ok_or(prctr_native_helper_protocol::HelperProtocolError::Sequence)?;
+        let settled_ns = self
+            .origin_ns
+            .checked_add(elapsed_ns)
+            .filter(|time| *time <= MAX_PROTOCOL_SAFE_INTEGER)
+            .ok_or(prctr_native_helper_protocol::HelperProtocolError::Sequence)?;
+        let published_ns = self.observe(settled_ns);
+        // Moving the outer timestamp forward must not move the original capture.
+        // Durations survive the helper/source origin translation without exposing
+        // a second ambiguous absolute clock in the event payload.
+        let delay = published_ns - captured_ns;
+        if event.capture_delay_ns.is_some() || delay != 0 {
+            event.capture_delay_ns = Some(delay);
+        }
+        Ok(published_ns)
     }
 }
 
@@ -362,6 +474,37 @@ mod tests {
 
     const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 
+    #[test]
+    fn translated_settlement_time_preserves_original_capture_under_clock_clamping() {
+        let mut clock = SourceClock::new(100, MacOsLifecycleTimeOrigin::capture());
+        let mut event = ProcessApplicationEvent {
+            kind: prctr_native_protocol::ProcessApplicationEventKind::Exited,
+            capture_delay_ns: Some(7),
+            process_instance_id: Some("process-instance-0001".to_owned()),
+            process: None,
+            state: None,
+        };
+        assert_eq!(clock.event_time(20, &mut event).unwrap(), 120);
+        assert_eq!(event.capture_delay_ns, Some(7));
+        clock.observe(150);
+        event.capture_delay_ns = Some(5);
+        assert_eq!(clock.event_time(25, &mut event).unwrap(), 150);
+        assert_eq!(event.capture_delay_ns, Some(30));
+        event.capture_delay_ns = None;
+        assert_eq!(clock.event_time(26, &mut event).unwrap(), 150);
+        assert_eq!(event.capture_delay_ns, Some(24));
+        event.capture_delay_ns = Some(27);
+        assert!(clock.event_time(26, &mut event).is_err());
+        assert_eq!(clock.last_ns, 150);
+        event.capture_delay_ns = None;
+        assert!(
+            clock
+                .event_time(MAX_PROTOCOL_SAFE_INTEGER, &mut event)
+                .is_err()
+        );
+        assert_eq!(clock.last_ns, 150);
+    }
+
     struct ScriptedOpener {
         shared_sink: Arc<Mutex<Option<MacOsLifecycleSink>>>,
         stop_thread: Arc<Mutex<Option<ThreadId>>>,
@@ -387,6 +530,33 @@ mod tests {
 
     struct EmptyInventory;
 
+    struct DeadlineRecorder {
+        inner: ScriptedOpener,
+        deadlines: Vec<Instant>,
+    }
+
+    impl MacOsProcessLifecycleOpener for DeadlineRecorder {
+        type Subscription = ScriptedSubscription;
+
+        fn open(
+            &mut self,
+            queue_capacity: u16,
+            event_classes: &[HelperEventClass],
+            time_origin: MacOsLifecycleTimeOrigin,
+            deadline: Instant,
+        ) -> Result<
+            (
+                ProcessApplicationState,
+                MacOsProcessLifecycle<Self::Subscription>,
+            ),
+            MacOsLifecycleFailure,
+        > {
+            self.deadlines.push(deadline);
+            self.inner
+                .open(queue_capacity, event_classes, time_origin, deadline)
+        }
+    }
+
     impl MacOsProcessLifecycleOpener for ScriptedOpener {
         type Subscription = ScriptedSubscription;
 
@@ -395,6 +565,7 @@ mod tests {
             queue_capacity: u16,
             _event_classes: &[HelperEventClass],
             time_origin: MacOsLifecycleTimeOrigin,
+            _deadline: Instant,
         ) -> Result<
             (
                 ProcessApplicationState,
@@ -424,6 +595,7 @@ mod tests {
             queue_capacity: u16,
             event_classes: &[HelperEventClass],
             time_origin: MacOsLifecycleTimeOrigin,
+            deadline: Instant,
         ) -> Result<
             (
                 ProcessApplicationState,
@@ -432,7 +604,9 @@ mod tests {
             MacOsLifecycleFailure,
         > {
             thread::sleep(self.before_open_delay);
-            let opened = self.inner.open(queue_capacity, event_classes, time_origin);
+            let opened = self
+                .inner
+                .open(queue_capacity, event_classes, time_origin, deadline);
             if opened.is_ok()
                 && let Some(input) = self.event_after_open.take()
                 && let Some(sink) = self.inner.shared_sink.lock().expect("shared sink").as_ref()
@@ -480,6 +654,37 @@ mod tests {
         ) -> Result<(), MacOsLifecycleFailure> {
             Ok(())
         }
+    }
+
+    #[test]
+    fn reopening_a_source_receives_a_new_operation_deadline() {
+        let mut opener = DeadlineRecorder {
+            inner: ScriptedOpener {
+                shared_sink: Arc::new(Mutex::new(None)),
+                stop_thread: Arc::new(Mutex::new(None)),
+            },
+            deadlines: Vec::new(),
+        };
+        let request = process_request(vec![
+            HelperEventClass::ProcessLifecycle,
+            HelperEventClass::ProcessIdentity,
+        ]);
+        for _ in 0..2 {
+            let started = Instant::now();
+            let HelperSourceOpenOutcome::Opened(mut source) =
+                open_process_source(&request, 10, &mut opener)
+            else {
+                panic!("source opens with a fresh budget");
+            };
+            let deadline = *opener.deadlines.last().expect("operation deadline");
+            assert!(deadline >= started + SOURCE_OPEN_BUDGET);
+            assert!(deadline <= Instant::now() + SOURCE_OPEN_BUDGET);
+            source
+                .source
+                .close(20)
+                .expect("source closes before reentry");
+        }
+        assert_eq!(opener.deadlines.len(), 2);
     }
 
     #[test]
@@ -797,6 +1002,7 @@ mod tests {
                 request.queue_capacity,
                 &request.event_classes,
                 time_origin.clone(),
+                Instant::now() + SOURCE_OPEN_BUDGET,
             )
             .expect("lifecycle opens");
         let mut source = MacOsLifecycleHelperSource {
@@ -863,7 +1069,7 @@ mod tests {
             helper_source_instance_id: "process-source-0001".to_owned(),
             source_kind: HelperSourceKind::ProcessApplication,
             schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
-            queue_capacity: 2,
+            queue_capacity: 4,
             event_classes,
         }
     }

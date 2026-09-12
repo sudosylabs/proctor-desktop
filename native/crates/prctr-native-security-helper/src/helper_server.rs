@@ -29,6 +29,20 @@ use prctr_native_security_helper::{
 )]
 mod macos_process_source;
 
+#[cfg(any(target_os = "windows", test))]
+#[allow(
+    dead_code,
+    reason = "selected by the authenticated Windows service bootstrap"
+)]
+mod interactive_session_source;
+
+#[cfg(target_os = "windows")]
+#[allow(
+    dead_code,
+    reason = "selected by the authenticated Windows service bootstrap"
+)]
+mod windows_session_source;
+
 const SERVER_POLL_INTERVAL: Duration = Duration::from_millis(5);
 
 pub(crate) trait HelperSourceFactory {
@@ -354,6 +368,43 @@ impl<F: HelperSourceFactory> HelperServer<F> {
         Ok(messages)
     }
 
+    /// Close every retained source even after one source or its final wire data
+    /// fails. The service may not announce Stopped with an abandoned owner.
+    #[cfg(any(target_os = "windows", test))]
+    pub(crate) fn close_all(&mut self) -> (Vec<HelperServerMessage>, Option<HelperTransportError>) {
+        let ids: Vec<_> = self.sources.keys().cloned().collect();
+        let mut messages = Vec::new();
+        let mut failure = None;
+        for id in ids {
+            let request = prctr_native_helper_protocol::HelperSourceClose {
+                protocol_version: HELPER_PROTOCOL_VERSION,
+                channel_nonce: self.nonce.clone(),
+                helper_source_instance_id: id.clone(),
+            };
+            match self.close_source(&request) {
+                Ok(tail) => {
+                    if tail.iter().any(|message| {
+                        message.failure.as_ref().is_some_and(|failure| {
+                            failure.failure_code == HelperFailureCode::Cleanup
+                        })
+                    }) {
+                        failure = Some(HelperTransportError::UtilityPoisoned);
+                    }
+                    messages.extend(tail);
+                }
+                Err(error) => {
+                    if !matches!(failure, Some(HelperTransportError::UtilityPoisoned)) {
+                        failure = Some(error);
+                    }
+                }
+            }
+            // close_source has called close before any fallible final-frame
+            // validation. Remove a closed owner even if validation refused it.
+            self.sources.remove(&id);
+        }
+        (messages, failure)
+    }
+
     fn monotonic_time_ns(&self) -> u64 {
         monotonic_time_ns_since(self.started)
     }
@@ -596,7 +647,7 @@ enum ClientReaderEvent {
 
 pub(crate) fn run_helper_server<R, W, F>(
     mut input: R,
-    mut output: W,
+    output: W,
     kind: HelperKind,
     factory: F,
 ) -> Result<(), HelperTransportError>
@@ -612,6 +663,24 @@ where
             )
         },
     )?;
+    run_helper_server_with_nonce(input, output, kind, factory, nonce)
+}
+
+/// The service worker has already read and bound this nonce to its private
+/// supervisor bootstrap. Ordinary stdio callers still use the framed wrapper.
+pub(crate) fn run_helper_server_with_nonce<R, W, F>(
+    input: R,
+    mut output: W,
+    kind: HelperKind,
+    factory: F,
+    nonce: String,
+) -> Result<(), HelperTransportError>
+where
+    R: Read + Send + 'static,
+    W: Write,
+    F: HelperSourceFactory,
+{
+    let mut input = input;
     let mut server = HelperServer::new(nonce.clone(), factory);
     let handshake = HelperHandshake {
         protocol_version: HELPER_PROTOCOL_VERSION,
@@ -716,6 +785,10 @@ const fn failure_message(failure: HelperSourceFailure) -> HelperServerMessage {
 
 pub(crate) struct PlatformHelperSourceFactory {
     capabilities: [HelperSourceKind; 2],
+    #[cfg(target_os = "macos")]
+    authenticated_process_opener: Option<macos_process_source::EndpointSecurityProcessOpener>,
+    #[cfg(target_os = "windows")]
+    authenticated_session_opener: Option<windows_session_source::WindowsSessionOpener>,
 }
 
 impl PlatformHelperSourceFactory {
@@ -725,6 +798,47 @@ impl PlatformHelperSourceFactory {
                 HelperSourceKind::ProcessApplication,
                 HelperSourceKind::InteractiveSession,
             ],
+            #[cfg(target_os = "macos")]
+            authenticated_process_opener: None,
+            #[cfg(target_os = "windows")]
+            authenticated_session_opener: None,
+        }
+    }
+
+    /// Only a root service's authenticated bootstrap may supply this context.
+    /// That owner must finish peer verification under its launch deadline and
+    /// poison on an unobserved verifier exit before selecting this constructor.
+    /// Ordinary stdio launches keep all privileged sources unavailable.
+    #[cfg(target_os = "macos")]
+    pub(crate) const fn from_verified_candidate(
+        candidate: prctr_process_application_state::MacOsCandidateAuditSession,
+    ) -> Self {
+        Self {
+            capabilities: [
+                HelperSourceKind::ProcessApplication,
+                HelperSourceKind::InteractiveSession,
+            ],
+            authenticated_process_opener: Some(
+                macos_process_source::EndpointSecurityProcessOpener::new(candidate),
+            ),
+        }
+    }
+
+    /// Called only by the service bootstrap after private-peer authentication.
+    #[cfg(target_os = "windows")]
+    #[allow(dead_code, reason = "signed service bootstrap is not yet selected")]
+    pub(crate) fn from_verified_session(
+        dispatcher: std::sync::Arc<prctr_interactive_session_state::WindowsWtsServiceDispatcher>,
+        candidate: prctr_interactive_session_state::WindowsCandidateSession,
+    ) -> Self {
+        Self {
+            capabilities: [
+                HelperSourceKind::ProcessApplication,
+                HelperSourceKind::InteractiveSession,
+            ],
+            authenticated_session_opener: Some(windows_session_source::WindowsSessionOpener::new(
+                dispatcher, candidate,
+            )),
         }
     }
 }
@@ -739,6 +853,26 @@ impl HelperSourceFactory for PlatformHelperSourceFactory {
         request: &HelperSourceOpen,
         monotonic_time_ns: u64,
     ) -> Result<HelperSourceOpenOutcome, HelperTransportError> {
+        #[cfg(target_os = "windows")]
+        if request.source_kind == HelperSourceKind::InteractiveSession
+            && let Some(opener) = &mut self.authenticated_session_opener
+        {
+            return Ok(interactive_session_source::open_session_source(
+                request,
+                monotonic_time_ns,
+                opener,
+            ));
+        }
+        #[cfg(target_os = "macos")]
+        if request.source_kind == HelperSourceKind::ProcessApplication
+            && let Some(opener) = &mut self.authenticated_process_opener
+        {
+            return Ok(macos_process_source::open_process_source(
+                request,
+                monotonic_time_ns,
+                opener,
+            ));
+        }
         Ok(HelperSourceOpenOutcome::Opened(OpenedHelperSource {
             initial_snapshot: unavailable_snapshot(request, monotonic_time_ns),
             source: Box::new(UnavailableHelperSource {
@@ -1016,6 +1150,7 @@ mod tests {
             sequence: 1,
             monotonic_time_ns: 2,
             process_event: Some(ProcessApplicationEvent {
+                capture_delay_ns: None,
                 kind: ProcessApplicationEventKind::Reconciled,
                 process_instance_id: None,
                 process: None,
@@ -1305,6 +1440,7 @@ mod tests {
             sequence: 1,
             monotonic_time_ns: 2,
             process_event: Some(ProcessApplicationEvent {
+                capture_delay_ns: None,
                 kind: ProcessApplicationEventKind::Reconciled,
                 process_instance_id: None,
                 process: None,
@@ -1756,6 +1892,100 @@ mod tests {
             _monotonic_time_ns: u64,
         ) -> Result<HelperSourceOpenOutcome, HelperTransportError> {
             Ok(HelperSourceOpenOutcome::Failed(self.failure.clone()))
+        }
+    }
+
+    #[test]
+    fn close_all_preserves_tail_and_final_snapshot() {
+        let request = process_request();
+        let HelperSourceEvent::Observation(observation) = process_observation(&request, 1, 2)
+        else {
+            panic!("observation");
+        };
+        let mut server = HelperServer::new(
+            NONCE.to_owned(),
+            EventFactory {
+                capabilities: [HelperSourceKind::ProcessApplication],
+                observation: *observation,
+            },
+        );
+        server.handle_message(open_message(request)).expect("open");
+        let (tail, failure) = server.close_all();
+        assert!(failure.is_none());
+        assert_eq!(tail.len(), 2);
+        assert_eq!(tail[0].kind, HelperServerMessageKind::Observation);
+        assert_eq!(tail[1].kind, HelperServerMessageKind::Snapshot);
+        assert!(!server.has_active_sources());
+        assert!(server.close_all().0.is_empty());
+    }
+
+    #[test]
+    fn close_all_continues_after_cleanup_failure_and_keeps_other_tail() {
+        let closed = Arc::new(AtomicUsize::new(0));
+        let mut server = HelperServer::new(NONCE.to_owned(), ShutdownFactory(Arc::clone(&closed)));
+        let first = process_request();
+        let mut second = first.clone();
+        second.source_kind = HelperSourceKind::InteractiveSession;
+        second.event_classes =
+            vec![prctr_native_helper_protocol::HelperEventClass::InteractiveSessionLifecycle];
+        second.helper_source_instance_id = "session-source-0001".to_owned();
+        server
+            .handle_message(open_message(first))
+            .expect("first open");
+        server
+            .handle_message(open_message(second))
+            .expect("second open");
+        let (tail, failure) = server.close_all();
+        assert!(matches!(
+            failure,
+            Some(HelperTransportError::UtilityPoisoned)
+        ));
+        assert_eq!(closed.load(Ordering::SeqCst), 2);
+        assert_eq!(tail.len(), 2);
+        assert_eq!(tail[0].kind, HelperServerMessageKind::Failure);
+        assert_eq!(tail[1].kind, HelperServerMessageKind::Snapshot);
+        assert!(!server.has_active_sources());
+    }
+
+    struct ShutdownFactory(Arc<AtomicUsize>);
+    impl HelperSourceFactory for ShutdownFactory {
+        fn capabilities(&self) -> &[HelperSourceKind] {
+            &[
+                HelperSourceKind::ProcessApplication,
+                HelperSourceKind::InteractiveSession,
+            ]
+        }
+        fn open(
+            &mut self,
+            request: &HelperSourceOpen,
+            time: u64,
+        ) -> Result<HelperSourceOpenOutcome, HelperTransportError> {
+            Ok(HelperSourceOpenOutcome::Opened(OpenedHelperSource {
+                initial_snapshot: unavailable_snapshot(request, time),
+                source: Box::new(ShutdownSource(request.clone(), Arc::clone(&self.0))),
+            }))
+        }
+    }
+    struct ShutdownSource(HelperSourceOpen, Arc<AtomicUsize>);
+    impl HelperSource for ShutdownSource {
+        fn source_kind(&self) -> HelperSourceKind {
+            self.0.source_kind
+        }
+        fn schema_version(&self) -> u16 {
+            self.0.schema_version
+        }
+        fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
+            Ok(Vec::new())
+        }
+        fn close(&mut self, time: u64) -> Result<HelperSourceCloseOutput, HelperTransportError> {
+            self.1.fetch_add(1, Ordering::SeqCst);
+            if self.0.source_kind == HelperSourceKind::ProcessApplication {
+                return Err(HelperTransportError::ConnectionFenced);
+            }
+            Ok(HelperSourceCloseOutput {
+                events: Vec::new(),
+                final_snapshot: unavailable_snapshot(&self.0, time),
+            })
         }
     }
 
@@ -2273,6 +2503,7 @@ mod tests {
             sequence,
             monotonic_time_ns,
             process_event: Some(ProcessApplicationEvent {
+                capture_delay_ns: None,
                 kind: ProcessApplicationEventKind::Reconciled,
                 process_instance_id: None,
                 process: None,
@@ -2295,6 +2526,7 @@ mod tests {
             sequence,
             monotonic_time_ns,
             process_event: Some(ProcessApplicationEvent {
+                capture_delay_ns: None,
                 kind: ProcessApplicationEventKind::Reconciled,
                 process_instance_id: None,
                 process: None,

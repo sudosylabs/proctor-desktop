@@ -106,6 +106,7 @@ struct OpenBaselineResult {
 struct WirePoll {
     state: &'static str,
     opened_snapshots: Vec<WireSnapshot>,
+    final_snapshots: Vec<WireSnapshot>,
     batches: Vec<WireBatch>,
     transitions: Vec<WireTransition>,
 }
@@ -113,6 +114,7 @@ struct WirePoll {
 #[derive(Serialize)]
 struct WireStop {
     state: &'static str,
+    final_snapshots: Vec<WireSnapshot>,
     batches: Vec<WireBatch>,
     process_replacement_required: bool,
 }
@@ -489,7 +491,7 @@ fn baseline_factories(
     selected_categories: SelectedSourceCategories,
 ) -> BaselineSourceFactories {
     let mut candidate_receiver = Some(receiver);
-    BaselineSourceFactories::new(
+    let factories = BaselineSourceFactories::new(
         display_topology_factory(|| Ok(PlatformDisplayTopologyBackend)),
         candidate_window_factory(move || {
             candidate_receiver.take().map_or_else(
@@ -555,7 +557,32 @@ fn baseline_factories(
             },
             |selection| Ok(PlatformMediaDeviceBackend::new(selection)),
         )
-    }))
+    }));
+    #[cfg(target_os = "macos")]
+    let factories = with_packaged_macos_helper(factories);
+    factories
+}
+
+#[cfg(target_os = "macos")]
+fn with_packaged_macos_helper(factories: BaselineSourceFactories) -> BaselineSourceFactories {
+    use prctr_native_protocol::{HelperSourceKind, PlatformFamily};
+    use prctr_native_security_helper::{
+        HELPER_BUILD_ID, MacOsServiceConnectionConfiguration, NativeHelperConnection,
+    };
+    let Some(requirement) = option_env!("PRCTR_NATIVE_SERVICE_REQUIREMENT") else {
+        return factories;
+    };
+    // A configured package never falls back after peer or lifecycle failure.
+    factories.with_helper_sources(PlatformFamily::Macos, HELPER_BUILD_ID, move || {
+        NativeHelperConnection::connect_macos_service(MacOsServiceConnectionConfiguration {
+            service_designated_requirement: requirement.to_owned(),
+            expected_helper_build_id: HELPER_BUILD_ID.to_owned(),
+            expected_capabilities: vec![
+                HelperSourceKind::ProcessApplication,
+                HelperSourceKind::InteractiveSession,
+            ],
+        })
+    })
 }
 
 impl From<SupervisorPoll> for WirePoll {
@@ -564,6 +591,11 @@ impl From<SupervisorPoll> for WirePoll {
             state: supervisor_state(value.state),
             opened_snapshots: value
                 .opened_snapshots
+                .into_iter()
+                .map(WireSnapshot::from)
+                .collect(),
+            final_snapshots: value
+                .final_snapshots
                 .into_iter()
                 .map(WireSnapshot::from)
                 .collect(),
@@ -581,6 +613,11 @@ impl From<SupervisorStop> for WireStop {
     fn from(value: SupervisorStop) -> Self {
         Self {
             state: supervisor_state(value.state),
+            final_snapshots: value
+                .final_snapshots
+                .into_iter()
+                .map(WireSnapshot::from)
+                .collect(),
             batches: value.batches.into_iter().map(WireBatch::from).collect(),
             process_replacement_required: value.process_replacement_required,
         }

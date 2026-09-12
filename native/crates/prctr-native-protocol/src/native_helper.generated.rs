@@ -13,6 +13,163 @@ pub const NATIVE_HELPER_SCHEMA_VERSION: u16 = 1;
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
+pub enum HelperServiceRequestKind {
+    Open,
+    Attach,
+    Stop,
+}
+
+impl ProtocolValidatable for HelperServiceRequestKind {
+    fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
+        Ok(())
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HelperServiceResponseKind {
+    Ready,
+    Started,
+    Stopped,
+}
+
+impl ProtocolValidatable for HelperServiceResponseKind {
+    fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct HelperServiceRequest {
+    pub protocol_version: u16,
+    pub channel_nonce: String,
+    pub kind: HelperServiceRequestKind,
+}
+
+impl ProtocolValidatable for HelperServiceRequest {
+    fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
+        if self.protocol_version != 1 {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceRequest",
+                "protocol_version",
+                "const 1",
+            ));
+        }
+        if !(64..=64).contains(&self.channel_nonce.chars().count()) {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceRequest",
+                "channel_nonce",
+                "length 64..=64",
+            ));
+        }
+        self.kind.validate_protocol()?;
+        if self.channel_nonce.len() != 64
+            || !self
+                .channel_nonce
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceRequest",
+                "channel_nonce",
+                "64 lowercase hexadecimal characters",
+            ));
+        }
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct HelperServiceResponse {
+    pub protocol_version: u16,
+    pub channel_nonce: String,
+    pub kind: HelperServiceResponseKind,
+}
+
+impl ProtocolValidatable for HelperServiceResponse {
+    fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
+        if self.protocol_version != 1 {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceResponse",
+                "protocol_version",
+                "const 1",
+            ));
+        }
+        if !(64..=64).contains(&self.channel_nonce.chars().count()) {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceResponse",
+                "channel_nonce",
+                "length 64..=64",
+            ));
+        }
+        self.kind.validate_protocol()?;
+        if self.channel_nonce.len() != 64
+            || !self
+                .channel_nonce
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceResponse",
+                "channel_nonce",
+                "64 lowercase hexadecimal characters",
+            ));
+        }
+        Ok(())
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct HelperServiceWorkerBootstrap {
+    pub protocol_version: u16,
+    pub channel_nonce: String,
+    pub client_designated_requirement: String,
+}
+
+impl ProtocolValidatable for HelperServiceWorkerBootstrap {
+    fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
+        if self.protocol_version != 1 {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceWorkerBootstrap",
+                "protocol_version",
+                "const 1",
+            ));
+        }
+        if !(64..=64).contains(&self.channel_nonce.chars().count()) {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceWorkerBootstrap",
+                "channel_nonce",
+                "length 64..=64",
+            ));
+        }
+        if !(1..=2_048).contains(&self.client_designated_requirement.chars().count()) {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceWorkerBootstrap",
+                "client_designated_requirement",
+                "length 1..=2048",
+            ));
+        }
+        if self.channel_nonce.len() != 64
+            || !self
+                .channel_nonce
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        {
+            return Err(ProtocolValidationError::new(
+                "HelperServiceWorkerBootstrap",
+                "channel_nonce",
+                "64 lowercase hexadecimal characters",
+            ));
+        }
+        Ok(())
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum HelperKind {
     WindowsSecurityService,
     MacosEndpointSecurityHelper,
@@ -606,6 +763,18 @@ impl ProtocolValidatable for HelperObservation {
                 "HelperObservation",
                 "source_kind",
                 "exact matching event payload",
+            ));
+        }
+        if self
+            .process_event
+            .as_ref()
+            .and_then(|event| event.capture_delay_ns)
+            .is_some_and(|delay| delay > self.monotonic_time_ns)
+        {
+            return Err(ProtocolValidationError::new(
+                "HelperObservation",
+                "process_event",
+                "capture delay cannot precede the source time origin",
             ));
         }
         Ok(())

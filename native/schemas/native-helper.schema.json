@@ -9,6 +9,68 @@
     "schema_version": { "const": 1 }
   },
   "$defs": {
+    "HelperServiceRequestKind": {
+      "type": "string",
+      "enum": ["open", "attach", "stop"]
+    },
+    "HelperServiceResponseKind": {
+      "type": "string",
+      "enum": ["ready", "started", "stopped"]
+    },
+    "HelperServiceRequest": {
+      "description": "Closed service lifecycle control. The service owner enforces ordering and binds the fresh nonce to the authenticated live peer; no caller-selected native identity crosses this wire.",
+      "type": "object",
+      "x-proctor-rules": ["valid_helper_channel_nonce"],
+      "additionalProperties": false,
+      "required": ["protocol_version", "channel_nonce", "kind"],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1,
+          "minimum": 1,
+          "maximum": 65535,
+          "x-rust-type": "u16"
+        },
+        "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "kind": { "$ref": "#/$defs/HelperServiceRequestKind" }
+      }
+    },
+    "HelperServiceResponse": {
+      "description": "Service lifecycle acknowledgement. The owner may send stopped only after observing worker exit; a stop request or disconnected socket is not proof of exit.",
+      "type": "object",
+      "x-proctor-rules": ["valid_helper_channel_nonce"],
+      "additionalProperties": false,
+      "required": ["protocol_version", "channel_nonce", "kind"],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1,
+          "minimum": 1,
+          "maximum": 65535,
+          "x-rust-type": "u16"
+        },
+        "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "kind": { "$ref": "#/$defs/HelperServiceResponseKind" }
+      }
+    },
+    "HelperServiceWorkerBootstrap": {
+      "description": "Private worker bootstrap supplied by the service owner over its bounded inherited channel. The requirement binds the connecting live client; lifecycle control frames have a separate 4096-byte consumer limit.",
+      "type": "object",
+      "x-proctor-rules": ["valid_helper_channel_nonce"],
+      "additionalProperties": false,
+      "required": ["protocol_version", "channel_nonce", "client_designated_requirement"],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1,
+          "minimum": 1,
+          "maximum": 65535,
+          "x-rust-type": "u16"
+        },
+        "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "client_designated_requirement": { "type": "string", "minLength": 1, "maxLength": 2048 }
+      }
+    },
     "HelperKind": {
       "type": "string",
       "enum": ["windows_security_service", "macos_endpoint_security_helper"]

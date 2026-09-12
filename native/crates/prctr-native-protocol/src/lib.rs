@@ -92,18 +92,9 @@ pub(crate) fn deserialize_protocol_safe_optional_u64<'de, D>(
 where
     D: Deserializer<'de>,
 {
-    let wire_value = Option::<i64>::deserialize(deserializer)?;
-    wire_value
-        .map(|wire_value| {
-            let value = u64::try_from(wire_value).map_err(serde::de::Error::custom)?;
-            if value > MAX_PROTOCOL_SAFE_INTEGER {
-                return Err(serde::de::Error::custom(
-                    "integer exceeds the protocol safe-integer maximum",
-                ));
-            }
-            Ok(value)
-        })
-        .transpose()
+    // Omission is handled by the generated serde default. A present property
+    // must be an integer: JSON null is not admitted by the shared schema.
+    deserialize_protocol_safe_u64(deserializer).map(Some)
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]

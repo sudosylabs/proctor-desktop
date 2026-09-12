@@ -132,6 +132,12 @@ pub fn bind_verified_helper_channel(
 }
 
 impl VerifiedHelperChannel {
+    /// Returns the private native channel binding for source lifecycle requests.
+    /// This value belongs to the trusted broker and is never a renderer DTO.
+    #[must_use]
+    pub fn channel_nonce(&self) -> &str {
+        &self.channel_nonce
+    }
     #[must_use]
     pub const fn peer(&self) -> &VerifiedHelperPeer {
         &self.peer

@@ -28,3 +28,6 @@ serde = { version = "=1.0.229", features = ["derive"] }
 
 [lints]
 workspace = true
+
+[target.'cfg(target_os = "macos")'.dependencies]
+prctr-native-security-helper = { path = "../prctr-native-security-helper" }

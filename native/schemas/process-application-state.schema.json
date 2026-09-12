@@ -85,6 +85,13 @@
       "required": ["kind"],
       "properties": {
         "kind": { "$ref": "#/$defs/ProcessApplicationEventKind" },
+        "capture_delay_ns": {
+          "description": "Elapsed time from source-ingress capture to normalized observation publication. Subtract from the enclosing monotonic observation timestamp to recover ingress time; absent means no delay. This is adapter receipt time, not a claim of the kernel event-generation timestamp. Identity settlement must not relabel delayed transitions as newly received.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991,
+          "x-rust-type": "u64"
+        },
         "process_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
         "process": { "$ref": "#/$defs/ProcessApplicationProcess" },
         "state": { "$ref": "#/$defs/ProcessApplicationState" }
@@ -131,7 +138,7 @@
     },
     "ProcessApplicationObservation": {
       "type": "object",
-      "x-proctor-rules": ["gap_ends_immediately_before_sequence"],
+      "x-proctor-rules": ["gap_ends_immediately_before_sequence", "coherent_process_capture_time"],
       "additionalProperties": false,
       "required": ["source_instance_id", "sequence", "observed_at", "event"],
       "properties": {

@@ -355,6 +355,7 @@ dependencies = [
  "prctr-interactive-session-state",
  "prctr-media-device-state",
  "prctr-native-protocol",
+ "prctr-native-security-helper",
  "prctr-native-source-supervisor",
  "prctr-network-configuration-state",
  "prctr-print-spooler-state",
@@ -375,8 +376,10 @@ dependencies = [
 name = "prctr-native-security-helper"
 version = "0.1.0"
 dependencies = [
+ "prctr-interactive-session-state",
  "prctr-native-helper-protocol",
  "prctr-native-protocol",
+ "prctr-native-source-runtime",
  "prctr-process-application-state",
  "serde",
  "serde_json",
@@ -401,6 +404,7 @@ dependencies = [
  "prctr-interactive-session-state",
  "prctr-media-device-state",
  "prctr-native-protocol",
+ "prctr-native-security-helper",
  "prctr-native-source-runtime",
  "prctr-network-configuration-state",
  "prctr-print-spooler-state",
@@ -432,6 +436,7 @@ dependencies = [
 name = "prctr-process-application-state"
 version = "0.1.0"
 dependencies = [
+ "libc",
  "prctr-native-protocol",
  "prctr-native-source-runtime",
  "windows-sys",

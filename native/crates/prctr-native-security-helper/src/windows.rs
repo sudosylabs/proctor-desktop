@@ -10,8 +10,10 @@ use std::ptr;
 
 use windows_sys::Win32::Foundation::{CloseHandle, HANDLE, INVALID_HANDLE_VALUE};
 use windows_sys::Win32::Security::Cryptography::{
-    BCRYPT_ALG_HANDLE, BCRYPT_SHA256_ALGORITHM, BCRYPT_USE_SYSTEM_PREFERRED_RNG,
-    BCryptCloseAlgorithmProvider, BCryptGenRandom, BCryptHash, BCryptOpenAlgorithmProvider,
+    BCRYPT_ALG_HANDLE, BCRYPT_HASH_HANDLE, BCRYPT_SHA256_ALGORITHM,
+    BCRYPT_USE_SYSTEM_PREFERRED_RNG, BCryptCloseAlgorithmProvider, BCryptCreateHash,
+    BCryptDestroyHash, BCryptFinishHash, BCryptGenRandom, BCryptHashData,
+    BCryptOpenAlgorithmProvider,
 };
 use windows_sys::Win32::Security::WinTrust::{
     WINTRUST_ACTION_GENERIC_VERIFY_V2, WINTRUST_DATA, WINTRUST_DATA_0, WINTRUST_FILE_INFO,
@@ -32,6 +34,14 @@ const MAX_WINDOWS_IMAGE_PATH_CODE_UNITS: usize = 32_768;
 pub(super) fn lock_and_verify_executable(
     path: &Path,
     expected_sha256: &str,
+) -> Result<File, HelperTransportError> {
+    lock_and_verify_executable_bounded(path, expected_sha256, MAX_HELPER_EXECUTABLE_BYTES)
+}
+
+pub(super) fn lock_and_verify_executable_bounded(
+    path: &Path,
+    expected_sha256: &str,
+    maximum_bytes: u64,
 ) -> Result<File, HelperTransportError> {
     let file = OpenOptions::new()
         .read(true)
@@ -72,10 +82,19 @@ pub(super) fn lock_and_verify_executable(
     data.dwStateAction = WTD_STATEACTION_CLOSE;
     // SAFETY: this closes only the state handle created by the verification
     // call above and uses the same initialized structures.
-    unsafe {
-        WinVerifyTrust(ptr::null_mut(), &raw mut action, (&raw mut data).cast());
+    let cleanup =
+        unsafe { WinVerifyTrust(ptr::null_mut(), &raw mut action, (&raw mut data).cast()) };
+    match crate::windows_lifecycle_checks::trust_result(status, cleanup) {
+        crate::windows_lifecycle_checks::TrustResult::CleanupFailed => {
+            crate::poison_helper_utility();
+            return Err(HelperTransportError::UtilityPoisoned);
+        }
+        crate::windows_lifecycle_checks::TrustResult::Rejected => {
+            return Err(HelperTransportError::ExecutableIdentity);
+        }
+        crate::windows_lifecycle_checks::TrustResult::Approved => {}
     }
-    if status != 0 || sha256(&file)? != parse_sha256(expected_sha256)? {
+    if sha256_bounded(&file, maximum_bytes)? != parse_sha256(expected_sha256)? {
         return Err(HelperTransportError::ExecutableIdentity);
     }
     Ok(file)
@@ -127,53 +146,93 @@ impl Drop for OwnedProcessHandle {
     }
 }
 
-fn sha256(file: &File) -> Result<[u8; 32], HelperTransportError> {
+pub(super) fn file_matches_digest(
+    file: &File,
+    expected: &str,
+    maximum_bytes: u64,
+) -> Result<(), HelperTransportError> {
+    if sha256_bounded(file, maximum_bytes)? == parse_sha256(expected)? {
+        Ok(())
+    } else {
+        Err(HelperTransportError::ExecutableIdentity)
+    }
+}
+
+fn sha256_bounded(file: &File, maximum_bytes: u64) -> Result<[u8; 32], HelperTransportError> {
     let metadata = file.metadata()?;
-    if !metadata.is_file() || metadata.len() == 0 || metadata.len() > MAX_HELPER_EXECUTABLE_BYTES {
+    if !metadata.is_file() || metadata.len() == 0 || metadata.len() > maximum_bytes {
         return Err(HelperTransportError::ExecutableIdentity);
     }
     let mut file = file.try_clone()?;
     file.seek(SeekFrom::Start(0))?;
-    let mut bytes = Vec::with_capacity(
-        usize::try_from(metadata.len())
-            .map_err(|_error| HelperTransportError::ExecutableIdentity)?,
-    );
-    file.take(MAX_HELPER_EXECUTABLE_BYTES + 1)
-        .read_to_end(&mut bytes)?;
-    if bytes.len() as u64 != metadata.len() || bytes.len() as u64 > MAX_HELPER_EXECUTABLE_BYTES {
-        return Err(HelperTransportError::ExecutableIdentity);
-    }
-    let input_length =
-        u32::try_from(bytes.len()).map_err(|_error| HelperTransportError::ExecutableIdentity)?;
     let mut algorithm: BCRYPT_ALG_HANDLE = ptr::null_mut();
-    // SAFETY: algorithm is valid output storage and the SHA-256 identifier is
-    // a static Windows string.
-    let open_status = unsafe {
+    // SAFETY: writable handle output and fixed system SHA256 algorithm identifier.
+    if unsafe {
         BCryptOpenAlgorithmProvider(&raw mut algorithm, BCRYPT_SHA256_ALGORITHM, ptr::null(), 0)
-    };
-    if open_status < 0 || algorithm.is_null() {
+    } < 0
+        || algorithm.is_null()
+    {
         return Err(HelperTransportError::ExecutableIdentity);
     }
-    let mut digest = [0_u8; 32];
-    // SAFETY: the algorithm handle is live and all byte buffers remain valid
-    // for the duration of this one-shot hash call.
-    let hash_status = unsafe {
-        BCryptHash(
+    let mut hash: BCRYPT_HASH_HANDLE = ptr::null_mut();
+    // SAFETY: Windows 10+ owns the allocated hash object when its buffer is null.
+    let created = unsafe {
+        BCryptCreateHash(
             algorithm,
+            &raw mut hash,
+            ptr::null_mut(),
+            0,
             ptr::null(),
             0,
-            bytes.as_ptr(),
-            input_length,
-            digest.as_mut_ptr(),
-            u32::try_from(digest.len()).unwrap_or(u32::MAX),
+            0,
         )
     };
-    // SAFETY: this closes only the algorithm handle opened above.
-    unsafe { BCryptCloseAlgorithmProvider(algorithm, 0) };
-    if hash_status < 0 {
-        return Err(HelperTransportError::ExecutableIdentity);
+    let result = (|| {
+        if created < 0 || hash.is_null() {
+            return Err(HelperTransportError::ExecutableIdentity);
+        }
+        let mut total = 0_u64;
+        let mut bytes = vec![0_u8; 65_536].into_boxed_slice();
+        loop {
+            let count = file.read(&mut bytes)?;
+            if count == 0 {
+                break;
+            }
+            total = total
+                .checked_add(count as u64)
+                .filter(|value| *value <= metadata.len())
+                .ok_or(HelperTransportError::ExecutableIdentity)?;
+            // SAFETY: fixed live input slice and exclusively owned hash handle.
+            if unsafe {
+                BCryptHashData(
+                    hash,
+                    bytes.as_ptr(),
+                    u32::try_from(count).expect("fixed hash chunk"),
+                    0,
+                )
+            } < 0
+            {
+                return Err(HelperTransportError::ExecutableIdentity);
+            }
+        }
+        if total != metadata.len() {
+            return Err(HelperTransportError::ExecutableIdentity);
+        }
+        let mut digest = [0_u8; 32];
+        // SAFETY: exact writable SHA256 output and live hash handle.
+        if unsafe { BCryptFinishHash(hash, digest.as_mut_ptr(), 32, 0) } < 0 {
+            return Err(HelperTransportError::ExecutableIdentity);
+        }
+        Ok(digest)
+    })();
+    // SAFETY: release only initialized handles, after all hashing operations.
+    let hash_closed = hash.is_null() || unsafe { BCryptDestroyHash(hash) } >= 0;
+    let algorithm_closed = unsafe { BCryptCloseAlgorithmProvider(algorithm, 0) } >= 0;
+    if !hash_closed || !algorithm_closed {
+        crate::poison_helper_utility();
+        return Err(HelperTransportError::UtilityPoisoned);
     }
-    Ok(digest)
+    result
 }
 
 pub(super) fn fill_random(bytes: &mut [u8]) -> Result<(), HelperTransportError> {

@@ -374,6 +374,13 @@ impl ProtocolValidatable for ProcessApplicationEventKind {
 #[serde(deny_unknown_fields)]
 pub struct ProcessApplicationEvent {
     pub kind: ProcessApplicationEventKind,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "crate::serialize_protocol_safe_optional_u64",
+        deserialize_with = "crate::deserialize_protocol_safe_optional_u64"
+    )]
+    pub capture_delay_ns: Option<u64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub process_instance_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -385,6 +392,17 @@ pub struct ProcessApplicationEvent {
 impl ProtocolValidatable for ProcessApplicationEvent {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
         self.kind.validate_protocol()?;
+        if self
+            .capture_delay_ns
+            .as_ref()
+            .is_some_and(|value| !(0..=9_007_199_254_740_991).contains(value))
+        {
+            return Err(ProtocolValidationError::new(
+                "ProcessApplicationEvent",
+                "capture_delay_ns",
+                "range 0..=9007199254740991",
+            ));
+        }
         if self
             .process_instance_id
             .as_ref()
@@ -542,6 +560,17 @@ impl ProtocolValidatable for ProcessApplicationObservation {
                 "ProcessApplicationObservation",
                 "gap",
                 "last_missing immediately before sequence",
+            ));
+        }
+        if self
+            .event
+            .capture_delay_ns
+            .is_some_and(|delay| delay > self.observed_at.monotonic_time_ns)
+        {
+            return Err(ProtocolValidationError::new(
+                "ProcessApplicationObservation",
+                "event",
+                "capture delay cannot precede the source time origin",
             ));
         }
         Ok(())

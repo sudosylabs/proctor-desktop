@@ -1,5 +1,8 @@
 #![forbid(unsafe_code)]
 
+mod helper_sources;
+pub use helper_sources::HelperSourceConnection;
+
 use std::fmt;
 use std::marker::PhantomData;
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, TryRecvError};
@@ -687,6 +690,7 @@ pub enum SourceLifecycleTransition {
 pub struct SupervisorPoll {
     pub state: SupervisorState,
     pub opened_snapshots: Vec<NativeSourceSnapshot>,
+    pub final_snapshots: Vec<NativeSourceSnapshot>,
     pub batches: Vec<NativeSourceBatch>,
     pub transitions: Vec<SourceLifecycleTransition>,
 }
@@ -694,6 +698,7 @@ pub struct SupervisorPoll {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SupervisorStop {
     pub state: SupervisorState,
+    pub final_snapshots: Vec<NativeSourceSnapshot>,
     pub batches: Vec<NativeSourceBatch>,
     pub process_replacement_required: bool,
 }
@@ -814,6 +819,7 @@ impl NativeSourceSupervisor {
     pub fn poll(&mut self) -> SupervisorPoll {
         if self.stopped {
             return SupervisorPoll {
+                final_snapshots: Vec::new(),
                 state: SupervisorState::Stopped,
                 opened_snapshots: Vec::new(),
                 batches: Vec::new(),
@@ -822,6 +828,7 @@ impl NativeSourceSupervisor {
         }
         if self.process_replacement_required {
             return SupervisorPoll {
+                final_snapshots: Vec::new(),
                 state: SupervisorState::Failed,
                 opened_snapshots: Vec::new(),
                 batches: Vec::new(),
@@ -832,6 +839,7 @@ impl NativeSourceSupervisor {
         let parameters = SourceParameters::from(&self.config);
         let policy = self.config.restart_policy;
         let mut poll = SupervisorPoll {
+            final_snapshots: Vec::new(),
             state: SupervisorState::Healthy,
             opened_snapshots: Vec::new(),
             batches: Vec::new(),
@@ -884,6 +892,7 @@ impl NativeSourceSupervisor {
     pub fn stop(&mut self) -> SupervisorStop {
         if self.stopped {
             return SupervisorStop {
+                final_snapshots: Vec::new(),
                 state: SupervisorState::Stopped,
                 batches: Vec::new(),
                 process_replacement_required: self.process_replacement_required,
@@ -891,10 +900,13 @@ impl NativeSourceSupervisor {
         }
         self.stopped = true;
         let mut batches = Vec::new();
+        let mut final_snapshots = Vec::new();
         for slot in self.slots.iter_mut().rev() {
             if let Some(mut source) = slot.source.take() {
                 let stopped = source.stop();
                 self.process_replacement_required |= !stopped.closed_input_boundary;
+                batches.extend(stopped.preceding_batches);
+                final_snapshots.extend(stopped.final_snapshot);
                 batches.push(stopped.batch);
             }
             let lifecycle = std::mem::replace(&mut slot.lifecycle, SlotLifecycle::Exhausted);
@@ -919,6 +931,8 @@ impl NativeSourceSupervisor {
                         Ok((mut source, _snapshot)) => {
                             let stopped = source.stop();
                             self.process_replacement_required |= !stopped.closed_input_boundary;
+                            batches.extend(stopped.preceding_batches);
+                            final_snapshots.extend(stopped.final_snapshot);
                             batches.push(stopped.batch);
                         }
                         Err(failure) => {
@@ -936,6 +950,7 @@ impl NativeSourceSupervisor {
             self.process_fence.poison();
         }
         SupervisorStop {
+            final_snapshots,
             state: SupervisorState::Stopped,
             batches,
             process_replacement_required: self.process_replacement_required,
@@ -1010,6 +1025,8 @@ trait ErasedSource: Send {
 }
 
 struct SourceStopOutcome {
+    preceding_batches: Vec<NativeSourceBatch>,
+    final_snapshot: Option<NativeSourceSnapshot>,
     batch: NativeSourceBatch,
     closed_input_boundary: bool,
 }
@@ -1176,6 +1193,8 @@ impl<S: DisplayTopologySubscription + Send> ErasedSource for DisplaySource<S> {
 
     fn stop(&mut self) -> SourceStopOutcome {
         SourceStopOutcome {
+            preceding_batches: Vec::new(),
+            final_snapshot: None,
             batch: NativeSourceBatch::DisplayTopology(self.0.stop()),
             closed_input_boundary: ensure_native_source_process_usable().is_ok(),
         }
@@ -1203,6 +1222,8 @@ impl<S: CandidateWindowSubscription + Send> ErasedSource for WindowSource<S> {
 
     fn stop(&mut self) -> SourceStopOutcome {
         SourceStopOutcome {
+            preceding_batches: Vec::new(),
+            final_snapshot: None,
             batch: NativeSourceBatch::CandidateWindow(self.0.stop()),
             closed_input_boundary: ensure_native_source_process_usable().is_ok(),
         }
@@ -1230,6 +1251,8 @@ impl<S: CaptureSessionSubscription + Send> ErasedSource for SessionSource<S> {
 
     fn stop(&mut self) -> SourceStopOutcome {
         SourceStopOutcome {
+            preceding_batches: Vec::new(),
+            final_snapshot: None,
             batch: NativeSourceBatch::CaptureSession(self.0.stop()),
             closed_input_boundary: ensure_native_source_process_usable().is_ok(),
         }
@@ -1257,6 +1280,8 @@ impl<S: ProcessApplicationSubscription + Send> ErasedSource for ProcessSource<S>
 
     fn stop(&mut self) -> SourceStopOutcome {
         SourceStopOutcome {
+            preceding_batches: Vec::new(),
+            final_snapshot: None,
             batch: NativeSourceBatch::ProcessApplication(self.0.stop()),
             closed_input_boundary: ensure_native_source_process_usable().is_ok(),
         }
@@ -1291,6 +1316,8 @@ where
 
     fn stop(&mut self) -> SourceStopOutcome {
         SourceStopOutcome {
+            preceding_batches: Vec::new(),
+            final_snapshot: None,
             batch: W::wrap_batch(self.0.stop()),
             closed_input_boundary: ensure_native_source_process_usable().is_ok(),
         }
@@ -1597,6 +1624,8 @@ fn poll_active_source(
     }
     let final_batch = source.stop();
     let failure = final_batch.batch.terminal_error().unwrap_or(failure);
+    poll.batches.extend(final_batch.preceding_batches);
+    poll.final_snapshots.extend(final_batch.final_snapshot);
     poll.batches.push(final_batch.batch);
     slot.source = None;
     if !final_batch.closed_input_boundary {
@@ -3078,6 +3107,8 @@ mod tests {
         fn stop(&mut self) -> SourceStopOutcome {
             self.stop_count.fetch_add(1, Ordering::AcqRel);
             SourceStopOutcome {
+                preceding_batches: Vec::new(),
+                final_snapshot: None,
                 batch: self.stop_batch.clone(),
                 closed_input_boundary: self.closed_input_boundary,
             }
