@@ -18,16 +18,20 @@ use prctr_native_source_runtime::{
 #[cfg(target_os = "linux")]
 pub use platform::LinuxProcessApplicationBackend;
 pub use platform::UnavailableProcessApplicationSubscription;
-#[cfg(target_os = "windows")]
-pub use platform::WindowsProcessApplicationBackend;
 #[cfg(target_os = "macos")]
 pub use platform::{
-    MacOsCandidateAuditSession, MacOsIdentityResolution, MacOsLifecycleCheckpoint,
-    MacOsLifecycleClose, MacOsLifecycleDrain, MacOsLifecycleEvent, MacOsLifecycleEventFeed,
-    MacOsLifecycleFailure, MacOsLifecycleInput, MacOsLifecycleSink, MacOsLifecycleSubscription,
-    MacOsLifecycleTerminal, MacOsLifecycleTimeOrigin, MacOsProcessAccountClass,
-    MacOsProcessApplicationBackend, MacOsProcessFact, MacOsProcessInventory,
-    MacOsProcessInventoryCollector, MacOsProcessKey, MacOsProcessLifecycle,
+    EndpointSecurityBootstrapRegistrar, EndpointSecurityEventFeed, EndpointSecuritySubscription,
+    MacOsAuditProcessInventory, MacOsCandidateAuditSession, MacOsIdentityResolution,
+    MacOsLifecycleCheckpoint, MacOsLifecycleClose, MacOsLifecycleDrain, MacOsLifecycleEvent,
+    MacOsLifecycleEventFeed, MacOsLifecycleFailure, MacOsLifecycleInput, MacOsLifecycleSink,
+    MacOsLifecycleSubscription, MacOsLifecycleTerminal, MacOsLifecycleTimeOrigin,
+    MacOsProcessAccountClass, MacOsProcessApplicationBackend, MacOsProcessFact,
+    MacOsProcessInventory, MacOsProcessInventoryCollector, MacOsProcessKey, MacOsProcessLifecycle,
+};
+#[cfg(target_os = "windows")]
+pub use platform::{
+    WindowsEtwDrain, WindowsEtwFailure, WindowsEtwProcessEvent, WindowsEtwProcessFeed,
+    WindowsProcessApplicationBackend, WindowsProcessLifetime,
 };
 
 pub const SOURCE_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -537,6 +541,7 @@ fn incoherent_transition() -> ProcessApplicationError {
 
 fn reconciled_event(state: ProcessApplicationState) -> ProcessApplicationEvent {
     ProcessApplicationEvent {
+        capture_delay_ns: None,
         kind: ProcessApplicationEventKind::Reconciled,
         process_instance_id: None,
         process: None,
@@ -585,6 +590,16 @@ fn bounded_cleanup_error(error: BoundedTaskError) -> ProcessApplicationError {
         "observer shutdown {error}; native utility restart is required"
     ))
 }
+
+#[cfg(target_os = "windows")]
+pub use platform::{
+    UnavailableWindowsPrefixBarrier, WindowsCandidateSession, WindowsCompletePrefixBarrier,
+    WindowsEnrichedProcessEvent, WindowsInventoryCapture, WindowsInventoryFact,
+    WindowsLifecycleEvent, WindowsLifecycleFailure, WindowsLifecycleSnapshot,
+    WindowsPinnedProcessInventory, WindowsPinnedProcessScope, WindowsPrefixCheckpoint,
+    WindowsProcessAccount, WindowsProcessReconciler, WindowsProcessScopeBackend, WindowsScopeDrain,
+    WindowsScopeEnricher,
+};
 
 #[cfg(test)]
 mod tests {
@@ -678,6 +693,7 @@ mod tests {
         process: Option<ProcessApplicationProcess>,
     ) -> ProcessApplicationEvent {
         ProcessApplicationEvent {
+            capture_delay_ns: None,
             kind,
             process_instance_id: process
                 .as_ref()

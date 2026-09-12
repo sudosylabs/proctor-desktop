@@ -1,8 +1,8 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, VecDeque};
 use std::fmt;
 use std::marker::PhantomData;
 use std::rc::Rc;
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, TryLockError, mpsc};
 use std::thread::{self, ThreadId};
 use std::time::Instant;
@@ -21,7 +21,9 @@ const MAX_RAW_INVENTORY: usize = 4_096;
 const MAX_CURRENT_PROCESSES: usize = 256;
 const MAX_SESSION_IDENTITIES: usize = 2_048;
 const MAX_OBSERVED_PROCESS_KEYS: usize = 4_096;
-const MIN_QUEUE_CAPACITY: u16 = 2;
+// Two observations reserve Partial/Complete settlement controls; at least two
+// input credits let a blocked native transition and its identity coexist.
+const MIN_QUEUE_CAPACITY: u16 = 4;
 const MAX_QUEUE_CAPACITY: u16 = 1_024;
 const INGRESS_TERMINAL_RESERVED: u64 = 1;
 const INGRESS_TERMINAL_TAG_MASK: u64 = 0b111;
@@ -44,6 +46,10 @@ pub struct MacOsProcessKey {
 }
 
 impl MacOsProcessKey {
+    pub(super) const fn process_id(self) -> i32 {
+        self.process_id
+    }
+
     /// Constructs a validated PID-plus-start-time process key.
     #[must_use]
     pub const fn new(
@@ -66,7 +72,7 @@ impl MacOsProcessKey {
     }
 }
 
-/// Audit-session identity derived by a future authenticated macOS transport.
+/// Audit-session identity derived by an authenticated macOS peer transport.
 ///
 /// This value is deliberately absent from the helper wire. A caller may create
 /// it only after verifying the local peer and reading that peer's audit token.
@@ -77,6 +83,28 @@ pub struct MacOsCandidateAuditSession {
 }
 
 impl MacOsCandidateAuditSession {
+    pub(super) const fn matches_audit_identity(
+        self,
+        audit_session_id: u32,
+        audit_user_id: u32,
+    ) -> bool {
+        self.audit_session_id == audit_session_id && self.audit_user_id == audit_user_id
+    }
+
+    pub(super) const fn classify_process(
+        self,
+        audit_session_id: u32,
+        audit_user_id: u32,
+    ) -> MacOsProcessAccountClass {
+        if self.matches_audit_identity(audit_session_id, audit_user_id) {
+            MacOsProcessAccountClass::Human
+        } else if audit_user_id == u32::MAX {
+            MacOsProcessAccountClass::SystemOrService
+        } else {
+            MacOsProcessAccountClass::Unknown
+        }
+    }
+
     /// Constructs local candidate context from an already verified peer audit token.
     #[must_use]
     pub const fn from_verified_peer(audit_session_id: u32, audit_user_id: u32) -> Option<Self> {
@@ -91,7 +119,7 @@ impl MacOsCandidateAuditSession {
     }
 }
 
-/// Bounded account classification supplied by the future native adapter.
+/// Bounded account classification supplied by the native adapter.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum MacOsProcessAccountClass {
     Human,
@@ -128,7 +156,7 @@ impl MacOsProcessFact {
         }
     }
 
-    const fn belongs_to(self, candidate: MacOsCandidateAuditSession) -> bool {
+    pub(super) const fn belongs_to(self, candidate: MacOsCandidateAuditSession) -> bool {
         matches!(self.account_class, MacOsProcessAccountClass::Human)
             && self.matches_candidate_identity(candidate)
     }
@@ -136,6 +164,15 @@ impl MacOsProcessFact {
     const fn has_ambiguous_candidate_scope(self, candidate: MacOsCandidateAuditSession) -> bool {
         matches!(self.account_class, MacOsProcessAccountClass::Unknown)
             && self.matches_candidate_identity(candidate)
+    }
+
+    pub(super) fn for_candidate(mut self, candidate: MacOsCandidateAuditSession) -> Self {
+        self.account_class = candidate.classify_process(self.audit_session_id, self.audit_user_id);
+        self
+    }
+
+    pub(super) const fn inventory_identity(self) -> (MacOsProcessKey, u32) {
+        (self.key, self.execution_generation)
     }
 
     const fn matches_candidate_identity(self, candidate: MacOsCandidateAuditSession) -> bool {
@@ -278,6 +315,8 @@ struct IngressStatus {
     next_sequence: Mutex<u64>,
     committed_sequence: AtomicU64,
     live_sinks: AtomicU64,
+    retained_inputs: AtomicUsize,
+    input_capacity: usize,
     terminal_word: AtomicU64,
     terminal_monotonic_time_ns: AtomicU64,
 }
@@ -290,13 +329,15 @@ struct TimedLifecycleFailure {
 }
 
 impl IngressStatus {
-    fn new(origin: MacOsLifecycleTimeOrigin) -> Self {
+    fn new(origin: MacOsLifecycleTimeOrigin, input_capacity: usize) -> Self {
         Self {
             origin,
             accepting: AtomicBool::new(true),
             next_sequence: Mutex::new(0),
             committed_sequence: AtomicU64::new(0),
             live_sinks: AtomicU64::new(1),
+            retained_inputs: AtomicUsize::new(0),
+            input_capacity,
             terminal_word: AtomicU64::new(0),
             terminal_monotonic_time_ns: AtomicU64::new(0),
         }
@@ -392,6 +433,26 @@ struct IngressEnvelope {
     sequence: u64,
     monotonic_time_ns: u64,
     input: MacOsLifecycleInput,
+    credit: Option<IngressCredit>,
+}
+
+// One source-wide credit remains owned through callback queueing, deferred
+// settlement and the current returned batch. Extraction never opens an extra
+// queueful of capacity behind an already accepted close tail.
+struct IngressCredit(Arc<IngressStatus>);
+impl Drop for IngressCredit {
+    fn drop(&mut self) {
+        if self
+            .0
+            .retained_inputs
+            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |count| {
+                count.checked_sub(1)
+            })
+            .is_err()
+        {
+            self.0.latch_terminal(MacOsLifecycleFailure::Protocol);
+        }
+    }
 }
 
 /// Cloneable, nonblocking callback ingress for the future native feed.
@@ -452,17 +513,23 @@ impl MacOsLifecycleSink {
     }
 
     /// Captures the committed sequence and source time under the same ingress
-    /// serialization boundary used by accepted callback facts.
+    /// serialization boundary used by accepted callback facts, without waiting.
     ///
     /// # Errors
     ///
-    /// Returns protocol failure when the ingress serialization state is poisoned.
+    /// Fences intake on contention or poisoned ingress serialization state.
     pub fn checkpoint(&self) -> Result<MacOsLifecycleCheckpoint, MacOsLifecycleFailure> {
-        let _next_sequence = self
-            .status
-            .next_sequence
-            .lock()
-            .map_err(|_poisoned| MacOsLifecycleFailure::Protocol)?;
+        let _next_sequence = match self.status.next_sequence.try_lock() {
+            Ok(guard) => guard,
+            Err(error) => {
+                let failure = match error {
+                    TryLockError::WouldBlock => MacOsLifecycleFailure::Backend,
+                    TryLockError::Poisoned(_) => MacOsLifecycleFailure::Protocol,
+                };
+                self.status.latch_terminal(failure);
+                return Err(failure);
+            }
+        };
         Ok(MacOsLifecycleCheckpoint {
             sequence: self.status.committed_sequence.load(Ordering::Acquire),
             monotonic_time_ns: self.status.monotonic_time_ns(),
@@ -472,7 +539,7 @@ impl MacOsLifecycleSink {
 
 fn submit_ingress(
     sender: &mpsc::SyncSender<IngressEnvelope>,
-    status: &IngressStatus,
+    status: &Arc<IngressStatus>,
     input: MacOsLifecycleInput,
 ) {
     if !status.accepting.load(Ordering::Acquire) {
@@ -517,7 +584,18 @@ fn submit_ingress(
         status.latch_terminal(MacOsLifecycleFailure::Protocol);
         return;
     };
+    if status
+        .retained_inputs
+        .fetch_update(Ordering::AcqRel, Ordering::Acquire, |count| {
+            (count < status.input_capacity).then_some(count + 1)
+        })
+        .is_err()
+    {
+        status.latch_terminal(MacOsLifecycleFailure::QueueOverflow(1));
+        return;
+    }
     let envelope = IngressEnvelope {
+        credit: Some(IngressCredit(Arc::clone(status))),
         sequence,
         monotonic_time_ns: status.monotonic_time_ns(),
         input,
@@ -583,12 +661,12 @@ pub struct MacOsLifecycleCheckpoint {
 pub trait MacOsLifecycleEventFeed {
     type Subscription: MacOsLifecycleSubscription;
 
-    /// Starts one serialized, bounded mechanical event feed. For each stable
-    /// process key, the feed submits exactly one final identity resolution for
-    /// the current generation before the next exec or exit. This also applies
-    /// to inventory-originated pending processes. A resolver failure or
-    /// deadline is reported as an operational terminal instead of releasing a
-    /// later generation out of order.
+    /// Starts one serialized, bounded mechanical event feed. Exact identity
+    /// completions may arrive after exec/exit or out of generation order. The
+    /// core keeps pending executions and transitions bounded, publishes Partial
+    /// while settlement is delayed, and never installs a historical identity
+    /// onto a newer execution. Unresolvable historical work stays an explicit
+    /// operational gap; it is never silently considered allowed.
     ///
     /// # Errors
     ///
@@ -735,6 +813,9 @@ struct ObservedProcess {
     scope: ProcessScope,
     execution_generation: u32,
     retired: bool,
+    inventory_generation: Option<u32>,
+    bootstrap_generation: Option<u32>,
+    bootstrap_pending_identity: Option<u32>,
 }
 
 #[derive(Default)]
@@ -744,7 +825,8 @@ struct ProcessScopeHistory {
 
 impl ProcessScopeHistory {
     fn observe_inventory(&mut self, fact: MacOsProcessFact) -> Result<(), MacOsLifecycleFailure> {
-        let observed = observed_process(fact, false);
+        let mut observed = observed_process(fact, false);
+        observed.inventory_generation = Some(fact.execution_generation);
         match self.processes.get(&fact.key) {
             Some(existing)
                 if existing.scope == observed.scope
@@ -756,6 +838,39 @@ impl ProcessScopeHistory {
             Some(_) => Err(MacOsLifecycleFailure::Protocol),
             None => self.insert(fact.key, observed),
         }
+    }
+
+    // Inventory state and the ordered callback cursor are separate. A newer
+    // inventory may cover history, but never excuses a duplicate or skipped
+    // generation inside that observed history.
+    fn inventory_covers(
+        &mut self,
+        fact: MacOsProcessFact,
+        fork: bool,
+    ) -> Result<bool, MacOsLifecycleFailure> {
+        let Some(existing) = self.processes.get_mut(&fact.key) else {
+            return Ok(false);
+        };
+        if existing.scope != process_scope(fact) || existing.retired {
+            return Err(MacOsLifecycleFailure::Protocol);
+        }
+        let Some(inventory_generation) = existing.inventory_generation else {
+            return Ok(false);
+        };
+        if let Some(previous) = existing.bootstrap_generation
+            && (fork || previous.checked_add(1) != Some(fact.execution_generation))
+        {
+            return Err(MacOsLifecycleFailure::Protocol);
+        }
+        // Signature work begins at the bootstrap cut. Covered historical
+        // executions need not synchronously resolve before the next callback;
+        // the ordered generation cursor still rejects duplicates and gaps.
+        existing.bootstrap_generation = Some(fact.execution_generation);
+        let covered = fact.execution_generation <= inventory_generation;
+        if covered && matches!(fact.account_class, MacOsProcessAccountClass::Human) {
+            existing.bootstrap_pending_identity = Some(fact.execution_generation);
+        }
+        Ok(covered)
     }
 
     fn observe_fork(
@@ -841,6 +956,9 @@ const fn observed_process(fact: MacOsProcessFact, retired: bool) -> ObservedProc
         scope: process_scope(fact),
         execution_generation: fact.execution_generation,
         retired,
+        inventory_generation: None,
+        bootstrap_generation: None,
+        bootstrap_pending_identity: None,
     }
 }
 
@@ -849,13 +967,28 @@ struct ProcessLifecycleModel {
     active: BTreeMap<MacOsProcessKey, TrackedProcess>,
     identities: ProcessIdentityMap,
     scope_history: ProcessScopeHistory,
+    deferred: VecDeque<DeferredTransition>,
+    future_identities: BTreeMap<(MacOsProcessKey, u32), DeferredIdentity>,
+    partial_settlement: bool,
+    released_credits: Vec<IngressCredit>,
 }
 
-/// FFI-free state machine for a future entitled macOS lifecycle feed.
+struct DeferredTransition {
+    input: MacOsLifecycleInput,
+    captured_at: u64,
+    credit: Option<IngressCredit>,
+}
+struct DeferredIdentity {
+    resolution: MacOsIdentityResolution,
+    captured_at: u64,
+    credit: Option<IngressCredit>,
+}
+
+/// FFI-free state machine for the entitled macOS lifecycle feed.
 ///
 /// Constructing this type proves only the in-memory lifecycle contract. The
-/// existing production macOS adapter remains snapshot-only, and no platform
-/// capability claim follows from this core.
+/// ordinary unprivileged adapter remains snapshot-only. Entitled feed selection
+/// still requires authenticated service composition and target qualification.
 pub struct MacOsProcessLifecycle<S: MacOsLifecycleSubscription> {
     receiver: mpsc::Receiver<IngressEnvelope>,
     status: Arc<IngressStatus>,
@@ -869,6 +1002,7 @@ pub struct MacOsProcessLifecycle<S: MacOsLifecycleSubscription> {
     terminal_emitted: bool,
     close_state: LifecycleCloseState,
     owner_thread: ThreadId,
+    settlement_time_ns: u64,
     not_send: PhantomData<Rc<()>>,
 }
 
@@ -928,8 +1062,11 @@ impl<S: MacOsLifecycleSubscription> MacOsProcessLifecycle<S> {
         if !(MIN_QUEUE_CAPACITY..=MAX_QUEUE_CAPACITY).contains(&queue_capacity) {
             return Err(MacOsLifecycleFailure::Protocol);
         }
-        let (sender, receiver) = mpsc::sync_channel(usize::from(queue_capacity));
-        let status = Arc::new(IngressStatus::new(time_origin));
+        // This adapter requires at least four slots before opening any feed:
+        // two shared input credits and Partial/Complete output reserves.
+        let input_capacity = usize::from(queue_capacity) - 2;
+        let (sender, receiver) = mpsc::sync_channel(input_capacity);
+        let status = Arc::new(IngressStatus::new(time_origin, input_capacity));
         let sink = MacOsLifecycleSink {
             sender,
             status: Arc::clone(&status),
@@ -983,6 +1120,7 @@ impl<S: MacOsLifecycleSubscription> MacOsProcessLifecycle<S> {
                 terminal_emitted: false,
                 close_state: LifecycleCloseState::Open,
                 owner_thread: thread::current().id(),
+                settlement_time_ns: bootstrap.snapshot_monotonic_time_ns,
                 not_send: PhantomData,
             },
         ))
@@ -1039,7 +1177,7 @@ impl<S: MacOsLifecycleSubscription> MacOsProcessLifecycle<S> {
         }
         self.status.accepting.store(false, Ordering::Release);
         self.close_state = LifecycleCloseState::Fenced;
-        let mut drain = self.drain_internal();
+        let mut drain = self.drain_with_budget(self.drain_limit.saturating_mul(3));
         if self.terminal.is_none() && self.model.has_pending_identity() {
             self.set_terminal(
                 MacOsLifecycleFailure::Backend,
@@ -1057,6 +1195,10 @@ impl<S: MacOsLifecycleSubscription> MacOsProcessLifecycle<S> {
     }
 
     fn drain_internal(&mut self) -> MacOsLifecycleDrain {
+        self.drain_with_budget(self.drain_limit)
+    }
+
+    fn drain_with_budget(&mut self, budget: usize) -> MacOsLifecycleDrain {
         let mut events = Vec::new();
         if self.terminal.is_none() {
             let mut ingress_terminal = self
@@ -1066,8 +1208,24 @@ impl<S: MacOsLifecycleSubscription> MacOsProcessLifecycle<S> {
             let ingress_boundary = ingress_terminal
                 .as_ref()
                 .and_then(|terminal| terminal.ingress_boundary_sequence);
-            for _ in 0..self.drain_limit {
+            let mut budget_exhausted = true;
+            for _ in 0..budget {
+                match self.model.settle_one(self.settlement_time_ns) {
+                    Ok(Some(event)) => {
+                        events.push(MacOsLifecycleEvent {
+                            monotonic_time_ns: self.settlement_time_ns,
+                            event,
+                        });
+                        continue;
+                    }
+                    Ok(None) => {}
+                    Err(error) => {
+                        self.set_terminal(error, self.settlement_time_ns);
+                        break;
+                    }
+                }
                 if ingress_boundary == Some(self.last_ingress_sequence) {
+                    budget_exhausted = false;
                     break;
                 }
                 let envelope = match self.receiver.try_recv() {
@@ -1089,6 +1247,7 @@ impl<S: MacOsLifecycleSubscription> MacOsProcessLifecycle<S> {
                     }
                 };
                 let Some(envelope) = envelope else {
+                    budget_exhausted = false;
                     break;
                 };
                 let Some(expected) = self.last_ingress_sequence.checked_add(1) else {
@@ -1100,11 +1259,22 @@ impl<S: MacOsLifecycleSubscription> MacOsProcessLifecycle<S> {
                     break;
                 }
                 self.last_ingress_sequence = envelope.sequence;
-                match self.model.apply_live_input(envelope.input) {
-                    Ok(Some(event)) => events.push(MacOsLifecycleEvent {
-                        monotonic_time_ns: envelope.monotonic_time_ns,
-                        event,
-                    }),
+                self.settlement_time_ns = self.settlement_time_ns.max(envelope.monotonic_time_ns);
+                match self.model.accept_live(
+                    envelope.input,
+                    envelope.monotonic_time_ns,
+                    envelope.credit,
+                ) {
+                    Ok(Some(mut event)) => {
+                        if self.settlement_time_ns > envelope.monotonic_time_ns {
+                            event.capture_delay_ns =
+                                Some(self.settlement_time_ns - envelope.monotonic_time_ns);
+                        }
+                        events.push(MacOsLifecycleEvent {
+                            monotonic_time_ns: self.settlement_time_ns,
+                            event,
+                        });
+                    }
                     Ok(None) => {}
                     Err(error) => {
                         self.set_terminal(error, envelope.monotonic_time_ns);
@@ -1112,37 +1282,16 @@ impl<S: MacOsLifecycleSubscription> MacOsProcessLifecycle<S> {
                     }
                 }
             }
-            if self.terminal.is_none() {
-                if let Some(mut terminal) = ingress_terminal {
-                    if terminal.ingress_boundary_sequence == Some(self.last_ingress_sequence) {
-                        if let Some(last_event) = events.last() {
-                            terminal.monotonic_time_ns =
-                                terminal.monotonic_time_ns.max(last_event.monotonic_time_ns);
-                        }
-                        self.terminal = Some(terminal);
-                    } else {
-                        self.set_terminal(
-                            MacOsLifecycleFailure::Protocol,
-                            terminal.monotonic_time_ns,
-                        );
-                    }
-                } else if let Some(mut terminal) = self.status.terminal() {
-                    // The terminal raced this poll. Its serialized accepted
-                    // tail is drained before the terminal is emitted next time.
-                    if let Some(last_event) = events.last() {
-                        terminal.monotonic_time_ns =
-                            terminal.monotonic_time_ns.max(last_event.monotonic_time_ns);
-                    }
-                    self.pending_ingress_terminal = Some(terminal);
-                }
-            }
+            self.finish_ingress_terminal(ingress_terminal, budget_exhausted, &events);
         }
+        self.finish_settlement(&mut events);
         let terminal = if self.terminal_emitted {
             None
         } else {
             self.terminal_emitted = self.terminal.is_some();
             self.terminal.clone()
         };
+        self.model.released_credits.clear();
         MacOsLifecycleDrain {
             events,
             terminal: terminal.map(|terminal| MacOsLifecycleTerminal {
@@ -1152,11 +1301,73 @@ impl<S: MacOsLifecycleSubscription> MacOsProcessLifecycle<S> {
         }
     }
 
+    fn finish_ingress_terminal(
+        &mut self,
+        ingress_terminal: Option<TimedLifecycleFailure>,
+        budget_exhausted: bool,
+        events: &[MacOsLifecycleEvent],
+    ) {
+        if self.terminal.is_none() {
+            if let Some(mut terminal) = ingress_terminal {
+                if terminal.ingress_boundary_sequence == Some(self.last_ingress_sequence)
+                    && !budget_exhausted
+                {
+                    if let Some(last_event) = events.last() {
+                        terminal.monotonic_time_ns =
+                            terminal.monotonic_time_ns.max(last_event.monotonic_time_ns);
+                    }
+                    terminal.monotonic_time_ns =
+                        terminal.monotonic_time_ns.max(self.settlement_time_ns);
+                    self.terminal = Some(terminal);
+                } else {
+                    // Settlement consumes work slots too. A bounded poll
+                    // can stop before the already accepted terminal tail.
+                    self.pending_ingress_terminal = Some(terminal);
+                }
+            } else if let Some(mut terminal) = self.status.terminal() {
+                // The terminal raced this poll. Its serialized accepted
+                // tail is drained before the terminal is emitted next time.
+                if let Some(last_event) = events.last() {
+                    terminal.monotonic_time_ns =
+                        terminal.monotonic_time_ns.max(last_event.monotonic_time_ns);
+                }
+                self.pending_ingress_terminal = Some(terminal);
+            }
+        }
+    }
+
+    fn finish_settlement(&mut self, events: &mut Vec<MacOsLifecycleEvent>) {
+        if self.terminal.is_none()
+            && self.pending_ingress_terminal.is_none()
+            && self.status.terminal().is_none()
+            && self.model.partial_settlement
+            && self.model.deferred.is_empty()
+            && self.model.future_identities.is_empty()
+            && self.last_ingress_sequence == self.status.committed_sequence.load(Ordering::Acquire)
+        {
+            self.model.partial_settlement = false;
+            match self.model.reconciled(None) {
+                Ok(event) => {
+                    // A separate observation preserves even same-identity
+                    // Exec transitions; a snapshot never substitutes for them.
+                    self.settlement_time_ns =
+                        self.settlement_time_ns.max(self.status.monotonic_time_ns());
+                    events.push(MacOsLifecycleEvent {
+                        monotonic_time_ns: self.settlement_time_ns,
+                        event,
+                    });
+                }
+                Err(error) => self.set_terminal(error, self.settlement_time_ns),
+            }
+        }
+    }
+
     fn set_terminal(&mut self, failure: MacOsLifecycleFailure, monotonic_time_ns: u64) {
+        self.settlement_time_ns = self.settlement_time_ns.max(monotonic_time_ns);
         self.status.accepting.store(false, Ordering::Release);
         self.terminal.get_or_insert(TimedLifecycleFailure {
             failure,
-            monotonic_time_ns,
+            monotonic_time_ns: self.settlement_time_ns,
             ingress_boundary_sequence: None,
         });
     }
@@ -1285,6 +1496,10 @@ impl ProcessLifecycleModel {
             active: BTreeMap::new(),
             identities: ProcessIdentityMap::default(),
             scope_history: ProcessScopeHistory::default(),
+            deferred: VecDeque::new(),
+            future_identities: BTreeMap::new(),
+            partial_settlement: false,
+            released_credits: Vec::new(),
         }
     }
 
@@ -1321,6 +1536,9 @@ impl ProcessLifecycleModel {
         match input {
             MacOsLifecycleInput::Fork(fact) => {
                 validate_candidate_audit_scope(candidate, fact)?;
+                if self.scope_history.inventory_covers(fact, true)? {
+                    return Ok(());
+                }
                 self.scope_history.observe_fork(fact, true)?;
                 if fact.has_ambiguous_candidate_scope(candidate) {
                     return Err(MacOsLifecycleFailure::Backend);
@@ -1341,6 +1559,9 @@ impl ProcessLifecycleModel {
             }
             MacOsLifecycleInput::Exec(fact) => {
                 validate_candidate_audit_scope(candidate, fact)?;
+                if self.scope_history.inventory_covers(fact, false)? {
+                    return Ok(());
+                }
                 self.scope_history.observe_exec(fact, true)?;
                 if fact.has_ambiguous_candidate_scope(candidate) {
                     return Err(MacOsLifecycleFailure::Backend);
@@ -1355,9 +1576,6 @@ impl ProcessLifecycleModel {
                     if fact.execution_generation == existing.execution_generation {
                         return Ok(());
                     }
-                    if existing.identity.status == ProcessExecutableIdentityStatus::Pending {
-                        return Err(MacOsLifecycleFailure::Backend);
-                    }
                     if existing.execution_generation.checked_add(1)
                         != Some(fact.execution_generation)
                     {
@@ -1371,11 +1589,30 @@ impl ProcessLifecycleModel {
             }
             MacOsLifecycleInput::Exit(fact) => {
                 validate_candidate_audit_scope(candidate, fact)?;
+                if self
+                    .scope_history
+                    .processes
+                    .get(&fact.key)
+                    .is_some_and(|history| {
+                        history
+                            .bootstrap_generation
+                            .is_some_and(|generation| generation != fact.execution_generation)
+                    })
+                {
+                    return Err(MacOsLifecycleFailure::Protocol);
+                }
                 self.scope_history.observe_exit(fact)?;
-                let _ = self.remove_process(fact)?;
+                // A process can exit after subscription but before enumeration
+                // reaches it. Its exit is a tombstone, not a missing live event.
+                if let Some(existing) = self.active.get(&fact.key) {
+                    if existing.execution_generation != fact.execution_generation {
+                        return Err(MacOsLifecycleFailure::Backend);
+                    }
+                    self.active.remove(&fact.key);
+                }
             }
             MacOsLifecycleInput::IdentityResolved(resolution) => {
-                self.apply_identity_resolution(*resolution)?;
+                self.apply_bootstrap_identity(*resolution)?;
             }
             MacOsLifecycleInput::NativeEventLoss(count) => return Err(native_event_loss(count)),
             MacOsLifecycleInput::PermissionLost => {
@@ -1388,7 +1625,215 @@ impl ProcessLifecycleModel {
         Ok(())
     }
 
+    fn apply_bootstrap_identity(
+        &mut self,
+        resolution: MacOsIdentityResolution,
+    ) -> Result<(), MacOsLifecycleFailure> {
+        if let Some(history) = self.scope_history.processes.get_mut(&resolution.key) {
+            if history.bootstrap_pending_identity == Some(resolution.execution_generation) {
+                history.bootstrap_pending_identity = None;
+                if history.inventory_generation != Some(resolution.execution_generation) {
+                    return Ok(());
+                }
+            }
+            if history.retired {
+                return if history.inventory_generation == Some(resolution.execution_generation)
+                    || history.execution_generation == resolution.execution_generation
+                {
+                    Ok(())
+                } else {
+                    Err(MacOsLifecycleFailure::Protocol)
+                };
+            }
+            if let Some(current) = self.active.get(&resolution.key) {
+                if resolution.execution_generation < current.execution_generation
+                    && history.inventory_generation == Some(resolution.execution_generation)
+                {
+                    return Ok(());
+                }
+                if history.inventory_generation == Some(resolution.execution_generation)
+                    && resolution.execution_generation == current.execution_generation
+                    && current.identity == resolution.identity
+                {
+                    return Ok(());
+                }
+            }
+        }
+        self.apply_identity_resolution(resolution)
+    }
+
+    #[cfg(test)]
     fn apply_live_input(
+        &mut self,
+        input: MacOsLifecycleInput,
+    ) -> Result<Option<ProcessApplicationEvent>, MacOsLifecycleFailure> {
+        self.accept_live(input, 0, None)
+    }
+
+    fn accept_live(
+        &mut self,
+        input: MacOsLifecycleInput,
+        captured_at: u64,
+        credit: Option<IngressCredit>,
+    ) -> Result<Option<ProcessApplicationEvent>, MacOsLifecycleFailure> {
+        if let MacOsLifecycleInput::IdentityResolved(resolution) = input {
+            let identity_key = (resolution.key, resolution.execution_generation);
+            let current = self.active.get(&resolution.key);
+            if current.is_some_and(|process| {
+                process.execution_generation == resolution.execution_generation
+            }) {
+                if let Some(credit) = credit {
+                    self.released_credits.push(credit);
+                }
+                return self.apply_settled_input(MacOsLifecycleInput::IdentityResolved(resolution));
+            }
+            let queued = self.deferred.iter().any(|deferred| match &deferred.input {
+                MacOsLifecycleInput::Fork(fact) | MacOsLifecycleInput::Exec(fact) => {
+                    fact.key == resolution.key
+                        && fact.execution_generation == resolution.execution_generation
+                }
+                _ => false,
+            });
+            if !queued || self.future_identities.contains_key(&identity_key) {
+                return Err(MacOsLifecycleFailure::Protocol);
+            }
+            if self.future_identities.len() >= usize::from(MAX_QUEUE_CAPACITY) {
+                return Err(MacOsLifecycleFailure::QueueOverflow(1));
+            }
+            self.future_identities.insert(
+                identity_key,
+                DeferredIdentity {
+                    resolution: *resolution,
+                    captured_at,
+                    credit,
+                },
+            );
+            return Ok(None);
+        }
+        if self.partial_settlement || self.transition_needs_identity(&input) {
+            if self.deferred.len() >= usize::from(MAX_QUEUE_CAPACITY) {
+                return Err(MacOsLifecycleFailure::QueueOverflow(1));
+            }
+            let first = !self.partial_settlement;
+            self.partial_settlement = true;
+            self.deferred.push_back(DeferredTransition {
+                input,
+                captured_at,
+                credit,
+            });
+            return if first {
+                self.reconciled(None).map(Some)
+            } else {
+                Ok(None)
+            };
+        }
+        if let Some(credit) = credit {
+            self.released_credits.push(credit);
+        }
+        self.apply_settled_input(input)
+    }
+
+    fn transition_needs_identity(&self, input: &MacOsLifecycleInput) -> bool {
+        let (MacOsLifecycleInput::Exec(fact) | MacOsLifecycleInput::Exit(fact)) = input else {
+            return false;
+        };
+        self.active.get(&fact.key).is_some_and(|process| {
+            process.identity.status == ProcessExecutableIdentityStatus::Pending
+        })
+    }
+
+    // Produces at most one observation. Callback input and settlement both use
+    // the caller's fixed output budget; original capture time is preserved as
+    // a delay from the monotonically published settlement observation.
+    fn settle_one(
+        &mut self,
+        published_at: u64,
+    ) -> Result<Option<ProcessApplicationEvent>, MacOsLifecycleFailure> {
+        if !self.partial_settlement {
+            return Ok(None);
+        }
+        loop {
+            let ready = self
+                .future_identities
+                .keys()
+                .find(|(key, generation)| {
+                    self.active
+                        .get(key)
+                        .is_some_and(|process| process.execution_generation == *generation)
+                })
+                .copied();
+            if let Some(key) = ready {
+                let resolved = self
+                    .future_identities
+                    .remove(&key)
+                    .ok_or(MacOsLifecycleFailure::Protocol)?;
+                if let Some(credit) = resolved.credit {
+                    self.released_credits.push(credit);
+                }
+                let delay = published_at
+                    .checked_sub(resolved.captured_at)
+                    .ok_or(MacOsLifecycleFailure::Protocol)?;
+                let event = self.apply_settled_input(MacOsLifecycleInput::IdentityResolved(
+                    Box::new(resolved.resolution),
+                ))?;
+                return Ok(event.map(|event| ProcessApplicationEvent {
+                    capture_delay_ns: Some(delay),
+                    ..event
+                }));
+            }
+            let Some(front) = self.deferred.front() else {
+                // Final certainty is restored only at the end of the caller's
+                // drain, after already accepted ingress has also been consumed.
+                return Ok(None);
+            };
+            if self.transition_needs_identity(&front.input) {
+                return Ok(None);
+            }
+            if let MacOsLifecycleInput::Exec(fact) | MacOsLifecycleInput::Exit(fact) = &front.input
+                && self.active.get(&fact.key).is_some_and(|process| {
+                    process.identity.status == ProcessExecutableIdentityStatus::Unavailable
+                })
+            {
+                return Err(MacOsLifecycleFailure::Backend);
+            }
+            let deferred = self
+                .deferred
+                .pop_front()
+                .ok_or(MacOsLifecycleFailure::Protocol)?;
+            let delay = published_at
+                .checked_sub(deferred.captured_at)
+                .ok_or(MacOsLifecycleFailure::Protocol)?;
+            if let Some(credit) = deferred.credit {
+                self.released_credits.push(credit);
+            }
+            let event = self.apply_settled_input(deferred.input)?;
+            if let Some(event) = event {
+                return Ok(Some(ProcessApplicationEvent {
+                    capture_delay_ns: Some(delay),
+                    ..event
+                }));
+            }
+        }
+    }
+
+    fn reconciled(
+        &self,
+        capture_delay_ns: Option<u64>,
+    ) -> Result<ProcessApplicationEvent, MacOsLifecycleFailure> {
+        let event = ProcessApplicationEvent {
+            kind: ProcessApplicationEventKind::Reconciled,
+            process_instance_id: None,
+            process: None,
+            state: Some(self.state()?),
+            capture_delay_ns,
+        };
+        event
+            .validate()
+            .map_err(|_| MacOsLifecycleFailure::Protocol)?;
+        Ok(event)
+    }
+
+    fn apply_settled_input(
         &mut self,
         input: MacOsLifecycleInput,
     ) -> Result<Option<ProcessApplicationEvent>, MacOsLifecycleFailure> {
@@ -1464,6 +1909,7 @@ impl ProcessLifecycleModel {
                     return Ok(None);
                 };
                 Ok(Some(ProcessApplicationEvent {
+                    capture_delay_ns: None,
                     kind: ProcessApplicationEventKind::Exited,
                     process_instance_id: Some(process.process_instance_id),
                     process: None,
@@ -1490,9 +1936,12 @@ impl ProcessLifecycleModel {
     }
 
     fn has_pending_identity(&self) -> bool {
-        self.active
-            .values()
-            .any(|process| process.identity.status == ProcessExecutableIdentityStatus::Pending)
+        !self.deferred.is_empty()
+            || !self.future_identities.is_empty()
+            || self
+                .active
+                .values()
+                .any(|process| process.identity.status == ProcessExecutableIdentityStatus::Pending)
     }
 }
 
@@ -1596,6 +2045,7 @@ fn process_event(
     process: ProcessApplicationProcess,
 ) -> Result<ProcessApplicationEvent, MacOsLifecycleFailure> {
     let event = ProcessApplicationEvent {
+        capture_delay_ns: None,
         kind,
         process_instance_id: Some(process.process_instance_id.clone()),
         process: Some(process),
@@ -1617,7 +2067,11 @@ impl ProcessLifecycleModel {
         processes.sort_by(|left, right| left.process_instance_id.cmp(&right.process_instance_id));
         let state = ProcessApplicationState {
             coverage: ProcessApplicationCoverage::FullLifecycle,
-            certainty: ProcessApplicationCertainty::Complete,
+            certainty: if self.partial_settlement {
+                ProcessApplicationCertainty::Partial
+            } else {
+                ProcessApplicationCertainty::Complete
+            },
             processes,
         };
         state
@@ -1976,16 +2430,394 @@ mod tests {
     }
 
     #[test]
-    fn irreconcilable_inventory_and_buffered_exec_generations_fail_closed() {
+    fn inventory_supersedes_older_buffered_exec_generation() {
         let process_key = key(113, 19);
         let result = open(
             8,
             Vec::new(),
-            vec![MacOsLifecycleInput::Exec(fact(process_key, 1))],
+            vec![
+                MacOsLifecycleInput::Exec(fact(process_key, 1)),
+                MacOsLifecycleInput::IdentityResolved(Box::new(
+                    MacOsIdentityResolution::new(process_key, 1, unavailable_identity())
+                        .expect("identity"),
+                )),
+            ],
             Vec::new(),
             vec![fact(process_key, 2)],
         );
-        assert!(matches!(result, Err(MacOsLifecycleFailure::Backend)));
+        let (state, mut source, _, _) = result.expect("inventory covers older exec");
+        assert_eq!(state.processes.len(), 1);
+        source.close().expect("source closes");
+    }
+
+    fn resolved(key: MacOsProcessKey, generation: u32) -> MacOsLifecycleInput {
+        MacOsLifecycleInput::IdentityResolved(Box::new(
+            MacOsIdentityResolution::new(key, generation, unavailable_identity())
+                .expect("identity"),
+        ))
+    }
+
+    fn verified(key: MacOsProcessKey, generation: u32) -> MacOsLifecycleInput {
+        MacOsLifecycleInput::IdentityResolved(Box::new(
+            MacOsIdentityResolution::new(
+                key,
+                generation,
+                ProcessExecutableIdentity {
+                    status: ProcessExecutableIdentityStatus::Verified,
+                    signing_id: Some(format!("execution-{generation}")),
+                    team_id: Some("team".to_owned()),
+                    designated_requirement: Some("designated".to_owned()),
+                    bundle_id: Some("bundle".to_owned()),
+                    version: Some("1".to_owned()),
+                    ..unavailable_identity()
+                },
+            )
+            .expect("verified mechanical identity"),
+        ))
+    }
+
+    #[test]
+    fn pending_execs_settle_out_of_order_results_without_overwriting_current_execution() {
+        let key = key(801, 80);
+        let (_, mut source, shared, _) =
+            open(24, Vec::new(), Vec::new(), Vec::new(), vec![fact(key, 1)]).expect("source");
+        let sink = shared.lock().expect("sink").clone().expect("registered");
+        sink.submit(MacOsLifecycleInput::Exec(fact(key, 2)));
+        sink.submit(MacOsLifecycleInput::Exec(fact(key, 3)));
+        let waiting = source.drain();
+        assert!(waiting.terminal.is_none());
+        assert_eq!(waiting.events.len(), 1);
+        assert_eq!(
+            waiting.events[0]
+                .event
+                .state
+                .as_ref()
+                .expect("partial projection")
+                .certainty,
+            ProcessApplicationCertainty::Partial
+        );
+        assert_eq!(source.model.active[&key].execution_generation, 1);
+        sink.submit(verified(key, 3));
+        sink.submit(verified(key, 2));
+        assert!(source.drain().events.is_empty());
+        assert_eq!(source.model.active[&key].execution_generation, 1);
+        sink.submit(verified(key, 1));
+        let settled = source.drain();
+        assert!(settled.terminal.is_none());
+        let signed = settled
+            .events
+            .iter()
+            .filter_map(|event| event.event.process.as_ref())
+            .filter_map(|process| process.identity.signing_id.as_deref())
+            .collect::<Vec<_>>();
+        assert_eq!(signed, vec!["execution-1", "execution-2", "execution-3"]);
+        let final_event = settled.events.last().expect("final state");
+        assert_eq!(
+            final_event.event.kind,
+            ProcessApplicationEventKind::Reconciled
+        );
+        let state = final_event
+            .event
+            .state
+            .as_ref()
+            .expect("complete projection");
+        assert_eq!(state.certainty, ProcessApplicationCertainty::Complete);
+        assert_eq!(
+            state.processes[0].identity.signing_id.as_deref(),
+            Some("execution-3")
+        );
+        assert_eq!(source.model.active[&key].execution_generation, 3);
+        assert!(
+            settled
+                .events
+                .windows(2)
+                .all(|pair| pair[0].monotonic_time_ns <= pair[1].monotonic_time_ns)
+        );
+        assert!(
+            settled
+                .events
+                .iter()
+                .any(|event| event.event.capture_delay_ns.is_some_and(|delay| delay > 0))
+        );
+        source.close().expect("settled close");
+    }
+
+    #[test]
+    fn pending_exit_keeps_tombstone_and_pid_reuse_separate_until_both_identities_settle() {
+        let old = key(802, 80);
+        let reused = key(802, 81);
+        let (initial, mut source, shared, _) =
+            open(24, Vec::new(), Vec::new(), Vec::new(), vec![fact(old, 1)]).expect("source");
+        let old_id = initial.processes[0].process_instance_id.clone();
+        let sink = shared.lock().expect("sink").clone().expect("registered");
+        for input in [
+            MacOsLifecycleInput::Exit(fact(old, 1)),
+            MacOsLifecycleInput::Fork(fact(reused, 1)),
+            verified(reused, 1),
+            verified(old, 1),
+        ] {
+            sink.submit(input);
+        }
+        let closed = source
+            .close()
+            .expect("all accepted work settles before close");
+        assert!(closed.drain.terminal.is_none());
+        assert!(closed.drain.events.len() <= 24);
+        assert_eq!(
+            closed.final_state.certainty,
+            ProcessApplicationCertainty::Complete
+        );
+        assert_eq!(closed.final_state.processes.len(), 1);
+        assert_ne!(closed.final_state.processes[0].process_instance_id, old_id);
+        assert!(closed.drain.events.iter().any(|event| event.event.kind
+            == ProcessApplicationEventKind::Exited
+            && event.event.process_instance_id.as_deref() == Some(old_id.as_str())));
+        assert!(!source.model.active.contains_key(&old));
+    }
+
+    #[test]
+    fn historical_unavailable_result_is_a_gap_only_after_verification_settles() {
+        let key = key(803, 80);
+        let (_, mut source, shared, _) =
+            open(8, Vec::new(), Vec::new(), Vec::new(), vec![fact(key, 1)]).expect("source");
+        let sink = shared.lock().expect("sink").clone().expect("registered");
+        sink.submit(MacOsLifecycleInput::Exit(fact(key, 1)));
+        assert!(source.drain().terminal.is_none());
+        sink.submit(resolved(key, 1));
+        let settled = source.drain();
+        assert_eq!(
+            terminal_failure(&settled),
+            Some(MacOsLifecycleFailure::Backend)
+        );
+        assert_eq!(settled.events.len(), 1);
+        assert_eq!(
+            settled.events[0]
+                .event
+                .process
+                .as_ref()
+                .expect("unavailable resolution")
+                .identity
+                .status,
+            ProcessExecutableIdentityStatus::Unavailable
+        );
+        assert_eq!(
+            source.close().expect("close").final_state.certainty,
+            ProcessApplicationCertainty::Partial
+        );
+    }
+
+    #[test]
+    fn retained_transition_credit_cannot_be_reused_by_a_second_queueful() {
+        let key = key(804, 80);
+        let (_, mut source, shared, _) =
+            open(4, Vec::new(), Vec::new(), Vec::new(), vec![fact(key, 1)]).expect("source");
+        let sink = shared.lock().expect("sink").clone().expect("registered");
+        sink.submit(MacOsLifecycleInput::Exit(fact(key, 1)));
+        assert!(source.drain().terminal.is_none());
+        assert_eq!(source.status.retained_inputs.load(Ordering::Acquire), 1);
+        sink.submit(verified(key, 1));
+        let closed = source.close().expect("bounded close");
+        assert!(closed.drain.terminal.is_none());
+        assert_eq!(closed.drain.events.len(), 3);
+        assert!(closed.final_state.processes.is_empty());
+        assert_eq!(source.status.retained_inputs.load(Ordering::Acquire), 0);
+    }
+
+    #[test]
+    fn minimum_capacity_rejects_before_subscribing_and_preserves_pending_close_tail() {
+        for capacity in [2, 3] {
+            let registration = Arc::new(Mutex::new(None));
+            assert!(matches!(
+                MacOsProcessLifecycle::open(
+                    candidate(),
+                    capacity,
+                    ExternallyOwnedFeed {
+                        sink: registration.clone()
+                    },
+                    EmptyInventory,
+                ),
+                Err(MacOsLifecycleFailure::Protocol)
+            ));
+            assert!(registration.lock().expect("registration").is_none());
+        }
+        let key = key(805, 80);
+        let (_, mut source, shared, _) =
+            open(4, Vec::new(), Vec::new(), Vec::new(), vec![fact(key, 1)])
+                .expect("minimum source");
+        let sink = shared.lock().expect("sink").clone().expect("registered");
+        sink.submit(MacOsLifecycleInput::Exit(fact(key, 1)));
+        sink.submit(verified(key, 1));
+        let closed = source.close().expect("close before normal drains");
+        assert!(closed.drain.terminal.is_none());
+        assert_eq!(closed.drain.events.len(), 4);
+        assert_eq!(
+            closed
+                .drain
+                .events
+                .iter()
+                .map(|event| event.event.kind)
+                .collect::<Vec<_>>(),
+            vec![
+                ProcessApplicationEventKind::Reconciled,
+                ProcessApplicationEventKind::IdentityChanged,
+                ProcessApplicationEventKind::Exited,
+                ProcessApplicationEventKind::Reconciled,
+            ]
+        );
+        assert!(closed.final_state.processes.is_empty());
+        assert_eq!(
+            closed.final_state.certainty,
+            ProcessApplicationCertainty::Complete
+        );
+    }
+
+    #[test]
+    fn bootstrap_replays_covered_generations_without_reverting_inventory() {
+        let key = key(130, 30);
+        let mut model = ProcessLifecycleModel::new(candidate());
+        model.seed_inventory(vec![fact(key, 3)]).expect("inventory");
+        for input in [
+            MacOsLifecycleInput::Fork(fact(key, 1)),
+            resolved(key, 1),
+            MacOsLifecycleInput::Exec(fact(key, 2)),
+            resolved(key, 2),
+            MacOsLifecycleInput::Exec(fact(key, 3)),
+            resolved(key, 3),
+            resolved(key, 3),
+            MacOsLifecycleInput::Exec(fact(key, 4)),
+            resolved(key, 4),
+            resolved(key, 3),
+        ] {
+            model
+                .apply_bootstrap_input(input)
+                .expect("covered ordered history");
+        }
+        let process = model.active.get(&key).expect("current process");
+        assert_eq!(process.execution_generation, 4);
+        assert_eq!(
+            process.identity.status,
+            ProcessExecutableIdentityStatus::Unavailable
+        );
+        assert!(
+            model
+                .apply_live_input(MacOsLifecycleInput::Exec(fact(key, 4)))
+                .is_err()
+        );
+    }
+
+    #[test]
+    fn bootstrap_coverage_does_not_hide_duplicate_forks_or_generation_gaps() {
+        let key = key(131, 31);
+        for bad in [
+            MacOsLifecycleInput::Fork(fact(key, 1)),
+            MacOsLifecycleInput::Exec(fact(key, 1)),
+            MacOsLifecycleInput::Exec(fact(key, 3)),
+        ] {
+            let mut model = ProcessLifecycleModel::new(candidate());
+            model.seed_inventory(vec![fact(key, 4)]).expect("inventory");
+            model
+                .apply_bootstrap_input(MacOsLifecycleInput::Fork(fact(key, 1)))
+                .expect("fork");
+            model
+                .apply_bootstrap_input(resolved(key, 1))
+                .expect("identity");
+            assert!(model.apply_bootstrap_input(bad).is_err());
+        }
+    }
+
+    #[test]
+    fn bootstrap_verifies_only_current_cut_then_keeps_live_pending_gaps_explicit() {
+        let key = key(140, 40);
+        for exit in [false, true] {
+            let mut model = ProcessLifecycleModel::new(candidate());
+            model.seed_inventory(vec![fact(key, 3)]).expect("inventory");
+            for input in [
+                MacOsLifecycleInput::Fork(fact(key, 1)),
+                MacOsLifecycleInput::Exec(fact(key, 2)),
+                MacOsLifecycleInput::Exec(fact(key, 3)),
+            ] {
+                model
+                    .apply_bootstrap_input(input)
+                    .expect("ordered bootstrap history");
+            }
+            assert_eq!(
+                model.active[&key].identity.status,
+                ProcessExecutableIdentityStatus::Pending
+            );
+            // A stale identity must not clear the pending execution at the cut.
+            assert!(model.apply_live_input(resolved(key, 2)).is_err());
+            assert_eq!(
+                model.active[&key].identity.status,
+                ProcessExecutableIdentityStatus::Pending
+            );
+            let next = if exit {
+                MacOsLifecycleInput::Exit(fact(key, 3))
+            } else {
+                MacOsLifecycleInput::Exec(fact(key, 4))
+            };
+            let event = model
+                .apply_live_input(next)
+                .expect("deferred transition")
+                .expect("partial wakeup");
+            assert_eq!(event.kind, ProcessApplicationEventKind::Reconciled);
+            assert_eq!(
+                model.state().expect("partial state").certainty,
+                ProcessApplicationCertainty::Partial
+            );
+        }
+    }
+
+    #[test]
+    fn bootstrap_exit_before_enumeration_keeps_tombstone_and_rejects_future_identity() {
+        let key = key(132, 32);
+        let mut model = ProcessLifecycleModel::new(candidate());
+        model.seed_inventory(Vec::new()).expect("empty inventory");
+        model
+            .apply_bootstrap_input(MacOsLifecycleInput::Exit(fact(key, 2)))
+            .expect("already exited");
+        assert!(model.active.is_empty());
+        assert!(model.apply_bootstrap_input(resolved(key, 3)).is_err());
+        assert!(
+            model
+                .apply_bootstrap_input(MacOsLifecycleInput::Fork(fact(key, 2)))
+                .is_err()
+        );
+        let reused = MacOsProcessKey::new(132, 33, 0).expect("new lifetime key");
+        model
+            .apply_bootstrap_input(MacOsLifecycleInput::Fork(fact(reused, 1)))
+            .expect("new lifetime");
+        model
+            .apply_bootstrap_input(resolved(reused, 1))
+            .expect("new identity");
+        assert_eq!(model.active.len(), 1);
+    }
+
+    #[test]
+    fn noncandidate_inventory_and_events_share_scope_without_identity_work() {
+        let other = other_session_fact(key(133, 34)).for_candidate(candidate());
+        assert_eq!(other.account_class, MacOsProcessAccountClass::Unknown);
+        let mut model = ProcessLifecycleModel::new(candidate());
+        let mut inventory = other;
+        inventory.execution_generation = 3;
+        model
+            .seed_inventory(vec![inventory])
+            .expect("other session inventory");
+        model
+            .apply_bootstrap_input(MacOsLifecycleInput::Fork(other))
+            .expect("covered other fork");
+        let mut exec = other;
+        exec.execution_generation = 2;
+        model
+            .apply_bootstrap_input(MacOsLifecycleInput::Exec(exec))
+            .expect("no other-session identity needed");
+        exec.execution_generation = 3;
+        model
+            .apply_bootstrap_input(MacOsLifecycleInput::Exec(exec))
+            .expect("ordered exec");
+        model
+            .apply_bootstrap_input(MacOsLifecycleInput::Exit(exec))
+            .expect("other exit");
+        assert!(model.active.is_empty());
     }
 
     #[test]
@@ -2225,6 +3057,40 @@ mod tests {
             );
             source.close().expect("source closes");
         }
+    }
+
+    #[test]
+    fn callback_checkpoint_fails_closed_without_waiting_for_an_inventory_writer() {
+        let (.., mut source, shared_sink, _) =
+            open(8, Vec::new(), Vec::new(), Vec::new(), Vec::new()).expect("source opens");
+        let sink = shared_sink
+            .lock()
+            .expect("shared sink")
+            .clone()
+            .expect("sink");
+        let guard = sink.status.next_sequence.lock().expect("inventory writer");
+        // The fixture exposes an uncounted probe; this callback owns a real sink.
+        sink.status.live_sinks.fetch_add(1, Ordering::AcqRel);
+        let callback_sink = MacOsLifecycleSink {
+            sender: sink.sender.clone(),
+            status: Arc::clone(&sink.status),
+        };
+        let (reply, receive) = mpsc::sync_channel(1);
+        let callback = thread::spawn(move || {
+            let _sent = reply.send(callback_sink.checkpoint());
+        });
+        let outcome = receive.recv_timeout(std::time::Duration::from_secs(1));
+        drop(guard);
+        callback
+            .join()
+            .expect("callback finishes after releasing writer even on regression");
+        assert!(matches!(outcome, Ok(Err(MacOsLifecycleFailure::Backend))));
+        assert_eq!(
+            terminal_failure(&source.drain()),
+            Some(MacOsLifecycleFailure::Backend)
+        );
+        drop(sink);
+        source.close().expect("failed source closes");
     }
 
     #[test]
@@ -2484,6 +3350,7 @@ mod tests {
             let next = sequence.checked_add(1).expect("next sequence");
             sender
                 .try_send(IngressEnvelope {
+                    credit: None,
                     sequence: next,
                     monotonic_time_ns: producer_status.monotonic_time_ns(),
                     input: MacOsLifecycleInput::Fork(fact(key(408, 37), 1)),
@@ -2565,6 +3432,7 @@ mod tests {
             closed.drain.events.as_slice(),
             [MacOsLifecycleEvent {
                 event: ProcessApplicationEvent {
+                    capture_delay_ns: None,
                     kind: ProcessApplicationEventKind::Started,
                     ..
                 },
@@ -2591,11 +3459,12 @@ mod tests {
             .clone()
             .expect("sink")
             .submit(MacOsLifecycleInput::Exit(fact(process_key, 1)));
+        assert_eq!(terminal_failure(&pending_source.drain()), None);
+        let closed = pending_source.close().expect("pending source closes");
         assert_eq!(
-            terminal_failure(&pending_source.drain()),
+            terminal_failure(&closed.drain),
             Some(MacOsLifecycleFailure::Backend)
         );
-        pending_source.close().expect("pending source closes");
 
         let (.., mut pending_exec_source, pending_exec_sink, _) = open(
             8,
@@ -2611,13 +3480,14 @@ mod tests {
             .clone()
             .expect("sink")
             .submit(MacOsLifecycleInput::Exec(fact(process_key, 2)));
-        assert_eq!(
-            terminal_failure(&pending_exec_source.drain()),
-            Some(MacOsLifecycleFailure::Backend)
-        );
-        pending_exec_source
+        assert_eq!(terminal_failure(&pending_exec_source.drain()), None);
+        let closed = pending_exec_source
             .close()
             .expect("pending exec source closes");
+        assert_eq!(
+            terminal_failure(&closed.drain),
+            Some(MacOsLifecycleFailure::Backend)
+        );
 
         let (.., mut source, shared_sink, _) = open(
             8,
@@ -2793,7 +3663,7 @@ mod tests {
     #[test]
     fn callback_queue_overflow_during_bootstrap_is_terminal() {
         let result = open(
-            2,
+            4,
             Vec::new(),
             vec![
                 MacOsLifecycleInput::Fork(fact(key(108, 16), 1)),
@@ -2835,9 +3705,90 @@ mod tests {
     }
 
     #[test]
+    fn terminal_tail_survives_a_poll_budget_spent_settling_generations() {
+        let key = key(811, 81);
+        let (_, mut source, shared, _) =
+            open(8, Vec::new(), Vec::new(), Vec::new(), vec![fact(key, 1)]).expect("source");
+        let sink = shared.lock().expect("sink").clone().expect("registered");
+        sink.submit(MacOsLifecycleInput::Exec(fact(key, 2)));
+        sink.submit(MacOsLifecycleInput::Exec(fact(key, 3)));
+        for generation in [3, 2, 1] {
+            sink.submit(verified(key, generation));
+        }
+        sink.submit(MacOsLifecycleInput::Exit(fact(key, 3)));
+        sink.submit(MacOsLifecycleInput::Fork(fact(key, 4))); // Known overflow.
+        let first = source.drain();
+        assert!(first.terminal.is_none());
+        assert!(
+            first
+                .events
+                .iter()
+                .all(|event| event.event.kind != ProcessApplicationEventKind::Exited)
+        );
+        let second = source.drain();
+        assert!(
+            second
+                .events
+                .iter()
+                .any(|event| event.event.kind == ProcessApplicationEventKind::Exited)
+        );
+        assert_eq!(
+            terminal_failure(&second),
+            Some(MacOsLifecycleFailure::QueueOverflow(1))
+        );
+        assert!(source.drain().events.is_empty());
+        let closed = source.close().expect("close");
+        assert!(closed.final_state.processes.is_empty());
+        assert_eq!(
+            closed.final_state.certainty,
+            ProcessApplicationCertainty::Partial
+        );
+    }
+
+    #[test]
+    fn terminal_at_ingress_boundary_waits_for_deferred_work_after_budget_end() {
+        let key = key(812, 81);
+        let (_, mut source, shared, _) =
+            open(8, Vec::new(), Vec::new(), Vec::new(), vec![fact(key, 1)]).expect("source");
+        let sink = shared.lock().expect("sink").clone().expect("registered");
+        for generation in [2, 3, 4] {
+            sink.submit(MacOsLifecycleInput::Exec(fact(key, generation)));
+        }
+        for generation in [1, 2, 3] {
+            sink.submit(verified(key, generation));
+        }
+        sink.submit(MacOsLifecycleInput::BackendInvalidated);
+        let first = source.drain();
+        assert!(first.terminal.is_none());
+        assert_eq!(
+            source.last_ingress_sequence,
+            source.status.committed_sequence.load(Ordering::Acquire)
+        );
+        let second = source.drain();
+        assert_eq!(second.events.len(), 1);
+        assert_eq!(
+            second.events[0].event.kind,
+            ProcessApplicationEventKind::IdentityChanged
+        );
+        assert_eq!(
+            terminal_failure(&second),
+            Some(MacOsLifecycleFailure::Backend)
+        );
+        assert!(
+            second
+                .terminal
+                .as_ref()
+                .expect("terminal")
+                .monotonic_time_ns
+                >= second.events[0].monotonic_time_ns
+        );
+        source.close().expect("close");
+    }
+
+    #[test]
     fn live_queue_overflow_preserves_the_accepted_tail_and_reports_exact_loss_once() {
         let (.., mut source, shared_sink, _) =
-            open(2, Vec::new(), Vec::new(), Vec::new(), Vec::new()).expect("source opens");
+            open(4, Vec::new(), Vec::new(), Vec::new(), Vec::new()).expect("source opens");
         let sink = shared_sink
             .lock()
             .expect("shared sink")
@@ -2847,7 +3798,7 @@ mod tests {
         sink.submit(MacOsLifecycleInput::Fork(fact(key(115, 20), 1)));
         sink.submit(MacOsLifecycleInput::Fork(fact(key(116, 20), 1)));
         let drain = source.drain();
-        assert_eq!(drain.events.len(), 2);
+        assert_eq!(drain.events.len(), 2); // Two slots reserve settlement controls.
         assert_eq!(
             terminal_failure(&drain),
             Some(MacOsLifecycleFailure::QueueOverflow(1))
@@ -2874,5 +3825,61 @@ mod tests {
         );
         sink.submit(MacOsLifecycleInput::Fork(fact(key(112, 18), 1)));
         assert!(source.drain().events.is_empty());
+    }
+    #[test]
+    fn same_identity_exec_keeps_its_explicit_transition_before_complete_reconciliation() {
+        let key = key(806, 80);
+        let (_, mut source, shared, _) =
+            open(8, Vec::new(), Vec::new(), Vec::new(), vec![fact(key, 1)]).expect("source");
+        let sink = shared.lock().expect("sink").clone().expect("registered");
+        sink.submit(MacOsLifecycleInput::Exec(fact(key, 2)));
+        for generation in [1, 2] {
+            let MacOsLifecycleInput::IdentityResolved(mut resolution) = verified(key, generation)
+            else {
+                unreachable!()
+            };
+            resolution.identity.signing_id = Some("same-executable".to_owned());
+            sink.submit(MacOsLifecycleInput::IdentityResolved(resolution));
+        }
+        let closed = source.close().expect("settled close");
+        assert!(closed.drain.terminal.is_none());
+        assert_eq!(
+            closed
+                .drain
+                .events
+                .iter()
+                .filter(|event| event.event.kind == ProcessApplicationEventKind::IdentityChanged)
+                .count(),
+            3
+        );
+        assert!(
+            closed
+                .drain
+                .events
+                .iter()
+                .any(|event| event
+                    .event
+                    .process
+                    .as_ref()
+                    .is_some_and(|process| process.identity.status
+                        == ProcessExecutableIdentityStatus::Pending))
+        );
+        assert_eq!(
+            closed.final_state.processes[0]
+                .identity
+                .signing_id
+                .as_deref(),
+            Some("same-executable")
+        );
+        assert_eq!(
+            closed
+                .drain
+                .events
+                .last()
+                .expect("complete event")
+                .event
+                .kind,
+            ProcessApplicationEventKind::Reconciled
+        );
     }
 }

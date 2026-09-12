@@ -60,6 +60,17 @@ fn query_state() -> Result<InteractiveSessionState, PassiveStateSourceError> {
             "Windows current interactive session is unavailable".to_owned(),
         ));
     }
+    query_state_for(candidate_session)
+}
+
+pub(super) fn query_state_for(
+    candidate_session: u32,
+) -> Result<InteractiveSessionState, PassiveStateSourceError> {
+    if candidate_session == 0 || candidate_session == u32::MAX {
+        return Err(PassiveStateSourceError::Backend(
+            "invalid authenticated interactive session".to_owned(),
+        ));
+    }
     let inventory = SessionInventory::query()?;
     let mut human_sessions = Vec::new();
     for session in inventory.records() {

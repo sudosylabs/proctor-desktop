@@ -119,6 +119,18 @@ impl PassiveStateWire for InteractiveSessionWire {
     }
 }
 
+#[cfg(target_os = "windows")]
+pub use platform::{
+    WindowsCandidateSession, WindowsWtsServiceDispatcher, WindowsWtsSessionDrain,
+    WindowsWtsSessionEvent, WindowsWtsSessionSnapshot, WindowsWtsSessionSource,
+};
+
+#[cfg(target_os = "macos")]
+pub use platform::{
+    MacOsGraphicalSessionId, MacOsSessionEventFeed, MacOsSessionFeedClose, MacOsSessionFeedDrain,
+    MacOsSessionFeedFailure, MacOsSessionNotification, MacOsSessionNotificationKind,
+};
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -11,7 +11,7 @@ use std::path::Path;
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::mpsc::{self, Receiver};
 use std::sync::{Arc, LazyLock, Mutex};
-use std::thread::{self, JoinHandle};
+use std::thread;
 use std::time::Duration;
 use std::time::Instant;
 
@@ -268,60 +268,87 @@ impl fmt::Display for ThreadFinishError {
 impl std::error::Error for ThreadFinishError {}
 
 pub struct DeadlineThread {
-    completion: Receiver<()>,
-    handle: Option<JoinHandle<()>>,
+    completion: Receiver<Result<(), ThreadFinishError>>,
+    joined: Arc<AtomicBool>,
+    observed: Option<Result<(), ThreadFinishError>>,
 }
 
 impl DeadlineThread {
-    /// Starts one named source-owned thread with a completion signal that is
-    /// independent of joining the operating-system thread handle.
+    /// Starts a resource-owning worker and establishes its join owner before
+    /// releasing the task. Completion means actual OS join, including TLS drops.
     ///
     /// # Errors
-    ///
-    /// Returns the operating-system thread creation error.
+    /// Returns a thread-creation error. Failure to create the join owner fences
+    /// this process and never releases the task to perform native work.
     pub fn spawn<F>(name: &str, task: F) -> Result<Self, io::Error>
     where
         F: FnOnce() + Send + 'static,
     {
-        let (sender, completion) = mpsc::sync_channel(1);
-        let handle = thread::Builder::new()
+        let (release, gate) = mpsc::sync_channel(1);
+        let worker = thread::Builder::new()
             .name(name.to_owned())
             .spawn(move || {
-                task();
-                let _ = sender.send(());
+                if gate.recv().is_ok() {
+                    task();
+                }
             })?;
+        let (sender, completion) = mpsc::sync_channel(1);
+        let joined = Arc::new(AtomicBool::new(false));
+        let observed_join = Arc::clone(&joined);
+        if let Err(error) = thread::Builder::new()
+            .name("prctr-source-join".to_owned())
+            .spawn(move || {
+                let result = worker.join().map_err(|_| ThreadFinishError::Panicked);
+                observed_join.store(true, Ordering::Release);
+                let _ = sender.send(result);
+            })
+        {
+            poison_native_source_process();
+            return Err(error);
+        }
+        release.send(()).map_err(|_| {
+            poison_native_source_process();
+            io::Error::other("native source worker release failed")
+        })?;
         Ok(Self {
             completion,
-            handle: Some(handle),
+            joined,
+            observed: None,
         })
     }
 
-    /// Waits no longer than `timeout` for completion and joins only after the
-    /// completion signal or channel disconnection proves the thread exited.
-    /// A timeout detaches the handle so privileged cleanup can continue.
+    /// Tests the actual OS join receipt without blocking or consuming it.
+    #[must_use]
+    pub fn is_finished(&self) -> bool {
+        self.joined.load(Ordering::Acquire)
+    }
+
+    /// Waits at most `timeout` for proof that the resource-owning thread exited.
+    /// The caller never joins the waiter. A timeout preserves the receipt so a
+    /// later cleanup check cannot mistake an abandoned handle for proved exit.
     ///
     /// # Errors
-    ///
     /// Returns [`ThreadFinishError::TimedOut`] at the deadline or
     /// [`ThreadFinishError::Panicked`] after an unwinding worker exits.
     pub fn finish(&mut self, timeout: Duration) -> Result<(), ThreadFinishError> {
-        let Some(handle) = self.handle.take() else {
-            return Ok(());
-        };
-        match self.completion.recv_timeout(timeout) {
-            Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => handle
-                .join()
-                .map_err(|_panic_payload| ThreadFinishError::Panicked),
-            Err(mpsc::RecvTimeoutError::Timeout) => Err(ThreadFinishError::TimedOut),
+        if let Some(result) = self.observed {
+            return result;
         }
+        let result = match self.completion.recv_timeout(timeout) {
+            Ok(result) => result,
+            Err(mpsc::RecvTimeoutError::Disconnected) => Err(ThreadFinishError::Panicked),
+            Err(mpsc::RecvTimeoutError::Timeout) => return Err(ThreadFinishError::TimedOut),
+        };
+        self.observed = Some(result);
+        result
     }
 }
 
 /// Runs one owned task behind a hard wait deadline.
 ///
-/// The worker is joined only after its independent completion signal proves it
-/// exited. A timed-out worker is detached so the privileged caller can fail
-/// closed and restart its process instead of blocking indefinitely.
+/// A separate owner acknowledges the actual OS join, including thread-local
+/// cleanup. A timeout returns without joining the waiter so the privileged
+/// caller can fail closed and replace its process instead of blocking.
 ///
 /// # Errors
 ///
@@ -338,12 +365,27 @@ where
 {
     let (result_sender, result_receiver) = mpsc::sync_channel(1);
     let started = Instant::now();
-    let mut worker = DeadlineThread::spawn(thread_name, move || {
+    let worker = DeadlineThread::spawn(thread_name, move || {
         let result = panic::catch_unwind(AssertUnwindSafe(task));
         let _ = result_sender.send(result);
     })
     .map_err(|_error| BoundedTaskError::CannotStart)?;
-    let result = match result_receiver.recv_timeout(deadline) {
+    collect_bounded_task_result(worker, &result_receiver, started, deadline)
+}
+
+fn collect_bounded_task_result<T>(
+    mut worker: DeadlineThread,
+    result_receiver: &Receiver<thread::Result<T>>,
+    started: Instant,
+    deadline: Duration,
+) -> Result<T, BoundedTaskError> {
+    // Thread creation and actual-join acknowledgement share the original budget.
+    // recv_timeout(0) may still deliver queued data: that is not a timely receipt.
+    if started.elapsed() >= deadline {
+        let _ = worker.finish(Duration::ZERO);
+        return Err(BoundedTaskError::TimedOut);
+    }
+    let result = match result_receiver.recv_timeout(deadline.saturating_sub(started.elapsed())) {
         Ok(Ok(value)) => value,
         Ok(Err(_panic_payload)) => {
             finish_bounded_worker(&mut worker, deadline.saturating_sub(started.elapsed()))?;
@@ -359,6 +401,9 @@ where
         }
     };
     finish_bounded_worker(&mut worker, deadline.saturating_sub(started.elapsed()))?;
+    if started.elapsed() >= deadline {
+        return Err(BoundedTaskError::TimedOut);
+    }
     Ok(result)
 }
 
@@ -2421,6 +2466,26 @@ mod tests {
     }
 
     #[test]
+    fn queued_task_result_after_setup_exhausted_budget_is_not_success() {
+        let (result_sender, result_receiver) = mpsc::sync_channel(1);
+        let mut worker = DeadlineThread::spawn("expired-queued-task", move || {
+            result_sender.send(Ok(42)).expect("queue completed result");
+        })
+        .expect("spawn worker");
+        worker
+            .finish(Duration::from_secs(1))
+            .expect("prove actual worker join");
+        let budget = Duration::from_millis(10);
+        let before_setup = Instant::now()
+            .checked_sub(Duration::from_secs(1))
+            .expect("past instant");
+        assert_eq!(
+            collect_bounded_task_result(worker, &result_receiver, before_setup, budget),
+            Err(BoundedTaskError::TimedOut)
+        );
+    }
+
+    #[test]
     fn bounded_task_reports_panics_without_unwinding_the_caller() {
         assert_eq!(
             run_bounded_task("bounded-task-panic", Duration::from_secs(1), || {
@@ -2574,6 +2639,21 @@ mod tests {
     }
 
     #[test]
+    fn deadline_thread_completion_probe_does_not_wait_for_running_task() {
+        let (release, wait) = std::sync::mpsc::sync_channel(1);
+        let mut worker = DeadlineThread::spawn("completion-probe", move || {
+            let _ = wait.recv();
+        })
+        .expect("worker");
+        assert!(!worker.is_finished());
+        release.send(()).expect("release worker");
+        worker
+            .finish(Duration::from_secs(1))
+            .expect("join completed worker");
+        assert!(worker.is_finished());
+    }
+
+    #[test]
     fn deadline_thread_reports_completion_and_panic() {
         let mut completed = DeadlineThread::spawn("completed-test", || {}).expect("spawn worker");
         assert_eq!(completed.finish(Duration::from_secs(1)), Ok(()));
@@ -2585,6 +2665,49 @@ mod tests {
             panicked.finish(Duration::from_secs(1)),
             Err(ThreadFinishError::Panicked)
         );
+    }
+
+    struct BlockingTlsDrop {
+        entered: mpsc::SyncSender<()>,
+        release: Receiver<()>,
+    }
+    impl Drop for BlockingTlsDrop {
+        fn drop(&mut self) {
+            self.entered.send(()).unwrap();
+            self.release.recv().unwrap();
+        }
+    }
+    thread_local! {
+        static BLOCKED_TLS: std::cell::RefCell<Option<BlockingTlsDrop>> = const { std::cell::RefCell::new(None) };
+    }
+
+    #[test]
+    fn deadline_thread_receipt_waits_for_actual_tls_cleanup() {
+        let (entered, blocked) = mpsc::sync_channel(1);
+        let (release, wait) = mpsc::sync_channel(1);
+        let mut worker = DeadlineThread::spawn("tls-receipt", move || {
+            BLOCKED_TLS.with(|value| {
+                *value.borrow_mut() = Some(BlockingTlsDrop {
+                    entered,
+                    release: wait,
+                });
+            });
+        })
+        .unwrap();
+        blocked.recv_timeout(Duration::from_secs(3)).unwrap();
+        assert!(!worker.is_finished());
+        assert_eq!(
+            worker.finish(Duration::ZERO),
+            Err(ThreadFinishError::TimedOut)
+        );
+        assert_eq!(
+            worker.finish(Duration::ZERO),
+            Err(ThreadFinishError::TimedOut)
+        );
+        release.send(()).unwrap();
+        worker.finish(Duration::from_secs(3)).unwrap();
+        assert!(worker.is_finished());
+        worker.finish(Duration::ZERO).unwrap();
     }
 
     #[test]
