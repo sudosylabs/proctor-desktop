@@ -12,7 +12,8 @@ void test('three product windows use isolated capability-specific preloads and l
 		execFileSync(electron, ['.build/window-skeleton'], {
 			encoding: 'utf8',
 			cwd: repositoryRoot,
-			timeout: 25_000
+			timeout: 25_000,
+			killSignal: 'SIGKILL'
 		}).trim()
 	) as {
 		readonly results: readonly Record<string, any>[];

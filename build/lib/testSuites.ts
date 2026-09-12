@@ -41,6 +41,16 @@ export const testSuites = {
 		build: 'build/buildWindowSkeleton.ts',
 		runtime: 'electron'
 	},
+	'integrated-browser': {
+		patterns: ['test/electron/integratedBrowser.real.test.ts'],
+		build: 'build/buildIntegratedBrowserTests.ts',
+		runtime: 'electron'
+	},
+	'resource-preview': {
+		patterns: ['test/electron/resourcePreview.real.test.ts'],
+		build: 'build/buildResourcePreviewTests.ts',
+		runtime: 'electron'
+	},
 	'editor-worker': {
 		patterns: ['test/electron/editorWorker.real.test.ts'],
 		build: 'build/buildEditorWorkerTests.ts',

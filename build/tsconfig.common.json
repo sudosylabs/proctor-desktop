@@ -11,7 +11,7 @@
   ],
   "exclude": [
     "../src/prctr/editor/common/**/*.ts",
-    "../src/prctr/workbench/contrib/attemptWorkspace/common/**/*.ts",
+    "../src/prctr/workbench/services/attemptWorkspace/common/**/*.ts",
     "../src/prctr/platform/integratedBrowser/common/**/*.ts",
     "../src/prctr/platform/executionEnvironment/common/**/*.ts",
     "../src/prctr/workbench/services/integratedBrowser/common/**/*.ts",
@@ -372,7 +372,8 @@
     "../src/prctr/workbench/services/textMate/common/tokenizationSupport/textMateTokenizationSupport.ts",
     "../src/prctr/workbench/services/textMate/common/tokenizationSupport/tokenizationSupportWithLineLimit.ts",
     "../src/prctr/workbench/services/textMate/common/backgroundTokenization/textMateWorkerHost.ts",
-    "../src/prctr/workbench/services/textMate/common/backgroundTokenization/textMateWorkerProtocol.ts"
+    "../src/prctr/workbench/services/textMate/common/backgroundTokenization/textMateWorkerProtocol.ts",
+    "../src/prctr/workbench/services/resourcePreview/common/**/*.ts"
   ],
   "compileOnSave": false
 }

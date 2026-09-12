@@ -7,7 +7,11 @@
   "exclude": [
     "../test/platform/identity/electron-main/**",
     "../test/platform/settings/electron-main/**",
-    "../test/platform/serverApi/**"
+    "../test/platform/serverApi/**",
+    "../test/platform/protectedStorage/node/**",
+    "../test/workbench/services/examSecurity/node/**",
+    "../test/platform/settings/node/**",
+    "../test/platform/native/node/**"
   ],
   "include": [
     "../src/prctr/base/common/**/*.ts",
@@ -25,7 +29,7 @@
     "../test/workbench/services/actions/common/**/*.ts",
     "../test/workbench/services/keybinding/common/**/*.ts",
     "../test/workbench/common/**/*.ts",
-    "../test/workbench/contrib/attemptWorkspace/common/**/*.ts",
+    "../test/workbench/services/attemptWorkspace/common/**/*.ts",
     "../test/workbench/contrib/integratedBrowser/common/**/*.ts",
     "../test/workbench/contrib/terminal/common/**/*.ts",
     "../test/workbench/services/examSecurity/**/*.test.ts",

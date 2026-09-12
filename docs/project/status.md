@@ -148,13 +148,13 @@ own this gap. Landing that baseline runner, recording reviewed Windows, macOS,
 and Linux images, and making comparison a required CI check blocks any claim of
 pixel-level visual conformance for this reusable control.
 
-Attempt Workspace now has canonical URI/path validation, hierarchy and content
-models, a provider boundary, mutation scheduling, late-result fencing, retry and
-protected-recovery contracts, three-way reconciliation, Exam Resource delivery,
-and a Candidate contribution. These are tested client models with injected ports;
-production server transport and protected-store adapters are still required.
-Likewise, editor core is present, but a complete Candidate editor presentation,
-language services, and server-backed Workspace composition have not landed.
+Attempt Workspace includes shared domain services, the server API authority adapter,
+OS-wrapped encrypted recovery storage, and real VS Code FileService providers.
+Tests cover acknowledged writes, exact retry commands, immutable resource bytes,
+relaunch recovery, three-way reconciliation and immediate participation gating.
+Reusable preview access uses the same providers and disposable, revocable leases.
+A privileged factory assembles these services; CandidateWindow composition and the
+complete editor document/working-copy wiring remain subsequent integration work.
 
 User Settings includes the static generated registry, JSONC document/draft and
 comment-preserving edits, validation, migrations, effective-resolution and
@@ -205,8 +205,8 @@ The executable toolchain has one pinned npm graph, strict NodeNext compiler
 projects for every runtime, esbuild harnesses, generators, policy/schema/source/
 documentation/provenance checks, focused Node/Rust suites, real sandboxed Chromium
 and Electron tests, and target-native CI foundations. Remaining delivery work is
-production composition with real server and protected-store ports, complete
-Candidate editor integration, Forge packaging and fuses, signed capability-matrix
+Candidate admission composition of the shared server/protected-store foundations,
+complete Candidate editor integration, Forge packaging and fuses, signed capability-matrix
 generation, packaged Windows/macOS conformance, updates, signing/notarization,
 SBOM/provenance publication, distribution, and release evidence. Accepted
 source-level behavior must not be reported as packaged production behavior.
@@ -254,14 +254,32 @@ The agreed server work and matching Desktop follow-through cover:
 - opaque execution-host fencing, semantic observations and incremental projection
   preserving the existing PTY.
 
-Desktop adapters, validators and fixtures must adopt those exact contracts.
-Known follow-through includes removing independent policy expiry, preserving
-configuration provenance across compatible patched builds, using approved catalog
-IDs, browser specificity/path parity, retaining redirect/block provenance, and
-implementing delivery/control ordering and capacity states. Existing source-level
-tests do not demonstrate agreement conformance. Signed production releases and
-matrices/catalogs, privileged adapters, packaged native verification and a verified
-pinned execution host remain activation dependencies.
+Desktop now decodes the frozen security policy and verifies its scope, canonical
+digests, release matrix, authenticated catalogs and preflight challenge. Native
+policy has no independent expiry; current Participation authority remains required.
+Missing observe-only coverage is explicit and degraded, while absent mandatory or
+enforce coverage blocks admission. Frozen configuration retains original build
+provenance across compatible patched builds and accepts only packaged catalog IDs.
+
+Production process/application and interactive-session helpers remain source-incomplete.
+The macOS source now includes an ES notification feed, kernel-bound peer code
+verification, bounded audit inventory and generation-aware reconciliation. A bounded
+worker verifies executable identity against exact kernel audit tokens and secured
+signing metadata; missing fields remain unavailable. Startup requires natural event
+boundaries around inventory and rejects gaps, suppressed notifications or an unproved
+deadline. The fixed macOS service/worker entrypoints, authenticated socket bootstrap,
+observed-exit acknowledgement, shared Node source owner and explicit main-process
+registration are implemented. Unsigned service staging records hashes and actual
+permissions; it does not establish installation, exact utility-role authorization,
+profile/signature validity or packaged support. The ordinary stdio entrypoint remains
+unavailable for privileged sources, and complete macOS interactive-session coverage
+remains unavailable. Windows has an ETW event feed, bounded process inventory/reducer,
+exact-lifetime account-scope enrichment, a service-owned WTS session source and an
+authenticated-context helper bridge. Live client
+executable verification, complete process bootstrap, service transport activation and
+target verification are still outstanding. Source tests do not
+establish entitlement, signing or packaged support. Execution and terminal work
+remain deferred from this Desktop batch.
 
 Initial resolver exclusions are Institution inheritance, accommodations and
 exception authoring/revocation, plus selective live native-policy strengthening.

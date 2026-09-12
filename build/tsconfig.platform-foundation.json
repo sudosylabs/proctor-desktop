@@ -16,7 +16,7 @@
     "../src/prctr/workbench/common/lifecycle.ts",
     "../src/prctr/workbench/common/restoration.ts",
     "../src/prctr/workbench/common/workbenchItem.ts",
-    "../src/prctr/workbench/contrib/attemptWorkspace/common/**/*.ts",
+    "../src/prctr/workbench/services/attemptWorkspace/common/**/*.ts",
     "../src/prctr/platform/integratedBrowser/common/**/*.ts",
     "../src/prctr/platform/executionEnvironment/common/**/*.ts",
     "../src/prctr/workbench/services/integratedBrowser/common/**/*.ts",
@@ -358,7 +358,8 @@
     "../src/prctr/workbench/services/views/common/viewsService.ts",
     "../src/prctr/workbench/common/editor/virtualTextEditorInput.ts",
     "../src/prctr/workbench/services/editor/common/editorRegistrations.ts",
-    "../src/prctr/platform/window/common/windowFocus.ts"
+    "../src/prctr/platform/window/common/windowFocus.ts",
+    "../src/prctr/workbench/services/resourcePreview/common/**/*.ts"
   ],
   "exclude": [
     "../src/prctr/base/common/localization.ts",

@@ -31,6 +31,8 @@ void test('test commands include every Node suite and close each Electron prereq
 	assert.deepEqual(selectSuites('electron'), [
 		'browser',
 		'window-skeleton',
+		'integrated-browser',
+		'resource-preview',
 		'editor-worker',
 		'desktop-identity',
 		'electron-security'

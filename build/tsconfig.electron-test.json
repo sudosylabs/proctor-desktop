@@ -25,6 +25,16 @@
     "../test/electron/desktopIdentityMain.ts",
     "../test/electron/desktopIdentity.real.test.ts",
     "../test/platform/settings/electron-main/**/*.ts",
-    "../test/platform/serverApi/**/*.ts"
+    "../test/platform/serverApi/**/*.ts",
+    "../test/platform/protectedStorage/node/**/*.ts",
+    "../test/workbench/services/attemptWorkspace/node/**/*.ts",
+    "../test/workbench/services/examSecurity/node/**/*.ts",
+    "../test/platform/settings/node/**/*.ts",
+    "../test/platform/native/node/**/*.ts",
+    "../test/electron/integratedBrowser.real.test.ts",
+    "../test/electron/integratedBrowserMain.ts",
+    "../test/electron/resourcePreview.real.test.ts",
+    "../test/electron/resourcePreviewMain.ts",
+    "../test/workbench/contrib/integratedBrowser/node/**/*.ts"
   ]
 }
