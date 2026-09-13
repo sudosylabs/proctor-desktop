@@ -189,22 +189,46 @@ function checkVulnerabilityWorkflow(repository: Repository, diagnostics: Diagnos
 	}
 	const foundation = requiredWorkflowJob(document, 'foundation');
 	const dependencyAudit = requiredWorkflowJob(document, 'dependency-audit');
+	const nativeTargets = requiredWorkflowJob(document, 'native-targets');
+	for (const [name, job] of [
+		['foundation', foundation],
+		['native-targets', nativeTargets]
+	] as const) {
+		if (job === undefined || !hasSafeNpmBootstrap(job))
+			diagnostics.push(
+				diagnostic(
+					'dependencies.admission',
+					path,
+					`${name} setup-node may invoke the wrong npm before the exact npm bootstrap.`,
+					'Disable setup-node package-manager caching and install npm 11.19.0 from runner.temp before entering the repository package graph.'
+				)
+			);
+	}
+	const cargoAuditInstall = dependencyAudit?.steps.findIndex(
+		(step) =>
+			isRequiredStep(step) &&
+			step.run === 'cargo install cargo-audit --version 0.22.2 --locked'
+	);
+	const cargoAuditAction = dependencyAudit?.steps.findIndex(
+		(step) =>
+			isRequiredStep(step) &&
+			step.uses === 'rustsec/audit-check@858dc40f52ca2b8570b7a997c1c4e35c6fc9a432' &&
+			step.with?.['working-directory'] === 'native'
+	);
 	const rustAudit =
 		dependencyAudit !== undefined &&
 		dependencyAuditJobHasRequiredPermissions(dependencyAudit) &&
-		dependencyAudit.steps.some(
-			(step) =>
-				isRequiredStep(step) &&
-				step.uses === 'rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998' &&
-				step.with?.['working-directory'] === 'native'
-		);
+		cargoAuditInstall !== undefined &&
+		cargoAuditAction !== undefined &&
+		cargoAuditInstall >= 0 &&
+		cargoAuditAction > cargoAuditInstall;
 	if (!rustAudit)
 		diagnostics.push(
 			diagnostic(
 				'dependencies.admission',
 				path,
-				'The pinned locked-Cargo advisory audit is missing or mis-scoped.',
-				'Run the exact pinned RustSec audit action against native/Cargo.lock.'
+				'The exact cargo-audit bootstrap is missing, unordered, or mis-scoped.',
+				'Install cargo-audit 0.22.2 with its published lock before running the exact pinned RustSec action against native/Cargo.lock.'
 			)
 		);
 	if (
@@ -236,6 +260,7 @@ type WorkflowStep = {
 	readonly uses?: string;
 	readonly run?: string;
 	readonly with?: Readonly<Record<string, unknown>>;
+	readonly workingDirectory?: string;
 	readonly if?: unknown;
 	readonly continueOnError?: unknown;
 };
@@ -261,6 +286,9 @@ function requiredWorkflowJob(document: unknown, name: string): WorkflowJob | und
 			...(typeof step.uses === 'string' ? { uses: step.uses } : {}),
 			...(typeof step.run === 'string' ? { run: step.run } : {}),
 			...(isRecord(step.with) ? { with: step.with } : {}),
+			...(typeof step['working-directory'] === 'string'
+				? { workingDirectory: step['working-directory'] }
+				: {}),
 			...(step.if !== undefined ? { if: step.if } : {}),
 			...(step['continue-on-error'] !== undefined
 				? { continueOnError: step['continue-on-error'] }
@@ -268,6 +296,24 @@ function requiredWorkflowJob(document: unknown, name: string): WorkflowJob | und
 		});
 	}
 	return { steps, ...(isRecord(job.permissions) ? { permissions: job.permissions } : {}) };
+}
+
+function hasSafeNpmBootstrap(job: WorkflowJob): boolean {
+	const setup = job.steps.findIndex(
+		(step) =>
+			isRequiredStep(step) &&
+			step.uses === 'actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38' &&
+			step.with?.['node-version-file'] === '.nvmrc' &&
+			step.with?.['package-manager-cache'] === false &&
+			step.with?.cache === undefined
+	);
+	const npm = job.steps.findIndex(
+		(step) =>
+			isRequiredStep(step) &&
+			step.run === 'npm install --global npm@11.19.0 --ignore-scripts' &&
+			step.workingDirectory === '${{ runner.temp }}'
+	);
+	return setup >= 0 && npm > setup;
 }
 
 function isRequiredStep(step: WorkflowStep): boolean {

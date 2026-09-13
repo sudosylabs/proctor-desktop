@@ -724,7 +724,7 @@ void test('dependency admission requires pinned npm and Cargo vulnerability audi
 		snapshot((files) => {
 			const path = '.github/workflows/foundation.yml';
 			files[path] = String(files[path]).replace(
-				'rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998',
+				'rustsec/audit-check@858dc40f52ca2b8570b7a997c1c4e35c6fc9a432',
 				'rustsec/audit-check@v2'
 			);
 		})
@@ -733,7 +733,7 @@ void test('dependency admission requires pinned npm and Cargo vulnerability audi
 		cargoDiagnostics.some(
 			(item) =>
 				item.path === '.github/workflows/foundation.yml' &&
-				/Cargo advisory audit is missing/.test(item.problem)
+				/cargo-audit bootstrap is missing/.test(item.problem)
 		),
 		JSON.stringify(cargoDiagnostics)
 	);
@@ -758,14 +758,14 @@ void test('dependency admission requires pinned npm and Cargo vulnerability audi
 		snapshot((files) => {
 			const path = '.github/workflows/foundation.yml';
 			files[path] = String(files[path]).replace(
-				'uses: rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998',
-				'# uses: rustsec/audit-check@69366f33c96575abad1ee0dba8212993eecbe998\n        uses: rustsec/audit-check@v2'
+				'uses: rustsec/audit-check@858dc40f52ca2b8570b7a997c1c4e35c6fc9a432',
+				'# uses: rustsec/audit-check@858dc40f52ca2b8570b7a997c1c4e35c6fc9a432\n        uses: rustsec/audit-check@v2'
 			);
 		})
 	);
 	assert.ok(
 		commentDecoyDiagnostics.some((item) =>
-			/Cargo advisory audit is missing/.test(item.problem)
+			/cargo-audit bootstrap is missing/.test(item.problem)
 		),
 		JSON.stringify(commentDecoyDiagnostics)
 	);
@@ -829,7 +829,7 @@ void test('dependency admission requires pinned npm and Cargo vulnerability audi
 	);
 	assert.ok(
 		disabledCargoAuditDiagnostics.some((item) =>
-			/Cargo advisory audit is missing/.test(item.problem)
+			/cargo-audit bootstrap is missing/.test(item.problem)
 		),
 		JSON.stringify(disabledCargoAuditDiagnostics)
 	);
@@ -845,9 +845,34 @@ void test('dependency admission requires pinned npm and Cargo vulnerability audi
 	);
 	assert.ok(
 		ignoredCargoAuditDiagnostics.some((item) =>
-			/Cargo advisory audit is missing/.test(item.problem)
+			/cargo-audit bootstrap is missing/.test(item.problem)
 		),
 		JSON.stringify(ignoredCargoAuditDiagnostics)
+	);
+});
+
+void test('dependency admission requires bootstrap tools before repository package checks', async () => {
+	const check = checkMap().get('dependencies.admission');
+	assert.ok(check);
+	const baseline = await run(
+		check,
+		snapshot((files) => {
+			const path = '.github/workflows/foundation.yml';
+			files[path] = String(files[path])
+				.replaceAll('package-manager-cache: false', 'cache: npm')
+				.replace(
+					'      - name: Install exact cargo-audit\n        run: cargo install cargo-audit --version 0.22.2 --locked\n',
+					''
+				);
+		})
+	);
+	assert.ok(
+		baseline.some((item) => /setup-node may invoke the wrong npm/.test(item.problem)),
+		JSON.stringify(baseline)
+	);
+	assert.ok(
+		baseline.some((item) => /exact cargo-audit bootstrap is missing/.test(item.problem)),
+		JSON.stringify(baseline)
 	);
 });
 
