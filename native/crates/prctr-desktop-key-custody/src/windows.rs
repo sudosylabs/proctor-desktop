@@ -89,7 +89,7 @@ fn key(scope: &str, create: bool) -> Result<Handle, ()> {
     let mut handle = 0;
     let status = unsafe { NCryptOpenKey(provider.0, &raw mut handle, name.as_ptr(), 0, 0) };
     if status != 0 {
-        if u32::from_ne_bytes(status.to_ne_bytes()) != 0x80090016 || !create {
+        if u32::from_ne_bytes(status.to_ne_bytes()) != 0x8009_0016 || !create {
             return Err(());
         }
         if unsafe {
@@ -202,7 +202,7 @@ pub fn delete(scope: &str) -> Result<(), ()> {
             0,
         )
     };
-    if u32::from_ne_bytes(status.to_ne_bytes()) == 0x80090016 {
+    if u32::from_ne_bytes(status.to_ne_bytes()) == 0x8009_0016 {
         return Ok(());
     }
     if status != 0 {
