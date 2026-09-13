@@ -98,7 +98,7 @@
     "vscode-markdown-languageservice": "0.5.0",
     "vscode-oniguruma": "1.7.0",
     "vscode-textmate": "9.3.2",
-    "vscode-uri": "3.1.0",
+    "vscode-uri": "3.2.0",
     "ws": "8.21.3",
     "yaml": "2.9.0"
   },
