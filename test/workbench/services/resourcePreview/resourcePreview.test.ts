@@ -1,25 +1,23 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { validatePreviewImage } from '../../../../src/prctr/workbench/services/resourcePreview/common/imageDimensions.js';
+import {
+	isPreviewImageDimensionAllowed,
+	matchesPreviewImageMediaType
+} from '../../../../src/prctr/workbench/services/resourcePreview/common/imageDimensions.js';
 import { MarkdownItEngine } from '../../../../src/prctr/workbench/services/resourcePreview/browser/markdown/src/markdownEngine.js';
 import { githubSlugifier } from '../../../../src/prctr/workbench/services/resourcePreview/browser/markdown/src/slugify.js';
 import { defaultMarkdownConfiguration } from '../../../../src/prctr/workbench/services/resourcePreview/browser/markdownTypes.js';
 import { URI } from '../../../../src/prctr/base/common/uri.js';
 
-void test('image header validation rejects decoded allocation attacks before decoding', () => {
-	const bytes = new Uint8Array(24);
-	const view = new DataView(bytes.buffer);
-	view.setUint32(0, 0x89504e47);
-	view.setUint32(4, 0x0d0a1a0a);
-	bytes.set([73, 72, 68, 82], 12);
-	view.setUint32(16, 2);
-	view.setUint32(20, 3);
-	assert.deepEqual(validatePreviewImage(bytes, 'image/png'), { width: 2, height: 3 });
-	view.setUint32(16, 0xffffffff);
-	assert.throws(() => validatePreviewImage(bytes, 'image/png'), /dimensions/);
-	assert.throws(() => validatePreviewImage(bytes, 'image/svg+xml'), /type/);
-	assert.throws(() => validatePreviewImage(bytes, 'application/octet-stream'), /Unsupported/);
-	assert.throws(() => validatePreviewImage(bytes.subarray(0, 3), 'image/png'), /size/);
+void test('image admission matches declared container types and bounds decoded dimensions', () => {
+	const png = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+	assert.equal(matchesPreviewImageMediaType(png, 'image/png'), true);
+	assert.equal(matchesPreviewImageMediaType(png, 'image/jpeg'), false);
+	assert.equal(matchesPreviewImageMediaType(png, 'image/svg+xml'), false);
+	assert.equal(matchesPreviewImageMediaType(png, 'application/octet-stream'), false);
+	assert.equal(isPreviewImageDimensionAllowed(2, 3), true);
+	assert.equal(isPreviewImageDimensionAllowed(0xffffffff, 3), false);
+	assert.equal(isPreviewImageDimensionAllowed(4096, 4097), false);
 });
 
 void test('upstream Markdown renderer preserves tables source lines slugs highlighting and frontmatter', async () => {
@@ -63,44 +61,26 @@ void test('typographer changes invalidate source token cache', async () => {
 	assert.match((await engine.render(document)).html, /©/);
 });
 
-void test('the full upstream image selector admits bounded animation vector bitmap icon and AVIF metadata', () => {
+void test('the full upstream image selector recognizes animation bitmap icon and AVIF containers', () => {
 	const gif = Uint8Array.from([71, 73, 70, 56, 57, 97, 2, 0, 3, 0]);
-	assert.deepEqual(validatePreviewImage(gif, 'image/gif'), { width: 2, height: 3 });
-	const svg = new TextEncoder().encode(
-		'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 30"><rect width="20" height="30"/></svg>'
-	);
-	assert.deepEqual(validatePreviewImage(svg, 'image/svg+xml'), { width: 20, height: 30 });
+	assert.equal(matchesPreviewImageMediaType(gif, 'image/gif'), true);
 	const bmp = new Uint8Array(26);
 	bmp.set([66, 77]);
-	new DataView(bmp.buffer).setUint32(18, 2, true);
-	new DataView(bmp.buffer).setInt32(22, -3, true);
-	assert.deepEqual(validatePreviewImage(bmp, 'image/bmp'), { width: 2, height: 3 });
+	assert.equal(matchesPreviewImageMediaType(bmp, 'image/bmp'), true);
 	const ico = new Uint8Array(22);
 	ico.set([0, 0, 1, 0, 1, 0, 16, 24]);
-	assert.deepEqual(validatePreviewImage(ico, 'image/x-icon'), { width: 16, height: 24 });
+	assert.equal(matchesPreviewImageMediaType(ico, 'image/x-icon'), true);
 	const webp = new Uint8Array(30);
 	webp.set(new TextEncoder().encode('RIFF'), 0);
 	webp.set(new TextEncoder().encode('WEBPVP8X'), 8);
-	webp[20] = 2; // The animation flag is supported, unlike the previous static-only guard.
-	webp[24] = 1;
-	webp[27] = 2;
-	assert.deepEqual(validatePreviewImage(webp, 'image/webp'), { width: 2, height: 3 });
-	const box = (kind: string, content: Uint8Array): Uint8Array => {
-		const value = new Uint8Array(content.length + 8);
-		new DataView(value.buffer).setUint32(0, value.length);
-		value.set(new TextEncoder().encode(kind), 4);
-		value.set(content, 8);
-		return value;
-	};
-	const size = new Uint8Array(12);
-	new DataView(size.buffer).setUint32(4, 20);
-	new DataView(size.buffer).setUint32(8, 30);
-	const properties = box('iprp', box('ipco', box('ispe', size)));
-	const metadata = new Uint8Array(properties.length + 4);
-	metadata.set(properties, 4);
-	const avif = new Uint8Array([
-		...box('ftyp', new TextEncoder().encode('avif')),
-		...box('meta', metadata)
-	]);
-	assert.deepEqual(validatePreviewImage(avif, 'image/avif'), { width: 20, height: 30 });
+	assert.equal(matchesPreviewImageMediaType(webp, 'image/webp'), true);
+	const avif = new Uint8Array(20);
+	new DataView(avif.buffer).setUint32(0, avif.byteLength);
+	avif.set(new TextEncoder().encode('ftypavif'), 4);
+	assert.equal(matchesPreviewImageMediaType(avif, 'image/avif'), true);
+	const avifOutsideFileType = new Uint8Array(24);
+	new DataView(avifOutsideFileType.buffer).setUint32(0, 16);
+	avifOutsideFileType.set(new TextEncoder().encode('ftypmif1'), 4);
+	avifOutsideFileType.set(new TextEncoder().encode('avif'), 20);
+	assert.equal(matchesPreviewImageMediaType(avifOutsideFileType, 'image/avif'), false);
 });

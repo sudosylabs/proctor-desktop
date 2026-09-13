@@ -105,12 +105,12 @@ void app.whenReady().then(async () => {
 		await waitFor(`document.body.dataset.link === 'https://example.invalid/'`);
 		const png = [
 			...Buffer.from(
-				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6AAAAAElFTkSuQmCC',
+				'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAXpeqz8AAAAASUVORK5CYII=',
 				'base64'
 			)
 		];
-		// image-size's ICNS parser loops on a zero entry length. MIME spoofing must
-		// neither reach the parent event loop nor prevent a later valid preview.
+		// A malformed container with a spoofed MIME must neither reach the parent
+		// event loop nor prevent a later valid preview.
 		const malformed = Buffer.alloc(16);
 		malformed.write('icns');
 		malformed.writeUInt32BE(16, 4);
@@ -134,7 +134,7 @@ void app.whenReady().then(async () => {
 		);
 		await run(`window.replacePreviewImage(${JSON.stringify(png)})`);
 		await waitFor(`document.body.dataset.state === 'ready'`);
-		// Allow the old parser's deadline to pass. Its cancellation/error must not
+		// Allow the old decoder's deadline to pass. Its cancellation/error must not
 		// clear the new document or release its current authorized lease.
 		await new Promise((resolve) => setTimeout(resolve, 1100));
 		assert.equal(await run('document.body.dataset.state'), 'ready');

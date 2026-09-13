@@ -20,7 +20,7 @@ const TIMEOUT_MS = 1000;
 const MAX_ACTIVE_WORKERS = 2;
 let activeWorkers = 0;
 
-/** Owns terminable metadata parsing, including known image-size non-terminating inputs. */
+/** Owns bounded native image decoding away from the workbench thread. */
 export class ImageMetadataService extends Disposable implements PreviewImageValidator {
 	private readonly pending = new Set<() => void>();
 	private ended = false;

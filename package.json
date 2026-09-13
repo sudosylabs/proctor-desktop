@@ -87,7 +87,6 @@
     "ajv-formats": "3.0.1",
     "electron": "44.0.0",
     "highlight.js": "11.11.1",
-    "image-size": "2.0.2",
     "lodash.throttle": "4.1.1",
     "markdown-it": "14.2.0",
     "morphdom": "2.7.8",

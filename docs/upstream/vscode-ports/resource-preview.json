@@ -544,9 +544,9 @@
     },
     {
       "id": "image-metadata",
-      "kind": "external-package",
-      "reference": "package.json",
-      "rationale": "image-size reads metadata only before native image decode, admitting the complete VS Code image format selector under byte, MIME and dimension limits."
+      "kind": "platform-interface",
+      "reference": "src/prctr/workbench/services/resourcePreview/browser/imageMetadataWorker.ts",
+      "rationale": "Chromium decodes admitted image containers in a bounded terminable worker before the bitmap enters the preview host."
     },
     {
       "id": "markdown-browser-dependencies",
@@ -558,7 +558,7 @@
   "divergences": [
     {
       "id": "closed-resource-security",
-      "summary": "Forbid document scripts, remote embeds, document-chosen assets, unsafe links, trust relaxation, clipboard export and system openers. Preserve applicable rendering, source mapping, incremental updates and image zoom inside an opaque CSP sandbox. PDF.js is a separately admitted dependency and is not attributed to VS Code. Configurable token cache also includes typographer and re-resolves image URLs under every new lease scope. Image preview keeps the full upstream JPG/PNG/BMP/GIF/ICO/WebP/AVIF/SVG format selection, including animation; metadata-only bounds reject oversized content before decode. SVG is delivered only as an image in the opaque host, never as an active document. Color variables map to the existing --prctr-theme- registry and theme changes are sent through the private channel. Terminal resource revocation destroys hosts and discards pending leases.",
+      "summary": "Forbid document scripts, remote embeds, document-chosen assets, unsafe links, trust relaxation, clipboard export and system openers. Preserve applicable rendering, source mapping, incremental updates and image zoom inside an opaque CSP sandbox. PDF.js is a separately admitted dependency and is not attributed to VS Code. Configurable token cache also includes typographer and re-resolves image URLs under every new lease scope. Image preview keeps the full upstream JPG/PNG/BMP/GIF/ICO/WebP/AVIF/SVG format selection, including animation; decoded dimensions are bounded before the image enters the preview host. SVG is delivered only as an image in the opaque host, never as an active document. Color variables map to the existing --prctr-theme- registry and theme changes are sent through the private channel. Terminal resource revocation destroys hosts and discards pending leases.",
       "localPaths": [
         "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/messaging.ts",
         "src/prctr/workbench/services/resourcePreview/browser/markdown/preview-src/strings.ts",

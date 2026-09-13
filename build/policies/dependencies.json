@@ -1107,24 +1107,6 @@
       "removalOwner": "resource-preview"
     },
     {
-      "package": "image-size",
-      "version": "2.0.2",
-      "kind": "production",
-      "purpose": "Read bounded metadata for every browser image format selected by the VS Code image preview before native decoding.",
-      "owner": "resource-preview",
-      "source": "https://www.npmjs.com/package/image-size/v/2.0.2",
-      "license": "MIT",
-      "lifecycleScripts": "blocked",
-      "processes": ["renderer"],
-      "networkBehavior": "No network calls; all workspace document and filesystem reads use injected authorized adapters.",
-      "nativeBehavior": "Pure JavaScript; no native addons or lifecycle scripts.",
-      "transitiveRisk": "Parses untrusted bytes only in a terminable dedicated worker with an absolute deadline and a global concurrency bound. Known ICNS/HEIF/JXL infinite-loop advisories have no patched release; timeout, cancellation and revocation destroy the worker before a result can reach the host. File size, media type and all image dimensions are checked. The filesystem entrypoint is never imported.",
-      "bundleTreatment": "bundled",
-      "localAlternative": "A maintained byte-only metadata library avoids parallel hand-written GIF, BMP, ICO, AVIF and SVG parsers while retaining the original image preview script.",
-      "updateOwner": "resource-preview",
-      "removalOwner": "resource-preview"
-    },
-    {
       "package": "path-browserify",
       "version": "1.0.1",
       "kind": "production",
