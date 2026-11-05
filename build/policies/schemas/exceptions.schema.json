@@ -3,10 +3,9 @@
   "$id": "exceptions.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "schemaVersion", "exceptions"],
+  "required": ["$schema", "exceptions"],
   "properties": {
     "$schema": { "const": "./schemas/exceptions.schema.json" },
-    "schemaVersion": { "const": 1 },
     "exceptions": {
       "type": "array",
       "items": {

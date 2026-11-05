@@ -28,7 +28,7 @@ export const BUNDLED_THEMES = [
 	{ name: 'GitHub Dark', path: 'github/dark.json', scheme: ColorScheme.DARK }
 ] as const;
 export type BundledThemeName = (typeof BUNDLED_THEMES)[number]['name'];
-export const LEGACY_THEME_NAMES = {
+export const SCHEME_THEME_NAMES = {
 	dark: DEFAULT_THEME,
 	light: 'GitHub Light Default',
 	highContrastDark: 'GitHub Dark High Contrast',

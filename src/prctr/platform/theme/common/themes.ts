@@ -15,7 +15,7 @@ import type { IWorkbenchColorTheme } from './workbenchThemeService.js';
 import { Color } from '../../../base/common/color.js';
 import type { IColorCustomizations } from './colorCustomizations.js';
 import { restorePackagedTheme } from './packagedThemeLoader.js';
-import { BUNDLED_THEMES, LEGACY_THEME_NAMES } from './bundledThemes.js';
+import { BUNDLED_THEMES, SCHEME_THEME_NAMES } from './bundledThemes.js';
 import { bundledThemeSnapshots } from './bundledThemeSnapshots.generated.js';
 import { getColorRegistry } from './colorRegistry.js';
 import './workbenchColors.js';
@@ -88,7 +88,7 @@ const foundations = {
 	'motion.duration.slow': '200ms'
 } as const;
 
-const legacyColorRoles = {
+const semanticColorRoles = {
 	'color.background.canvas': 'titleBar.activeBackground',
 	'color.background.surface': 'surface.background',
 	'color.background.raised': 'editorWidget.background',
@@ -132,7 +132,7 @@ export function getTheme(
 	tokenCustomizations: ITokenColorCustomizations = {},
 	semanticCustomizations?: ISemanticTokenColorCustomizations
 ): ResolvedTheme {
-	const name = LEGACY_THEME_NAMES[selection as keyof typeof LEGACY_THEME_NAMES] ?? selection;
+	const name = SCHEME_THEME_NAMES[selection as keyof typeof SCHEME_THEME_NAMES] ?? selection;
 	const entry = BUNDLED_THEMES.find((theme) => theme.name === name);
 	if (!entry) throw new Error(`Unknown bundled theme: ${selection}`);
 	const custom = normalizeColorCustomizations(customizations);
@@ -161,9 +161,9 @@ export function getTheme(
 		if (color) colors[id] = Color.Format.CSS.formatHexA(color, true);
 	}
 	const values = { ...foundations } as Record<DesignTokenId, string>;
-	for (const [token, role] of Object.entries(legacyColorRoles)) {
+	for (const [token, role] of Object.entries(semanticColorRoles)) {
 		// VS Code deliberately leaves these backgrounds unset in high contrast.
-		// A compatibility alias must preserve the absence of a fill, not replace
+		// A semantic alias must preserve the absence of a fill, not replace
 		// it with foreground (which makes dark-theme hover states nearly white).
 		if (role === 'toolbar.hoverBackground' || role === 'toolbar.activeBackground') {
 			values[token as DesignTokenId] = colors[role] ?? 'transparent';

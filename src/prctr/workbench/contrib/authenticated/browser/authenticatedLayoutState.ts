@@ -4,11 +4,10 @@ import type { PresentationCategory } from '../../../common/restoration.js';
 export const authenticatedLayoutCategory: PresentationCategory = Object.freeze({
 	id: 'prctr.authenticated.layout',
 	scope: 'device',
-	schemaVersion: 2,
 	sensitivity: 'nonSensitive',
 	cleanupOwner: 'prctr.authenticated.navigation'
 });
-const SIDEBAR_KEY = 'prctr.authenticated.layout.v1.sidebarVisible';
+const SIDEBAR_KEY = 'prctr.authenticated.layout.sidebarVisible';
 export class AuthenticatedLayoutState {
 	constructor(private readonly storage?: Pick<Storage, 'getItem' | 'setItem'>) {}
 	get sidebarVisible(): boolean {
@@ -20,7 +19,7 @@ export class AuthenticatedLayoutState {
 	}
 	get primarySide(): 'left' | 'right' {
 		try {
-			return this.storage?.getItem('prctr.authenticated.layout.v2.primarySide') === 'right'
+			return this.storage?.getItem('prctr.authenticated.layout.primarySide') === 'right'
 				? 'right'
 				: 'left';
 		} catch {
@@ -29,7 +28,7 @@ export class AuthenticatedLayoutState {
 	}
 	set primarySide(side: 'left' | 'right') {
 		try {
-			this.storage?.setItem('prctr.authenticated.layout.v2.primarySide', side);
+			this.storage?.setItem('prctr.authenticated.layout.primarySide', side);
 		} catch {
 			/* Session-only fallback. */
 		}

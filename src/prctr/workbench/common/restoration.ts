@@ -7,7 +7,6 @@ export type PresentationScope =
 export interface PresentationCategory {
 	readonly id: string;
 	readonly scope: PresentationScope;
-	readonly schemaVersion: number;
 	readonly sensitivity: 'nonSensitive';
 	readonly cleanupOwner: string;
 }
@@ -26,8 +25,6 @@ export class PresentationCategoryRegistry {
 	register(category: PresentationCategory): void {
 		if (!IDENTIFIER.test(category.id) || !IDENTIFIER.test(category.cleanupOwner))
 			throw new Error('Presentation category identifiers are invalid');
-		if (!Number.isSafeInteger(category.schemaVersion) || category.schemaVersion < 1)
-			throw new RangeError('Presentation category schemaVersion must be positive');
 		if (this.#categories.has(category.id))
 			throw new Error(`Presentation category ${category.id} is already registered`);
 		this.#categories.set(category.id, Object.freeze({ ...category }));

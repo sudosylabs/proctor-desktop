@@ -1,6 +1,5 @@
 {
   "$schema": "./schemas/dependencies.schema.json",
-  "schemaVersion": 1,
   "allowedLicenseExpressions": [
     "(MIT OR Apache-2.0) AND Unicode-3.0",
     "(MIT OR CC0-1.0)",

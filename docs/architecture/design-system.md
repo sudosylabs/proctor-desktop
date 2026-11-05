@@ -120,7 +120,7 @@ must be local, justified, and verified.
 Proctor bundles the GitHub VS Code theme collection. GitHub Dark Default is the
 initial selection. Theme names and JSON assets belong to the packaged catalog;
 light, dark, high-contrast light and high-contrast dark remain scheme categories,
-not a fixed list of four palettes. Legacy selection identifiers resolve through
+not a fixed list of four palettes. The four scheme identifiers used by Attempt Configuration resolve through
 catalog aliases.
 
 Users select `workbench.colorTheme` and edit `workbench.colorCustomizations` in
@@ -137,7 +137,7 @@ Packaged theming participants use the upstream registry and pure CSS collector; 
 Renderer CSS uses the namespaced `--prctr-theme-<color-id>` projection, with dots
 replaced by hyphens. Controls consume their actual roles, including Modern UI
 surface colors, rather than collapsing distinct surfaces into a shared palette.
-The existing Proctor semantic aliases remain a compatibility interface for
+The Proctor semantic aliases remain the interface for
 product-specific feedback and non-color presentation. Native window controls
 receive a closed, validated foreground/background projection. Native menus
 retain operating-system material and selection rendering.

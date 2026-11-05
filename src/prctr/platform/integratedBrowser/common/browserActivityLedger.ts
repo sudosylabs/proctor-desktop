@@ -31,7 +31,6 @@ export interface BrowserActivityLedgerOptions {
 	readonly clock: BrowserActivityClock;
 }
 interface MutableBrowserActivityState {
-	readonly schemaVersion: 1;
 	readonly scope: BrowserActivityScope;
 	readonly sourceInstanceId: string;
 	highestAcknowledged: number;
@@ -355,7 +354,6 @@ function freshState(
 	if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(sourceInstanceId))
 		throw new TypeError('Browser Activity source identity is invalid');
 	return freezeState({
-		schemaVersion: 1,
 		scope,
 		sourceInstanceId,
 		highestAcknowledged: 0,
@@ -373,7 +371,6 @@ function validateState(
 	if (
 		!isRecord(value) ||
 		!hasExactKeys(value, [
-			'schemaVersion',
 			'scope',
 			'sourceInstanceId',
 			'highestAcknowledged',
@@ -382,7 +379,6 @@ function validateState(
 			'gaps',
 			'sealed'
 		]) ||
-		value.schemaVersion !== 1 ||
 		!sameScope(validateScope(value.scope), scope) ||
 		typeof value.sourceInstanceId !== 'string' ||
 		!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(value.sourceInstanceId) ||
@@ -417,7 +413,6 @@ function validateState(
 		return gap.to > lastSequence || (prior !== undefined && prior.to >= gap.from);
 	});
 	const state = freezeState({
-		schemaVersion: 1,
 		scope,
 		sourceInstanceId: value.sourceInstanceId,
 		highestAcknowledged,
@@ -446,7 +441,6 @@ function hasExactCoverage(state: BrowserActivityState): boolean {
 }
 function freezeState(state: BrowserActivityState): BrowserActivityState {
 	return Object.freeze({
-		schemaVersion: 1,
 		scope: validateScope(state.scope),
 		sourceInstanceId: state.sourceInstanceId,
 		highestAcknowledged: state.highestAcknowledged,
@@ -458,7 +452,6 @@ function freezeState(state: BrowserActivityState): BrowserActivityState {
 }
 function thawState(state: BrowserActivityState): MutableBrowserActivityState {
 	return {
-		schemaVersion: 1,
 		scope: state.scope,
 		sourceInstanceId: state.sourceInstanceId,
 		highestAcknowledged: state.highestAcknowledged,
@@ -470,7 +463,6 @@ function thawState(state: BrowserActivityState): MutableBrowserActivityState {
 }
 function snapshotState(state: MutableBrowserActivityState): BrowserActivityState {
 	return Object.freeze({
-		schemaVersion: 1,
 		scope: state.scope,
 		sourceInstanceId: state.sourceInstanceId,
 		highestAcknowledged: state.highestAcknowledged,

@@ -30,8 +30,6 @@ export class ProtectedWorkspaceContent implements ProtectedContentPort {
 			if (
 				!value ||
 				typeof value !== 'object' ||
-				!('version' in value) ||
-				value.version !== 1 ||
 				!('record' in value) ||
 				!value.record ||
 				typeof value.record !== 'object' ||
@@ -47,7 +45,7 @@ export class ProtectedWorkspaceContent implements ProtectedContentPort {
 	}
 	async putRecovery(record: RecoveryRecord): Promise<void> {
 		const encoded = new TextEncoder().encode(
-			JSON.stringify({ version: 1, record }, (_name, value: unknown) =>
+			JSON.stringify({ record }, (_name, value: unknown) =>
 				value instanceof Uint8Array
 					? { $bytes: Buffer.from(value).toString('base64') }
 					: value

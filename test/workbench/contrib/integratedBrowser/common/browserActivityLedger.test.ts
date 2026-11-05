@@ -190,7 +190,6 @@ test('activity ledger rejects cross-source and cross-generation records as corru
 	]) {
 		const store = new Store();
 		store.state = {
-			schemaVersion: 1,
 			scope,
 			sourceInstanceId: 'browser-source:one',
 			highestAcknowledged: 0,
@@ -266,7 +265,6 @@ test('activity ledger rejects unexpected restored fields and invalid blocked con
 	]) {
 		const store = new Store();
 		store.state = {
-			schemaVersion: 1,
 			scope,
 			sourceInstanceId: 'browser-source:one',
 			highestAcknowledged: 0,
@@ -298,7 +296,6 @@ test('activity ledger converts sequence holes and record-gap overlap into an exp
 	});
 	for (const state of [
 		{
-			schemaVersion: 1,
 			scope,
 			sourceInstanceId: 'browser-source:one',
 			highestAcknowledged: 0,
@@ -308,7 +305,6 @@ test('activity ledger converts sequence holes and record-gap overlap into an exp
 			sealed: false
 		},
 		{
-			schemaVersion: 1,
 			scope,
 			sourceInstanceId: 'browser-source:one',
 			highestAcknowledged: 0,
@@ -565,7 +561,6 @@ function applyMutations(
 	mutations: readonly ProtectedBrowserActivityMutation[]
 ): BrowserActivityState {
 	let state = current ?? {
-		schemaVersion: 1 as const,
 		scope: requestedScope,
 		sourceInstanceId,
 		highestAcknowledged: 0,
@@ -614,7 +609,6 @@ function applyMutations(
 		}
 	}
 	return Object.freeze({
-		schemaVersion: 1,
 		scope: state.scope,
 		sourceInstanceId,
 		highestAcknowledged,

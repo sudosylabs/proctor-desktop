@@ -1,6 +1,5 @@
 {
   "$schema": "./schemas/source-boundaries.schema.json",
-  "schemaVersion": 1,
   "sourceRoot": "src/prctr",
   "layers": ["base", "platform", "editor", "workbench", "code"],
   "environments": {

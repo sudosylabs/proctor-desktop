@@ -19,14 +19,12 @@ interface BrandPlatform {
 const manifest = JSON.parse(
 	readFileSync(repositoryPath('resources/branding/manifest.json'), 'utf8')
 ) as {
-	readonly schemaVersion: number;
 	readonly sourceRevision: string;
 	readonly sources: Readonly<Record<string, BrandSource>>;
 	readonly platforms: Readonly<Record<'windows' | 'macos' | 'linux', BrandPlatform>>;
 };
 
 void test('desktop brand copies match the accepted inventory and digests without a source checkout', () => {
-	assert.equal(manifest.schemaVersion, 2);
 	assert.match(manifest.sourceRevision, /^[a-f0-9]{40}$/);
 	const paths = Object.values(manifest.sources).map(({ path }) => path);
 	assert.equal(new Set(paths).size, paths.length);

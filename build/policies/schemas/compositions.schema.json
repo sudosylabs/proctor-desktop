@@ -3,10 +3,9 @@
   "$id": "compositions.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "schemaVersion", "activationPath", "compositions"],
+  "required": ["$schema", "activationPath", "compositions"],
   "properties": {
     "$schema": { "const": "./schemas/compositions.schema.json" },
-    "schemaVersion": { "const": 1 },
     "activationPath": { "$ref": "#/$defs/path" },
     "compositions": {
       "type": "array",

@@ -13,7 +13,6 @@ export interface BrowserPolicyRuleInput {
 	readonly institutionHttpException?: boolean;
 }
 export interface BrowserPolicyInput {
-	readonly schemaVersion: 1;
 	readonly attemptId: string;
 	readonly participationGeneration: number;
 	readonly revision: string;
@@ -34,7 +33,6 @@ export interface BrowserPolicyRule {
 	readonly institutionHttpException: boolean;
 }
 export interface BrowserPolicy {
-	readonly schemaVersion: 1;
 	readonly attemptId: string;
 	readonly participationGeneration: number;
 	readonly revision: string;
@@ -84,7 +82,6 @@ export function validateBrowserPolicy(
 	if (
 		!isRecord(input) ||
 		!hasExactKeys(input, [
-			'schemaVersion',
 			'attemptId',
 			'participationGeneration',
 			'revision',
@@ -95,7 +92,6 @@ export function validateBrowserPolicy(
 	)
 		throw new TypeError('Browser Policy must use the exact supported schema');
 	if (
-		input.schemaVersion !== 1 ||
 		typeof input.attemptId !== 'string' ||
 		!identifierPattern.test(input.attemptId) ||
 		typeof input.revision !== 'string' ||
@@ -179,7 +175,6 @@ export function validateBrowserPolicy(
 		);
 	}
 	return Object.freeze({
-		schemaVersion: 1,
 		attemptId: input.attemptId,
 		participationGeneration: input.participationGeneration as number,
 		revision: input.revision,

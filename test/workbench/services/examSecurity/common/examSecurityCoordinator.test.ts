@@ -32,7 +32,6 @@ import { createExamSecurityCoordinator } from '../../../../../src/prctr/workbenc
 
 function policyFixture(): EffectiveExamSecurityPolicy {
 	return validateEffectiveExamSecurityPolicy({
-		schemaVersion: 1,
 		policyId: 'policy:one',
 		revision: 'policy:revision:one',
 		ordinal: 1,

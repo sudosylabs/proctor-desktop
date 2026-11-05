@@ -32,7 +32,6 @@ interface StoredEvent {
 	readonly digest: string;
 }
 interface SourceSnapshot {
-	readonly version: 1;
 	readonly binding: BrowserSourceBinding;
 	readonly transition: BrowserStartTransition;
 	readonly allocated: number;
@@ -157,7 +156,6 @@ export class BrowserDeliveryService {
 						throw new TypeError('Browser source predecessor scope is invalid');
 				}
 				current = {
-					version: 1,
 					binding: Object.freeze({ ...binding }),
 					transition: Object.freeze({ ...transition }),
 					allocated: 0,
@@ -630,7 +628,6 @@ function validateSnapshot(value: unknown): SourceSnapshot {
 		Object.keys(value).some(
 			(key) =>
 				![
-					'version',
 					'binding',
 					'transition',
 					'allocated',
@@ -648,7 +645,6 @@ function validateSnapshot(value: unknown): SourceSnapshot {
 					'cutoffReceiptCursor'
 				].includes(key)
 		) ||
-		state.version !== 1 ||
 		(state.cutoffReceiptCursor !== undefined &&
 			(typeof state.cutoffReceiptCursor !== 'string' ||
 				state.cutoffReceiptCursor.length < 1 ||

@@ -11,7 +11,6 @@ import {
 } from '../../../../../src/prctr/platform/integratedBrowser/common/browserPolicy.ts';
 
 const policy = validateBrowserPolicy({
-	schemaVersion: 1,
 	attemptId: 'attempt',
 	participationGeneration: 1,
 	revision: 'revision',

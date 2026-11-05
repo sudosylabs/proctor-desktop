@@ -416,7 +416,7 @@ external opener nor unrestricted clipboard access. An absent link adapter render
 plain text. Failed actions show bounded feedback without logging raw errors.
 
 The model, message content and action closures are `windowSession` state and are
-disposed with the window. The private preference adapter stores only versioned
+disposed with the window. The private preference adapter stores only
 booleans, bounded source-filter records and one validated position. Application
 suppression and placement use `device`; profile suppression is bound to
 Institution/principal `principalComposition`; workspace suppression is bound to

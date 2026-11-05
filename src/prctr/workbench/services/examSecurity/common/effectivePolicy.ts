@@ -89,7 +89,6 @@ export type EffectivePolicyScope =
 	| { readonly kind: 'attempt'; readonly attemptId: string }
 	| { readonly kind: 'admission'; readonly admissionScopeId: string };
 export interface EffectiveExamSecurityPolicy {
-	readonly schemaVersion: 1;
 	readonly policyId: string;
 	readonly revision: string;
 	readonly ordinal: number;
@@ -134,7 +133,6 @@ export function validateEffectiveExamSecurityPolicy(value: unknown): EffectiveEx
 	if (
 		!isRecord(value) ||
 		!hasOnly(value, [
-			'schemaVersion',
 			'policyId',
 			'revision',
 			'ordinal',
@@ -160,7 +158,6 @@ export function validateEffectiveExamSecurityPolicy(value: unknown): EffectiveEx
 	)
 		throw new TypeError('Effective Exam Security Policy envelope is invalid');
 	if (
-		value.schemaVersion !== 1 ||
 		!identifiers(value, [
 			'policyId',
 			'institutionId',

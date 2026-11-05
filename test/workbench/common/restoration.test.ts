@@ -33,7 +33,6 @@ test('presentation categories are explicit non-sensitive scoped declarations', (
 	registry.register({
 		id: 'layout.main',
 		cleanupOwner: 'workbench.layout',
-		schemaVersion: 1,
 		scope: 'principalComposition',
 		sensitivity: 'nonSensitive'
 	});
@@ -43,7 +42,6 @@ test('presentation categories are explicit non-sensitive scoped declarations', (
 			registry.register({
 				id: 'layout.main',
 				cleanupOwner: 'workbench.layout',
-				schemaVersion: 1,
 				scope: 'device',
 				sensitivity: 'nonSensitive'
 			}),

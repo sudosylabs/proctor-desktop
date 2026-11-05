@@ -3,10 +3,9 @@
   "$id": "assurance.schema.json",
   "type": "object",
   "additionalProperties": false,
-  "required": ["$schema", "schemaVersion", "invariantSource", "controls"],
+  "required": ["$schema", "invariantSource", "controls"],
   "properties": {
     "$schema": { "const": "./schemas/assurance.schema.json" },
-    "schemaVersion": { "const": 1 },
     "invariantSource": { "$ref": "#/$defs/path" },
     "controls": {
       "type": "array",

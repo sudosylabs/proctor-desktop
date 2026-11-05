@@ -57,7 +57,6 @@ export const commonWorkbenchContributions: readonly WorkbenchContributionRegistr
 				categories.register({
 					id: context.composition.id.replaceAll(':', '.').toLowerCase(),
 					scope: context.composition.restoration.scope,
-					schemaVersion: 1,
 					sensitivity: 'nonSensitive',
 					cleanupOwner: 'prctr.workbench'
 				});

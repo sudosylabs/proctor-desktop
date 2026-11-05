@@ -67,7 +67,6 @@ export function mapServerBrowserPolicy(
 		throw new TypeError('Browser start rule is unavailable');
 	const policy = validateBrowserPolicy(
 		{
-			schemaVersion: 1,
 			attemptId: scope.attemptId,
 			participationGeneration: scope.participationGeneration,
 			revision: wire.policy_revision_id,

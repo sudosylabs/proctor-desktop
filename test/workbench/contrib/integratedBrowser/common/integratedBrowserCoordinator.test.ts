@@ -82,7 +82,6 @@ class Engine implements PrivilegedBrowserEngine {
 }
 function policyInputRevision(revision: string, ordinal: number, digest: string) {
 	return {
-		schemaVersion: 1 as const,
 		attemptId: 'attempt:one',
 		participationGeneration: 3,
 		revision,
@@ -250,7 +249,6 @@ test('policy corrections are exactly validated, Institution-bound, cloned, and f
 	assert.throws(
 		() =>
 			coordinator.replacePolicy({
-				schemaVersion: 1,
 				attemptId: 'attempt:one',
 				participationGeneration: 3,
 				revision: 'browser:2',
@@ -272,7 +270,6 @@ test('policy corrections are exactly validated, Institution-bound, cloned, and f
 	assert.throws(
 		() =>
 			coordinator.replacePolicy({
-				schemaVersion: 1,
 				attemptId: 'attempt:one',
 				participationGeneration: 3,
 				revision: 'browser:2',
@@ -292,7 +289,6 @@ test('policy corrections are exactly validated, Institution-bound, cloned, and f
 		/outside the bound Institution origin/u
 	);
 	const correction = {
-		schemaVersion: 1,
 		attemptId: 'attempt:one',
 		participationGeneration: 3,
 		revision: 'browser:2',
@@ -738,7 +734,6 @@ function applyMutations(
 	mutations: readonly ProtectedBrowserActivityMutation[]
 ): BrowserActivityState {
 	let state = current ?? {
-		schemaVersion: 1 as const,
 		scope: requestedScope,
 		sourceInstanceId,
 		highestAcknowledged: 0,
@@ -773,7 +768,6 @@ function applyMutations(
 		} else sealed = true;
 	}
 	return Object.freeze({
-		schemaVersion: 1,
 		scope: state.scope,
 		sourceInstanceId,
 		highestAcknowledged,

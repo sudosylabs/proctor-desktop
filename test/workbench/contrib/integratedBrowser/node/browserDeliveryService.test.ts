@@ -378,7 +378,6 @@ void test('local loss declaration retries its persisted identity before deliveri
 		`browser_${binding.sourceInstanceId}`,
 		new TextEncoder().encode(
 			JSON.stringify({
-				version: 1,
 				binding,
 				transition: { kind: 'initial' },
 				allocated: 3,
@@ -462,7 +461,6 @@ void test('bounded spool reserves a truthful gap instead of silently dropping a 
 		`browser_${binding.sourceInstanceId}`,
 		new TextEncoder().encode(
 			JSON.stringify({
-				version: 1,
 				binding,
 				transition: { kind: 'initial' },
 				allocated: 8192,
@@ -551,7 +549,6 @@ void test('source sink bounds pending capture and contains synchronously when st
 		now: () => Date.parse(time)
 	});
 	const sink = await factory.create({
-		schemaVersion: 1,
 		attemptId: binding.attemptId,
 		participationGeneration: 1,
 		revision: binding.policyRevision,

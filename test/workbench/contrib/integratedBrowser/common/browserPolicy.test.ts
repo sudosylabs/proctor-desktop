@@ -9,7 +9,6 @@ import {
 import { validateIntegratedBrowserProjection } from '../../../../../src/prctr/platform/integratedBrowser/common/browserProtocol.ts';
 
 const input: BrowserPolicyInput = {
-	schemaVersion: 1,
 	attemptId: 'attempt:one',
 	participationGeneration: 7,
 	revision: 'browser:1',

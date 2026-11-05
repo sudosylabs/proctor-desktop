@@ -44,7 +44,6 @@ export interface BrowserActivityGap {
 	readonly reason: 'corruptStore' | 'lostKey' | 'overflow';
 }
 export interface BrowserActivityState {
-	readonly schemaVersion: 1;
 	readonly scope: BrowserActivityScope;
 	readonly sourceInstanceId: string;
 	readonly highestAcknowledged: number;

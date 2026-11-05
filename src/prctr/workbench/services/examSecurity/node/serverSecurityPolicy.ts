@@ -145,7 +145,6 @@ export function decodeServerSecurityPolicy(
 
 function mapPolicy(wire: PolicyWire): EffectiveExamSecurityPolicy {
 	return validateEffectiveExamSecurityPolicy({
-		schemaVersion: 1,
 		policyId: wire.policy_id,
 		revision: wire.revision,
 		ordinal: wire.ordinal,

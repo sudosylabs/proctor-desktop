@@ -78,7 +78,7 @@ external runtime dependencies.
 
 ## Deterministic generation and localization
 
-Handwritten typed manifests and migration functions remain authorities.
+Handwritten typed manifests remain authorities.
 Deterministic generators derive runtime catalogs, lookup tables, fingerprints,
 schemas, and package metadata without a parallel hand-maintained registry.
 
