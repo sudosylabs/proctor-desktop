@@ -1,0 +1,6 @@
+#!/bin/sh
+# Runs the full check before a push only when this checkout opted in with
+# `git config proctor.prePush full`; otherwise CI is the gate.
+if [ "$(git config --get proctor.prePush)" = "full" ]; then
+	exec npm run check
+fi

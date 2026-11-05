@@ -339,6 +339,7 @@ export const hygieneCheck: Check = {
 					'.editorconfig',
 					'.prettierignore',
 					'.githooks/pre-commit',
+					'.githooks/pre-push',
 					'.npmrc',
 					'.nvmrc',
 					'AGENTS.md',

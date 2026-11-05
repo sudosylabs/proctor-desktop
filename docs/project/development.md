@@ -61,6 +61,11 @@ between the index and working copy so the executed policy is unambiguous.
 Type-aware analysis and the complete test suite belong to `npm run check` and
 CI, not to a misleading mixture of staged source and unstaged dependency types.
 
+A second tracked hook, `.githooks/pre-push`, does nothing by default. In a
+checkout with hooks enabled, `git config proctor.prePush full` makes it run the
+complete `npm run check` before each push; unset the key to turn it off. CI runs
+the same check either way.
+
 ## Real-server identity development
 
 `npm run dev -- --allow-http-loopback` builds the native identity adapter and
