@@ -197,7 +197,7 @@ failure wires. Clear transient native identity buffers within a fixed bound;
 oversized cleanup runs only behind the shared cleanup deadline and poisons the
 utility when completion cannot be proved.
 
-Use `prctr-native-helper-protocol` only for the generated process/session helper
+Use `native-helper-protocol` only for the generated process/session helper
 handshake, operational source configuration, frame boundary, verified-peer
 binding, and normalized facts. Its presence does not imply that a helper
 executable, OS peer verification, entitlement, signed service, or platform

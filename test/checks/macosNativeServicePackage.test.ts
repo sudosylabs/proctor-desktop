@@ -64,10 +64,7 @@ void test('service package activates only fixed root socket service and uses sam
 	assert.ok(daemon.includes(nativeServicePackage.observationSocket));
 	assert.equal(files.filter((file) => file.mode === 0o755).length, 1);
 	const rustService = readFileSync(
-		new URL(
-			'../../native/crates/prctr-native-security-helper/src/macos_service.rs',
-			import.meta.url
-		),
+		new URL('../../native/crates/native-security-helper/src/macos_service.rs', import.meta.url),
 		'utf8'
 	);
 	for (const socket of [

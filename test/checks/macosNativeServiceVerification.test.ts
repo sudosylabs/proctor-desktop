@@ -335,7 +335,7 @@ void test('ASAR allocation size is rejected before the upstream reader allocates
 });
 
 void test('only owned universal signed native addons may live outside ASAR', async () => {
-	for (const name of ['prctr_native_node_bridge.node', 'unapproved.node']) {
+	for (const name of ['native_node_bridge.node', 'unapproved.node']) {
 		const f = await fixture();
 		try {
 			writeFileSync(join(f.root, 'source', name), 'native-fixture');

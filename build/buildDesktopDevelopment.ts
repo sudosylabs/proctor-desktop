@@ -18,23 +18,16 @@ import {
 const outdir = resetBuildOutput('desktop-development');
 execFileSync(
 	'cargo',
-	[
-		'build',
-		'--locked',
-		'--manifest-path',
-		'native/Cargo.toml',
-		'-p',
-		'prctr-desktop-key-custody'
-	],
+	['build', '--locked', '--manifest-path', 'native/Cargo.toml', '-p', 'desktop-key-custody'],
 	{ cwd: repositoryRoot, stdio: 'inherit' }
 );
 const nativeFile =
 	process.platform === 'win32'
-		? 'prctr_desktop_key_custody.dll'
-		: `libprctr_desktop_key_custody.${process.platform === 'darwin' ? 'dylib' : 'so'}`;
+		? 'desktop_key_custody.dll'
+		: `libdesktop_key_custody.${process.platform === 'darwin' ? 'dylib' : 'so'}`;
 cpSync(
 	repositoryPath(`native/target/debug/${nativeFile}`),
-	join(outdir, 'prctr_desktop_key_custody.node')
+	join(outdir, 'desktop_key_custody.node')
 );
 await Promise.all([
 	buildEditorWorker(outdir),

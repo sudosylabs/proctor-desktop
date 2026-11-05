@@ -10,12 +10,12 @@ void test('native test command accepts exact package and target selectors', () =
 	assert.deepEqual(
 		parseNativeTestArguments([
 			'--package',
-			'prctr-display-topology',
+			'display-topology',
 			'--target',
 			'x86_64-pc-windows-msvc'
 		]),
 		{
-			package: 'prctr-display-topology',
+			package: 'display-topology',
 			target: 'x86_64-pc-windows-msvc',
 			help: false
 		}
@@ -23,7 +23,7 @@ void test('native test command accepts exact package and target selectors', () =
 });
 
 void test('native test command rejects ambiguous or unsafe selectors', () => {
-	assert.throws(() => parseNativeTestArguments(['prctr-display-topology']), /Unknown/);
+	assert.throws(() => parseNativeTestArguments(['display-topology']), /Unknown/);
 	assert.throws(() => parseNativeTestArguments(['--package', '../outside']), /exact selector/);
 	assert.throws(() => parseNativeTestArguments(['--target', 'windows']), /target triple/);
 	assert.throws(
@@ -33,12 +33,12 @@ void test('native test command rejects ambiguous or unsafe selectors', () => {
 });
 
 void test('native test command admits only workspace packages and built-in Rust targets', () => {
-	const packages = new Set(['prctr-display-topology']);
+	const packages = new Set(['display-topology']);
 	const targets = new Set(['x86_64-pc-windows-msvc']);
 	assert.doesNotThrow(() =>
 		validateNativeTestSelection(
 			{
-				package: 'prctr-display-topology',
+				package: 'display-topology',
 				target: 'x86_64-pc-windows-msvc',
 				help: false
 			},
@@ -67,7 +67,7 @@ void test('native test command admits only workspace packages and built-in Rust 
 void test('native test command keeps package and target scope on the promised phases', () => {
 	assert.deepEqual(
 		planNativeTestCommands({
-			package: 'prctr-display-topology',
+			package: 'display-topology',
 			target: 'x86_64-pc-windows-msvc',
 			help: false
 		}),
@@ -79,7 +79,7 @@ void test('native test command keeps package and target scope on the promised ph
 					'--manifest-path',
 					'native/Cargo.toml',
 					'--package',
-					'prctr-display-topology',
+					'display-topology',
 					'--',
 					'--check'
 				]
@@ -92,7 +92,7 @@ void test('native test command keeps package and target scope on the promised ph
 					'--manifest-path',
 					'native/Cargo.toml',
 					'--package',
-					'prctr-display-topology',
+					'display-topology',
 					'--all-targets',
 					'--target',
 					'x86_64-pc-windows-msvc',
@@ -109,7 +109,7 @@ void test('native test command keeps package and target scope on the promised ph
 					'--manifest-path',
 					'native/Cargo.toml',
 					'--package',
-					'prctr-display-topology',
+					'display-topology',
 					'--target',
 					'x86_64-pc-windows-msvc'
 				]

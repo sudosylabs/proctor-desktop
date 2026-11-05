@@ -14,7 +14,7 @@ export const nativeServicePackage = Object.freeze({
 	plistName: 'com.proctor.native.plist',
 	bundleIdentifier: 'com.proctor.native.service',
 	bundlePath: 'Contents/Helpers/ProctorNativeService.app',
-	executable: 'prctr-native-security-helper',
+	executable: 'native-security-helper',
 	controlSocket: '/var/run/com.proctor.native.control',
 	observationSocket: '/var/run/com.proctor.native.observation'
 });

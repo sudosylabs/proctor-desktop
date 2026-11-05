@@ -17,10 +17,9 @@ const VIRTUALIZATION_AUTHORITY = 'native/schemas/virtualization-state.schema.jso
 const NETWORK_CONFIGURATION_AUTHORITY = 'native/schemas/network-configuration-state.schema.json';
 const MEDIA_DEVICE_AUTHORITY = 'native/schemas/media-device-state.schema.json';
 const NATIVE_HELPER_AUTHORITY = 'native/schemas/native-helper.schema.json';
-const RUST_OUTPUT = 'native/crates/prctr-native-protocol/src/generated.rs';
+const RUST_OUTPUT = 'native/crates/native-protocol/src/generated.rs';
 const TYPESCRIPT_OUTPUT = 'src/prctr/platform/native/common/nativeObservation.generated.ts';
-const NATIVE_HELPER_RUST_OUTPUT =
-	'native/crates/prctr-native-protocol/src/native_helper.generated.rs';
+const NATIVE_HELPER_RUST_OUTPUT = 'native/crates/native-protocol/src/native_helper.generated.rs';
 
 type CapabilityDescriptor = {
 	readonly sourceId: string;
@@ -75,7 +74,7 @@ function capabilityDescriptor(
 		sourceId,
 		generatorId: `${sourceId}.protocol`,
 		authority,
-		rustOutput: `native/crates/prctr-native-protocol/src/${sourceId.replaceAll('-', '_')}.generated.rs`,
+		rustOutput: `native/crates/native-protocol/src/${sourceId.replaceAll('-', '_')}.generated.rs`,
 		drainType: `${typePrefix}Drain`,
 		schemaVersionConstant: `${snakePrefix}_SCHEMA_VERSION`,
 		maximumFactsConstant: `MAX_${snakePrefix}_FACTS`,

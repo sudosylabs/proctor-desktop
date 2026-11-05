@@ -6,12 +6,12 @@ import { build, type BuildOptions } from 'esbuild';
 import { nodeTarget, repositoryRoot, repositoryPath, resetBuildOutput } from './lib/paths.ts';
 
 const outputDirectory = resetBuildOutput('security-utility');
-const nativeOutput = join(outputDirectory, 'prctr_native_node_bridge.node');
+const nativeOutput = join(outputDirectory, 'native_node_bridge.node');
 const buildIdentity = sourceBuildIdentity();
 
 execFileSync(
 	'cargo',
-	['build', '--locked', '--manifest-path', 'native/Cargo.toml', '-p', 'prctr-native-node-bridge'],
+	['build', '--locked', '--manifest-path', 'native/Cargo.toml', '-p', 'native-node-bridge'],
 	{ stdio: 'inherit', cwd: repositoryRoot }
 );
 cpSync(repositoryPath(nativeLibraryPath()), nativeOutput);
@@ -66,10 +66,10 @@ writeFileSync(
 
 function nativeLibraryPath(): string {
 	if (process.platform === 'win32') {
-		return 'native/target/debug/prctr_native_node_bridge.dll';
+		return 'native/target/debug/native_node_bridge.dll';
 	}
 	const extension = process.platform === 'darwin' ? 'dylib' : 'so';
-	return `native/target/debug/libprctr_native_node_bridge.${extension}`;
+	return `native/target/debug/libnative_node_bridge.${extension}`;
 }
 
 function sourceBuildIdentity(): string {

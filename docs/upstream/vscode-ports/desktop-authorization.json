@@ -135,7 +135,7 @@
       "localPaths": [
         "src/prctr/platform/identity/electron-main/nativeDesktopKeyCustody.ts",
         "src/prctr/platform/identity/electron-main/desktopCredentialStore.ts",
-        "native/crates/prctr-desktop-key-custody/src/lib.rs"
+        "native/crates/desktop-key-custody/src/lib.rs"
       ],
       "verificationRefs": ["authorization-tests", "native-electron"]
     }
