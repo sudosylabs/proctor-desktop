@@ -384,7 +384,7 @@ export class ServerWorkspaceAuthority implements AuthoritativeWorkspacePort {
 			{
 				path: { exam_attempt_id: scope.attemptId },
 				header: headers(scope),
-				query: { after_cursor: cursor, limit: 200 }
+				query: { workspace_cursor: cursor, limit: 200 }
 			},
 			{ signal: this.#lifetime.signal }
 		);

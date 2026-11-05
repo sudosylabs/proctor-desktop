@@ -35,10 +35,14 @@ export function credential(value: unknown): string {
 	if (!/^[A-Za-z0-9_-]{43}$/.test(text)) throw new DesktopAuthorizationError('rejected');
 	return text;
 }
+/** Reads a server RFC 3339 UTC instant as epoch milliseconds that is still in the future. */
 export function expiry(value: unknown): number {
-	if (!Number.isSafeInteger(value) || Number(value) <= Date.now() || Number(value) > 8.64e15)
+	if (typeof value !== 'string' || value.length > 40 || !/Z$/u.test(value))
 		throw new DesktopAuthorizationError('rejected');
-	return Number(value);
+	const time = Date.parse(value);
+	if (!Number.isSafeInteger(time) || time <= Date.now() || time > 8.64e15)
+		throw new DesktopAuthorizationError('rejected');
+	return time;
 }
 export function errorCode(result: DesktopHttpResult): string | undefined {
 	if (!result.value || typeof result.value !== 'object') return undefined;

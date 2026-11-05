@@ -186,7 +186,7 @@ interface SequenceRange {
 }
 interface DeclareDeliveryGaps {
   declaration_id: OpaqueID;
-  expected_declaration_revision: SafeInt;
+  expected_revision: SafeInt; // The source's current declaration_revision.
   allocated_through_sequence: SafeInt;
   ranges: SequenceRange[]; // 1..32, sorted, disjoint, non-adjacent.
   reason: 'spool_corrupt' | 'spool_lost' | 'local_capacity_exhausted';
@@ -285,18 +285,19 @@ sequence or accepted live-control allocated watermark at that instant.
 ```typescript
 interface FinalDeliveryDeclaration {
   declaration_id: OpaqueID;
-  expected_declaration_revision: SafeInt;
+  expected_revision: SafeInt; // The source's current declaration_revision.
   final_sequence: SafeInt;
 }
+// Absent members are omitted, never null. An open delivery carries only unknown_tail.
 interface DeliveryClosure {
-  closed_at: Instant | null;
-  close_reason: DeliveryCloseReason | null;
-  known_at_close: SafeInt | null;
-  final_sequence: SafeInt | null;
-  final_declaration_id: OpaqueID | null;
-  final_boundary_origin: 'client_declared' | 'server_known' | null;
+  closed_at?: Instant;
+  close_reason?: DeliveryCloseReason;
+  known_at_close?: SafeInt;
+  final_sequence?: SafeInt;
+  final_declaration_id?: OpaqueID;
+  final_boundary_origin?: 'client_declared' | 'server_known';
   unknown_tail: boolean;
-  upload_expires_at: Instant | null;
+  upload_expires_at?: Instant;
 }
 type DeliveryCloseReason =
   | 'submission'
@@ -562,8 +563,8 @@ interface UnretainedDeliverySummary {
   summary_sequence: PositiveInt;
   unretained_record_count: SafeInt;
   count_complete: boolean;
-  first_unretained_at: Instant | null;
-  last_unretained_at: Instant | null;
+  first_unretained_at?: Instant; // Omitted, never null, when unknown.
+  last_unretained_at?: Instant;
 }
 ```
 

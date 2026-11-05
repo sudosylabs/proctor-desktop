@@ -1,7 +1,9 @@
 import {
 	accountRecord as record,
 	accountId,
+	accountInstant,
 	accountList,
+	accountPage,
 	validateAccountResponse,
 	type AccountData,
 	type AccountBinding
@@ -51,7 +53,7 @@ export function readAccountSecurity(methods: unknown, mfa: unknown): AccountData
 export function readAccountSessions(raw: unknown, binding: AccountBinding): AccountData {
 	return checked({
 		section: 'sessions',
-		sessions: accountList(raw).map((value) => {
+		sessions: accountPage(raw).map((value) => {
 			const s = record(value);
 			if (accountId(s.user_id) !== binding.principalId)
 				throw new TypeError('Account binding mismatch');
@@ -61,9 +63,9 @@ export function readAccountSessions(raw: unknown, binding: AccountBinding): Acco
 				name: s.device_name ?? '',
 				client: s.client_type,
 				method: s.authentication_method,
-				createdAt: s.create_at,
-				lastActivityAt: s.last_activity_at,
-				expiresAt: s.expires_at
+				createdAt: accountInstant(s.created_at),
+				lastActivityAt: accountInstant(s.last_activity_at),
+				expiresAt: accountInstant(s.expires_at)
 			};
 		})
 	});
@@ -71,7 +73,7 @@ export function readAccountSessions(raw: unknown, binding: AccountBinding): Acco
 export function readAccountDesktops(raw: unknown, currentRegistrationId: string): AccountData {
 	return checked({
 		section: 'desktops',
-		desktops: accountList(raw).map((value) => {
+		desktops: accountPage(raw).map((value) => {
 			const d = record(value);
 			if (
 				d.current !== (d.id === currentRegistrationId) ||
@@ -84,8 +86,8 @@ export function readAccountDesktops(raw: unknown, currentRegistrationId: string)
 				name: d.display_name,
 				platform: d.platform,
 				release: d.desktop_release,
-				createdAt: d.created_at,
-				lastUsedAt: d.last_used_at,
+				createdAt: accountInstant(d.created_at),
+				lastUsedAt: accountInstant(d.last_used_at),
 				revoked: d.status === 'revoked'
 			};
 		})

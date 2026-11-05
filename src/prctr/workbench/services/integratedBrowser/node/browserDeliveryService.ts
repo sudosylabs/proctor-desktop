@@ -47,7 +47,7 @@ interface SourceSnapshot {
 	readonly summarySentAt?: number;
 	readonly stopDetailsKey?: string;
 	readonly budget?: components['schemas']['DeliveryFamilyBudget'];
-	readonly cutoffReceiptCursor?: number;
+	readonly cutoffReceiptCursor?: string;
 }
 export class BrowserSpoolCapacityError extends Error {
 	constructor() {
@@ -313,17 +313,19 @@ export class BrowserDeliveryService {
 	/** Recover exact receipts after a lost response, including accepted content beyond a permanent gap. */
 	recoverReceipts(source: string): Promise<void> {
 		return this.enqueue(async () => {
-			let first = 1;
-			while (true) {
+			let cursor: string | undefined;
+			let previous = 0;
+			for (let pages = 0; ; pages++) {
 				const state = this.source(source);
-				const page = await this.transport.receipts(state.binding, first);
-				if (page.receipts.some((receipt) => receipt.sequence < first))
-					throw new TypeError('Browser receipt page regressed');
-				await this.applyReceipts(source, page.receipts);
-				if (page.next_sequence === null) break;
-				if (page.next_sequence <= first || page.next_sequence > state.allocated + 1)
+				if (pages > state.allocated + 1)
 					throw new TypeError('Browser receipt cursor is invalid');
-				first = page.next_sequence;
+				const page = await this.transport.receipts(state.binding, cursor);
+				previous = assertReceiptPage(page.items, previous, state.allocated);
+				await this.applyReceipts(source, page.items);
+				if (page.next_cursor === undefined) break;
+				if (page.next_cursor === cursor)
+					throw new TypeError('Browser receipt cursor is invalid');
+				cursor = page.next_cursor;
 			}
 		});
 	}
@@ -334,7 +336,7 @@ export class BrowserDeliveryService {
 			if (!state.finalDeclaration) {
 				const finalDeclaration = {
 					declaration_id: randomUUID(),
-					expected_declaration_revision: state.status.declaration_revision,
+					expected_revision: state.status.declaration_revision,
 					final_sequence: state.allocated
 				};
 				await this.commit({ ...state, finalDeclaration });
@@ -378,14 +380,14 @@ export class BrowserDeliveryService {
 					(prior?.count_complete ?? true) && complete && Number.isSafeInteger(nextCount),
 				first_unretained_at:
 					time === null
-						? (prior?.first_unretained_at ?? null)
+						? prior?.first_unretained_at
 						: prior?.first_unretained_at &&
 							  Date.parse(prior.first_unretained_at) < Date.parse(time)
 							? prior.first_unretained_at
 							: time,
 				last_unretained_at:
 					time === null
-						? (prior?.last_unretained_at ?? null)
+						? prior?.last_unretained_at
 						: prior?.last_unretained_at &&
 							  Date.parse(prior.last_unretained_at) > Date.parse(time)
 							? prior.last_unretained_at
@@ -417,20 +419,17 @@ export class BrowserDeliveryService {
 		) {
 			// Receipt recovery precedes omission accounting. New summary-only capture may continue
 			// while this network call is pending; its counts must survive this transaction.
-			const first = state.cutoffReceiptCursor ?? 1;
-			const page = await this.transport.receipts(state.binding, first);
+			const cursor = state.cutoffReceiptCursor;
+			const page = await this.transport.receipts(state.binding, cursor);
 			await this.enqueue(async () => {
 				state = this.source(source);
-				if (
-					page.receipts.some((receipt) => receipt.sequence < first) ||
-					(page.next_sequence !== null &&
-						(page.next_sequence <= first || page.next_sequence > state.allocated + 1))
-				)
+				assertReceiptPage(page.items, 0, state.allocated);
+				if (page.next_cursor !== undefined && page.next_cursor === cursor)
 					throw new TypeError('Browser receipt cursor is invalid');
-				await this.applyReceipts(source, page.receipts);
+				await this.applyReceipts(source, page.items);
 				state = this.source(source);
-				if (page.next_sequence !== null) {
-					await this.commit({ ...state, cutoffReceiptCursor: page.next_sequence });
+				if (page.next_cursor !== undefined) {
+					await this.commit({ ...state, cutoffReceiptCursor: page.next_cursor });
 				} else {
 					for (const { record } of state.records)
 						state = this.summarize(
@@ -462,7 +461,7 @@ export class BrowserDeliveryService {
 							...current,
 							pendingGap: {
 								declaration_id: randomUUID(),
-								expected_declaration_revision: current.status!.declaration_revision,
+								expected_revision: current.status!.declaration_revision,
 								allocated_through_sequence: current.allocated,
 								ranges: current.lossRanges!,
 								reason: 'local_capacity_exhausted'
@@ -650,6 +649,10 @@ function validateSnapshot(value: unknown): SourceSnapshot {
 				].includes(key)
 		) ||
 		state.version !== 1 ||
+		(state.cutoffReceiptCursor !== undefined &&
+			(typeof state.cutoffReceiptCursor !== 'string' ||
+				state.cutoffReceiptCursor.length < 1 ||
+				state.cutoffReceiptCursor.length > 2048)) ||
 		!Number.isSafeInteger(state.allocated) ||
 		state.allocated < 0 ||
 		state.allocated > 50_000 ||
@@ -735,4 +738,19 @@ function freezeSnapshot<T>(value: T): T {
 		Object.freeze(value);
 	}
 	return value;
+}
+
+/** Receipts are strictly ascending within and across pages and never exceed the allocated sequence. */
+function assertReceiptPage(
+	items: readonly { readonly sequence: number }[],
+	previous: number,
+	allocated: number
+): number {
+	let last = previous;
+	for (const { sequence } of items) {
+		if (sequence <= last || sequence > allocated)
+			throw new TypeError('Browser receipt page regressed');
+		last = sequence;
+	}
+	return last;
 }

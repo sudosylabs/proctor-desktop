@@ -285,12 +285,6 @@ void test('workspace foundation composes real server reads and recovery behind a
 				workspace_mutation_allowed: true,
 				submission_allowed: true,
 				browser: { state: 'disabled' },
-				terminal: {
-					state: 'disabled',
-					applied_workspace_cursor: 0,
-					environment_epoch: null,
-					projection_state: 'unavailable'
-				},
 				exam_revision: {
 					admission_revision_id: id,
 					current_revision_id: id,

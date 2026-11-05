@@ -114,6 +114,17 @@ export function accountList(value: unknown, limit = 256): unknown[] {
 	if (!Array.isArray(value) || value.length > limit) throw new TypeError('Invalid account list');
 	return value;
 }
+/** Reads one page of a server collection; only its first page is presented. */
+export function accountPage(value: unknown, limit = 256): unknown[] {
+	return accountList(accountRecord(value).items, limit);
+}
+/** Reads a server RFC 3339 UTC instant as epoch milliseconds; absence stays absent. */
+export function accountInstant(value: unknown): number | undefined {
+	if (value === undefined) return undefined;
+	if (typeof value !== 'string' || value.length > 40 || !/Z$/u.test(value))
+		throw new TypeError('Invalid account timestamp');
+	return accountTime(Date.parse(value));
+}
 export function validateAccountIntent(value: unknown): AccountIntent {
 	const input = accountRecord(value);
 	if (input.kind === 'readPhoto' && Object.keys(input).length === 1) return { kind: 'readPhoto' };

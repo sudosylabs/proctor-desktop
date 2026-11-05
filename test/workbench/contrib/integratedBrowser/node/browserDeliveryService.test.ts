@@ -40,14 +40,7 @@ function status(scope = binding): BrowserSourceStatus {
 		missing_ranges: [],
 		missing_ranges_truncated: false,
 		closure: {
-			close_reason: null,
-			closed_at: null,
-			final_boundary_origin: null,
-			final_declaration_id: null,
-			final_sequence: null,
-			known_at_close: null,
-			unknown_tail: false,
-			upload_expires_at: null
+			unknown_tail: false
 		},
 		declaration_revision: 0,
 		detail_mode: 'collecting',
@@ -144,7 +137,7 @@ function transport(overrides: Partial<BrowserSourceTransport> = {}): BrowserSour
 			};
 		},
 		async receipts() {
-			return { receipts: [], next_sequence: null };
+			return { items: [] };
 		},
 		async seal(scope, declaration) {
 			return {

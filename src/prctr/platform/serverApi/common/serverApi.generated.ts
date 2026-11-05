@@ -35,7 +35,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Create an Institution- or Academic-Unit-owned Academic Period
-         * @description Creates one named Academic Period under the exact Institution or Academic Unit owner after terminal scope authorization. The inclusive start and exclusive end are Unix-millisecond instants, and an optional Idempotency-Key makes uncertain retries safe.
+         * @description Creates one named Academic Period under the exact Institution or Academic Unit owner after terminal scope authorization. The inclusive start and exclusive end are RFC 3339 instants, and an optional Idempotency-Key makes uncertain retries safe.
          */
         readonly post: operations["createAcademicPeriod"];
         readonly delete?: never;
@@ -261,7 +261,7 @@ export interface paths {
         };
         /**
          * List effective-dated organizational members
-         * @description Lists authorized current or historical organizational memberships for one Academic Unit at the requested effective instant. Membership describes a relationship only and is never presented as an unrestricted permission grant. Bounded pages use immutable (user_id, id) ordering. The next Link freezes the effective instant or history filter, but pages are a live view: later membership edits and insertions can change later results; no database snapshot is retained across requests.
+         * @description Lists authorized current or historical organizational memberships for one Academic Unit at the requested effective instant. Membership describes a relationship only and is never presented as an unrestricted permission grant. Bounded pages use immutable (user_id, id) ordering. The next_cursor freezes the effective instant or history filter, but pages are a live view: later membership edits and insertions can change later results; no database snapshot is retained across requests.
          */
         readonly get: operations["listAcademicUnitMembers"];
         readonly put?: never;
@@ -601,7 +601,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Terminally cancel the browser-bound Desktop transaction
-         * @description Validates the binding cookie and exact pinned state before terminally cancelling the transaction and destroying every remaining browser and code proof.
+         * @description Validates the binding cookie and exact pinned state before terminally canceling the transaction and destroying every remaining browser and code proof.
          */
         readonly post: operations["cancelDesktopAuthorization"];
         readonly delete?: never;
@@ -644,6 +644,26 @@ export interface paths {
          * @description Atomically consumes the code only when state and PKCE match and no active Attempt currently owns the account Session lock.
          */
         readonly post: operations["exchangeDesktopAuthorizationCode"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/auth/email-change/undo": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Undo an email change from the previous address
+         * @description Consumes the single-use undo token Proctor mails to an account's previous address when its email changes. Within the configured undo window it restores that address as the verified account email, cancels pending verification and password-reset links, signs out every Session of the account, and records an audit event. An invalid, expired, or already used token reveals no account details; a previous address that another account now holds is refused.
+         */
+        readonly post: operations["undoEmailChange"];
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -701,7 +721,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Create an interactive session
-         * @description Authenticates a local credential and creates an interactive Session for the declared client type. Browser clients receive host-only cookies while native clients may consume response tokens; MFA-enabled accounts must include a current TOTP or unused recovery code. Authentication failures do not reveal which credential was wrong. Requires Content-Type application/json, optionally with charset=utf-8. Cross-origin browser requests and invalid media types return request.invalid before credential verification or cookie issuance; native clients may omit browser origin headers.
+         * @description Authenticates a local credential and creates an interactive Session for the declared client type. Browser clients receive host-only cookies while native clients may consume response tokens; MFA-enabled accounts must include a current TOTP or unused recovery code. Authentication failures do not reveal which credential was wrong. Every rate-limit-admitted success or failure is durably audited; if that audit cannot be recorded the login fails with audit.unavailable and issues no usable Session. Requires Content-Type application/json, optionally with charset=utf-8. Cross-origin browser requests and invalid media types return request.invalid before credential verification or cookie issuance; native clients may omit browser origin headers.
          */
         readonly post: operations["login"];
         readonly delete?: never;
@@ -964,6 +984,26 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/authentication-methods/password/change": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Replace the current User's local password after strong recent authentication
+         * @description Replaces the current User's existing local password when Access Policy permits local login and the interactive Session has strong recent assurance. The new password must satisfy the password policy: it must fit the configured length bounds and must not be a common password, a simple pattern, derived from the account's username, email local part, or name, or one of the account's recent passwords. The calling Session stays signed in; every other Session of the User is revoked, outstanding password-reset links stop working, and the account address receives a password-changed notice.
+         */
+        readonly post: operations["changePassword"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/authentication-methods/providers/{external_identity_id}": {
         readonly parameters: {
             readonly query?: never;
@@ -1123,7 +1163,7 @@ export interface paths {
         };
         /**
          * List active or historical student enrollments for a Class
-         * @description Lists authorized student enrollments for one Class at the requested effective instant or across retained history. The roster projection contains relationship state and does not expand student credentials, answers, or unrestricted profile data. Bounded pages use immutable (user_id, id) ordering. The next Link freezes the effective instant or history filter, but pages are a live view: later membership edits and insertions can change later results; no database snapshot is retained across requests.
+         * @description Lists authorized student enrollments for one Class at the requested effective instant or across retained history. The roster projection contains relationship state and does not expand student credentials, answers, or unrestricted profile data. Bounded pages use immutable (user_id, id) ordering. The next_cursor freezes the effective instant or history filter, but pages are a live view: later membership edits and insertions can change later results; no database snapshot is retained across requests.
          */
         readonly get: operations["listClassMembers"];
         readonly put?: never;
@@ -1294,7 +1334,7 @@ export interface paths {
         };
         /**
          * Read bounded per-event Browser receipts
-         * @description Return up to 64 retained receipts in ascending sequence order, omitting missing positions. next_sequence is the first retained sequence on the next page or null. Response is bounded at 16 KiB; current registered-key ownership and live Connection rules apply.
+         * @description Return up to 64 retained receipts in ascending sequence order, omitting missing positions. next_cursor continues at the next retained receipt and is omitted on the last page. Response is bounded at 16 KiB; current registered-key ownership and live Connection rules apply.
          */
         readonly get: operations["browserDeliveryReceipts"];
         readonly put?: never;
@@ -1728,7 +1768,7 @@ export interface paths {
         };
         /**
          * List ordered acknowledged Workspace changes
-         * @description Returns acknowledged Workspace mutations after the supplied journal cursor in strict order for the active candidate Attempt. If retained history can no longer bridge the cursor, the response explicitly instructs the client to reload the full manifest.
+         * @description Returns acknowledged Workspace mutations after the supplied workspace_cursor in strict order for the active candidate Attempt. If retained history can no longer bridge the cursor, the response explicitly instructs the client to reload the full manifest.
          */
         readonly get: operations["listCandidateExamWorkspaceChanges"];
         readonly put?: never;
@@ -1975,52 +2015,6 @@ export interface paths {
          * @description Replaces the complete closed Browser Policy value at the expected Draft revision. Disabled policies contain no rules; enabled policies use canonical HTTPS origins and deterministic path and host matching.
          */
         readonly put: operations["configureExamDraftBrowserPolicy"];
-        readonly post?: never;
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
-    readonly "/api/v1/exams/{exam_id}/draft/execution-images": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path: {
-                /** @description The Exam identifier. */
-                readonly exam_id: components["parameters"]["ExamID"];
-            };
-            readonly cookie?: never;
-        };
-        /**
-         * List safe execution image choices available for Exam authoring
-         * @description Returns the stable identifiers and permitted network modes of execution images available for the current Exam Draft. Registry coordinates, credentials, internal runtime metadata, and unavailable images are not exposed.
-         */
-        readonly get: operations["listExamExecutionImages"];
-        readonly put?: never;
-        readonly post?: never;
-        readonly delete?: never;
-        readonly options?: never;
-        readonly head?: never;
-        readonly patch?: never;
-        readonly trace?: never;
-    };
-    readonly "/api/v1/exams/{exam_id}/draft/execution-profile": {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path: {
-                /** @description The Exam identifier. */
-                readonly exam_id: components["parameters"]["ExamID"];
-            };
-            readonly cookie?: never;
-        };
-        readonly get?: never;
-        /**
-         * Replace the execution profile on the active Exam Draft
-         * @description Replaces the Draft's complete execution profile at the expected Draft revision. The selected image and network mode must be present in the current safe catalog; disabling execution still records an explicit, validated profile.
-         */
-        readonly put: operations["configureExamDraftExecutionProfile"];
         readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
@@ -2758,6 +2752,33 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/suspend": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Suspend (kick) one exact active Exam Attempt
+         * @description An Exam Manager's immediate manual control. Ends the active Participation generation as kicked, closes its open Connection, and opens one manual suspension episode without an Integrity Flag. The suspended Attempt denies connections, workspace and exam-material access, and candidate submission until an authorized re-allow. The candidate sees only the safe manager_suspended reason; the private manager reason is retained only in suspension provenance. PostgreSQL time bounds the kick: once the Sitting's scheduled end is reached it fails with exam.attempt.sitting_not_open, and when the generation's lease has already lapsed the server records that Connection Loss (Flag, evidence, and policy suspension) and fails with exam.attempt.connection_lost instead of ending the generation as kicked.
+         */
+        readonly post: operations["suspendExamAttempt"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/cancel": {
         readonly parameters: {
             readonly query?: never;
@@ -2894,7 +2915,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Create a Sitting export
-         * @description Requires an interactive Session and the separate exam.records.export permission through the current Exam Manager and exact Academic Unit membership, or its scoped override. Ordinary Submission view authority is also required for every selected Submission; Sitting exports additionally require Sitting view. Integrity exports additionally require current exact Exam Manager membership and the dedicated Browser Activity view permission on creation, replay, metadata read and download. The general export override cannot bypass these history checks. Candidate self-access is excluded. Personal Access Tokens are forbidden. Select work, integrity, or both explicitly. The entire selected scope is frozen atomically; no partial Sitting archive is returned. Initial limits are 200 Submissions, 50,000 workspace entries, 50,000 structured records, 8 GiB original bytes and 64 MiB structured JSON. Exceeding a limit rejects the request. A configured export period from 1 through 7 days is required; zero leaves exports unconfigured and must be changed explicitly before creation. Expiry starts at request creation, with at most 24 hours for construction. Audit, finite Job and exact category source protections commit together. Retries return the same export and never extend its expiry. The archive contains original workspace files, structured records, a versioned manifest and SHA-256 hashes. Re-import is not supported.
+         * @description Requires an interactive Session and the separate exam.records.export permission through the current Exam Manager and exact Academic Unit membership, or its scoped override. Ordinary Submission view authority is also required for every selected Submission; Sitting exports additionally require Sitting view. Integrity exports additionally require current exact Exam Manager membership and the dedicated Browser Activity view permission on creation, replay, metadata read and download. The general export override cannot bypass these history checks. Candidate self-access is excluded. Personal Access Tokens are forbidden. Select work, integrity, or both explicitly. The entire selected scope is frozen atomically; no partial Sitting archive is returned. Initial limits are 200 Submissions, 50,000 workspace entries, 50,000 structured records, 8 GiB original bytes and 64 MiB structured JSON. Exceeding a limit rejects the request. A configured export period from 1 through 7 days is required; zero leaves exports unconfigured and must be changed explicitly before creation. Expiry starts at request creation, with at most 24 hours for construction. Audit, finite Job and exact category source protections commit together. Retries return the same export and never extend its expiry. The archive contains original workspace files, structured records, a manifest and SHA-256 hashes. Re-import is not supported.
          */
         readonly post: operations["createSittingExport"];
         readonly delete?: never;
@@ -3078,7 +3099,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Create a Submission export
-         * @description Requires an interactive Session and the separate exam.records.export permission through the current Exam Manager and exact Academic Unit membership, or its scoped override. Ordinary Submission view authority is also required for every selected Submission; Sitting exports additionally require Sitting view. Integrity exports additionally require current exact Exam Manager membership and the dedicated Browser Activity view permission on creation, replay, metadata read and download. The general export override cannot bypass these history checks. Candidate self-access is excluded. Personal Access Tokens are forbidden. Select work, integrity, or both explicitly. The entire selected scope is frozen atomically; no partial Sitting archive is returned. Initial limits are 200 Submissions, 50,000 workspace entries, 50,000 structured records, 8 GiB original bytes and 64 MiB structured JSON. Exceeding a limit rejects the request. A configured export period from 1 through 7 days is required; zero leaves exports unconfigured and must be changed explicitly before creation. Expiry starts at request creation, with at most 24 hours for construction. Audit, finite Job and exact category source protections commit together. Retries return the same export and never extend its expiry. The archive contains original workspace files, structured records, a versioned manifest and SHA-256 hashes. Re-import is not supported.
+         * @description Requires an interactive Session and the separate exam.records.export permission through the current Exam Manager and exact Academic Unit membership, or its scoped override. Ordinary Submission view authority is also required for every selected Submission; Sitting exports additionally require Sitting view. Integrity exports additionally require current exact Exam Manager membership and the dedicated Browser Activity view permission on creation, replay, metadata read and download. The general export override cannot bypass these history checks. Candidate self-access is excluded. Personal Access Tokens are forbidden. Select work, integrity, or both explicitly. The entire selected scope is frozen atomically; no partial Sitting archive is returned. Initial limits are 200 Submissions, 50,000 workspace entries, 50,000 structured records, 8 GiB original bytes and 64 MiB structured JSON. Exceeding a limit rejects the request. A configured export period from 1 through 7 days is required; zero leaves exports unconfigured and must be changed explicitly before creation. Expiry starts at request creation, with at most 24 hours for construction. Audit, finite Job and exact category source protections commit together. Retries return the same export and never extend its expiry. The archive contains original workspace files, structured records, a manifest and SHA-256 hashes. Re-import is not supported.
          */
         readonly post: operations["createSubmissionExport"];
         readonly delete?: never;
@@ -3708,6 +3729,69 @@ export interface paths {
          * @description Durably queues the fixed test template to the current operator's verified eligible address. The server chooses the recipient and content, applies a dedicated rate limit, and returns only safe delivery metadata.
          */
         readonly post: operations["sendControlledTestMail"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/mfa/keys": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * Inspect the MFA key ring and the live secrets each key seals
+         * @description Returns the non-secret identifier of this node's configured MFA primary key, the primary-key fence that the last rekey installed, and, per sealing key, how many live TOTP secrets it seals and whether this node's ring holds it. Use it to plan a rotation and to confirm a retiring key seals nothing before removing it from configuration. No key bytes, ciphertext, or account identities are returned.
+         */
+        readonly get: operations["inspectMFAKeyState"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/mfa/rekey": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Start a durable fenced rotation of the MFA secret key
+         * @description Fences the MFA key ring on this node's configured primary key and starts one durable Job that re-seals every live TOTP secret from other keys to it, one credential at a time under a compare-and-swap on its key identity. The Job resumes from its checkpoint after a crash or lease loss. A rekey is refused while another is queued or running, and the fence moves to a different primary only after the previous rekey proved that no live secret needs another key. From the fence onwards every node must seal new secrets with the fenced primary.
+         */
+        readonly post: operations["startMFARekey"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/mfa/rekey/{job_id}": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The durable MFA rekey Job whose safe progress is requested. */
+                readonly job_id: components["schemas"]["ID"];
+            };
+            readonly cookie?: never;
+        };
+        /**
+         * Inspect safe progress and final retirement proof for one MFA rekey Job
+         * @description Returns bounded progress for one MFA rekey Job and, after it succeeds, the live-secret counts that prove the retiring key seals nothing and may be removed from configuration. A Job of another type is not found. No secrets, ciphertext, account identities, key bytes, or worker diagnostics are returned.
+         */
+        readonly get: operations["getMFARekeyStatus"];
+        readonly put?: never;
+        readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -4768,7 +4852,7 @@ export interface paths {
         };
         /**
          * List my retention notices
-         * @description Returns the current Session User’s own durable grace notices, including cancellation and delivery status. The notice grants no examination record access. Reading it neither acknowledges delivery nor changes cleanup. Candidate notices are optional; responsible Exam Managers and institution operators receive them by default. Pending dates are invalidated when grace is cancelled.
+         * @description Returns the current Session User’s own durable grace notices, including cancellation and delivery status. The notice grants no examination record access. Reading it neither acknowledges delivery nor changes cleanup. Candidate notices are optional; responsible Exam Managers and institution operators receive them by default. Pending dates are invalidated when grace is canceled.
          */
         readonly get: operations["listRetentionNotices"];
         readonly put?: never;
@@ -5046,7 +5130,7 @@ export interface paths {
         readonly get?: never;
         /**
          * Explicitly change a User email address and require verification
-         * @description Replaces the target User's email only after strong recent authentication, marks the new address unverified, and starts the bounded account-recovery notification path. It never treats possession of administrator authority as proof that the new address is owned.
+         * @description Replaces the target User's email only after strong recent authentication, marks the new address unverified, and starts the bounded account-recovery notification path: the new address receives a verification link and the previous address receives a single-use undo link valid for the configured undo window. Changes to one account share the account-recovery rate limit. It never treats possession of administrator authority as proof that the new address is owned.
          */
         readonly put: operations["changeUserEmail"];
         readonly post?: never;
@@ -5168,7 +5252,7 @@ export interface paths {
         };
         /**
          * List a User's Sessions for administrative review
-         * @description Returns safe Session metadata for the exact User when the caller has current administrative authority. Revoked Sessions are excluded unless requested; access and refresh credentials are never exposed.
+         * @description Returns one page of safe Session metadata for the exact User, newest first, when the caller has current administrative authority. Revoked and expired Sessions are excluded unless requested; access and refresh credentials are never exposed.
          */
         readonly get: operations["listUserSessions"];
         readonly put?: never;
@@ -5294,18 +5378,18 @@ export interface components {
         readonly AcademicAdministrationBatchItemRequest: {
             /** @enum {string} */
             readonly affiliation_kind?: "student" | "teacher" | "staff";
-            /** Format: int64 */
-            readonly end_at?: number;
+            /** Format: date-time */
+            readonly end_at?: string;
             readonly key: string;
             readonly relationship_id?: components["schemas"]["ID"];
             readonly role_id?: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly start_at?: number;
+            /** Format: date-time */
+            readonly start_at?: string;
             readonly user_id?: components["schemas"]["ID"];
         };
         readonly AcademicAdministrationBatchItemResponse: {
             /** @enum {string} */
-            readonly error_code?: "request.invalid" | "resource.not_found" | "authorization.denied" | "authorization.request.invalid" | "authorization.unavailable" | "audit.unavailable" | "administration.unavailable" | "mail.unavailable" | "authentication.invalid_token" | "authentication.strong_required" | "authentication.reauthentication_required" | "affiliation.invalid" | "affiliation.conflict" | "affiliation.student_has_active_enrollment" | "academic_unit_member.invalid" | "academic_unit_member.conflict" | "class_member.invalid" | "class_member.student_affiliation_required" | "class.enrollment_conflict" | "role_binding.invalid" | "role_binding.conflict" | "role_binding.last_system_admin" | "role_binding.system_admin_requires_institution_scope" | "user.invalid" | "user.conflict" | "user.last_system_admin" | "session.not_found" | "idempotency.conflict" | "idempotency.in_progress" | "onboarding_batch.duplicate";
+            readonly error_code?: "request.invalid" | "resource.not_found" | "authorization.denied" | "authorization.request.invalid" | "authorization.unavailable" | "audit.unavailable" | "administration.unavailable" | "mail.unavailable" | "authentication.token_invalid" | "authentication.strong_required" | "authentication.reauthentication_required" | "affiliation.invalid" | "affiliation.conflict" | "affiliation.student_has_active_enrollment" | "academic_unit_member.invalid" | "academic_unit_member.conflict" | "class_member.invalid" | "class_member.student_affiliation_required" | "class.enrollment_conflict" | "role_binding.invalid" | "role_binding.conflict" | "role_binding.last_system_admin" | "role_binding.system_admin_scope_invalid" | "user.invalid" | "user.conflict" | "user.last_system_admin" | "session.not_found" | "idempotency.conflict" | "idempotency.in_progress" | "onboarding_batch.duplicate";
             readonly index: number;
             readonly resource_id?: components["schemas"]["ID"];
             /** @enum {string} */
@@ -5327,19 +5411,23 @@ export interface components {
             readonly operation: "affiliation.add" | "affiliation.end" | "academic_unit_member.add" | "academic_unit_member.end" | "class.enroll" | "class.end" | "class.transfer" | "role_binding.create" | "role_binding.end" | "user.enable" | "user.disable" | "user_sessions.revoke";
             readonly succeeded: number;
         };
-        readonly AcademicPeriodListResponse: readonly components["schemas"]["AcademicPeriodResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly AcademicPeriodListResponse: {
+            readonly items: readonly components["schemas"]["AcademicPeriodResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly AcademicPeriodResponse: {
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly description: string;
             readonly display_name: string;
             /**
-             * Format: int64
-             * @description Exclusive end time in Unix milliseconds; must be after start_at.
+             * Format: date-time
+             * @description Exclusive end time; must be after start_at.
              */
-            readonly end_at: number;
+            readonly end_at: string;
             readonly id: components["schemas"]["ID"];
             readonly name: string;
             readonly owner_id: components["schemas"]["ID"];
@@ -5351,35 +5439,43 @@ export interface components {
              */
             readonly revision: number;
             /**
-             * Format: int64
-             * @description Inclusive start time in Unix milliseconds.
+             * Format: date-time
+             * @description Inclusive start time.
              */
-            readonly start_at: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            readonly start_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
-        readonly AcademicUnitListResponse: readonly components["schemas"]["AcademicUnitResponse"][];
-        readonly AcademicUnitMemberListResponse: readonly components["schemas"]["AcademicUnitMemberResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly AcademicUnitListResponse: {
+            readonly items: readonly components["schemas"]["AcademicUnitResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /** @description One page of the collection in its stable order. */
+        readonly AcademicUnitMemberListResponse: {
+            readonly items: readonly components["schemas"]["AcademicUnitMemberResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly AcademicUnitMemberResponse: {
             readonly academic_unit_id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
-            /** Format: int64 */
-            readonly end_at?: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly end_at?: string;
             readonly id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly start_at: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly start_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
             readonly user_id: components["schemas"]["ID"];
         };
         readonly AcademicUnitResponse: {
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly description: string;
             readonly display_name: string;
             readonly id: components["schemas"]["ID"];
@@ -5391,8 +5487,8 @@ export interface components {
              * @description Current aggregate revision. Supply it as expected_revision on an edit or archive to protect a client snapshot from concurrent changes.
              */
             readonly revision: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
         readonly AcceptScopedRoleInvitationRequest: {
             readonly claim: string;
@@ -5423,8 +5519,8 @@ export interface components {
         /** @description Current revisioned Access Policy plus bounded safe capabilities and transition history. */
         readonly AccessPolicyResponse: {
             readonly available_providers: readonly components["schemas"]["ExternalAuthenticationProviderResponse"][];
-            /** Format: int64 */
-            readonly created_at: number;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly desktop_authorization_enabled: boolean;
             /** @description Whether the deployment can durably deliver invitation and account-security mail. */
             readonly durable_mail: boolean;
@@ -5443,8 +5539,8 @@ export interface components {
              * @description Monotonic policy revision used for optimistic concurrency.
              */
             readonly revision: number;
-            /** Format: int64 */
-            readonly updated_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
         readonly AccessPolicySettingsRequest: {
             /** @description Whether the native-client browser authorization protocol is admitted. */
@@ -5473,10 +5569,10 @@ export interface components {
         readonly AccessPolicyTransitionResponse: {
             readonly actor_user_id: components["schemas"]["ID"];
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the replacement committed.
+             * Format: date-time
+             * @description Time when the replacement committed.
              */
-            readonly changed_at: number;
+            readonly changed_at: string;
             readonly changed_fields: readonly ("local_login_enabled" | "public_registration_enabled" | "invitation_admission_enabled" | "invitation_local_credential_enabled" | "desktop_authorization_enabled" | "provider_admissions" | "revoke_existing_sessions")[];
             /** Format: int64 */
             readonly from_revision: number;
@@ -5502,7 +5598,7 @@ export interface components {
         };
         readonly AddExamManagerRequest: {
             /** Format: int64 */
-            readonly expected_exam_revision: number;
+            readonly expected_revision: number;
             readonly user_id: components["schemas"]["ID"];
         };
         readonly AdmittedSecurity: {
@@ -5524,20 +5620,24 @@ export interface components {
         };
         /** @enum {string} */
         readonly AffiliationKind: "student" | "teacher" | "staff" | "external";
-        readonly AffiliationListResponse: readonly components["schemas"]["AffiliationResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly AffiliationListResponse: {
+            readonly items: readonly components["schemas"]["AffiliationResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly AffiliationResponse: {
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
-            /** Format: int64 */
-            readonly end_at?: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly end_at?: string;
             readonly id: components["schemas"]["ID"];
             readonly kind: components["schemas"]["AffiliationKind"];
-            /** Format: int64 */
-            readonly start_at: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly start_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
             readonly user_id: components["schemas"]["ID"];
         };
         /** @description Revision-fenced complete content correction for one open or paused Sitting. */
@@ -5550,7 +5650,7 @@ export interface components {
             readonly candidate_summary: string;
             readonly expected_current_revision_id: components["schemas"]["ID"];
             /** Format: int64 */
-            readonly expected_sitting_revision: number;
+            readonly expected_revision: number;
             /** @description Omitted preserves current instructions. A present empty string clears them; null is invalid. Authored Markdown is limited to 65536 UTF-8 bytes. */
             readonly instructions_markdown?: string;
             /** @description Required already-trimmed private manager rationale; valid UTF-8, at most 1000 Unicode scalar values and 4000 bytes. */
@@ -5558,9 +5658,16 @@ export interface components {
             /** @description Required complete desired resource manifest. Omitted base resources are removed and array order becomes resource position. Resource and non-empty stage identities must each be unique. */
             readonly resources: readonly components["schemas"]["ExamSittingCorrectionResourceRequest"][];
         };
+        readonly ArchiveAcademicRequest: {
+            /**
+             * Format: int64
+             * @description Revision from the last resource response.
+             */
+            readonly expected_revision?: number;
+        };
         readonly ArchiveExamRequest: {
             /** Format: int64 */
-            readonly expected_exam_revision: number;
+            readonly expected_revision: number;
         };
         /** @description Complete proposed configuration, bounded at 16 KiB canonical bytes. Initial admission checks the acknowledged User Settings revision, exact admitted build and target, packaged registry and manifest, and Candidate-safe catalog membership. Out-of-range values are rejected without clamping. The digest of a frozen configuration covers this entire candidate, including its original provenance. */
         readonly AttemptConfigurationCandidate: {
@@ -5615,10 +5722,10 @@ export interface components {
             readonly authentication_method?: string;
             readonly client_type?: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the audit Attempt was created.
+             * Format: date-time
+             * @description Time when the audit Attempt was created.
              */
-            readonly create_at: number;
+            readonly created_at: string;
             /** @description Stable safe failure category for an unsuccessful action; internal detail is omitted. */
             readonly error_code?: string;
             readonly id: components["schemas"]["ID"];
@@ -5640,15 +5747,15 @@ export interface components {
             /** @description Durable outcome state of the audited Attempt. */
             readonly status: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds of the latest durable audit status change.
+             * Format: date-time
+             * @description Time of the latest durable audit status change.
              */
-            readonly update_at: number;
+            readonly updated_at: string;
             readonly user_agent?: string;
         };
         /** @description One bounded page of authorized audit Events. */
         readonly AuditListResponse: {
-            readonly events: readonly components["schemas"]["AuditEventResponse"][];
+            readonly items: readonly components["schemas"]["AuditEventResponse"][];
             /** @description Opaque continuation for the next page, omitted after the final page. */
             readonly next_cursor?: string;
         };
@@ -5668,11 +5775,11 @@ export interface components {
             readonly user?: components["schemas"]["UserProfileResponse"];
         };
         readonly AuthenticationTokensResponse: {
-            /** Format: int64 */
-            readonly access_expires_at: number;
+            /** Format: date-time */
+            readonly access_expires_at: string;
             readonly access_token: string;
-            /** Format: int64 */
-            readonly refresh_expires_at: number;
+            /** Format: date-time */
+            readonly refresh_expires_at: string;
             readonly refresh_token: string;
             /** @enum {string} */
             readonly token_type: "Bearer" | "DPoP";
@@ -5885,10 +5992,12 @@ export interface components {
             readonly rule_id: string;
             readonly source_session_id: components["schemas"]["BrowserSourceSessionID"];
         };
-        /** @description Frozen Browser rule group with server-received overflow times. Counts exclude unretained client summaries. */
+        /** @description Frozen Browser rule group with server-received overflow times, omitted while the group has no overflow. Counts exclude unretained client summaries. */
         readonly BrowserIntegrityGroup: {
-            readonly overflow_first_received_at: string | null;
-            readonly overflow_last_received_at: string | null;
+            /** Format: date-time */
+            readonly overflow_first_received_at?: string;
+            /** Format: date-time */
+            readonly overflow_last_received_at?: string;
             readonly participation_id: components["schemas"]["ID"];
             readonly policy_revision_id: components["schemas"]["ID"];
             readonly rule_id: string;
@@ -5921,8 +6030,8 @@ export interface components {
             readonly claim: string;
         };
         readonly BrowserInvitationStartResponse: {
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly expires_at: string;
             readonly handle: string;
             /** @enum {string} */
             readonly purpose: "student_class" | "teacher_academic_unit" | "academic_unit_role" | "institution_role";
@@ -5959,12 +6068,12 @@ export interface components {
             readonly rule_id: string;
         };
         readonly BrowserReceiptPage: {
-            /** Format: int64 */
-            readonly next_sequence: number | null;
-            readonly receipts: readonly components["schemas"]["BrowserEventReceipt"][];
+            readonly items: readonly components["schemas"]["BrowserEventReceipt"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
         };
         readonly BrowserSourceList: {
-            readonly sources: readonly components["schemas"]["BrowserSourceStatus"][];
+            readonly items: readonly components["schemas"]["BrowserSourceStatus"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
         };
         /** Format: uuid */
         readonly BrowserSourceSessionID: string;
@@ -6012,9 +6121,9 @@ export interface components {
             readonly summary: {
                 readonly count_complete: boolean;
                 /** Format: date-time */
-                readonly first_unretained_at: string | null;
+                readonly first_unretained_at?: string;
                 /** Format: date-time */
-                readonly last_unretained_at: string | null;
+                readonly last_unretained_at?: string;
                 /** Format: int64 */
                 readonly summary_sequence: number;
                 /** Format: int64 */
@@ -6101,7 +6210,7 @@ export interface components {
             readonly enabled?: true;
         });
         /** @enum {string} */
-        readonly CandidateCapability: "browser" | "submission" | "terminal" | "workspace";
+        readonly CandidateCapability: "browser" | "submission" | "workspace";
         readonly CandidateDepartureCapability: {
             /** @enum {boolean} */
             readonly allowed: false;
@@ -6115,7 +6224,7 @@ export interface components {
             /** @enum {string} */
             readonly state: "ready" | "active" | "suspended" | "submitted";
             /** @enum {string|null} */
-            readonly suspension_reason_code: "secure_connectivity_lost" | "focus_policy_review_required" | null;
+            readonly suspension_reason_code: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended" | null;
         };
         readonly CandidateExamActivityItemResponse: {
             readonly academic_unit: components["schemas"]["CandidateExamActivityRelationResponse"];
@@ -6207,7 +6316,7 @@ export interface components {
         });
         readonly CandidateExamWorkspaceListResponse: {
             readonly items: readonly components["schemas"]["CandidateExamWorkspaceItemResponse"][];
-            /** @description Opaque versioned cursor containing only the pinned Workspace cursor and last Entry identity; no Workspace path enters the URL. */
+            /** @description Opaque cursor containing only the pinned Workspace cursor and last Entry identity; no Workspace path enters the URL. */
             readonly next_cursor?: string;
             /** @description True with an empty page when the pinned manifest cursor advanced; restart from the first page. */
             readonly refresh_required: boolean;
@@ -6248,18 +6357,7 @@ export interface components {
             /** Format: date-time */
             readonly server_time: string;
             readonly submission_allowed: boolean;
-            readonly terminal: components["schemas"]["CandidateTerminalCapability"];
             readonly workspace_mutation_allowed: boolean;
-        };
-        readonly CandidateTerminalCapability: {
-            /** Format: int64 */
-            readonly applied_workspace_cursor: number;
-            /** @description Host environment identity; null until an environment has been created. */
-            readonly environment_epoch: string | null;
-            /** @enum {string} */
-            readonly projection_state: "synchronizing" | "ready" | "conflict" | "unavailable";
-            /** @enum {string} */
-            readonly state: "disabled" | "available" | "sitting_paused" | "acknowledgement_required" | "temporarily_unavailable";
         };
         readonly CandidateWorkspaceFileUploadMetadata: {
             /**
@@ -6306,8 +6404,8 @@ export interface components {
         readonly CandidateWorkspaceJournalResponse: {
             /** Format: int64 */
             readonly current_cursor: number;
-            readonly entries: readonly components["schemas"]["CandidateWorkspaceJournalEntryResponse"][];
-            readonly has_more: boolean;
+            readonly items: readonly components["schemas"]["CandidateWorkspaceJournalEntryResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
             readonly refresh_required: boolean;
             readonly workspace_id: components["schemas"]["ID"];
         };
@@ -6324,6 +6422,9 @@ export interface components {
             readonly workspace_cursor: number;
             readonly workspace_id: components["schemas"]["ID"];
         };
+        readonly ChangePasswordRequest: {
+            readonly password: string;
+        };
         /** @description New email address to store in an unverified state. */
         readonly ChangeUserEmailRequest: {
             /**
@@ -6336,30 +6437,38 @@ export interface components {
             readonly membership: components["schemas"]["ClassMemberResponse"];
             readonly previous?: components["schemas"]["ClassMemberResponse"];
         };
-        readonly ClassListResponse: readonly components["schemas"]["ClassResponse"][];
-        readonly ClassMemberListResponse: readonly components["schemas"]["ClassMemberResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly ClassListResponse: {
+            readonly items: readonly components["schemas"]["ClassResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /** @description One page of the collection in its stable order. */
+        readonly ClassMemberListResponse: {
+            readonly items: readonly components["schemas"]["ClassMemberResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly ClassMemberResponse: {
             readonly academic_period_id: components["schemas"]["ID"];
+            /** Format: date-time */
+            readonly archived_at?: string;
             readonly class_id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
-            /** Format: int64 */
-            readonly end_at?: number;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly end_at?: string;
             readonly id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly start_at: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly start_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
             readonly user_id: components["schemas"]["ID"];
         };
         readonly ClassResponse: {
             readonly academic_period_id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly description: string;
             readonly display_name: string;
             readonly id: components["schemas"]["ID"];
@@ -6370,8 +6479,8 @@ export interface components {
              * @description Current aggregate revision. Supply it as expected_revision on an edit or archive to protect a client snapshot from concurrent changes.
              */
             readonly revision: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
         readonly CompleteExamRecordsRequest: {
             /** Format: int64 */
@@ -6382,20 +6491,12 @@ export interface components {
         readonly ConfigureExamDraftBrowserPolicyRequest: {
             readonly browser_policy: components["schemas"]["BrowserPolicy"];
             /** Format: int64 */
-            readonly expected_draft_revision: number;
-        };
-        readonly ConfigureExamDraftExecutionProfileRequest: {
-            readonly enabled: boolean;
-            /** Format: int64 */
-            readonly expected_draft_revision: number;
-            readonly image: string;
-            /** @enum {string} */
-            readonly network: "none" | "allowlist";
+            readonly expected_revision: number;
         };
         readonly ConfigureExamDraftFocusLossRequest: {
             readonly enabled: boolean;
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             readonly incident_count: number;
             /** Format: int64 */
             readonly minimum_duration_milliseconds: number;
@@ -6409,165 +6510,47 @@ export interface components {
         };
         readonly ConfigureExamDraftNativePolicyRequest: {
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             readonly native: components["schemas"]["NativeSecurityPolicy"];
         };
         readonly ConnectionLossPolicy: {
             /** @constant */
             readonly outcome: "flag_and_suspend";
         };
-        /** @description Explicit sorted selection. A Browser Policy change requires browser; an instructions or resources change requires submission, terminal and workspace. Supersets are permitted. The selection cannot create a correction without an actual content change and remains present when acknowledgement is not required. */
+        /** @description Explicit sorted selection. A Browser Policy change requires browser; an instructions or resources change requires submission and workspace. Supersets are permitted. The selection cannot create a correction without an actual content change and remains present when acknowledgement is not required. */
         readonly CorrectionCapabilitySelection: readonly components["schemas"]["CandidateCapability"][];
         /** @description Complete owner, presentation, and time window for a new Academic Period. */
         readonly CreateAcademicPeriodRequest: {
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly create_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly delete_at?: number;
             readonly description?: string;
             readonly display_name: string;
-            /** Format: int64 */
-            readonly end_at: number;
-            /**
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly id?: string;
+            /** Format: date-time */
+            readonly end_at: string;
             readonly name: string;
             readonly owner_id: components["schemas"]["ID"];
             /** @enum {string} */
             readonly owner_type: "institution" | "academic_unit";
-            /** Format: int64 */
-            readonly start_at: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly update_at?: number;
+            /** Format: date-time */
+            readonly start_at: string;
         };
         readonly CreateAcademicUnitMemberRequest: {
-            /**
-             * @deprecated
-             * @description Accepted and ignored; route scope is authoritative.
-             */
-            readonly academic_unit_id?: string;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly create_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly delete_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored; memberships are ended through DELETE.
-             */
-            readonly end_at?: number;
-            /**
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly id?: string;
-            /** Format: int64 */
-            readonly start_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly update_at?: number;
+            /** Format: date-time */
+            readonly start_at?: string;
             readonly user_id: components["schemas"]["ID"];
         };
         readonly CreateAcademicUnitRequest: {
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly create_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly delete_at?: number;
             /** @description An optional human-facing description. */
             readonly description?: string;
             /** @description The human-facing Academic Unit name. */
             readonly display_name: string;
-            /**
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly id?: string;
-            /**
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly institution_id?: string;
             /** @description The owner-scoped canonical machine name. */
             readonly name: string;
-            /**
-             * @deprecated
-             * @description Accepted and ignored; route scope is authoritative.
-             */
-            readonly parent_id?: string;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly update_at?: number;
         };
         readonly CreateAffiliationRequest: {
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly create_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly delete_at?: number;
-            /** Format: int64 */
-            readonly end_at?: number;
-            /**
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly id?: string;
+            /** Format: date-time */
+            readonly end_at?: string;
             readonly kind: components["schemas"]["AffiliationKind"];
-            /** Format: int64 */
-            readonly start_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly update_at?: number;
-            /**
-             * @deprecated
-             * @description Accepted and ignored; route scope is authoritative.
-             */
-            readonly user_id?: string;
+            /** Format: date-time */
+            readonly start_at?: string;
         };
         readonly CreateCandidateWorkspaceDirectoryRequest: {
             /** Format: int64 */
@@ -6578,37 +6561,9 @@ export interface components {
         /** @description Academic Period and presentation for a concrete student roster. */
         readonly CreateClassRequest: {
             readonly academic_period_id: components["schemas"]["ID"];
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly create_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly delete_at?: number;
             readonly description?: string;
             readonly display_name: string;
-            /**
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly id?: string;
             readonly name: string;
-            /**
-             * @deprecated
-             * @description Accepted and ignored; route scope is authoritative.
-             */
-            readonly programme_level_id?: string;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly update_at?: number;
         };
         readonly CreateExamExportRequest: {
             /** @description Work and/or integrity, or Browser Activity alone. Browser Activity requires exact current Exam Manager membership and the dedicated history permission; generic exports contain no ordinary browsing URLs. */
@@ -6624,83 +6579,27 @@ export interface components {
         };
         readonly CreateExamStarterWorkspaceDirectoryRequest: {
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             readonly path: components["schemas"]["StarterWorkspacePath"];
         };
         readonly CreatePersonalAccessTokenRequest: {
             readonly academic_unit_id?: components["schemas"]["ID"];
             readonly description: string;
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly expires_at: string;
             readonly scopes: readonly string[];
         };
         /** @description Canonical and human-facing fields for a new Programme Level. */
         readonly CreateProgrammeLevelRequest: {
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly create_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly delete_at?: number;
             readonly description?: string;
             readonly display_name: string;
-            /**
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly id?: string;
             readonly name: string;
-            /**
-             * @deprecated
-             * @description Accepted and ignored; route scope is authoritative.
-             */
-            readonly programme_id?: string;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly update_at?: number;
         };
         /** @description Canonical and human-facing fields for a new Programme. */
         readonly CreateProgrammeRequest: {
-            /**
-             * @deprecated
-             * @description Accepted and ignored; route scope is authoritative.
-             */
-            readonly academic_unit_id?: string;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly create_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly delete_at?: number;
             readonly description?: string;
             readonly display_name: string;
-            /**
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly id?: string;
             readonly name: string;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly update_at?: number;
         };
         /** @description Omit both nested IDs for an Exam hold, provide Sitting ID for a Sitting hold, or provide both for an exact Submission hold. Explicit null and empty IDs are rejected. */
         readonly CreateRetentionHoldRequest: {
@@ -6717,19 +6616,19 @@ export interface components {
         /** @description Exact effective-dated permission grant to create. */
         readonly CreateRoleBindingRequest: {
             /**
-             * Format: int64
-             * @description Optional Unix time in milliseconds when the grant stops being effective.
+             * Format: date-time
+             * @description Optional time when the grant stops being effective.
              */
-            readonly end_at?: number;
+            readonly end_at?: string;
             readonly role_id: components["schemas"]["ID"];
             readonly scope_id: components["schemas"]["ID"];
             /** @description Stable scope kind supported by the selected Role permissions. */
             readonly scope_type: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the grant becomes effective.
+             * Format: date-time
+             * @description Time when the grant becomes effective.
              */
-            readonly start_at?: number;
+            readonly start_at?: string;
             readonly user_id: components["schemas"]["ID"];
         };
         /** @description Canonical identity, presentation, and complete permission set for a new custom Role. */
@@ -6776,7 +6675,7 @@ export interface components {
             readonly allocated_through_sequence: number;
             readonly declaration_id: string;
             /** Format: int64 */
-            readonly expected_declaration_revision: number;
+            readonly expected_revision: number;
             readonly ranges: readonly components["schemas"]["SequenceRange"][];
             /** @enum {string} */
             readonly reason: "spool_corrupt" | "spool_lost" | "local_capacity_exhausted";
@@ -6818,21 +6717,22 @@ export interface components {
             /** Format: date-time */
             readonly server_time: string;
         };
+        /** @description Delivery closure. An open delivery carries only unknown_tail false; a closed one carries closed_at, close_reason, known_at_close and upload_expires_at, plus the final sequence, declaration and boundary origin when they are known. Absent members are omitted, never null. */
         readonly DeliveryClosure: {
-            /** @enum {string|null} */
-            readonly close_reason: "submission" | "suspension" | "manager_end" | "sitting_closed" | "participation_ended" | "security_session_lost" | "policy_correction" | "runtime_reset" | "browser_disabled" | null;
+            /** @enum {string} */
+            readonly close_reason?: "submission" | "suspension" | "manager_end" | "sitting_closed" | "participation_ended" | "security_session_lost" | "policy_correction" | "runtime_reset" | "browser_disabled";
             /** Format: date-time */
-            readonly closed_at: string | null;
-            /** @enum {string|null} */
-            readonly final_boundary_origin: "client_declared" | "server_known" | null;
-            readonly final_declaration_id: string | null;
+            readonly closed_at?: string;
+            /** @enum {string} */
+            readonly final_boundary_origin?: "client_declared" | "server_known";
+            readonly final_declaration_id?: string;
             /** Format: int64 */
-            readonly final_sequence: number | null;
+            readonly final_sequence?: number;
             /** Format: int64 */
-            readonly known_at_close: number | null;
+            readonly known_at_close?: number;
             readonly unknown_tail: boolean;
             /** Format: date-time */
-            readonly upload_expires_at: string | null;
+            readonly upload_expires_at?: string;
         };
         readonly DeliveryFamilyBudget: {
             readonly attempt: components["schemas"]["DeliveryQuotaUsage"];
@@ -6897,8 +6797,8 @@ export interface components {
             readonly username: string;
         };
         readonly DesktopAuthorizationApprovalResponse: {
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly expires_at: string;
             /** Format: uri */
             readonly redirect_url: string;
         };
@@ -6912,8 +6812,8 @@ export interface components {
         readonly DesktopAuthorizationContextResponse: {
             readonly account?: components["schemas"]["DesktopAuthorizationAccountResponse"];
             readonly device_name: string;
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly expires_at: string;
             readonly external_providers: readonly components["schemas"]["ExternalAuthenticationProviderResponse"][];
             readonly local_login_enabled: boolean;
             /** @enum {string} */
@@ -6965,8 +6865,8 @@ export interface components {
         readonly DesktopAuthorizationStartResponse: {
             /** Format: uri */
             readonly authorization_url: string;
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly expires_at: string;
         };
         readonly DesktopAuthorizationStateRequest: {
             readonly state: string;
@@ -6980,8 +6880,11 @@ export interface components {
             readonly expected_revision: number;
             /** @description Empty for no Institution minimum, otherwise a canonical semantic release without a leading v. */
             readonly minimum_desktop_release: string;
-            /** @description Optional retry time; it must be null while availability is ready. */
-            readonly retry_at: string | null;
+            /**
+             * Format: date-time
+             * @description Optional retry time; omit it for none, and always while availability is ready. Null is invalid.
+             */
+            readonly retry_at?: string;
             readonly revoked_desktop_build_ids: readonly string[];
         };
         readonly DesktopCompatibilityPolicyResponse: {
@@ -6991,7 +6894,11 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string;
             readonly minimum_desktop_release: string;
-            readonly retry_at: string | null;
+            /**
+             * Format: date-time
+             * @description Present only while availability is maintenance and a retry time is set.
+             */
+            readonly retry_at?: string;
             /** Format: int64 */
             readonly revision: number;
             readonly revoked_desktop_build_ids: readonly string[];
@@ -7006,19 +6913,23 @@ export interface components {
             readonly x: string;
             readonly y: string;
         };
-        readonly DesktopRegistrationListResponse: readonly components["schemas"]["DesktopRegistrationResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly DesktopRegistrationListResponse: {
+            readonly items: readonly components["schemas"]["DesktopRegistrationResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly DesktopRegistrationResponse: {
             /** @enum {string} */
             readonly architecture: "arm64" | "x64";
-            /** Format: int64 */
-            readonly created_at: number;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly current: boolean;
             readonly desktop_build_id: string;
             readonly desktop_release: string;
             readonly display_name: string;
             readonly id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly last_used_at: number;
+            /** Format: date-time */
+            readonly last_used_at: string;
             /** @enum {string} */
             readonly platform: "darwin" | "win32" | "linux";
             readonly realtime_protocol: number;
@@ -7027,7 +6938,7 @@ export interface components {
         };
         readonly EditExamDraftTextRequest: {
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             /** @description Omitted or null leaves the authored Markdown unchanged; an empty string clears it. Present UTF-8 content is limited to 65536 bytes. */
             readonly instructions_markdown?: string | null;
             /** @description Omitted or null leaves the title unchanged; a present value is trimmed and must remain non-empty. */
@@ -7043,7 +6954,7 @@ export interface components {
             /** @description Omitted or null leaves the name unchanged; a present value is trimmed UTF-8 with at most 255 Unicode scalar values. */
             readonly display_name?: string | null;
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
         } | {
             readonly display_name: string;
         } | {
@@ -7179,53 +7090,23 @@ export interface components {
             /** @constant */
             readonly visibility_class_id: "examiner_restricted";
         };
+        readonly EmailChangeUndoRequest: {
+            readonly token: string;
+        };
         readonly EmailVerificationCompletionRequest: {
             readonly token: string;
         };
         readonly EndExamAttemptByManagerRequest: {
             /** Format: int64 */
-            readonly expected_attempt_revision: number;
+            readonly expected_revision: number;
             /** @description Trimmed private manager reason; never exposed to the candidate. */
             readonly reason: string;
         };
         readonly EnrollClassMemberRequest: {
-            /**
-             * @deprecated
-             * @description Accepted and ignored; destination Class is authoritative.
-             */
-            readonly academic_period_id?: string;
-            /**
-             * @deprecated
-             * @description Accepted and ignored; route scope is authoritative.
-             */
-            readonly class_id?: string;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly create_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly delete_at?: number;
-            /** Format: int64 */
-            readonly end_at?: number;
-            /**
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly id?: string;
-            /** Format: int64 */
-            readonly start_at?: number;
-            /**
-             * Format: int64
-             * @deprecated
-             * @description Accepted and ignored for v1 compatibility.
-             */
-            readonly update_at?: number;
+            /** Format: date-time */
+            readonly end_at?: string;
+            /** Format: date-time */
+            readonly start_at?: string;
             readonly user_id: components["schemas"]["ID"];
         };
         readonly EnrollPasswordRequest: {
@@ -7242,7 +7123,7 @@ export interface components {
         };
         readonly ExamAttemptManagerListResponse: {
             readonly items: readonly components["schemas"]["ExamAttemptManagerResponse"][];
-            /** @description Opaque versioned cursor over descending creation time and Attempt identity; clients return it unchanged. */
+            /** @description Opaque cursor over descending creation time and Attempt identity; clients return it unchanged. */
             readonly next_cursor?: string;
         };
         readonly ExamAttemptManagerResponse: {
@@ -7285,8 +7166,8 @@ export interface components {
         readonly ExamAttemptReallowResponse: {
             /** Format: int64 */
             readonly attempt_revision: number;
-            /** @constant */
-            readonly candidate_reason: "secure_connectivity_lost";
+            /** @enum {string} */
+            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended";
             readonly exam_attempt_id: components["schemas"]["ID"];
             readonly exam_sitting_id: components["schemas"]["ID"];
             readonly reallowed_by_user_id: components["schemas"]["ID"];
@@ -7298,23 +7179,43 @@ export interface components {
         };
         /** @enum {string} */
         readonly ExamAttemptState: "ready" | "active" | "suspended" | "submitted";
-        readonly ExamAttemptSuspensionResponse: {
+        readonly ExamAttemptSuspendResponse: {
+            /** Format: int64 */
+            readonly attempt_revision: number;
             /** @constant */
-            readonly candidate_reason: "secure_connectivity_lost";
+            readonly candidate_reason: "manager_suspended";
+            /** @description True when the kick closed the candidate's open Connection. */
+            readonly connection_closed: boolean;
+            readonly exam_attempt_id: components["schemas"]["ID"];
+            readonly exam_sitting_id: components["schemas"]["ID"];
+            /** @constant */
+            readonly source: "manual";
+            /** @constant */
+            readonly state: "suspended";
+            readonly suspended_by_user_id: components["schemas"]["ID"];
+            readonly suspension_id: components["schemas"]["ID"];
+            /** @constant */
+            readonly suspension_state: "active";
+        };
+        /** @description One suspension episode. A policy episode links its Integrity Flag in integrity_flag_id; a manual episode (an Exam Manager's kick) links no Flag and names its manager in suspended_by_user_id. */
+        readonly ExamAttemptSuspensionResponse: {
+            /** @enum {string} */
+            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended";
             /** Format: date-time */
             readonly ended_at?: string;
-            readonly flag_id: components["schemas"]["ID"];
             /** Format: int64 */
             readonly generation: number;
             readonly id: components["schemas"]["ID"];
+            readonly integrity_flag_id?: components["schemas"]["ID"];
             readonly participation_id: components["schemas"]["ID"];
             readonly reallowed_by_user_id?: components["schemas"]["ID"];
-            /** @constant */
-            readonly source: "policy";
+            /** @enum {string} */
+            readonly source: "policy" | "manual";
             /** Format: date-time */
             readonly started_at: string;
             /** @enum {string} */
             readonly state: "active" | "closed";
+            readonly suspended_by_user_id?: components["schemas"]["ID"];
         };
         readonly ExamAttemptWorkspaceResponse: {
             /** Format: date-time */
@@ -7340,7 +7241,6 @@ export interface components {
             readonly browser_policy: components["schemas"]["BrowserPolicy"];
             readonly capacity: components["schemas"]["ExamCapacityPolicy"];
             readonly exam_id: components["schemas"]["ID"];
-            readonly execution_profile: components["schemas"]["ExecutionProfile"];
             readonly has_starter_workspace: boolean;
             /** @description Authored Markdown encoded as UTF-8 and limited to 65536 bytes. */
             readonly instructions_markdown: string;
@@ -7382,7 +7282,7 @@ export interface components {
         readonly ExamIdentityResponse: {
             readonly academic_unit_id: components["schemas"]["ID"];
             /** Format: date-time */
-            readonly archived_at: string | null;
+            readonly archived_at?: string;
             /** Format: date-time */
             readonly created_at: string;
             readonly creator_user_id: components["schemas"]["ID"];
@@ -7429,8 +7329,6 @@ export interface components {
             readonly participation_id: components["schemas"]["ID"];
             /** Format: date-time */
             readonly received_at: string;
-            /** @constant */
-            readonly schema_version: 1;
             /** Format: int64 */
             readonly sequence?: number;
             /** @enum {string} */
@@ -7609,7 +7507,7 @@ export interface components {
         };
         readonly ExamResourceContentReplacementMetadata: {
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             readonly media_type: components["schemas"]["ExamResourceMediaType"];
             readonly sha256: components["schemas"]["SHA256"];
             /** Format: int64 */
@@ -7623,6 +7521,7 @@ export interface components {
         };
         readonly ExamResourceListResponse: {
             readonly items: readonly components["schemas"]["ExamResourceResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
         };
         /** @enum {string} */
         readonly ExamResourceMediaType: "application/pdf" | "image/png" | "image/jpeg" | "image/webp" | "text/plain" | "text/markdown" | "text/csv" | "application/json";
@@ -7648,7 +7547,7 @@ export interface components {
             /** @description Trimmed UTF-8 with at most 255 Unicode scalar values. */
             readonly display_name: string;
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             readonly media_type: components["schemas"]["ExamResourceMediaType"];
             readonly sha256: components["schemas"]["SHA256"];
             /** Format: int64 */
@@ -7668,7 +7567,7 @@ export interface components {
         };
         readonly ExamRevisionListResponse: {
             readonly items: readonly components["schemas"]["ExamRevisionResponse"][];
-            /** @description Opaque versioned cursor over descending Revision number and identity; clients return it unchanged. */
+            /** @description Opaque cursor over descending Revision number and identity; clients return it unchanged. */
             readonly next_cursor?: string;
         };
         readonly ExamRevisionResponse: {
@@ -7676,7 +7575,6 @@ export interface components {
             readonly capacity: components["schemas"]["ExamCapacityPolicy"];
             readonly content_digest: components["schemas"]["SHA256"];
             readonly exam_id: components["schemas"]["ID"];
-            readonly execution_profile_digest: components["schemas"]["SHA256"];
             readonly id: components["schemas"]["ID"];
             /** Format: int64 */
             readonly number: number;
@@ -7766,7 +7664,7 @@ export interface components {
         /** @description One bounded page of authorized Exam Sittings. */
         readonly ExamSittingListResponse: {
             readonly items: readonly components["schemas"]["ExamSittingResponse"][];
-            /** @description Opaque versioned cursor over descending scheduled start and Sitting identity; clients return it unchanged. */
+            /** @description Opaque cursor over descending scheduled start and Sitting identity; clients return it unchanged. */
             readonly next_cursor?: string;
         };
         /** @description Revision fence and private manager rationale for a Sitting lifecycle transition. */
@@ -7782,7 +7680,7 @@ export interface components {
         /** @description One bounded page of derived no-show candidate identities. */
         readonly ExamSittingNoShowListResponse: {
             readonly items: readonly components["schemas"]["ExamSittingNoShowResponse"][];
-            /** @description Opaque versioned candidate-identity cursor; clients return it unchanged. */
+            /** @description Opaque candidate-identity cursor; clients return it unchanged. */
             readonly next_cursor?: string;
         };
         /** @description Candidate who belonged to the target Class at actual opening and has no Attempt. */
@@ -7867,7 +7765,7 @@ export interface components {
              * Format: int64
              * @description Last observed mutable Draft revision, used to reject replacement against newer authoring state.
              */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             readonly media_type: string;
             readonly sha256: components["schemas"]["SHA256"];
             /**
@@ -7884,7 +7782,7 @@ export interface components {
         };
         readonly ExamStarterWorkspaceFileUploadMetadata: {
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             readonly media_type: string;
             readonly path: components["schemas"]["StarterWorkspacePath"];
             readonly sha256: components["schemas"]["SHA256"];
@@ -7923,6 +7821,7 @@ export interface components {
         });
         readonly ExamStarterWorkspaceListResponse: {
             readonly items: readonly components["schemas"]["ExamStarterWorkspaceListItemResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
         };
         /** @description Manager-safe Submission header without Workspace bytes or integrity evidence. Retired integrity has an explicit retirement time and omits the former signal counters; retained work remains accessible. */
         readonly ExamSubmissionManagerResponse: {
@@ -7997,7 +7896,7 @@ export interface components {
         readonly ExamSubmissionManifestResponse: {
             readonly items: readonly components["schemas"]["ExamSubmissionManifestItemResponse"][];
             readonly manifest_digest: components["schemas"]["SHA256"];
-            /** @description Opaque versioned keyset cursor containing only the last stable Entry identity; no path or storage selector enters the URL. */
+            /** @description Opaque keyset cursor containing only the last stable Entry identity; no path or storage selector enters the URL. */
             readonly next_cursor?: string;
             readonly submission_id: components["schemas"]["ID"];
             /** Format: int64 */
@@ -8063,7 +7962,7 @@ export interface components {
             readonly academic_unit_display_name: string;
             readonly academic_unit_id: components["schemas"]["ID"];
             /** Format: date-time */
-            readonly archived_at: string | null;
+            readonly archived_at?: string;
             readonly creator_user_id: components["schemas"]["ID"];
             readonly id: components["schemas"]["ID"];
             readonly manager_count: number;
@@ -8089,19 +7988,6 @@ export interface components {
             /** Format: date-time */
             readonly updated_at: string;
         };
-        readonly ExecutionImage: {
-            readonly id: string;
-            readonly networks: readonly ("none" | "allowlist")[];
-        };
-        readonly ExecutionImageListResponse: {
-            readonly items: readonly components["schemas"]["ExecutionImage"][];
-        };
-        readonly ExecutionProfile: {
-            readonly enabled: boolean;
-            readonly image: string;
-            /** @enum {string} */
-            readonly network: "none" | "allowlist";
-        };
         /** @description Revision-fenced deadline extension for an open or paused Sitting. */
         readonly ExtendExamSittingRequest: {
             /** Format: int64 */
@@ -8114,7 +8000,11 @@ export interface components {
              */
             readonly scheduled_end_at: string;
         };
-        readonly ExternalAuthenticationProviderListResponse: readonly components["schemas"]["ExternalAuthenticationProviderResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly ExternalAuthenticationProviderListResponse: {
+            readonly items: readonly components["schemas"]["ExternalAuthenticationProviderResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly ExternalAuthenticationProviderResponse: {
             readonly display_name: string;
             readonly id: string;
@@ -8137,7 +8027,7 @@ export interface components {
         readonly FinalDeliveryDeclaration: {
             readonly declaration_id: string;
             /** Format: int64 */
-            readonly expected_declaration_revision: number;
+            readonly expected_revision: number;
             /** Format: int64 */
             readonly final_sequence: number;
         };
@@ -8198,10 +8088,10 @@ export interface components {
         readonly InstallationStateResponse: {
             readonly administrator_user_id: components["schemas"]["ID"];
             /**
-             * Format: int64
-             * @description Unix time in milliseconds at which bootstrap committed.
+             * Format: date-time
+             * @description Time at which bootstrap committed.
              */
-            readonly initialized_at: number;
+            readonly initialized_at: string;
             readonly institution_id: components["schemas"]["ID"];
         };
         /** @description Safe public bootstrap state for one installation. */
@@ -8210,17 +8100,17 @@ export interface components {
             readonly initialized: boolean;
         };
         readonly InstitutionResponse: {
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly description: string;
             readonly display_name: string;
             readonly exam_capacity: components["schemas"]["ExamCapacityPolicy"];
             readonly id: components["schemas"]["ID"];
             readonly name: string;
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
         readonly InvitationAcceptanceResponse: {
             readonly academic_unit_member_id?: components["schemas"]["ID"];
@@ -8240,15 +8130,15 @@ export interface components {
             readonly academic_unit_id?: components["schemas"]["ID"];
             readonly accepted_user_id?: components["schemas"]["ID"];
             readonly class_id?: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly created_at: number;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly delivery?: components["schemas"]["InvitationDeliveryResponse"];
             /** Format: email */
             readonly email: string;
-            /** Format: int64 */
-            readonly end_at?: number;
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly end_at?: string;
+            /** Format: date-time */
+            readonly expires_at: string;
             readonly id: components["schemas"]["ID"];
             readonly inviter_user_id: components["schemas"]["ID"];
             /** @enum {string} */
@@ -8257,25 +8147,25 @@ export interface components {
             readonly revision: number;
             readonly role_actions?: readonly string[];
             readonly role_id?: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly start_at: number;
+            /** Format: date-time */
+            readonly start_at: string;
             /** @enum {string} */
             readonly state: "pending" | "accepted" | "revoked" | "expired" | "superseded";
-            /** Format: int64 */
-            readonly updated_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
         readonly InvitationBatchItemRequest: {
             /** Format: email */
             readonly email?: string;
-            /** Format: int64 */
-            readonly end_at?: number;
+            /** Format: date-time */
+            readonly end_at?: string;
             /** Format: int64 */
             readonly expected_revision?: number;
             readonly invitation_id?: components["schemas"]["ID"];
             readonly key: string;
             readonly role_id?: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly start_at?: number;
+            /** Format: date-time */
+            readonly start_at?: string;
             readonly suggested_display_name?: string;
             readonly suggested_first_name?: string;
             readonly suggested_last_name?: string;
@@ -8285,7 +8175,7 @@ export interface components {
         };
         readonly InvitationBatchItemResponse: {
             /** @enum {string} */
-            readonly error_code?: "request.invalid" | "resource.not_found" | "authorization.denied" | "authorization.request.invalid" | "authorization.unavailable" | "audit.unavailable" | "administration.unavailable" | "authentication.invalid_token" | "authentication.strong_required" | "authentication.reauthentication_required" | "invitation.invalid" | "invitation.class_period_invalid" | "invitation.conflict" | "invitation.role_not_delegable" | "invitation.mail_unavailable" | "invitation.unavailable" | "idempotency.conflict" | "idempotency.in_progress" | "onboarding_batch.duplicate";
+            readonly error_code?: "request.invalid" | "resource.not_found" | "authorization.denied" | "authorization.request.invalid" | "authorization.unavailable" | "audit.unavailable" | "administration.unavailable" | "authentication.token_invalid" | "authentication.strong_required" | "authentication.reauthentication_required" | "invitation.invalid" | "invitation.class_period_conflict" | "invitation.conflict" | "invitation.role_not_delegable" | "invitation.mail_unavailable" | "invitation.unavailable" | "idempotency.conflict" | "idempotency.in_progress" | "onboarding_batch.duplicate";
             readonly index: number;
             readonly invitation_id?: components["schemas"]["ID"];
             /** @enum {string} */
@@ -8308,19 +8198,19 @@ export interface components {
             readonly succeeded: number;
         };
         readonly InvitationDeliveryResponse: {
-            /** Format: int64 */
-            readonly accepted_at?: number;
-            /** Format: int64 */
-            readonly created_at: number;
-            /** Format: int64 */
-            readonly deadline: number;
+            /** Format: date-time */
+            readonly accepted_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly deadline: string;
             readonly masked_recipient: string;
             readonly public_failure_code?: string;
             /** @enum {string} */
             readonly state: "queued" | "sending" | "accepted" | "failed" | "suppressed" | "canceled";
             readonly template_key: string;
-            /** Format: int64 */
-            readonly updated_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
         readonly InvitationMutationRequest: {
             /** Format: int64 */
@@ -8330,36 +8220,36 @@ export interface components {
             readonly academic_period_id?: components["schemas"]["ID"];
             readonly academic_unit_id?: components["schemas"]["ID"];
             readonly class_id?: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly end_at?: number;
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly end_at?: string;
+            /** Format: date-time */
+            readonly expires_at: string;
             readonly id: components["schemas"]["ID"];
             /** @enum {string} */
             readonly purpose: "student_class" | "teacher_academic_unit" | "academic_unit_role" | "institution_role";
             readonly role_actions?: readonly string[];
             readonly role_id?: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly start_at: number;
+            /** Format: date-time */
+            readonly start_at: string;
             /** @enum {string} */
             readonly state: "pending" | "accepted" | "revoked" | "expired" | "superseded";
         };
         readonly IssueScopedRoleInvitationRequest: {
             /** Format: email */
             readonly email: string;
-            /** Format: int64 */
-            readonly end_at?: number;
+            /** Format: date-time */
+            readonly end_at?: string;
             readonly role_id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly start_at?: number;
+            /** Format: date-time */
+            readonly start_at?: string;
         };
         readonly IssueStudentClassInvitationRequest: {
             /** Format: email */
             readonly email: string;
-            /** Format: int64 */
-            readonly end_at?: number;
-            /** Format: int64 */
-            readonly start_at?: number;
+            /** Format: date-time */
+            readonly end_at?: string;
+            /** Format: date-time */
+            readonly start_at?: string;
             readonly suggested_display_name?: string;
             readonly suggested_first_name?: string;
             readonly suggested_last_name?: string;
@@ -8370,11 +8260,11 @@ export interface components {
         readonly IssueTeacherAcademicUnitInvitationRequest: {
             /** Format: email */
             readonly email: string;
-            /** Format: int64 */
-            readonly end_at?: number;
+            /** Format: date-time */
+            readonly end_at?: string;
             readonly role_id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly start_at?: number;
+            /** Format: date-time */
+            readonly start_at?: string;
             readonly suggested_display_name?: string;
             readonly suggested_first_name?: string;
             readonly suggested_last_name?: string;
@@ -8391,30 +8281,30 @@ export interface components {
         /** @description Safe execution history for one Job Attempt. */
         readonly JobAttemptResponse: {
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the Attempt reached a terminal state, when complete.
+             * Format: date-time
+             * @description Time when the Attempt reached a terminal state, when complete.
              */
-            readonly complete_at?: number;
+            readonly completed_at?: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds of the last retained worker heartbeat.
+             * Format: date-time
+             * @description Time of the last retained worker heartbeat.
              */
-            readonly heartbeat_at: number;
+            readonly heartbeat_at: string;
             readonly id: components["schemas"]["ID"];
             /**
-             * Format: int64
-             * @description Unix time in milliseconds at which this execution lease expires.
+             * Format: date-time
+             * @description Time at which this execution lease expires.
              */
-            readonly lease_expires_at: number;
+            readonly lease_expires_at: string;
             /** @description Monotonic attempt number within the parent Job. */
             readonly number: number;
             /** @description Stable safe failure category for a failed terminal Attempt; internal error detail is never returned. */
             readonly public_error_code?: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when execution started.
+             * Format: date-time
+             * @description Time when execution started.
              */
-            readonly start_at: number;
+            readonly started_at: string;
             readonly status: components["schemas"]["JobAttemptStatus"];
         };
         /**
@@ -8448,20 +8338,20 @@ export interface components {
             /** @description Number of durable execution Attempts created so far. */
             readonly attempt_count: number;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds at or after which queued work may be claimed.
+             * Format: date-time
+             * @description Time at or after which queued work may be claimed.
              */
-            readonly available_at: number;
+            readonly available_at: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the Job reached a terminal state.
+             * Format: date-time
+             * @description Time when the Job reached a terminal state.
              */
-            readonly complete_at?: number;
+            readonly completed_at?: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the Job was created.
+             * Format: date-time
+             * @description Time when the Job was created.
              */
-            readonly create_at: number;
+            readonly created_at: string;
             readonly id: components["schemas"]["ID"];
             /** @description Maximum execution Attempts allowed by this Job's retry policy. */
             readonly maximum_attempts: number;
@@ -8474,18 +8364,18 @@ export interface components {
              */
             readonly revision: number;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the current or latest Attempt started.
+             * Format: date-time
+             * @description Time when the current or latest Attempt started.
              */
-            readonly start_at?: number;
+            readonly started_at?: string;
             readonly status: components["schemas"]["JobStatus"];
             /** @description Stable allowlisted Job type. */
             readonly type: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds of the latest durable Job change.
+             * Format: date-time
+             * @description Time of the latest durable Job change.
              */
-            readonly update_at: number;
+            readonly updated_at: string;
         };
         /** @enum {string} */
         readonly JobStatus: "queued" | "running" | "cancel_requested" | "succeeded" | "failed" | "canceled";
@@ -8512,12 +8402,102 @@ export interface components {
         readonly MFACodeRequest: {
             readonly code: string;
         };
+        /** @description MFA key-ring identities, the durable primary-key fence, and live-secret counts. */
+        readonly MFAKeyStateResponse: {
+            /** @description Keys that seal at least one live MFA secret, ordered by identifier. */
+            readonly active: readonly components["schemas"]["MFASecretKeyUsage"][];
+            readonly active_rekey_job_id?: components["schemas"]["ID"];
+            /** @description Identifier of the key this node uses for new MFA secrets. */
+            readonly primary_key_id: string;
+            /** @description Primary key the last rekey fenced; every node must seal new secrets with it. Absent before the first rekey. */
+            readonly required_primary_key_id?: string;
+        };
         readonly MFARecoveryCodesResponse: {
             readonly recovery_codes: readonly string[];
         };
-        readonly MFASetupResponse: {
+        /** @description Coarse bounded progress while live MFA secrets are re-sealed. */
+        readonly MFARekeyProgress: {
+            /**
+             * Format: int64
+             * @description Credentials examined so far.
+             */
+            readonly current: number;
+            /** @enum {string} */
+            readonly stage: "resealing";
+            /**
+             * Format: int64
+             * @description Credentials in the processing set.
+             */
+            readonly total: number;
+        };
+        /** @description Final live-secret counts used to decide whether the retiring key may be removed. */
+        readonly MFARekeyProof: {
+            /**
+             * Format: int64
+             * @description Live MFA secrets sealed with any non-primary key after processing.
+             */
+            readonly non_primary_references: number;
+            /** @description True only when the final counts prove the retiring key can be removed. */
+            readonly retirement_safe: boolean;
+            /**
+             * Format: int64
+             * @description Live MFA secrets still sealed with the exact retiring key.
+             */
+            readonly retiring_references: number;
+        };
+        /** @description Exact retiring-key selection for a new fenced MFA rotation Job. */
+        readonly MFARekeyRequest: {
+            /** @description Non-secret identifier of the configured MFA key to retire; it must not be the primary key. */
+            readonly retiring_key_id: string;
+        };
+        /** @description Durable identities created when the MFA rotation Job is accepted. */
+        readonly MFARekeyResponse: {
+            /**
+             * Format: date-time
+             * @description Time when the rekey Job was created.
+             */
+            readonly created_at: string;
+            readonly job_id: components["schemas"]["ID"];
+            readonly primary_key_id: string;
+            readonly retiring_key_id: string;
+        };
+        /** @description Safe Job status, progress, and optional final key-retirement proof. */
+        readonly MFARekeyStatusResponse: {
+            readonly attempt_count: number;
+            /** Format: date-time */
+            readonly completed_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
+            readonly job_id: components["schemas"]["ID"];
+            readonly maximum_attempts: number;
+            readonly primary_key_id: string;
             /** Format: int64 */
-            readonly expires_at: number;
+            readonly processed: number;
+            readonly progress?: components["schemas"]["MFARekeyProgress"];
+            readonly proof?: components["schemas"]["MFARekeyProof"];
+            readonly public_error_code?: string;
+            /** Format: int64 */
+            readonly resealed: number;
+            readonly retiring_key_id: string;
+            readonly status: components["schemas"]["JobStatus"];
+            /** Format: date-time */
+            readonly updated_at: string;
+        };
+        /** @description Live TOTP secrets sealed with one MFA key. */
+        readonly MFASecretKeyUsage: {
+            /** @description Whether this node's configured MFA key ring holds the key. */
+            readonly configured: boolean;
+            /**
+             * Format: int64
+             * @description Number of live MFA credentials whose secret this key seals.
+             */
+            readonly credentials: number;
+            /** @description Non-secret 128-bit key identifier encoded as lowercase hexadecimal. */
+            readonly key_id: string;
+        };
+        readonly MFASetupResponse: {
+            /** Format: date-time */
+            readonly expires_at: string;
             /** Format: uri */
             readonly provisioning_uri: string;
             readonly secret: string;
@@ -8533,8 +8513,8 @@ export interface components {
             /** @description Whether this Session is restricted to fresh primary proof and local authenticator enrollment after an assisted reset. */
             readonly mfa_recovery_required: boolean;
             readonly pending: boolean;
-            /** Format: int64 */
-            readonly pending_expires_at?: number;
+            /** Format: date-time */
+            readonly pending_expires_at?: string;
             readonly recently_authenticated: boolean;
             readonly recovery_codes_remaining: number;
             /** @description Whether local authenticator enrollment and verification are currently available. */
@@ -8577,34 +8557,34 @@ export interface components {
         /** @description Safe durable mail delivery metadata with the recipient masked and content omitted. */
         readonly MailDeliveryResponse: {
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when SMTP accepted the message.
+             * Format: date-time
+             * @description Time when SMTP accepted the message.
              */
-            readonly accepted_at?: number;
+            readonly accepted_at?: string;
             readonly attempt_count: number;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the delivery was created.
+             * Format: date-time
+             * @description Time when the delivery was created.
              */
-            readonly created_at: number;
+            readonly created_at: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds after which the message is no longer relevant for delivery.
+             * Format: date-time
+             * @description Time after which the message is no longer relevant for delivery.
              */
-            readonly deadline: number;
+            readonly deadline: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the delivery became terminally failed.
+             * Format: date-time
+             * @description Time when the delivery became terminally failed.
              */
-            readonly failed_at?: number;
+            readonly failed_at?: string;
             readonly id: components["schemas"]["ID"];
             /** @description Redacted recipient address suitable for bounded administrative display. */
             readonly masked_recipient: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds represented by the message Date header.
+             * Format: date-time
+             * @description Time represented by the message Date header.
              */
-            readonly message_date: number;
+            readonly message_date: string;
             /** @description Safe retained Message-ID for delivery correlation, not a credential. */
             readonly message_id: string;
             readonly occurrence_id: components["schemas"]["ID"];
@@ -8617,10 +8597,10 @@ export interface components {
             /** @enum {string} */
             readonly template_key: "system.mail_test";
             /**
-             * Format: int64
-             * @description Unix time in milliseconds of the latest durable state change.
+             * Format: date-time
+             * @description Time of the latest durable state change.
              */
-            readonly updated_at: number;
+            readonly updated_at: string;
         };
         /**
          * @description Durable lifecycle state of one mail delivery occurrence.
@@ -8715,10 +8695,10 @@ export interface components {
         /** @description Durable identities created when the rotation Job is accepted. */
         readonly MailRekeyResponse: {
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the rekey Job was created.
+             * Format: date-time
+             * @description Time when the rekey Job was created.
              */
-            readonly created_at: number;
+            readonly created_at: string;
             readonly job_id: components["schemas"]["ID"];
             readonly primary_key_id: string;
             readonly retiring_key_id: string;
@@ -8726,10 +8706,10 @@ export interface components {
         /** @description Safe Job status, progress, and optional final key-retirement proof. */
         readonly MailRekeyStatusResponse: {
             readonly attempt_count: number;
-            /** Format: int64 */
-            readonly completed_at?: number;
-            /** Format: int64 */
-            readonly created_at: number;
+            /** Format: date-time */
+            readonly completed_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly job_id: components["schemas"]["ID"];
             readonly maximum_attempts: number;
             readonly primary_key_id: string;
@@ -8742,8 +8722,8 @@ export interface components {
             readonly reencrypted: number;
             readonly retiring_key_id: string;
             readonly status: components["schemas"]["JobStatus"];
-            /** Format: int64 */
-            readonly updated_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
         readonly MoveCandidateWorkspaceEntryRequest: {
             readonly destination_path: components["schemas"]["StarterWorkspacePath"];
@@ -8754,7 +8734,7 @@ export interface components {
         };
         readonly MoveExamStarterWorkspaceEntryRequest: {
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             readonly path: components["schemas"]["StarterWorkspacePath"];
         };
         readonly NativeBaselineReport: {
@@ -8955,9 +8935,9 @@ export interface components {
             readonly summary: {
                 readonly count_complete: boolean;
                 /** Format: date-time */
-                readonly first_unretained_at: string | null;
+                readonly first_unretained_at?: string;
                 /** Format: date-time */
-                readonly last_unretained_at: string | null;
+                readonly last_unretained_at?: string;
                 /** Format: int64 */
                 readonly summary_sequence: number;
                 /** Format: int64 */
@@ -9043,6 +9023,8 @@ export interface components {
             /** @enum {string} */
             readonly source_id: "display-topology" | "candidate-window" | "capture-session" | "process-application" | "interactive-session" | "clipboard" | "print-spooler" | "removable-storage" | "virtualization" | "network-configuration" | "media-device";
         };
+        /** @description Opaque continuation for the next page, omitted on the last page. Clients return it unchanged as cursor. */
+        readonly NextCursor: string;
         readonly OnboardingImportCommitRequest: {
             /** Format: int64 */
             readonly expected_revision: number;
@@ -9118,26 +9100,30 @@ export interface components {
             readonly credential: string;
             readonly token: components["schemas"]["PersonalAccessTokenResponse"];
         };
-        readonly PersonalAccessTokenListResponse: readonly components["schemas"]["PersonalAccessTokenResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly PersonalAccessTokenListResponse: {
+            readonly items: readonly components["schemas"]["PersonalAccessTokenResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly PersonalAccessTokenResponse: {
             readonly academic_unit_id?: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly description: string;
-            /** Format: int64 */
-            readonly disabled_at?: number;
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly disabled_at?: string;
+            /** Format: date-time */
+            readonly expires_at: string;
             readonly id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly last_used_at?: number;
-            /** Format: int64 */
-            readonly revoked_at?: number;
+            /** Format: date-time */
+            readonly last_used_at?: string;
+            /** Format: date-time */
+            readonly revoked_at?: string;
             readonly scopes: readonly string[];
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
             readonly user_id: components["schemas"]["ID"];
         };
         readonly PrepareSecurityPreflightRequest: {
@@ -9181,12 +9167,16 @@ export interface components {
             /** Format: uri-reference */
             readonly type: string;
         };
-        readonly ProgrammeLevelListResponse: readonly components["schemas"]["ProgrammeLevelResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly ProgrammeLevelListResponse: {
+            readonly items: readonly components["schemas"]["ProgrammeLevelResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly ProgrammeLevelResponse: {
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly description: string;
             readonly display_name: string;
             readonly id: components["schemas"]["ID"];
@@ -9197,16 +9187,20 @@ export interface components {
              * @description Current aggregate revision. Supply it as expected_revision on an edit or archive to protect a client snapshot from concurrent changes.
              */
             readonly revision: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
-        readonly ProgrammeListResponse: readonly components["schemas"]["ProgrammeResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly ProgrammeListResponse: {
+            readonly items: readonly components["schemas"]["ProgrammeResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly ProgrammeResponse: {
             readonly academic_unit_id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
             readonly description: string;
             readonly display_name: string;
             readonly id: components["schemas"]["ID"];
@@ -9216,8 +9210,8 @@ export interface components {
              * @description Current aggregate revision. Supply it as expected_revision on an edit or archive to protect a client snapshot from concurrent changes.
              */
             readonly revision: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
         /**
          * @description Admission rule applied after a configured provider proves an external identity.
@@ -9225,8 +9219,8 @@ export interface components {
          */
         readonly ProviderAdmissionMode: "linked_only" | "invitation_required" | "auto_provision";
         readonly ProviderConnectionResponse: {
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly expires_at: string;
             /** Format: uri */
             readonly redirect_url: string;
         };
@@ -9278,11 +9272,11 @@ export interface components {
              * Format: int64
              * @description The exact current Draft revision to validate and publish.
              */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
         };
         readonly ReallowExamAttemptRequest: {
             /** Format: int64 */
-            readonly expected_attempt_revision: number;
+            readonly expected_revision: number;
             /** @description Trimmed private manager reason retained only in suspension provenance. */
             readonly reason: string;
             readonly suspension_id: components["schemas"]["ID"];
@@ -9303,15 +9297,15 @@ export interface components {
         };
         readonly RemoveExamManagerRequest: {
             /** Format: int64 */
-            readonly expected_exam_revision: number;
+            readonly expected_revision: number;
         };
         readonly RemoveExamResourceRequest: {
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
         };
         readonly RemoveExamStarterWorkspaceEntryRequest: {
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             /**
              * @description Remove this directory and every descendant atomically under the expected Draft revision. Omit for a file or ordinary empty-directory removal.
              * @default false
@@ -9320,7 +9314,7 @@ export interface components {
         };
         readonly ReorderExamResourcesRequest: {
             /** Format: int64 */
-            readonly expected_draft_revision: number;
+            readonly expected_revision: number;
             readonly resource_ids: readonly components["schemas"]["ID"][];
         };
         readonly ReplaceCandidateWorkspaceFileMetadata: {
@@ -9356,16 +9350,16 @@ export interface components {
             readonly class_id?: components["schemas"]["ID"];
             /** Format: email */
             readonly email: string;
-            /** Format: int64 */
-            readonly end_at?: number;
+            /** Format: date-time */
+            readonly end_at?: string;
             /** Format: int64 */
             readonly expected_revision: number;
             readonly institution_id?: components["schemas"]["ID"];
             /** @enum {string} */
             readonly purpose: "student_class" | "teacher_academic_unit" | "academic_unit_role" | "institution_role";
             readonly role_id?: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly start_at?: number;
+            /** Format: date-time */
+            readonly start_at?: string;
             readonly suggested_display_name?: string;
             readonly suggested_first_name?: string;
             readonly suggested_last_name?: string;
@@ -9469,7 +9463,7 @@ export interface components {
         };
         readonly RetentionNoticeResponse: {
             /** Format: date-time */
-            readonly cancelled_at?: string;
+            readonly canceled_at?: string;
             /** @enum {string} */
             readonly category: "work" | "integrity" | "browser_activity" | "security_operational";
             /** Format: date-time */
@@ -9483,7 +9477,7 @@ export interface components {
             readonly retire_after: string;
             readonly retirement_id: components["schemas"]["ID"];
             /** @enum {string} */
-            readonly state: "grace" | "cancelled" | "retired";
+            readonly state: "grace" | "canceled" | "retired";
             readonly submission_id: components["schemas"]["ID"];
         };
         readonly RetentionNoticesResponse: {
@@ -9567,7 +9561,7 @@ export interface components {
         };
         readonly RetentionPreviewRequest: {
             /** Format: int64 */
-            readonly expected_policy_revision: number;
+            readonly expected_revision: number;
         };
         readonly RetentionPreviewResponse: {
             readonly audit: components["schemas"]["RetentionExpiryCounts"];
@@ -9636,54 +9630,60 @@ export interface components {
             /** Format: date-time */
             readonly scheduled_at: string;
             /** @enum {string} */
-            readonly state: "grace" | "cancelled" | "retired";
+            readonly state: "grace" | "canceled" | "retired";
         };
         readonly RevokeSessionRequest: {
             readonly session_id: components["schemas"]["ID"];
         };
         /** @description Authorized current and historical Role Bindings. */
-        readonly RoleBindingListResponse: readonly components["schemas"]["RoleBindingResponse"][];
+        readonly RoleBindingListResponse: {
+            readonly items: readonly components["schemas"]["RoleBindingResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         /** @description Effective-dated grant of one Role to one User in one exact scope. */
         readonly RoleBindingResponse: {
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the grant stops being effective, when bounded.
+             * Format: date-time
+             * @description Time when the grant stops being effective, when bounded.
              */
-            readonly end_at?: number;
+            readonly end_at?: string;
             readonly id: components["schemas"]["ID"];
             readonly role_id: components["schemas"]["ID"];
             readonly scope_id: components["schemas"]["ID"];
             /** @description Stable authorization scope kind for the grant. */
             readonly scope_type: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the grant becomes effective.
+             * Format: date-time
+             * @description Time when the grant becomes effective.
              */
-            readonly start_at: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            readonly start_at: string;
+            /** Format: date-time */
+            readonly updated_at: string;
             readonly user_id: components["schemas"]["ID"];
         };
         /** @description Roles visible to the authorized caller. */
-        readonly RoleListResponse: readonly components["schemas"]["RoleResponse"][];
+        readonly RoleListResponse: {
+            readonly items: readonly components["schemas"]["RoleResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         /** @description Reusable Role definition; effective access still requires a scoped Role Binding. */
         readonly RoleResponse: {
+            /**
+             * Format: date-time
+             * @description Time when the Role was archived; omitted while active.
+             */
+            readonly archived_at?: string;
             /** @description True when installation invariants protect the Role from ordinary update or deletion. */
             readonly built_in: boolean;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds when the Role was created.
+             * Format: date-time
+             * @description Time when the Role was created.
              */
-            readonly create_at: number;
-            /**
-             * Format: int64
-             * @description Unix time in milliseconds when deleted, or zero while active.
-             */
-            readonly delete_at: number;
+            readonly created_at: string;
             /** @description Human-facing explanation of the Role's intended responsibility. */
             readonly description: string;
             /** @description Human-facing Role name. */
@@ -9694,24 +9694,24 @@ export interface components {
             /** @description Duplicate-free set of stable permission actions granted by the Role. */
             readonly permissions: readonly string[];
             /**
-             * Format: int64
-             * @description Unix time in milliseconds of the latest Role change.
+             * Format: date-time
+             * @description Time of the latest Role change.
              */
-            readonly update_at: number;
+            readonly updated_at: string;
         };
         readonly SHA256: string;
         /** @description Conditional create or replacement of the current decision for one integrity Flag. */
         readonly SaveExamIntegrityDecisionRequest: {
             /**
              * Format: int64
-             * @description Zero for the first decision on this Flag; otherwise the exact current decision revision.
-             */
-            readonly expected_decision_revision: number;
-            /**
-             * Format: int64
              * @description Zero when creating the first Review through this command; otherwise the exact current Review revision.
              */
             readonly expected_review_revision: number;
+            /**
+             * Format: int64
+             * @description Zero for the first decision on this Flag; otherwise the exact current decision revision.
+             */
+            readonly expected_revision: number;
             /**
              * @description A non-academic integrity disposition, never a grade or guilt verdict.
              * @enum {string}
@@ -9742,8 +9742,6 @@ export interface components {
             /** @enum {string} */
             readonly coverage_result: "accepted" | "stale_control" | "reset_required" | "reset_conflict";
             readonly delivery_watermark_rejections: readonly components["schemas"]["DeliveryWatermarkRejection"][];
-            /** @enum {string} */
-            readonly execution_state: "not_allocated" | "ready" | "freeze_pending" | "frozen" | "thaw_pending" | "unavailable";
             readonly processed_control_digest: string | null;
             /** Format: int64 */
             readonly processed_control_sequence: number;
@@ -9814,17 +9812,22 @@ export interface components {
             /** Format: int64 */
             readonly last: number;
         };
-        readonly SessionAdministrationListResponse: readonly components["schemas"]["SessionAdministrationResponse"][];
+        /** @description One bounded page of a User's Sessions, newest first. */
+        readonly SessionAdministrationListResponse: {
+            readonly items: readonly components["schemas"]["SessionAdministrationResponse"][];
+            /** @description Opaque continuation for the next page, omitted after the final page. */
+            readonly next_cursor?: string;
+        };
         readonly SessionAdministrationResponse: {
-            /** Format: int64 */
-            readonly authenticated_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly authenticated_at: string;
             readonly authentication_method: string;
             readonly authentication_strength: string;
             readonly client_type: string;
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly created_at: string;
             /** @enum {string} */
             readonly desktop_architecture?: "arm64" | "x64";
             readonly desktop_build_id?: string;
@@ -9835,44 +9838,48 @@ export interface components {
             readonly desktop_release?: string;
             readonly device_id?: string;
             readonly device_name?: string;
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly expires_at: string;
             readonly id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly idle_expires_at: number;
-            /** Format: int64 */
-            readonly last_activity_at: number;
-            /** Format: int64 */
-            readonly mfa_completed_at?: number;
+            /** Format: date-time */
+            readonly idle_expires_at: string;
+            /** Format: date-time */
+            readonly last_activity_at: string;
+            /** Format: date-time */
+            readonly mfa_completed_at?: string;
             /** @description Whether this Session is restricted to MFA reenrollment after an assisted reset. */
             readonly mfa_recovery_required: boolean;
             /**
-             * Format: int64
+             * Format: date-time
              * @description Most recent fresh primary proof for the original Session method, independent of initial authentication and MFA history.
              */
-            readonly reauthenticated_at?: number;
+            readonly reauthenticated_at?: string;
             /** @description Localized presentation of revocation_reason_code. */
             readonly revocation_reason?: string;
             /** @enum {string} */
-            readonly revocation_reason_code?: "account_disabled" | "access_policy_changed" | "administrator_all_sessions" | "administrator_session" | "authentication_audit_failed" | "desktop_authorization_failed" | "desktop_registration_revoked" | "external_identity_unlinked" | "inactive_user" | "mfa_reset" | "password_removed" | "password_reset" | "refresh_replay" | "user_all_sessions" | "user_logout" | "user_session";
-            /** Format: int64 */
-            readonly revoked_at?: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            readonly revocation_reason_code?: "account_disabled" | "access_policy_changed" | "administrator_all_sessions" | "administrator_session" | "authentication_audit_failed" | "desktop_authorization_failed" | "desktop_registration_revoked" | "email_change_undone" | "external_identity_unlinked" | "inactive_user" | "mfa_reset" | "password_changed" | "password_removed" | "password_reset" | "refresh_replay" | "user_all_sessions" | "user_logout" | "user_session";
+            /** Format: date-time */
+            readonly revoked_at?: string;
+            /** Format: date-time */
+            readonly updated_at: string;
             readonly user_id: components["schemas"]["ID"];
         };
-        readonly SessionListResponse: readonly components["schemas"]["SessionResponse"][];
+        /** @description One page of the collection in its stable order. */
+        readonly SessionListResponse: {
+            readonly items: readonly components["schemas"]["SessionResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         readonly SessionResponse: {
-            /** Format: int64 */
-            readonly authenticated_at: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly authenticated_at: string;
             readonly authentication_method: string;
             readonly authentication_strength: string;
             /** @enum {string} */
             readonly client_type: "desktop" | "cli" | "web";
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
+            /** Format: date-time */
+            readonly created_at: string;
             /** @enum {string} */
             readonly desktop_architecture?: "arm64" | "x64";
             readonly desktop_build_id?: string;
@@ -9883,30 +9890,30 @@ export interface components {
             readonly desktop_release?: string;
             readonly device_id?: string;
             readonly device_name?: string;
-            /** Format: int64 */
-            readonly expires_at: number;
+            /** Format: date-time */
+            readonly expires_at: string;
             readonly id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly idle_expires_at: number;
-            /** Format: int64 */
-            readonly last_activity_at: number;
-            /** Format: int64 */
-            readonly mfa_completed_at?: number;
+            /** Format: date-time */
+            readonly idle_expires_at: string;
+            /** Format: date-time */
+            readonly last_activity_at: string;
+            /** Format: date-time */
+            readonly mfa_completed_at?: string;
             /** @description Ordinary access remains unavailable until a new local authenticator is activated. */
             readonly mfa_recovery_required: boolean;
             /**
-             * Format: int64
+             * Format: date-time
              * @description Most recent verified fresh primary proof for the original Session method; does not replace initial authentication or MFA history.
              */
-            readonly reauthenticated_at?: number;
+            readonly reauthenticated_at?: string;
             /** @description Localized presentation of revocation_reason_code. */
             readonly revocation_reason?: string;
             /** @enum {string} */
-            readonly revocation_reason_code?: "mfa_reset" | "account_disabled" | "access_policy_changed" | "administrator_all_sessions" | "administrator_session" | "authentication_audit_failed" | "desktop_authorization_failed" | "desktop_registration_revoked" | "external_identity_unlinked" | "inactive_user" | "password_removed" | "password_reset" | "refresh_replay" | "user_all_sessions" | "user_logout" | "user_session";
-            /** Format: int64 */
-            readonly revoked_at?: number;
-            /** Format: int64 */
-            readonly update_at: number;
+            readonly revocation_reason_code?: "mfa_reset" | "account_disabled" | "access_policy_changed" | "administrator_all_sessions" | "administrator_session" | "authentication_audit_failed" | "desktop_authorization_failed" | "desktop_registration_revoked" | "email_change_undone" | "external_identity_unlinked" | "inactive_user" | "password_changed" | "password_removed" | "password_reset" | "refresh_replay" | "user_all_sessions" | "user_logout" | "user_session";
+            /** Format: date-time */
+            readonly revoked_at?: string;
+            /** Format: date-time */
+            readonly updated_at: string;
             readonly user_id: components["schemas"]["ID"];
         };
         readonly SittingCandidateAttemptResponse: {
@@ -9928,9 +9935,9 @@ export interface components {
         };
         readonly SittingCandidatePresenceResponse: {
             /** Format: date-time */
-            readonly last_lease_renewed_at: string | null;
+            readonly last_lease_renewed_at?: string;
             /** Format: date-time */
-            readonly lease_expires_at: string | null;
+            readonly lease_expires_at?: string;
             readonly state: components["schemas"]["SittingCandidatePresenceState"];
         };
         /** @enum {string} */
@@ -9953,7 +9960,7 @@ export interface components {
         };
         readonly SittingCandidateSuspensionResponse: {
             /** @enum {string} */
-            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required";
+            readonly candidate_reason: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended";
             readonly id: components["schemas"]["ID"];
             readonly reallow_available: boolean;
         };
@@ -10054,6 +10061,12 @@ export interface components {
             /** @description The active Participation identifier returned by the successful Attempt connection. */
             readonly participation_id: components["schemas"]["ID"];
         };
+        readonly SuspendExamAttemptRequest: {
+            /** Format: int64 */
+            readonly expected_revision: number;
+            /** @description Trimmed private manager reason retained only in suspension provenance. */
+            readonly reason: string;
+        };
         /** @description Safe product availability and compatibility projection for one declared Desktop build. */
         readonly SystemPingResponse: {
             /** @description Optional bounded plain-text Institution administrator message. */
@@ -10092,20 +10105,20 @@ export interface components {
         /** @description Existing Review identity and exact revision for a terminal transition. */
         readonly TerminalExamIntegrityReviewRequest: {
             /** Format: int64 */
-            readonly expected_review_revision: number;
+            readonly expected_revision: number;
             readonly submission_review_id: components["schemas"]["ID"];
         };
         readonly TransferExamOwnershipRequest: {
             /** Format: int64 */
-            readonly expected_exam_revision: number;
+            readonly expected_revision: number;
             readonly user_id: components["schemas"]["ID"];
         };
         readonly UnretainedDeliverySummary: {
             readonly count_complete: boolean;
             /** Format: date-time */
-            readonly first_unretained_at: string | null;
+            readonly first_unretained_at?: string;
             /** Format: date-time */
-            readonly last_unretained_at: string | null;
+            readonly last_unretained_at?: string;
             /** Format: int64 */
             readonly summary_sequence: number;
             /** Format: int64 */
@@ -10118,10 +10131,10 @@ export interface components {
             /** @description Omitted or null leaves the value unchanged. An empty string is present and subject to validation. */
             readonly display_name?: string | null;
             /**
-             * Format: int64
-             * @description Omitted or null leaves the exclusive end unchanged.
+             * Format: date-time
+             * @description Omitted leaves the exclusive end unchanged; null is invalid.
              */
-            readonly end_at?: number | null;
+            readonly end_at?: string;
             /**
              * Format: int64
              * @description Optional positive revision from the last resource response. A stale value returns the resource conflict error without applying the edit. Omission preserves v1 compatibility; null is invalid.
@@ -10130,10 +10143,10 @@ export interface components {
             /** @description Omitted or null leaves the value unchanged. An empty string is present and subject to validation. */
             readonly name?: string | null;
             /**
-             * Format: int64
-             * @description Omitted or null leaves the inclusive start unchanged.
+             * Format: date-time
+             * @description Omitted leaves the inclusive start unchanged; null is invalid.
              */
-            readonly start_at?: number | null;
+            readonly start_at?: string;
         };
         /** @description Mutable Academic Unit fields, including an optional hierarchy move. */
         readonly UpdateAcademicUnitRequest: {
@@ -10171,7 +10184,7 @@ export interface components {
         /** @description Conditional complete replacement of the Review's mutable text fields. */
         readonly UpdateExamIntegrityReviewRequest: {
             /** Format: int64 */
-            readonly expected_review_revision: number;
+            readonly expected_revision: number;
             /** @description Already-trimmed private manager UTF-8 notes, at most 3000 Unicode scalar values and 12000 bytes. */
             readonly manager_notes: string;
             /** @description Optional approved student-facing Markdown, at most 8192 Unicode scalar values and 32768 UTF-8 bytes; sanitized again on candidate projection. */
@@ -10272,33 +10285,36 @@ export interface components {
             readonly id: components["schemas"]["ID"];
         };
         /** @description Visible User profiles ordered by canonical username and identity. */
-        readonly UserProfileListResponse: readonly components["schemas"]["UserProfileResponse"][];
+        readonly UserProfileListResponse: {
+            readonly items: readonly components["schemas"]["UserProfileResponse"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
         /** @description User directory projection. Email, verification, locale, timezone, activity, and disabled state are present only for self or institution-wide user.view authority. */
         readonly UserProfileResponse: {
-            /** Format: int64 */
-            readonly create_at: number;
-            /** Format: int64 */
-            readonly delete_at: number;
-            /** Format: int64 */
-            readonly disabled_at?: number;
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly created_at: string;
+            /** Format: date-time */
+            readonly disabled_at?: string;
             readonly display_name: string;
             /** Format: email */
             readonly email?: string;
             readonly email_verified?: boolean;
             readonly first_name: string;
             readonly id: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly last_activity_at?: number;
-            /** Format: int64 */
-            readonly last_login_at?: number;
+            /** Format: date-time */
+            readonly last_activity_at?: string;
+            /** Format: date-time */
+            readonly last_login_at?: string;
             readonly last_name: string;
             readonly locale?: string;
-            /** Format: int64 */
-            readonly profile_picture_changed_at?: number;
+            /** Format: date-time */
+            readonly profile_picture_changed_at?: string;
             readonly profile_picture_url: string;
             readonly timezone?: string;
-            /** Format: int64 */
-            readonly update_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
             readonly username: string;
         };
         /** @description Complete conditional replacement for the current User Settings Document. */
@@ -10313,8 +10329,8 @@ export interface components {
             readonly changed: boolean;
             readonly format_version: number;
             readonly revision: components["schemas"]["ID"];
-            /** Format: int64 */
-            readonly updated_at: number;
+            /** Format: date-time */
+            readonly updated_at: string;
         };
         /** @description Exact private User Settings Document with concurrency metadata. */
         readonly UserSettingsResponse: {
@@ -10325,10 +10341,10 @@ export interface components {
             /** @description Exact validated JSON source, bounded to 256 KiB. */
             readonly source: string;
             /**
-             * Format: int64
-             * @description Unix time in milliseconds of the latest durable replacement.
+             * Format: date-time
+             * @description Time of the latest durable replacement.
              */
-            readonly updated_at: number;
+            readonly updated_at: string;
             /** @description Whether this Session may currently replace the settings source. */
             readonly writable: boolean;
         };
@@ -10390,7 +10406,11 @@ export interface components {
                 readonly [name: string]: unknown;
             };
             content: {
-                /** @example [] */
+                /**
+                 * @example {
+                 *       "items": []
+                 *     }
+                 */
                 readonly "application/json": components["schemas"]["AcademicPeriodListResponse"];
             };
         };
@@ -10451,8 +10471,6 @@ export interface components {
         /** @description Academic Unit Member collection */
         readonly AcademicUnitMemberListOK: {
             headers: {
-                /** @description Present only when a bounded page has more rows. Follow the relative URL with rel="next"; its cursor and effective/history filter identify the continuation. */
-                readonly Link?: string;
                 readonly [name: string]: unknown;
             };
             content: {
@@ -10478,7 +10496,7 @@ export interface components {
                 /**
                  * @example {
                  *       "available_providers": [],
-                 *       "created_at": 1798761600000,
+                 *       "created_at": "2027-01-01T00:00:00Z",
                  *       "desktop_authorization_enabled": true,
                  *       "durable_mail": true,
                  *       "history": [],
@@ -10489,7 +10507,7 @@ export interface components {
                  *       "provider_admissions": {},
                  *       "public_registration_enabled": false,
                  *       "revision": 4,
-                 *       "updated_at": 1798765200000
+                 *       "updated_at": "2027-01-01T01:00:00Z"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["AccessPolicyResponse"];
@@ -10530,7 +10548,11 @@ export interface components {
                 readonly [name: string]: unknown;
             };
             content: {
-                /** @example [] */
+                /**
+                 * @example {
+                 *       "items": []
+                 *     }
+                 */
                 readonly "application/json": components["schemas"]["AffiliationListResponse"];
             };
         };
@@ -10542,7 +10564,7 @@ export interface components {
             content: {
                 /**
                  * @example {
-                 *       "events": []
+                 *       "items": []
                  *     }
                  */
                 readonly "application/json": components["schemas"]["AuditListResponse"];
@@ -10832,8 +10854,6 @@ export interface components {
         /** @description Class Member collection */
         readonly ClassMemberListOK: {
             headers: {
-                /** @description Present only when a bounded page has more rows. Follow the relative URL with rel="next"; its cursor and effective/history filter identify the continuation. */
-                readonly Link?: string;
                 readonly [name: string]: unknown;
             };
             content: {
@@ -11007,6 +11027,16 @@ export interface components {
             };
             content: {
                 readonly "application/json": components["schemas"]["ExamAttemptReallowResponse"];
+            };
+        };
+        /** @description Exam Attempt suspended by a manager without exposing the private manager reason */
+        readonly ExamAttemptSuspended: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "application/json": components["schemas"]["ExamAttemptSuspendResponse"];
             };
         };
         /** @description Retained acknowledgement for the exact required correction */
@@ -11568,23 +11598,17 @@ export interface components {
                 readonly "application/json": components["schemas"]["ExamSubmissionReceiptResponse"];
             };
         };
-        /** @description Safe execution image authoring catalog */
-        readonly ExecutionImageListOK: {
-            headers: {
-                readonly "Cache-Control": components["headers"]["NoStore"];
-                readonly [name: string]: unknown;
-            };
-            content: {
-                readonly "application/json": components["schemas"]["ExecutionImageListResponse"];
-            };
-        };
         /** @description External authentication provider collection */
         readonly ExternalAuthenticationProviderListOK: {
             headers: {
                 readonly [name: string]: unknown;
             };
             content: {
-                /** @example [] */
+                /**
+                 * @example {
+                 *       "items": []
+                 *     }
+                 */
                 readonly "application/json": components["schemas"]["ExternalAuthenticationProviderListResponse"];
             };
         };
@@ -11624,6 +11648,26 @@ export interface components {
                  *       "status": 403,
                  *       "title": "Access denied",
                  *       "type": "/problems/authorization-denied"
+                 *     }
+                 */
+                readonly "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
+        /** @description Gone */
+        readonly Gone: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "code": "exam.security.preflight_expired",
+                 *       "detail": "The security preflight expired.",
+                 *       "request_id": "req_docs_gone",
+                 *       "status": 410,
+                 *       "title": "Gone",
+                 *       "type": "/problems/exam.security.preflight_expired"
                  *     }
                  */
                 readonly "application/problem+json": components["schemas"]["ProblemDetails"];
@@ -11679,12 +11723,12 @@ export interface components {
             content: {
                 /**
                  * @example {
-                 *       "code": "authentication.internal",
-                 *       "detail": "The request could not be completed.",
+                 *       "code": "server.internal",
+                 *       "detail": "An unexpected error occurred.",
                  *       "request_id": "req_docs_internal",
                  *       "status": 500,
                  *       "title": "Internal server error",
-                 *       "type": "/problems/internal"
+                 *       "type": "/problems/server.internal"
                  *     }
                  */
                 readonly "application/problem+json": components["schemas"]["ProblemDetails"];
@@ -11777,6 +11821,16 @@ export interface components {
                 readonly "application/json": components["schemas"]["MFAActivationResponse"];
             };
         };
+        /** @description MFA key-ring identities, fence, and live-secret counts */
+        readonly MFAKeyStateOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "application/json": components["schemas"]["MFAKeyStateResponse"];
+            };
+        };
         /** @description New MFA recovery codes */
         readonly MFARecoveryCodesOK: {
             headers: {
@@ -11785,6 +11839,26 @@ export interface components {
             };
             content: {
                 readonly "application/json": components["schemas"]["MFARecoveryCodesResponse"];
+            };
+        };
+        /** @description Durable fenced MFA key rotation accepted */
+        readonly MFARekeyAccepted: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "application/json": components["schemas"]["MFARekeyResponse"];
+            };
+        };
+        /** @description Safe MFA rekey progress and final retirement proof */
+        readonly MFARekeyStatusOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                readonly "application/json": components["schemas"]["MFARekeyStatusResponse"];
             };
         };
         /** @description Pending MFA setup */
@@ -12672,7 +12746,11 @@ export interface components {
                 readonly [name: string]: unknown;
             };
             content: {
-                /** @example [] */
+                /**
+                 * @example {
+                 *       "items": []
+                 *     }
+                 */
                 readonly "application/json": components["schemas"]["UserProfileListResponse"];
             };
         };
@@ -12707,8 +12785,6 @@ export interface components {
         };
     };
     parameters: {
-        /** @description Optional revision from the last resource response. A stale value returns the resource conflict error without archiving; omission preserves v1 compatibility. */
-        readonly AcademicExpectedRevision: number;
         /** @description The Academic Period identifier. */
         readonly AcademicPeriodID: components["schemas"]["ID"];
         /** @description The Academic Unit identifier. */
@@ -12769,6 +12845,10 @@ export interface components {
         readonly OnboardingImportID: components["schemas"]["ID"];
         /** @description Opaque client key. Identical semantic commands replay the committed outcome for at least 24 hours; reuse with different input is a conflict. */
         readonly OptionalIdempotencyKey: string;
+        /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+        readonly PageCursor: string;
+        /** @description Maximum number of items in the page. */
+        readonly PageLimit: number;
         /** @description The Personal Access Token record identifier; this is not the token secret. */
         readonly PersonalAccessTokenID: components["schemas"]["ID"];
         /** @description The Programme identifier. */
@@ -12819,7 +12899,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_exam_revision": 3,
+                 *       "expected_revision": 3,
                  *       "user_id": "ybndrfg8ejkmcpqxot1uwisza3"
                  *     }
                  */
@@ -12834,12 +12914,11 @@ export interface components {
                  *       "acknowledgement_required": true,
                  *       "affected_capabilities": [
                  *         "submission",
-                 *         "terminal",
                  *         "workspace"
                  *       ],
                  *       "candidate_summary": "The formula sheet for Question 3 was corrected.",
                  *       "expected_current_revision_id": "ybndrfg8ejkmcpqxot1uwisza3",
-                 *       "expected_sitting_revision": 8,
+                 *       "expected_revision": 8,
                  *       "instructions_markdown": "Read the corrected resource before continuing.",
                  *       "reason": "Question 3 contained an incorrect constant.",
                  *       "resources": [
@@ -12855,12 +12934,23 @@ export interface components {
                 readonly "application/json": components["schemas"]["ApplyExamSittingCorrectionRequest"];
             };
         };
+        /** @description Optional revision fence. A stale `expected_revision` returns the resource conflict error without archiving; a request without a body archives unconditionally. */
+        readonly ArchiveAcademic: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "expected_revision": 3
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ArchiveAcademicRequest"];
+            };
+        };
         /** @description Supplies the last observed Exam aggregate revision required for the concurrency-safe archive transition. */
         readonly ArchiveExam: {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_exam_revision": 3
+                 *       "expected_revision": 3
                  *     }
                  */
                 readonly "application/json": components["schemas"]["ArchiveExamRequest"];
@@ -12971,6 +13061,17 @@ export interface components {
                 readonly "application/json": components["schemas"]["CancelExamSittingRequest"];
             };
         };
+        /** @description Supplies the new policy-compliant local password; clients must prevent it from entering logs, traces, or analytics. */
+        readonly ChangePassword: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "password": "lantern-orchard-copper-tide"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["ChangePasswordRequest"];
+            };
+        };
         /** @description Exact current control and policy revisions plus the intended state. Enabling also requires an unexpired preview for that policy revision. */
         readonly ChangeRetentionControl: {
             readonly content: {
@@ -13076,24 +13177,10 @@ export interface components {
                  *       "browser_policy": {
                  *         "enabled": false
                  *       },
-                 *       "expected_draft_revision": 4
+                 *       "expected_revision": 4
                  *     }
                  */
                 readonly "application/json": components["schemas"]["ConfigureExamDraftBrowserPolicyRequest"];
-            };
-        };
-        /** @description Supplies the expected Draft revision and the complete enabled, image, and network selection that should replace the current profile. */
-        readonly ConfigureExamDraftExecutionProfile: {
-            readonly content: {
-                /**
-                 * @example {
-                 *       "enabled": true,
-                 *       "expected_draft_revision": 3,
-                 *       "image": "go-1.25",
-                 *       "network": "none"
-                 *     }
-                 */
-                readonly "application/json": components["schemas"]["ConfigureExamDraftExecutionProfileRequest"];
             };
         };
         /** @description Supplies the expected Draft revision and the complete replacement Focus Loss collection and outcome policy. */
@@ -13102,7 +13189,7 @@ export interface components {
                 /**
                  * @example {
                  *       "enabled": true,
-                 *       "expected_draft_revision": 4,
+                 *       "expected_revision": 4,
                  *       "incident_count": 3,
                  *       "minimum_duration_milliseconds": 1500,
                  *       "outcome": "flag_and_warn",
@@ -13117,7 +13204,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_draft_revision": 4,
+                 *       "expected_revision": 4,
                  *       "native": {
                  *         "baseline_id": "desktop_candidate",
                  *         "families": [
@@ -13185,17 +13272,17 @@ export interface components {
                 readonly "application/json": components["schemas"]["ConfigureExamDraftNativePolicyRequest"];
             };
         };
-        /** @description Exact owner, canonical presentation, and Unix-millisecond bounds for a new Academic Period. */
+        /** @description Exact owner, canonical presentation, and RFC 3339 bounds for a new Academic Period. */
         readonly CreateAcademicPeriod: {
             readonly content: {
                 /**
                  * @example {
                  *       "display_name": "2026–2027",
-                 *       "end_at": 1817078399000,
+                 *       "end_at": "2027-07-31T23:59:59Z",
                  *       "name": "2026-2027",
                  *       "owner_id": "ybndrfg8ejkmcpqxot1uwisza3",
                  *       "owner_type": "institution",
-                 *       "start_at": 1785542400000
+                 *       "start_at": "2026-08-01T00:00:00Z"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["CreateAcademicPeriodRequest"];
@@ -13219,7 +13306,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "start_at": 1785542400000,
+                 *       "start_at": "2026-08-01T00:00:00Z",
                  *       "user_id": "ybndrfg8ejkmcpqxot1uwisza3"
                  *     }
                  */
@@ -13232,7 +13319,7 @@ export interface components {
                 /**
                  * @example {
                  *       "kind": "teacher",
-                 *       "start_at": 1785542400000
+                 *       "start_at": "2026-08-01T00:00:00Z"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["CreateAffiliationRequest"];
@@ -13297,7 +13384,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_draft_revision": 2,
+                 *       "expected_revision": 2,
                  *       "path": "starter/tests"
                  *     }
                  */
@@ -13311,7 +13398,7 @@ export interface components {
                  * @example {
                  *       "academic_unit_id": "ybndrfg8ejkmcpqxot1uwisza3",
                  *       "description": "Read examination schedules from the registrar tool",
-                 *       "expires_at": 1798761600000,
+                 *       "expires_at": "2027-01-01T00:00:00Z",
                  *       "scopes": [
                  *         "examinations:read"
                  *       ]
@@ -13363,7 +13450,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_policy_revision": 1
+                 *       "expected_revision": 1
                  *     }
                  */
                 readonly "application/json": components["schemas"]["RetentionPreviewRequest"];
@@ -13393,7 +13480,7 @@ export interface components {
                  *       "role_id": "ybndrfg8ejkmcpqxot1uwisza4",
                  *       "scope_id": "ybndrfg8ejkmcpqxot1uwisza5",
                  *       "scope_type": "academic_unit",
-                 *       "start_at": 1785542400000,
+                 *       "start_at": "2026-08-01T00:00:00Z",
                  *       "user_id": "ybndrfg8ejkmcpqxot1uwisza3"
                  *     }
                  */
@@ -13407,7 +13494,7 @@ export interface components {
                  * @example {
                  *       "allocated_through_sequence": 4,
                  *       "declaration_id": "loss-0001",
-                 *       "expected_declaration_revision": 0,
+                 *       "expected_revision": 0,
                  *       "ranges": [
                  *         {
                  *           "first": 2,
@@ -13541,7 +13628,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_draft_revision": 2,
+                 *       "expected_revision": 2,
                  *       "instructions_markdown": "Read every question carefully. Save your work before submitting.",
                  *       "title": "Distributed Systems Final"
                  *     }
@@ -13555,7 +13642,7 @@ export interface components {
                 /**
                  * @example {
                  *       "display_name": "Formula sheet, revision 2",
-                 *       "expected_draft_revision": 4
+                 *       "expected_revision": 4
                  *     }
                  */
                 readonly "application/json": components["schemas"]["EditExamResourceMetadataRequest"];
@@ -13566,7 +13653,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_attempt_revision": 7,
+                 *       "expected_revision": 7,
                  *       "reason": "Candidate requested an early end after completing the exam."
                  *     }
                  */
@@ -13578,7 +13665,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "start_at": 1785542400000,
+                 *       "start_at": "2026-08-01T00:00:00Z",
                  *       "user_id": "ybndrfg8ejkmcpqxot1uwisza3"
                  *     }
                  */
@@ -13626,7 +13713,7 @@ export interface components {
                 /**
                  * @example {
                  *       "declaration_id": "final-0001",
-                 *       "expected_declaration_revision": 1,
+                 *       "expected_revision": 1,
                  *       "final_sequence": 4
                  *     }
                  */
@@ -13678,7 +13765,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_draft_revision": 5,
+                 *       "expected_revision": 5,
                  *       "path": "starter/src/main.go"
                  *     }
                  */
@@ -13778,7 +13865,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_draft_revision": 12
+                 *       "expected_revision": 12
                  *     }
                  */
                 readonly "application/json": components["schemas"]["PublishExamRevisionRequest"];
@@ -13789,7 +13876,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_attempt_revision": 4,
+                 *       "expected_revision": 4,
                  *       "reason": "Candidate identity was reverified by the invigilator.",
                  *       "suspension_id": "ybndrfg8ejkmcpqxot1uwisza3"
                  *     }
@@ -13815,7 +13902,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_exam_revision": 4
+                 *       "expected_revision": 4
                  *     }
                  */
                 readonly "application/json": components["schemas"]["RemoveExamManagerRequest"];
@@ -13826,7 +13913,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_draft_revision": 6
+                 *       "expected_revision": 6
                  *     }
                  */
                 readonly "application/json": components["schemas"]["RemoveExamResourceRequest"];
@@ -13837,7 +13924,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_draft_revision": 6
+                 *       "expected_revision": 6
                  *     }
                  */
                 readonly "application/json": components["schemas"]["RemoveExamStarterWorkspaceEntryRequest"];
@@ -13848,7 +13935,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_draft_revision": 5,
+                 *       "expected_revision": 5,
                  *       "resource_ids": [
                  *         "ybndrfg8ejkmcpqxot1uwisza3",
                  *         "ybndrfg8ejkmcpqxot1uwisza4"
@@ -14032,8 +14119,8 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_decision_revision": 0,
                  *       "expected_review_revision": 0,
+                 *       "expected_revision": 0,
                  *       "outcome": "inconclusive",
                  *       "private_rationale": "The retained evidence does not establish a reliable conclusion."
                  *     }
@@ -14081,6 +14168,17 @@ export interface components {
                 readonly "application/json": components["schemas"]["SecurityPreflightReport"];
             };
         };
+        /** @description Identifies the configured non-primary MFA key that this rotation must retire. */
+        readonly StartMFARekey: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "retiring_key_id": "0123456789abcdef0123456789abcdef"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["MFARekeyRequest"];
+            };
+        };
         /** @description Identifies the currently active non-primary key that this rotation must retire. */
         readonly StartMailRekey: {
             readonly content: {
@@ -14119,12 +14217,24 @@ export interface components {
                 readonly "application/json": components["schemas"]["SubmitExamAttemptRequest"];
             };
         };
+        /** @description Identifies the expected Attempt revision and the private manager reason required for the audited manual suspension. */
+        readonly SuspendExamAttempt: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "expected_revision": 3,
+                 *       "reason": "Candidate left the examination room without permission."
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["SuspendExamAttemptRequest"];
+            };
+        };
         /** @description Exact existing Review identity and revision to finalize or release. */
         readonly TerminalExamIntegrityReview: {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_review_revision": 7,
+                 *       "expected_revision": 7,
                  *       "submission_review_id": "ybndrfg8ejkmcpqxot1uwisza3"
                  *     }
                  */
@@ -14136,11 +14246,22 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_exam_revision": 5,
+                 *       "expected_revision": 5,
                  *       "user_id": "ybndrfg8ejkmcpqxot1uwisza3"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["TransferExamOwnershipRequest"];
+            };
+        };
+        /** @description Supplies the one-time undo token delivered to the previous email address. */
+        readonly UndoEmailChange: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "token": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["EmailChangeUndoRequest"];
             };
         };
         /** @description Closed bounded native delivery control; unknown, missing, duplicate, and invalid members are rejected. */
@@ -14164,7 +14285,7 @@ export interface components {
                 /**
                  * @example {
                  *       "display_name": "Academic Year 2026–2027",
-                 *       "end_at": 1819756799000
+                 *       "end_at": "2027-08-31T23:59:59Z"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["UpdateAcademicPeriodRequest"];
@@ -14199,7 +14320,7 @@ export interface components {
             readonly content: {
                 /**
                  * @example {
-                 *       "expected_review_revision": 0,
+                 *       "expected_revision": 0,
                  *       "manager_notes": "Review opened; evidence assessment is pending.",
                  *       "student_remarks_markdown": ""
                  *     }
@@ -14342,8 +14463,10 @@ export interface operations {
             readonly query?: {
                 /** @description Literal case-insensitive substring matched against name and display name. */
                 readonly q?: string;
-                /** @description Maximum number of visible Academic Periods to return. */
-                readonly limit?: number;
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: never;
             readonly path?: never;
@@ -14405,10 +14528,7 @@ export interface operations {
     };
     readonly archiveAcademicPeriod: {
         readonly parameters: {
-            readonly query?: {
-                /** @description Optional revision from the last resource response. A stale value returns the resource conflict error without archiving; omission preserves v1 compatibility. */
-                readonly expected_revision?: components["parameters"]["AcademicExpectedRevision"];
-            };
+            readonly query?: never;
             readonly header?: never;
             readonly path: {
                 /** @description The Academic Period identifier. */
@@ -14416,7 +14536,7 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: never;
+        readonly requestBody?: components["requestBodies"]["ArchiveAcademic"];
         readonly responses: {
             readonly 204: components["responses"]["AcademicPeriodArchived"];
             readonly 400: components["responses"]["BadRequest"];
@@ -14477,8 +14597,10 @@ export interface operations {
             readonly query?: {
                 /** @description Literal case-insensitive substring matched against name and display name. */
                 readonly q?: string;
-                /** @description Maximum number of Academic Units to return, from 1 through 200. */
-                readonly limit?: number;
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: never;
             readonly path?: never;
@@ -14490,6 +14612,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -14510,6 +14633,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -14538,10 +14662,7 @@ export interface operations {
     };
     readonly archiveAcademicUnit: {
         readonly parameters: {
-            readonly query?: {
-                /** @description Optional revision from the last resource response. A stale value returns the resource conflict error without archiving; omission preserves v1 compatibility. */
-                readonly expected_revision?: components["parameters"]["AcademicExpectedRevision"];
-            };
+            readonly query?: never;
             readonly header?: never;
             readonly path: {
                 /** @description The Academic Unit identifier. */
@@ -14549,7 +14670,7 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: never;
+        readonly requestBody?: components["requestBodies"]["ArchiveAcademic"];
         readonly responses: {
             readonly 204: components["responses"]["AcademicUnitArchived"];
             readonly 400: components["responses"]["BadRequest"];
@@ -14585,7 +14706,12 @@ export interface operations {
     };
     readonly listAcademicUnitChildren: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path: {
                 /** @description The Academic Unit identifier. */
@@ -14631,8 +14757,10 @@ export interface operations {
             readonly query?: {
                 /** @description Literal case-insensitive substring matched against name and display name. */
                 readonly q?: string;
-                /** @description Maximum number of Classes to return. */
-                readonly limit?: number;
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: never;
             readonly path: {
@@ -14669,7 +14797,7 @@ export interface operations {
                  * @example {
                  *       "email": "reviewer.one@example.edu",
                  *       "role_id": "ybndrfg8ejkmcpqxot1uwisza3",
-                 *       "start_at": 1785542400000
+                 *       "start_at": "2026-08-01T00:00:00Z"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["IssueScopedRoleInvitationRequest"];
@@ -14711,7 +14839,7 @@ export interface operations {
                  * @example {
                  *       "email": "teacher.one@example.edu",
                  *       "role_id": "ybndrfg8ejkmcpqxot1uwisza3",
-                 *       "start_at": 1785542400000,
+                 *       "start_at": "2026-08-01T00:00:00Z",
                  *       "suggested_display_name": "Teacher One",
                  *       "suggested_username": "teacher-one"
                  *     }
@@ -14741,14 +14869,14 @@ export interface operations {
     readonly listAcademicUnitMembers: {
         readonly parameters: {
             readonly query?: {
-                /** @description Opt into bounded paging while preserving the bare-array response. Defaults to 50 when cursor is supplied; pages contain at most 200 rows. Without limit or cursor the legacy full-list response remains available. */
-                readonly limit?: number;
-                /** @description Opaque continuation from the previous Link header. It binds the resource and effective/history filter. Every page requires fresh authorization; do not edit or reuse it for another resource or filter. */
-                readonly cursor?: string;
-                /** @description Unix time in milliseconds at which membership must be effective; ignored when history is true in legacy full-list mode. For paging, omit it with history=true and inherit the first page instant when following a cursor. */
-                readonly active_at?: number;
+                /** @description RFC 3339 instant at which membership must be effective; ignored when history is true in legacy full-list mode. For paging, omit it with history=true and inherit the first page instant when following a cursor. */
+                readonly active_at?: string;
                 /** @description When true, return membership history. Legacy full-list mode ignores active_at; paged requests must omit active_at with history=true. */
                 readonly history?: boolean;
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: never;
             readonly path: {
@@ -14795,8 +14923,10 @@ export interface operations {
             readonly query?: {
                 /** @description Literal case-insensitive substring matched against name and display name. */
                 readonly q?: string;
-                /** @description Maximum number of Programmes to return. */
-                readonly limit?: number;
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: never;
             readonly path: {
@@ -14851,6 +14981,8 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -14871,6 +15003,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -14889,6 +15022,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -14942,6 +15076,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -15082,6 +15217,7 @@ export interface operations {
             readonly 303: components["responses"]["ExternalAuthenticationRedirect"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 429: components["responses"]["TooManyRequests"];
@@ -15180,6 +15316,22 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly undoEmailChange: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["UndoEmailChange"];
+        readonly responses: {
+            readonly 204: components["responses"]["SensitiveNoContent"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 429: components["responses"]["TooManyRequests"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly completeEmailVerification: {
         readonly parameters: {
             readonly query?: never;
@@ -15258,6 +15410,7 @@ export interface operations {
         readonly responses: {
             readonly 204: components["responses"]["SensitiveNoContent"];
             readonly 400: components["responses"]["BadRequest"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 429: components["responses"]["TooManyRequests"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -15279,7 +15432,12 @@ export interface operations {
     };
     readonly listAuthenticationProviders: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path?: never;
             readonly cookie?: never;
@@ -15287,6 +15445,7 @@ export interface operations {
         readonly requestBody?: never;
         readonly responses: {
             readonly 200: components["responses"]["ExternalAuthenticationProviderListOK"];
+            readonly 400: components["responses"]["BadRequest"];
             readonly 500: components["responses"]["InternalError"];
         };
     };
@@ -15337,6 +15496,7 @@ export interface operations {
             readonly 303: components["responses"]["ExternalAuthenticationRedirect"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 429: components["responses"]["TooManyRequests"];
             readonly 500: components["responses"]["InternalError"];
@@ -15492,6 +15652,25 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly changePassword: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["ChangePassword"];
+        readonly responses: {
+            readonly 204: components["responses"]["SensitiveNoContent"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly unlinkExternalIdentity: {
         readonly parameters: {
             readonly query?: never;
@@ -15548,6 +15727,7 @@ export interface operations {
         readonly responses: {
             readonly 200: components["responses"]["InstallationStatusOK"];
             readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
     readonly bootstrapInstallation: {
@@ -15613,10 +15793,7 @@ export interface operations {
     };
     readonly archiveClass: {
         readonly parameters: {
-            readonly query?: {
-                /** @description Optional revision from the last resource response. A stale value returns the resource conflict error without archiving; omission preserves v1 compatibility. */
-                readonly expected_revision?: components["parameters"]["AcademicExpectedRevision"];
-            };
+            readonly query?: never;
             readonly header?: never;
             readonly path: {
                 /** @description The Class identifier. */
@@ -15624,7 +15801,7 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: never;
+        readonly requestBody?: components["requestBodies"]["ArchiveAcademic"];
         readonly responses: {
             readonly 204: components["responses"]["ClassArchived"];
             readonly 400: components["responses"]["BadRequest"];
@@ -15705,14 +15882,14 @@ export interface operations {
     readonly listClassMembers: {
         readonly parameters: {
             readonly query?: {
-                /** @description Opt into bounded paging while preserving the bare-array response. Defaults to 50 when cursor is supplied; pages contain at most 200 rows. Without limit or cursor the legacy full-list response remains available. */
-                readonly limit?: number;
-                /** @description Opaque continuation from the previous Link header. It binds the resource and effective/history filter. Every page requires fresh authorization; do not edit or reuse it for another resource or filter. */
-                readonly cursor?: string;
-                /** @description Unix time in milliseconds at which enrollment must be effective; ignored when history is true in legacy full-list mode. For paging, omit it with history=true and inherit the first page instant when following a cursor. */
-                readonly active_at?: number;
+                /** @description RFC 3339 instant at which enrollment must be effective; ignored when history is true in legacy full-list mode. For paging, omit it with history=true and inherit the first page instant when following a cursor. */
+                readonly active_at?: string;
                 /** @description When true, return enrollment history. Legacy full-list mode ignores active_at; paged requests must omit active_at with history=true. */
                 readonly history?: boolean;
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: never;
             readonly path: {
@@ -15767,6 +15944,8 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -15787,6 +15966,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -15802,6 +15982,7 @@ export interface operations {
         readonly requestBody?: never;
         readonly responses: {
             readonly 200: components["responses"]["PublicAccessDiscoveryOK"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
@@ -15810,6 +15991,10 @@ export interface operations {
             readonly query: {
                 /** @description Owned Participation whose bounded source inventory is requested. */
                 readonly participation_id: components["schemas"]["ID"];
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: {
                 /** @description Sensitive canonical 32-byte Raw URL-safe base64 continuity credential for the active Participation. Never log, persist, cache, or place this value in a URL. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
@@ -15932,11 +16117,11 @@ export interface operations {
     };
     readonly browserDeliveryReceipts: {
         readonly parameters: {
-            readonly query: {
-                /** @description First sequence to examine, inclusive. */
-                readonly first_sequence: number;
-                /** @description Maximum number of retained receipts. */
-                readonly limit: number;
+            readonly query?: {
+                /** @description Maximum number of retained receipts in the page. */
+                readonly limit?: number;
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: {
                 /** @description Sensitive canonical 32-byte Raw URL-safe base64 continuity credential for the active Participation. Never log, persist, cache, or place this value in a URL. Required together while the source is live. May be omitted after server-owned closure; omission never establishes historical authority. */
@@ -16146,6 +16331,7 @@ export interface operations {
             readonly 200: components["responses"]["CandidateExamPresentationOK"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
@@ -16177,6 +16363,7 @@ export interface operations {
             readonly 304: components["responses"]["CandidateExamContentNotModified"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
@@ -16252,6 +16439,7 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 410: components["responses"]["Gone"];
             readonly 429: components["responses"]["TooManyRequests"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -16454,7 +16642,7 @@ export interface operations {
             readonly query?: {
                 /** @description Maximum number of Workspace entries to return from the cursor-pinned manifest page. */
                 readonly limit?: number;
-                /** @description Opaque versioned cursor over ascending canonical path and Workspace entry identity; clients return it unchanged. */
+                /** @description Opaque cursor over ascending canonical path and Workspace entry identity; clients return it unchanged. */
                 readonly cursor?: string;
             };
             readonly header: {
@@ -16474,6 +16662,7 @@ export interface operations {
             readonly 200: components["responses"]["CandidateExamWorkspaceListOK"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
@@ -16483,10 +16672,12 @@ export interface operations {
     readonly listCandidateExamWorkspaceChanges: {
         readonly parameters: {
             readonly query?: {
-                /** @description Return acknowledged changes strictly after this Workspace journal cursor; zero starts at the retained beginning. */
-                readonly after_cursor?: number;
-                /** @description Maximum number of ordered Workspace journal entries to return in this page. */
-                readonly limit?: number;
+                /** @description Start the listing with changes strictly after this Workspace Cursor; zero or omission starts at the retained beginning. Omit it when continuing with cursor. */
+                readonly workspace_cursor?: number;
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header: {
                 /** @description Sensitive canonical 32-byte Raw URL-safe base64 continuity credential for the active Participation. Never log, persist, cache, or place this value in a URL. */
@@ -16505,6 +16696,7 @@ export interface operations {
             readonly 200: components["responses"]["CandidateWorkspaceJournalOK"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
@@ -16661,6 +16853,7 @@ export interface operations {
             readonly 304: components["responses"]["CandidateExamContentNotModified"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
@@ -16724,6 +16917,7 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 410: components["responses"]["Gone"];
             readonly 429: components["responses"]["TooManyRequests"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -16759,6 +16953,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -16881,52 +17076,6 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
-    readonly listExamExecutionImages: {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header?: never;
-            readonly path: {
-                /** @description The Exam identifier. */
-                readonly exam_id: components["parameters"]["ExamID"];
-            };
-            readonly cookie?: never;
-        };
-        readonly requestBody?: never;
-        readonly responses: {
-            readonly 200: components["responses"]["ExecutionImageListOK"];
-            readonly 400: components["responses"]["BadRequest"];
-            readonly 401: components["responses"]["Unauthorized"];
-            readonly 403: components["responses"]["Forbidden"];
-            readonly 404: components["responses"]["NotFound"];
-            readonly 500: components["responses"]["InternalError"];
-            readonly 503: components["responses"]["ServiceUnavailable"];
-        };
-    };
-    readonly configureExamDraftExecutionProfile: {
-        readonly parameters: {
-            readonly query?: never;
-            readonly header: {
-                /** @description Required opaque client key. Identical semantic commands replay the committed outcome for at least 24 hours; reuse with different input is a conflict. */
-                readonly "Idempotency-Key": components["parameters"]["RequiredIdempotencyKey"];
-            };
-            readonly path: {
-                /** @description The Exam identifier. */
-                readonly exam_id: components["parameters"]["ExamID"];
-            };
-            readonly cookie?: never;
-        };
-        readonly requestBody: components["requestBodies"]["ConfigureExamDraftExecutionProfile"];
-        readonly responses: {
-            readonly 200: components["responses"]["ExamOK"];
-            readonly 400: components["responses"]["BadRequest"];
-            readonly 401: components["responses"]["Unauthorized"];
-            readonly 403: components["responses"]["Forbidden"];
-            readonly 404: components["responses"]["NotFound"];
-            readonly 409: components["responses"]["Conflict"];
-            readonly 500: components["responses"]["InternalError"];
-            readonly 503: components["responses"]["ServiceUnavailable"];
-        };
-    };
     readonly configureExamDraftFocusLoss: {
         readonly parameters: {
             readonly query?: never;
@@ -16979,7 +17128,12 @@ export interface operations {
     };
     readonly listExamDraftResources: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path: {
                 /** @description The Exam identifier. */
@@ -17168,7 +17322,12 @@ export interface operations {
     };
     readonly listExamDraftStarterWorkspace: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path: {
                 /** @description The Exam identifier. */
@@ -17292,6 +17451,7 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 410: components["responses"]["Gone"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -17351,6 +17511,7 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 410: components["responses"]["Gone"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -17547,7 +17708,7 @@ export interface operations {
             readonly query?: {
                 /** @description Maximum number of immutable Exam Revision metadata records to return in this page. */
                 readonly limit?: number;
-                /** @description Opaque versioned cursor over descending Revision number and identity; clients return it unchanged. */
+                /** @description Opaque cursor over descending Revision number and identity; clients return it unchanged. */
                 readonly cursor?: string;
             };
             readonly header?: never;
@@ -17629,7 +17790,7 @@ export interface operations {
                 readonly starts_before?: string;
                 /** @description Maximum number of Sittings to return. */
                 readonly limit?: number;
-                /** @description Opaque versioned cursor over descending scheduled start and Sitting identity; clients return it unchanged. */
+                /** @description Opaque cursor over descending scheduled start and Sitting identity; clients return it unchanged. */
                 readonly cursor?: string;
             };
             readonly header?: never;
@@ -17732,7 +17893,7 @@ export interface operations {
                 readonly state?: readonly components["schemas"]["ExamAttemptState"][];
                 /** @description Maximum number of manager-safe Exam Attempt projections to return in this page. */
                 readonly limit?: number;
-                /** @description Opaque versioned cursor over descending creation time and Attempt identity; clients return it unchanged. */
+                /** @description Opaque cursor over descending creation time and Attempt identity; clients return it unchanged. */
                 readonly cursor?: string;
             };
             readonly header?: never;
@@ -17751,6 +17912,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -17776,6 +17938,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -17785,7 +17948,7 @@ export interface operations {
             readonly query?: {
                 /** @description Maximum number of minimized Browser Activity records to return in this keyset page. */
                 readonly limit?: number;
-                /** @description Opaque versioned keyset cursor; return it unchanged and do not infer Browser location data from it. */
+                /** @description Opaque keyset cursor; return it unchanged and do not infer Browser location data from it. */
                 readonly cursor?: string;
             };
             readonly header?: never;
@@ -17806,6 +17969,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -17891,6 +18055,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -17924,6 +18089,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -17933,7 +18099,7 @@ export interface operations {
             readonly query?: {
                 /** @description Maximum number of immutable manifest entries to return. */
                 readonly limit?: number;
-                /** @description Opaque versioned keyset cursor containing only the last stable Entry identity. */
+                /** @description Opaque keyset cursor containing only the last stable Entry identity. */
                 readonly cursor?: string;
             };
             readonly header?: never;
@@ -17956,6 +18122,36 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly suspendExamAttempt: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header: {
+                /** @description Required opaque client key. Identical semantic commands replay the committed outcome for at least 24 hours; reuse with different input is a conflict. */
+                readonly "Idempotency-Key": components["parameters"]["RequiredIdempotencyKey"];
+            };
+            readonly path: {
+                /** @description The Exam identifier. */
+                readonly exam_id: components["parameters"]["ExamID"];
+                /** @description The Exam Sitting identifier. */
+                readonly exam_sitting_id: components["parameters"]["ExamSittingID"];
+                /** @description The Exam Attempt identifier. */
+                readonly exam_attempt_id: components["parameters"]["ExamAttemptID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["SuspendExamAttempt"];
+        readonly responses: {
+            readonly 200: components["responses"]["ExamAttemptSuspended"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -18011,6 +18207,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -18213,7 +18410,7 @@ export interface operations {
             readonly query?: {
                 /** @description Maximum number of no-show candidate identities to return. */
                 readonly limit?: number;
-                /** @description Opaque versioned cursor over candidate identity; return unchanged. */
+                /** @description Opaque cursor over candidate identity; return unchanged. */
                 readonly cursor?: string;
             };
             readonly header?: never;
@@ -18535,7 +18732,7 @@ export interface operations {
                  * @example {
                  *       "email": "administrator.one@example.edu",
                  *       "role_id": "ybndrfg8ejkmcpqxot1uwisza3",
-                 *       "start_at": 1785542400000
+                 *       "start_at": "2026-08-01T00:00:00Z"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["IssueScopedRoleInvitationRequest"];
@@ -18592,10 +18789,10 @@ export interface operations {
                 readonly email?: string;
                 /** @description Match the exact Class, Academic Unit, or Institution targeted by the Invitation. */
                 readonly target_id?: components["schemas"]["ID"];
-                /** @description Return Invitations created at or after this Unix timestamp in milliseconds. */
-                readonly created_after?: number;
-                /** @description Return Invitations created before this Unix timestamp in milliseconds. */
-                readonly created_before?: number;
+                /** @description Return Invitations created at or after this RFC 3339 instant. */
+                readonly created_after?: string;
+                /** @description Return Invitations created before this RFC 3339 instant. */
+                readonly created_before?: string;
                 /** @description Continue from the opaque cursor returned by the preceding page. */
                 readonly cursor?: string;
                 /** @description Maximum number of Invitations to return in this page. */
@@ -18869,6 +19066,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -18975,10 +19173,10 @@ export interface operations {
                 readonly state?: readonly components["schemas"]["MailDeliveryState"][];
                 /** @description Optional set of public allowlisted template keys to include. */
                 readonly template_key?: readonly "system.mail_test"[];
-                /** @description Include deliveries created at or after this Unix-millisecond timestamp. */
-                readonly created_after?: number;
-                /** @description Include deliveries created before this Unix-millisecond timestamp. */
-                readonly created_before?: number;
+                /** @description Include deliveries created at or after this RFC 3339 instant. */
+                readonly created_after?: string;
+                /** @description Include deliveries created before this RFC 3339 instant. */
+                readonly created_before?: string;
             };
             readonly header?: never;
             readonly path?: never;
@@ -18990,6 +19188,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19072,6 +19271,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19089,6 +19289,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19106,6 +19307,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -19145,8 +19347,67 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 429: components["responses"]["TooManyRequests"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly inspectMFAKeyState: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["MFAKeyStateOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly startMFARekey: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["StartMFARekey"];
+        readonly responses: {
+            readonly 202: components["responses"]["MFARekeyAccepted"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly getMFARekeyStatus: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path: {
+                /** @description The durable MFA rekey Job whose safe progress is requested. */
+                readonly job_id: components["schemas"]["ID"];
+            };
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["MFARekeyStatusOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19297,10 +19558,7 @@ export interface operations {
     };
     readonly archiveProgrammeLevel: {
         readonly parameters: {
-            readonly query?: {
-                /** @description Optional revision from the last resource response. A stale value returns the resource conflict error without archiving; omission preserves v1 compatibility. */
-                readonly expected_revision?: components["parameters"]["AcademicExpectedRevision"];
-            };
+            readonly query?: never;
             readonly header?: never;
             readonly path: {
                 /** @description The Programme Level identifier. */
@@ -19308,7 +19566,7 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: never;
+        readonly requestBody?: components["requestBodies"]["ArchiveAcademic"];
         readonly responses: {
             readonly 204: components["responses"]["ProgrammeLevelArchived"];
             readonly 400: components["responses"]["BadRequest"];
@@ -19344,7 +19602,12 @@ export interface operations {
     };
     readonly listClasses: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path: {
                 /** @description The Programme Level identifier. */
@@ -19408,10 +19671,7 @@ export interface operations {
     };
     readonly archiveProgramme: {
         readonly parameters: {
-            readonly query?: {
-                /** @description Optional revision from the last resource response. A stale value returns the resource conflict error without archiving; omission preserves v1 compatibility. */
-                readonly expected_revision?: components["parameters"]["AcademicExpectedRevision"];
-            };
+            readonly query?: never;
             readonly header?: never;
             readonly path: {
                 /** @description The Programme identifier. */
@@ -19419,7 +19679,7 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: never;
+        readonly requestBody?: components["requestBodies"]["ArchiveAcademic"];
         readonly responses: {
             readonly 204: components["responses"]["ProgrammeArchived"];
             readonly 400: components["responses"]["BadRequest"];
@@ -19458,8 +19718,10 @@ export interface operations {
             readonly query?: {
                 /** @description Literal case-insensitive substring matched against name and display name. */
                 readonly q?: string;
-                /** @description Maximum number of Programme Levels to return. */
-                readonly limit?: number;
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: never;
             readonly path: {
@@ -19514,6 +19776,8 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19534,6 +19798,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -19553,6 +19818,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19618,6 +19884,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19641,6 +19908,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19654,6 +19922,10 @@ export interface operations {
                 readonly scope_type?: string;
                 /** @description Return only Bindings for this exact scope identity. */
                 readonly scope_id?: components["schemas"]["ID"];
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: never;
             readonly path?: never;
@@ -19665,6 +19937,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19712,7 +19985,12 @@ export interface operations {
     };
     readonly listRoles: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path?: never;
             readonly cookie?: never;
@@ -19723,6 +20001,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -19740,6 +20019,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -19831,6 +20111,7 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 410: components["responses"]["Gone"];
             readonly 429: components["responses"]["TooManyRequests"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -19872,6 +20153,7 @@ export interface operations {
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -20196,6 +20478,8 @@ export interface operations {
         readonly responses: {
             readonly 200: components["responses"]["SystemPingOK"];
             readonly 400: components["responses"]["BadRequest"];
+            readonly 409: components["responses"]["Conflict"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
     readonly getSystemVersion: {
@@ -20215,14 +20499,12 @@ export interface operations {
             readonly query?: {
                 /** @description Literal case-insensitive substring matched against visible User directory fields. */
                 readonly q?: string;
-                /** @description Canonical username from the preceding page; supply together with after_id. */
-                readonly after_username?: string;
-                /** @description Stable User identity from the preceding page; supply together with after_username. */
-                readonly after_id?: string;
-                /** @description Maximum number of visible User profiles to return. */
-                readonly limit?: number;
                 /** @description Honored only for institution-wide user.view; scoped visibility always excludes disabled Users. */
                 readonly include_disabled?: boolean;
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
             };
             readonly header?: never;
             readonly path?: never;
@@ -20234,6 +20516,7 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -20274,7 +20557,12 @@ export interface operations {
     };
     readonly listDesktopRegistrations: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path?: never;
             readonly cookie?: never;
@@ -20284,6 +20572,7 @@ export interface operations {
             readonly 200: components["responses"]["DesktopRegistrationListOK"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -20326,6 +20615,7 @@ export interface operations {
             readonly 200: components["responses"]["CandidateExamActivityOK"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -20342,6 +20632,7 @@ export interface operations {
             readonly 200: components["responses"]["MFAStatusOK"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 501: components["responses"]["NotImplemented"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -20466,13 +20757,19 @@ export interface operations {
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
             readonly 403: components["responses"]["Forbidden"];
+            readonly 409: components["responses"]["Conflict"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
     readonly listCurrentUserSessions: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path?: never;
             readonly cookie?: never;
@@ -20560,7 +20857,12 @@ export interface operations {
     };
     readonly listPersonalAccessTokens: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path?: never;
             readonly cookie?: never;
@@ -20570,6 +20872,7 @@ export interface operations {
             readonly 200: components["responses"]["PersonalAccessTokenListOK"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -20702,7 +21005,12 @@ export interface operations {
     };
     readonly listAffiliations: {
         readonly parameters: {
-            readonly query?: never;
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+            };
             readonly header?: never;
             readonly path: {
                 /** @description The User identifier. */
@@ -20783,6 +21091,7 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 429: components["responses"]["TooManyRequests"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
@@ -20950,6 +21259,10 @@ export interface operations {
             readonly query?: {
                 /** @description Include previously revoked Sessions and their safe revocation reason metadata in the result. */
                 readonly include_revoked?: boolean;
+                /** @description Maximum number of Sessions to return. */
+                readonly limit?: number;
+                /** @description Opaque continuation emitted by the preceding Session page. */
+                readonly cursor?: string;
             };
             readonly header?: never;
             readonly path: {

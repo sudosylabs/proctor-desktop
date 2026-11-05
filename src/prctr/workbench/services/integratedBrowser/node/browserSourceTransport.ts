@@ -47,7 +47,7 @@ export interface BrowserSourceTransport {
 	): Promise<components['schemas']['BrowserActivityAcknowledgement']>;
 	receipts(
 		binding: BrowserSourceBinding,
-		first: number
+		cursor?: string
 	): Promise<components['schemas']['BrowserReceiptPage']>;
 	gaps(
 		binding: BrowserSourceBinding,
@@ -199,11 +199,11 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 			throw new ServerApiError('invalidResponse');
 		return result.value;
 	}
-	async receipts(binding: BrowserSourceBinding, first: number) {
+	async receipts(binding: BrowserSourceBinding, cursor?: string) {
 		const result = await this.api.request('browserDeliveryReceipts', {
 			path: this.path(binding),
 			header: this.headers(binding),
-			query: { first_sequence: first, limit: 256 }
+			query: { limit: 64, ...(cursor === undefined ? {} : { cursor }) }
 		});
 		if (result.status !== 200) throw new ServerApiError('server', result.status);
 		return result.value;

@@ -52,8 +52,9 @@ function metadata(value: Record<string, unknown>): string {
 		value.format_version !== 1 ||
 		typeof value.revision !== 'string' ||
 		!/^[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/u.test(value.revision) ||
-		!Number.isSafeInteger(value.updated_at) ||
-		Number(value.updated_at) < 0
+		typeof value.updated_at !== 'string' ||
+		!/Z$/u.test(value.updated_at) ||
+		!Number.isSafeInteger(Date.parse(value.updated_at))
 	)
 		throw new TypeError('Unsupported User Settings metadata');
 	return value.revision;

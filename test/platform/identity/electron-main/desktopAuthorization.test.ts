@@ -208,8 +208,8 @@ function tokens() {
 			token_type: 'DPoP',
 			access_token: random(),
 			refresh_token: random(),
-			access_expires_at: Date.now() + 300000,
-			refresh_expires_at: Date.now() + 3600000
+			access_expires_at: new Date(Date.now() + 300000).toISOString(),
+			refresh_expires_at: new Date(Date.now() + 3600000).toISOString()
 		}
 	};
 }
@@ -255,7 +255,7 @@ void test('hosted authorization uses exact wire fields, persists only refresh cu
 			return response(
 				{
 					authorization_url: 'https://example.edu/desktop/authorize?handle=safe',
-					expires_at: Date.now() + 60000
+					expires_at: new Date(Date.now() + 60000).toISOString()
 				},
 				201
 			);
@@ -343,7 +343,7 @@ void test('nonce challenge is retried once with a fresh proof, while ambiguous r
 				return response(
 					{
 						authorization_url: 'https://example.edu/authorize',
-						expires_at: Date.now() + 60000
+						expires_at: new Date(Date.now() + 60000).toISOString()
 					},
 					201
 				);
@@ -447,7 +447,7 @@ void test('ordinary shutdown drains pending rotation and sign-out without restor
 			return response(
 				{
 					authorization_url: 'https://example.edu/authorize',
-					expires_at: Date.now() + 60000
+					expires_at: new Date(Date.now() + 60000).toISOString()
 				},
 				201
 			);
@@ -612,7 +612,7 @@ void test('sign-out preserves separate local cleanup and remote revocation outco
 				return response(
 					{
 						authorization_url: 'https://example.edu/authorize',
-						expires_at: Date.now() + 60000
+						expires_at: new Date(Date.now() + 60000).toISOString()
 					},
 					201
 				);
@@ -754,7 +754,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 			return response(
 				{
 					authorization_url: 'https://example.edu/desktop/authorize',
-					expires_at: Date.now() + 60000
+					expires_at: new Date(Date.now() + 60000).toISOString()
 				},
 				201
 			);
@@ -785,7 +785,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 					source: settingsSource,
 					revision: 'r'.repeat(26),
 					format_version: 1,
-					updated_at: Date.now(),
+					updated_at: new Date(Date.now()).toISOString(),
 					writable: true
 				});
 			settingsWrites++;
@@ -812,7 +812,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 			return response({
 				revision: 't'.repeat(26),
 				format_version: 1,
-				updated_at: Date.now(),
+				updated_at: new Date(Date.now()).toISOString(),
 				changed: true
 			});
 		}
@@ -836,9 +836,8 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 				display_name: 'Candidate',
 				first_name: '',
 				last_name: '',
-				create_at: 0,
-				update_at: 0,
-				delete_at: 0,
+				created_at: '1970-01-01T00:00:00Z',
+				updated_at: '1970-01-01T00:00:00Z',
 				profile_picture_url: '',
 				password_hash: 'never project'
 			});

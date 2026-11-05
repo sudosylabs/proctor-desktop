@@ -121,7 +121,7 @@ if (probe) {
 						return response(
 							{
 								authorization_url: `${origin}/authorize`,
-								expires_at: Date.now() + 60000
+								expires_at: new Date(Date.now() + 60000).toISOString()
 							},
 							201
 						);
@@ -147,8 +147,8 @@ if (probe) {
 								token_type: 'DPoP',
 								access_token: random(),
 								refresh_token: refreshToken,
-								access_expires_at: Date.now() + 300000,
-								refresh_expires_at: Date.now() + 3600000
+								access_expires_at: new Date(Date.now() + 300000).toISOString(),
+								refresh_expires_at: new Date(Date.now() + 3600000).toISOString()
 							}
 						});
 					}
@@ -186,9 +186,8 @@ if (probe) {
 							display_name: 'Identity Test',
 							first_name: 'Identity',
 							last_name: 'Test',
-							create_at: 0,
-							update_at: 0,
-							delete_at: 0,
+							created_at: '1970-01-01T00:00:00Z',
+							updated_at: '1970-01-01T00:00:00Z',
 							profile_picture_url: ''
 						});
 					if (path === '/api/v1/users/me/settings')
@@ -196,7 +195,7 @@ if (probe) {
 							source: '{}',
 							revision: 'b'.repeat(26),
 							format_version: 1,
-							updated_at: 0,
+							updated_at: '1970-01-01T00:00:00Z',
 							writable: true
 						});
 					if (path === '/api/v1/authentication-methods')
