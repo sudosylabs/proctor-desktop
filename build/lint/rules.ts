@@ -157,10 +157,35 @@ export const requireLeakCheckedTests: Rule.RuleModule = {
 	}
 };
 
+export const preferDomHelpers: Rule.RuleModule = {
+	meta: {
+		type: 'suggestion',
+		schema: [],
+		messages: {
+			global: 'Build DOM with h(), $() or append() from base/browser/dom.ts, or create it from the document this code was given.'
+		}
+	},
+	create(context) {
+		return {
+			"CallExpression[callee.type='MemberExpression'][callee.property.name='createElement'][callee.object.type='Identifier'][callee.object.name='document']"(
+				node: Rule.Node
+			) {
+				const reference = context.sourceCode
+					.getScope(node)
+					.references.find((candidate) => candidate.identifier.name === 'document');
+				// A parameter or local named document is a caller-provided Document; only the global is flagged.
+				if (reference && reference.resolved === null)
+					context.report({ node, messageId: 'global' });
+			}
+		};
+	}
+};
+
 export const rules = {
 	'no-focused-tests': noFocusedTests,
 	'disposable-ownership': disposableOwnership,
 	'no-unsafe-double-assertion': noUnsafeDoubleAssertion,
 	'no-sync-fs': noSynchronousFileSystem,
-	'require-leak-checked-tests': requireLeakCheckedTests
+	'require-leak-checked-tests': requireLeakCheckedTests,
+	'prefer-dom-helpers': preferDomHelpers
 };

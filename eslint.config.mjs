@@ -90,6 +90,16 @@ export default [
 		rules: { 'proctor/no-sync-fs': 'error' }
 	},
 	{
+		files: ['src/prctr/**/browser/**/*.ts', 'src/prctr/workbench/**/*.ts'],
+		ignores: transferred,
+		rules: { 'proctor/prefer-dom-helpers': 'error' }
+	},
+	{
+		// A standalone bundle for the isolated PDF page; it stays free of the workbench DOM module.
+		files: ['src/prctr/workbench/services/resourcePreview/browser/pdfPreviewEntry.ts'],
+		rules: { 'proctor/prefer-dom-helpers': 'off' }
+	},
+	{
 		// Reads two small branding files once, before the loopback callback listener starts.
 		files: ['src/prctr/workbench/node/desktopAuthCallbackPage.ts'],
 		rules: { 'proctor/no-sync-fs': 'off' }

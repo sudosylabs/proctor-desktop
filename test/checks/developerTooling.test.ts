@@ -19,6 +19,7 @@ import {
 	noFocusedTests,
 	noSynchronousFileSystem,
 	noUnsafeDoubleAssertion,
+	preferDomHelpers,
 	requireLeakCheckedTests
 } from '../../build/lint/rules.ts';
 
@@ -188,6 +189,19 @@ void test('lint rules reject unsafe forms and accept the supported counterparts'
 			{
 				code: "import { DisposableStore } from '../src/prctr/base/common/lifecycle.ts';",
 				errors: [{ messageId: 'missing' }]
+			}
+		]
+	});
+	tester.run('prefer-dom-helpers', preferDomHelpers, {
+		valid: [
+			"const node = h('div.card').root;",
+			"function build(document: Document) { return document.createElement('div'); }",
+			"const node = host.ownerDocument.createElement('div');"
+		],
+		invalid: [
+			{
+				code: "const node = document.createElement('div');",
+				errors: [{ messageId: 'global' }]
 			}
 		]
 	});
