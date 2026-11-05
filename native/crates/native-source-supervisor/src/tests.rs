@@ -35,7 +35,7 @@ impl DisplayTopologyBackend for TestDisplayBackend {
             platform: PlatformFamily::Linux,
             permission: PermissionState::Granted,
             health: OpenedSourceHealth::Healthy,
-            adapter_version: "test-display-v1",
+            adapter_version: "test-display",
             initial_topology: display_state(),
             subscription: TestDisplaySubscription,
         })
@@ -61,7 +61,7 @@ impl CandidateWindowBackend for TestWindowBackend {
         Ok(OpenedCandidateWindowBackend {
             platform: PlatformFamily::Linux,
             permission: PermissionState::Granted,
-            adapter_version: "test-window-v1",
+            adapter_version: "test-window",
             initial_window: window_state(),
             subscription: TestWindowSubscription,
         })
@@ -87,7 +87,7 @@ impl CaptureSessionBackend for TestSessionBackend {
         Ok(OpenedCaptureSessionBackend {
             platform: PlatformFamily::Linux,
             permission: PermissionState::Unavailable,
-            adapter_version: "test-session-v1",
+            adapter_version: "test-session",
             initial_state: capture_state(),
             subscription: TestSessionSubscription,
         })
@@ -113,7 +113,7 @@ impl ProcessApplicationBackend for TestProcessBackend {
         Ok(OpenedProcessApplicationBackend {
             platform: PlatformFamily::Linux,
             permission: PermissionState::Unavailable,
-            adapter_version: "test-process-v1",
+            adapter_version: "test-process",
             initial_state: process_state(),
             subscription: TestProcessSubscription,
         })
@@ -138,46 +138,46 @@ fn public_factories_open_the_fixed_baseline_and_stop_in_reverse_order() {
         || {
             Ok(UnavailablePassiveStateBackend::new(
                 PlatformFamily::Linux,
-                "test-interactive-v1",
+                "test-interactive",
             ))
         },
     ))
     .with_passive_source(passive_state_factory::<ClipboardWire, _, _>(|| {
         Ok(UnavailablePassiveStateBackend::new(
             PlatformFamily::Linux,
-            "test-clipboard-v1",
+            "test-clipboard",
         ))
     }))
     .with_passive_source(passive_state_factory::<PrintSpoolerWire, _, _>(|| {
         Ok(UnavailablePassiveStateBackend::new(
             PlatformFamily::Linux,
-            "test-print-v1",
+            "test-print",
         ))
     }))
     .with_passive_source(passive_state_factory::<RemovableStorageWire, _, _>(|| {
         Ok(UnavailablePassiveStateBackend::new(
             PlatformFamily::Linux,
-            "test-storage-v1",
+            "test-storage",
         ))
     }))
     .with_passive_source(passive_state_factory::<VirtualizationWire, _, _>(|| {
         Ok(UnavailablePassiveStateBackend::new(
             PlatformFamily::Linux,
-            "test-virtual-v1",
+            "test-virtual",
         ))
     }))
     .with_passive_source(passive_state_factory::<NetworkConfigurationWire, _, _>(
         || {
             Ok(UnavailablePassiveStateBackend::new(
                 PlatformFamily::Linux,
-                "test-network-v1",
+                "test-network",
             ))
         },
     ))
     .with_passive_source(passive_state_factory::<MediaDeviceWire, _, _>(|| {
         Ok(UnavailablePassiveStateBackend::new(
             PlatformFamily::Linux,
-            "test-media-v1",
+            "test-media",
         ))
     }));
     let opened = NativeSourceSupervisor::open(config(), factories).expect("baseline opens");
@@ -946,8 +946,8 @@ fn timestamp() -> SourceTimestamp {
 fn display_snapshot(id: &str, health: SourceHealth) -> NativeSourceSnapshot {
     NativeSourceSnapshot::DisplayTopology(DisplayTopologySourceSnapshot {
         source_instance_id: id.to_owned(),
-        source_version: "test-v1".to_owned(),
-        adapter_version: "test-adapter-v1".to_owned(),
+        source_version: "test".to_owned(),
+        adapter_version: "test-adapter".to_owned(),
         schema_version: DISPLAY_TOPOLOGY_SCHEMA_VERSION,
         platform: PlatformFamily::Linux,
         permission: PermissionState::Granted,
@@ -961,8 +961,8 @@ fn display_snapshot(id: &str, health: SourceHealth) -> NativeSourceSnapshot {
 fn candidate_snapshot(id: &str) -> NativeSourceSnapshot {
     NativeSourceSnapshot::CandidateWindow(CandidateWindowSourceSnapshot {
         source_instance_id: id.to_owned(),
-        source_version: "test-v1".to_owned(),
-        adapter_version: "test-adapter-v1".to_owned(),
+        source_version: "test".to_owned(),
+        adapter_version: "test-adapter".to_owned(),
         schema_version: CANDIDATE_WINDOW_SCHEMA_VERSION,
         platform: PlatformFamily::Linux,
         permission: PermissionState::Granted,
@@ -976,8 +976,8 @@ fn candidate_snapshot(id: &str) -> NativeSourceSnapshot {
 fn capture_snapshot(id: &str) -> NativeSourceSnapshot {
     NativeSourceSnapshot::CaptureSession(CaptureSessionSourceSnapshot {
         source_instance_id: id.to_owned(),
-        source_version: "test-v1".to_owned(),
-        adapter_version: "test-adapter-v1".to_owned(),
+        source_version: "test".to_owned(),
+        adapter_version: "test-adapter".to_owned(),
         schema_version: CAPTURE_SESSION_SCHEMA_VERSION,
         platform: PlatformFamily::Linux,
         permission: PermissionState::Unavailable,
@@ -991,8 +991,8 @@ fn capture_snapshot(id: &str) -> NativeSourceSnapshot {
 fn process_snapshot(id: &str) -> NativeSourceSnapshot {
     NativeSourceSnapshot::ProcessApplication(ProcessApplicationSourceSnapshot {
         source_instance_id: id.to_owned(),
-        source_version: "test-v1".to_owned(),
-        adapter_version: "test-adapter-v1".to_owned(),
+        source_version: "test".to_owned(),
+        adapter_version: "test-adapter".to_owned(),
         schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
         platform: PlatformFamily::Linux,
         permission: PermissionState::Unavailable,
@@ -1012,7 +1012,7 @@ fn passive_snapshot<W: SupervisedPassiveStateWire>(id: &str) -> NativeSourceSnap
         },
         PlatformFamily::Linux,
         PermissionState::Unavailable,
-        "test-adapter-v1",
+        "test-adapter",
         W::unavailable_state(),
     ))
 }

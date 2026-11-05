@@ -84,7 +84,7 @@ impl PassiveStateBackend<RemovableStorageWire> for PlatformRemovableStorageBacke
         if !self.selection.includes_block_storage() {
             let opened = UnavailablePassiveStateBackend::new(
                 PlatformFamily::Macos,
-                "macos-portable-storage-unavailable-v1",
+                "macos-portable-storage-unavailable",
             )
             .open(emitter)?;
             return Ok(OpenedPassiveStateBackend {
@@ -99,13 +99,13 @@ impl PassiveStateBackend<RemovableStorageWire> for PlatformRemovableStorageBacke
         let opened = PollingPassiveStateBackend::new(
             PlatformFamily::Macos,
             PermissionState::Granted,
-            "macos-mounted-removable-v1",
+            "macos-mounted-removable",
             Duration::from_millis(500),
             move || query_state(&query_identities),
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "macos-mounted-removable-unavailable-v1",
+            "macos-mounted-removable-unavailable",
             RemovableStorageWire::unavailable_state(),
         )?;
         Ok(OpenedPassiveStateBackend {

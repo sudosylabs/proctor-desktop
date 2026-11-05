@@ -35,13 +35,13 @@ impl PassiveStateBackend<InteractiveSessionWire> for PlatformInteractiveSessionB
         PollingPassiveStateBackend::new(
             PlatformFamily::Linux,
             PermissionState::Granted,
-            "linux-logind-session-snapshot-v1",
+            "linux-logind-session-snapshot",
             Duration::from_millis(500),
             || query_state(Path::new(SESSION_ROOT), Path::new(PROCESS_STATUS)),
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "linux-logind-unavailable-v1",
+            "linux-logind-unavailable",
             InteractiveSessionWire::unavailable_state(),
         )
     }

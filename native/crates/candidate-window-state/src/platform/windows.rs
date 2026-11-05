@@ -22,7 +22,7 @@ impl WindowsCandidateWindowBackend {
         Self {
             backend: UtilityIngressBackend::new(
                 PlatformFamily::Windows,
-                "utility-post-ipc-v1",
+                "utility-post-ipc",
                 initial_window,
                 ingress,
             ),

@@ -481,7 +481,7 @@ mod tests {
             Ok(OpenedCaptureSessionBackend {
                 platform: PlatformFamily::Linux,
                 permission: PermissionState::Granted,
-                adapter_version: "fake-v1",
+                adapter_version: "fake",
                 initial_state: self.initial,
                 subscription: FakeSubscription(self.final_state),
             })

@@ -19,7 +19,7 @@ impl PassiveStateBackend<InteractiveSessionWire> for PlatformInteractiveSessionB
     > {
         UnavailablePassiveStateBackend::new(
             PlatformFamily::Macos,
-            "macos-session-helper-unavailable-v1",
+            "macos-session-helper-unavailable",
         )
         .open(emitter)
     }

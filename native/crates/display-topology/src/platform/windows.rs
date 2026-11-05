@@ -47,7 +47,7 @@ impl DisplayTopologyBackend for WindowsDisplayTopologyBackend {
             platform: PlatformFamily::Windows,
             permission: PermissionState::Granted,
             health,
-            adapter_version: "windows-ccd-v2",
+            adapter_version: "windows-ccd",
             initial_topology,
             subscription,
         })

@@ -18,7 +18,7 @@ impl PassiveStateBackend<ClipboardWire> for PlatformClipboardBackend {
         // Generic Linux has no compositor-independent clipboard generation.
         UnavailablePassiveStateBackend::new(
             PlatformFamily::Linux,
-            "generic-linux-clipboard-unavailable-v1",
+            "generic-linux-clipboard-unavailable",
         )
         .open(emitter)
     }

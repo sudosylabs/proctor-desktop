@@ -51,13 +51,13 @@ impl PassiveStateBackend<MediaDeviceWire> for PlatformMediaDeviceBackend {
         PollingPassiveStateBackend::new(
             PlatformFamily::Windows,
             PermissionState::Granted,
-            "windows-media-endpoint-presence-v1",
+            "windows-media-endpoint-presence",
             Duration::from_millis(500),
             move || query_state(selection),
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "windows-selected-media-endpoints-unavailable-v1",
+            "windows-selected-media-endpoints-unavailable",
             selected_unavailable_state(selection),
         )
     }

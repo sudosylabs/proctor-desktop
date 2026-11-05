@@ -61,11 +61,11 @@ impl ProcessApplicationBackend for MacOsProcessApplicationBackend {
         let query_tracker = Arc::clone(&tracker);
         SnapshotPollingProcessBackend::new(
             PlatformFamily::Macos,
-            "macos-running-applications-snapshot-v1",
+            "macos-running-applications-snapshot",
             Duration::from_millis(500),
             move || query_state(&query_tracker),
         )
-        .open_with_initial_backend_fallback(emitter, "macos-running-applications-unavailable-v1")
+        .open_with_initial_backend_fallback(emitter, "macos-running-applications-unavailable")
     }
 }
 

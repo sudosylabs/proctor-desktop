@@ -39,13 +39,13 @@ impl PassiveStateBackend<InteractiveSessionWire> for PlatformInteractiveSessionB
         PollingPassiveStateBackend::new(
             PlatformFamily::Windows,
             PermissionState::Granted,
-            "windows-wts-session-snapshot-v1",
+            "windows-wts-session-snapshot",
             Duration::from_millis(500),
             query_state,
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "windows-wts-session-unavailable-v1",
+            "windows-wts-session-unavailable",
             InteractiveSessionWire::unavailable_state(),
         )
     }

@@ -53,7 +53,7 @@ impl PassiveStateBackend<NetworkConfigurationWire> for PlatformNetworkConfigurat
         PollingPassiveStateBackend::new(
             PlatformFamily::Linux,
             PermissionState::Granted,
-            "linux-network-topology-v1",
+            "linux-network-topology",
             Duration::from_millis(500),
             move || {
                 query_state(
@@ -66,7 +66,7 @@ impl PassiveStateBackend<NetworkConfigurationWire> for PlatformNetworkConfigurat
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "linux-network-unavailable-v1",
+            "linux-network-unavailable",
             NetworkConfigurationWire::unavailable_state(),
         )
     }

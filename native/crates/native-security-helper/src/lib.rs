@@ -101,7 +101,7 @@ pub use macos_service::{
     verify_candidate_socket_peer_under_deadline,
 };
 
-pub const HELPER_BUILD_ID: &str = "native-helper-0.1.0";
+pub const HELPER_BUILD_ID: &str = "native-helper-build";
 const MAX_PENDING_HELPER_OBSERVATIONS: usize = 2_048;
 const HELPER_STARTUP_DEADLINE: Duration = Duration::from_secs(5);
 const HELPER_REQUEST_DEADLINE: Duration = Duration::from_secs(5);

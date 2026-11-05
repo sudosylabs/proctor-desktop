@@ -53,7 +53,7 @@ impl DisplayTopologyBackend for LinuxDisplayTopologyBackend {
             platform: PlatformFamily::Linux,
             permission: PermissionState::Granted,
             health: OpenedSourceHealth::Degraded,
-            adapter_version: "drm-sysfs-v1",
+            adapter_version: "drm-sysfs",
             initial_topology,
             subscription,
         })

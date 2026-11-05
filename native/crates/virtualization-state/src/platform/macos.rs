@@ -21,7 +21,7 @@ impl PassiveStateBackend<VirtualizationWire> for PlatformVirtualizationBackend {
         // feature or model string would overstate this capability.
         UnavailablePassiveStateBackend::new(
             PlatformFamily::Macos,
-            "macos-public-classification-unavailable-v1",
+            "macos-public-classification-unavailable",
         )
         .open(emitter)
     }

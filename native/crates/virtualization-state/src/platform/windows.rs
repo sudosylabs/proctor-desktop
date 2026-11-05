@@ -25,7 +25,7 @@ impl PassiveStateBackend<VirtualizationWire> for PlatformVirtualizationBackend {
         StaticPassiveStateBackend::new(
             PlatformFamily::Windows,
             PermissionState::Granted,
-            "windows-cpuid-guest-markers-v1",
+            "windows-cpuid-guest-markers",
             classify_current_environment(),
         )
         .open(emitter)

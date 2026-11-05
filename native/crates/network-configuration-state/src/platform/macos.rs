@@ -48,13 +48,13 @@ impl PassiveStateBackend<NetworkConfigurationWire> for PlatformNetworkConfigurat
         PollingPassiveStateBackend::new(
             PlatformFamily::Macos,
             PermissionState::Granted,
-            "macos-network-configuration-v2",
+            "macos-network-configuration",
             Duration::from_millis(500),
             move || query_state(&query_tracker, selection),
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "macos-network-unavailable-v1",
+            "macos-network-unavailable",
             NetworkConfigurationWire::unavailable_state(),
         )
     }

@@ -27,8 +27,8 @@ use crate::{
 pub const HELPER_SERVICE_FRAME_BYTES: usize = 4096;
 /// A nonce-free framing barrier proving only that the acceptor has written to
 /// this socket. The client must still verify its live code identity before
-/// sending authority. This exact versioned marker has no extensible fields.
-pub const MACOS_SERVICE_ACCEPTANCE_FRAME: &[u8] = b"native-service-accepted-v1";
+/// sending authority. This exact marker has no extensible fields.
+pub const MACOS_SERVICE_ACCEPTANCE_FRAME: &[u8] = b"native-service-accepted";
 pub(crate) const CONTROL_SOCKET_PATH: &str = "/var/run/com.proctor.native.control";
 pub(crate) const OBSERVATION_SOCKET_PATH: &str = "/var/run/com.proctor.native.observation";
 
@@ -443,7 +443,7 @@ mod tests {
     fn acceptance_marker_is_exact_and_does_not_authorize_the_peer() {
         for marker in [
             MACOS_SERVICE_ACCEPTANCE_FRAME,
-            b"native-service-accepted-v2".as_slice(),
+            b"native-service-rejected".as_slice(),
             b"{}".as_slice(),
         ] {
             let (socket, mut peer) = UnixStream::pair().unwrap();

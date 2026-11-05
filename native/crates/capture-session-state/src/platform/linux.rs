@@ -14,7 +14,7 @@ impl CaptureSessionBackend for LinuxCaptureSessionBackend {
         self,
         emitter: CaptureSessionEmitter,
     ) -> Result<OpenedCaptureSessionBackend<Self::Subscription>, CaptureSessionError> {
-        StaticCoverageBackend::new(PlatformFamily::Linux, "unsupported-public-signals-v1")
+        StaticCoverageBackend::new(PlatformFamily::Linux, "unsupported-public-signals")
             .open(emitter)
     }
 }

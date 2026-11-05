@@ -19,7 +19,7 @@ impl PassiveStateBackend<PrintSpoolerWire> for PlatformPrintSpoolerBackend {
     > {
         UnavailablePassiveStateBackend::new(
             current_platform(),
-            "bounded-print-spooler-inventory-unavailable-v1",
+            "bounded-print-spooler-inventory-unavailable",
         )
         .open(emitter)
     }

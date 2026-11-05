@@ -141,7 +141,7 @@ mod tests {
             Ok(OpenedClipboardBackend {
                 platform: PlatformFamily::Macos,
                 permission: PermissionState::Granted,
-                adapter_version: "test-clipboard-v1",
+                adapter_version: "test-clipboard",
                 initial_state,
                 subscription: TestSubscription { final_state },
             })

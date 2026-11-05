@@ -72,7 +72,7 @@ impl CaptureSessionBackend for WindowsCaptureSessionBackend {
         Ok(OpenedCaptureSessionBackend {
             platform: PlatformFamily::Windows,
             permission: PermissionState::Granted,
-            adapter_version: "wts-session-notify-v1",
+            adapter_version: "wts-session-notify",
             // WTS observation is already active, so transitions concurrent
             // with this query are retained by the source opening queue.
             initial_state: query_state(),

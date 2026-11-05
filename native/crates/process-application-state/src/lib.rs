@@ -637,7 +637,7 @@ mod tests {
             Ok(OpenedProcessApplicationBackend {
                 platform: PlatformFamily::Linux,
                 permission: PermissionState::Granted,
-                adapter_version: "fake-process-v1",
+                adapter_version: "fake-process",
                 initial_state: self.initial,
                 subscription: FakeSubscription(self.final_state),
             })

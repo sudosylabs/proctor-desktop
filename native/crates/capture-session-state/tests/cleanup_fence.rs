@@ -31,7 +31,7 @@ impl CaptureSessionBackend for BoundaryFailureBackend {
         Ok(OpenedCaptureSessionBackend {
             platform: PlatformFamily::Linux,
             permission: PermissionState::Unavailable,
-            adapter_version: "cleanup-fence-test-v1",
+            adapter_version: "cleanup-fence-test",
             initial_state: unsupported_state(),
             subscription: BoundaryFailureSubscription,
         })

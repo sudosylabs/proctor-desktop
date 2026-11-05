@@ -401,15 +401,15 @@ fn authoritative_initial_backend_failure_degrades_after_a_successful_probe() {
     let opened = PollingPassiveStateBackend::new(
         PlatformFamily::Linux,
         PermissionState::Granted,
-        "test-polling-v1",
+        "test-polling",
         Duration::from_secs(1),
         query,
     )
-    .open_with_initial_backend_fallback(emitter, "test-unavailable-v1", RejectChangedState(0))
+    .open_with_initial_backend_fallback(emitter, "test-unavailable", RejectChangedState(0))
     .expect("ordinary query discovery failure degrades");
 
     assert_eq!(opened.permission, PermissionState::Unavailable);
-    assert_eq!(opened.adapter_version, "test-unavailable-v1");
+    assert_eq!(opened.adapter_version, "test-unavailable");
     assert_eq!(opened.initial_state, RejectChangedState(0));
     assert_eq!(
         opened.subscription.stop().expect("static source stops"),
@@ -423,7 +423,7 @@ fn authoritative_initial_inventory_overflow_remains_terminal() {
     let result = PollingPassiveStateBackend::new(
         PlatformFamily::Linux,
         PermissionState::Granted,
-        "test-polling-v1",
+        "test-polling",
         Duration::from_secs(1),
         || {
             Err(PassiveStateSourceError::InventoryOverflow(
@@ -431,7 +431,7 @@ fn authoritative_initial_inventory_overflow_remains_terminal() {
             ))
         },
     )
-    .open_with_initial_backend_fallback(emitter, "test-unavailable-v1", RejectChangedState(0));
+    .open_with_initial_backend_fallback(emitter, "test-unavailable", RejectChangedState(0));
 
     assert!(matches!(
         result,
@@ -446,11 +446,11 @@ fn released_polling_worker_accepts_an_immediate_stop() {
     let opened = PollingPassiveStateBackend::new(
         PlatformFamily::Linux,
         PermissionState::Granted,
-        "test-polling-v1",
+        "test-polling",
         Duration::from_secs(1),
         || Ok(RejectChangedState(1)),
     )
-    .open_with_initial_backend_fallback(emitter, "test-unavailable-v1", RejectChangedState(0))
+    .open_with_initial_backend_fallback(emitter, "test-unavailable", RejectChangedState(0))
     .expect("polling source opens");
 
     assert_eq!(

@@ -22,7 +22,7 @@ impl MacOsCandidateWindowBackend {
         Self {
             backend: UtilityIngressBackend::new(
                 PlatformFamily::Macos,
-                "utility-post-ipc-v1",
+                "utility-post-ipc",
                 initial_window,
                 ingress,
             ),

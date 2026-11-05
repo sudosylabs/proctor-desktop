@@ -35,11 +35,11 @@ impl ProcessApplicationBackend for LinuxProcessApplicationBackend {
         let query_tracker = Arc::clone(&tracker);
         SnapshotPollingProcessBackend::new(
             PlatformFamily::Linux,
-            "linux-proc-snapshot-v1",
+            "linux-proc-snapshot",
             Duration::from_millis(500),
             move || query_state(&query_tracker, Path::new(PROCESS_ROOT)),
         )
-        .open_with_initial_backend_fallback(emitter, "linux-proc-unavailable-v1")
+        .open_with_initial_backend_fallback(emitter, "linux-proc-unavailable")
     }
 }
 

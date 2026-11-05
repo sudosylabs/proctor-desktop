@@ -413,15 +413,15 @@ mod tests {
         let emitter = ProcessApplicationEmitter::new(4).expect("emitter");
         let opened = SnapshotPollingProcessBackend::new(
             PlatformFamily::Linux,
-            "test-process-snapshot-v1",
+            "test-process-snapshot",
             Duration::from_secs(1),
             query,
         )
-        .open_with_initial_backend_fallback(emitter, "test-process-unavailable-v1")
+        .open_with_initial_backend_fallback(emitter, "test-process-unavailable")
         .expect("ordinary authoritative query failure degrades");
 
         assert_eq!(opened.permission, PermissionState::Unavailable);
-        assert_eq!(opened.adapter_version, "test-process-unavailable-v1");
+        assert_eq!(opened.adapter_version, "test-process-unavailable");
         assert_eq!(
             opened.initial_state.coverage,
             ProcessApplicationCoverage::Unavailable
@@ -441,7 +441,7 @@ mod tests {
         let emitter = ProcessApplicationEmitter::new(4).expect("emitter");
         let result = SnapshotPollingProcessBackend::new(
             PlatformFamily::Linux,
-            "test-process-snapshot-v1",
+            "test-process-snapshot",
             Duration::from_secs(1),
             || {
                 Err(ProcessApplicationError::InventoryOverflow(
@@ -449,7 +449,7 @@ mod tests {
                 ))
             },
         )
-        .open_with_initial_backend_fallback(emitter, "test-process-unavailable-v1");
+        .open_with_initial_backend_fallback(emitter, "test-process-unavailable");
 
         assert!(matches!(
             result,

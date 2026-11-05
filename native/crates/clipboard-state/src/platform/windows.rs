@@ -23,13 +23,13 @@ impl PassiveStateBackend<ClipboardWire> for PlatformClipboardBackend {
         PollingPassiveStateBackend::new(
             PlatformFamily::Windows,
             PermissionState::Granted,
-            "windows-clipboard-sequence-v1",
+            "windows-clipboard-sequence",
             Duration::from_millis(250),
             query_state as fn() -> Result<ClipboardState, PassiveStateSourceError>,
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "windows-clipboard-unavailable-v1",
+            "windows-clipboard-unavailable",
             ClipboardWire::unavailable_state(),
         )
     }

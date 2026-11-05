@@ -70,7 +70,7 @@ impl DisplayTopologyBackend for MacOsDisplayTopologyBackend {
             platform: PlatformFamily::Macos,
             permission: PermissionState::Granted,
             health: OpenedSourceHealth::from(initial_topology.certainty),
-            adapter_version: "core-graphics-v1",
+            adapter_version: "core-graphics",
             initial_topology,
             subscription: MacOsDisplaySubscription {
                 notifications,

@@ -44,13 +44,13 @@ impl PassiveStateBackend<MediaDeviceWire> for PlatformMediaDeviceBackend {
         PollingPassiveStateBackend::new(
             PlatformFamily::Linux,
             PermissionState::Granted,
-            "linux-microphone-endpoint-presence-v1",
+            "linux-microphone-endpoint-presence",
             Duration::from_millis(500),
             move || query_state(selection, Path::new(SOUND_ROOT)),
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "linux-selected-media-endpoints-unavailable-v1",
+            "linux-selected-media-endpoints-unavailable",
             selected_unavailable_state(selection),
         )
     }

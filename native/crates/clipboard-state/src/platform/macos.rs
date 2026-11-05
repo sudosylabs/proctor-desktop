@@ -50,13 +50,13 @@ impl PassiveStateBackend<ClipboardWire> for PlatformClipboardBackend {
         PollingPassiveStateBackend::new(
             PlatformFamily::Macos,
             PermissionState::Granted,
-            "macos-pasteboard-generation-v1",
+            "macos-pasteboard-generation",
             Duration::from_millis(250),
             query_state,
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "macos-pasteboard-service-unavailable-v1",
+            "macos-pasteboard-service-unavailable",
             ClipboardWire::unavailable_state(),
         )
     }

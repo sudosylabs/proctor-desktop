@@ -14,7 +14,7 @@ impl CaptureSessionBackend for MacOsCaptureSessionBackend {
         self,
         emitter: CaptureSessionEmitter,
     ) -> Result<OpenedCaptureSessionBackend<Self::Subscription>, CaptureSessionError> {
-        StaticCoverageBackend::new(PlatformFamily::Macos, "unsupported-public-signals-v1")
+        StaticCoverageBackend::new(PlatformFamily::Macos, "unsupported-public-signals")
             .open(emitter)
     }
 }

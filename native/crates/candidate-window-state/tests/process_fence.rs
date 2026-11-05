@@ -38,7 +38,7 @@ impl CandidateWindowBackend for HangingCandidateBackend {
         Ok(OpenedCandidateWindowBackend {
             platform: PlatformFamily::Linux,
             permission: PermissionState::Granted,
-            adapter_version: "process-fence-test-v1",
+            adapter_version: "process-fence-test",
             initial_window: candidate_window(),
             subscription: HangingCandidateSubscription(self.release),
         })

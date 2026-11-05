@@ -553,7 +553,7 @@ mod tests {
             Ok(OpenedCandidateWindowBackend {
                 platform: PlatformFamily::Linux,
                 permission: PermissionState::Granted,
-                adapter_version: "fake-window-v1",
+                adapter_version: "fake-window",
                 initial_window: self.initial,
                 subscription: FakeSubscription {
                     final_window: self.final_window,

@@ -39,11 +39,11 @@ impl ProcessApplicationBackend for WindowsProcessApplicationBackend {
         let query_tracker = Arc::clone(&tracker);
         SnapshotPollingProcessBackend::new(
             PlatformFamily::Windows,
-            "windows-toolhelp-snapshot-v1",
+            "windows-toolhelp-snapshot",
             Duration::from_millis(500),
             move || query_state(&query_tracker),
         )
-        .open_with_initial_backend_fallback(emitter, "windows-toolhelp-unavailable-v1")
+        .open_with_initial_backend_fallback(emitter, "windows-toolhelp-unavailable")
     }
 }
 

@@ -46,13 +46,13 @@ impl PassiveStateBackend<PrintSpoolerWire> for PlatformPrintSpoolerBackend {
         PollingPassiveStateBackend::new(
             PlatformFamily::Windows,
             PermissionState::Granted,
-            "windows-spooler-field-selective-v1",
+            "windows-spooler-field-selective",
             Duration::from_millis(500),
             query_state,
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "windows-spooler-field-selective-unavailable-v1",
+            "windows-spooler-field-selective-unavailable",
             PrintSpoolerWire::unavailable_state(),
         )
     }

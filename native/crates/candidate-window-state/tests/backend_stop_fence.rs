@@ -30,7 +30,7 @@ impl CandidateWindowBackend for BoundaryFailureBackend {
         Ok(OpenedCandidateWindowBackend {
             platform: PlatformFamily::Linux,
             permission: PermissionState::Granted,
-            adapter_version: "backend-stop-fence-test-v1",
+            adapter_version: "backend-stop-fence-test",
             initial_window: candidate_window(),
             subscription: BoundaryFailureSubscription,
         })

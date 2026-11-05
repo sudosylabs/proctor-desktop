@@ -39,7 +39,7 @@ impl PassiveStateBackend<VirtualizationWire> for PlatformVirtualizationBackend {
         StaticPassiveStateBackend::new(
             PlatformFamily::Linux,
             PermissionState::Granted,
-            "linux-guest-markers-v1",
+            "linux-guest-markers",
             classify_paths(&MARKER_PATHS.map(Path::new))?,
         )
         .open(emitter)

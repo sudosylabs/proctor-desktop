@@ -81,13 +81,13 @@ impl PassiveStateBackend<MediaDeviceWire> for PlatformMediaDeviceBackend {
         PollingPassiveStateBackend::new(
             PlatformFamily::Macos,
             PermissionState::Granted,
-            "macos-avfoundation-media-state-v1",
+            "macos-avfoundation-media-state",
             Duration::from_millis(500),
             move || query_state(selection),
         )
         .open_with_initial_backend_fallback(
             emitter,
-            "macos-selected-avfoundation-unavailable-v1",
+            "macos-selected-avfoundation-unavailable",
             selected_unavailable_state(selection),
         )
     }
