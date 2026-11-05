@@ -46,6 +46,17 @@ words over repeated prohibitions.
 Tracked documentation records current rules and concise rationale, not decision
 chronology. Update a superseded rule in place and use Git history for chronology.
 
+## 3a. Turn a correction into a rule
+
+Read the user's example and the files it names before generalizing. An example
+illustrates a broader concern; it is not necessarily the whole scope, and an
+isolated incident is not a universal ban. Classify the cause: missing guidance,
+weak discovery, conflicting rules, a stale fact, or an existing rule that was not
+followed. Record the decision at its one owning level through the routing above,
+supersede any conflicting earlier text in place, and do not copy the exchange
+across several skills. Describe the target behavior and the evidence that shows
+it, then check the change against a realistic task rather than the new wording.
+
 ## 4. Prune
 
 Remove duplicated meaning, stale sediment, environment caches, weak pointers,

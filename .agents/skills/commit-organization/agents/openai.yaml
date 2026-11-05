@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit Organization"
+  short_description: "Split work into verified, coherent commits"
+  default_prompt: "Use $commit-organization to plan and create coherent, independently verified commits for these Proctor Desktop changes."

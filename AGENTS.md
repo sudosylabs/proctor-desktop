@@ -207,6 +207,13 @@ Use these repository skills when their trigger matches:
 - [`source-code-organization`](.agents/skills/source-code-organization/SKILL.md)
   when placing or reviewing a module, service, contribution, environment folder,
   entrypoint, or native package.
+- [`commit-organization`](.agents/skills/commit-organization/SKILL.md) when
+  committing work, splitting a large change, or planning a commit series.
+- [`cross-platform-validation`](.agents/skills/cross-platform-validation/SKILL.md)
+  when a change behaves differently on Windows, macOS, or Linux, or claims that a
+  platform works.
+- [`code-review`](.agents/skills/code-review/SKILL.md) when reviewing a branch,
+  commit, pull request, or working-tree change.
 - [`adapt-vscode`](.agents/skills/adapt-vscode/SKILL.md) when inspecting, copying,
   comparing, admitting, updating, or auditing VS Code-derived material.
 - [`maintain-agent-documentation`](.agents/skills/maintain-agent-documentation/SKILL.md)

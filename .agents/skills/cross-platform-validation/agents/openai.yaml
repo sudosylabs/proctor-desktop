@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cross-Platform Validation"
+  short_description: "Match evidence to the platforms a change affects"
+  default_prompt: "Use $cross-platform-validation to choose and report platform evidence for this Proctor Desktop change."

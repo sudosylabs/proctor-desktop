@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Review"
+  short_description: "Review changes against Proctor's rules and evidence"
+  default_prompt: "Use $code-review to review these Proctor Desktop changes against the repository's architecture, security, and verification rules."

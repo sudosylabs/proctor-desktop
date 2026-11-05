@@ -125,5 +125,10 @@ Use [`design-product-ui`](../.agents/skills/design-product-ui/SKILL.md),
 [`develop-ui-layout`](../.agents/skills/develop-ui-layout/SKILL.md) for their
 distinct product-design, shared-system, accessibility, and CSS/layout branches.
 
+Use [`commit-organization`](../.agents/skills/commit-organization/SKILL.md),
+[`cross-platform-validation`](../.agents/skills/cross-platform-validation/SKILL.md),
+and [`code-review`](../.agents/skills/code-review/SKILL.md) for committing,
+platform evidence, and review.
+
 Bundled color assets and their source relationship are documented in
 [GitHub themes](./upstream/github-themes.md).
