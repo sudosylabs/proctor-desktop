@@ -7,7 +7,7 @@ import { SecurityUtilityHost } from '../../platform/native/electron-utility/secu
 declare const __PRCTR_SECURITY_UTILITY_BUILD_IDENTITY__: string;
 
 const PORT_TRANSFER_TIMEOUT_MS = 5_000;
-const nativeModulePath = fileURLToPath(new URL('./prctr_native_node_bridge.node', import.meta.url));
+const nativeModulePath = fileURLToPath(new URL('./native_node_bridge.node', import.meta.url));
 const parentPort: ParentPort = process.parentPort;
 const transferTimer = setTimeout(
 	() => terminateWithDiagnostic('port-transfer-timeout'),
@@ -47,9 +47,8 @@ function isPortTransfer(value: unknown): boolean {
 		typeof value === 'object' &&
 		value !== null &&
 		!Array.isArray(value) &&
-		Object.keys(value).length === 2 &&
-		Reflect.get(value, 'kind') === 'security-utility-port' &&
-		Reflect.get(value, 'protocol_version') === 1
+		Object.keys(value).length === 1 &&
+		Reflect.get(value, 'kind') === 'security-utility-port'
 	);
 }
 

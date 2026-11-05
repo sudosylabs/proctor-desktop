@@ -131,7 +131,7 @@ class FixtureCommands implements NativePackageCommand {
 	}
 }
 async function fixture(): Promise<{ root: string; app: string; archive: string }> {
-	const root = realpathSync(mkdtempSync(join(tmpdir(), 'prctr-signed-fixture-')));
+	const root = realpathSync(mkdtempSync(join(tmpdir(), 'signed-fixture-')));
 	const app = join(root, 'Proctor.app');
 	const service = join(app, nativeServicePackage.bundlePath, 'Contents');
 	for (const directory of [
@@ -335,7 +335,7 @@ void test('ASAR allocation size is rejected before the upstream reader allocates
 });
 
 void test('only owned universal signed native addons may live outside ASAR', async () => {
-	for (const name of ['prctr_native_node_bridge.node', 'unapproved.node']) {
+	for (const name of ['native_node_bridge.node', 'unapproved.node']) {
 		const f = await fixture();
 		try {
 			writeFileSync(join(f.root, 'source', name), 'native-fixture');

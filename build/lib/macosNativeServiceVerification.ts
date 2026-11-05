@@ -67,7 +67,7 @@ export class MacOsNativeServiceVerifier {
 				app.endsWith('.app') && lstatSync(app).isDirectory(),
 				'Expected application bundle'
 			);
-			temporary = realpathSync(mkdtempSync(join(tmpdir(), 'prctr-native-verification-')));
+			temporary = realpathSync(mkdtempSync(join(tmpdir(), 'native-verification-')));
 			const service = this.inside(app, nativeServicePackage.bundlePath, true);
 			const executable = this.inside(
 				app,
@@ -534,7 +534,7 @@ function verifyArchive(
 			for (let index = 1; index < parts.length; index++)
 				unpackedDirectories.add(parts.slice(0, index).join('/'));
 			assert(
-				['prctr_native_node_bridge.node', 'prctr_desktop_key_custody.node'].includes(
+				['native_node_bridge.node', 'desktop_key_custody.node'].includes(
 					relative.split('/').at(-1)!
 				),
 				'Undeclared unpacked native file'

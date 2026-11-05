@@ -92,9 +92,7 @@ export class ElectronSecurityUtilityProcessService implements ISecurityUtilityPr
 			);
 			await waitForSpawn(child, startupDeadline, cancellation);
 			if (cancellation.isCancellationRequested) throw new CancellationError();
-			child.postMessage({ kind: 'security-utility-port', protocol_version: 1 }, [
-				channel.port2
-			]);
+			child.postMessage({ kind: 'security-utility-port' }, [channel.port2]);
 			const ready = await ownedClient.start(remainingStartupTimeout(startupDeadline));
 			return { abort: () => ownedConnection.abort(), connection: ownedConnection, ready };
 		} catch (error) {

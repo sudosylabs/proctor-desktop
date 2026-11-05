@@ -301,7 +301,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 	} as const;
 	assert.equal(
 		isHelperHandshake({
-			protocol_version: 1,
 			channel_nonce: helperNonce,
 			helper_kind: 'macos_endpoint_security_helper',
 			helper_build_id: 'helper-build-0001',
@@ -311,7 +310,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 	);
 	assert.equal(
 		isHelperHandshake({
-			protocol_version: 1,
 			channel_nonce: helperNonce.toUpperCase(),
 			helper_kind: 'macos_endpoint_security_helper',
 			helper_build_id: 'helper-build-0001',
@@ -321,22 +319,18 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 	);
 	assert.equal(
 		isHelperSourceOpen({
-			protocol_version: 1,
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',
-			schema_version: 1,
 			queue_capacity: 16,
 			event_classes: ['process_lifecycle']
 		}),
 		false
 	);
 	const helperOpen = {
-		protocol_version: 1,
 		channel_nonce: helperNonce,
 		helper_source_instance_id: 'helper-source-0001',
 		source_kind: 'interactive_session',
-		schema_version: 1,
 		queue_capacity: 16,
 		event_classes: ['interactive_session_lifecycle']
 	} as const;
@@ -346,7 +340,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 			kind: 'close',
 			open: helperOpen,
 			close: {
-				protocol_version: 1,
 				channel_nonce: helperNonce,
 				helper_source_instance_id: 'helper-source-0001'
 			}
@@ -355,11 +348,9 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 	);
 	assert.equal(
 		isHelperSourceSnapshot({
-			protocol_version: 1,
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',
-			schema_version: 1,
 			last_sequence: 0,
 			monotonic_time_ns: 1,
 			interactive_session_state: interactiveState
@@ -370,11 +361,9 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 		isHelperServerMessage({
 			kind: 'snapshot',
 			snapshot: {
-				protocol_version: 1,
 				channel_nonce: helperNonce,
 				helper_source_instance_id: 'helper-source-0001',
 				source_kind: 'interactive_session',
-				schema_version: 1,
 				last_sequence: 0,
 				monotonic_time_ns: 1,
 				interactive_session_state: interactiveState
@@ -386,17 +375,14 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 		isHelperServerMessage({
 			kind: 'snapshot',
 			snapshot: {
-				protocol_version: 1,
 				channel_nonce: helperNonce,
 				helper_source_instance_id: 'helper-source-0001',
 				source_kind: 'interactive_session',
-				schema_version: 1,
 				last_sequence: 0,
 				monotonic_time_ns: 1,
 				interactive_session_state: interactiveState
 			},
 			failure: {
-				protocol_version: 1,
 				channel_nonce: helperNonce,
 				helper_source_instance_id: 'helper-source-0001',
 				source_kind: 'interactive_session',
@@ -409,11 +395,9 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 	);
 	assert.equal(
 		isHelperSourceSnapshot({
-			protocol_version: 1,
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',
-			schema_version: 1,
 			last_sequence: 0,
 			monotonic_time_ns: 1,
 			process_state: {
@@ -426,7 +410,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 	);
 	assert.equal(
 		isHelperSourceFailure({
-			protocol_version: 1,
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',
@@ -439,7 +422,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 	);
 	assert.equal(
 		isHelperSourceFailure({
-			protocol_version: 1,
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',
@@ -452,7 +434,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 	);
 	assert.equal(
 		isHelperObservation({
-			protocol_version: 1,
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',
@@ -467,7 +448,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 	);
 	assert.equal(
 		isHelperObservation({
-			protocol_version: 1,
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',

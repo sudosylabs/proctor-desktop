@@ -4,7 +4,6 @@ import type { CancellationToken } from '../../src/prctr/base/common/cancellation
 import type { CandidateWindowState } from '../../src/prctr/platform/native/common/nativeObservation.generated.js';
 import {
 	SECURITY_UTILITY_SOURCE_MANIFEST,
-	SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 	type NativeSupervisorStop
 } from '../../src/prctr/platform/native/common/securityUtilityProtocol.js';
 import { SyncDescriptor } from '../../src/prctr/platform/instantiation/common/descriptors.js';
@@ -101,11 +100,9 @@ class TestProcessService implements ISecurityUtilityProcessService {
 			},
 			ready: {
 				kind: 'ready',
-				protocol_version: 1,
 				message_sequence: 0,
 				challenge_response: 'test',
 				build_identity: 'test',
-				source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 				source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 				selected_sources: options.selectedSources,
 				selected_source_categories: options.selectedSourceCategories,

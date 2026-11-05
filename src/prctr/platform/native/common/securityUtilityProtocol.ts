@@ -2,7 +2,6 @@ import {
 	NATIVE_SOURCE_MANIFEST,
 	NATIVE_SOURCE_CATEGORY_ORDER,
 	NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS,
-	NATIVE_SOURCE_MANIFEST_VERSION,
 	isCandidateWindowDrain,
 	isCandidateWindowHostEvent,
 	isCandidateWindowSourceSnapshot,
@@ -57,8 +56,6 @@ import {
 	type VirtualizationSourceSnapshot
 } from './nativeObservation.generated.js';
 
-export const SECURITY_UTILITY_PROTOCOL_VERSION = 1;
-export const SECURITY_UTILITY_SOURCE_MANIFEST_VERSION = NATIVE_SOURCE_MANIFEST_VERSION;
 export const SECURITY_UTILITY_SOURCE_MANIFEST = NATIVE_SOURCE_MANIFEST;
 
 export type SecurityUtilitySourceManifest = NativeSourceManifest;
@@ -88,10 +85,8 @@ export const SECURITY_UTILITY_MAX_LOST_EVENT_COUNT = 0xffff_ffff;
 
 export interface SecurityUtilityBootstrap {
 	readonly kind: 'bootstrap';
-	readonly protocol_version: 1;
 	readonly challenge: string;
 	readonly build_identity: string;
-	readonly source_manifest_version: typeof SECURITY_UTILITY_SOURCE_MANIFEST_VERSION;
 	readonly source_manifest: SecurityUtilitySourceManifest;
 	readonly participation_generation: string;
 	readonly collection_session_id: string;
@@ -103,7 +98,6 @@ export interface SecurityUtilityBootstrap {
 
 export interface SecurityUtilityCandidateWindowEvent {
 	readonly kind: 'candidate_window_event';
-	readonly protocol_version: 1;
 	readonly participation_generation: string;
 	readonly message_sequence: number;
 	readonly event: CandidateWindowHostEvent;
@@ -111,7 +105,6 @@ export interface SecurityUtilityCandidateWindowEvent {
 
 export interface SecurityUtilityCandidateWindowEventsLost {
 	readonly kind: 'candidate_window_events_lost';
-	readonly protocol_version: 1;
 	readonly participation_generation: string;
 	readonly message_sequence: number;
 	readonly lost_count: number;
@@ -119,7 +112,6 @@ export interface SecurityUtilityCandidateWindowEventsLost {
 
 export interface SecurityUtilityShutdown {
 	readonly kind: 'shutdown';
-	readonly protocol_version: 1;
 	readonly participation_generation: string;
 	readonly message_sequence: number;
 	readonly final_candidate_window: CandidateWindowState;
@@ -127,7 +119,6 @@ export interface SecurityUtilityShutdown {
 
 export interface SecurityUtilityAcknowledgement {
 	readonly kind: 'acknowledge';
-	readonly protocol_version: 1;
 	readonly participation_generation: string;
 	readonly message_sequence: number;
 	readonly acknowledged_sequence: number;
@@ -232,11 +223,9 @@ export interface NativeSupervisorStop {
 
 export interface SecurityUtilityReady {
 	readonly kind: 'ready';
-	readonly protocol_version: 1;
 	readonly message_sequence: 0;
 	readonly challenge_response: string;
 	readonly build_identity: string;
-	readonly source_manifest_version: typeof SECURITY_UTILITY_SOURCE_MANIFEST_VERSION;
 	readonly source_manifest: SecurityUtilitySourceManifest;
 	readonly selected_sources: readonly NativeSourceId[];
 	readonly selected_source_categories: readonly NativeSourceCategory[];
@@ -247,7 +236,6 @@ export interface SecurityUtilityReady {
 
 export interface SecurityUtilityPoll {
 	readonly kind: 'native_poll';
-	readonly protocol_version: 1;
 	readonly message_sequence: number;
 	readonly participation_generation: string;
 	readonly delivered_at_wall_time_unix_ms: number;
@@ -256,7 +244,6 @@ export interface SecurityUtilityPoll {
 
 export interface SecurityUtilityHeartbeat {
 	readonly kind: 'heartbeat';
-	readonly protocol_version: 1;
 	readonly message_sequence: number;
 	readonly participation_generation: string;
 	readonly monotonic_time_ms: number;
@@ -266,7 +253,6 @@ export type CandidateWindowIngressOutcome = 'accepted' | 'dropped' | 'stopped';
 
 export interface SecurityUtilityCandidateWindowIngressResult {
 	readonly kind: 'candidate_window_ingress_result';
-	readonly protocol_version: 1;
 	readonly message_sequence: number;
 	readonly participation_generation: string;
 	readonly input_sequence: number;
@@ -275,7 +261,6 @@ export interface SecurityUtilityCandidateWindowIngressResult {
 
 export interface SecurityUtilityStopped {
 	readonly kind: 'stopped';
-	readonly protocol_version: 1;
 	readonly message_sequence: number;
 	readonly participation_generation: string;
 	readonly result: NativeSupervisorStop;
@@ -296,7 +281,6 @@ export type SecurityUtilityFailureCode =
 
 export interface SecurityUtilityFatal {
 	readonly kind: 'fatal';
-	readonly protocol_version: 1;
 	readonly message_sequence: number;
 	readonly participation_generation: string;
 	readonly code: SecurityUtilityFailureCode;
@@ -329,10 +313,8 @@ export function isSecurityUtilityBootstrap(value: unknown): value is SecurityUti
 	return (
 		isRecordWithKeys(value, [
 			'kind',
-			'protocol_version',
 			'challenge',
 			'build_identity',
-			'source_manifest_version',
 			'source_manifest',
 			'participation_generation',
 			'collection_session_id',
@@ -342,10 +324,8 @@ export function isSecurityUtilityBootstrap(value: unknown): value is SecurityUti
 			'initial_candidate_window'
 		]) &&
 		value.kind === 'bootstrap' &&
-		value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
 		isBootstrapChallenge(value.challenge) &&
 		isBoundedString(value.build_identity, 16, 256) &&
-		value.source_manifest_version === SECURITY_UTILITY_SOURCE_MANIFEST_VERSION &&
 		isSecurityUtilitySourceManifest(value.source_manifest) &&
 		isBoundedString(value.participation_generation, 16, 128) &&
 		isBoundedString(value.collection_session_id, 16, 128) &&
@@ -363,12 +343,10 @@ export function isSecurityUtilityMainMessage(value: unknown): value is SecurityU
 		return (
 			isRecordWithKeys(value, [
 				'kind',
-				'protocol_version',
 				'participation_generation',
 				'message_sequence',
 				'event'
 			]) &&
-			value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
 			isBoundedString(value.participation_generation, 16, 128) &&
 			isBoundedInteger(value.message_sequence, 1, Number.MAX_SAFE_INTEGER) &&
 			isCandidateWindowHostEvent(value.event)
@@ -378,12 +356,10 @@ export function isSecurityUtilityMainMessage(value: unknown): value is SecurityU
 		return (
 			isRecordWithKeys(value, [
 				'kind',
-				'protocol_version',
 				'participation_generation',
 				'message_sequence',
 				'lost_count'
 			]) &&
-			value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
 			isBoundedString(value.participation_generation, 16, 128) &&
 			isBoundedInteger(value.message_sequence, 1, Number.MAX_SAFE_INTEGER) &&
 			isBoundedInteger(value.lost_count, 1, SECURITY_UTILITY_MAX_LOST_EVENT_COUNT)
@@ -393,12 +369,10 @@ export function isSecurityUtilityMainMessage(value: unknown): value is SecurityU
 		return (
 			isRecordWithKeys(value, [
 				'kind',
-				'protocol_version',
 				'participation_generation',
 				'message_sequence',
 				'final_candidate_window'
 			]) &&
-			value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
 			isBoundedString(value.participation_generation, 16, 128) &&
 			isBoundedInteger(value.message_sequence, 1, Number.MAX_SAFE_INTEGER) &&
 			isCandidateWindowState(value.final_candidate_window)
@@ -408,12 +382,10 @@ export function isSecurityUtilityMainMessage(value: unknown): value is SecurityU
 		return (
 			isRecordWithKeys(value, [
 				'kind',
-				'protocol_version',
 				'participation_generation',
 				'message_sequence',
 				'acknowledged_sequence'
 			]) &&
-			value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
 			isBoundedString(value.participation_generation, 16, 128) &&
 			isBoundedInteger(value.message_sequence, 1, Number.MAX_SAFE_INTEGER) &&
 			isBoundedInteger(value.acknowledged_sequence, 0, Number.MAX_SAFE_INTEGER)
@@ -424,18 +396,14 @@ export function isSecurityUtilityMainMessage(value: unknown): value is SecurityU
 
 export function isNativeBridgeManifest(value: unknown): boolean {
 	return (
-		isRecordWithKeys(value, ['bridge_version', 'source_manifest_version', 'source_manifest']) &&
-		value.bridge_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
-		value.source_manifest_version === SECURITY_UTILITY_SOURCE_MANIFEST_VERSION &&
+		isRecordWithKeys(value, ['source_manifest']) &&
 		isSecurityUtilitySourceManifest(value.source_manifest)
 	);
 }
 
 export function isNativeBaselineSnapshots(
 	value: unknown,
-	selectedSources: readonly NativeSourceId[] = SECURITY_UTILITY_SOURCE_MANIFEST.map(
-		(entry) => entry.source_id
-	)
+	selectedSources: readonly NativeSourceId[] = SECURITY_UTILITY_SOURCE_MANIFEST
 ): value is NativeBaselineSnapshots {
 	return (
 		isBoundedArray(value, SECURITY_UTILITY_SOURCE_COUNT, isNativeSnapshotEnvelope) &&
@@ -517,11 +485,9 @@ export function isSecurityUtilityChildMessage(
 		return (
 			isRecordWithKeys(value, [
 				'kind',
-				'protocol_version',
 				'message_sequence',
 				'challenge_response',
 				'build_identity',
-				'source_manifest_version',
 				'source_manifest',
 				'selected_sources',
 				'selected_source_categories',
@@ -529,11 +495,9 @@ export function isSecurityUtilityChildMessage(
 				'delivered_at_wall_time_unix_ms',
 				'snapshots'
 			]) &&
-			value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
 			value.message_sequence === 0 &&
 			isBootstrapChallenge(value.challenge_response) &&
 			isBoundedString(value.build_identity, 16, 256) &&
-			value.source_manifest_version === SECURITY_UTILITY_SOURCE_MANIFEST_VERSION &&
 			isSecurityUtilitySourceManifest(value.source_manifest) &&
 			isSelectedNativeSources(value.selected_sources) &&
 			isSelectedSourceCategories(value.selected_source_categories, value.selected_sources) &&
@@ -546,7 +510,6 @@ export function isSecurityUtilityChildMessage(
 		return (
 			hasChildEnvelope(value, [
 				'kind',
-				'protocol_version',
 				'message_sequence',
 				'participation_generation',
 				'delivered_at_wall_time_unix_ms',
@@ -560,7 +523,6 @@ export function isSecurityUtilityChildMessage(
 		return (
 			hasChildEnvelope(value, [
 				'kind',
-				'protocol_version',
 				'message_sequence',
 				'participation_generation',
 				'monotonic_time_ms'
@@ -571,7 +533,6 @@ export function isSecurityUtilityChildMessage(
 		return (
 			hasChildEnvelope(value, [
 				'kind',
-				'protocol_version',
 				'message_sequence',
 				'participation_generation',
 				'input_sequence',
@@ -585,7 +546,6 @@ export function isSecurityUtilityChildMessage(
 		return (
 			hasChildEnvelope(value, [
 				'kind',
-				'protocol_version',
 				'message_sequence',
 				'participation_generation',
 				'result'
@@ -596,7 +556,6 @@ export function isSecurityUtilityChildMessage(
 		return (
 			hasChildEnvelope(value, [
 				'kind',
-				'protocol_version',
 				'message_sequence',
 				'participation_generation',
 				'code'
@@ -611,14 +570,7 @@ export function isSecurityUtilitySourceManifest(
 ): value is SecurityUtilitySourceManifest {
 	if (!Array.isArray(value) || value.length !== SECURITY_UTILITY_SOURCE_MANIFEST.length)
 		return false;
-	return SECURITY_UTILITY_SOURCE_MANIFEST.every((expected, index) => {
-		const actual = value[index];
-		return (
-			isRecordWithKeys(actual, ['source_id', 'schema_version']) &&
-			actual.source_id === expected.source_id &&
-			actual.schema_version === expected.schema_version
-		);
-	});
+	return SECURITY_UTILITY_SOURCE_MANIFEST.every((expected, index) => value[index] === expected);
 }
 
 export function isSelectedNativeSources(value: unknown): value is readonly NativeSourceId[] {
@@ -629,12 +581,12 @@ export function isSelectedNativeSources(value: unknown): value is readonly Nativ
 	) {
 		return false;
 	}
-	const sourceIds = new Set(SECURITY_UTILITY_SOURCE_MANIFEST.map((entry) => entry.source_id));
+	const sourceIds = new Set<unknown>(SECURITY_UTILITY_SOURCE_MANIFEST);
 	const selected = new Set<unknown>();
 	let previousManifestIndex = -1;
 	for (const sourceId of value) {
 		const manifestIndex = SECURITY_UTILITY_SOURCE_MANIFEST.findIndex(
-			(entry) => entry.source_id === sourceId
+			(entry) => entry === sourceId
 		);
 		if (
 			!sourceIds.has(sourceId as NativeSourceId) ||
@@ -685,7 +637,6 @@ export function isSelectedSourceCategories(
 function hasChildEnvelope(value: Record<string, unknown>, keys: readonly string[]): boolean {
 	return (
 		hasOnlyKeys(value, keys) &&
-		value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
 		isBoundedInteger(value.message_sequence, 1, Number.MAX_SAFE_INTEGER) &&
 		isBoundedString(value.participation_generation, 16, 128)
 	);

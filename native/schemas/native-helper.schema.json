@@ -2,12 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://proctor.invalid/native/native-helper.schema.json",
   "title": "Proctor privileged native-helper protocol",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["schema_version"],
-  "properties": {
-    "schema_version": { "const": 1 }
-  },
   "$defs": {
     "HelperServiceRequestKind": {
       "type": "string",
@@ -22,15 +16,8 @@
       "type": "object",
       "x-proctor-rules": ["valid_helper_channel_nonce"],
       "additionalProperties": false,
-      "required": ["protocol_version", "channel_nonce", "kind"],
+      "required": ["channel_nonce", "kind"],
       "properties": {
-        "protocol_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
         "kind": { "$ref": "#/$defs/HelperServiceRequestKind" }
       }
@@ -40,15 +27,8 @@
       "type": "object",
       "x-proctor-rules": ["valid_helper_channel_nonce"],
       "additionalProperties": false,
-      "required": ["protocol_version", "channel_nonce", "kind"],
+      "required": ["channel_nonce", "kind"],
       "properties": {
-        "protocol_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
         "kind": { "$ref": "#/$defs/HelperServiceResponseKind" }
       }
@@ -58,15 +38,8 @@
       "type": "object",
       "x-proctor-rules": ["valid_helper_channel_nonce"],
       "additionalProperties": false,
-      "required": ["protocol_version", "channel_nonce", "client_designated_requirement"],
+      "required": ["channel_nonce", "client_designated_requirement"],
       "properties": {
-        "protocol_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
         "client_designated_requirement": { "type": "string", "minLength": 1, "maxLength": 2048 }
       }
@@ -87,21 +60,8 @@
       "type": "object",
       "x-proctor-rules": ["valid_helper_channel_nonce", "unique_helper_capabilities"],
       "additionalProperties": false,
-      "required": [
-        "protocol_version",
-        "channel_nonce",
-        "helper_kind",
-        "helper_build_id",
-        "capabilities"
-      ],
+      "required": ["channel_nonce", "helper_kind", "helper_build_id", "capabilities"],
       "properties": {
-        "protocol_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
         "helper_kind": { "$ref": "#/$defs/HelperKind" },
         "helper_build_id": { "type": "string", "minLength": 16, "maxLength": 64 },
@@ -117,31 +77,16 @@
       "x-proctor-rules": ["valid_helper_channel_nonce", "coherent_helper_source_open"],
       "additionalProperties": false,
       "required": [
-        "protocol_version",
         "channel_nonce",
         "helper_source_instance_id",
         "source_kind",
-        "schema_version",
         "queue_capacity",
         "event_classes"
       ],
       "properties": {
-        "protocol_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
         "helper_source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
         "source_kind": { "$ref": "#/$defs/HelperSourceKind" },
-        "schema_version": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "queue_capacity": {
           "type": "integer",
           "minimum": 2,
@@ -159,15 +104,8 @@
       "type": "object",
       "x-proctor-rules": ["valid_helper_channel_nonce"],
       "additionalProperties": false,
-      "required": ["protocol_version", "channel_nonce", "helper_source_instance_id"],
+      "required": ["channel_nonce", "helper_source_instance_id"],
       "properties": {
-        "protocol_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
         "helper_source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 }
       }
@@ -177,31 +115,16 @@
       "x-proctor-rules": ["valid_helper_channel_nonce", "coherent_helper_source_snapshot"],
       "additionalProperties": false,
       "required": [
-        "protocol_version",
         "channel_nonce",
         "helper_source_instance_id",
         "source_kind",
-        "schema_version",
         "last_sequence",
         "monotonic_time_ns"
       ],
       "properties": {
-        "protocol_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
         "helper_source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
         "source_kind": { "$ref": "#/$defs/HelperSourceKind" },
-        "schema_version": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "last_sequence": {
           "type": "integer",
           "minimum": 0,
@@ -239,7 +162,6 @@
       "x-proctor-rules": ["valid_helper_channel_nonce", "coherent_helper_source_failure"],
       "additionalProperties": false,
       "required": [
-        "protocol_version",
         "channel_nonce",
         "helper_source_instance_id",
         "source_kind",
@@ -248,13 +170,6 @@
         "monotonic_time_ns"
       ],
       "properties": {
-        "protocol_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
         "helper_source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
         "source_kind": { "$ref": "#/$defs/HelperSourceKind" },
@@ -284,7 +199,6 @@
       "x-proctor-rules": ["valid_helper_channel_nonce", "coherent_helper_observation"],
       "additionalProperties": false,
       "required": [
-        "protocol_version",
         "channel_nonce",
         "helper_source_instance_id",
         "source_kind",
@@ -292,13 +206,6 @@
         "monotonic_time_ns"
       ],
       "properties": {
-        "protocol_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "channel_nonce": { "type": "string", "minLength": 64, "maxLength": 64 },
         "helper_source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
         "source_kind": { "$ref": "#/$defs/HelperSourceKind" },

@@ -21,8 +21,8 @@ async function run(check: Check, repository: VirtualRepository): Promise<readonl
 	return check.run({ repository, registeredCheckIds: new Set(checks.map((entry) => entry.id)) });
 }
 
-const displayTopologyManifest = 'native/crates/prctr-display-topology/Cargo.toml';
-const captureSessionManifest = 'native/crates/prctr-capture-session-state/Cargo.toml';
+const displayTopologyManifest = 'native/crates/display-topology/Cargo.toml';
+const captureSessionManifest = 'native/crates/capture-session-state/Cargo.toml';
 
 function appendCargoDependency(
 	files: Record<string, string | Uint8Array | { symlink: string }>,
@@ -202,7 +202,7 @@ void test('dependency admission rejects an unreviewed exact Cargo dependency', a
 	assert.ok(
 		diagnostics.some(
 			(item) =>
-				item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+				item.path === 'native/crates/display-topology/Cargo.toml' &&
 				/unreviewed-native is not admitted/.test(item.problem)
 		)
 	);
@@ -223,7 +223,7 @@ void test('dependency admission covers every Cargo registry declaration form', a
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+					item.path === 'native/crates/display-topology/Cargo.toml' &&
 					/unreviewed-(?:string|inline|table) is not admitted/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -247,7 +247,7 @@ void test('dependency admission resolves Cargo package aliases and rejects skipp
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+					item.path === 'native/crates/display-topology/Cargo.toml' &&
 					/unreviewed-(?:renamed|table-renamed|quoted|quoted-table)|unsupported/.test(
 						item.problem
 					)
@@ -267,7 +267,7 @@ void test('dependency admission rejects non-exact Cargo versions', async () => {
 	assert.ok(
 		diagnostics.some(
 			(item) =>
-				item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+				item.path === 'native/crates/display-topology/Cargo.toml' &&
 				/not-exact is not pinned/.test(item.problem)
 		)
 	);
@@ -288,7 +288,7 @@ void test('dependency admission rejects alternate Cargo sources', async () => {
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+					item.path === 'native/crates/display-topology/Cargo.toml' &&
 					/unsupported alternate Cargo source/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -312,7 +312,7 @@ void test('dependency admission rejects quoted Cargo source and path properties'
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+					item.path === 'native/crates/display-topology/Cargo.toml' &&
 					/unsupported alternate Cargo source|not a tracked member/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -334,7 +334,7 @@ void test('dependency admission rejects dotted Cargo dependency declarations', a
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+					item.path === 'native/crates/display-topology/Cargo.toml' &&
 					/unreviewed-(?:dotted|target-dotted) is not admitted/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -356,7 +356,7 @@ void test('dependency admission rejects dotted Cargo source overrides', async ()
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+					item.path === 'native/crates/display-topology/Cargo.toml' &&
 					/Cargo override/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -379,7 +379,7 @@ void test('dependency admission rejects quoted Cargo structural keys', async () 
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+					item.path === 'native/crates/display-topology/Cargo.toml' &&
 					/is not admitted as a Cargo dependency|Cargo override/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -418,7 +418,7 @@ void test('dependency admission rejects spaced Cargo structural dotted keys', as
 		assert.ok(
 			diagnostics.some(
 				(item) =>
-					item.path === 'native/crates/prctr-display-topology/Cargo.toml' &&
+					item.path === 'native/crates/display-topology/Cargo.toml' &&
 					/is not admitted as a Cargo dependency|Cargo override/.test(item.problem)
 			),
 			`${declaration}: ${JSON.stringify(diagnostics)}`
@@ -434,7 +434,7 @@ void test('dependency admission rejects external Cargo paths and source override
 			appendCargoDependency(files, 'outside = { path = "../../../../outside" }');
 		},
 		(files: Record<string, string | Uint8Array | { symlink: string }>): void => {
-			const path = 'native/crates/prctr-display-topology/Cargo.toml';
+			const path = 'native/crates/display-topology/Cargo.toml';
 			files[path] =
 				`${String(files[path])}\n[patch.crates-io]\nwindows-sys = { path = "../patched" }\n`;
 		},
@@ -559,7 +559,7 @@ void test('dependency admission rejects an additional unreviewed per-manifest de
 	const diagnostics = await run(
 		check,
 		snapshot((files) => {
-			const path = 'native/crates/prctr-candidate-window-state/Cargo.toml';
+			const path = 'native/crates/candidate-window-state/Cargo.toml';
 			files[path] =
 				`${String(files[path])}\n[target.'cfg(target_os = "macos")'.dependencies]\nwindows-sys = { version = "=0.61.2", features = ["Win32_Foundation"] }\n`;
 		})

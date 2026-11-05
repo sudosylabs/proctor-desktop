@@ -80,7 +80,7 @@ by the target matrix or explicitly unavailable.
 
 ## 3. Define a race-free source session
 
-Open one session that returns source/adapter/schema versions, platform and
+Open one session that returns source/adapter identity, platform and
 permission state, a fresh source-instance identifier, health, and a complete
 snapshot at sequence `N`. Deliver ordered observations strictly after `N` and
 buffer transitions produced while the snapshot is built.
@@ -88,8 +88,7 @@ buffer transitions produced while the snapshot is built.
 Use per-source monotonic sequence/time, bounded payloads, explicit gaps and
 resets, and idempotent disposal. Let the privileged delivery layer add wall-
 clock context. Give the source only an opaque collection-session identifier,
-requested schema, selected mechanical categories, adapter variant, and resource
-limits. Let the coordinator attach trusted Session, Attempt, participation, and
+selected mechanical categories, adapter variant, and resource limits. Let the coordinator attach trusted Session, Attempt, participation, and
 policy provenance.
 
 Treat notifications as reconciliation wakeups. Require a complete snapshot after
@@ -173,9 +172,10 @@ it must not report granted while a selected endpoint is denied, restricted,
 undetermined, or unavailable.
 
 Launch exact packaged entrypoints and connect them through fixed, typed,
-versioned, bounded private protocols. Verify build and source manifests,
-protocol/schema compatibility, peer code identity, OS access control,
-participation generation, and a broker-generated single-use nonce. Bind peer
+bounded private protocols that carry exactly one current shape, with no
+version fields or negotiation. Verify build and source manifests, peer code
+identity, OS access control, participation generation, and a broker-generated
+single-use nonce. Bind peer
 identity to the live process or to a verified non-replaceable executable handle
 retained across spawn; a second path lookup is not a post-spawn identity proof.
 Use one absolute launch deadline across executable verification, spawn, live-
@@ -197,7 +197,7 @@ failure wires. Clear transient native identity buffers within a fixed bound;
 oversized cleanup runs only behind the shared cleanup deadline and poisons the
 utility when completion cannot be proved.
 
-Use `prctr-native-helper-protocol` only for the generated process/session helper
+Use `native-helper-protocol` only for the generated process/session helper
 handshake, operational source configuration, frame boundary, verified-peer
 binding, and normalized facts. Its presence does not imply that a helper
 executable, OS peer verification, entitlement, signed service, or platform

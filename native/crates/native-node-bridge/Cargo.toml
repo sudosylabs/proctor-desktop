@@ -1,0 +1,33 @@
+[package]
+name = "native-node-bridge"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "=3.12.2", default-features = false, features = ["dyn-symbols", "napi8", "serde-json"] }
+napi-derive = { version = "=3.6.3", default-features = false, features = ["strict"] }
+candidate-window-state = { path = "../candidate-window-state" }
+capture-session-state = { path = "../capture-session-state" }
+clipboard-state = { path = "../clipboard-state" }
+display-topology = { path = "../display-topology" }
+interactive-session-state = { path = "../interactive-session-state" }
+media-device-state = { path = "../media-device-state" }
+native-protocol = { path = "../native-protocol" }
+native-source-supervisor = { path = "../native-source-supervisor" }
+network-configuration-state = { path = "../network-configuration-state" }
+print-spooler-state = { path = "../print-spooler-state" }
+process-application-state = { path = "../process-application-state" }
+removable-storage-state = { path = "../removable-storage-state" }
+virtualization-state = { path = "../virtualization-state" }
+serde = { version = "=1.0.229", features = ["derive"] }
+
+[lints]
+workspace = true
+
+[target.'cfg(target_os = "macos")'.dependencies]
+native-security-helper = { path = "../native-security-helper" }

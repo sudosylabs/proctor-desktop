@@ -14,5 +14,5 @@ const inventory = new WindowsNativeServiceInventoryBuilder().build(
 );
 writeFileSync(output, JSON.stringify(inventory, null, 2) + '\n', { flag: 'wx', mode: 0o600 });
 process.stdout.write(
-	`Inventoried ${inventory.files.length} client files. Review and pass this build input as PRCTR_WINDOWS_SERVICE_PACKAGE before compiling the helper. This does not verify signatures or install the service.\n`
+	`Inventoried ${inventory.files.length} client files. Review and pass this build input as WINDOWS_SERVICE_PACKAGE before compiling the helper. This does not verify signatures or install the service.\n`
 );

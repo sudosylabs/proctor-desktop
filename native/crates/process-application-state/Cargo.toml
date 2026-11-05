@@ -1,0 +1,19 @@
+[package]
+name = "process-application-state"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+native-protocol = { path = "../native-protocol" }
+native-source-runtime = { path = "../native-source-runtime" }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+libc = "=0.2.189"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Security", "Win32_System_Diagnostics_Etw", "Win32_System_Diagnostics_ToolHelp", "Win32_System_Performance", "Win32_System_RemoteDesktop", "Win32_System_Threading", "Win32_System_Time"] }
+
+[lints]
+workspace = true

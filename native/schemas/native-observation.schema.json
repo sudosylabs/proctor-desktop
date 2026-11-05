@@ -2,7 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://proctor.invalid/native/native-observation.schema.json",
   "title": "Proctor shared native-observation protocol",
-  "x-proctor-source-manifest-version": 3,
   "x-proctor-source-manifest": [
     "display-topology",
     "candidate-window",
@@ -17,12 +16,6 @@
     "media-device"
   ],
   "x-proctor-source-lifecycle-deadline-ms": 5000,
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["schema_version"],
-  "properties": {
-    "schema_version": { "const": 1 }
-  },
   "$defs": {
     "PlatformFamily": {
       "type": "string",
@@ -91,15 +84,9 @@
     "SourceOpenRequest": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["collection_session_id", "requested_schema_version", "queue_capacity"],
+      "required": ["collection_session_id", "queue_capacity"],
       "properties": {
         "collection_session_id": { "type": "string", "minLength": 16, "maxLength": 128 },
-        "requested_schema_version": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "queue_capacity": { "type": "integer", "minimum": 2, "maximum": 1024, "x-rust-type": "u16" }
       }
     },

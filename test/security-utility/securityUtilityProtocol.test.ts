@@ -8,7 +8,6 @@ import {
 	SECURITY_UTILITY_SHUTDOWN_TIMEOUT_MS,
 	SECURITY_UTILITY_SOURCE_COUNT,
 	SECURITY_UTILITY_SOURCE_MANIFEST,
-	SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 	SECURITY_UTILITY_STARTUP_TIMEOUT_MS,
 	SECURITY_UTILITY_HEARTBEAT_TIMEOUT_MS,
 	isNativeBridgeManifest,
@@ -31,7 +30,7 @@ const candidateWindow: CandidateWindowState = {
 	display_target_id: 'security-test-display'
 };
 
-const selectedSources = SECURITY_UTILITY_SOURCE_MANIFEST.map((entry) => entry.source_id);
+const selectedSources = [...SECURITY_UTILITY_SOURCE_MANIFEST];
 const selectedSourceCategories = [
 	'os-clipboard-change',
 	'removable-block-storage',
@@ -53,7 +52,6 @@ const snapshots = [
 			source_instance_id: 'display-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'granted',
 			health: 'healthy',
@@ -82,7 +80,6 @@ const snapshots = [
 			source_instance_id: 'candidate-source-001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'granted',
 			health: 'healthy',
@@ -97,7 +94,6 @@ const snapshots = [
 			source_instance_id: 'capture-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -123,7 +119,6 @@ const snapshots = [
 			source_instance_id: 'process-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -142,7 +137,6 @@ const snapshots = [
 			source_instance_id: 'interactive-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -164,7 +158,6 @@ const snapshots = [
 			source_instance_id: 'clipboard-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -179,7 +172,6 @@ const snapshots = [
 			source_instance_id: 'print-source-000001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -200,7 +192,6 @@ const snapshots = [
 			source_instance_id: 'storage-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -215,7 +206,6 @@ const snapshots = [
 			source_instance_id: 'virtual-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -230,7 +220,6 @@ const snapshots = [
 			source_instance_id: 'network-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -252,7 +241,6 @@ const snapshots = [
 			source_instance_id: 'media-source-00001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -304,10 +292,8 @@ void test('main client honors a smaller remaining startup budget', async () => {
 void test('private bootstrap validator rejects unknown fields and manifest drift', () => {
 	const bootstrap = {
 		kind: 'bootstrap',
-		protocol_version: 1,
 		challenge: 'a'.repeat(43),
 		build_identity: 'proctor-build-identity-0001',
-		source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 		participation_generation: 'participation-generation-0001',
 		collection_session_id: 'collection-session-0001',
@@ -388,10 +374,8 @@ void test('private bootstrap validator rejects unknown fields and manifest drift
 	);
 });
 
-void test('native bridge admission compares the generated per-source schema manifest', () => {
+void test('native bridge admission compares the exact generated source manifest', () => {
 	const manifest = {
-		bridge_version: 1,
-		source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 	};
 	assert.equal(isNativeBridgeManifest(manifest), true);
@@ -399,7 +383,7 @@ void test('native bridge admission compares the generated per-source schema mani
 		isNativeBridgeManifest({
 			...manifest,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST.map((source, index) =>
-				index === 1 ? { ...source, schema_version: source.schema_version + 1 } : source
+				index === 1 ? 'unknown-source' : source
 			)
 		}),
 		false
@@ -435,11 +419,9 @@ void test('main rejects a ready echo with a different valid source selection', a
 			return;
 		utilityPort.postMessage({
 			kind: 'ready',
-			protocol_version: 1,
 			message_sequence: 0,
 			challenge_response: 'a'.repeat(43),
 			build_identity: 'proctor-build-identity-0001',
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 			selected_sources: selectedSources.slice(0, -1),
 			selected_source_categories: [
@@ -488,11 +470,9 @@ void test('main rejects later utility output from a source outside the sealed su
 			return;
 		utilityPort.postMessage({
 			kind: 'ready',
-			protocol_version: 1,
 			message_sequence: 0,
 			challenge_response: 'a'.repeat(43),
 			build_identity: 'proctor-build-identity-0001',
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 			selected_sources: ['display-topology'],
 			selected_source_categories: [],
@@ -519,7 +499,6 @@ void test('main rejects later utility output from a source outside the sealed su
 
 	utilityPort.postMessage({
 		kind: 'native_poll',
-		protocol_version: 1,
 		message_sequence: 1,
 		participation_generation: 'participation-generation-0001',
 		delivered_at_wall_time_unix_ms: 2,
@@ -540,8 +519,6 @@ void test('main and utility complete the authenticated lifecycle over a private 
 	const acceptedEvents: unknown[] = [];
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -606,8 +583,6 @@ void test('candidate ingress stays bounded and reports the exact sender-side los
 	const lostCounts: number[] = [];
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -673,8 +648,6 @@ void test('shutdown compacts the maximum pending ingress into one exact loss mar
 	let eventCalls = 0;
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -737,8 +710,6 @@ void test('native ingress drops remain ordered so a later event can expose the e
 	let calls = 0;
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -800,11 +771,9 @@ void test('supervisor polls do not conceal a missing utility heartbeat', async (
 			return;
 		utilityPort.postMessage({
 			kind: 'ready',
-			protocol_version: 1,
 			message_sequence: 0,
 			challenge_response: 'a'.repeat(43),
 			build_identity: 'proctor-build-identity-0001',
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 			selected_sources: selectedSources,
 			selected_source_categories: selectedSourceCategories,
@@ -832,7 +801,6 @@ void test('supervisor polls do not conceal a missing utility heartbeat', async (
 	const pollTimer = setInterval(() => {
 		utilityPort.postMessage({
 			kind: 'native_poll',
-			protocol_version: 1,
 			message_sequence: nextSequence,
 			participation_generation: 'participation-generation-0001',
 			delivered_at_wall_time_unix_ms: 1,
@@ -858,8 +826,6 @@ void test('utility fails closed when the main side does not acknowledge bounded 
 	let healthy = false;
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -906,8 +872,6 @@ void test('main fails closed when a supervisor poll cannot be delivered', async 
 	const [mainPort, utilityPort] = memoryPortPair();
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -1020,10 +984,8 @@ function eventLoopTurn(): Promise<void> {
 function validBootstrap(): unknown {
 	return {
 		kind: 'bootstrap',
-		protocol_version: 1,
 		challenge: 'a'.repeat(43),
 		build_identity: 'proctor-build-identity-0001',
-		source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 		participation_generation: 'participation-generation-0001',
 		collection_session_id: 'collection-session-0001',

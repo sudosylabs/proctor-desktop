@@ -170,23 +170,23 @@ One Rust crate owns each independently testable observation-source lifecycle.
 Small facts that share one OS lifecycle remain sub-capabilities rather than
 separate crates. The accepted expansion is:
 
-- `prctr-process-application-state`;
-- `prctr-interactive-session-state`;
-- `prctr-clipboard-state`;
-- `prctr-print-spooler-state`;
-- `prctr-removable-storage-state`;
-- `prctr-virtualization-state`;
-- `prctr-network-configuration-state`;
-- `prctr-media-device-state` for separate camera and microphone facts over
+- `process-application-state`;
+- `interactive-session-state`;
+- `clipboard-state`;
+- `print-spooler-state`;
+- `removable-storage-state`;
+- `virtualization-state`;
+- `network-configuration-state`;
+- `media-device-state` for separate camera and microphone facts over
   shared permission, endpoint, hot-plug, and cleanup machinery.
 
-`prctr-native-source-runtime`, `prctr-native-protocol`, and
-`prctr-native-source-supervisor` own only reusable source lifecycle, schema,
+`native-source-runtime`, `native-protocol`, and
+`native-source-supervisor` own only reusable source lifecycle, schema,
 fencing, bounded queue, health, and transport mechanics. Capability crates own
 their state models, platform adapters, normalization, and focused tests.
-`prctr-native-helper-protocol` binds the generated process/session helper wire
+`native-helper-protocol` binds the generated process/session helper wire
 contract to a verified peer identity, fresh channel nonce, and frame boundary;
-it contains no executable or OS transport. `prctr-native-security-helper` owns
+it contains no executable or OS transport. `native-security-helper` owns
 the exact-path signature check, inherited-pipe and authenticated macOS service
 transports, fixed supervisor/worker entrypoints, and unavailable responses for
 unimplemented target sources. The macOS launchd service retains the worker process
@@ -280,12 +280,12 @@ through the private Node and utility/main contracts.
 A native observation package is a passive fact source. It receives no User or
 Attempt identity, exam content, authorization object, Exam Security Policy,
 accommodation, detector rule, posture, or generic control command. It receives
-only an opaque collection-session identifier, requested schema version,
-selected mechanical categories, and resource bounds.
+only an opaque collection-session identifier, selected mechanical categories,
+and resource bounds.
 
 Opening a source creates one race-free source session. The handshake returns:
 
-- source, adapter, and schema versions;
+- source and adapter identity;
 - platform support and permission state;
 - a new source-instance identifier and current health;
 - one complete initial snapshot at sequence `N`;
@@ -315,7 +315,7 @@ The coordinator translates the verified effective policy into source admission:
   prohibited condition.
 
 Sources remain policy-blind. They receive only selected mechanical categories,
-schema versions, adapter variants, queue limits, and other observation bounds.
+adapter variants, queue limits, and other observation bounds.
 The private bootstrap names clipboard change; removable block and portable/MTP;
 system-proxy, OS-managed-VPN, tunnel-interface, route-change, and network-source-
 health; and camera/microphone selections in the schema-generated fixed order. A selected
@@ -483,9 +483,8 @@ subscriptions when collection closes.
 
 Electron main launches one exact packaged security entrypoint without `PATH`
 lookup and transfers a private MessagePort using a single-use bootstrap secret.
-Startup verifies packaged build identity, exact protocol version, expected
-source manifest, participation generation, one-time challenge, and schema
-compatibility. Secrets never travel in command-line arguments or environment
+Startup verifies packaged build identity, the expected source manifest,
+participation generation, and the one-time challenge. Secrets never travel in command-line arguments or environment
 variables. Renderers cannot discover or connect to this port.
 
 Every cross-process protocol is fixed, typed, versioned, bounded, and
@@ -559,7 +558,7 @@ old source session; a later successful join creates fresh generations.
 
 ## Privacy and diagnostics
 
-Ordinary diagnostics contain only bounded adapter/schema versions,
+Ordinary diagnostics contain only bounded adapter identities,
 pseudonymous source-instance identity, lifecycle transitions, health/error
 codes, queue utilization, missing ranges, timing aggregates, resets, permission
 category, and cleanup classification. Raw observations, process/device/network

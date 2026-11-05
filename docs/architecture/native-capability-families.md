@@ -24,7 +24,7 @@ Every capability-matrix entry states one of:
   an enforcement boundary;
 - `unavailable` — the platform or packaged adapter cannot make that claim.
 
-Coverage belongs to a sub-capability, schema version, and target tuple. One
+Coverage belongs to a sub-capability, source schema digest, and target tuple. One
 enforceable part never makes its whole family enforceable. Missing enforce
 coverage blocks admission. Missing observe coverage produces an explicit
 degraded result and never silently changes policy.
@@ -43,7 +43,7 @@ Every family uses an explicit server-frozen mode:
 The Desktop contains a deterministically generated capability registry. Its
 checked JSON authority and bounded family-policy schema are the single source
 of truth. Each entry declares a
-stable identifier, schema versions, permitted modes, bounded configuration and
+stable identifier, permitted modes, bounded configuration and
 fact shapes, permission/effect requirements, privacy class, and per-platform
 coverage keys. New authoring templates start these broader families as
 `disabled`; there is no hidden inheritance or Desktop-selected default.

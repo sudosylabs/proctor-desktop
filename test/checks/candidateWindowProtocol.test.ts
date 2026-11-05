@@ -29,7 +29,6 @@ void test('generated CandidateWindow validator accepts one coherent mechanical s
 			source_instance_id: 'source-instance-0001',
 			source_version: '0.1.0',
 			adapter_version: 'utility-post-ipc-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'granted',
 			health: 'healthy',

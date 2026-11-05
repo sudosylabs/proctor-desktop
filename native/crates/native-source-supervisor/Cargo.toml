@@ -1,0 +1,25 @@
+[package]
+name = "native-source-supervisor"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+candidate-window-state = { path = "../candidate-window-state" }
+capture-session-state = { path = "../capture-session-state" }
+clipboard-state = { path = "../clipboard-state" }
+display-topology = { path = "../display-topology" }
+interactive-session-state = { path = "../interactive-session-state" }
+media-device-state = { path = "../media-device-state" }
+native-protocol = { path = "../native-protocol" }
+native-security-helper = { path = "../native-security-helper" }
+native-source-runtime = { path = "../native-source-runtime" }
+network-configuration-state = { path = "../network-configuration-state" }
+print-spooler-state = { path = "../print-spooler-state" }
+process-application-state = { path = "../process-application-state" }
+removable-storage-state = { path = "../removable-storage-state" }
+virtualization-state = { path = "../virtualization-state" }
+
+[lints]
+workspace = true

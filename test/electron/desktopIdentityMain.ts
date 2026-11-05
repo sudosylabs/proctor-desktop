@@ -51,7 +51,7 @@ if (probe) {
 			);
 			assert.deepEqual(JSON.parse(child.stdout), { acquired: false });
 			const root = resolve('.build/desktop-development');
-			const keys = loadNativeDesktopKeyCustody(join(root, 'prctr_desktop_key_custody.node'));
+			const keys = loadNativeDesktopKeyCustody(join(root, 'desktop_key_custody.node'));
 			const origin = 'https://identity-test.example';
 			const institutionId = randomBytes(13).toString('hex');
 			const scope = installationKeyScope(origin, institutionId);

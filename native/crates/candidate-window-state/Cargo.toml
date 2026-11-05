@@ -1,0 +1,16 @@
+[package]
+name = "candidate-window-state"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+native-protocol = { path = "../native-protocol" }
+native-source-runtime = { path = "../native-source-runtime" }
+
+[dev-dependencies]
+display-topology = { path = "../display-topology" }
+
+[lints]
+workspace = true

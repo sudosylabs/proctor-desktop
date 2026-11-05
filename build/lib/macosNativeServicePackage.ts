@@ -14,7 +14,7 @@ export const nativeServicePackage = Object.freeze({
 	plistName: 'com.proctor.native.plist',
 	bundleIdentifier: 'com.proctor.native.service',
 	bundlePath: 'Contents/Helpers/ProctorNativeService.app',
-	executable: 'prctr-native-security-helper',
+	executable: 'native-security-helper',
 	controlSocket: '/var/run/com.proctor.native.control',
 	observationSocket: '/var/run/com.proctor.native.observation'
 });
@@ -39,8 +39,8 @@ export function nativeServiceBuildEnvironment(
 	const requirement = (identifier: string): string =>
 		`anchor apple generic and identifier "${identifier}" and certificate leaf[subject.OU] = "${identity.teamIdentifier}"`;
 	return {
-		PRCTR_NATIVE_SERVICE_REQUIREMENT: requirement(nativeServicePackage.bundleIdentifier),
-		PRCTR_NATIVE_CLIENT_REQUIREMENT: requirement(identity.clientBundleIdentifier)
+		NATIVE_SERVICE_REQUIREMENT: requirement(nativeServicePackage.bundleIdentifier),
+		NATIVE_CLIENT_REQUIREMENT: requirement(identity.clientBundleIdentifier)
 	};
 }
 

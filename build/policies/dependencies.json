@@ -31,7 +31,7 @@
       "lifecycleScripts": "allowed",
       "declarations": [
         {
-          "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
+          "manifest": "native/crates/native-node-bridge/Cargo.toml",
           "alias": "napi",
           "kind": "production",
           "features": ["dyn-symbols", "napi8", "serde-json"],
@@ -40,7 +40,7 @@
           "targetScope": null
         },
         {
-          "manifest": "native/crates/prctr-desktop-key-custody/Cargo.toml",
+          "manifest": "native/crates/desktop-key-custody/Cargo.toml",
           "alias": "napi",
           "kind": "production",
           "features": ["dyn-symbols", "napi8"],
@@ -70,7 +70,7 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
+          "manifest": "native/crates/native-node-bridge/Cargo.toml",
           "alias": "napi-derive",
           "kind": "production",
           "features": ["strict"],
@@ -79,7 +79,7 @@
           "targetScope": null
         },
         {
-          "manifest": "native/crates/prctr-desktop-key-custody/Cargo.toml",
+          "manifest": "native/crates/desktop-key-custody/Cargo.toml",
           "alias": "napi-derive",
           "kind": "production",
           "features": ["strict"],
@@ -109,7 +109,7 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/prctr-native-node-bridge/Cargo.toml",
+          "manifest": "native/crates/native-node-bridge/Cargo.toml",
           "alias": "serde",
           "kind": "production",
           "features": ["derive"],
@@ -118,7 +118,7 @@
           "targetScope": null
         },
         {
-          "manifest": "native/crates/prctr-native-protocol/Cargo.toml",
+          "manifest": "native/crates/native-protocol/Cargo.toml",
           "alias": "serde",
           "kind": "production",
           "features": ["derive"],
@@ -127,7 +127,7 @@
           "targetScope": null
         },
         {
-          "manifest": "native/crates/prctr-native-security-helper/Cargo.toml",
+          "manifest": "native/crates/native-security-helper/Cargo.toml",
           "alias": "serde",
           "kind": "production",
           "features": [],
@@ -157,7 +157,7 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/prctr-native-security-helper/Cargo.toml",
+          "manifest": "native/crates/native-security-helper/Cargo.toml",
           "alias": "serde_json",
           "kind": "production",
           "features": [],
@@ -187,7 +187,7 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml",
+          "manifest": "native/crates/removable-storage-state/Cargo.toml",
           "alias": "hmac",
           "kind": "production",
           "features": [],
@@ -217,7 +217,7 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml",
+          "manifest": "native/crates/removable-storage-state/Cargo.toml",
           "alias": "sha2",
           "kind": "production",
           "features": [],
@@ -247,7 +247,7 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/prctr-capture-session-state/Cargo.toml",
+          "manifest": "native/crates/capture-session-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": [
@@ -264,7 +264,7 @@
           "targetScope": "cfg(target_os=\"windows\")"
         },
         {
-          "manifest": "native/crates/prctr-display-topology/Cargo.toml",
+          "manifest": "native/crates/display-topology/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": [
@@ -281,7 +281,7 @@
           "targetScope": "cfg(target_os=\"windows\")"
         },
         {
-          "manifest": "native/crates/prctr-process-application-state/Cargo.toml",
+          "manifest": "native/crates/process-application-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": [
@@ -299,7 +299,7 @@
           "targetScope": "cfg(target_os=\"windows\")"
         },
         {
-          "manifest": "native/crates/prctr-interactive-session-state/Cargo.toml",
+          "manifest": "native/crates/interactive-session-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": [
@@ -314,7 +314,7 @@
           "targetScope": "cfg(target_os=\"windows\")"
         },
         {
-          "manifest": "native/crates/prctr-clipboard-state/Cargo.toml",
+          "manifest": "native/crates/clipboard-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": ["Win32_System_DataExchange"],
@@ -323,7 +323,7 @@
           "targetScope": "cfg(target_os=\"windows\")"
         },
         {
-          "manifest": "native/crates/prctr-print-spooler-state/Cargo.toml",
+          "manifest": "native/crates/print-spooler-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": [
@@ -338,7 +338,7 @@
           "targetScope": "cfg(target_os=\"windows\")"
         },
         {
-          "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml",
+          "manifest": "native/crates/removable-storage-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": ["Win32_Storage_FileSystem", "Win32_System_WindowsProgramming"],
@@ -347,7 +347,7 @@
           "targetScope": "cfg(target_os=\"windows\")"
         },
         {
-          "manifest": "native/crates/prctr-network-configuration-state/Cargo.toml",
+          "manifest": "native/crates/network-configuration-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": [
@@ -362,7 +362,7 @@
           "targetScope": "cfg(target_os=\"windows\")"
         },
         {
-          "manifest": "native/crates/prctr-media-device-state/Cargo.toml",
+          "manifest": "native/crates/media-device-state/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": [
@@ -376,7 +376,7 @@
           "targetScope": "cfg(target_os=\"windows\")"
         },
         {
-          "manifest": "native/crates/prctr-native-security-helper/Cargo.toml",
+          "manifest": "native/crates/native-security-helper/Cargo.toml",
           "alias": "windows-sys",
           "kind": "production",
           "features": [
@@ -425,7 +425,7 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/prctr-removable-storage-state/Cargo.toml",
+          "manifest": "native/crates/removable-storage-state/Cargo.toml",
           "alias": "libc",
           "kind": "production",
           "features": [],
@@ -434,7 +434,7 @@
           "targetScope": "cfg(target_os=\"macos\")"
         },
         {
-          "manifest": "native/crates/prctr-network-configuration-state/Cargo.toml",
+          "manifest": "native/crates/network-configuration-state/Cargo.toml",
           "alias": "libc",
           "kind": "production",
           "features": [],
@@ -443,7 +443,7 @@
           "targetScope": "cfg(target_os=\"macos\")"
         },
         {
-          "manifest": "native/crates/prctr-process-application-state/Cargo.toml",
+          "manifest": "native/crates/process-application-state/Cargo.toml",
           "alias": "libc",
           "kind": "production",
           "features": [],

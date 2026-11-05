@@ -1,0 +1,16 @@
+[package]
+name = "desktop-key-custody"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "=3.12.2", default-features = false, features = ["dyn-symbols", "napi8"] }
+napi-derive = { version = "=3.6.3", default-features = false, features = ["strict"] }
+
+[lints]
+workspace = true

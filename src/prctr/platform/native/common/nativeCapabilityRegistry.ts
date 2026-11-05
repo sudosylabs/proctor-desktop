@@ -19,7 +19,6 @@ export type NativeClosedEffect =
 
 export type NativeSubCapabilityDescriptor = {
 	readonly id: string;
-	readonly schemaVersion: number;
 	readonly sourceSchemaDigest: string;
 	readonly coverageKey: string;
 	readonly permittedClaims: readonly NativeCapabilityClaim[];

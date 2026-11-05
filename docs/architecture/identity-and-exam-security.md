@@ -101,7 +101,7 @@ To start authorization, Electron main creates:
 The private installation key is non-exportable and remains behind an approved
 OS-backed adapter. Development requires the same native custody and never falls
 back to an encrypted software private-key file. The separate
-`prctr-desktop-key-custody` Node-API module is loaded only by Electron main. macOS
+`desktop-key-custody` Node-API module is loaded only by Electron main. macOS
 uses persistent Security.framework P-256 keys and verifies the non-extractable
 attribute; Windows uses a named CNG P-256 key and verifies an empty export policy.
 Only the public point, digest signing, and deletion are exported. This identity

@@ -56,7 +56,7 @@ else {
 						candidate: join(root, 'candidatePreload.cjs')
 					}
 				},
-				nativeKeyModule: join(root, 'prctr_desktop_key_custody.node'),
+				nativeKeyModule: join(root, 'desktop_key_custody.node'),
 				callbackBrandingDirectory: join(root, 'branding'),
 				stateDirectory: app.getPath('userData'),
 				allowDevelopmentLoopback: allowHttp,

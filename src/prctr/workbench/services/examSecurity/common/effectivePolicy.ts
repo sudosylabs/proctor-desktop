@@ -321,7 +321,7 @@ export function resolveExamSecurityNativeSelection(
 			categories.add('microphone');
 	}
 	for (const source of enforcedSources) observedSources.delete(source);
-	const sourceOrder = NATIVE_SOURCE_MANIFEST.map((entry) => entry.source_id as NativeSourceId);
+	const sourceOrder = NATIVE_SOURCE_MANIFEST.map((entry) => entry as NativeSourceId);
 	const categoryOrder = [...NATIVE_SOURCE_CATEGORY_ORDER];
 	return deepFreeze({
 		selectedSources: sourceOrder.filter((source) => sources.has(source)),

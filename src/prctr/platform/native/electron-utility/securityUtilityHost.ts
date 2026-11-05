@@ -2,9 +2,7 @@ import {
 	SECURITY_UTILITY_HEARTBEAT_INTERVAL_MS,
 	SECURITY_UTILITY_MAX_UNACKNOWLEDGED_MESSAGES,
 	SECURITY_UTILITY_POLL_INTERVAL_MS,
-	SECURITY_UTILITY_PROTOCOL_VERSION,
 	SECURITY_UTILITY_SOURCE_MANIFEST,
-	SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 	SECURITY_UTILITY_STARTUP_TIMEOUT_MS,
 	isNativeBaselineOpenResult,
 	isNativeBridgeManifest,
@@ -104,10 +102,7 @@ export class SecurityUtilityHost {
 	}
 
 	#open(bootstrap: SecurityUtilityBootstrap): void {
-		if (
-			bootstrap.build_identity !== this.#buildIdentity ||
-			bootstrap.source_manifest_version !== SECURITY_UTILITY_SOURCE_MANIFEST_VERSION
-		) {
+		if (bootstrap.build_identity !== this.#buildIdentity) {
 			this.#terminateWithoutRelease('build-identity-mismatch');
 			return;
 		}
@@ -139,11 +134,9 @@ export class SecurityUtilityHost {
 		this.#startupTimer = undefined;
 		this.#post({
 			kind: 'ready',
-			protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 			message_sequence: 0,
 			challenge_response: bootstrap.challenge,
 			build_identity: this.#buildIdentity,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 			selected_sources: bootstrap.selected_sources,
 			selected_source_categories: bootstrap.selected_source_categories,
@@ -199,7 +192,6 @@ export class SecurityUtilityHost {
 			}
 			this.#post({
 				kind: 'candidate_window_ingress_result',
-				protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 				message_sequence: this.#takeOutgoingSequence(),
 				participation_generation: bootstrap.participation_generation,
 				input_sequence: message.message_sequence,
@@ -239,7 +231,6 @@ export class SecurityUtilityHost {
 		}
 		this.#post({
 			kind: 'native_poll',
-			protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 			message_sequence: this.#takeOutgoingSequence(),
 			participation_generation: this.#bootstrap.participation_generation,
 			delivered_at_wall_time_unix_ms: Date.now(),
@@ -255,7 +246,6 @@ export class SecurityUtilityHost {
 		}
 		this.#post({
 			kind: 'heartbeat',
-			protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 			message_sequence: this.#takeOutgoingSequence(),
 			participation_generation: this.#bootstrap.participation_generation,
 			monotonic_time_ms: Math.floor(performance.now())
@@ -279,7 +269,6 @@ export class SecurityUtilityHost {
 		this.#terminal = true;
 		this.#post({
 			kind: 'stopped',
-			protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 			message_sequence: this.#takeOutgoingSequence(),
 			participation_generation: this.#bootstrap.participation_generation,
 			result
@@ -294,7 +283,6 @@ export class SecurityUtilityHost {
 		if (this.#bootstrap !== undefined) {
 			this.#post({
 				kind: 'fatal',
-				protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 				message_sequence: this.#takeOutgoingSequence(),
 				participation_generation: this.#bootstrap.participation_generation,
 				code

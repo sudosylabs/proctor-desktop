@@ -17,10 +17,9 @@ const VIRTUALIZATION_AUTHORITY = 'native/schemas/virtualization-state.schema.jso
 const NETWORK_CONFIGURATION_AUTHORITY = 'native/schemas/network-configuration-state.schema.json';
 const MEDIA_DEVICE_AUTHORITY = 'native/schemas/media-device-state.schema.json';
 const NATIVE_HELPER_AUTHORITY = 'native/schemas/native-helper.schema.json';
-const RUST_OUTPUT = 'native/crates/prctr-native-protocol/src/generated.rs';
+const RUST_OUTPUT = 'native/crates/native-protocol/src/generated.rs';
 const TYPESCRIPT_OUTPUT = 'src/prctr/platform/native/common/nativeObservation.generated.ts';
-const NATIVE_HELPER_RUST_OUTPUT =
-	'native/crates/prctr-native-protocol/src/native_helper.generated.rs';
+const NATIVE_HELPER_RUST_OUTPUT = 'native/crates/native-protocol/src/native_helper.generated.rs';
 
 type CapabilityDescriptor = {
 	readonly sourceId: string;
@@ -28,7 +27,6 @@ type CapabilityDescriptor = {
 	readonly authority: string;
 	readonly rustOutput: string;
 	readonly drainType: string;
-	readonly schemaVersionConstant: string;
 	readonly maximumFactsConstant: string;
 	readonly typescriptValidator: string;
 };
@@ -75,9 +73,8 @@ function capabilityDescriptor(
 		sourceId,
 		generatorId: `${sourceId}.protocol`,
 		authority,
-		rustOutput: `native/crates/prctr-native-protocol/src/${sourceId.replaceAll('-', '_')}.generated.rs`,
+		rustOutput: `native/crates/native-protocol/src/${sourceId.replaceAll('-', '_')}.generated.rs`,
 		drainType: `${typePrefix}Drain`,
-		schemaVersionConstant: `${snakePrefix}_SCHEMA_VERSION`,
 		maximumFactsConstant: `MAX_${snakePrefix}_FACTS`,
 		typescriptValidator: `is${typePrefix}Observation`
 	};
@@ -85,15 +82,8 @@ function capabilityDescriptor(
 
 type JsonSchema = {
 	readonly $defs?: Readonly<Record<string, Definition>>;
-	readonly properties?: Readonly<Record<string, Property>>;
 	readonly ['x-proctor-source-manifest']?: readonly unknown[];
-	readonly ['x-proctor-source-manifest-version']?: unknown;
 	readonly ['x-proctor-source-lifecycle-deadline-ms']?: unknown;
-};
-
-type SourceManifestEntry = {
-	readonly source_id: string;
-	readonly schema_version: number;
 };
 
 type SemanticRule =
@@ -177,34 +167,15 @@ export const nativeProtocolGenerator: Generator = {
 			if (capabilityDefinitions === undefined) {
 				throw new Error(`${descriptor.authority} must define $defs`);
 			}
-			const capabilitySchemaVersion = capabilitySchema.properties?.schema_version?.const;
-			if (typeof capabilitySchemaVersion !== 'number') {
-				throw new Error(
-					`${descriptor.authority} must declare numeric schema_version const`
-				);
-			}
-			return {
-				descriptor,
-				definitions: capabilityDefinitions,
-				schemaVersion: capabilitySchemaVersion
-			};
+			return { descriptor, definitions: capabilityDefinitions };
 		});
-		const schemaVersion = schema.properties?.schema_version?.const;
-		if (typeof schemaVersion !== 'number')
-			throw new Error(
-				`${DISPLAY_TOPOLOGY_AUTHORITY} must declare numeric schema_version const`
-			);
 		const sourceManifest = requiredSourceManifest(
 			commonSchema,
-			new Map([
-				['display-topology', schemaVersion],
-				...capabilities.map(
-					(capability) =>
-						[capability.descriptor.sourceId, capability.schemaVersion] as const
-				)
+			new Set([
+				'display-topology',
+				...capabilities.map((capability) => capability.descriptor.sourceId)
 			])
 		);
-		const sourceManifestVersion = requiredSourceManifestVersion(commonSchema);
 		const sourceLifecycleDeadlineMs = requiredSourceLifecycleDeadline(commonSchema);
 		const sourceCategories = requiredNativeSourceCategories(commonDefinitions);
 		const helperSchema = JSON.parse(repository.read(NATIVE_HELPER_AUTHORITY)) as JsonSchema;
@@ -215,14 +186,7 @@ export const nativeProtocolGenerator: Generator = {
 		const rustOutput = write(
 			outputRoot,
 			RUST_OUTPUT,
-			renderRust(
-				definitions,
-				schemaVersion,
-				sourceManifest,
-				sourceManifestVersion,
-				sourceLifecycleDeadlineMs,
-				sourceCategories
-			)
+			renderRust(definitions, sourceManifest, sourceLifecycleDeadlineMs, sourceCategories)
 		);
 		execFileSync('rustfmt', ['--edition', '2024', rustOutput]);
 		write(
@@ -234,7 +198,6 @@ export const nativeProtocolGenerator: Generator = {
 					mergeDefinitions(definitions, helperDefinitions)
 				),
 				sourceManifest,
-				sourceManifestVersion,
 				sourceLifecycleDeadlineMs,
 				sourceCategories
 			)
@@ -253,21 +216,13 @@ export const nativeCapabilityProtocolGenerators: readonly Generator[] = CAPABILI
 			const definitions = schema.$defs;
 			if (definitions === undefined)
 				throw new Error(`${descriptor.authority} must define $defs`);
-			const schemaVersion = schema.properties?.schema_version?.const;
-			if (typeof schemaVersion !== 'number') {
-				throw new Error(
-					`${descriptor.authority} must declare numeric schema_version const`
-				);
-			}
 			const rustOutput = write(
 				outputRoot,
 				descriptor.rustOutput,
 				renderCapabilityRust(
 					definitions,
-					schemaVersion,
 					`// @${'generated'} by ${descriptor.generatorId} from ${COMMON_AUTHORITY} and ${descriptor.authority}.`,
 					descriptor.drainType,
-					descriptor.schemaVersionConstant,
 					descriptor.maximumFactsConstant
 				)
 			);
@@ -291,14 +246,10 @@ export const nativeHelperProtocolGenerator: Generator = {
 		const definitions = schema.$defs;
 		if (definitions === undefined)
 			throw new Error(`${NATIVE_HELPER_AUTHORITY} must define $defs`);
-		const schemaVersion = schema.properties?.schema_version?.const;
-		if (typeof schemaVersion !== 'number') {
-			throw new Error(`${NATIVE_HELPER_AUTHORITY} must declare numeric schema_version const`);
-		}
 		const rustOutput = write(
 			outputRoot,
 			NATIVE_HELPER_RUST_OUTPUT,
-			renderHelperRust(definitions, schemaVersion)
+			renderHelperRust(definitions)
 		);
 		execFileSync('rustfmt', ['--edition', '2024', rustOutput]);
 	}
@@ -306,9 +257,7 @@ export const nativeHelperProtocolGenerator: Generator = {
 
 function renderRust(
 	definitions: Readonly<Record<string, Definition>>,
-	schemaVersion: number,
-	sourceManifest: readonly SourceManifestEntry[],
-	sourceManifestVersion: number,
+	sourceManifest: readonly string[],
 	sourceLifecycleDeadlineMs: number,
 	sourceCategories: readonly string[]
 ): string {
@@ -328,30 +277,15 @@ function renderRust(
 		'use std::fmt;',
 		'use serde::{Deserialize, Serialize};',
 		'',
-		`pub const DISPLAY_TOPOLOGY_SCHEMA_VERSION: u16 = ${rustNumber(schemaVersion)};`,
 		`pub const MAX_DISPLAY_TARGETS: usize = ${rustNumber(maximumTargets)};`,
 		`pub const MAX_DISPLAY_TOPOLOGY_FACTS: usize = ${rustNumber(maximumFacts)};`,
 		`pub const MAX_PROTOCOL_SAFE_INTEGER: u64 = ${rustNumber(maximumTimestamp)};`,
 		`pub const NATIVE_SOURCE_COUNT: usize = ${sourceManifest.length};`,
 		`pub const NATIVE_SOURCE_CATEGORY_COUNT: usize = ${sourceCategories.length};`,
-		`pub const NATIVE_SOURCE_MANIFEST_VERSION: u16 = ${rustNumber(sourceManifestVersion)};`,
 		`pub const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS: u64 = ${rustNumber(sourceLifecycleDeadlineMs)};`,
 		'',
-		'#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]',
-		'pub struct NativeSourceManifestEntry {',
-		"    pub source_id: &'static str,",
-		'    pub schema_version: u16,',
-		'}',
-		'',
-		'pub const NATIVE_SOURCE_MANIFEST: [NativeSourceManifestEntry; NATIVE_SOURCE_COUNT] = [',
-		...sourceManifest
-			.map((entry) => [
-				'    NativeSourceManifestEntry {',
-				`        source_id: ${JSON.stringify(entry.source_id)},`,
-				`        schema_version: ${rustNumber(entry.schema_version)},`,
-				'    },'
-			])
-			.flat(),
+		'pub const NATIVE_SOURCE_MANIFEST: [&str; NATIVE_SOURCE_COUNT] = [',
+		...sourceManifest.map((sourceId) => `    ${JSON.stringify(sourceId)},`),
 		'];',
 		'',
 		'pub const NATIVE_SOURCE_CATEGORY_ORDER: [NativeSourceCategory; NATIVE_SOURCE_CATEGORY_COUNT] = [',
@@ -397,10 +331,8 @@ function renderRust(
 
 function renderCapabilityRust(
 	definitions: Readonly<Record<string, Definition>>,
-	schemaVersion: number,
 	marker: string,
 	drainType: string,
-	schemaVersionConstant: string,
 	maximumFactsConstant: string
 ): string {
 	const maximumFacts = sourceBatchFactLimit(definitions, drainType);
@@ -415,7 +347,6 @@ function renderCapabilityRust(
 		'    SequenceGap, SourceFailureCode, SourceHealth, SourceReset, SourceTimestamp,',
 		'};',
 		'',
-		`pub const ${schemaVersionConstant}: u16 = ${rustNumber(schemaVersion)};`,
 		`pub const ${maximumFactsConstant}: usize = ${rustNumber(maximumFacts)};`,
 		''
 	];
@@ -423,10 +354,7 @@ function renderCapabilityRust(
 	return `${lines.join('\n').trimEnd()}\n`;
 }
 
-function renderHelperRust(
-	definitions: Readonly<Record<string, Definition>>,
-	schemaVersion: number
-): string {
+function renderHelperRust(definitions: Readonly<Record<string, Definition>>): string {
 	const lines = [
 		`// @${'generated'} by native-helper.protocol from ${COMMON_AUTHORITY}, ${PROCESS_APPLICATION_AUTHORITY}, ${INTERACTIVE_SESSION_AUTHORITY}, and ${NATIVE_HELPER_AUTHORITY}.`,
 		'// Do not edit by hand.',
@@ -434,12 +362,10 @@ function renderHelperRust(
 		'use serde::{Deserialize, Serialize};',
 		'',
 		'use crate::{',
-		'    INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveSessionEvent, InteractiveSessionState,',
-		'    PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationEvent, ProcessApplicationState,',
+		'    InteractiveSessionEvent, InteractiveSessionState, ProcessApplicationEvent,',
+		'    ProcessApplicationState,',
 		'    ProtocolValidatable, ProtocolValidationError,',
 		'};',
-		'',
-		`pub const NATIVE_HELPER_SCHEMA_VERSION: u16 = ${rustNumber(schemaVersion)};`,
 		''
 	];
 	lines.push(...renderRustDefinitions(definitions));
@@ -539,8 +465,7 @@ function renderRustDefinitions(definitions: Readonly<Record<string, Definition>>
 
 function renderTypeScript(
 	definitions: Readonly<Record<string, Definition>>,
-	sourceManifest: readonly SourceManifestEntry[],
-	sourceManifestVersion: number,
+	sourceManifest: readonly string[],
 	sourceLifecycleDeadlineMs: number,
 	sourceCategories: readonly string[]
 ): string {
@@ -554,7 +479,6 @@ function renderTypeScript(
 		'',
 		`export const NATIVE_SOURCE_MANIFEST = ${JSON.stringify(sourceManifest)} as const;`,
 		'export type NativeSourceManifest = typeof NATIVE_SOURCE_MANIFEST;',
-		`export const NATIVE_SOURCE_MANIFEST_VERSION = ${sourceManifestVersion};`,
 		`export const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS = ${sourceLifecycleDeadlineMs};`,
 		`export const NATIVE_SOURCE_CATEGORY_ORDER = ${JSON.stringify(sourceCategories)} as const;`,
 		'',
@@ -820,10 +744,6 @@ function renderTypeScript(
 		'',
 		'function hasCoherentHelperSourceOpen(value: JsonObject): boolean {',
 		'  if (!Array.isArray(value.event_classes)) return false;',
-		"  const schemaMatches = value.source_kind === 'process_application'",
-		'    ? value.schema_version === 1',
-		"    : value.source_kind === 'interactive_session' && value.schema_version === 1;",
-		'  if (!schemaMatches) return false;',
 		"  return value.source_kind === 'process_application'",
 		'    ? value.event_classes.length === 2',
 		"      && value.event_classes.includes('process_lifecycle')",
@@ -844,10 +764,6 @@ function renderTypeScript(
 		'}',
 		'',
 		'function hasCoherentHelperSourceSnapshot(value: JsonObject): boolean {',
-		"  const schemaMatches = value.source_kind === 'process_application'",
-		'    ? value.schema_version === 1',
-		"    : value.source_kind === 'interactive_session' && value.schema_version === 1;",
-		'  if (!schemaMatches) return false;',
 		"  return value.source_kind === 'process_application'",
 		'    ? isProcessApplicationState(value.process_state)',
 		'      && value.interactive_session_state === undefined',
@@ -885,8 +801,8 @@ function renderTypeScript(
 
 function requiredSourceManifest(
 	schema: JsonSchema,
-	schemaVersions: ReadonlyMap<string, number>
-): readonly SourceManifestEntry[] {
+	generatedSources: ReadonlySet<string>
+): readonly string[] {
 	const manifest = schema['x-proctor-source-manifest'];
 	if (manifest === undefined || manifest.length === 0) {
 		throw new Error(`${COMMON_AUTHORITY} must declare a non-empty x-proctor-source-manifest`);
@@ -901,16 +817,15 @@ function requiredSourceManifest(
 		if (sourceIds.has(sourceId)) {
 			throw new Error(`${COMMON_AUTHORITY} source manifest repeats ${sourceId}`);
 		}
-		const schemaVersion = schemaVersions.get(sourceId);
-		if (schemaVersion === undefined) {
+		if (!generatedSources.has(sourceId)) {
 			throw new Error(
 				`${COMMON_AUTHORITY} source manifest names unsupported source ${sourceId}`
 			);
 		}
 		sourceIds.add(sourceId);
-		return { source_id: sourceId, schema_version: schemaVersion };
+		return sourceId;
 	});
-	if (sourceIds.size !== schemaVersions.size) {
+	if (sourceIds.size !== generatedSources.size) {
 		throw new Error(
 			`${COMMON_AUTHORITY} source manifest must name every generated source exactly once`
 		);
@@ -931,21 +846,6 @@ function requiredSourceLifecycleDeadline(schema: JsonSchema): number {
 		);
 	}
 	return deadline;
-}
-
-function requiredSourceManifestVersion(schema: JsonSchema): number {
-	const version = schema['x-proctor-source-manifest-version'];
-	if (
-		typeof version !== 'number' ||
-		!Number.isInteger(version) ||
-		version < 1 ||
-		version > 65_535
-	) {
-		throw new Error(
-			`${COMMON_AUTHORITY} must declare a bounded x-proctor-source-manifest-version`
-		);
-	}
-	return version;
 }
 
 function requiredNativeSourceCategories(
@@ -1487,15 +1387,7 @@ const semanticRuleEmitters = {
 			'                    == [HelperEventClass::InteractiveSessionLifecycle]',
 			'            }',
 			'        };',
-			'        let schema_matches = match self.source_kind {',
-			'            HelperSourceKind::ProcessApplication => {',
-			'                self.schema_version == PROCESS_APPLICATION_SCHEMA_VERSION',
-			'            }',
-			'            HelperSourceKind::InteractiveSession => {',
-			'                self.schema_version == INTERACTIVE_SESSION_SCHEMA_VERSION',
-			'            }',
-			'        };',
-			'        if !matching || !schema_matches {',
+			'        if !matching {',
 			`            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "event_classes", "complete coherent class set matches helper source"));`,
 			'        }'
 		],
@@ -1511,15 +1403,7 @@ const semanticRuleEmitters = {
 			'                self.process_state.is_none() && self.interactive_session_state.is_some()',
 			'            }',
 			'        };',
-			'        let schema_matches = match self.source_kind {',
-			'            HelperSourceKind::ProcessApplication => {',
-			'                self.schema_version == PROCESS_APPLICATION_SCHEMA_VERSION',
-			'            }',
-			'            HelperSourceKind::InteractiveSession => {',
-			'                self.schema_version == INTERACTIVE_SESSION_SCHEMA_VERSION',
-			'            }',
-			'        };',
-			'        if !coherent || !schema_matches {',
+			'        if !coherent {',
 			`            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "source_kind", "exact matching source state"));`,
 			'        }'
 		],

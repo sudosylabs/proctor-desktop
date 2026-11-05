@@ -75,7 +75,6 @@ export const nativeCapabilityRegistryGenerator: Generator = {
 			id,
 			...(sourceId === undefined ? {} : { sourceId }),
 			coverageKey: `baseline.${id}`,
-			schemaVersion: 1,
 			sourceSchemaDigest: `sha256:${createHash('sha256').update(repository.read(schema!)).digest('hex')}`,
 			permittedClaims: ['enforce', 'unavailable'],
 			platformCoverageKeys: {
@@ -181,7 +180,6 @@ function normalizeFamily(
 		const coverageKey = `native.${subId}.v1`;
 		return {
 			id: subId,
-			schemaVersion: 1,
 			sourceSchemaDigest: `sha256:${createHash('sha256').update(repository.read(factSchema)).digest('hex')}`,
 			coverageKey,
 			permittedClaims: [...claims, 'unavailable'],
