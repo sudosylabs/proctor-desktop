@@ -17,7 +17,9 @@ import { selectSuites, testSuites, type TestSuite } from '../../build/lib/testSu
 import {
 	disposableOwnership,
 	noFocusedTests,
-	noUnsafeDoubleAssertion
+	noSynchronousFileSystem,
+	noUnsafeDoubleAssertion,
+	requireLeakCheckedTests
 } from '../../build/lint/rules.ts';
 
 void test('test commands include every Node suite and close each Electron prerequisite', () => {
@@ -174,6 +176,26 @@ void test('lint rules reject unsafe forms and accept the supported counterparts'
 				code: 'class Owner { store = new MutableDisposable(); }',
 				errors: [{ messageId: 'mutable' }]
 			}
+		]
+	});
+	tester.run('require-leak-checked-tests', requireLeakCheckedTests, {
+		valid: [
+			"import { x } from './other.ts';",
+			"import { DisposableStore } from '../src/prctr/base/common/lifecycle.ts';\nensureNoDisposablesAreLeakedInTestSuite();",
+			"import type { IDisposable } from '../src/prctr/base/common/lifecycle.ts';"
+		],
+		invalid: [
+			{
+				code: "import { DisposableStore } from '../src/prctr/base/common/lifecycle.ts';",
+				errors: [{ messageId: 'missing' }]
+			}
+		]
+	});
+	tester.run('no-sync-fs', noSynchronousFileSystem, {
+		valid: ["await readFile('a');", "await fs.promises.readFile('a');", 'syncState();'],
+		invalid: [
+			{ code: "readFileSync('a');", errors: [{ messageId: 'synchronous' }] },
+			{ code: "fs.existsSync('a');", errors: [{ messageId: 'synchronous' }] }
 		]
 	});
 	tester.run('no-unsafe-double-assertion', noUnsafeDoubleAssertion, {

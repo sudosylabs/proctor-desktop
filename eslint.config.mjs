@@ -84,5 +84,21 @@ export default [
 			'no-constant-binary-expression': 'error'
 		}
 	},
-	{ files: ['test/**/*.ts'], rules: { 'proctor/no-focused-tests': 'error' } }
+	{
+		files: ['src/prctr/**/*.ts'],
+		ignores: transferred,
+		rules: { 'proctor/no-sync-fs': 'error' }
+	},
+	{
+		// Reads two small branding files once, before the loopback callback listener starts.
+		files: ['src/prctr/workbench/node/desktopAuthCallbackPage.ts'],
+		rules: { 'proctor/no-sync-fs': 'off' }
+	},
+	{ files: ['test/**/*.ts'], rules: { 'proctor/no-focused-tests': 'error' } },
+	{
+		// Chromium-harness and real-Electron suites run outside the Node runner; checks test build tooling.
+		files: ['test/**/*.test.ts'],
+		ignores: ['test/checks/**', 'test/browser/**', 'test/electron/**'],
+		rules: { 'proctor/require-leak-checked-tests': 'error' }
+	}
 ];

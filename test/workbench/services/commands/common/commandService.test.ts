@@ -5,6 +5,9 @@ import { CommandsRegistry } from '../../../../../src/prctr/platform/commands/com
 import { InstantiationService } from '../../../../../src/prctr/platform/instantiation/common/instantiationService.ts';
 import { CommandService } from '../../../../../src/prctr/workbench/services/commands/common/commandService.ts';
 import { ProctorCommands } from '../../../../../src/prctr/workbench/services/commands/common/proctorCommands.ts';
+import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../base/common/upstream/upstreamTestUtils.ts';
+
+ensureNoDisposablesAreLeakedInTestSuite();
 
 void test('command execution is synchronous through invocation and emits ordered events', async () => {
 	const store = new DisposableStore();

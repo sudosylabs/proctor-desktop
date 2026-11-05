@@ -1,18 +1,15 @@
 import assert from 'node:assert';
-import { afterEach, beforeEach, test } from 'node:test';
+import { test } from 'node:test';
 
 import { Event } from '../../../../src/prctr/base/common/event.ts';
 import { timeout } from '../../../../src/prctr/base/common/async.ts';
 import { runWithFakedTimers } from '../../../base/common/upstream/timeTravelScheduler.ts';
+import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../base/common/upstream/upstreamTestUtils.ts';
 import {
 	createLocalization,
 	defineMessage
 } from '../../../../src/prctr/base/common/localization.ts';
-import {
-	DisposableStore,
-	DisposableTracker,
-	setDisposableTracker
-} from '../../../../src/prctr/base/common/lifecycle.ts';
+import { DisposableStore } from '../../../../src/prctr/base/common/lifecycle.ts';
 import {
 	MenuId,
 	MenuRegistry,
@@ -71,18 +68,7 @@ class RecordingCommandService implements ICommandService {
 	}
 }
 
-const contexts = new DisposableStore();
-let tracker: DisposableTracker;
-beforeEach(() => {
-	tracker = new DisposableTracker();
-	setDisposableTracker(tracker);
-});
-afterEach(() => {
-	contexts.clear();
-	setDisposableTracker(null);
-	const leaks = tracker.computeLeakingDisposables();
-	assert.strictEqual(leaks, undefined, leaks?.details);
-});
+const contexts = ensureNoDisposablesAreLeakedInTestSuite();
 
 function context(values: Readonly<Record<string, ContextKeyValue>> = {}): IContextKeyService {
 	const service = contexts.add(new ContextKeyService());

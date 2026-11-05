@@ -11,6 +11,9 @@ import { registerProctorAction } from '../../../../../src/prctr/workbench/servic
 import { DisposableStore } from '../../../../../src/prctr/base/common/lifecycle.ts';
 import { InstantiationService } from '../../../../../src/prctr/platform/instantiation/common/instantiationService.ts';
 import { CommandService } from '../../../../../src/prctr/workbench/services/commands/common/commandService.ts';
+import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../base/common/upstream/upstreamTestUtils.ts';
+
+ensureNoDisposablesAreLeakedInTestSuite();
 
 void test('one Proctor action contribution owns command, menus, palette, keybindings, and disposal', () => {
 	const id = 'prctr.test.contributedAction';

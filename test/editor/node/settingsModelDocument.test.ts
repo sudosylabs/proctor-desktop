@@ -9,6 +9,9 @@ import { SettingsDraft } from '../../../src/prctr/platform/settings/common/setti
 import { userSettingsResource } from '../../../src/prctr/platform/settings/common/settingsResource.js';
 import { SettingsModelDocument } from '../../../src/prctr/workbench/services/settings/common/settingsModelDocument.js';
 import { createModelServices } from '../common/upstream/testTextModel.js';
+import { ensureNoDisposablesAreLeakedInTestSuite } from '../../base/common/upstream/upstreamTestUtils.js';
+
+ensureNoDisposablesAreLeakedInTestSuite();
 
 function fixture(source: string) {
 	const store = new DisposableStore();
