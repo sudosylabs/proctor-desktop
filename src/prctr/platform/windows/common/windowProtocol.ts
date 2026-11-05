@@ -5,7 +5,6 @@ import {
 export type ProductWindowKind = 'launch' | 'authenticated' | 'candidate';
 
 interface DescriptorBase {
-	readonly protocolVersion: 1;
 	readonly kind: ProductWindowKind;
 	readonly windowId: string;
 	readonly institutionOrigin?: string;
@@ -47,17 +46,11 @@ export type ProductWindowIntent =
 	| { readonly kind: 'candidate.requestDeparture' };
 
 export function validateWindowDescriptor(value: unknown): ProductWindowDescriptor {
-	if (
-		!isRecord(value) ||
-		value.protocolVersion !== 1 ||
-		!isIdentifier(value.windowId) ||
-		!isWindowKind(value.kind)
-	)
+	if (!isRecord(value) || !isIdentifier(value.windowId) || !isWindowKind(value.kind))
 		throw new TypeError('Invalid product window descriptor');
 	if (value.kind === 'launch') {
 		if (value.institutionOrigin !== undefined) validateOrigin(value.institutionOrigin);
 		return Object.freeze({
-			protocolVersion: 1,
 			kind: 'launch',
 			windowId: value.windowId,
 			...(value.institutionOrigin === undefined
@@ -66,7 +59,6 @@ export function validateWindowDescriptor(value: unknown): ProductWindowDescripto
 		});
 	}
 	const common = {
-		protocolVersion: 1 as const,
 		kind: value.kind,
 		windowId: value.windowId,
 		institutionOrigin: validateOrigin(

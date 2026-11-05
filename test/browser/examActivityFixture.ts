@@ -83,7 +83,6 @@ export async function mountExamActivityFixture(
 		createDesktopWorkbenchContribution(
 			'authenticated',
 			async () => ({
-				protocolVersion: 1,
 				kind: 'authenticated',
 				windowId: 'window:exam-activity-fixture',
 				institutionOrigin: 'https://institution.example.test',
@@ -104,7 +103,6 @@ export async function mountExamActivityFixture(
 			{
 				async configuration() {
 					return {
-						protocolVersion: 1,
 						platform: isMacintosh ? 'darwin' : 'linux',
 						mode: isMacintosh ? 'nativeTrafficLights' : 'nativeOverlay',
 						controlsLocation: isMacintosh ? 'left' : 'right',

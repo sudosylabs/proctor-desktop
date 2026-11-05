@@ -47,7 +47,6 @@ export async function runLaunchWindowTests(
 	const chromeUpdates: unknown[] = [];
 	let finish!: () => void;
 	let projection: LaunchIdentityProjection = {
-		protocolVersion: 1,
 		revision: 0,
 		state: 'selectingServer',
 		developmentOrigin: false,
@@ -59,7 +58,6 @@ export async function runLaunchWindowTests(
 		extra: Partial<LaunchIdentityProjection> = {}
 	): void => {
 		projection = {
-			protocolVersion: 1,
 			revision: projection.revision + 1,
 			state,
 			developmentOrigin: false,
@@ -97,7 +95,6 @@ export async function runLaunchWindowTests(
 	};
 	const launch = await bootstrapLaunchWindow(owner, {
 		bootstrap: async () => ({
-			protocolVersion: 1,
 			kind: 'launch',
 			windowId: 'launch-ui-test',
 			institutionOrigin: 'https://not-readiness.example.test'
@@ -106,7 +103,6 @@ export async function runLaunchWindowTests(
 			configuration: async () => {
 				fullscreenListener?.(true);
 				return {
-					protocolVersion: 1,
 					platform: 'win32',
 					mode: 'nativeOverlay',
 					controlsLocation: 'right',
@@ -520,7 +516,6 @@ export async function runLaunchWindowTests(
 async function verifySnapshotRace(document: Document): Promise<void> {
 	const owner = document.implementation.createHTMLDocument('launch snapshot race');
 	const initial: LaunchIdentityProjection = {
-		protocolVersion: 1,
 		revision: 0,
 		state: 'selectingServer',
 		developmentOrigin: false,
@@ -528,10 +523,9 @@ async function verifySnapshotRace(document: Document): Promise<void> {
 		canSignIn: false
 	};
 	const launch = await bootstrapLaunchWindow(owner, {
-		bootstrap: async () => ({ protocolVersion: 1, kind: 'launch', windowId: 'launch-race' }),
+		bootstrap: async () => ({ kind: 'launch', windowId: 'launch-race' }),
 		windowChrome: {
 			configuration: async () => ({
-				protocolVersion: 1,
 				platform: 'win32',
 				mode: 'nativeOverlay',
 				controlsLocation: 'right',

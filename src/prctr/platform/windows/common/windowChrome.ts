@@ -16,7 +16,6 @@ export type ProductWindowControlsLocation = 'left' | 'right';
 export type ProductWindowChromeTheme = 'light' | 'dark' | 'highContrastLight' | 'highContrastDark';
 
 export interface ProductWindowChromeConfiguration {
-	readonly protocolVersion: 1;
 	readonly platform: ProductWindowChromePlatform;
 	readonly mode: ProductWindowChromeMode;
 	readonly controlsLocation: ProductWindowControlsLocation;
@@ -31,7 +30,6 @@ export interface ProductWindowChromeColors {
 
 export interface ProductWindowChromeUpdate {
 	readonly colors?: ProductWindowChromeColors;
-	readonly protocolVersion: 1;
 	readonly theme: ProductWindowChromeTheme;
 	readonly titlebarHeight: number;
 	readonly dimmed: boolean;
@@ -51,17 +49,15 @@ export function validateProductWindowChromeConfiguration(
 ): ProductWindowChromeConfiguration {
 	if (
 		!isRecord(value) ||
-		value.protocolVersion !== 1 ||
 		!isProductWindowChromePlatform(value.platform) ||
 		!isProductWindowChromeMode(value.mode) ||
 		!isControlsLocation(value.controlsLocation) ||
 		!isConfigurationTitlebarHeight(value.titlebarHeight) ||
 		typeof value.fullscreen !== 'boolean' ||
-		Object.keys(value).length !== 6
+		Object.keys(value).length !== 5
 	)
 		throw new TypeError('Invalid product window chrome configuration');
 	return Object.freeze({
-		protocolVersion: 1,
 		platform: value.platform,
 		mode: value.mode,
 		controlsLocation: value.controlsLocation,
@@ -73,16 +69,14 @@ export function validateProductWindowChromeConfiguration(
 export function validateProductWindowChromeUpdate(value: unknown): ProductWindowChromeUpdate {
 	if (
 		!isRecord(value) ||
-		value.protocolVersion !== 1 ||
 		!isThemeId(value.theme) ||
 		!isPhysicalTitlebarHeight(value.titlebarHeight) ||
 		typeof value.dimmed !== 'boolean' ||
-		Object.keys(value).length !== (value.colors === undefined ? 4 : 5) ||
+		Object.keys(value).length !== (value.colors === undefined ? 3 : 4) ||
 		(value.colors !== undefined && !validChromeColors(value.colors))
 	)
 		throw new TypeError('Invalid product window chrome update');
 	return Object.freeze({
-		protocolVersion: 1,
 		theme: value.theme,
 		...(value.colors === undefined
 			? {}

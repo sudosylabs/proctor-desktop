@@ -49,7 +49,7 @@ export class ProductWindowCoordinator {
 
   returnToLaunch(windowId: string): void {
     this.#requireCurrent('authenticated');
-    this.#replace({protocolVersion:1,kind:'launch',windowId});
+    this.#replace({kind:'launch',windowId});
   }
 
   enterCandidate(descriptorValue: unknown): void {

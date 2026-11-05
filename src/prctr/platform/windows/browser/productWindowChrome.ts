@@ -183,7 +183,6 @@ export class ProductWindowChrome extends Disposable {
 		const chromeTheme = resolveProductWindowChromeTheme(this.#themeService);
 		const palette = chromeTheme === this.#themeService.theme.id ? this.#themeService.theme : getTheme(chromeTheme);
 		const update: ProductWindowChromeUpdate = Object.freeze({
-			protocolVersion: 1,
 			theme: chromeTheme,
 			colors: {
 				background: palette.colors['titleBar.activeBackground'] ?? palette.values['color.background.canvas'],

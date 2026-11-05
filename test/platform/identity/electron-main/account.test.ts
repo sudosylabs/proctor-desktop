@@ -330,7 +330,7 @@ void test('closing an authenticated window fences settings requests waiting for 
 	const rejected = assert.rejects(pending, /bound AuthenticatedWindow/);
 	binding.dispose();
 	release({
-		acknowledged: { source: '{}', revision: 'before', registryVersion: 1 },
+		acknowledged: { source: '{}', revision: 'before' },
 		writable: true
 	});
 	await rejected;

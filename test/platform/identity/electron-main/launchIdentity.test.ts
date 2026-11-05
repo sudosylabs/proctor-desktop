@@ -140,7 +140,6 @@ void test('server remains compatibility authority and unrelated discovery fields
 				'developmentOrigin',
 				'institutionName',
 				'origin',
-				'protocolVersion',
 				'revision',
 				'state'
 			].sort()
@@ -370,7 +369,6 @@ void test('protocol validators enforce closed intents and strip arbitrary projec
 	])
 		assert.throws(() => validateLaunchIdentityIntent(value));
 	const base = {
-		protocolVersion: 1,
 		revision: 0,
 		state: 'selectingServer',
 		developmentOrigin: false,

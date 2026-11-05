@@ -59,7 +59,6 @@ export async function runAccountTests(document: Document): Promise<void> {
 		},
 		createLocalization({ requestedLocale: 'en', messages: Object.values(accountMessages) }),
 		{
-			protocolVersion: 1,
 			kind: 'authenticated',
 			windowId: 'test:account',
 			institutionOrigin: 'https://example.test',

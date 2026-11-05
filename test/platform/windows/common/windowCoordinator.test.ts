@@ -114,7 +114,6 @@ suite('ProductWindowCoordinator', () => {
 
 function auth(windowId: string) {
 	return {
-		protocolVersion: 1,
 		kind: 'authenticated',
 		windowId,
 		institutionOrigin: 'https://example.edu',
@@ -125,7 +124,6 @@ function auth(windowId: string) {
 }
 function candidate(windowId: string) {
 	return {
-		protocolVersion: 1,
 		kind: 'candidate',
 		windowId,
 		institutionOrigin: 'https://example.edu',

@@ -126,7 +126,6 @@ void test('settings accepts immutable bounded color data and keeps overrides out
 
 void test('native chrome accepts bounded resolved colors and rejects arbitrary styling', () => {
 	const update = {
-		protocolVersion: 1,
 		theme: 'dark',
 		titlebarHeight: 32,
 		dimmed: false,

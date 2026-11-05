@@ -82,8 +82,7 @@ async function run(): Promise<void> {
 				return {
 					acknowledged: {
 						source: '{"workbench.colorTheme":"GitHub Dark Dimmed"}',
-						revision: 'r'.repeat(26),
-						registryVersion: 1
+						revision: 'r'.repeat(26)
 					},
 					writable: true
 				};
@@ -186,7 +185,7 @@ async function run(): Promise<void> {
       if (bootstrap.kind !== 'candidate') {
         windowChrome = await api.windowChrome.configuration();
         const subscription = api.windowChrome.onDidChangeFullscreen(() => {});
-        await api.windowChrome.update({ protocolVersion: 1, theme: 'dark', titlebarHeight: windowChrome.titlebarHeight, dimmed: false });
+        await api.windowChrome.update({ theme: 'dark', titlebarHeight: windowChrome.titlebarHeight, dimmed: false });
         subscription.dispose();
       }
       if (bootstrap.kind === 'launch') {
@@ -356,7 +355,6 @@ async function verifyLaunchWindowMenu(): Promise<void> {
 			window,
 			'en',
 			() => ({
-				protocolVersion: 1,
 				revision: 1,
 				state: 'checking',
 				origin: 'https://example.edu',
@@ -424,7 +422,7 @@ async function verifyTransactionalRollback(
 			context: { window: 'authenticated' },
 			authority: { commit: async () => ({ kind: 'unavailable' }) },
 			cache: { load: async () => undefined, store: async () => {} },
-			acknowledged: { source: '{}', revision: 'settings-1', registryVersion: 1 },
+			acknowledged: { source: '{}', revision: 'settings-1' },
 			writable: true
 		});
 	} catch (error) {
@@ -541,7 +539,6 @@ async function verifyIntegratedBrowser(): Promise<unknown> {
 	const origin = `http://127.0.0.1:${address.port}`;
 	const institutionOrigin = `https://127.0.0.1:${address.port}`;
 	const policyInput = {
-		schemaVersion: 1 as const,
 		attemptId: 'attempt-1',
 		participationGeneration: 1,
 		revision: 'browser-1',
@@ -811,13 +808,11 @@ async function verifyIntegratedBrowserCompositionRollback(
 function descriptor(kind: ProductWindowKind): ProductWindowDescriptor {
 	if (kind === 'launch')
 		return {
-			protocolVersion: 1,
 			kind,
 			windowId: 'launch-1',
 			institutionOrigin: 'https://example.edu'
 		};
 	const common = {
-		protocolVersion: 1 as const,
 		windowId: `${kind}-1`,
 		institutionOrigin: 'https://example.edu',
 		principalId: 'principal-1',
@@ -962,7 +957,6 @@ function invokeChromeUpdate(
 	if (update === undefined) throw new Error('Window chrome update handler is unavailable');
 	try {
 		update({} as IpcMainInvokeEvent, {
-			protocolVersion: 1,
 			theme: 'dark',
 			titlebarHeight,
 			dimmed

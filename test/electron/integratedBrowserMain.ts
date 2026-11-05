@@ -29,7 +29,6 @@ void app
 		const origin = `http://127.0.0.1:${address.port}`;
 		const policy = validateBrowserPolicy(
 			{
-				schemaVersion: 1,
 				attemptId: 'attempt',
 				participationGeneration: 1,
 				revision: 'revision',

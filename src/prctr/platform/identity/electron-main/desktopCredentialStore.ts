@@ -100,8 +100,7 @@ function valid(value: unknown): value is StoredDesktopSession {
 	if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
 	const item = value as Record<string, unknown>;
 	if (
-		Object.keys(item).length !== 11 ||
-		item.version !== 1 ||
+		Object.keys(item).length !== 10 ||
 		(item.phase !== 'usable' && item.phase !== 'rotationPending')
 	)
 		return false;

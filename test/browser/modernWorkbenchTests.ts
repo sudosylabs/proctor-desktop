@@ -216,8 +216,8 @@ export async function runModernWorkbenchTests(
 		const accountStore = new DisposableStore();
 		const savedLayout = new Map(
 			[
-				'prctr.authenticated.layout.v1.sidebarVisible',
-				'prctr.authenticated.layout.v2.primarySide'
+				'prctr.authenticated.layout.sidebarVisible',
+				'prctr.authenticated.layout.primarySide'
 			].map((key) => [key, document.defaultView!.localStorage.getItem(key)])
 		);
 		const preferences = new AuthenticatedLayoutState(document.defaultView!.localStorage);
@@ -229,7 +229,6 @@ export async function runModernWorkbenchTests(
 					shell.part('titlebar'),
 					{
 						configuration: async () => ({
-							protocolVersion: 1,
 							platform: 'win32',
 							mode: 'nativeOverlay',
 							controlsLocation: 'right',
@@ -266,7 +265,6 @@ export async function runModernWorkbenchTests(
 				context,
 				{ signOut: async () => {}, close: async () => {} },
 				{
-					protocolVersion: 1,
 					kind: 'authenticated',
 					windowId: 'test:titlebar',
 					institutionOrigin: 'https://example.test',

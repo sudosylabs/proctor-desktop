@@ -23,7 +23,6 @@ const variants: readonly {
 		id: 'windows-overlay-ltr',
 		direction: 'ltr',
 		configuration: {
-			protocolVersion: 1,
 			platform: 'win32',
 			mode: 'nativeOverlay',
 			controlsLocation: 'right',
@@ -35,7 +34,6 @@ const variants: readonly {
 		id: 'linux-overlay-rtl',
 		direction: 'rtl',
 		configuration: {
-			protocolVersion: 1,
 			platform: 'linux',
 			mode: 'nativeOverlay',
 			controlsLocation: 'right',
@@ -47,7 +45,6 @@ const variants: readonly {
 		id: 'traffic-ltr',
 		direction: 'ltr',
 		configuration: {
-			protocolVersion: 1,
 			platform: 'darwin',
 			mode: 'nativeTrafficLights',
 			controlsLocation: 'left',
@@ -59,7 +56,6 @@ const variants: readonly {
 		id: 'traffic-rtl',
 		direction: 'rtl',
 		configuration: {
-			protocolVersion: 1,
 			platform: 'darwin',
 			mode: 'nativeTrafficLights',
 			controlsLocation: 'right',

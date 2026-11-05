@@ -75,7 +75,7 @@
       "rationale": "Preserve native titlebar color, modal dimming, and physical-height synchronization, the one-pixel Windows border correction, macOS traffic-light centering, Tahoe button geometry, sheet offset, fullscreen notification, retry-safe native update caching, sender authorization, and deterministic teardown behind a product-window-scoped bridge.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronWindowChrome.ts",
-      "localSha256": "f5033b4097a6766fc447a9c9de4751b7ffd663702bf3bc34db2c71fe1fbf9780",
+      "localSha256": "5315dc76a0790df940ccadd5155c65497666e1d07662c92a5a0af8aea0a5aacc",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -99,7 +99,7 @@
       "rationale": "Preserve renderer-to-main theme, modal-dimming, and zoom-aware titlebar updates, forced-color synchronization, disposal fencing, and the macOS first-title workaround while replacing VS Code service decorators and general workbench title services with Proctor's closed chrome client and browser theme service.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/browser/productWindowChrome.ts",
-      "localSha256": "a8b15fd3c1148dee7d25450829452d57f7678280367897e5ab0b6a81c6939d20",
+      "localSha256": "1f9c28e9faa933ad124039603b0e4d22cc3e0cb510947cfff6e1a62cc2ae6b36",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",

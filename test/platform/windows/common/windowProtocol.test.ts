@@ -8,7 +8,6 @@ import {
 suite('Product window protocol', () => {
 	test('normalizes HTTPS origins and rejects credentials, paths, and malformed identities', () => {
 		const descriptor = validateWindowDescriptor({
-			protocolVersion: 1,
 			kind: 'authenticated',
 			windowId: 'w1',
 			institutionOrigin: 'https://EXAMPLE.edu:443/',
@@ -24,21 +23,17 @@ suite('Product window protocol', () => {
 		]) {
 			assert.throws(() =>
 				validateWindowDescriptor({
-					protocolVersion: 1,
 					kind: 'launch',
 					windowId: 'w1',
 					institutionOrigin: origin
 				})
 			);
 		}
-		assert.throws(() =>
-			validateWindowDescriptor({ protocolVersion: 1, kind: 'candidate', windowId: 'w1' })
-		);
+		assert.throws(() => validateWindowDescriptor({ kind: 'candidate', windowId: 'w1' }));
 	});
 
 	test('development HTTP is explicit, loopback-only, and cannot enter CandidateWindow', () => {
 		const descriptor = {
-			protocolVersion: 1,
 			kind: 'authenticated',
 			windowId: 'w-dev',
 			principalId: 'p1',

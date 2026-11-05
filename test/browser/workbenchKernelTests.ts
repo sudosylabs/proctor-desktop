@@ -83,7 +83,6 @@ function testWindowChromeClient(updates?: ProductWindowChromeUpdate[]): ProductW
 	return Object.freeze({
 		configuration: async () =>
 			Object.freeze({
-				protocolVersion: 1,
 				platform: 'win32',
 				mode: 'nativeOverlay',
 				controlsLocation: 'right',
@@ -461,7 +460,6 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		bootstrap: async () => {
 			bootstrapCalls++;
 			return {
-				protocolVersion: 1,
 				kind: 'launch',
 				windowId: 'launch:test',
 				institutionOrigin: 'https://institution.example.test'
@@ -470,7 +468,6 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		windowChrome: testWindowChromeClient(),
 		identity: {
 			projection: async () => ({
-				protocolVersion: 1,
 				revision: 1,
 				state: 'ready',
 				origin: 'https://institution.example.test',
@@ -585,7 +582,6 @@ async function runExecutableKernelTest(document: Document): Promise<void> {
 	const result = await bootstrapWorkbench(child, candidateComposition, [
 		...commonWorkbenchContributions,
 		createDesktopWorkbenchContribution('candidate', async () => ({
-			protocolVersion: 1,
 			kind: 'candidate',
 			windowId: 'window:kernel',
 			institutionOrigin: 'https://institution.example.test',
@@ -750,7 +746,6 @@ async function runWindowBindingFailureTests(document: Document): Promise<void> {
 			'Pending privileged binding exposed an unthemed or unowned loading surface'
 		);
 	resolveBinding({
-		protocolVersion: 1,
 		kind: 'candidate',
 		windowId: 'window:pending',
 		institutionOrigin: 'https://institution.example.test',
@@ -775,7 +770,6 @@ async function runWindowBindingFailureTests(document: Document): Promise<void> {
 			throw new Error('binding unavailable');
 		},
 		async () => ({
-			protocolVersion: 1 as const,
 			kind: 'authenticated' as const,
 			windowId: 'window:mismatch',
 			institutionOrigin: 'https://institution.example.test',
@@ -1832,7 +1826,6 @@ async function runSettingsModalContributionTest(document: Document): Promise<voi
 	let acknowledged: UserSettingsProjection = {
 		source: '{\n // retained\n "editor.fontSize":18, "workbench.tree.indent":12\n}',
 		revision: 'revision:live',
-		registryVersion: 1,
 		availability: 'available',
 		writable: true,
 		presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
@@ -1859,7 +1852,6 @@ async function runSettingsModalContributionTest(document: Document): Promise<voi
 			createDesktopWorkbenchContribution(
 				'authenticated',
 				async () => ({
-					protocolVersion: 1,
 					kind: 'authenticated',
 					windowId: 'window:modal-settings',
 					institutionOrigin: 'https://institution.example.test',

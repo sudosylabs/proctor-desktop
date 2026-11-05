@@ -194,7 +194,6 @@ export class DesktopIdentityCoordinator extends Disposable {
 	): LaunchIdentityProjection {
 		return validateLaunchIdentityProjection({
 			...presentation,
-			protocolVersion: 1,
 			revision,
 			developmentOrigin: presentation.origin?.startsWith('http:') ?? false,
 			authorizationAvailable: this.options.authorization !== undefined,

@@ -47,7 +47,6 @@ export function resolveProductWindowChromeConfiguration(
 ): ProductWindowChromeConfiguration {
 	const macos = platform === 'darwin';
 	return Object.freeze({
-		protocolVersion: 1,
 		platform,
 		mode: macos ? 'nativeTrafficLights' : 'nativeOverlay',
 		controlsLocation: macos && isRightToLeftLocale(locale) ? 'right' : macos ? 'left' : 'right',

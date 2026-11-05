@@ -185,7 +185,6 @@ export class DesktopAuthorizationService extends Disposable {
 					key,
 					tokens,
 					stored: {
-						version: 1,
 						phase: 'usable',
 						origin: identity.origin,
 						institutionId: identity.institutionId,

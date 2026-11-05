@@ -28,7 +28,6 @@ export const launchStates = [
 export type LaunchState = (typeof launchStates)[number];
 
 export interface LaunchIdentityProjection {
-	readonly protocolVersion: 1;
 	readonly revision: number;
 	readonly state: LaunchState;
 	readonly origin?: string;
@@ -93,7 +92,6 @@ export function validateLaunchIdentityIntent(value: unknown): LaunchIdentityInte
 export function validateLaunchIdentityProjection(value: unknown): LaunchIdentityProjection {
 	if (
 		!isRecord(value) ||
-		value.protocolVersion !== 1 ||
 		!Number.isSafeInteger(value.revision) ||
 		(value.revision as number) < 0 ||
 		!launchStates.includes(value.state as LaunchState) ||
@@ -148,7 +146,6 @@ export function validateLaunchIdentityProjection(value: unknown): LaunchIdentity
 		throw new TypeError('Invalid LaunchWindow compatibility reason');
 	}
 	return Object.freeze({
-		protocolVersion: 1,
 		revision: value.revision as number,
 		state: value.state as LaunchState,
 		developmentOrigin: value.developmentOrigin,

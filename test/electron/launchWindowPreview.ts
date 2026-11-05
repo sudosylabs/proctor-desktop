@@ -101,7 +101,7 @@ void app
 			}
 		});
 		const managed = factory.create(
-			{ protocolVersion: 1, kind: 'launch', windowId: 'launch-preview' },
+			{ kind: 'launch', windowId: 'launch-preview' },
 			() => app.quit(),
 			() => app.quit()
 		);

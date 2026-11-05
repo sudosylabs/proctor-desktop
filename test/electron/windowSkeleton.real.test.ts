@@ -66,7 +66,6 @@ void test('three product windows use isolated capability-specific preloads and l
 		});
 		if (item.kind === 'candidate') assert.equal(item.renderer.windowChrome, undefined);
 		else {
-			assert.equal(item.renderer.windowChrome.protocolVersion, 1);
 			assert.equal(
 				item.renderer.windowChrome.platform,
 				process.platform === 'darwin' || process.platform === 'win32'

@@ -32,10 +32,9 @@ async function eventually(predicate: () => boolean): Promise<void> {
 /** Real shell/services with no Settings runtime or server needed to arrange the window. */
 export async function exerciseAuthenticatedLayout(): Promise<void> {
 	const saved = new Map(
-		[
-			'prctr.authenticated.layout.v1.sidebarVisible',
-			'prctr.authenticated.layout.v2.primarySide'
-		].map((key) => [key, localStorage.getItem(key)])
+		['prctr.authenticated.layout.sidebarVisible', 'prctr.authenticated.layout.primarySide'].map(
+			(key) => [key, localStorage.getItem(key)]
+		)
 	);
 
 	let commands!: ICommandService;
@@ -48,7 +47,6 @@ export async function exerciseAuthenticatedLayout(): Promise<void> {
 		createDesktopWorkbenchContribution(
 			'authenticated',
 			async () => ({
-				protocolVersion: 1,
 				kind: 'authenticated',
 				windowId: 'window:layout-test',
 				institutionOrigin: 'https://institution.example.test',
@@ -59,7 +57,6 @@ export async function exerciseAuthenticatedLayout(): Promise<void> {
 			{
 				async configuration() {
 					return {
-						protocolVersion: 1,
 						platform: isMacintosh ? 'darwin' : 'linux',
 						mode: isMacintosh ? 'nativeTrafficLights' : 'nativeOverlay',
 						controlsLocation: isMacintosh ? 'left' : 'right',

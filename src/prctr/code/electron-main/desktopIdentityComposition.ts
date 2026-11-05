@@ -63,7 +63,6 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				),
 				onAuthenticated: async (identity) => {
 					windows.completeSignIn({
-						protocolVersion: 1,
 						kind: 'authenticated',
 						windowId: randomUUID(),
 						institutionOrigin: identity.institutionOrigin,
@@ -142,7 +141,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 			})
 		);
 		owned.add(windows.onDidTerminate(exit));
-		windows.openInitial({ protocolVersion: 1, kind: 'launch', windowId: randomUUID() });
+		windows.openInitial({ kind: 'launch', windowId: randomUUID() });
 		return { dispose: () => owned.dispose(), shutdown };
 	} catch (error) {
 		owned.dispose();

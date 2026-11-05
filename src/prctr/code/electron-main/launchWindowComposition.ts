@@ -52,7 +52,7 @@ export function createLaunchWindowComposition(options: LaunchWindowCompositionOp
 		);
 		owned.add({ dispose: () => windows.shutdown() });
 		owned.add(windows.onDidTerminate(() => owned.dispose()));
-		windows.openInitial({ protocolVersion: 1, kind: 'launch', windowId: options.windowId });
+		windows.openInitial({ kind: 'launch', windowId: options.windowId });
 		return Object.freeze({ identity, windows, dispose: () => owned.dispose() });
 	} catch (error) {
 		try {

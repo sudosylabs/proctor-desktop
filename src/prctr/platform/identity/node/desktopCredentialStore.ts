@@ -1,5 +1,4 @@
 export interface StoredDesktopSession {
-	readonly version: 1;
 	readonly phase: 'usable' | 'rotationPending';
 	readonly origin: string;
 	readonly institutionId: string;

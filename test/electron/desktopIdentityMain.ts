@@ -252,7 +252,6 @@ if (probe) {
 						},
 						async onAuthenticated(identity) {
 							windows!.completeSignIn({
-								protocolVersion: 1,
 								kind: 'authenticated',
 								windowId: 'identity-test-account',
 								principalId,
@@ -266,7 +265,6 @@ if (probe) {
 				service = createService();
 				windows = createWindows();
 				windows.openInitial({
-					protocolVersion: 1,
 					kind: 'launch',
 					windowId: 'identity-test-launch'
 				});
@@ -342,7 +340,6 @@ if (probe) {
 				service = createService();
 				windows = createWindows();
 				windows.openInitial({
-					protocolVersion: 1,
 					kind: 'launch',
 					windowId: 'identity-test-relaunch'
 				});
