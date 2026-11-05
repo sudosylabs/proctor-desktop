@@ -4,7 +4,6 @@ import {
 	SECURITY_UTILITY_POLL_INTERVAL_MS,
 	SECURITY_UTILITY_PROTOCOL_VERSION,
 	SECURITY_UTILITY_SOURCE_MANIFEST,
-	SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 	SECURITY_UTILITY_STARTUP_TIMEOUT_MS,
 	isNativeBaselineOpenResult,
 	isNativeBridgeManifest,
@@ -104,10 +103,7 @@ export class SecurityUtilityHost {
 	}
 
 	#open(bootstrap: SecurityUtilityBootstrap): void {
-		if (
-			bootstrap.build_identity !== this.#buildIdentity ||
-			bootstrap.source_manifest_version !== SECURITY_UTILITY_SOURCE_MANIFEST_VERSION
-		) {
+		if (bootstrap.build_identity !== this.#buildIdentity) {
 			this.#terminateWithoutRelease('build-identity-mismatch');
 			return;
 		}
@@ -143,7 +139,6 @@ export class SecurityUtilityHost {
 			message_sequence: 0,
 			challenge_response: bootstrap.challenge,
 			build_identity: this.#buildIdentity,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 			selected_sources: bootstrap.selected_sources,
 			selected_source_categories: bootstrap.selected_source_categories,

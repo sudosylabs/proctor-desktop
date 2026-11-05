@@ -10,7 +10,6 @@ pub const MAX_DISPLAY_TOPOLOGY_FACTS: usize = 1_024;
 pub const MAX_PROTOCOL_SAFE_INTEGER: u64 = 9_007_199_254_740_991;
 pub const NATIVE_SOURCE_COUNT: usize = 11;
 pub const NATIVE_SOURCE_CATEGORY_COUNT: usize = 10;
-pub const NATIVE_SOURCE_MANIFEST_VERSION: u16 = 3;
 pub const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS: u64 = 5_000;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]

@@ -37,12 +37,11 @@ use native_protocol::{
     ClipboardSourceSnapshot, DisplayTopologyDrain, DisplayTopologySourceSnapshot,
     InteractiveSessionDrain, InteractiveSessionSourceSnapshot, MediaDeviceDrain,
     MediaDeviceSourceSnapshot, NATIVE_SOURCE_CATEGORY_ORDER, NATIVE_SOURCE_COUNT,
-    NATIVE_SOURCE_MANIFEST, NATIVE_SOURCE_MANIFEST_VERSION, NativeSourceCategory,
-    NativeSourceManifestEntry, NetworkConfigurationDrain, NetworkConfigurationSourceSnapshot,
-    PrintSpoolerDrain, PrintSpoolerSourceSnapshot, ProcessApplicationDrain,
-    ProcessApplicationSourceSnapshot, ProtocolValidatable, RemovableStorageDrain,
-    RemovableStorageSourceSnapshot, SourceFailureCode, VirtualizationDrain,
-    VirtualizationSourceSnapshot,
+    NATIVE_SOURCE_MANIFEST, NativeSourceCategory, NativeSourceManifestEntry,
+    NetworkConfigurationDrain, NetworkConfigurationSourceSnapshot, PrintSpoolerDrain,
+    PrintSpoolerSourceSnapshot, ProcessApplicationDrain, ProcessApplicationSourceSnapshot,
+    ProtocolValidatable, RemovableStorageDrain, RemovableStorageSourceSnapshot, SourceFailureCode,
+    VirtualizationDrain, VirtualizationSourceSnapshot,
 };
 use native_source_supervisor::{
     BaselineSourceFactories, NATIVE_SOURCE_KINDS, NativeSourceBatch, NativeSourceKind,
@@ -93,7 +92,6 @@ struct OpenBaselineRequest {
 #[derive(Serialize)]
 struct BridgeManifest {
     bridge_version: u16,
-    source_manifest_version: u16,
     source_manifest: [NativeSourceManifestEntry; NATIVE_SOURCE_COUNT],
 }
 
@@ -195,7 +193,6 @@ pub fn manifest<'env>(env: Env) -> Result<Unknown<'env>> {
         env,
         &BridgeManifest {
             bridge_version: BRIDGE_VERSION,
-            source_manifest_version: NATIVE_SOURCE_MANIFEST_VERSION,
             source_manifest: NATIVE_SOURCE_MANIFEST,
         },
     )

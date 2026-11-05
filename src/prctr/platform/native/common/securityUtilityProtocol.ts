@@ -2,7 +2,6 @@ import {
 	NATIVE_SOURCE_MANIFEST,
 	NATIVE_SOURCE_CATEGORY_ORDER,
 	NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS,
-	NATIVE_SOURCE_MANIFEST_VERSION,
 	isCandidateWindowDrain,
 	isCandidateWindowHostEvent,
 	isCandidateWindowSourceSnapshot,
@@ -58,7 +57,6 @@ import {
 } from './nativeObservation.generated.js';
 
 export const SECURITY_UTILITY_PROTOCOL_VERSION = 1;
-export const SECURITY_UTILITY_SOURCE_MANIFEST_VERSION = NATIVE_SOURCE_MANIFEST_VERSION;
 export const SECURITY_UTILITY_SOURCE_MANIFEST = NATIVE_SOURCE_MANIFEST;
 
 export type SecurityUtilitySourceManifest = NativeSourceManifest;
@@ -91,7 +89,6 @@ export interface SecurityUtilityBootstrap {
 	readonly protocol_version: 1;
 	readonly challenge: string;
 	readonly build_identity: string;
-	readonly source_manifest_version: typeof SECURITY_UTILITY_SOURCE_MANIFEST_VERSION;
 	readonly source_manifest: SecurityUtilitySourceManifest;
 	readonly participation_generation: string;
 	readonly collection_session_id: string;
@@ -236,7 +233,6 @@ export interface SecurityUtilityReady {
 	readonly message_sequence: 0;
 	readonly challenge_response: string;
 	readonly build_identity: string;
-	readonly source_manifest_version: typeof SECURITY_UTILITY_SOURCE_MANIFEST_VERSION;
 	readonly source_manifest: SecurityUtilitySourceManifest;
 	readonly selected_sources: readonly NativeSourceId[];
 	readonly selected_source_categories: readonly NativeSourceCategory[];
@@ -332,7 +328,6 @@ export function isSecurityUtilityBootstrap(value: unknown): value is SecurityUti
 			'protocol_version',
 			'challenge',
 			'build_identity',
-			'source_manifest_version',
 			'source_manifest',
 			'participation_generation',
 			'collection_session_id',
@@ -345,7 +340,6 @@ export function isSecurityUtilityBootstrap(value: unknown): value is SecurityUti
 		value.protocol_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
 		isBootstrapChallenge(value.challenge) &&
 		isBoundedString(value.build_identity, 16, 256) &&
-		value.source_manifest_version === SECURITY_UTILITY_SOURCE_MANIFEST_VERSION &&
 		isSecurityUtilitySourceManifest(value.source_manifest) &&
 		isBoundedString(value.participation_generation, 16, 128) &&
 		isBoundedString(value.collection_session_id, 16, 128) &&
@@ -424,9 +418,8 @@ export function isSecurityUtilityMainMessage(value: unknown): value is SecurityU
 
 export function isNativeBridgeManifest(value: unknown): boolean {
 	return (
-		isRecordWithKeys(value, ['bridge_version', 'source_manifest_version', 'source_manifest']) &&
+		isRecordWithKeys(value, ['bridge_version', 'source_manifest']) &&
 		value.bridge_version === SECURITY_UTILITY_PROTOCOL_VERSION &&
-		value.source_manifest_version === SECURITY_UTILITY_SOURCE_MANIFEST_VERSION &&
 		isSecurityUtilitySourceManifest(value.source_manifest)
 	);
 }
@@ -521,7 +514,6 @@ export function isSecurityUtilityChildMessage(
 				'message_sequence',
 				'challenge_response',
 				'build_identity',
-				'source_manifest_version',
 				'source_manifest',
 				'selected_sources',
 				'selected_source_categories',
@@ -533,7 +525,6 @@ export function isSecurityUtilityChildMessage(
 			value.message_sequence === 0 &&
 			isBootstrapChallenge(value.challenge_response) &&
 			isBoundedString(value.build_identity, 16, 256) &&
-			value.source_manifest_version === SECURITY_UTILITY_SOURCE_MANIFEST_VERSION &&
 			isSecurityUtilitySourceManifest(value.source_manifest) &&
 			isSelectedNativeSources(value.selected_sources) &&
 			isSelectedSourceCategories(value.selected_source_categories, value.selected_sources) &&

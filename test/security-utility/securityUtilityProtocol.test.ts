@@ -8,7 +8,6 @@ import {
 	SECURITY_UTILITY_SHUTDOWN_TIMEOUT_MS,
 	SECURITY_UTILITY_SOURCE_COUNT,
 	SECURITY_UTILITY_SOURCE_MANIFEST,
-	SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 	SECURITY_UTILITY_STARTUP_TIMEOUT_MS,
 	SECURITY_UTILITY_HEARTBEAT_TIMEOUT_MS,
 	isNativeBridgeManifest,
@@ -307,7 +306,6 @@ void test('private bootstrap validator rejects unknown fields and manifest drift
 		protocol_version: 1,
 		challenge: 'a'.repeat(43),
 		build_identity: 'proctor-build-identity-0001',
-		source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 		participation_generation: 'participation-generation-0001',
 		collection_session_id: 'collection-session-0001',
@@ -391,7 +389,6 @@ void test('private bootstrap validator rejects unknown fields and manifest drift
 void test('native bridge admission compares the generated per-source schema manifest', () => {
 	const manifest = {
 		bridge_version: 1,
-		source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 	};
 	assert.equal(isNativeBridgeManifest(manifest), true);
@@ -439,7 +436,6 @@ void test('main rejects a ready echo with a different valid source selection', a
 			message_sequence: 0,
 			challenge_response: 'a'.repeat(43),
 			build_identity: 'proctor-build-identity-0001',
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 			selected_sources: selectedSources.slice(0, -1),
 			selected_source_categories: [
@@ -492,7 +488,6 @@ void test('main rejects later utility output from a source outside the sealed su
 			message_sequence: 0,
 			challenge_response: 'a'.repeat(43),
 			build_identity: 'proctor-build-identity-0001',
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 			selected_sources: ['display-topology'],
 			selected_source_categories: [],
@@ -541,7 +536,6 @@ void test('main and utility complete the authenticated lifecycle over a private 
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
 			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -607,7 +601,6 @@ void test('candidate ingress stays bounded and reports the exact sender-side los
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
 			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -674,7 +667,6 @@ void test('shutdown compacts the maximum pending ingress into one exact loss mar
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
 			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -738,7 +730,6 @@ void test('native ingress drops remain ordered so a later event can expose the e
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
 			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -804,7 +795,6 @@ void test('supervisor polls do not conceal a missing utility heartbeat', async (
 			message_sequence: 0,
 			challenge_response: 'a'.repeat(43),
 			build_identity: 'proctor-build-identity-0001',
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 			selected_sources: selectedSources,
 			selected_source_categories: selectedSourceCategories,
@@ -859,7 +849,6 @@ void test('utility fails closed when the main side does not acknowledge bounded 
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
 			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -907,7 +896,6 @@ void test('main fails closed when a supervisor poll cannot be delivered', async 
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
 			bridge_version: 1,
-			source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -1023,7 +1011,6 @@ function validBootstrap(): unknown {
 		protocol_version: 1,
 		challenge: 'a'.repeat(43),
 		build_identity: 'proctor-build-identity-0001',
-		source_manifest_version: SECURITY_UTILITY_SOURCE_MANIFEST_VERSION,
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
 		participation_generation: 'participation-generation-0001',
 		collection_session_id: 'collection-session-0001',

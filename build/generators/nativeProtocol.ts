@@ -86,7 +86,6 @@ type JsonSchema = {
 	readonly $defs?: Readonly<Record<string, Definition>>;
 	readonly properties?: Readonly<Record<string, Property>>;
 	readonly ['x-proctor-source-manifest']?: readonly unknown[];
-	readonly ['x-proctor-source-manifest-version']?: unknown;
 	readonly ['x-proctor-source-lifecycle-deadline-ms']?: unknown;
 };
 
@@ -203,7 +202,6 @@ export const nativeProtocolGenerator: Generator = {
 				)
 			])
 		);
-		const sourceManifestVersion = requiredSourceManifestVersion(commonSchema);
 		const sourceLifecycleDeadlineMs = requiredSourceLifecycleDeadline(commonSchema);
 		const sourceCategories = requiredNativeSourceCategories(commonDefinitions);
 		const helperSchema = JSON.parse(repository.read(NATIVE_HELPER_AUTHORITY)) as JsonSchema;
@@ -218,7 +216,6 @@ export const nativeProtocolGenerator: Generator = {
 				definitions,
 				schemaVersion,
 				sourceManifest,
-				sourceManifestVersion,
 				sourceLifecycleDeadlineMs,
 				sourceCategories
 			)
@@ -233,7 +230,6 @@ export const nativeProtocolGenerator: Generator = {
 					mergeDefinitions(definitions, helperDefinitions)
 				),
 				sourceManifest,
-				sourceManifestVersion,
 				sourceLifecycleDeadlineMs,
 				sourceCategories
 			)
@@ -307,7 +303,6 @@ function renderRust(
 	definitions: Readonly<Record<string, Definition>>,
 	schemaVersion: number,
 	sourceManifest: readonly SourceManifestEntry[],
-	sourceManifestVersion: number,
 	sourceLifecycleDeadlineMs: number,
 	sourceCategories: readonly string[]
 ): string {
@@ -333,7 +328,6 @@ function renderRust(
 		`pub const MAX_PROTOCOL_SAFE_INTEGER: u64 = ${rustNumber(maximumTimestamp)};`,
 		`pub const NATIVE_SOURCE_COUNT: usize = ${sourceManifest.length};`,
 		`pub const NATIVE_SOURCE_CATEGORY_COUNT: usize = ${sourceCategories.length};`,
-		`pub const NATIVE_SOURCE_MANIFEST_VERSION: u16 = ${rustNumber(sourceManifestVersion)};`,
 		`pub const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS: u64 = ${rustNumber(sourceLifecycleDeadlineMs)};`,
 		'',
 		'#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]',
@@ -539,7 +533,6 @@ function renderRustDefinitions(definitions: Readonly<Record<string, Definition>>
 function renderTypeScript(
 	definitions: Readonly<Record<string, Definition>>,
 	sourceManifest: readonly SourceManifestEntry[],
-	sourceManifestVersion: number,
 	sourceLifecycleDeadlineMs: number,
 	sourceCategories: readonly string[]
 ): string {
@@ -553,7 +546,6 @@ function renderTypeScript(
 		'',
 		`export const NATIVE_SOURCE_MANIFEST = ${JSON.stringify(sourceManifest)} as const;`,
 		'export type NativeSourceManifest = typeof NATIVE_SOURCE_MANIFEST;',
-		`export const NATIVE_SOURCE_MANIFEST_VERSION = ${sourceManifestVersion};`,
 		`export const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS = ${sourceLifecycleDeadlineMs};`,
 		`export const NATIVE_SOURCE_CATEGORY_ORDER = ${JSON.stringify(sourceCategories)} as const;`,
 		'',
@@ -930,21 +922,6 @@ function requiredSourceLifecycleDeadline(schema: JsonSchema): number {
 		);
 	}
 	return deadline;
-}
-
-function requiredSourceManifestVersion(schema: JsonSchema): number {
-	const version = schema['x-proctor-source-manifest-version'];
-	if (
-		typeof version !== 'number' ||
-		!Number.isInteger(version) ||
-		version < 1 ||
-		version > 65_535
-	) {
-		throw new Error(
-			`${COMMON_AUTHORITY} must declare a bounded x-proctor-source-manifest-version`
-		);
-	}
-	return version;
 }
 
 function requiredNativeSourceCategories(

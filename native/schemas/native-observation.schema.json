@@ -2,7 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://proctor.invalid/native/native-observation.schema.json",
   "title": "Proctor shared native-observation protocol",
-  "x-proctor-source-manifest-version": 3,
   "x-proctor-source-manifest": [
     "display-topology",
     "candidate-window",

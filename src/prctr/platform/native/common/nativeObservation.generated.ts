@@ -3,7 +3,6 @@
 
 export const NATIVE_SOURCE_MANIFEST = [{"source_id":"display-topology","schema_version":1},{"source_id":"candidate-window","schema_version":1},{"source_id":"capture-session","schema_version":1},{"source_id":"process-application","schema_version":1},{"source_id":"interactive-session","schema_version":1},{"source_id":"clipboard","schema_version":1},{"source_id":"print-spooler","schema_version":1},{"source_id":"removable-storage","schema_version":1},{"source_id":"virtualization","schema_version":1},{"source_id":"network-configuration","schema_version":1},{"source_id":"media-device","schema_version":1}] as const;
 export type NativeSourceManifest = typeof NATIVE_SOURCE_MANIFEST;
-export const NATIVE_SOURCE_MANIFEST_VERSION = 3;
 export const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS = 5000;
 export const NATIVE_SOURCE_CATEGORY_ORDER = ["os-clipboard-change","removable-block-storage","portable-mtp","system-proxy-state","os-managed-vpn-state","tunnel-interface-state","route-change","network-source-health","camera","microphone"] as const;
 
