@@ -112,7 +112,6 @@ mod tests {
     fn platform_boundary_reports_truthful_coverage() {
         let request = SourceOpenRequest {
             collection_session_id: "virtualization-session-0001".to_owned(),
-            requested_schema_version: VIRTUALIZATION_SCHEMA_VERSION,
             queue_capacity: 8,
         };
         let mut source = VirtualizationSource::<VirtualizationWire, _>::open(

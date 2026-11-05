@@ -100,20 +100,12 @@ where
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ProtocolViolation {
     Schema(ProtocolValidationError),
-    SchemaVersion { requested: u16, supported: u16 },
 }
 
 impl fmt::Display for ProtocolViolation {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Schema(error) => write!(formatter, "wire schema violation: {error}"),
-            Self::SchemaVersion {
-                requested,
-                supported,
-            } => write!(
-                formatter,
-                "requested schema version {requested} is incompatible with supported version {supported}"
-            ),
         }
     }
 }
@@ -131,61 +123,11 @@ impl SourceOpenRequest {
     ///
     /// # Errors
     ///
-    /// Returns a protocol violation when the identifier, schema version, or
-    /// queue capacity is outside the declared wire bounds.
+    /// Returns a protocol violation when the identifier or queue capacity is
+    /// outside the declared wire bounds.
     pub fn validate(&self) -> Result<(), ProtocolViolation> {
-        self.validate_for(DISPLAY_TOPOLOGY_SCHEMA_VERSION)
-    }
-
-    /// Validates this request for the `CandidateWindow`-state schema.
-    ///
-    /// # Errors
-    ///
-    /// Returns a protocol violation when the request is outside the shared
-    /// bounds or requests an incompatible `CandidateWindow` schema version.
-    pub fn validate_candidate_window(&self) -> Result<(), ProtocolViolation> {
-        self.validate_for(CANDIDATE_WINDOW_SCHEMA_VERSION)
-    }
-
-    /// Validates this request for the capture and native-session schema.
-    ///
-    /// # Errors
-    ///
-    /// Returns a protocol violation when the request is outside the shared
-    /// bounds or requests an incompatible capture-session schema version.
-    pub fn validate_capture_session(&self) -> Result<(), ProtocolViolation> {
-        self.validate_for(CAPTURE_SESSION_SCHEMA_VERSION)
-    }
-
-    /// Validates this request for the process/application schema.
-    ///
-    /// # Errors
-    ///
-    /// Returns a protocol violation when the request is outside the shared
-    /// bounds or requests an incompatible process/application schema version.
-    pub fn validate_process_application(&self) -> Result<(), ProtocolViolation> {
-        self.validate_for(PROCESS_APPLICATION_SCHEMA_VERSION)
-    }
-
-    /// Validates this request against one generated capability schema version.
-    ///
-    /// # Errors
-    ///
-    /// Returns a protocol violation when shared bounds fail or the requested
-    /// schema version differs from the capability's supported version.
-    pub fn validate_for_schema_version(&self, supported: u16) -> Result<(), ProtocolViolation> {
         self.validate_protocol()?;
-        if self.requested_schema_version != supported {
-            return Err(ProtocolViolation::SchemaVersion {
-                requested: self.requested_schema_version,
-                supported,
-            });
-        }
         Ok(())
-    }
-
-    fn validate_for(&self, supported: u16) -> Result<(), ProtocolViolation> {
-        self.validate_for_schema_version(supported)
     }
 }
 
@@ -258,22 +200,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn request_rejects_incompatible_schema() {
-        let request = SourceOpenRequest {
-            collection_session_id: "collection-session-0001".to_owned(),
-            requested_schema_version: 2,
-            queue_capacity: 16,
-        };
-        assert_eq!(
-            request.validate(),
-            Err(ProtocolViolation::SchemaVersion {
-                requested: 2,
-                supported: 1
-            })
-        );
-    }
-
-    #[test]
     fn topology_rejects_unknown_mirror_primary() {
         let topology = DisplayTopologySnapshot {
             certainty: TopologyCertainty::Complete,
@@ -303,7 +229,6 @@ mod tests {
     fn request_length_counts_unicode_code_points_instead_of_utf8_bytes() {
         let request = SourceOpenRequest {
             collection_session_id: "🦀🦀🦀🦀🦀🦀🦀🦀".to_owned(),
-            requested_schema_version: DISPLAY_TOPOLOGY_SCHEMA_VERSION,
             queue_capacity: 16,
         };
         assert!(matches!(

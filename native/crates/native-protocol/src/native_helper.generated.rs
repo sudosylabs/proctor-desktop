@@ -9,8 +9,6 @@ use crate::{
     ProtocolValidatable, ProtocolValidationError,
 };
 
-pub const NATIVE_HELPER_SCHEMA_VERSION: u16 = 1;
-
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum HelperServiceRequestKind {
@@ -42,20 +40,12 @@ impl ProtocolValidatable for HelperServiceResponseKind {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HelperServiceRequest {
-    pub protocol_version: u16,
     pub channel_nonce: String,
     pub kind: HelperServiceRequestKind,
 }
 
 impl ProtocolValidatable for HelperServiceRequest {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
-        if self.protocol_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "HelperServiceRequest",
-                "protocol_version",
-                "const 1",
-            ));
-        }
         if !(64..=64).contains(&self.channel_nonce.chars().count()) {
             return Err(ProtocolValidationError::new(
                 "HelperServiceRequest",
@@ -83,20 +73,12 @@ impl ProtocolValidatable for HelperServiceRequest {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HelperServiceResponse {
-    pub protocol_version: u16,
     pub channel_nonce: String,
     pub kind: HelperServiceResponseKind,
 }
 
 impl ProtocolValidatable for HelperServiceResponse {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
-        if self.protocol_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "HelperServiceResponse",
-                "protocol_version",
-                "const 1",
-            ));
-        }
         if !(64..=64).contains(&self.channel_nonce.chars().count()) {
             return Err(ProtocolValidationError::new(
                 "HelperServiceResponse",
@@ -124,20 +106,12 @@ impl ProtocolValidatable for HelperServiceResponse {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HelperServiceWorkerBootstrap {
-    pub protocol_version: u16,
     pub channel_nonce: String,
     pub client_designated_requirement: String,
 }
 
 impl ProtocolValidatable for HelperServiceWorkerBootstrap {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
-        if self.protocol_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "HelperServiceWorkerBootstrap",
-                "protocol_version",
-                "const 1",
-            ));
-        }
         if !(64..=64).contains(&self.channel_nonce.chars().count()) {
             return Err(ProtocolValidationError::new(
                 "HelperServiceWorkerBootstrap",
@@ -211,7 +185,6 @@ impl ProtocolValidatable for HelperEventClass {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HelperHandshake {
-    pub protocol_version: u16,
     pub channel_nonce: String,
     pub helper_kind: HelperKind,
     pub helper_build_id: String,
@@ -220,13 +193,6 @@ pub struct HelperHandshake {
 
 impl ProtocolValidatable for HelperHandshake {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
-        if self.protocol_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "HelperHandshake",
-                "protocol_version",
-                "const 1",
-            ));
-        }
         if !(64..=64).contains(&self.channel_nonce.chars().count()) {
             return Err(ProtocolValidationError::new(
                 "HelperHandshake",
@@ -284,7 +250,6 @@ impl ProtocolValidatable for HelperHandshake {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HelperSourceOpen {
-    pub protocol_version: u16,
     pub channel_nonce: String,
     pub helper_source_instance_id: String,
     pub source_kind: HelperSourceKind,
@@ -295,13 +260,6 @@ pub struct HelperSourceOpen {
 
 impl ProtocolValidatable for HelperSourceOpen {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
-        if self.protocol_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "HelperSourceOpen",
-                "protocol_version",
-                "const 1",
-            ));
-        }
         if !(64..=64).contains(&self.channel_nonce.chars().count()) {
             return Err(ProtocolValidationError::new(
                 "HelperSourceOpen",
@@ -389,20 +347,12 @@ impl ProtocolValidatable for HelperSourceOpen {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HelperSourceClose {
-    pub protocol_version: u16,
     pub channel_nonce: String,
     pub helper_source_instance_id: String,
 }
 
 impl ProtocolValidatable for HelperSourceClose {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
-        if self.protocol_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "HelperSourceClose",
-                "protocol_version",
-                "const 1",
-            ));
-        }
         if !(64..=64).contains(&self.channel_nonce.chars().count()) {
             return Err(ProtocolValidationError::new(
                 "HelperSourceClose",
@@ -436,7 +386,6 @@ impl ProtocolValidatable for HelperSourceClose {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HelperSourceSnapshot {
-    pub protocol_version: u16,
     pub channel_nonce: String,
     pub helper_source_instance_id: String,
     pub source_kind: HelperSourceKind,
@@ -457,17 +406,8 @@ pub struct HelperSourceSnapshot {
     pub interactive_session_state: Option<InteractiveSessionState>,
 }
 
-// Validation remains generated next to the complete bounded wire shape.
-#[allow(clippy::too_many_lines)]
 impl ProtocolValidatable for HelperSourceSnapshot {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
-        if self.protocol_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "HelperSourceSnapshot",
-                "protocol_version",
-                "const 1",
-            ));
-        }
         if !(64..=64).contains(&self.channel_nonce.chars().count()) {
             return Err(ProtocolValidationError::new(
                 "HelperSourceSnapshot",
@@ -570,7 +510,6 @@ impl ProtocolValidatable for HelperFailureCode {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HelperSourceFailure {
-    pub protocol_version: u16,
     pub channel_nonce: String,
     pub helper_source_instance_id: String,
     pub source_kind: HelperSourceKind,
@@ -596,13 +535,6 @@ pub struct HelperSourceFailure {
 
 impl ProtocolValidatable for HelperSourceFailure {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
-        if self.protocol_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "HelperSourceFailure",
-                "protocol_version",
-                "const 1",
-            ));
-        }
         if !(64..=64).contains(&self.channel_nonce.chars().count()) {
             return Err(ProtocolValidationError::new(
                 "HelperSourceFailure",
@@ -674,7 +606,6 @@ impl ProtocolValidatable for HelperSourceFailure {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct HelperObservation {
-    pub protocol_version: u16,
     pub channel_nonce: String,
     pub helper_source_instance_id: String,
     pub source_kind: HelperSourceKind,
@@ -696,13 +627,6 @@ pub struct HelperObservation {
 
 impl ProtocolValidatable for HelperObservation {
     fn validate_protocol(&self) -> Result<(), ProtocolValidationError> {
-        if self.protocol_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "HelperObservation",
-                "protocol_version",
-                "const 1",
-            ));
-        }
         if !(64..=64).contains(&self.channel_nonce.chars().count()) {
             return Err(ProtocolValidationError::new(
                 "HelperObservation",

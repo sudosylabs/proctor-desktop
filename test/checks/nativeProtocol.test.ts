@@ -13,7 +13,7 @@ import {
 } from '../../src/prctr/platform/native/common/nativeObservation.generated.ts';
 
 void test('service lifecycle controls reject malformed and identity-bearing wire messages', () => {
-	const envelope = { protocol_version: 1, channel_nonce: 'a0'.repeat(32) };
+	const envelope = { channel_nonce: 'a0'.repeat(32) };
 	for (const [validate, kinds] of [
 		[isHelperServiceRequest, ['open', 'attach', 'stop']],
 		[isHelperServiceResponse, ['ready', 'started', 'stopped']]
@@ -21,9 +21,6 @@ void test('service lifecycle controls reject malformed and identity-bearing wire
 		for (const kind of kinds) assert.equal(validate({ ...envelope, kind }), true);
 		const valid = { ...envelope, kind: kinds[0] };
 		for (const patch of [
-			{ protocol_version: 0 },
-			{ protocol_version: 2 },
-			{ protocol_version: 1.5 },
 			{ channel_nonce: 'A'.repeat(64) },
 			{ channel_nonce: 'g'.repeat(64) },
 			{ channel_nonce: 'a'.repeat(63) },
@@ -50,7 +47,6 @@ void test('service lifecycle controls reject malformed and identity-bearing wire
 
 void test('service worker bootstrap bounds the code requirement and admits no caller identity', () => {
 	const valid = {
-		protocol_version: 1,
 		channel_nonce: '0a'.repeat(32),
 		client_designated_requirement: 'anchor apple generic'
 	};
@@ -64,7 +60,6 @@ void test('service worker bootstrap bounds the code requirement and admits no ca
 		);
 	}
 	for (const patch of [
-		{ protocol_version: 2 },
 		{ channel_nonce: 'A'.repeat(64) },
 		{ client_designated_requirement: '' },
 		{ client_designated_requirement: 'a'.repeat(2049) },
@@ -95,7 +90,6 @@ void test('deferred process facts preserve bounded capture delay in source and h
 		event
 	};
 	const helper = {
-		protocol_version: 1,
 		channel_nonce: 'a'.repeat(64),
 		helper_source_instance_id: 'process-source-0001',
 		source_kind: 'process_application',
@@ -133,7 +127,6 @@ void test('generated source-open validator enforces wire shape and Unicode lengt
 	assert.equal(
 		isSourceOpenRequest({
 			collection_session_id: 'collection-session-0001',
-			requested_schema_version: 1,
 			queue_capacity: 16
 		}),
 		true
@@ -141,21 +134,18 @@ void test('generated source-open validator enforces wire shape and Unicode lengt
 	assert.equal(
 		isSourceOpenRequest({
 			collection_session_id: '🦀🦀🦀🦀🦀🦀🦀🦀',
-			requested_schema_version: 1,
 			queue_capacity: 16
 		}),
 		false
 	);
 	const inherited = Object.create({
 		collection_session_id: 'collection-session-0001',
-		requested_schema_version: 1,
 		queue_capacity: 16
 	}) as unknown;
 	assert.equal(isSourceOpenRequest(inherited), false);
 	assert.equal(
 		isSourceOpenRequest({
 			collection_session_id: 'collection-session-0001',
-			requested_schema_version: 1,
 			queue_capacity: 16,
 			unexpected: true
 		}),
@@ -164,14 +154,12 @@ void test('generated source-open validator enforces wire shape and Unicode lengt
 	assert.equal(
 		isSourceOpenRequest({
 			collection_session_id: 'x'.repeat(1_000_000),
-			requested_schema_version: 1,
 			queue_capacity: 16
 		}),
 		false
 	);
 	const propertyStorm: Record<string, unknown> = {
 		collection_session_id: 'collection-session-0001',
-		requested_schema_version: 1,
 		queue_capacity: 16
 	};
 	for (let index = 0; index < 10_000; index += 1) propertyStorm[`unexpected_${index}`] = true;

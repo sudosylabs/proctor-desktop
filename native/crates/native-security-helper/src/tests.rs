@@ -10,7 +10,6 @@ fn delayed_process_capture_is_bounded_by_each_observation_clock() {
         "event": {"kind": "exited", "process_instance_id": "process-instance-0001"}
     });
     let helper = serde_json::json!({
-        "protocol_version": 1,
         "channel_nonce": "a".repeat(64),
         "helper_source_instance_id": "process-source-0001",
         "source_kind": "process_application",
@@ -57,9 +56,7 @@ fn delayed_process_capture_is_bounded_by_each_observation_clock() {
 use std::io::Cursor;
 use std::sync::{Arc, mpsc::Receiver};
 
-use native_helper_protocol::{
-    HELPER_PROTOCOL_VERSION, HelperEventClass, HelperKind, MAX_HELPER_FRAME_BYTES,
-};
+use native_helper_protocol::{HelperEventClass, HelperKind, MAX_HELPER_FRAME_BYTES};
 use native_protocol::{
     INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveConsoleOwnership, InteractiveLockState,
     InteractiveRemoteAttachment, InteractiveSessionCertainty, InteractiveSessionCoverage,
@@ -246,7 +243,6 @@ fn discriminated_failure_frames_route_to_their_owned_source_fences() {
     };
     let channel = bind_verified_helper_channel(
         &HelperHandshake {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_kind: peer.helper_kind,
             helper_build_id: peer.helper_build_id.clone(),
@@ -273,7 +269,6 @@ fn discriminated_failure_frames_route_to_their_owned_source_fences() {
     );
 
     let failure = HelperSourceFailure {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: NONCE.to_owned(),
         helper_source_instance_id: "session-source-0001".to_owned(),
         source_kind: HelperSourceKind::InteractiveSession,
@@ -305,7 +300,6 @@ fn initial_source_failure_preserves_its_category_without_fencing_the_channel() {
     const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let (channel, request, _initial) = process_channel(NONCE);
     let failure = HelperSourceFailure {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: NONCE.to_owned(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: HelperSourceKind::ProcessApplication,
@@ -376,7 +370,6 @@ fn interleaved_backlog_is_distinct_from_ingress_capacity_and_reserves_failure_co
 
     for sequence in 1..=4 {
         let observation = HelperObservation {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: HelperSourceKind::ProcessApplication,
@@ -400,7 +393,6 @@ fn interleaved_backlog_is_distinct_from_ingress_capacity_and_reserves_failure_co
     }
 
     let failure = HelperSourceFailure {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: NONCE.to_owned(),
         helper_source_instance_id: request.helper_source_instance_id,
         source_kind: HelperSourceKind::ProcessApplication,
@@ -430,7 +422,6 @@ fn close_returns_the_ordered_tail_before_its_terminal_snapshot() {
     const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let (channel, request, initial) = process_channel(NONCE);
     let observation = HelperObservation {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: NONCE.to_owned(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: HelperSourceKind::ProcessApplication,
@@ -480,7 +471,6 @@ fn close_returns_the_ordered_tail_before_its_terminal_snapshot() {
     );
     let result = connection
         .close_source(&HelperSourceClose {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: request.helper_source_instance_id,
         })
@@ -498,7 +488,6 @@ fn close_protocol_failure_can_follow_an_operational_source_failure() {
     const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let (channel, request, initial) = process_channel(NONCE);
     let backend_failure = HelperSourceFailure {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: NONCE.to_owned(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: request.source_kind,
@@ -538,7 +527,6 @@ fn close_protocol_failure_can_follow_an_operational_source_failure() {
     ));
     assert!(matches!(
         connection.close_source(&HelperSourceClose {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: request.helper_source_instance_id,
         }),
@@ -579,7 +567,6 @@ fn process_channel(
     };
     let channel = bind_verified_helper_channel(
         &HelperHandshake {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: nonce.to_owned(),
             helper_kind: peer.helper_kind,
             helper_build_id: peer.helper_build_id.clone(),
@@ -640,7 +627,6 @@ fn process_source(nonce: &str) -> (HelperSourceOpen, HelperSourceSnapshot) {
     let source_id = "process-source-0001".to_owned();
     (
         HelperSourceOpen {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: nonce.to_owned(),
             helper_source_instance_id: source_id.clone(),
             source_kind: HelperSourceKind::ProcessApplication,
@@ -652,7 +638,6 @@ fn process_source(nonce: &str) -> (HelperSourceOpen, HelperSourceSnapshot) {
             ],
         },
         HelperSourceSnapshot {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: nonce.to_owned(),
             helper_source_instance_id: source_id,
             source_kind: HelperSourceKind::ProcessApplication,
@@ -673,7 +658,6 @@ fn session_source(nonce: &str) -> (HelperSourceOpen, HelperSourceSnapshot) {
     let source_id = "session-source-0001".to_owned();
     (
         HelperSourceOpen {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: nonce.to_owned(),
             helper_source_instance_id: source_id.clone(),
             source_kind: HelperSourceKind::InteractiveSession,
@@ -682,7 +666,6 @@ fn session_source(nonce: &str) -> (HelperSourceOpen, HelperSourceSnapshot) {
             event_classes: vec![HelperEventClass::InteractiveSessionLifecycle],
         },
         HelperSourceSnapshot {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: nonce.to_owned(),
             helper_source_instance_id: source_id,
             source_kind: HelperSourceKind::InteractiveSession,

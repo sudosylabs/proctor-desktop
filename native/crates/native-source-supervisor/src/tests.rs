@@ -1,4 +1,8 @@
 use super::*;
+use native_protocol::{
+    CANDIDATE_WINDOW_SCHEMA_VERSION, CAPTURE_SESSION_SCHEMA_VERSION,
+    DISPLAY_TOPOLOGY_SCHEMA_VERSION, PROCESS_APPLICATION_SCHEMA_VERSION,
+};
 
 use std::cell::Cell;
 use std::collections::VecDeque;

@@ -229,9 +229,7 @@ mod tests {
     use std::thread;
     use std::time::{Duration, Instant};
 
-    use native_protocol::{
-        CAPTURE_SESSION_SCHEMA_VERSION, ProtocolValidatable, SourceHealth, SourceOpenRequest,
-    };
+    use native_protocol::{ProtocolValidatable, SourceHealth, SourceOpenRequest};
 
     use super::*;
     use crate::CaptureSessionSource;
@@ -239,7 +237,6 @@ mod tests {
     fn request() -> SourceOpenRequest {
         SourceOpenRequest {
             collection_session_id: "windows-wts-conformance".to_owned(),
-            requested_schema_version: CAPTURE_SESSION_SCHEMA_VERSION,
             queue_capacity: 8,
         }
     }

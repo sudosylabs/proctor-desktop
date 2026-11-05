@@ -286,14 +286,10 @@ export const nativeHelperProtocolGenerator: Generator = {
 		const definitions = schema.$defs;
 		if (definitions === undefined)
 			throw new Error(`${NATIVE_HELPER_AUTHORITY} must define $defs`);
-		const schemaVersion = schema.properties?.schema_version?.const;
-		if (typeof schemaVersion !== 'number') {
-			throw new Error(`${NATIVE_HELPER_AUTHORITY} must declare numeric schema_version const`);
-		}
 		const rustOutput = write(
 			outputRoot,
 			NATIVE_HELPER_RUST_OUTPUT,
-			renderHelperRust(definitions, schemaVersion)
+			renderHelperRust(definitions)
 		);
 		execFileSync('rustfmt', ['--edition', '2024', rustOutput]);
 	}
@@ -416,10 +412,7 @@ function renderCapabilityRust(
 	return `${lines.join('\n').trimEnd()}\n`;
 }
 
-function renderHelperRust(
-	definitions: Readonly<Record<string, Definition>>,
-	schemaVersion: number
-): string {
+function renderHelperRust(definitions: Readonly<Record<string, Definition>>): string {
 	const lines = [
 		`// @${'generated'} by native-helper.protocol from ${COMMON_AUTHORITY}, ${PROCESS_APPLICATION_AUTHORITY}, ${INTERACTIVE_SESSION_AUTHORITY}, and ${NATIVE_HELPER_AUTHORITY}.`,
 		'// Do not edit by hand.',
@@ -431,8 +424,6 @@ function renderHelperRust(
 		'    PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationEvent, ProcessApplicationState,',
 		'    ProtocolValidatable, ProtocolValidationError,',
 		'};',
-		'',
-		`pub const NATIVE_HELPER_SCHEMA_VERSION: u16 = ${rustNumber(schemaVersion)};`,
 		''
 	];
 	lines.push(...renderRustDefinitions(definitions));

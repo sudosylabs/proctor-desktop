@@ -5,12 +5,12 @@ use std::sync::{Arc, Mutex};
 
 use native_protocol::{
     HelperFailureCode, HelperSourceFailure, HelperSourceKind, HelperSourceSnapshot,
-    INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveSessionCertainty, InteractiveSessionCoverage,
-    InteractiveSessionDrain, InteractiveSessionObservation, InteractiveSessionSourceSnapshot,
-    MAX_PROTOCOL_SAFE_INTEGER, PROCESS_APPLICATION_SCHEMA_VERSION, PermissionState, PlatformFamily,
-    ProcessApplicationCertainty, ProcessApplicationCoverage, ProcessApplicationDrain,
-    ProcessApplicationObservation, ProcessApplicationSourceSnapshot, ProtocolValidatable,
-    SequenceGap, SourceFailureCode, SourceHealth, SourceReset, SourceTimestamp,
+    InteractiveSessionCertainty, InteractiveSessionCoverage, InteractiveSessionDrain,
+    InteractiveSessionObservation, InteractiveSessionSourceSnapshot, MAX_PROTOCOL_SAFE_INTEGER,
+    PermissionState, PlatformFamily, ProcessApplicationCertainty, ProcessApplicationCoverage,
+    ProcessApplicationDrain, ProcessApplicationObservation, ProcessApplicationSourceSnapshot,
+    ProtocolValidatable, SequenceGap, SourceFailureCode, SourceHealth, SourceReset,
+    SourceTimestamp,
 };
 use native_security_helper::{
     HelperSourceCloseResult, HelperTransportError, NativeHelperConnection, NativeHelperSourceEvent,
@@ -222,7 +222,7 @@ impl ErasedFactory for HelperFactory {
         ensure_native_source_process_usable()
             .map_err(|_| source_start_failure(SourceFailureCode::Cleanup))?;
         parameters
-            .request(schema(self.kind))
+            .request()
             .validate_protocol()
             .map_err(|_| source_start_failure(SourceFailureCode::Protocol))?;
         // Reserve the restart and terminal-loss resets, then split retained
@@ -637,10 +637,11 @@ fn lock_failure<T>(error: &std::sync::TryLockError<T>) -> SourceStartFailure {
     }
 }
 
+#[cfg(test)]
 fn schema(kind: HelperSourceKind) -> u16 {
     match kind {
-        HelperSourceKind::ProcessApplication => PROCESS_APPLICATION_SCHEMA_VERSION,
-        HelperSourceKind::InteractiveSession => INTERACTIVE_SESSION_SCHEMA_VERSION,
+        HelperSourceKind::ProcessApplication => native_protocol::PROCESS_APPLICATION_SCHEMA_VERSION,
+        HelperSourceKind::InteractiveSession => native_protocol::INTERACTIVE_SESSION_SCHEMA_VERSION,
     }
 }
 fn source_failure(code: HelperFailureCode) -> SourceFailureCode {
@@ -809,7 +810,6 @@ mod tests {
             };
             if script.close_loss {
                 events.push(NativeHelperSourceEvent::Failure(HelperSourceFailure {
-                    protocol_version: 1,
                     channel_nonce: "a".repeat(64),
                     helper_source_instance_id: id.to_owned(),
                     source_kind: final_snapshot.source_kind,
@@ -837,7 +837,6 @@ mod tests {
     }
     fn snapshot(kind: HelperSourceKind, id: &str) -> HelperSourceSnapshot {
         HelperSourceSnapshot {
-            protocol_version: 1,
             channel_nonce: "a".repeat(64),
             helper_source_instance_id: id.to_owned(),
             source_kind: kind,
@@ -857,7 +856,6 @@ mod tests {
     }
     fn observation(snapshot: &HelperSourceSnapshot, sequence: u64) -> NativeHelperSourceEvent {
         NativeHelperSourceEvent::Observation(Box::new(HelperObservation {
-            protocol_version: 1,
             channel_nonce: "a".repeat(64),
             helper_source_instance_id: snapshot.helper_source_instance_id.clone(),
             source_kind: snapshot.source_kind,

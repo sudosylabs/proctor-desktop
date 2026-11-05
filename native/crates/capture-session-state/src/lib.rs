@@ -351,7 +351,7 @@ impl<S: CaptureSessionSubscription> CaptureSessionSource<S> {
     where
         B: CaptureSessionBackend<Subscription = S>,
     {
-        request.validate_capture_session()?;
+        request.validate()?;
         ensure_native_source_process_usable()
             .map_err(|error| CaptureSessionError::Cleanup(error.to_string()))?;
         let emitter = CaptureSessionEmitter::new(usize::from(request.queue_capacity))?;
@@ -514,7 +514,6 @@ mod tests {
     fn request(capacity: u16) -> SourceOpenRequest {
         SourceOpenRequest {
             collection_session_id: "capture-session-0001".to_owned(),
-            requested_schema_version: CAPTURE_SESSION_SCHEMA_VERSION,
             queue_capacity: capacity,
         }
     }

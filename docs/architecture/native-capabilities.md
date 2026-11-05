@@ -280,8 +280,8 @@ through the private Node and utility/main contracts.
 A native observation package is a passive fact source. It receives no User or
 Attempt identity, exam content, authorization object, Exam Security Policy,
 accommodation, detector rule, posture, or generic control command. It receives
-only an opaque collection-session identifier, requested schema version,
-selected mechanical categories, and resource bounds.
+only an opaque collection-session identifier, selected mechanical categories,
+and resource bounds.
 
 Opening a source creates one race-free source session. The handshake returns:
 
@@ -483,9 +483,8 @@ subscriptions when collection closes.
 
 Electron main launches one exact packaged security entrypoint without `PATH`
 lookup and transfers a private MessagePort using a single-use bootstrap secret.
-Startup verifies packaged build identity, exact protocol version, expected
-source manifest, participation generation, one-time challenge, and schema
-compatibility. Secrets never travel in command-line arguments or environment
+Startup verifies packaged build identity, the expected source manifest,
+participation generation, and the one-time challenge. Secrets never travel in command-line arguments or environment
 variables. Renderers cannot discover or connect to this port.
 
 Every cross-process protocol is fixed, typed, versioned, bounded, and

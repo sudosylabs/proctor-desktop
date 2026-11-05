@@ -3,9 +3,9 @@ use capture_session_state::{
     CaptureSessionSubscription, OpenedCaptureSessionBackend,
 };
 use native_protocol::{
-    CAPTURE_SESSION_SCHEMA_VERSION, CaptureSessionActivity, CaptureSessionCertainty,
-    CaptureSessionSignal, CaptureSessionState, CaptureSessionSupport, PermissionState,
-    PlatformFamily, SourceFailureCode, SourceHealth, SourceOpenRequest,
+    CaptureSessionActivity, CaptureSessionCertainty, CaptureSessionSignal, CaptureSessionState,
+    CaptureSessionSupport, PermissionState, PlatformFamily, SourceFailureCode, SourceHealth,
+    SourceOpenRequest,
 };
 
 struct BoundaryFailureBackend;
@@ -53,7 +53,6 @@ fn every_subscription_stop_error_fences_future_openings() {
 fn request() -> SourceOpenRequest {
     SourceOpenRequest {
         collection_session_id: "cleanup-fence-integration".to_owned(),
-        requested_schema_version: CAPTURE_SESSION_SCHEMA_VERSION,
         queue_capacity: 8,
     }
 }

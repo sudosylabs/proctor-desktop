@@ -100,7 +100,6 @@ class TestProcessService implements ISecurityUtilityProcessService {
 			},
 			ready: {
 				kind: 'ready',
-				protocol_version: 1,
 				message_sequence: 0,
 				challenge_response: 'test',
 				build_identity: 'test',

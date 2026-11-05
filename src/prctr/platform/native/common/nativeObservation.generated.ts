@@ -387,15 +387,13 @@ export function isSequenceGap(value: unknown): value is SequenceGap {
 
 export interface SourceOpenRequest {
   readonly collection_session_id: string;
-  readonly requested_schema_version: number;
   readonly queue_capacity: number;
 }
 
 export function isSourceOpenRequest(value: unknown): value is SourceOpenRequest {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["collection_session_id", "requested_schema_version", "queue_capacity"])
+    && hasOnlyKeys(value, ["collection_session_id", "queue_capacity"])
     && Object.hasOwn(value, "collection_session_id") && hasCodePointLength(value.collection_session_id, 16, 128)
-    && Object.hasOwn(value, "requested_schema_version") && isBoundedInteger(value.requested_schema_version, 1, 65535)
     && Object.hasOwn(value, "queue_capacity") && isBoundedInteger(value.queue_capacity, 2, 1024)
 }
 
@@ -561,45 +559,39 @@ export function isHelperServiceResponseKind(value: unknown): value is HelperServ
 }
 
 export interface HelperServiceRequest {
-  readonly protocol_version: number;
   readonly channel_nonce: string;
   readonly kind: HelperServiceRequestKind;
 }
 
 export function isHelperServiceRequest(value: unknown): value is HelperServiceRequest {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "kind"])
-    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && hasOnlyKeys(value, ["channel_nonce", "kind"])
     && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
     && Object.hasOwn(value, "kind") && isHelperServiceRequestKind(value.kind)
     && hasValidHelperChannelNonce(value)
 }
 
 export interface HelperServiceResponse {
-  readonly protocol_version: number;
   readonly channel_nonce: string;
   readonly kind: HelperServiceResponseKind;
 }
 
 export function isHelperServiceResponse(value: unknown): value is HelperServiceResponse {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "kind"])
-    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && hasOnlyKeys(value, ["channel_nonce", "kind"])
     && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
     && Object.hasOwn(value, "kind") && isHelperServiceResponseKind(value.kind)
     && hasValidHelperChannelNonce(value)
 }
 
 export interface HelperServiceWorkerBootstrap {
-  readonly protocol_version: number;
   readonly channel_nonce: string;
   readonly client_designated_requirement: string;
 }
 
 export function isHelperServiceWorkerBootstrap(value: unknown): value is HelperServiceWorkerBootstrap {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "client_designated_requirement"])
-    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && hasOnlyKeys(value, ["channel_nonce", "client_designated_requirement"])
     && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
     && Object.hasOwn(value, "client_designated_requirement") && hasCodePointLength(value.client_designated_requirement, 1, 2048)
     && hasValidHelperChannelNonce(value)
@@ -624,7 +616,6 @@ export function isHelperEventClass(value: unknown): value is HelperEventClass {
 }
 
 export interface HelperHandshake {
-  readonly protocol_version: number;
   readonly channel_nonce: string;
   readonly helper_kind: HelperKind;
   readonly helper_build_id: string;
@@ -633,8 +624,7 @@ export interface HelperHandshake {
 
 export function isHelperHandshake(value: unknown): value is HelperHandshake {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "helper_kind", "helper_build_id", "capabilities"])
-    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && hasOnlyKeys(value, ["channel_nonce", "helper_kind", "helper_build_id", "capabilities"])
     && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
     && Object.hasOwn(value, "helper_kind") && isHelperKind(value.helper_kind)
     && Object.hasOwn(value, "helper_build_id") && hasCodePointLength(value.helper_build_id, 16, 64)
@@ -644,7 +634,6 @@ export function isHelperHandshake(value: unknown): value is HelperHandshake {
 }
 
 export interface HelperSourceOpen {
-  readonly protocol_version: number;
   readonly channel_nonce: string;
   readonly helper_source_instance_id: string;
   readonly source_kind: HelperSourceKind;
@@ -655,8 +644,7 @@ export interface HelperSourceOpen {
 
 export function isHelperSourceOpen(value: unknown): value is HelperSourceOpen {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "helper_source_instance_id", "source_kind", "schema_version", "queue_capacity", "event_classes"])
-    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && hasOnlyKeys(value, ["channel_nonce", "helper_source_instance_id", "source_kind", "schema_version", "queue_capacity", "event_classes"])
     && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
     && Object.hasOwn(value, "helper_source_instance_id") && hasCodePointLength(value.helper_source_instance_id, 16, 64)
     && Object.hasOwn(value, "source_kind") && isHelperSourceKind(value.source_kind)
@@ -668,22 +656,19 @@ export function isHelperSourceOpen(value: unknown): value is HelperSourceOpen {
 }
 
 export interface HelperSourceClose {
-  readonly protocol_version: number;
   readonly channel_nonce: string;
   readonly helper_source_instance_id: string;
 }
 
 export function isHelperSourceClose(value: unknown): value is HelperSourceClose {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "helper_source_instance_id"])
-    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && hasOnlyKeys(value, ["channel_nonce", "helper_source_instance_id"])
     && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
     && Object.hasOwn(value, "helper_source_instance_id") && hasCodePointLength(value.helper_source_instance_id, 16, 64)
     && hasValidHelperChannelNonce(value)
 }
 
 export interface HelperSourceSnapshot {
-  readonly protocol_version: number;
   readonly channel_nonce: string;
   readonly helper_source_instance_id: string;
   readonly source_kind: HelperSourceKind;
@@ -696,8 +681,7 @@ export interface HelperSourceSnapshot {
 
 export function isHelperSourceSnapshot(value: unknown): value is HelperSourceSnapshot {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "helper_source_instance_id", "source_kind", "schema_version", "last_sequence", "monotonic_time_ns", "process_state", "interactive_session_state"])
-    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && hasOnlyKeys(value, ["channel_nonce", "helper_source_instance_id", "source_kind", "schema_version", "last_sequence", "monotonic_time_ns", "process_state", "interactive_session_state"])
     && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
     && Object.hasOwn(value, "helper_source_instance_id") && hasCodePointLength(value.helper_source_instance_id, 16, 64)
     && Object.hasOwn(value, "source_kind") && isHelperSourceKind(value.source_kind)
@@ -717,7 +701,6 @@ export function isHelperFailureCode(value: unknown): value is HelperFailureCode 
 }
 
 export interface HelperSourceFailure {
-  readonly protocol_version: number;
   readonly channel_nonce: string;
   readonly helper_source_instance_id: string;
   readonly source_kind: HelperSourceKind;
@@ -729,8 +712,7 @@ export interface HelperSourceFailure {
 
 export function isHelperSourceFailure(value: unknown): value is HelperSourceFailure {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "helper_source_instance_id", "source_kind", "failure_code", "last_sequence", "lost_event_count", "monotonic_time_ns"])
-    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && hasOnlyKeys(value, ["channel_nonce", "helper_source_instance_id", "source_kind", "failure_code", "last_sequence", "lost_event_count", "monotonic_time_ns"])
     && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
     && Object.hasOwn(value, "helper_source_instance_id") && hasCodePointLength(value.helper_source_instance_id, 16, 64)
     && Object.hasOwn(value, "source_kind") && isHelperSourceKind(value.source_kind)
@@ -743,7 +725,6 @@ export function isHelperSourceFailure(value: unknown): value is HelperSourceFail
 }
 
 export interface HelperObservation {
-  readonly protocol_version: number;
   readonly channel_nonce: string;
   readonly helper_source_instance_id: string;
   readonly source_kind: HelperSourceKind;
@@ -755,8 +736,7 @@ export interface HelperObservation {
 
 export function isHelperObservation(value: unknown): value is HelperObservation {
   return isJsonObject(value)
-    && hasOnlyKeys(value, ["protocol_version", "channel_nonce", "helper_source_instance_id", "source_kind", "sequence", "monotonic_time_ns", "process_event", "interactive_session_event"])
-    && Object.hasOwn(value, "protocol_version") && value.protocol_version === 1
+    && hasOnlyKeys(value, ["channel_nonce", "helper_source_instance_id", "source_kind", "sequence", "monotonic_time_ns", "process_event", "interactive_session_event"])
     && Object.hasOwn(value, "channel_nonce") && hasCodePointLength(value.channel_nonce, 64, 64)
     && Object.hasOwn(value, "helper_source_instance_id") && hasCodePointLength(value.helper_source_instance_id, 16, 64)
     && Object.hasOwn(value, "source_kind") && isHelperSourceKind(value.source_kind)

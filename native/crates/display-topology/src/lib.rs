@@ -603,7 +603,6 @@ where
 {
     let request = SourceOpenRequest {
         collection_session_id: "adapter-conformance-session".to_owned(),
-        requested_schema_version: DISPLAY_TOPOLOGY_SCHEMA_VERSION,
         queue_capacity: 16,
     };
     let mut source = DisplayTopologySource::<B::Subscription>::open(&request, backend)
@@ -779,7 +778,6 @@ mod tests {
     fn request() -> SourceOpenRequest {
         SourceOpenRequest {
             collection_session_id: "collection-session-0001".to_owned(),
-            requested_schema_version: DISPLAY_TOPOLOGY_SCHEMA_VERSION,
             queue_capacity: 4,
         }
     }

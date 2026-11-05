@@ -47,9 +47,8 @@ function isPortTransfer(value: unknown): boolean {
 		typeof value === 'object' &&
 		value !== null &&
 		!Array.isArray(value) &&
-		Object.keys(value).length === 2 &&
-		Reflect.get(value, 'kind') === 'security-utility-port' &&
-		Reflect.get(value, 'protocol_version') === 1
+		Object.keys(value).length === 1 &&
+		Reflect.get(value, 'kind') === 'security-utility-port'
 	);
 }
 

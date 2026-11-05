@@ -129,8 +129,8 @@ Electron MessagePorts carry only schema-valid JSON-compatible structured-clone
 values. Node-API bindings expose the same bounded DTO shapes. A separately
 signed helper uses size-prefixed UTF-8 JSON frames on a private inherited
 channel and rejects excessive frames before parsing. Each capability manifest
-declares protocol and schema versions, bounds, compatibility fixtures, target
-tuple, build toolchain, source revision, artifact hash, and signature.
+declares bounds, compatibility fixtures, target tuple, build toolchain, source
+revision, artifact hash, and signature.
 
 Observation Node-API modules belong only to passive sources in the security
 utility process. The separate identity key-custody adapter is the narrow

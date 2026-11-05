@@ -427,7 +427,7 @@ impl<S: ProcessApplicationSubscription> ProcessApplicationSource<S> {
     where
         B: ProcessApplicationBackend<Subscription = S>,
     {
-        request.validate_process_application()?;
+        request.validate()?;
         ensure_native_source_process_usable()
             .map_err(|error| ProcessApplicationError::Cleanup(error.to_string()))?;
         let emitter = ProcessApplicationEmitter::new(usize::from(request.queue_capacity))?;
@@ -706,7 +706,6 @@ mod tests {
     fn request() -> SourceOpenRequest {
         SourceOpenRequest {
             collection_session_id: "process-application-0001".to_owned(),
-            requested_schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
             queue_capacity: 8,
         }
     }

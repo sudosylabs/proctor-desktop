@@ -1,8 +1,8 @@
 use std::time::{Duration, Instant};
 
 use native_helper_protocol::{
-    HELPER_PROTOCOL_VERSION, HelperEventClass, HelperFailureCode, HelperObservation,
-    HelperSourceFailure, HelperSourceKind, HelperSourceOpen, HelperSourceSnapshot,
+    HelperEventClass, HelperFailureCode, HelperObservation, HelperSourceFailure, HelperSourceKind,
+    HelperSourceOpen, HelperSourceSnapshot,
 };
 use native_protocol::{
     MAX_PROTOCOL_SAFE_INTEGER, PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationEvent,
@@ -303,7 +303,6 @@ impl<S: MacOsLifecycleSubscription> MacOsLifecycleHelperSource<S> {
                 .ok_or(native_helper_protocol::HelperProtocolError::Sequence)?;
             events.push(HelperSourceEvent::Observation(Box::new(
                 HelperObservation {
-                    protocol_version: HELPER_PROTOCOL_VERSION,
                     channel_nonce: self.request.channel_nonce.clone(),
                     helper_source_instance_id: self.request.helper_source_instance_id.clone(),
                     source_kind: HelperSourceKind::ProcessApplication,
@@ -402,7 +401,6 @@ fn source_snapshot(
     state: ProcessApplicationState,
 ) -> HelperSourceSnapshot {
     HelperSourceSnapshot {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: request.channel_nonce.clone(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: HelperSourceKind::ProcessApplication,
@@ -441,7 +439,6 @@ fn source_failure(
         MacOsLifecycleFailure::Protocol => (HelperFailureCode::Protocol, None),
     };
     HelperSourceFailure {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: request.channel_nonce.clone(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: HelperSourceKind::ProcessApplication,
@@ -1062,7 +1059,6 @@ mod tests {
 
     fn process_request(event_classes: Vec<HelperEventClass>) -> HelperSourceOpen {
         HelperSourceOpen {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "process-source-0001".to_owned(),
             source_kind: HelperSourceKind::ProcessApplication,

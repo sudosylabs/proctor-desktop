@@ -114,7 +114,6 @@ mod tests {
     fn platform_boundary_reports_truthful_coverage() {
         let request = SourceOpenRequest {
             collection_session_id: "print-spooler-session-0001".to_owned(),
-            requested_schema_version: PRINT_SPOOLER_SCHEMA_VERSION,
             queue_capacity: 8,
         };
         let mut source =

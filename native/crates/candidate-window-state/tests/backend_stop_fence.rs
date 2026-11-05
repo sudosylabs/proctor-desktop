@@ -3,8 +3,8 @@ use candidate_window_state::{
     CandidateWindowSubscription, OpenedCandidateWindowBackend,
 };
 use native_protocol::{
-    CANDIDATE_WINDOW_SCHEMA_VERSION, CandidateWindowBounds, CandidateWindowCertainty,
-    CandidateWindowFocus, CandidateWindowPlacement, CandidateWindowPresence, CandidateWindowState,
+    CandidateWindowBounds, CandidateWindowCertainty, CandidateWindowFocus,
+    CandidateWindowPlacement, CandidateWindowPresence, CandidateWindowState,
     CandidateWindowVisibility, PermissionState, PlatformFamily, SourceFailureCode, SourceHealth,
     SourceOpenRequest,
 };
@@ -52,7 +52,6 @@ fn backend_category_stop_error_fences_future_candidate_openings() {
 fn request() -> SourceOpenRequest {
     SourceOpenRequest {
         collection_session_id: "candidate-backend-stop-fence".to_owned(),
-        requested_schema_version: CANDIDATE_WINDOW_SCHEMA_VERSION,
         queue_capacity: 8,
     }
 }

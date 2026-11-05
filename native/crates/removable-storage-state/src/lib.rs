@@ -151,7 +151,6 @@ mod tests {
     fn platform_boundary_reports_truthful_coverage() {
         let request = SourceOpenRequest {
             collection_session_id: "removable-storage-session-0001".to_owned(),
-            requested_schema_version: REMOVABLE_STORAGE_SCHEMA_VERSION,
             queue_capacity: 8,
         };
         let mut source = RemovableStorageSource::<RemovableStorageWire, _>::open(
@@ -192,7 +191,6 @@ mod tests {
     fn portable_only_selection_never_collects_block_storage() {
         let request = SourceOpenRequest {
             collection_session_id: "portable-storage-session-0001".to_owned(),
-            requested_schema_version: REMOVABLE_STORAGE_SCHEMA_VERSION,
             queue_capacity: 8,
         };
         let selection = RemovableStorageSelection::new(false, true).expect("portable selection");

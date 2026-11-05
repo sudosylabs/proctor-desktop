@@ -24,17 +24,15 @@ use display_topology::{
 use interactive_session_state::InteractiveSessionWire;
 use media_device_state::MediaDeviceWire;
 use native_protocol::{
-    CANDIDATE_WINDOW_SCHEMA_VERSION, CAPTURE_SESSION_SCHEMA_VERSION, CandidateWindowDrain,
-    CandidateWindowSourceSnapshot, CaptureSessionDrain, CaptureSessionSourceSnapshot,
-    ClipboardDrain, ClipboardSourceSnapshot, DISPLAY_TOPOLOGY_SCHEMA_VERSION, DisplayTopologyDrain,
+    CandidateWindowDrain, CandidateWindowSourceSnapshot, CaptureSessionDrain,
+    CaptureSessionSourceSnapshot, ClipboardDrain, ClipboardSourceSnapshot, DisplayTopologyDrain,
     DisplayTopologySourceSnapshot, InteractiveSessionDrain, InteractiveSessionSourceSnapshot,
     MediaDeviceDrain, MediaDeviceSourceSnapshot, NATIVE_SOURCE_COUNT,
     NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS, NetworkConfigurationDrain,
-    NetworkConfigurationSourceSnapshot, PROCESS_APPLICATION_SCHEMA_VERSION, PermissionState,
-    PrintSpoolerDrain, PrintSpoolerSourceSnapshot, ProcessApplicationDrain,
-    ProcessApplicationSourceSnapshot, ProtocolValidatable, RemovableStorageDrain,
-    RemovableStorageSourceSnapshot, SourceFailureCode, SourceHealth, SourceOpenRequest,
-    VirtualizationDrain, VirtualizationSourceSnapshot,
+    NetworkConfigurationSourceSnapshot, PermissionState, PrintSpoolerDrain,
+    PrintSpoolerSourceSnapshot, ProcessApplicationDrain, ProcessApplicationSourceSnapshot,
+    ProtocolValidatable, RemovableStorageDrain, RemovableStorageSourceSnapshot, SourceFailureCode,
+    SourceHealth, SourceOpenRequest, VirtualizationDrain, VirtualizationSourceSnapshot,
 };
 use native_source_runtime::{
     BoundedTaskError, PassiveStateBackend, PassiveStateSource, PassiveStateSourceError,
@@ -375,7 +373,6 @@ impl SupervisorConfig {
     ) -> Result<Self, SupervisorConfigError> {
         SourceOpenRequest {
             collection_session_id: collection_session_id.clone(),
-            requested_schema_version: DISPLAY_TOPOLOGY_SCHEMA_VERSION,
             queue_capacity,
         }
         .validate_protocol()
@@ -980,10 +977,9 @@ impl From<&SupervisorConfig> for SourceParameters {
 }
 
 impl SourceParameters {
-    fn request(&self, requested_schema_version: u16) -> SourceOpenRequest {
+    fn request(&self) -> SourceOpenRequest {
         SourceOpenRequest {
             collection_session_id: self.collection_session_id.clone(),
-            requested_schema_version,
             queue_capacity: self.queue_capacity,
         }
     }
@@ -1044,7 +1040,7 @@ where
     ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
         let backend =
             (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
-        let request = parameters.request(DISPLAY_TOPOLOGY_SCHEMA_VERSION);
+        let request = parameters.request();
         let source = match restart {
             Some(boundary) => DisplayTopologySource::open_after_reset(
                 &request,
@@ -1072,7 +1068,7 @@ where
     ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
         let backend =
             (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
-        let request = parameters.request(CANDIDATE_WINDOW_SCHEMA_VERSION);
+        let request = parameters.request();
         let source = match restart {
             Some(boundary) => CandidateWindowSource::open_after_reset(
                 &request,
@@ -1100,7 +1096,7 @@ where
     ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
         let backend =
             (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
-        let request = parameters.request(CAPTURE_SESSION_SCHEMA_VERSION);
+        let request = parameters.request();
         let source = match restart {
             Some(boundary) => CaptureSessionSource::open_after_reset(
                 &request,
@@ -1128,7 +1124,7 @@ where
     ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
         let backend =
             (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
-        let request = parameters.request(PROCESS_APPLICATION_SCHEMA_VERSION);
+        let request = parameters.request();
         let source = match restart {
             Some(boundary) => ProcessApplicationSource::open_after_reset(
                 &request,
@@ -1157,7 +1153,7 @@ where
     ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
         let backend =
             (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
-        let request = parameters.request(W::SCHEMA_VERSION);
+        let request = parameters.request();
         let source = match restart {
             Some(boundary) => PassiveStateSource::<W, B::Subscription>::open_after_reset(
                 &request,

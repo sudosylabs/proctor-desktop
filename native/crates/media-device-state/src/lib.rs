@@ -207,7 +207,6 @@ mod tests {
     fn platform_boundary_reports_a_coherent_bounded_snapshot() {
         let request = SourceOpenRequest {
             collection_session_id: "media-device-session-0001".to_owned(),
-            requested_schema_version: MEDIA_DEVICE_SCHEMA_VERSION,
             queue_capacity: 8,
         };
         let mut source = MediaDeviceSource::<MediaDeviceWire, _>::open(

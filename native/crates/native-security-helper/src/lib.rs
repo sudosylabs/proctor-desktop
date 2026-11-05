@@ -268,7 +268,6 @@ impl NativeHelperConnection {
             ),
         };
         let request = HelperSourceOpen {
-            protocol_version: native_helper_protocol::HELPER_PROTOCOL_VERSION,
             channel_nonce: self.channel.channel_nonce().to_owned(),
             helper_source_instance_id: instance_id,
             source_kind: kind,
@@ -292,7 +291,6 @@ impl NativeHelperConnection {
             return Err(HelperProtocolError::Lifecycle.into());
         }
         Ok(HelperSourceClose {
-            protocol_version: native_helper_protocol::HELPER_PROTOCOL_VERSION,
             channel_nonce: self.channel.channel_nonce().to_owned(),
             helper_source_instance_id: instance_id.to_owned(),
         })

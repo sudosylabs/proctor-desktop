@@ -303,7 +303,6 @@ void test('main client honors a smaller remaining startup budget', async () => {
 void test('private bootstrap validator rejects unknown fields and manifest drift', () => {
 	const bootstrap = {
 		kind: 'bootstrap',
-		protocol_version: 1,
 		challenge: 'a'.repeat(43),
 		build_identity: 'proctor-build-identity-0001',
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
@@ -388,7 +387,6 @@ void test('private bootstrap validator rejects unknown fields and manifest drift
 
 void test('native bridge admission compares the generated per-source schema manifest', () => {
 	const manifest = {
-		bridge_version: 1,
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 	};
 	assert.equal(isNativeBridgeManifest(manifest), true);
@@ -432,7 +430,6 @@ void test('main rejects a ready echo with a different valid source selection', a
 			return;
 		utilityPort.postMessage({
 			kind: 'ready',
-			protocol_version: 1,
 			message_sequence: 0,
 			challenge_response: 'a'.repeat(43),
 			build_identity: 'proctor-build-identity-0001',
@@ -484,7 +481,6 @@ void test('main rejects later utility output from a source outside the sealed su
 			return;
 		utilityPort.postMessage({
 			kind: 'ready',
-			protocol_version: 1,
 			message_sequence: 0,
 			challenge_response: 'a'.repeat(43),
 			build_identity: 'proctor-build-identity-0001',
@@ -514,7 +510,6 @@ void test('main rejects later utility output from a source outside the sealed su
 
 	utilityPort.postMessage({
 		kind: 'native_poll',
-		protocol_version: 1,
 		message_sequence: 1,
 		participation_generation: 'participation-generation-0001',
 		delivered_at_wall_time_unix_ms: 2,
@@ -535,7 +530,6 @@ void test('main and utility complete the authenticated lifecycle over a private 
 	const acceptedEvents: unknown[] = [];
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -600,7 +594,6 @@ void test('candidate ingress stays bounded and reports the exact sender-side los
 	const lostCounts: number[] = [];
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -666,7 +659,6 @@ void test('shutdown compacts the maximum pending ingress into one exact loss mar
 	let eventCalls = 0;
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -729,7 +721,6 @@ void test('native ingress drops remain ordered so a later event can expose the e
 	let calls = 0;
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -791,7 +782,6 @@ void test('supervisor polls do not conceal a missing utility heartbeat', async (
 			return;
 		utilityPort.postMessage({
 			kind: 'ready',
-			protocol_version: 1,
 			message_sequence: 0,
 			challenge_response: 'a'.repeat(43),
 			build_identity: 'proctor-build-identity-0001',
@@ -822,7 +812,6 @@ void test('supervisor polls do not conceal a missing utility heartbeat', async (
 	const pollTimer = setInterval(() => {
 		utilityPort.postMessage({
 			kind: 'native_poll',
-			protocol_version: 1,
 			message_sequence: nextSequence,
 			participation_generation: 'participation-generation-0001',
 			delivered_at_wall_time_unix_ms: 1,
@@ -848,7 +837,6 @@ void test('utility fails closed when the main side does not acknowledge bounded 
 	let healthy = false;
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -895,7 +883,6 @@ void test('main fails closed when a supervisor poll cannot be delivered', async 
 	const [mainPort, utilityPort] = memoryPortPair();
 	const driver: NativeBaselineDriver = {
 		manifest: () => ({
-			bridge_version: 1,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 		}),
 		openBaseline: () => ({ snapshots }),
@@ -1008,7 +995,6 @@ function eventLoopTurn(): Promise<void> {
 function validBootstrap(): unknown {
 	return {
 		kind: 'bootstrap',
-		protocol_version: 1,
 		challenge: 'a'.repeat(43),
 		build_identity: 'proctor-build-identity-0001',
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,

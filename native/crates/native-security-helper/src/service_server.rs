@@ -92,7 +92,6 @@ fn serve_connection(
         &configuration.worker,
         observation,
         &HelperServiceWorkerBootstrap {
-            protocol_version: 1,
             channel_nonce: open.channel_nonce.clone(),
             client_designated_requirement: configuration.client_designated_requirement.clone(),
         },
@@ -207,7 +206,6 @@ fn write_response(
     write_control(
         stream,
         &HelperServiceResponse {
-            protocol_version: 1,
             channel_nonce: nonce.to_owned(),
             kind,
         },
@@ -435,7 +433,6 @@ mod tests {
 
     fn request(kind: HelperServiceRequestKind) -> HelperServiceRequest {
         HelperServiceRequest {
-            protocol_version: 1,
             channel_nonce: NONCE.to_owned(),
             kind,
         }

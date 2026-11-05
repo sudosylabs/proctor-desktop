@@ -280,7 +280,6 @@ fn send_control(
     deadline: Instant,
 ) -> Result<(), HelperTransportError> {
     let request = HelperServiceRequest {
-        protocol_version: 1,
         channel_nonce: nonce.to_owned(),
         kind,
     };
@@ -502,7 +501,6 @@ mod tests {
                 write_json_frame(
                     &mut peer,
                     &HelperServiceResponse {
-                        protocol_version: 1,
                         channel_nonce: if reply_case == "wrong_nonce" {
                             "a".repeat(64)
                         } else {

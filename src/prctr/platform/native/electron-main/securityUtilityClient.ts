@@ -1,7 +1,6 @@
 import {
 	SECURITY_UTILITY_HEARTBEAT_TIMEOUT_MS,
 	SECURITY_UTILITY_MAX_LOST_EVENT_COUNT,
-	SECURITY_UTILITY_PROTOCOL_VERSION,
 	SECURITY_UTILITY_SHUTDOWN_TIMEOUT_MS,
 	SECURITY_UTILITY_SOURCE_MANIFEST,
 	SECURITY_UTILITY_STARTUP_TIMEOUT_MS,
@@ -82,7 +81,6 @@ export class SecurityUtilityClient {
 		this.#port = options.port;
 		this.#bootstrap = {
 			kind: 'bootstrap',
-			protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 			challenge: options.challenge,
 			build_identity: options.buildIdentity,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST,
@@ -328,14 +326,12 @@ export class SecurityUtilityClient {
 				pending.kind === 'event'
 					? {
 							kind: 'candidate_window_event',
-							protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 							participation_generation: this.#bootstrap.participation_generation,
 							message_sequence: inputSequence,
 							event: pending.event
 						}
 					: {
 							kind: 'candidate_window_events_lost',
-							protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 							participation_generation: this.#bootstrap.participation_generation,
 							message_sequence: inputSequence,
 							lost_count: pending.lostCount
@@ -356,7 +352,6 @@ export class SecurityUtilityClient {
 		this.#heartbeatTimer = undefined;
 		this.#post({
 			kind: 'shutdown',
-			protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 			participation_generation: this.#bootstrap.participation_generation,
 			message_sequence: this.#takeOutgoingSequence(),
 			final_candidate_window: finalCandidateWindow
@@ -385,7 +380,6 @@ export class SecurityUtilityClient {
 	#acknowledge(sequence: number): void {
 		this.#post({
 			kind: 'acknowledge',
-			protocol_version: SECURITY_UTILITY_PROTOCOL_VERSION,
 			participation_generation: this.#bootstrap.participation_generation,
 			message_sequence: this.#takeOutgoingSequence(),
 			acknowledged_sequence: sequence

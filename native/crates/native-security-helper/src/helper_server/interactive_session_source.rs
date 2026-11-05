@@ -3,8 +3,8 @@
 use std::time::{Duration, Instant};
 
 use native_helper_protocol::{
-    HELPER_PROTOCOL_VERSION, HelperFailureCode, HelperObservation, HelperSourceFailure,
-    HelperSourceKind, HelperSourceOpen, HelperSourceSnapshot,
+    HelperFailureCode, HelperObservation, HelperSourceFailure, HelperSourceKind, HelperSourceOpen,
+    HelperSourceSnapshot,
 };
 use native_protocol::{
     INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveSessionEvent, InteractiveSessionEventKind,
@@ -274,7 +274,6 @@ impl<S: SessionSource> SessionHelperSource<S> {
             self.sequence += 1;
             events.push(HelperSourceEvent::Observation(Box::new(
                 HelperObservation {
-                    protocol_version: HELPER_PROTOCOL_VERSION,
                     channel_nonce: self.request.channel_nonce.clone(),
                     helper_source_instance_id: self.request.helper_source_instance_id.clone(),
                     source_kind: HelperSourceKind::InteractiveSession,
@@ -342,7 +341,6 @@ fn snapshot(
     state: InteractiveSessionState,
 ) -> HelperSourceSnapshot {
     HelperSourceSnapshot {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: request.channel_nonce.clone(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: HelperSourceKind::InteractiveSession,
@@ -360,7 +358,6 @@ fn failure(
     code: HelperFailureCode,
 ) -> HelperSourceFailure {
     HelperSourceFailure {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: request.channel_nonce.clone(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: HelperSourceKind::InteractiveSession,
@@ -410,7 +407,6 @@ mod tests {
     }
     fn request() -> HelperSourceOpen {
         HelperSourceOpen {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
                 .to_owned(),
             helper_source_instance_id: "session-source-0001".to_owned(),

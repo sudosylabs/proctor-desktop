@@ -408,7 +408,7 @@ impl<S: CandidateWindowSubscription> CandidateWindowSource<S> {
     where
         B: CandidateWindowBackend<Subscription = S>,
     {
-        request.validate_candidate_window()?;
+        request.validate()?;
         ensure_native_source_process_usable()
             .map_err(|error| CandidateWindowError::Cleanup(error.to_string()))?;
         let emitter = CandidateWindowEmitter::new(usize::from(request.queue_capacity))?;
@@ -583,7 +583,6 @@ mod tests {
     fn request(queue_capacity: u16) -> SourceOpenRequest {
         SourceOpenRequest {
             collection_session_id: "candidate-window-session-0001".to_owned(),
-            requested_schema_version: CANDIDATE_WINDOW_SCHEMA_VERSION,
             queue_capacity,
         }
     }

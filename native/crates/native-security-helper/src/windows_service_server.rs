@@ -6,8 +6,7 @@ use std::sync::Arc;
 use crate::helper_server::{HelperServer, PlatformHelperSourceFactory};
 use interactive_session_state::{WindowsCandidateSession, WindowsWtsServiceDispatcher};
 use native_helper_protocol::{
-    HELPER_PROTOCOL_VERSION, HelperFailureCode, HelperHandshake, HelperKind, HelperProtocolError,
-    HelperServerMessage,
+    HelperFailureCode, HelperHandshake, HelperKind, HelperProtocolError, HelperServerMessage,
 };
 use native_security_helper::{
     HELPER_BUILD_ID, HelperTransportError, WindowsConfiguredService, WindowsLaunchManifest,
@@ -60,7 +59,6 @@ fn serve(
     channel: &WindowsSourceChannel,
 ) -> Result<(), HelperTransportError> {
     channel.handshake(&HelperHandshake {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: channel.channel_nonce().to_owned(),
         helper_kind: HelperKind::WindowsSecurityService,
         helper_build_id: HELPER_BUILD_ID.to_owned(),

@@ -88,8 +88,7 @@ buffer transitions produced while the snapshot is built.
 Use per-source monotonic sequence/time, bounded payloads, explicit gaps and
 resets, and idempotent disposal. Let the privileged delivery layer add wall-
 clock context. Give the source only an opaque collection-session identifier,
-requested schema, selected mechanical categories, adapter variant, and resource
-limits. Let the coordinator attach trusted Session, Attempt, participation, and
+selected mechanical categories, adapter variant, and resource limits. Let the coordinator attach trusted Session, Attempt, participation, and
 policy provenance.
 
 Treat notifications as reconciliation wakeups. Require a complete snapshot after
@@ -173,9 +172,10 @@ it must not report granted while a selected endpoint is denied, restricted,
 undetermined, or unavailable.
 
 Launch exact packaged entrypoints and connect them through fixed, typed,
-versioned, bounded private protocols. Verify build and source manifests,
-protocol/schema compatibility, peer code identity, OS access control,
-participation generation, and a broker-generated single-use nonce. Bind peer
+bounded private protocols that carry exactly one current shape, with no
+version fields or negotiation. Verify build and source manifests, peer code
+identity, OS access control, participation generation, and a broker-generated
+single-use nonce. Bind peer
 identity to the live process or to a verified non-replaceable executable handle
 retained across spawn; a second path lookup is not a post-spawn identity proof.
 Use one absolute launch deadline across executable verification, spawn, live-

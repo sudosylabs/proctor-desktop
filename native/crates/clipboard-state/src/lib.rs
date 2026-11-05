@@ -152,7 +152,6 @@ mod tests {
     fn platform_boundary_reports_truthful_coverage() {
         let request = SourceOpenRequest {
             collection_session_id: "clipboard-session-0001".to_owned(),
-            requested_schema_version: CLIPBOARD_SCHEMA_VERSION,
             queue_capacity: 8,
         };
         let mut source =
@@ -190,7 +189,6 @@ mod tests {
     fn callback_registered_before_snapshot_is_delivered_after_sequence_zero() {
         let request = SourceOpenRequest {
             collection_session_id: "clipboard-session-0002".to_owned(),
-            requested_schema_version: CLIPBOARD_SCHEMA_VERSION,
             queue_capacity: 8,
         };
         let mut source =

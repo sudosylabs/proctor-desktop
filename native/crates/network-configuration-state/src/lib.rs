@@ -182,7 +182,6 @@ mod tests {
     fn platform_boundary_reports_a_coherent_bounded_snapshot() {
         let request = SourceOpenRequest {
             collection_session_id: "network-config-session-0001".to_owned(),
-            requested_schema_version: NETWORK_CONFIGURATION_SCHEMA_VERSION,
             queue_capacity: 8,
         };
         let mut source = NetworkConfigurationSource::<NetworkConfigurationWire, _>::open(

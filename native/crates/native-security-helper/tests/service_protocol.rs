@@ -11,9 +11,6 @@ fn accepts<T: DeserializeOwned + ProtocolValidatable>(value: Value) -> bool {
 fn assert_closed_envelope<T: DeserializeOwned + ProtocolValidatable>(valid: &Value) {
     assert!(accepts::<T>(valid.clone()));
     for (field, replacement) in [
-        ("protocol_version", json!(0)),
-        ("protocol_version", json!(2)),
-        ("protocol_version", json!(1.5)),
         ("channel_nonce", json!("A".repeat(64))),
         ("channel_nonce", json!("g".repeat(64))),
         ("channel_nonce", json!("a".repeat(63))),
@@ -41,19 +38,17 @@ fn assert_closed_envelope<T: DeserializeOwned + ProtocolValidatable>(valid: &Val
 #[test]
 fn lifecycle_controls_accept_only_their_own_closed_kinds() {
     for kind in ["open", "attach", "stop"] {
-        let request =
-            json!({"protocol_version": 1, "channel_nonce": "a0".repeat(32), "kind": kind});
+        let request = json!({"channel_nonce": "a0".repeat(32), "kind": kind});
         assert_closed_envelope::<HelperServiceRequest>(&request);
         assert!(!accepts::<HelperServiceResponse>(request));
     }
     for kind in ["ready", "started", "stopped"] {
-        let response =
-            json!({"protocol_version": 1, "channel_nonce": "a0".repeat(32), "kind": kind});
+        let response = json!({"channel_nonce": "a0".repeat(32), "kind": kind});
         assert_closed_envelope::<HelperServiceResponse>(&response);
         assert!(!accepts::<HelperServiceRequest>(response));
     }
     for kind in [json!("launch"), Value::Null, json!(42)] {
-        let value = json!({"protocol_version": 1, "channel_nonce": "a0".repeat(32), "kind": kind});
+        let value = json!({"channel_nonce": "a0".repeat(32), "kind": kind});
         assert!(!accepts::<HelperServiceRequest>(value.clone()));
         assert!(!accepts::<HelperServiceResponse>(value));
     }
@@ -62,7 +57,6 @@ fn lifecycle_controls_accept_only_their_own_closed_kinds() {
 #[test]
 fn worker_bootstrap_enforces_requirement_character_bounds_and_closed_fields() {
     let valid = json!({
-        "protocol_version": 1,
         "channel_nonce": "0a".repeat(32),
         "client_designated_requirement": "anchor apple generic"
     });

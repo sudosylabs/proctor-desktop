@@ -5,12 +5,11 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use native_helper_protocol::{
-    HELPER_PROTOCOL_VERSION, HelperClientMessage, HelperClientMessageKind, HelperFailureCode,
-    HelperHandshake, HelperKind, HelperObservation, HelperProtocolError, HelperServerMessage,
-    HelperServerMessageKind, HelperSourceFailure, HelperSourceKind, HelperSourceOpen,
-    HelperSourceSnapshot, validate_helper_frame_size, validate_helper_observation,
-    validate_helper_source_close, validate_helper_source_failure, validate_helper_source_open,
-    validate_helper_source_snapshot,
+    HelperClientMessage, HelperClientMessageKind, HelperFailureCode, HelperHandshake, HelperKind,
+    HelperObservation, HelperProtocolError, HelperServerMessage, HelperServerMessageKind,
+    HelperSourceFailure, HelperSourceKind, HelperSourceOpen, HelperSourceSnapshot,
+    validate_helper_frame_size, validate_helper_observation, validate_helper_source_close,
+    validate_helper_source_failure, validate_helper_source_open, validate_helper_source_snapshot,
 };
 use native_protocol::{
     InteractiveConsoleOwnership, InteractiveLockState, InteractiveRemoteAttachment,
@@ -377,7 +376,6 @@ impl<F: HelperSourceFactory> HelperServer<F> {
         let mut failure = None;
         for id in ids {
             let request = native_helper_protocol::HelperSourceClose {
-                protocol_version: HELPER_PROTOCOL_VERSION,
                 channel_nonce: self.nonce.clone(),
                 helper_source_instance_id: id.clone(),
             };
@@ -461,7 +459,6 @@ fn initial_failure_response(
     monotonic_time_ns: u64,
 ) -> Result<Vec<HelperServerMessage>, HelperTransportError> {
     let message = failure_message(HelperSourceFailure {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: request.channel_nonce.clone(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: request.source_kind,
@@ -617,7 +614,6 @@ fn append_terminal_failure(
     messages: &mut Vec<HelperServerMessage>,
 ) -> Result<(), HelperTransportError> {
     let failure = HelperSourceFailure {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: active.request.channel_nonce.clone(),
         helper_source_instance_id: active.request.helper_source_instance_id.clone(),
         source_kind: active.request.source_kind,
@@ -682,7 +678,6 @@ where
     let mut input = input;
     let mut server = HelperServer::new(nonce.clone(), factory);
     let handshake = HelperHandshake {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: nonce,
         helper_kind: kind,
         helper_build_id: HELPER_BUILD_ID.to_owned(),
@@ -921,7 +916,6 @@ fn unavailable_snapshot(
     monotonic_time_ns: u64,
 ) -> HelperSourceSnapshot {
     HelperSourceSnapshot {
-        protocol_version: HELPER_PROTOCOL_VERSION,
         channel_nonce: request.channel_nonce.clone(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: request.source_kind,
@@ -1066,7 +1060,6 @@ mod tests {
     #[test]
     fn factory_failure_is_a_typed_sequence_zero_message_without_active_state() {
         let failure = HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "process-source-0001".to_owned(),
             source_kind: HelperSourceKind::ProcessApplication,
@@ -1098,7 +1091,6 @@ mod tests {
             NONCE.to_owned(),
             FailingFactory {
                 failure: HelperSourceFailure {
-                    protocol_version: 0,
                     channel_nonce: "malformed".to_owned(),
                     helper_source_instance_id: "wrong-source-id-0001".to_owned(),
                     source_kind: HelperSourceKind::InteractiveSession,
@@ -1118,7 +1110,6 @@ mod tests {
             [HelperServerMessage {
                 kind: HelperServerMessageKind::Failure,
                 failure: Some(HelperSourceFailure {
-                    protocol_version: HELPER_PROTOCOL_VERSION,
                     channel_nonce,
                     helper_source_instance_id,
                     source_kind: HelperSourceKind::ProcessApplication,
@@ -1142,7 +1133,6 @@ mod tests {
             .process_state
             .expect("process state");
         let observation = HelperObservation {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: HelperSourceKind::ProcessApplication,
@@ -1180,7 +1170,6 @@ mod tests {
         let request = process_request();
         let drain_count = Arc::new(AtomicUsize::new(0));
         let failure = HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: HelperSourceKind::ProcessApplication,
@@ -1273,7 +1262,6 @@ mod tests {
             process_observation(&request, 1, 2),
             process_observation(&request, 2, 3),
             HelperSourceEvent::Failure(HelperSourceFailure {
-                protocol_version: HELPER_PROTOCOL_VERSION,
                 channel_nonce: NONCE.to_owned(),
                 helper_source_instance_id: request.helper_source_instance_id.clone(),
                 source_kind: request.source_kind,
@@ -1330,7 +1318,6 @@ mod tests {
     fn oversized_fatal_drain_batch_is_rejected_before_failure_inspection() {
         let request = process_request_with_capacity(2);
         let cleanup = HelperSourceEvent::Failure(HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -1367,7 +1354,6 @@ mod tests {
     fn oversized_fatal_close_batch_is_rejected_before_failure_inspection() {
         let request = process_request_with_capacity(2);
         let cleanup = HelperSourceEvent::Failure(HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -1404,7 +1390,6 @@ mod tests {
     fn oversized_fatal_rollback_batch_is_protocol_not_cleanup() {
         let request = process_request_with_capacity(2);
         let cleanup = HelperSourceEvent::Failure(HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -1432,7 +1417,6 @@ mod tests {
     fn oversized_live_observation_becomes_one_failure_and_frame_safe_close() {
         let request = process_request_with_capacity(2);
         let event = HelperSourceEvent::Observation(Box::new(HelperObservation {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -1545,7 +1529,6 @@ mod tests {
         let request = process_request_with_capacity(2);
         let oversized = oversized_process_observation(&request, 1, 2);
         let cleanup = HelperSourceEvent::Failure(HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -1584,7 +1567,6 @@ mod tests {
     fn fatal_failure_outranks_an_out_of_order_observation() {
         let request = process_request_with_capacity(2);
         let cleanup = HelperSourceEvent::Failure(HelperSourceFailure {
-            protocol_version: 0,
             channel_nonce: "malformed".to_owned(),
             helper_source_instance_id: "wrong-source-id-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
@@ -1623,7 +1605,6 @@ mod tests {
     fn cleanup_failure_during_wire_overflow_close_remains_fatal() {
         let request = process_request_with_capacity(2);
         let cleanup = HelperSourceEvent::Failure(HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -1697,7 +1678,6 @@ mod tests {
     fn protocol_failure_during_close_is_typed_after_an_earlier_source_failure() {
         let request = process_request();
         let backend = HelperSourceEvent::Failure(HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -1707,7 +1687,6 @@ mod tests {
             monotonic_time_ns: 2,
         });
         let protocol = HelperSourceEvent::Failure(HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -1807,7 +1786,6 @@ mod tests {
             if self.stage == DelayedFailureStage::Open {
                 thread::sleep(DELAYED_SOURCE_OPERATION);
                 return Ok(HelperSourceOpenOutcome::Failed(HelperSourceFailure {
-                    protocol_version: HELPER_PROTOCOL_VERSION,
                     channel_nonce: request.channel_nonce.clone(),
                     helper_source_instance_id: request.helper_source_instance_id.clone(),
                     source_kind: request.source_kind,
@@ -1847,7 +1825,6 @@ mod tests {
             }
             thread::sleep(DELAYED_SOURCE_OPERATION);
             Ok(vec![HelperSourceEvent::Failure(HelperSourceFailure {
-                protocol_version: HELPER_PROTOCOL_VERSION,
                 channel_nonce: self.request.channel_nonce.clone(),
                 helper_source_instance_id: self.request.helper_source_instance_id.clone(),
                 source_kind: self.request.source_kind,
@@ -2095,7 +2072,6 @@ mod tests {
             Ok(HelperSourceCloseOutput {
                 events: Vec::new(),
                 final_snapshot: HelperSourceSnapshot {
-                    protocol_version: HELPER_PROTOCOL_VERSION,
                     channel_nonce: self.request.channel_nonce.clone(),
                     helper_source_instance_id: self.request.helper_source_instance_id.clone(),
                     source_kind: self.request.source_kind,
@@ -2120,7 +2096,6 @@ mod tests {
             monotonic_time_ns: u64,
         ) -> Result<HelperSourceOpenOutcome, HelperTransportError> {
             let snapshot = HelperSourceSnapshot {
-                protocol_version: HELPER_PROTOCOL_VERSION,
                 channel_nonce: request.channel_nonce.clone(),
                 helper_source_instance_id: request.helper_source_instance_id.clone(),
                 source_kind: request.source_kind,
@@ -2225,7 +2200,6 @@ mod tests {
         ) -> Result<HelperSourceCloseOutput, HelperTransportError> {
             Ok(HelperSourceCloseOutput {
                 events: vec![HelperSourceEvent::Failure(HelperSourceFailure {
-                    protocol_version: HELPER_PROTOCOL_VERSION,
                     channel_nonce: self.request.channel_nonce.clone(),
                     helper_source_instance_id: self.request.helper_source_instance_id.clone(),
                     source_kind: self.request.source_kind,
@@ -2439,7 +2413,6 @@ mod tests {
             Ok(HelperSourceCloseOutput {
                 events: self.drain()?,
                 final_snapshot: HelperSourceSnapshot {
-                    protocol_version: HELPER_PROTOCOL_VERSION,
                     channel_nonce: self.request.channel_nonce.clone(),
                     helper_source_instance_id: self.request.helper_source_instance_id.clone(),
                     source_kind: self.request.source_kind,
@@ -2476,7 +2449,6 @@ mod tests {
 
     fn process_request_with_capacity(queue_capacity: u16) -> HelperSourceOpen {
         HelperSourceOpen {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "process-source-0001".to_owned(),
             source_kind: HelperSourceKind::ProcessApplication,
@@ -2495,7 +2467,6 @@ mod tests {
         monotonic_time_ns: u64,
     ) -> HelperSourceEvent {
         HelperSourceEvent::Observation(Box::new(HelperObservation {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -2518,7 +2489,6 @@ mod tests {
         monotonic_time_ns: u64,
     ) -> HelperSourceEvent {
         HelperSourceEvent::Observation(Box::new(HelperObservation {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: request.channel_nonce.clone(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
@@ -2575,7 +2545,6 @@ mod tests {
             kind: HelperClientMessageKind::Close,
             open: None,
             close: Some(HelperSourceClose {
-                protocol_version: HELPER_PROTOCOL_VERSION,
                 channel_nonce: request.channel_nonce.clone(),
                 helper_source_instance_id: request.helper_source_instance_id.clone(),
             }),

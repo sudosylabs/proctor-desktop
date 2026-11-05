@@ -2,15 +2,14 @@
 
 use std::fmt;
 
+use native_protocol::ProtocolValidatable;
 pub use native_protocol::{
     HelperClientMessage, HelperClientMessageKind, HelperEventClass, HelperFailureCode,
     HelperHandshake, HelperKind, HelperObservation, HelperServerMessage, HelperServerMessageKind,
     HelperSourceClose, HelperSourceFailure, HelperSourceKind, HelperSourceOpen,
     HelperSourceSnapshot,
 };
-use native_protocol::{NATIVE_HELPER_SCHEMA_VERSION, ProtocolValidatable};
 
-pub const HELPER_PROTOCOL_VERSION: u16 = NATIVE_HELPER_SCHEMA_VERSION;
 pub const MAX_HELPER_FRAME_BYTES: usize = 65_536;
 const MAX_HELPER_IDENTIFIER_LENGTH: usize = 64;
 const MIN_HELPER_IDENTIFIER_LENGTH: usize = 16;
@@ -34,7 +33,6 @@ pub struct VerifiedHelperChannel {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum HelperProtocolError {
     FrameSize,
-    ProtocolVersion,
     ChannelNonce,
     Identifier,
     PeerIdentity,
@@ -52,7 +50,6 @@ impl fmt::Display for HelperProtocolError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str(match self {
             Self::FrameSize => "helper frame is outside the fixed size boundary",
-            Self::ProtocolVersion => "helper protocol version does not match",
             Self::ChannelNonce => "helper channel nonce is invalid or stale",
             Self::Identifier => "helper identifier is outside the bounded format",
             Self::PeerIdentity => "helper peer identity does not match the verified executable",
@@ -87,18 +84,14 @@ pub const fn validate_helper_frame_size(length: usize) -> Result<(), HelperProto
 ///
 /// # Errors
 ///
-/// Returns a bounded protocol category when version, nonce, executable identity,
+/// Returns a bounded protocol category when nonce, executable identity,
 /// or capability declarations do not match.
 fn validate_helper_handshake(
     handshake: &HelperHandshake,
     peer: &VerifiedHelperPeer,
     expected_channel_nonce: &str,
 ) -> Result<(), HelperProtocolError> {
-    validate_version_and_nonce(
-        handshake.protocol_version,
-        &handshake.channel_nonce,
-        expected_channel_nonce,
-    )?;
+    validate_nonce(&handshake.channel_nonce, expected_channel_nonce)?;
     if !is_identifier(&handshake.helper_build_id)
         || handshake.helper_kind != peer.helper_kind
         || handshake.helper_build_id != peer.helper_build_id
@@ -184,11 +177,7 @@ pub fn validate_helper_source_open(
     request: &HelperSourceOpen,
     expected_channel_nonce: &str,
 ) -> Result<(), HelperProtocolError> {
-    validate_version_and_nonce(
-        request.protocol_version,
-        &request.channel_nonce,
-        expected_channel_nonce,
-    )?;
+    validate_nonce(&request.channel_nonce, expected_channel_nonce)?;
     if !is_identifier(&request.helper_source_instance_id) || request.validate_protocol().is_err() {
         return Err(HelperProtocolError::SourceConfiguration);
     }
@@ -204,11 +193,7 @@ pub fn validate_helper_source_close(
     request: &HelperSourceClose,
     expected_channel_nonce: &str,
 ) -> Result<(), HelperProtocolError> {
-    validate_version_and_nonce(
-        request.protocol_version,
-        &request.channel_nonce,
-        expected_channel_nonce,
-    )?;
+    validate_nonce(&request.channel_nonce, expected_channel_nonce)?;
     if !is_identifier(&request.helper_source_instance_id) || request.validate_protocol().is_err() {
         return Err(HelperProtocolError::Identifier);
     }
@@ -228,11 +213,7 @@ pub fn validate_helper_source_snapshot(
     expected_source_kind: HelperSourceKind,
     expected_schema_version: u16,
 ) -> Result<(), HelperProtocolError> {
-    validate_version_and_nonce(
-        snapshot.protocol_version,
-        &snapshot.channel_nonce,
-        expected_channel_nonce,
-    )?;
+    validate_nonce(&snapshot.channel_nonce, expected_channel_nonce)?;
     if snapshot.helper_source_instance_id != expected_source_instance_id
         || !is_identifier(&snapshot.helper_source_instance_id)
     {
@@ -259,11 +240,7 @@ pub fn validate_helper_observation(
     expected_source_instance_id: &str,
     expected_source_kind: HelperSourceKind,
 ) -> Result<(), HelperProtocolError> {
-    validate_version_and_nonce(
-        observation.protocol_version,
-        &observation.channel_nonce,
-        expected_channel_nonce,
-    )?;
+    validate_nonce(&observation.channel_nonce, expected_channel_nonce)?;
     if observation.helper_source_instance_id != expected_source_instance_id
         || !is_identifier(&observation.helper_source_instance_id)
     {
@@ -289,11 +266,7 @@ pub fn validate_helper_source_failure(
     expected_source_instance_id: &str,
     expected_source_kind: HelperSourceKind,
 ) -> Result<(), HelperProtocolError> {
-    validate_version_and_nonce(
-        failure.protocol_version,
-        &failure.channel_nonce,
-        expected_channel_nonce,
-    )?;
+    validate_nonce(&failure.channel_nonce, expected_channel_nonce)?;
     if failure.helper_source_instance_id != expected_source_instance_id
         || !is_identifier(&failure.helper_source_instance_id)
     {
@@ -550,14 +523,10 @@ impl HelperSourceFence {
     }
 }
 
-fn validate_version_and_nonce(
-    protocol_version: u16,
+fn validate_nonce(
     channel_nonce: &str,
     expected_channel_nonce: &str,
 ) -> Result<(), HelperProtocolError> {
-    if protocol_version != HELPER_PROTOCOL_VERSION {
-        return Err(HelperProtocolError::ProtocolVersion);
-    }
     if !is_channel_nonce(channel_nonce) || channel_nonce != expected_channel_nonce {
         return Err(HelperProtocolError::ChannelNonce);
     }
@@ -600,7 +569,6 @@ mod tests {
             ],
         };
         let handshake = HelperHandshake {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_kind: peer.helper_kind,
             helper_build_id: peer.helper_build_id.clone(),
@@ -626,7 +594,6 @@ mod tests {
     #[test]
     fn source_configuration_accepts_only_fixed_classes_and_limits() {
         let request = HelperSourceOpen {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "helper-source-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
@@ -687,7 +654,6 @@ mod tests {
                 kind: HelperClientMessageKind::Close,
                 open: Some(open),
                 close: Some(HelperSourceClose {
-                    protocol_version: HELPER_PROTOCOL_VERSION,
                     channel_nonce: NONCE.to_owned(),
                     helper_source_instance_id: "helper-source-0001".to_owned(),
                 }),
@@ -706,7 +672,6 @@ mod tests {
         };
         let channel = bind_verified_helper_channel(
             &HelperHandshake {
-                protocol_version: HELPER_PROTOCOL_VERSION,
                 channel_nonce: NONCE.to_owned(),
                 helper_kind: peer.helper_kind,
                 helper_build_id: peer.helper_build_id.clone(),
@@ -717,7 +682,6 @@ mod tests {
         )
         .expect("verified channel");
         let request = HelperSourceClose {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: "a".repeat(MAX_HELPER_FRAME_BYTES + 1),
             helper_source_instance_id: "helper-source-0001".to_owned(),
         };
@@ -731,7 +695,6 @@ mod tests {
     fn helper_observation_reuses_generated_content_free_fact_validation() {
         let source_id = "helper-source-0001";
         let observation = HelperObservation {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: source_id.to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
@@ -816,7 +779,6 @@ mod tests {
             .accept_initial_snapshot(&interactive_snapshot(0, 1))
             .expect("initial snapshot accepted");
         let failure = HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: request.helper_source_instance_id,
             source_kind: HelperSourceKind::InteractiveSession,
@@ -874,7 +836,6 @@ mod tests {
             .accept_initial_snapshot(&interactive_snapshot(0, 1))
             .expect("initial snapshot accepted");
         let cleanup = HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: HelperSourceKind::InteractiveSession,
@@ -957,7 +918,6 @@ mod tests {
         let channel = interactive_channel();
         let mut fence = channel.open_source(&request).expect("source fence opens");
         let failure = HelperSourceFailure {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: request.helper_source_instance_id,
             source_kind: HelperSourceKind::InteractiveSession,
@@ -1008,7 +968,6 @@ mod tests {
         };
         bind_verified_helper_channel(
             &HelperHandshake {
-                protocol_version: HELPER_PROTOCOL_VERSION,
                 channel_nonce: NONCE.to_owned(),
                 helper_kind: peer.helper_kind,
                 helper_build_id: peer.helper_build_id.clone(),
@@ -1022,7 +981,6 @@ mod tests {
 
     fn interactive_source_open() -> HelperSourceOpen {
         HelperSourceOpen {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "helper-source-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
@@ -1045,7 +1003,6 @@ mod tests {
 
     fn interactive_snapshot(last_sequence: u64, monotonic_time_ns: u64) -> HelperSourceSnapshot {
         HelperSourceSnapshot {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "helper-source-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
@@ -1059,7 +1016,6 @@ mod tests {
 
     fn interactive_observation(sequence: u64, monotonic_time_ns: u64) -> HelperObservation {
         HelperObservation {
-            protocol_version: HELPER_PROTOCOL_VERSION,
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "helper-source-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,

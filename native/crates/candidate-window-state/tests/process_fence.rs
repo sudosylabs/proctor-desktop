@@ -9,10 +9,9 @@ use display_topology::{
     DisplayTopologySubscription, OpenedDisplayTopologyBackend,
 };
 use native_protocol::{
-    CANDIDATE_WINDOW_SCHEMA_VERSION, CandidateWindowBounds, CandidateWindowCertainty,
-    CandidateWindowFocus, CandidateWindowPlacement, CandidateWindowPresence, CandidateWindowState,
-    CandidateWindowVisibility, DISPLAY_TOPOLOGY_SCHEMA_VERSION, PermissionState, PlatformFamily,
-    SourceOpenRequest,
+    CandidateWindowBounds, CandidateWindowCertainty, CandidateWindowFocus,
+    CandidateWindowPlacement, CandidateWindowPresence, CandidateWindowState,
+    CandidateWindowVisibility, PermissionState, PlatformFamily, SourceOpenRequest,
 };
 
 struct HangingCandidateBackend {
@@ -82,10 +81,9 @@ fn candidate_window() -> CandidateWindowState {
     }
 }
 
-fn request(schema_version: u16) -> SourceOpenRequest {
+fn request() -> SourceOpenRequest {
     SourceOpenRequest {
         collection_session_id: "cross-capability-fence-session".to_owned(),
-        requested_schema_version: schema_version,
         queue_capacity: 8,
     }
 }
@@ -94,7 +92,7 @@ fn request(schema_version: u16) -> SourceOpenRequest {
 fn candidate_cleanup_timeout_fences_display_open_in_the_same_utility_process() {
     let (release_sender, release_receiver) = mpsc::sync_channel(1);
     let mut candidate = CandidateWindowSource::open(
-        &request(CANDIDATE_WINDOW_SCHEMA_VERSION),
+        &request(),
         HangingCandidateBackend {
             release: release_receiver,
         },
@@ -107,10 +105,8 @@ fn candidate_cleanup_timeout_fences_display_open_in_the_same_utility_process() {
         Some(native_protocol::SourceFailureCode::Cleanup)
     );
 
-    let display = DisplayTopologySource::<NeverDisplaySubscription>::open(
-        &request(DISPLAY_TOPOLOGY_SCHEMA_VERSION),
-        NeverDisplayBackend,
-    );
+    let display =
+        DisplayTopologySource::<NeverDisplaySubscription>::open(&request(), NeverDisplayBackend);
     assert!(matches!(display, Err(DisplayTopologyError::Cleanup(_))));
 
     release_sender

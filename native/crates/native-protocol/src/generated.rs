@@ -278,7 +278,6 @@ impl ProtocolValidatable for SequenceGap {
 #[serde(deny_unknown_fields)]
 pub struct SourceOpenRequest {
     pub collection_session_id: String,
-    pub requested_schema_version: u16,
     pub queue_capacity: u16,
 }
 
@@ -289,13 +288,6 @@ impl ProtocolValidatable for SourceOpenRequest {
                 "SourceOpenRequest",
                 "collection_session_id",
                 "length 16..=128",
-            ));
-        }
-        if !(1..=65_535).contains(&self.requested_schema_version) {
-            return Err(ProtocolValidationError::new(
-                "SourceOpenRequest",
-                "requested_schema_version",
-                "range 1..=65535",
             ));
         }
         if !(2..=1_024).contains(&self.queue_capacity) {

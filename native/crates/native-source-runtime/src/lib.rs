@@ -1229,7 +1229,7 @@ impl<W: PassiveStateWire, S: PassiveStateSubscription<W>> PassiveStateSource<W, 
     where
         B: PassiveStateBackend<W, Subscription = S>,
     {
-        request.validate_for_schema_version(W::SCHEMA_VERSION)?;
+        request.validate()?;
         ensure_native_source_process_usable()
             .map_err(|error| PassiveStateSourceError::Cleanup(error.to_string()))?;
         let emitter = PassiveStateEmitter::new(usize::from(request.queue_capacity))?;

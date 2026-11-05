@@ -68,8 +68,6 @@ use removable_storage_state::{
 use serde::{Deserialize, Serialize};
 use virtualization_state::{PlatformVirtualizationBackend, VirtualizationWire};
 
-const BRIDGE_VERSION: u16 = 1;
-
 thread_local! {
     static RUNTIME: RefCell<Option<BridgeRuntime>> = const { RefCell::new(None) };
 }
@@ -91,7 +89,6 @@ struct OpenBaselineRequest {
 
 #[derive(Serialize)]
 struct BridgeManifest {
-    bridge_version: u16,
     source_manifest: [NativeSourceManifestEntry; NATIVE_SOURCE_COUNT],
 }
 
@@ -192,7 +189,6 @@ pub fn manifest<'env>(env: Env) -> Result<Unknown<'env>> {
     to_js(
         env,
         &BridgeManifest {
-            bridge_version: BRIDGE_VERSION,
             source_manifest: NATIVE_SOURCE_MANIFEST,
         },
     )

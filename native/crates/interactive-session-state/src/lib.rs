@@ -140,7 +140,6 @@ mod tests {
     fn platform_boundary_reports_truthful_snapshot_or_unavailable_coverage() {
         let request = SourceOpenRequest {
             collection_session_id: "interactive-session-0001".to_owned(),
-            requested_schema_version: INTERACTIVE_SESSION_SCHEMA_VERSION,
             queue_capacity: 8,
         };
         let mut source = InteractiveSessionSource::<InteractiveSessionWire, _>::open(
