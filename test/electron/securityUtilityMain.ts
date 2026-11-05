@@ -15,7 +15,7 @@ import { createElectronCandidateWindow } from '../../src/prctr/platform/native/e
 import { NativePermissionBrokerError } from '../../src/prctr/platform/native/electron-main/nativePermissionBroker.js';
 
 const participationGeneration = 'participation-generation-test-0001';
-const selectedSources = SECURITY_UTILITY_SOURCE_MANIFEST.map((entry) => entry.source_id);
+const selectedSources = [...SECURITY_UTILITY_SOURCE_MANIFEST];
 const selectedSourceCategories = [
 	'os-clipboard-change',
 	'removable-block-storage',

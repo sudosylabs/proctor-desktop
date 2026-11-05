@@ -5,8 +5,8 @@ use native_helper_protocol::{
     HelperSourceOpen, HelperSourceSnapshot,
 };
 use native_protocol::{
-    MAX_PROTOCOL_SAFE_INTEGER, PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationEvent,
-    ProcessApplicationState, ProtocolValidatable,
+    MAX_PROTOCOL_SAFE_INTEGER, ProcessApplicationEvent, ProcessApplicationState,
+    ProtocolValidatable,
 };
 use process_application_state::{
     MacOsLifecycleDrain, MacOsLifecycleFailure, MacOsLifecycleSubscription,
@@ -170,10 +170,6 @@ struct MacOsLifecycleHelperSource<S: MacOsLifecycleSubscription> {
 impl<S: MacOsLifecycleSubscription> HelperSource for MacOsLifecycleHelperSource<S> {
     fn source_kind(&self) -> HelperSourceKind {
         HelperSourceKind::ProcessApplication
-    }
-
-    fn schema_version(&self) -> u16 {
-        PROCESS_APPLICATION_SCHEMA_VERSION
     }
 
     fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
@@ -404,7 +400,6 @@ fn source_snapshot(
         channel_nonce: request.channel_nonce.clone(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: HelperSourceKind::ProcessApplication,
-        schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
         last_sequence,
         monotonic_time_ns,
         process_state: Some(state),
@@ -1062,7 +1057,6 @@ mod tests {
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "process-source-0001".to_owned(),
             source_kind: HelperSourceKind::ProcessApplication,
-            schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
             queue_capacity: 4,
             event_classes,
         }

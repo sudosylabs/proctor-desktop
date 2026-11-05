@@ -8,7 +8,6 @@ use crate::{
     SourceFailureCode, SourceHealth, SourceReset, SourceTimestamp,
 };
 
-pub const CANDIDATE_WINDOW_SCHEMA_VERSION: u16 = 1;
 pub const MAX_CANDIDATE_WINDOW_FACTS: usize = 1_024;
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -289,7 +288,6 @@ pub struct CandidateWindowSourceSnapshot {
     pub source_instance_id: String,
     pub source_version: String,
     pub adapter_version: String,
-    pub schema_version: u16,
     pub platform: PlatformFamily,
     pub permission: PermissionState,
     pub health: SourceHealth,
@@ -325,13 +323,6 @@ impl ProtocolValidatable for CandidateWindowSourceSnapshot {
                 "CandidateWindowSourceSnapshot",
                 "adapter_version",
                 "length 1..=32",
-            ));
-        }
-        if self.schema_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "CandidateWindowSourceSnapshot",
-                "schema_version",
-                "const 1",
             ));
         }
         self.platform.validate_protocol()?;

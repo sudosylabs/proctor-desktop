@@ -3,10 +3,10 @@ mod platform;
 use std::fmt;
 
 use native_protocol::{
-    CAPTURE_SESSION_SCHEMA_VERSION, CaptureSessionCertainty, CaptureSessionDrain,
-    CaptureSessionObservation, CaptureSessionSourceSnapshot, CaptureSessionState,
-    CaptureSessionSupport, PermissionState, PlatformFamily, ProtocolValidatable, ProtocolViolation,
-    SourceFailureCode, SourceHealth, SourceOpenRequest, SourceReset,
+    CaptureSessionCertainty, CaptureSessionDrain, CaptureSessionObservation,
+    CaptureSessionSourceSnapshot, CaptureSessionState, CaptureSessionSupport, PermissionState,
+    PlatformFamily, ProtocolValidatable, ProtocolViolation, SourceFailureCode, SourceHealth,
+    SourceOpenRequest, SourceReset,
 };
 use native_source_runtime::{
     BoundedTaskError, QueueError, SourceModel, SourceResetPlan, SourceSession, SourceSessionFact,
@@ -227,7 +227,6 @@ impl CaptureSessionEmitter {
             source_instance_id: metadata.source_instance_id,
             source_version: SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: CAPTURE_SESSION_SCHEMA_VERSION,
             platform,
             permission,
             health: metadata.health,

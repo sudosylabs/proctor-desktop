@@ -403,9 +403,7 @@ export function isNativeBridgeManifest(value: unknown): boolean {
 
 export function isNativeBaselineSnapshots(
 	value: unknown,
-	selectedSources: readonly NativeSourceId[] = SECURITY_UTILITY_SOURCE_MANIFEST.map(
-		(entry) => entry.source_id
-	)
+	selectedSources: readonly NativeSourceId[] = SECURITY_UTILITY_SOURCE_MANIFEST
 ): value is NativeBaselineSnapshots {
 	return (
 		isBoundedArray(value, SECURITY_UTILITY_SOURCE_COUNT, isNativeSnapshotEnvelope) &&
@@ -572,14 +570,7 @@ export function isSecurityUtilitySourceManifest(
 ): value is SecurityUtilitySourceManifest {
 	if (!Array.isArray(value) || value.length !== SECURITY_UTILITY_SOURCE_MANIFEST.length)
 		return false;
-	return SECURITY_UTILITY_SOURCE_MANIFEST.every((expected, index) => {
-		const actual = value[index];
-		return (
-			isRecordWithKeys(actual, ['source_id', 'schema_version']) &&
-			actual.source_id === expected.source_id &&
-			actual.schema_version === expected.schema_version
-		);
-	});
+	return SECURITY_UTILITY_SOURCE_MANIFEST.every((expected, index) => value[index] === expected);
 }
 
 export function isSelectedNativeSources(value: unknown): value is readonly NativeSourceId[] {
@@ -590,12 +581,12 @@ export function isSelectedNativeSources(value: unknown): value is readonly Nativ
 	) {
 		return false;
 	}
-	const sourceIds = new Set(SECURITY_UTILITY_SOURCE_MANIFEST.map((entry) => entry.source_id));
+	const sourceIds = new Set<unknown>(SECURITY_UTILITY_SOURCE_MANIFEST);
 	const selected = new Set<unknown>();
 	let previousManifestIndex = -1;
 	for (const sourceId of value) {
 		const manifestIndex = SECURITY_UTILITY_SOURCE_MANIFEST.findIndex(
-			(entry) => entry.source_id === sourceId
+			(entry) => entry === sourceId
 		);
 		if (
 			!sourceIds.has(sourceId as NativeSourceId) ||

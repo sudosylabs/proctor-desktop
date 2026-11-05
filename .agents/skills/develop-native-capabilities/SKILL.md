@@ -80,7 +80,7 @@ by the target matrix or explicitly unavailable.
 
 ## 3. Define a race-free source session
 
-Open one session that returns source/adapter/schema versions, platform and
+Open one session that returns source/adapter identity, platform and
 permission state, a fresh source-instance identifier, health, and a complete
 snapshot at sequence `N`. Deliver ordered observations strictly after `N` and
 buffer transitions produced while the snapshot is built.

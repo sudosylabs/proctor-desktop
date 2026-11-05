@@ -16,12 +16,6 @@
     "media-device"
   ],
   "x-proctor-source-lifecycle-deadline-ms": 5000,
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["schema_version"],
-  "properties": {
-    "schema_version": { "const": 1 }
-  },
   "$defs": {
     "PlatformFamily": {
       "type": "string",

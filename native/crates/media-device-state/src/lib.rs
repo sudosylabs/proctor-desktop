@@ -2,10 +2,10 @@
 
 mod platform;
 use native_protocol::{
-    MEDIA_DEVICE_SCHEMA_VERSION, MediaConcurrentUse, MediaDeviceCertainty, MediaDeviceCoverage,
-    MediaDeviceDrain, MediaDeviceEvent, MediaDeviceEventKind, MediaDeviceObservation,
-    MediaDeviceSourceSnapshot, MediaDeviceState, MediaEndpointReadiness, MediaEndpointState,
-    PermissionState, PlatformFamily, SourceFailureCode, SourceHealth, SourceReset,
+    MediaConcurrentUse, MediaDeviceCertainty, MediaDeviceCoverage, MediaDeviceDrain,
+    MediaDeviceEvent, MediaDeviceEventKind, MediaDeviceObservation, MediaDeviceSourceSnapshot,
+    MediaDeviceState, MediaEndpointReadiness, MediaEndpointState, PermissionState, PlatformFamily,
+    SourceFailureCode, SourceHealth, SourceReset,
 };
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedMediaDeviceBackend,
@@ -62,7 +62,6 @@ impl PassiveStateWire for MediaDeviceWire {
     type Snapshot = MediaDeviceSourceSnapshot;
     type Observation = MediaDeviceObservation;
     type Drain = MediaDeviceDrain;
-    const SCHEMA_VERSION: u16 = MEDIA_DEVICE_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
     const STOP_THREAD_NAME: &'static str = "media-device-stop";
     fn health(state: &Self::State) -> SourceHealth {
@@ -98,7 +97,6 @@ impl PassiveStateWire for MediaDeviceWire {
             source_instance_id: metadata.source_instance_id,
             source_version: Self::SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: Self::SCHEMA_VERSION,
             platform,
             permission: aggregate_permission(&state),
             health: metadata.health,

@@ -254,24 +254,19 @@ impl NativeHelperConnection {
         capacity: u16,
     ) -> Result<HelperSourceOpen, HelperTransportError> {
         self.assert_usable()?;
-        let (schema_version, event_classes) = match kind {
-            HelperSourceKind::ProcessApplication => (
-                native_protocol::PROCESS_APPLICATION_SCHEMA_VERSION,
-                vec![
-                    native_protocol::HelperEventClass::ProcessLifecycle,
-                    native_protocol::HelperEventClass::ProcessIdentity,
-                ],
-            ),
-            HelperSourceKind::InteractiveSession => (
-                native_protocol::INTERACTIVE_SESSION_SCHEMA_VERSION,
-                vec![native_protocol::HelperEventClass::InteractiveSessionLifecycle],
-            ),
+        let event_classes = match kind {
+            HelperSourceKind::ProcessApplication => vec![
+                native_protocol::HelperEventClass::ProcessLifecycle,
+                native_protocol::HelperEventClass::ProcessIdentity,
+            ],
+            HelperSourceKind::InteractiveSession => {
+                vec![native_protocol::HelperEventClass::InteractiveSessionLifecycle]
+            }
         };
         let request = HelperSourceOpen {
             channel_nonce: self.channel.channel_nonce().to_owned(),
             helper_source_instance_id: instance_id,
             source_kind: kind,
-            schema_version,
             queue_capacity: capacity,
             event_classes,
         };

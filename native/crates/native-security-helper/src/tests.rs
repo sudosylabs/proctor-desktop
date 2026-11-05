@@ -58,11 +58,10 @@ use std::sync::{Arc, mpsc::Receiver};
 
 use native_helper_protocol::{HelperEventClass, HelperKind, MAX_HELPER_FRAME_BYTES};
 use native_protocol::{
-    INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveConsoleOwnership, InteractiveLockState,
-    InteractiveRemoteAttachment, InteractiveSessionCertainty, InteractiveSessionCoverage,
-    InteractiveSessionState, PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationCertainty,
-    ProcessApplicationCoverage, ProcessApplicationEvent, ProcessApplicationEventKind,
-    ProcessApplicationState,
+    InteractiveConsoleOwnership, InteractiveLockState, InteractiveRemoteAttachment,
+    InteractiveSessionCertainty, InteractiveSessionCoverage, InteractiveSessionState,
+    ProcessApplicationCertainty, ProcessApplicationCoverage, ProcessApplicationEvent,
+    ProcessApplicationEventKind, ProcessApplicationState,
 };
 
 #[test]
@@ -630,7 +629,6 @@ fn process_source(nonce: &str) -> (HelperSourceOpen, HelperSourceSnapshot) {
             channel_nonce: nonce.to_owned(),
             helper_source_instance_id: source_id.clone(),
             source_kind: HelperSourceKind::ProcessApplication,
-            schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
             queue_capacity: 8,
             event_classes: vec![
                 HelperEventClass::ProcessLifecycle,
@@ -641,7 +639,6 @@ fn process_source(nonce: &str) -> (HelperSourceOpen, HelperSourceSnapshot) {
             channel_nonce: nonce.to_owned(),
             helper_source_instance_id: source_id,
             source_kind: HelperSourceKind::ProcessApplication,
-            schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
             last_sequence: 0,
             monotonic_time_ns: 1,
             process_state: Some(ProcessApplicationState {
@@ -661,7 +658,6 @@ fn session_source(nonce: &str) -> (HelperSourceOpen, HelperSourceSnapshot) {
             channel_nonce: nonce.to_owned(),
             helper_source_instance_id: source_id.clone(),
             source_kind: HelperSourceKind::InteractiveSession,
-            schema_version: INTERACTIVE_SESSION_SCHEMA_VERSION,
             queue_capacity: 8,
             event_classes: vec![HelperEventClass::InteractiveSessionLifecycle],
         },
@@ -669,7 +665,6 @@ fn session_source(nonce: &str) -> (HelperSourceOpen, HelperSourceSnapshot) {
             channel_nonce: nonce.to_owned(),
             helper_source_instance_id: source_id,
             source_kind: HelperSourceKind::InteractiveSession,
-            schema_version: INTERACTIVE_SESSION_SCHEMA_VERSION,
             last_sequence: 0,
             monotonic_time_ns: 1,
             process_state: None,

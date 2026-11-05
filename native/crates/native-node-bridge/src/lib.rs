@@ -37,11 +37,11 @@ use native_protocol::{
     ClipboardSourceSnapshot, DisplayTopologyDrain, DisplayTopologySourceSnapshot,
     InteractiveSessionDrain, InteractiveSessionSourceSnapshot, MediaDeviceDrain,
     MediaDeviceSourceSnapshot, NATIVE_SOURCE_CATEGORY_ORDER, NATIVE_SOURCE_COUNT,
-    NATIVE_SOURCE_MANIFEST, NativeSourceCategory, NativeSourceManifestEntry,
-    NetworkConfigurationDrain, NetworkConfigurationSourceSnapshot, PrintSpoolerDrain,
-    PrintSpoolerSourceSnapshot, ProcessApplicationDrain, ProcessApplicationSourceSnapshot,
-    ProtocolValidatable, RemovableStorageDrain, RemovableStorageSourceSnapshot, SourceFailureCode,
-    VirtualizationDrain, VirtualizationSourceSnapshot,
+    NATIVE_SOURCE_MANIFEST, NativeSourceCategory, NetworkConfigurationDrain,
+    NetworkConfigurationSourceSnapshot, PrintSpoolerDrain, PrintSpoolerSourceSnapshot,
+    ProcessApplicationDrain, ProcessApplicationSourceSnapshot, ProtocolValidatable,
+    RemovableStorageDrain, RemovableStorageSourceSnapshot, SourceFailureCode, VirtualizationDrain,
+    VirtualizationSourceSnapshot,
 };
 use native_source_supervisor::{
     BaselineSourceFactories, NATIVE_SOURCE_KINDS, NativeSourceBatch, NativeSourceKind,
@@ -89,7 +89,7 @@ struct OpenBaselineRequest {
 
 #[derive(Serialize)]
 struct BridgeManifest {
-    source_manifest: [NativeSourceManifestEntry; NATIVE_SOURCE_COUNT],
+    source_manifest: [&'static str; NATIVE_SOURCE_COUNT],
 }
 
 #[derive(Serialize)]

@@ -67,7 +67,6 @@ pub(crate) struct OpenedHelperSource {
 
 pub(crate) trait HelperSource {
     fn source_kind(&self) -> HelperSourceKind;
-    fn schema_version(&self) -> u16;
     fn requires_polling(&self) -> bool {
         true
     }
@@ -327,7 +326,6 @@ impl<F: HelperSourceFactory> HelperServer<F> {
             &self.nonce,
             &active.request.helper_source_instance_id,
             active.request.source_kind,
-            active.request.schema_version,
         )?;
         if closed.final_snapshot.last_sequence != active.last_sequence
             || closed.final_snapshot.monotonic_time_ns < active.last_monotonic_time_ns
@@ -420,9 +418,7 @@ fn validate_opened_source(
     request: &HelperSourceOpen,
     nonce: &str,
 ) -> Result<(), HelperTransportError> {
-    if source.source_kind() != request.source_kind
-        || source.schema_version() != request.schema_version
-    {
+    if source.source_kind() != request.source_kind {
         return Err(HelperProtocolError::Lifecycle.into());
     }
     validate_helper_source_snapshot(
@@ -430,7 +426,6 @@ fn validate_opened_source(
         nonce,
         &request.helper_source_instance_id,
         request.source_kind,
-        request.schema_version,
     )?;
     if initial_snapshot.last_sequence != 0 {
         return Err(HelperProtocolError::Sequence.into());
@@ -887,10 +882,6 @@ impl HelperSource for UnavailableHelperSource {
         self.request.source_kind
     }
 
-    fn schema_version(&self) -> u16 {
-        self.request.schema_version
-    }
-
     fn requires_polling(&self) -> bool {
         false
     }
@@ -919,7 +910,6 @@ fn unavailable_snapshot(
         channel_nonce: request.channel_nonce.clone(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: request.source_kind,
-        schema_version: request.schema_version,
         last_sequence: 0,
         monotonic_time_ns,
         process_state: matches!(request.source_kind, HelperSourceKind::ProcessApplication).then(
@@ -966,7 +956,6 @@ mod tests {
         HelperEventClass, HelperFailureCode, HelperSourceClose, MAX_HELPER_FRAME_BYTES,
     };
     use native_protocol::{
-        INTERACTIVE_SESSION_SCHEMA_VERSION, PROCESS_APPLICATION_SCHEMA_VERSION,
         ProcessApplicationEvent, ProcessApplicationEventKind, ProcessApplicationProcess,
         ProcessApplicationScope, ProcessExecutableIdentity, ProcessExecutableIdentityStatus,
     };
@@ -1749,7 +1738,6 @@ mod tests {
         let session = HelperSourceOpen {
             helper_source_instance_id: "session-source-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
-            schema_version: INTERACTIVE_SESSION_SCHEMA_VERSION,
             event_classes: vec![HelperEventClass::InteractiveSessionLifecycle],
             ..process
         };
@@ -1813,10 +1801,6 @@ mod tests {
     impl HelperSource for DelayedFailureSource {
         fn source_kind(&self) -> HelperSourceKind {
             self.request.source_kind
-        }
-
-        fn schema_version(&self) -> u16 {
-            self.request.schema_version
         }
 
         fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
@@ -1947,9 +1931,6 @@ mod tests {
         fn source_kind(&self) -> HelperSourceKind {
             self.0.source_kind
         }
-        fn schema_version(&self) -> u16 {
-            self.0.schema_version
-        }
         fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
             Ok(Vec::new())
         }
@@ -2011,10 +1992,6 @@ mod tests {
             self.request.source_kind
         }
 
-        fn schema_version(&self) -> u16 {
-            self.request.schema_version
-        }
-
         fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
             Ok(Vec::new())
         }
@@ -2057,10 +2034,6 @@ mod tests {
             self.request.source_kind
         }
 
-        fn schema_version(&self) -> u16 {
-            self.request.schema_version
-        }
-
         fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
             Ok(Vec::new())
         }
@@ -2075,7 +2048,6 @@ mod tests {
                     channel_nonce: self.request.channel_nonce.clone(),
                     helper_source_instance_id: self.request.helper_source_instance_id.clone(),
                     source_kind: self.request.source_kind,
-                    schema_version: self.request.schema_version,
                     last_sequence: 0,
                     monotonic_time_ns,
                     process_state: Some(oversized_process_state()),
@@ -2099,7 +2071,6 @@ mod tests {
                 channel_nonce: request.channel_nonce.clone(),
                 helper_source_instance_id: request.helper_source_instance_id.clone(),
                 source_kind: request.source_kind,
-                schema_version: request.schema_version,
                 last_sequence: 0,
                 monotonic_time_ns,
                 process_state: Some(oversized_process_state()),
@@ -2129,10 +2100,6 @@ mod tests {
     impl HelperSource for TrackingSource {
         fn source_kind(&self) -> HelperSourceKind {
             self.request.source_kind
-        }
-
-        fn schema_version(&self) -> u16 {
-            self.request.schema_version
         }
 
         fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
@@ -2184,10 +2151,6 @@ mod tests {
     impl HelperSource for RollbackFailureSource {
         fn source_kind(&self) -> HelperSourceKind {
             self.request.source_kind
-        }
-
-        fn schema_version(&self) -> u16 {
-            self.request.schema_version
         }
 
         fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
@@ -2287,10 +2250,6 @@ mod tests {
             self.request.source_kind
         }
 
-        fn schema_version(&self) -> u16 {
-            self.request.schema_version
-        }
-
         fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
             Ok(std::mem::take(&mut self.events))
         }
@@ -2338,10 +2297,6 @@ mod tests {
     impl HelperSource for SourceFailureSource {
         fn source_kind(&self) -> HelperSourceKind {
             self.request.source_kind
-        }
-
-        fn schema_version(&self) -> u16 {
-            self.request.schema_version
         }
 
         fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
@@ -2393,10 +2348,6 @@ mod tests {
             self.request.source_kind
         }
 
-        fn schema_version(&self) -> u16 {
-            self.request.schema_version
-        }
-
         fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
             Ok(self
                 .observation
@@ -2416,7 +2367,6 @@ mod tests {
                     channel_nonce: self.request.channel_nonce.clone(),
                     helper_source_instance_id: self.request.helper_source_instance_id.clone(),
                     source_kind: self.request.source_kind,
-                    schema_version: self.request.schema_version,
                     last_sequence: 1,
                     monotonic_time_ns,
                     process_state: Some(self.state.clone()),
@@ -2452,7 +2402,6 @@ mod tests {
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "process-source-0001".to_owned(),
             source_kind: HelperSourceKind::ProcessApplication,
-            schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
             queue_capacity,
             event_classes: vec![
                 HelperEventClass::ProcessLifecycle,

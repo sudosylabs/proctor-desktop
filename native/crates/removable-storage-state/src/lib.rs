@@ -2,10 +2,10 @@
 
 mod platform;
 use native_protocol::{
-    PermissionState, PlatformFamily, REMOVABLE_STORAGE_SCHEMA_VERSION, RemovableStorageCertainty,
-    RemovableStorageCoverage, RemovableStorageDrain, RemovableStorageEvent,
-    RemovableStorageEventKind, RemovableStorageObservation, RemovableStorageSourceSnapshot,
-    RemovableStorageState, SourceFailureCode, SourceHealth, SourceReset,
+    PermissionState, PlatformFamily, RemovableStorageCertainty, RemovableStorageCoverage,
+    RemovableStorageDrain, RemovableStorageEvent, RemovableStorageEventKind,
+    RemovableStorageObservation, RemovableStorageSourceSnapshot, RemovableStorageState,
+    SourceFailureCode, SourceHealth, SourceReset,
 };
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedRemovableStorageBackend,
@@ -65,7 +65,6 @@ impl PassiveStateWire for RemovableStorageWire {
     type Snapshot = RemovableStorageSourceSnapshot;
     type Observation = RemovableStorageObservation;
     type Drain = RemovableStorageDrain;
-    const SCHEMA_VERSION: u16 = REMOVABLE_STORAGE_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
     const STOP_THREAD_NAME: &'static str = "removable-storage-stop";
     fn health(state: &Self::State) -> SourceHealth {
@@ -104,7 +103,6 @@ impl PassiveStateWire for RemovableStorageWire {
             source_instance_id: metadata.source_instance_id,
             source_version: Self::SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: Self::SCHEMA_VERSION,
             platform,
             permission,
             health: metadata.health,

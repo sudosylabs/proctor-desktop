@@ -5,10 +5,10 @@ mod platform;
 use std::fmt;
 
 use native_protocol::{
-    CANDIDATE_WINDOW_SCHEMA_VERSION, CandidateWindowCertainty, CandidateWindowDrain,
-    CandidateWindowEvent, CandidateWindowObservation, CandidateWindowSourceSnapshot,
-    CandidateWindowState, PermissionState, PlatformFamily, ProtocolValidatable, ProtocolViolation,
-    SourceFailureCode, SourceHealth, SourceOpenRequest, SourceReset,
+    CandidateWindowCertainty, CandidateWindowDrain, CandidateWindowEvent,
+    CandidateWindowObservation, CandidateWindowSourceSnapshot, CandidateWindowState,
+    PermissionState, PlatformFamily, ProtocolValidatable, ProtocolViolation, SourceFailureCode,
+    SourceHealth, SourceOpenRequest, SourceReset,
 };
 use native_source_runtime::{
     BoundedTaskError, QueueError, SourceModel, SourceResetPlan, SourceSession, SourceSessionFact,
@@ -262,7 +262,6 @@ impl CandidateWindowEmitter {
             source_instance_id: metadata.source_instance_id,
             source_version: SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: CANDIDATE_WINDOW_SCHEMA_VERSION,
             platform,
             permission,
             health: metadata.health,

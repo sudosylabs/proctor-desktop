@@ -278,7 +278,6 @@ impl PassiveStateWire for RejectChangedWire {
     type Observation = RejectChangedObservation;
     type Drain = RejectChangedDrain;
 
-    const SCHEMA_VERSION: u16 = 1;
     const SOURCE_VERSION: &'static str = "test";
     const STOP_THREAD_NAME: &'static str = "reject-changed-stop";
 

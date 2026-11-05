@@ -322,7 +322,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',
-			schema_version: 1,
 			queue_capacity: 16,
 			event_classes: ['process_lifecycle']
 		}),
@@ -332,7 +331,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 		channel_nonce: helperNonce,
 		helper_source_instance_id: 'helper-source-0001',
 		source_kind: 'interactive_session',
-		schema_version: 1,
 		queue_capacity: 16,
 		event_classes: ['interactive_session_lifecycle']
 	} as const;
@@ -353,7 +351,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',
-			schema_version: 1,
 			last_sequence: 0,
 			monotonic_time_ns: 1,
 			interactive_session_state: interactiveState
@@ -367,7 +364,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 				channel_nonce: helperNonce,
 				helper_source_instance_id: 'helper-source-0001',
 				source_kind: 'interactive_session',
-				schema_version: 1,
 				last_sequence: 0,
 				monotonic_time_ns: 1,
 				interactive_session_state: interactiveState
@@ -382,7 +378,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 				channel_nonce: helperNonce,
 				helper_source_instance_id: 'helper-source-0001',
 				source_kind: 'interactive_session',
-				schema_version: 1,
 				last_sequence: 0,
 				monotonic_time_ns: 1,
 				interactive_session_state: interactiveState
@@ -403,7 +398,6 @@ void test('helper protocol is fixed, nonce-bound, policy-blind, and source-speci
 			channel_nonce: helperNonce,
 			helper_source_instance_id: 'helper-source-0001',
 			source_kind: 'interactive_session',
-			schema_version: 1,
 			last_sequence: 0,
 			monotonic_time_ns: 1,
 			process_state: {

@@ -3,11 +3,11 @@
 mod platform;
 
 use native_protocol::{
-    INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveConsoleOwnership, InteractiveLockState,
-    InteractiveRemoteAttachment, InteractiveSessionCertainty, InteractiveSessionCoverage,
-    InteractiveSessionDrain, InteractiveSessionEvent, InteractiveSessionEventKind,
-    InteractiveSessionObservation, InteractiveSessionSourceSnapshot, InteractiveSessionState,
-    PermissionState, PlatformFamily, SourceFailureCode, SourceHealth, SourceReset,
+    InteractiveConsoleOwnership, InteractiveLockState, InteractiveRemoteAttachment,
+    InteractiveSessionCertainty, InteractiveSessionCoverage, InteractiveSessionDrain,
+    InteractiveSessionEvent, InteractiveSessionEventKind, InteractiveSessionObservation,
+    InteractiveSessionSourceSnapshot, InteractiveSessionState, PermissionState, PlatformFamily,
+    SourceFailureCode, SourceHealth, SourceReset,
 };
 use native_source_runtime::{
     PassiveStateEventKind, PassiveStateWire, SequencedObservation, SourceSessionMetadata,
@@ -33,7 +33,6 @@ impl PassiveStateWire for InteractiveSessionWire {
     type Observation = InteractiveSessionObservation;
     type Drain = InteractiveSessionDrain;
 
-    const SCHEMA_VERSION: u16 = INTERACTIVE_SESSION_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
     const STOP_THREAD_NAME: &'static str = "interactive-session-stop";
 
@@ -79,7 +78,6 @@ impl PassiveStateWire for InteractiveSessionWire {
             source_instance_id: metadata.source_instance_id,
             source_version: Self::SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: Self::SCHEMA_VERSION,
             platform,
             permission,
             health: metadata.health,

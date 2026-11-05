@@ -4,10 +4,10 @@ use std::fmt;
 use std::time::Duration;
 
 use native_protocol::{
-    DISPLAY_TOPOLOGY_SCHEMA_VERSION, DisplayTopologyDrain, DisplayTopologyObservation,
-    DisplayTopologySnapshot, DisplayTopologySourceSnapshot, PermissionState, PlatformFamily,
-    ProtocolValidatable, ProtocolViolation, SourceFailureCode, SourceHealth, SourceOpenRequest,
-    SourceReset, TopologyCertainty,
+    DisplayTopologyDrain, DisplayTopologyObservation, DisplayTopologySnapshot,
+    DisplayTopologySourceSnapshot, PermissionState, PlatformFamily, ProtocolValidatable,
+    ProtocolViolation, SourceFailureCode, SourceHealth, SourceOpenRequest, SourceReset,
+    TopologyCertainty,
 };
 use native_source_runtime::{
     BoundedTaskError, DeadlineThread, QueueError, SOURCE_CLEANUP_DEADLINE, SourceModel,
@@ -379,7 +379,6 @@ impl DisplayTopologyEmitter {
             source_instance_id: metadata.source_instance_id,
             source_version: SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: DISPLAY_TOPOLOGY_SCHEMA_VERSION,
             platform,
             permission,
             health: metadata.health,

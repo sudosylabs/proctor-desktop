@@ -36,7 +36,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "process_application_lifecycle",
-        "sourceSchemaDigest": "sha256:aa6a235df7dd33ebd223ba31f77fe848fdbd2a29158092a2a9116b511bf83fb2",
+        "sourceSchemaDigest": "sha256:876dcd1a5b437f54b92ae1d09edc9a41e7e08b0881838d4f8e30f61d185a9898",
         "coverageKey": "native.process_application_lifecycle.v1",
         "permittedClaims": [
           "enforce",
@@ -76,7 +76,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "single_interactive_session",
-        "sourceSchemaDigest": "sha256:7e695ff1c04bbd9c3f64e98c0e8cdb6cd6b7b55743463a27f2892716499ba7a0",
+        "sourceSchemaDigest": "sha256:7ddf24bf5b8004e0522f07e2b186980d8418f5db17fa917197da77d724a7a7c2",
         "coverageKey": "native.single_interactive_session.v1",
         "permittedClaims": [
           "enforce",
@@ -113,7 +113,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "candidate_private_clipboard",
-        "sourceSchemaDigest": "sha256:70d7fd18f0adc862d8d4d963518effdf5c0a0b5f444554227c92192c2ff26cf2",
+        "sourceSchemaDigest": "sha256:6ad8828125ff23f60bc57302dc6e0f21e6b9b1d0b037b9c34ea899b9f8dffc3b",
         "coverageKey": "native.candidate_private_clipboard.v1",
         "permittedClaims": [
           "enforce",
@@ -127,7 +127,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "os_clipboard_change",
-        "sourceSchemaDigest": "sha256:70d7fd18f0adc862d8d4d963518effdf5c0a0b5f444554227c92192c2ff26cf2",
+        "sourceSchemaDigest": "sha256:6ad8828125ff23f60bc57302dc6e0f21e6b9b1d0b037b9c34ea899b9f8dffc3b",
         "coverageKey": "native.os_clipboard_change.v1",
         "permittedClaims": [
           "observe",
@@ -164,7 +164,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "candidate_print_commands",
-        "sourceSchemaDigest": "sha256:bae240feff637bbf51b1403ad37e240dec74ca3f1b937907f60a6fdeb8c85bfa",
+        "sourceSchemaDigest": "sha256:a4eef0ee523171eef532d5383c7219fa297d5e1c4ec5882122bf66d4f2e79f90",
         "coverageKey": "native.candidate_print_commands.v1",
         "permittedClaims": [
           "enforce",
@@ -178,7 +178,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "monitored_spooler_job",
-        "sourceSchemaDigest": "sha256:bae240feff637bbf51b1403ad37e240dec74ca3f1b937907f60a6fdeb8c85bfa",
+        "sourceSchemaDigest": "sha256:a4eef0ee523171eef532d5383c7219fa297d5e1c4ec5882122bf66d4f2e79f90",
         "coverageKey": "native.monitored_spooler_job.v1",
         "permittedClaims": [
           "enforce",
@@ -193,7 +193,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "no_physical_printing",
-        "sourceSchemaDigest": "sha256:bae240feff637bbf51b1403ad37e240dec74ca3f1b937907f60a6fdeb8c85bfa",
+        "sourceSchemaDigest": "sha256:a4eef0ee523171eef532d5383c7219fa297d5e1c4ec5882122bf66d4f2e79f90",
         "coverageKey": "native.no_physical_printing.v1",
         "permittedClaims": [
           "unavailable"
@@ -228,7 +228,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "removable_block_storage",
-        "sourceSchemaDigest": "sha256:31c3588e8c6a77ecc534323ef4fbfabaca44ca9e68ac1a6f15db225d89856f28",
+        "sourceSchemaDigest": "sha256:a10debf6568efb9522c546846e075db12fd4c68e75f637b9916e1204ffa9a3d4",
         "coverageKey": "native.removable_block_storage.v1",
         "permittedClaims": [
           "enforce",
@@ -243,7 +243,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "portable_mtp",
-        "sourceSchemaDigest": "sha256:31c3588e8c6a77ecc534323ef4fbfabaca44ca9e68ac1a6f15db225d89856f28",
+        "sourceSchemaDigest": "sha256:a10debf6568efb9522c546846e075db12fd4c68e75f637b9916e1204ffa9a3d4",
         "coverageKey": "native.portable_mtp.v1",
         "permittedClaims": [
           "enforce",
@@ -280,7 +280,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "recognized_guest",
-        "sourceSchemaDigest": "sha256:d5590cdd41350a93f7f56ce27cc38424db73c573568c58d27365cf36b800545f",
+        "sourceSchemaDigest": "sha256:1a92a1f80d5286c21287e960b8d871935ae60e6d770dd93751380acdda47e9de",
         "coverageKey": "native.recognized_guest.v1",
         "permittedClaims": [
           "enforce",
@@ -295,7 +295,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "certified_physical_environment",
-        "sourceSchemaDigest": "sha256:d5590cdd41350a93f7f56ce27cc38424db73c573568c58d27365cf36b800545f",
+        "sourceSchemaDigest": "sha256:1a92a1f80d5286c21287e960b8d871935ae60e6d770dd93751380acdda47e9de",
         "coverageKey": "native.certified_physical_environment.v1",
         "permittedClaims": [
           "enforce",
@@ -332,7 +332,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "system_proxy_state",
-        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
+        "sourceSchemaDigest": "sha256:bc00111be394796cfbcb001fcc669dd3f308827d246724fa7a813451e48a6152",
         "coverageKey": "native.system_proxy_state.v1",
         "permittedClaims": [
           "enforce",
@@ -347,7 +347,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "os_managed_vpn_state",
-        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
+        "sourceSchemaDigest": "sha256:bc00111be394796cfbcb001fcc669dd3f308827d246724fa7a813451e48a6152",
         "coverageKey": "native.os_managed_vpn_state.v1",
         "permittedClaims": [
           "enforce",
@@ -362,7 +362,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "tunnel_interface_state",
-        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
+        "sourceSchemaDigest": "sha256:bc00111be394796cfbcb001fcc669dd3f308827d246724fa7a813451e48a6152",
         "coverageKey": "native.tunnel_interface_state.v1",
         "permittedClaims": [
           "enforce",
@@ -377,7 +377,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "route_change",
-        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
+        "sourceSchemaDigest": "sha256:bc00111be394796cfbcb001fcc669dd3f308827d246724fa7a813451e48a6152",
         "coverageKey": "native.route_change.v1",
         "permittedClaims": [
           "observe",
@@ -391,7 +391,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "network_source_health",
-        "sourceSchemaDigest": "sha256:052a750c0a923fbbb5a36a6e9409b884414854b6c0e493a249a5f86f68934c53",
+        "sourceSchemaDigest": "sha256:bc00111be394796cfbcb001fcc669dd3f308827d246724fa7a813451e48a6152",
         "coverageKey": "native.network_source_health.v1",
         "permittedClaims": [
           "enforce",
@@ -432,7 +432,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "camera_ready",
-        "sourceSchemaDigest": "sha256:2e5a9e295f0e867f67561d3ef16f43abcb239f51b00f3d3f6c8cf766cd165167",
+        "sourceSchemaDigest": "sha256:8517aa68a1c548dd6fd1ec071067e917172fb014c894aead356df4937fa0af1a",
         "coverageKey": "native.camera_ready.v1",
         "permittedClaims": [
           "enforce",
@@ -447,7 +447,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "camera_other_application_use",
-        "sourceSchemaDigest": "sha256:2e5a9e295f0e867f67561d3ef16f43abcb239f51b00f3d3f6c8cf766cd165167",
+        "sourceSchemaDigest": "sha256:8517aa68a1c548dd6fd1ec071067e917172fb014c894aead356df4937fa0af1a",
         "coverageKey": "native.camera_other_application_use.v1",
         "permittedClaims": [
           "enforce",
@@ -488,7 +488,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "microphone_ready",
-        "sourceSchemaDigest": "sha256:2e5a9e295f0e867f67561d3ef16f43abcb239f51b00f3d3f6c8cf766cd165167",
+        "sourceSchemaDigest": "sha256:8517aa68a1c548dd6fd1ec071067e917172fb014c894aead356df4937fa0af1a",
         "coverageKey": "native.microphone_ready.v1",
         "permittedClaims": [
           "enforce",
@@ -503,7 +503,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
       },
       {
         "id": "microphone_other_stream_running",
-        "sourceSchemaDigest": "sha256:2e5a9e295f0e867f67561d3ef16f43abcb239f51b00f3d3f6c8cf766cd165167",
+        "sourceSchemaDigest": "sha256:8517aa68a1c548dd6fd1ec071067e917172fb014c894aead356df4937fa0af1a",
         "coverageKey": "native.microphone_other_stream_running.v1",
         "permittedClaims": [
           "enforce",
@@ -538,7 +538,7 @@ export const NATIVE_CAPABILITY_REGISTRY_DATA = deepFreeze([
     "subCapabilities": [
       {
         "id": "external_capture_detection",
-        "sourceSchemaDigest": "sha256:291f420f209d04096a67bf3b58c8fcec5cb2a6f8a29b55b87ab568f5f0e62157",
+        "sourceSchemaDigest": "sha256:c5faaed56c1fa5824fa5c2f8b94795db01a06a2a2350e200ec91ba8e4ffe871a",
         "coverageKey": "native.external_capture_detection.v1",
         "permittedClaims": [
           "unavailable"
@@ -557,7 +557,7 @@ export const NATIVE_BASELINE_CAPABILITIES_DATA = deepFreeze([
     "id": "display",
     "sourceId": "display-topology",
     "coverageKey": "baseline.display",
-    "sourceSchemaDigest": "sha256:592cdd2f235e79c8d4f89bc573f72164d7dbbfa264f3d6ba8b7a357e7ac8d771",
+    "sourceSchemaDigest": "sha256:67ef1ed5899fd0750ef4d96c30ac15defaff71669ff8f5e4e38c2c9141215d3a",
     "permittedClaims": [
       "enforce",
       "unavailable"
@@ -577,7 +577,7 @@ export const NATIVE_BASELINE_CAPABILITIES_DATA = deepFreeze([
     "id": "window",
     "sourceId": "candidate-window",
     "coverageKey": "baseline.window",
-    "sourceSchemaDigest": "sha256:e7d24311166436f6a3f1fa02dff4827c4994b290a71c241f3f04197365afb15e",
+    "sourceSchemaDigest": "sha256:965ba53e57ee8e285baddda68edf2b0d73d95d32f7ddfac8e3fec08e0790a779",
     "permittedClaims": [
       "enforce",
       "unavailable"
@@ -597,7 +597,7 @@ export const NATIVE_BASELINE_CAPABILITIES_DATA = deepFreeze([
     "id": "capture",
     "sourceId": "capture-session",
     "coverageKey": "baseline.capture",
-    "sourceSchemaDigest": "sha256:291f420f209d04096a67bf3b58c8fcec5cb2a6f8a29b55b87ab568f5f0e62157",
+    "sourceSchemaDigest": "sha256:c5faaed56c1fa5824fa5c2f8b94795db01a06a2a2350e200ec91ba8e4ffe871a",
     "permittedClaims": [
       "enforce",
       "unavailable"
@@ -616,7 +616,7 @@ export const NATIVE_BASELINE_CAPABILITIES_DATA = deepFreeze([
   {
     "id": "content_protection",
     "coverageKey": "baseline.content_protection",
-    "sourceSchemaDigest": "sha256:e7d24311166436f6a3f1fa02dff4827c4994b290a71c241f3f04197365afb15e",
+    "sourceSchemaDigest": "sha256:965ba53e57ee8e285baddda68edf2b0d73d95d32f7ddfac8e3fec08e0790a779",
     "permittedClaims": [
       "enforce",
       "unavailable"

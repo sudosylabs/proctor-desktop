@@ -2,12 +2,6 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://proctor.invalid/native/capture-session-state.schema.json",
   "title": "Proctor native capture and remote-session observation protocol",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["schema_version"],
-  "properties": {
-    "schema_version": { "const": 1 }
-  },
   "$defs": {
     "CaptureSessionSupport": {
       "type": "string",
@@ -48,7 +42,6 @@
         "source_instance_id",
         "source_version",
         "adapter_version",
-        "schema_version",
         "platform",
         "permission",
         "health",
@@ -60,13 +53,6 @@
         "source_instance_id": { "type": "string", "minLength": 16, "maxLength": 64 },
         "source_version": { "type": "string", "minLength": 1, "maxLength": 32 },
         "adapter_version": { "type": "string", "minLength": 1, "maxLength": 32 },
-        "schema_version": {
-          "type": "integer",
-          "const": 1,
-          "minimum": 1,
-          "maximum": 65535,
-          "x-rust-type": "u16"
-        },
         "platform": { "$ref": "native-observation.schema.json#/$defs/PlatformFamily" },
         "permission": { "$ref": "native-observation.schema.json#/$defs/PermissionState" },
         "health": { "$ref": "native-observation.schema.json#/$defs/SourceHealth" },

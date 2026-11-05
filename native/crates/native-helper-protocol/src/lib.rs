@@ -205,13 +205,12 @@ pub fn validate_helper_source_close(
 /// # Errors
 ///
 /// Returns a bounded protocol category for a stale channel, mismatched source,
-/// incompatible schema, or incoherent source-specific state.
+/// or incoherent source-specific state.
 pub fn validate_helper_source_snapshot(
     snapshot: &HelperSourceSnapshot,
     expected_channel_nonce: &str,
     expected_source_instance_id: &str,
     expected_source_kind: HelperSourceKind,
-    expected_schema_version: u16,
 ) -> Result<(), HelperProtocolError> {
     validate_nonce(&snapshot.channel_nonce, expected_channel_nonce)?;
     if snapshot.helper_source_instance_id != expected_source_instance_id
@@ -219,10 +218,7 @@ pub fn validate_helper_source_snapshot(
     {
         return Err(HelperProtocolError::Identifier);
     }
-    if snapshot.source_kind != expected_source_kind
-        || snapshot.schema_version != expected_schema_version
-        || snapshot.validate_protocol().is_err()
-    {
+    if snapshot.source_kind != expected_source_kind || snapshot.validate_protocol().is_err() {
         return Err(HelperProtocolError::Snapshot);
     }
     Ok(())
@@ -286,7 +282,7 @@ enum HelperSourcePhase {
     Closed,
 }
 
-/// Fences one helper source's identity, schema, ordering, and monotonic timeline.
+/// Fences one helper source's identity, ordering, and monotonic timeline.
 ///
 /// Transport implementations keep this state in the unprivileged utility side;
 /// the helper cannot reset it by sending a different source identifier.
@@ -294,7 +290,6 @@ pub struct HelperSourceFence {
     channel_nonce: String,
     source_instance_id: String,
     source_kind: HelperSourceKind,
-    schema_version: u16,
     last_sequence: u64,
     last_monotonic_time_ns: u64,
     phase: HelperSourcePhase,
@@ -316,7 +311,6 @@ impl HelperSourceFence {
             channel_nonce: expected_channel_nonce.to_owned(),
             source_instance_id: request.helper_source_instance_id.clone(),
             source_kind: request.source_kind,
-            schema_version: request.schema_version,
             last_sequence: 0,
             last_monotonic_time_ns: 0,
             phase: HelperSourcePhase::AwaitingInitialSnapshot,
@@ -499,7 +493,6 @@ impl HelperSourceFence {
             &self.channel_nonce,
             &self.source_instance_id,
             self.source_kind,
-            self.schema_version,
         )
     }
 
@@ -553,7 +546,7 @@ mod tests {
     use native_protocol::{
         InteractiveConsoleOwnership, InteractiveLockState, InteractiveRemoteAttachment,
         InteractiveSessionCertainty, InteractiveSessionCoverage, InteractiveSessionEvent,
-        InteractiveSessionEventKind, InteractiveSessionState, PROCESS_APPLICATION_SCHEMA_VERSION,
+        InteractiveSessionEventKind, InteractiveSessionState,
     };
 
     const NONCE: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
@@ -597,7 +590,6 @@ mod tests {
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "helper-source-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
-            schema_version: 1,
             queue_capacity: 16,
             event_classes: vec![HelperEventClass::InteractiveSessionLifecycle],
         };
@@ -615,7 +607,6 @@ mod tests {
 
         let mut process_request = HelperSourceOpen {
             source_kind: HelperSourceKind::ProcessApplication,
-            schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
             event_classes: vec![
                 HelperEventClass::ProcessLifecycle,
                 HelperEventClass::ProcessIdentity,
@@ -984,7 +975,6 @@ mod tests {
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "helper-source-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
-            schema_version: 1,
             queue_capacity: 16,
             event_classes: vec![HelperEventClass::InteractiveSessionLifecycle],
         }
@@ -1006,7 +996,6 @@ mod tests {
             channel_nonce: NONCE.to_owned(),
             helper_source_instance_id: "helper-source-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
-            schema_version: 1,
             last_sequence,
             monotonic_time_ns,
             process_state: None,

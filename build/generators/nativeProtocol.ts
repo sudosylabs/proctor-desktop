@@ -27,7 +27,6 @@ type CapabilityDescriptor = {
 	readonly authority: string;
 	readonly rustOutput: string;
 	readonly drainType: string;
-	readonly schemaVersionConstant: string;
 	readonly maximumFactsConstant: string;
 	readonly typescriptValidator: string;
 };
@@ -76,7 +75,6 @@ function capabilityDescriptor(
 		authority,
 		rustOutput: `native/crates/native-protocol/src/${sourceId.replaceAll('-', '_')}.generated.rs`,
 		drainType: `${typePrefix}Drain`,
-		schemaVersionConstant: `${snakePrefix}_SCHEMA_VERSION`,
 		maximumFactsConstant: `MAX_${snakePrefix}_FACTS`,
 		typescriptValidator: `is${typePrefix}Observation`
 	};
@@ -84,14 +82,8 @@ function capabilityDescriptor(
 
 type JsonSchema = {
 	readonly $defs?: Readonly<Record<string, Definition>>;
-	readonly properties?: Readonly<Record<string, Property>>;
 	readonly ['x-proctor-source-manifest']?: readonly unknown[];
 	readonly ['x-proctor-source-lifecycle-deadline-ms']?: unknown;
-};
-
-type SourceManifestEntry = {
-	readonly source_id: string;
-	readonly schema_version: number;
 };
 
 type SemanticRule =
@@ -175,31 +167,13 @@ export const nativeProtocolGenerator: Generator = {
 			if (capabilityDefinitions === undefined) {
 				throw new Error(`${descriptor.authority} must define $defs`);
 			}
-			const capabilitySchemaVersion = capabilitySchema.properties?.schema_version?.const;
-			if (typeof capabilitySchemaVersion !== 'number') {
-				throw new Error(
-					`${descriptor.authority} must declare numeric schema_version const`
-				);
-			}
-			return {
-				descriptor,
-				definitions: capabilityDefinitions,
-				schemaVersion: capabilitySchemaVersion
-			};
+			return { descriptor, definitions: capabilityDefinitions };
 		});
-		const schemaVersion = schema.properties?.schema_version?.const;
-		if (typeof schemaVersion !== 'number')
-			throw new Error(
-				`${DISPLAY_TOPOLOGY_AUTHORITY} must declare numeric schema_version const`
-			);
 		const sourceManifest = requiredSourceManifest(
 			commonSchema,
-			new Map([
-				['display-topology', schemaVersion],
-				...capabilities.map(
-					(capability) =>
-						[capability.descriptor.sourceId, capability.schemaVersion] as const
-				)
+			new Set([
+				'display-topology',
+				...capabilities.map((capability) => capability.descriptor.sourceId)
 			])
 		);
 		const sourceLifecycleDeadlineMs = requiredSourceLifecycleDeadline(commonSchema);
@@ -212,13 +186,7 @@ export const nativeProtocolGenerator: Generator = {
 		const rustOutput = write(
 			outputRoot,
 			RUST_OUTPUT,
-			renderRust(
-				definitions,
-				schemaVersion,
-				sourceManifest,
-				sourceLifecycleDeadlineMs,
-				sourceCategories
-			)
+			renderRust(definitions, sourceManifest, sourceLifecycleDeadlineMs, sourceCategories)
 		);
 		execFileSync('rustfmt', ['--edition', '2024', rustOutput]);
 		write(
@@ -248,21 +216,13 @@ export const nativeCapabilityProtocolGenerators: readonly Generator[] = CAPABILI
 			const definitions = schema.$defs;
 			if (definitions === undefined)
 				throw new Error(`${descriptor.authority} must define $defs`);
-			const schemaVersion = schema.properties?.schema_version?.const;
-			if (typeof schemaVersion !== 'number') {
-				throw new Error(
-					`${descriptor.authority} must declare numeric schema_version const`
-				);
-			}
 			const rustOutput = write(
 				outputRoot,
 				descriptor.rustOutput,
 				renderCapabilityRust(
 					definitions,
-					schemaVersion,
 					`// @${'generated'} by ${descriptor.generatorId} from ${COMMON_AUTHORITY} and ${descriptor.authority}.`,
 					descriptor.drainType,
-					descriptor.schemaVersionConstant,
 					descriptor.maximumFactsConstant
 				)
 			);
@@ -297,8 +257,7 @@ export const nativeHelperProtocolGenerator: Generator = {
 
 function renderRust(
 	definitions: Readonly<Record<string, Definition>>,
-	schemaVersion: number,
-	sourceManifest: readonly SourceManifestEntry[],
+	sourceManifest: readonly string[],
 	sourceLifecycleDeadlineMs: number,
 	sourceCategories: readonly string[]
 ): string {
@@ -318,7 +277,6 @@ function renderRust(
 		'use std::fmt;',
 		'use serde::{Deserialize, Serialize};',
 		'',
-		`pub const DISPLAY_TOPOLOGY_SCHEMA_VERSION: u16 = ${rustNumber(schemaVersion)};`,
 		`pub const MAX_DISPLAY_TARGETS: usize = ${rustNumber(maximumTargets)};`,
 		`pub const MAX_DISPLAY_TOPOLOGY_FACTS: usize = ${rustNumber(maximumFacts)};`,
 		`pub const MAX_PROTOCOL_SAFE_INTEGER: u64 = ${rustNumber(maximumTimestamp)};`,
@@ -326,21 +284,8 @@ function renderRust(
 		`pub const NATIVE_SOURCE_CATEGORY_COUNT: usize = ${sourceCategories.length};`,
 		`pub const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS: u64 = ${rustNumber(sourceLifecycleDeadlineMs)};`,
 		'',
-		'#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]',
-		'pub struct NativeSourceManifestEntry {',
-		"    pub source_id: &'static str,",
-		'    pub schema_version: u16,',
-		'}',
-		'',
-		'pub const NATIVE_SOURCE_MANIFEST: [NativeSourceManifestEntry; NATIVE_SOURCE_COUNT] = [',
-		...sourceManifest
-			.map((entry) => [
-				'    NativeSourceManifestEntry {',
-				`        source_id: ${JSON.stringify(entry.source_id)},`,
-				`        schema_version: ${rustNumber(entry.schema_version)},`,
-				'    },'
-			])
-			.flat(),
+		'pub const NATIVE_SOURCE_MANIFEST: [&str; NATIVE_SOURCE_COUNT] = [',
+		...sourceManifest.map((sourceId) => `    ${JSON.stringify(sourceId)},`),
 		'];',
 		'',
 		'pub const NATIVE_SOURCE_CATEGORY_ORDER: [NativeSourceCategory; NATIVE_SOURCE_CATEGORY_COUNT] = [',
@@ -386,10 +331,8 @@ function renderRust(
 
 function renderCapabilityRust(
 	definitions: Readonly<Record<string, Definition>>,
-	schemaVersion: number,
 	marker: string,
 	drainType: string,
-	schemaVersionConstant: string,
 	maximumFactsConstant: string
 ): string {
 	const maximumFacts = sourceBatchFactLimit(definitions, drainType);
@@ -404,7 +347,6 @@ function renderCapabilityRust(
 		'    SequenceGap, SourceFailureCode, SourceHealth, SourceReset, SourceTimestamp,',
 		'};',
 		'',
-		`pub const ${schemaVersionConstant}: u16 = ${rustNumber(schemaVersion)};`,
 		`pub const ${maximumFactsConstant}: usize = ${rustNumber(maximumFacts)};`,
 		''
 	];
@@ -420,8 +362,8 @@ function renderHelperRust(definitions: Readonly<Record<string, Definition>>): st
 		'use serde::{Deserialize, Serialize};',
 		'',
 		'use crate::{',
-		'    INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveSessionEvent, InteractiveSessionState,',
-		'    PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationEvent, ProcessApplicationState,',
+		'    InteractiveSessionEvent, InteractiveSessionState, ProcessApplicationEvent,',
+		'    ProcessApplicationState,',
 		'    ProtocolValidatable, ProtocolValidationError,',
 		'};',
 		''
@@ -523,7 +465,7 @@ function renderRustDefinitions(definitions: Readonly<Record<string, Definition>>
 
 function renderTypeScript(
 	definitions: Readonly<Record<string, Definition>>,
-	sourceManifest: readonly SourceManifestEntry[],
+	sourceManifest: readonly string[],
 	sourceLifecycleDeadlineMs: number,
 	sourceCategories: readonly string[]
 ): string {
@@ -802,10 +744,6 @@ function renderTypeScript(
 		'',
 		'function hasCoherentHelperSourceOpen(value: JsonObject): boolean {',
 		'  if (!Array.isArray(value.event_classes)) return false;',
-		"  const schemaMatches = value.source_kind === 'process_application'",
-		'    ? value.schema_version === 1',
-		"    : value.source_kind === 'interactive_session' && value.schema_version === 1;",
-		'  if (!schemaMatches) return false;',
 		"  return value.source_kind === 'process_application'",
 		'    ? value.event_classes.length === 2',
 		"      && value.event_classes.includes('process_lifecycle')",
@@ -826,10 +764,6 @@ function renderTypeScript(
 		'}',
 		'',
 		'function hasCoherentHelperSourceSnapshot(value: JsonObject): boolean {',
-		"  const schemaMatches = value.source_kind === 'process_application'",
-		'    ? value.schema_version === 1',
-		"    : value.source_kind === 'interactive_session' && value.schema_version === 1;",
-		'  if (!schemaMatches) return false;',
 		"  return value.source_kind === 'process_application'",
 		'    ? isProcessApplicationState(value.process_state)',
 		'      && value.interactive_session_state === undefined',
@@ -867,8 +801,8 @@ function renderTypeScript(
 
 function requiredSourceManifest(
 	schema: JsonSchema,
-	schemaVersions: ReadonlyMap<string, number>
-): readonly SourceManifestEntry[] {
+	generatedSources: ReadonlySet<string>
+): readonly string[] {
 	const manifest = schema['x-proctor-source-manifest'];
 	if (manifest === undefined || manifest.length === 0) {
 		throw new Error(`${COMMON_AUTHORITY} must declare a non-empty x-proctor-source-manifest`);
@@ -883,16 +817,15 @@ function requiredSourceManifest(
 		if (sourceIds.has(sourceId)) {
 			throw new Error(`${COMMON_AUTHORITY} source manifest repeats ${sourceId}`);
 		}
-		const schemaVersion = schemaVersions.get(sourceId);
-		if (schemaVersion === undefined) {
+		if (!generatedSources.has(sourceId)) {
 			throw new Error(
 				`${COMMON_AUTHORITY} source manifest names unsupported source ${sourceId}`
 			);
 		}
 		sourceIds.add(sourceId);
-		return { source_id: sourceId, schema_version: schemaVersion };
+		return sourceId;
 	});
-	if (sourceIds.size !== schemaVersions.size) {
+	if (sourceIds.size !== generatedSources.size) {
 		throw new Error(
 			`${COMMON_AUTHORITY} source manifest must name every generated source exactly once`
 		);
@@ -1454,15 +1387,7 @@ const semanticRuleEmitters = {
 			'                    == [HelperEventClass::InteractiveSessionLifecycle]',
 			'            }',
 			'        };',
-			'        let schema_matches = match self.source_kind {',
-			'            HelperSourceKind::ProcessApplication => {',
-			'                self.schema_version == PROCESS_APPLICATION_SCHEMA_VERSION',
-			'            }',
-			'            HelperSourceKind::InteractiveSession => {',
-			'                self.schema_version == INTERACTIVE_SESSION_SCHEMA_VERSION',
-			'            }',
-			'        };',
-			'        if !matching || !schema_matches {',
+			'        if !matching {',
 			`            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "event_classes", "complete coherent class set matches helper source"));`,
 			'        }'
 		],
@@ -1478,15 +1403,7 @@ const semanticRuleEmitters = {
 			'                self.process_state.is_none() && self.interactive_session_state.is_some()',
 			'            }',
 			'        };',
-			'        let schema_matches = match self.source_kind {',
-			'            HelperSourceKind::ProcessApplication => {',
-			'                self.schema_version == PROCESS_APPLICATION_SCHEMA_VERSION',
-			'            }',
-			'            HelperSourceKind::InteractiveSession => {',
-			'                self.schema_version == INTERACTIVE_SESSION_SCHEMA_VERSION',
-			'            }',
-			'        };',
-			'        if !coherent || !schema_matches {',
+			'        if !coherent {',
 			`            return Err(ProtocolValidationError::new(${JSON.stringify(typeName)}, "source_kind", "exact matching source state"));`,
 			'        }'
 		],

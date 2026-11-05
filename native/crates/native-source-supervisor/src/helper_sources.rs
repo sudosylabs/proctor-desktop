@@ -637,13 +637,6 @@ fn lock_failure<T>(error: &std::sync::TryLockError<T>) -> SourceStartFailure {
     }
 }
 
-#[cfg(test)]
-fn schema(kind: HelperSourceKind) -> u16 {
-    match kind {
-        HelperSourceKind::ProcessApplication => native_protocol::PROCESS_APPLICATION_SCHEMA_VERSION,
-        HelperSourceKind::InteractiveSession => native_protocol::INTERACTIVE_SESSION_SCHEMA_VERSION,
-    }
-}
 fn source_failure(code: HelperFailureCode) -> SourceFailureCode {
     match code {
         HelperFailureCode::Cleanup => SourceFailureCode::Cleanup,
@@ -709,7 +702,6 @@ fn project_snapshot(
                 source_instance_id: snapshot.helper_source_instance_id.clone(),
                 source_version: "helper-source-0.1.0".to_owned(),
                 adapter_version: adapter.to_owned(),
-                schema_version: snapshot.schema_version,
                 platform,
                 permission,
                 health,
@@ -729,7 +721,6 @@ fn project_snapshot(
                 source_instance_id: snapshot.helper_source_instance_id.clone(),
                 source_version: "helper-source-0.1.0".to_owned(),
                 adapter_version: adapter.to_owned(),
-                schema_version: snapshot.schema_version,
                 platform,
                 permission,
                 health,
@@ -840,7 +831,6 @@ mod tests {
             channel_nonce: "a".repeat(64),
             helper_source_instance_id: id.to_owned(),
             source_kind: kind,
-            schema_version: schema(kind),
             last_sequence: 0,
             monotonic_time_ns: 100,
             process_state: (kind == HelperSourceKind::ProcessApplication).then(|| {

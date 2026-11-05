@@ -1006,7 +1006,6 @@ pub trait PassiveStateWire: Send + Sync + 'static {
     type Observation: Clone + Eq + ProtocolValidatable + Send + 'static;
     type Drain: Clone + Eq + ProtocolValidatable + Send + 'static;
 
-    const SCHEMA_VERSION: u16;
     const SOURCE_VERSION: &'static str;
     const STOP_THREAD_NAME: &'static str;
 

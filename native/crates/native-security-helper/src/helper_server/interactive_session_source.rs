@@ -7,8 +7,8 @@ use native_helper_protocol::{
     HelperSourceSnapshot,
 };
 use native_protocol::{
-    INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveSessionEvent, InteractiveSessionEventKind,
-    InteractiveSessionState, MAX_PROTOCOL_SAFE_INTEGER, ProtocolValidatable,
+    InteractiveSessionEvent, InteractiveSessionEventKind, InteractiveSessionState,
+    MAX_PROTOCOL_SAFE_INTEGER, ProtocolValidatable,
 };
 
 use super::{
@@ -137,9 +137,6 @@ struct SessionHelperSource<S: SessionSource> {
 impl<S: SessionSource> HelperSource for SessionHelperSource<S> {
     fn source_kind(&self) -> HelperSourceKind {
         HelperSourceKind::InteractiveSession
-    }
-    fn schema_version(&self) -> u16 {
-        INTERACTIVE_SESSION_SCHEMA_VERSION
     }
     fn drain(&mut self) -> Result<Vec<HelperSourceEvent>, HelperTransportError> {
         if self.terminal || Instant::now() < self.next_poll {
@@ -344,7 +341,6 @@ fn snapshot(
         channel_nonce: request.channel_nonce.clone(),
         helper_source_instance_id: request.helper_source_instance_id.clone(),
         source_kind: HelperSourceKind::InteractiveSession,
-        schema_version: INTERACTIVE_SESSION_SCHEMA_VERSION,
         last_sequence: sequence,
         monotonic_time_ns: time,
         process_state: None,
@@ -411,7 +407,6 @@ mod tests {
                 .to_owned(),
             helper_source_instance_id: "session-source-0001".to_owned(),
             source_kind: HelperSourceKind::InteractiveSession,
-            schema_version: INTERACTIVE_SESSION_SCHEMA_VERSION,
             queue_capacity: 8,
             event_classes: vec![HelperEventClass::InteractiveSessionLifecycle],
         }

@@ -3,11 +3,10 @@ mod platform;
 use std::fmt;
 
 use native_protocol::{
-    PROCESS_APPLICATION_SCHEMA_VERSION, PermissionState, PlatformFamily, ProcessApplicationDrain,
-    ProcessApplicationEvent, ProcessApplicationEventKind, ProcessApplicationObservation,
-    ProcessApplicationSourceSnapshot, ProcessApplicationState, ProcessExecutableIdentityStatus,
-    ProtocolValidatable, ProtocolViolation, SourceFailureCode, SourceHealth, SourceOpenRequest,
-    SourceReset,
+    PermissionState, PlatformFamily, ProcessApplicationDrain, ProcessApplicationEvent,
+    ProcessApplicationEventKind, ProcessApplicationObservation, ProcessApplicationSourceSnapshot,
+    ProcessApplicationState, ProcessExecutableIdentityStatus, ProtocolValidatable,
+    ProtocolViolation, SourceFailureCode, SourceHealth, SourceOpenRequest, SourceReset,
 };
 use native_source_runtime::{
     BoundedTaskError, QueueError, SourceModel, SourceResetPlan, SourceSession, SourceSessionFact,
@@ -265,7 +264,6 @@ impl ProcessApplicationEmitter {
             source_instance_id: metadata.source_instance_id,
             source_version: SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
             platform,
             permission,
             health: metadata.health,

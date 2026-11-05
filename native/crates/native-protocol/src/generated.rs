@@ -4,7 +4,6 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
-pub const DISPLAY_TOPOLOGY_SCHEMA_VERSION: u16 = 1;
 pub const MAX_DISPLAY_TARGETS: usize = 32;
 pub const MAX_DISPLAY_TOPOLOGY_FACTS: usize = 1_024;
 pub const MAX_PROTOCOL_SAFE_INTEGER: u64 = 9_007_199_254_740_991;
@@ -12,57 +11,18 @@ pub const NATIVE_SOURCE_COUNT: usize = 11;
 pub const NATIVE_SOURCE_CATEGORY_COUNT: usize = 10;
 pub const NATIVE_SOURCE_LIFECYCLE_DEADLINE_MS: u64 = 5_000;
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize)]
-pub struct NativeSourceManifestEntry {
-    pub source_id: &'static str,
-    pub schema_version: u16,
-}
-
-pub const NATIVE_SOURCE_MANIFEST: [NativeSourceManifestEntry; NATIVE_SOURCE_COUNT] = [
-    NativeSourceManifestEntry {
-        source_id: "display-topology",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "candidate-window",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "capture-session",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "process-application",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "interactive-session",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "clipboard",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "print-spooler",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "removable-storage",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "virtualization",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "network-configuration",
-        schema_version: 1,
-    },
-    NativeSourceManifestEntry {
-        source_id: "media-device",
-        schema_version: 1,
-    },
+pub const NATIVE_SOURCE_MANIFEST: [&str; NATIVE_SOURCE_COUNT] = [
+    "display-topology",
+    "candidate-window",
+    "capture-session",
+    "process-application",
+    "interactive-session",
+    "clipboard",
+    "print-spooler",
+    "removable-storage",
+    "virtualization",
+    "network-configuration",
+    "media-device",
 ];
 
 pub const NATIVE_SOURCE_CATEGORY_ORDER: [NativeSourceCategory; NATIVE_SOURCE_CATEGORY_COUNT] = [
@@ -531,7 +491,6 @@ pub struct DisplayTopologySourceSnapshot {
     pub source_instance_id: String,
     pub source_version: String,
     pub adapter_version: String,
-    pub schema_version: u16,
     pub platform: PlatformFamily,
     pub permission: PermissionState,
     pub health: SourceHealth,
@@ -567,13 +526,6 @@ impl ProtocolValidatable for DisplayTopologySourceSnapshot {
                 "DisplayTopologySourceSnapshot",
                 "adapter_version",
                 "length 1..=32",
-            ));
-        }
-        if self.schema_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "DisplayTopologySourceSnapshot",
-                "schema_version",
-                "const 1",
             ));
         }
         self.platform.validate_protocol()?;

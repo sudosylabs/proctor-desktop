@@ -3,9 +3,9 @@
 mod platform;
 
 use native_protocol::{
-    CLIPBOARD_SCHEMA_VERSION, ClipboardCertainty, ClipboardCoverage, ClipboardDrain,
-    ClipboardEvent, ClipboardEventKind, ClipboardObservation, ClipboardSourceSnapshot,
-    ClipboardState, PermissionState, PlatformFamily, SourceFailureCode, SourceHealth, SourceReset,
+    ClipboardCertainty, ClipboardCoverage, ClipboardDrain, ClipboardEvent, ClipboardEventKind,
+    ClipboardObservation, ClipboardSourceSnapshot, ClipboardState, PermissionState, PlatformFamily,
+    SourceFailureCode, SourceHealth, SourceReset,
 };
 use native_source_runtime::{
     PassiveStateEventKind, PassiveStateWire, SequencedObservation, SourceSessionMetadata,
@@ -27,7 +27,6 @@ impl PassiveStateWire for ClipboardWire {
     type Snapshot = ClipboardSourceSnapshot;
     type Observation = ClipboardObservation;
     type Drain = ClipboardDrain;
-    const SCHEMA_VERSION: u16 = CLIPBOARD_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
     const STOP_THREAD_NAME: &'static str = "clipboard-stop";
 
@@ -70,7 +69,6 @@ impl PassiveStateWire for ClipboardWire {
             source_instance_id: metadata.source_instance_id,
             source_version: Self::SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: Self::SCHEMA_VERSION,
             platform,
             permission,
             health: metadata.health,

@@ -30,7 +30,7 @@ const candidateWindow: CandidateWindowState = {
 	display_target_id: 'security-test-display'
 };
 
-const selectedSources = SECURITY_UTILITY_SOURCE_MANIFEST.map((entry) => entry.source_id);
+const selectedSources = [...SECURITY_UTILITY_SOURCE_MANIFEST];
 const selectedSourceCategories = [
 	'os-clipboard-change',
 	'removable-block-storage',
@@ -52,7 +52,6 @@ const snapshots = [
 			source_instance_id: 'display-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'granted',
 			health: 'healthy',
@@ -81,7 +80,6 @@ const snapshots = [
 			source_instance_id: 'candidate-source-001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'granted',
 			health: 'healthy',
@@ -96,7 +94,6 @@ const snapshots = [
 			source_instance_id: 'capture-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -122,7 +119,6 @@ const snapshots = [
 			source_instance_id: 'process-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -141,7 +137,6 @@ const snapshots = [
 			source_instance_id: 'interactive-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -163,7 +158,6 @@ const snapshots = [
 			source_instance_id: 'clipboard-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -178,7 +172,6 @@ const snapshots = [
 			source_instance_id: 'print-source-000001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -199,7 +192,6 @@ const snapshots = [
 			source_instance_id: 'storage-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -214,7 +206,6 @@ const snapshots = [
 			source_instance_id: 'virtual-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -229,7 +220,6 @@ const snapshots = [
 			source_instance_id: 'network-source-0001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -251,7 +241,6 @@ const snapshots = [
 			source_instance_id: 'media-source-00001',
 			source_version: '0.1.0',
 			adapter_version: 'test-v1',
-			schema_version: 1,
 			platform: 'macos',
 			permission: 'unavailable',
 			health: 'degraded',
@@ -385,7 +374,7 @@ void test('private bootstrap validator rejects unknown fields and manifest drift
 	);
 });
 
-void test('native bridge admission compares the generated per-source schema manifest', () => {
+void test('native bridge admission compares the exact generated source manifest', () => {
 	const manifest = {
 		source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST
 	};
@@ -394,7 +383,7 @@ void test('native bridge admission compares the generated per-source schema mani
 		isNativeBridgeManifest({
 			...manifest,
 			source_manifest: SECURITY_UTILITY_SOURCE_MANIFEST.map((source, index) =>
-				index === 1 ? { ...source, schema_version: source.schema_version + 1 } : source
+				index === 1 ? 'unknown-source' : source
 			)
 		}),
 		false

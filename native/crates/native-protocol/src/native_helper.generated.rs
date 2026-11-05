@@ -4,9 +4,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    INTERACTIVE_SESSION_SCHEMA_VERSION, InteractiveSessionEvent, InteractiveSessionState,
-    PROCESS_APPLICATION_SCHEMA_VERSION, ProcessApplicationEvent, ProcessApplicationState,
-    ProtocolValidatable, ProtocolValidationError,
+    InteractiveSessionEvent, InteractiveSessionState, ProcessApplicationEvent,
+    ProcessApplicationState, ProtocolValidatable, ProtocolValidationError,
 };
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -253,7 +252,6 @@ pub struct HelperSourceOpen {
     pub channel_nonce: String,
     pub helper_source_instance_id: String,
     pub source_kind: HelperSourceKind,
-    pub schema_version: u16,
     pub queue_capacity: u16,
     pub event_classes: Vec<HelperEventClass>,
 }
@@ -275,13 +273,6 @@ impl ProtocolValidatable for HelperSourceOpen {
             ));
         }
         self.source_kind.validate_protocol()?;
-        if !(1..=65_535).contains(&self.schema_version) {
-            return Err(ProtocolValidationError::new(
-                "HelperSourceOpen",
-                "schema_version",
-                "range 1..=65535",
-            ));
-        }
         if !(2..=1_024).contains(&self.queue_capacity) {
             return Err(ProtocolValidationError::new(
                 "HelperSourceOpen",
@@ -325,15 +316,7 @@ impl ProtocolValidatable for HelperSourceOpen {
                 self.event_classes.as_slice() == [HelperEventClass::InteractiveSessionLifecycle]
             }
         };
-        let schema_matches = match self.source_kind {
-            HelperSourceKind::ProcessApplication => {
-                self.schema_version == PROCESS_APPLICATION_SCHEMA_VERSION
-            }
-            HelperSourceKind::InteractiveSession => {
-                self.schema_version == INTERACTIVE_SESSION_SCHEMA_VERSION
-            }
-        };
-        if !matching || !schema_matches {
+        if !matching {
             return Err(ProtocolValidationError::new(
                 "HelperSourceOpen",
                 "event_classes",
@@ -389,7 +372,6 @@ pub struct HelperSourceSnapshot {
     pub channel_nonce: String,
     pub helper_source_instance_id: String,
     pub source_kind: HelperSourceKind,
-    pub schema_version: u16,
     #[serde(
         serialize_with = "crate::serialize_protocol_safe_u64",
         deserialize_with = "crate::deserialize_protocol_safe_u64"
@@ -423,13 +405,6 @@ impl ProtocolValidatable for HelperSourceSnapshot {
             ));
         }
         self.source_kind.validate_protocol()?;
-        if !(1..=65_535).contains(&self.schema_version) {
-            return Err(ProtocolValidationError::new(
-                "HelperSourceSnapshot",
-                "schema_version",
-                "range 1..=65535",
-            ));
-        }
         if !(0..=9_007_199_254_740_991).contains(&self.last_sequence) {
             return Err(ProtocolValidationError::new(
                 "HelperSourceSnapshot",
@@ -470,15 +445,7 @@ impl ProtocolValidatable for HelperSourceSnapshot {
                 self.process_state.is_none() && self.interactive_session_state.is_some()
             }
         };
-        let schema_matches = match self.source_kind {
-            HelperSourceKind::ProcessApplication => {
-                self.schema_version == PROCESS_APPLICATION_SCHEMA_VERSION
-            }
-            HelperSourceKind::InteractiveSession => {
-                self.schema_version == INTERACTIVE_SESSION_SCHEMA_VERSION
-            }
-        };
-        if !coherent || !schema_matches {
+        if !coherent {
             return Err(ProtocolValidationError::new(
                 "HelperSourceSnapshot",
                 "source_kind",

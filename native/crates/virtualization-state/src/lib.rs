@@ -3,9 +3,9 @@
 mod platform;
 use native_protocol::{
     PermissionState, PlatformFamily, SourceFailureCode, SourceHealth, SourceReset,
-    VIRTUALIZATION_SCHEMA_VERSION, VirtualizationCertainty, VirtualizationClassification,
-    VirtualizationCoverage, VirtualizationDrain, VirtualizationEvent, VirtualizationEventKind,
-    VirtualizationObservation, VirtualizationSourceSnapshot, VirtualizationState,
+    VirtualizationCertainty, VirtualizationClassification, VirtualizationCoverage,
+    VirtualizationDrain, VirtualizationEvent, VirtualizationEventKind, VirtualizationObservation,
+    VirtualizationSourceSnapshot, VirtualizationState,
 };
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedVirtualizationBackend,
@@ -26,7 +26,6 @@ impl PassiveStateWire for VirtualizationWire {
     type Snapshot = VirtualizationSourceSnapshot;
     type Observation = VirtualizationObservation;
     type Drain = VirtualizationDrain;
-    const SCHEMA_VERSION: u16 = VIRTUALIZATION_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
     const STOP_THREAD_NAME: &'static str = "virtualization-stop";
     fn health(state: &Self::State) -> SourceHealth {
@@ -65,7 +64,6 @@ impl PassiveStateWire for VirtualizationWire {
             source_instance_id: metadata.source_instance_id,
             source_version: Self::SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: Self::SCHEMA_VERSION,
             platform,
             permission,
             health: metadata.health,

@@ -2,11 +2,10 @@
 
 mod platform;
 use native_protocol::{
-    NETWORK_CONFIGURATION_SCHEMA_VERSION, NetworkActivityState, NetworkConfigurationCertainty,
-    NetworkConfigurationCoverage, NetworkConfigurationDrain, NetworkConfigurationEvent,
-    NetworkConfigurationEventKind, NetworkConfigurationObservation,
-    NetworkConfigurationSourceSnapshot, NetworkConfigurationState, PermissionState, PlatformFamily,
-    SourceFailureCode, SourceHealth, SourceReset,
+    NetworkActivityState, NetworkConfigurationCertainty, NetworkConfigurationCoverage,
+    NetworkConfigurationDrain, NetworkConfigurationEvent, NetworkConfigurationEventKind,
+    NetworkConfigurationObservation, NetworkConfigurationSourceSnapshot, NetworkConfigurationState,
+    PermissionState, PlatformFamily, SourceFailureCode, SourceHealth, SourceReset,
 };
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedNetworkConfigurationBackend,
@@ -81,7 +80,6 @@ impl PassiveStateWire for NetworkConfigurationWire {
     type Snapshot = NetworkConfigurationSourceSnapshot;
     type Observation = NetworkConfigurationObservation;
     type Drain = NetworkConfigurationDrain;
-    const SCHEMA_VERSION: u16 = NETWORK_CONFIGURATION_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
     const STOP_THREAD_NAME: &'static str = "network-configuration-stop";
     fn health(state: &Self::State) -> SourceHealth {
@@ -125,7 +123,6 @@ impl PassiveStateWire for NetworkConfigurationWire {
             source_instance_id: metadata.source_instance_id,
             source_version: Self::SOURCE_VERSION.to_owned(),
             adapter_version: adapter_version.to_owned(),
-            schema_version: Self::SCHEMA_VERSION,
             platform,
             permission,
             health: metadata.health,

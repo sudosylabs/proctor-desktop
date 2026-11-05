@@ -285,7 +285,7 @@ and resource bounds.
 
 Opening a source creates one race-free source session. The handshake returns:
 
-- source, adapter, and schema versions;
+- source and adapter identity;
 - platform support and permission state;
 - a new source-instance identifier and current health;
 - one complete initial snapshot at sequence `N`;
@@ -315,7 +315,7 @@ The coordinator translates the verified effective policy into source admission:
   prohibited condition.
 
 Sources remain policy-blind. They receive only selected mechanical categories,
-schema versions, adapter variants, queue limits, and other observation bounds.
+adapter variants, queue limits, and other observation bounds.
 The private bootstrap names clipboard change; removable block and portable/MTP;
 system-proxy, OS-managed-VPN, tunnel-interface, route-change, and network-source-
 health; and camera/microphone selections in the schema-generated fixed order. A selected
@@ -558,7 +558,7 @@ old source session; a later successful join creates fresh generations.
 
 ## Privacy and diagnostics
 
-Ordinary diagnostics contain only bounded adapter/schema versions,
+Ordinary diagnostics contain only bounded adapter identities,
 pseudonymous source-instance identity, lifecycle transitions, health/error
 codes, queue utilization, missing ranges, timing aggregates, resets, permission
 category, and cleanup classification. Raw observations, process/device/network

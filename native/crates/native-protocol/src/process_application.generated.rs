@@ -8,7 +8,6 @@ use crate::{
     SourceFailureCode, SourceHealth, SourceReset, SourceTimestamp,
 };
 
-pub const PROCESS_APPLICATION_SCHEMA_VERSION: u16 = 1;
 pub const MAX_PROCESS_APPLICATION_FACTS: usize = 1_024;
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -454,7 +453,6 @@ pub struct ProcessApplicationSourceSnapshot {
     pub source_instance_id: String,
     pub source_version: String,
     pub adapter_version: String,
-    pub schema_version: u16,
     pub platform: PlatformFamily,
     pub permission: PermissionState,
     pub health: SourceHealth,
@@ -490,13 +488,6 @@ impl ProtocolValidatable for ProcessApplicationSourceSnapshot {
                 "ProcessApplicationSourceSnapshot",
                 "adapter_version",
                 "length 1..=64",
-            ));
-        }
-        if self.schema_version != 1 {
-            return Err(ProtocolValidationError::new(
-                "ProcessApplicationSourceSnapshot",
-                "schema_version",
-                "const 1",
             ));
         }
         self.platform.validate_protocol()?;

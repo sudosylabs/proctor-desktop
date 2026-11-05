@@ -1,8 +1,4 @@
 use super::*;
-use native_protocol::{
-    CANDIDATE_WINDOW_SCHEMA_VERSION, CAPTURE_SESSION_SCHEMA_VERSION,
-    DISPLAY_TOPOLOGY_SCHEMA_VERSION, PROCESS_APPLICATION_SCHEMA_VERSION,
-};
 
 use std::cell::Cell;
 use std::collections::VecDeque;
@@ -952,7 +948,6 @@ fn display_snapshot(id: &str, health: SourceHealth) -> NativeSourceSnapshot {
         source_instance_id: id.to_owned(),
         source_version: "test".to_owned(),
         adapter_version: "test-adapter".to_owned(),
-        schema_version: DISPLAY_TOPOLOGY_SCHEMA_VERSION,
         platform: PlatformFamily::Linux,
         permission: PermissionState::Granted,
         health,
@@ -967,7 +962,6 @@ fn candidate_snapshot(id: &str) -> NativeSourceSnapshot {
         source_instance_id: id.to_owned(),
         source_version: "test".to_owned(),
         adapter_version: "test-adapter".to_owned(),
-        schema_version: CANDIDATE_WINDOW_SCHEMA_VERSION,
         platform: PlatformFamily::Linux,
         permission: PermissionState::Granted,
         health: SourceHealth::Healthy,
@@ -982,7 +976,6 @@ fn capture_snapshot(id: &str) -> NativeSourceSnapshot {
         source_instance_id: id.to_owned(),
         source_version: "test".to_owned(),
         adapter_version: "test-adapter".to_owned(),
-        schema_version: CAPTURE_SESSION_SCHEMA_VERSION,
         platform: PlatformFamily::Linux,
         permission: PermissionState::Unavailable,
         health: SourceHealth::Healthy,
@@ -997,7 +990,6 @@ fn process_snapshot(id: &str) -> NativeSourceSnapshot {
         source_instance_id: id.to_owned(),
         source_version: "test".to_owned(),
         adapter_version: "test-adapter".to_owned(),
-        schema_version: PROCESS_APPLICATION_SCHEMA_VERSION,
         platform: PlatformFamily::Linux,
         permission: PermissionState::Unavailable,
         health: SourceHealth::Healthy,
