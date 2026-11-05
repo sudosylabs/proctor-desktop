@@ -19,7 +19,7 @@ export const SETTINGS_REGISTRY_VERSION = 1;
 
 export type SettingStorageScope = 'portableUser' | 'device';
 export type SettingDomain =
-	'appearance' | 'accessibility' | 'editor' | 'navigation' | 'terminal' | 'browser' | 'security';
+	'appearance' | 'accessibility' | 'editor' | 'navigation' | 'browser' | 'security';
 export type SettingWindow = 'authenticated' | 'candidate';
 export type SettingActivation = 'immediate' | 'nextWindow';
 export type CandidateTreatment =
@@ -508,29 +508,6 @@ export const SETTINGS_MANIFEST = [
 			description: 'Description of the tree indentation setting.'
 		}),
 		migration: { from: 'explorer.tree.indent', removeAfter: 2 }
-	},
-	{
-		id: 'terminal.integrated.fontSize',
-		type: 'integer',
-		default: 14,
-		minimum: 12,
-		maximum: 24,
-		storage: 'device',
-		domain: 'terminal',
-		windows: ['authenticated'],
-		languageOverride: false,
-		activation: 'immediate',
-		candidate: 'nonCandidateOnly',
-		title: defineMessage({
-			id: 'settings.terminal.fontsize.title',
-			defaultMessage: 'Terminal font size',
-			description: 'Title for the terminal font size setting.'
-		}),
-		description: defineMessage({
-			id: 'settings.terminal.fontsize.description',
-			defaultMessage: 'Sets terminal presentation outside an Attempt.',
-			description: 'Description of the terminal font size setting.'
-		})
 	},
 	{
 		id: 'browser.presentation.zoom',

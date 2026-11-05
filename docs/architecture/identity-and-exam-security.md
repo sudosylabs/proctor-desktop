@@ -323,13 +323,13 @@ A closed idempotent containment plan orders effects:
 7. queue permitted activity/integrity delivery.
 
 Failure of a required step remains blocked. The actual Workspace, browser,
-terminal, submission, and server operation owners still reauthorize requests.
+submission, and server operation owners still reauthorize requests.
 
 A high-confidence native event may synchronously enter `checking` and close
 mutation gates while the coordinator reconciles. It creates no occurrence or
 integrity evidence until deterministic policy evaluation confirms the condition.
 `contained` keeps CandidateWindow visible beneath one aggregated secure overlay
-while blocking editor changes, terminal input, browser interaction/navigation,
+while blocking editor changes, browser interaction/navigation,
 resource mutation, and submission. Observe-only conditions never contain and do
 not repeatedly notify the candidate.
 
@@ -352,7 +352,7 @@ under Connection Loss policy while leaving an otherwise valid Session usable.
 On any authoritative event that may block mutation, privileged gates close
 before refetch. A paused Sitting keeps active Attempt, Participation renewal,
 and Session lock. CandidateWindow remains visible beneath an overlay while
-Workspace changes, browser, terminal, and submission are frozen.
+Workspace changes, browser, and submission are frozen.
 
 Suspension closes gates, protects accepted/unknown work, shows a blocking
 overlay, destroys CandidateWindow, and opens AuthenticatedWindow at the
@@ -391,10 +391,8 @@ accepted.
 The [correction contract](../contracts/live-corrections.md) defines the minimum
 affected set and oldest-first Attempt-owned acknowledgement. Browser-only
 corrections gate browser access independently. Instructions/resources affect
-Workspace, terminal and submission, with explicit supersets permitted. Pending
+Workspace and submission, with explicit supersets permitted. Pending
 overlaps, rejoin and concurrent publication cannot bypass a remaining gate.
-Execution containment freezes the running guest and waits for the current host
-fence acknowledgement; disabling terminal input alone is insufficient.
 
 ## Integrity meaning and privacy
 
@@ -459,8 +457,8 @@ review material.
 
 LaunchWindow receives only readiness/identity projection and identity intents.
 AuthenticatedWindow receives self-context and authorized product projections.
-CandidateWindow receives the bounded security, Attempt, Workspace, browser, and
-execution projections for its one active Attempt.
+CandidateWindow receives the bounded security, Attempt, Workspace, and
+browser projections for its one active Attempt.
 
 Concrete credential, DPoP, server transport, protected storage, native source,
 and enforcement adapters are chosen in privileged composition roots. The exam-
@@ -494,5 +492,5 @@ Use real coordinators behind in-memory ports and packaged-process tests. Cover:
 Cross-process tests verify sandboxing, IPC validation, fixed preloads, key and
 credential custody, close veto, window transitions, security-utility loss, and
 capability revocation before presentation. Native platform claims follow
-[native-capability architecture](./native-capabilities.md); browser and PTY
-claims follow their focused architecture topics.
+[native-capability architecture](./native-capabilities.md); browser
+claims follow their focused architecture topic.

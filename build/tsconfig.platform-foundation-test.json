@@ -31,7 +31,6 @@
     "../test/workbench/common/**/*.ts",
     "../test/workbench/services/attemptWorkspace/common/**/*.ts",
     "../test/workbench/contrib/integratedBrowser/common/**/*.ts",
-    "../test/workbench/contrib/terminal/common/**/*.ts",
     "../test/workbench/services/examSecurity/**/*.test.ts",
     "../src/prctr/workbench/services/examSecurity/electron-utility/**/*.ts",
     "../test/workbench/services/notification/common/**/*.ts"

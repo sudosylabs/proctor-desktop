@@ -38,15 +38,18 @@
   academic, management, administration, and account areas. One candidate has at
   most one unresolved Attempt across all Sittings.
 - The Attempt Workspace boundary separates server snapshot, Desktop Working
-  Overlay, protected recovery/cache, and Execution Environment projection. The
+  Overlay, and protected recovery/cache. The
   initial adapter is pinned to the server's integer-cursor/five-mutation v1.
 - User Settings remain one server-authoritative virtual JSONC document edited in
   AuthenticatedWindow. Candidate behavior uses a closed server-validated frozen
   Attempt Configuration.
 - The integrated browser is first-release scope with revision-frozen privileged
   navigation and minimized ordered Browser Activity over the candidate network.
-- The initial terminal attaches to one remote PTY and exposes only open/input/
-  resize/output/close. The AI agent is deferred.
+- Code execution is deferred. The server removed execution hosts and interactive
+  terminals (2026-09-12) because institutions self-host and per-candidate
+  environments are too costly, so Desktop removed its remote terminal. A Run
+  action with an output panel and no interactive terminal is planned before the
+  first release; its backend is undecided. The AI agent is deferred.
 - Native architecture uses passive sources, a dedicated exam-security utility
   process, main-process enforcement, one physical display, constrained
   CandidateWindow, and packaged Windows/macOS conformance. Its accepted first-
@@ -90,7 +93,7 @@ base-common runtime, performance, Codicons and semantic icons, themes and design
 tokens, browser interaction, shared browser controls, context conditions,
 commands, instantiation/registry, actions/menus, keybindings, editor core,
 workbench kernel, Electron window skeleton, Attempt Workspace core, User Settings,
-integrated browser, and remote terminal. Each admitted cluster is pinned to
+and integrated browser. Each admitted cluster is pinned to
 reviewed upstream blobs, retains applicable license evidence, and is compiled and
 tested without a runtime dependency on another checkout.
 
@@ -175,12 +178,9 @@ Chromium, and enforcement is exercised in real Electron. Server Browser Policy,
 activity upload/acknowledgement, and production protected-spool adapters remain
 required.
 
-The remote terminal implements the server-authorized one-PTY protocol,
-generation/open-epoch fencing, bounded early and live output, sequence/gap and
-acknowledgement handling, Workspace projection settlement before readiness,
-resize/input/close intents, retryable teardown, Electron IPC, and an accessible
-xterm-backed Candidate panel. It still needs the production remote transport and
-Workspace projection adapter. The AI agent remains deferred.
+The remote terminal and Execution Environment projection were removed to match
+the server. The Candidate panel part remains in the workbench kernel without a
+contribution. The AI agent remains deferred.
 
 Exam security now includes effective-policy and native-selection validation,
 reconciliation, minimized evidence, authoritative projection derivation, action
@@ -215,8 +215,8 @@ source-level behavior must not be reported as packaged production behavior.
 
 The current server already exposes `/api/v1` and realtime contracts for
 discovery/authentication, Sessions, candidate Attempts, Participation and
-connections, workspaces/resources/submissions, User Settings, integrity review,
-and remote execution/terminal transport. Desktop work should characterize and
+connections, workspaces/resources/submissions, User Settings, and integrity
+review. Desktop work should characterize and
 pin those existing contracts rather than treating all server protocol design as
 future.
 
@@ -246,13 +246,11 @@ The agreed server work and matching Desktop follow-through cover:
 - bounded preflight, atomic Connect/configuration freeze and metadata reservation;
 - exact receipts, active gap progression, closure-based replay, finite quotas and
   metadata capacity refusal across rejoining;
-- processed-control ordering for successful and failed coverage updates, live
-  reset receipts and confirmed execution freeze/thaw;
+- processed-control ordering for successful and failed coverage updates and live
+  reset receipts;
 - complete browser source lifecycle, committed closure on replacement refusal,
   grouped evidence, all-source settlement and independent manager access/retention;
-- oldest-first correction acknowledgement with transactional per-capability gates;
-- opaque execution-host fencing, semantic observations and incremental projection
-  preserving the existing PTY.
+- oldest-first correction acknowledgement with transactional per-capability gates.
 
 Desktop now decodes the frozen security policy and verifies its scope, canonical
 digests, release matrix, authenticated catalogs and preflight challenge. Native
@@ -278,8 +276,7 @@ exact-lifetime account-scope enrichment, a service-owned WTS session source and 
 authenticated-context helper bridge. Live client
 executable verification, complete process bootstrap, service transport activation and
 target verification are still outstanding. Source tests do not
-establish entitlement, signing or packaged support. Execution and terminal work
-remain deferred from this Desktop batch.
+establish entitlement, signing or packaged support.
 
 Initial resolver exclusions are Institution inheritance, accommodations and
 exception authoring/revocation, plus selective live native-policy strengthening.
@@ -316,10 +313,7 @@ compatibility-gated state until their adapters match the verified server contrac
 7. **Integrated browser** — frozen policy validation/enforcement, Candidate item,
    minimized activity, protected spool, ordered delivery, and privacy/access
    verification.
-8. **Execution Environment** — terminal capability projection, one remote PTY,
-   framing/backpressure/fencing, Candidate panel, and Workspace projection
-   reconciliation.
-9. **Packaging and distribution** — central signed feeds, Institution
+8. **Packaging and distribution** — central signed feeds, Institution
    compatibility/build revocation, updater safety, target-native verification,
    signing/notarization, SBOM/provenance, and support artifacts.
 
@@ -337,8 +331,9 @@ packaged evidence, architecture, skills, and project status agree.
 - AI agent provider/model/prompt/tool/network/privacy/evidence contract.
 - Workspace batch, historical/range-backed reads, server revert/conflict
   resolution, journal mutation keys, and per-entry capability snapshots.
-- Isolation requirements for untrusted exam code beyond the current Execution
-  Environment boundary.
+- The Run capability: backend (local sandbox, opt-in server runner, or both),
+  whether Run output is exam evidence, and any server API. Draft reasoning is in
+  ignored `.scratch/run-capability/`; it must be settled before the first release.
 - Institution choices for independent protected-record and Browser Activity retention
   periods; their fields, access boundaries and retirement semantics are agreed.
 - Signing providers, artifact publication details, and support-artifact

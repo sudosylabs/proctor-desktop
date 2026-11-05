@@ -35,10 +35,10 @@ affected by it.
 
 The current phase turns the accepted application platform into the first
 end-to-end Desktop slices. Existing server contracts already cover identity,
-Sessions, realtime, Attempts, workspaces, submissions, User Settings, integrity
-review, and remote execution. The accepted
+Sessions, realtime, Attempts, workspaces, submissions, User Settings, and
+integrity review. The accepted
 [Desktop/server contract](../contracts/README.md) defines coordinated policy,
-secure admission, configuration, delivery, browser, correction and execution work.
+secure admission, configuration, delivery, browser and correction work.
 [Project status](../project/status.md) distinguishes implementation progress,
 remaining adapters and verified release capability.
 
@@ -49,8 +49,8 @@ remaining adapters and verified release capability.
   framework. The accepted renderer model is plain TypeScript, DOM APIs, and
   co-located CSS following the VS Code workbench style.
 - Treating local folders, the local filesystem, or a local PTY as the primary
-  application model. Attempt resources are remote-first, and the integrated
-  terminal connects to a PTY in an isolated remote execution environment.
+  application model. Attempt resources are remote-first. Code execution is
+  deferred; a Run capability is planned before the first release.
 - Treating the desktop client as the authority for durable institutional,
   authorization, examination, or submission state.
 - Hiding platform-specific behavior behind a false cross-platform abstraction

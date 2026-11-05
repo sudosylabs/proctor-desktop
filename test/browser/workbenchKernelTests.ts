@@ -72,7 +72,7 @@ const labels: WorkbenchShellLabels = {
 	navigation: 'Navigation',
 	sidebar: 'Workspace files',
 	content: 'Workspace content',
-	panel: 'Terminal',
+	panel: 'Panel',
 	status: 'Status',
 	resetLayout: 'Reset layout',
 	resizeSidebar: 'Resize sidebar',
@@ -1249,7 +1249,7 @@ async function runIntegratedBrowserPaneTest(document: Document): Promise<void> {
 	);
 	if (document.activeElement !== shell.part('panel'))
 		throw new Error(
-			'Leaving compact layout hid the focused terminal toggle without a visible focus destination'
+			'Leaving compact layout hid the focused panel toggle without a visible focus destination'
 		);
 	const sidebarFocus = document.createElement('button');
 	sidebarFocus.textContent = 'Workspace item';
@@ -1520,7 +1520,7 @@ async function runExamSecurityContributionTest(document: Document): Promise<void
 			revision: 1,
 			reason: 'network',
 			state: 'acknowledgementRequired',
-			affectedCapabilities: ['terminal']
+			affectedCapabilities: ['browser']
 		}
 	];
 	listener?.(securityProjectionWithCorrections(3, corrections));
@@ -1705,7 +1705,6 @@ function securityProjection(
 		canRetryChecks: false,
 		canWorkspaceMutate: usable,
 		canUseBrowser: usable,
-		canUseTerminal: usable,
 		canSubmit: usable,
 		activeSecurityConditions:
 			posture === 'checking' ? [{ reason: 'sourceCoverage', state: 'checking' }] : [],
@@ -1727,7 +1726,6 @@ function securityProjectionWithCorrections(
 		...securityProjection(revision, 'compliant'),
 		canWorkspaceMutate: !blocks('workspace'),
 		canUseBrowser: !blocks('browser'),
-		canUseTerminal: !blocks('terminal'),
 		canSubmit: !blocks('submission'),
 		activeCorrections: corrections
 	};

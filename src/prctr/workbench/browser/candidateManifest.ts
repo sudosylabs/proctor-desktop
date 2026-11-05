@@ -19,11 +19,6 @@ const candidateWorkbenchManifest = Object.freeze({
 			dependencies: Object.freeze(['prctr.workbench.desktop' as const])
 		}),
 		Object.freeze({
-			id: 'prctr.candidate.terminal' as const,
-			phase: 'ready' as const,
-			dependencies: Object.freeze(['prctr.workbench.desktop' as const])
-		}),
-		Object.freeze({
 			id: 'prctr.candidate.examSecurity' as const,
 			phase: 'starting' as const,
 			blocksPhase: true,

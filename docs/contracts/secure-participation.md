@@ -287,8 +287,6 @@ interface SecurityCoverageResult {
   coverage_result: 'accepted' | 'stale_control' | 'reset_required' | 'reset_conflict';
   source_reset_receipts: SourceResetReceipt[];
   security_interaction_allowed: boolean;
-  execution_state:
-    'not_allocated' | 'ready' | 'freeze_pending' | 'frozen' | 'thaw_pending' | 'unavailable';
   delivery_watermark_rejections: {
     family: 'native' | 'browser';
     source_id: string;
@@ -360,26 +358,16 @@ IDs. Source reset receipts and current source identities are also returned by
 Desktop, alongside the original admitted policy/receipt. Historical batch
 arrival, replay, or a lower control_sequence never rolls the live head backward.
 
-## Actual containment and recovery
+## Containment and recovery
 
 Local containment closes Desktop dispatch immediately. On the authenticated
-blocking control, the server durably closes its operation gates and records a
-required execution freeze before emitting transient effects. Pending historical
-batches play no role in that decision. Freeze targets the actual running guest,
-not only the PTY input channel.
+blocking control, the server durably closes its operation gates before emitting
+transient effects. Pending historical batches play no role in that decision.
 
-Use the durable grant/effect owner for freeze, retry, and failure recovery.
-Report freeze_pending until the current host fence acknowledges the effect.
-A failed/lost host call does not become a successful freeze; keep interaction
-closed and drive the existing safe revoke/rebuild recovery if the host cannot
-confirm state. Persisting an effect intent is not evidence that a guest stopped.
-
-Thaw requires all current gates: usable native coverage, current lease/key/
-Session/generation, appropriate Sitting state, no applicable correction, and
-current execution grant/profile. Report thaw_pending until the current fence
-acknowledges it; only then permit execution input. A delayed prior thaw, freeze,
-revoke, input, output, or observer callback cannot affect a successor grant or
-contradict a newer durable decision.
+Reopening requires all current gates: usable native coverage, current lease/key/
+Session/generation, appropriate Sitting state, and no applicable correction. A
+delayed prior effect or observer callback cannot contradict a newer durable
+decision.
 
 Registered-key proof authenticates the sending installation credential. Matrix
 validation restricts the claimed capabilities. Neither proves the physical OS
@@ -389,9 +377,8 @@ packaged/native correctness requires its own platform verification.
 
 Tests: delayed historical reset with healthy new live snapshot; lost live reset
 response; stale control after containment; unknown or reused source identity;
-reset quota; exhausted evidence storage with continuing valid renewal; immediate
-freeze while a guest process runs; freeze/thaw failures and reordered effects;
-and confirmed lease expiry despite unprocessed historical uploads.
+reset quota; exhausted evidence storage with continuing valid renewal; reordered
+containment effects; and confirmed lease expiry despite unprocessed historical uploads.
 
 ## Processed control ordering
 
@@ -407,7 +394,7 @@ coverage. Both `renew` and `security.update` use this one ordering boundary.
    `reset_conflict`. A delivery-watermark rejection also cannot make an otherwise
    processed control disappear from the ordering history.
 3. A lower sequence never changes coverage, source identities, reset faults,
-   delivery watermarks, or execution intent. A matching retained replay remains
+   or delivery watermarks. A matching retained replay remains
    idempotent; an unknown older sequence returns `stale_control`. Conflicting
    bytes at a retained sequence fail without installing either body.
 4. Recovery after a processed fault requires a greater sequence than that fault,
@@ -415,7 +402,7 @@ coverage. Both `renew` and `security.update` use this one ordering boundary.
    Keeping the last usable snapshot for provenance does not authorize reuse of
    its healthy result over the fault.
 5. Exact replay returns the retained command outcome together with a fresh
-   current gate/execution projection. It never returns an old `true` gate as
+   current gate projection. It never returns an old `true` gate as
    current authority. Desktop applies response projections monotonically by
    their processed-control sequence; an older response cannot undo newer local
    containment or a newer received server state. Other authority can become
@@ -427,7 +414,7 @@ coverage. Both `renew` and `security.update` use this one ordering boundary.
 The live-control array and request bounds above apply. Sequence zero and null digest
 mean no control has yet been processed; the admitted preflight still supplies
 the initial coverage state. `coverage_result` describes this command's outcome;
-the processed boundary and gate/execution fields describe current server state.
+the processed boundary and gate fields describe current server state.
 A retained replay can therefore report its original accepted outcome alongside
 a newer processed boundary and a currently closed gate.
 

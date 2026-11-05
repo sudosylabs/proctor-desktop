@@ -43,7 +43,6 @@ import {
 } from '../../src/prctr/workbench/services/integratedBrowser/common/integratedBrowserCoordinator.js';
 import { IntegratedBrowserIpcBridge } from '../../src/prctr/workbench/services/integratedBrowser/electron-main/integratedBrowserIpc.js';
 import { createIntegratedBrowserComposition } from '../../src/prctr/code/electron-main/integratedBrowserComposition.js';
-import { createTerminalComposition } from '../../src/prctr/code/electron-main/terminalComposition.js';
 import { createUserSettingsComposition } from '../../src/prctr/code/electron-main/userSettingsComposition.js';
 import { ExamSecurityIpcBridge } from '../../src/prctr/workbench/services/examSecurity/electron-main/examSecurityIpc.js';
 import { errorHandler, setUnexpectedErrorHandler } from '../../src/prctr/base/common/errors.js';
@@ -417,47 +416,6 @@ async function verifyTransactionalRollback(
 	root: string,
 	html: string
 ): Promise<unknown> {
-	const terminalIpc = failingIpc(2);
-	let terminalRejected = false;
-	let terminalCloseCalls = 0;
-	try {
-		createTerminalComposition({
-			scope: {
-				attemptId: 'attempt-1',
-				sessionId: 'session-1',
-				connectionId: 'connection-1',
-				participationGeneration: 1
-			},
-			gate: {
-				attemptState: 'active',
-				participationGeneration: 1,
-				connectionId: 'connection-1',
-				paused: false,
-				postureUsable: true,
-				environmentReady: true,
-				executionProfileAdmitted: true,
-				availability: 'enabled'
-			},
-			workspace: {
-				captureGeneration: () => 1,
-				persistThrough: async () => ({ acknowledged: true, cursor: 1, blockers: [] })
-			},
-			transport: {
-				open: async () => ({ kind: 'transportUnavailable' }),
-				send: async () => 'transportUnavailable',
-				closeTransport: () => {
-					terminalCloseCalls++;
-				},
-				dispose() {}
-			},
-			ids: { nextOpenRequestId: () => 'open-1' },
-			ipcMain: terminalIpc.ipc,
-			candidateContents
-		});
-	} catch (error) {
-		terminalRejected =
-			error instanceof Error && error.message === 'injected IPC registration failure';
-	}
 	const settingsIpc = failingIpc(3);
 	let settingsRejected = false;
 	try {
@@ -488,7 +446,6 @@ async function verifyTransactionalRollback(
 		canRetryChecks: true,
 		canWorkspaceMutate: false,
 		canUseBrowser: false,
-		canUseTerminal: false,
 		canSubmit: false,
 		activeSecurityConditions: [
 			{ reason: 'sourceCoverage' as const, state: 'checking' as const }
@@ -533,11 +490,6 @@ async function verifyTransactionalRollback(
 			error instanceof Error && error.message === 'injected IPC registration failure';
 	}
 	return {
-		terminal: {
-			rejected: terminalRejected,
-			handlersRemaining: terminalIpc.handlers.size,
-			modelClosed: terminalCloseCalls === 1
-		},
 		settings: { rejected: settingsRejected, handlersRemaining: settingsIpc.handlers.size },
 		security: { rejected: securityRejected, handlersRemaining: securityIpc.handlers.size },
 		productWindow: {

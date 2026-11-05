@@ -1,7 +1,7 @@
 {
   "generatedBy": "settings.registry",
   "registryVersion": 1,
-  "registryFingerprint": "fnv1a64:cca72c3ff616b688",
+  "registryFingerprint": "fnv1a64:99c8b2729a551067",
   "settings": [
     {
       "id": "workbench.hover.delay",
@@ -329,22 +329,6 @@
       "default": 8,
       "storage": "portableUser",
       "domain": "navigation",
-      "windows": [
-        "authenticated"
-      ],
-      "languageOverride": false,
-      "activation": "immediate",
-      "candidate": "nonCandidateOnly"
-    },
-    {
-      "id": "terminal.integrated.fontSize",
-      "title": "Terminal font size",
-      "titleMessageId": "settings.terminal.fontsize.title",
-      "description": "Sets terminal presentation outside an Attempt.",
-      "descriptionMessageId": "settings.terminal.fontsize.description",
-      "default": 14,
-      "storage": "device",
-      "domain": "terminal",
       "windows": [
         "authenticated"
       ],

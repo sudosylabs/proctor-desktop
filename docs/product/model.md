@@ -235,14 +235,6 @@ or guilt.
 
 _Avoid_: Automatic cheating violation, ordinary logout
 
-**Execution Environment**
-
-The isolated remote environment that projects acknowledged Attempt Workspace
-state and hosts the candidate's permitted execution. The integrated terminal
-attaches to its remote PTY; its filesystem is not a second Workspace authority.
-
-_Avoid_: Local shell, Attempt Workspace, terminal window
-
 **Browser Policy**
 
 The Exam Revision-frozen allowlist and navigation rules enforced by the

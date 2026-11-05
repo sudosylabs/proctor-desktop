@@ -8,10 +8,11 @@ change.
 1. `product.exam-workbench` Proctor Desktop is a programming-examination workbench; every Candidate Exam
    Attempt includes an IDE workspace, but the product is not a general-purpose
    editor.
-2. `product.remote-workspace` Attempt Workspace identity does not derive from a local or execution-
-   environment filesystem path.
-3. `product.remote-terminal` The integrated terminal attaches to one remote Execution Environment PTY and
-   never creates a renderer-accessible local process.
+2. `product.remote-workspace` Attempt Workspace identity does not derive from a local or remote-VM
+   filesystem path.
+3. `product.no-local-process` The Candidate renderer never receives a local process, shell, or
+   generic execution handle. Code execution is absent until its boundary is
+   accepted.
 4. `product.integrity-flag` An Integrity Flag records evidence and never represents an automatic finding
    of guilt or a grade.
 5. `product.independent-gates` Server readiness, authentication, authenticated navigation, Attempt
@@ -48,7 +49,7 @@ change.
     remain outside renderers.
 19. `runtime.handle-isolation` Electron, Node.js, and native handles do not cross environment-neutral or
     renderer interfaces.
-20. `diagnostics.sensitive-data` Sensitive exam, identity, browser, terminal, observation, and credential data
+20. `diagnostics.sensitive-data` Sensitive exam, identity, browser, observation, and credential data
     does not enter ordinary logs, telemetry, or crash metadata.
 
 ## Design system
@@ -103,7 +104,7 @@ change.
 37. `workspace.acknowledged-durability` Only an authoritative acknowledgement establishes server durability;
     provider completion, events, cache, recovery, and editor cleanliness do not.
 38. `workspace.distinct-states` Authoritative Workspace Snapshot, Working Workspace Overlay, protected local
-    recovery/cache, and remote execution projection remain distinct states.
+    recovery/cache remain distinct states.
 39. `workspace.protected-recovery` Recovery Records use privileged encrypted storage and opaque identifiers;
     the renderer receives neither raw paths nor a generic filesystem interface.
 40. `workspace.provider-projection` A VS Code-compatible filesystem provider is a caller-side projection over
@@ -225,29 +226,18 @@ change.
     spooling, at-least-once idempotent delivery, exact content receipts distinct
     from settlement, terminal gaps, and exact Attempt-manager-plus-action access.
 
-## Execution Environment
-
-79. `execution.remote-pty` The initial terminal exposes one server-authorized remote PTY with only
-    open/input/resize/output/close; local shell, replay, persistence, tabs,
-    splits, tasks, and debugging are absent.
-80. `execution.generation-fencing` Every terminal action is bound to current Attempt, Session, Connection, and
-    Participation generation and is gated on pause, suspension, and completion.
-81. `execution.workspace-projection` The Execution Environment projects acknowledged Workspace state; VM paths
-    and terminal output never establish Workspace authority or durability.
-    Opaque host grant/epoch/revision fences keep exam identity in Proctor.
-
 ## Toolchain and release
 
-82. `toolchain.single-esm-graph` Desktop TypeScript uses one private locked npm graph, strict NodeNext ESM,
+79. `toolchain.single-esm-graph` Desktop TypeScript uses one private locked npm graph, strict NodeNext ESM,
     independent no-emit type/runtime checks, and esbuild as its application
     emitter/bundler. Source layers are not packages.
-83. `toolchain.closed-packages` Production processes and windows enter through closed Proctor-owned manifests;
+80. `toolchain.closed-packages` Production processes and windows enter through closed Proctor-owned manifests;
     inventory, fuses, ASAR integrity, signing, and tests prove the artifact.
-84. `toolchain.native-schema-authority` Native protocols have one language-neutral schema authority, generated
+81. `toolchain.native-schema-authority` Native protocols have one language-neutral schema authority, generated
     TypeScript/Rust views, runtime validation, bounds, and target-bound artifacts.
-85. `toolchain.signed-capability-matrix` Secure-candidate support exists only for tuples proven on packaged target-
+82. `toolchain.signed-capability-matrix` Secure-candidate support exists only for tuples proven on packaged target-
     native artifacts and named in the signed capability matrix.
-86. `toolchain.central-distribution` Central Proctor distribution owns signed installers/update feeds;
+83. `toolchain.central-distribution` Central Proctor distribution owns signed installers/update feeds;
     Institution servers publish compatibility and build-revocation policy only.
-87. `toolchain.attempt-safe-updates` Updates never stage during active/paused participation and never install,
+84. `toolchain.attempt-safe-updates` Updates never stage during active/paused participation and never install,
     restart, or downgrade while CandidateWindow or unresolved continuity exists.

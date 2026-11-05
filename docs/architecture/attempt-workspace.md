@@ -17,10 +17,9 @@ Four states remain distinct:
 
 - the authoritative Workspace Snapshot held by the server;
 - the desktop Working Workspace Overlay;
-- protected local recovery and evictable acknowledged-content cache;
-- the filesystem projection in an isolated remote execution environment.
+- protected local recovery and evictable acknowledged-content cache.
 
-Disconnect, recovery, or execution-environment change does not itself mutate
+Disconnect or recovery does not itself mutate
 authoritative Exam Attempt lifecycle state.
 
 ## Resource model
@@ -33,7 +32,7 @@ A `Workspace Path` is mutable hierarchy metadata. It is normalized,
 POSIX-relative, case-sensitive, and unique within the workspace. It never
 contains or resolves to a desktop or remote-VM host path. Empty directories are
 supported. Symbolic links are excluded until their escape, cycle,
-authorization, and execution-projection semantics are separately accepted.
+and authorization semantics are separately accepted.
 
 A `Workspace Content Version` is an opaque provider-issued comparison token for
 one exact acknowledged content state of a workspace file. It supports
@@ -334,8 +333,8 @@ still-unresolved protected-record retention policy.
 
 Atomic batch, historical-version reads, range-backed models, server conflict
 resolution/revert, journal mutation keys, and per-entry capability snapshots are
-deferred extensions. Protected-record retention remains unresolved. Remote
-execution projection exists server-side; its Desktop terminal and synchronization
-boundary is defined by [Execution Environment architecture](./execution-environment.md).
-Identity/security governs key custody and candidate gates, and native capability
+deferred extensions. Protected-record retention remains unresolved. Code
+execution is absent: the server removed execution hosts, and the planned Run
+capability will read acknowledged Workspace state rather than own a filesystem
+projection. Identity/security governs key custody and candidate gates, and native capability
 work owns privileged placement and platform enforcement.

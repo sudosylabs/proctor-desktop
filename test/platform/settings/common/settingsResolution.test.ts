@@ -31,9 +31,9 @@ suite('Effective User Settings', () => {
 
 	test('keeps device values separate from portable source', () => {
 		const settings = new EffectiveSettings(
-			parseSettingsDocument('{"terminal.integrated.fontSize":20}'),
-			{ window: 'authenticated', deviceValues: { 'terminal.integrated.fontSize': 16 } }
+			parseSettingsDocument('{"browser.presentation.zoom":120}'),
+			{ window: 'authenticated', deviceValues: { 'browser.presentation.zoom': 150 } }
 		);
-		assert.strictEqual(settings.get('terminal.integrated.fontSize'), 16);
+		assert.strictEqual(settings.get('browser.presentation.zoom'), 150);
 	});
 });

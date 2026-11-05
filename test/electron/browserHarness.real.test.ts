@@ -81,7 +81,6 @@ void test('sandboxed Chromium renderer runs deterministic browser fixtures', () 
 		],
 		ready: 'true',
 		themeChanges: '3',
-		terminalPanelTests: '24',
 		workbenchKernelTests: '28'
 	});
 });

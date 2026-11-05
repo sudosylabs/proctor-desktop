@@ -490,13 +490,8 @@ test('a one-use admission policy never authorizes active Attempt operations', as
 	const projection = coordinator.observe().current;
 	assert.strictEqual(projection.canJoin, true);
 	assert.deepStrictEqual(
-		[
-			projection.canWorkspaceMutate,
-			projection.canUseBrowser,
-			projection.canUseTerminal,
-			projection.canSubmit
-		],
-		[false, false, false, false]
+		[projection.canWorkspaceMutate, projection.canUseBrowser, projection.canSubmit],
+		[false, false, false]
 	);
 	assert.throws(
 		() =>
@@ -522,7 +517,6 @@ test('clean complete preflight verifies closed effects before publishing and ope
 	]);
 	assert.equal(coordinator.observe().current.canWorkspaceMutate, true);
 	assert.equal(coordinator.observe().current.canUseBrowser, true);
-	assert.equal(coordinator.observe().current.canUseTerminal, true);
 	coordinator.dispose();
 });
 
@@ -1007,7 +1001,6 @@ test('pause and transport continuity remain independent authoritative gates and 
 	);
 	assert.equal(coordinator.observe().current.paused, true);
 	assert.equal(coordinator.observe().current.posture, 'compliant');
-	assert.equal(coordinator.observe().current.canUseTerminal, false);
 	assert.ok(harness.log.indexOf('deny:pause') < harness.log.indexOf('publish:compliant'));
 	await coordinator.updateAuthoritativeState(
 		authoritative({ attemptRevision: 3, authoritativeTimeUnixMs: 4_000 })
@@ -1051,7 +1044,6 @@ test('live correction acknowledgement is exact and gates only affected mutations
 	assert.equal(gated.canWorkspaceMutate, false);
 	assert.equal(gated.canSubmit, false);
 	assert.equal(gated.canUseBrowser, true);
-	assert.equal(gated.canUseTerminal, true);
 	assert.deepStrictEqual(gated.activeCorrections, [
 		{
 			correctionId: correction.correctionId,
@@ -1485,7 +1477,6 @@ test('source-instance watermarks reject delayed sequence regressions and unprove
 		/sequence regressed/u
 	);
 	assert.strictEqual(coordinator.observe().current.posture, 'failed');
-	assert.strictEqual(coordinator.observe().current.canUseTerminal, false);
 	assert.strictEqual(
 		coordinator
 			.observe()
@@ -1753,7 +1744,6 @@ test('malformed reconciliation denies synchronously and serializes source-covera
 	} as never);
 	assert.strictEqual(harness.log.at(-1), 'deny:sourceCoverage');
 	await assert.rejects(rejected, /invalid or stale/u);
-	assert.strictEqual(coordinator.observe().current.canUseTerminal, false);
 	assert.strictEqual(coordinator.observe().current.posture, 'failed');
 	assert.strictEqual(harness.log.includes('protect'), true);
 	coordinator.dispose();

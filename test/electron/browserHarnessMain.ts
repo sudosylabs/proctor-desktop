@@ -73,7 +73,6 @@ async function runHarness(): Promise<void> {
         })),
         ready: document.body.dataset.ready,
         themeChanges: document.body.dataset.themeChanges,
-        terminalPanelTests: document.body.dataset.terminalPanelTests,
         workbenchKernelTests: document.body.dataset.workbenchKernelTests,
         userAgent: navigator.userAgent
       };

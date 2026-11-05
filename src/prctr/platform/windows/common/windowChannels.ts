@@ -47,12 +47,6 @@ export const CANDIDATE_BROWSER_CHANNELS = Object.freeze({
 	changed: 'prctr:candidate:browser:changed',
 	surfaceFocusChanged: 'prctr:candidate:browser:surface-focus-changed'
 });
-export const CANDIDATE_TERMINAL_CHANNELS = Object.freeze({
-	projection: 'prctr:candidate:terminal:projection',
-	intent: 'prctr:candidate:terminal:intent',
-	changed: 'prctr:candidate:terminal:changed',
-	output: 'prctr:candidate:terminal:output'
-});
 export const CANDIDATE_SECURITY_CHANNELS = Object.freeze({
 	projection: 'prctr:candidate:security:projection',
 	intent: 'prctr:candidate:security:intent',

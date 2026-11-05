@@ -2,7 +2,7 @@
 export const settingsSchema = {
 	"generatedBy": "settings.registry",
 	"registryVersion": 1,
-	"registryFingerprint": "fnv1a64:cca72c3ff616b688",
+	"registryFingerprint": "fnv1a64:99c8b2729a551067",
 	"$schema": "https://json-schema.org/draft/2020-12/schema",
 	"type": "object",
 	"additionalProperties": true,
@@ -241,14 +241,6 @@ export const settingsSchema = {
 			"maximum": 20,
 			"title": "Tree indentation",
 			"description": "Sets indentation for hierarchical navigation outside an Attempt."
-		},
-		"terminal.integrated.fontSize": {
-			"type": "integer",
-			"default": 14,
-			"minimum": 12,
-			"maximum": 24,
-			"title": "Terminal font size",
-			"description": "Sets terminal presentation outside an Attempt."
 		},
 		"browser.presentation.zoom": {
 			"type": "integer",

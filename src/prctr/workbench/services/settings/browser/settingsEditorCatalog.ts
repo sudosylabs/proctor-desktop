@@ -16,7 +16,6 @@ const sections: readonly { id: SettingDomain; label: string }[] = [
 	{ id: 'editor', label: localize('proctor.settings.editor', 'Text Editor') },
 	{ id: 'accessibility', label: localize('proctor.settings.accessibility', 'Accessibility') },
 	{ id: 'navigation', label: localize('proctor.settings.navigation', 'Navigation') },
-	{ id: 'terminal', label: localize('proctor.settings.terminal', 'Terminal') },
 	{ id: 'browser', label: localize('proctor.settings.browser', 'Browser') }
 ];
 

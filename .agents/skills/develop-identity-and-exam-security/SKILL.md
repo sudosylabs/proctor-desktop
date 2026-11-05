@@ -20,7 +20,7 @@ placement, [`develop-workbench`](../develop-workbench/SKILL.md) for window UI,
 [`develop-user-settings`](../develop-user-settings/SKILL.md) for Attempt
 Configuration, [`develop-attempt-workspace`](../develop-attempt-workspace/SKILL.md)
 for protection/reconciliation, and [`develop-native-capabilities`](../develop-native-capabilities/SKILL.md)
-for sources/effects. Load browser/execution skills when those gates change. The
+for sources/effects. Load the browser skill when its gates change. The
 step is complete when caller, process, authority, scope, sensitive fields, and
 failure outcome are explicit.
 
@@ -129,11 +129,11 @@ delivery.
 A high-confidence event may provisionally enter checking and close mutation
 gates, but creates no occurrence until deterministic evaluation confirms it.
 Observe conditions never contain. Contained CandidateWindow blocks editor,
-terminal, browser, resource, and submission mutations behind one safe correction
+browser, resource, and submission mutations behind one safe correction
 overlay while sources continue verifying recovery.
 
 Pause keeps CandidateWindow/Participation/lock while gating Workspace, browser,
-terminal, and submission. Suspension gates and protects first, shows overlay,
+and submission. Suspension gates and protects first, shows overlay,
 destroys CandidateWindow, then opens AuthenticatedWindow. Relaunch never restores
 CandidateWindow; ready rejoin repeats full admission and creates a new
 generation. The step is complete when event-before-refetch, renderer crash,
@@ -159,7 +159,6 @@ authorized detailed review and use server-defined retention. Process successful
 and faulted controls through one durable ordering boundary. Reset edges reach
 live coverage independently of delayed evidence; stale responses never undo
 containment. Lease renewal remains available while interaction gates are closed.
-Confirm actual guest freeze/thaw through the current execution fence.
 
 The step is complete when every collected field has a purpose, classification,
 scope, delivery/access/retention rule, and failure behavior without becoming a

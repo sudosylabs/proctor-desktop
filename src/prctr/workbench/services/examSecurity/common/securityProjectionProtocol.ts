@@ -21,7 +21,7 @@ export type SafeSecurityReason =
 	| 'sourceCoverage'
 	| 'virtualization';
 export type ProtectedWorkState = 'failed' | 'notRequired' | 'protected' | 'protecting';
-export type CandidateCorrectionCapability = 'browser' | 'submission' | 'terminal' | 'workspace';
+export type CandidateCorrectionCapability = 'browser' | 'submission' | 'workspace';
 
 export interface CandidateSecurityCondition {
 	readonly reason: SafeSecurityReason;
@@ -49,7 +49,6 @@ export interface CandidateSecurityProjection {
 	readonly canRetryChecks: boolean;
 	readonly canWorkspaceMutate: boolean;
 	readonly canUseBrowser: boolean;
-	readonly canUseTerminal: boolean;
 	readonly canSubmit: boolean;
 	readonly activeSecurityConditions: readonly CandidateSecurityCondition[];
 	readonly activeCorrections: readonly CandidateLiveCorrection[];
@@ -88,12 +87,7 @@ const reasons = new Set<SafeSecurityReason>([
 	'sourceCoverage',
 	'virtualization'
 ]);
-const capabilities = new Set<CandidateCorrectionCapability>([
-	'browser',
-	'submission',
-	'terminal',
-	'workspace'
-]);
+const capabilities = new Set<CandidateCorrectionCapability>(['browser', 'submission', 'workspace']);
 const allowed = new Set([
 	'revision',
 	'attemptState',
@@ -108,7 +102,6 @@ const allowed = new Set([
 	'canRetryChecks',
 	'canWorkspaceMutate',
 	'canUseBrowser',
-	'canUseTerminal',
 	'canSubmit',
 	'activeSecurityConditions',
 	'activeCorrections',
@@ -183,7 +176,6 @@ export function validateCandidateSecurityProjection(value: unknown): CandidateSe
 			'canRetryChecks',
 			'canWorkspaceMutate',
 			'canUseBrowser',
-			'canUseTerminal',
 			'canSubmit'
 		]) ||
 		!integer(value.authoritativeTimeUnixMs, 0) ||
@@ -229,7 +221,6 @@ export function validateCandidateSecurityProjection(value: unknown): CandidateSe
 	if (
 		value.canWorkspaceMutate !== expected('workspace') ||
 		value.canUseBrowser !== expected('browser') ||
-		value.canUseTerminal !== expected('terminal') ||
 		value.canSubmit !== expected('submission') ||
 		value.canJoin !== expectedJoin ||
 		value.canRetryChecks !== expectedRetry
@@ -249,7 +240,6 @@ export function validateCandidateSecurityProjection(value: unknown): CandidateSe
 		canRetryChecks: value.canRetryChecks as boolean,
 		canWorkspaceMutate: value.canWorkspaceMutate as boolean,
 		canUseBrowser: value.canUseBrowser as boolean,
-		canUseTerminal: value.canUseTerminal as boolean,
 		canSubmit: value.canSubmit as boolean,
 		activeSecurityConditions: Object.freeze(conditions),
 		activeCorrections: Object.freeze(corrections),

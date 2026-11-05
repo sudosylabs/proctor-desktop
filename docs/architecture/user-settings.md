@@ -91,7 +91,7 @@ keys, renderer state, and remote schema never enter precedence.
 The initial non-candidate settings surface may cover theme, high contrast,
 zoom, typography, editor indentation/wrapping/line numbers/minimap, cursor,
 approved keybindings, reduced motion, screen-reader/announcement behavior,
-safe file-tree presentation, and terminal/browser presentation that does not
+safe file-tree presentation, and browser presentation that does not
 alter their authority. A stored preference may remain inactive when its
 capability is absent.
 
@@ -238,7 +238,7 @@ its full behavioral and visual verification. Foundation source alone does not
 establish delivery of the editor experience.
 
 Candidate consumers depend on an Attempt Configuration projection contract,
-not the User Settings service. Editor, design system, workbench, terminal, and
+not the User Settings service. Editor, design system, workbench, and
 browser modules request only their owned typed values.
 
 ## Verification

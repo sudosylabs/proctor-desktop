@@ -105,21 +105,6 @@
       "allowedDynamicImports": []
     },
     {
-      "id": "remote-terminal-main",
-      "kind": "main",
-      "entrypoint": "src/prctr/code/electron-main/terminalComposition.ts",
-      "required": [
-        "src/prctr/platform/executionEnvironment/common",
-        "src/prctr/workbench/services/executionEnvironment/common",
-        "src/prctr/workbench/services/executionEnvironment/electron-main"
-      ],
-      "forbidden": [
-        "src/prctr/workbench/contrib/terminal/browser",
-        "src/prctr/platform/native/electron-utility"
-      ],
-      "allowedDynamicImports": []
-    },
-    {
       "id": "exam-security-projection-main",
       "kind": "main",
       "entrypoint": "src/prctr/code/electron-main/examSecurityComposition.ts",

@@ -11,7 +11,7 @@
       "invariants": [
         "product.exam-workbench",
         "product.remote-workspace",
-        "product.remote-terminal",
+        "product.no-local-process",
         "product.integrity-flag",
         "product.independent-gates",
         "source.namespace",
@@ -87,9 +87,6 @@
         "browser.privileged-enforcement",
         "browser.minimized-activity",
         "browser.ordered-delivery",
-        "execution.remote-pty",
-        "execution.generation-fencing",
-        "execution.workspace-projection",
         "toolchain.single-esm-graph",
         "toolchain.closed-packages",
         "toolchain.native-schema-authority",
@@ -593,32 +590,6 @@
         "test/workbench/contrib/integratedBrowser/common/integratedBrowserCoordinator.test.ts",
         "test/electron/windowSkeleton.real.test.ts",
         "docs/upstream/vscode-ports/integrated-browser-client.json"
-      ]
-    },
-    {
-      "id": "execution-contract-tests",
-      "kind": "test",
-      "status": "active",
-      "owner": "execution-environment",
-      "invariants": [
-        "execution.remote-pty",
-        "execution.generation-fencing",
-        "execution.workspace-projection"
-      ],
-      "evidence": [
-        "src/prctr/platform/executionEnvironment/common/terminalProtocol.ts",
-        "src/prctr/platform/executionEnvironment/common/terminalRendererProtocol.ts",
-        "src/prctr/workbench/services/executionEnvironment/common/remoteTerminal.ts",
-        "src/prctr/workbench/services/executionEnvironment/common/remoteTerminalModel.ts",
-        "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.ts",
-        "src/prctr/workbench/services/executionEnvironment/electron-main/terminalIpc.ts",
-        "src/prctr/code/electron-browser/candidatePreload.ts",
-        "src/prctr/code/electron-main/terminalComposition.ts",
-        "src/prctr/workbench/browser/candidateManifest.ts",
-        "test/workbench/contrib/terminal/common/remoteTerminalModel.test.ts",
-        "test/browser/remoteTerminalPanelTests.ts",
-        "test/electron/browserHarness.real.test.ts",
-        "docs/upstream/vscode-ports/remote-terminal-client.json"
       ]
     },
     {

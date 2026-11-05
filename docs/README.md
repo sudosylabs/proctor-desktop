@@ -38,8 +38,6 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
 - [Integrated browser](./architecture/integrated-browser.md) — frozen browser
   policy, privileged navigation, minimized activity, protected delivery, and
   privacy
-- [Execution Environment](./architecture/execution-environment.md) — remote PTY,
-  lifecycle/generation fencing, Workspace projection, and terminal presentation
 - [Native capabilities](./architecture/native-capabilities.md) — passive native
   observation, candidate-window enforcement, process, privacy, failure, and
   platform-verification boundaries
@@ -105,11 +103,6 @@ Use
 [`develop-integrated-browser`](../.agents/skills/develop-integrated-browser/SKILL.md)
 for browser policy, navigation enforcement, Browser Activity, protected
 spooling, privacy, access, and Candidate presentation.
-
-Use
-[`develop-execution-environment`](../.agents/skills/develop-execution-environment/SKILL.md)
-for remote PTY transport, terminal lifecycle/presentation, generation fencing,
-and Workspace projection synchronization.
 
 Use
 [`develop-native-capabilities`](../.agents/skills/develop-native-capabilities/SKILL.md)

@@ -768,7 +768,7 @@ class ExamSecurityCoordinatorModel implements ExamSecurityCoordinator {
 			(this.#posture === 'compliant' || this.#posture === 'degraded')
 		);
 	}
-	#correctionAllows(capability: 'browser' | 'submission' | 'terminal' | 'workspace'): boolean {
+	#correctionAllows(capability: 'browser' | 'submission' | 'workspace'): boolean {
 		return !this.#authoritative.activeCorrections.some(
 			(correction) =>
 				correction.requiresAcknowledgement &&
@@ -842,7 +842,6 @@ class ExamSecurityCoordinatorModel implements ExamSecurityCoordinator {
 				['checking', 'contained', 'failed'].includes(this.#posture),
 			canWorkspaceMutate: allowed && this.#correctionAllows('workspace'),
 			canUseBrowser: allowed && this.#correctionAllows('browser'),
-			canUseTerminal: allowed && this.#correctionAllows('terminal'),
 			canSubmit: allowed && this.#correctionAllows('submission'),
 			activeSecurityConditions: Object.freeze(dedupedConditions),
 			activeCorrections: Object.freeze(corrections),
@@ -1250,7 +1249,7 @@ const safeReasons: ReadonlySet<string> = new Set<SafeSecurityReason>([
 	'sourceCoverage',
 	'virtualization'
 ]);
-const correctionCapabilities = new Set(['browser', 'submission', 'terminal', 'workspace']);
+const correctionCapabilities = new Set(['browser', 'submission', 'workspace']);
 function isExactRecord(value: unknown, keys: readonly string[]): value is Record<string, any> {
 	if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
 	const actual = Object.keys(value);

@@ -6,8 +6,6 @@ import type { CandidateSecurityRendererClient } from '../../workbench/contrib/ex
 import { createExamSecurityContribution } from '../../workbench/contrib/examSecurity/browser/examSecurityContribution.js';
 import type { IntegratedBrowserRendererClient } from '../../workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.js';
 import { createIntegratedBrowserContribution } from '../../workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.js';
-import type { TerminalRendererClient } from '../../workbench/contrib/terminal/browser/remoteTerminalPanel.js';
-import { createRemoteTerminalContribution } from '../../workbench/contrib/terminal/browser/terminalContribution.js';
 import { commonWorkbenchContributions } from '../../workbench/workbench.common.main.js';
 import { createDesktopWorkbenchContribution } from './workbench.desktop.main.js';
 
@@ -15,7 +13,6 @@ interface CandidatePreloadApi {
 	bootstrap(): Promise<CandidateWindowDescriptor>;
 	readonly security: CandidateSecurityRendererClient;
 	readonly browser: IntegratedBrowserRendererClient;
-	readonly terminal: TerminalRendererClient;
 }
 const api = (globalThis as unknown as { readonly proctorCandidate?: CandidatePreloadApi })
 	.proctorCandidate;
@@ -25,7 +22,6 @@ const candidateWindow = await bootstrapWorkbench(document, candidateComposition,
 	createDesktopWorkbenchContribution('candidate', () => api.bootstrap()),
 	attemptWorkspaceContribution,
 	createIntegratedBrowserContribution(api.browser),
-	createRemoteTerminalContribution(api.terminal),
 	createExamSecurityContribution(api.security)
 ]);
 globalThis.addEventListener('pagehide', () => candidateWindow.disposables.dispose(), {

@@ -174,7 +174,7 @@ The shared workbench kernel contains only reusable mechanics:
 
 Student activity, academic management, administration, settings, Attempt
 Workspace, Exam Resources, editor behavior, exam security, integrated browser,
-remote terminal, supervision, and review remain product contributions. The
+supervision, and review remain product contributions. The
 kernel does not import VS Code's extension ecosystem, local-workspace model,
 profiles/settings sync, Git/SCM, debugging, tasks, testing, local terminals,
 notebooks, custom editors, chat/agent systems, Microsoft identity, telemetry,
@@ -242,11 +242,11 @@ a destination restores focus to content. The destination list scrolls
 independently. Floating gutters and borders reduce each grid slot once before
 its content is measured. CandidateWindow layout policy is independent.
 
-`CandidateWindow` additionally exposes a `PanelPart` for the policy-gated
-remote terminal. Candidate navigation initially has `Workspace` and `Exam
+`CandidateWindow` additionally exposes a `PanelPart`, currently without a
+contribution; it is reserved for the planned Run output. Candidate navigation initially has `Workspace` and `Exam
 Materials`; the integrated browser opens only as a policy-controlled workbench
 item in the content area. The Workspace sidebar owns the file tree, the content
-area owns code-file and browser items, and the panel owns the single remote PTY.
+area owns code-file and browser items, and the panel is reserved for Run output.
 Exam Materials owns a separately authorized resource list and read-only viewers.
 There is no first-release agent region.
 
@@ -259,7 +259,6 @@ cross-region movement are outside the initial model.
 
 Workspace files, integrated-browser pages, Exam Resources, authenticated
 catalog/detail pages, and authorized review surfaces may be `WorkbenchItem`s.
-The terminal remains owned by `PanelPart`.
 
 A `WorkbenchItem` exposes only:
 
@@ -272,7 +271,7 @@ A `WorkbenchPane` exposes only one-time DOM creation, cancellable item
 assignment and clearing, visibility, layout constraints, layout, focus,
 non-sensitive view state, and disposal. A registered resolver obtains the item
 model. Saving, synchronization, content versions, browser enforcement,
-submission, and terminal lifetime stay behind their owning capabilities.
+and submission stay behind their owning capabilities.
 
 The internal layout model may support controlled groups and editor splits.
 Compositions expose policy rather than generic grid mutation. A failed or
@@ -314,7 +313,7 @@ Electron main owns composition-aware window and shutdown coordination:
   Attempt admission and preflight establish active state;
 - pause keeps CandidateWindow open beneath a blocking overlay while
   Participation renewal and the active Session lock continue; workspace
-  changes, browser, terminal, and submission remain gated;
+  changes, browser, and submission remain gated;
 - suspension first closes privileged operation gates, presents a blocking
   overlay, protects work, then destroys CandidateWindow and opens
   AuthenticatedWindow at the suspended Attempt;
@@ -339,7 +338,7 @@ stay privileged. Preload exposes only window-specific projections and intents.
 
 Candidate security state distinguishes local posture from authoritative Attempt
 state. A renderer cannot mark itself ready, active, reallowed, or submitted.
-Current policy and posture gate Workspace, browser, and terminal capabilities;
+Current policy and posture gate Workspace and browser capabilities;
 the underlying operation owner reauthorizes each request.
 
 ## Interaction, accessibility, and external input

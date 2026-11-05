@@ -7,7 +7,6 @@ import { BrowserThemeService } from '../../src/prctr/platform/theme/browser/them
 import { runBrowserInteractionOwnerTests } from './upstream/browserOwnerTests.ts';
 import { runControlExplorer } from './controlExplorer/controlExplorer.ts';
 import { runWorkbenchKernelBrowserTests } from './workbenchKernelTests.ts';
-import { runRemoteTerminalPanelTests } from './remoteTerminalPanelTests.ts';
 import { runBrowserKeybindingServiceTests } from './browserKeybindingServiceTests.ts';
 
 const parameters = new URL(globalThis.location.href).searchParams;
@@ -106,11 +105,6 @@ await runGroup('workbench-kernel', async () => {
 });
 await runGroup('keybindings', async () => {
 	await runBrowserKeybindingServiceTests(document);
-});
-await runGroup('terminal-panel', async () => {
-	document.body.dataset.terminalPanelTests = String(
-		await runRemoteTerminalPanelTests(document, themeService)
-	);
 });
 if (failures.length) document.body.dataset.browserOwnerError = failures.join('\n');
 delete document.body.dataset.currentSuite;

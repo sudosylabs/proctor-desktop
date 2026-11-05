@@ -483,20 +483,12 @@
     {
       "package": "@xterm/xterm",
       "version": "6.1.0-beta.303",
-      "kind": "production",
-      "purpose": "Render the exact terminal emulator generation admitted by the pinned VS Code source for the Candidate remote PTY surface.",
-      "owner": "execution-environment",
+      "kind": "development",
+      "purpose": "Compile the admitted workbench driver's type-only terminal reference. No terminal runtime is selected; the erased import emits no package execution.",
+      "owner": "settings-editor",
       "source": "https://www.npmjs.com/package/@xterm/xterm/v/6.1.0-beta.303",
       "license": "MIT",
-      "lifecycleScripts": "blocked",
-      "processes": ["candidate-renderer"],
-      "networkBehavior": "None; xterm parses and renders byte output already delivered through Proctor's closed terminal renderer API.",
-      "nativeBehavior": "Platform-neutral TypeScript and browser assets only; no executable or native library is bundled.",
-      "transitiveRisk": "The exact production package has no runtime dependencies and is imported only by the Candidate terminal panel.",
-      "bundleTreatment": "bundled",
-      "localAlternative": "A smaller local escape-sequence parser would be observably less correct and accessible than the mature emulator VS Code currently uses.",
-      "updateOwner": "execution-environment",
-      "removalOwner": "execution-environment"
+      "lifecycleScripts": "none"
     },
     {
       "package": "electron",

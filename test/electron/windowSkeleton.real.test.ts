@@ -189,7 +189,6 @@ void test('three product windows use isolated capability-specific preloads and l
 		destroyed: true
 	});
 	assert.deepEqual(result.transactionalRollback, {
-		terminal: { rejected: true, handlersRemaining: 0, modelClosed: true },
 		settings: { rejected: true, handlersRemaining: 0 },
 		security: { rejected: true, handlersRemaining: 0 },
 		productWindow: { rejected: true, handlersRemaining: 0, windowDestroyed: true }

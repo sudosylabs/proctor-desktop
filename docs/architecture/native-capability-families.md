@@ -117,8 +117,9 @@ digest and are disabled by default.
 The catalog assigns deterministic execution classes. External shells,
 interpreters, automation hosts, remote-control tools, capture tools, and local
 development servers are initially prohibited classes and cannot become allowed
-merely by registering a signer or digest. The Proctor-owned remote terminal and
-Execution Environment remain the permitted execution path.
+merely by registering a signer or digest. No execution path is currently
+permitted; the planned Proctor-owned Run capability must be admitted explicitly
+and cannot rely on a child shell or interpreter.
 
 A new relevant process immediately enters reversible `checking` while identity
 verification completes. An allowed identity clears without a violation; a

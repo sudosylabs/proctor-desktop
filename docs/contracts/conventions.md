@@ -12,7 +12,7 @@ type SafeInt = number; // Integer in [0, 9007199254740991].
 type PositiveInt = number; // Integer in [1, 9007199254740991].
 type Instant = string; // Existing RFC3339 UTC server timestamp convention.
 type NativeMode = 'disabled' | 'observe' | 'enforce';
-type CandidateCapability = 'browser' | 'submission' | 'terminal' | 'workspace';
+type CandidateCapability = 'browser' | 'submission' | 'workspace';
 ```
 
 All objects are closed: reject unknown and duplicate members at every depth.

@@ -79,8 +79,8 @@ re-read authoritative state, restore subscriptions, and acknowledge that
 requirement before issuing ordinary commands. Action-specific payload validation
 and reconciliation of unconfirmed outcomes remain with those owners. Commands
 are never replayed; reconnect never reopens an Attempt or grants participation.
-Capability owners map relevant events to query-key prefixes; terminal output does
-not implicitly refresh unrelated pages. Realtime invalidations coalesce and let
+Capability owners map relevant events to query-key prefixes; unrelated events do
+not implicitly refresh pages. Realtime invalidations coalesce and let
 in-flight reads finish before the following authoritative refresh. Mutations use
 stronger cancellation fencing. Lost event continuity invalidates active queries
 once and leaves domain resynchronization explicitly required. Binary downloads

@@ -86,13 +86,6 @@ scoped coordination under `src/prctr/workbench/services/integratedBrowser/`,
 and the item/pane under `src/prctr/workbench/contrib/integratedBrowser/`. Use
 [`develop-integrated-browser`](../develop-integrated-browser/SKILL.md).
 
-Keep terminal framing/state contracts under
-`src/prctr/platform/executionEnvironment/common/`, authenticated transport in
-the narrow privileged environment, Workspace/Attempt coordination under
-`src/prctr/workbench/services/executionEnvironment/`, and the Candidate panel
-under `src/prctr/workbench/contrib/terminal/`. Use
-[`develop-execution-environment`](../develop-execution-environment/SKILL.md).
-
 Use these aggregate manifest locations when workbench source lands:
 
 - `src/prctr/workbench/workbench.common.main.ts` for mechanics shared by every
@@ -106,8 +99,7 @@ Use these aggregate manifest locations when workbench source lands:
 - `src/prctr/code/electron-browser/candidate.main.ts` for the candidate
   contribution allowlist.
 
-Place integrated-browser policy/enforcement/activity modules and remote-terminal
-modules behind their focused skills. Their renderer contributions enter only
+Place integrated-browser policy/enforcement/activity modules behind their focused skill. Their renderer contributions enter only
 the candidate manifest; privileged adapters remain outside renderer closure.
 
 Load an optional packaged capability through a literal, statically discoverable

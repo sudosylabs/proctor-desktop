@@ -31,7 +31,6 @@ revision, disposition, dependencies, divergence, and evidence):
 - [`platform-instantiation-registry`](./platform-instantiation-registry.json) — constructor injection, scopes, delayed services, cycle detection, and disposal.
 - [`platform-keybindings`](./platform-keybindings.json) — platform keybinding resolution, conflicts, chords, IME, labels, and dispatch.
 - [`resource-preview`](./resource-preview.json) — complete image and Markdown document rendering mechanics behind an isolated reusable host, with separately packaged PDF.js decoding.
-- [`remote-terminal-client`](./remote-terminal-client.json) — one Workspace-fenced, policy-gated, xterm-backed remote PTY.
 - [`shared-browser-controls`](./shared-browser-controls.json) — reusable native-DOM controls and deterministic Control Explorer evidence.
 - [`themes-design-tokens`](./themes-design-tokens.json) — static semantic tokens and the four color-scheme classifications and non-color presentation tokens.
 - [`user-settings-common`](./user-settings-common.json) — bounded JSONC settings, typed resolution, and frozen Attempt Configuration.

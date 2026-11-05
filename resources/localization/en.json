@@ -1139,12 +1139,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
     },
-    "candidate.security.capability.terminal": {
-      "message": "terminal",
-      "description": "Candidate capability affected by a live correction.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
-    },
     "candidate.security.capability.workspace": {
       "message": "workspace",
       "description": "Candidate capability affected by a live correction.",
@@ -1188,7 +1182,7 @@
       "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
     },
     "candidate.security.paused.message": {
-      "message": "Work is protected. Editing, browser, terminal, and submission actions are paused.",
+      "message": "Work is protected. Editing, browser, and submission actions are paused.",
       "description": "Consequence explained by the Candidate pause gate.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
@@ -2384,18 +2378,6 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.terminal.fontsize.description": {
-      "message": "Sets terminal presentation outside an Attempt.",
-      "description": "Description of the terminal font size setting.",
-      "placeholders": [],
-      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
-    },
-    "settings.terminal.fontsize.title": {
-      "message": "Terminal font size",
-      "description": "Title for the terminal font size setting.",
-      "placeholders": [],
-      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
-    },
     "settings.theme.description": {
       "message": "Selects one packaged Proctor color theme.",
       "description": "Description of the packaged color theme setting.",
@@ -2439,7 +2421,7 @@
       "source": "src/prctr/workbench/browser/bootstrap.ts"
     },
     "workbench.layout.resize.panel": {
-      "message": "Resize terminal panel",
+      "message": "Resize panel",
       "description": "Accessible name for the Candidate panel separator.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/bootstrap.ts"
@@ -2612,7 +2594,7 @@
       "source": "src/prctr/workbench/browser/bootstrap.ts"
     },
     "workbench.part.panel": {
-      "message": "Terminal panel",
+      "message": "Panel",
       "description": "Accessible name for Candidate panel content.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/bootstrap.ts"
@@ -2646,72 +2628,6 @@
       "description": "Minimal startup recovery message.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/bootstrap.ts"
-    },
-    "workbench.terminal.close": {
-      "message": "Close terminal",
-      "description": "Action that closes the Candidate remote terminal.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.input": {
-      "message": "Terminal input",
-      "description": "Accessible label for the Candidate remote terminal input.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.open": {
-      "message": "Start terminal",
-      "description": "Action that asks the server to open the Candidate remote terminal.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.status.closed": {
-      "message": "Not started",
-      "description": "Status shown when the Candidate remote terminal is closed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.status.closing": {
-      "message": "Closing…",
-      "description": "Status shown while the Candidate remote terminal close request is in flight.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.status.exited": {
-      "message": "Process exited",
-      "description": "Status shown after the remote terminal process exits.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.status.failed": {
-      "message": "Terminal unavailable",
-      "description": "Status shown after the remote terminal fails closed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.status.opening": {
-      "message": "Starting…",
-      "description": "Status shown while the remote terminal is opening.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.status.paused": {
-      "message": "Paused by exam policy",
-      "description": "Status shown while the remote terminal is paused by an independent exam gate.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.status.ready": {
-      "message": "Connected",
-      "description": "Status shown when the remote terminal is connected and accepts input.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
-    },
-    "workbench.terminal.title": {
-      "message": "Terminal",
-      "description": "Title of the Candidate remote terminal panel.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalLabels.ts"
     }
   }
 }

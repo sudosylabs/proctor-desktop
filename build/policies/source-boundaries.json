@@ -25,12 +25,6 @@
       "rationale": "Adapt the admitted Modern UI keyboardFocusOnly panel rule to Proctor shell owners. Suppress pointer outlines over imported workbench focus rules while retaining focus-visible and text-entry focus; source editor and modal overlays remain independent."
     },
     {
-      "path": "src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.css",
-      "selector": ".prctr-terminal .xterm-dim",
-      "property": "opacity",
-      "rationale": "Preserve xterm dim rendering by preventing its generated foreground opacity from dimming cell backgrounds."
-    },
-    {
       "path": "src/prctr/base/browser/ui/sash/sash.css",
       "selector": ":where(.prctr-editor-scope) .monaco-sash.disabled",
       "property": "cursor",

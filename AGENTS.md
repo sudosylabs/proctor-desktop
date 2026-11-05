@@ -10,15 +10,16 @@ The renderer is built with plain TypeScript, DOM APIs, and CSS. React, Vite,
 Next.js, JSX, and equivalent application frameworks are outside the accepted
 architecture.
 
-Most durable data is remote. An Attempt Workspace is not a local folder, and the
-integrated terminal attaches to one PTY in an isolated remote Execution
-Environment. Native
+Most durable data is remote. An Attempt Workspace is not a local folder. Code
+execution is absent for now because the server no longer provides execution
+hosts or terminals; a Run capability is planned before the first release, and
+no local shell or process is ever exposed to a renderer. Native
 observation packages report bounded mechanical facts behind privileged process
 boundaries; the exam-security coordinator applies policy and separate adapters
 own enforcement.
 
 The accepted workspace separates authoritative server state, the desktop
-working overlay, protected local recovery, and remote execution projection. Read
+working overlay, and protected local recovery. Read
 [`docs/architecture/attempt-workspace.md`](docs/architecture/attempt-workspace.md)
 before changing workspace resources, file providers, working state, recovery,
 reconciliation, or Exam Resource delivery.
@@ -61,12 +62,6 @@ revision-frozen navigation enforcement and minimized ordered Browser Activity.
 Read [`docs/architecture/integrated-browser.md`](docs/architecture/integrated-browser.md)
 before changing browser policy, navigation, Electron browser boundaries,
 activity collection, protected spooling, or manager access.
-
-The initial terminal exposes one server-authorized remote PTY and keeps
-Execution Environment files distinct from Workspace authority. Read
-[`docs/architecture/execution-environment.md`](docs/architecture/execution-environment.md)
-before changing terminal transport, PTY lifecycle, generation fencing,
-Workspace projection synchronization, or terminal presentation.
 
 The accepted UI uses one Proctor-owned design system across every composition.
 Read [`docs/architecture/design-system.md`](docs/architecture/design-system.md)
@@ -205,9 +200,6 @@ Use these repository skills when their trigger matches:
 - [`develop-integrated-browser`](.agents/skills/develop-integrated-browser/SKILL.md)
   when changing Candidate browser policy, navigation enforcement, activity,
   spooling, privacy, access, or workbench presentation.
-- [`develop-execution-environment`](.agents/skills/develop-execution-environment/SKILL.md)
-  when changing remote PTY transport, terminal lifecycle, fencing, Workspace
-  projection synchronization, or terminal presentation.
 - [`develop-toolchain`](.agents/skills/develop-toolchain/SKILL.md) when changing
   package metadata, dependencies, TypeScript or esbuild configuration,
   generators, tests, Electron packaging, native builds, updates, signing, CI,

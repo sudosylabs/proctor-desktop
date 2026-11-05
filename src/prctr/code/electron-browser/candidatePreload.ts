@@ -1,12 +1,5 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 import {
-	validateTerminalRendererOutput,
-	validateTerminalRendererProjection,
-	type TerminalRendererIntent,
-	type TerminalRendererOutput,
-	type TerminalRendererProjection
-} from '../../platform/executionEnvironment/common/terminalRendererProtocol.js';
-import {
 	validateIntegratedBrowserProjection,
 	validateIntegratedBrowserSurface,
 	type IntegratedBrowserIntent,
@@ -16,7 +9,6 @@ import {
 import {
 	CANDIDATE_BROWSER_CHANNELS,
 	CANDIDATE_SECURITY_CHANNELS,
-	CANDIDATE_TERMINAL_CHANNELS,
 	WINDOW_CHANNELS
 } from '../../platform/windows/common/windowChannels.js';
 import {
@@ -97,28 +89,6 @@ contextBridge.exposeInMainWorld(
 				ipcRenderer.on(CANDIDATE_BROWSER_CHANNELS.surfaceFocusChanged, handler);
 				return () =>
 					ipcRenderer.off(CANDIDATE_BROWSER_CHANNELS.surfaceFocusChanged, handler);
-			}
-		}),
-		terminal: Object.freeze({
-			projection: async (): Promise<TerminalRendererProjection> =>
-				validateTerminalRendererProjection(
-					await ipcRenderer.invoke(CANDIDATE_TERMINAL_CHANNELS.projection)
-				),
-			intent: (intent: TerminalRendererIntent): Promise<void> =>
-				ipcRenderer.invoke(CANDIDATE_TERMINAL_CHANNELS.intent, intent),
-			onDidChange: (
-				listener: (projection: TerminalRendererProjection) => void
-			): (() => void) => {
-				const handler = (_event: IpcRendererEvent, value: unknown): void =>
-					listener(validateTerminalRendererProjection(value));
-				ipcRenderer.on(CANDIDATE_TERMINAL_CHANNELS.changed, handler);
-				return () => ipcRenderer.off(CANDIDATE_TERMINAL_CHANNELS.changed, handler);
-			},
-			onDidOutput: (listener: (output: TerminalRendererOutput) => void): (() => void) => {
-				const handler = (_event: IpcRendererEvent, value: unknown): void =>
-					listener(validateTerminalRendererOutput(value));
-				ipcRenderer.on(CANDIDATE_TERMINAL_CHANNELS.output, handler);
-				return () => ipcRenderer.off(CANDIDATE_TERMINAL_CHANNELS.output, handler);
 			}
 		})
 	})

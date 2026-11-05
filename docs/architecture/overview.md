@@ -9,7 +9,7 @@ Proctor Desktop is an Electron workbench for the whole Proctor examination
 product. Authenticated students see their exam activity; teachers, Exam
 Managers, and administrators see their current server-authorized areas. Every
 Candidate Exam Attempt includes an IDE workspace and may include an integrated
-browser and one remote terminal. The renderer uses plain TypeScript, DOM APIs,
+browser. The renderer uses plain TypeScript, DOM APIs,
 and CSS.
 
 The application has three trusted window kinds. `LaunchWindow` selects one
@@ -32,14 +32,14 @@ Most durable product data is remote. A local folder is not the Attempt
 Workspace. Desktop owns a Working Overlay and protected recovery/cache around
 the server's v1 cursor/journal/mutation contract. The integrated browser enforces
 revision-frozen policy over the candidate's network and delivers minimized
-ordered Browser Activity. The terminal attaches to one PTY in an isolated
-remote Execution Environment; its filesystem remains a projection rather than
-Workspace authority. The AI agent is deferred.
+ordered Browser Activity. Code execution is absent for now: the server removed
+execution hosts and terminals, and a Run capability is planned before the first
+release. The AI agent is deferred.
 
 ## Process boundary
 
 ```text
-Proctor Server and isolated Execution Environments
+Proctor Server
                          ^
                          |
                privileged Electron processes
@@ -73,8 +73,6 @@ The focused architecture topics own the detailed rules:
   recovery, and v1 adapter;
 - [Integrated browser](./integrated-browser.md) — navigation enforcement and
   Browser Activity;
-- [Execution Environment](./execution-environment.md) — remote PTY and Workspace
-  projection boundary;
 - [Native capabilities](./native-capabilities.md) — passive sources, window/
   display enforcement, privacy, and packaged conformance;
 - [Design system](./design-system.md) and [toolchain](./toolchain.md) — shared

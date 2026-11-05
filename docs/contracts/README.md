@@ -13,12 +13,11 @@ agreement fixture, admission path, or protected delivery boundary:
 | --------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | Shared aliases, closed objects, authentication, canonical JSON and hashes                           | [Conventions](conventions.md)                     |
 | Authored native families, mandatory baseline, effective policy, artifacts and lease-based authority | [Security policy](security-policy.md)             |
-| Preflight, atomic Connect, source resets, processed controls, renewal and execution containment     | [Secure participation](secure-participation.md)   |
+| Preflight, atomic Connect, source resets, processed controls, renewal and native containment        | [Secure participation](secure-participation.md)   |
 | Native records, receipts, gaps, closure, historical delivery, quotas and metadata reservations      | [Protected delivery](protected-delivery.md)       |
 | Desktop derivation, server freeze, exact provenance and compatible-build re-entry                   | [Attempt Configuration](attempt-configuration.md) |
 | Rule specificity, canonical paths, browser sources, grouped evidence, access and retention          | [Browser](browser.md)                             |
 | Minimum affected capabilities, transactional gates and oldest-first acknowledgement                 | [Live corrections](live-corrections.md)           |
-| Opaque host fences, incremental projection, semantic directory observation and PTY readiness        | [Execution](execution.md)                         |
 
 TypeScript blocks are wire-model notation with cross-file references. They are
 not generated production codecs. Runtime validation includes the textual bounds
@@ -29,7 +28,7 @@ server-owned implementation seams, not local runtime dependencies.
 Architecture documents own process and product boundaries and link here for the
 exact contract. [Project status](../project/status.md#server-integration-baseline)
 owns implementation progress. Agreement does not claim that an endpoint, Desktop
-adapter, signed native claim, or upgraded execution host is available.
+adapter, or signed native claim is available.
 
 Initial security resolution uses published selections, mandatory baseline,
 verified artifacts/catalogs, and existing admission/revocation fences. Institution

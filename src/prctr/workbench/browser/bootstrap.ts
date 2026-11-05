@@ -52,7 +52,7 @@ const messages = Object.freeze({
 	}),
 	panel: defineMessage({
 		id: 'workbench.part.panel',
-		defaultMessage: 'Terminal panel',
+		defaultMessage: 'Panel',
 		description: 'Accessible name for Candidate panel content.'
 	}),
 	status: defineMessage({
@@ -72,7 +72,7 @@ const messages = Object.freeze({
 	}),
 	resizePanel: defineMessage({
 		id: 'workbench.layout.resize.panel',
-		defaultMessage: 'Resize terminal panel',
+		defaultMessage: 'Resize panel',
 		description: 'Accessible name for the Candidate panel separator.'
 	}),
 	loading: defineMessage({

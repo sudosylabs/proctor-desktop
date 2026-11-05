@@ -50,7 +50,6 @@ export type AssuranceControl = {
 		| 'source-present'
 		| 'workspace-source-present'
 		| 'browser-source-present'
-		| 'execution-source-present'
 		| 'code-layer-present'
 		| 'css-present'
 		| 'settings-registry-present'

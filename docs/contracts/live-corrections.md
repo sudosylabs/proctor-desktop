@@ -37,8 +37,8 @@ actual semantic change:
 | Changed area        | Minimum affected set                |
 | ------------------- | ----------------------------------- |
 | browser_policy only | browser                             |
-| instructions        | submission, terminal, workspace     |
-| resources           | submission, terminal, workspace     |
+| instructions        | submission, workspace               |
+| resources           | submission, workspace               |
 | combined            | Sorted union of the applicable rows |
 
 The author must provide that minimum or a deliberate superset of the four known
@@ -66,32 +66,23 @@ transaction before a mutation is insufficient because a correction can publish
 between check and effect. Keep every other suspension, deadline, posture, and
 continuity gate intact.
 
-| Capability | Operations affected by its pending gate                                                                                    |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------- |
-| workspace  | Candidate create/write/rename/move/delete and execution-origin authoritative Workspace mutations                           |
-| terminal   | New attach/open, input, resize, and any operation that initiates guest work; existing terminal input is fenced immediately |
-| browser    | Browser open/new navigation/redirect and release of a usable Browser Policy to a navigating source                         |
-| submission | Submission creation/finalization                                                                                           |
+| Capability | Operations affected by its pending gate                                                            |
+| ---------- | -------------------------------------------------------------------------------------------------- |
+| workspace  | Candidate create/write/rename/move/delete of authoritative Workspace entries                       |
+| browser    | Browser open/new navigation/redirect and release of a usable Browser Policy to a navigating source |
+| submission | Submission creation/finalization                                                                   |
 
 Corrected instructions and Exam Resources remain readable so the candidate can
 understand and acknowledge the notice. Keep correction list/read/acknowledge,
 participation renewal, minimized observation delivery, browser spool upload,
 source sealing, and safe exit available subject to their ordinary authorization.
-Read-only recovery and terminal output drain may remain available; they do not
-grant fresh execution input. Desktop additionally closes its local gates from
-the same immutable notice.
-
-If terminal activity must stop for a pending terminal correction, apply the
-existing reversible execution freeze/fence and retain its generation until
-acknowledgement and other gates permit resumption. Do not claim that disabling
-new keyboard input stops an already-running guest process. Workspace and terminal
-minimum sets above prevent guest writes from bypassing an instructions/resources
-gate. A browser-only correction leaves Workspace saves, permitted terminal use,
-and submission available.
+Read-only recovery may remain available. Desktop additionally closes its local
+gates from the same immutable notice. A browser-only correction leaves Workspace
+saves and submission available.
 
 Expose a bounded `pending_correction_capabilities: CandidateCapability[]` union
 in Candidate capability summaries alongside the individual notices. Derive each
-workspace/browser/terminal/submission state independently. This field is a
+workspace/browser/submission state independently. This field is a
 projection of current notices, not a second authority.
 
 ## Acknowledgement and race behavior
@@ -110,10 +101,10 @@ acknowledgement response returns fresh capability state and current correction
 revision so a stale client does not resume from an obsolete response.
 
 Acceptance tests: browser-only correction with pending acknowledgement permits
-workspace/terminal/submission; instructions/resources gate their minimum set;
+workspace/submission; instructions/resources gate their minimum set;
 explicit supersets; acknowledgement_required=false; multiple pending overlaps;
 wrong candidate/revision; replay; publication-vs-mutation and ack-vs-new-correction
-races; readonly notice access; terminal freeze/recovery; and rejection of notices
+races; readonly notice access; and rejection of notices
 without an affected-capability selection.
 
 Acknowledgement order is oldest-first within the Attempt. Rejoin preserves

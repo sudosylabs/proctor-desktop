@@ -1112,7 +1112,6 @@ resources/server-api/openapi.json
 /src/prctr/platform/environment/common/argv.ts
 /src/prctr/platform/environment/common/environment.ts
 /src/prctr/platform/environment/common/environmentService.ts
-/src/prctr/platform/executionEnvironment/common/terminalProtocol.ts
 /src/prctr/platform/extensionManagement/common/extensionGalleryManifest.ts
 /src/prctr/platform/extensionManagement/common/extensionManagement.ts
 /src/prctr/platform/extensionManagement/common/extensionManagementUtil.ts
@@ -1525,7 +1524,6 @@ resources/server-api/openapi.json
 /src/prctr/workbench/contrib/snippets/browser/snippetsFile.ts
 /src/prctr/workbench/contrib/snippets/browser/snippetsService.ts
 /src/prctr/workbench/contrib/snippets/browser/tabCompletion.ts
-/src/prctr/workbench/contrib/terminal/browser/remoteTerminalPanel.ts
 /src/prctr/workbench/contrib/webview/browser/webview.ts
 /src/prctr/workbench/node/desktopAuthCallbackPage.css
 /src/prctr/workbench/node/desktopAuthCallbackPage.ts
@@ -1565,7 +1563,6 @@ resources/server-api/openapi.json
 /src/prctr/workbench/services/editor/common/editorService.ts
 /src/prctr/workbench/services/environment/browser/environmentService.ts
 /src/prctr/workbench/services/environment/common/environmentService.ts
-/src/prctr/workbench/services/executionEnvironment/common/remoteTerminalModel.ts
 /src/prctr/workbench/services/extensionManagement/common/extensionFeatures.ts
 /src/prctr/workbench/services/extensionManagement/common/extensionManagement.ts
 /src/prctr/workbench/services/extensions/common/extensionHostKind.ts

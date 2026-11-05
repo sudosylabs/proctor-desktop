@@ -53,8 +53,7 @@ const messages = Object.freeze({
 	}),
 	pausedMessage: defineMessage({
 		id: 'candidate.security.paused.message',
-		defaultMessage:
-			'Work is protected. Editing, browser, terminal, and submission actions are paused.',
+		defaultMessage: 'Work is protected. Editing, browser, and submission actions are paused.',
 		description: 'Consequence explained by the Candidate pause gate.'
 	}),
 	checkingTitle: defineMessage({
@@ -172,11 +171,6 @@ const correctionCapabilityMessages: Readonly<
 		defaultMessage: 'submission',
 		description: 'Candidate capability affected by a live correction.'
 	}),
-	terminal: defineMessage({
-		id: 'candidate.security.capability.terminal',
-		defaultMessage: 'terminal',
-		description: 'Candidate capability affected by a live correction.'
-	}),
 	workspace: defineMessage({
 		id: 'candidate.security.capability.workspace',
 		defaultMessage: 'workspace',
@@ -222,10 +216,7 @@ export function createExamSecurityContribution(
 				if (value.revision < latestRevision) return;
 				latestRevision = value.revision;
 				candidateInteractionAllowed.set(
-					value.canWorkspaceMutate ||
-						value.canUseBrowser ||
-						value.canUseTerminal ||
-						value.canSubmit
+					value.canWorkspaceMutate || value.canUseBrowser || value.canSubmit
 				);
 				const active = context.document.activeElement;
 				const hadBannerFocus = active instanceof HTMLElement && root.contains(active);

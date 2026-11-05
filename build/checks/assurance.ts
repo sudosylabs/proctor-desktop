@@ -19,10 +19,6 @@ function activationPresent(
 			);
 		case 'browser-source-present':
 			return files.some((path) => path.includes('/integratedBrowser/'));
-		case 'execution-source-present':
-			return files.some(
-				(path) => path.includes('/executionEnvironment/') || path.includes('/terminal/')
-			);
 		case 'code-layer-present':
 			return files.some((path) => path.startsWith('src/prctr/code/'));
 		case 'css-present':

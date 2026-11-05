@@ -18,8 +18,6 @@ These files contain accepted current-state rules:
   and integrity data
 - [Integrated browser](./integrated-browser.md) — revision-frozen navigation,
   privileged enforcement, Browser Activity, privacy, and delivery
-- [Execution Environment](./execution-environment.md) — remote PTY, generation
-  fencing, Workspace projection, terminal presentation, and lifecycle
 - [Native capabilities](./native-capabilities.md) — passive observation sources,
   candidate-window enforcement, privileged process boundaries, and platform
   verification
@@ -55,11 +53,6 @@ Use
 [`develop-integrated-browser`](../../.agents/skills/develop-integrated-browser/SKILL.md)
 when implementing or reviewing Candidate browser policy, navigation
 enforcement, Browser Activity, protected delivery, privacy, or access.
-
-Use
-[`develop-execution-environment`](../../.agents/skills/develop-execution-environment/SKILL.md)
-when implementing or reviewing remote PTY transport, terminal presentation,
-generation fencing, or Workspace projection synchronization.
 
 Use
 [`develop-native-capabilities`](../../.agents/skills/develop-native-capabilities/SKILL.md)

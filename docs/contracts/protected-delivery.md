@@ -547,7 +547,7 @@ at 1 MiB. The client cannot replenish quotas with this operation.
 
 Historical detail exhaustion alone creates no misconduct Flag and does not
 suspend the Attempt or deny otherwise authorized interaction. Native observation,
-local enforcement, server operation gates, execution freeze when required,
+local enforcement, server operation gates,
 Participation renewal, correction acknowledgement, and submission remain valid.
 Required live coverage failure continues to contain independently. Present
 bounded incomplete-record status to authorized users; never claim complete
@@ -616,7 +616,7 @@ renewal/containment while historical detail budgets are exhausted.
    source continuity. Commit a processed `reset_required` result under [processed control ordering](secure-participation.md#processed-control-ordering),
    close the required security gates, and keep valid lease renewal available.
    Capacity loss must not be converted into a healthy source assertion.
-6. Existing authoritative lifecycle, audit, idempotency, and execution-effect
+6. Existing authoritative lifecycle, audit, and idempotency
    owners retain their existing storage controls. The contract does not relabel
    newly introduced delivery metadata as general audit state to evade its cap.
 

@@ -20,9 +20,7 @@ for readiness, auth, bindings, candidate gates, Attempt transitions, or secure
 window handoff. Use [`develop-user-settings`](../develop-user-settings/SKILL.md)
 for Account/Settings or Attempt Configuration,
 [`develop-integrated-browser`](../develop-integrated-browser/SKILL.md) for
-browser items, and
-[`develop-execution-environment`](../develop-execution-environment/SKILL.md) for
-terminal panels. Use [`adapt-vscode`](../adapt-vscode/SKILL.md) before deriving
+browser items. Use [`adapt-vscode`](../adapt-vscode/SKILL.md) before deriving
 from VS Code.
 
 For shell composition, apply the accepted
@@ -55,7 +53,7 @@ Use `WorkbenchItem`, `WorkbenchPane`, and a resolver for central content. Items
 own identity/presentation/shell capabilities; panes own DOM lifecycle,
 cancellable assignment, visibility/layout/focus, safe view state, and disposal.
 The resolver acquires the model. Saving, synchronization, browser enforcement,
-terminal lifetime, review, and submission remain in owning capabilities.
+review, and submission remain in owning capabilities.
 
 Use [`develop-attempt-workspace`](../develop-attempt-workspace/SKILL.md) for
 files, resources, durability, recovery, or merge UI. The step is complete when
@@ -88,7 +86,7 @@ authority.
 ## 6. Preserve secure window transitions
 
 Compose common, authenticated, and candidate allowlists explicitly. Candidate
-always includes IDE Workspace and Exam Materials; browser and terminal activate
+always includes IDE Workspace and Exam Materials; the browser activates
 only from trusted Attempt capability and posture. The AI agent remains absent.
 
 Opening CandidateWindow closes AuthenticatedWindow. Pause keeps CandidateWindow
