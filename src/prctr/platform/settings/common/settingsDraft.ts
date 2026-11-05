@@ -45,8 +45,10 @@ export class SettingsDraft extends Disposable {
 		super();
 		this.base = { source, revision };
 		this.#document = document ?? this._register(new SettingsDraftStorage(source));
-		if (this.#document.value !== source)
+		if (this.#document.value !== source) {
+			this.dispose();
 			throw new Error('Settings document does not match its base source');
+		}
 		this._register(this.#document.onDidChange(() => this.#sourceVersion++));
 	}
 
