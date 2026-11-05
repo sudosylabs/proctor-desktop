@@ -21,8 +21,10 @@ not replace the review questions in
   `base/browser/dom.ts`. Code that receives a `Document` or host element builds
   with `createElementFactory(document)` from `base/browser/documentElements.ts`,
   so nodes belong to the right window. `proctor/prefer-dom-helpers` rejects the
-  global `document.createElement`; raw `createElement` on an injected document
-  is older style and migrates as files are touched.
+  global `document.createElement`, and `proctor/prefer-element-factory` rejects
+  raw `createElement` everywhere else. The 22 files in
+  `build/lint/legacyElementCreation.json` predate it; remove a file from that list
+  when you migrate it, and never add one.
 - Files carrying `@proctor-vscode-port` belong to a manifest under
   `docs/upstream/vscode-ports/`; change them only through
   [`adapt-vscode`](../../.agents/skills/adapt-vscode/SKILL.md).

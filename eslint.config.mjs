@@ -6,6 +6,9 @@ import { transferredFiles } from './build/lib/formatOwnership.ts';
 import { upstreamDirectives } from './build/lint/upstreamDirectives.ts';
 
 const solution = JSON.parse(readFileSync(new URL('./tsconfig.json', import.meta.url), 'utf8'));
+const legacyElementCreation = JSON.parse(
+	readFileSync(new URL('./build/lint/legacyElementCreation.json', import.meta.url), 'utf8')
+);
 const transferred = [...transferredFiles(new FileSystemRepository(import.meta.dirname))];
 
 export default [
@@ -93,6 +96,16 @@ export default [
 		files: ['src/prctr/**/browser/**/*.ts', 'src/prctr/workbench/**/*.ts'],
 		ignores: transferred,
 		rules: { 'proctor/prefer-dom-helpers': 'error' }
+	},
+	{
+		// Ratchet: files listed in legacyElementCreation.json predate the factory and leave the list as they are touched.
+		files: ['src/prctr/**/browser/**/*.ts', 'src/prctr/workbench/**/*.ts'],
+		ignores: [
+			...transferred,
+			...legacyElementCreation,
+			'src/prctr/base/browser/documentElements.ts'
+		],
+		rules: { 'proctor/prefer-element-factory': 'error' }
 	},
 	{
 		// A standalone bundle for the isolated PDF page; it stays free of the workbench DOM module.

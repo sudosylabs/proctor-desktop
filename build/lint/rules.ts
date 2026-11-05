@@ -181,11 +181,31 @@ export const preferDomHelpers: Rule.RuleModule = {
 	}
 };
 
+export const preferElementFactory: Rule.RuleModule = {
+	meta: {
+		type: 'suggestion',
+		schema: [],
+		messages: {
+			raw: 'Create elements with createElementFactory(document) from base/browser/documentElements.ts instead of calling createElement directly.'
+		}
+	},
+	create(context) {
+		return {
+			"CallExpression[callee.type='MemberExpression'][callee.property.name='createElement']"(
+				node: Rule.Node
+			) {
+				context.report({ node, messageId: 'raw' });
+			}
+		};
+	}
+};
+
 export const rules = {
 	'no-focused-tests': noFocusedTests,
 	'disposable-ownership': disposableOwnership,
 	'no-unsafe-double-assertion': noUnsafeDoubleAssertion,
 	'no-sync-fs': noSynchronousFileSystem,
 	'require-leak-checked-tests': requireLeakCheckedTests,
-	'prefer-dom-helpers': preferDomHelpers
+	'prefer-dom-helpers': preferDomHelpers,
+	'prefer-element-factory': preferElementFactory
 };

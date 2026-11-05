@@ -20,6 +20,7 @@ import {
 	noSynchronousFileSystem,
 	noUnsafeDoubleAssertion,
 	preferDomHelpers,
+	preferElementFactory,
 	requireLeakCheckedTests
 } from '../../build/lint/rules.ts';
 
@@ -202,6 +203,15 @@ void test('lint rules reject unsafe forms and accept the supported counterparts'
 			{
 				code: "const node = document.createElement('div');",
 				errors: [{ messageId: 'global' }]
+			}
+		]
+	});
+	tester.run('prefer-element-factory', preferElementFactory, {
+		valid: ["const $ = createElementFactory(document);\nconst node = $('div.card');"],
+		invalid: [
+			{
+				code: "const node = host.ownerDocument.createElement('div');",
+				errors: [{ messageId: 'raw' }]
 			}
 		]
 	});
