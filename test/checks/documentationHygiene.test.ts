@@ -86,3 +86,38 @@ void test('exact copied JSON assets preserve upstream JSONC and terminal whitesp
 		[]
 	);
 });
+
+void test('hygiene rejects authored comments that cite repository guidance', () => {
+	const cited = (comment: string) => {
+		const diagnostics = hygieneCheck.run(
+			context({
+				'src/prctr/platform/common/example.ts': `${comment}\nexport const value = 1;\n`
+			})
+		);
+		assert.ok(Array.isArray(diagnostics));
+		return diagnostics;
+	};
+	for (const comment of [
+		'// See docs/architecture/workbench.md for the lifecycle.',
+		'/** Described in .agents/skills/example/SKILL.md */',
+		' * Tracked under .scratch/plan.md'
+	])
+		assert.match(cited(comment)[0]?.problem ?? '', /cites repository guidance/, comment);
+	for (const comment of [
+		'// See https://www.electronjs.org/docs/latest/api/accelerator.',
+		'// Owns the lifecycle of each window.'
+	])
+		assert.deepStrictEqual(cited(comment), [], comment);
+});
+
+void test('hygiene leaves comments in admitted upstream ports alone', () => {
+	assert.deepStrictEqual(
+		hygieneCheck.run(
+			context({
+				'src/prctr/platform/common/example.ts':
+					'// @proctor-vscode-port base-common-runtime\n// See docs/monitoring/guide.md\n'
+			})
+		),
+		[]
+	);
+});

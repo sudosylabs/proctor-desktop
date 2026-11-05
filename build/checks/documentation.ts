@@ -317,6 +317,9 @@ function copiedJsonAssets(repository: Repository): ReadonlySet<string> {
 	return assets;
 }
 
+const COMMENT_CITING_GUIDANCE =
+	/^\s*(?:\/\/|\/?\*)(?:.*[\s`'"(])?(?:docs\/|\.agents\/|\.scratch\b|SKILL\.md|AGENTS\.md)/;
+
 export const hygieneCheck: Check = {
 	id: 'repository.hygiene',
 	category: 'documentation',
@@ -426,6 +429,19 @@ export const hygieneCheck: Check = {
 						'Use repository-relative paths or portable placeholders.'
 					)
 				);
+			if (!admittedUpstreamFixture && path.startsWith('src/prctr/') && extension === '.ts')
+				lines.forEach((line, index) => {
+					if (COMMENT_CITING_GUIDANCE.test(line))
+						diagnostics.push(
+							diagnostic(
+								'repository.hygiene',
+								path,
+								'Comment cites repository guidance that can outlive the code it describes.',
+								'Name the symbols and behavior the comment explains instead of a document, skill, or scratch path.',
+								index + 1
+							)
+						);
+				});
 		}
 		return diagnostics;
 	}
