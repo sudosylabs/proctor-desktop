@@ -220,6 +220,10 @@ Use these repository skills when their trigger matches:
   when changing `AGENTS.md`, a skill, agent routing, or tracked documentation
   intended to guide agents.
 
+Directory-local guides add rules for one area and defer everything else to this
+file: [`src/prctr/AGENTS.md`](src/prctr/AGENTS.md),
+[`build/AGENTS.md`](build/AGENTS.md), and [`test/AGENTS.md`](test/AGENTS.md).
+
 Keep universal, stable rules here. Put deep domain procedure in a triggered
 skill. Put unsettled reasoning in `.scratch/`. Code, tests, configuration, and
 command help own facts that are cheap to discover.

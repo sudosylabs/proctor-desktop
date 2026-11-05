@@ -128,7 +128,9 @@ distinct product-design, shared-system, accessibility, and CSS/layout branches.
 Use [`commit-organization`](../.agents/skills/commit-organization/SKILL.md),
 [`cross-platform-validation`](../.agents/skills/cross-platform-validation/SKILL.md),
 and [`code-review`](../.agents/skills/code-review/SKILL.md) for committing,
-platform evidence, and review.
+platform evidence, and review. Directory-local guides live in
+[`src/prctr`](../src/prctr/AGENTS.md), [`build`](../build/AGENTS.md), and
+[`test`](../test/AGENTS.md).
 
 Bundled color assets and their source relationship are documented in
 [GitHub themes](./upstream/github-themes.md).
