@@ -4,6 +4,7 @@
 
 import lockupDarkUrl from '../../../../resources/branding/source/lockup/proctor-lockup-vertical-25d-dark.svg';
 import lockupLightUrl from '../../../../resources/branding/source/lockup/proctor-lockup-vertical-25d-light.svg';
+import { createElementFactory } from '../../base/browser/documentElements.js';
 import { Disposable } from '../../base/common/lifecycle.js';
 import type { ResolvedTheme } from '../../platform/theme/common/themes.js';
 import './brandLockup.css';
@@ -24,11 +25,13 @@ export class BrandLockup extends Disposable {
 	constructor(document: Document, appearance: BrandLockupAppearance) {
 		super();
 		this.#appearance = appearance;
-		this.element = document.createElement('div');
-		this.element.className = 'prctr-brand-lockup';
-		this.element.dataset.appearance = appearance;
-		this.element.setAttribute('aria-hidden', 'true');
-		this.#image = document.createElement('img');
+		const $ = createElementFactory(document);
+		this.#image = $('img');
+		this.element = $(
+			'div.prctr-brand-lockup',
+			{ data: { appearance }, attrs: { 'aria-hidden': 'true' } },
+			this.#image
+		);
 		this.#image.alt = '';
 		// Reserve the supplied SVG's aspect ratio before its first decoded frame.
 		this.#image.width = 768;
@@ -36,7 +39,6 @@ export class BrandLockup extends Disposable {
 		this.#image.decoding = 'async';
 		this.#image.draggable = false;
 		this.#image.src = sources[appearance];
-		this.element.append(this.#image);
 	}
 
 	get appearance(): BrandLockupAppearance {

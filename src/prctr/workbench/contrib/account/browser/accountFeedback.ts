@@ -1,3 +1,4 @@
+import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import type { LocalizationContext } from '../../../../base/common/localization.js';
 import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
@@ -14,13 +15,15 @@ export class AccountFeedback extends Disposable {
 		private readonly localization: LocalizationContext
 	) {
 		super();
-		this.element = host.ownerDocument.createElement('div');
-		this.element.className = 'prctr-account-feedback';
-		this.element.role = 'status';
-		this.element.hidden = true;
+		const $ = createElementFactory(host.ownerDocument);
 		this.icon = this._register(createSemanticIcon(host.ownerDocument, { id: 'state.info' }));
-		this.text = host.ownerDocument.createElement('span');
-		this.element.append(this.icon.element, this.text);
+		this.text = $('span');
+		this.element = $(
+			'div.prctr-account-feedback',
+			{ role: 'status', hidden: true },
+			this.icon.element,
+			this.text
+		);
 		host.append(this.element);
 	}
 	set(key?: keyof typeof accountMessages, kind: 'info' | 'error' | 'loading' = 'info'): void {

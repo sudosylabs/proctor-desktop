@@ -17,9 +17,12 @@ not replace the review questions in
   path. `repository.hygiene` rejects those references.
 - Synchronous `node:fs` calls are rejected by `proctor/no-sync-fs`; an exception
   needs a reason in `eslint.config.mjs`.
-- Code that creates DOM uses the document it was given, or `h()`, `$()`, and
-  `append()` from `base/browser/dom.ts`. `proctor/prefer-dom-helpers` rejects the
-  global `document.createElement`.
+- Code that creates DOM for its own window uses `h()`, `$()`, and `append()` from
+  `base/browser/dom.ts`. Code that receives a `Document` or host element builds
+  with `createElementFactory(document)` from `base/browser/documentElements.ts`,
+  so nodes belong to the right window. `proctor/prefer-dom-helpers` rejects the
+  global `document.createElement`; raw `createElement` on an injected document
+  is older style and migrates as files are touched.
 - Files carrying `@proctor-vscode-port` belong to a manifest under
   `docs/upstream/vscode-ports/`; change them only through
   [`adapt-vscode`](../../.agents/skills/adapt-vscode/SKILL.md).
