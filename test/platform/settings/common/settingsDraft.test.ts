@@ -4,21 +4,8 @@ import {
 	SettingsDraft,
 	mergeSettingsSources
 } from '../../../../src/prctr/platform/settings/common/settingsDraft.ts';
-import { migrateSettingsDocument } from '../../../../src/prctr/platform/settings/common/settingsMigration.ts';
 
-suite('Settings migration and draft', () => {
-	test('migrates a legacy property deterministically while retaining surrounding comments', () => {
-		const source =
-			'{\n  // legacy tree presentation\n  "explorer.tree.indent": 12,\n  "future.key": true\n}';
-		const first = migrateSettingsDocument(source, 1);
-		const second = migrateSettingsDocument(source, 1);
-		assert.strictEqual(first.source, second.source);
-		assert.strictEqual(first.changed, true);
-		assert.ok(first.source.includes('// legacy tree presentation'));
-		assert.ok(first.source.includes('"workbench.tree.indent": 12'));
-		assert.ok(first.source.includes('"future.key": true'));
-	});
-
+suite('Settings draft', () => {
 	test('structured and JSONC editing share one source', async () => {
 		const draft = new SettingsDraft('{\n  // font\n  "editor.fontSize": 14\n}', 'rev-1');
 		await draft.set('editor.fontSize', 18);

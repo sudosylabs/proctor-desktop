@@ -70,7 +70,7 @@ private. Route cross-contribution behavior through one narrow shared contract or
 an owning workbench service. Import contributions only from Proctor-owned
 manifests.
 
-Keep static setting declarations, JSONC grammar, migrations, resolution,
+Keep static setting declarations, JSONC grammar, resolution,
 inspection, generated-schema inputs, and immutable projections under
 `src/prctr/platform/settings/common/`. Keep privileged settings transport and
 protected-cache ownership in Electron main. Put the editing surface in

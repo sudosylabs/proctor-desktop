@@ -1,4 +1,3 @@
-import { SETTINGS_REGISTRY_VERSION } from './settingsManifest.js';
 import { parseSettingsDocument } from './settingsDocument.js';
 import type {
 	AcknowledgedUserSettings,
@@ -35,8 +34,7 @@ export function readUserSettingsWire(value: unknown): UserSettingsSnapshot {
 	return Object.freeze({
 		acknowledged: Object.freeze({
 			source: data.source,
-			revision: metadata(data),
-			registryVersion: SETTINGS_REGISTRY_VERSION
+			revision: metadata(data)
 		}),
 		writable: data.writable
 	});

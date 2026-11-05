@@ -5,7 +5,6 @@ import {
 import { normalizeColorCustomizations } from '../../theme/common/colorCustomizations.js';
 import {
 	SETTINGS_MANIFEST,
-	SETTINGS_REGISTRY_VERSION,
 	type EffectiveSettingId,
 	type SettingDeclaration,
 	type SettingId,
@@ -16,7 +15,6 @@ import { registryFingerprint } from './settingsRegistryFingerprint.js';
 export { registryFingerprint, stableStringify } from './settingsRegistryFingerprint.js';
 
 export interface SettingsRegistry {
-	readonly version: number;
 	readonly fingerprint: string;
 	readonly declarations: readonly Readonly<SettingDeclaration>[];
 	declaration(id: string): Readonly<SettingDeclaration> | undefined;
@@ -41,8 +39,7 @@ if (byId.size !== declarations.length)
 	throw new Error('The packaged settings manifest contains duplicate identifiers');
 
 export const settingsRegistry: SettingsRegistry = Object.freeze({
-	version: SETTINGS_REGISTRY_VERSION,
-	fingerprint: registryFingerprint({ version: SETTINGS_REGISTRY_VERSION, declarations }),
+	fingerprint: registryFingerprint({ declarations }),
 	declarations,
 	declaration: (id: string) => byId.get(id),
 	isKnown: (id: string): id is SettingId => byId.has(id),

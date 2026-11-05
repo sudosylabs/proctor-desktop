@@ -403,7 +403,6 @@ export async function exerciseSettingsWindowServices(): Promise<void> {
 		let acknowledged: UserSettingsProjection = {
 			source: '{"editor.fontSize":18}',
 			revision: 'r1',
-			registryVersion: 1,
 			writable: true,
 			availability: 'available',
 			presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }

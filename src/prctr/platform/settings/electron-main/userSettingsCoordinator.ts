@@ -1,8 +1,6 @@
 import { getTheme } from '../../theme/common/themes.js';
 import { Emitter, type Event } from '../../../base/common/event.js';
-import { SETTINGS_REGISTRY_VERSION } from '../common/settingsManifest.js';
 import { parseSettingsDocument, SETTINGS_DOCUMENT_LIMITS } from '../common/settingsDocument.js';
-import { migrateSettingsDocument } from '../common/settingsMigration.js';
 import {
 	validateUserSettingsCommitIntent,
 	validateUserSettingsPreviewIntent,
@@ -79,7 +77,7 @@ export class UserSettingsCoordinator {
 		this.#cache = options.cache;
 		this.#cacheLease = cacheLease;
 		this.#acknowledged = freezeAcknowledged(acknowledged);
-		this.#inMemory = migrateAcknowledged(this.#acknowledged);
+		this.#inMemory = this.#acknowledged;
 		this.#writable = options.writable && acknowledged.revision !== 'unavailable';
 		this.#effective = new DefaultUserSettingsService(this.#inMemory, options.context);
 	}
@@ -100,8 +98,7 @@ export class UserSettingsCoordinator {
 			options,
 			cached ?? {
 				source: '{}',
-				revision: 'unavailable',
-				registryVersion: SETTINGS_REGISTRY_VERSION
+				revision: 'unavailable'
 			},
 			cacheLease
 		);
@@ -186,8 +183,7 @@ export class UserSettingsCoordinator {
 			this.#ambiguousRequest = undefined;
 			await this.#accept({
 				source: request.source,
-				revision: result.revision,
-				registryVersion: this.#acknowledged.registryVersion
+				revision: result.revision
 			});
 			return Object.freeze({ kind: 'success', projection: this.projection() });
 		}
@@ -218,7 +214,7 @@ export class UserSettingsCoordinator {
 		this.#assertLive();
 		const acknowledged = freezeAcknowledged(value);
 		this.#acknowledged = acknowledged;
-		this.#inMemory = migrateAcknowledged(acknowledged);
+		this.#inMemory = acknowledged;
 		this.#effective.updateAcknowledged(this.#inMemory);
 		this.#change.fire(this.projection());
 		await this.#persistAcknowledged(acknowledged).catch(() => {});
@@ -296,28 +292,18 @@ function freezeAcknowledged(value: AcknowledgedUserSettings): AcknowledgedUserSe
 		value.source.length > SETTINGS_DOCUMENT_LIMITS.maxBytes ||
 		new TextEncoder().encode(value.source).byteLength > SETTINGS_DOCUMENT_LIMITS.maxBytes ||
 		typeof value.revision !== 'string' ||
-		!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(value.revision) ||
-		!Number.isSafeInteger(value.registryVersion) ||
-		value.registryVersion <= 0
+		!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(value.revision)
 	)
 		throw new TypeError('Acknowledged User Settings are invalid');
 	return Object.freeze({
 		source: value.source,
-		revision: value.revision,
-		registryVersion: value.registryVersion
+		revision: value.revision
 	});
 }
 function isExactAcknowledged(value: unknown): value is AcknowledgedUserSettings {
 	if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
 	const keys = Object.keys(value);
-	return (
-		keys.length === 3 &&
-		['source', 'revision', 'registryVersion'].every((key) => Object.hasOwn(value, key))
-	);
-}
-function migrateAcknowledged(value: AcknowledgedUserSettings): AcknowledgedUserSettings {
-	const migration = migrateSettingsDocument(value.source, value.registryVersion);
-	return Object.freeze({ ...value, source: migration.source });
+	return keys.length === 2 && ['source', 'revision'].every((key) => Object.hasOwn(value, key));
 }
 function sameRequest(left: SettingsCommitRequest, right: SettingsCommitRequest): boolean {
 	return (

@@ -2,7 +2,7 @@ import { setProperty } from '../../../base/common/jsonEdit.js';
 import { findNodeAtLocation, parseTree } from '../../../base/common/json.js';
 import { stripComments } from '../../../base/common/jsonc.js';
 import { parseSettingsDocument } from './settingsDocument.js';
-import { applyEdits } from './settingsMigration.js';
+import { applyEdits } from '../../../base/common/jsonEdit.js';
 import { settingsRegistry } from './settingsRegistry.js';
 import { ConfigurationService } from '../../configuration/common/configurationService.js';
 import { NullPolicyService } from '../../policy/common/policy.js';

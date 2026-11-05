@@ -17,10 +17,7 @@ suite('Proctor settings registry', () => {
 		assert.ok(Object.isFrozen(settingsRegistry.declarations));
 		assert.strictEqual(
 			settingsRegistry.fingerprint,
-			registryFingerprint({
-				version: settingsRegistry.version,
-				declarations: settingsRegistry.declarations
-			})
+			registryFingerprint({ declarations: settingsRegistry.declarations })
 		);
 		assert.strictEqual(
 			activeSettingIds().length,

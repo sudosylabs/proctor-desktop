@@ -15,8 +15,6 @@ function defineMessage(
 	return Object.freeze({ ...definition, placeholders: Object.freeze([]) });
 }
 
-export const SETTINGS_REGISTRY_VERSION = 1;
-
 export type SettingStorageScope = 'portableUser' | 'device';
 export type SettingDomain =
 	'appearance' | 'accessibility' | 'editor' | 'navigation' | 'browser' | 'security';
@@ -43,7 +41,6 @@ export interface SettingDeclaration {
 	readonly candidate: CandidateTreatment;
 	readonly title: SettingMessageDescriptor;
 	readonly description: SettingMessageDescriptor;
-	readonly migration?: { readonly from: string; readonly removeAfter: number };
 	readonly rejectionReason?: SettingMessageDescriptor;
 }
 
@@ -506,8 +503,7 @@ export const SETTINGS_MANIFEST = [
 			id: 'settings.navigation.indent.description',
 			defaultMessage: 'Sets indentation for hierarchical navigation outside an Attempt.',
 			description: 'Description of the tree indentation setting.'
-		}),
-		migration: { from: 'explorer.tree.indent', removeAfter: 2 }
+		})
 	},
 	{
 		id: 'browser.presentation.zoom',

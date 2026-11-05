@@ -12,7 +12,6 @@ export interface UserSettingsPresentationProjection {
 export interface UserSettingsProjection {
 	readonly source: string;
 	readonly revision: string;
-	readonly registryVersion: number;
 	readonly availability: 'available' | 'unavailable';
 	readonly writable: boolean;
 	readonly presentation: UserSettingsPresentationProjection;
@@ -32,18 +31,10 @@ export type UserSettingsCommitResponse =
 export function validateUserSettingsProjection(value: unknown): UserSettingsProjection {
 	if (
 		!isRecord(value) ||
-		exactKeys(value, [
-			'availability',
-			'presentation',
-			'registryVersion',
-			'revision',
-			'source',
-			'writable'
-		]) === false ||
+		exactKeys(value, ['availability', 'presentation', 'revision', 'source', 'writable']) ===
+			false ||
 		!boundedSource(value.source) ||
 		!boundedId(value.revision) ||
-		!Number.isSafeInteger(value.registryVersion) ||
-		(value.registryVersion as number) <= 0 ||
 		!['available', 'unavailable'].includes(value.availability as string) ||
 		typeof value.writable !== 'boolean' ||
 		(value.availability === 'unavailable' && value.writable)
@@ -52,7 +43,6 @@ export function validateUserSettingsProjection(value: unknown): UserSettingsProj
 	return Object.freeze({
 		source: value.source,
 		revision: value.revision,
-		registryVersion: value.registryVersion,
 		availability: value.availability,
 		writable: value.writable,
 		presentation: validatePresentation(value.presentation)

@@ -29,7 +29,6 @@ export async function exerciseSettingsProduction(): Promise<void> {
 	let acknowledged: UserSettingsProjection = {
 		source: '{"editor.fontSize":18}',
 		revision: 'r1',
-		registryVersion: 1,
 		writable: true,
 		availability: 'available',
 		presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
@@ -69,7 +68,6 @@ export async function exerciseSettingsProduction(): Promise<void> {
 		createDesktopWorkbenchContribution(
 			'authenticated',
 			async () => ({
-				protocolVersion: 1,
 				kind: 'authenticated',
 				windowId: 'window:settings',
 				institutionOrigin: 'https://institution.example.test',
@@ -80,7 +78,6 @@ export async function exerciseSettingsProduction(): Promise<void> {
 			{
 				async configuration() {
 					return {
-						protocolVersion: 1,
 						platform: isMacintosh ? 'darwin' : 'linux',
 						mode: isMacintosh ? 'nativeTrafficLights' : 'nativeOverlay',
 						controlsLocation: isMacintosh ? 'left' : 'right',

@@ -1,6 +1,6 @@
 ---
 name: develop-user-settings
-description: Design, implement, or review Proctor Desktop User Settings JSONC, static registry declarations, Account/Settings editing, effective configuration, Attempt Configuration, preferences, constraints, migrations, conflicts, caches, schemas, or settings projections. Use before changing any user setting or settings-related interface.
+description: Design, implement, or review Proctor Desktop User Settings JSONC, static registry declarations, Account/Settings editing, effective configuration, Attempt Configuration, preferences, constraints, conflicts, caches, schemas, or settings projections. Use before changing any user setting or settings-related interface.
 ---
 
 # Develop user settings
@@ -34,7 +34,7 @@ For Attempt Configuration models, hashes, approved IDs or re-entry, load the
 Add one immutable typed declaration through the owning capability and literal
 settings manifest. Declare identifier, schema/default, bounds/normalization,
 portable/device scope, domain, window applicability, candidate treatment,
-activation, language override, fallback, lifecycle, migration, and localized
+activation, language override, fallback, lifecycle, and localized
 editor metadata.
 
 Choose `eligible`, `policyConstrained`, `nonCandidateOnly`, or `prohibited`.
@@ -95,7 +95,7 @@ completion preserve the draft and never guess authority or cross Principals.
 
 ## 6. Place and present
 
-Keep registry, JSONC grammar, migrations, resolution, inspection, schema inputs,
+Keep registry, JSONC grammar, resolution, inspection, schema inputs,
 and immutable projections under `src/prctr/platform/settings/common/`. Keep
 coordinator/network/protected-cache adapters in Electron main. Put UI under
 `src/prctr/workbench/contrib/settings/` and select it from the authenticated
@@ -108,7 +108,7 @@ preload, and manifest express the accepted ownership.
 ## 7. Verify
 
 Test registry/generated parity, parser bounds/fuzzing, unknown/prohibited keys,
-precedence, migrations, conditional writes, ambiguity/conflict, cache isolation,
+precedence, conditional writes, ambiguity/conflict, cache isolation,
 Attempt Configuration closed schema/freeze/rejoin, and Candidate preload
 exclusion. Exercise the Account/Settings page for keyboard/focus, loading,
 invalid, conflict, unavailable, themes, reduced motion, high contrast, and 200%

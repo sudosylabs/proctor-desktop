@@ -4,7 +4,6 @@ import { dirname, join } from 'node:path';
 import type { Repository } from '../checks/types.ts';
 import {
 	SETTINGS_MANIFEST,
-	SETTINGS_REGISTRY_VERSION,
 	type SettingDeclaration
 } from '../../src/prctr/platform/settings/common/settingsManifest.ts';
 import { registryFingerprint } from '../../src/prctr/platform/settings/common/settingsRegistryFingerprint.ts';
@@ -29,14 +28,12 @@ export const settingsRegistryGenerator: Generator = {
 		const declarations = SETTINGS_MANIFEST as readonly SettingDeclaration[];
 		validate(declarations);
 		const fingerprint = registryFingerprint({
-			version: SETTINGS_REGISTRY_VERSION,
 			declarations
 		});
 		const effective = declarations.filter((item) => item.candidate !== 'prohibited');
 		const language = effective.filter((item) => item.languageOverride);
 		const schema = {
 			generatedBy: 'settings.registry',
-			registryVersion: SETTINGS_REGISTRY_VERSION,
 			registryFingerprint: fingerprint,
 			$schema: 'https://json-schema.org/draft/2020-12/schema',
 			type: 'object',
@@ -66,7 +63,6 @@ export const settingsRegistryGenerator: Generator = {
 		);
 		write(outputRoot, CATALOG, {
 			generatedBy: 'settings.registry',
-			registryVersion: SETTINGS_REGISTRY_VERSION,
 			registryFingerprint: fingerprint,
 			settings: effective.map((item) => ({
 				id: item.id,
@@ -86,7 +82,6 @@ export const settingsRegistryGenerator: Generator = {
 		});
 		write(outputRoot, REJECTIONS, {
 			generatedBy: 'settings.registry',
-			registryVersion: SETTINGS_REGISTRY_VERSION,
 			registryFingerprint: fingerprint,
 			settings: declarations
 				.filter((item) => item.candidate === 'prohibited')
@@ -98,7 +93,6 @@ export const settingsRegistryGenerator: Generator = {
 		});
 		write(outputRoot, FINGERPRINT, {
 			generatedBy: 'settings.registry',
-			registryVersion: SETTINGS_REGISTRY_VERSION,
 			registryFingerprint: fingerprint
 		});
 	}

@@ -112,7 +112,7 @@ enforcement, security-utility supervision, native IPC, and platform verification
 Use
 [`develop-user-settings`](../.agents/skills/develop-user-settings/SKILL.md) for
 registered preferences, JSONC parsing and persistence, effective configuration,
-Account/Settings editing, Attempt Configuration, constraints, migrations,
+Account/Settings editing, Attempt Configuration, constraints,
 conflicts, and caches.
 
 Use [`develop-toolchain`](../.agents/skills/develop-toolchain/SKILL.md) for

@@ -195,7 +195,7 @@ Use these repository skills when their trigger matches:
   Windows/macOS capability verification.
 - [`develop-user-settings`](.agents/skills/develop-user-settings/SKILL.md) when
   changing registered preferences, JSONC settings, effective configuration,
-  Account/Settings editing, Attempt Configuration, constraints, migrations,
+  Account/Settings editing, Attempt Configuration, constraints,
   conflicts, caches, or projections.
 - [`develop-integrated-browser`](.agents/skills/develop-integrated-browser/SKILL.md)
   when changing Candidate browser policy, navigation enforcement, activity,

@@ -9,7 +9,6 @@ import {
 	type AttemptConfigurationCandidate,
 	type FrozenAttemptConfiguration
 } from '../common/attemptConfiguration.js';
-import { SETTINGS_REGISTRY_VERSION } from '../common/settingsManifest.js';
 
 type CandidateWire = components['schemas']['AttemptConfigurationCandidate'];
 type FrozenWire = components['schemas']['FrozenAttemptConfiguration'];
@@ -55,8 +54,6 @@ export function decodeFrozenAttemptConfiguration(bytes: Uint8Array): FrozenAttem
 	if (canonicalContractDigest(candidate, 16384) !== digest)
 		throw new TypeError('Frozen configuration digest mismatch');
 	return validateFrozenAttemptConfiguration({
-		schemaVersion: 1,
-		registryVersion: SETTINGS_REGISTRY_VERSION,
 		manifestFingerprint: candidate.manifest_fingerprint,
 		registryFingerprint: candidate.registry_fingerprint,
 		desktopBuild: candidate.desktop_build,

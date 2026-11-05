@@ -24,8 +24,8 @@ Keep these other state families separate:
 
 Only packaged immutable declarations make a key effective. Each declaration
 defines identifier, schema/default, bounds/normalization, storage scope, domain,
-window applicability, language-override support, activation point, migration,
-localized editor metadata, and candidate treatment:
+window applicability, language-override support, activation point, localized
+editor metadata, and candidate treatment:
 
 - `eligible` may enter Attempt Configuration;
 - `policyConstrained` may enter only after authoritative constraints;
@@ -163,7 +163,7 @@ revision/digest needed by packaged consumers. It exposes no User Settings
 source, cache, draft, update, merge, or conflict operation. Attempt layout
 remains `attemptPresentation`, not configuration.
 
-## Persistence, parsing, and migration
+## Persistence and parsing
 
 The server owns the document and opaque revision. Desktop PUT commits the
 complete bounded JSONC source with expected revision and idempotency key; its
@@ -176,15 +176,14 @@ the editor. Duplicate keys and dangerous/confusable forms produce precise
 diagnostics. A syntax-invalid acknowledged document remains editable but does
 not become effective.
 
-Registry migrations are deterministic transforms over parsed data and preserve
-unknown keys/comments where safe. Automatic migration updates in-memory form
-only; server authority changes only through explicit save. A registry/build
-that cannot reproduce a stored Attempt Configuration blocks secure re-entry
+The registry has one current shape: there are no stored-format versions or
+migrations, and a key the registry no longer declares is an unknown key that
+never becomes effective. A registry/build that cannot reproduce a stored Attempt Configuration blocks secure re-entry
 with a precise compatibility result instead of changing candidate behavior.
 
 ## Module and process seams
 
-Keep Proctor static declarations, bounded validation, migrations, trusted
+Keep Proctor static declarations, bounded validation, trusted
 constraints, schema inputs, and immutable projections under
 `src/prctr/platform/settings/common/`. The admitted VS Code configuration
 models, registry, default/policy configuration, and resource editing service
@@ -246,7 +245,7 @@ browser modules request only their owned typed values.
 Verify:
 
 - registry/schema/catalog/fingerprint parity;
-- JSONC bounds/fuzzing, unknown/prohibited keys, precedence, and migrations;
+- JSONC bounds/fuzzing, unknown/prohibited keys, and precedence;
 - conditional writes, idempotent ambiguity, conflict merge, and cache isolation;
 - Account/Settings loading, empty, invalid, conflict, unavailable, save, cancel,
   keyboard/focus, themes, reduced motion, high contrast, and 200% zoom;
@@ -261,8 +260,8 @@ Configuration subset.
 
 ## Color theme settings
 
-`workbench.colorTheme` selects from the packaged GitHub theme catalog, retaining
-legacy scheme aliases. `workbench.colorCustomizations` is bounded object data
+`workbench.colorTheme` selects from the packaged GitHub theme catalog, also
+accepting the four scheme identifiers. `workbench.colorCustomizations` is bounded object data
 with optional bracketed theme scopes; it is non-Candidate presentation. Both
 are edited in the JSONC destination. Preview and cancellation apply the complete
 selection and overrides together. Color schemas and registry metadata belong
@@ -272,7 +271,7 @@ Authenticated startup binds the existing settings coordinator and IPC to the
 current User/Session before the renderer requests its projection. The privileged
 identity owner reads `GET /api/v1/users/me/settings` and conditionally writes
 `PUT` on that same fixed endpoint with DPoP and a stable SHA-256 encoding of the existing idempotency key, matching the server header alphabet without changing retry identity.
-Format version 1 is decoded separately from the local registry version.
+The server's `format_version` is checked at the wire boundary only.
 A revision conflict refetches the authoritative source; an uncertain write
 retains the existing retry identity. Closing the window disposes the binding,
 and sign-out fences all pending transport responses.

@@ -5,16 +5,12 @@ import {
 } from './attemptConfigurationManifest.js';
 import { getTheme } from '../../theme/common/themes.js';
 import type { EffectiveSettings, SettingConstraint } from './settingsResolution.js';
-import { SETTINGS_REGISTRY_VERSION } from './settingsManifest.js';
 import { settingsRegistry } from './settingsRegistry.js';
 
-export const ATTEMPT_CONFIGURATION_SCHEMA_VERSION = 1;
 const MAX_APPROVED_IDENTIFIERS = 128;
 
 export interface AttemptConfigurationCandidate {
-	readonly schemaVersion: 1;
 	readonly manifestFingerprint: string;
-	readonly registryVersion: number;
 	readonly registryFingerprint: string;
 	readonly desktopBuild: string;
 	readonly desktopTarget: string;
@@ -50,8 +46,7 @@ export interface AttemptConfigurationProjection {
 }
 
 export type AttemptConfigurationCompatibility =
-	| { readonly compatible: true }
-	| { readonly compatible: false; readonly reason: 'schema' | 'registry' | 'manifest' };
+	{ readonly compatible: true } | { readonly compatible: false; readonly reason: 'manifest' };
 
 export function deriveAttemptConfiguration(
 	settings: EffectiveSettings,
@@ -65,9 +60,7 @@ export function deriveAttemptConfiguration(
 	approvedKeybindings: readonly string[]
 ): AttemptConfigurationCandidate {
 	return deepFreeze({
-		schemaVersion: ATTEMPT_CONFIGURATION_SCHEMA_VERSION,
 		manifestFingerprint: ATTEMPT_CONFIGURATION_MANIFEST_FINGERPRINT,
-		registryVersion: SETTINGS_REGISTRY_VERSION,
 		registryFingerprint: identity.registryFingerprint,
 		desktopBuild: boundedIdentity(identity.desktopBuild),
 		desktopTarget: boundedIdentity(identity.desktopTarget),
@@ -213,8 +206,6 @@ export function checkAttemptConfigurationCompatibility(
 		readonly desktopTarget: string;
 	}
 ): AttemptConfigurationCompatibility {
-	if (frozen.schemaVersion !== ATTEMPT_CONFIGURATION_SCHEMA_VERSION)
-		return { compatible: false, reason: 'schema' };
 	const validated = validateFrozenAttemptConfiguration(frozen);
 	if (validated.manifestFingerprint !== current.manifestFingerprint)
 		return { compatible: false, reason: 'manifest' };
@@ -225,9 +216,7 @@ export function validateFrozenAttemptConfiguration(value: unknown): FrozenAttemp
 	if (
 		!isRecord(value) ||
 		!hasExactKeys(value, [
-			'schemaVersion',
 			'manifestFingerprint',
-			'registryVersion',
 			'registryFingerprint',
 			'desktopBuild',
 			'desktopTarget',
@@ -238,11 +227,8 @@ export function validateFrozenAttemptConfiguration(value: unknown): FrozenAttemp
 			'attemptConfigurationRevision',
 			'digest'
 		]) ||
-		value.schemaVersion !== ATTEMPT_CONFIGURATION_SCHEMA_VERSION ||
 		typeof value.manifestFingerprint !== 'string' ||
 		!/^sha256:[a-f0-9]{64}$/.test(value.manifestFingerprint) ||
-		!Number.isSafeInteger(value.registryVersion) ||
-		(value.registryVersion as number) <= 0 ||
 		typeof value.registryFingerprint !== 'string' ||
 		!/^fnv1a64:[0-9a-f]{16}$/u.test(value.registryFingerprint) ||
 		typeof value.desktopBuild !== 'string' ||
@@ -325,9 +311,7 @@ export function validateFrozenAttemptConfiguration(value: unknown): FrozenAttemp
 	)
 		throw new TypeError('Frozen Attempt Configuration approvals are not canonical');
 	return deepFreeze({
-		schemaVersion: 1,
 		manifestFingerprint: value.manifestFingerprint,
-		registryVersion: value.registryVersion as number,
 		registryFingerprint: value.registryFingerprint,
 		desktopBuild: value.desktopBuild,
 		desktopTarget: value.desktopTarget,

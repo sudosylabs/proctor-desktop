@@ -32,7 +32,6 @@ export async function exerciseSettingsEditorSession(
 	let acknowledged: UserSettingsProjection = {
 		source: '{"editor.fontSize":18}',
 		revision: 'r1',
-		registryVersion: 1,
 		availability: 'available',
 		writable: true,
 		presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
@@ -190,7 +189,6 @@ async function exerciseProjectionOrdering(copy: SettingsWorkingCopy): Promise<vo
 		const initial: UserSettingsProjection = {
 			source: '{"editor.fontSize":18}',
 			revision: 'opaque-base',
-			registryVersion: 1,
 			availability: 'available',
 			writable: true,
 			presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
@@ -271,7 +269,6 @@ async function exercisePendingConfiguration(
 	let acknowledged: UserSettingsProjection = {
 		source: '{"editor.lineNumbers":"on"}',
 		revision: 'menu-base',
-		registryVersion: 1,
 		availability: 'available',
 		writable: true,
 		presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }

@@ -11,7 +11,6 @@ import type { EffectiveSettingId, SettingValueMap } from './settingsManifest.js'
 export interface AcknowledgedUserSettings {
 	readonly source: string;
 	readonly revision: string;
-	readonly registryVersion: number;
 }
 
 export interface SettingsCommitRequest {

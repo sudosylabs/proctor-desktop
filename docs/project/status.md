@@ -160,7 +160,7 @@ A privileged factory assembles these services; CandidateWindow composition and t
 complete editor document/working-copy wiring remain subsequent integration work.
 
 User Settings includes the static generated registry, JSONC document/draft and
-comment-preserving edits, validation, migrations, effective-resolution and
+comment-preserving edits, validation, effective-resolution and
 Attempt Configuration constraints. An Electron-main coordinator owns the
 protected cache and server-authoritative revisions, exposes a bounded preload
 protocol, and fails unavailable state read-only. AuthenticatedWindow has a real

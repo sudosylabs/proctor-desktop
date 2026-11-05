@@ -67,7 +67,7 @@ async function create(writable = true) {
 		context: { window: 'authenticated' },
 		authority,
 		cache,
-		acknowledged: { source: '{}', revision: 'r1', registryVersion: 1 },
+		acknowledged: { source: '{}', revision: 'r1' },
 		writable
 	});
 	return { authority, cache, coordinator };
@@ -78,7 +78,6 @@ suite('UserSettingsCoordinator', () => {
 		const projection = {
 			source: '{}',
 			revision: 'r1',
-			registryVersion: 1,
 			availability: 'available',
 			writable: true,
 			presentation: defaultPresentation
@@ -114,15 +113,13 @@ suite('UserSettingsCoordinator', () => {
 	});
 	test('persists the first authoritative snapshot for protected offline recovery', async () => {
 		const { cache, coordinator } = await create();
-		assert.deepStrictEqual(cache.stored, [
-			{ source: '{}', revision: 'r1', registryVersion: 1 }
-		]);
+		assert.deepStrictEqual(cache.stored, [{ source: '{}', revision: 'r1' }]);
 		await coordinator.dispose();
 	});
 	test('rejects non-exact or coerced acknowledged state from options, cache, and authority', async () => {
 		for (const acknowledged of [
-			{ source: '{}', revision: 1234567890123456, registryVersion: 1 },
-			{ source: '{}', revision: 'r1', registryVersion: 1, extra: true }
+			{ source: '{}', revision: 1234567890123456 },
+			{ source: '{}', revision: 'r1', extra: true }
 		])
 			await assert.rejects(
 				UserSettingsCoordinator.create({
@@ -136,8 +133,7 @@ suite('UserSettingsCoordinator', () => {
 				/invalid/u
 			);
 		const cache = new Cache();
-		cache.load = async () =>
-			({ source: '{}', revision: 1234567890123456, registryVersion: 1 }) as never;
+		cache.load = async () => ({ source: '{}', revision: 1234567890123456 }) as never;
 		await assert.rejects(
 			UserSettingsCoordinator.create({
 				binding,
@@ -161,41 +157,6 @@ suite('UserSettingsCoordinator', () => {
 		assert.strictEqual(current.coordinator.projection().revision, 'r1');
 		await current.coordinator.dispose();
 	});
-	test('migrates acknowledged settings only in memory until an explicit save', async () => {
-		const authority = new Authority();
-		const cache = new Cache();
-		const legacy = '{\n  // retained\n  "explorer.tree.indent": 12\n}';
-		const coordinator = await UserSettingsCoordinator.create({
-			binding,
-			context: { window: 'authenticated' },
-			authority,
-			cache,
-			acknowledged: { source: legacy, revision: 'r1', registryVersion: 1 },
-			writable: true
-		});
-		const projection = coordinator.projection();
-		assert.ok(/"workbench\.tree\.indent": 12/u.test(projection.source));
-		assert.ok(!/explorer\.tree\.indent/u.test(projection.source));
-		assert.strictEqual(coordinator.effective.get('workbench.tree.indent'), 12);
-		assert.deepStrictEqual(cache.stored, [
-			{ source: legacy, revision: 'r1', registryVersion: 1 }
-		]);
-		authority.results.push({ kind: 'success', revision: 'r2' });
-		const saved = await coordinator.commit({
-			source: projection.source,
-			expectedRevision: projection.revision,
-			idempotencyKey: 'save-key-migration'
-		});
-		assert.strictEqual(saved.kind, 'success');
-		assert.ok(/"workbench\.tree\.indent": 12/u.test(authority.requests[0]?.source ?? ''));
-		assert.ok(!/explorer\.tree\.indent/u.test(authority.requests[0]?.source ?? ''));
-		assert.deepStrictEqual(cache.stored.at(-1), {
-			source: projection.source,
-			revision: 'r2',
-			registryVersion: 1
-		});
-		await coordinator.dispose();
-	});
 	test('concurrent creation rejects an owner superseded during initial cache persistence', async () => {
 		const cache = new Cache();
 		let release = () => {};
@@ -210,7 +171,7 @@ suite('UserSettingsCoordinator', () => {
 			context: { window: 'authenticated' },
 			authority: new Authority(),
 			cache,
-			acknowledged: { source: '{}', revision: 'r1', registryVersion: 1 },
+			acknowledged: { source: '{}', revision: 'r1' },
 			writable: true
 		});
 		await storing;
@@ -219,7 +180,7 @@ suite('UserSettingsCoordinator', () => {
 			context: { window: 'authenticated' },
 			authority: new Authority(),
 			cache,
-			acknowledged: { source: '{"editor.fontSize":18}', revision: 'r2', registryVersion: 1 },
+			acknowledged: { source: '{"editor.fontSize":18}', revision: 'r2' },
 			writable: true
 		});
 		release();
@@ -294,7 +255,6 @@ suite('UserSettingsCoordinator', () => {
 		assert.deepStrictEqual(coordinator.projection(), {
 			source: '{}',
 			revision: 'r1',
-			registryVersion: 1,
 			availability: 'unavailable',
 			writable: false,
 			presentation: defaultPresentation
@@ -325,7 +285,6 @@ suite('UserSettingsCoordinator', () => {
 		assert.deepStrictEqual(coordinator.projection(), {
 			source: '{}',
 			revision: 'unavailable',
-			registryVersion: 1,
 			availability: 'unavailable',
 			writable: false,
 			presentation: defaultPresentation
@@ -448,7 +407,7 @@ suite('UserSettingsCoordinator', () => {
 			context: { window: 'authenticated' },
 			authority,
 			cache,
-			acknowledged: { source: '{}', revision: 'r1', registryVersion: 1 },
+			acknowledged: { source: '{}', revision: 'r1' },
 			writable: true
 		});
 		cache.stored.length = 0;
@@ -477,7 +436,7 @@ suite('UserSettingsCoordinator', () => {
 			context: { window: 'authenticated' },
 			authority: new Authority(),
 			cache,
-			acknowledged: { source: '{"editor.fontSize":18}', revision: 'r3', registryVersion: 1 },
+			acknowledged: { source: '{"editor.fontSize":18}', revision: 'r3' },
 			writable: true
 		});
 		release();
@@ -486,7 +445,7 @@ suite('UserSettingsCoordinator', () => {
 		await disposing;
 		assert.strictEqual(authority.requests.length, 1);
 		assert.deepStrictEqual(cache.stored, [
-			{ source: '{"editor.fontSize":18}', revision: 'r3', registryVersion: 1 }
+			{ source: '{"editor.fontSize":18}', revision: 'r3' }
 		]);
 		assert.strictEqual(replacement.projection().revision, 'r3');
 		await replacement.dispose();
