@@ -267,11 +267,28 @@ fn activated_listener(
     }
     let listener = std::os::unix::net::UnixListener::from(owned.remove(0));
     validate_activated_listener(&listener)?;
+    set_close_on_exec(&listener)?;
     if listener.local_addr()?.as_pathname() != Some(std::path::Path::new(path)) {
         return Err(HelperTransportError::ExecutableIdentity);
     }
     listener.set_nonblocking(true)?;
     Ok(listener)
+}
+
+/// launchd hands over descriptors that are not close-on-exec, so a spawned
+/// worker or `codesign` would inherit the listening socket.
+fn set_close_on_exec(listener: &std::os::unix::net::UnixListener) -> std::io::Result<()> {
+    use std::os::fd::AsRawFd;
+    unsafe extern "C" {
+        fn fcntl(fd: i32, cmd: i32, ...) -> i32;
+    }
+    const F_SETFD: i32 = 2;
+    const FD_CLOEXEC: i32 = 1;
+    // SAFETY: the listener owns this descriptor for the duration of the call.
+    if unsafe { fcntl(listener.as_raw_fd(), F_SETFD, FD_CLOEXEC) } == -1 {
+        return Err(std::io::Error::last_os_error());
+    }
+    Ok(())
 }
 
 fn validate_activated_listener(

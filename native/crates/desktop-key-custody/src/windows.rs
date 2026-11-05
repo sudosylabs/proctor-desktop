@@ -169,6 +169,9 @@ pub fn public_key(scope: &str) -> Result<Vec<u8>, ()> {
     Ok(result)
 }
 pub fn sign(scope: &str, digest: &[u8]) -> Result<Vec<u8>, ()> {
+    if digest.len() != 32 {
+        return Err(());
+    }
     let key = key(scope, false)?;
     let mut signature = vec![0_u8; 64];
     let mut size = 0;
