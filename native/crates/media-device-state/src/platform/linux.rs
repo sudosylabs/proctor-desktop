@@ -168,7 +168,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time after epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("prctr-media-non-utf8-{unique}"));
+        let root = std::env::temp_dir().join(format!("media-non-utf8-{unique}"));
         fs::create_dir_all(&root).expect("create media fixture");
         let invalid = std::ffi::OsString::from_vec(vec![b'p', b'c', b'm', 0xff, b'c']);
         fs::write(root.join(invalid), []).expect("write invalid endpoint fixture");

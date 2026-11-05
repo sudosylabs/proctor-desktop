@@ -17,7 +17,7 @@ fn main() {
     };
     let output = PathBuf::from(env::var_os("OUT_DIR").expect("Cargo output directory"));
     let object = output.join("macos_session_es.o");
-    let archive = output.join("libprctr_macos_session_es.a");
+    let archive = output.join("libmacos_session_es.a");
     run(Command::new("xcrun")
         .args([
             "--sdk",
@@ -41,7 +41,7 @@ fn main() {
         .arg(&archive)
         .arg(&object));
     println!("cargo:rustc-link-search=native={}", output.display());
-    println!("cargo:rustc-link-lib=static=prctr_macos_session_es");
+    println!("cargo:rustc-link-lib=static=macos_session_es");
     println!("cargo:rustc-link-lib=dylib=EndpointSecurity");
 }
 

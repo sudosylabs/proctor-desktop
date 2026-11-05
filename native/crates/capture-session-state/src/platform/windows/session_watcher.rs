@@ -95,7 +95,7 @@ impl SessionWatcher {
         let ownership = Arc::new(Mutex::new(WindowOwnership::default()));
         let thread_ownership = Arc::clone(&ownership);
         let thread_emitter = emitter.clone();
-        let mut thread = DeadlineThread::spawn("prctr-capture-session-wts", move || {
+        let mut thread = DeadlineThread::spawn("capture-session-wts", move || {
             let panic_cleanup = cleanup_sender.clone();
             let result = panic::catch_unwind(AssertUnwindSafe(|| {
                 run_window_thread(

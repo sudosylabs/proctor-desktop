@@ -706,7 +706,7 @@ fn project_snapshot(
             };
             NativeSourceSnapshot::ProcessApplication(ProcessApplicationSourceSnapshot {
                 source_instance_id: snapshot.helper_source_instance_id.clone(),
-                source_version: "prctr-helper-source-0.1.0".to_owned(),
+                source_version: "helper-source-0.1.0".to_owned(),
                 adapter_version: adapter.to_owned(),
                 schema_version: snapshot.schema_version,
                 platform,
@@ -726,7 +726,7 @@ fn project_snapshot(
             };
             NativeSourceSnapshot::InteractiveSession(InteractiveSessionSourceSnapshot {
                 source_instance_id: snapshot.helper_source_instance_id.clone(),
-                source_version: "prctr-helper-source-0.1.0".to_owned(),
+                source_version: "helper-source-0.1.0".to_owned(),
                 adapter_version: adapter.to_owned(),
                 schema_version: snapshot.schema_version,
                 platform,
@@ -1110,7 +1110,7 @@ mod tests {
 
     #[test]
     fn failed_worker_stop_poisons_before_another_source_can_open() {
-        const KEY: &str = "PRCTR_TEST_SHARED_HELPER_STOP_FAILURE";
+        const KEY: &str = "TEST_SHARED_HELPER_STOP_FAILURE";
         if std::env::var_os(KEY).is_none() {
             let result = std::process::Command::new(std::env::current_exe().unwrap()).arg("--exact").arg("helper_sources::tests::failed_worker_stop_poisons_before_another_source_can_open").env(KEY, "1").status().unwrap();
             assert!(result.success());

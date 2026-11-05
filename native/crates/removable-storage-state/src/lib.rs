@@ -67,7 +67,7 @@ impl PassiveStateWire for RemovableStorageWire {
     type Drain = RemovableStorageDrain;
     const SCHEMA_VERSION: u16 = REMOVABLE_STORAGE_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
-    const STOP_THREAD_NAME: &'static str = "prctr-removable-storage-stop";
+    const STOP_THREAD_NAME: &'static str = "removable-storage-stop";
     fn health(state: &Self::State) -> SourceHealth {
         if !matches!(state.coverage, RemovableStorageCoverage::Unavailable)
             && matches!(state.certainty, RemovableStorageCertainty::Complete)

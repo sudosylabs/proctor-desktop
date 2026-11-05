@@ -28,7 +28,7 @@ impl PassiveStateWire for VirtualizationWire {
     type Drain = VirtualizationDrain;
     const SCHEMA_VERSION: u16 = VIRTUALIZATION_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
-    const STOP_THREAD_NAME: &'static str = "prctr-virtualization-stop";
+    const STOP_THREAD_NAME: &'static str = "virtualization-stop";
     fn health(state: &Self::State) -> SourceHealth {
         if matches!(state.coverage, VirtualizationCoverage::Classification)
             && matches!(state.certainty, VirtualizationCertainty::Complete)

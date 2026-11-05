@@ -23,21 +23,21 @@ typedef struct {
     uint32_t audit_user_id;
     uint32_t kind; /* 1 fork, 2 exec, 3 exit, 0 unsupported message shape */
     audit_token_t audit_token; /* Exact kernel token, never a reconstructed token. */
-} prctr_es_fact;
+} shim_es_fact;
 
-_Static_assert(sizeof(prctr_es_fact) == 96, "ES minimized fact ABI changed");
+_Static_assert(sizeof(shim_es_fact) == 96, "ES minimized fact ABI changed");
 
-typedef void (*prctr_es_callback)(void *, const prctr_es_fact *);
+typedef void (*shim_es_callback)(void *, const shim_es_fact *);
 typedef struct {
     es_client_t *client;
     atomic_bool accepting;
-    prctr_es_callback callback;
+    shim_es_callback callback;
     void *context;
-} prctr_es_subscription;
+} shim_es_subscription;
 
-uint64_t prctr_es_clock_now(void) { return mach_absolute_time(); }
+uint64_t shim_es_clock_now(void) { return mach_absolute_time(); }
 
-static void erase_fact(prctr_es_fact *fact) {
+static void erase_fact(shim_es_fact *fact) {
     volatile unsigned char *bytes = (volatile unsigned char *)fact;
     for (size_t i = 0; i < sizeof(*fact); ++i) bytes[i] = 0;
 }
@@ -87,7 +87,7 @@ static bool lifecycle_notifications_unmuted(es_client_t *client) {
 /* 0 success, 1 denied/missing privilege, 2 backend, 3 unproved cleanup.
  * On result 3, memory is deliberately retained: the supervising process must
  * be replaced because callback removal could not be proved. */
-int prctr_es_close(prctr_es_subscription *subscription) {
+int shim_es_close(shim_es_subscription *subscription) {
     if (subscription == NULL) return 0;
     atomic_store_explicit(&subscription->accepting, false, memory_order_release);
     if (es_delete_client(subscription->client) != ES_RETURN_SUCCESS) return 3;
@@ -95,10 +95,10 @@ int prctr_es_close(prctr_es_subscription *subscription) {
     return 0;
 }
 
-int prctr_es_open(void *context, prctr_es_callback callback,
-                  prctr_es_subscription **result) {
+int shim_es_open(void *context, shim_es_callback callback,
+                  shim_es_subscription **result) {
     *result = NULL;
-    prctr_es_subscription *subscription = calloc(1, sizeof(*subscription));
+    shim_es_subscription *subscription = calloc(1, sizeof(*subscription));
     if (subscription == NULL) return 2;
     subscription->context = context;
     subscription->callback = callback;
@@ -107,7 +107,7 @@ int prctr_es_open(void *context, prctr_es_callback callback,
         ^(es_client_t *client, const es_message_t *message) {
             (void)client;
             if (!atomic_load_explicit(&subscription->accepting, memory_order_acquire)) return;
-            prctr_es_fact fact = {0};
+            shim_es_fact fact = {0};
             const es_process_t *process = NULL;
             if (message->version >= 4 && message->action_type == ES_ACTION_TYPE_NOTIFY) {
                 fact.global_sequence = message->global_seq_num;
@@ -145,7 +145,7 @@ int prctr_es_open(void *context, prctr_es_callback callback,
         });
     if (created != ES_NEW_CLIENT_RESULT_SUCCESS) {
         if (subscription->client != NULL) {
-            if (prctr_es_close(subscription) != 0) return 3;
+            if (shim_es_close(subscription) != 0) return 3;
         } else {
             free(subscription);
         }
@@ -157,13 +157,13 @@ int prctr_es_open(void *context, prctr_es_callback callback,
         }
     }
     if (!lifecycle_notifications_unmuted(subscription->client)) {
-        return prctr_es_close(subscription) == 0 ? 2 : 3;
+        return shim_es_close(subscription) == 0 ? 2 : 3;
     }
     const es_event_type_t events[] = {
         ES_EVENT_TYPE_NOTIFY_FORK, ES_EVENT_TYPE_NOTIFY_EXEC, ES_EVENT_TYPE_NOTIFY_EXIT
     };
     if (es_subscribe(subscription->client, events, 3) != ES_RETURN_SUCCESS) {
-        return prctr_es_close(subscription) == 0 ? 2 : 3;
+        return shim_es_close(subscription) == 0 ? 2 : 3;
     }
     *result = subscription;
     return 0;
@@ -177,7 +177,7 @@ typedef struct {
     char designated_requirement[513];
     char bundle_id[257];
     char version[65];
-} prctr_macos_identity;
+} macos_identity;
 
 static bool copy_identity_string(CFTypeRef value, char *out, CFIndex capacity) {
     if (value == NULL || CFGetTypeID(value) != CFStringGetTypeID()) return false;
@@ -192,8 +192,8 @@ static bool copy_identity_string(CFTypeRef value, char *out, CFIndex capacity) {
 /* Only the source-owned worker calls this synchronous Security.framework
  * routine. Its outer owner must impose a deadline and replace a stuck helper.
  * The token is borrowed until all CF/SecCode references have been released. */
-int prctr_macos_copy_identity(const audit_token_t *token, int32_t pid,
-                             uint32_t generation, prctr_macos_identity *out) {
+int macos_copy_identity(const audit_token_t *token, int32_t pid,
+                             uint32_t generation, macos_identity *out) {
     memset(out, 0, sizeof(*out));
     if (audit_token_to_pid(*token) != pid ||
         (uint32_t)audit_token_to_pidversion(*token) != generation) return 1;

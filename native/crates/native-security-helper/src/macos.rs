@@ -298,13 +298,13 @@ fn validate_activated_listener(
     // Darwin exposes SO_ACCEPTCONN in proc_pidfdinfo, not getsockopt. The SDK
     // shim checks the owned descriptor without accepting or changing its state.
     // SAFETY: the listener owns this descriptor throughout the bounded query.
-    if unsafe { prctr_macos_service_listener_is_valid(listener.as_raw_fd()) } != 1 {
+    if unsafe { macos_service_listener_is_valid(listener.as_raw_fd()) } != 1 {
         return Err(HelperTransportError::ExecutableIdentity);
     }
     Ok(())
 }
 unsafe extern "C" {
-    fn prctr_macos_service_listener_is_valid(fd: i32) -> i32;
+    fn macos_service_listener_is_valid(fd: i32) -> i32;
     fn getsockopt(socket: i32, level: i32, name: i32, value: *mut c_void, length: *mut u32) -> i32;
 }
 #[link(name = "CoreFoundation", kind = "framework")]
@@ -444,7 +444,7 @@ mod peer_tests {
         fn bind() -> (Self, std::os::unix::net::UnixListener) {
             static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
             let path = std::path::PathBuf::from(format!(
-                "/tmp/prctr-listener-{}-{}",
+                "/tmp/listener-{}-{}",
                 std::process::id(),
                 NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
             ));
@@ -477,7 +477,7 @@ mod peer_tests {
     fn activated_listener_acceptance_child() {
         use std::io::{Read, Write};
         use std::os::fd::AsFd;
-        if std::env::var_os("PRCTR_TEST_ACCEPTANCE_CHILD").is_none() {
+        if std::env::var_os("TEST_ACCEPTANCE_CHILD").is_none() {
             return;
         }
         let listener = std::os::unix::net::UnixListener::from(
@@ -515,7 +515,7 @@ mod peer_tests {
                 "macos::peer_tests::activated_listener_acceptance_child",
                 "--nocapture",
             ])
-            .env("PRCTR_TEST_ACCEPTANCE_CHILD", "1")
+            .env("TEST_ACCEPTANCE_CHILD", "1")
             .stdin(Stdio::from(OwnedFd::from(listener)))
             .stdout(Stdio::null())
             .stderr(Stdio::from(OwnedFd::from(child_gate)))

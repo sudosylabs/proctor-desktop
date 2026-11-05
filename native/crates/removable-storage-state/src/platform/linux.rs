@@ -533,7 +533,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time after epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("prctr-storage-dev-{unique}"));
+        let root = std::env::temp_dir().join(format!("storage-dev-{unique}"));
         fs::create_dir_all(&root).expect("create storage fixture");
         assert!(matches!(
             storage_or_partition_is_mounted(&root, &BTreeSet::new()),
@@ -558,7 +558,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time after epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("prctr-storage-marker-{unique}"));
+        let root = std::env::temp_dir().join(format!("storage-marker-{unique}"));
         fs::create_dir_all(&root).expect("create marker fixture");
         symlink("partition", root.join("partition")).expect("create marker symlink loop");
         assert!(matches!(
@@ -575,7 +575,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time after epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("prctr-storage-identity-{unique}"));
+        let root = std::env::temp_dir().join(format!("storage-identity-{unique}"));
         let first = root.join("sdb");
         let reconnected = root.join("sdf");
         fs::create_dir_all(first.join("device")).expect("create first device");
@@ -598,7 +598,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time after epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("prctr-storage-controller-{unique}"));
+        let root = std::env::temp_dir().join(format!("storage-controller-{unique}"));
         fs::create_dir_all(&root).expect("create controller");
         fs::write(root.join("uevent"), "DEVTYPE=usb_device\n").expect("write controller type");
         fs::write(root.join("serial"), "controller-serial\n").expect("write controller serial");

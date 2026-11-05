@@ -29,7 +29,7 @@ impl PassiveStateWire for ClipboardWire {
     type Drain = ClipboardDrain;
     const SCHEMA_VERSION: u16 = CLIPBOARD_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
-    const STOP_THREAD_NAME: &'static str = "prctr-clipboard-stop";
+    const STOP_THREAD_NAME: &'static str = "clipboard-stop";
 
     fn health(state: &Self::State) -> SourceHealth {
         if matches!(state.coverage, ClipboardCoverage::ChangeNotifications)

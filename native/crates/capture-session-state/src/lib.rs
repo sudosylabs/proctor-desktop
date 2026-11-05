@@ -437,7 +437,7 @@ fn stop_subscription<S: CaptureSessionSubscription>(
     subscription: S,
 ) -> Result<CaptureSessionState, CaptureSessionError> {
     run_bounded_source_stop(
-        "prctr-capture-session-stop",
+        "capture-session-stop",
         move || subscription.stop(),
         bounded_cleanup_error,
     )

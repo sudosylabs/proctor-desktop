@@ -51,13 +51,13 @@ struct RawFact {
 }
 
 unsafe extern "C" {
-    fn prctr_es_open(
+    fn shim_es_open(
         context: *mut c_void,
         callback: unsafe extern "C" fn(*mut c_void, *const RawFact),
         result: *mut *mut c_void,
     ) -> i32;
-    fn prctr_es_close(subscription: *mut c_void) -> i32;
-    fn prctr_es_clock_now() -> u64;
+    fn shim_es_close(subscription: *mut c_void) -> i32;
+    fn shim_es_clock_now() -> u64;
 }
 
 /// One passive ES client restricted to fork, exec and exit notifications.
@@ -182,7 +182,7 @@ impl MacOsLifecycleEventFeed for EndpointSecurityEventFeed {
         // SAFETY: the Box address is stable until successful ES deletion. The C
         // shim copies its block and calls only the fixed ABI callback below.
         let result =
-            unsafe { prctr_es_open((&raw mut *callback).cast(), receive_fact, &raw mut native) };
+            unsafe { shim_es_open((&raw mut *callback).cast(), receive_fact, &raw mut native) };
         if result != 0 {
             self.registrar.clear();
             if result == 3 {
@@ -232,7 +232,7 @@ impl EndpointSecuritySubscription {
         };
         // SAFETY: the owner is !Send, holds exclusive access to this client and
         // no callback calls another es_* API. Native deletion fences intake.
-        let result = unsafe { prctr_es_close(native.as_ptr()) };
+        let result = unsafe { shim_es_close(native.as_ptr()) };
         if result != 0 {
             if let Some(callback) = self.callback.take() {
                 let _retained = Box::into_raw(callback);
@@ -277,7 +277,7 @@ fn await_callback_boundary(
         return Err(MacOsLifecycleFailure::Backend);
     }
     // SAFETY: pure process clock read, same tick domain as ES mach_time.
-    let after_mach_time = unsafe { prctr_es_clock_now() };
+    let after_mach_time = unsafe { shim_es_clock_now() };
     let (reply, receive) = mpsc::sync_channel(1);
     *callback
         .barrier
@@ -557,7 +557,7 @@ mod tests {
             // SAFETY: pure clock read; receive_fact borrows two initialized
             // values synchronously and retains neither pointer.
             unsafe {
-                baseline.mach_time = prctr_es_clock_now();
+                baseline.mach_time = shim_es_clock_now();
                 receive_fact((&raw const state).cast_mut().cast(), &raw const baseline);
             }
             Ok(CallbackTestSubscription {

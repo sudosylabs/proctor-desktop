@@ -13,7 +13,7 @@ pub(super) fn accept_owned<T: Send + 'static>(
     deadline: Option<Instant>,
 ) -> Result<T, HelperTransportError> {
     let (sender, receiver) = mpsc::sync_channel(1);
-    let mut worker = FrameWorker::spawn("prctr-service-accept", move || {
+    let mut worker = FrameWorker::spawn("service-accept", move || {
         // A late accepted value remains owned by the channel or SendError and is
         // dropped there; it cannot escape a stopped admission generation.
         let _ = sender.send(task());
@@ -69,7 +69,7 @@ fn cancel_owned<C: Fn() + Send + 'static>(
     deadline: Instant,
 ) -> Result<(), HelperTransportError> {
     if let Some(cancel) = cancel.take() {
-        crate::run_startup_task("prctr-service-accept-cancel", deadline, move || {
+        crate::run_startup_task("service-accept-cancel", deadline, move || {
             cancel();
             Ok(())
         })?;
@@ -146,7 +146,7 @@ mod tests {
         use std::process::{Command, Stdio};
         use std::thread;
 
-        const SCENARIO: &str = "PRCTR_TEST_STALLED_SERVICE_OWNER";
+        const SCENARIO: &str = "TEST_STALLED_SERVICE_OWNER";
         if let Ok(scenario) = std::env::var(SCENARIO) {
             let (entered, waiting) = mpsc::sync_channel(1);
             let (release, blocked) = mpsc::sync_channel(1);

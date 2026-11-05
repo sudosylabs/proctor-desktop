@@ -296,7 +296,7 @@ impl DeadlineThread {
         let joined = Arc::new(AtomicBool::new(false));
         let observed_join = Arc::clone(&joined);
         if let Err(error) = thread::Builder::new()
-            .name("prctr-source-join".to_owned())
+            .name("source-join".to_owned())
             .spawn(move || {
                 let result = worker.join().map_err(|_| ThreadFinishError::Panicked);
                 observed_join.store(true, Ordering::Release);

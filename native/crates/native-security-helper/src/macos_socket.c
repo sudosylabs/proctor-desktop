@@ -7,7 +7,7 @@
 
 _Static_assert(sizeof(struct socket_fdinfo) < 16384, "bounded socket descriptor metadata");
 
-int prctr_macos_service_listener_is_valid(int fd) {
+int macos_service_listener_is_valid(int fd) {
     struct socket_fdinfo info = {0};
     int bytes = proc_pidfdinfo(getpid(), fd, PROC_PIDFDSOCKETINFO, &info, sizeof(info));
     int valid = bytes == sizeof(info)

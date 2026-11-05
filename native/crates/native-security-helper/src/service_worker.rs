@@ -49,7 +49,7 @@ fn arm_supervisor_watchdog(mut guard: UnixStream) -> Result<(), HelperTransportE
     // unexpected payload or I/O failure means its sole lifecycle owner is lost.
     // Abort also interrupts a worker blocked inside a native SDK callback.
     let _watchdog = thread::Builder::new()
-        .name("prctr-service-owner-watchdog".to_owned())
+        .name("service-owner-watchdog".to_owned())
         .spawn(move || {
             let mut byte = [0_u8; 1];
             loop {
@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn watchdog_child() {
-        if std::env::var_os("PRCTR_TEST_OWNER_WATCHDOG").is_none() {
+        if std::env::var_os("TEST_OWNER_WATCHDOG").is_none() {
             return;
         }
         let mut guard =
@@ -92,7 +92,7 @@ mod tests {
                 "service_worker::tests::watchdog_child",
                 "--nocapture",
             ])
-            .env("PRCTR_TEST_OWNER_WATCHDOG", "1")
+            .env("TEST_OWNER_WATCHDOG", "1")
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::from(std::os::fd::OwnedFd::from(worker_guard)))

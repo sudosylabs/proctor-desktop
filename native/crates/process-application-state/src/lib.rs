@@ -579,7 +579,7 @@ fn stop_subscription<S: ProcessApplicationSubscription>(
     subscription: S,
 ) -> Result<ProcessApplicationState, ProcessApplicationError> {
     run_bounded_source_stop(
-        "prctr-process-application-stop",
+        "process-application-stop",
         move || subscription.stop(),
         bounded_cleanup_error,
     )

@@ -427,7 +427,7 @@ impl WindowsWtsSessionSource {
             let remaining = deadline
                 .checked_duration_since(Instant::now())
                 .ok_or_else(|| backend("WTS query deadline exceeded"))?;
-            let snapshot = run_bounded_task("prctr-wts-initial-query", remaining, move || {
+            let snapshot = run_bounded_task("wts-initial-query", remaining, move || {
                 query_snapshot(candidate)
             })
             .map_err(|_| {

@@ -211,7 +211,7 @@ impl<H: WindowsSourceHandler> WindowsServiceBody for WindowsConfiguredService<H>
                 crate::poison_helper_utility();
             }
             let close = run_startup_task(
-                "prctr-service-client-close",
+                "service-client-close",
                 Instant::now() + crate::HELPER_TERMINATION_DEADLINE,
                 move || {
                     let result = channel.close();
@@ -239,19 +239,18 @@ impl<H: WindowsSourceHandler> WindowsConfiguredService<H> {
         if launch.transport.read_bytes(remaining(deadline)?)? != WINDOWS_LAUNCH_REQUEST {
             return Err(HelperTransportError::ConnectionFenced);
         }
-        let (mut launch, user) =
-            run_startup_task("prctr-service-launch-user", deadline, move || {
-                let user = crate::windows_peer::user_for_windows_launch_request(
-                    launch.pipe.handle(),
-                    deadline,
-                )?;
-                Ok((launch, user))
-            })?;
+        let (mut launch, user) = run_startup_task("service-launch-user", deadline, move || {
+            let user = crate::windows_peer::user_for_windows_launch_request(
+                launch.pipe.handle(),
+                deadline,
+            )?;
+            Ok((launch, user))
+        })?;
         // Create the fixed source endpoint before the suspended client is resumed.
         let source = crate::windows_pipe::create_source_listener()?;
         let root = self.root.clone();
         let manifest = Arc::clone(&self.manifest);
-        let client = run_startup_task("prctr-service-controlled-launch", deadline, move || {
+        let client = run_startup_task("service-controlled-launch", deadline, move || {
             let closure = WindowsProtectedLaunchClosure::open(&root, &manifest, deadline)?;
             WindowsControlledClient::launch(closure, &user, deadline)
         })?;
@@ -271,7 +270,7 @@ impl<H: WindowsSourceHandler> WindowsConfiguredService<H> {
         if source.transport.read_bytes(remaining(deadline)?)? != WINDOWS_SOURCE_REQUEST {
             return Err(HelperTransportError::ConnectionFenced);
         }
-        let (source, client) = run_startup_task("prctr-service-main-peer", deadline, move || {
+        let (source, client) = run_startup_task("service-main-peer", deadline, move || {
             let candidate = crate::windows_peer::candidate_session_for_verified_pipe_peer(
                 source.pipe.handle(),
                 client.process(),
@@ -282,7 +281,7 @@ impl<H: WindowsSourceHandler> WindowsConfiguredService<H> {
             }
             Ok((source, client))
         })?;
-        let nonce = run_startup_task("prctr-service-nonce", deadline, generate_channel_nonce)?;
+        let nonce = run_startup_task("service-nonce", deadline, generate_channel_nonce)?;
         remaining(deadline)?;
         if dispatcher.stop_requested() {
             return Err(HelperTransportError::ConnectionFenced);

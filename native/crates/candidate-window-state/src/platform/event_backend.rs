@@ -310,7 +310,7 @@ impl CandidateWindowBackend for UtilityIngressBackend {
         }
         let (final_sender, final_state) = mpsc::sync_channel(1);
         let worker_fence = Arc::clone(&fence);
-        let worker = DeadlineThread::spawn("prctr-candidate-window-events", move || {
+        let worker = DeadlineThread::spawn("candidate-window-events", move || {
             run_event_worker(&receiver, &emitter, &final_sender, &worker_fence);
         })
         .map_err(|error| {

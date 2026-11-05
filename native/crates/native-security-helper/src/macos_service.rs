@@ -28,7 +28,7 @@ pub const HELPER_SERVICE_FRAME_BYTES: usize = 4096;
 /// A nonce-free framing barrier proving only that the acceptor has written to
 /// this socket. The client must still verify its live code identity before
 /// sending authority. This exact versioned marker has no extensible fields.
-pub const MACOS_SERVICE_ACCEPTANCE_FRAME: &[u8] = b"prctr-native-service-accepted-v1";
+pub const MACOS_SERVICE_ACCEPTANCE_FRAME: &[u8] = b"native-service-accepted-v1";
 pub(crate) const CONTROL_SOCKET_PATH: &str = "/var/run/com.proctor.native.control";
 pub(crate) const OBSERVATION_SOCKET_PATH: &str = "/var/run/com.proctor.native.observation";
 
@@ -52,10 +52,10 @@ pub struct MacOsServicePackage {
 /// # Errors
 /// An ordinary development build without release identities has no service mode.
 pub fn packaged_macos_service_configuration() -> Result<MacOsServicePackage, HelperTransportError> {
-    let service = option_env!("PRCTR_NATIVE_SERVICE_REQUIREMENT")
+    let service = option_env!("NATIVE_SERVICE_REQUIREMENT")
         .ok_or(HelperTransportError::ExecutableIdentity)?;
-    let client = option_env!("PRCTR_NATIVE_CLIENT_REQUIREMENT")
-        .ok_or(HelperTransportError::ExecutableIdentity)?;
+    let client =
+        option_env!("NATIVE_CLIENT_REQUIREMENT").ok_or(HelperTransportError::ExecutableIdentity)?;
     validate_requirement(service)?;
     validate_requirement(client)?;
     Ok(MacOsServicePackage {
@@ -94,7 +94,7 @@ pub fn verify_candidate_socket_peer_under_deadline(
     validate_requirement(requirement)?;
     let socket = socket.try_clone()?;
     let requirement = requirement.to_owned();
-    let result = run_startup_task("prctr-service-candidate-verifier", deadline, move || {
+    let result = run_startup_task("service-candidate-verifier", deadline, move || {
         crate::verify_candidate_socket_peer(&socket, &requirement)
     });
     ensure_helper_utility_usable()?;
@@ -116,7 +116,7 @@ pub(crate) fn connect(
     validate_requirement(&configuration.service_designated_requirement)?;
     let deadline = Instant::now() + HELPER_STARTUP_DEADLINE;
     // The absolute budget includes connect, both live-peer checks and handshakes.
-    run_startup_task("prctr-service-connect", deadline, move || {
+    run_startup_task("service-connect", deadline, move || {
         connect_before(configuration, deadline)
     })
 }
@@ -382,13 +382,13 @@ pub fn launch_macos_service_worker(
     bootstrap.validate_protocol()?;
     validate_requirement(&bootstrap.client_designated_requirement)?;
     let config = configuration.clone();
-    let verified = run_startup_task("prctr-service-worker-package", deadline, move || {
+    let verified = run_startup_task("service-worker-package", deadline, move || {
         verify_packaged_helper(&config, deadline)
     })?;
     let (lifetime, bootstrap_socket) = UnixStream::pair()?;
     let input = observation.try_clone()?;
     let executable: PathBuf = configuration.executable.clone();
-    let mut worker = run_startup_task("prctr-service-worker-spawn", deadline, move || {
+    let mut worker = run_startup_task("service-worker-spawn", deadline, move || {
         let child = Command::new(executable)
             .arg("--service-worker")
             .env_clear()
@@ -406,7 +406,7 @@ pub fn launch_macos_service_worker(
     let started = (|| {
         let process_id = worker.child.id();
         let config = configuration.clone();
-        run_startup_task("prctr-service-worker-live", deadline, move || {
+        run_startup_task("service-worker-live", deadline, move || {
             verify_spawned_helper(&config, process_id, &verified)
         })?;
         let mut framing = DeadlineFramedTransport::new_bounded(
@@ -443,7 +443,7 @@ mod tests {
     fn acceptance_marker_is_exact_and_does_not_authorize_the_peer() {
         for marker in [
             MACOS_SERVICE_ACCEPTANCE_FRAME,
-            b"prctr-native-service-accepted-v2".as_slice(),
+            b"native-service-accepted-v2".as_slice(),
             b"{}".as_slice(),
         ] {
             let (socket, mut peer) = UnixStream::pair().unwrap();
@@ -482,7 +482,7 @@ mod tests {
 
     #[test]
     fn service_stop_requires_an_exact_acknowledgement_not_eof() {
-        const CASE: &str = "PRCTR_TEST_SERVICE_ACK";
+        const CASE: &str = "TEST_SERVICE_ACK";
         let Ok(case) = std::env::var(CASE) else {
             for case in ["valid", "eof", "wrong_nonce", "wrong_kind"] {
                 assert!(Command::new(std::env::current_exe().unwrap())

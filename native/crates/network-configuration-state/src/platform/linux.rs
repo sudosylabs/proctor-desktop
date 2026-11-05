@@ -290,7 +290,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time after epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("prctr-tunnel-marker-{unique}"));
+        let root = std::env::temp_dir().join(format!("tunnel-marker-{unique}"));
         fs::create_dir_all(&root).expect("create tunnel fixture");
         symlink("tun_flags", root.join("tun_flags")).expect("create symlink loop");
         assert!(matches!(

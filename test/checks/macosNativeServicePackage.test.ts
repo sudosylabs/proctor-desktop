@@ -75,7 +75,7 @@ void test('service package activates only fixed root socket service and uses sam
 });
 
 void test('staging refuses replacement and path traversal before writing payload', () => {
-	const parent = realpathSync(mkdtempSync(join(tmpdir(), 'prctr-service-package-')));
+	const parent = realpathSync(mkdtempSync(join(tmpdir(), 'service-package-')));
 	try {
 		const output = join(parent, 'service');
 		const files = planMacOsNativeServicePackage(identity, universal(), Buffer.from('profile'));
@@ -105,7 +105,7 @@ void test('restrictive umask cannot make the inventory differ from the staged mo
         import assert from 'node:assert/strict';
         import { stageMacOsNativeServicePackage } from ${JSON.stringify(moduleUrl)};
         process.umask(0o077);
-        const parent = realpathSync(mkdtempSync(join(tmpdir(), 'prctr-service-modes-')));
+        const parent = realpathSync(mkdtempSync(join(tmpdir(), 'service-modes-')));
         try {
             const output = join(parent, 'stage');
             const [entry] = stageMacOsNativeServicePackage(output, [{path: 'Contents/MacOS/helper', bytes: new Uint8Array([1]), mode: 0o755}]);

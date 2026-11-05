@@ -492,7 +492,7 @@ fn stop_subscription<S: CandidateWindowSubscription>(
     subscription: S,
 ) -> Result<CandidateWindowState, CandidateWindowError> {
     run_bounded_source_stop(
-        "prctr-candidate-window-stop",
+        "candidate-window-stop",
         move || subscription.stop(),
         bounded_cleanup_error,
     )

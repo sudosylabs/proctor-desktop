@@ -1576,17 +1576,17 @@ where
 
 fn source_open_thread_name(kind: NativeSourceKind) -> &'static str {
     match kind {
-        NativeSourceKind::DisplayTopology => "prctr-open-display-source",
-        NativeSourceKind::CandidateWindow => "prctr-open-window-source",
-        NativeSourceKind::CaptureSession => "prctr-open-session-source",
-        NativeSourceKind::ProcessApplication => "prctr-open-process-source",
-        NativeSourceKind::InteractiveSession => "prctr-open-interactive-session-source",
-        NativeSourceKind::Clipboard => "prctr-open-clipboard-source",
-        NativeSourceKind::PrintSpooler => "prctr-open-print-spooler-source",
-        NativeSourceKind::RemovableStorage => "prctr-open-removable-storage-source",
-        NativeSourceKind::Virtualization => "prctr-open-virtualization-source",
-        NativeSourceKind::NetworkConfiguration => "prctr-open-network-source",
-        NativeSourceKind::MediaDevice => "prctr-open-media-device-source",
+        NativeSourceKind::DisplayTopology => "open-display-source",
+        NativeSourceKind::CandidateWindow => "open-window-source",
+        NativeSourceKind::CaptureSession => "open-session-source",
+        NativeSourceKind::ProcessApplication => "open-process-source",
+        NativeSourceKind::InteractiveSession => "open-interactive-session-source",
+        NativeSourceKind::Clipboard => "open-clipboard-source",
+        NativeSourceKind::PrintSpooler => "open-print-spooler-source",
+        NativeSourceKind::RemovableStorage => "open-removable-storage-source",
+        NativeSourceKind::Virtualization => "open-virtualization-source",
+        NativeSourceKind::NetworkConfiguration => "open-network-source",
+        NativeSourceKind::MediaDevice => "open-media-device-source",
     }
 }
 

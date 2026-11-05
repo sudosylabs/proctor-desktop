@@ -3185,7 +3185,7 @@ mod tests {
 
     #[test]
     fn successful_stop_that_retains_a_counted_sink_is_cleanup_and_poisons_the_utility() {
-        const CHILD_ENV: &str = "PRCTR_RETAINED_MACOS_LIFECYCLE_SINK_CHILD";
+        const CHILD_ENV: &str = "RETAINED_MACOS_LIFECYCLE_SINK_CHILD";
         const TEST_NAME: &str = concat!(
             "platform::macos_lifecycle::tests::",
             "successful_stop_that_retains_a_counted_sink_is_cleanup_and_poisons_the_utility"

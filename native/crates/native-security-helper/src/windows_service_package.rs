@@ -100,7 +100,7 @@ pub fn packaged_windows_service_configuration()
 -> Result<(std::path::PathBuf, WindowsLaunchManifest), HelperTransportError> {
     const EMBEDDED: &str = include_str!(concat!(env!("OUT_DIR"), "/windows-service-package.json"));
     let deadline = std::time::Instant::now() + crate::HELPER_STARTUP_DEADLINE;
-    crate::run_startup_task("prctr-service-package", deadline, move || {
+    crate::run_startup_task("service-package", deadline, move || {
         let package = WindowsServicePackage::decode(EMBEDDED)?;
         let root = package.installed_root(deadline)?;
         Ok((root, package.into_manifest()))

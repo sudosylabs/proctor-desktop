@@ -101,7 +101,7 @@ pub use macos_service::{
     verify_candidate_socket_peer_under_deadline,
 };
 
-pub const HELPER_BUILD_ID: &str = "prctr-native-helper-0.1.0";
+pub const HELPER_BUILD_ID: &str = "native-helper-0.1.0";
 const MAX_PENDING_HELPER_OBSERVATIONS: usize = 2_048;
 const HELPER_STARTUP_DEADLINE: Duration = Duration::from_secs(5);
 const HELPER_REQUEST_DEADLINE: Duration = Duration::from_secs(5);
@@ -341,19 +341,17 @@ impl NativeHelperConnection {
         ensure_helper_utility_usable()?;
         let deadline = Instant::now() + HELPER_STARTUP_DEADLINE;
         let verify_configuration = configuration.clone();
-        let verified =
-            run_startup_task("prctr-helper-package-verification", deadline, move || {
-                verify_packaged_helper(&verify_configuration, deadline)
-            })?;
-        let channel_nonce =
-            run_startup_task("prctr-helper-nonce", deadline, generate_channel_nonce)?;
+        let verified = run_startup_task("helper-package-verification", deadline, move || {
+            verify_packaged_helper(&verify_configuration, deadline)
+        })?;
+        let channel_nonce = run_startup_task("helper-nonce", deadline, generate_channel_nonce)?;
         let mut child = spawn_helper_before_deadline(&configuration.executable, deadline)?;
         let mut startup_transport = None;
         let startup = (|| {
             let peer = verified.peer.clone();
             let verify_configuration = configuration.clone();
             let process_id = child.id();
-            run_startup_task("prctr-helper-live-verification", deadline, move || {
+            run_startup_task("helper-live-verification", deadline, move || {
                 verify_spawned_helper(&verify_configuration, process_id, &verified)
             })?;
             let input = child
@@ -952,7 +950,7 @@ impl DeadlineFramedTransport {
     ) -> Result<Self, HelperTransportError> {
         validate_helper_frame_size(maximum_bytes)?;
         let (write_sender, write_receiver) = mpsc::sync_channel::<WriteRequest>(1);
-        let mut writer_worker = FrameWorker::spawn("prctr-helper-frame-writer", move || {
+        let mut writer_worker = FrameWorker::spawn("helper-frame-writer", move || {
             while let Ok(request) = write_receiver.recv() {
                 let result = if request.bytes.len() > maximum_bytes {
                     Err(HelperProtocolError::FrameSize.into())
@@ -967,7 +965,7 @@ impl DeadlineFramedTransport {
             }
         })?;
         let (read_sender, read_receiver) = mpsc::sync_channel::<ReadRequest>(1);
-        let reader_worker = match FrameWorker::spawn("prctr-helper-frame-reader", move || {
+        let reader_worker = match FrameWorker::spawn("helper-frame-reader", move || {
             while let Ok(request) = read_receiver.recv() {
                 let result = read_frame_started(&mut reader, maximum_bytes, &request.started);
                 let terminal = result.is_err();
@@ -1300,7 +1298,7 @@ impl WorkerJoinReceipt {
         // Establish the join owner before releasing work. If its creation fails,
         // dropping the gate prevents SDK calls or an unowned spawned Child.
         if thread::Builder::new()
-            .name("prctr-worker-join".to_owned())
+            .name("worker-join".to_owned())
             .spawn(move || {
                 let joined = worker.join().map_err(|_panic_payload| ());
                 let _ = acknowledge.send(joined);
@@ -1418,7 +1416,7 @@ fn spawn_helper_before_deadline(
     remaining(deadline)?;
     let executable = executable.to_owned();
     let (sender, receiver) = mpsc::sync_channel(1);
-    let mut worker = WorkerJoinReceipt::spawn("prctr-helper-spawn", move || {
+    let mut worker = WorkerJoinReceipt::spawn("helper-spawn", move || {
         let result = Command::new(executable)
             .env_clear()
             .stdin(Stdio::piped())

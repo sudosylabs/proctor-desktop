@@ -35,7 +35,7 @@ impl PassiveStateWire for InteractiveSessionWire {
 
     const SCHEMA_VERSION: u16 = INTERACTIVE_SESSION_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
-    const STOP_THREAD_NAME: &'static str = "prctr-interactive-session-stop";
+    const STOP_THREAD_NAME: &'static str = "interactive-session-stop";
 
     fn health(state: &Self::State) -> SourceHealth {
         if matches!(state.coverage, InteractiveSessionCoverage::FullLifecycle)

@@ -160,7 +160,7 @@ fn expired_startup_deadlines_do_not_start_new_work() {
         .checked_sub(Duration::from_millis(1))
         .expect("representable expired deadline");
     assert!(matches!(
-        run_startup_task("prctr-expired-test", expired, move || {
+        run_startup_task("expired-test", expired, move || {
             worker_started.store(true, Ordering::Release);
             Ok(())
         }),
@@ -169,7 +169,7 @@ fn expired_startup_deadlines_do_not_start_new_work() {
     assert!(!task_started.load(Ordering::Acquire));
     assert!(matches!(
         spawn_helper_before_deadline(
-            std::path::Path::new("/prctr-expired-helper-must-not-start"),
+            std::path::Path::new("/expired-helper-must-not-start"),
             expired,
         ),
         Err(HelperTransportError::DeadlineExceeded)

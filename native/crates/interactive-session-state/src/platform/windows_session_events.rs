@@ -131,7 +131,7 @@ impl PendingQuery {
             return Err(backend("WTS query deadline exceeded"));
         }
         let (sender, result) = mpsc::sync_channel(1);
-        let worker = DeadlineThread::spawn("prctr-wts-query", move || {
+        let worker = DeadlineThread::spawn("wts-query", move || {
             let _ = sender.send(query());
         })
         .map_err(|_| backend("WTS query worker cannot start"))?;

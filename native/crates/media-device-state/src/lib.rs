@@ -64,7 +64,7 @@ impl PassiveStateWire for MediaDeviceWire {
     type Drain = MediaDeviceDrain;
     const SCHEMA_VERSION: u16 = MEDIA_DEVICE_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
-    const STOP_THREAD_NAME: &'static str = "prctr-media-device-stop";
+    const STOP_THREAD_NAME: &'static str = "media-device-stop";
     fn health(state: &Self::State) -> SourceHealth {
         if endpoint_healthy(&state.camera) && endpoint_healthy(&state.microphone) {
             SourceHealth::Healthy

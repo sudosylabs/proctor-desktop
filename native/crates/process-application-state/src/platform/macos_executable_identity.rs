@@ -68,7 +68,7 @@ impl Drop for RawIdentity {
 }
 
 unsafe extern "C" {
-    fn prctr_macos_copy_identity(
+    fn macos_copy_identity(
         token: *const u32,
         process_id: i32,
         generation: u32,
@@ -96,7 +96,7 @@ fn verify(job: IdentityJob) -> ProcessExecutableIdentity {
     // SAFETY: the exact kernel token and fixed output stay alive for the entire
     // synchronous SDK call. No CF or SecCode reference escapes the C routine.
     let status = unsafe {
-        prctr_macos_copy_identity(
+        macos_copy_identity(
             token.as_words().as_ptr(),
             job.key.process_id(),
             job.generation,
@@ -635,7 +635,7 @@ mod tests {
 
     #[test]
     fn timed_out_sdk_cannot_be_acknowledged_as_clean_source_close() {
-        const CHILD_ENV: &str = "PRCTR_MACOS_IDENTITY_CLOSE_POISON_CHILD";
+        const CHILD_ENV: &str = "MACOS_IDENTITY_CLOSE_POISON_CHILD";
         const TEST_NAME: &str = concat!(
             "platform::macos_executable_identity::tests::",
             "timed_out_sdk_cannot_be_acknowledged_as_clean_source_close"

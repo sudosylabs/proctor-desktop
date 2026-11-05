@@ -126,7 +126,7 @@ impl SnapshotPollingProcessBackend {
         let worker_query = Arc::clone(&self.query);
         let worker_emitter = emitter;
         let interval = self.interval;
-        let worker = DeadlineThread::spawn("prctr-process-snapshot-worker", move || {
+        let worker = DeadlineThread::spawn("process-snapshot-worker", move || {
             let result = panic::catch_unwind(AssertUnwindSafe(|| {
                 match control_receiver.recv() {
                     Ok(SnapshotWorkerCommand::Start) => {}

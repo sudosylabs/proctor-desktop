@@ -18,15 +18,15 @@ typedef struct {
     uint32_t kind;
     uint32_t succeeded;
     uint32_t reserved;
-} prctr_session_fact;
-_Static_assert(sizeof(prctr_session_fact) == 40, "session fact ABI changed");
-typedef void (*prctr_session_callback)(void *, const prctr_session_fact *);
+} session_fact;
+_Static_assert(sizeof(session_fact) == 40, "session fact ABI changed");
+typedef void (*session_callback)(void *, const session_fact *);
 typedef struct {
     es_client_t *client;
     atomic_bool accepting;
-    prctr_session_callback callback;
+    session_callback callback;
     void *context;
-} prctr_session_subscription;
+} session_subscription;
 
 static bool has_session_event(const es_event_type_t *events, size_t count) {
     if (count > 1024 || (count != 0 && events == NULL)) return true;
@@ -79,7 +79,7 @@ static bool session_notifications_unmuted(es_client_t *client) {
 
 /* SDK deletion is synchronous: invoke only inside the killable helper's
  * deadline-owned source worker. Failed deletion retains callback storage. */
-int prctr_session_es_close(prctr_session_subscription *subscription) {
+int session_es_close(session_subscription *subscription) {
     if (subscription == NULL) return 0;
     atomic_store_explicit(&subscription->accepting, false, memory_order_release);
     if (es_delete_client(subscription->client) != ES_RETURN_SUCCESS) return 3;
@@ -87,7 +87,7 @@ int prctr_session_es_close(prctr_session_subscription *subscription) {
     return 0;
 }
 
-static void copy_fact(const es_message_t *message, prctr_session_fact *fact) {
+static void copy_fact(const es_message_t *message, session_fact *fact) {
     if (message->version < 4 || message->action_type != ES_ACTION_TYPE_NOTIFY) return;
     fact->global_sequence = message->global_seq_num;
     fact->type_sequence = message->seq_num;
@@ -147,10 +147,10 @@ static void copy_fact(const es_message_t *message, prctr_session_fact *fact) {
     }
 }
 
-int prctr_session_es_open(void *context, prctr_session_callback callback,
-                         prctr_session_subscription **result) {
+int session_es_open(void *context, session_callback callback,
+                         session_subscription **result) {
     *result = NULL;
-    prctr_session_subscription *subscription = calloc(1, sizeof(*subscription));
+    session_subscription *subscription = calloc(1, sizeof(*subscription));
     if (subscription == NULL) return 2;
     subscription->context = context;
     subscription->callback = callback;
@@ -159,7 +159,7 @@ int prctr_session_es_open(void *context, prctr_session_callback callback,
         ^(es_client_t *client, const es_message_t *message) {
             (void)client;
             if (!atomic_load_explicit(&subscription->accepting, memory_order_acquire)) return;
-            prctr_session_fact fact = {0};
+            session_fact fact = {0};
             copy_fact(message, &fact);
             subscription->callback(subscription->context, &fact);
             volatile unsigned char *bytes = (volatile unsigned char *)&fact;
@@ -167,7 +167,7 @@ int prctr_session_es_open(void *context, prctr_session_callback callback,
         });
     if (created != ES_NEW_CLIENT_RESULT_SUCCESS) {
         if (subscription->client != NULL) {
-            if (prctr_session_es_close(subscription) != 0) return 3;
+            if (session_es_close(subscription) != 0) return 3;
         } else { free(subscription); }
         switch (created) {
             case ES_NEW_CLIENT_RESULT_ERR_NOT_ENTITLED:
@@ -177,7 +177,7 @@ int prctr_session_es_open(void *context, prctr_session_callback callback,
         }
     }
     if (!session_notifications_unmuted(subscription->client)) {
-        return prctr_session_es_close(subscription) == 0 ? 2 : 3;
+        return session_es_close(subscription) == 0 ? 2 : 3;
     }
     const es_event_type_t events[] = {
         ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGIN,
@@ -192,7 +192,7 @@ int prctr_session_es_open(void *context, prctr_session_callback callback,
         ES_EVENT_TYPE_NOTIFY_LOGIN_LOGOUT
     };
     if (es_subscribe(subscription->client, events, 10) != ES_RETURN_SUCCESS) {
-        return prctr_session_es_close(subscription) == 0 ? 2 : 3;
+        return session_es_close(subscription) == 0 ? 2 : 3;
     }
     *result = subscription;
     return 0;

@@ -28,7 +28,7 @@ impl PassiveStateWire for PrintSpoolerWire {
     type Drain = PrintSpoolerDrain;
     const SCHEMA_VERSION: u16 = PRINT_SPOOLER_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
-    const STOP_THREAD_NAME: &'static str = "prctr-print-spooler-stop";
+    const STOP_THREAD_NAME: &'static str = "print-spooler-stop";
     fn health(state: &Self::State) -> SourceHealth {
         if matches!(state.coverage, PrintSpoolerCoverage::MonitoredScheduler)
             && matches!(state.certainty, PrintSpoolerCertainty::Complete)

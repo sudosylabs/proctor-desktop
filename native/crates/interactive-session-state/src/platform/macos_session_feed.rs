@@ -18,12 +18,12 @@ use std::sync::{Arc, mpsc};
 use std::time::{Duration, Instant};
 
 unsafe extern "C" {
-    fn prctr_session_es_open(
+    fn session_es_open(
         context: *mut c_void,
         callback: unsafe extern "C" fn(*mut c_void, *const RawSessionFact),
         result: *mut *mut c_void,
     ) -> i32;
-    fn prctr_session_es_close(subscription: *mut c_void) -> i32;
+    fn session_es_close(subscription: *mut c_void) -> i32;
 }
 
 /// A fixed passive notification subscription, owned by the killable native helper.
@@ -69,7 +69,7 @@ impl MacOsSessionEventFeed {
         let (ready, readiness) = mpsc::sync_channel(1);
         let (stop, stopping) = mpsc::sync_channel(1);
         let worker_ingress = Arc::clone(&ingress);
-        let worker = DeadlineThread::spawn("prctr-es-session-source", move || {
+        let worker = DeadlineThread::spawn("es-session-source", move || {
             let result = catch_unwind(AssertUnwindSafe(|| {
                 match opener(Arc::clone(&worker_ingress)) {
                     Ok(mut client) => {
@@ -178,7 +178,7 @@ impl NativeClient {
         let mut native = std::ptr::null_mut();
         // SAFETY: Arc allocation is stable until SDK deletion fences all callbacks.
         let result = unsafe {
-            prctr_session_es_open(
+            session_es_open(
                 Arc::as_ptr(&callback).cast_mut().cast(),
                 receive,
                 &raw mut native,
@@ -213,7 +213,7 @@ impl SessionClient for NativeClient {
             return Ok(());
         };
         // SAFETY: only the owner thread calls ES. Rust context survives deletion.
-        if unsafe { prctr_session_es_close(native.as_ptr()) } != 0 {
+        if unsafe { session_es_close(native.as_ptr()) } != 0 {
             if let Some(callback) = self.callback.take() {
                 let _retained = Arc::into_raw(callback);
             }
@@ -321,7 +321,7 @@ mod tests {
     fn late_open_is_owned_until_client_closes_and_poison_remains() {
         if isolated(
             "platform::macos_session_feed::tests::late_open_is_owned_until_client_closes_and_poison_remains",
-            "PRCTR_TEST_SESSION_LATE_OPEN",
+            "TEST_SESSION_LATE_OPEN",
         ) {
             return;
         }
@@ -355,7 +355,7 @@ mod tests {
     fn close_deadline_preserves_tail_and_never_returns_clean_after_timeout() {
         if isolated(
             "platform::macos_session_feed::tests::close_deadline_preserves_tail_and_never_returns_clean_after_timeout",
-            "PRCTR_TEST_SESSION_CLOSE_TIMEOUT",
+            "TEST_SESSION_CLOSE_TIMEOUT",
         ) {
             return;
         }

@@ -350,7 +350,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time after epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("prctr-drm-{unique}"));
+        let root = std::env::temp_dir().join(format!("drm-{unique}"));
         let first = root.join("card0-eDP-1");
         let second = root.join("card0-HDMI-A-1");
         fs::create_dir_all(&first).expect("create first connector");
@@ -389,7 +389,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time after epoch")
             .as_nanos();
-        let root = std::env::temp_dir().join(format!("prctr-drm-disconnected-{unique}"));
+        let root = std::env::temp_dir().join(format!("drm-disconnected-{unique}"));
         for index in 0..=MAX_DISPLAY_TARGETS {
             let connector = root.join(format!("card0-HDMI-A-{index}"));
             fs::create_dir_all(&connector).expect("create disconnected connector");
@@ -457,7 +457,7 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .expect("time after epoch")
             .as_nanos();
-        let connector = std::env::temp_dir().join(format!("prctr-drm-edid-{unique}"));
+        let connector = std::env::temp_dir().join(format!("drm-edid-{unique}"));
         fs::create_dir_all(&connector).expect("create connector");
         let edid = connector.join("edid");
 

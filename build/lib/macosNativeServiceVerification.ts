@@ -67,7 +67,7 @@ export class MacOsNativeServiceVerifier {
 				app.endsWith('.app') && lstatSync(app).isDirectory(),
 				'Expected application bundle'
 			);
-			temporary = realpathSync(mkdtempSync(join(tmpdir(), 'prctr-native-verification-')));
+			temporary = realpathSync(mkdtempSync(join(tmpdir(), 'native-verification-')));
 			const service = this.inside(app, nativeServicePackage.bundlePath, true);
 			const executable = this.inside(
 				app,

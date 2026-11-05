@@ -693,7 +693,7 @@ where
 
     let (sender, receiver) = mpsc::sync_channel(2);
     let reader = thread::Builder::new()
-        .name("prctr-helper-client-reader".to_owned())
+        .name("helper-client-reader".to_owned())
         .spawn(move || {
             loop {
                 let event = match read_json_frame(&mut input) {

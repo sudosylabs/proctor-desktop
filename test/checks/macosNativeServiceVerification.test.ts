@@ -131,7 +131,7 @@ class FixtureCommands implements NativePackageCommand {
 	}
 }
 async function fixture(): Promise<{ root: string; app: string; archive: string }> {
-	const root = realpathSync(mkdtempSync(join(tmpdir(), 'prctr-signed-fixture-')));
+	const root = realpathSync(mkdtempSync(join(tmpdir(), 'signed-fixture-')));
 	const app = join(root, 'Proctor.app');
 	const service = join(app, nativeServicePackage.bundlePath, 'Contents');
 	for (const directory of [

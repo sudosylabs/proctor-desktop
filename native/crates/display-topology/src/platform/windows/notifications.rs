@@ -107,7 +107,7 @@ impl MonitorNotifications {
         let handle_address = mem::take(&mut self.handle);
         let callback_state = Arc::clone(&self.state);
         let result = cleanup_with_deadline(
-            "prctr-display-callback-remove-windows",
+            "display-callback-remove-windows",
             "Windows monitor callback removal",
             move || {
                 // SAFETY: the address is the exact handle returned by

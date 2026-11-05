@@ -83,7 +83,7 @@ impl PassiveStateWire for NetworkConfigurationWire {
     type Drain = NetworkConfigurationDrain;
     const SCHEMA_VERSION: u16 = NETWORK_CONFIGURATION_SCHEMA_VERSION;
     const SOURCE_VERSION: &'static str = env!("CARGO_PKG_VERSION");
-    const STOP_THREAD_NAME: &'static str = "prctr-network-configuration-stop";
+    const STOP_THREAD_NAME: &'static str = "network-configuration-stop";
     fn health(state: &Self::State) -> SourceHealth {
         if matches!(
             state.coverage,

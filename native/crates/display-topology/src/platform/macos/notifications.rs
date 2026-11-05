@@ -59,7 +59,7 @@ impl MacDisplayNotifications {
         self.registered = false;
         let hub = self.hub;
         cleanup_with_deadline(
-            "prctr-display-callback-remove-macos",
+            "display-callback-remove-macos",
             "CoreGraphics display callback removal",
             move || {
                 // SAFETY: pointer and callback match the successful registration and

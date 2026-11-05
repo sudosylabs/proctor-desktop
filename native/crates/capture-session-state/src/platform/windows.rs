@@ -107,7 +107,7 @@ fn start_event_worker(
     shutdown: Arc<AtomicBool>,
 ) -> Result<DeadlineThread, CaptureSessionError> {
     let worker_emitter = emitter.clone();
-    DeadlineThread::spawn("prctr-capture-session-events", move || {
+    DeadlineThread::spawn("capture-session-events", move || {
         let result = panic::catch_unwind(AssertUnwindSafe(|| {
             loop {
                 match exact_overflowed_wakeups(&receiver, &notifications) {

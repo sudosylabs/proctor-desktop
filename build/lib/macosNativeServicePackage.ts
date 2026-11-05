@@ -39,8 +39,8 @@ export function nativeServiceBuildEnvironment(
 	const requirement = (identifier: string): string =>
 		`anchor apple generic and identifier "${identifier}" and certificate leaf[subject.OU] = "${identity.teamIdentifier}"`;
 	return {
-		PRCTR_NATIVE_SERVICE_REQUIREMENT: requirement(nativeServicePackage.bundleIdentifier),
-		PRCTR_NATIVE_CLIENT_REQUIREMENT: requirement(identity.clientBundleIdentifier)
+		NATIVE_SERVICE_REQUIREMENT: requirement(nativeServicePackage.bundleIdentifier),
+		NATIVE_CLIENT_REQUIREMENT: requirement(identity.clientBundleIdentifier)
 	};
 }
 

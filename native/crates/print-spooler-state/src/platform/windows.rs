@@ -502,7 +502,7 @@ fn release_notification(pointer: usize) -> Result<(), PassiveStateSourceError> {
         return clear_owner_buffers_and_free(pointer);
     }
     match run_bounded_task(
-        "prctr-print-notification-cleanup",
+        "print-notification-cleanup",
         SOURCE_CLEANUP_DEADLINE,
         move || clear_owner_buffers_and_free(pointer),
     ) {

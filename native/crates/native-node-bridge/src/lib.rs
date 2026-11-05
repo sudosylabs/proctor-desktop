@@ -569,7 +569,7 @@ fn with_packaged_macos_helper(factories: BaselineSourceFactories) -> BaselineSou
     use native_security_helper::{
         HELPER_BUILD_ID, MacOsServiceConnectionConfiguration, NativeHelperConnection,
     };
-    let Some(requirement) = option_env!("PRCTR_NATIVE_SERVICE_REQUIREMENT") else {
+    let Some(requirement) = option_env!("NATIVE_SERVICE_REQUIREMENT") else {
         return factories;
     };
     // A configured package never falls back after peer or lifecycle failure.

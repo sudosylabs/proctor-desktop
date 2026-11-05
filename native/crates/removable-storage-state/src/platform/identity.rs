@@ -103,7 +103,7 @@ impl StorageIdentityMap {
 fn attempt_pseudonym(attempt_context: &[u8], stable_key: &str) -> String {
     let mut mac = Hmac::<Sha256>::new_from_slice(attempt_context)
         .expect("HMAC accepts every bounded Attempt context length");
-    mac.update(b"prctr-removable-storage-v1\0");
+    mac.update(b"removable-storage-v1\0");
     mac.update(stable_key.as_bytes());
     let digest = mac.finalize().into_bytes();
     let mut suffix = String::with_capacity(32);
