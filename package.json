@@ -59,6 +59,7 @@
     "test:unit": "node scripts/test.ts unit",
     "check:all": "npm run check && npm run test:electron && npm run test:native",
     "doctor": "node scripts/doctor.ts",
+    "tasks": "node build/tasks.ts --list",
     "setup": "node scripts/setup.ts",
     "lint": "node --max-old-space-size=4096 scripts/lint.ts",
     "lint:fix": "node --max-old-space-size=4096 scripts/lint.ts --fix",

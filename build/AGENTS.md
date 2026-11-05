@@ -17,3 +17,7 @@ schemas, generators, and enforcement exceptions are described in
 - Use Node from `.nvmrc`; `npm run doctor` reports what the machine has.
 - A tooling change that alters what the staged-file hook reads must be staged with
   its working copy; see `scripts/staged.ts`.
+
+- `npm run tasks` prints the grouped script index from `build/tasks.ts`. Adding
+  or removing an npm script requires the matching entry there; a check test
+  fails on any mismatch.
