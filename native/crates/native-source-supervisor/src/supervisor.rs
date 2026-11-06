@@ -1,14 +1,14 @@
 //! The supervisor itself and the results it reports to its caller.
 
 use std::fmt;
-use std::sync::mpsc::RecvTimeoutError;
+use std::sync::mpsc::Receiver;
 use std::time::{Duration, Instant};
 
 use native_protocol::SourceFailureCode;
 use native_source_runtime::poison_native_source_process;
 
 use crate::config::SupervisorConfig;
-use crate::erased::SourceParameters;
+use crate::erased::{SourceParameters, SourceStopOutcome};
 use crate::factories::BaselineSourceFactories;
 use crate::open::{OpenedManifest, SOURCE_OPEN_DEADLINE, open_initial_manifest};
 use crate::restart::{
@@ -200,33 +200,15 @@ impl NativeSourceSupervisor {
     #[must_use]
     pub fn poll(&mut self) -> SupervisorPoll {
         if self.stopped {
-            return SupervisorPoll {
-                final_snapshots: Vec::new(),
-                state: SupervisorState::Stopped,
-                opened_snapshots: Vec::new(),
-                batches: Vec::new(),
-                transitions: Vec::new(),
-            };
+            return SupervisorPoll::empty(SupervisorState::Stopped);
         }
         if self.process_replacement_required {
-            return SupervisorPoll {
-                final_snapshots: Vec::new(),
-                state: SupervisorState::Failed,
-                opened_snapshots: Vec::new(),
-                batches: Vec::new(),
-                transitions: Vec::new(),
-            };
+            return SupervisorPoll::empty(SupervisorState::Failed);
         }
         let now = self.clock.now();
         let parameters = SourceParameters::from(&self.config);
         let policy = self.config.restart_policy;
-        let mut poll = SupervisorPoll {
-            final_snapshots: Vec::new(),
-            state: SupervisorState::Healthy,
-            opened_snapshots: Vec::new(),
-            batches: Vec::new(),
-            transitions: Vec::new(),
-        };
+        let mut poll = SupervisorPoll::empty(SupervisorState::Healthy);
         for slot in &mut self.slots {
             let control = match slot.lifecycle {
                 SlotLifecycle::Active => {
@@ -272,25 +254,22 @@ impl NativeSourceSupervisor {
     /// safe and return an empty stopped result.
     #[must_use]
     pub fn stop(&mut self) -> SupervisorStop {
+        let mut result = SupervisorStop {
+            state: SupervisorState::Stopped,
+            final_snapshots: Vec::new(),
+            batches: Vec::new(),
+            process_replacement_required: self.process_replacement_required,
+        };
         if self.stopped {
-            return SupervisorStop {
-                final_snapshots: Vec::new(),
-                state: SupervisorState::Stopped,
-                batches: Vec::new(),
-                process_replacement_required: self.process_replacement_required,
-            };
+            return result;
         }
         self.stopped = true;
-        let mut batches = Vec::new();
-        let mut final_snapshots = Vec::new();
         for slot in self.slots.iter_mut().rev() {
             if let Some(mut source) = slot.source.take() {
-                let stopped = source.stop();
-                self.process_replacement_required |= !stopped.closed_input_boundary;
-                batches.extend(stopped.preceding_batches);
-                final_snapshots.extend(stopped.final_snapshot);
-                batches.push(stopped.batch);
+                result.absorb(source.stop());
             }
+            // A restart still in flight must be waited out (up to its own
+            // deadline) so its source is stopped rather than leaked.
             let lifecycle = std::mem::replace(&mut slot.lifecycle, SlotLifecycle::Exhausted);
             if let SlotLifecycle::RestartOpening {
                 deadline,
@@ -298,51 +277,68 @@ impl NativeSourceSupervisor {
                 ..
             } = lifecycle
             {
-                let remaining = deadline.saturating_duration_since(Instant::now());
-                let received = if remaining.is_zero() {
-                    completion.try_recv().map_err(|_error| ())
-                } else {
-                    completion
-                        .recv_timeout(remaining)
-                        .map_err(|error| match error {
-                            RecvTimeoutError::Timeout | RecvTimeoutError::Disconnected => (),
-                        })
-                };
-                match received {
-                    Ok(RestartOpenMessage::Completed(completion)) => match completion.result {
-                        Ok((mut source, _snapshot)) => {
-                            let stopped = source.stop();
-                            self.process_replacement_required |= !stopped.closed_input_boundary;
-                            batches.extend(stopped.preceding_batches);
-                            final_snapshots.extend(stopped.final_snapshot);
-                            batches.push(stopped.batch);
-                        }
+                match wait_for_restart_open(deadline, &completion) {
+                    Some(RestartOpenMessage::Completed(completion)) => match completion.result {
+                        Ok((mut source, _snapshot)) => result.absorb(source.stop()),
                         Err(failure) => {
-                            self.process_replacement_required |=
+                            result.process_replacement_required |=
                                 failure.process_replacement_required;
                         }
                     },
-                    Ok(RestartOpenMessage::MissedDeadline) | Err(()) => {
-                        self.process_replacement_required = true;
+                    Some(RestartOpenMessage::MissedDeadline) | None => {
+                        result.process_replacement_required = true;
                     }
                 }
             }
         }
+        self.process_replacement_required = result.process_replacement_required;
         if self.process_replacement_required {
             self.process_fence.poison();
         }
-        SupervisorStop {
-            final_snapshots,
-            state: SupervisorState::Stopped,
-            batches,
-            process_replacement_required: self.process_replacement_required,
-        }
+        result
     }
 }
 
 impl Drop for NativeSourceSupervisor {
     fn drop(&mut self) {
         let _ = self.stop();
+    }
+}
+
+impl SupervisorPoll {
+    fn empty(state: SupervisorState) -> Self {
+        Self {
+            state,
+            opened_snapshots: Vec::new(),
+            final_snapshots: Vec::new(),
+            batches: Vec::new(),
+            transitions: Vec::new(),
+        }
+    }
+}
+
+impl SupervisorStop {
+    /// Collects one stopped source's output, remembering if its input could
+    /// not be closed.
+    fn absorb(&mut self, stopped: SourceStopOutcome) {
+        self.process_replacement_required |= !stopped.closed_input_boundary;
+        self.batches.extend(stopped.preceding_batches);
+        self.final_snapshots.extend(stopped.final_snapshot);
+        self.batches.push(stopped.batch);
+    }
+}
+
+/// Waits until `deadline` for a restart worker's message. `None` means the
+/// worker neither reported in time nor is still able to.
+fn wait_for_restart_open(
+    deadline: Instant,
+    completion: &Receiver<RestartOpenMessage>,
+) -> Option<RestartOpenMessage> {
+    let remaining = deadline.saturating_duration_since(Instant::now());
+    if remaining.is_zero() {
+        completion.try_recv().ok()
+    } else {
+        completion.recv_timeout(remaining).ok()
     }
 }
 

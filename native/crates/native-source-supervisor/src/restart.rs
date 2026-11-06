@@ -115,14 +115,7 @@ pub(crate) fn poll_active_source(
     poll.batches.push(final_batch.batch);
     slot.source = None;
     if !final_batch.closed_input_boundary {
-        process_fence.poison();
-        slot.lifecycle = SlotLifecycle::Exhausted;
-        poll.transitions
-            .push(SourceLifecycleTransition::ProcessReplacementRequired {
-                source: slot.kind,
-                failure: SourceFailureCode::Cleanup,
-            });
-        return PollControl::ReplaceProcess;
+        return require_process_replacement(slot, poll, process_fence, SourceFailureCode::Cleanup);
     }
     if slot.restart_attempts >= policy.maximum_attempts {
         slot.lifecycle = SlotLifecycle::Exhausted;
@@ -216,14 +209,7 @@ pub(crate) fn begin_restart_source(
             PollControl::Continue
         }
         Err(_error) => {
-            process_fence.poison();
-            slot.lifecycle = SlotLifecycle::Exhausted;
-            poll.transitions
-                .push(SourceLifecycleTransition::ProcessReplacementRequired {
-                    source: slot.kind,
-                    failure: SourceFailureCode::Cleanup,
-                });
-            PollControl::ReplaceProcess
+            require_process_replacement(slot, poll, process_fence, SourceFailureCode::Cleanup)
         }
     }
 }
@@ -285,14 +271,12 @@ pub(crate) fn poll_restart_source(
     let completion = match received {
         Ok(RestartOpenMessage::Completed(completion)) => completion,
         Ok(RestartOpenMessage::MissedDeadline) | Err(()) => {
-            process_fence.poison();
-            slot.lifecycle = SlotLifecycle::Exhausted;
-            poll.transitions
-                .push(SourceLifecycleTransition::ProcessReplacementRequired {
-                    source: slot.kind,
-                    failure: SourceFailureCode::Cleanup,
-                });
-            return PollControl::ReplaceProcess;
+            return require_process_replacement(
+                slot,
+                poll,
+                process_fence,
+                SourceFailureCode::Cleanup,
+            );
         }
     };
     slot.factory = Some(completion.factory);
@@ -310,14 +294,7 @@ pub(crate) fn poll_restart_source(
             });
         }
         Err(failure) if failure.process_replacement_required => {
-            process_fence.poison();
-            slot.lifecycle = SlotLifecycle::Exhausted;
-            poll.transitions
-                .push(SourceLifecycleTransition::ProcessReplacementRequired {
-                    source: slot.kind,
-                    failure: failure.code,
-                });
-            return PollControl::ReplaceProcess;
+            return require_process_replacement(slot, poll, process_fence, failure.code);
         }
         Err(failure) if attempt >= policy.maximum_attempts => {
             slot.lifecycle = SlotLifecycle::Exhausted;
@@ -344,6 +321,24 @@ pub(crate) fn poll_restart_source(
         }
     }
     PollControl::Continue
+}
+
+/// Retires a slot whose source could not be shut down or reopened safely and
+/// poisons the process so nothing else opens in it.
+fn require_process_replacement(
+    slot: &mut SourceSlot,
+    poll: &mut SupervisorPoll,
+    process_fence: &dyn ProcessFence,
+    failure: SourceFailureCode,
+) -> PollControl {
+    process_fence.poison();
+    slot.lifecycle = SlotLifecycle::Exhausted;
+    poll.transitions
+        .push(SourceLifecycleTransition::ProcessReplacementRequired {
+            source: slot.kind,
+            failure,
+        });
+    PollControl::ReplaceProcess
 }
 
 pub(crate) fn supervisor_state(slots: &[SourceSlot]) -> SupervisorState {
