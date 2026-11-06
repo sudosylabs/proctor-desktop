@@ -117,11 +117,12 @@ fn query_state(
         }
         let pid = unsafe { send_pid(application, pid_selector) };
         let launch_date = unsafe { send_id(application, launch_date_selector) };
-        if pid > 0 && !launch_date.is_null() {
-            let launch_time = unsafe { send_f64(launch_date, time_interval_selector) };
-            if let Some(key) = stable_process_key(pid, launch_time) {
-                raw_keys.push(key);
-            }
+        // A running application without a launch date stays visible to policy
+        // under a PID-only identity rather than disappearing from inventory.
+        let launch_time = (!launch_date.is_null())
+            .then(|| unsafe { send_f64(launch_date, time_interval_selector) });
+        if let Some(key) = stable_process_key(pid, launch_time) {
+            raw_keys.push(key);
         }
     }
     tracker
@@ -187,9 +188,18 @@ unsafe fn send_f64(receiver: *mut c_void, selector: *mut c_void) -> f64 {
     unsafe { send(receiver, selector) }
 }
 
-fn stable_process_key(pid: i32, launch_time: f64) -> Option<String> {
-    (pid > 0 && launch_time.is_finite() && launch_time > 0.0)
-        .then(|| format!("{pid}:{:016x}", launch_time.to_bits()))
+/// Non-positive PIDs are not running processes. Without a valid launch time the
+/// key is PID-only, so a reused PID may share one degraded process identity.
+fn stable_process_key(pid: i32, launch_time: Option<f64>) -> Option<String> {
+    if pid <= 0 {
+        return None;
+    }
+    Some(
+        match launch_time.filter(|time| time.is_finite() && *time > 0.0) {
+            Some(time) => format!("{pid}:{:016x}", time.to_bits()),
+            None => format!("{pid}:launch-unknown"),
+        },
+    )
 }
 
 unsafe fn send_void(receiver: *mut c_void, selector: *mut c_void) {
@@ -246,9 +256,17 @@ mod tests {
 
     #[test]
     fn stable_key_uses_pid_and_launch_generation_not_object_address() {
-        let first = stable_process_key(42, 1234.5).expect("valid launch identity");
-        assert_eq!(first, stable_process_key(42, 1234.5).unwrap());
-        assert_ne!(first, stable_process_key(42, 1235.0).unwrap());
-        assert!(stable_process_key(42, f64::NAN).is_none());
+        let first = stable_process_key(42, Some(1234.5)).expect("valid launch identity");
+        assert_eq!(first, stable_process_key(42, Some(1234.5)).unwrap());
+        assert_ne!(first, stable_process_key(42, Some(1235.0)).unwrap());
+        assert!(stable_process_key(0, Some(1234.5)).is_none());
+    }
+
+    #[test]
+    fn application_without_launch_date_keeps_a_pid_only_identity() {
+        let missing = stable_process_key(42, None).expect("PID-only identity");
+        assert_eq!(missing, stable_process_key(42, Some(f64::NAN)).unwrap());
+        assert_ne!(missing, stable_process_key(42, Some(1234.5)).unwrap());
+        assert_ne!(missing, stable_process_key(43, None).unwrap());
     }
 }
