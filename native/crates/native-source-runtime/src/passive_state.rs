@@ -18,8 +18,8 @@ use crate::deadline::{
 use crate::passive_backends::POLL_QUERY_BUDGET;
 use crate::queue::{QueueError, SequencedObservation};
 use crate::session::{
-    SourceModel, SourceResetPlan, SourceSession, SourceSessionFact, SourceSessionMetadata,
-    SourceStateChange,
+    SourceResetPlan, SourceSession, SourceSessionFact, SourceSessionMetadata, SourceStateChange,
+    SourceStateMachine,
 };
 
 /// Deadline for stopping any passive-state subscription: the ordinary cleanup
@@ -220,7 +220,7 @@ pub(crate) enum PassiveStateInput<W: PassiveStateWire> {
 
 pub(crate) struct PassiveStateModel<W: PassiveStateWire>(PhantomData<W>);
 
-impl<W: PassiveStateWire> SourceModel for PassiveStateModel<W> {
+impl<W: PassiveStateWire> SourceStateMachine for PassiveStateModel<W> {
     type State = W::State;
     type Input = PassiveStateInput<W>;
     type Observation = W::Event;

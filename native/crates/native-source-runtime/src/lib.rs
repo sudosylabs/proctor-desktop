@@ -28,8 +28,8 @@ pub use passive_state::{
 };
 pub use queue::{QueueError, SequencedObservation};
 pub use session::{
-    SourceModel, SourceResetPlan, SourceSession, SourceSessionDrain, SourceSessionFact,
-    SourceSessionMetadata, SourceStateChange, fresh_source_instance_id,
+    SourceResetPlan, SourceSession, SourceSessionDrain, SourceSessionFact, SourceSessionMetadata,
+    SourceStateChange, SourceStateMachine, new_source_instance_id,
 };
 
 #[cfg(test)]

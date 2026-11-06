@@ -10,8 +10,8 @@ use native_protocol::{
     TopologyCertainty,
 };
 use native_source_runtime::{
-    BoundedTaskError, DeadlineThread, QueueError, SOURCE_CLEANUP_DEADLINE, SourceModel,
-    SourceResetPlan, SourceSession, SourceSessionFact, SourceSessionMetadata, SourceStateChange,
+    BoundedTaskError, DeadlineThread, QueueError, SOURCE_CLEANUP_DEADLINE, SourceResetPlan,
+    SourceSession, SourceSessionFact, SourceSessionMetadata, SourceStateChange, SourceStateMachine,
     ensure_native_source_process_usable, poison_native_source_process, run_bounded_task,
 };
 
@@ -277,7 +277,7 @@ struct DisplayTopologyInput {
 
 struct DisplayTopologyModel;
 
-impl SourceModel for DisplayTopologyModel {
+impl SourceStateMachine for DisplayTopologyModel {
     type State = DisplayTopologySnapshot;
     type Input = DisplayTopologyInput;
     type Observation = DisplayTopologySnapshot;

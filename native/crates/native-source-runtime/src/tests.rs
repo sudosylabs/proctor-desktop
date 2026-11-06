@@ -30,7 +30,7 @@ fn bounded_reader_rejects_actual_content_past_the_limit() {
 
 struct OrderedOpeningModel;
 
-impl SourceModel for OrderedOpeningModel {
+impl SourceStateMachine for OrderedOpeningModel {
     type State = u8;
     type Input = u8;
     type Observation = u8;
@@ -164,7 +164,7 @@ fn restart_reset_survives_an_input_followed_by_opening_loss_at_minimum_capacity(
 fn opening_metadata_is_immutable_when_buffered_input_changes_live_health() {
     struct HealthChangingModel;
 
-    impl SourceModel for HealthChangingModel {
+    impl SourceStateMachine for HealthChangingModel {
         type State = u8;
         type Input = u8;
         type Observation = u8;
@@ -663,8 +663,8 @@ fn stop_is_idempotent_and_rejects_new_input() {
 
 #[test]
 fn instance_identifiers_are_fresh_and_bounded() {
-    let first = fresh_source_instance_id();
-    let second = fresh_source_instance_id();
+    let first = new_source_instance_id();
+    let second = new_source_instance_id();
     assert_ne!(first, second);
     assert_eq!(first.len(), 48);
     assert!(first.bytes().all(|byte| byte.is_ascii_hexdigit()));
