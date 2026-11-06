@@ -945,6 +945,30 @@ async function runThemePreferenceTest(document: Document): Promise<void> {
 		throw new Error('Disposed theme service retained operating-system preference listeners');
 	if (rootStyle.getPropertyValue('--prctr-theme-menu-background'))
 		throw new Error('Disposed theme retained CSS variables');
+
+	// A nested owner on the same document hands back the outer owner's theme on disposal.
+	const outer = new BrowserThemeService(themeDocument, 'highContrastLight', {
+		density: 'compact',
+		motion: 'reduced',
+		transparency: 'reduced'
+	});
+	const outerTheme = themeDocument.documentElement.dataset.prctrTheme;
+	const outerBackdrop = rootStyle.getPropertyValue('--prctr-color-overlay-backdrop');
+	const nested = new BrowserThemeService(themeDocument, 'dark', {
+		density: 'default',
+		motion: 'full',
+		transparency: 'full'
+	});
+	nested.dispose();
+	if (
+		themeDocument.documentElement.dataset.prctrTheme !== outerTheme ||
+		themeDocument.documentElement.dataset.prctrDensity !== 'compact' ||
+		rootStyle.getPropertyValue('--prctr-color-overlay-backdrop') !== outerBackdrop
+	)
+		throw new Error('A nested theme owner erased the outer owner on disposal');
+	outer.dispose();
+	if (themeDocument.documentElement.dataset.prctrTheme !== undefined)
+		throw new Error('The outermost theme owner did not clear the root on disposal');
 	frame.remove();
 }
 
@@ -2002,10 +2026,12 @@ async function runSettingsModalContributionTest(document: Document): Promise<voi
 		release?.();
 		result.disposables.dispose();
 		document.body.replaceChildren(...originalNodes);
+		// The CSP blocks restoring an inline style attribute; the theme owners return the root styles on dispose.
 		for (const attribute of [...document.documentElement.attributes])
-			document.documentElement.removeAttribute(attribute.name);
+			if (attribute.name !== 'style')
+				document.documentElement.removeAttribute(attribute.name);
 		for (const [name, value] of originalAttributes)
-			document.documentElement.setAttribute(name, value);
+			if (name !== 'style') document.documentElement.setAttribute(name, value);
 	}
 }
 

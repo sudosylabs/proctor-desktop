@@ -41,6 +41,8 @@ export class BrowserThemeService extends Disposable {
 	readonly onDidChangePresentation: Event<void> = this.presentationChangeEmitter.event;
 	private currentTheme: ResolvedTheme;
 	private readonly themeStyleSheet: CSSStyleSheet | undefined;
+	/** The root presentation found at construction; disposal hands it back unchanged. */
+	private readonly previousRoot: RootPresentation;
 	private customizations: IColorCustomizations = {};
 	private tokenCustomizations: ITokenColorCustomizations = {};
 	private semanticCustomizations: ISemanticTokenColorCustomizations | undefined;
@@ -61,6 +63,7 @@ export class BrowserThemeService extends Disposable {
 		options: BrowserThemeServiceOptions = {}
 	) {
 		super();
+		this.previousRoot = captureRootPresentation(document.documentElement);
 		this.themeStyleSheet = document.defaultView ? new document.defaultView.CSSStyleSheet() : undefined;
 		if (this.themeStyleSheet) document.adoptedStyleSheets = [...document.adoptedStyleSheets, this.themeStyleSheet];
 		this._register({ dispose: () => { document.adoptedStyleSheets = document.adoptedStyleSheets.filter(sheet => sheet !== this.themeStyleSheet); } });
@@ -197,21 +200,62 @@ export class BrowserThemeService extends Disposable {
 	}
 
 	override dispose(): void {
-		const root = this.document.documentElement;
-		for (const definition of getDesignTokenDefinitions()) {
-			root.style.removeProperty(asCssVariableName(definition.id));
-		}
-		for (const variable of this.appliedColorVariables) root.style.removeProperty(variable);
+		// A nested owner, such as a test fixture on a shared document, must not erase the outer owner's theme.
+		const owned = [
+			...getDesignTokenDefinitions().map(definition => asCssVariableName(definition.id)),
+			...this.appliedColorVariables,
+			'color-scheme',
+			'zoom'
+		];
+		restoreRootPresentation(this.document.documentElement, this.previousRoot, owned);
 		this.appliedColorVariables.clear();
-		delete root.dataset.prctrThemeName;
-		delete root.dataset.prctrTheme;
-		delete root.dataset.prctrThemeContrast;
-		delete root.dataset.prctrDensity;
-		delete root.dataset.prctrMotion;
-		delete root.dataset.prctrTransparency;
-		delete root.dataset.prctrForcedColors;
-		root.style.removeProperty('color-scheme');
-		root.style.removeProperty('zoom');
 		super.dispose();
+	}
+}
+
+const ROOT_PRESENTATION_ATTRIBUTES = [
+	'data-prctr-theme-name',
+	'data-prctr-theme',
+	'data-prctr-theme-contrast',
+	'data-prctr-density',
+	'data-prctr-motion',
+	'data-prctr-transparency',
+	'data-prctr-forced-colors'
+] as const;
+
+interface RootPresentation {
+	/** Inline style properties present before this owner, with their values. */
+	readonly style: ReadonlyMap<string, string>;
+	readonly attributes: ReadonlyMap<string, string | null>;
+}
+
+function captureRootPresentation(root: HTMLElement): RootPresentation {
+	const style = new Map<string, string>();
+	for (let index = 0; index < root.style.length; index++) {
+		const property = root.style.item(index);
+		style.set(property, root.style.getPropertyValue(property));
+	}
+	return {
+		style,
+		attributes: new Map(ROOT_PRESENTATION_ATTRIBUTES.map(name => [name, root.getAttribute(name)]))
+	};
+}
+
+/** Puts back only what this owner wrote: its style properties and presentation attributes. */
+function restoreRootPresentation(root: HTMLElement, previous: RootPresentation, ownedProperties: readonly string[]): void {
+	for (const property of ownedProperties) {
+		const value = previous.style.get(property);
+		if (value === undefined) {
+			root.style.removeProperty(property);
+		} else {
+			root.style.setProperty(property, value);
+		}
+	}
+	for (const [name, value] of previous.attributes) {
+		if (value === null) {
+			root.removeAttribute(name);
+		} else {
+			root.setAttribute(name, value);
+		}
 	}
 }
