@@ -28,7 +28,8 @@ For shell composition, apply the accepted
 when mapping parts, shared edges, gutters, and layout sizing.
 
 For user-visible work, also load the design-system architecture and applicable
-product-UI, accessibility, design-system, and layout skills. The step is complete
+product-UI, accessibility, design-system, and layout skills. Write the code with
+[`write-workbench-code`](../write-workbench-code/SKILL.md). The step is complete
 when every domain state and action has one authority outside shell presentation.
 
 ## 2. Choose the window and owner

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Workbench Code"
+  short_description: "Write Proctor renderer code in VS Code's style"
+  default_prompt: "Use $write-workbench-code to write or review a Proctor view, control, service, or contribution."

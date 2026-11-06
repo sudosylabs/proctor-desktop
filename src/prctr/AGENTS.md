@@ -4,7 +4,9 @@ Placement, layers, environment folders, services, contributions, and entrypoints
 are owned by
 [`source-code-organization`](../../.agents/skills/source-code-organization/SKILL.md).
 Workbench mechanisms are owned by
-[`develop-workbench`](../../.agents/skills/develop-workbench/SKILL.md). The root
+[`develop-workbench`](../../.agents/skills/develop-workbench/SKILL.md). How
+renderer classes, services, and contributions are written is owned by
+[`write-workbench-code`](../../.agents/skills/write-workbench-code/SKILL.md). The root
 [`AGENTS.md`](../../AGENTS.md) holds the universal engineering rules.
 
 Lint and repository checks enforce part of this mechanically; passing them does

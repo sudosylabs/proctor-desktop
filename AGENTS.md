@@ -182,6 +182,9 @@ Use these repository skills when their trigger matches:
 - [`develop-workbench`](.agents/skills/develop-workbench/SKILL.md) when adding or
   reviewing a shell part, workbench item or pane, resolver, contribution,
   command, menu, keybinding, manifest, window, or secure transition behavior.
+- [`write-workbench-code`](.agents/skills/write-workbench-code/SKILL.md) when
+  writing or reviewing renderer TypeScript: views, panes, parts, controls,
+  workbench services, contributions, and their DOM, listeners, and lifecycle.
 - [`develop-attempt-workspace`](.agents/skills/develop-attempt-workspace/SKILL.md)
   when changing workspace identity, hierarchy, content, providers, working
   state, persistence, recovery, caching, reconciliation, or Exam Resource reads.

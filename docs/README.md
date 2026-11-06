@@ -86,7 +86,9 @@ contribution, and entrypoint rules.
 
 Use [`develop-workbench`](../.agents/skills/develop-workbench/SKILL.md) for
 workbench shell, item, pane, resolver, contribution, interaction, manifest,
-lifecycle, restoration, and composition changes.
+lifecycle, restoration, and composition changes. Use
+[`write-workbench-code`](../.agents/skills/write-workbench-code/SKILL.md) for how
+renderer classes, services, and contributions are written in VS Code's style.
 
 Use
 [`develop-attempt-workspace`](../.agents/skills/develop-attempt-workspace/SKILL.md)
