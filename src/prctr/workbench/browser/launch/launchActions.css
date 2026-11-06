@@ -1,0 +1,22 @@
+@layer workbench {
+	.prctr-launch-actions {
+		align-items: center;
+		border-block-start: var(--prctr-shape-stroke-default) solid
+			var(--prctr-color-border-default);
+		display: flex;
+		gap: var(--prctr-spacing-control-inline);
+		padding: var(--prctr-spacing-content-large) var(--prctr-spacing-region);
+	}
+
+	.prctr-launch-actions[hidden] {
+		display: none;
+	}
+
+	.prctr-launch-actions .prctr-launch-actions__secondary {
+		flex: none;
+	}
+
+	.prctr-launch-actions .prctr-launch-actions__primary {
+		flex: 1;
+	}
+}

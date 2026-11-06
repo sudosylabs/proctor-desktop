@@ -124,10 +124,12 @@ export async function verifyLaunchWindowScenario(root: string): Promise<void> {
 			})()`);
 		};
 		await waitForState('selectingServer');
-		assert.equal(nativeTheme.themeSource, 'dark');
-		assert.equal(
-			await contents.executeJavaScript('document.documentElement.dataset.prctrTheme'),
-			'dark'
+		// LaunchWindow releases any pinned scheme and follows the operating system.
+		assert.equal(nativeTheme.themeSource, 'system');
+		assert.ok(
+			['light', 'dark'].includes(
+				await contents.executeJavaScript('document.documentElement.dataset.prctrTheme')
+			)
 		);
 		await contents.executeJavaScript(
 			`document.querySelector('input').value = ${JSON.stringify(serverOrigin)}; document.querySelector('form').requestSubmit();`
@@ -136,15 +138,16 @@ export async function verifyLaunchWindowScenario(root: string): Promise<void> {
 		await verifyWindowChromeGeometry(contents);
 		const presentation = (await contents.executeJavaScript(`({
 			text: document.body.textContent,
-			canSignIn: !document.querySelector('.prctr-launch-window__actions button').disabled,
+			canSignIn: !document.querySelector('.prctr-launch-actions__primary').disabled,
 			focusedRole: document.activeElement?.getAttribute('role'),
 			hasNode: 'process' in globalThis || 'require' in globalThis
 		})`)) as { text: string; canSignIn: boolean; hasNode: boolean; focusedRole: string | null };
 		assert.ok(presentation.text.includes('Example University'));
 		assert.ok(presentation.text.includes('Development server'));
-		assert.ok(presentation.text.includes('Sign-in is not available in this build.'));
+		assert.ok(presentation.text.includes('Sign-in isn’t available in this build'));
 		assert.ok(!presentation.text.includes('Provider must stay private'));
-		assert.ok(!presentation.text.includes(serverOrigin));
+		// The confirmed Institution is shown with the address it was checked at.
+		assert.ok(presentation.text.includes(new URL(serverOrigin).origin));
 		assert.equal(presentation.canSignIn, false);
 		assert.equal(presentation.hasNode, false);
 		assert.equal(presentation.focusedRole, null);
@@ -202,7 +205,7 @@ export async function verifyLaunchWindowScenario(root: string): Promise<void> {
 		await verifyPrimaryButtonInteractionColors(contents);
 		writeFileSync(join(root, 'launch-maintenance.png'), (await contents.capturePage()).toPNG());
 		await contents.executeJavaScript(
-			"Array.from(document.querySelectorAll('button')).find(button => button.textContent === 'Change server').click()"
+			"Array.from(document.querySelectorAll('button')).find(button => button.textContent === 'Change').click()"
 		);
 		await waitForState('selectingServer');
 		assert.equal(
@@ -229,7 +232,7 @@ async function verifyPrimaryButtonInteractionColors(contents: WebContents): Prom
 		const { root } = await contents.debugger.sendCommand('DOM.getDocument');
 		const { nodeId } = await contents.debugger.sendCommand('DOM.querySelector', {
 			nodeId: root.nodeId,
-			selector: '.prctr-launch-window__primary button:not([hidden])'
+			selector: '.prctr-launch-actions__primary:not([hidden])'
 		});
 		assert.ok(nodeId > 0, 'A retryable state must have a visible primary action');
 		for (const scheme of ['light', 'dark'] as const) {
@@ -237,9 +240,9 @@ async function verifyPrimaryButtonInteractionColors(contents: WebContents): Prom
 				features: [{ name: 'prefers-color-scheme', value: scheme }]
 			});
 			for (const state of [
-				{ pseudo: [], token: 'color.interaction.accent' },
-				{ pseudo: ['hover'], token: 'color.interaction.accentHover' },
-				{ pseudo: ['hover', 'active'], token: 'color.interaction.accentActive' }
+				{ pseudo: [], token: 'color.brand.accent' },
+				{ pseudo: ['hover'], token: 'color.brand.accentHover' },
+				{ pseudo: ['hover', 'active'], token: 'color.brand.accentHover' }
 			] as const) {
 				await contents.debugger.sendCommand('CSS.forcePseudoState', {
 					nodeId,
@@ -247,7 +250,7 @@ async function verifyPrimaryButtonInteractionColors(contents: WebContents): Prom
 				});
 				const colors =
 					await contents.executeJavaScript(`new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(() => {
-					const button = document.querySelector('.prctr-launch-window__primary button:not([hidden])');
+					const button = document.querySelector('.prctr-launch-actions__primary:not([hidden])');
 					const style = getComputedStyle(button);
 					resolve({ background: style.backgroundColor, border: style.borderTopColor, foreground: style.color });
 				})))`);
@@ -263,7 +266,7 @@ async function verifyPrimaryButtonInteractionColors(contents: WebContents): Prom
 				);
 				assert.ok(
 					Color.Format.CSS.parse(colors.foreground)?.equals(
-						Color.Format.CSS.parseHex(theme.values['color.text.inverse'])!
+						Color.Format.CSS.parseHex(theme.values['color.brand.onAccent'])!
 					),
 					`${scheme} primary action must retain readable text`
 				);

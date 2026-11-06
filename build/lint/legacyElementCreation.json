@@ -2,7 +2,6 @@
   "src/prctr/base/browser/ui/menu/menuControl.ts",
   "src/prctr/editor/browser/view/renderedLinesDom.ts",
   "src/prctr/platform/theme/browser/semanticIcon.ts",
-  "src/prctr/workbench/browser/launchWindow.ts",
   "src/prctr/workbench/browser/overlayHost.ts",
   "src/prctr/workbench/browser/parts/notifications/notificationHover.ts",
   "src/prctr/workbench/browser/parts/notifications/notifications.ts",

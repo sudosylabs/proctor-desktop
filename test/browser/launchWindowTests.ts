@@ -3,7 +3,7 @@ import type {
 	LaunchIdentityClient
 } from '../../src/prctr/platform/identity/common/launchIdentity.ts';
 import { launchStates } from '../../src/prctr/platform/identity/common/launchIdentity.ts';
-import { bootstrapLaunchWindow } from '../../src/prctr/workbench/browser/launchWindow.ts';
+import { bootstrapLaunchWindow } from '../../src/prctr/workbench/browser/launch/launchWindow.ts';
 
 function check(value: unknown, message: string): asserts value {
 	if (!value) throw new Error(message);
@@ -19,8 +19,8 @@ export async function runLaunchWindowTests(
 	parent: HTMLElement = document.body
 ): Promise<void> {
 	const frame = document.createElement('iframe');
-	frame.style.width = '360px';
-	frame.style.height = '640px';
+	frame.style.width = '440px';
+	frame.style.height = '600px';
 	parent.append(frame);
 	const owner = frame.contentDocument!;
 	// Exercise the production stylesheet in a real browsing context.
@@ -67,6 +67,8 @@ export async function runLaunchWindowTests(
 		};
 		listener?.(projection);
 	};
+	let cancels = 0;
+	let reopens = 0;
 	const identity: LaunchIdentityClient = {
 		projection: async () => projection,
 		onDidChange: (accept) => {
@@ -92,8 +94,12 @@ export async function runLaunchWindowTests(
 		signIn: async () => {
 			throw new Error('No authorization owner');
 		},
-		cancel: async () => {},
-		reopenBrowser: async () => {}
+		cancel: async () => {
+			cancels++;
+		},
+		reopenBrowser: async () => {
+			reopens++;
+		}
 	};
 	const launch = await bootstrapLaunchWindow(owner, {
 		bootstrap: async () => ({
@@ -129,6 +135,22 @@ export async function runLaunchWindowTests(
 		identity,
 		exit: async () => {}
 	});
+	const counts = (): { cancels: number; reopens: number } => ({ cancels, reopens });
+	const view = owner.defaultView!;
+	const frameTick = (): Promise<void> =>
+		new Promise<void>((resolve) => view.requestAnimationFrame(() => resolve()));
+	const button = (text: string): HTMLButtonElement => {
+		const found = Array.from(owner.querySelectorAll('button')).find(
+			(element) => element.textContent === text
+		);
+		check(found, 'Missing Launch action: ' + text);
+		return found;
+	};
+	const painted = (element: Element): boolean => element.getBoundingClientRect().height > 0;
+	const announcer = (): HTMLElement =>
+		launch.element.querySelector<HTMLElement>('.prctr-launch-window__announcer')!;
+	const rows = (): HTMLElement[] =>
+		Array.from(launch.element.querySelectorAll<HTMLElement>('.prctr-launch-checks__row'));
 	try {
 		check(
 			launch.element.firstElementChild?.classList.contains('prctr-product-window-chrome') &&
@@ -144,97 +166,80 @@ export async function runLaunchWindowTests(
 			launch.element.firstElementChild?.getAttribute('data-fullscreen') === 'false',
 			'Launch window chrome did not track later native fullscreen changes'
 		);
-		const brand = owner.querySelector<HTMLElement>('.prctr-brand-lockup');
+
+		const heading = owner.querySelector('h1');
 		check(
-			brand?.getAttribute('aria-hidden') === 'true' &&
-				brand.querySelector('img')?.alt === '' &&
-				owner.querySelector('h1')?.getAttribute('aria-label') === 'Proctor',
-			'Launch lockup must supply the accessible product heading without repeated copy'
+			heading?.textContent === 'Proctor' &&
+				owner.querySelector('.prctr-launch-header__mark')?.getAttribute('aria-hidden') ===
+					'true',
+			'The header names the product once and keeps the mark decorative'
 		);
 		const input = owner.querySelector('input')!;
 		const form = owner.querySelector('form')!;
-		const action = (text: string): HTMLButtonElement => {
-			const button = Array.from(owner.querySelectorAll('button')).find(
-				(element) => element.textContent === text
-			);
-			check(button, 'Missing Launch action: ' + text);
-			return button;
-		};
 		check(owner.activeElement === input, 'Launch must focus server entry');
 		check(
 			!form.hidden && !owner.body.textContent?.includes('not-readiness'),
 			'Bootstrap origin must not imply verified readiness'
 		);
+		check(
+			rows().length === 4 && rows().every((row) => row.dataset.status === 'pending'),
+			'Server selection previews four pending checks'
+		);
+
 		input.value = 'example.edu';
-		form.requestSubmit();
+		button('Continue').click();
 		check(
 			selected === 'example.edu' && form.hidden,
-			'Server form must send one bounded selection intent'
+			'Continue must send one bounded selection intent'
+		);
+		check(view.getComputedStyle(form).display === 'none', 'The hidden form was made visible');
+		check(
+			owner.activeElement === button('Cancel'),
+			'A pending check moves focus to an available action, not hidden input or message text'
 		);
 		check(
-			owner.defaultView!.getComputedStyle(form).display === 'none',
-			'Hidden server form was made visible by the cascade'
-		);
-		check(
-			owner.activeElement === action('Change server'),
-			'Pending selection must focus the available action instead of hidden input or message text'
-		);
-		check(
-			!action('Change server').disabled &&
-				action('Change server').closest('[hidden]') === null,
-			'Changing server must remain available during a pending check'
-		);
-		check(
-			!owner.querySelector('footer') && !owner.body.textContent?.includes('Exit Proctor'),
-			'Native exit must not be repeated in the content'
+			rows()[0]?.dataset.status === 'active' &&
+				rows()
+					.slice(1)
+					.every((row) => row.dataset.status === 'pending'),
+			'Checking shows the first check running and the rest waiting'
 		);
 		const spinner = owner.querySelector<HTMLElement>(
 			'[data-prctr-semantic-icon="state.loading"]'
 		);
 		check(spinner, 'Server checks must show the loading glyph');
-		if (!owner.defaultView!.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-			await new Promise<void>((resolve) =>
-				owner.defaultView!.requestAnimationFrame(() => resolve())
-			);
-			const before = owner.defaultView!.getComputedStyle(spinner).transform;
-			await new Promise((resolve) => owner.defaultView!.setTimeout(resolve, 100));
+		if (!view.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			await frameTick();
+			const before = view.getComputedStyle(spinner).transform;
+			await new Promise((resolve) => view.setTimeout(resolve, 100));
 			check(
-				owner.defaultView!.getComputedStyle(spinner).transform !== before,
+				view.getComputedStyle(spinner).transform !== before,
 				'The loading spinner must visibly rotate while checking'
 			);
 		}
-		action('Change server').click();
+		button('Cancel').click();
 		await tick();
-		check(
-			!form.hidden && owner.activeElement === input,
-			'Changing server must restore input focus'
-		);
+		check(counts().cancels === 1, 'Cancel must reach the identity coordinator');
+		button('Change').click();
+		await tick();
+		check(!form.hidden && owner.activeElement === input, 'Change must restore input focus');
 		finish();
 		await tick();
+
 		publish('invalidServer');
+		const describedBy = input.getAttribute('aria-describedby') ?? '';
 		check(
 			input.getAttribute('aria-invalid') === 'true' &&
-				input.getAttribute('aria-describedby')?.includes('-error'),
-			'Invalid origin needs associated field error'
-		);
-		const feedback = owner.querySelector<HTMLElement>('.prctr-launch-window__feedback')!;
-		const feedbackMessage = owner.getElementById('prctr-launch-feedback-error')!;
-		check(
-			feedback.getBoundingClientRect().top >
-				action('Continue').getBoundingClientRect().bottom &&
-				feedbackMessage.getBoundingClientRect().height > 0 &&
-				input.getAttribute('aria-describedby')?.split(' ').includes(feedbackMessage.id) &&
-				!form.querySelector('.prctr-text-field__error')?.textContent,
-			'Invalid address feedback must appear once below Continue and remain associated with the field'
+				describedBy.split(' ').some((id) => owner.getElementById(id)?.textContent),
+			'An invalid address needs an associated field error'
 		);
 		check(
-			feedback.dataset.tone === 'error' &&
-				feedback
-					.querySelector('[data-prctr-semantic-icon="state.error"]')
-					?.getAttribute('aria-hidden') === 'true' &&
-				owner.defaultView!.getComputedStyle(feedback).textAlign === 'start',
-			'Errors need readable text and a decorative severity mark in the feedback surface'
+			announcer().textContent?.includes('without a path') &&
+				announcer().getAttribute('role') === 'status' &&
+				announcer().getAttribute('aria-atomic') === 'true',
+			'The invalid address is announced once through the window announcer'
 		);
+
 		const stale = projection;
 		publish('ready', {
 			origin: 'https://example.edu',
@@ -243,100 +248,83 @@ export async function runLaunchWindowTests(
 		});
 		check(
 			owner.querySelector('script') === null &&
-				launch.element.querySelector('.prctr-launch-window__server img') === null &&
-				launch.element.querySelector('.prctr-launch-window__administrator img') === null,
+				launch.element.querySelector(
+					'.prctr-launch-server img, .prctr-launch-status img'
+				) === null,
 			'Server text became markup'
 		);
 		check(
-			action('Sign in').disabled &&
-				action('Sign in').getAttribute('aria-label') ===
-					'Sign in to <img src=x onerror=alert(1)>',
-			'Unavailable auth owner must keep sign-in disabled'
-		);
-		check(
-			owner.body.textContent?.includes('Sign-in is not available in this build.'),
-			'Unwired auth must be explained'
-		);
-		check(
-			Array.from(
-				owner.querySelectorAll<HTMLButtonElement>("button[data-variant='primary']")
-			).filter((button) => button.getBoundingClientRect().height > 0).length === 1,
-			'Ready Launch state must expose one primary task action'
+			button('Sign in').disabled &&
+				owner.body.textContent?.includes('Sign-in isn’t available in this build'),
+			'A build without a sign-in owner explains itself and keeps sign-in disabled'
 		);
 		listener?.(stale);
 		check(
 			launch.element.dataset.state === 'ready',
 			'Stale projection replaced current readiness'
 		);
+
 		publish('ready', {
 			origin: 'https://example.edu',
 			institutionName: 'Example University',
 			canSignIn: true,
-			authorizationAvailable: true
+			authorizationAvailable: true,
+			build: { release: '0.1.0', platform: 'windows' }
 		});
-		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-		const readyTask = launch.element.querySelector<HTMLElement>('main')!;
-		const readyPage = launch.element.querySelector<HTMLElement>('.prctr-launch-window__page')!;
-		const taskBounds = readyTask.getBoundingClientRect();
-		const pageBounds = readyPage.getBoundingClientRect();
+		await frameTick();
+		const signIn = button('Sign in to Example University');
 		check(
-			Math.abs(
-				taskBounds.top + taskBounds.height / 2 - pageBounds.top - pageBounds.height / 2
-			) <= 1,
-			'The entire brand and action group must be vertically centered'
+			!signIn.disabled &&
+				signIn.dataset.variant === 'brand' &&
+				signIn.getBoundingClientRect().height >= 40,
+			'Ready offers one large branded sign-in action'
 		);
 		check(
-			Math.abs(action('Sign in').getBoundingClientRect().width - 240) <= 1,
-			'The main launch action must retain its intended visual width'
+			Array.from(owner.querySelectorAll<HTMLButtonElement>('button[data-variant]')).filter(
+				(element) => painted(element)
+			).length === 1,
+			'Ready shows exactly one footer action'
 		);
 		check(
-			action('Sign in').getBoundingClientRect().height >= 40,
-			'The main launch action must use the large control size'
+			rows().every((row) => row.dataset.status === 'done') &&
+				owner.body.textContent?.includes('Proctor 0.1.0 · Windows') &&
+				owner.querySelector('.prctr-launch-header__version')?.textContent === '0.1.0',
+			'Ready marks every check done and names the build that was checked'
 		);
 		check(
-			!owner.body.textContent?.includes('https://example.edu') &&
-				!owner.body.textContent?.includes('Opens your browser'),
-			'The verified Institution should supply context without the origin or browser hint'
-		);
-		check(
-			action('Retry').getBoundingClientRect().height === 0,
-			'Ready state must not paint the hidden Retry action'
+			rows().every((row) => row.querySelector('.prctr-launch-checks__status')?.textContent),
+			'Every check carries a status word for screen readers'
 		);
 		check(
 			!launch.element.querySelector('.prctr-notifications-indicator, .prctr-notifications'),
 			'Launch must not mount the workbench notification UI'
 		);
-		const signInBounds = action('Sign in').getBoundingClientRect();
-		const changeBounds = action('Change server').getBoundingClientRect();
 		check(
-			action('Change server').dataset.variant === 'secondary' &&
-				changeBounds.top > signInBounds.bottom &&
-				Math.abs(changeBounds.width - signInBounds.width) <= 1,
-			'Change server must be a compact muted button directly below Sign in'
-		);
-		check(
-			owner.defaultView!.getComputedStyle(launch.element.firstElementChild!)
-				.backgroundColor ===
-				owner.defaultView!.getComputedStyle(launch.element).backgroundColor,
+			view.getComputedStyle(launch.element.firstElementChild!).backgroundColor ===
+				view.getComputedStyle(launch.element).backgroundColor,
 			'Native chrome must blend into the window canvas'
 		);
-		check(
-			owner.querySelector<HTMLElement>('[role=status]')?.dataset.announcementOnly === 'true',
-			'Ready status must not repeat the sign-in action visually'
-		);
-		action('Sign in').focus();
-		action('Sign in').click();
+		signIn.focus();
+		signIn.click();
 		await tick();
 		check(
-			owner.querySelector('[role=alert]')?.textContent?.includes('could not be completed'),
-			'Failed sign-in must provide recoverable feedback'
+			painted(launch.element.querySelector('.prctr-launch-status__failure')!) &&
+				announcer().textContent?.includes('That didn’t work'),
+			'A failed action gives visible, announced, recoverable feedback'
 		);
-		check(
-			feedback.getBoundingClientRect().top >
-				action('Change server').getBoundingClientRect().bottom &&
-				feedback.dataset.announcementOnly === 'false',
-			'Action failures must paint below the action group'
-		);
+
+		publish('authorizing', {
+			origin: 'https://example.edu',
+			institutionName: 'Example University',
+			authorizationAvailable: true
+		});
+		button('Open the sign-in page again').click();
+		await tick();
+		check(counts().reopens === 1, 'The reopen link must reach the identity coordinator');
+		button('Cancel').click();
+		await tick();
+		check(counts().cancels === 2, 'Cancel during sign-in must reach the identity coordinator');
+
 		const ending = {
 			sequence: 1,
 			origin: 'https://example.edu',
@@ -354,11 +342,11 @@ export async function runLaunchWindowTests(
 			sessionOutcome: ending
 		});
 		check(
-			action('Retry').disabled && action('Change server').disabled,
+			button('Continue').disabled && !painted(button('Change')),
 			'Sign-out cleanup must settle before a new identity action'
 		);
 		check(
-			owner.querySelector('[role=status]')?.textContent === 'Signing out…',
+			announcer().textContent === 'Signing out…',
 			'Pending cleanup needs its own announcement'
 		);
 		publish('authorizationFailed', {
@@ -372,20 +360,16 @@ export async function runLaunchWindowTests(
 			}
 		});
 		check(
-			!action('Retry').disabled && !action('Change server').disabled,
+			!button('Continue').disabled && painted(button('Change')),
 			'Settled cleanup must restore recovery actions'
 		);
 		check(
 			owner
-				.querySelector('[role=status]')
-				?.textContent?.includes('Server sign-out could not be confirmed.'),
+				.querySelector('.prctr-launch-notice')
+				?.textContent?.includes('couldn’t confirm sign-out with the server'),
 			'A stale access token must never render successful remote sign-out'
 		);
-		check(
-			feedback.getBoundingClientRect().top >
-				action('Change server').getBoundingClientRect().bottom,
-			'Session cleanup feedback must stay below actions'
-		);
+
 		for (const state of launchStates) {
 			const selection = state === 'selectingServer' || state === 'invalidServer';
 			publish(
@@ -399,22 +383,12 @@ export async function runLaunchWindowTests(
 							canSignIn: state === 'ready'
 						}
 			);
+			check(launch.element.dataset.state === state, 'Missing rendered state: ' + state);
 			check(
-				launch.element.dataset.state === state,
-				'Missing rendered readiness state: ' + state
+				!painted(button('Change')) === selection,
+				'Change must only be offered after a server has been submitted: ' + state
 			);
-			check(
-				(action('Change server').closest('[hidden]') !== null) === selection,
-				'Change server must only be offered after a server has been submitted'
-			);
-			if (state !== 'ready' && state !== 'selectingServer') {
-				const lastAction = selection ? action('Continue') : action('Change server');
-				check(
-					feedback.getBoundingClientRect().top >
-						lastAction.getBoundingClientRect().bottom,
-					'Feedback must follow the actions in state: ' + state
-				);
-			}
+			check(rows().length === 4, 'Every state shows the four checks: ' + state);
 			const loading = owner.querySelector(
 				'[data-prctr-semantic-icon="state.loading"][data-prctr-icon-modifier="spin"]'
 			);
@@ -423,51 +397,45 @@ export async function runLaunchWindowTests(
 				'Spinner must follow pending work and stop for settled states: ' + state
 			);
 			check(
-				feedback.getAttribute('tabindex') === null &&
-					owner.querySelector('[role=status]')?.getAttribute('tabindex') === null,
-				'Message text must not become a focus target'
-			);
-			const status = owner.querySelector('[role=status]');
-			check(
-				status?.textContent && status.getAttribute('aria-atomic') === 'true',
-				'Readiness state needs an atomic announcement'
+				owner.querySelectorAll('[role=status], [role=alert], [aria-live]').length === 1,
+				'Exactly one live region announces state: ' + state
 			);
 		}
+
 		publish('maintenance', {
 			origin: 'http://localhost:8080',
 			institutionName: 'Long Institution '.repeat(20),
-			administratorMessage: 'Please retry after maintenance.',
+			administratorMessage: 'Please retry after maintenance. '.repeat(8),
 			developmentOrigin: true,
 			retryAt: Date.now() + 60000
 		});
 		check(
-			owner.body.textContent?.includes('Development server'),
+			painted(launch.element.querySelector('.prctr-launch-window__development')!),
 			'HTTP development selection must be visible'
 		);
 		check(
-			action('Retry').dataset.variant === 'primary',
-			'Retryable Launch state must promote Retry as its primary task action'
+			button('Retry').dataset.variant === 'brand',
+			'A retryable state promotes Retry as its primary action'
 		);
 		owner.documentElement.dir = 'rtl';
 		owner.documentElement.style.zoom = '2';
-		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+		await frameTick();
 		check(
 			owner.documentElement.scrollWidth <= owner.documentElement.clientWidth + 1,
-			'Launch surface overflows at narrow width and 200% zoom'
+			'Launch surface overflows at 200% zoom'
 		);
 		const scroller = launch.element.querySelector<HTMLElement>('.prctr-launch-window__page');
 		check(scroller !== null, 'Launch scroll container is missing');
 		const slider = launch.element.querySelector<HTMLElement>('.scrollbar.vertical > .slider');
 		check(slider !== null, 'Launch must use the admitted VS Code scrollbar');
 		check(
-			getComputedStyle(scroller).overflowY === 'hidden' &&
-				getComputedStyle(slider).borderRadius === '4px',
+			view.getComputedStyle(scroller).overflowY === 'hidden' &&
+				view.getComputedStyle(slider).borderRadius === '4px',
 			'Launch must use the shared rounded scrollbar without a native scrollbar'
 		);
 		scroller.scrollTop = scroller.scrollHeight;
-		await new Promise<void>((resolve) =>
-			requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-		);
+		await frameTick();
+		await frameTick();
 		check(scroller.scrollTop > 0, 'Long Launch state must remain vertically scrollable');
 		const bottomPosition = slider.getBoundingClientRect().top;
 		check(
@@ -476,33 +444,26 @@ export async function runLaunchWindowTests(
 			'Scrollbar must measure the zoomed content and viewport'
 		);
 		check(
-			action('Retry').getBoundingClientRect().bottom <=
-				scroller.getBoundingClientRect().bottom,
-			'Recovery action cannot be reached at 200% zoom'
+			button('Retry').getBoundingClientRect().bottom <= view.innerHeight + 1,
+			'The footer action stays reachable at 200% zoom'
 		);
-		action('Retry').dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+		scroller.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
 		check(
 			scroller.scrollTop === 0 && slider.getBoundingClientRect().top < bottomPosition,
 			'Keyboard scrolling must move both the page and the thumb'
 		);
-		action('Retry').focus();
-		await new Promise<void>((resolve) =>
-			requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-		);
-		check(
-			scroller.scrollTop > 0 &&
-				slider.getBoundingClientRect().top > scroller.getBoundingClientRect().top,
-			'Focus must reveal an off-screen action and synchronize the thumb'
-		);
-		const previousTop = scroller.scrollTop;
+		const previousTop = scroller.scrollHeight;
+		scroller.scrollTop = previousTop;
+		await frameTick();
+		const scrolledTop = scroller.scrollTop;
 		const wheel = new WheelEvent('wheel', { deltaY: -100, bubbles: true, cancelable: true });
 		// Chromium's synthetic event leaves the legacy delta with the modern sign.
 		// Match real wheel input, which supplies opposite signs for these two fields.
 		Object.defineProperty(wheel, 'wheelDeltaY', { value: 120 });
 		scroller.dispatchEvent(wheel);
 		check(
-			scroller.scrollTop < previousTop,
-			`Wheel input must scroll the Launch page (${previousTop} -> ${scroller.scrollTop})`
+			scroller.scrollTop < scrolledTop,
+			`Wheel input must scroll the Launch page (${scrolledTop} -> ${scroller.scrollTop})`
 		);
 	} finally {
 		launch.disposables.dispose();

@@ -1,0 +1,11 @@
+@layer workbench {
+	.prctr-launch-server-field {
+		display: grid;
+		margin: 0;
+		min-inline-size: 0;
+	}
+
+	.prctr-launch-server-field[hidden] {
+		display: none;
+	}
+}

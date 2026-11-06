@@ -26,9 +26,10 @@
       "upstreamBlob": "0fdeff4661587690d8a0ee478e1d6826ee422ee5",
       "category": "source",
       "disposition": "behaviorally-reimplemented",
-      "rationale": "Retain native activation, focus, enabled/busy state, intent events, icon composition, and lifecycle behind a smaller Proctor interface.",
+      "rationale": "Retain native activation, focus, enabled/busy state, intent events, icon composition, and lifecycle behind a smaller Proctor interface. Adds a Proctor brand variant for the one branded primary action on a surface.",
       "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/base/browser/ui/button/buttonControl.ts"
+      "localPath": "src/prctr/base/browser/ui/button/buttonControl.ts",
+      "localSha256": "0d4077f3c5754fb13956e0c428fdc5e623310177e7f1ae137a7ee92203d2bcbf"
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/inputbox/inputBox.ts",

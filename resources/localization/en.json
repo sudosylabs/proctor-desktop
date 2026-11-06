@@ -1727,137 +1727,312 @@
       "placeholders": [],
       "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
     },
-    "launch.auth.unavailable": {
-      "message": "Sign-in is not available in this build.",
-      "description": "Readiness is implemented but the hosted authentication owner is not connected.",
+    "launch.action.cancel": {
+      "message": "Cancel",
+      "description": "Stop the running check or sign-in.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.authorization.disabled": {
-      "message": "Desktop sign-in is not available on this server. Contact your Institution.",
-      "description": "Server has disabled desktop authorization.",
+    "launch.action.checkagain": {
+      "message": "Check again",
+      "description": "Run the readiness checks again after a version or sign-in problem.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.authorization.failed": {
-      "message": "Sign-in could not be completed. Retry to check this server again.",
-      "description": "Safe hosted authorization failure.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.authorization.failure.callbackinvalid": {
-      "message": "The sign-in response could not be verified. Try again.",
-      "description": "Bounded privileged sign-in failure shown below the action.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.authorization.failure.cancelled": {
-      "message": "Sign-in was cancelled.",
-      "description": "Bounded privileged sign-in failure shown below the action.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.authorization.failure.rejected": {
-      "message": "The server could not complete sign-in. Try again.",
-      "description": "Bounded privileged sign-in failure shown below the action.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.authorization.failure.storageunavailable": {
-      "message": "Proctor could not access secure key storage on this computer.",
-      "description": "Bounded privileged sign-in failure shown below the action.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.authorization.failure.timedout": {
-      "message": "Sign-in expired. Try again.",
-      "description": "Bounded privileged sign-in failure shown below the action.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.authorization.failure.unavailable": {
-      "message": "Sign-in is unavailable. Check your connection and try again.",
-      "description": "Bounded privileged sign-in failure shown below the action.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.authorization.failure.verificationrequired": {
-      "message": "Your saved sign-in could not be verified. Sign in again.",
-      "description": "Bounded privileged sign-in failure shown below the action.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.authorization.unsupported": {
-      "message": "This Proctor build does not support the server’s sign-in protocol. Contact your Institution.",
-      "description": "Desktop authorization protocol incompatibility.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.authorizing": {
-      "message": "Complete sign-in in your browser.",
-      "description": "Privileged hosted authorization is in progress.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.change.server": {
-      "message": "Change server",
-      "description": "Discard the selected server and cancel pending work.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.check": {
+    "launch.action.continue": {
       "message": "Continue",
-      "description": "Submit the Institution server for readiness checks.",
+      "description": "Check the entered server.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.checking": {
-      "message": "Checking server…",
-      "description": "Readiness check in progress.",
+    "launch.action.failed": {
+      "message": "That didn’t work. Please try again.",
+      "description": "A LaunchWindow action could not be completed.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.action.reopen": {
+      "message": "Open the sign-in page again",
+      "description": "Reopen the browser sign-in page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.action.retry": {
+      "message": "Retry",
+      "description": "Run the readiness checks again.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.action.signin": {
+      "message": "Sign in to {institution}",
+      "description": "Start browser sign-in for the confirmed Institution.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.action.signin.generic": {
+      "message": "Sign in",
+      "description": "Start browser sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.action.tryagain": {
+      "message": "Try again",
+      "description": "Start again after a failed sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.action.waiting": {
+      "message": "Waiting…",
+      "description": "Disabled primary action during browser sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.browser": {
+      "message": "Opens in your browser",
+      "description": "Sign-in check passed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.build": {
+      "message": "Proctor {release} · {platform}",
+      "description": "Version check passed.",
+      "placeholders": [
+        "release",
+        "platform"
+      ],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.cancelled": {
+      "message": "Cancelled",
+      "description": "Sign-in cancelled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.connecting": {
+      "message": "Connecting…",
+      "description": "Reach check in progress.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.expired": {
+      "message": "Expired",
+      "description": "Sign-in timed out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.identitychanged": {
+      "message": "Changed since last check",
+      "description": "Institution identity changed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.incompatible": {
+      "message": "Not compatible",
+      "description": "Build incompatible.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.keystorage": {
+      "message": "Key storage unavailable",
+      "description": "Secure key storage failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.maintenance": {
+      "message": "Under maintenance",
+      "description": "Server maintenance.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.methodunsupported": {
+      "message": "Method not supported",
+      "description": "Sign-in protocol unsupported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.noanswer": {
+      "message": "No answer",
+      "description": "Server request timed out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.noconnection": {
+      "message": "No connection",
+      "description": "Server unreachable.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.notinbuild": {
+      "message": "Not in this build",
+      "description": "This build has no sign-in owner.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.notproctor": {
+      "message": "Not a Proctor server",
+      "description": "Malformed readiness response.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.notverified": {
+      "message": "Response not verified",
+      "description": "Sign-in callback invalid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.otheraddress": {
+      "message": "Reports another address",
+      "description": "Canonical origin mismatch.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.platform": {
+      "message": "This computer isn’t allowed",
+      "description": "Platform not supported by the server.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.reached": {
+      "message": "Reached",
+      "description": "Reach check passed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.redirects": {
+      "message": "Redirects elsewhere",
+      "description": "Server redirected the request.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.rejected": {
+      "message": "Not accepted",
+      "description": "Server rejected sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.sessionnotverified": {
+      "message": "Sign in again",
+      "description": "Saved sign-in could not be verified.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.turnedoff": {
+      "message": "Turned off",
+      "description": "Desktop sign-in is disabled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.unavailable": {
+      "message": "Temporarily unavailable",
+      "description": "Server temporarily unavailable.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.update": {
+      "message": "Update required",
+      "description": "Build too old or revoked.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.detail.waiting": {
+      "message": "Waiting for your browser",
+      "description": "Browser sign-in in progress.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.institution": {
+      "message": "Confirm the institution",
+      "description": "Second check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.reach": {
+      "message": "Reach the server",
+      "description": "First readiness check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.signin": {
+      "message": "Desktop sign-in",
+      "description": "Fourth check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.status.active": {
+      "message": "In progress",
+      "description": "Status of a running check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.status.attention": {
+      "message": "Needs attention",
+      "description": "Status of a check that is not failed but blocks sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.status.done": {
+      "message": "Done",
+      "description": "Screen-reader status of a passed check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.status.failed": {
+      "message": "Failed",
+      "description": "Status of a failed check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.status.pending": {
+      "message": "Not started",
+      "description": "Status of a waiting check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.status.skipped": {
+      "message": "Skipped",
+      "description": "Status of a skipped check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.title": {
+      "message": "Checks",
+      "description": "Checklist heading once a server is selected.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.title.before": {
+      "message": "Before you sign in, Proctor checks",
+      "description": "Checklist heading before a server is entered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.checks.version": {
+      "message": "Check this version",
+      "description": "Third check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "launch.development": {
-      "message": "Development server · HTTP loopback connection",
-      "description": "Visible warning for explicitly enabled development-only HTTP.",
+      "message": "Development server · plain HTTP on this computer",
+      "description": "Strip shown when an explicitly enabled development server uses HTTP loopback.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.exit": {
-      "message": "Exit Proctor",
-      "description": "Exit the signed-out LaunchWindow.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+    "launch.institution.message": {
+      "message": "Message from {institution}",
+      "description": "Caption above a message written by the Institution.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.failed": {
-      "message": "The requested action could not be completed. Please try again.",
-      "description": "Safe failure for a LaunchWindow action.",
+    "launch.institution.message.generic": {
+      "message": "Message from your institution",
+      "description": "Caption above an Institution message when its name is unknown.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.identity.changed": {
-      "message": "This server’s Institution identity changed. Confirm the address with your Institution before retrying.",
-      "description": "Block an authorization handoff when the fresh check identifies a different Institution or installation.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.invalid.response": {
-      "message": "This server returned an unexpected response. Check the address or contact your Institution.",
-      "description": "Malformed public readiness response.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.invalid.server": {
-      "message": "Enter a server address using HTTPS, without a path, query, or sign-in details.",
-      "description": "Invalid server origin input.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.maintenance": {
-      "message": "This server is undergoing maintenance. Try again later or contact your Institution.",
-      "description": "Server maintenance status.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "launch.menu.application": {
       "message": "Proctor",
@@ -1942,153 +2117,385 @@
       "placeholders": [],
       "source": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
     },
-    "launch.origin.mismatch": {
-      "message": "The server identifies itself with a different address. Confirm the correct address with your Institution.",
-      "description": "Canonical server origin mismatch.",
+    "launch.product": {
+      "message": "Proctor",
+      "description": "Product name in the LaunchWindow header.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.ready": {
-      "message": "This server is ready for sign-in.",
-      "description": "Server passed both public readiness checks.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "launch.recovery": {
-      "message": "Proctor could not start the launch window safely.",
-      "description": "Minimal LaunchWindow startup recovery message.",
+      "message": "Proctor couldn’t open safely. Quit and open Proctor again.",
+      "description": "Shown when the LaunchWindow itself fails to start.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.redirect.blocked": {
-      "message": "This address redirects elsewhere. Enter the Institution’s server address directly.",
-      "description": "Server redirects are not followed.",
+    "launch.server.change": {
+      "message": "Change",
+      "description": "Choose a different server.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.retry": {
-      "message": "Retry",
-      "description": "Manually repeat both public readiness checks.",
+    "launch.server.change.label": {
+      "message": "Change server",
+      "description": "Accessible name of the Change action.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.retry.at": {
-      "message": "The server suggests trying again after {time}.",
-      "description": "Advisory server retry time, displayed in the user’s locale.",
-      "placeholders": [
-        "time"
-      ],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.selecting.server": {
-      "message": "Choose your Institution server to continue.",
-      "description": "Launch status before selecting a server.",
+    "launch.server.help": {
+      "message": "It’s in your exam instructions. You only enter it once.",
+      "description": "Help under the server address field.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.server.hint": {
-      "message": "Enter the server address provided by your Institution.",
-      "description": "Help for Institution server selection.",
+    "launch.server.invalid": {
+      "message": "Enter only the server address, like exams.your-school.edu, without a path or sign-in details.",
+      "description": "The server address is malformed or carries a path, query or credentials.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
-    },
-    "launch.server.incompatible": {
-      "message": "This Proctor build and server are not compatible. Contact your Institution for a supported version.",
-      "description": "Server and desktop compatibility failure.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "launch.server.label": {
       "message": "Institution server",
-      "description": "Label for the server address input.",
+      "description": "Label for the server address.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.session.cleanup.failed": {
-      "message": "Local sign-in cleanup and server sign-out could not be confirmed.",
-      "description": "Local capabilities are closed but neither cleanup outcome is confirmed.",
+    "launch.server.placeholder": {
+      "message": "exams.your-school.edu",
+      "description": "Example shown in the empty server address field.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.session.cleanup.unconfirmed": {
-      "message": "The server session ended, but local sign-in cleanup could not be confirmed.",
-      "description": "Server revocation succeeded but protected credential cleanup failed.",
+    "launch.server.unconfirmed": {
+      "message": "Institution not confirmed",
+      "description": "Shown under a server address before its Institution is confirmed.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.session.bothunconfirmed": {
+      "message": "Proctor couldn’t confirm sign-out on this computer or with the server.",
+      "description": "Neither cleanup outcome confirmed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.session.cleared": {
+      "message": "Signed out.",
+      "description": "Local and server sign-out confirmed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "launch.session.ending": {
       "message": "Signing out…",
-      "description": "Local access is closed while sign-out cleanup completes.",
+      "description": "Sign-out cleanup is finishing.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.session.revocation.unconfirmed": {
-      "message": "Signed out on this computer. Server sign-out could not be confirmed.",
-      "description": "Local cleanup succeeded but the remote Session revocation is unconfirmed.",
+    "launch.session.localunconfirmed": {
+      "message": "The server session ended, but Proctor couldn’t confirm cleanup on this computer.",
+      "description": "Local cleanup unconfirmed.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.session.signed.out": {
-      "message": "Signed out.",
-      "description": "Local credentials were removed and the server confirmed revocation.",
+    "launch.session.refreshfailed": {
+      "message": "Your session couldn’t be verified. Sign in again to continue.",
+      "description": "A refresh failed or was ambiguous.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.session.verification.required": {
-      "message": "Your session could not be verified. Sign in again.",
-      "description": "A refresh failed or its result is ambiguous; the Institution stays selected.",
+    "launch.session.remoteunconfirmed": {
+      "message": "Signed out on this computer. Proctor couldn’t confirm sign-out with the server.",
+      "description": "Server revocation unconfirmed.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.sign.in": {
-      "message": "Sign in to {institution}",
-      "description": "Start system-browser authentication for the verified Institution.",
+    "launch.status.authorizationdisabled": {
+      "message": "Desktop sign-in is turned off",
+      "description": "Server disabled desktop sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.authorizationdisabled.body": {
+      "message": "Your institution has turned off sign-in from Proctor. Contact them for help.",
+      "description": "Next step when sign-in is disabled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.authorizationunsupported": {
+      "message": "This version can’t use the server’s sign-in",
+      "description": "Sign-in protocol unsupported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.authorizationunsupported.body": {
+      "message": "Install the version of Proctor your institution approved.",
+      "description": "Next step when the sign-in protocol is unsupported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.authorizing": {
+      "message": "Finish signing in in your browser",
+      "description": "Browser sign-in in progress.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.authorizing.body": {
+      "message": "A sign-in page opened in your default browser. This window continues by itself when you’re done.",
+      "description": "Explains the browser hand-off.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.cancelled": {
+      "message": "Sign-in was cancelled",
+      "description": "Sign-in cancelled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.cancelled.body": {
+      "message": "Nothing was saved. Try again when you’re ready.",
+      "description": "Next step after cancelling.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.expired": {
+      "message": "Sign-in took too long",
+      "description": "Sign-in timed out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.expired.body": {
+      "message": "The sign-in page expired before you finished. Start again from this window.",
+      "description": "Next step after expiry.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.identitychanged": {
+      "message": "This server’s identity has changed",
+      "description": "Institution identity changed between checks.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.identitychanged.body": {
+      "message": "It no longer matches the institution you used before. Don’t sign in until your institution confirms the address.",
+      "description": "Next step after an identity change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.incompatible": {
+      "message": "This version doesn’t work with this server",
+      "description": "Build and server incompatible.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.incompatible.body": {
+      "message": "Ask your institution which version of Proctor to install.",
+      "description": "Next step when incompatible.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.invalidresponse": {
+      "message": "This doesn’t look like a Proctor server",
+      "description": "Malformed readiness response.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.invalidresponse.body": {
+      "message": "Check the address, or ask your institution for the correct one.",
+      "description": "Next step after a malformed response.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.keystorage": {
+      "message": "Proctor couldn’t use secure key storage",
+      "description": "Key storage failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.keystorage.body": {
+      "message": "Restart your computer and try again. If it keeps happening, contact your institution.",
+      "description": "Next step after a key storage failure.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.maintenance": {
+      "message": "{institution} is under maintenance",
+      "description": "Server maintenance with a known Institution.",
       "placeholders": [
         "institution"
       ],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.sign.in.generic": {
-      "message": "Sign in",
-      "description": "Compact sign-in action; the adjacent Institution supplies context.",
+    "launch.status.maintenance.body": {
+      "message": "Try again later, or contact your institution.",
+      "description": "Next step during maintenance.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.timed.out": {
-      "message": "The server isn’t responding. Check your connection and try again.",
-      "description": "Server request deadline elapsed.",
+    "launch.status.maintenance.generic": {
+      "message": "The server is under maintenance",
+      "description": "Server maintenance before the Institution is known.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.title": {
-      "message": "Proctor",
-      "description": "Accessible heading for the LaunchWindow brand lockup.",
+    "launch.status.notinbuild": {
+      "message": "Sign-in isn’t available in this build",
+      "description": "No sign-in owner is connected.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.unavailable": {
-      "message": "This server is temporarily unavailable. Try again later or contact your Institution.",
-      "description": "Coarse server unavailable status.",
+    "launch.status.notinbuild.body": {
+      "message": "Install the version of Proctor your institution provides.",
+      "description": "Next step when sign-in is missing from the build.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.unreachable": {
-      "message": "Couldn’t connect to the server. Check the address and your connection.",
-      "description": "Server request failed.",
+    "launch.status.notverified": {
+      "message": "Proctor couldn’t verify the sign-in",
+      "description": "Callback invalid.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.unsupported.target": {
-      "message": "This server does not support Proctor on this platform. Contact your Institution.",
-      "description": "Unsupported desktop platform or architecture.",
+    "launch.status.notverified.body": {
+      "message": "The response from your browser didn’t match this sign-in. Start again from this window.",
+      "description": "Next step after an invalid callback.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.update.required": {
-      "message": "This Proctor build cannot sign in. Install an approved update from your Institution.",
-      "description": "Server requires a different approved desktop build.",
+    "launch.status.originmismatch": {
+      "message": "The server reports a different address",
+      "description": "Canonical origin mismatch.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launchWindowMessages.ts"
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.originmismatch.body": {
+      "message": "Confirm the correct address with your institution before you continue.",
+      "description": "Next step after an origin mismatch.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.ready": {
+      "message": "Ready to sign in",
+      "description": "Every check passed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.ready.body": {
+      "message": "Sign-in continues in your browser. Proctor never asks for your password in this window.",
+      "description": "Explains browser sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.redirect": {
+      "message": "This address sends you somewhere else",
+      "description": "Server redirected.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.redirect.body": {
+      "message": "Enter your institution’s Proctor address directly. Proctor doesn’t follow redirects.",
+      "description": "Next step after a redirect.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.rejected": {
+      "message": "The server couldn’t complete sign-in",
+      "description": "Server rejected sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.rejected.body": {
+      "message": "Try again.",
+      "description": "Next step after rejection.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.retryafter": {
+      "message": "The server suggests trying again after {time}.",
+      "description": "Advisory server retry time, in the user’s locale.",
+      "placeholders": [
+        "time"
+      ],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.signinunavailable": {
+      "message": "Sign-in is unavailable",
+      "description": "Sign-in could not reach the server.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.signinunavailable.body": {
+      "message": "Check your connection and try again.",
+      "description": "Next step when sign-in is unavailable.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.timedout": {
+      "message": "The server isn’t responding",
+      "description": "Timed out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.timedout.body": {
+      "message": "It may be busy, or your connection may be slow. Retry in a moment.",
+      "description": "Next step after a timeout.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.unavailable": {
+      "message": "The server is temporarily unavailable",
+      "description": "Server temporarily unavailable.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.unavailable.body": {
+      "message": "Try again in a few minutes. If it keeps happening, contact your institution.",
+      "description": "Next step when the server is unavailable.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.unreachable": {
+      "message": "Couldn’t reach this server",
+      "description": "Unreachable.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.unreachable.body": {
+      "message": "Check the address and your internet connection, then retry.",
+      "description": "Next step when the server is unreachable.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.unsupportedtarget": {
+      "message": "This computer isn’t supported here",
+      "description": "Platform not supported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.unsupportedtarget.body": {
+      "message": "This server doesn’t allow Proctor on {platform}. Use a supported computer, or contact your institution.",
+      "description": "Next step when the platform is not supported.",
+      "placeholders": [
+        "platform"
+      ],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.updaterequired": {
+      "message": "This version of Proctor can’t sign in here",
+      "description": "Build must be updated.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.updaterequired.body": {
+      "message": "Install the update your institution approved, then open Proctor again.",
+      "description": "Next step when an update is required.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.version": {
+      "message": "Version {release}",
+      "description": "Accessible name for the version shown in the header.",
+      "placeholders": [
+        "release"
+      ],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "settings.accessibility.announcements.description": {
       "message": "Controls the detail of assistive announcements.",

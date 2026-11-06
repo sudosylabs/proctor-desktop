@@ -1,7 +1,7 @@
 import {
 	bootstrapLaunchWindow,
 	type LaunchRendererClient
-} from '../../workbench/browser/launchWindow.js';
+} from '../../workbench/browser/launch/launchWindow.js';
 
 const api = (globalThis as unknown as { readonly proctorLaunch?: LaunchRendererClient })
 	.proctorLaunch;

@@ -1,0 +1,46 @@
+@layer workbench {
+	.prctr-launch-notice {
+		align-items: flex-start;
+		background: var(--prctr-color-background-raised);
+		border-radius: var(--prctr-shape-radius-large);
+		display: flex;
+		font-size: var(--prctr-typography-label-size);
+		gap: var(--prctr-spacing-control-inline);
+		line-height: 20px;
+		margin: 0;
+		padding: var(--prctr-spacing-control-inline) var(--prctr-spacing-content-large);
+	}
+
+	.prctr-launch-notice[hidden] {
+		display: none;
+	}
+
+	.prctr-launch-notice .prctr-launch-notice__glyph {
+		align-items: center;
+		block-size: 20px;
+		display: inline-flex;
+		flex: none;
+	}
+
+	.prctr-launch-notice[data-tone='success'] .prctr-launch-notice__glyph {
+		color: var(--prctr-color-feedback-success);
+	}
+
+	.prctr-launch-notice[data-tone='attention'] .prctr-launch-notice__glyph {
+		color: var(--prctr-color-feedback-warning);
+	}
+
+	.prctr-launch-notice[data-tone='active'] .prctr-launch-notice__glyph {
+		color: var(--prctr-color-brand-mark);
+	}
+
+	@media (forced-colors: active) {
+		.prctr-launch-notice {
+			border: var(--prctr-shape-stroke-default) solid CanvasText;
+		}
+
+		.prctr-launch-notice .prctr-launch-notice__glyph {
+			color: CanvasText;
+		}
+	}
+}

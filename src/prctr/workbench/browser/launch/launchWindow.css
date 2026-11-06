@@ -1,0 +1,97 @@
+@layer workbench {
+	.prctr-launch-window {
+		background: var(--prctr-color-background-canvas);
+		block-size: 100%;
+		color: var(--prctr-color-text-primary);
+		display: grid;
+		font-family: var(--prctr-typography-font-application);
+		grid-template-rows: auto auto minmax(0, 1fr) auto;
+		inline-size: 100%;
+		overflow: hidden;
+	}
+
+	.prctr-launch-window .prctr-launch-window__titlebar {
+		inline-size: 100%;
+	}
+
+	/* Shown only for an explicitly enabled development server, so it can never pass for production. */
+	.prctr-launch-window .prctr-launch-window__development {
+		background: var(--prctr-color-feedback-warningBackground);
+		border-block: var(--prctr-shape-stroke-default) solid var(--prctr-color-feedback-warning);
+		color: var(--prctr-color-text-primary);
+		font-family: var(--prctr-typography-font-monospace);
+		font-size: var(--prctr-typography-label-small-size);
+		line-height: var(--prctr-typography-label-small-lineHeight);
+		margin: 0;
+		padding: var(--prctr-spacing-content-small) var(--prctr-spacing-region);
+		text-align: center;
+	}
+
+	.prctr-launch-window .prctr-launch-window__development[hidden] {
+		display: none;
+	}
+
+	.prctr-launch-window .prctr-launch-window__scrollable {
+		min-block-size: 0;
+		min-inline-size: 0;
+	}
+
+	.prctr-launch-window .prctr-launch-window__page {
+		block-size: 100%;
+		inline-size: 100%;
+		overflow: hidden;
+		overscroll-behavior: contain;
+	}
+
+	.prctr-launch-window .prctr-launch-window__content {
+		box-sizing: border-box;
+		display: grid;
+		gap: var(--prctr-spacing-region);
+		min-inline-size: 0;
+		padding: var(--prctr-spacing-control-inline) var(--prctr-spacing-region)
+			var(--prctr-spacing-region);
+	}
+
+	.prctr-launch-window .prctr-launch-window__announcer {
+		block-size: 1px;
+		clip-path: inset(50%);
+		inline-size: 1px;
+		overflow: hidden;
+		position: absolute;
+		white-space: nowrap;
+	}
+
+	/* A text action that reads as a link but is a real button. */
+	.prctr-launch-window .prctr-launch-link {
+		background: transparent;
+		border: 0;
+		border-radius: var(--prctr-shape-radius-small);
+		color: var(--prctr-color-brand-link);
+		cursor: pointer;
+		flex: none;
+		font: inherit;
+		font-size: var(--prctr-typography-label-size);
+		font-weight: var(--prctr-typography-weight-medium);
+		line-height: var(--prctr-typography-label-lineHeight);
+		min-block-size: 28px;
+		padding: 0 var(--prctr-spacing-content-small);
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+
+	.prctr-launch-window .prctr-launch-link[hidden] {
+		display: none;
+	}
+
+	.prctr-launch-window .prctr-launch-link:focus-visible {
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-launch-window .prctr-launch-link {
+			color: LinkText;
+		}
+	}
+}

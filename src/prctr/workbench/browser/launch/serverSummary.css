@@ -1,0 +1,40 @@
+@layer workbench {
+	.prctr-launch-server {
+		align-items: flex-start;
+		display: flex;
+		gap: var(--prctr-spacing-content-large);
+		min-inline-size: 0;
+	}
+
+	.prctr-launch-server[hidden] {
+		display: none;
+	}
+
+	.prctr-launch-server .prctr-launch-server__text {
+		display: grid;
+		flex: 1;
+		gap: var(--prctr-spacing-content-small);
+		min-inline-size: 0;
+	}
+
+	.prctr-launch-server .prctr-launch-server__title {
+		font-size: var(--prctr-typography-heading-medium-size);
+		font-weight: var(--prctr-typography-weight-semibold);
+		letter-spacing: -0.015em;
+		line-height: var(--prctr-typography-heading-medium-lineHeight);
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.prctr-launch-server .prctr-launch-server__subtitle {
+		color: var(--prctr-color-text-secondary);
+		font-size: var(--prctr-typography-label-small-size);
+		line-height: var(--prctr-typography-label-small-lineHeight);
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.prctr-launch-server .prctr-launch-server__subtitle[data-kind='address'] {
+		font-family: var(--prctr-typography-font-monospace);
+	}
+}

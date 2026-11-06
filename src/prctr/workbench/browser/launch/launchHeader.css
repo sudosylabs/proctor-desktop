@@ -1,0 +1,37 @@
+@layer workbench {
+	.prctr-launch-header {
+		align-items: center;
+		display: flex;
+		gap: var(--prctr-spacing-content-medium);
+		min-inline-size: 0;
+	}
+
+	.prctr-launch-header .prctr-launch-header__mark {
+		block-size: 22px;
+		color: var(--prctr-color-brand-mark);
+		flex: none;
+		inline-size: 22px;
+	}
+
+	.prctr-launch-header .prctr-launch-header__name {
+		font-size: var(--prctr-typography-heading-small-size);
+		font-weight: var(--prctr-typography-weight-medium);
+		letter-spacing: -0.01em;
+		line-height: var(--prctr-typography-heading-small-lineHeight);
+		margin: 0;
+	}
+
+	.prctr-launch-header .prctr-launch-header__version {
+		color: var(--prctr-color-text-secondary);
+		font-family: var(--prctr-typography-font-monospace);
+		font-size: var(--prctr-typography-label-small-size);
+		line-height: var(--prctr-typography-label-small-lineHeight);
+		margin-inline-start: auto;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-launch-header .prctr-launch-header__mark {
+			color: CanvasText;
+		}
+	}
+}

@@ -18,7 +18,7 @@ import {
 } from '../../src/prctr/workbench/browser/bootstrap.ts';
 import { authenticatedComposition } from '../../src/prctr/workbench/browser/authenticatedManifest.ts';
 import { candidateComposition } from '../../src/prctr/workbench/browser/candidateManifest.ts';
-import { bootstrapLaunchWindow } from '../../src/prctr/workbench/browser/launchWindow.ts';
+import { bootstrapLaunchWindow } from '../../src/prctr/workbench/browser/launch/launchWindow.ts';
 import { WorkbenchPaneHost } from '../../src/prctr/workbench/browser/paneHost.ts';
 import {
 	WorkbenchItemResolverRegistry,
@@ -495,17 +495,12 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 		launchSurface.closest('.prctr-workbench') !== null
 	)
 		throw new Error('Minimal LaunchWindow surface did not activate independently');
-	const launchActions = launchSurface.querySelectorAll<HTMLButtonElement>(
-		'.prctr-launch-window__actions button'
+	const signIn = launchSurface.querySelector<HTMLButtonElement>(
+		".prctr-launch-actions button[data-variant='brand']"
 	);
-	if (
-		launchActions.length !== 3 ||
-		launchActions[0]?.disabled ||
-		!launchActions[1]?.hidden ||
-		launchActions[2]?.dataset.variant !== 'secondary'
-	)
-		throw new Error('LaunchWindow did not render its executable actions');
-	launchActions[0]?.click();
+	if (signIn === null || signIn.disabled || signIn.hidden)
+		throw new Error('LaunchWindow did not render its executable sign-in action');
+	signIn.click();
 	await Promise.resolve();
 	await Promise.resolve();
 	if (signInCalls !== 1)

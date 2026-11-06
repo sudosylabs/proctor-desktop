@@ -1,0 +1,110 @@
+@layer workbench {
+	.prctr-launch-status {
+		display: grid;
+		gap: var(--prctr-spacing-control-inline);
+		min-inline-size: 0;
+	}
+
+	.prctr-launch-status[hidden] {
+		display: none;
+	}
+
+	.prctr-launch-status .prctr-launch-status__headline {
+		align-items: flex-start;
+		display: flex;
+		gap: var(--prctr-spacing-control-inline);
+	}
+
+	.prctr-launch-status .prctr-launch-status__glyph {
+		align-items: center;
+		block-size: var(--prctr-typography-body-lineHeight);
+		display: inline-flex;
+		flex: none;
+	}
+
+	.prctr-launch-status .prctr-launch-status__head {
+		font-size: var(--prctr-typography-body-size);
+		font-weight: var(--prctr-typography-weight-semibold);
+		line-height: var(--prctr-typography-body-lineHeight);
+		margin: 0;
+		text-wrap: pretty;
+	}
+
+	/* Indented to the headline text, past its glyph. */
+	.prctr-launch-status .prctr-launch-status__detail {
+		display: grid;
+		gap: var(--prctr-spacing-control-inline);
+		justify-items: start;
+		padding-inline-start: calc(
+			var(--prctr-icon-size-medium) + var(--prctr-spacing-control-inline)
+		);
+	}
+
+	.prctr-launch-status .prctr-launch-status__body {
+		color: var(--prctr-color-text-secondary);
+		font-size: var(--prctr-typography-label-size);
+		line-height: 20px;
+		margin: 0;
+		text-wrap: pretty;
+	}
+
+	.prctr-launch-status .prctr-launch-status__message {
+		background: var(--prctr-color-background-raised);
+		border-radius: var(--prctr-shape-radius-large);
+		display: grid;
+		gap: var(--prctr-spacing-content-small);
+		justify-self: stretch;
+		margin: 0;
+		padding: var(--prctr-spacing-content-large);
+	}
+
+	.prctr-launch-status .prctr-launch-status__caption {
+		color: var(--prctr-color-text-secondary);
+		font-size: var(--prctr-typography-label-small-size);
+		font-weight: var(--prctr-typography-weight-medium);
+		line-height: var(--prctr-typography-label-small-lineHeight);
+	}
+
+	.prctr-launch-status .prctr-launch-status__quote {
+		font-size: var(--prctr-typography-label-size);
+		line-height: 20px;
+		margin: 0;
+	}
+
+	.prctr-launch-status .prctr-launch-status__failure {
+		color: var(--prctr-color-feedback-error);
+		font-size: var(--prctr-typography-label-size);
+		line-height: var(--prctr-typography-label-lineHeight);
+		margin: 0;
+	}
+
+	.prctr-launch-status [hidden] {
+		display: none;
+	}
+
+	.prctr-launch-status[data-tone='success'] .prctr-launch-status__glyph {
+		color: var(--prctr-color-feedback-success);
+	}
+
+	.prctr-launch-status[data-tone='attention'] .prctr-launch-status__glyph {
+		color: var(--prctr-color-feedback-warning);
+	}
+
+	.prctr-launch-status[data-tone='failed'] .prctr-launch-status__glyph {
+		color: var(--prctr-color-feedback-error);
+	}
+
+	.prctr-launch-status[data-tone='active'] .prctr-launch-status__glyph {
+		color: var(--prctr-color-brand-mark);
+	}
+
+	@media (forced-colors: active) {
+		.prctr-launch-status .prctr-launch-status__glyph {
+			color: CanvasText;
+		}
+
+		.prctr-launch-status .prctr-launch-status__message {
+			border: var(--prctr-shape-stroke-default) solid CanvasText;
+		}
+	}
+}

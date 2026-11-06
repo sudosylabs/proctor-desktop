@@ -37,6 +37,18 @@
 		border-color: var(--prctr-theme-button-border, var(--prctr-theme-button-background));
 		color: var(--prctr-theme-button-foreground);
 	}
+	/* The one Proctor-branded primary action on a surface; follows color.brand.* in every theme. */
+	.prctr-button[data-variant='brand'] {
+		background: var(--prctr-color-brand-accent);
+		border-color: var(--prctr-color-brand-accent);
+		color: var(--prctr-color-brand-onAccent);
+		font-weight: var(--prctr-typography-weight-semibold);
+	}
+	.prctr-button[data-variant='brand']:hover:not(:disabled),
+	.prctr-button[data-variant='brand']:active:not(:disabled) {
+		background-color: var(--prctr-color-brand-accentHover);
+		border-color: var(--prctr-color-brand-accentHover);
+	}
 	.prctr-button[data-variant='secondary'] {
 		background: var(--prctr-theme-button-secondaryBackground);
 		border-color: var(

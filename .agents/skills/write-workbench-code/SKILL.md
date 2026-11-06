@@ -25,19 +25,28 @@ Read the closest upstream class first and keep it open while you write:
 Ported copies of these live under `src/prctr/` at the same relative paths; use
 `adapt-vscode` before copying more.
 
-Existing Proctor-authored renderer code is **not** precedent. Known debt to
-avoid copying:
+The in-repo reference is the LaunchWindow under
+`src/prctr/workbench/browser/launch/`, including its pure presentation model. New renderer code should read like it:
 
-- `workbench/browser/launchWindow.ts`: one long async function whose DOM,
-  state and handlers are closures. Write a class instead.
+- `launchWindow.ts`: the window's composition root. `bootstrapLaunchWindow`
+  builds a `ServiceCollection` and `InstantiationService`, and the `LaunchWindow`
+  class creates its views with `createInstance`, owns focus and announcements,
+  and renders one view model.
+- `launchIdentityService.ts`: a `createDecorator` service wrapping a preload
+  client, with events for changes and one-at-a-time intents.
+- `readinessChecklist.ts`, `serverSummary.ts`, `launchStatus.ts`,
+  `launchActions.ts`: views that build their DOM once and update it in `render`.
+- `launchPresentation.ts`: every state as a table entry, tested in Node without
+  a DOM.
+
+Other Proctor-authored renderer code is **not** precedent. Known debt to avoid
+copying:
+
 - `WorkbenchBootstrapContext.getService<T>('string-id')`: an untyped service
   locator. New code takes typed services in its constructor.
 - `base/browser/ui/button/buttonControl.ts`, `field/textField.ts` and the other
   `*Control.ts` files: several statements per line. Use their behavior, not their
   layout.
-
-The LaunchWindow rebuild is intended to become the in-repo reference. Once it
-lands, name its files here and imitate them.
 
 The step is complete when you can name the upstream class your code mirrors.
 

@@ -2208,8 +2208,8 @@
       "id": "launch-scrollbar-reuse",
       "summary": "LaunchWindow reuses the complete admitted DomScrollableElement with automatic vertical overlay visibility, a hidden horizontal axis, and no inset shadow on its continuous canvas. Viewport/content resize observations and DOM scroll synchronization preserve layout and focus reveal; owner keyboard handling provides page and arrow scrolling. Shared track stays transparent, interaction colors use dedicated Proctor tokens, and the Modern UI thumb rounding is always enabled. Launch still mounts no notification UI.",
       "localPaths": [
-        "src/prctr/workbench/browser/launchWindow.ts",
-        "src/prctr/workbench/browser/launchWindow.css",
+        "src/prctr/workbench/browser/launch/launchWindow.ts",
+        "src/prctr/workbench/browser/launch/launchWindow.css",
         "src/prctr/base/browser/ui/scrollbar/media/scrollbars.css",
         "src/prctr/base/browser/ui/scrollbar/media/scrollbarsModern.css"
       ],

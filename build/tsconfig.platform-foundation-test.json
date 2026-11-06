@@ -29,6 +29,7 @@
     "../test/workbench/services/actions/common/**/*.ts",
     "../test/workbench/services/keybinding/common/**/*.ts",
     "../test/workbench/common/**/*.ts",
+    "../test/workbench/browser/launch/**/*.ts",
     "../test/workbench/services/attemptWorkspace/common/**/*.ts",
     "../test/workbench/contrib/integratedBrowser/common/**/*.ts",
     "../test/workbench/services/examSecurity/**/*.test.ts",

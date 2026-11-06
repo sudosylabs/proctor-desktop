@@ -7,7 +7,7 @@
     "callers": [
       "src/prctr/code/electron-main/productWindowComposition.ts",
       "src/prctr/code/electron-browser/workbench.desktop.main.ts",
-      "src/prctr/workbench/browser/launchWindow.ts"
+      "src/prctr/workbench/browser/launch/launchWindow.ts"
     ],
     "interface": "src/prctr/platform/windows/common/windowCoordinator.ts",
     "decision": "docs/architecture/workbench.md"
@@ -240,10 +240,10 @@
     },
     {
       "id": "minimal-launch-window",
-      "summary": "LaunchWindow opens normally at a compact, resizable size and places its original Proctor lockup, verified Institution, quiet Change server action, and compact Sign in button in one centered group. The native drag region shares the canvas with no visible separator. Ready/form instructions remain accessible without duplicating visible copy. Proctor-owned native menus provide signed-out editing, zoom, window actions, safe connection diagnostics, and exit; the VS Code menubar implementation remains excluded.",
+      "summary": "LaunchWindow is a fixed 440x600 utility window that follows the operating-system color scheme. It shows the Proctor mark and version, the server field or the selected server with a quiet Change action, a four-step readiness checklist, one status message, and a footer with at most one secondary and one branded primary action. The native drag region shares the canvas with no visible separator. Proctor-owned native menus provide signed-out editing, zoom, window actions, safe connection diagnostics, and exit; the VS Code menubar implementation remains excluded.",
       "localPaths": [
-        "src/prctr/workbench/browser/launchWindow.ts",
-        "src/prctr/workbench/browser/launchWindow.css",
+        "src/prctr/workbench/browser/launch/launchWindow.ts",
+        "src/prctr/workbench/browser/launch/launchWindow.css",
         "src/prctr/code/electron-browser/launch.main.ts",
         "src/prctr/platform/windows/electron-main/launchWindowMenu.ts"
       ],

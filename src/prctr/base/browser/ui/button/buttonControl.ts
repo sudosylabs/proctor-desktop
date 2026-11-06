@@ -3,7 +3,7 @@ import { Disposable } from '../../../common/lifecycle.js';
 import { addDisposableListener } from '../../dom.js';
 import './buttonControl.css';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger';
+export type ButtonVariant = 'primary' | 'brand' | 'secondary' | 'danger';
 export type ButtonSize = 'default' | 'large';
 export interface ButtonIcon { readonly element: HTMLElement; dispose(): void }
 export interface ButtonState { readonly label: string; readonly accessibleLabel?: string; readonly disabled?: boolean; readonly busy?: boolean; readonly icon?: (document: Document) => ButtonIcon; }

@@ -319,10 +319,10 @@
       "upstreamBlob": "f8f02ab6152b64cfb667e5c11854fbfe0fb82185",
       "category": "style",
       "disposition": "adapted",
-      "rationale": "Text-button geometry, regular typography, secondary border fallback, hover colors, focus offset and disabled opacity on the existing native ButtonControl interface. The source Modern UI control-radius tier applies. Split/dropdown, markdown and short-label buttons remain in the already admitted source Button cluster; they are not selected by this interface.",
+      "rationale": "Text-button geometry, regular typography, secondary border fallback, hover colors, focus offset and disabled opacity on the existing native ButtonControl interface. The source Modern UI control-radius tier applies. Split/dropdown, markdown and short-label buttons remain in the already admitted source Button cluster; they are not selected by this interface. Adds a Proctor brand variant that follows the color.brand roles.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/browser/ui/button/buttonControl.css",
-      "localSha256": "5166c697f6237889d5b062c932685576133c349635df0b32cf76dfe4bfbba4e0",
+      "localSha256": "22c602de5492695e3ef52f570e0be8148fb363cea373dc1dce5850ddffa01e72",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
