@@ -1,8 +1,21 @@
 //! Security.framework owns persistent non-exportable P-256 keys. All CF references
 //! are scoped and released; external representation is requested only for the public key.
 #![allow(unsafe_code, non_upper_case_globals)]
-use std::{ffi::c_void, ptr, slice};
+use std::{
+    ffi::c_void,
+    ptr, slice,
+    sync::{Mutex, MutexGuard, PoisonError},
+};
 type Ref = *const c_void;
+// Keychain find-then-generate is not atomic: two concurrent creators would each
+// add a key under one tag. This serializes lookup, creation and deletion within
+// the process (all Node threads loading this addon). Cross-process creation is
+// not serialized here; the Electron main single-instance lock owns that.
+static CUSTODY: Mutex<()> = Mutex::new(());
+fn custody() -> MutexGuard<'static, ()> {
+    // The guard protects no data, so a panicked holder leaves nothing inconsistent.
+    CUSTODY.lock().unwrap_or_else(PoisonError::into_inner)
+}
 #[link(name = "CoreFoundation", kind = "framework")]
 unsafe extern "C" {
     fn CFRelease(value: Ref);
@@ -79,7 +92,7 @@ fn dict(entries: &[(Ref, Ref)]) -> Result<Owned, ()> {
     })
 }
 fn tag(scope: &str) -> Result<Owned, ()> {
-    let value = format!("org.proctor.desktop.key.v1.{scope}");
+    let value = format!("org.proctor.desktop.key.{scope}");
     Owned::new(unsafe {
         CFDataCreate(
             ptr::null(),
@@ -103,6 +116,7 @@ fn query(tag: &Owned, return_ref: bool) -> Result<Owned, ()> {
     }
 }
 fn key(scope: &str, create: bool) -> Result<Owned, ()> {
+    let _custody = custody();
     let tag = tag(scope)?;
     let query = query(&tag, true)?;
     let mut result = ptr::null();
@@ -228,6 +242,7 @@ fn p1363(der: &[u8]) -> Result<Vec<u8>, ()> {
     Ok(result)
 }
 pub fn delete(scope: &str) -> Result<(), ()> {
+    let _custody = custody();
     let tag = tag(scope)?;
     let query = query(&tag, false)?;
     match unsafe { SecItemDelete(query.0) } {

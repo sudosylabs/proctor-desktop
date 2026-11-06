@@ -556,13 +556,24 @@ fn baseline_factories(
     factories
 }
 
+/// Release builds must embed the packaged service identity (see
+/// `nativeServiceBuildEnvironment` in `build/lib/macosNativeServicePackage.ts`);
+/// only development builds may run without the macOS helper.
+#[cfg(all(target_os = "macos", not(debug_assertions)))]
+const MACOS_SERVICE_REQUIREMENT: Option<&str> = Some(env!(
+    "NATIVE_SERVICE_REQUIREMENT",
+    "release macOS builds require NATIVE_SERVICE_REQUIREMENT"
+));
+#[cfg(all(target_os = "macos", debug_assertions))]
+const MACOS_SERVICE_REQUIREMENT: Option<&str> = option_env!("NATIVE_SERVICE_REQUIREMENT");
+
 #[cfg(target_os = "macos")]
 fn with_packaged_macos_helper(factories: BaselineSourceFactories) -> BaselineSourceFactories {
     use native_protocol::{HelperSourceKind, PlatformFamily};
     use native_security_helper::{
         HELPER_BUILD_ID, MacOsServiceConnectionConfiguration, NativeHelperConnection,
     };
-    let Some(requirement) = option_env!("NATIVE_SERVICE_REQUIREMENT") else {
+    let Some(requirement) = MACOS_SERVICE_REQUIREMENT else {
         return factories;
     };
     // A configured package never falls back after peer or lifecycle failure.

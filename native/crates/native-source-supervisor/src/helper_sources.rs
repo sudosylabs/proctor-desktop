@@ -19,11 +19,12 @@ use native_source_runtime::{
     ensure_native_source_process_usable, fresh_source_instance_id, poison_native_source_process,
 };
 
-use super::{
-    BaselineSourceFactories, ErasedFactory, ErasedSource, NativeSourceBatch, NativeSourceKind,
-    NativeSourceSnapshot, RestartBoundary, SourceParameters, SourceStartFailure, SourceStopOutcome,
-    source_start_failure,
+use crate::erased::{
+    ErasedFactory, ErasedSource, RestartBoundary, SourceParameters, SourceStartFailure,
+    SourceStopOutcome, source_start_failure,
 };
+use crate::factories::BaselineSourceFactories;
+use crate::source::{NativeSourceBatch, NativeSourceKind, NativeSourceSnapshot};
 
 /// Authenticated helper connection owned by the supervisor's shared source group.
 /// Methods retain the transport's absolute deadlines and validated native fences.
