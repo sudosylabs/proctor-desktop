@@ -42,6 +42,17 @@ impl RestartPolicy {
             maximum_backoff,
         })
     }
+
+    /// Delay before the next restart: doubles with each attempt already made,
+    /// capped at the policy maximum.
+    pub(crate) fn backoff_after(self, attempts_made: u8) -> Duration {
+        let multiplier = 1_u32
+            .checked_shl(u32::from(attempts_made))
+            .unwrap_or(u32::MAX);
+        self.initial_backoff
+            .saturating_mul(multiplier)
+            .min(self.maximum_backoff)
+    }
 }
 
 impl Default for RestartPolicy {
@@ -107,13 +118,3 @@ impl fmt::Display for SupervisorConfigError {
 }
 
 impl std::error::Error for SupervisorConfigError {}
-
-pub(crate) fn restart_backoff(policy: RestartPolicy, attempts_made: u8) -> Duration {
-    let multiplier = 1_u32
-        .checked_shl(u32::from(attempts_made))
-        .unwrap_or(u32::MAX);
-    policy
-        .initial_backoff
-        .saturating_mul(multiplier)
-        .min(policy.maximum_backoff)
-}

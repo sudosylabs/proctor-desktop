@@ -8,7 +8,7 @@ use std::time::{Duration, Instant};
 use native_protocol::{SourceFailureCode, SourceHealth};
 use native_source_runtime::ensure_native_source_process_usable;
 
-use crate::config::{RestartPolicy, restart_backoff};
+use crate::config::RestartPolicy;
 use crate::erased::{ErasedFactory, ErasedSource, RestartBoundary, SourceParameters};
 use crate::open::{source_open_thread_name, validate_opened_source};
 use crate::source::{NativeSourceKind, NativeSourceSnapshot};
@@ -127,7 +127,7 @@ pub(crate) fn poll_active_source(
             });
         return PollControl::Continue;
     }
-    let retry_after = restart_backoff(policy, slot.restart_attempts);
+    let retry_after = policy.backoff_after(slot.restart_attempts);
     slot.lifecycle = SlotLifecycle::RestartPending {
         due_at: now.saturating_add(retry_after),
         previous_source_instance_id: previous_source_instance_id.clone(),
@@ -306,7 +306,7 @@ pub(crate) fn poll_restart_source(
                 });
         }
         Err(failure) => {
-            let retry_after = restart_backoff(policy, attempt);
+            let retry_after = policy.backoff_after(attempt);
             slot.lifecycle = SlotLifecycle::RestartPending {
                 due_at: now.saturating_add(retry_after),
                 previous_source_instance_id,

@@ -276,7 +276,7 @@ typed_source_factory!(
     DisplayTopologyBackend,
     DisplayTopologyError,
     DisplayTopologySource,
-    DisplaySource
+    DisplayTopologyAdapter
 );
 typed_source_factory!(
     /// Builds the candidate-window factory. The constructor runs again for
@@ -286,7 +286,7 @@ typed_source_factory!(
     CandidateWindowBackend,
     CandidateWindowError,
     CandidateWindowSource,
-    WindowSource
+    CandidateWindowAdapter
 );
 typed_source_factory!(
     /// Builds the capture-session factory. The constructor runs again for
@@ -296,7 +296,7 @@ typed_source_factory!(
     CaptureSessionBackend,
     CaptureSessionError,
     CaptureSessionSource,
-    SessionSource
+    CaptureSessionAdapter
 );
 typed_source_factory!(
     /// Builds the process-application factory. The constructor runs again for
@@ -306,7 +306,7 @@ typed_source_factory!(
     ProcessApplicationBackend,
     ProcessApplicationError,
     ProcessApplicationSource,
-    ProcessSource
+    ProcessApplicationAdapter
 );
 
 impl<W, F, B> ErasedFactory for PassiveStateFactory<W, F, B>
@@ -334,7 +334,7 @@ where
             None => PassiveStateSource::<W, B::Subscription>::open(&request, backend),
         }
         .map_err(|error| source_start_failure(error.failure_code()))?;
-        Ok(Box::new(PassiveSource(source)))
+        Ok(Box::new(PassiveStateAdapter(source)))
     }
 }
 
@@ -370,36 +370,36 @@ macro_rules! erased_source {
 }
 
 erased_source!(
-    DisplaySource,
+    DisplayTopologyAdapter,
     DisplayTopologySource,
     DisplayTopologySubscription,
     DisplayTopology
 );
 erased_source!(
-    WindowSource,
+    CandidateWindowAdapter,
     CandidateWindowSource,
     CandidateWindowSubscription,
     CandidateWindow
 );
 erased_source!(
-    SessionSource,
+    CaptureSessionAdapter,
     CaptureSessionSource,
     CaptureSessionSubscription,
     CaptureSession
 );
 erased_source!(
-    ProcessSource,
+    ProcessApplicationAdapter,
     ProcessApplicationSource,
     ProcessApplicationSubscription,
     ProcessApplication
 );
 
-struct PassiveSource<W, S>(PassiveStateSource<W, S>)
+struct PassiveStateAdapter<W, S>(PassiveStateSource<W, S>)
 where
     W: SupervisedPassiveStateWire,
     S: PassiveStateSubscription<W>;
 
-impl<W, S> ErasedSource for PassiveSource<W, S>
+impl<W, S> ErasedSource for PassiveStateAdapter<W, S>
 where
     W: SupervisedPassiveStateWire,
     S: PassiveStateSubscription<W> + Send,
