@@ -389,11 +389,13 @@ export async function runLaunchWindowTests(
 				'Change must only be offered after a server has been submitted: ' + state
 			);
 			check(rows().length === 4, 'Every state shows the four checks: ' + state);
-			const loading = owner.querySelector(
-				'[data-prctr-semantic-icon="state.loading"][data-prctr-icon-modifier="spin"]'
-			);
+			const loading = Array.from(
+				owner.querySelectorAll(
+					'[data-prctr-semantic-icon="state.loading"][data-prctr-icon-modifier="spin"]'
+				)
+			).some(painted);
 			check(
-				!!loading === ['checking', 'authorizing'].includes(state),
+				loading === ['checking', 'authorizing'].includes(state),
 				'Spinner must follow pending work and stop for settled states: ' + state
 			);
 			check(
