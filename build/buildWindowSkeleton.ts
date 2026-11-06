@@ -10,7 +10,7 @@ await Promise.all([
 		bundle: true,
 		entryPoints: { launch: 'src/prctr/code/electron-browser/launch.main.ts' },
 		format: 'esm',
-		loader: { '.svg': 'file', '.ttf': 'file' },
+		loader: { '.svg': 'file', '.ttf': 'file', '.woff': 'file', '.woff2': 'file' },
 		outdir,
 		platform: 'browser',
 		target: chromiumTarget,

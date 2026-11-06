@@ -47,20 +47,20 @@
       "upstreamBlob": "c9736ff355fa22791e95f12c9d38b2a26ece4832",
       "category": "source",
       "disposition": "behaviorally-reimplemented",
-      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window.",
+      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "aa64ae7cbaddbbf545448241527ce43c388e79821be26a1e5f83b00534bda67e"
+      "localSha256": "72c8708cd8019129d904ea96340a22ace9a0ef894c6633d8d010795d5fb5559b"
     },
     {
       "upstreamPath": "src/vs/platform/windows/electron-main/windows.ts",
       "upstreamBlob": "7c4f02efdfa374b2d8712f2892bc8c5b5e697064",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window.",
+      "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "aa64ae7cbaddbbf545448241527ce43c388e79821be26a1e5f83b00534bda67e",
+      "localSha256": "72c8708cd8019129d904ea96340a22ace9a0ef894c6633d8d010795d5fb5559b",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",

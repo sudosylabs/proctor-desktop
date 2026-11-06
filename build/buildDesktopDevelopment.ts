@@ -41,7 +41,13 @@ await Promise.all([
 			authenticated: 'src/prctr/code/electron-browser/authenticated.main.ts'
 		},
 		format: 'esm',
-		loader: { '.svg': 'file', '.ttf': 'file', '.png': 'file' },
+		loader: {
+			'.svg': 'file',
+			'.ttf': 'file',
+			'.woff': 'file',
+			'.woff2': 'file',
+			'.png': 'file'
+		},
 		plugins: [packagedEditorDependencies()],
 		outdir,
 		platform: 'browser',

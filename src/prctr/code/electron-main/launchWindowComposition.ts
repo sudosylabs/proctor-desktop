@@ -1,4 +1,3 @@
-import { nativeTheme } from 'electron';
 import {
 	DesktopIdentityCoordinator,
 	type DesktopIdentityCoordinatorOptions
@@ -28,8 +27,6 @@ export function createLaunchWindowComposition(options: LaunchWindowCompositionOp
 } {
 	if (options.window.production && options.allowDevelopmentLoopback)
 		throw new Error('Production LaunchWindow cannot enable development HTTP');
-	// Resolve the product default before native chrome and renderer media queries initialize.
-	nativeTheme.themeSource = 'dark';
 	const identity = new DesktopIdentityCoordinator({
 		target: options.target,
 		transport: new HttpServerReadinessTransport(),

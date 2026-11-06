@@ -24,7 +24,13 @@ await Promise.all([
 		entryPoints: { renderer: 'test/browser/rendererHarness.ts' },
 		format: 'esm',
 		logLevel: 'info',
-		loader: { '.svg': 'file', '.ttf': 'file', '.png': 'file' },
+		loader: {
+			'.svg': 'file',
+			'.ttf': 'file',
+			'.woff': 'file',
+			'.woff2': 'file',
+			'.png': 'file'
+		},
 		plugins: [packagedEditorDependencies()],
 		outdir: outputDirectory,
 		platform: 'browser',

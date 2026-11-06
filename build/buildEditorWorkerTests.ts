@@ -18,7 +18,13 @@ await Promise.all([
 		format: 'esm',
 		outdir,
 		platform: 'browser',
-		loader: { '.ttf': 'file', '.svg': 'file', '.png': 'file' },
+		loader: {
+			'.ttf': 'file',
+			'.woff': 'file',
+			'.woff2': 'file',
+			'.svg': 'file',
+			'.png': 'file'
+		},
 		plugins: [packagedEditorDependencies()],
 		target: chromiumTarget,
 		tsconfig: 'build/tsconfig.browser.json'

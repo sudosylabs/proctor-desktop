@@ -4,6 +4,7 @@
 
 import type { ITokenColorCustomizations, ISemanticTokenColorCustomizations } from '../common/workbenchThemeService.js';
 import { generateColorThemeCSS } from './colorThemeCss.js';
+import './applicationFonts.js';
 import { getThemingRegistry } from '../common/themeService.js';
 import { getColorRegistry } from '../common/colorRegistry.js';
 import { getSizeRegistry } from '../common/sizeRegistry.js';

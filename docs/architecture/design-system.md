@@ -138,7 +138,10 @@ Renderer CSS uses the namespaced `--prctr-theme-<color-id>` projection, with dot
 replaced by hyphens. Controls consume their actual roles, including Modern UI
 surface colors, rather than collapsing distinct surfaces into a shared palette.
 The Proctor semantic aliases remain the interface for
-product-specific feedback and non-color presentation. Native window controls
+product-specific feedback and non-color presentation. The `color.brand.*` roles
+carry the one Proctor accent through every bundled theme; they are reserved for
+the primary action, links, progress, and the product mark, and are registered
+with light, dark, and high-contrast defaults. Native window controls
 receive a closed, validated foreground/background projection. Native menus
 retain operating-system material and selection rendering.
 
@@ -195,9 +198,11 @@ required token behind a raw fallback.
 
 ## Foundation scales
 
-Application chrome uses the operating-system UI font. Monospace is reserved for
-code, terminals, logs, and data that requires alignment. Examination content
-uses controlled content roles and cannot override application chrome.
+Application chrome uses IBM Plex Sans, bundled with the application so every
+window renders the same face offline and matches the Proctor wordmark. IBM Plex
+Mono is reserved for code, terminals, logs, server addresses, and data that
+requires alignment. Both fall back to the operating-system stacks. Examination
+content uses controlled content roles and cannot override application chrome.
 
 | Typography role  | Font size / line height |
 | ---------------- | ----------------------- |
@@ -209,7 +214,7 @@ uses controlled content roles and cannot override application chrome.
 | `heading.medium` | 20px / 28px             |
 | `heading.large`  | 24px / 32px             |
 
-Use weights 400 and 600; weight alone cannot communicate state. Whole-window
+Use weights 400, 500 (medium, for quiet emphasis on labels and names) and 600; weight alone cannot communicate state. Whole-window
 zoom is the primary scaling mechanism, and layout must reflow rather than clip.
 
 The private spacing ramp is `0, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 64`

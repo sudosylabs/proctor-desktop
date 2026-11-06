@@ -39,6 +39,15 @@ const tokenDefinitions = [
 	},
 	{ id: 'color.text.inverse', kind: 'color', description: 'Text on an accent surface.' },
 	{ id: 'color.text.link', kind: 'color', description: 'Link text.' },
+	{ id: 'color.brand.accent', kind: 'color', description: 'Proctor primary action surface.' },
+	{
+		id: 'color.brand.accentHover',
+		kind: 'color',
+		description: 'Hovered Proctor primary action surface.'
+	},
+	{ id: 'color.brand.onAccent', kind: 'color', description: 'Text on the brand accent.' },
+	{ id: 'color.brand.link', kind: 'color', description: 'Proctor link text.' },
+	{ id: 'color.brand.mark', kind: 'color', description: 'Product mark and progress.' },
 	{ id: 'color.border.default', kind: 'color', description: 'Ordinary component boundary.' },
 	{ id: 'color.border.strong', kind: 'color', description: 'Emphasized component boundary.' },
 	{ id: 'color.border.focus', kind: 'color', description: 'Keyboard focus indicator.' },
@@ -105,7 +114,7 @@ const tokenDefinitions = [
 	{
 		id: 'typography.font.application',
 		kind: 'font-family',
-		description: 'Operating-system application font stack.'
+		description: 'Application font stack, led by the bundled IBM Plex Sans.'
 	},
 	{
 		id: 'typography.font.monospace',
@@ -163,6 +172,11 @@ const tokenDefinitions = [
 		description: 'Large heading line height.'
 	},
 	{ id: 'typography.weight.regular', kind: 'font-weight', description: 'Regular text weight.' },
+	{
+		id: 'typography.weight.medium',
+		kind: 'font-weight',
+		description: 'Labels and names that need quiet emphasis.'
+	},
 	{
 		id: 'typography.weight.semibold',
 		kind: 'font-weight',

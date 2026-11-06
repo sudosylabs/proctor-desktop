@@ -19,6 +19,7 @@ import { BUNDLED_THEMES, SCHEME_THEME_NAMES } from './bundledThemes.js';
 import { bundledThemeSnapshots } from './bundledThemeSnapshots.generated.js';
 import { getColorRegistry } from './colorRegistry.js';
 import './workbenchColors.js';
+import './colors/brandColors.js';
 import { normalizeColorCustomizations } from './colorCustomizations.js';
 import { ColorScheme, isDark, isHighContrast } from './theme.js';
 import { type DesignTokenId } from './tokens.js';
@@ -44,9 +45,10 @@ const foundations = {
 	'spacing.workbench.gutter': '4px',
 	'spacing.workbench.gap': '4px',
 	'spacing.workbench.rowInset': '4px',
-	'typography.font.application': '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+	'typography.font.application':
+		'"IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
 	'typography.font.monospace':
-		'ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace',
+		'"IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace',
 	'typography.label.small.size': '12px',
 	'typography.label.small.lineHeight': '16px',
 	'typography.label.size': '13px',
@@ -62,6 +64,7 @@ const foundations = {
 	'typography.heading.large.size': '24px',
 	'typography.heading.large.lineHeight': '32px',
 	'typography.weight.regular': '400',
+	'typography.weight.medium': '500',
 	'typography.weight.semibold': '600',
 	'spacing.control.inline': '8px',
 	'spacing.control.block': '6px',
@@ -97,6 +100,11 @@ const semanticColorRoles = {
 	'color.text.disabled': 'disabledForeground',
 	'color.text.inverse': 'button.foreground',
 	'color.text.link': 'textLink.foreground',
+	'color.brand.accent': 'proctor.brandAccent',
+	'color.brand.accentHover': 'proctor.brandAccentHover',
+	'color.brand.onAccent': 'proctor.brandAccentForeground',
+	'color.brand.link': 'proctor.brandLink',
+	'color.brand.mark': 'proctor.brandMark',
 	'color.border.default': 'surface.border',
 	'color.border.strong': 'surface.border',
 	'color.border.focus': 'focusBorder',

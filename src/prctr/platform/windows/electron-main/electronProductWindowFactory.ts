@@ -183,6 +183,8 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 	): ManagedProductWindow {
 		if (this.#options.production && descriptor.kind==='authenticated' && descriptor.developmentOrigin) throw new Error('Production windows cannot use development HTTP');
 		const channels = WINDOW_CHANNELS[descriptor.kind];
+		// Release any scheme a signed-in window pinned, so LaunchWindow opens in the system scheme.
+		if (descriptor.kind === 'launch') nativeTheme.themeSource = 'system';
 		const chromeEnvironment =
 			this.#options.windowChromeEnvironment ?? electronWindowChromeEnvironment();
 		const window = new BrowserWindow(
@@ -286,9 +288,15 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 			});
 			handled.push(intentChannel);
 			if (descriptor.kind !== 'candidate') {
+				// LaunchWindow follows the operating-system scheme, so it never pins the native theme.
+				const synchronizeTheme = descriptor.kind === 'launch'
+					? undefined
+					: (scheme: 'light' | 'dark') => {
+						nativeTheme.themeSource = scheme;
+					};
 				this.#windowChromeBridge = new ElectronWindowChromeBridge(
 					ipc,
-					{ window, contents: window.webContents, synchronizeTheme: scheme => { nativeTheme.themeSource = scheme; } },
+					{ window, contents: window.webContents, synchronizeTheme },
 					descriptor.kind,
 					resolveProductWindowChromeConfiguration(
 						chromeEnvironment.platform,

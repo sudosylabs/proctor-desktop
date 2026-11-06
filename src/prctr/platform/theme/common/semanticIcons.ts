@@ -40,6 +40,8 @@ const definitions = {
 	'state.error': Codicon.error,
 	'state.info': Codicon.info,
 	'state.loading': Codicon.loading,
+	'state.pending': Codicon.circleLargeOutline,
+	'state.skipped': Codicon.dash,
 	'state.success': Codicon.check,
 	'state.warning': Codicon.warning,
 	'workbench.browser': Codicon.browser,

@@ -17,7 +17,7 @@ await Promise.all([
 		bundle: true,
 		entryPoints: { renderer: 'test/browser/notificationsPreview.ts' },
 		format: 'esm',
-		loader: { '.ttf': 'file' },
+		loader: { '.ttf': 'file', '.woff': 'file', '.woff2': 'file' },
 		outdir,
 		platform: 'browser',
 		target: chromiumTarget,

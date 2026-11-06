@@ -1,4 +1,4 @@
-import { nativeTheme, shell, net, powerMonitor } from 'electron';
+import { shell, net, powerMonitor } from 'electron';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { DisposableStore } from '../../base/common/lifecycle.js';
@@ -40,7 +40,6 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 } {
 	if (options.window.production && options.allowDevelopmentLoopback)
 		throw new Error('Development HTTP is unavailable in production');
-	nativeTheme.themeSource = 'dark';
 	const owned = new DisposableStore();
 	try {
 		const localization = createLocalization({
