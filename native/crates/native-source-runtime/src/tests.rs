@@ -1,4 +1,21 @@
+use std::io;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+use std::sync::mpsc::{self, Receiver};
+use std::thread;
+use std::time::{Duration, Instant};
+
+use native_protocol::{
+    MAX_PROTOCOL_SAFE_INTEGER, PermissionState, PlatformFamily, ProtocolValidatable,
+    ProtocolValidationError, SequenceGap, SourceFailureCode, SourceHealth, SourceReset,
+    SourceTimestamp,
+};
+
 use super::*;
+use crate::bounded_read::read_bounded;
+use crate::deadline::{collect_bounded_task_result, run_bounded_source_stop_with};
+use crate::passive_state::{passive_state_drain, passive_state_stop_subscription};
+use crate::session::bounded_protocol_integer;
 
 #[test]
 fn bounded_reader_rejects_actual_content_past_the_limit() {
