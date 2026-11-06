@@ -12,6 +12,7 @@ import { Disposable } from '../../../base/common/lifecycle.js';
 import {
 	validateLaunchIdentityIntent,
 	validateLaunchIdentityProjection,
+	type LaunchBuild,
 	type LaunchIdentityProjection
 } from '../common/launchIdentity.js';
 import {
@@ -204,6 +205,10 @@ export class DesktopIdentityCoordinator extends Disposable {
 		return validateLaunchIdentityProjection({
 			...presentation,
 			revision,
+			build: {
+				release: this.#target.release,
+				platform: launchPlatform(this.#target.platform)
+			},
 			developmentOrigin: presentation.origin?.startsWith('http:') ?? false,
 			authorizationAvailable: this.options.authorization !== undefined,
 			canSignIn:
@@ -255,4 +260,10 @@ export class DesktopIdentityCoordinator extends Disposable {
 		this.#cancel();
 		super.dispose();
 	}
+}
+
+function launchPlatform(platform: string): LaunchBuild['platform'] {
+	if (platform === 'darwin') return 'macos';
+	if (platform === 'win32') return 'windows';
+	return 'linux';
 }

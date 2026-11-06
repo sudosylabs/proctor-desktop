@@ -81,10 +81,13 @@ void test('three product windows use isolated capability-specific preloads and l
 		}
 	}
 	assert.deepEqual(result.windowChromeOptions.darwin, {
-		width: 600,
-		height: 500,
-		minWidth: 360,
-		minHeight: 360,
+		width: 440,
+		height: 600,
+		minWidth: 440,
+		minHeight: 600,
+		fullscreenable: false,
+		maximizable: false,
+		resizable: false,
 		title: 'Proctor',
 		backgroundColor: '#0d1117',
 		titleBarStyle: 'hidden',

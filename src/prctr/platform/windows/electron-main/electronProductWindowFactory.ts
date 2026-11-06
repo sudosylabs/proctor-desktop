@@ -97,11 +97,14 @@ export function lockedBrowserWindowOptions(
 	);
 	const theme = getTheme(chromeEnvironment.initialTheme);
 	return {
-		width: candidate ? 1280 : launch ? 600 : 1180,
-		height: candidate ? 800 : launch ? 500 : 760,
-		minWidth: candidate ? undefined : launch ? 360 : 640,
-		minHeight: candidate ? undefined : launch ? 360 : 480,
-		...(launch ? { center: true, fullscreen: false } : {}),
+		width: candidate ? 1280 : launch ? 440 : 1180,
+		height: candidate ? 800 : launch ? 600 : 760,
+		minWidth: candidate ? undefined : launch ? 440 : 640,
+		minHeight: candidate ? undefined : launch ? 600 : 480,
+		// LaunchWindow is a fixed utility window; zoom reflows its content inside a scroll region.
+		...(launch
+			? { center: true, fullscreen: false, fullscreenable: false, maximizable: false, resizable: false }
+			: {}),
 		show: false,
 		autoHideMenuBar: true,
 		...(runtimeIconPath === undefined ? {} : { icon: runtimeIconPath }),

@@ -27,12 +27,19 @@ export const launchStates = [
 
 export type LaunchState = (typeof launchStates)[number];
 
+/** The running build, as the readiness check presents it; main supplies it from the release target. */
+export interface LaunchBuild {
+	readonly release: string;
+	readonly platform: 'macos' | 'windows' | 'linux';
+}
+
 export interface LaunchIdentityProjection {
 	readonly revision: number;
 	readonly state: LaunchState;
 	readonly origin?: string;
 	readonly institutionName?: string;
 	readonly developmentOrigin: boolean;
+	readonly build?: LaunchBuild;
 	readonly administratorMessage?: string;
 	/** Local-clock projection of the server-relative retry time; advisory, never an admission grant. */
 	readonly retryAt?: number;
@@ -138,6 +145,7 @@ export function validateLaunchIdentityProjection(value: unknown): LaunchIdentity
 	) {
 		throw new TypeError('Invalid LaunchWindow retry time');
 	}
+	const build = optionalBuild(value.build);
 	const reasons = [
 		'releaseTooOld',
 		'releaseTooNew',
@@ -169,6 +177,7 @@ export function validateLaunchIdentityProjection(value: unknown): LaunchIdentity
 						LaunchIdentityProjection['authorizationFailure']
 					>
 				}),
+		...(build === undefined ? {} : { build }),
 		...(origin === undefined ? {} : { origin }),
 		...(institutionName === undefined ? {} : { institutionName }),
 		...(administratorMessage === undefined ? {} : { administratorMessage }),
@@ -198,4 +207,17 @@ function optionalText(value: unknown, maximum: number): string | undefined {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function optionalBuild(value: unknown): LaunchBuild | undefined {
+	if (value === undefined) return undefined;
+	if (
+		!isRecord(value) ||
+		Object.keys(value).length !== 2 ||
+		typeof value.release !== 'string' ||
+		!/^[0-9A-Za-z.+-]{1,64}$/.test(value.release) ||
+		(value.platform !== 'macos' && value.platform !== 'windows' && value.platform !== 'linux')
+	)
+		throw new TypeError('Invalid LaunchWindow build');
+	return Object.freeze({ release: value.release, platform: value.platform });
 }

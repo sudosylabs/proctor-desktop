@@ -132,10 +132,12 @@ void test('server remains compatibility authority and unrelated discovery fields
 		assert.equal(projection.canSignIn, false);
 		assert.equal(projection.authorizationAvailable, false);
 		assert.ok(Object.isFrozen(projection));
+		assert.deepEqual(projection.build, { release: '1.2.3', platform: 'macos' });
 		assert.deepEqual(
 			Object.keys(projection).sort(),
 			[
 				'authorizationAvailable',
+				'build',
 				'canSignIn',
 				'developmentOrigin',
 				'institutionName',
@@ -443,6 +445,12 @@ void test('protocol validators enforce closed intents and strip arbitrary projec
 	assert.throws(() =>
 		validateLaunchIdentityProjection({ ...base, retryAt: Number.MAX_SAFE_INTEGER })
 	);
+	for (const build of [
+		{ release: '1.0.0', platform: 'darwin' },
+		{ release: '1.0.0 beta', platform: 'macos' },
+		{ release: '1.0.0', platform: 'macos', arch: 'arm64' }
+	])
+		assert.throws(() => validateLaunchIdentityProjection({ ...base, build }));
 });
 
 void test('HTTP adapter sends exactly the existing public selectors, omits credentials and never follows redirects', async (t) => {
