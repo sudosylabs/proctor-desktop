@@ -16,8 +16,8 @@ use native_source_runtime::{
 use std::mem::size_of;
 use std::time::Instant;
 use windows_sys::Win32::Foundation::{
-    CloseHandle, ERROR_ACCESS_DENIED, FILETIME, GetLastError, HANDLE, INVALID_HANDLE_VALUE,
-    WAIT_TIMEOUT,
+    CloseHandle, ERROR_ACCESS_DENIED, ERROR_INVALID_PARAMETER, FILETIME, GetLastError, HANDLE,
+    INVALID_HANDLE_VALUE, WAIT_OBJECT_0, WAIT_TIMEOUT,
 };
 use windows_sys::Win32::Security::{
     EqualSid, GetLengthSid, GetTokenInformation, IsValidSid, IsWellKnownSid, PSID, TOKEN_QUERY,
@@ -40,6 +40,8 @@ impl WindowsPinnedProcessInventory {
     /// before protected system processes would require impossible `OpenProcess`
     /// access. Only proven System/service accounts are excluded; unknown or
     /// unreadable candidate processes fail rather than silently disappearing.
+    /// A process proven to have exited after WTS enumeration is skipped: its
+    /// stop is reconciled from the lifecycle event stream, as on macOS.
     /// # Errors
     /// Permissions, churn, clock/deadline, inventory bounds or unproved cleanup
     /// prevent a successful capture. The caller must keep the verified session
@@ -121,7 +123,8 @@ impl WindowsProcessScopeBackend for WindowsPinnedProcessScope {
                 None,
                 Some(lifetime.creation_file_time),
                 deadline,
-            )
+            )?
+            .ok_or(WindowsLifecycleFailure::Backend)
         })
     }
 }
@@ -258,13 +261,17 @@ fn enumerate(
         if excluded_system_account(record.pUserSid)? {
             continue;
         }
-        capture.push(read_pinned_process(
+        // A PID that exited between WTS enumeration and pinning is not part
+        // of this capture; only proven exit is skipped, other failures stay fatal.
+        if let Some(fact) = read_pinned_process(
             record.ProcessId,
             record.SessionId,
             Some(record.pUserSid),
             None,
             deadline,
-        )?)?;
+        )? {
+            capture.push(fact)?;
+        }
     }
     Ok(capture)
 }
@@ -322,7 +329,7 @@ fn read_pinned_process(
     expected_sid: Option<PSID>,
     expected_creation: Option<u64>,
     deadline: Instant,
-) -> Result<WindowsInventoryFact, WindowsLifecycleFailure> {
+) -> Result<Option<WindowsInventoryFact>, WindowsLifecycleFailure> {
     // SAFETY: least-privilege query handle; no inheritance, mutation or content read.
     let raw = unsafe {
         OpenProcess(
@@ -332,7 +339,14 @@ fn read_pinned_process(
         )
     };
     if raw.is_null() {
-        return Err(last_error());
+        // SAFETY: read immediately after the failed OpenProcess call.
+        let error = unsafe { GetLastError() };
+        // A PID with no live process object (exited and fully released since
+        // enumeration) is rejected as an invalid parameter.
+        if error == ERROR_INVALID_PARAMETER {
+            return Ok(None);
+        }
+        return Err(failure_from(error));
     }
     let process = OwnedHandle::new(raw)?;
     let result = (|| {
@@ -341,7 +355,9 @@ fn read_pinned_process(
         if unsafe { GetProcessId(process.raw) } != process_id {
             return Err(WindowsLifecycleFailure::Backend);
         }
-        let creation_file_time = live_creation_time(process.raw)?;
+        let Some(creation_file_time) = live_creation_time(process.raw)? else {
+            return Ok(None);
+        };
         if expected_creation.is_some_and(|expected| expected != creation_file_time) {
             return Err(WindowsLifecycleFailure::Backend);
         }
@@ -391,17 +407,21 @@ fn read_pinned_process(
         })();
         let (session_id, account) = token.finish(queried)?;
         check_boundary(deadline)?;
-        if live_creation_time(process.raw)? != creation_file_time {
-            return Err(WindowsLifecycleFailure::Backend);
+        match live_creation_time(process.raw)? {
+            None => return Ok(None),
+            Some(current) if current != creation_file_time => {
+                return Err(WindowsLifecycleFailure::Backend);
+            }
+            Some(_) => {}
         }
-        Ok(WindowsInventoryFact {
+        Ok(Some(WindowsInventoryFact {
             lifetime: WindowsProcessLifetime {
                 process_id,
                 creation_file_time,
             },
             session_id,
             account,
-        })
+        }))
     })();
     process.finish(result)
 }
@@ -501,8 +521,11 @@ fn read_session(token: HANDLE) -> Result<u32, WindowsLifecycleFailure> {
     Ok(session)
 }
 
-fn live_creation_time(process: HANDLE) -> Result<u64, WindowsLifecycleFailure> {
-    require_alive(process)?;
+/// `None` means the pinned process has exited; it is not an error.
+fn live_creation_time(process: HANDLE) -> Result<Option<u64>, WindowsLifecycleFailure> {
+    if !is_alive(process)? {
+        return Ok(None);
+    }
     let mut creation = FILETIME::default();
     let mut exit = FILETIME::default();
     let mut kernel = FILETIME::default();
@@ -529,19 +552,19 @@ fn live_creation_time(process: HANDLE) -> Result<u64, WindowsLifecycleFailure> {
     if queried == 0 || identity == 0 {
         return Err(WindowsLifecycleFailure::Backend);
     }
-    require_alive(process)?;
-    Ok(identity)
+    Ok(is_alive(process)?.then_some(identity))
 }
 
-fn require_alive(process: HANDLE) -> Result<(), WindowsLifecycleFailure> {
+fn is_alive(process: HANDLE) -> Result<bool, WindowsLifecycleFailure> {
     // GetProcessTimes exit time is undefined for a live process. Instead observe
     // the pinned process object's signaled state without blocking or effects:
     // https://learn.microsoft.com/windows/win32/api/synchapi/nf-synchapi-waitforsingleobject
     // SAFETY: this owned process handle has SYNCHRONIZE access and remains live.
-    if unsafe { WaitForSingleObject(process, 0) } != WAIT_TIMEOUT {
-        return Err(WindowsLifecycleFailure::Backend);
+    match unsafe { WaitForSingleObject(process, 0) } {
+        WAIT_TIMEOUT => Ok(true),
+        WAIT_OBJECT_0 => Ok(false),
+        _ => Err(WindowsLifecycleFailure::Backend),
     }
-    Ok(())
 }
 
 fn clock() -> Result<i64, WindowsLifecycleFailure> {
@@ -561,7 +584,10 @@ fn check_boundary(deadline: Instant) -> Result<(), WindowsLifecycleFailure> {
 }
 fn last_error() -> WindowsLifecycleFailure {
     // SAFETY: caller invokes immediately after its failed Windows query.
-    if unsafe { GetLastError() } == ERROR_ACCESS_DENIED {
+    failure_from(unsafe { GetLastError() })
+}
+fn failure_from(error: u32) -> WindowsLifecycleFailure {
+    if error == ERROR_ACCESS_DENIED {
         WindowsLifecycleFailure::Permission
     } else {
         WindowsLifecycleFailure::Backend
@@ -648,7 +674,7 @@ mod tests {
         use windows_sys::Win32::System::Threading::{GetCurrentProcess, GetCurrentProcessId};
         // SAFETY: query-only pseudo-handle to this running test process.
         let process = unsafe { GetCurrentProcess() };
-        let creation = live_creation_time(process).unwrap();
+        let creation = live_creation_time(process).unwrap().unwrap();
         // SAFETY: scalar ID of this still-running test process.
         let pid = unsafe { GetCurrentProcessId() };
         let mut raw = std::ptr::null_mut();
@@ -661,7 +687,9 @@ mod tests {
         let session = read_session(token.raw).unwrap();
         token.finish(Ok(())).unwrap();
         let deadline = Instant::now() + Duration::from_secs(3);
-        let proved = read_pinned_process(pid, session, None, Some(creation), deadline).unwrap();
+        let proved = read_pinned_process(pid, session, None, Some(creation), deadline)
+            .unwrap()
+            .unwrap();
         assert!(
             proved.lifetime
                 == WindowsProcessLifetime {
