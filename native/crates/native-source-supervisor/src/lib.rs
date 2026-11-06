@@ -1027,6 +1027,20 @@ struct SourceStopOutcome {
     closed_input_boundary: bool,
 }
 
+impl SourceStopOutcome {
+    /// Outcome for a source that runs inside this process: it has no tail or
+    /// final snapshot beyond its last batch, and its input is closed only if
+    /// the process is still usable after the stop.
+    fn in_process(batch: NativeSourceBatch) -> Self {
+        Self {
+            preceding_batches: Vec::new(),
+            final_snapshot: None,
+            batch,
+            closed_input_boundary: ensure_native_source_process_usable().is_ok(),
+        }
+    }
+}
+
 impl<F, B> ErasedFactory for DisplayTopologyFactory<F, B>
 where
     F: FnMut() -> Result<B, DisplayTopologyError> + Send,
@@ -1168,121 +1182,61 @@ where
     }
 }
 
-struct DisplaySource<S: DisplayTopologySubscription>(DisplayTopologySource<S>);
+/// Wraps one capability's typed source so the supervisor can drive it through
+/// [`ErasedSource`]. The wrapper exists because the typed sources have inherent
+/// methods with the same names as the erased trait.
+macro_rules! erased_source {
+    ($wrapper:ident, $source:ident, $subscription:ident, $kind:ident) => {
+        struct $wrapper<S: $subscription>($source<S>);
 
-impl<S: DisplayTopologySubscription + Send> ErasedSource for DisplaySource<S> {
-    fn kind(&self) -> NativeSourceKind {
-        NativeSourceKind::DisplayTopology
-    }
+        impl<S: $subscription + Send> ErasedSource for $wrapper<S> {
+            fn kind(&self) -> NativeSourceKind {
+                NativeSourceKind::$kind
+            }
 
-    fn snapshot(&self) -> NativeSourceSnapshot {
-        NativeSourceSnapshot::DisplayTopology(self.0.snapshot().clone())
-    }
+            fn snapshot(&self) -> NativeSourceSnapshot {
+                NativeSourceSnapshot::$kind(self.0.snapshot().clone())
+            }
 
-    fn health(&self) -> SourceHealth {
-        self.0.health()
-    }
+            fn health(&self) -> SourceHealth {
+                self.0.health()
+            }
 
-    fn drain(&mut self) -> NativeSourceBatch {
-        NativeSourceBatch::DisplayTopology(self.0.drain())
-    }
+            fn drain(&mut self) -> NativeSourceBatch {
+                NativeSourceBatch::$kind(self.0.drain())
+            }
 
-    fn stop(&mut self) -> SourceStopOutcome {
-        SourceStopOutcome {
-            preceding_batches: Vec::new(),
-            final_snapshot: None,
-            batch: NativeSourceBatch::DisplayTopology(self.0.stop()),
-            closed_input_boundary: ensure_native_source_process_usable().is_ok(),
+            fn stop(&mut self) -> SourceStopOutcome {
+                SourceStopOutcome::in_process(NativeSourceBatch::$kind(self.0.stop()))
+            }
         }
-    }
+    };
 }
 
-struct WindowSource<S: CandidateWindowSubscription>(CandidateWindowSource<S>);
-
-impl<S: CandidateWindowSubscription + Send> ErasedSource for WindowSource<S> {
-    fn kind(&self) -> NativeSourceKind {
-        NativeSourceKind::CandidateWindow
-    }
-
-    fn snapshot(&self) -> NativeSourceSnapshot {
-        NativeSourceSnapshot::CandidateWindow(self.0.snapshot().clone())
-    }
-
-    fn health(&self) -> SourceHealth {
-        self.0.health()
-    }
-
-    fn drain(&mut self) -> NativeSourceBatch {
-        NativeSourceBatch::CandidateWindow(self.0.drain())
-    }
-
-    fn stop(&mut self) -> SourceStopOutcome {
-        SourceStopOutcome {
-            preceding_batches: Vec::new(),
-            final_snapshot: None,
-            batch: NativeSourceBatch::CandidateWindow(self.0.stop()),
-            closed_input_boundary: ensure_native_source_process_usable().is_ok(),
-        }
-    }
-}
-
-struct SessionSource<S: CaptureSessionSubscription>(CaptureSessionSource<S>);
-
-impl<S: CaptureSessionSubscription + Send> ErasedSource for SessionSource<S> {
-    fn kind(&self) -> NativeSourceKind {
-        NativeSourceKind::CaptureSession
-    }
-
-    fn snapshot(&self) -> NativeSourceSnapshot {
-        NativeSourceSnapshot::CaptureSession(self.0.snapshot().clone())
-    }
-
-    fn health(&self) -> SourceHealth {
-        self.0.health()
-    }
-
-    fn drain(&mut self) -> NativeSourceBatch {
-        NativeSourceBatch::CaptureSession(self.0.drain())
-    }
-
-    fn stop(&mut self) -> SourceStopOutcome {
-        SourceStopOutcome {
-            preceding_batches: Vec::new(),
-            final_snapshot: None,
-            batch: NativeSourceBatch::CaptureSession(self.0.stop()),
-            closed_input_boundary: ensure_native_source_process_usable().is_ok(),
-        }
-    }
-}
-
-struct ProcessSource<S: ProcessApplicationSubscription>(ProcessApplicationSource<S>);
-
-impl<S: ProcessApplicationSubscription + Send> ErasedSource for ProcessSource<S> {
-    fn kind(&self) -> NativeSourceKind {
-        NativeSourceKind::ProcessApplication
-    }
-
-    fn snapshot(&self) -> NativeSourceSnapshot {
-        NativeSourceSnapshot::ProcessApplication(self.0.snapshot().clone())
-    }
-
-    fn health(&self) -> SourceHealth {
-        self.0.health()
-    }
-
-    fn drain(&mut self) -> NativeSourceBatch {
-        NativeSourceBatch::ProcessApplication(self.0.drain())
-    }
-
-    fn stop(&mut self) -> SourceStopOutcome {
-        SourceStopOutcome {
-            preceding_batches: Vec::new(),
-            final_snapshot: None,
-            batch: NativeSourceBatch::ProcessApplication(self.0.stop()),
-            closed_input_boundary: ensure_native_source_process_usable().is_ok(),
-        }
-    }
-}
+erased_source!(
+    DisplaySource,
+    DisplayTopologySource,
+    DisplayTopologySubscription,
+    DisplayTopology
+);
+erased_source!(
+    WindowSource,
+    CandidateWindowSource,
+    CandidateWindowSubscription,
+    CandidateWindow
+);
+erased_source!(
+    SessionSource,
+    CaptureSessionSource,
+    CaptureSessionSubscription,
+    CaptureSession
+);
+erased_source!(
+    ProcessSource,
+    ProcessApplicationSource,
+    ProcessApplicationSubscription,
+    ProcessApplication
+);
 
 struct PassiveSource<W, S>(PassiveStateSource<W, S>)
 where
@@ -1311,12 +1265,7 @@ where
     }
 
     fn stop(&mut self) -> SourceStopOutcome {
-        SourceStopOutcome {
-            preceding_batches: Vec::new(),
-            final_snapshot: None,
-            batch: W::wrap_batch(self.0.stop()),
-            closed_input_boundary: ensure_native_source_process_usable().is_ok(),
-        }
+        SourceStopOutcome::in_process(W::wrap_batch(self.0.stop()))
     }
 }
 
