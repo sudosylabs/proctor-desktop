@@ -406,78 +406,8 @@ impl fmt::Display for SupervisorConfigError {
 
 impl std::error::Error for SupervisorConfigError {}
 
-pub struct DisplayTopologyFactory<F, B> {
-    make_backend: F,
-    backend: PhantomData<fn() -> B>,
-}
-
-#[must_use]
-pub fn display_topology_factory<F, B>(make_backend: F) -> DisplayTopologyFactory<F, B>
-where
-    F: FnMut() -> Result<B, DisplayTopologyError> + Send,
-    B: DisplayTopologyBackend + Send,
-    B::Subscription: Send,
-{
-    DisplayTopologyFactory {
-        make_backend,
-        backend: PhantomData,
-    }
-}
-
-pub struct CandidateWindowFactory<F, B> {
-    make_backend: F,
-    backend: PhantomData<fn() -> B>,
-}
-
-#[must_use]
-pub fn candidate_window_factory<F, B>(make_backend: F) -> CandidateWindowFactory<F, B>
-where
-    F: FnMut() -> Result<B, CandidateWindowError> + Send,
-    B: CandidateWindowBackend + Send,
-    B::Subscription: Send,
-{
-    CandidateWindowFactory {
-        make_backend,
-        backend: PhantomData,
-    }
-}
-
-pub struct CaptureSessionFactory<F, B> {
-    make_backend: F,
-    backend: PhantomData<fn() -> B>,
-}
-
-#[must_use]
-pub fn capture_session_factory<F, B>(make_backend: F) -> CaptureSessionFactory<F, B>
-where
-    F: FnMut() -> Result<B, CaptureSessionError> + Send,
-    B: CaptureSessionBackend + Send,
-    B::Subscription: Send,
-{
-    CaptureSessionFactory {
-        make_backend,
-        backend: PhantomData,
-    }
-}
-
-pub struct ProcessApplicationFactory<F, B> {
-    make_backend: F,
-    backend: PhantomData<fn() -> B>,
-}
-
-#[must_use]
-pub fn process_application_factory<F, B>(make_backend: F) -> ProcessApplicationFactory<F, B>
-where
-    F: FnMut() -> Result<B, ProcessApplicationError> + Send,
-    B: ProcessApplicationBackend + Send,
-    B::Subscription: Send,
-{
-    ProcessApplicationFactory {
-        make_backend,
-        backend: PhantomData,
-    }
-}
-
+/// A passive-state wire format the supervisor knows how to label and wrap into
+/// its source-neutral snapshot and batch enums.
 pub trait SupervisedPassiveStateWire: PassiveStateWire {
     const KIND: NativeSourceKind;
     fn wrap_snapshot(snapshot: Self::Snapshot) -> NativeSourceSnapshot;
@@ -526,11 +456,15 @@ supervised_passive_wire!(
 );
 supervised_passive_wire!(MediaDeviceWire, MediaDevice, MediaDevice, MediaDevice);
 
+/// Opens one passive-state source for wire format `W` from a caller-supplied
+/// backend constructor.
 pub struct PassiveStateFactory<W, F, B> {
     make_backend: F,
     wire: PhantomData<fn() -> (W, B)>,
 }
 
+/// Builds a passive-state factory for wire format `W`. The constructor runs
+/// again for every restart, so it must produce a fresh backend each time.
 #[must_use]
 pub fn passive_state_factory<W, F, B>(make_backend: F) -> PassiveStateFactory<W, F, B>
 where
@@ -1041,117 +975,105 @@ impl SourceStopOutcome {
     }
 }
 
-impl<F, B> ErasedFactory for DisplayTopologyFactory<F, B>
-where
-    F: FnMut() -> Result<B, DisplayTopologyError> + Send,
-    B: DisplayTopologyBackend + Send + 'static,
-    B::Subscription: Send + 'static,
-{
-    fn open(
-        &mut self,
-        parameters: &SourceParameters,
-        restart: Option<RestartBoundary>,
-    ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
-        let backend =
-            (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
-        let request = parameters.request();
-        let source = match restart {
-            Some(boundary) => DisplayTopologySource::open_after_reset(
-                &request,
-                backend,
-                boundary.missing_count,
-                boundary.reason.to_owned(),
-            ),
-            None => DisplayTopologySource::open(&request, backend),
+/// Declares the public factory for one capability with its own backend trait,
+/// and teaches the supervisor to open that capability fresh or after a restart
+/// boundary.
+macro_rules! typed_source_factory {
+    (
+        $(#[$doc:meta])*
+        $factory:ident, $constructor:ident,
+        $backend:ident, $error:ident, $source:ident, $wrapper:ident
+    ) => {
+        /// Opens one capability source from a caller-supplied backend constructor.
+        pub struct $factory<F, B> {
+            make_backend: F,
+            backend: PhantomData<fn() -> B>,
         }
-        .map_err(|error| source_start_failure(error.failure_code()))?;
-        Ok(Box::new(DisplaySource(source)))
-    }
+
+        $(#[$doc])*
+        #[must_use]
+        pub fn $constructor<F, B>(make_backend: F) -> $factory<F, B>
+        where
+            F: FnMut() -> Result<B, $error> + Send,
+            B: $backend + Send,
+            B::Subscription: Send,
+        {
+            $factory {
+                make_backend,
+                backend: PhantomData,
+            }
+        }
+
+        impl<F, B> ErasedFactory for $factory<F, B>
+        where
+            F: FnMut() -> Result<B, $error> + Send,
+            B: $backend + Send + 'static,
+            B::Subscription: Send + 'static,
+        {
+            fn open(
+                &mut self,
+                parameters: &SourceParameters,
+                restart: Option<RestartBoundary>,
+            ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
+                let backend = (self.make_backend)()
+                    .map_err(|error| source_start_failure(error.failure_code()))?;
+                let request = parameters.request();
+                let source = match restart {
+                    Some(boundary) => $source::open_after_reset(
+                        &request,
+                        backend,
+                        boundary.missing_count,
+                        boundary.reason.to_owned(),
+                    ),
+                    None => $source::open(&request, backend),
+                }
+                .map_err(|error| source_start_failure(error.failure_code()))?;
+                Ok(Box::new($wrapper(source)))
+            }
+        }
+    };
 }
 
-impl<F, B> ErasedFactory for CandidateWindowFactory<F, B>
-where
-    F: FnMut() -> Result<B, CandidateWindowError> + Send,
-    B: CandidateWindowBackend + Send + 'static,
-    B::Subscription: Send + 'static,
-{
-    fn open(
-        &mut self,
-        parameters: &SourceParameters,
-        restart: Option<RestartBoundary>,
-    ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
-        let backend =
-            (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
-        let request = parameters.request();
-        let source = match restart {
-            Some(boundary) => CandidateWindowSource::open_after_reset(
-                &request,
-                backend,
-                boundary.missing_count,
-                boundary.reason.to_owned(),
-            ),
-            None => CandidateWindowSource::open(&request, backend),
-        }
-        .map_err(|error| source_start_failure(error.failure_code()))?;
-        Ok(Box::new(WindowSource(source)))
-    }
-}
-
-impl<F, B> ErasedFactory for CaptureSessionFactory<F, B>
-where
-    F: FnMut() -> Result<B, CaptureSessionError> + Send,
-    B: CaptureSessionBackend + Send + 'static,
-    B::Subscription: Send + 'static,
-{
-    fn open(
-        &mut self,
-        parameters: &SourceParameters,
-        restart: Option<RestartBoundary>,
-    ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
-        let backend =
-            (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
-        let request = parameters.request();
-        let source = match restart {
-            Some(boundary) => CaptureSessionSource::open_after_reset(
-                &request,
-                backend,
-                boundary.missing_count,
-                boundary.reason.to_owned(),
-            ),
-            None => CaptureSessionSource::open(&request, backend),
-        }
-        .map_err(|error| source_start_failure(error.failure_code()))?;
-        Ok(Box::new(SessionSource(source)))
-    }
-}
-
-impl<F, B> ErasedFactory for ProcessApplicationFactory<F, B>
-where
-    F: FnMut() -> Result<B, ProcessApplicationError> + Send,
-    B: ProcessApplicationBackend + Send + 'static,
-    B::Subscription: Send + 'static,
-{
-    fn open(
-        &mut self,
-        parameters: &SourceParameters,
-        restart: Option<RestartBoundary>,
-    ) -> Result<Box<dyn ErasedSource>, SourceStartFailure> {
-        let backend =
-            (self.make_backend)().map_err(|error| source_start_failure(error.failure_code()))?;
-        let request = parameters.request();
-        let source = match restart {
-            Some(boundary) => ProcessApplicationSource::open_after_reset(
-                &request,
-                backend,
-                boundary.missing_count,
-                boundary.reason.to_owned(),
-            ),
-            None => ProcessApplicationSource::open(&request, backend),
-        }
-        .map_err(|error| source_start_failure(error.failure_code()))?;
-        Ok(Box::new(ProcessSource(source)))
-    }
-}
+typed_source_factory!(
+    /// Builds the display-topology factory. The constructor runs again for
+    /// every restart, so it must produce a fresh backend each time.
+    DisplayTopologyFactory,
+    display_topology_factory,
+    DisplayTopologyBackend,
+    DisplayTopologyError,
+    DisplayTopologySource,
+    DisplaySource
+);
+typed_source_factory!(
+    /// Builds the candidate-window factory. The constructor runs again for
+    /// every restart, so it must produce a fresh backend each time.
+    CandidateWindowFactory,
+    candidate_window_factory,
+    CandidateWindowBackend,
+    CandidateWindowError,
+    CandidateWindowSource,
+    WindowSource
+);
+typed_source_factory!(
+    /// Builds the capture-session factory. The constructor runs again for
+    /// every restart, so it must produce a fresh backend each time.
+    CaptureSessionFactory,
+    capture_session_factory,
+    CaptureSessionBackend,
+    CaptureSessionError,
+    CaptureSessionSource,
+    SessionSource
+);
+typed_source_factory!(
+    /// Builds the process-application factory. The constructor runs again for
+    /// every restart, so it must produce a fresh backend each time.
+    ProcessApplicationFactory,
+    process_application_factory,
+    ProcessApplicationBackend,
+    ProcessApplicationError,
+    ProcessApplicationSource,
+    ProcessSource
+);
 
 impl<W, F, B> ErasedFactory for PassiveStateFactory<W, F, B>
 where
