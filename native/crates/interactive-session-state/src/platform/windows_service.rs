@@ -221,11 +221,14 @@ unsafe extern "system" fn service_control(
                 dispatcher.failed.store(true, Ordering::Release);
                 return NO_ERROR;
             }
-            let Ok(source) = dispatcher.source.try_lock() else {
+            // The binding lock is held only for O(1) attach/detach that never
+            // calls into SCM, so waiting here is bounded and cannot re-enter.
+            // Contention is not failure; only a poisoned binding is permanent.
+            let Ok(source) = dispatcher.source.lock().map(|source| source.clone()) else {
                 dispatcher.failed.store(true, Ordering::Release);
                 return NO_ERROR;
             };
-            if let Some(source) = source.as_ref() {
+            if let Some(source) = source {
                 source.record(WindowsSessionNotification {
                     event_type,
                     session_id: notification.dwSessionId,
