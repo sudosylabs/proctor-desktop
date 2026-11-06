@@ -1,25 +1,60 @@
-use super::*;
-
 use std::cell::Cell;
 use std::collections::VecDeque;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 use std::sync::mpsc::{self, Receiver, SyncSender};
 use std::sync::{Arc, Mutex};
+use std::thread;
+use std::time::{Duration, Instant};
 
-use candidate_window_state::{CandidateWindowEmitter, OpenedCandidateWindowBackend};
-use capture_session_state::{CaptureSessionEmitter, OpenedCaptureSessionBackend};
-use display_topology::{DisplayTopologyEmitter, OpenedDisplayTopologyBackend, OpenedSourceHealth};
-use native_protocol::{
-    CandidateWindowBounds, CandidateWindowCertainty, CandidateWindowFocus,
-    CandidateWindowPlacement, CandidateWindowPresence, CandidateWindowState,
-    CandidateWindowVisibility, CaptureSessionActivity, CaptureSessionCertainty,
-    CaptureSessionSignal, CaptureSessionState, CaptureSessionSupport, DisplayTopologySnapshot,
-    PlatformFamily, ProcessApplicationCertainty, ProcessApplicationCoverage,
-    ProcessApplicationState, SequenceGap, SourceReset, SourceTimestamp, TopologyCertainty,
+use candidate_window_state::{
+    CandidateWindowBackend, CandidateWindowEmitter, CandidateWindowError,
+    CandidateWindowSubscription, OpenedCandidateWindowBackend,
 };
-use native_source_runtime::{SourceSessionMetadata, UnavailablePassiveStateBackend};
-use process_application_state::{OpenedProcessApplicationBackend, ProcessApplicationEmitter};
+use capture_session_state::{
+    CaptureSessionBackend, CaptureSessionEmitter, CaptureSessionError, CaptureSessionSubscription,
+    OpenedCaptureSessionBackend,
+};
+use clipboard_state::ClipboardWire;
+use display_topology::{
+    DisplayTopologyBackend, DisplayTopologyEmitter, DisplayTopologyError,
+    DisplayTopologySubscription, OpenedDisplayTopologyBackend, OpenedSourceHealth,
+};
+use interactive_session_state::InteractiveSessionWire;
+use media_device_state::MediaDeviceWire;
+use native_protocol::{
+    CandidateWindowBounds, CandidateWindowCertainty, CandidateWindowDrain, CandidateWindowFocus,
+    CandidateWindowPlacement, CandidateWindowPresence, CandidateWindowSourceSnapshot,
+    CandidateWindowState, CandidateWindowVisibility, CaptureSessionActivity,
+    CaptureSessionCertainty, CaptureSessionDrain, CaptureSessionSignal,
+    CaptureSessionSourceSnapshot, CaptureSessionState, CaptureSessionSupport, DisplayTopologyDrain,
+    DisplayTopologySnapshot, DisplayTopologySourceSnapshot, NATIVE_SOURCE_COUNT, PermissionState,
+    PlatformFamily, ProcessApplicationCertainty, ProcessApplicationCoverage,
+    ProcessApplicationDrain, ProcessApplicationSourceSnapshot, ProcessApplicationState,
+    SequenceGap, SourceFailureCode, SourceHealth, SourceReset, SourceTimestamp, TopologyCertainty,
+};
+use native_source_runtime::{
+    BoundedTaskError, SourceSessionMetadata, UnavailablePassiveStateBackend,
+};
+use network_configuration_state::NetworkConfigurationWire;
+use print_spooler_state::PrintSpoolerWire;
+use process_application_state::{
+    OpenedProcessApplicationBackend, ProcessApplicationBackend, ProcessApplicationEmitter,
+    ProcessApplicationError, ProcessApplicationSubscription,
+};
+use removable_storage_state::RemovableStorageWire;
+use virtualization_state::VirtualizationWire;
+
+use super::*;
+use crate::erased::{
+    ErasedFactory, ErasedSource, RestartBoundary, SourceParameters, SourceStartFailure,
+    SourceStopOutcome,
+};
+use crate::open::{
+    FactoryOpenOutcome, SOURCE_OPEN_DEADLINE, bounded_factory_open_with, validate_opened_source,
+};
+use crate::restart::{RESTART_BOUNDARY_MISSING_COUNT, RESTART_REASON};
+use crate::supervisor::{ProcessFence, SupervisorClock};
 
 struct TestDisplayBackend;
 struct TestDisplaySubscription;
