@@ -14,7 +14,7 @@ pub struct SequencedObservation<T> {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct QueuePushOutcome {
+pub(crate) struct QueuePushOutcome {
     pub sequence: u64,
     pub dropped: Option<SequenceGap>,
 }
@@ -37,7 +37,7 @@ impl fmt::Display for QueueError {
 impl std::error::Error for QueueError {}
 
 #[derive(Debug)]
-pub struct BoundedObservationQueue<T> {
+pub(crate) struct BoundedObservationQueue<T> {
     capacity: usize,
     next_sequence: u64,
     stopped: bool,
@@ -157,11 +157,6 @@ impl<T> BoundedObservationQueue<T> {
     #[must_use]
     pub fn len(&self) -> usize {
         self.observations.len()
-    }
-
-    #[must_use]
-    pub fn is_empty(&self) -> bool {
-        self.observations.is_empty()
     }
 }
 

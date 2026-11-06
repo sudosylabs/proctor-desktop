@@ -15,6 +15,7 @@ use super::*;
 use crate::bounded_read::read_bounded;
 use crate::deadline::{collect_bounded_task_result, run_bounded_source_stop_with};
 use crate::passive_state::{passive_state_drain, passive_state_stop_subscription};
+use crate::queue::BoundedObservationQueue;
 use crate::session::bounded_protocol_integer;
 
 #[test]

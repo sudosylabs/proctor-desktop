@@ -26,10 +26,10 @@ pub use passive_state::{
     OpenedPassiveStateBackend, PassiveStateBackend, PassiveStateEmitter, PassiveStateEventKind,
     PassiveStateSource, PassiveStateSourceError, PassiveStateSubscription, PassiveStateWire,
 };
-pub use queue::{BoundedObservationQueue, QueueError, QueuePushOutcome, SequencedObservation};
+pub use queue::{QueueError, SequencedObservation};
 pub use session::{
-    SourceClock, SourceModel, SourceResetPlan, SourceSession, SourceSessionDrain,
-    SourceSessionFact, SourceSessionMetadata, SourceStateChange, fresh_source_instance_id,
+    SourceModel, SourceResetPlan, SourceSession, SourceSessionDrain, SourceSessionFact,
+    SourceSessionMetadata, SourceStateChange, fresh_source_instance_id,
 };
 
 #[cfg(test)]

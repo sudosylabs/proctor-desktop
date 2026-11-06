@@ -18,7 +18,7 @@ static INSTANCE_COUNTER: AtomicU64 = AtomicU64::new(1);
 static INSTANCE_ENTROPY: LazyLock<RandomState> = LazyLock::new(RandomState::new);
 
 #[derive(Debug)]
-pub struct SourceClock {
+pub(crate) struct SourceClock {
     started_at: Instant,
 }
 
