@@ -4,6 +4,7 @@
 		border-block-start: var(--prctr-shape-stroke-default) solid
 			var(--prctr-color-border-default);
 		display: flex;
+		flex: none;
 		gap: var(--prctr-spacing-control-inline);
 		padding: var(--prctr-spacing-content-large) var(--prctr-spacing-region);
 	}

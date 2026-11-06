@@ -3,14 +3,16 @@
 		background: var(--prctr-color-background-canvas);
 		block-size: 100%;
 		color: var(--prctr-color-text-primary);
-		display: grid;
+		/* A column, so hiding the development strip never shifts the other regions. */
+		display: flex;
+		flex-direction: column;
 		font-family: var(--prctr-typography-font-application);
-		grid-template-rows: auto auto minmax(0, 1fr) auto;
 		inline-size: 100%;
 		overflow: hidden;
 	}
 
 	.prctr-launch-window .prctr-launch-window__titlebar {
+		flex: none;
 		inline-size: 100%;
 	}
 
@@ -32,6 +34,7 @@
 	}
 
 	.prctr-launch-window .prctr-launch-window__scrollable {
+		flex: 1 1 auto;
 		min-block-size: 0;
 		min-inline-size: 0;
 	}
