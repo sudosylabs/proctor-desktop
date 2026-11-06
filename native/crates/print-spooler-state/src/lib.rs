@@ -2,19 +2,17 @@
 
 mod platform;
 use native_protocol::{
-    PermissionState, PlatformFamily, PrintSpoolerCertainty, PrintSpoolerCoverage,
-    PrintSpoolerDrain, PrintSpoolerEvent, PrintSpoolerEventKind, PrintSpoolerObservation,
-    PrintSpoolerSourceSnapshot, PrintSpoolerState, SourceFailureCode, SourceHealth, SourceReset,
+    PrintSpoolerCertainty, PrintSpoolerCoverage, PrintSpoolerDrain, PrintSpoolerEvent,
+    PrintSpoolerEventKind, PrintSpoolerObservation, PrintSpoolerSourceSnapshot, PrintSpoolerState,
+    SourceHealth,
 };
+use native_source_runtime::PassiveStateWire;
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedPrintSpoolerBackend,
     PassiveStateBackend as PrintSpoolerBackend, PassiveStateEmitter as PrintSpoolerEmitter,
     PassiveStateSource as PrintSpoolerSource, PassiveStateSourceError as PrintSpoolerError,
     PassiveStateSubscription as PrintSpoolerSubscription,
     UnavailablePassiveStateSubscription as UnavailablePrintSpoolerSubscription,
-};
-use native_source_runtime::{
-    PassiveStateEventKind, PassiveStateWire, SequencedObservation, SourceSessionMetadata,
 };
 pub use platform::PlatformPrintSpoolerBackend;
 
@@ -45,60 +43,12 @@ impl PassiveStateWire for PrintSpoolerWire {
             unknown_job_count: 0,
         }
     }
-    fn event(kind: PassiveStateEventKind, state: Self::State) -> Self::Event {
-        PrintSpoolerEvent {
-            kind: match kind {
-                PassiveStateEventKind::Changed => PrintSpoolerEventKind::Changed,
-                PassiveStateEventKind::Reconciled => PrintSpoolerEventKind::Reconciled,
-            },
-            state,
-        }
-    }
-    fn snapshot(
-        metadata: SourceSessionMetadata,
-        platform: PlatformFamily,
-        permission: PermissionState,
-        adapter_version: &str,
-        state: Self::State,
-    ) -> Self::Snapshot {
-        PrintSpoolerSourceSnapshot {
-            source_instance_id: metadata.source_instance_id,
-            source_version: Self::SOURCE_VERSION.to_owned(),
-            adapter_version: adapter_version.to_owned(),
-            platform,
-            permission,
-            health: metadata.health,
-            sequence: 0,
-            observed_at: metadata.observed_at,
-            state,
-        }
-    }
-    fn observation(
-        source_instance_id: String,
-        fact: SequencedObservation<Self::Event>,
-    ) -> Self::Observation {
-        PrintSpoolerObservation {
-            source_instance_id,
-            sequence: fact.sequence,
-            observed_at: fact.observed_at,
-            gap: fact.gap,
-            event: fact.payload,
-        }
-    }
-    fn drain(
-        source_instance_id: String,
-        health: SourceHealth,
-        observations: Vec<Self::Observation>,
-        resets: Vec<SourceReset>,
-        terminal_error: Option<SourceFailureCode>,
-    ) -> Self::Drain {
-        PrintSpoolerDrain {
-            source_instance_id,
-            health,
-            observations,
-            resets,
-            terminal_error,
-        }
+    native_source_runtime::passive_state_constructors! {
+        event: PrintSpoolerEvent,
+        event_kind: PrintSpoolerEventKind,
+        snapshot: PrintSpoolerSourceSnapshot,
+        observation: PrintSpoolerObservation,
+        drain: PrintSpoolerDrain,
     }
 }
 

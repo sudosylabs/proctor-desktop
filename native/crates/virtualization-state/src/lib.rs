@@ -2,20 +2,17 @@
 
 mod platform;
 use native_protocol::{
-    PermissionState, PlatformFamily, SourceFailureCode, SourceHealth, SourceReset,
-    VirtualizationCertainty, VirtualizationClassification, VirtualizationCoverage,
+    SourceHealth, VirtualizationCertainty, VirtualizationClassification, VirtualizationCoverage,
     VirtualizationDrain, VirtualizationEvent, VirtualizationEventKind, VirtualizationObservation,
     VirtualizationSourceSnapshot, VirtualizationState,
 };
+use native_source_runtime::PassiveStateWire;
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedVirtualizationBackend,
     PassiveStateBackend as VirtualizationBackend, PassiveStateEmitter as VirtualizationEmitter,
     PassiveStateSource as VirtualizationSource, PassiveStateSourceError as VirtualizationError,
     PassiveStateSubscription as VirtualizationSubscription,
     UnavailablePassiveStateSubscription as UnavailableVirtualizationSubscription,
-};
-use native_source_runtime::{
-    PassiveStateEventKind, PassiveStateWire, SequencedObservation, SourceSessionMetadata,
 };
 pub use platform::PlatformVirtualizationBackend;
 
@@ -44,60 +41,12 @@ impl PassiveStateWire for VirtualizationWire {
             classification: VirtualizationClassification::Unknown,
         }
     }
-    fn event(kind: PassiveStateEventKind, state: Self::State) -> Self::Event {
-        VirtualizationEvent {
-            kind: match kind {
-                PassiveStateEventKind::Changed => VirtualizationEventKind::Changed,
-                PassiveStateEventKind::Reconciled => VirtualizationEventKind::Reconciled,
-            },
-            state,
-        }
-    }
-    fn snapshot(
-        metadata: SourceSessionMetadata,
-        platform: PlatformFamily,
-        permission: PermissionState,
-        adapter_version: &str,
-        state: Self::State,
-    ) -> Self::Snapshot {
-        VirtualizationSourceSnapshot {
-            source_instance_id: metadata.source_instance_id,
-            source_version: Self::SOURCE_VERSION.to_owned(),
-            adapter_version: adapter_version.to_owned(),
-            platform,
-            permission,
-            health: metadata.health,
-            sequence: 0,
-            observed_at: metadata.observed_at,
-            state,
-        }
-    }
-    fn observation(
-        source_instance_id: String,
-        fact: SequencedObservation<Self::Event>,
-    ) -> Self::Observation {
-        VirtualizationObservation {
-            source_instance_id,
-            sequence: fact.sequence,
-            observed_at: fact.observed_at,
-            gap: fact.gap,
-            event: fact.payload,
-        }
-    }
-    fn drain(
-        source_instance_id: String,
-        health: SourceHealth,
-        observations: Vec<Self::Observation>,
-        resets: Vec<SourceReset>,
-        terminal_error: Option<SourceFailureCode>,
-    ) -> Self::Drain {
-        VirtualizationDrain {
-            source_instance_id,
-            health,
-            observations,
-            resets,
-            terminal_error,
-        }
+    native_source_runtime::passive_state_constructors! {
+        event: VirtualizationEvent,
+        event_kind: VirtualizationEventKind,
+        snapshot: VirtualizationSourceSnapshot,
+        observation: VirtualizationObservation,
+        drain: VirtualizationDrain,
     }
 }
 

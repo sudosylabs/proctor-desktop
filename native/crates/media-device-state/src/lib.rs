@@ -4,18 +4,15 @@ mod platform;
 use native_protocol::{
     MediaConcurrentUse, MediaDeviceCertainty, MediaDeviceCoverage, MediaDeviceDrain,
     MediaDeviceEvent, MediaDeviceEventKind, MediaDeviceObservation, MediaDeviceSourceSnapshot,
-    MediaDeviceState, MediaEndpointReadiness, MediaEndpointState, PermissionState, PlatformFamily,
-    SourceFailureCode, SourceHealth, SourceReset,
+    MediaDeviceState, MediaEndpointReadiness, MediaEndpointState, PermissionState, SourceHealth,
 };
+use native_source_runtime::PassiveStateWire;
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedMediaDeviceBackend,
     PassiveStateBackend as MediaDeviceBackend, PassiveStateEmitter as MediaDeviceEmitter,
     PassiveStateSource as MediaDeviceSource, PassiveStateSourceError as MediaDeviceError,
     PassiveStateSubscription as MediaDeviceSubscription,
     UnavailablePassiveStateSubscription as UnavailableMediaDeviceSubscription,
-};
-use native_source_runtime::{
-    PassiveStateEventKind, PassiveStateWire, SequencedObservation, SourceSessionMetadata,
 };
 pub use platform::PlatformMediaDeviceBackend;
 
@@ -77,60 +74,13 @@ impl PassiveStateWire for MediaDeviceWire {
             microphone: unavailable_endpoint(),
         }
     }
-    fn event(kind: PassiveStateEventKind, state: Self::State) -> Self::Event {
-        MediaDeviceEvent {
-            kind: match kind {
-                PassiveStateEventKind::Changed => MediaDeviceEventKind::Changed,
-                PassiveStateEventKind::Reconciled => MediaDeviceEventKind::Reconciled,
-            },
-            state,
-        }
-    }
-    fn snapshot(
-        metadata: SourceSessionMetadata,
-        platform: PlatformFamily,
-        _permission: PermissionState,
-        adapter_version: &str,
-        state: Self::State,
-    ) -> Self::Snapshot {
-        MediaDeviceSourceSnapshot {
-            source_instance_id: metadata.source_instance_id,
-            source_version: Self::SOURCE_VERSION.to_owned(),
-            adapter_version: adapter_version.to_owned(),
-            platform,
-            permission: aggregate_permission(&state),
-            health: metadata.health,
-            sequence: 0,
-            observed_at: metadata.observed_at,
-            state,
-        }
-    }
-    fn observation(
-        source_instance_id: String,
-        fact: SequencedObservation<Self::Event>,
-    ) -> Self::Observation {
-        MediaDeviceObservation {
-            source_instance_id,
-            sequence: fact.sequence,
-            observed_at: fact.observed_at,
-            gap: fact.gap,
-            event: fact.payload,
-        }
-    }
-    fn drain(
-        source_instance_id: String,
-        health: SourceHealth,
-        observations: Vec<Self::Observation>,
-        resets: Vec<SourceReset>,
-        terminal_error: Option<SourceFailureCode>,
-    ) -> Self::Drain {
-        MediaDeviceDrain {
-            source_instance_id,
-            health,
-            observations,
-            resets,
-            terminal_error,
-        }
+    native_source_runtime::passive_state_constructors! {
+        event: MediaDeviceEvent,
+        event_kind: MediaDeviceEventKind,
+        snapshot: MediaDeviceSourceSnapshot,
+        observation: MediaDeviceObservation,
+        drain: MediaDeviceDrain,
+        permission: |state, _| aggregate_permission(state),
     }
 }
 

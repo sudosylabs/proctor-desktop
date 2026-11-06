@@ -98,6 +98,88 @@ pub enum PassiveStateEventKind {
     Reconciled,
 }
 
+/// Writes the four constructors of a [`PassiveStateWire`] impl that only copy
+/// fields into the generated wire structs: `event`, `snapshot`, `observation`
+/// and `drain`. The caller names its generated types; `permission` optionally
+/// derives the snapshot permission from the state instead of the caller's value.
+#[macro_export]
+macro_rules! passive_state_constructors {
+    (
+        event: $event:ident, event_kind: $kind:ident, snapshot: $snapshot:ident,
+        observation: $observation:ident, drain: $drain:ident $(,)?
+    ) => {
+        $crate::passive_state_constructors! {
+            event: $event, event_kind: $kind, snapshot: $snapshot,
+            observation: $observation, drain: $drain,
+            permission: |_state, permission| permission,
+        }
+    };
+    (
+        event: $event:ident, event_kind: $kind:ident, snapshot: $snapshot:ident,
+        observation: $observation:ident, drain: $drain:ident,
+        permission: $permission:expr $(,)?
+    ) => {
+        fn event(kind: $crate::PassiveStateEventKind, state: Self::State) -> Self::Event {
+            $event {
+                kind: match kind {
+                    $crate::PassiveStateEventKind::Changed => $kind::Changed,
+                    $crate::PassiveStateEventKind::Reconciled => $kind::Reconciled,
+                },
+                state,
+            }
+        }
+
+        fn snapshot(
+            metadata: $crate::SourceSessionMetadata,
+            platform: ::native_protocol::PlatformFamily,
+            permission: ::native_protocol::PermissionState,
+            adapter_version: &str,
+            state: Self::State,
+        ) -> Self::Snapshot {
+            $snapshot {
+                source_instance_id: metadata.source_instance_id,
+                source_version: Self::SOURCE_VERSION.to_owned(),
+                adapter_version: adapter_version.to_owned(),
+                platform,
+                permission: ($permission)(&state, permission),
+                health: metadata.health,
+                sequence: 0,
+                observed_at: metadata.observed_at,
+                state,
+            }
+        }
+
+        fn observation(
+            source_instance_id: String,
+            fact: $crate::SequencedObservation<Self::Event>,
+        ) -> Self::Observation {
+            $observation {
+                source_instance_id,
+                sequence: fact.sequence,
+                observed_at: fact.observed_at,
+                gap: fact.gap,
+                event: fact.payload,
+            }
+        }
+
+        fn drain(
+            source_instance_id: String,
+            health: ::native_protocol::SourceHealth,
+            observations: Vec<Self::Observation>,
+            resets: Vec<::native_protocol::SourceReset>,
+            terminal_error: Option<::native_protocol::SourceFailureCode>,
+        ) -> Self::Drain {
+            $drain {
+                source_instance_id,
+                health,
+                observations,
+                resets,
+                terminal_error,
+            }
+        }
+    };
+}
+
 /// Capability-owned mapping between shared lifecycle mechanics and generated wire types.
 pub trait PassiveStateWire: Send + Sync + 'static {
     type State: Clone + Eq + ProtocolValidatable + Send + 'static;

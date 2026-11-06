@@ -4,12 +4,9 @@ mod platform;
 
 use native_protocol::{
     ClipboardCertainty, ClipboardCoverage, ClipboardDrain, ClipboardEvent, ClipboardEventKind,
-    ClipboardObservation, ClipboardSourceSnapshot, ClipboardState, PermissionState, PlatformFamily,
-    SourceFailureCode, SourceHealth, SourceReset,
+    ClipboardObservation, ClipboardSourceSnapshot, ClipboardState, SourceHealth,
 };
-use native_source_runtime::{
-    PassiveStateEventKind, PassiveStateWire, SequencedObservation, SourceSessionMetadata,
-};
+use native_source_runtime::PassiveStateWire;
 
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedClipboardBackend, PassiveStateBackend as ClipboardBackend,
@@ -48,70 +45,19 @@ impl PassiveStateWire for ClipboardWire {
         }
     }
 
-    fn event(kind: PassiveStateEventKind, state: Self::State) -> Self::Event {
-        ClipboardEvent {
-            kind: match kind {
-                PassiveStateEventKind::Changed => ClipboardEventKind::Changed,
-                PassiveStateEventKind::Reconciled => ClipboardEventKind::Reconciled,
-            },
-            state,
-        }
-    }
-
-    fn snapshot(
-        metadata: SourceSessionMetadata,
-        platform: PlatformFamily,
-        permission: PermissionState,
-        adapter_version: &str,
-        state: Self::State,
-    ) -> Self::Snapshot {
-        ClipboardSourceSnapshot {
-            source_instance_id: metadata.source_instance_id,
-            source_version: Self::SOURCE_VERSION.to_owned(),
-            adapter_version: adapter_version.to_owned(),
-            platform,
-            permission,
-            health: metadata.health,
-            sequence: 0,
-            observed_at: metadata.observed_at,
-            state,
-        }
-    }
-
-    fn observation(
-        source_instance_id: String,
-        fact: SequencedObservation<Self::Event>,
-    ) -> Self::Observation {
-        ClipboardObservation {
-            source_instance_id,
-            sequence: fact.sequence,
-            observed_at: fact.observed_at,
-            gap: fact.gap,
-            event: fact.payload,
-        }
-    }
-
-    fn drain(
-        source_instance_id: String,
-        health: SourceHealth,
-        observations: Vec<Self::Observation>,
-        resets: Vec<SourceReset>,
-        terminal_error: Option<SourceFailureCode>,
-    ) -> Self::Drain {
-        ClipboardDrain {
-            source_instance_id,
-            health,
-            observations,
-            resets,
-            terminal_error,
-        }
+    native_source_runtime::passive_state_constructors! {
+        event: ClipboardEvent,
+        event_kind: ClipboardEventKind,
+        snapshot: ClipboardSourceSnapshot,
+        observation: ClipboardObservation,
+        drain: ClipboardDrain,
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use native_protocol::SourceOpenRequest;
+    use native_protocol::{PermissionState, PlatformFamily, SourceOpenRequest};
 
     struct TestSubscription {
         final_state: ClipboardState,

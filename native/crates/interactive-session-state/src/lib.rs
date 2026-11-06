@@ -6,12 +6,9 @@ use native_protocol::{
     InteractiveConsoleOwnership, InteractiveLockState, InteractiveRemoteAttachment,
     InteractiveSessionCertainty, InteractiveSessionCoverage, InteractiveSessionDrain,
     InteractiveSessionEvent, InteractiveSessionEventKind, InteractiveSessionObservation,
-    InteractiveSessionSourceSnapshot, InteractiveSessionState, PermissionState, PlatformFamily,
-    SourceFailureCode, SourceHealth, SourceReset,
+    InteractiveSessionSourceSnapshot, InteractiveSessionState, SourceHealth,
 };
-use native_source_runtime::{
-    PassiveStateEventKind, PassiveStateWire, SequencedObservation, SourceSessionMetadata,
-};
+use native_source_runtime::PassiveStateWire;
 
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedInteractiveSessionBackend,
@@ -57,63 +54,12 @@ impl PassiveStateWire for InteractiveSessionWire {
         }
     }
 
-    fn event(kind: PassiveStateEventKind, state: Self::State) -> Self::Event {
-        InteractiveSessionEvent {
-            kind: match kind {
-                PassiveStateEventKind::Changed => InteractiveSessionEventKind::Changed,
-                PassiveStateEventKind::Reconciled => InteractiveSessionEventKind::Reconciled,
-            },
-            state,
-        }
-    }
-
-    fn snapshot(
-        metadata: SourceSessionMetadata,
-        platform: PlatformFamily,
-        permission: PermissionState,
-        adapter_version: &str,
-        state: Self::State,
-    ) -> Self::Snapshot {
-        InteractiveSessionSourceSnapshot {
-            source_instance_id: metadata.source_instance_id,
-            source_version: Self::SOURCE_VERSION.to_owned(),
-            adapter_version: adapter_version.to_owned(),
-            platform,
-            permission,
-            health: metadata.health,
-            sequence: 0,
-            observed_at: metadata.observed_at,
-            state,
-        }
-    }
-
-    fn observation(
-        source_instance_id: String,
-        fact: SequencedObservation<Self::Event>,
-    ) -> Self::Observation {
-        InteractiveSessionObservation {
-            source_instance_id,
-            sequence: fact.sequence,
-            observed_at: fact.observed_at,
-            gap: fact.gap,
-            event: fact.payload,
-        }
-    }
-
-    fn drain(
-        source_instance_id: String,
-        health: SourceHealth,
-        observations: Vec<Self::Observation>,
-        resets: Vec<SourceReset>,
-        terminal_error: Option<SourceFailureCode>,
-    ) -> Self::Drain {
-        InteractiveSessionDrain {
-            source_instance_id,
-            health,
-            observations,
-            resets,
-            terminal_error,
-        }
+    native_source_runtime::passive_state_constructors! {
+        event: InteractiveSessionEvent,
+        event_kind: InteractiveSessionEventKind,
+        snapshot: InteractiveSessionSourceSnapshot,
+        observation: InteractiveSessionObservation,
+        drain: InteractiveSessionDrain,
     }
 }
 

@@ -2,20 +2,17 @@
 
 mod platform;
 use native_protocol::{
-    PermissionState, PlatformFamily, RemovableStorageCertainty, RemovableStorageCoverage,
-    RemovableStorageDrain, RemovableStorageEvent, RemovableStorageEventKind,
-    RemovableStorageObservation, RemovableStorageSourceSnapshot, RemovableStorageState,
-    SourceFailureCode, SourceHealth, SourceReset,
+    RemovableStorageCertainty, RemovableStorageCoverage, RemovableStorageDrain,
+    RemovableStorageEvent, RemovableStorageEventKind, RemovableStorageObservation,
+    RemovableStorageSourceSnapshot, RemovableStorageState, SourceHealth,
 };
+use native_source_runtime::PassiveStateWire;
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedRemovableStorageBackend,
     PassiveStateBackend as RemovableStorageBackend, PassiveStateEmitter as RemovableStorageEmitter,
     PassiveStateSource as RemovableStorageSource, PassiveStateSourceError as RemovableStorageError,
     PassiveStateSubscription as RemovableStorageSubscription,
     UnavailablePassiveStateSubscription as UnavailableRemovableStorageSubscription,
-};
-use native_source_runtime::{
-    PassiveStateEventKind, PassiveStateWire, SequencedObservation, SourceSessionMetadata,
 };
 pub use platform::PlatformRemovableStorageBackend;
 
@@ -83,60 +80,12 @@ impl PassiveStateWire for RemovableStorageWire {
             attached_functions: Vec::new(),
         }
     }
-    fn event(kind: PassiveStateEventKind, state: Self::State) -> Self::Event {
-        RemovableStorageEvent {
-            kind: match kind {
-                PassiveStateEventKind::Changed => RemovableStorageEventKind::Changed,
-                PassiveStateEventKind::Reconciled => RemovableStorageEventKind::Reconciled,
-            },
-            state,
-        }
-    }
-    fn snapshot(
-        metadata: SourceSessionMetadata,
-        platform: PlatformFamily,
-        permission: PermissionState,
-        adapter_version: &str,
-        state: Self::State,
-    ) -> Self::Snapshot {
-        RemovableStorageSourceSnapshot {
-            source_instance_id: metadata.source_instance_id,
-            source_version: Self::SOURCE_VERSION.to_owned(),
-            adapter_version: adapter_version.to_owned(),
-            platform,
-            permission,
-            health: metadata.health,
-            sequence: 0,
-            observed_at: metadata.observed_at,
-            state,
-        }
-    }
-    fn observation(
-        source_instance_id: String,
-        fact: SequencedObservation<Self::Event>,
-    ) -> Self::Observation {
-        RemovableStorageObservation {
-            source_instance_id,
-            sequence: fact.sequence,
-            observed_at: fact.observed_at,
-            gap: fact.gap,
-            event: fact.payload,
-        }
-    }
-    fn drain(
-        source_instance_id: String,
-        health: SourceHealth,
-        observations: Vec<Self::Observation>,
-        resets: Vec<SourceReset>,
-        terminal_error: Option<SourceFailureCode>,
-    ) -> Self::Drain {
-        RemovableStorageDrain {
-            source_instance_id,
-            health,
-            observations,
-            resets,
-            terminal_error,
-        }
+    native_source_runtime::passive_state_constructors! {
+        event: RemovableStorageEvent,
+        event_kind: RemovableStorageEventKind,
+        snapshot: RemovableStorageSourceSnapshot,
+        observation: RemovableStorageObservation,
+        drain: RemovableStorageDrain,
     }
 }
 
