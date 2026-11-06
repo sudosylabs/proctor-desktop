@@ -92,7 +92,7 @@ fn dict(entries: &[(Ref, Ref)]) -> Result<Owned, ()> {
     })
 }
 fn tag(scope: &str) -> Result<Owned, ()> {
-    let value = format!("org.proctor.desktop.key.v1.{scope}");
+    let value = format!("org.proctor.desktop.key.{scope}");
     Owned::new(unsafe {
         CFDataCreate(
             ptr::null(),
