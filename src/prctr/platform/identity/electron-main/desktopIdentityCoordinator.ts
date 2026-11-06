@@ -30,6 +30,8 @@ export interface DesktopIdentityCoordinatorOptions {
 	/** The hosted-auth owner supplies this only when its complete privileged flow is available. */
 	readonly authorization?: {
 		start(identity: VerifiedServerIdentity, token: CancellationToken): Promise<void>;
+		/** Opens the pending sign-in page again; does nothing when no sign-in is waiting. */
+		reopenBrowser(): Promise<void>;
 	};
 	readonly now?: () => number;
 }
@@ -98,6 +100,13 @@ export class DesktopIdentityCoordinator extends Disposable {
 				await this.#check(origin, false);
 				return;
 			}
+			case 'cancel':
+				this.#cancelOperation();
+				return;
+			case 'reopenBrowser':
+				if (this.#projection.state === 'authorizing')
+					await this.options.authorization?.reopenBrowser();
+				return;
 			case 'retry':
 				if (
 					!this.#projection.origin ||
@@ -210,6 +219,28 @@ export class DesktopIdentityCoordinator extends Disposable {
 		this.#projection = this.#makeProjection(presentation, this.#projection.revision + 1);
 		this.#changes.fire(this.#projection);
 	}
+	/**
+	 * Stops the running check or browser sign-in. A cancelled check returns to server
+	 * selection; a cancelled sign-in keeps the selected Institution so it can be retried.
+	 */
+	#cancelOperation(): void {
+		const { state, origin, institutionName } = this.#projection;
+		if (state === 'checking') {
+			this.#cancel();
+			this.#publish({ state: 'selectingServer' });
+			return;
+		}
+		if (state === 'authorizing') {
+			this.#cancel();
+			this.#publish({
+				state: 'authorizationFailed',
+				...(origin === undefined ? {} : { origin }),
+				...(institutionName === undefined ? {} : { institutionName }),
+				authorizationFailure: 'cancelled'
+			});
+		}
+	}
+
 	#cancel(): void {
 		this.#generation++;
 		this.#verifiedIdentity = undefined;

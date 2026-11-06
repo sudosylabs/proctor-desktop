@@ -277,7 +277,8 @@ void test('sign-in rechecks readiness and delivers only freshly verified identit
 				assert.equal(identity.origin, origin);
 				assert.equal(identity.installationId, 'institution-1');
 				await authorization.promise;
-			}
+			},
+			reopenBrowser: async () => {}
 		}
 	});
 	try {
@@ -306,6 +307,63 @@ void test('sign-in rechecks readiness and delivers only freshly verified identit
 	}
 });
 
+void test('cancel stops a check or a browser sign-in and is ignored otherwise', async () => {
+	const check = deferred<ServerReadinessProbe>();
+	let useDeferred = false;
+	let authToken = CancellationToken.None;
+	const reopened: string[] = [];
+	const coordinator = new DesktopIdentityCoordinator({
+		target,
+		allowDevelopmentLoopback: false,
+		transport: {
+			probe: async () => (useDeferred ? check.promise : probe())
+		},
+		authorization: {
+			start: async (_identity, token) =>
+				new Promise<void>((resolve) => {
+					authToken = token;
+					token.onCancellationRequested(() => resolve());
+				}),
+			reopenBrowser: async () => {
+				reopened.push(coordinator.projection().state);
+			}
+		}
+	});
+	try {
+		useDeferred = true;
+		const checking = coordinator.handleIntent({ kind: 'selectServer', address: origin });
+		assert.equal(coordinator.projection().state, 'checking');
+		await coordinator.handleIntent({ kind: 'cancel' });
+		assert.equal(coordinator.projection().state, 'selectingServer');
+		check.resolve(probe());
+		await checking;
+		assert.equal(coordinator.projection().state, 'selectingServer', 'a late result is dropped');
+
+		useDeferred = false;
+		await coordinator.handleIntent({ kind: 'selectServer', address: origin });
+		await coordinator.handleIntent({ kind: 'reopenBrowser' });
+		await coordinator.handleIntent({ kind: 'cancel' });
+		assert.equal(coordinator.projection().state, 'ready', 'cancel does nothing when idle');
+		assert.deepEqual(reopened, [], 'reopen does nothing before sign-in');
+
+		const signingIn = coordinator.handleIntent({ kind: 'signIn' });
+		await new Promise((resolve) => setImmediate(resolve));
+		assert.equal(coordinator.projection().state, 'authorizing');
+		await coordinator.handleIntent({ kind: 'reopenBrowser' });
+		assert.deepEqual(reopened, ['authorizing']);
+		await coordinator.handleIntent({ kind: 'cancel' });
+		await signingIn;
+		assert.ok(authToken.isCancellationRequested);
+		const cancelled = coordinator.projection();
+		assert.equal(cancelled.state, 'authorizationFailed');
+		assert.equal(cancelled.authorizationFailure, 'cancelled');
+		assert.equal(cancelled.origin, origin);
+		assert.equal(cancelled.institutionName, 'Example University');
+	} finally {
+		coordinator.dispose();
+	}
+});
+
 void test('sign-in never silently follows a replaced Institution at the same origin', async () => {
 	let next = probe();
 	let starts = 0;
@@ -316,7 +374,8 @@ void test('sign-in never silently follows a replaced Institution at the same ori
 		authorization: {
 			start: async () => {
 				starts++;
-			}
+			},
+			reopenBrowser: async () => {}
 		}
 	});
 	try {
@@ -361,8 +420,12 @@ void test('disposal and reentrant change-server cannot leave a live or late chec
 });
 
 void test('protocol validators enforce closed intents and strip arbitrary projection fields', () => {
+	for (const kind of ['cancel', 'reopenBrowser'])
+		assert.deepEqual(validateLaunchIdentityIntent({ kind }), { kind });
 	for (const value of [
 		{ kind: 'signIn', target },
+		{ kind: 'cancel', operation: 'checking' },
+		{ kind: 'reopenBrowser', url: origin },
 		{ kind: 'selectServer', address: origin, ready: true },
 		{ kind: 'selectServer', address: 123 },
 		{ kind: 'get', url: origin }

@@ -91,7 +91,9 @@ export async function runLaunchWindowTests(
 		retry: async () => {},
 		signIn: async () => {
 			throw new Error('No authorization owner');
-		}
+		},
+		cancel: async () => {},
+		reopenBrowser: async () => {}
 	};
 	const launch = await bootstrapLaunchWindow(owner, {
 		bootstrap: async () => ({
@@ -550,7 +552,9 @@ async function verifySnapshotRace(document: Document): Promise<void> {
 			selectServer: async () => {},
 			changeServer: async () => {},
 			retry: async () => {},
-			signIn: async () => {}
+			signIn: async () => {},
+			cancel: async () => {},
+			reopenBrowser: async () => {}
 		},
 		exit: async () => {}
 	});

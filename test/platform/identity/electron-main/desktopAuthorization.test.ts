@@ -327,6 +327,80 @@ void test('hosted authorization uses exact wire fields, persists only refresh cu
 		service.dispose();
 	}
 });
+void test('a waiting sign-in page can be opened again until the callback arrives', async () => {
+	const key = softwareTestKey();
+	let started: Record<string, unknown> = {};
+	let stored: StoredDesktopSession | undefined;
+	const opened: string[] = [];
+	const http = new DesktopAuthHttp(async (input, init) => {
+		const path = new URL(String(input)).pathname;
+		if (path.endsWith('/authorizations')) {
+			started = JSON.parse(String(init?.body));
+			return response(
+				{
+					authorization_url: 'https://example.edu/desktop/authorize?handle=safe',
+					expires_at: new Date(Date.now() + 60000).toISOString()
+				},
+				201
+			);
+		}
+		if (path.endsWith('/token')) return response(tokens());
+		if (path.endsWith('/context')) return response(context());
+		if (path.endsWith('/logout')) return new Response(null, { status: 204 });
+		throw Error('Unexpected route');
+	});
+	let service: DesktopAuthorizationService | undefined;
+	service = new DesktopAuthorizationService({
+		target,
+		keys: {
+			async loadOrCreate() {
+				return key;
+			},
+			async delete() {}
+		},
+		credentials: {
+			async read() {
+				return stored;
+			},
+			async write(_scope, value) {
+				stored = value;
+			},
+			async delete() {
+				stored = undefined;
+			}
+		},
+		http,
+		callbackPages,
+		async openBrowser(url) {
+			opened.push(url);
+			if (opened.length === 1) {
+				// The first page was closed; the candidate asks Proctor to open it again.
+				await service!.reopenBrowser();
+				return;
+			}
+			const callback = new URL(String(started.callback_url));
+			callback.searchParams.set('state', String(started.state));
+			callback.searchParams.set('code', random());
+			assert.equal((await fetch(callback)).status, 200);
+		},
+		async onAuthenticated() {}
+	});
+	try {
+		await service.reopenBrowser();
+		assert.deepEqual(opened, [], 'nothing is reopened before sign-in starts');
+		await service.start(identity, CancellationToken.None);
+		assert.deepEqual(opened, [
+			'https://example.edu/desktop/authorize?handle=safe',
+			'https://example.edu/desktop/authorize?handle=safe'
+		]);
+		await service.reopenBrowser();
+		assert.equal(opened.length, 2, 'a finished sign-in has no page to reopen');
+		await service.signOut();
+	} finally {
+		service.dispose();
+	}
+});
+
 void test('nonce challenge is retried once with a fresh proof, while ambiguous refresh remains fenced', async () => {
 	for (const failure of ['network', 'storage'] as const) {
 		const key = softwareTestKey();

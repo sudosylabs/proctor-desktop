@@ -86,7 +86,8 @@ void app
 							subscription.dispose();
 							resolve();
 						});
-					})
+					}),
+				reopenBrowser: async () => {}
 			}
 		});
 		const renderer = join(root, 'launch.html');

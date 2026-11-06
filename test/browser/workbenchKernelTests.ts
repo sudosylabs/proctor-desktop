@@ -482,7 +482,9 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 			changeServer: async () => {},
 			signIn: async () => {
 				signInCalls++;
-			}
+			},
+			cancel: async () => {},
+			reopenBrowser: async () => {}
 		},
 		exit: async () => {}
 	});
@@ -523,7 +525,9 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 			selectServer: async () => {},
 			retry: async () => {},
 			changeServer: async () => {},
-			signIn: async () => {}
+			signIn: async () => {},
+			cancel: async () => {},
+			reopenBrowser: async () => {}
 		},
 		exit: async () => {}
 	}).then(

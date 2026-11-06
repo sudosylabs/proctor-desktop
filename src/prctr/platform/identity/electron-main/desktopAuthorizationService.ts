@@ -103,6 +103,8 @@ export class DesktopAuthorizationService extends Disposable {
 	#shutdown: Promise<void> | undefined;
 	#outcomeSequence = 0;
 	#accountMutation: object | undefined;
+	/** The sign-in page a browser is completing, kept so it can be opened again until it expires. */
+	#pendingSignInPage: { readonly url: string; readonly expiresAt: number } | undefined;
 	#api: ServerApiClient | undefined;
 	constructor(private readonly options: DesktopAuthorizationOptions) {
 		super();
@@ -293,8 +295,10 @@ export class DesktopAuthorizationService extends Disposable {
 			listener.expireAt(expiresAt);
 			let nonce = credential(started.nonce);
 			if (token.isCancellationRequested) throw new DesktopAuthorizationError('cancelled');
+			this.#pendingSignInPage = { url: authorizationURL.href, expiresAt };
 			await this.options.openBrowser(authorizationURL.href);
 			const code = await listener.waitForCode();
+			this.#pendingSignInPage = undefined;
 			if (Date.now() >= expiresAt) throw new DesktopAuthorizationError('timedOut');
 			let result = await this.options.http.request(
 				identity.origin,
@@ -342,8 +346,16 @@ export class DesktopAuthorizationService extends Disposable {
 			}
 			return parseTokens(result);
 		} finally {
+			this.#pendingSignInPage = undefined;
 			await listener.stop();
 		}
+	}
+
+	/** Opens the waiting sign-in page again. Does nothing once the callback arrived or the page expired. */
+	async reopenBrowser(): Promise<void> {
+		const page = this.#pendingSignInPage;
+		if (this.#disposed || page === undefined || Date.now() >= page.expiresAt) return;
+		await this.options.openBrowser(page.url);
 	}
 
 	#selectors(): Record<string, string | number> {

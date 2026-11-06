@@ -59,7 +59,7 @@ export interface LaunchIdentityProjection {
 
 export type LaunchIdentityIntent =
 	| { readonly kind: 'selectServer'; readonly address: string }
-	| { readonly kind: 'retry' | 'changeServer' | 'signIn' };
+	| { readonly kind: 'retry' | 'changeServer' | 'signIn' | 'cancel' | 'reopenBrowser' };
 
 export interface LaunchIdentityClient {
 	projection(): Promise<LaunchIdentityProjection>;
@@ -68,6 +68,10 @@ export interface LaunchIdentityClient {
 	retry(): Promise<void>;
 	changeServer(): Promise<void>;
 	signIn(): Promise<void>;
+	/** Stops a running readiness check or the browser sign-in it started. */
+	cancel(): Promise<void>;
+	/** Opens the pending browser sign-in page again while sign-in is in progress. */
+	reopenBrowser(): Promise<void>;
 }
 
 export function validateLaunchIdentityIntent(value: unknown): LaunchIdentityIntent {
@@ -82,7 +86,11 @@ export function validateLaunchIdentityIntent(value: unknown): LaunchIdentityInte
 	}
 	if (
 		Object.keys(value).length === 1 &&
-		(value.kind === 'retry' || value.kind === 'changeServer' || value.kind === 'signIn')
+		(value.kind === 'retry' ||
+			value.kind === 'changeServer' ||
+			value.kind === 'signIn' ||
+			value.kind === 'cancel' ||
+			value.kind === 'reopenBrowser')
 	) {
 		return Object.freeze({ kind: value.kind });
 	}

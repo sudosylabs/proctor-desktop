@@ -14,7 +14,9 @@ const identity: LaunchIdentityClient = Object.freeze({
 	selectServer: async (address: string) => { await ipcRenderer.invoke(LAUNCH_IDENTITY_CHANNELS.intent, validateLaunchIdentityIntent({ kind: 'selectServer', address })); },
 	retry: async () => { await ipcRenderer.invoke(LAUNCH_IDENTITY_CHANNELS.intent, { kind: 'retry' }); },
 	changeServer: async () => { await ipcRenderer.invoke(LAUNCH_IDENTITY_CHANNELS.intent, { kind: 'changeServer' }); },
-	signIn: async () => { await ipcRenderer.invoke(LAUNCH_IDENTITY_CHANNELS.intent, { kind: 'signIn' }); }
+	signIn: async () => { await ipcRenderer.invoke(LAUNCH_IDENTITY_CHANNELS.intent, { kind: 'signIn' }); },
+	cancel: async () => { await ipcRenderer.invoke(LAUNCH_IDENTITY_CHANNELS.intent, { kind: 'cancel' }); },
+	reopenBrowser: async () => { await ipcRenderer.invoke(LAUNCH_IDENTITY_CHANNELS.intent, { kind: 'reopenBrowser' }); }
 });
 
 contextBridge.exposeInMainWorld('proctorLaunch', Object.freeze({
