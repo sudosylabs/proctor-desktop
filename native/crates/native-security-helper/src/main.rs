@@ -22,11 +22,24 @@ fn main() {
     let code = match run() {
         Ok(()) => 0,
         Err(error) => {
-            let _ = error;
+            report_failure(&error);
             70
         }
     };
     std::process::exit(code);
+}
+
+/// Writes only the static failure category; error details never leave the helper.
+fn report_failure(error: &HelperTransportError) {
+    use std::io::Write as _;
+    // A service worker's fd 2 is the supervisor's private guard channel, not a log.
+    if std::env::args_os()
+        .nth(1)
+        .is_some_and(|mode| mode == "--service-worker")
+    {
+        return;
+    }
+    let _ignored = writeln!(std::io::stderr().lock(), "native-security-helper: {error}");
 }
 
 fn run() -> Result<(), HelperTransportError> {
