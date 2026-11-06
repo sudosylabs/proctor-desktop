@@ -27,6 +27,17 @@ static NATIVE_SOURCE_PROCESS_POISONED: AtomicBool = AtomicBool::new(false);
 
 pub const SOURCE_CLEANUP_DEADLINE: Duration = Duration::from_millis(500);
 
+/// Longest a single polling query is expected to take. Stopping a polling
+/// source may have to wait for one query already in flight and then run one
+/// final query, so its stop deadlines are derived from this budget.
+const POLL_QUERY_BUDGET: Duration = Duration::from_secs(1);
+
+/// Deadline for stopping any passive-state subscription: the ordinary cleanup
+/// deadline plus room for a polling source's in-flight and final queries.
+const PASSIVE_STATE_STOP_DEADLINE: Duration = SOURCE_CLEANUP_DEADLINE
+    .saturating_add(POLL_QUERY_BUDGET)
+    .saturating_add(POLL_QUERY_BUDGET);
+
 #[derive(Debug)]
 pub enum BoundedFileReadError {
     Io(io::Error),
@@ -1511,14 +1522,14 @@ pub struct PollingPassiveStateSubscription<W: PassiveStateWire> {
 impl<W: PassiveStateWire> PassiveStateSubscription<W> for PollingPassiveStateSubscription<W> {
     fn stop(mut self) -> Result<W::State, PassiveStateSourceError> {
         let _ = self.stop_sender.try_send(PollingWorkerCommand::Stop);
-        self.worker
-            .finish(Duration::from_millis(400))
-            .map_err(|error| {
-                poison_native_source_process();
-                PassiveStateSourceError::Cleanup(format!(
-                    "polling source worker {error}; native utility restart is required"
-                ))
-            })?;
+        // The worker only sees Stop between polls, so allow a query already in
+        // flight to finish before treating the worker as stuck.
+        self.worker.finish(POLL_QUERY_BUDGET).map_err(|error| {
+            poison_native_source_process();
+            PassiveStateSourceError::Cleanup(format!(
+                "polling source worker {error}; native utility restart is required"
+            ))
+        })?;
         (self.query)()
     }
 }
@@ -1561,7 +1572,7 @@ fn stop_opening_poll_worker(
     worker: &mut DeadlineThread,
 ) -> Result<(), PassiveStateSourceError> {
     let _ = stop_sender.try_send(PollingWorkerCommand::Stop);
-    worker.finish(Duration::from_millis(400)).map_err(|error| {
+    worker.finish(POLL_QUERY_BUDGET).map_err(|error| {
         poison_native_source_process();
         PassiveStateSourceError::Cleanup(format!(
             "polling source rollback {error}; native utility restart is required"
@@ -1789,14 +1800,16 @@ where
     W: PassiveStateWire,
     S: PassiveStateSubscription<W>,
 {
-    run_bounded_source_stop(
+    run_bounded_source_stop_with(
         W::STOP_THREAD_NAME,
+        PASSIVE_STATE_STOP_DEADLINE,
         move || subscription.stop(),
         |error| {
             PassiveStateSourceError::Cleanup(format!(
                 "observer shutdown {error}; native utility restart is required"
             ))
         },
+        &poison_native_source_process,
     )
 }
 

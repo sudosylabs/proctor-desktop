@@ -462,6 +462,38 @@ fn released_polling_worker_accepts_an_immediate_stop() {
 }
 
 #[test]
+fn stopping_during_a_slow_poll_waits_for_the_query_without_poisoning() {
+    let calls = Arc::new(AtomicU64::new(0));
+    let query_calls = Arc::clone(&calls);
+    let (in_flight_sender, in_flight) = mpsc::sync_channel(1);
+    let query = move || {
+        if query_calls.fetch_add(1, Ordering::Relaxed) > 0 {
+            let _ = in_flight_sender.try_send(());
+            thread::sleep(Duration::from_millis(450));
+        }
+        Ok(RejectChangedState(1))
+    };
+    let emitter = PassiveStateEmitter::<RejectChangedWire>::new(4).expect("emitter");
+    let opened = PollingPassiveStateBackend::new(
+        PlatformFamily::Linux,
+        PermissionState::Granted,
+        "test-polling",
+        Duration::from_millis(10),
+        query,
+    )
+    .open(emitter)
+    .expect("polling source opens");
+    in_flight
+        .recv_timeout(Duration::from_secs(2))
+        .expect("a periodic query starts");
+
+    let final_state = passive_state_stop_subscription::<RejectChangedWire, _>(opened.subscription);
+
+    assert_eq!(final_state, Ok(RejectChangedState(1)));
+    assert_eq!(ensure_native_source_process_usable(), Ok(()));
+}
+
+#[test]
 fn bounded_task_returns_a_completed_value() {
     assert_eq!(
         run_bounded_task("bounded-task-success", Duration::from_secs(1), || 42),
