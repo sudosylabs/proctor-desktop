@@ -43,7 +43,7 @@ pub(crate) fn bounded_protocol_integer(value: u128) -> u64 {
         .min(MAX_PROTOCOL_SAFE_INTEGER)
 }
 
-pub trait SourceModel: Send + Sync + 'static {
+pub trait SourceStateMachine: Send + Sync + 'static {
     type State: Clone + Eq + Send + 'static;
     type Input: Send + 'static;
     type Observation: Send + 'static;
@@ -139,7 +139,7 @@ enum PendingOpenFact<I> {
     Missing(u64),
 }
 
-struct SourceSessionState<M: SourceModel> {
+struct SourceSessionState<M: SourceStateMachine> {
     clock: SourceClock,
     source_instance_id: String,
     opening: bool,
@@ -152,11 +152,11 @@ struct SourceSessionState<M: SourceModel> {
     terminal_error: Option<M::Error>,
 }
 
-pub struct SourceSession<M: SourceModel> {
+pub struct SourceSession<M: SourceStateMachine> {
     state: Arc<Mutex<SourceSessionState<M>>>,
 }
 
-impl<M: SourceModel> Clone for SourceSession<M> {
+impl<M: SourceStateMachine> Clone for SourceSession<M> {
     fn clone(&self) -> Self {
         Self {
             state: Arc::clone(&self.state),
@@ -164,7 +164,7 @@ impl<M: SourceModel> Clone for SourceSession<M> {
     }
 }
 
-impl<M: SourceModel> SourceSession<M> {
+impl<M: SourceStateMachine> SourceSession<M> {
     /// Creates one capability-neutral race-free source session.
     ///
     /// # Errors
@@ -174,7 +174,7 @@ impl<M: SourceModel> SourceSession<M> {
         Ok(Self {
             state: Arc::new(Mutex::new(SourceSessionState {
                 clock: SourceClock::start(),
-                source_instance_id: fresh_source_instance_id(),
+                source_instance_id: new_source_instance_id(),
                 opening: true,
                 accepting: true,
                 last_state: None,
@@ -397,7 +397,7 @@ impl<M: SourceModel> SourceSession<M> {
     }
 }
 
-fn push_pending_open_fact<M: SourceModel>(
+fn push_pending_open_fact<M: SourceStateMachine>(
     state: &mut SourceSessionState<M>,
     fact: PendingOpenFact<M::Input>,
 ) {
@@ -415,7 +415,7 @@ fn push_pending_open_fact<M: SourceModel>(
     }
 }
 
-fn push_bounded_pending_open_fact<M: SourceModel>(
+fn push_bounded_pending_open_fact<M: SourceStateMachine>(
     state: &mut SourceSessionState<M>,
     fact: PendingOpenFact<M::Input>,
 ) {
@@ -468,11 +468,11 @@ fn replace_first_pending_input_with_loss<I>(pending: &mut VecDeque<PendingOpenFa
     }
 }
 
-fn accepts_source_input<M: SourceModel>(state: &SourceSessionState<M>) -> bool {
+fn accepts_source_input<M: SourceStateMachine>(state: &SourceSessionState<M>) -> bool {
     !state.facts.is_stopped() && state.accepting && state.terminal_error.is_none()
 }
 
-fn apply_source_input<M: SourceModel>(
+fn apply_source_input<M: SourceStateMachine>(
     state: &mut SourceSessionState<M>,
     input: M::Input,
     observed_at: SourceTimestamp,
@@ -493,7 +493,7 @@ fn apply_source_input<M: SourceModel>(
     }
 }
 
-fn push_source_observation<M: SourceModel>(
+fn push_source_observation<M: SourceStateMachine>(
     state: &mut SourceSessionState<M>,
     observation: M::Observation,
     observed_at: SourceTimestamp,
@@ -510,7 +510,7 @@ fn push_source_observation<M: SourceModel>(
     }
 }
 
-fn record_source_reset<M: SourceModel>(
+fn record_source_reset<M: SourceStateMachine>(
     state: &mut SourceSessionState<M>,
     reset: SourceResetPlan,
 ) -> Result<(), M::Error> {
@@ -532,14 +532,14 @@ fn record_source_reset<M: SourceModel>(
     Ok(())
 }
 
-fn fail_source_session<M: SourceModel>(state: &mut SourceSessionState<M>, error: M::Error) {
+fn fail_source_session<M: SourceStateMachine>(state: &mut SourceSessionState<M>, error: M::Error) {
     state.health = SourceHealth::Failed;
     if state.terminal_error.is_none() {
         state.terminal_error = Some(error);
     }
 }
 
-fn lock_source_session<M: SourceModel>(
+fn lock_source_session<M: SourceStateMachine>(
     mutex: &Mutex<SourceSessionState<M>>,
 ) -> std::sync::MutexGuard<'_, SourceSessionState<M>> {
     mutex
@@ -548,7 +548,7 @@ fn lock_source_session<M: SourceModel>(
 }
 
 #[must_use]
-pub fn fresh_source_instance_id() -> String {
+pub fn new_source_instance_id() -> String {
     let counter = INSTANCE_COUNTER.fetch_add(1, Ordering::Relaxed);
     let generated_at = Instant::now();
     let hash_part = |domain: u8| {

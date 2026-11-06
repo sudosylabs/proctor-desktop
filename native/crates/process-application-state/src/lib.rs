@@ -9,9 +9,9 @@ use native_protocol::{
     ProtocolViolation, SourceFailureCode, SourceHealth, SourceOpenRequest, SourceReset,
 };
 use native_source_runtime::{
-    BoundedTaskError, QueueError, SourceModel, SourceResetPlan, SourceSession, SourceSessionFact,
-    SourceSessionMetadata, SourceStateChange, ensure_native_source_process_usable,
-    prefer_boundary_error, run_bounded_source_stop,
+    BoundedTaskError, QueueError, SourceResetPlan, SourceSession, SourceSessionFact,
+    SourceSessionMetadata, SourceStateChange, SourceStateMachine,
+    ensure_native_source_process_usable, prefer_boundary_error, run_bounded_source_stop,
 };
 
 #[cfg(target_os = "linux")]
@@ -150,7 +150,7 @@ enum ProcessApplicationInput {
     Reconcile(ProcessApplicationState),
 }
 
-impl SourceModel for ProcessApplicationModel {
+impl SourceStateMachine for ProcessApplicationModel {
     type State = ProcessApplicationState;
     type Input = ProcessApplicationInput;
     type Observation = ProcessApplicationEvent;

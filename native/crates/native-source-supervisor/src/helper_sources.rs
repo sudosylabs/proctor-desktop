@@ -16,7 +16,7 @@ use native_security_helper::{
     HelperSourceCloseResult, HelperTransportError, NativeHelperConnection, NativeHelperSourceEvent,
 };
 use native_source_runtime::{
-    ensure_native_source_process_usable, fresh_source_instance_id, poison_native_source_process,
+    ensure_native_source_process_usable, new_source_instance_id, poison_native_source_process,
 };
 
 use crate::erased::{
@@ -245,7 +245,7 @@ impl ErasedFactory for HelperFactory {
                 (shared.connect)().map_err(|error| source_start_failure(shared.fail(&error)))?;
             shared.connection = Some(connection);
         }
-        let id = fresh_source_instance_id();
+        let id = new_source_instance_id();
         let result = shared
             .connection
             .as_mut()

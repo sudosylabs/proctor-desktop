@@ -5,8 +5,9 @@ use native_protocol::{
     NetworkActivityState, NetworkConfigurationCertainty, NetworkConfigurationCoverage,
     NetworkConfigurationDrain, NetworkConfigurationEvent, NetworkConfigurationEventKind,
     NetworkConfigurationObservation, NetworkConfigurationSourceSnapshot, NetworkConfigurationState,
-    PermissionState, PlatformFamily, SourceFailureCode, SourceHealth, SourceReset,
+    SourceHealth,
 };
+use native_source_runtime::PassiveStateWire;
 pub use native_source_runtime::{
     OpenedPassiveStateBackend as OpenedNetworkConfigurationBackend,
     PassiveStateBackend as NetworkConfigurationBackend,
@@ -15,9 +16,6 @@ pub use native_source_runtime::{
     PassiveStateSourceError as NetworkConfigurationError,
     PassiveStateSubscription as NetworkConfigurationSubscription,
     UnavailablePassiveStateSubscription as UnavailableNetworkConfigurationSubscription,
-};
-use native_source_runtime::{
-    PassiveStateEventKind, PassiveStateWire, SequencedObservation, SourceSessionMetadata,
 };
 pub use platform::PlatformNetworkConfigurationBackend;
 
@@ -103,60 +101,12 @@ impl PassiveStateWire for NetworkConfigurationWire {
             route_generation: 0,
         }
     }
-    fn event(kind: PassiveStateEventKind, state: Self::State) -> Self::Event {
-        NetworkConfigurationEvent {
-            kind: match kind {
-                PassiveStateEventKind::Changed => NetworkConfigurationEventKind::Changed,
-                PassiveStateEventKind::Reconciled => NetworkConfigurationEventKind::Reconciled,
-            },
-            state,
-        }
-    }
-    fn snapshot(
-        metadata: SourceSessionMetadata,
-        platform: PlatformFamily,
-        permission: PermissionState,
-        adapter_version: &str,
-        state: Self::State,
-    ) -> Self::Snapshot {
-        NetworkConfigurationSourceSnapshot {
-            source_instance_id: metadata.source_instance_id,
-            source_version: Self::SOURCE_VERSION.to_owned(),
-            adapter_version: adapter_version.to_owned(),
-            platform,
-            permission,
-            health: metadata.health,
-            sequence: 0,
-            observed_at: metadata.observed_at,
-            state,
-        }
-    }
-    fn observation(
-        source_instance_id: String,
-        fact: SequencedObservation<Self::Event>,
-    ) -> Self::Observation {
-        NetworkConfigurationObservation {
-            source_instance_id,
-            sequence: fact.sequence,
-            observed_at: fact.observed_at,
-            gap: fact.gap,
-            event: fact.payload,
-        }
-    }
-    fn drain(
-        source_instance_id: String,
-        health: SourceHealth,
-        observations: Vec<Self::Observation>,
-        resets: Vec<SourceReset>,
-        terminal_error: Option<SourceFailureCode>,
-    ) -> Self::Drain {
-        NetworkConfigurationDrain {
-            source_instance_id,
-            health,
-            observations,
-            resets,
-            terminal_error,
-        }
+    native_source_runtime::passive_state_constructors! {
+        event: NetworkConfigurationEvent,
+        event_kind: NetworkConfigurationEventKind,
+        snapshot: NetworkConfigurationSourceSnapshot,
+        observation: NetworkConfigurationObservation,
+        drain: NetworkConfigurationDrain,
     }
 }
 
