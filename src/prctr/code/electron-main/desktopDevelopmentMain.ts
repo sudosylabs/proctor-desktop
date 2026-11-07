@@ -3,6 +3,22 @@ import { app, BrowserWindow } from 'electron';
 import { join } from 'node:path';
 import { createDesktopIdentityComposition } from './desktopIdentityComposition.js';
 import { developmentApplicationId } from '../../platform/product/common/productMetadata.generated.js';
+import {
+	REFUSED_SWITCH_EXIT_CODE,
+	refusedDebuggingSwitch
+} from '../../platform/environment/electron-main/debuggingSwitches.js';
+
+// Every Proctor entry checks this first: an installed build accepts no debugging switch.
+const refused = refusedDebuggingSwitch({
+	built: !process.defaultApp,
+	argv: process.argv,
+	hasSwitch: (name) => app.commandLine.hasSwitch(name)
+});
+if (refused !== undefined) {
+	console.error(`Proctor does not accept ${refused}.`);
+	// Synchronously, so nothing below runs and Electron never becomes ready.
+	process.exit(REFUSED_SWITCH_EXIT_CODE);
+}
 
 // Closed development entrypoint. Build selectors are main-process arguments, never renderer data.
 const args = process.argv.slice(2);

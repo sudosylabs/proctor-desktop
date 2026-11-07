@@ -21,6 +21,7 @@
     "../src/prctr/platform/settings/common/**/*.ts",
     "../src/prctr/platform/windows/common/windowMaterial.ts",
     "../src/prctr/platform/windows/electron-main/windowMaterial.ts",
+    "../src/prctr/platform/environment/electron-main/debuggingSwitches.ts",
     "../test/base/common/upstream/testAdapter.ts",
     "../test/base/common/upstream/nodeBuiltins.d.ts",
     "../test/base/common/upstream/upstreamTestUtils.ts",

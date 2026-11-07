@@ -168,6 +168,13 @@ Before platform signing, package-time fuses:
 - disable `runAsNode`, `NODE_OPTIONS`, and command-line inspector arguments;
 - restrict application loading to the packaged ASAR.
 
+Fuses cannot turn off Chromium's remote debugging, so every product main entry
+first calls `refusedDebuggingSwitch`
+(`platform/environment/electron-main/debuggingSwitches.ts`): an installed build
+exits before Electron is ready when given `--remote-debugging-port`, `-pipe`,
+`-address`, `--auto-open-devtools-for-tabs` or a Node inspector option. A
+source checkout, started as `electron <path>`, keeps them.
+
 Packaged tests verify the fuse values and ASAR integrity from the resulting
 binary. Helper processes are explicit signed executables and never depend on
 `ELECTRON_RUN_AS_NODE`.
