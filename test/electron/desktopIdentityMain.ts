@@ -384,13 +384,27 @@ if (probe) {
 				windows?.shutdown();
 				launch?.dispose();
 				await keys.delete(scope);
-				await rm(stateDirectory, { recursive: true, force: true });
+				// The credentials always go; on Windows Chromium keeps its profile databases
+				// in this folder open until the process exits, so the rest may stay in temp.
+				await rm(join(stateDirectory, 'credentials'), { recursive: true, force: true });
+				await rm(stateDirectory, { recursive: true, force: true }).catch(
+					(error: unknown) => {
+						if (
+							process.platform !== 'win32' ||
+							(error as NodeJS.ErrnoException).code !== 'EBUSY'
+						)
+							throw error;
+					}
+				);
 				instanceLock.dispose();
 				app.exit(Number(process.exitCode ?? 0));
 			}
 		})
-		.catch(() => {
-			console.error('Identity test startup failed.');
+		.catch((error: unknown) => {
+			console.error(
+				'Identity test startup failed.',
+				error instanceof Error ? error.stack : String(error)
+			);
 			app.exit(1);
 		});
 }
