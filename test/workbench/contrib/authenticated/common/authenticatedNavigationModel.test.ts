@@ -2,7 +2,6 @@ import assert from 'node:assert';
 import { test } from 'node:test';
 
 import {
-	accountSectionOf,
 	AuthenticatedNavigationModel,
 	type AuthenticatedLocation
 } from '../../../../../src/prctr/workbench/contrib/authenticated/common/authenticatedNavigationModel.ts';
@@ -64,10 +63,4 @@ void test('losing an area moves away from it and history skips it', () => {
 	assert.ok(!navigation.canGoBack, 'the removed Activity area is skipped');
 	navigation.setAreas([]);
 	assert.strictEqual(navigation.location.destination, 'account');
-});
-
-void test('access tokens show the Sessions section until they have their own page', () => {
-	assert.strictEqual(accountSectionOf('tokens'), 'sessions');
-	assert.strictEqual(accountSectionOf('security'), 'security');
-	assert.strictEqual(accountSectionOf('profile'), 'profile');
 });

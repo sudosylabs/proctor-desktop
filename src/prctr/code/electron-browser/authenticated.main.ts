@@ -31,7 +31,9 @@ const authenticatedWindow = await bootstrapWorkbench(document, authenticatedComp
 	...commonWorkbenchContributions,
 	createDesktopWorkbenchContribution('authenticated', () => api.bootstrap(), api.windowChrome),
 	createAuthenticatedContribution(api),
-	createAccountContribution(api.account),
+	createAccountContribution(api.account, {
+		writeClipboard: (text) => api.settingsNative.clipboard.writeText(text)
+	}),
 	createSettingsContribution(
 		api.settings,
 		createElectronSettingsEditorEnvironment(api.settingsNative)

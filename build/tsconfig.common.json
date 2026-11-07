@@ -34,6 +34,7 @@
     "../src/prctr/workbench/services/keybinding/common/**/*.ts",
     "../src/prctr/workbench/services/examSecurity/common/**/*.ts",
     "../src/prctr/workbench/contrib/authenticated/common/**/*.ts",
+    "../src/prctr/workbench/contrib/account/common/**/*.ts",
     "../src/prctr/platform/notification/common/**/*.ts",
     "../src/prctr/workbench/common/notifications.ts",
     "../src/prctr/workbench/services/notification/common/**/*.ts",

@@ -1,3 +1,5 @@
+import { createElementFactory } from '../../../../base/browser/documentElements.js';
+
 /** Local import limits are separate from the server's 5 MiB upload limit. */
 export const photoImportLimits = Object.freeze({
 	bytes: 32 * 1024 * 1024,
@@ -118,7 +120,7 @@ export async function encodePhoto(
 	crop: PhotoCrop
 ): Promise<Uint8Array> {
 	const rect = photoCropRect(bitmap.width, bitmap.height, crop);
-	const canvas = document.createElement('canvas');
+	const canvas = createElementFactory(document)('canvas');
 	canvas.width = canvas.height = Math.max(1, Math.min(512, Math.floor(rect.size)));
 	const context = canvas.getContext('2d');
 	if (!context) throw new PhotoImportError('photoInvalid');

@@ -248,12 +248,9 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 			'Account sidebar lists its pages and Sign out'
 		);
 		entry('sessions')!.click();
-		check(nav().accountSection === 'sessions', 'Sessions and devices opens Sessions');
+		check(nav().accountPage === 'sessions', 'Sessions and devices opens Sessions');
 		entry('tokens')!.click();
-		check(
-			nav().accountPage === 'tokens' && nav().accountSection === 'sessions',
-			'Access tokens shows Sessions until it has a page'
-		);
+		check(nav().accountPage === 'tokens', 'Access tokens opens its own page');
 		entry('settings')!.click();
 		check(
 			settingsRequests === 1 && nav().accountPage === 'tokens',

@@ -1,0 +1,77 @@
+@layer contributions {
+	.prctr-account-dialog {
+		background: var(--prctr-color-background-surface);
+		border: 0;
+		/* Dialogs take the window's large radius: 12px on macOS, 8px on Windows. */
+		border-radius: calc(var(--prctr-workbench-control-radius, 6px) * 2);
+		box-shadow: var(--prctr-elevation-modal);
+		box-sizing: border-box;
+		color: var(--prctr-color-text-primary);
+		display: flex;
+		flex-direction: column;
+		font-family: var(--prctr-typography-font-application);
+		font-size: 13.5px;
+		gap: 18px;
+		inline-size: min(400px, calc(100vw - 32px));
+		line-height: 20px;
+		margin-block-start: min(140px, 15vh);
+		max-block-size: calc(100vh - 32px);
+		overflow: auto;
+		padding: 22px 24px 20px;
+	}
+	.prctr-account-dialog:not([open]) {
+		display: none;
+	}
+	.prctr-account-dialog[data-size='medium'] {
+		inline-size: min(460px, calc(100vw - 32px));
+		margin-block-start: min(72px, 10vh);
+	}
+	.prctr-account-dialog::backdrop {
+		background: var(--prctr-color-overlay-backdrop);
+	}
+	.prctr-account-dialog .prctr-account-dialog__header {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.prctr-account-dialog .prctr-account-dialog__title {
+		font-size: 17px;
+		font-weight: var(--prctr-typography-weight-semibold);
+		line-height: 24px;
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+	.prctr-account-dialog .prctr-account-dialog__description {
+		color: var(--prctr-color-text-secondary);
+		line-height: 1.5;
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+	.prctr-account-dialog .prctr-account-dialog__body {
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+	.prctr-account-dialog .prctr-account-dialog__body:empty {
+		display: none;
+	}
+	.prctr-account-dialog .prctr-account-dialog__actions {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		justify-content: flex-end;
+	}
+	.prctr-account-dialog .prctr-account-dialog__spacer {
+		flex: 1 1 auto;
+	}
+	.prctr-account-dialog [hidden] {
+		display: none;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-account-dialog {
+			border: var(--prctr-shape-stroke-default) solid CanvasText;
+		}
+	}
+}

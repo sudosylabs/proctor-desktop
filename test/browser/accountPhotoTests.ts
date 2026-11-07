@@ -1,4 +1,7 @@
-import { AccountPhotoEditor } from '../../src/prctr/workbench/contrib/account/browser/accountPhotoEditor.ts';
+import { AccountPhotoDialog } from '../../src/prctr/workbench/contrib/account/browser/accountPhotoDialog.ts';
+import { AccountPageServices } from '../../src/prctr/workbench/contrib/account/browser/accountPageServices.ts';
+import { MenuControl } from '../../src/prctr/base/browser/ui/menu/menuControl.ts';
+import { Event as Events } from '../../src/prctr/base/common/event.ts';
 import {
 	inspectPhoto,
 	photoCropRect,
@@ -86,8 +89,8 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 	const overlays = new WorkbenchOverlayHost(host, background);
 	const requests: AccountIntent[] = [];
 	let mode: 'success' | 'uncertain' | 'conflict' | 'reject' = 'success';
-	let recheckOnClose = false;
-	let changed = 0,
+	let refreshOnClose = false;
+	let saved = 0,
 		closed = 0;
 	const initial = '"' + 'a'.repeat(64) + '"',
 		newer = '"' + 'b'.repeat(64) + '"';
@@ -120,85 +123,110 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 		requestedLocale: 'en',
 		messages: Object.values(accountMessages)
 	});
+	const menu = new MenuControl(host, {
+		canInteract: () => true,
+		onDidChangeInteraction: Events.None,
+		restoreFocus: () => undefined,
+		onActionError: () => undefined
+	});
+	const services = new AccountPageServices(
+		document,
+		client,
+		localization,
+		{
+			kind: 'authenticated',
+			windowId: 'test:photo',
+			institutionOrigin: 'https://institution.example.test',
+			principalId: 'y'.repeat(26),
+			sessionId: 'b'.repeat(26),
+			initialDestination: 'account'
+		},
+		overlays,
+		menu,
+		{ setProfilePhoto() {}, signOut() {} },
+		new Set(),
+		() => undefined
+	);
 	const button = (label: string) =>
 		[...document.querySelectorAll<HTMLButtonElement>('dialog button')].find(
 			(b) => b.textContent === label
 		)!;
+	const dialogText = (): string => document.querySelector('dialog')?.textContent ?? '';
 	const open = () =>
-		new AccountPhotoEditor(
-			document,
-			overlays,
-			client,
-			localization,
+		new AccountPhotoDialog(
+			services,
 			initial,
 			file,
-			() => changed++,
-			(reconcile) => {
-				recheckOnClose = reconcile;
+			() => saved++,
+			(refresh) => {
+				refreshOnClose = refresh;
 				closed++;
 			}
 		);
-	let editor: AccountPhotoEditor | undefined;
+	let editor: AccountPhotoDialog | undefined;
 	try {
 		editor = open();
 		await wait(() => !!button('Save photo') && !button('Save photo').disabled);
 		assert(overlays.visible, 'Modal did not gate the workbench');
+		assert(dialogText().includes('Change photo'), 'The dialog is titled Change photo');
 		assert(!requests.length, 'Selection uploaded without explicit save');
-		const canvas = document.querySelector<HTMLCanvasElement>('dialog canvas')!;
+		const stage = document.querySelector<HTMLElement>('dialog .prctr-account-photo__stage')!;
+		const canvas = stage.querySelector('canvas')!;
 		const before = canvas.toDataURL();
-		canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+		stage.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
 		assert(before !== canvas.toDataURL(), 'Keyboard framing did not move the image');
+		const zoom = document.querySelector<HTMLInputElement>('dialog input[type=range]')!;
+		zoom.value = '2';
+		zoom.dispatchEvent(new Event('input'));
+		assert(zoom.getAttribute('aria-valuetext') === '200%', 'Zoom does not report its value');
 		const input = document.querySelector<HTMLInputElement>('dialog input[type=file]')!;
+		const moved = canvas.toDataURL();
 		input.dispatchEvent(new Event('cancel'));
-		assert(before !== canvas.toDataURL(), 'Cancelling replacement discarded the crop');
+		assert(moved === canvas.toDataURL(), 'Cancelling a replacement discarded the crop');
 		button('Cancel').click();
 		assert(
-			!document.querySelector('dialog') && !overlays.visible && changed === 0,
+			!document.querySelector('dialog') && !overlays.visible && saved === 0,
 			'Cancel changed the account or left modal gating'
 		);
 		editor = open();
 		await wait(() => !button('Save photo')?.disabled);
 		button('Save photo').click();
 		await wait(() => !document.querySelector('dialog'));
-		assert(changed === 1, 'Confirmed save did not update avatar');
+		assert(saved === 1, 'Confirmed save did not update the photo');
+		assert(
+			requests
+				.slice(-2)
+				.map((r) => r.kind)
+				.join() === 'uploadPhoto,readPhoto',
+			'A save is confirmed by reading the photo again'
+		);
 		mode = 'reject';
 		editor = open();
 		await wait(() => !button('Save photo')?.disabled);
 		button('Save photo').click();
-		await wait(() =>
-			document.querySelector('dialog')!.textContent!.includes('could not accept')
-		);
-		assert(!button('Save photo').disabled, 'Known rejection destroyed retry');
+		await wait(() => dialogText().includes('didn’t accept'));
+		assert(!button('Save photo').disabled, 'A known rejection prevented retry');
 		editor.dispose();
 		mode = 'uncertain';
 		editor = open();
 		await wait(() => !button('Save photo')?.disabled);
 		const count = requests.length;
 		button('Save photo').click();
-		await wait(() =>
-			document
-				.querySelector('dialog')!
-				.textContent!.includes('current photo has been checked')
-		);
+		await wait(() => requests.length === count + 2 && !button('Save photo').disabled);
 		assert(
 			requests
 				.slice(count)
 				.map((r) => r.kind)
 				.join(',') === 'uploadPhoto,readPhoto',
-			'Unknown mutation was retried before reconciliation'
+			'An unknown outcome was retried before reading the photo'
 		);
 		editor.dispose();
-		assert(
-			recheckOnClose,
-			'Closing an uncertain upload lost the page reconciliation requirement'
-		);
 		mode = 'conflict';
 		editor = open();
 		await wait(() => !button('Save photo')?.disabled);
+		refreshOnClose = false;
 		button('Save photo').click();
-		await wait(() => !!button('Keep my crop') && !button('Keep my crop').hidden);
-		assert(button('Save photo').disabled, 'Conflict silently allowed stale overwrite');
-		button('Keep my crop').click();
+		await wait(() => dialogText().includes('changed somewhere else'));
 		mode = 'success';
 		button('Save photo').click();
 		await wait(() => !document.querySelector('dialog'));
@@ -208,17 +236,19 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 					r.kind === 'uploadPhoto'
 			)
 			.at(-1)!;
-		assert(upload.etag === newer, 'Conflict review did not use the refreshed revision');
+		assert(upload.etag === newer, 'A conflict did not adopt the refreshed revision');
 		editor = open();
 		editor.dispose();
 		await new Promise((resolve) => setTimeout(resolve, 30));
 		assert(
 			!document.querySelector('dialog') && !overlays.visible,
-			'Late decode resurrected disposed editor'
+			'A late decode resurrected a disposed dialog'
 		);
-		assert(closed >= 6, 'Editor closure was not reported');
+		assert(closed >= 6, 'Dialog closure was not reported');
+		assert(!refreshOnClose, 'A settled dialog asked the page to refresh');
 	} finally {
 		editor?.dispose();
+		menu.dispose();
 		overlays.dispose();
 		host.remove();
 		background.remove();

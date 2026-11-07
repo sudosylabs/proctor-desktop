@@ -4,7 +4,6 @@
 
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import type { AccountSection } from '../../../../platform/account/common/accountProtocol.js';
 import type { ProductArea } from '../../../../platform/examActivity/common/examActivityProtocol.js';
 
 export const productDestinations = ['activity', 'management', 'administration'] as const;
@@ -30,11 +29,6 @@ const areaDestinations: Readonly<Partial<Record<ProductArea, ProductDestination>
 	exam_management: 'management',
 	administration: 'administration'
 });
-
-/** The account section that renders a page. Access tokens have no page yet and show Sessions. */
-export function accountSectionOf(page: AccountPage): AccountSection {
-	return page === 'tokens' ? 'sessions' : page;
-}
 
 /** One place in the window: an area or Account, and the page last chosen inside each. */
 export interface AuthenticatedLocation {

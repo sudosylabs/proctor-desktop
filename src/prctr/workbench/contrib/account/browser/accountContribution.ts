@@ -2,13 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { HoverPosition } from '../../../../base/browser/ui/hover/hoverWidget.js';
 import { Event } from '../../../../base/common/event.js';
-import {
-	accountSections,
-	type AccountClient,
-	type AccountSection
-} from '../../../../platform/account/common/accountProtocol.js';
+import type { AccountClient } from '../../../../platform/account/common/accountProtocol.js';
 import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
 import type {
 	WorkbenchBootstrapContext,
@@ -19,21 +14,32 @@ import type { WorkbenchItemResolverRegistry } from '../../../browser/workbenchPa
 import type { WorkbenchItem } from '../../../common/workbenchItem.js';
 import { WORKBENCH_ITEM_RESOLVERS, WORKBENCH_PANE_HOST } from '../../../workbench.common.main.js';
 import {
+	accountPages,
 	AUTHENTICATED_NAVIGATION_SERVICE,
+	type AccountPage,
 	type AuthenticatedNavigationService
 } from '../../authenticated/browser/authenticatedNavigation.js';
-import {
-	AUTHENTICATED_WINDOW_CONTROLS_SERVICE,
-	type AuthenticatedWindowControls
-} from '../../authenticated/browser/authenticatedWindowControls.js';
-import { accountMessages as messages } from './accountMessages.js';
+import { accountMessages as messages, type AccountMessage } from './accountMessages.js';
 import { AccountPane, type AccountModel } from './accountPane.js';
 
 const ACCOUNT_ITEM_TYPE = 'prctr.authenticated.account';
 
+const pageTitles: Readonly<Record<AccountPage, AccountMessage>> = Object.freeze({
+	profile: 'profileTitle',
+	security: 'securityTitle',
+	sessions: 'sessionsTitle',
+	tokens: 'tokensTitle'
+});
+
+export interface AccountContributionOptions {
+	/** Copies a new token's credential through the window's privileged clipboard. */
+	readonly writeClipboard?: (text: string) => Promise<void>;
+}
+
 /** Account's pages in the content area, opened from the Account sidebar. */
 export function createAccountContribution(
-	client: AccountClient
+	client: AccountClient,
+	options: AccountContributionOptions = {}
 ): WorkbenchContributionRegistration {
 	return Object.freeze({
 		id: 'prctr.authenticated.account',
@@ -47,43 +53,38 @@ export function createAccountContribution(
 			const navigation = context.getService<AuthenticatedNavigationService>(
 				AUTHENTICATED_NAVIGATION_SERVICE
 			);
-			const controls = context.getService<AuthenticatedWindowControls>(
-				AUTHENTICATED_WINDOW_CONTROLS_SERVICE
-			);
 			const host = context.getService<WorkbenchPaneHost>(WORKBENCH_PANE_HOST);
 			const registry =
 				context.getService<WorkbenchItemResolverRegistry>(WORKBENCH_ITEM_RESOLVERS);
 			const customPhotos = new Set<string>();
-			const items = new Map<AccountSection, WorkbenchItem>(
-				accountSections.map((section) => [section, accountItem(section, context)])
+			const items = new Map<AccountPage, WorkbenchItem>(
+				accountPages.map((page) => [page, accountItem(page, context)])
 			);
 			context.disposables.add(
 				registry.register({
 					typeId: ACCOUNT_ITEM_TYPE,
 					async resolve(item): Promise<AccountModel> {
-						const section = accountSections.find(
+						const page = accountPages.find(
 							(candidate) => items.get(candidate) === item
 						);
-						if (!section) throw new Error('Unknown account item');
-						return { item, section, dispose() {} };
+						if (!page) throw new Error('Unknown account item');
+						return { item, page, dispose() {} };
 					},
 					createPane(document) {
-						return new AccountPane(
-							document,
+						return new AccountPane(document, {
 							client,
-							context.localization,
+							localization: context.localization,
 							binding,
-							(dataUrl) => navigation.setProfilePhoto(dataUrl),
-							{
-								overlays: context.shell.overlayHost,
-								customPhotos,
-								hover: (target, label) =>
-									controls.hover.setupDelayedHover(target, () => ({
-										content: label,
-										position: { hoverPosition: HoverPosition.BELOW }
-									}))
+							overlays: context.shell.overlayHost,
+							customPhotos,
+							hooks: {
+								setProfilePhoto: (dataUrl) => navigation.setProfilePhoto(dataUrl),
+								signOut: () => navigation.signOut(),
+								...(options.writeClipboard === undefined
+									? {}
+									: { writeClipboard: options.writeClipboard })
 							}
-						);
+						});
 					}
 				})
 			);
@@ -91,7 +92,7 @@ export function createAccountContribution(
 			let sequence = 0;
 			const open = async (focus: boolean): Promise<void> => {
 				const serial = ++sequence;
-				const item = items.get(navigation.accountSection);
+				const item = items.get(navigation.accountPage);
 				try {
 					if (
 						item &&
@@ -104,7 +105,7 @@ export function createAccountContribution(
 				} catch {
 					if (!disposed && serial === sequence)
 						navigation.setProductStatus(
-							context.localization.format(messages.unavailable)
+							context.localization.format(messages.pageUnavailable)
 						);
 				}
 			};
@@ -125,11 +126,11 @@ export function createAccountContribution(
 	});
 }
 
-function accountItem(section: AccountSection, context: WorkbenchBootstrapContext): WorkbenchItem {
-	const title = context.localization.format(messages[section]);
+function accountItem(page: AccountPage, context: WorkbenchBootstrapContext): WorkbenchItem {
+	const title = context.localization.format(messages[pageTitles[page]]);
 	return {
 		typeId: ACCOUNT_ITEM_TYPE,
-		logicalIdentity: section,
+		logicalIdentity: page,
 		presentation: { title, accessibleLabel: title },
 		closable: false,
 		restorable: false,

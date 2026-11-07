@@ -3,7 +3,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import type { Event } from '../../../../base/common/event.js';
-import type { AccountSection } from '../../../../platform/account/common/accountProtocol.js';
 import type {
 	AccountPage,
 	ActivityView,
@@ -29,8 +28,6 @@ export interface AuthenticatedNavigationService {
 	readonly current: AuthenticatedDestination;
 	readonly activityView: ActivityView;
 	readonly accountPage: AccountPage;
-	/** The account section that renders the current account page. */
-	readonly accountSection: AccountSection;
 	/** The destination changed. */
 	readonly onDidChange: Event<AuthenticatedDestination>;
 	/** The Activity page changed while Activity stayed current. */
@@ -48,6 +45,8 @@ export interface AuthenticatedNavigationService {
 	/** Show a server-access notice in the sidebar, with an optional way to retry. */
 	setProductStatus(message: string, retry?: () => void): void;
 	setProfilePhoto(dataUrl: string): void;
+	/** Sign out of this window, as the sidebar's Sign out does, reporting a failure beside it. */
+	signOut(): void;
 }
 
 /** The contextual sidebar's visibility, which other window owners may request. */

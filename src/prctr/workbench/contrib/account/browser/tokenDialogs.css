@@ -1,0 +1,77 @@
+@layer contributions {
+	.prctr-account-dialog .prctr-account-token-form__scopes {
+		border: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		margin: 0;
+		min-inline-size: 0;
+		padding: 0;
+	}
+	.prctr-account-dialog .prctr-account-token-form__legend,
+	.prctr-account-dialog .prctr-account-token-form__label {
+		font-size: 13px;
+		font-weight: var(--prctr-typography-weight-medium);
+		padding: 0 0 6px;
+	}
+	.prctr-account-dialog .prctr-account-token-form__scope {
+		align-items: center;
+		display: flex;
+		gap: 10px;
+	}
+	.prctr-account-dialog .prctr-account-token-form__checkbox {
+		accent-color: var(--prctr-color-brand-accent);
+		block-size: 16px;
+		inline-size: 16px;
+		margin: 0;
+	}
+	.prctr-account-dialog .prctr-account-token-form__checkbox:focus-visible,
+	.prctr-account-dialog .prctr-account-token-form__select:focus-visible {
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
+	}
+	.prctr-account-dialog .prctr-account-token-form__error {
+		color: var(--prctr-color-feedback-error);
+		font-size: 13px;
+		margin: 0;
+	}
+	.prctr-account-dialog .prctr-account-token-form__field {
+		display: flex;
+		flex-direction: column;
+	}
+	.prctr-account-dialog .prctr-account-token-form__select {
+		background: var(--prctr-color-background-canvas);
+		block-size: 32px;
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border-radius: var(--prctr-workbench-control-radius, 6px);
+		color: var(--prctr-color-text-primary);
+		font: inherit;
+		padding: 0 8px;
+	}
+	.prctr-account-dialog .prctr-account-token-credential {
+		align-items: center;
+		background: var(--prctr-color-background-raised);
+		border-radius: var(--prctr-workbench-control-radius, 6px);
+		display: flex;
+		gap: 8px;
+		padding: 8px 8px 8px 12px;
+	}
+	.prctr-account-dialog .prctr-account-token-credential__value {
+		flex: 1;
+		font-family: var(--prctr-typography-font-monospace);
+		font-size: 13px;
+		min-inline-size: 0;
+		overflow-wrap: anywhere;
+		user-select: all;
+	}
+	.prctr-account-dialog .prctr-account-token-credential__value:focus-visible {
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 2px;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-account-dialog .prctr-account-token-credential {
+			border: var(--prctr-shape-stroke-default) solid CanvasText;
+		}
+	}
+}

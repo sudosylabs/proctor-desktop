@@ -4,81 +4,215 @@ import {
 	type AccountModel
 } from '../../src/prctr/workbench/contrib/account/browser/accountPane.ts';
 import { accountMessages } from '../../src/prctr/workbench/contrib/account/browser/accountMessages.ts';
+import type { AccountPage } from '../../src/prctr/workbench/contrib/authenticated/common/authenticatedNavigationModel.ts';
+import { WorkbenchOverlayHost } from '../../src/prctr/workbench/browser/overlayHost.ts';
 import { createLocalization } from '../../src/prctr/base/common/localization.ts';
 import { CancellationToken } from '../../src/prctr/base/common/cancellation.ts';
-import { Event } from '../../src/prctr/base/common/event.ts';
+import { Event as Events } from '../../src/prctr/base/common/event.ts';
 import type {
+	AccountData,
+	AccountFailure,
 	AccountIntent,
-	AccountResponse,
-	AccountSection
+	AccountReadSection,
+	AccountResponse
 } from '../../src/prctr/platform/account/common/accountProtocol.ts';
+
+const NOW = Date.UTC(2026, 10, 7, 12, 0, 0);
+const DAY = 24 * 60 * 60 * 1000;
+const id = (letter: string): string => letter.repeat(26);
+const CREDENTIAL = 'prctr_pat_7f3Kq9vXw2LmB8tRz4Yc1NdJ6hQe0sUa';
+
+type Reply = AccountResponse | Promise<AccountResponse>;
+
+function check(value: unknown, message: string): asserts value {
+	if (!value) throw new Error(message);
+}
+
+function data(value: AccountData): AccountResponse {
+	return { kind: 'data', data: value };
+}
+
+function failure(reason: AccountFailure): AccountResponse {
+	return { kind: 'error', reason };
+}
+
+/** A fake account capability: each read section and each change kind has a scripted reply. */
+class FakeAccount {
+	readonly requests: AccountIntent[] = [];
+	readonly reads = new Map<AccountReadSection, () => Reply>();
+	readonly changes = new Map<AccountIntent['kind'], (intent: AccountIntent) => Reply>();
+
+	async request(intent: AccountIntent): Promise<AccountResponse> {
+		this.requests.push(intent);
+		if (intent.kind === 'read')
+			return (this.reads.get(intent.section) ?? (() => failure('unavailable')))();
+		if (intent.kind === 'readPhoto') return failure('unavailable');
+		const change = this.changes.get(intent.kind);
+		return change ? change(intent) : { kind: 'success' };
+	}
+
+	count(kind: AccountIntent['kind']): number {
+		return this.requests.filter((intent) => intent.kind === kind).length;
+	}
+}
+
+const profile = (emailVerified: boolean): AccountResponse =>
+	data({
+		section: 'profile',
+		profile: {
+			username: 'a.okafor',
+			displayName: 'Amara Okafor',
+			firstName: 'Amara',
+			lastName: 'Okafor',
+			email: 'amara.okafor@northfield.example',
+			emailVerified,
+			locale: 'en-GB',
+			timezone: 'Europe/London'
+		}
+	});
+
+const sessions = (): AccountResponse =>
+	data({
+		section: 'sessions',
+		sessions: [
+			{
+				id: id('b'),
+				current: true,
+				name: 'Proctor Desktop on Amara’s MacBook Pro',
+				client: 'desktop',
+				method: 'oidc',
+				createdAt: NOW - 60 * 60 * 1000,
+				lastActivityAt: NOW,
+				expiresAt: NOW + DAY
+			},
+			{
+				id: id('c'),
+				current: false,
+				name: 'Lab PC 14',
+				client: 'desktop',
+				method: 'password',
+				createdAt: NOW - 4 * DAY,
+				lastActivityAt: NOW - 4 * DAY,
+				expiresAt: NOW + DAY
+			}
+		]
+	});
+
+const desktops = (): AccountResponse =>
+	data({
+		section: 'desktops',
+		desktops: [
+			{
+				id: id('d'),
+				current: true,
+				name: 'Amara’s MacBook Pro',
+				platform: 'darwin',
+				release: '0.1.0',
+				createdAt: NOW - 50 * DAY,
+				lastUsedAt: NOW,
+				revoked: false
+			},
+			{
+				id: id('e'),
+				current: false,
+				name: 'Lab PC 14',
+				platform: 'win32',
+				release: '0.1.0',
+				createdAt: NOW - 10 * DAY,
+				lastUsedAt: NOW - 4 * DAY,
+				revoked: false
+			}
+		]
+	});
+
+const tokens = (): AccountResponse =>
+	data({
+		section: 'tokens',
+		tokens: [
+			{
+				id: id('f'),
+				description: 'Grade export script',
+				scopes: ['examinations:read'],
+				academicUnitId: id('u'),
+				expiresAt: NOW + 100 * DAY,
+				lastUsedAt: NOW - 2 * DAY,
+				createdAt: NOW - 20 * DAY
+			},
+			{
+				id: id('g'),
+				description: 'Marking spreadsheet',
+				scopes: ['examinations:read'],
+				expiresAt: NOW + 50 * DAY,
+				disabledAt: NOW - 25 * DAY,
+				createdAt: NOW - 30 * DAY
+			},
+			{
+				id: id('h'),
+				description: 'Old roster import',
+				scopes: ['people:read'],
+				expiresAt: NOW - 150 * DAY,
+				createdAt: NOW - 300 * DAY
+			}
+		]
+	});
 
 export async function runAccountTests(document: Document): Promise<void> {
 	await runAccountPhotoTests(document);
-	const requests: AccountIntent[] = [];
-	let failure: 'strongAuthenticationRequired' | 'unconfirmed' = 'strongAuthenticationRequired';
-	let delayed: ((value: AccountResponse) => void) | undefined;
-	const pane = new AccountPane(
-		document,
-		{
-			async request(intent) {
-				requests.push(intent);
-				if (intent.kind === 'read' && intent.section === 'profile')
-					return new Promise<AccountResponse>((resolve) => {
-						delayed = resolve;
-					});
-				if (intent.kind === 'read' && intent.section === 'sessions')
-					return {
-						kind: 'data',
-						data: {
-							section: 'sessions',
-							sessions: [
-								{
-									id: 'y'.repeat(26),
-									current: false,
-									name: 'Browser on another computer',
-									client: 'web',
-									method: 'password',
-									createdAt: 1,
-									lastActivityAt: 1,
-									expiresAt: 2
-								}
-							]
-						}
-					};
-				if (intent.kind === 'read' && intent.section === 'security')
-					return {
-						kind: 'data',
-						data: {
-							section: 'security',
-							security: { password: true, providers: [], mfa: undefined }
-						}
-					};
-				return { kind: 'error', reason: failure };
-			}
-		},
-		createLocalization({ requestedLocale: 'en', messages: Object.values(accountMessages) }),
-		{
+	const host = document.createElement('div');
+	const background = document.createElement('div');
+	host.style.cssText = 'position: relative; inline-size: 900px; block-size: 700px;';
+	document.body.append(host, background);
+	const overlays = new WorkbenchOverlayHost(host, background);
+	const account = new FakeAccount();
+	const signOuts: number[] = [];
+	const copied: string[] = [];
+	const pane = new AccountPane(document, {
+		client: account,
+		localization: createLocalization({
+			requestedLocale: 'en',
+			messages: Object.values(accountMessages)
+		}),
+		binding: {
 			kind: 'authenticated',
 			windowId: 'test:account',
-			institutionOrigin: 'https://example.test',
-			principalId: 'y'.repeat(26),
-			sessionId: 'b'.repeat(26),
-			initialDestination: 'account'
-		}
-	);
-	document.body.append(pane.element);
-	const assign = (section: AccountSection): void => {
-		pane.clear();
+			institutionOrigin: 'https://northfield.example',
+			principalId: id('y'),
+			sessionId: id('b'),
+			initialDestination: 'account',
+			identity: {
+				principalId: id('y'),
+				sessionId: id('b'),
+				institutionOrigin: 'https://northfield.example',
+				institutionName: 'Northfield University',
+				displayName: 'Amara Okafor',
+				availableProductAreas: ['account'],
+				noCurrentAffiliation: false,
+				noAssignedAccess: false
+			}
+		},
+		overlays,
+		customPhotos: new Set(),
+		hooks: {
+			setProfilePhoto() {},
+			signOut: () => signOuts.push(1),
+			writeClipboard: async (text) => {
+				copied.push(text);
+			}
+		},
+		now: () => NOW
+	});
+	host.append(pane.element);
+	const root = pane.element;
+	const assign = (page: AccountPage): void => {
 		const model: AccountModel = {
-			section,
+			page,
 			item: {
 				typeId: 'prctr.authenticated.account',
-				logicalIdentity: section,
-				presentation: { title: section, accessibleLabel: section },
+				logicalIdentity: page,
+				presentation: { title: page, accessibleLabel: page },
 				closable: false,
 				restorable: false,
-				onDidChangePresentation: Event.None,
+				onDidChangePresentation: Events.None,
 				matches() {
 					return false;
 				}
@@ -88,122 +222,385 @@ export async function runAccountTests(document: Document): Promise<void> {
 		pane.setItem(model, CancellationToken.None);
 		pane.setVisible(true);
 	};
-	const button = (text: string): HTMLButtonElement => {
-		const button = [...pane.element.querySelectorAll('button')].find(
-			(button) => button.textContent === text
-		);
-		if (!button) throw new Error(`Missing account action: ${text}`);
-		return button;
-	};
-	const wait = async (predicate: () => boolean): Promise<void> => {
-		for (let i = 0; i < 40; i++) {
+	const wait = async (predicate: () => boolean, what: string): Promise<void> => {
+		for (let i = 0; i < 60; i++) {
 			if (predicate()) return;
 			await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 		}
-		throw new Error('Account view did not settle: ' + pane.element.textContent);
+		throw new Error(`Account page did not settle: ${what}\n${root.textContent ?? ''}`);
+	};
+	const buttonIn = (scope: ParentNode, text: string): HTMLButtonElement | undefined =>
+		[...scope.querySelectorAll<HTMLButtonElement>('button')].find(
+			(button) => button.textContent?.trim() === text
+		);
+	const dialog = (): HTMLDialogElement | null => host.querySelector('dialog[open]');
+	const section = (title: string): HTMLElement => {
+		const found = [...root.querySelectorAll<HTMLElement>('.prctr-account-section')].find(
+			(candidate) => candidate.querySelector('h2')?.textContent === title
+		);
+		check(found, `Missing section ${title}`);
+		return found;
+	};
+	const row = (title: string): HTMLElement => {
+		const found = [...root.querySelectorAll<HTMLElement>('.prctr-account-row')].find(
+			(candidate) =>
+				candidate.querySelector('.prctr-account-row__title')?.textContent === title
+		);
+		check(found, `Missing row ${title}`);
+		return found;
+	};
+	const openMenu = (title: string): HTMLElement => {
+		const more = row(title).querySelector<HTMLButtonElement>('.prctr-account-row__more');
+		check(more, `Row ${title} has no actions menu`);
+		more.click();
+		const menu = root.querySelector<HTMLElement>('.prctr-menu[role="menu"]');
+		check(menu, 'The actions menu did not open');
+		check(
+			more.getAttribute('aria-expanded') === 'true',
+			'The menu button does not report it is open'
+		);
+		return menu;
+	};
+	const menuItem = (menu: HTMLElement, label: string): HTMLButtonElement => {
+		const item = buttonIn(menu, label);
+		check(item, `Menu has no ${label}`);
+		return item;
 	};
 	try {
+		// #region Profile
+		let resolveProfile: ((value: AccountResponse) => void) | undefined;
+		account.reads.set('profile', () => new Promise((resolve) => (resolveProfile = resolve)));
+		account.reads.set('sessions', sessions);
+		account.reads.set('notices', () => data({ section: 'notices', notices: [], more: false }));
 		assign('profile');
-		if (!pane.element.querySelector('[data-prctr-icon-modifier="spin"]'))
-			throw new Error('Account loading has no animated Codicon');
-		assign('sessions');
-		await wait(() => pane.element.textContent!.includes('Browser on another computer'));
-		delayed?.({
-			kind: 'data',
-			data: {
-				section: 'profile',
-				profile: {
-					username: 'stale',
-					displayName: 'Stale response',
-					firstName: '',
-					lastName: ''
-				}
-			}
-		});
-		await Promise.resolve();
-		if (pane.element.textContent!.includes('Stale response'))
-			throw new Error('Old account response replaced the selected section');
-		button('End session').click();
-		if (requests.some((intent) => intent.kind === 'revokeSession'))
-			throw new Error('Session ended without confirmation');
-		if (document.activeElement !== button('Cancel'))
-			throw new Error('Confirmation must focus the safe action');
-		button('Cancel').click();
-		if (document.activeElement !== button('End session'))
-			throw new Error('Cancel did not restore focus');
-		button('End session').click();
-		const confirm = pane.element.querySelector<HTMLButtonElement>(
-			'[data-confirmation] button:nth-child(2)'
+		check(root.querySelector('h1')?.textContent === 'Profile', 'Profile has its heading');
+		check(
+			root
+				.querySelector('.prctr-account__description')
+				?.textContent?.includes('Northfield University'),
+			'Profile describes the institution'
 		);
-		confirm?.click();
+		check(
+			root.querySelector('[data-prctr-icon-modifier="spin"]'),
+			'Loading shows an animated indicator'
+		);
+		resolveProfile?.(profile(false));
 		await wait(
-			() =>
-				!!pane.element
-					.querySelector('[data-confirmation] .prctr-account-feedback')
-					?.textContent?.includes('multi-factor authentication before')
+			() => root.textContent!.includes('amara.okafor@northfield.example'),
+			'profile details'
 		);
-		if (requests.filter((intent) => intent.kind === 'revokeSession').length !== 1)
-			throw new Error('Revocation should run exactly once');
-		button('Cancel').click();
-		failure = 'unconfirmed';
-		button('End session').click();
-		pane.element
-			.querySelector<HTMLButtonElement>('[data-confirmation] button:nth-child(2)')!
-			.click();
-		await wait(() => pane.element.textContent!.includes('server did not confirm'));
-		button('Cancel').click();
-		button('End session').click();
-		const blocked = pane.element.querySelector<HTMLButtonElement>(
-			'[data-confirmation] button:nth-child(2)'
-		)!;
-		if (!blocked.disabled)
-			throw new Error('Closing confirmation bypassed uncertain-outcome reconciliation');
-		blocked.click();
-		if (requests.filter((intent) => intent.kind === 'revokeSession').length !== 2)
-			throw new Error('Uncertain mutation was retried without a read');
-		failure = 'strongAuthenticationRequired';
-		assign('security');
-		await wait(() => pane.element.textContent!.includes('Password sign-in'));
-		if (!pane.element.textContent!.includes('Not available'))
-			throw new Error('Unavailable MFA was misrepresented as disabled');
-		if (pane.element.querySelector('input'))
-			throw new Error('Security credentials must stay in the browser');
-		pane.element.style.width = '370px';
-		pane.element.style.height = '400px';
+		check(
+			root.querySelector('.prctr-account-profile__username')?.textContent === 'a.okafor',
+			'Username is shown'
+		);
+		check(
+			root.textContent!.includes('English (United Kingdom)'),
+			'Language is named, not coded'
+		);
+		check(root.textContent!.includes('Not verified'), 'Unverified email is marked');
+		await wait(() => {
+			const signIn = [
+				...root.querySelectorAll<HTMLElement>('.prctr-account-details__row')
+			].find((candidate) => candidate.querySelector('dt')?.textContent === 'Last sign-in');
+			return !!signIn && !signIn.hidden && signIn.textContent!.includes('Proctor Desktop');
+		}, 'last sign-in from this window’s session');
+		check(
+			section('Exam records due for deletion').hidden,
+			'Retention notices are absent when there are none'
+		);
+		check(!root.querySelector('input:not([type="file"])'), 'Account details are read-only');
+		const send = buttonIn(root, 'Send verification email');
+		check(send, 'Unverified email offers verification');
+		send.click();
+		await wait(() => account.count('requestEmailVerification') === 1, 'verification request');
+		await wait(
+			() => root.textContent!.includes('If this address can receive email'),
+			'non-enumerating reply'
+		);
+
+		account.reads.set('profile', () => profile(true));
+		account.reads.set('notices', () =>
+			data({
+				section: 'notices',
+				more: true,
+				notices: [
+					{
+						retirementId: id('r'),
+						examId: id('x'),
+						examSittingId: id('s'),
+						submissionId: id('t'),
+						category: 'work',
+						state: 'grace',
+						createdAt: NOW - 3 * DAY,
+						retireAfter: NOW + 30 * DAY,
+						deliveryState: 'accepted'
+					}
+				]
+			})
+		);
 		assign('profile');
-		delayed?.({
-			kind: 'data',
-			data: {
-				section: 'profile',
-				profile: {
-					username: 'a.long.user.name',
-					displayName: 'Alexandra Montgomery',
-					firstName: 'Alexandra',
-					lastName: 'Montgomery',
-					email: 'alexandra.montgomery@institution.example',
-					emailVerified: true,
-					locale: 'English',
-					timezone: 'Europe/Paris'
+		await wait(() => !section('Exam records due for deletion').hidden, 'notices section');
+		check(row('Your submitted work'), 'A notice names its record category');
+		check(!root.textContent!.includes(id('x')), 'Notices never show raw identifiers');
+		check(
+			root.textContent!.includes('There are more records'),
+			'Further notices are acknowledged'
+		);
+		check(
+			buttonIn(root, 'Send verification email')?.closest('[hidden]'),
+			'Verified email needs no verification'
+		);
+		// #endregion
+
+		// #region Sign-in and security
+		account.reads.set('security', () =>
+			data({
+				section: 'security',
+				security: {
+					password: true,
+					providers: [{ name: 'Northfield University account', type: 'oidc' }],
+					mfa: {
+						available: true,
+						enabled: true,
+						pending: false,
+						recoveryRequired: false,
+						recoveryCodesRemaining: 2
+					}
 				}
-			}
+			})
+		);
+		assign('security');
+		await wait(
+			() => root.textContent!.includes('Northfield University account'),
+			'security rows'
+		);
+		check(
+			row('Recovery codes').querySelector('[data-shape="attention"]'),
+			'Few recovery codes read as attention'
+		);
+		check(!root.querySelector('input'), 'Security credentials stay on the hosted page');
+		check(
+			root.textContent!.includes('never asks for your password'),
+			'The footnote explains the hosted page'
+		);
+		check(!root.querySelector('.prctr-account-row__more'), 'Security rows have no actions');
+		buttonIn(root, 'Open security page')!.click();
+		await wait(() => account.count('openSecurity') === 1, 'open security');
+		// #endregion
+
+		// #region Sessions and devices
+		account.reads.set('desktops', () => failure('unavailable'));
+		assign('sessions');
+		await wait(() => root.textContent!.includes('Lab PC 14'), 'sessions');
+		check(
+			section('Registered desktops').dataset.state === 'failed' &&
+				buttonIn(section('Registered desktops'), 'Try again'),
+			'A failed section offers a retry'
+		);
+		check(section('Other sessions').dataset.state === 'ready', 'Sections fail independently');
+		check(
+			[...root.querySelectorAll('.prctr-account-row button')].every((button) =>
+				button.classList.contains('prctr-account-row__more')
+			),
+			'Row actions are never inline buttons'
+		);
+		account.reads.set('desktops', desktops);
+		buttonIn(section('Registered desktops'), 'Try again')!.click();
+		await wait(
+			() => section('Registered desktops').dataset.state === 'ready',
+			'desktops retry'
+		);
+		check(
+			!row('Amara’s MacBook Pro').querySelector('.prctr-account-row__more'),
+			'This computer’s desktop has no Remove'
+		);
+
+		let menu = openMenu('Proctor Desktop on Amara’s MacBook Pro');
+		menuItem(menu, 'Sign out').click();
+		await wait(() => signOuts.length === 1, 'current session signs out');
+		check(account.count('revokeSession') === 0, 'Signing out is not a remote revocation here');
+
+		menu = openMenu('Lab PC 14');
+		const end = menuItem(menu, 'End session');
+		check(end.dataset.destructive === 'true', 'Ending a session is destructive');
+		end.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+		check(!root.querySelector('.prctr-menu'), 'Escape closes the menu');
+		const more = row('Lab PC 14').querySelector<HTMLButtonElement>('.prctr-account-row__more')!;
+		check(document.activeElement === more, 'Closing the menu returns focus to its button');
+		menuItem(openMenu('Lab PC 14'), 'End session').click();
+		await wait(() => dialog() !== null, 'confirmation');
+		check(
+			dialog()!.getAttribute('role') === 'alertdialog',
+			'The confirmation is an alert dialog'
+		);
+		check(
+			dialog()!.textContent!.includes('End the session on Lab PC 14?'),
+			'The confirmation names the session'
+		);
+		check(document.activeElement === buttonIn(dialog()!, 'Cancel'), 'Cancel has initial focus');
+		check(overlays.visible, 'The dialog gates the window');
+		buttonIn(dialog()!, 'Cancel')!.click();
+		check(!dialog() && account.count('revokeSession') === 0, 'Cancel changes nothing');
+		check(document.activeElement === more, 'Cancel returns focus to the row');
+
+		account.changes.set('revokeSession', () => failure('strongAuthenticationRequired'));
+		menuItem(openMenu('Lab PC 14'), 'End session').click();
+		await wait(() => dialog() !== null, 'confirmation again');
+		buttonIn(dialog()!, 'End session')!.click();
+		await wait(
+			() => !!dialog()?.textContent?.includes('stronger sign-in'),
+			'known failure in dialog'
+		);
+		check(account.count('revokeSession') === 1, 'The change ran exactly once');
+		buttonIn(dialog()!, 'Cancel')!.click();
+
+		account.changes.set('revokeSession', () => failure('unconfirmed'));
+		let resolveSessions: ((value: AccountResponse) => void) | undefined;
+		account.reads.set('sessions', () => new Promise((resolve) => (resolveSessions = resolve)));
+		menuItem(openMenu('Lab PC 14'), 'End session').click();
+		await wait(() => dialog() !== null, 'confirmation for unknown outcome');
+		buttonIn(dialog()!, 'End session')!.click();
+		await wait(() => !dialog(), 'unknown outcome closes the dialog');
+		check(
+			section('Other sessions').textContent!.includes('couldn’t confirm'),
+			'The unknown outcome is reported'
+		);
+		menu = openMenu('Lab PC 14');
+		check(
+			menuItem(menu, 'End session').getAttribute('aria-disabled') === 'true',
+			'An unknown outcome locks the row until the list is read again'
+		);
+		menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+		resolveSessions?.(sessions());
+		await wait(() => {
+			const item = buttonIn(openMenu('Lab PC 14'), 'End session');
+			root.querySelector('.prctr-menu')?.dispatchEvent(
+				new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+			);
+			return item?.getAttribute('aria-disabled') === 'false';
+		}, 'fresh read unlocks the row');
+		// #endregion
+
+		// #region Access tokens
+		account.reads.set('tokens', tokens);
+		assign('tokens');
+		await wait(() => root.textContent!.includes('Grade export script'), 'tokens');
+		check(section('Active').contains(row('Grade export script')), 'Working tokens are active');
+		check(
+			section('Disabled or expired').contains(row('Marking spreadsheet')),
+			'Disabled tokens are inactive'
+		);
+		check(
+			row('Grade export script').textContent!.includes('One academic unit only'),
+			'A unit limit is tagged'
+		);
+		check(
+			row('Old roster import').textContent!.includes('people:read'),
+			'An unknown scope is shown as the server names it'
+		);
+		check(
+			!row('Old roster import').querySelector('.prctr-account-row__more'),
+			'Expired tokens have no actions'
+		);
+		check(
+			[...openMenu('Marking spreadsheet').querySelectorAll('button')]
+				.map((item) => item.textContent)
+				.join() === 'Enable,Revoke',
+			'A disabled token can be enabled or revoked'
+		);
+		root.querySelector('.prctr-menu')?.dispatchEvent(
+			new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+		);
+
+		menuItem(openMenu('Grade export script'), 'Disable').click();
+		await wait(() => account.count('disableToken') === 1, 'disable runs without confirmation');
+
+		menuItem(openMenu('Grade export script'), 'Revoke').click();
+		await wait(() => dialog() !== null, 'revoke confirmation');
+		check(
+			dialog()!.textContent!.includes('Revoke Grade export script?'),
+			'Revoke is confirmed'
+		);
+		buttonIn(dialog()!, 'Revoke token')!.click();
+		await wait(() => !dialog() && account.count('revokeToken') === 1, 'revoke');
+
+		buttonIn(root, 'New token')!.click();
+		await wait(() => dialog() !== null, 'new token dialog');
+		const form = dialog()!;
+		check(form.textContent!.includes('Read exams'), 'The contract’s scope is offered');
+		check(
+			!form.querySelector('select[name="unit"]') && !form.textContent!.includes('Limit to'),
+			'No unit choice without known units'
+		);
+		buttonIn(form, 'Create token')!.click();
+		check(form.textContent!.includes('Enter a name.'), 'A token needs a name');
+		check(account.count('createToken') === 0, 'An invalid draft is never sent');
+		const name = form.querySelector<HTMLInputElement>('input[type="text"]')!;
+		name.value = '  Grade export script 2  ';
+		name.dispatchEvent(new Event('input', { bubbles: true }));
+		buttonIn(form, 'Create token')!.click();
+		check(form.textContent!.includes('Tick at least one'), 'A token needs a scope');
+		form.querySelector<HTMLInputElement>('input[type="checkbox"]')!.click();
+		account.changes.set('createToken', (intent) => {
+			check(intent.kind === 'createToken', 'createToken intent');
+			return {
+				kind: 'tokenCreated',
+				credential: CREDENTIAL,
+				token: {
+					id: id('k'),
+					description: intent.description,
+					scopes: intent.scopes,
+					expiresAt: intent.expiresAt,
+					createdAt: NOW
+				}
+			};
 		});
-		await wait(() => pane.element.textContent!.includes('Alexandra Montgomery'));
+		buttonIn(form, 'Create token')!.click();
+		await wait(
+			() => !!dialog()?.textContent?.includes('Copy your token now'),
+			'credential dialog'
+		);
+		const created = account.requests.find(
+			(intent): intent is Extract<AccountIntent, { kind: 'createToken' }> =>
+				intent.kind === 'createToken'
+		)!;
+		check(created.description === 'Grade export script 2', 'The name is sent trimmed');
+		check(created.scopes.join() === 'examinations:read', 'Only ticked scopes are sent');
+		check(created.expiresAt === NOW + 90 * DAY, 'The default expiry is 90 days');
+		check(dialog()!.textContent!.includes(CREDENTIAL), 'The credential is shown once');
+		buttonIn(dialog()!, 'Copy')!.click();
+		await wait(() => copied.at(-1) === CREDENTIAL, 'copy');
+		buttonIn(dialog()!, 'Done')!.click();
+		check(!dialog(), 'Done closes the credential dialog');
+		check(
+			!document.body.textContent!.includes(CREDENTIAL),
+			'The credential leaves the page when the dialog closes'
+		);
+		// #endregion
+
+		// #region Layout and lifecycle
+		host.style.inlineSize = '360px';
+		assign('sessions');
+		await wait(() => root.textContent!.includes('Lab PC 14'), 'narrow sessions');
 		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-		const viewport = pane.element.querySelector<HTMLElement>('.prctr-account__viewport')!;
-		if (viewport.scrollWidth > viewport.clientWidth + 1)
-			throw new Error('Narrow account content overflows horizontally');
-		if (
-			!pane.element
-				.querySelector('.prctr-account__email .prctr-account__verified')
-				?.textContent?.includes('Verified')
-		)
-			throw new Error('Email verification must stay next to account details');
+		const viewport = root.querySelector<HTMLElement>('.prctr-account__viewport')!;
+		check(
+			viewport.scrollWidth <= viewport.clientWidth + 1,
+			'Narrow account content does not overflow sideways'
+		);
+		let late: ((value: AccountResponse) => void) | undefined;
+		account.reads.set('profile', () => new Promise((resolve) => (late = resolve)));
 		assign('profile');
 		pane.dispose();
-		delayed?.({ kind: 'error', reason: 'unavailable' });
+		late?.(profile(true));
 		await Promise.resolve();
-		if (pane.element.isConnected) throw new Error('Disposed account pane remains attached');
+		check(!pane.element.isConnected, 'A disposed pane leaves the window');
+		check(!overlays.visible, 'A disposed pane leaves no modal behind');
+		// #endregion
 	} finally {
 		pane.dispose();
+		overlays.dispose();
+		host.remove();
+		background.remove();
 	}
 }

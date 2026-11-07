@@ -9,7 +9,6 @@ import { KeyCode, KeyMod } from '../../../../base/common/keyCodes.js';
 import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
 import type { LocalizationContext } from '../../../../base/common/localization.js';
 import { isMacintosh } from '../../../../base/common/platform.js';
-import type { AccountSection } from '../../../../platform/account/common/accountProtocol.js';
 import { KeybindingWeight } from '../../../../platform/keybinding/common/keybindingsRegistry.js';
 import type { ProductWindowChrome } from '../../../../platform/windows/browser/productWindowChrome.js';
 import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
@@ -18,7 +17,6 @@ import type { WorkbenchShell } from '../../../browser/workbenchShell.js';
 import { WorkbenchModalContext } from '../../../common/contextKeys.js';
 import { registerProctorAction } from '../../../services/actions/common/proctorActions.js';
 import {
-	accountSectionOf,
 	activityViews,
 	AuthenticatedNavigationModel,
 	type AccountPage,
@@ -217,10 +215,6 @@ export class AuthenticatedFrame
 
 	get accountPage(): AccountPage {
 		return this.model.location.accountPage;
-	}
-
-	get accountSection(): AccountSection {
-		return accountSectionOf(this.model.location.accountPage);
 	}
 
 	get settingsRequested(): boolean {
@@ -486,7 +480,7 @@ export class AuthenticatedFrame
 		if (hadFocus && !this.topBar.focusShowSidebar()) this.shell.focusVisiblePart(['content']);
 	}
 
-	private signOut(): void {
+	signOut(): void {
 		if (this.signingOut) return;
 		this.signingOut = true;
 		this.sidebar.setSigningOut(true);

@@ -5,7 +5,7 @@
   "admission": {
     "workflow": "Present Proctor's native ButtonControl with VS Code Modern UI text-button geometry, states and radius tier. The AuthenticatedWindow frame is Proctor-owned and no longer transfers the floating-panel shell.",
     "callers": [
-      "src/prctr/workbench/contrib/account/browser/accountPane.ts",
+      "src/prctr/workbench/contrib/account/browser/accountSection.ts",
       "src/prctr/workbench/contrib/examActivity/browser/examActivityPane.ts"
     ],
     "interface": "src/prctr/base/browser/ui/button/buttonControl.ts",
@@ -77,7 +77,7 @@
       "id": "account-browser",
       "kind": "test",
       "path": "test/browser/accountTests.ts",
-      "obligation": "Account loading, mutation confirmation/cancellation, focus, disposal and constrained-width profile behavior through production pane."
+      "obligation": "Account page loading, failure, menu actions, confirmation/cancellation, focus, disposal and constrained-width behavior through the production pane."
     },
     {
       "id": "manual-comparison",
