@@ -2,7 +2,7 @@
 	.prctr-launch-header {
 		align-items: center;
 		display: flex;
-		gap: var(--prctr-spacing-content-medium);
+		gap: 10px;
 		min-inline-size: 0;
 	}
 
@@ -14,19 +14,11 @@
 	}
 
 	.prctr-launch-header .prctr-launch-header__name {
-		font-size: var(--prctr-typography-heading-small-size);
+		font-size: 16px;
 		font-weight: var(--prctr-typography-weight-medium);
 		letter-spacing: -0.01em;
-		line-height: var(--prctr-typography-heading-small-lineHeight);
+		line-height: 22px;
 		margin: 0;
-	}
-
-	.prctr-launch-header .prctr-launch-header__version {
-		color: var(--prctr-color-text-secondary);
-		font-family: var(--prctr-typography-font-monospace);
-		font-size: var(--prctr-typography-label-small-size);
-		line-height: var(--prctr-typography-label-small-lineHeight);
-		margin-inline-start: auto;
 	}
 
 	@media (forced-colors: active) {

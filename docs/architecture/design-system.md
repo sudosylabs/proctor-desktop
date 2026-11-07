@@ -145,6 +145,28 @@ with light, dark, and high-contrast defaults. Native window controls
 receive a closed, validated foreground/background projection. Native menus
 retain operating-system material and selection rendering.
 
+Proctor also bundles its own Proctor Light and Proctor Dark themes, the warm
+neutral palette of the accepted LaunchWindow design. They include the GitHub
+Light Default and Dark Default themes for every role they do not set, including
+syntax colors. LaunchWindow follows the operating-system scheme with these two
+themes. The other windows keep the GitHub default until a decision moves them.
+Roles VS Code has no color for (tertiary text, pending glyphs, the disabled
+primary fill and the development-server stripes) are registered as `proctor.*`
+colors and exposed as semantic tokens.
+
+Status glyphs are Proctor-owned SVG shapes on a 16-unit grid, distinct by shape
+as well as color: success is a check in a circle, error a filled circle with a
+cut-out cross, warning an exclamation in a circle, loading an arc on a quiet
+track, pending a dashed circle and skipped a dash.
+
+LaunchWindow shows the system's window material behind its page: Liquid Glass
+on macOS 26 and later, `sidebar` vibrancy when glass cannot attach or on earlier
+macOS, and Mica on Windows 11 22H2 and later. Reduce Transparency and Increase
+Contrast make the window opaque in the theme's canvas color. Electron main owns
+the material and reports it through the window chrome channel. The page marks
+the document root with `data-window-material` and becomes transparent only
+while a material is active; fields, panels and buttons stay opaque.
+
 Custom color overrides apply to AuthenticatedWindow. The current server Attempt
 Configuration carries only four scheme identifiers: Candidate freezes that
 scheme and uses its packaged default palette, with no live user color overrides.

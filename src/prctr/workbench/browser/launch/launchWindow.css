@@ -1,5 +1,9 @@
 @layer workbench {
 	.prctr-launch-window {
+		/* The window's own sizes, from the accepted LaunchWindow design. */
+		--prctr-launch-inset: 28px;
+		--prctr-launch-gap: 22px;
+		--prctr-launch-control-radius: 6px;
 		background: var(--prctr-color-background-canvas);
 		block-size: 100%;
 		color: var(--prctr-color-text-primary);
@@ -11,6 +15,30 @@
 		overflow: hidden;
 	}
 
+	/*
+	 * Over Liquid Glass, vibrancy or Mica the backdrop is the window's surface, so the
+	 * window and its title bar let it show through. Fields, panels and buttons stay opaque.
+	 */
+	:root:is(
+			[data-window-material='glass'],
+			[data-window-material='vibrancy'],
+			[data-window-material='mica']
+		)
+		.prctr-launch-window,
+	:root:is(
+			[data-window-material='glass'],
+			[data-window-material='vibrancy'],
+			[data-window-material='mica']
+		)
+		.prctr-launch-window
+		.prctr-launch-window__titlebar {
+		background: transparent;
+	}
+
+	.prctr-launch-window[data-platform='windows'] {
+		--prctr-launch-control-radius: 4px;
+	}
+
 	.prctr-launch-window .prctr-launch-window__titlebar {
 		flex: none;
 		inline-size: 100%;
@@ -18,14 +46,22 @@
 
 	/* Shown only for an explicitly enabled development server, so it can never pass for production. */
 	.prctr-launch-window .prctr-launch-window__development {
-		background: var(--prctr-color-feedback-warningBackground);
-		border-block: var(--prctr-shape-stroke-default) solid var(--prctr-color-feedback-warning);
-		color: var(--prctr-color-text-primary);
+		align-items: center;
+		background: repeating-linear-gradient(
+			135deg,
+			var(--prctr-color-development-background) 0 8px,
+			var(--prctr-color-development-stripe) 8px 16px
+		);
+		color: var(--prctr-color-development-foreground);
+		display: flex;
+		flex: none;
 		font-family: var(--prctr-typography-font-monospace);
-		font-size: var(--prctr-typography-label-small-size);
-		line-height: var(--prctr-typography-label-small-lineHeight);
+		font-size: 11.5px;
+		justify-content: center;
+		line-height: 16px;
 		margin: 0;
-		padding: var(--prctr-spacing-content-small) var(--prctr-spacing-region);
+		min-block-size: 26px;
+		padding: 0 var(--prctr-launch-inset);
 		text-align: center;
 	}
 
@@ -48,11 +84,11 @@
 
 	.prctr-launch-window .prctr-launch-window__content {
 		box-sizing: border-box;
-		display: grid;
-		gap: var(--prctr-spacing-region);
+		display: flex;
+		flex-direction: column;
+		gap: var(--prctr-launch-gap);
 		min-inline-size: 0;
-		padding: var(--prctr-spacing-control-inline) var(--prctr-spacing-region)
-			var(--prctr-spacing-region);
+		padding: 8px var(--prctr-launch-inset) var(--prctr-spacing-content-large);
 	}
 
 	.prctr-launch-window .prctr-launch-window__announcer {
@@ -73,11 +109,11 @@
 		cursor: pointer;
 		flex: none;
 		font: inherit;
-		font-size: var(--prctr-typography-label-size);
+		font-size: 13px;
 		font-weight: var(--prctr-typography-weight-medium);
-		line-height: var(--prctr-typography-label-lineHeight);
+		line-height: 18px;
 		min-block-size: 28px;
-		padding: 0 var(--prctr-spacing-content-small);
+		padding: 0 2px;
 		text-decoration: underline;
 		text-decoration-thickness: 1px;
 		text-underline-offset: 3px;

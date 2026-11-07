@@ -120,6 +120,7 @@ export async function runLaunchWindowTests(
 				};
 			},
 			zoomFactor: () => 1,
+			onDidChangeMaterial: () => ({ dispose() {} }),
 			onDidChangeFullscreen: (accept) => {
 				fullscreenListener = accept;
 				return {
@@ -288,9 +289,10 @@ export async function runLaunchWindowTests(
 		);
 		check(
 			rows().every((row) => row.dataset.status === 'done') &&
-				owner.body.textContent?.includes('Proctor 0.1.0 · Windows') &&
-				owner.querySelector('.prctr-launch-header__version')?.textContent === '0.1.0',
-			'Ready marks every check done and names the build that was checked'
+				rows()[2]?.querySelector('.prctr-launch-checks__detail')?.textContent ===
+					'Windows' &&
+				!owner.body.textContent?.includes('0.1.0'),
+			'Ready marks every check done, names the platform and shows no version number'
 		);
 		check(
 			rows().every((row) => row.querySelector('.prctr-launch-checks__status')?.textContent),
@@ -500,6 +502,7 @@ async function verifySnapshotRace(document: Document): Promise<void> {
 				material: 'none' as const
 			}),
 			zoomFactor: () => 1,
+			onDidChangeMaterial: () => ({ dispose() {} }),
 			onDidChangeFullscreen: () => ({ dispose() {} }),
 			update: async () => {}
 		},

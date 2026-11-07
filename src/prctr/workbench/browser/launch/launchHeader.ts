@@ -5,7 +5,6 @@
 import { createElementFactory } from '../../../base/browser/documentElements.js';
 import type { LocalizationContext } from '../../../base/common/localization.js';
 import { Disposable } from '../../../base/common/lifecycle.js';
-import type { LaunchBuild } from '../../../platform/identity/common/launchIdentity.js';
 import { launchMessages as messages } from './launchMessages.js';
 import './launchHeader.css';
 
@@ -20,11 +19,9 @@ const MARK_PATHS = [
 	}
 ];
 
-/** The window's identity row: mark, product name as the page heading, and the running version. */
+/** The window's identity row: the mark and the product name as the page heading. */
 export class LaunchHeader extends Disposable {
 	readonly element: HTMLElement;
-
-	private readonly version: HTMLElement;
 
 	constructor(
 		host: HTMLElement,
@@ -36,28 +33,8 @@ export class LaunchHeader extends Disposable {
 			id: 'prctr-launch-title',
 			textContent: this.localization.format(messages.productName)
 		});
-		this.version = $('span.prctr-launch-header__version', { hidden: true });
-		this.element = $(
-			'header.prctr-launch-header',
-			{},
-			createMark(host.ownerDocument),
-			name,
-			this.version
-		);
+		this.element = $('header.prctr-launch-header', {}, createMark(host.ownerDocument), name);
 		host.append(this.element);
-	}
-
-	render(build: LaunchBuild | undefined): void {
-		this.version.hidden = build === undefined;
-		this.version.textContent = build?.release ?? '';
-		if (build === undefined) {
-			this.version.removeAttribute('aria-label');
-		} else {
-			this.version.setAttribute(
-				'aria-label',
-				this.localization.format(messages.version, { release: build.release })
-			);
-		}
 	}
 
 	override dispose(): void {

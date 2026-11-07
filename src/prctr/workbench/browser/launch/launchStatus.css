@@ -1,7 +1,8 @@
 @layer workbench {
 	.prctr-launch-status {
-		display: grid;
-		gap: var(--prctr-spacing-control-inline);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
 		min-inline-size: 0;
 	}
 
@@ -12,62 +13,62 @@
 	.prctr-launch-status .prctr-launch-status__headline {
 		align-items: flex-start;
 		display: flex;
-		gap: var(--prctr-spacing-control-inline);
+		gap: 8px;
 	}
 
 	.prctr-launch-status .prctr-launch-status__glyph {
 		align-items: center;
-		block-size: var(--prctr-typography-body-lineHeight);
+		block-size: 22px;
 		display: inline-flex;
 		flex: none;
 	}
 
 	.prctr-launch-status .prctr-launch-status__head {
-		font-size: var(--prctr-typography-body-size);
+		font-size: 15px;
 		font-weight: var(--prctr-typography-weight-semibold);
-		line-height: var(--prctr-typography-body-lineHeight);
+		line-height: 1.45;
 		margin: 0;
 		text-wrap: pretty;
 	}
 
 	/* Indented to the headline text, past its glyph. */
 	.prctr-launch-status .prctr-launch-status__detail {
-		display: grid;
-		gap: var(--prctr-spacing-control-inline);
-		justify-items: start;
-		padding-inline-start: calc(
-			var(--prctr-icon-size-medium) + var(--prctr-spacing-control-inline)
-		);
+		align-items: flex-start;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		padding-inline-start: 24px;
 	}
 
 	.prctr-launch-status .prctr-launch-status__body {
 		color: var(--prctr-color-text-secondary);
-		font-size: var(--prctr-typography-label-size);
-		line-height: 20px;
+		font-size: 13.5px;
+		line-height: 1.55;
 		margin: 0;
 		text-wrap: pretty;
 	}
 
 	.prctr-launch-status .prctr-launch-status__message {
 		background: var(--prctr-color-background-raised);
-		border-radius: var(--prctr-shape-radius-large);
-		display: grid;
-		gap: var(--prctr-spacing-content-small);
-		justify-self: stretch;
-		margin: 0;
-		padding: var(--prctr-spacing-content-large);
+		align-self: stretch;
+		border-radius: var(--prctr-launch-control-radius);
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		margin: 2px 0 0;
+		padding: 11px 13px;
 	}
 
 	.prctr-launch-status .prctr-launch-status__caption {
 		color: var(--prctr-color-text-secondary);
-		font-size: var(--prctr-typography-label-small-size);
+		font-size: 12px;
 		font-weight: var(--prctr-typography-weight-medium);
-		line-height: var(--prctr-typography-label-small-lineHeight);
+		line-height: 16px;
 	}
 
 	.prctr-launch-status .prctr-launch-status__quote {
-		font-size: var(--prctr-typography-label-size);
-		line-height: 20px;
+		font-size: 13.5px;
+		line-height: 1.5;
 		margin: 0;
 	}
 

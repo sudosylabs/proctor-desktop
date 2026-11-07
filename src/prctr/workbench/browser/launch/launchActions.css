@@ -5,19 +5,50 @@
 			var(--prctr-color-border-default);
 		display: flex;
 		flex: none;
-		gap: var(--prctr-spacing-control-inline);
-		padding: var(--prctr-spacing-content-large) var(--prctr-spacing-region);
+		gap: 10px;
+		padding: 14px var(--prctr-launch-inset) 16px;
 	}
 
 	.prctr-launch-actions[hidden] {
 		display: none;
 	}
 
+	.prctr-launch-actions .prctr-button {
+		border-radius: var(--prctr-launch-control-radius);
+		font-size: 13.5px;
+		line-height: 18px;
+		min-block-size: 36px;
+	}
+
 	.prctr-launch-actions .prctr-launch-actions__secondary {
+		background: transparent;
+		border-color: var(--prctr-theme-input-border);
+		color: var(--prctr-color-text-primary);
 		flex: none;
+		font-weight: var(--prctr-typography-weight-medium);
+		padding: 0 14px;
+	}
+
+	.prctr-launch-actions .prctr-launch-actions__secondary:hover:not(:disabled) {
+		background: var(--prctr-color-interaction-hover);
 	}
 
 	.prctr-launch-actions .prctr-launch-actions__primary {
 		flex: 1;
+		padding: 0 16px;
+	}
+
+	/* An unavailable primary action keeps its place and reads as a quiet fill, not a faded accent. */
+	.prctr-launch-actions .prctr-launch-actions__primary:disabled {
+		background: var(--prctr-color-interaction-disabled);
+		border-color: var(--prctr-color-interaction-disabled);
+		color: var(--prctr-color-text-disabled);
+		opacity: 1;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-launch-actions .prctr-launch-actions__primary:disabled {
+			color: GrayText;
+		}
 	}
 }

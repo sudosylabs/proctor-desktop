@@ -11,11 +11,6 @@ export const launchMessages = Object.freeze({
 		defaultMessage: 'Proctor',
 		description: 'Product name in the LaunchWindow header.'
 	}),
-	version: defineMessage({
-		id: 'launch.version',
-		defaultMessage: 'Version {release}',
-		description: 'Accessible name for the version shown in the header.'
-	}),
 	serverLabel: defineMessage({
 		id: 'launch.server.label',
 		defaultMessage: 'Institution server',
@@ -236,11 +231,6 @@ export const checklistMessages = Object.freeze({
 		defaultMessage: 'Changed since last check',
 		description: 'Institution identity changed.'
 	}),
-	build: defineMessage({
-		id: 'launch.checks.detail.build',
-		defaultMessage: 'Proctor {release} · {platform}',
-		description: 'Version check passed.'
-	}),
 	updateRequired: defineMessage({
 		id: 'launch.checks.detail.update',
 		defaultMessage: 'Update required',
@@ -353,8 +343,8 @@ export const statusMessages = Object.freeze({
 	}),
 	retryAfter: defineMessage({
 		id: 'launch.status.retryafter',
-		defaultMessage: 'The server suggests trying again after {time}.',
-		description: 'Advisory server retry time, in the user’s locale.'
+		defaultMessage: 'Proctor will be available again after {time}. Retry then.',
+		description: 'Advisory server retry time during maintenance, in the user’s locale.'
 	}),
 	unavailableHead: defineMessage({
 		id: 'launch.status.unavailable',

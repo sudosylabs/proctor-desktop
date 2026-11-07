@@ -42,7 +42,6 @@ export class LaunchStatus extends Disposable {
 	private readonly headline: HTMLElement;
 	private readonly head: HTMLElement;
 	private readonly body: HTMLElement;
-	private readonly retryTime: HTMLElement;
 	private readonly institution: HTMLElement;
 	private readonly institutionCaption: HTMLElement;
 	private readonly institutionText: HTMLElement;
@@ -59,7 +58,6 @@ export class LaunchStatus extends Disposable {
 		this.icon = this._register(createSemanticIcon(document, { id: 'state.info', size: 16 }));
 		this.head = $('p.prctr-launch-status__head');
 		this.body = $('p.prctr-launch-status__body');
-		this.retryTime = $('p.prctr-launch-status__body');
 		this.institutionCaption = $('figcaption.prctr-launch-status__caption');
 		this.institutionText = $('blockquote.prctr-launch-status__quote', { dir: 'auto' });
 		this.institution = $(
@@ -90,7 +88,6 @@ export class LaunchStatus extends Disposable {
 				'div.prctr-launch-status__detail',
 				{},
 				this.body,
-				this.retryTime,
 				this.institution,
 				this.reopen,
 				this.failure
@@ -113,7 +110,6 @@ export class LaunchStatus extends Disposable {
 			this.element.dataset.tone = 'failed';
 			this.head.textContent = '';
 			this.body.hidden = true;
-			this.retryTime.hidden = true;
 			this.institution.hidden = true;
 			this.reopen.hidden = true;
 			return;
@@ -121,10 +117,7 @@ export class LaunchStatus extends Disposable {
 		this.element.dataset.tone = status.tone;
 		this.icon.setState({ ...toneIcons[status.tone], size: 16 });
 		this.head.textContent = formatLaunchText(this.localization, status.head);
-		this.body.hidden = status.body === undefined;
-		this.body.textContent =
-			status.body === undefined ? '' : formatLaunchText(this.localization, status.body);
-		this.renderRetryTime(status.retryAt);
+		this.renderBody(status);
 		this.institution.hidden = status.institutionMessage === undefined;
 		if (status.institutionMessage !== undefined) {
 			this.institutionCaption.textContent = formatLaunchText(
@@ -140,17 +133,27 @@ export class LaunchStatus extends Disposable {
 		return this.reopen;
 	}
 
-	private renderRetryTime(retryAt: number | undefined): void {
-		this.retryTime.hidden = retryAt === undefined;
-		if (retryAt === undefined) {
-			this.retryTime.textContent = '';
+	/** A server's advisory retry time replaces the generic advice, since it is the more useful answer. */
+	private renderBody(status: LaunchStatusModel): void {
+		if (status.retryAt !== undefined) {
+			const time = this.formatRetryTime(status.retryAt);
+			this.body.hidden = false;
+			this.body.textContent = this.localization.format(statusMessages.retryAfter, { time });
 			return;
 		}
-		const time = new Intl.DateTimeFormat(this.localization.locale, {
-			dateStyle: 'medium',
-			timeStyle: 'short'
-		}).format(retryAt);
-		this.retryTime.textContent = this.localization.format(statusMessages.retryAfter, { time });
+		this.body.hidden = status.body === undefined;
+		this.body.textContent =
+			status.body === undefined ? '' : formatLaunchText(this.localization, status.body);
+	}
+
+	/** Only the time when it is today; the date as well when it is not. */
+	private formatRetryTime(retryAt: number): string {
+		const isToday = new Date(retryAt).toDateString() === new Date().toDateString();
+		const format = new Intl.DateTimeFormat(
+			this.localization.locale,
+			isToday ? { timeStyle: 'short' } : { dateStyle: 'medium', timeStyle: 'short' }
+		);
+		return format.format(retryAt);
 	}
 
 	override dispose(): void {

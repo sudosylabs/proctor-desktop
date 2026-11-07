@@ -99,12 +99,12 @@ test('checks stop at the step that failed and skip the rest', () => {
 		);
 });
 
-test('ready names the Institution, the build and the browser hand-off', () => {
+test('ready names the Institution, the platform and the browser hand-off', () => {
 	const model = presentLaunch(projection('ready', { canSignIn: true }));
 	assert.strictEqual(progress(model), 'dddd');
 	assert.deepStrictEqual(
 		model.steps.map((step) => text(step.detail)),
-		['Reached', institutionName, 'Proctor 0.1.0 · macOS', 'Opens in your browser']
+		['Reached', institutionName, 'macOS', 'Opens in your browser']
 	);
 	assert.strictEqual(model.server?.title, institutionName);
 	assert.strictEqual(text(model.server?.subtitle), origin);
@@ -114,7 +114,7 @@ test('ready names the Institution, the build and the browser hand-off', () => {
 	const windows = presentLaunch(
 		projection('ready', { canSignIn: true, build: { release: '0.1.0', platform: 'windows' } })
 	);
-	assert.strictEqual(text(windows.steps[2]?.detail), 'Proctor 0.1.0 · Windows');
+	assert.strictEqual(text(windows.steps[2]?.detail), 'Windows');
 });
 
 test('a build without sign-in says so instead of offering a dead button as ready', () => {

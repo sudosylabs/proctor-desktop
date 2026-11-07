@@ -93,6 +93,9 @@ export class ReadinessChecklist extends Disposable {
 		row.status.textContent = this.localization.format(statusWords[step.status]);
 		row.detail.textContent =
 			step.detail === undefined ? '' : formatLaunchText(this.localization, step.detail);
+		// The dash of a step that has not run is visual; the status word already says so.
+		const isQuiet = step.status === 'pending' || step.status === 'skipped';
+		row.detail.toggleAttribute('aria-hidden', isQuiet);
 	}
 
 	override dispose(): void {

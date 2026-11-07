@@ -41,6 +41,7 @@ export class ServerField extends Disposable {
 				description: this.localization.format(messages.serverHelp),
 				value: '',
 				inputMode: 'url',
+				prefix: 'https://',
 				autocomplete: 'off',
 				required: true
 			})

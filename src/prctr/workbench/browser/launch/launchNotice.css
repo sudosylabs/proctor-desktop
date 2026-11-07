@@ -2,13 +2,13 @@
 	.prctr-launch-notice {
 		align-items: flex-start;
 		background: var(--prctr-color-background-raised);
-		border-radius: var(--prctr-shape-radius-large);
+		border-radius: var(--prctr-launch-control-radius);
 		display: flex;
-		font-size: var(--prctr-typography-label-size);
-		gap: var(--prctr-spacing-control-inline);
-		line-height: 20px;
+		font-size: 13px;
+		gap: 10px;
+		line-height: 1.45;
 		margin: 0;
-		padding: var(--prctr-spacing-control-inline) var(--prctr-spacing-content-large);
+		padding: 10px 12px;
 	}
 
 	.prctr-launch-notice[hidden] {
@@ -17,7 +17,7 @@
 
 	.prctr-launch-notice .prctr-launch-notice__glyph {
 		align-items: center;
-		block-size: 20px;
+		block-size: 19px;
 		display: inline-flex;
 		flex: none;
 	}

@@ -466,6 +466,9 @@ function action(kind: LaunchActionKind, label: MessageDescriptor, enabled: boole
 	return { kind, label: { message: label }, enabled };
 }
 
+/** A step that has not run shows a dash, so every row has a value in the same column. */
+const QUIET_DETAIL: LaunchText = { literal: '—' };
+
 function steps(
 	projection: LaunchIdentityProjection,
 	progress: Progress,
@@ -477,7 +480,7 @@ function steps(
 			status === 'done'
 				? doneDetail(projection, index)
 				: status === 'pending' || status === 'skipped'
-					? undefined
+					? QUIET_DETAIL
 					: stoppedDetail === undefined
 						? undefined
 						: ({ message: stoppedDetail } as const);
@@ -494,15 +497,10 @@ function doneDetail(projection: LaunchIdentityProjection, index: number): Launch
 				? { message: checks.reached }
 				: { literal: projection.institutionName };
 		case 2:
+			// The platform alone: the window shows no version number.
 			return projection.build === undefined
 				? { message: checks.reached }
-				: {
-						message: checks.build,
-						values: {
-							release: projection.build.release,
-							platform: platformName(projection.build)
-						}
-					};
+				: { literal: platformName(projection.build) };
 		default:
 			return { message: checks.opensInBrowser };
 	}

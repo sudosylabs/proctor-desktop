@@ -13,6 +13,7 @@ import { IInstantiationService } from '../../../platform/instantiation/common/in
 import { InstantiationService } from '../../../platform/instantiation/common/instantiationService.js';
 import { ServiceCollection } from '../../../platform/instantiation/common/serviceCollection.js';
 import { BrowserThemeService } from '../../../platform/theme/browser/themeService.js';
+import { PROCTOR_SCHEME_THEME_NAMES } from '../../../platform/theme/common/bundledThemes.js';
 import { ProductWindowChrome } from '../../../platform/windows/browser/productWindowChrome.js';
 import type { ProductWindowChromeClient } from '../../../platform/windows/common/windowChrome.js';
 import type { LaunchWindowDescriptor } from '../../../platform/windows/common/windowProtocol.js';
@@ -60,7 +61,6 @@ export class LaunchWindow extends Disposable {
 	private readonly development: HTMLElement;
 	private readonly announcer: HTMLElement;
 	private readonly scrollable: DomScrollableElement;
-	private readonly header: LaunchHeader;
 	private readonly notice: LaunchNotice;
 	private readonly field: ServerField;
 	private readonly server: ServerSummary;
@@ -104,9 +104,7 @@ export class LaunchWindow extends Disposable {
 			})
 		);
 
-		this.header = this._register(
-			instantiationService.createInstance(LaunchHeader, content, localization)
-		);
+		this._register(instantiationService.createInstance(LaunchHeader, content, localization));
 		this.notice = this._register(
 			instantiationService.createInstance(LaunchNotice, content, localization)
 		);
@@ -255,8 +253,9 @@ export class LaunchWindow extends Disposable {
 		this.model = model;
 
 		this.element.dataset.state = projection.state;
+		// Corner radii follow the platform: macOS rounds more than Windows 11.
+		this.element.dataset.platform = projection.build?.platform ?? 'macos';
 		this.development.hidden = !model.development;
-		this.header.render(projection.build);
 		this.notice.render(model.notice);
 		this.field.render(model.stage === 'input', model.fieldInvalid);
 		this.server.render(model.server);
@@ -375,7 +374,7 @@ export async function bootstrapLaunchWindow(
 				document,
 				'dark',
 				{ density: 'default', motion: 'full', transparency: 'full' },
-				{ followSystemColorScheme: true }
+				{ followSystemColorScheme: true, systemThemes: PROCTOR_SCHEME_THEME_NAMES }
 			)
 		);
 		return themeService;

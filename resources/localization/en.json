@@ -1795,15 +1795,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
-    "launch.checks.detail.build": {
-      "message": "Proctor {release} · {platform}",
-      "description": "Version check passed.",
-      "placeholders": [
-        "release",
-        "platform"
-      ],
-      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
-    },
     "launch.checks.detail.cancelled": {
       "message": "Cancelled",
       "description": "Sign-in cancelled.",
@@ -2408,8 +2399,8 @@
       "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "launch.status.retryafter": {
-      "message": "The server suggests trying again after {time}.",
-      "description": "Advisory server retry time, in the user’s locale.",
+      "message": "Proctor will be available again after {time}. Retry then.",
+      "description": "Advisory server retry time during maintenance, in the user’s locale.",
       "placeholders": [
         "time"
       ],
@@ -2487,14 +2478,6 @@
       "message": "Install the update your institution approved, then open Proctor again.",
       "description": "Next step when an update is required.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
-    },
-    "launch.version": {
-      "message": "Version {release}",
-      "description": "Accessible name for the version shown in the header.",
-      "placeholders": [
-        "release"
-      ],
       "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "settings.accessibility.announcements.description": {
