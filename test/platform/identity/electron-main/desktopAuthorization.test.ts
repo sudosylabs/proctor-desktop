@@ -1075,3 +1075,226 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		service.dispose();
 	}
 });
+
+void test('account tokens, email verification and retention notices are bound, strict and serialized', async () => {
+	const key = softwareTestKey();
+	let started: Record<string, unknown> = {};
+	let stored: StoredDesktopSession | undefined;
+	const tokenId = 'e'.repeat(26);
+	const credential = `pat_${'x'.repeat(40)}`;
+	const seen: string[] = [];
+	let createMode = 'success';
+	let listReads = 0;
+	let releaseCreate: (() => void) | undefined;
+	const token = (overrides: Record<string, unknown> = {}) => ({
+		id: tokenId,
+		user_id: id,
+		description: 'Registrar\u0007 tool',
+		scopes: ['examinations:read'],
+		expires_at: '2027-01-01T00:00:00Z',
+		created_at: '2026-01-01T00:00:00Z',
+		updated_at: '2026-01-01T00:00:00Z',
+		...overrides
+	});
+	const http = new DesktopAuthHttp(async (input, init) => {
+		const url = new URL(String(input));
+		const path = url.pathname;
+		if (path.endsWith('/authorizations')) {
+			started = JSON.parse(String(init?.body));
+			return response(
+				{
+					authorization_url: 'https://example.edu/desktop/authorize',
+					expires_at: new Date(Date.now() + 60000).toISOString()
+				},
+				201
+			);
+		}
+		if (path.endsWith('/token') || path.endsWith('/refresh')) return response(tokens());
+		if (path.endsWith('/context')) return response(context());
+		if (path.endsWith('/logout')) return new Response(null, { status: 204 });
+		assert.ok(new Headers(init?.headers).get('DPoP'));
+		seen.push(`${String(init?.method)} ${path}${url.search}`);
+		if (path === '/api/v1/users/me/tokens' && init?.method === 'GET') {
+			listReads++;
+			return response({ items: [token()], next_cursor: 'later' });
+		}
+		if (path === '/api/v1/users/me/tokens') {
+			assert.deepEqual(JSON.parse(String(init?.body)), {
+				description: 'CI',
+				scopes: ['examinations:read'],
+				academic_unit_id: registration,
+				expires_at: '2027-01-01T00:00:00.000Z'
+			});
+			if (createMode === 'hold')
+				await new Promise<void>((resolve) => {
+					releaseCreate = resolve;
+				});
+			if (createMode === 'malformed') return response({ token: token() }, 201);
+			if (createMode === 'foreign')
+				return response({ token: token({ user_id: sessionId }), credential }, 201);
+			return response({ token: token(), credential }, 201);
+		}
+		if (path === `/api/v1/users/me/tokens/${tokenId}/enable`)
+			return response(
+				{
+					type: 'about:blank',
+					title: 'Reauthentication required',
+					status: 403,
+					code: 'authentication.reauthentication_required'
+				},
+				403
+			);
+		if (path === `/api/v1/users/me/tokens/${tokenId}/disable`)
+			return response(token({ disabled_at: '2026-03-01T00:00:00Z' }));
+		if (path === `/api/v1/users/me/tokens/${tokenId}`)
+			return new Response(null, { status: 204 });
+		if (path === '/api/v1/auth/email-verification/request')
+			return new Response(null, { status: 202 });
+		if (path === '/api/v1/users/me/retention-notices')
+			return response({
+				items: [
+					{
+						retirement_id: tokenId,
+						exam_id: registration,
+						exam_sitting_id: registration,
+						submission_id: registration,
+						category: 'work',
+						state: 'grace',
+						created_at: '2026-01-01T00:00:00Z',
+						retire_after: '2026-02-01T00:00:00.000Z',
+						delivery_state: 'accepted'
+					}
+				],
+				next_cursor: 'more'
+			});
+		throw new Error('Unexpected route');
+	});
+	const service = new DesktopAuthorizationService({
+		applicationId: 'fr.sudosy.proctor.test',
+		target,
+		keys: {
+			async loadOrCreate() {
+				return key;
+			},
+			async delete() {}
+		},
+		credentials: {
+			async read() {
+				return stored;
+			},
+			async write(_scope, value) {
+				stored = value;
+			},
+			async delete() {
+				stored = undefined;
+			}
+		},
+		http,
+		callbackPages,
+		async openBrowser() {
+			const callback = new URL(String(started.callback_url));
+			callback.searchParams.set('state', String(started.state));
+			callback.searchParams.set('code', random());
+			await fetch(callback);
+		},
+		async onAuthenticated() {}
+	});
+	try {
+		await service.start(identity, CancellationToken.None);
+		const binding = { principalId: id, sessionId };
+		const list = await service.account(binding, { kind: 'read', section: 'tokens' });
+		assert.deepEqual(list, {
+			kind: 'data',
+			data: {
+				section: 'tokens',
+				tokens: [
+					{
+						id: tokenId,
+						description: 'Registrar  tool',
+						scopes: ['examinations:read'],
+						expiresAt: Date.parse('2027-01-01T00:00:00Z'),
+						createdAt: Date.parse('2026-01-01T00:00:00Z')
+					}
+				]
+			}
+		});
+		await service.account(binding, { kind: 'read', section: 'tokens' });
+		assert.equal(listReads, 1, 'token reads use the shared account cache');
+
+		const create = {
+			kind: 'createToken',
+			description: 'CI',
+			scopes: ['examinations:read'],
+			academicUnitId: registration,
+			expiresAt: Date.parse('2027-01-01T00:00:00Z')
+		} as const;
+		createMode = 'hold';
+		const pending = service.account(binding, create);
+		await new Promise((resolve) => setTimeout(resolve, 20));
+		assert.deepEqual(await service.account(binding, { kind: 'revokeToken', id: tokenId }), {
+			kind: 'error',
+			reason: 'unavailable'
+		});
+		releaseCreate?.();
+		const created = await pending;
+		assert.equal(created.kind, 'tokenCreated');
+		if (created.kind === 'tokenCreated') {
+			assert.equal(created.credential, credential);
+			assert.equal(created.token.id, tokenId);
+		}
+		const after = await service.account(binding, { kind: 'read', section: 'tokens' });
+		assert.equal(listReads, 2, 'a successful creation invalidates account reads');
+		assert.ok(!JSON.stringify(after).includes(credential), 'the credential is never cached');
+		assert.ok(!JSON.stringify(stored).includes(credential), 'the credential is never stored');
+
+		createMode = 'malformed';
+		assert.deepEqual(await service.account(binding, create), {
+			kind: 'error',
+			reason: 'unconfirmed'
+		});
+		createMode = 'foreign';
+		assert.deepEqual(await service.account(binding, create), {
+			kind: 'error',
+			reason: 'unconfirmed'
+		});
+		assert.deepEqual(await service.account(binding, { kind: 'enableToken', id: tokenId }), {
+			kind: 'error',
+			reason: 'reauthenticationRequired'
+		});
+		assert.deepEqual(await service.account(binding, { kind: 'disableToken', id: tokenId }), {
+			kind: 'success'
+		});
+		assert.deepEqual(await service.account(binding, { kind: 'revokeToken', id: tokenId }), {
+			kind: 'success'
+		});
+		assert.deepEqual(await service.account(binding, { kind: 'requestEmailVerification' }), {
+			kind: 'success'
+		});
+		assert.deepEqual(await service.account(binding, { kind: 'read', section: 'notices' }), {
+			kind: 'data',
+			data: {
+				section: 'notices',
+				notices: [
+					{
+						retirementId: tokenId,
+						examId: registration,
+						examSittingId: registration,
+						submissionId: registration,
+						category: 'work',
+						state: 'grace',
+						createdAt: Date.parse('2026-01-01T00:00:00Z'),
+						retireAfter: Date.parse('2026-02-01T00:00:00Z'),
+						deliveryState: 'accepted'
+					}
+				],
+				more: true
+			}
+		});
+		assert.ok(seen.includes(`DELETE /api/v1/users/me/tokens/${tokenId}`));
+		assert.ok(seen.includes(`POST /api/v1/users/me/tokens/${tokenId}/disable`));
+		assert.ok(seen.includes('POST /api/v1/auth/email-verification/request'));
+		assert.ok(seen.includes('GET /api/v1/users/me/retention-notices?limit=200'));
+	} finally {
+		service.dispose();
+	}
+});

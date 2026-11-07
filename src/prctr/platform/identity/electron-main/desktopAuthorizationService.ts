@@ -50,7 +50,11 @@ import {
 	readAccountProfile,
 	readAccountSecurity,
 	readAccountSessions,
-	readAccountDesktops
+	readAccountDesktops,
+	readAccountNotices,
+	readAccountToken,
+	readAccountTokenCreation,
+	readAccountTokens
 } from '../../account/electron-main/accountWire.js';
 import {
 	createDPoPProof,
@@ -497,7 +501,8 @@ export class DesktopAuthorizationService extends Disposable {
 		const intent = validateAccountIntent(raw);
 		if (intent.kind !== 'read' && intent.kind !== 'readPhoto') {
 			const result = await this.accountUncached(binding, intent);
-			if (result.kind === 'success') await this.#api?.invalidate(['account']);
+			if (result.kind === 'success' || result.kind === 'tokenCreated')
+				await this.#api?.invalidate(['account']);
 			return result;
 		}
 		try {
@@ -570,7 +575,12 @@ export class DesktopAuthorizationService extends Disposable {
 			intent.kind === 'revokeSession' ||
 			intent.kind === 'revokeDesktop' ||
 			intent.kind === 'uploadPhoto' ||
-			intent.kind === 'removePhoto';
+			intent.kind === 'removePhoto' ||
+			intent.kind === 'createToken' ||
+			intent.kind === 'disableToken' ||
+			intent.kind === 'enableToken' ||
+			intent.kind === 'revokeToken' ||
+			intent.kind === 'requestEmailVerification';
 		if (mutation && this.#accountMutation) return { kind: 'error', reason: 'unavailable' };
 		const operation = {};
 		if (mutation) this.#accountMutation = operation;
@@ -673,14 +683,49 @@ export class DesktopAuthorizationService extends Disposable {
 					}));
 				return { kind: 'success' };
 			}
+			if (intent.kind === 'createToken') {
+				const response = await request('/api/v1/users/me/tokens', {
+					description: intent.description,
+					scopes: intent.scopes,
+					...(intent.academicUnitId === undefined
+						? {}
+						: { academic_unit_id: intent.academicUnitId }),
+					expires_at: new Date(intent.expiresAt).toISOString()
+				});
+				if (response.status !== 201) return failed(response);
+				// The one-time credential is returned to the caller only; it is never cached.
+				return readAccountTokenCreation(response.value, binding);
+			}
+			if (intent.kind === 'disableToken' || intent.kind === 'enableToken') {
+				const response = await request(
+					`/api/v1/users/me/tokens/${intent.id}/${intent.kind === 'disableToken' ? 'disable' : 'enable'}`
+				);
+				if (response.status !== 200) return failed(response);
+				readAccountToken(response.value, binding, intent.id);
+				return { kind: 'success' };
+			}
+			if (intent.kind === 'revokeToken') {
+				const response = await request(`/api/v1/users/me/tokens/${intent.id}`);
+				return response.status === 204 ? { kind: 'success' } : failed(response);
+			}
+			if (intent.kind === 'requestEmailVerification') {
+				const response = await request('/api/v1/auth/email-verification/request');
+				return response.status === 202 ? { kind: 'success' } : failed(response);
+			}
 			const paths = {
 				profile: '/api/v1/users/me',
 				security: '/api/v1/authentication-methods',
 				sessions: '/api/v1/users/me/sessions',
-				desktops: '/api/v1/users/me/desktop-registrations'
+				desktops: '/api/v1/users/me/desktop-registrations',
+				tokens: '/api/v1/users/me/tokens',
+				notices: '/api/v1/users/me/retention-notices?limit=200'
 			} as const;
 			const response = await request(paths[intent.section]);
 			if (response.status !== 200) return failed(response);
+			if (intent.section === 'tokens')
+				return { kind: 'data', data: readAccountTokens(response.value, binding) };
+			if (intent.section === 'notices')
+				return { kind: 'data', data: readAccountNotices(response.value) };
 			if (intent.section === 'profile')
 				return { kind: 'data', data: readAccountProfile(response.value, binding) };
 			if (intent.section === 'sessions')
@@ -813,7 +858,7 @@ export class DesktopAuthorizationService extends Disposable {
 		const { id, input } = resolveApiRoute(
 			session.identity.origin,
 			path,
-			desktopHttpMethod(path, photo, settings),
+			desktopHttpMethod(path, photo, settings, body !== undefined),
 			photo?.bytes ?? body,
 			headers,
 			photo?.mediaType

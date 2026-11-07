@@ -7,7 +7,11 @@ import {
 import {
 	readAccountProfile,
 	readAccountSessions,
-	readAccountDesktops
+	readAccountDesktops,
+	readAccountNotices,
+	readAccountToken,
+	readAccountTokenCreation,
+	readAccountTokens
 } from '../../../../src/prctr/platform/account/electron-main/accountWire.js';
 import { desktopHttpMethod } from '../../../../src/prctr/platform/identity/node/desktopAuthHttp.js';
 const id = 'y'.repeat(26);
@@ -336,4 +340,164 @@ void test('closing an authenticated window fences settings requests waiting for 
 	await rejected;
 	assert.equal(commits, 0);
 	assert.equal(handlers.size, 0);
+});
+
+void test('token, verification and notice intents are exact and bounded', () => {
+	const create = {
+		kind: 'createToken',
+		description: 'Registrar tool',
+		scopes: ['examinations:read'],
+		expiresAt: 1798761600000
+	};
+	assert.deepEqual(validateAccountIntent(create), create);
+	assert.deepEqual(validateAccountIntent({ ...create, academicUnitId: id }), {
+		...create,
+		academicUnitId: id
+	});
+	assert.deepEqual(validateAccountIntent({ kind: 'requestEmailVerification' }), {
+		kind: 'requestEmailVerification'
+	});
+	for (const kind of ['disableToken', 'enableToken', 'revokeToken'])
+		assert.deepEqual(validateAccountIntent({ kind, id }), { kind, id });
+	for (const section of ['tokens', 'notices'])
+		assert.deepEqual(validateAccountIntent({ kind: 'read', section }), {
+			kind: 'read',
+			section
+		});
+	for (const value of [
+		{ ...create, credential: 'x' },
+		{ ...create, description: '' },
+		{ ...create, description: '   ' },
+		{ ...create, description: 'a'.repeat(257) },
+		{ ...create, description: 'line\nbreak' },
+		{ ...create, scopes: [] },
+		{ ...create, scopes: ['examinations:read', 'examinations:read'] },
+		{ ...create, scopes: ['Examinations Read'] },
+		{ ...create, scopes: Array.from({ length: 65 }, (_, i) => `scope${i}`) },
+		{ ...create, expiresAt: '2026-01-01T00:00:00Z' },
+		{ ...create, expiresAt: 0 },
+		{ ...create, academicUnitId: '../units' },
+		{ kind: 'createToken' },
+		{ kind: 'revokeToken', id: '../me' },
+		{ kind: 'enableToken', id, extra: true },
+		{ kind: 'requestEmailVerification', email: 'other@example.test' }
+	])
+		assert.throws(() => validateAccountIntent(value));
+});
+
+void test('token and notice wire parsers whitelist fields and bind the principal', () => {
+	const binding = { principalId: id, sessionId: id };
+	const raw = {
+		id,
+		user_id: id,
+		description: 'Tool',
+		scopes: ['examinations:read'],
+		academic_unit_id: id,
+		expires_at: '2027-01-01T00:00:00Z',
+		last_used_at: '2026-03-01T00:00:00Z',
+		revoked_at: '2026-04-01T00:00:00Z',
+		created_at: '2026-01-01T00:00:00Z',
+		updated_at: '2026-01-01T00:00:00Z',
+		credential: 'SECRET'
+	};
+	assert.deepEqual(readAccountTokens({ items: [raw] }, binding), {
+		section: 'tokens',
+		tokens: [
+			{
+				id,
+				description: 'Tool',
+				scopes: ['examinations:read'],
+				academicUnitId: id,
+				expiresAt: Date.parse('2027-01-01T00:00:00Z'),
+				lastUsedAt: Date.parse('2026-03-01T00:00:00Z'),
+				revokedAt: Date.parse('2026-04-01T00:00:00Z'),
+				createdAt: Date.parse('2026-01-01T00:00:00Z')
+			}
+		]
+	});
+	assert.ok(!JSON.stringify(readAccountTokens({ items: [raw] }, binding)).includes('SECRET'));
+	assert.throws(() =>
+		readAccountTokens({ items: [{ ...raw, user_id: 'b'.repeat(26) }] }, binding)
+	);
+	assert.throws(() => readAccountTokens({ items: [raw, raw] }, binding));
+	assert.throws(() =>
+		readAccountTokens({ items: [{ ...raw, scopes: 'examinations:read' }] }, binding)
+	);
+	assert.throws(() => readAccountToken(raw, binding, 'b'.repeat(26)));
+	for (const stale of [{ disabled_at: 0 }, { revoked_at: null }, { created_at: 1 }])
+		assert.throws(() => readAccountTokens({ items: [{ ...raw, ...stale }] }, binding));
+	const credential = `pat_${'x'.repeat(40)}`;
+	const created = readAccountTokenCreation({ token: raw, credential }, binding);
+	assert.equal(created.kind, 'tokenCreated');
+	for (const value of [
+		{ token: raw },
+		{ token: raw, credential: 'short' },
+		{ token: raw, credential: `${credential} ` },
+		{ token: raw, credential, extra: 1 }
+	])
+		assert.throws(() => readAccountTokenCreation(value, binding));
+	const notice = {
+		retirement_id: id,
+		exam_id: id,
+		exam_sitting_id: id,
+		submission_id: id,
+		category: 'browser_activity',
+		state: 'canceled',
+		created_at: '2026-01-01T00:00:00Z',
+		retire_after: '2026-01-01T23:00:00Z',
+		delivery_state: 'canceled',
+		canceled_at: '2026-01-01T12:00:00.5Z',
+		delivery_error_code: 'mail.unavailable'
+	};
+	assert.deepEqual(readAccountNotices({ items: [notice] }), {
+		section: 'notices',
+		notices: [
+			{
+				retirementId: id,
+				examId: id,
+				examSittingId: id,
+				submissionId: id,
+				category: 'browser_activity',
+				state: 'canceled',
+				createdAt: Date.parse('2026-01-01T00:00:00Z'),
+				retireAfter: Date.parse('2026-01-01T23:00:00Z'),
+				deliveryState: 'canceled',
+				canceledAt: Date.parse('2026-01-01T12:00:00.5Z')
+			}
+		],
+		more: false
+	});
+	for (const value of [
+		{},
+		{ items: [{ ...notice, category: 'other' }] },
+		{ items: [{ ...notice, created_at: 'yesterday' }] },
+		{ items: [{ ...notice, created_at: 1 }] },
+		{ items: [{ ...notice, state: 'cancelled' }] },
+		{ items: [{ ...notice, canceled_at: null }] },
+		{ items: [notice, notice] },
+		{ items: Array(201).fill(notice) },
+		{ items: [], next_cursor: 'x'.repeat(257) }
+	])
+		assert.throws(() => readAccountNotices(value));
+	assert.throws(() =>
+		validateAccountResponse({
+			kind: 'data',
+			data: { section: 'notices', notices: [], more: 'yes' }
+		})
+	);
+});
+
+void test('token and verification routes map to exact methods and reject bodies on reads', () => {
+	assert.equal(desktopHttpMethod('/api/v1/users/me/tokens'), 'GET');
+	assert.equal(desktopHttpMethod('/api/v1/users/me/tokens', undefined, undefined, true), 'POST');
+	assert.equal(desktopHttpMethod(`/api/v1/users/me/tokens/${id}`), 'DELETE');
+	assert.equal(desktopHttpMethod(`/api/v1/users/me/tokens/${id}/disable`), 'POST');
+	assert.equal(desktopHttpMethod(`/api/v1/users/me/tokens/${id}/enable`), 'POST');
+	assert.equal(desktopHttpMethod('/api/v1/auth/email-verification/request'), 'POST');
+	assert.equal(desktopHttpMethod('/api/v1/users/me/retention-notices?limit=200'), 'GET');
+	assert.throws(() => desktopHttpMethod(`/api/v1/users/me/tokens/${id}/rotate`));
+	assert.throws(() => desktopHttpMethod('/api/v1/users/me/tokens/../sessions'));
+	assert.throws(() =>
+		desktopHttpMethod(`/api/v1/users/me/tokens/${id}`, undefined, undefined, true)
+	);
 });

@@ -6,7 +6,9 @@ import {
 	accountPage,
 	validateAccountResponse,
 	type AccountData,
-	type AccountBinding
+	type AccountBinding,
+	type AccountResponse,
+	type AccountToken
 } from '../common/accountProtocol.js';
 
 export function readAccountProfile(raw: unknown, binding: AccountBinding): AccountData {
@@ -91,6 +93,78 @@ export function readAccountDesktops(raw: unknown, currentRegistrationId: string)
 				revoked: d.status === 'revoked'
 			};
 		})
+	});
+}
+function tokenProjection(raw: unknown, binding: AccountBinding): Record<string, unknown> {
+	const t = record(raw);
+	if (accountId(t.user_id) !== binding.principalId)
+		throw new TypeError('Account binding mismatch');
+	const projection: Record<string, unknown> = {
+		id: t.id,
+		description: t.description,
+		scopes: t.scopes,
+		academicUnitId: t.academic_unit_id,
+		expiresAt: accountInstant(t.expires_at),
+		lastUsedAt: accountInstant(t.last_used_at),
+		disabledAt: accountInstant(t.disabled_at),
+		revokedAt: accountInstant(t.revoked_at),
+		createdAt: accountInstant(t.created_at)
+	};
+	for (const key of Object.keys(projection))
+		if (projection[key] === undefined) delete projection[key];
+	return projection;
+}
+export function readAccountTokens(raw: unknown, binding: AccountBinding): AccountData {
+	return checked({
+		section: 'tokens',
+		tokens: accountPage(raw).map((value) => tokenProjection(value, binding))
+	});
+}
+/** Parses one token returned by disable/enable and binds it to the requested record. */
+export function readAccountToken(raw: unknown, binding: AccountBinding, id: string): AccountToken {
+	const data = checked({ section: 'tokens', tokens: [tokenProjection(raw, binding)] });
+	if (data.section !== 'tokens' || data.tokens[0]?.id !== id)
+		throw new TypeError('Account token mismatch');
+	return data.tokens[0];
+}
+/** The credential crosses only this one reply; callers must not cache, log or store it. */
+export function readAccountTokenCreation(raw: unknown, binding: AccountBinding): AccountResponse {
+	const c = record(raw);
+	if (Object.keys(c).sort().join() !== 'credential,token')
+		throw new TypeError('Invalid token creation');
+	const result = validateAccountResponse({
+		kind: 'tokenCreated',
+		token: tokenProjection(c.token, binding),
+		credential: c.credential
+	});
+	if (result.kind !== 'tokenCreated') throw new TypeError('Invalid token creation');
+	return result;
+}
+export function readAccountNotices(raw: unknown): AccountData {
+	const page = record(raw);
+	if (
+		page.next_cursor !== undefined &&
+		(typeof page.next_cursor !== 'string' || page.next_cursor.length > 256)
+	)
+		throw new TypeError('Invalid notice cursor');
+	return checked({
+		section: 'notices',
+		notices: accountList(page.items, 200).map((value) => {
+			const n = record(value);
+			return {
+				retirementId: n.retirement_id,
+				examId: n.exam_id,
+				examSittingId: n.exam_sitting_id,
+				submissionId: n.submission_id,
+				category: n.category,
+				state: n.state,
+				createdAt: accountInstant(n.created_at),
+				retireAfter: accountInstant(n.retire_after),
+				deliveryState: n.delivery_state,
+				canceledAt: accountInstant(n.canceled_at)
+			};
+		}),
+		more: typeof page.next_cursor === 'string' && page.next_cursor.length > 0
 	});
 }
 function checked(value: unknown): AccountData {

@@ -2,8 +2,27 @@ import type { ObservableApiCapability } from '../../serverApi/common/apiObservat
 export const ACCOUNT_CHANNEL = 'prctr:authenticated:account';
 export const accountSections = ['profile', 'security', 'sessions', 'desktops'] as const;
 export type AccountSection = (typeof accountSections)[number];
+/** Every readable section: the navigable sections plus token and retention-notice reads. */
+export const accountReadSections = [...accountSections, 'tokens', 'notices'] as const;
+export type AccountReadSection = (typeof accountReadSections)[number];
+export const accountNoticeCategories = [
+	'work',
+	'integrity',
+	'browser_activity',
+	'security_operational'
+] as const;
+export const accountNoticeStates = ['grace', 'canceled', 'retired'] as const;
+export const accountNoticeDeliveryStates = [
+	'pending',
+	'queued',
+	'sending',
+	'accepted',
+	'suppressed',
+	'failed',
+	'canceled'
+] as const;
 export type AccountIntent =
-	| { readonly kind: 'read'; readonly section: AccountSection }
+	| { readonly kind: 'read'; readonly section: AccountReadSection }
 	| { readonly kind: 'openSecurity' }
 	| { readonly kind: 'readPhoto' }
 	| {
@@ -14,7 +33,19 @@ export type AccountIntent =
 	  }
 	| { readonly kind: 'removePhoto'; readonly etag: string }
 	| { readonly kind: 'revokeSession'; readonly id: string }
-	| { readonly kind: 'revokeDesktop'; readonly id: string };
+	| { readonly kind: 'revokeDesktop'; readonly id: string }
+	| {
+			readonly kind: 'createToken';
+			readonly description: string;
+			readonly scopes: readonly string[];
+			readonly academicUnitId?: string;
+			/** Absolute expiry in epoch milliseconds, as the server contract declares. */
+			readonly expiresAt: number;
+	  }
+	| { readonly kind: 'disableToken'; readonly id: string }
+	| { readonly kind: 'enableToken'; readonly id: string }
+	| { readonly kind: 'revokeToken'; readonly id: string }
+	| { readonly kind: 'requestEmailVerification' };
 export interface AccountProfile {
 	readonly username: string;
 	readonly displayName: string;
@@ -58,11 +89,42 @@ export interface AccountDesktop {
 	readonly lastUsedAt: number;
 	readonly revoked: boolean;
 }
+/** Safe Personal Access Token metadata; the credential is never part of a read. */
+export interface AccountToken {
+	readonly id: string;
+	readonly description: string;
+	readonly scopes: readonly string[];
+	readonly academicUnitId?: string;
+	readonly expiresAt: number;
+	readonly lastUsedAt?: number;
+	readonly disabledAt?: number;
+	readonly revokedAt?: number;
+	readonly createdAt: number;
+}
+export interface AccountRetentionNotice {
+	readonly retirementId: string;
+	readonly examId: string;
+	readonly examSittingId: string;
+	readonly submissionId: string;
+	readonly category: (typeof accountNoticeCategories)[number];
+	readonly state: (typeof accountNoticeStates)[number];
+	readonly createdAt: number;
+	readonly retireAfter: number;
+	readonly deliveryState: (typeof accountNoticeDeliveryStates)[number];
+	readonly canceledAt?: number;
+}
 export type AccountData =
 	| { readonly section: 'profile'; readonly profile: AccountProfile }
 	| { readonly section: 'security'; readonly security: AccountSecurity }
 	| { readonly section: 'sessions'; readonly sessions: readonly AccountSession[] }
-	| { readonly section: 'desktops'; readonly desktops: readonly AccountDesktop[] };
+	| { readonly section: 'desktops'; readonly desktops: readonly AccountDesktop[] }
+	| { readonly section: 'tokens'; readonly tokens: readonly AccountToken[] }
+	| {
+			readonly section: 'notices';
+			readonly notices: readonly AccountRetentionNotice[];
+			/** The server holds further notices beyond this bounded first page. */
+			readonly more: boolean;
+	  };
 export type AccountFailure =
 	| 'unavailable'
 	| 'sessionEnded'
@@ -76,6 +138,8 @@ export type AccountFailure =
 export type AccountResponse =
 	| { readonly kind: 'photo'; readonly dataUrl: string; readonly etag: string }
 	| { readonly kind: 'data'; readonly data: AccountData }
+	/** The one-time credential reply to createToken; never cached, logged or stored. */
+	| { readonly kind: 'tokenCreated'; readonly token: AccountToken; readonly credential: string }
 	| { readonly kind: 'success' }
 	| { readonly kind: 'error'; readonly reason: AccountFailure };
 export interface AccountClient extends ObservableApiCapability<AccountIntent, AccountResponse> {
@@ -145,17 +209,98 @@ export function validateAccountIntent(value: unknown): AccountIntent {
 			etag: accountPhotoEtag(input.etag)
 		};
 	}
-	if (input.kind === 'openSecurity' && Object.keys(input).length === 1)
-		return Object.freeze({ kind: 'openSecurity' });
+	if (
+		(input.kind === 'openSecurity' || input.kind === 'requestEmailVerification') &&
+		Object.keys(input).length === 1
+	)
+		return Object.freeze({ kind: input.kind });
+	if (input.kind === 'createToken') return validateCreateToken(input);
 	if (Object.keys(input).length !== 2) throw new TypeError('Invalid account action');
-	if (input.kind === 'read' && accountSections.includes(input.section as AccountSection))
-		return Object.freeze({ kind: 'read', section: input.section as AccountSection });
-	if (input.kind === 'revokeSession' || input.kind === 'revokeDesktop')
+	if (input.kind === 'read' && accountReadSections.includes(input.section as AccountReadSection))
+		return Object.freeze({ kind: 'read', section: input.section as AccountReadSection });
+	if (
+		input.kind === 'revokeSession' ||
+		input.kind === 'revokeDesktop' ||
+		input.kind === 'disableToken' ||
+		input.kind === 'enableToken' ||
+		input.kind === 'revokeToken'
+	)
 		return Object.freeze({ kind: input.kind, id: accountId(input.id) });
 	throw new TypeError('Invalid account action');
 }
+const tokenScope = /^[a-z][a-z0-9_.:-]{0,127}$/u;
+function validateCreateToken(input: Record<string, unknown>): AccountIntent {
+	const keys = Object.keys(input).sort().join();
+	if (
+		keys !== 'description,expiresAt,kind,scopes' &&
+		keys !== 'academicUnitId,description,expiresAt,kind,scopes'
+	)
+		throw new TypeError('Invalid account action');
+	if (
+		typeof input.description !== 'string' ||
+		input.description.length > 256 ||
+		input.description.trim().length === 0 ||
+		/[\u0000-\u001f\u007f]/u.test(input.description)
+	)
+		throw new TypeError('Invalid token description');
+	const scopes = accountList(input.scopes, 64);
+	if (
+		scopes.length === 0 ||
+		new Set(scopes).size !== scopes.length ||
+		!scopes.every((scope) => typeof scope === 'string' && tokenScope.test(scope))
+	)
+		throw new TypeError('Invalid token scopes');
+	const expiresAt = accountTime(input.expiresAt);
+	if (expiresAt === 0) throw new TypeError('Invalid token expiry');
+	return Object.freeze({
+		kind: 'createToken',
+		description: input.description,
+		scopes: Object.freeze([...(scopes as string[])]),
+		...(input.academicUnitId === undefined
+			? {}
+			: { academicUnitId: accountId(input.academicUnitId) }),
+		expiresAt
+	});
+}
+function validateToken(value: unknown): AccountToken {
+	const t = accountRecord(value);
+	const scopes = accountList(t.scopes, 64).map((scope) => {
+		if (typeof scope !== 'string' || !tokenScope.test(scope))
+			throw new TypeError('Invalid token scope');
+		return scope;
+	});
+	const optionalTime = (key: string) =>
+		t[key] === undefined ? {} : { [key]: accountTime(t[key]) };
+	return Object.freeze({
+		id: accountId(t.id),
+		description: accountText(t.description, 512),
+		scopes: Object.freeze(scopes),
+		...(t.academicUnitId === undefined ? {} : { academicUnitId: accountId(t.academicUnitId) }),
+		expiresAt: accountTime(t.expiresAt),
+		...optionalTime('lastUsedAt'),
+		...optionalTime('disabledAt'),
+		...optionalTime('revokedAt'),
+		createdAt: accountTime(t.createdAt)
+	});
+}
+function accountMember<T extends string>(value: unknown, members: readonly T[]): T {
+	if (!members.includes(value as T)) throw new TypeError('Invalid account state');
+	return value as T;
+}
 export function validateAccountResponse(value: unknown): AccountResponse {
 	const input = accountRecord(value);
+	if (input.kind === 'tokenCreated') {
+		if (
+			typeof input.credential !== 'string' ||
+			!/^[\x21-\x7e]{16,1024}$/u.test(input.credential)
+		)
+			throw new TypeError('Invalid token credential');
+		return Object.freeze({
+			kind: 'tokenCreated',
+			token: validateToken(input.token),
+			credential: input.credential
+		});
+	}
 	if (input.kind === 'photo') {
 		if (
 			typeof input.dataUrl !== 'string' ||
@@ -266,6 +411,36 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 					});
 				})
 			)
+		};
+	} else if (data.section === 'tokens') {
+		result = {
+			section: 'tokens',
+			tokens: Object.freeze(accountList(data.tokens).map(validateToken))
+		};
+		if (new Set(result.tokens.map((token) => token.id)).size !== result.tokens.length)
+			throw new TypeError('Ambiguous account resource list');
+	} else if (data.section === 'notices') {
+		const notices = accountList(data.notices, 200).map((value) => {
+			const n = accountRecord(value);
+			return Object.freeze({
+				retirementId: accountId(n.retirementId),
+				examId: accountId(n.examId),
+				examSittingId: accountId(n.examSittingId),
+				submissionId: accountId(n.submissionId),
+				category: accountMember(n.category, accountNoticeCategories),
+				state: accountMember(n.state, accountNoticeStates),
+				createdAt: accountTime(n.createdAt),
+				retireAfter: accountTime(n.retireAfter),
+				deliveryState: accountMember(n.deliveryState, accountNoticeDeliveryStates),
+				...(n.canceledAt === undefined ? {} : { canceledAt: accountTime(n.canceledAt) })
+			});
+		});
+		if (new Set(notices.map((notice) => notice.retirementId)).size !== notices.length)
+			throw new TypeError('Ambiguous account resource list');
+		result = {
+			section: 'notices',
+			notices: Object.freeze(notices),
+			more: accountBoolean(data.more)
 		};
 	} else throw new TypeError('Invalid account section');
 	if (result.section === 'sessions' || result.section === 'desktops') {

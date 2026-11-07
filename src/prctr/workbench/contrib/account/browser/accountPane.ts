@@ -555,7 +555,9 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		const items =
 			data.section === 'desktops'
 				? data.desktops
-				: data.sessions.filter((session) => !session.current);
+				: data.section === 'sessions'
+					? data.sessions.filter((session) => !session.current)
+					: [];
 		if (!items.length) {
 			this.paragraph(this.text(desktops ? 'emptyDesktops' : 'emptySessions'), host, 'empty');
 			return;

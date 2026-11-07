@@ -19,6 +19,10 @@ export type DesktopHttpPath =
 	| '/api/v1/users/me/sessions/revoke'
 	| '/api/v1/users/me/desktop-registrations'
 	| `/api/v1/users/me/desktop-registrations/${string}`
+	| '/api/v1/users/me/tokens'
+	| `/api/v1/users/me/tokens/${string}`
+	| '/api/v1/users/me/retention-notices?limit=200'
+	| '/api/v1/auth/email-verification/request'
 	| `/api/v1/users/${string}/profile-picture`;
 export interface DesktopSettingsRequest {
 	readonly operation: 'GET' | 'PUT';
@@ -33,7 +37,19 @@ export interface DesktopPhotoRequest {
 export function desktopHttpMethod(
 	path: DesktopHttpPath,
 	photo?: DesktopPhotoRequest,
-	settings?: DesktopSettingsRequest
+	settings?: DesktopSettingsRequest,
+	body = false
+): 'GET' | 'POST' | 'DELETE' | 'PUT' {
+	const method = desktopHttpRoute(path, photo, settings, body);
+	if (body && (method === 'GET' || method === 'DELETE'))
+		throw new DesktopAuthorizationError('rejected');
+	return method;
+}
+function desktopHttpRoute(
+	path: DesktopHttpPath,
+	photo: DesktopPhotoRequest | undefined,
+	settings: DesktopSettingsRequest | undefined,
+	body: boolean
 ): 'GET' | 'POST' | 'DELETE' | 'PUT' {
 	if (settings) {
 		if (
@@ -66,8 +82,18 @@ export function desktopHttpMethod(
 		)
 	)
 		return 'DELETE';
+	if (/^\/api\/v1\/users\/me\/tokens\/[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/u.test(path))
+		return 'DELETE';
+	if (
+		/^\/api\/v1\/users\/me\/tokens\/[ybndrfg8ejkmcpqxot1uwisza345h769]{26}\/(?:disable|enable)$/u.test(
+			path
+		)
+	)
+		return 'POST';
+	if (path === '/api/v1/users/me/tokens') return body ? 'POST' : 'GET';
 	if (
 		[
+			'/api/v1/users/me/retention-notices?limit=200',
 			'/api/v1/users/me/context',
 			'/api/v1/users/me',
 			'/api/v1/authentication-methods',
@@ -83,7 +109,8 @@ export function desktopHttpMethod(
 			'/api/v1/auth/desktop/token',
 			'/api/v1/auth/refresh',
 			'/api/v1/auth/logout',
-			'/api/v1/users/me/sessions/revoke'
+			'/api/v1/users/me/sessions/revoke',
+			'/api/v1/auth/email-verification/request'
 		].includes(path)
 	)
 		return 'POST';
@@ -114,7 +141,12 @@ export class DesktopAuthHttp {
 			readonly settings?: DesktopSettingsRequest;
 		} = {}
 	): Promise<DesktopHttpResult> {
-		const method = desktopHttpMethod(path, options.photo, options.settings);
+		const method = desktopHttpMethod(
+			path,
+			options.photo,
+			options.settings,
+			options.body !== undefined
+		);
 		const url = new URL(path, origin);
 		if (url.origin !== origin) throw new DesktopAuthorizationError('rejected');
 		const controller = new AbortController();
