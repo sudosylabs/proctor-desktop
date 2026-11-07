@@ -1163,6 +1163,16 @@
       "lifecycleScripts": "none"
     },
     {
+      "package": "resedit",
+      "version": "3.1.0",
+      "kind": "development",
+      "purpose": "Write the development application's name, icon and version strings into the Windows Electron executable, so the dev app sits beside an installed release as its own app. Pure JavaScript, loaded only on Windows by build/lib/electron.ts; never shipped. Chosen over rcedit, which runs a bundled Windows executable.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/resedit",
+      "license": "MIT",
+      "lifecycleScripts": "none"
+    },
+    {
       "package": "@electron/asar",
       "version": "4.3.0",
       "kind": "development",

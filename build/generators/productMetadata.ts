@@ -10,10 +10,13 @@ export const productMetadataGenerator: Generator = {
 	buildOutputs: [],
 	generate(repository, outputRoot) {
 		const metadata = JSON.parse(repository.read('package.json')) as Record<string, unknown>;
-		for (const key of ['name', 'version', 'productName', 'license']) {
+		for (const key of ['name', 'version', 'productName', 'license', 'appId']) {
 			if (typeof metadata[key] !== 'string' || metadata[key].length === 0)
 				throw new TypeError(`Missing packaged product metadata: ${key}`);
 		}
+		const appId = String(metadata.appId);
+		if (!/^[a-z][a-z0-9]*(\.[a-z][a-z0-9-]*)+$/.test(appId))
+			throw new TypeError(`The appId must be a lowercase reverse-DNS name: ${appId}`);
 		const product = {
 			version: metadata.version,
 			nameShort: metadata.productName,
@@ -24,6 +27,8 @@ export const productMetadataGenerator: Generator = {
 			dataFolderName: `.${String(metadata.name)}`,
 			sharedDataFolderName: `.${String(metadata.name)}-shared`,
 			licenseName: metadata.license,
+			darwinBundleIdentifier: appId,
+			win32AppUserModelId: appId,
 			enableTelemetry: false,
 			extensionProperties: {},
 			builtInExtensionsEnabledWithAutoUpdates: []
@@ -38,7 +43,10 @@ export const productMetadataGenerator: Generator = {
 				"import type { IProductConfiguration } from '../../../base/common/product.js';\n\n" +
 				'export const productMetadata: Readonly<IProductConfiguration> = Object.freeze(' +
 				JSON.stringify(product, null, '\t') +
-				');\n'
+				');\n\n' +
+				"/** The installed application's identity; a source checkout runs as this with `.dev`. */\n" +
+				`export const applicationId = ${JSON.stringify(appId)};\n` +
+				'export const developmentApplicationId = `${applicationId}.dev`;\n'
 		);
 	}
 };

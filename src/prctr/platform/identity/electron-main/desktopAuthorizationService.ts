@@ -81,6 +81,8 @@ interface CurrentSession {
 }
 export interface DesktopAuthorizationOptions {
 	readonly target: DesktopReleaseTarget;
+	/** The running application's identity, which keeps its installation keys apart. */
+	readonly applicationId: string;
 	readonly keys: DesktopKeyCustody;
 	readonly credentials: DesktopCredentialStore;
 	readonly http: DesktopAuthHttp;
@@ -140,7 +142,11 @@ export class DesktopAuthorizationService extends Disposable {
 			)
 				throw new DesktopAuthorizationError('cancelled');
 		};
-		const scope = installationKeyScope(identity.origin, identity.institutionId);
+		const scope = installationKeyScope(
+			this.options.applicationId,
+			identity.origin,
+			identity.institutionId
+		);
 		current();
 		const key = await this.options.keys.loadOrCreate(scope);
 		current();

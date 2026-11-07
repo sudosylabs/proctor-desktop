@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { repositoryPath, repositoryRoot } from './paths.ts';
-import { electronExecutable } from './electron.ts';
+import { stockElectronExecutable } from './electron.ts';
 
 export interface EnvironmentFact {
 	readonly name: string;
@@ -94,7 +94,7 @@ export function inspectEnvironment(includeElectron = true): EnvironmentFact[] {
 	];
 	if (includeElectron) {
 		try {
-			facts.push({ name: 'Electron', ok: true, detail: electronExecutable() });
+			facts.push({ name: 'Electron', ok: true, detail: stockElectronExecutable() });
 		} catch (error) {
 			facts.push({ name: 'Electron', ok: false, detail: String(error) });
 		}

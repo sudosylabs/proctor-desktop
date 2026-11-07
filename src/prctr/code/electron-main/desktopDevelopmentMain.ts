@@ -2,6 +2,7 @@ import { acquireDesktopInstanceLock } from '../../platform/identity/electron-mai
 import { app, BrowserWindow } from 'electron';
 import { join } from 'node:path';
 import { createDesktopIdentityComposition } from './desktopIdentityComposition.js';
+import { developmentApplicationId } from '../../platform/product/common/productMetadata.generated.js';
 
 // Closed development entrypoint. Build selectors are main-process arguments, never renderer data.
 const args = process.argv.slice(2);
@@ -15,6 +16,8 @@ for (let i = 0; i < args.length; i++) {
 	else throw new Error('Unknown Desktop development argument');
 }
 app.setName('Proctor Development');
+// Windows groups taskbar buttons and notifications by this id, apart from an installed release.
+if (process.platform === 'win32') app.setAppUserModelId(developmentApplicationId);
 // The coordinator owns closure; a secure replacement briefly has no window.
 app.on('window-all-closed', () => {});
 app.setPath('userData', join(app.getPath('appData'), 'Proctor Development'));
@@ -35,6 +38,7 @@ else {
 		.then(() => {
 			const root = app.getAppPath();
 			const desktop = createDesktopIdentityComposition({
+				applicationId: developmentApplicationId,
 				target: {
 					release,
 					buildId,

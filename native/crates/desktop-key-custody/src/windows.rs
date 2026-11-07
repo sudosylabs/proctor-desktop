@@ -85,7 +85,7 @@ fn provider() -> Result<Handle, ()> {
 }
 fn key(scope: &str, create: bool) -> Result<Handle, ()> {
     let provider = provider()?;
-    let name = wide(&format!("org.proctor.desktop.key.{scope}"));
+    let name = wide(&format!("fr.sudosy.proctor.key.{scope}"));
     let mut handle = 0;
     let status = unsafe { NCryptOpenKey(provider.0, &raw mut handle, name.as_ptr(), 0, 0) };
     if status != 0 {
@@ -200,7 +200,7 @@ pub fn delete(scope: &str) -> Result<(), ()> {
         NCryptOpenKey(
             provider.0,
             &raw mut handle,
-            wide(&format!("org.proctor.desktop.key.{scope}")).as_ptr(),
+            wide(&format!("fr.sudosy.proctor.key.{scope}")).as_ptr(),
             0,
             0,
         )

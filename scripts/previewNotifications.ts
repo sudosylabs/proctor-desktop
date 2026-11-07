@@ -7,7 +7,7 @@ import {
 	repositoryRoot,
 	resetBuildOutput
 } from '../build/lib/paths.ts';
-import { electronExecutable } from '../build/lib/electron.ts';
+import { developmentLaunch } from '../build/lib/electron.ts';
 if (process.argv.slice(2).some((argument) => argument !== '--capture'))
 	throw new Error('Usage: npm run preview:notifications [-- --capture]');
 const outdir = resetBuildOutput('notifications-preview');
@@ -40,7 +40,8 @@ writeFileSync(
 	`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'"><link rel="stylesheet" href="./renderer.css"><title>Proctor notifications</title></head><body><script type="module" src="./renderer.js"></script></body></html>`
 );
 writeFileSync(`${outdir}/package.json`, JSON.stringify({ type: 'module', main: 'main.js' }));
-const child = spawn(electronExecutable(), [`${outdir}/main.js`, ...process.argv.slice(2)], {
+const launch = developmentLaunch([`${outdir}/main.js`, ...process.argv.slice(2)]);
+const child = spawn(launch.command, launch.args, {
 	cwd: repositoryRoot,
 	stdio: 'inherit'
 });

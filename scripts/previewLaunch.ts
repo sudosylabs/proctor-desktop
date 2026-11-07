@@ -1,11 +1,12 @@
 import { spawn } from 'node:child_process';
 import { runNode } from '../build/lib/process.ts';
-import { electronExecutable } from '../build/lib/electron.ts';
+import { developmentLaunch } from '../build/lib/electron.ts';
 import { repositoryRoot } from '../build/lib/paths.ts';
 
 if (process.argv.length > 2) throw new Error('Usage: npm run preview:launch');
 runNode(['build/buildWindowSkeleton.ts']);
-const child = spawn(electronExecutable(), ['.build/window-skeleton/preview.js'], {
+const launch = developmentLaunch(['.build/window-skeleton/preview.js']);
+const child = spawn(launch.command, launch.args, {
 	cwd: repositoryRoot,
 	stdio: 'inherit'
 });

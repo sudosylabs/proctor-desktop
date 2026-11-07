@@ -16,9 +16,17 @@ export interface DesktopKeyCustody {
 	loadOrCreate(scope: string): Promise<DesktopSigningKey>;
 	delete(scope: string): Promise<void>;
 }
-export function installationKeyScope(origin: string, institutionId: string): string {
+/**
+ * The custody scope of one installation key. It includes the application identity, so a
+ * development build and an installed release on one computer never share a key.
+ */
+export function installationKeyScope(
+	applicationId: string,
+	origin: string,
+	institutionId: string
+): string {
 	return createHash('sha256')
-		.update(JSON.stringify([origin, institutionId]))
+		.update(JSON.stringify([applicationId, origin, institutionId]))
 		.digest('hex');
 }
 export async function createDPoPProof(

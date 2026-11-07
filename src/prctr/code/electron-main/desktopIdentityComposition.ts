@@ -23,6 +23,8 @@ import {
 
 export interface DesktopIdentityCompositionOptions {
 	readonly target: DesktopReleaseTarget;
+	/** The running application's identity: the product's, or its `.dev` form from a checkout. */
+	readonly applicationId: string;
 	readonly window: Omit<
 		ElectronProductWindowFactoryOptions,
 		'launchIdentity' | 'account' | 'settings' | 'examActivity'
@@ -52,6 +54,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 		const authorization = owned.add(
 			new DesktopAuthorizationService({
 				target: options.target,
+				applicationId: options.applicationId,
 				keys: loadNativeDesktopKeyCustody(options.nativeKeyModule),
 				credentials: new OsDesktopCredentialStore(join(options.stateDirectory, 'identity')),
 				http,

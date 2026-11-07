@@ -12,7 +12,13 @@ export const productMetadata: Readonly<IProductConfiguration> = Object.freeze({
 	"dataFolderName": ".proctor-desktop",
 	"sharedDataFolderName": ".proctor-desktop-shared",
 	"licenseName": "UNLICENSED",
+	"darwinBundleIdentifier": "fr.sudosy.proctor",
+	"win32AppUserModelId": "fr.sudosy.proctor",
 	"enableTelemetry": false,
 	"extensionProperties": {},
 	"builtInExtensionsEnabledWithAutoUpdates": []
 });
+
+/** The installed application's identity; a source checkout runs as this with `.dev`. */
+export const applicationId = "fr.sudosy.proctor";
+export const developmentApplicationId = `${applicationId}.dev`;

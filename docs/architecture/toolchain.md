@@ -278,6 +278,25 @@ packaged target gates exist. Unsigned verified payloads enter protected signing
 jobs whose credentials are unavailable to pull requests and ordinary builds.
 Releases are produced only by clean protected CI workflows.
 
+## Development application identity
+
+The product's app ID, `appId` in `package.json` (`fr.sudosy.proctor`), is the
+one identity authority; the product-metadata generator derives the macOS bundle
+identifier and Windows AppUserModelID from it. A source checkout runs as a
+separate application, `<appId>.dev` named "Proctor Development", so it sits
+beside an installed release without sharing its data, permissions, taskbar
+entry, or installation keys. `build/lib/electron.ts` copies the pinned stock
+Electron once into `.build/electron` with that name, the release icon and
+identity: on macOS through the bundle's Info.plist and an ad-hoc re-signature,
+on Windows through the executable's resources (`resedit`). It is branded again
+only when Electron, the identity or the icon changes. Development, preview and
+Electron test runs launch it; Linux keeps the stock executable. On macOS,
+interactive launches start through `build/lib/macos/disclaim.c`, so the app,
+not the terminal, editor or agent that started it, owns its camera,
+microphone, screen and accessibility permissions. Installation key scopes
+include the running application's identity, so development and release keys
+never coincide.
+
 ## Command contract
 
 The foundation currently exposes `check`, focused repository checks,

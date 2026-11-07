@@ -27,6 +27,8 @@ import { ProductWindowCoordinator } from '../../src/prctr/platform/windows/commo
 import { ElectronProductWindowFactory } from '../../src/prctr/platform/windows/electron-main/electronProductWindowFactory.js';
 
 const random = (): string => randomBytes(32).toString('base64url');
+/** Its own identity, so the test never touches a development or installed application's keys. */
+const applicationId = 'fr.sudosy.proctor.test';
 const probe = process.argv[2] === '--probe-instance';
 const stateDirectory = probe
 	? process.argv[3]!
@@ -54,7 +56,7 @@ if (probe) {
 			const keys = loadNativeDesktopKeyCustody(join(root, 'desktop_key_custody.node'));
 			const origin = 'https://identity-test.example';
 			const institutionId = randomBytes(13).toString('hex');
-			const scope = installationKeyScope(origin, institutionId);
+			const scope = installationKeyScope(applicationId, origin, institutionId);
 			const credentials = new OsDesktopCredentialStore(join(stateDirectory, 'credentials'));
 			const principalId = 'a'.repeat(26),
 				sessionId = 'b'.repeat(26),
@@ -225,6 +227,7 @@ if (probe) {
 				});
 				const createService = () =>
 					new DesktopAuthorizationService({
+						applicationId,
 						target: {
 							release: '1.0.0',
 							buildId: 'test',

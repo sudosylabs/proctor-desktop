@@ -24,6 +24,7 @@ import { DesktopAuthHttp } from '../../../../src/prctr/platform/identity/node/de
 import { DesktopAuthorizationService } from '../../../../src/prctr/platform/identity/electron-main/desktopAuthorizationService.js';
 import {
 	createDPoPProof,
+	installationKeyScope,
 	type DesktopSigningKey
 } from '../../../../src/prctr/platform/identity/node/desktopSigningKey.js';
 import { DesktopAuthorizationError } from '../../../../src/prctr/platform/identity/node/desktopAuthorizationError.js';
@@ -127,6 +128,14 @@ void test('callback deadline closes unanswered transactions', async () => {
 	await assert.rejects(listener.waitForCode(), /timedOut/);
 	await listener.stop();
 });
+void test('a development build and an installed release never share an installation key', () => {
+	const origin = 'https://exams.example.edu';
+	const release = installationKeyScope('fr.sudosy.proctor', origin, 'institution');
+	assert.match(release, /^[0-9a-f]{64}$/);
+	assert.notEqual(installationKeyScope('fr.sudosy.proctor.dev', origin, 'institution'), release);
+	assert.equal(installationKeyScope('fr.sudosy.proctor', origin, 'institution'), release);
+});
+
 void test('DPoP proofs bind method, canonical URI, nonce and access token with a fresh signature and ID', async () => {
 	const key = softwareTestKey();
 	const nonce = random();
@@ -281,6 +290,7 @@ void test('hosted authorization uses exact wire fields, persists only refresh cu
 		throw Error('Unexpected route');
 	});
 	const service = new DesktopAuthorizationService({
+		applicationId: 'fr.sudosy.proctor.test',
 		target,
 		keys: {
 			async loadOrCreate() {
@@ -351,6 +361,7 @@ void test('a waiting sign-in page can be opened again until the callback arrives
 	});
 	let service: DesktopAuthorizationService | undefined;
 	service = new DesktopAuthorizationService({
+		applicationId: 'fr.sudosy.proctor.test',
 		target,
 		keys: {
 			async loadOrCreate() {
@@ -445,6 +456,7 @@ void test('nonce challenge is retried once with a fresh proof, while ambiguous r
 			throw Error('Unexpected route');
 		});
 		const service = new DesktopAuthorizationService({
+			applicationId: 'fr.sudosy.proctor.test',
 			target,
 			keys: {
 				async loadOrCreate() {
@@ -531,6 +543,7 @@ void test('ordinary shutdown drains pending rotation and sign-out without restor
 		return response(tokens());
 	});
 	const service = new DesktopAuthorizationService({
+		applicationId: 'fr.sudosy.proctor.test',
 		target,
 		keys: {
 			async loadOrCreate() {
@@ -626,6 +639,7 @@ void test('identity HTTP rejects redirects, oversized JSON, and malformed nonce 
 void test('native custody failure stops sign-in before authorization or browser launch', async () => {
 	let crossedBoundary = false;
 	const service = new DesktopAuthorizationService({
+		applicationId: 'fr.sudosy.proctor.test',
 		target,
 		keys: {
 			async loadOrCreate() {
@@ -707,6 +721,7 @@ void test('sign-out preserves separate local cleanup and remote revocation outco
 			return response(tokens());
 		});
 		const service = new DesktopAuthorizationService({
+			applicationId: 'fr.sudosy.proctor.test',
 			target,
 			keys: {
 				async loadOrCreate() {
@@ -932,6 +947,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		throw new Error('Unexpected route');
 	});
 	const service = new DesktopAuthorizationService({
+		applicationId: 'fr.sudosy.proctor.test',
 		target,
 		keys: {
 			async loadOrCreate() {

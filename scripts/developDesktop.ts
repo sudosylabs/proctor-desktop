@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { runNode } from '../build/lib/process.ts';
-import { electronExecutable } from '../build/lib/electron.ts';
+import { developmentLaunch } from '../build/lib/electron.ts';
 import { repositoryRoot } from '../build/lib/paths.ts';
 
 const args = process.argv.slice(2);
@@ -10,7 +10,8 @@ if (args.includes('--help')) {
 	);
 } else {
 	runNode(['build/buildDesktopDevelopment.ts']);
-	const child = spawn(electronExecutable(), ['.build/desktop-development', ...args], {
+	const launch = developmentLaunch(['.build/desktop-development', ...args]);
+	const child = spawn(launch.command, launch.args, {
 		cwd: repositoryRoot,
 		stdio: 'inherit'
 	});

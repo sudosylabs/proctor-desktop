@@ -8,7 +8,7 @@ import { RuleTester } from 'eslint';
 import tseslint from 'typescript-eslint';
 import ts from 'typescript';
 import { upstreamDirectives } from '../../build/lint/upstreamDirectives.ts';
-import { electronExecutable } from '../../build/lib/electron.ts';
+import { stockElectronExecutable } from '../../build/lib/electron.ts';
 import { VirtualRepository } from '../../build/checks/repository.ts';
 import { formattingIgnore } from '../../build/lib/formatOwnership.ts';
 import { readIndex, stagedPaths } from '../../build/lib/indexRepository.ts';
@@ -249,7 +249,7 @@ void test('upstream directive interpretation preserves locations and never rewri
 void test('missing Electron runtime is diagnosed without acquisition or filesystem mutation', () => {
 	const root = mkdtempSync(join(tmpdir(), 'proctor-runtime-test-'));
 	try {
-		assert.throws(() => electronExecutable(root), /npm run setup/);
+		assert.throws(() => stockElectronExecutable(root), /npm run setup/);
 		assert.throws(() => readFileSync(join(root, 'path.txt')), /ENOENT/);
 	} finally {
 		rmSync(root, { recursive: true, force: true });
