@@ -1,0 +1,29 @@
+@layer contributions {
+	.prctr-unavailable-page {
+		box-sizing: border-box;
+		color: var(--prctr-color-text-primary);
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		font-family: var(--prctr-typography-font-application);
+		gap: 4px;
+		padding: 12px 28px 24px;
+	}
+
+	.prctr-unavailable-page[hidden] {
+		display: none;
+	}
+
+	.prctr-unavailable-page .prctr-unavailable-page__title {
+		font-size: 24px;
+		font-weight: var(--prctr-typography-weight-semibold);
+		line-height: 32px;
+		margin: 0;
+	}
+
+	.prctr-unavailable-page .prctr-unavailable-page__message {
+		color: var(--prctr-color-text-secondary);
+		font-size: 14px;
+		margin: 0;
+	}
+}

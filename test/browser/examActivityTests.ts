@@ -62,6 +62,9 @@ export async function exerciseExamActivity(document: Document): Promise<void> {
 	});
 	const root = result.shell.element;
 	const rows = () => [...root.querySelectorAll<HTMLButtonElement>('.prctr-exam-activity__row')];
+	const detailsOpen = () =>
+		root.querySelector<HTMLElement>('.prctr-exam-activity__details')?.hidden === false;
+	const sidebarDocked = () => root.dataset.sidebarPresentation === 'docked';
 	const button = (label: string) =>
 		[...root.querySelectorAll<HTMLButtonElement>('button')].find(
 			(button) => button.querySelector('.prctr-button__label')?.textContent === label
@@ -69,21 +72,21 @@ export async function exerciseExamActivity(document: Document): Promise<void> {
 	try {
 		await eventually(() => rows().length === 2);
 		check(
-			root.querySelectorAll('[data-destination]').length === 3,
+			root.querySelectorAll('.prctr-area-rail__area:not([hidden])').length === 3,
 			'Mixed access must show three product areas'
 		);
-		check(!result.shell.secondaryVisible, 'Details start closed');
+		check(!detailsOpen(), 'Details start closed');
 		rows()[0]!.click();
-		check(result.shell.secondaryVisible, 'Selection opens Secondary Side Bar');
+		check(detailsOpen(), 'Selection opens the page detail panel');
 		const frame = document.defaultView!.frameElement as HTMLIFrameElement;
 		frame.style.width = '640px';
-		await eventually(() => !result.shell.navigationVisible);
+		await eventually(() => !sidebarDocked());
 		check(
 			result.shell.part('content').getBoundingClientRect().width >= 300,
 			'Open details must not squeeze the main page at narrow width'
 		);
 		frame.style.width = '1100px';
-		await eventually(() => result.shell.navigationVisible);
+		await eventually(() => sidebarDocked());
 
 		check(button('Enter exam')?.disabled, 'Incomplete admission must remain disabled');
 		check(
@@ -109,11 +112,12 @@ export async function exerciseExamActivity(document: Document): Promise<void> {
 			'Upcoming filters the loaded collection'
 		);
 		check(
-			root.querySelector('[data-activity-view="upcoming"]')?.getAttribute('aria-current') ===
-				'page',
+			root
+				.querySelector('.prctr-area-sidebar__entry[data-entry="upcoming"]')
+				?.getAttribute('aria-current') === 'page',
 			'Sidebar selection follows the active category'
 		);
-		check(!result.shell.secondaryVisible, 'Changing category closes the previous inspector');
+		check(!detailsOpen(), 'Changing category closes the previous inspector');
 		result.navigation.selectActivityView?.('submitted');
 		check(
 			rows().length === 0 && root.textContent?.includes('No exams in this section'),
@@ -125,7 +129,7 @@ export async function exerciseExamActivity(document: Document): Promise<void> {
 		const close = root.querySelector<HTMLButtonElement>('[aria-label="Close exam details"]')!;
 		close.click();
 		check(
-			!result.shell.secondaryVisible && document.activeElement === rows()[0],
+			!detailsOpen() && document.activeElement === rows()[0],
 			'Inspector closes and restores focus'
 		);
 		rows()[0]!.click();
@@ -140,7 +144,7 @@ export async function exerciseExamActivity(document: Document): Promise<void> {
 		result.navigation.selectActivityView?.('overview');
 		result.navigation.select('account');
 		await eventually(() => !!root.querySelector('.prctr-account__header'));
-		check(!result.shell.secondaryVisible, 'Account navigation clears exam details');
+		check(!detailsOpen(), 'Account navigation clears exam details');
 		result.navigation.select('management');
 		await eventually(() => !!root.textContent?.includes('Your management access'));
 		check(
@@ -180,7 +184,9 @@ export async function exerciseExamActivity(document: Document): Promise<void> {
 		);
 		areas = ['account', 'settings'];
 		document.defaultView!.dispatchEvent(new FocusEvent('focus'));
-		await eventually(() => root.querySelectorAll('[data-destination]').length === 0);
+		await eventually(
+			() => root.querySelectorAll('.prctr-area-rail__area:not([hidden])').length === 0
+		);
 		check(
 			root.textContent?.includes('No exam or management access'),
 			'No access must have a distinct explanation'

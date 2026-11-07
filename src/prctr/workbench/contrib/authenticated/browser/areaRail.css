@@ -1,0 +1,125 @@
+@layer contributions {
+	.prctr-area-rail {
+		align-items: center;
+		box-sizing: border-box;
+		color: var(--prctr-color-text-secondary);
+		display: flex;
+		flex-direction: column;
+		font-family: var(--prctr-typography-font-application);
+		gap: 6px;
+		min-block-size: 100%;
+		padding-block-end: 12px;
+		/* The rail is part of the window frame, so its empty space moves the window. */
+		-webkit-app-region: drag;
+	}
+
+	.prctr-area-rail .prctr-area-rail__areas {
+		align-items: center;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.prctr-area-rail .prctr-area-rail__area {
+		align-items: center;
+		background: transparent;
+		border: 0;
+		border-radius: 10px;
+		box-sizing: border-box;
+		color: inherit;
+		cursor: pointer;
+		display: flex;
+		flex-direction: column;
+		font: inherit;
+		font-size: 11px;
+		gap: 4px;
+		inline-size: 60px;
+		line-height: 14px;
+		padding: 8px 2px 6px;
+		-webkit-app-region: no-drag;
+	}
+
+	.prctr-area-rail .prctr-area-rail__area[hidden] {
+		display: none;
+	}
+
+	.prctr-area-rail .prctr-area-rail__label {
+		max-inline-size: 100%;
+		overflow-wrap: anywhere;
+		text-align: center;
+	}
+
+	.prctr-area-rail .prctr-area-rail__area:hover {
+		background: var(--prctr-color-interaction-hover);
+		color: var(--prctr-color-text-primary);
+	}
+
+	.prctr-area-rail .prctr-area-rail__area[aria-current='page'] {
+		background: var(--prctr-color-navigation-selected);
+		color: var(--prctr-color-navigation-selectedForeground);
+		font-weight: var(--prctr-typography-weight-medium);
+	}
+
+	.prctr-area-rail .prctr-area-rail__account {
+		align-items: center;
+		background: var(--prctr-color-avatar-background);
+		block-size: 36px;
+		border: 0;
+		border-radius: 50%;
+		color: var(--prctr-color-avatar-foreground);
+		cursor: pointer;
+		display: flex;
+		flex: none;
+		font: inherit;
+		font-size: 12.5px;
+		font-weight: var(--prctr-typography-weight-semibold);
+		inline-size: 36px;
+		justify-content: center;
+		margin-block-start: auto;
+		overflow: hidden;
+		padding: 0;
+		-webkit-app-region: no-drag;
+	}
+
+	/* While Account is open the photo carries the accent ring, set off from the frame by a gap. */
+	.prctr-area-rail .prctr-area-rail__account[aria-current='page'] {
+		box-shadow:
+			0 0 0 2px var(--prctr-color-frame-background),
+			0 0 0 4px var(--prctr-color-brand-mark);
+	}
+
+	.prctr-area-rail .prctr-area-rail__avatar {
+		align-items: center;
+		block-size: 100%;
+		display: flex;
+		inline-size: 100%;
+		justify-content: center;
+	}
+
+	.prctr-area-rail .prctr-area-rail__avatar img {
+		block-size: 100%;
+		border-radius: 50%;
+		display: block;
+		inline-size: 100%;
+		object-fit: cover;
+	}
+
+	.prctr-area-rail .prctr-area-rail__area:focus-visible,
+	.prctr-area-rail .prctr-area-rail__account:focus-visible {
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-area-rail .prctr-area-rail__area[aria-current='page'] {
+			outline: var(--prctr-shape-stroke-default) solid Highlight;
+		}
+		.prctr-area-rail .prctr-area-rail__account[aria-current='page'] {
+			outline: var(--prctr-shape-stroke-strong) solid Highlight;
+			outline-offset: 2px;
+		}
+		.prctr-area-rail .prctr-area-rail__area:hover {
+			outline: var(--prctr-shape-stroke-default) dashed Highlight;
+		}
+	}
+}

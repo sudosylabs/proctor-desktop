@@ -1,0 +1,27 @@
+@layer contributions {
+	.prctr-window-title {
+		align-items: center;
+		color: var(--prctr-color-text-secondary);
+		display: flex;
+		flex: 0 1 auto;
+		font-family: var(--prctr-typography-font-application);
+		font-size: 12px;
+		gap: 8px;
+		min-inline-size: 0;
+		overflow: hidden;
+		padding-inline-start: 14px;
+		white-space: nowrap;
+	}
+
+	.prctr-window-title .prctr-window-title__mark {
+		block-size: 14px;
+		color: var(--prctr-color-brand-mark);
+		flex: none;
+		inline-size: 14px;
+	}
+
+	.prctr-window-title .prctr-window-title__name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}

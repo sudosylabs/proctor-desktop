@@ -56,7 +56,7 @@ export class BrowserThemeService extends Disposable {
 	private readonly colorSchemeQuery: MediaQueryList | undefined;
 	private readonly reducedMotionQuery: MediaQueryList | undefined;
 	private readonly reducedTransparencyQuery: MediaQueryList | undefined;
-	private followsSystemColorScheme: boolean;
+	private followsSystem: boolean;
 	private readonly systemThemes: { readonly light: string; readonly dark: string };
 
 	constructor(
@@ -72,14 +72,14 @@ export class BrowserThemeService extends Disposable {
 		this._register({ dispose: () => { document.adoptedStyleSheets = document.adoptedStyleSheets.filter(sheet => sheet !== this.themeStyleSheet); } });
 		this._register(getThemingRegistry().onThemingParticipantAdded(() => this.applyThemeRules()));
 		this.preferences = preferences;
-		this.followsSystemColorScheme = options.followSystemColorScheme === true;
+		this.followsSystem = options.followSystemColorScheme === true;
 		this.systemThemes = options.systemThemes ?? { light: 'light', dark: 'dark' };
 		const matchMedia = document.defaultView?.matchMedia?.bind(document.defaultView);
 		this.forcedColorsQuery = matchMedia?.('(forced-colors: active)');
 		this.colorSchemeQuery = matchMedia?.('(prefers-color-scheme: dark)');
 		this.reducedMotionQuery = matchMedia?.('(prefers-reduced-motion: reduce)');
 		this.reducedTransparencyQuery = matchMedia?.('(prefers-reduced-transparency: reduce)');
-		this.currentTheme = getTheme(this.followsSystemColorScheme && this.colorSchemeQuery !== undefined ? this.systemTheme(this.colorSchemeQuery) : initialTheme);
+		this.currentTheme = getTheme(this.followsSystem && this.colorSchemeQuery !== undefined ? this.systemTheme(this.colorSchemeQuery) : initialTheme);
 		this.listen(this.forcedColorsQuery, () => { this.applyForcedColors(); this.presentationChangeEmitter.fire(); });
 		this.listen(this.colorSchemeQuery, () => this.applySystemColorScheme());
 		this.listen(this.reducedMotionQuery, () => { this.applyPreferences(); this.presentationChangeEmitter.fire(); });
@@ -93,6 +93,11 @@ export class BrowserThemeService extends Disposable {
 		return this.currentTheme;
 	}
 
+	/** The theme comes from the operating-system scheme rather than an explicit selection. */
+	get followsSystemColorScheme(): boolean {
+		return this.followsSystem;
+	}
+
 	get forcedColorsActive(): boolean {
 		return this.forcedColorsQuery?.matches === true;
 	}
@@ -104,13 +109,43 @@ export class BrowserThemeService extends Disposable {
 	setTheme(id: string, customizations: IColorCustomizations = {}, tokenCustomizations: ITokenColorCustomizations = {}, semanticCustomizations?: ISemanticTokenColorCustomizations): void {
 		const theme = getTheme(id, customizations, tokenCustomizations, semanticCustomizations);
 		const customizationKey = JSON.stringify([customizations, tokenCustomizations, semanticCustomizations]);
-		this.followsSystemColorScheme = false;
-		if (theme.settingsId === this.currentTheme.settingsId && customizationKey === this.customizationKey && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) return;
+		const followed = this.followsSystem;
+		this.followsSystem = false;
+		if (theme.settingsId === this.currentTheme.settingsId && customizationKey === this.customizationKey && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) {
+			if (followed) this.presentationChangeEmitter.fire();
+			return;
+		}
 		this.currentTheme = theme;
 		this.customizations = customizations;
 		this.tokenCustomizations = tokenCustomizations;
 		this.semanticCustomizations = semanticCustomizations;
 		this.customizationKey = customizationKey;
+		this.apply();
+		this.changeEmitter.fire(theme);
+		this.presentationChangeEmitter.fire();
+	}
+
+	/**
+	 * Follow the operating-system scheme with the system themes, keeping the given
+	 * customizations. A later explicit selection through `setTheme` stops following.
+	 */
+	followSystemTheme(customizations: IColorCustomizations = {}, tokenCustomizations: ITokenColorCustomizations = {}, semanticCustomizations?: ISemanticTokenColorCustomizations): void {
+		if (this.colorSchemeQuery === undefined) {
+			this.setTheme(this.systemThemes.light, customizations, tokenCustomizations, semanticCustomizations);
+			return;
+		}
+		const followed = this.followsSystem;
+		this.followsSystem = true;
+		this.customizations = customizations;
+		this.tokenCustomizations = tokenCustomizations;
+		this.semanticCustomizations = semanticCustomizations;
+		this.customizationKey = JSON.stringify([customizations, tokenCustomizations, semanticCustomizations]);
+		const theme = getTheme(this.systemTheme(this.colorSchemeQuery), customizations, tokenCustomizations, semanticCustomizations);
+		if (theme.settingsId === this.currentTheme.settingsId && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) {
+			if (!followed) this.presentationChangeEmitter.fire();
+			return;
+		}
+		this.currentTheme = theme;
 		this.apply();
 		this.changeEmitter.fire(theme);
 		this.presentationChangeEmitter.fire();
@@ -184,7 +219,7 @@ export class BrowserThemeService extends Disposable {
 	}
 
 	private applySystemColorScheme(): void {
-		if (!this.followsSystemColorScheme || this.colorSchemeQuery === undefined) return;
+		if (!this.followsSystem || this.colorSchemeQuery === undefined) return;
 		const theme = getTheme(this.systemTheme(this.colorSchemeQuery), this.customizations, this.tokenCustomizations, this.semanticCustomizations);
 		if (theme.settingsId === this.currentTheme.settingsId && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) return;
 		this.currentTheme = theme;

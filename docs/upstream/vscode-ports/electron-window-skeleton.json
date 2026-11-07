@@ -50,7 +50,7 @@
       "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme. LaunchWindow is a fixed 440x600 utility window that cannot be resized, maximized or made fullscreen.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "54e2c34b999096989afe371a7fd6937a83ee6848eb76519daca5c853ca57f470"
+      "localSha256": "ebf4e2b198b5b44345344efcb33b8e6bc6db8838098c8627bb8b6f620389b330"
     },
     {
       "upstreamPath": "src/vs/platform/windows/electron-main/windows.ts",
@@ -60,7 +60,7 @@
       "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme. LaunchWindow is a fixed 440x600 utility window that cannot be resized, maximized or made fullscreen.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "54e2c34b999096989afe371a7fd6937a83ee6848eb76519daca5c853ca57f470",
+      "localSha256": "ebf4e2b198b5b44345344efcb33b8e6bc6db8838098c8627bb8b6f620389b330",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -75,7 +75,7 @@
       "rationale": "Preserve native titlebar color, modal dimming, and physical-height synchronization, the one-pixel Windows border correction, macOS traffic-light centering, Tahoe button geometry, sheet offset, fullscreen notification, retry-safe native update caching, sender authorization, and deterministic teardown behind a product-window-scoped bridge.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronWindowChrome.ts",
-      "localSha256": "e9044fbe0e208257ea64746e497e18445a063825a922802743b7a605333a8c97",
+      "localSha256": "b0d61e6b2af92285470bca184a9ca3ea76de99cb09e715ba2b383527d91bdb36",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -99,7 +99,7 @@
       "rationale": "Preserve renderer-to-main theme, modal-dimming, and zoom-aware titlebar updates, forced-color synchronization, disposal fencing, and the macOS first-title workaround while replacing VS Code service decorators and general workbench title services with Proctor's closed chrome client and browser theme service.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/browser/productWindowChrome.ts",
-      "localSha256": "8686c5d4bfca2ab8b9cb0f0a6ab6d03268ef025b3c3c87460c75268606d7b65c",
+      "localSha256": "85bc0b9ff2128e4f44b544010e9ec30e50072d85901690bfb144f3032d1bfa8f",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -202,12 +202,6 @@
       "kind": "local-interface",
       "reference": "src/prctr/platform/windows/electron-main/launchWindowMenu.ts",
       "rationale": "Proctor-owned signed-out menu adapter uses Electron roles and native dialogs directly. It owns localized bounded diagnostics, guarded exit, focus activation, and deterministic menu cleanup without importing the VS Code menubar subsystem."
-    },
-    {
-      "id": "native-account-menu",
-      "kind": "local-interface",
-      "reference": "src/prctr/platform/account/common/accountMenu.ts",
-      "rationale": "The fixed account menu accepts bounded placement and returns only an account destination or logout. Its main adapter owns native popup lifetime and sender revalidation."
     }
   ],
   "divergences": [

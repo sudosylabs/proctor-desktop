@@ -121,10 +121,12 @@ export async function mountExamActivityFixture(
 				async update() {}
 			}
 		),
-		createAuthenticatedContribution(
-			{ async signOut() {}, async close() {}, account, examActivity: client },
-			true
-		),
+		createAuthenticatedContribution({
+			async signOut() {},
+			async close() {},
+			account,
+			examActivity: client
+		}),
 		createAccountContribution(account),
 		{
 			id: 'prctr.authenticated.settings',

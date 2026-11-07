@@ -1,0 +1,35 @@
+@layer contributions {
+	.prctr-sidebar-sash {
+		cursor: col-resize;
+		inline-size: 6px;
+		inset-block: 0;
+		inset-inline-end: -3px;
+		position: absolute;
+		touch-action: none;
+		z-index: 2;
+		-webkit-app-region: no-drag;
+	}
+
+	.prctr-sidebar-sash[hidden] {
+		display: none;
+	}
+
+	.prctr-sidebar-sash:hover,
+	.prctr-sidebar-sash[data-dragging='true'] {
+		background: var(--prctr-color-border-focus);
+		transition: background var(--prctr-motion-duration-normal) ease-out;
+	}
+
+	.prctr-sidebar-sash:focus-visible {
+		background: var(--prctr-color-border-focus);
+		outline: none;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-sidebar-sash:hover,
+		.prctr-sidebar-sash:focus-visible,
+		.prctr-sidebar-sash[data-dragging='true'] {
+			background: Highlight;
+		}
+	}
+}

@@ -1,0 +1,173 @@
+@layer contributions {
+	.prctr-area-sidebar {
+		block-size: 100%;
+		box-sizing: border-box;
+		color: var(--prctr-color-text-primary);
+		display: flex;
+		flex-direction: column;
+		font-family: var(--prctr-typography-font-application);
+		gap: 16px;
+		min-block-size: 0;
+		padding: 12px 8px 8px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__header {
+		align-items: center;
+		display: flex;
+		flex: none;
+		min-block-size: 28px;
+		padding-inline-start: 10px;
+		/* The title row lines up with the macOS traffic lights and moves the window. */
+		-webkit-app-region: drag;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__title {
+		flex: 1;
+		font-size: 15px;
+		font-weight: var(--prctr-typography-weight-semibold);
+		line-height: 20px;
+		margin: 0;
+		min-inline-size: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__hide {
+		align-items: center;
+		background: transparent;
+		block-size: 28px;
+		border: 0;
+		border-radius: var(--prctr-workbench-control-radius, 6px);
+		color: var(--prctr-color-text-secondary);
+		cursor: pointer;
+		display: flex;
+		flex: none;
+		inline-size: 28px;
+		justify-content: center;
+		padding: 0;
+		-webkit-app-region: no-drag;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__scroll {
+		flex: 1 1 auto;
+		min-block-size: 0;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__pages {
+		block-size: 100%;
+		box-sizing: border-box;
+		overflow: hidden;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__group {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__group[hidden],
+	.prctr-area-sidebar .prctr-area-sidebar__status[hidden],
+	.prctr-area-sidebar .prctr-area-sidebar__footer[hidden],
+	.prctr-area-sidebar .prctr-area-sidebar__entry[hidden] {
+		display: none;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__entry {
+		align-items: center;
+		background: transparent;
+		border: 0;
+		border-radius: 7px;
+		box-sizing: border-box;
+		color: inherit;
+		cursor: pointer;
+		display: flex;
+		font: inherit;
+		font-size: 13.5px;
+		gap: 8px;
+		inline-size: 100%;
+		line-height: 20px;
+		min-block-size: 30px;
+		padding: 5px 10px;
+		text-align: start;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__label {
+		flex: 1;
+		min-inline-size: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__entry:hover:not(:disabled),
+	.prctr-area-sidebar .prctr-area-sidebar__hide:hover {
+		background: var(--prctr-color-interaction-hover);
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__entry[aria-current='page'] {
+		background: var(--prctr-color-navigation-selected);
+		color: var(--prctr-color-navigation-selectedForeground);
+		font-weight: var(--prctr-typography-weight-medium);
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__entry:disabled {
+		cursor: default;
+		opacity: 0.6;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__entry:focus-visible,
+	.prctr-area-sidebar .prctr-area-sidebar__hide:focus-visible {
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: -2px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__status {
+		color: var(--prctr-color-text-secondary);
+		display: flex;
+		flex: none;
+		flex-direction: column;
+		font-size: 12.5px;
+		gap: 4px;
+		line-height: 18px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__status-text {
+		margin: 0;
+		padding-inline: 10px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__footer {
+		display: flex;
+		flex: none;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__footer .prctr-area-sidebar__entry {
+		color: var(--prctr-color-text-secondary);
+		min-block-size: 32px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__feedback {
+		color: var(--prctr-color-feedback-error);
+		font-size: 12.5px;
+		line-height: 18px;
+		margin: 0;
+		padding-inline: 10px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__feedback:empty {
+		display: none;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-area-sidebar .prctr-area-sidebar__entry[aria-current='page'] {
+			outline: var(--prctr-shape-stroke-default) solid Highlight;
+		}
+		.prctr-area-sidebar .prctr-area-sidebar__entry:hover:not(:disabled),
+		.prctr-area-sidebar .prctr-area-sidebar__hide:hover {
+			outline: var(--prctr-shape-stroke-default) dashed Highlight;
+		}
+	}
+}

@@ -292,30 +292,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
-    "account.menu.logout": {
-      "message": "Log out",
-      "description": "Native account menu logout action.",
-      "placeholders": [],
-      "source": "src/prctr/platform/account/electron-main/electronAccountMenu.ts"
-    },
-    "account.menu.profile": {
-      "message": "Profile",
-      "description": "Native account menu profile action.",
-      "placeholders": [],
-      "source": "src/prctr/platform/account/electron-main/electronAccountMenu.ts"
-    },
-    "account.menu.sessions": {
-      "message": "Sessions",
-      "description": "Native account menu sessions action.",
-      "placeholders": [],
-      "source": "src/prctr/platform/account/electron-main/electronAccountMenu.ts"
-    },
-    "account.menu.settings": {
-      "message": "Settings",
-      "description": "Native account menu settings action.",
-      "placeholders": [],
-      "source": "src/prctr/platform/account/electron-main/electronAccountMenu.ts"
-    },
     "account.method": {
       "message": "Signed in with",
       "description": "Own-account method presentation.",
@@ -796,229 +772,253 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
-    "authenticated.account.connected": {
-      "message": "Signed in to {institution}.",
-      "description": "Verified account institution.",
-      "placeholders": [
-        "institution"
-      ],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
-    },
-    "authenticated.account.no.access": {
-      "message": "No examination or management access is assigned to your account.",
-      "description": "Server-confirmed absence of assigned access.",
+    "authenticated.account.nav.profile": {
+      "message": "Profile",
+      "description": "Account page with the signed-in user’s photo and details.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.account.no.affiliation": {
-      "message": "You have no current institution affiliation.",
-      "description": "Server-confirmed account context.",
+    "authenticated.account.nav.security": {
+      "message": "Sign-in and security",
+      "description": "Account page about how the user signs in.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.action.failed": {
-      "message": "The requested account action could not be completed.",
-      "description": "Safe authenticated action failure.",
+    "authenticated.account.nav.sessions": {
+      "message": "Sessions and devices",
+      "description": "Account page listing signed-in sessions and registered desktops.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.action.sign.out": {
-      "message": "Sign out",
-      "description": "Action that ends the current authenticated Session.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
-    },
-    "authenticated.destination.account": {
-      "message": "Account",
-      "description": "Authenticated account destination.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
-    },
-    "authenticated.destination.activity": {
-      "message": "Exam activity",
-      "description": "Authenticated destination for the current User’s examination activity.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
-    },
-    "authenticated.destination.settings": {
+    "authenticated.account.nav.settings": {
       "message": "Settings",
-      "description": "Authenticated User Settings destination.",
+      "description": "Account item that opens User Settings.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.destination.waiting": {
-      "message": "Waiting for the current authorized server projection.",
-      "description": "Honest unavailable state before an authenticated destination receives server data.",
+    "authenticated.account.nav.tokens": {
+      "message": "Access tokens",
+      "description": "Account page for personal access tokens.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.heading": {
-      "message": "Authenticated workspace",
-      "description": "Heading for the signed-in Proctor application.",
+    "authenticated.account.sign.out": {
+      "message": "Sign out",
+      "description": "Ends the current desktop session.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.layout.customize": {
-      "message": "Customize Layout",
-      "description": "Authenticated window layout action.",
+    "authenticated.account.sign.out.failed": {
+      "message": "Sign-out could not be completed.",
+      "description": "Shown when ending the desktop session fails.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts"
-    },
-    "authenticated.layout.primary": {
-      "message": "Toggle Primary Side Bar Visibility",
-      "description": "Authenticated window layout action.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts"
-    },
-    "authenticated.layout.secondary": {
-      "message": "Toggle Secondary Side Bar Visibility",
-      "description": "Authenticated window layout action.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.nav.available": {
       "message": "Ready to join",
       "description": "Available exams navigation, subject to admission checks.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
-    },
-    "authenticated.nav.exam.views": {
-      "message": "My exams sections",
-      "description": "Expand or collapse exam navigation children.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.nav.history": {
       "message": "History",
       "description": "Past exam activity navigation.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.nav.overview": {
       "message": "Overview",
-      "description": "Exam overview navigation.",
+      "description": "Sidebar page that summarizes an area.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.nav.progress": {
       "message": "In progress",
       "description": "Unfinished attempts navigation.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.nav.results": {
       "message": "Results",
       "description": "Released results navigation.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.nav.submitted": {
       "message": "Submitted",
       "description": "Submitted exams navigation.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.nav.upcoming": {
       "message": "Upcoming",
       "description": "Upcoming exams navigation.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.rail.account": {
+      "message": "Account: {name}",
+      "description": "Accessible name of the rail photo that opens Account; name is the signed-in user.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.rail.activity": {
+      "message": "Activity",
+      "description": "Rail label of the student exam activity area.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.rail.administration": {
+      "message": "Admin",
+      "description": "Rail label of the institution administration area.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.rail.label": {
+      "message": "Areas",
+      "description": "Accessible name of the rail that switches between product areas and Account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.rail.management": {
+      "message": "Exams",
+      "description": "Rail label of the exam management area.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.shell.account": {
       "message": "Account",
-      "description": "Account navigation group.",
+      "description": "Fallback name of the signed-in user.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.shell.administration": {
-      "message": "Administration",
-      "description": "Authorized institution management destination.",
+    "authenticated.shell.back": {
+      "message": "Back",
+      "description": "Returns to the previous page.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.shell.exams": {
-      "message": "My exams",
-      "description": "Student examination destination.",
+    "authenticated.shell.forward": {
+      "message": "Forward",
+      "description": "Goes to the next page after going back.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.shell.hide.sidebar": {
       "message": "Hide sidebar",
-      "description": "Hide product navigation.",
+      "description": "Hides the contextual sidebar.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.shell.management": {
-      "message": "Exam management",
-      "description": "Authorized exam management destination.",
+    "authenticated.shell.navigate.back": {
+      "message": "Go Back",
+      "description": "Command that returns to the previous page.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.shell.navigate.forward": {
+      "message": "Go Forward",
+      "description": "Command that goes to the next page after going back.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.shell.product": {
       "message": "Proctor",
-      "description": "Product name in authenticated navigation.",
+      "description": "Product name in the Windows title bar.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.shell.profile": {
-      "message": "Profile",
-      "description": "Own profile destination.",
+    "authenticated.shell.resize.sidebar": {
+      "message": "Resize sidebar",
+      "description": "Accessible name of the separator that changes the sidebar width.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.shell.retry": {
       "message": "Refresh access",
       "description": "Refresh permitted product areas from the server.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.shell.sessions": {
-      "message": "Sessions",
-      "description": "Sessions and registered desktops destination.",
+    "authenticated.shell.search": {
+      "message": "Search",
+      "description": "Accessible name of the window search field.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.shell.settings": {
-      "message": "Settings",
-      "description": "User settings destination.",
+    "authenticated.shell.search.focus": {
+      "message": "Focus Search",
+      "description": "Command that moves focus to the window search field.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.shell.search.placeholder": {
+      "message": "Search exams, students and classes",
+      "description": "Placeholder of the window search field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.shell.search.unavailable": {
+      "message": "Search isn’t available yet.",
+      "description": "Announced when the user submits a search before search exists.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.shell.show.sidebar": {
       "message": "Show sidebar",
-      "description": "Reveal product navigation.",
+      "description": "Shows the contextual sidebar.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.shell.sign.out": {
-      "message": "Log out",
-      "description": "End the current desktop session.",
+    "authenticated.shell.sidebar.hidden": {
+      "message": "Sidebar hidden",
+      "description": "Announcement after the sidebar is hidden.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
-    "authenticated.shell.sign.out.failed": {
-      "message": "Sign-out could not be completed.",
-      "description": "Account menu failure.",
+    "authenticated.shell.sidebar.shown": {
+      "message": "Sidebar shown",
+      "description": "Announcement after the sidebar appears.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
-    },
-    "authenticated.shell.title": {
-      "message": "Proctor",
-      "description": "Authenticated window title.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.shell.toggle.sidebar": {
-      "message": "Toggle sidebar visibility",
-      "description": "Show or hide product navigation.",
+      "message": "Toggle Sidebar Visibility",
+      "description": "Command that shows or hides the contextual sidebar.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.shell.waiting": {
       "message": "Exam activity is not available yet.",
       "description": "Unavailable examination destination.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/authenticated/browser/accountShellNavigation.ts"
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.sidebar.account": {
+      "message": "Account",
+      "description": "Sidebar title of the Account space.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.sidebar.activity": {
+      "message": "Activity",
+      "description": "Sidebar title of the student exam activity area.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.sidebar.administration": {
+      "message": "Administration",
+      "description": "Sidebar title of the institution administration area.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.sidebar.management": {
+      "message": "Exams",
+      "description": "Sidebar title of the exam management area.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "candidate.browser.back": {
       "message": "Back",

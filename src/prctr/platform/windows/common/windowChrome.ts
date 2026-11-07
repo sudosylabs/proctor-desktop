@@ -12,6 +12,15 @@ export const MACOS_TAHOE_PRODUCT_TITLEBAR_HEIGHT = 32;
 export const LAUNCH_MACOS_TITLEBAR_HEIGHT = 36;
 /** LaunchWindow's title bar on Windows and Linux, from the accepted LaunchWindow design. */
 export const LAUNCH_TITLEBAR_HEIGHT = 32;
+/**
+ * AuthenticatedWindow's top region on macOS: the area rail's top holds the traffic
+ * lights, centred on the sidebar title row, and the content top bar is the same height.
+ */
+export const AUTHENTICATED_MACOS_TITLEBAR_HEIGHT = 52;
+/** AuthenticatedWindow's title bar strip above the frame on Windows and Linux. */
+export const AUTHENTICATED_TITLEBAR_HEIGHT = 32;
+/** The traffic lights' leading inset, which centres them in the 76px area rail. */
+export const AUTHENTICATED_MACOS_TRAFFIC_LIGHT_X = 12;
 export const MACOS_TRAFFIC_LIGHT_INSET = 70;
 export const PRODUCT_WINDOW_TITLE = 'Proctor';
 
@@ -38,6 +47,8 @@ export interface ProductWindowChromeColors {
 export interface ProductWindowChromeUpdate {
 	readonly colors?: ProductWindowChromeColors;
 	readonly theme: ProductWindowChromeTheme;
+	/** The page follows the operating-system scheme, so the native scheme must not be pinned. */
+	readonly followsSystemScheme: boolean;
 	readonly titlebarHeight: number;
 	readonly dimmed: boolean;
 }
@@ -84,7 +95,8 @@ export function validateProductWindowChromeUpdate(value: unknown): ProductWindow
 		!isThemeId(value.theme) ||
 		!isPhysicalTitlebarHeight(value.titlebarHeight) ||
 		typeof value.dimmed !== 'boolean' ||
-		Object.keys(value).length !== (value.colors === undefined ? 3 : 4) ||
+		typeof value.followsSystemScheme !== 'boolean' ||
+		Object.keys(value).length !== (value.colors === undefined ? 4 : 5) ||
 		(value.colors !== undefined && !validChromeColors(value.colors))
 	)
 		throw new TypeError('Invalid product window chrome update');
@@ -94,7 +106,8 @@ export function validateProductWindowChromeUpdate(value: unknown): ProductWindow
 			? {}
 			: { colors: Object.freeze({ ...(value.colors as ProductWindowChromeColors) }) }),
 		titlebarHeight: value.titlebarHeight,
-		dimmed: value.dimmed
+		dimmed: value.dimmed,
+		followsSystemScheme: value.followsSystemScheme
 	});
 }
 

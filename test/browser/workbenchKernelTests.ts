@@ -2,7 +2,6 @@ import { ICommandService } from '../../src/prctr/platform/commands/common/comman
 import type { IInstantiationService } from '../../src/prctr/platform/instantiation/common/instantiation.js';
 import { WORKBENCH_INSTANTIATION_SERVICE } from '../../src/prctr/workbench/common/serviceIds.js';
 import { browserSettingsEditorEnvironment } from './editor/settingsEditorEnvironment.js';
-import { runModernWorkbenchTests } from './modernWorkbenchTests.ts';
 import { runAccountTests } from './accountTests.ts';
 import { createAccountContribution } from '../../src/prctr/workbench/contrib/account/browser/accountContribution.ts';
 import {
@@ -100,7 +99,6 @@ function testWindowChromeClient(updates?: ProductWindowChromeUpdate[]): ProductW
 }
 
 export async function runWorkbenchKernelBrowserTests(document: Document): Promise<number> {
-	await runModernWorkbenchTests(document, labels);
 	await runAccountTests(document);
 	await runThemePreferenceTest(document);
 	await runExecutableKernelTest(document);
@@ -2014,15 +2012,19 @@ async function runSettingsModalContributionTest(document: Document): Promise<voi
 		await commands.executeCommand('workbench.action.closeModalEditor');
 		await waitFor(() => chromeUpdates.at(-1)?.dimmed === false);
 		if (child.querySelector('.modal-editor-part')) throw Error('Settings modal did not close');
+		result.shell
+			.part('navigation')
+			.querySelector<HTMLButtonElement>('.prctr-area-rail__account')
+			?.click();
 		const signOut = result.shell
-			.part('titlebar')
-			.querySelector<HTMLButtonElement>('[data-region="signout"]');
+			.part('sidebar')
+			.querySelector<HTMLButtonElement>('[data-action="signOut"]');
 		if (!signOut) throw Error('Authenticated sign-out action is absent');
 		signOut.click();
 		await waitFor(
 			() =>
-				result.shell.part('titlebar').querySelector('[data-region="action-status"]')
-					?.textContent === 'The requested account action could not be completed.'
+				result.shell.part('sidebar').querySelector('.prctr-area-sidebar__feedback')
+					?.textContent === 'Sign-out could not be completed.'
 		);
 	} finally {
 		release?.();

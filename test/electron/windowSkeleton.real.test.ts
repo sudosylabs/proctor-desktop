@@ -138,6 +138,31 @@ void test('three product windows use isolated capability-specific preloads and l
 		symbolColor: '#ededee',
 		height: 31
 	});
+	// AuthenticatedWindow shows the same material, stays resizable, and keeps its own title bar.
+	assert.deepEqual(result.windowChromeOptions.authenticatedDarwin, {
+		width: 1180,
+		height: 760,
+		minWidth: 640,
+		minHeight: 480,
+		title: 'Proctor',
+		backgroundColor: '#00000000',
+		vibrancy: 'sidebar',
+		titleBarStyle: 'hidden',
+		titleBarOverlay: true,
+		acceptFirstMouse: true
+	});
+	assert.deepEqual(result.windowChromeOptions.authenticatedWin32Mica, {
+		width: 1180,
+		height: 760,
+		minWidth: 640,
+		minHeight: 480,
+		title: 'Proctor',
+		backgroundColor: '#00000000',
+		backgroundMaterial: 'mica',
+		frame: false,
+		titleBarStyle: 'hidden',
+		titleBarOverlay: { color: '#00000000', symbolColor: '#ededee', height: 31 }
+	});
 	assert.deepEqual(result.windowChromeOptions.candidate, {
 		width: 1280,
 		height: 800,

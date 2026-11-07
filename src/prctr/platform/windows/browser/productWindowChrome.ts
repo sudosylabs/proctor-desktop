@@ -25,7 +25,11 @@ export const PRODUCT_WINDOW_CHROME_SERVICE = 'prctr.window.chrome';
 
 export type ProductWindowChromeThemeService = Pick<
 	BrowserThemeService,
-	'theme' | 'forcedColorsActive' | 'onDidChangeTheme' | 'onDidChangePresentation'
+	| 'theme'
+	| 'followsSystemColorScheme'
+	| 'forcedColorsActive'
+	| 'onDidChangeTheme'
+	| 'onDidChangePresentation'
 >;
 
 export class ProductWindowChrome extends Disposable {
@@ -202,9 +206,10 @@ export class ProductWindowChrome extends Disposable {
 				measuredHeight >= 24 && measuredHeight <= 256
 					? measuredHeight
 					: this.configuration.titlebarHeight,
-			dimmed: this.#dimmed
+			dimmed: this.#dimmed,
+			followsSystemScheme: this.#themeService.followsSystemColorScheme
 		});
-		const key = `${update.theme}:${update.titlebarHeight}:${update.dimmed}:${zoomFactor}:${JSON.stringify(update.colors)}`;
+		const key = `${update.theme}:${update.titlebarHeight}:${update.dimmed}:${update.followsSystemScheme}:${zoomFactor}:${JSON.stringify(update.colors)}`;
 		if (key === this.#lastRequested) return this.#tail;
 		this.#lastRequested = key;
 		const task = this.#tail.then(() => {

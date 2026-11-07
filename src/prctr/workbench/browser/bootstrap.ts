@@ -9,6 +9,7 @@ import {
 	type MessageDescriptor
 } from '../../base/common/localization.js';
 import { DisposableStore } from '../../base/common/lifecycle.js';
+import { PROCTOR_SCHEME_THEME_NAMES } from '../../platform/theme/common/bundledThemes.js';
 import {
 	BROWSER_THEME_SERVICE,
 	BrowserThemeService
@@ -125,7 +126,10 @@ export async function bootstrapWorkbench(
 				document,
 				'dark',
 				{ density: 'default', motion: 'full', transparency: 'full' },
-				{ followSystemColorScheme: true }
+				// AuthenticatedWindow follows the system with the Proctor palette until the user chooses a theme.
+				composition.windowKind === 'authenticated'
+					? { followSystemColorScheme: true, systemThemes: PROCTOR_SCHEME_THEME_NAMES }
+					: { followSystemColorScheme: true }
 			)
 		));
 	try {

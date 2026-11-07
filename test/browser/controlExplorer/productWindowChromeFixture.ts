@@ -285,6 +285,10 @@ class FixtureThemeService extends Disposable implements ProductWindowChromeTheme
 		return this.#forcedColors;
 	}
 
+	get followsSystemColorScheme(): boolean {
+		return false;
+	}
+
 	setTheme(id: ThemeId, colors: Parameters<typeof getTheme>[1] = {}): void {
 		this.#theme = getTheme(id, colors);
 		this.#themeEmitter.fire(this.#theme);
@@ -344,6 +348,7 @@ async function verifyFailedSetupCleanup(
 			{
 				theme: themeService.theme,
 				forcedColorsActive: themeService.forcedColorsActive,
+				followsSystemColorScheme: false,
 				onDidChangeTheme: () => {
 					throw setupFailure;
 				},

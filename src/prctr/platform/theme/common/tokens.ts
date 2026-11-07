@@ -142,6 +142,37 @@ const tokenDefinitions = [
 	{ id: 'color.scrollbar.thumbHover', kind: 'color', description: 'Hovered scrollbar thumb.' },
 	{ id: 'color.scrollbar.thumbActive', kind: 'color', description: 'Dragged scrollbar thumb.' },
 	{
+		id: 'color.frame.background',
+		kind: 'color',
+		description: 'Window frame behind the area rail and sidebar when no material shows.'
+	},
+	{
+		id: 'color.frame.sidebar',
+		kind: 'color',
+		description: 'Wash that sets the contextual sidebar apart from the area rail.'
+	},
+	{ id: 'color.frame.divider', kind: 'color', description: 'Hairline between frame regions.' },
+	{
+		id: 'color.navigation.selected',
+		kind: 'color',
+		description: 'Selected area, page or account surface.'
+	},
+	{
+		id: 'color.navigation.selectedForeground',
+		kind: 'color',
+		description: 'Selected area, page or account text.'
+	},
+	{
+		id: 'color.avatar.background',
+		kind: 'color',
+		description: 'Fill behind initials of an account without a photo.'
+	},
+	{
+		id: 'color.avatar.foreground',
+		kind: 'color',
+		description: 'Initials of an account without a photo.'
+	},
+	{
 		id: 'typography.font.application',
 		kind: 'font-family',
 		description: 'Application font stack, led by the bundled IBM Plex Sans.'

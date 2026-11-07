@@ -96,7 +96,7 @@ export async function exerciseSettingsProduction(): Promise<void> {
 				async update() {}
 			}
 		),
-		createAuthenticatedContribution({ async signOut() {}, async close() {} }, true),
+		createAuthenticatedContribution({ async signOut() {}, async close() {} }),
 		createAccountContribution({
 			async request() {
 				return { kind: 'error', reason: 'unavailable' };
@@ -165,8 +165,8 @@ export async function exerciseSettingsProduction(): Promise<void> {
 			'Closing Settings did not release background gating.'
 		);
 		const trigger = result.shell
-			.part('titlebar')
-			.querySelector<HTMLButtonElement>('[data-region=trigger]')!;
+			.part('navigation')
+			.querySelector<HTMLButtonElement>('.prctr-area-rail__account')!;
 		trigger.focus();
 		await commands!.executeCommand('workbench.action.openSettingsJson', {
 			revealSetting: { key: 'editor.fontSize', edit: false }

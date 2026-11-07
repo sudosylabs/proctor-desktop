@@ -5,11 +5,6 @@ import {
 	validateExamActivityResponse
 } from '../../platform/examActivity/common/examActivityProtocol.js';
 import {
-	ACCOUNT_MENU_CHANNEL,
-	validateAccountMenuAnchor,
-	validateAccountMenuAction
-} from '../../platform/account/common/accountMenu.js';
-import {
 	ACCOUNT_CHANNEL,
 	validateAccountIntent,
 	validateAccountResponse
@@ -58,18 +53,6 @@ contextBridge.exposeInMainWorld(
 			ipcRenderer.invoke(WINDOW_CHANNELS.authenticated.intent, {
 				kind: 'authenticated.close'
 			}),
-		accountMenu:
-			process.platform === 'darwin'
-				? Object.freeze({
-						show: async (anchor: unknown) =>
-							validateAccountMenuAction(
-								await ipcRenderer.invoke(
-									ACCOUNT_MENU_CHANNEL,
-									validateAccountMenuAnchor(anchor)
-								)
-							)
-					})
-				: undefined,
 		examActivity: Object.freeze({
 			observe: createApiObserver(
 				`${EXAM_ACTIVITY_CHANNEL}:observe`,

@@ -185,7 +185,7 @@ async function run(): Promise<void> {
       if (bootstrap.kind !== 'candidate') {
         windowChrome = await api.windowChrome.configuration();
         const subscription = api.windowChrome.onDidChangeFullscreen(() => {});
-        await api.windowChrome.update({ theme: 'dark', titlebarHeight: windowChrome.titlebarHeight, dimmed: false });
+        await api.windowChrome.update({ theme: 'dark', titlebarHeight: windowChrome.titlebarHeight, dimmed: false, followsSystemScheme: false });
         subscription.dispose();
       }
       if (bootstrap.kind === 'launch') {
@@ -323,6 +323,23 @@ async function run(): Promise<void> {
 						platform: 'linux',
 						locale: 'en',
 						macOsRelease: '',
+						initialTheme: 'dark'
+					})
+				),
+				authenticatedDarwin: pickChromeOptions(
+					lockedBrowserWindowOptions('authenticated', 'preload.cjs', true, undefined, {
+						platform: 'darwin',
+						locale: 'en',
+						macOsRelease: '24.0.0',
+						initialTheme: 'light'
+					})
+				),
+				authenticatedWin32Mica: pickChromeOptions(
+					lockedBrowserWindowOptions('authenticated', 'preload.cjs', true, undefined, {
+						platform: 'win32',
+						locale: 'en',
+						macOsRelease: '',
+						osRelease: '10.0.22631',
 						initialTheme: 'dark'
 					})
 				),
@@ -977,7 +994,8 @@ function invokeChromeUpdate(
 		update({} as IpcMainInvokeEvent, {
 			theme: 'dark',
 			titlebarHeight,
-			dimmed
+			dimmed,
+			followsSystemScheme: false
 		});
 	} catch (error) {
 		if (

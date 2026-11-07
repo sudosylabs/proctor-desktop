@@ -42,7 +42,9 @@ import { SettingsEditorPartServices } from '../../../services/settings/browser/s
 import type { SettingsEditorEnvironment } from '../../../services/settings/browser/settingsEditorEnvironment.js';
 import type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
 import {
+	AUTHENTICATED_LAYOUT_SERVICE,
 	AUTHENTICATED_NAVIGATION_SERVICE,
+	type AuthenticatedLayoutService,
 	type AuthenticatedNavigationService
 } from '../../authenticated/browser/authenticatedNavigation.js';
 import { SettingsModal } from './settingsModal.js';
@@ -52,7 +54,7 @@ export type { SettingsRendererClient } from '../../../services/settings/common/s
 const shellParts: readonly (readonly [Parts, WorkbenchPart])[] = [
 	[Parts.TITLEBAR_PART, 'titlebar'],
 	[Parts.BANNER_PART, 'banner'],
-	[Parts.SIDEBAR_PART, 'navigation'],
+	[Parts.SIDEBAR_PART, 'sidebar'],
 	[Parts.PANEL_PART, 'panel'],
 	[Parts.STATUSBAR_PART, 'status']
 ];
@@ -73,6 +75,9 @@ export function createSettingsContribution(
 			const dependencies = store.add(new DisposableStore());
 			const navigation = context.getService<AuthenticatedNavigationService>(
 				AUTHENTICATED_NAVIGATION_SERVICE
+			);
+			const layoutService = context.getService<AuthenticatedLayoutService>(
+				AUTHENTICATED_LAYOUT_SERVICE
 			);
 			const presentation = context.getService<BrowserThemeService>(BROWSER_THEME_SERVICE);
 			const notifications = context.getService<INotificationService>(
@@ -112,16 +117,13 @@ export function createSettingsContribution(
 						}),
 						relayout: () => context.shell.layout(),
 						readPositions: () => ({
-							sidebar:
-								context.shell.primarySide === 'left'
-									? Position.LEFT
-									: Position.RIGHT,
+							sidebar: Position.LEFT,
 							panel: Position.BOTTOM,
 							panelAlignment: 'center'
 						}),
 						setPartHidden(hidden, part) {
 							if (part === Parts.SIDEBAR_PART)
-								context.shell.setNavigationVisible(!hidden);
+								layoutService.setSidebarVisible(!hidden);
 							else if (part === Parts.BANNER_PART)
 								context.shell.setPartVisible('banner', !hidden);
 							else if (part === Parts.PANEL_PART)
@@ -191,12 +193,20 @@ export function createSettingsContribution(
 					'editor.semanticTokenColorCustomizations',
 					parsed.values.get('editor.semanticTokenColorCustomizations') ?? {}
 				);
-				presentation.setTheme(
-					next.presentation.theme,
-					next.presentation.colorCustomizations,
-					tokens,
-					semantic
-				);
+				// An explicit theme choice wins; otherwise the window keeps following the system scheme.
+				if (parsed.values.has('workbench.colorTheme'))
+					presentation.setTheme(
+						next.presentation.theme,
+						next.presentation.colorCustomizations,
+						tokens,
+						semantic
+					);
+				else
+					presentation.followSystemTheme(
+						next.presentation.colorCustomizations,
+						tokens,
+						semantic
+					);
 				presentation.setMotionPreference(
 					next.presentation.reducedMotion ? 'reduced' : 'full'
 				);

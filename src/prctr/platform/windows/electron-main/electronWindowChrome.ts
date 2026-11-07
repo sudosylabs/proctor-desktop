@@ -9,6 +9,9 @@ import { Color } from '../../../base/common/color.js';
 import { isTahoeOrNewer } from '../../../base/common/platform.js';
 import { getTheme, type ThemeId } from '../../theme/common/themes.js';
 import {
+	AUTHENTICATED_MACOS_TITLEBAR_HEIGHT,
+	AUTHENTICATED_MACOS_TRAFFIC_LIGHT_X,
+	AUTHENTICATED_TITLEBAR_HEIGHT,
 	DEFAULT_PRODUCT_TITLEBAR_HEIGHT,
 	LAUNCH_MACOS_TITLEBAR_HEIGHT,
 	LAUNCH_TITLEBAR_HEIGHT,
@@ -32,7 +35,8 @@ export interface ElectronWindowMaterialSource {
 export type ElectronPlatform = ProductWindowChromePlatform;
 
 export interface ElectronWindowChromeTarget {
-	readonly synchronizeTheme?: (scheme: 'light' | 'dark') => void;
+	/** Pins the native scheme to the page's, or releases it while the page follows the system. */
+	readonly synchronizeTheme?: (scheme: 'light' | 'dark' | 'system') => void;
 	readonly window: {
 		isFullScreen(): boolean;
 		isDestroyed(): boolean;
@@ -56,8 +60,11 @@ export function resolveProductWindowChromeConfiguration(
 	kind?: ChromeCapableProductWindowKind
 ): ProductWindowChromeConfiguration {
 	const macos = platform === 'darwin';
-	// LaunchWindow keeps the accepted design's title bar on every release.
+	// LaunchWindow and AuthenticatedWindow keep their accepted designs' title bars on every release.
 	const launchHeight = macos ? LAUNCH_MACOS_TITLEBAR_HEIGHT : LAUNCH_TITLEBAR_HEIGHT;
+	const authenticatedHeight = macos
+		? AUTHENTICATED_MACOS_TITLEBAR_HEIGHT
+		: AUTHENTICATED_TITLEBAR_HEIGHT;
 	return Object.freeze({
 		platform,
 		mode: macos ? 'nativeTrafficLights' : 'nativeOverlay',
@@ -66,6 +73,8 @@ export function resolveProductWindowChromeConfiguration(
 		material: 'none',
 		titlebarHeight: kind === 'launch'
 			? launchHeight
+			: kind === 'authenticated'
+			? authenticatedHeight
 			: macos
 			? isTahoeOrNewer(macOsRelease)
 				? MACOS_TAHOE_PRODUCT_TITLEBAR_HEIGHT
@@ -77,6 +86,7 @@ export function resolveProductWindowChromeConfiguration(
 
 export class ElectronWindowChromeBridge {
 	readonly #channels: (typeof WINDOW_CHROME_CHANNELS)[ChromeCapableProductWindowKind];
+	readonly #kind: ChromeCapableProductWindowKind;
 	readonly #configuration: ProductWindowChromeConfiguration;
 	readonly #ipc: Pick<typeof ipcMain, 'handle' | 'removeHandler'>;
 	readonly #target: ElectronWindowChromeTarget;
@@ -85,7 +95,7 @@ export class ElectronWindowChromeBridge {
 	#materialSubscription: { dispose(): void } | undefined;
 	#disposed = false;
 	#lastUpdate:
-		| { readonly theme: ThemeId; readonly titlebarHeight: number; readonly dimmed: boolean; readonly colors?: ProductWindowChromeColors }
+		| { readonly theme: ThemeId; readonly titlebarHeight: number; readonly dimmed: boolean; readonly followsSystemScheme: boolean; readonly colors?: ProductWindowChromeColors }
 		| undefined;
 	readonly #onDidEnterFullScreen = (): void => this.#sendFullscreen(true);
 	readonly #onDidLeaveFullScreen = (): void => this.#sendFullscreen(false);
@@ -102,12 +112,13 @@ export class ElectronWindowChromeBridge {
 		this.#ipc = ipc;
 		this.#target = target;
 		this.#channels = WINDOW_CHROME_CHANNELS[kind];
+		this.#kind = kind;
 		this.#configuration = configuration;
 		this.#authorize = authorize;
 		this.#material = material;
 		const handled: string[] = [];
 		try {
-			this.#apply(initialTheme, configuration.titlebarHeight, false);
+			this.#apply(initialTheme, configuration.titlebarHeight, false, true);
 			target.window.on('enter-full-screen', this.#onDidEnterFullScreen);
 			target.window.on('leave-full-screen', this.#onDidLeaveFullScreen);
 			ipc.handle(this.#channels.configuration, (event) => {
@@ -122,7 +133,7 @@ export class ElectronWindowChromeBridge {
 			ipc.handle(this.#channels.update, (event, value: unknown) => {
 				this.#authorize(event);
 				const update = validateProductWindowChromeUpdate(value);
-				this.#apply(update.theme, update.titlebarHeight, update.dimmed, update.colors);
+				this.#apply(update.theme, update.titlebarHeight, update.dimmed, update.followsSystemScheme, update.colors);
 			});
 			handled.push(this.#channels.update);
 			this.#materialSubscription = material?.onDidChange((value) => {
@@ -179,19 +190,22 @@ export class ElectronWindowChromeBridge {
 		if (last !== undefined && this.#configuration.mode === 'nativeOverlay') {
 			// The caption buttons' background follows the material, so apply the last update again.
 			this.#lastUpdate = undefined;
-			this.#apply(last.theme, last.titlebarHeight, last.dimmed, last.colors);
+			this.#apply(last.theme, last.titlebarHeight, last.dimmed, last.followsSystemScheme, last.colors);
 		}
 	}
 
-	#apply(themeId: ThemeId, titlebarHeight: number, dimmed: boolean, colors?: ProductWindowChromeColors): void {
+	#apply(themeId: ThemeId, titlebarHeight: number, dimmed: boolean, followsSystemScheme: boolean, colors?: ProductWindowChromeColors): void {
 		if (this.#disposed || this.#target.window.isDestroyed()) return;
 		if (
 			this.#lastUpdate?.theme === themeId &&
 			this.#lastUpdate.titlebarHeight === titlebarHeight &&
-			this.#lastUpdate.dimmed === dimmed && JSON.stringify(this.#lastUpdate.colors) === JSON.stringify(colors)
+			this.#lastUpdate.dimmed === dimmed &&
+			this.#lastUpdate.followsSystemScheme === followsSystemScheme &&
+			JSON.stringify(this.#lastUpdate.colors) === JSON.stringify(colors)
 		)
 			return;
-		this.#target.synchronizeTheme?.(getTheme(themeId).isDark ? 'dark' : 'light');
+		// A pinned scheme would hide later system changes from a page that follows them.
+		this.#target.synchronizeTheme?.(followsSystemScheme ? 'system' : getTheme(themeId).isDark ? 'dark' : 'light');
 		if (this.#configuration.mode === 'nativeOverlay') {
 			const theme = getTheme(themeId);
 			const background = colors?.background ?? theme.values['color.background.canvas'];
@@ -207,12 +221,14 @@ export class ElectronWindowChromeBridge {
 			// Only the pre-Tahoe standard title bar uses the taller pre-Tahoe button frame.
 			const buttonHeight = this.#configuration.titlebarHeight === MACOS_PRODUCT_TITLEBAR_HEIGHT ? 16 : 14;
 			const offset = Math.floor((titlebarHeight - buttonHeight) / 2);
+			// AuthenticatedWindow centres the traffic lights in its area rail rather than the title bar.
+			const x = this.#kind === 'authenticated' ? AUTHENTICATED_MACOS_TRAFFIC_LIGHT_X : offset + 1;
 			this.#target.window.setWindowButtonPosition(
-				offset === 0 ? null : { x: offset + 1, y: offset }
+				offset === 0 ? null : { x, y: offset }
 			);
 			this.#target.window.setSheetOffset(this.#configuration.titlebarHeight);
 		}
-		this.#lastUpdate = Object.freeze({ theme: themeId, titlebarHeight, dimmed, ...(colors ? { colors } : {}) });
+		this.#lastUpdate = Object.freeze({ theme: themeId, titlebarHeight, dimmed, followsSystemScheme, ...(colors ? { colors } : {}) });
 	}
 }
 

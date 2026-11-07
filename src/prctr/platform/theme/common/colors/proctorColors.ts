@@ -77,3 +77,94 @@ export const developmentForeground = registerColor(
 	},
 	localize('proctor.developmentForeground', 'Text of the development-server strip.')
 );
+
+/*
+ * AuthenticatedWindow's frame: the area rail and contextual sidebar sit on the
+ * window material, and on these opaque colors when no material shows.
+ */
+
+export const frameBackground = registerColor(
+	'proctor.frameBackground',
+	{
+		light: Color.fromHex('#EEEEEC'),
+		dark: Color.fromHex('#26272B'),
+		hcLight: Color.white,
+		hcDark: Color.black
+	},
+	localize(
+		'proctor.frameBackground',
+		'Window frame behind the area rail and sidebar when no system material shows.'
+	)
+);
+
+export const frameSidebarBackground = registerColor(
+	'proctor.frameSidebarBackground',
+	{
+		light: Color.fromHex('#FFFFFF59'),
+		dark: Color.fromHex('#FFFFFF08'),
+		hcLight: Color.white,
+		hcDark: Color.black
+	},
+	localize(
+		'proctor.frameSidebarBackground',
+		'Wash that sets the contextual sidebar apart from the area rail.'
+	)
+);
+
+export const frameDivider = registerColor(
+	'proctor.frameDivider',
+	{
+		light: Color.fromHex('#00000012'),
+		dark: Color.fromHex('#FFFFFF14'),
+		hcLight: Color.fromHex('#0F4A85'),
+		hcDark: Color.fromHex('#6FC3DF')
+	},
+	localize('proctor.frameDivider', 'Hairline between the frame regions.')
+);
+
+export const navigationSelectedBackground = registerColor(
+	'proctor.navigationSelectedBackground',
+	{
+		light: Color.fromHex('#5C00AA17'),
+		dark: Color.fromHex('#B98AF029'),
+		hcLight: Color.fromHex('#0F4A851A'),
+		hcDark: Color.fromHex('#6FC3DF33')
+	},
+	localize(
+		'proctor.navigationSelectedBackground',
+		'Surface of the selected area, page or account.'
+	)
+);
+
+export const navigationSelectedForeground = registerColor(
+	'proctor.navigationSelectedForeground',
+	{
+		light: Color.fromHex('#3D0072'),
+		dark: Color.fromHex('#EDE0FB'),
+		hcLight: Color.fromHex('#292929'),
+		hcDark: Color.white
+	},
+	localize('proctor.navigationSelectedForeground', 'Text of the selected area, page or account.')
+);
+
+export const avatarBackground = registerColor(
+	'proctor.avatarBackground',
+	{
+		light: Color.fromHex('#ECE2F6'),
+		dark: Color.fromHex('#3A2B52'),
+		hcLight: Color.white,
+		hcDark: Color.black
+	},
+	localize('proctor.avatarBackground', 'Fill behind initials when an account has no photo.')
+);
+
+export const avatarForeground = registerColor(
+	'proctor.avatarForeground',
+	{
+		light: Color.fromHex('#4A1488'),
+		dark: Color.fromHex('#E3D1FA'),
+		hcLight: Color.fromHex('#292929'),
+		hcDark: Color.white
+	},
+	localize('proctor.avatarForeground', 'Initials of an account that has no photo.')
+);

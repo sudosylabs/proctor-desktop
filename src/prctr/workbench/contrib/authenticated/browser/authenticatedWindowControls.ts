@@ -57,7 +57,7 @@ import {
 import { WORKBENCH_NOTIFICATION_SERVICE } from '../../../browser/parts/notifications/notifications.js';
 import type { WorkbenchBootstrapContext } from '../../../browser/bootstrap.js';
 
-/** Source controls shared by the authenticated titlebar, layout picker and account menu. */
+/** Source controls shared by AuthenticatedWindow's frame and pages: hovers, menus and quick input. */
 export const AUTHENTICATED_WINDOW_CONTROLS_SERVICE = 'prctr.authenticated.windowControls';
 
 export class AuthenticatedWindowControls extends Disposable {
@@ -126,8 +126,7 @@ export class AuthenticatedWindowControls extends Disposable {
 					}),
 					relayout: () => context.shell.layout(),
 					readPositions: () => ({
-						sidebar:
-							context.shell.primarySide === 'left' ? Position.LEFT : Position.RIGHT,
+						sidebar: Position.LEFT,
 						panel: Position.BOTTOM,
 						panelAlignment: 'center'
 					}),

@@ -2,14 +2,12 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { Emitter } from '../../base/common/event.js';
 import { Disposable, DisposableStore, MutableDisposable } from '../../base/common/lifecycle.js';
 import { addDisposableListener } from '../../base/browser/dom.js';
 import type { WorkbenchComposition, WorkbenchPart } from '../common/composition.js';
 import { WorkbenchOverlayHost } from './overlayHost.js';
 import './workbenchShell.css';
 import './media/style.css';
-import { layoutFloatingPanels } from './floatingPanels.js';
 
 export interface WorkbenchShellLabels {
 	readonly titlebar: string; readonly banner: string; readonly navigation: string; readonly sidebar: string; readonly content: string; readonly panel: string; readonly status: string; readonly resetLayout: string; readonly resizeSidebar: string; readonly resizePanel: string;
@@ -22,29 +20,13 @@ export class WorkbenchShell extends Disposable {
 	readonly composition: WorkbenchComposition;
 	readonly #parts = new Map<WorkbenchPart, HTMLElement>(); readonly #compactToggles = new Map<'panel' | 'sidebar', HTMLButtonElement>(); readonly #initialSidebar = 260; readonly #initialPanel = 220; readonly #resetButton: HTMLButtonElement;
 	readonly #drag = this._register(new MutableDisposable<DisposableStore>());
-	readonly #navigationVisibility = this._register(new Emitter<boolean>());
-	readonly onDidChangeNavigationVisibility = this.#navigationVisibility.event;
-	#externalNavigationToggle = false;
-	readonly #layoutChange = this._register(new Emitter<void>());
-	readonly onDidChangeLayout = this.#layoutChange.event;
-	#primarySide: 'left' | 'right' = 'left';
-	get primarySide(): 'left' | 'right' { return this.#primarySide; }
-	get secondaryVisible(): boolean { return this.#parts.get('sidebar')?.hidden === false && !this.#compactSidebarOpen; }
-	setPrimarySide(side: 'left' | 'right'): void { this.#primarySide = side; this.element.dataset.primarySide = side; this.#applyLayout(); }
-	setSecondaryVisible(visible: boolean): void {
-		const part = this.part('sidebar');
-		const focused = !visible && part.contains(part.ownerDocument.activeElement);
-		part.hidden = !visible; if (visible) this.#compactSidebarOpen = false; this.#applyLayout();
-		if (focused) this.focusVisiblePart(['content']);
-	}
-	#lastNavigationVisible = false;
 	#resetLayoutAction: () => void | Promise<void> = () => this.resetLayout();
 	#sidebarSize = this.#initialSidebar; #panelSize = this.#initialPanel; #compactSidebarOpen = false; #compactPanelOpen = false; #disposed = false;
 	constructor(host: HTMLElement, composition: WorkbenchComposition, labels: WorkbenchShellLabels) {
-		super(); this.composition = composition; const document = host.ownerDocument; const shellId = `prctr-workbench-${++shellSequence}`; this.element = document.createElement('div'); this.element.className = 'prctr-workbench'; this.element.dataset.windowKind = composition.windowKind; this.element.dataset.presentation = composition.windowKind === 'authenticated' ? 'modern' : 'classic';
+		super(); this.composition = composition; const document = host.ownerDocument; const shellId = `prctr-workbench-${++shellSequence}`; this.element = document.createElement('div'); this.element.className = 'prctr-workbench'; this.element.dataset.windowKind = composition.windowKind;
 		for (const part of composition.layout.parts) this.#createPart(part, labels[part], document);
-		if (composition.windowKind === 'authenticated') { this.part('navigation').id = `${shellId}-navigation`; this.part('sidebar').hidden = true; this.element.dataset.primarySide = 'left'; }
-		for (const region of ['sidebar', 'panel'] as const) { const part = this.#parts.get(region); if (part !== undefined) { part.id = `${shellId}-${region}`; this.#createCompactToggle(region, labels[region], part.id, document); } }
+		for (const region of ['sidebar', 'panel'] as const) { const part = this.#parts.get(region); if (part !== undefined) { part.id = `${shellId}-${region}`; if (!this.#framed) this.#createCompactToggle(region, labels[region], part.id, document); } }
+		if (this.#framed) { this.part('navigation').id = `${shellId}-navigation`; this.setSidebarPresentation('hidden', this.#initialSidebar); }
 		if (composition.layout.allowRegionResize && composition.layout.parts.includes('sidebar')) this.#createSash('sidebar', labels.resizeSidebar, document);
 		if (composition.layout.allowRegionResize && composition.layout.parts.includes('panel')) this.#createSash('panel', labels.resizePanel, document);
 		const reset = document.createElement('button'); reset.className = 'prctr-workbench__reset'; reset.type = 'button'; reset.textContent = labels.resetLayout; this.#resetButton = reset; if (composition.layout.allowRegionResize) this.part('titlebar').append(reset); this._register(addDisposableListener(reset, 'click', () => { void Promise.resolve(this.#resetLayoutAction()).catch(error => console.error('Reset layout action failed', error)); }));
@@ -54,39 +36,23 @@ export class WorkbenchShell extends Disposable {
 	focusVisiblePart(preferred: readonly WorkbenchPart[] = []): void { const seen = new Set<WorkbenchPart>(); for (const part of [...preferred, 'content', 'sidebar', 'panel', 'titlebar'] as const) { if (seen.has(part)) continue; seen.add(part); const target = this.#parts.get(part); if (target !== undefined && isVisibleFocusTarget(target)) { target.focus(); if (target.ownerDocument.activeElement === target) return; } } }
 	setPartVisible(part: 'banner' | 'panel' | 'sidebar', visible: boolean): void { const element = this.part(part); element.hidden = !visible; if (!visible && part === 'sidebar') this.#compactSidebarOpen = false; if (!visible && part === 'panel') this.#compactPanelOpen = false; this.#applyLayout(); }
 	setResetLayoutAction(action: () => void | Promise<void>, enabled: boolean): void { this.#resetLayoutAction = action; this.#resetButton.disabled = !enabled; }
-	setNavigationLayout(layout: 'rail' | 'sidebar', externalVisibilityControl = false): void {
-		this.#externalNavigationToggle = externalVisibilityControl;
-		this.element.dataset.navigationLayout = layout;
-		this.#resetButton.hidden = layout === 'sidebar';
-		const target = this.#sidebarTarget();
-		const toggle = this.#compactToggles.get('sidebar');
-		if (target && toggle) {
-			target.id ||= `${this.part('sidebar').id}-navigation`;
-			toggle.setAttribute('aria-controls', target.id);
-			toggle.textContent = target.getAttribute('aria-label');
-		}
-		this.layout();
+	/**
+	 * Place AuthenticatedWindow's contextual sidebar. Its frame owns the visibility,
+	 * width and responsive state; the shell owns the geometry each presentation uses.
+	 */
+	setSidebarPresentation(presentation: 'docked' | 'overlay' | 'hidden', size: number): void {
+		if (!this.#framed) throw new Error(`Composition ${this.composition.id} has no framed sidebar`);
+		const sidebar = this.part('sidebar');
+		sidebar.hidden = presentation === 'hidden';
+		this.element.dataset.sidebarPresentation = presentation;
+		this.element.style.setProperty('--prctr-workbench-sidebar-size', `${Math.round(size)}px`);
 	}
-	get navigationVisible(): boolean {
-		return this.#parts.get('navigation')?.hidden === false &&
-			(this.element.dataset.compactSidebar !== 'true' || this.#compactSidebarOpen);
-	}
-	setNavigationVisible(visible: boolean): void {
-		const navigation = this.part('navigation');
-		const restoreFocus = !visible && navigation.contains(navigation.ownerDocument.activeElement);
-		navigation.hidden = !visible;
-		this.#compactSidebarOpen = visible && this.element.dataset.compactSidebar === 'true';
-		if (this.#compactSidebarOpen) this.#compactPanelOpen = false;
-		this.#applyLayout();
-		if (restoreFocus) this.focusVisiblePart(['content']);
-	}
-	/** Close the narrow navigation presentation before a destination takes focus. */
-	revealContent(): void { if (this.#compactSidebarOpen) { this.#compactSidebarOpen = false; this.#applyLayout(); this.focusVisiblePart(['content']); } }
-	#sidebarTarget(): HTMLElement | undefined { return this.#parts.get(this.element.dataset.navigationLayout === 'sidebar' ? 'navigation' : 'sidebar'); }
+	get #framed(): boolean { return this.composition.windowKind === 'authenticated'; }
+	#sidebarTarget(): HTMLElement | undefined { return this.#parts.get('sidebar'); }
 	resetLayout(): void { this.#sidebarSize = this.#initialSidebar; this.#panelSize = this.#initialPanel; this.#applyLayout(); }
 	layout(): void { this.#applyLayout(); }
 	#createPart(part: WorkbenchPart, label: string, document: Document): void {
-		const element = document.createElement(part === 'navigation' ? 'nav' : part === 'status' ? 'footer' : part === 'titlebar' ? 'header' : part === 'content' ? 'main' : 'section');
+		const element = document.createElement(part === 'navigation' || part === 'sidebar' && this.#framed ? 'nav' : part === 'status' ? 'footer' : part === 'titlebar' ? 'header' : part === 'content' ? 'main' : 'section');
 		element.className = `prctr-workbench__${part}`; element.dataset.part = part; element.setAttribute('aria-label', label);
 		if (part === 'banner') { element.role = 'status'; element.hidden = true; }
 		if (part === 'status') element.role = 'status';
@@ -124,7 +90,8 @@ export class WorkbenchShell extends Disposable {
 	#sizeLimit(region: 'panel' | 'sidebar'): number { return Math.max(MIN_REGION, (region === 'sidebar' ? this.element.clientWidth : this.element.clientHeight) * .5); }
 	#effectiveSize(region: 'panel' | 'sidebar'): number { return Math.round(Math.min(this.#sizeLimit(region), Math.max(MIN_REGION, region === 'sidebar' ? this.#sidebarSize : this.#panelSize))); }
 	#applyLayout(): void {
-		if (this.#disposed) return; const sidebar = this.#sidebarTarget(); const panel = this.#parts.get('panel'); const secondaryWidth = this.composition.windowKind === 'authenticated' && this.#parts.get('sidebar')?.hidden === false ? Math.min(300, this.element.clientWidth * .45) : 0; const compactSidebar = this.element.clientWidth > 0 && this.element.clientWidth < 640 + secondaryWidth; const compactPanel = this.element.clientHeight > 0 && this.element.clientHeight < 480; const wasCompactSidebar = this.element.dataset.compactSidebar === 'true'; const wasCompactPanel = this.element.dataset.compactPanel === 'true'; const activeElement = this.element.ownerDocument.activeElement; const active = activeElement instanceof HTMLElement ? activeElement : null; let focusAfterLayout: HTMLElement | undefined;
+		// AuthenticatedWindow's frame places its own regions through setSidebarPresentation.
+		if (this.#disposed || this.#framed) return; const sidebar = this.#sidebarTarget(); const panel = this.#parts.get('panel'); const compactSidebar = this.element.clientWidth > 0 && this.element.clientWidth < 640; const compactPanel = this.element.clientHeight > 0 && this.element.clientHeight < 480; const wasCompactSidebar = this.element.dataset.compactSidebar === 'true'; const wasCompactPanel = this.element.dataset.compactPanel === 'true'; const activeElement = this.element.ownerDocument.activeElement; const active = activeElement instanceof HTMLElement ? activeElement : null; let focusAfterLayout: HTMLElement | undefined;
 		if (compactSidebar && !wasCompactSidebar && active !== null && sidebar?.contains(active)) { this.#compactSidebarOpen = true; this.#compactPanelOpen = false; }
 		if (compactPanel && !wasCompactPanel && active !== null && panel?.contains(active)) { this.#compactPanelOpen = true; this.#compactSidebarOpen = false; }
 		if (compactSidebar && !wasCompactSidebar && active?.dataset.sash === 'sidebar') focusAfterLayout = this.#compactToggles.get('sidebar');
@@ -135,22 +102,11 @@ export class WorkbenchShell extends Disposable {
 		const effectiveSidebarSize = this.#effectiveSize('sidebar'); const effectivePanelSize = this.#effectiveSize('panel');
 		this.element.style.setProperty('--prctr-workbench-sidebar-size', sidebar?.hidden === false && !compactSidebar ? `${effectiveSidebarSize}px` : '0px');
 		this.element.style.setProperty('--prctr-workbench-panel-size', panel?.hidden === false && !compactPanel ? `${effectivePanelSize}px` : '0px');
-		for (const region of ['sidebar', 'panel'] as const) { const toggle = this.#compactToggles.get(region); const target = region === 'sidebar' ? sidebar : this.#parts.get(region); if (toggle === undefined) continue; const compact = region === 'sidebar' ? compactSidebar : compactPanel; const open = region === 'sidebar' ? this.#compactSidebarOpen : this.#compactPanelOpen; toggle.hidden = region === 'sidebar' && this.#externalNavigationToggle || !compact || target?.hidden !== false; toggle.setAttribute('aria-expanded', String(open)); }
+		for (const region of ['sidebar', 'panel'] as const) { const toggle = this.#compactToggles.get(region); const target = region === 'sidebar' ? sidebar : this.#parts.get(region); if (toggle === undefined) continue; const compact = region === 'sidebar' ? compactSidebar : compactPanel; const open = region === 'sidebar' ? this.#compactSidebarOpen : this.#compactPanelOpen; toggle.hidden = !compact || target?.hidden !== false; toggle.setAttribute('aria-expanded', String(open)); }
 		for (const sash of this.element.querySelectorAll<HTMLElement>('[data-sash]')) {
 			const region = sash.dataset.sash as 'panel' | 'sidebar'; const target = region === 'sidebar' ? sidebar : this.#parts.get(region); sash.hidden = target?.hidden !== false || (region === 'sidebar' ? compactSidebar : compactPanel) || this.#compactSidebarOpen || this.#compactPanelOpen;
 			const size = region === 'sidebar' ? effectiveSidebarSize : effectivePanelSize; sash.setAttribute('aria-valuenow', String(size)); sash.setAttribute('aria-valuemax', String(Math.round(this.#sizeLimit(region))));
 		}
-		if (this.composition.windowKind === 'authenticated') {
-			this.element.style.setProperty('--prctr-workbench-secondary-size', this.secondaryVisible ? `${Math.min(300, this.element.clientWidth * .45)}px` : '0px');
-			this.element.dataset.secondaryVisible = String(this.secondaryVisible);
-		}
-		if (this.element.dataset.presentation === 'modern') layoutFloatingPanels(this.element, this.#parts, { navigationSidebar: this.element.dataset.navigationLayout === 'sidebar', compactSidebar, sidebarOpen: this.#compactSidebarOpen, panelOpen: this.#compactPanelOpen, compactPanel });
-		const navigationVisible = this.navigationVisible;
-		if (this.#lastNavigationVisible !== navigationVisible) {
-			this.#lastNavigationVisible = navigationVisible;
-			this.#navigationVisibility.fire(navigationVisible);
-		}
-		this.#layoutChange.fire();
 		if (focusAfterLayout !== undefined) { if (isVisibleFocusTarget(focusAfterLayout)) focusAfterLayout.focus(); else this.focusVisiblePart([this.#compactPanelOpen ? 'panel' : this.#compactSidebarOpen ? 'sidebar' : 'content']); }
 	}
 	override dispose(): void { if (this.#disposed) return; this.#disposed = true; super.dispose(); this.element.remove(); }

@@ -129,6 +129,7 @@ void test('native chrome accepts bounded resolved colors and rejects arbitrary s
 		theme: 'dark',
 		titlebarHeight: 32,
 		dimmed: false,
+		followsSystemScheme: true,
 		colors: { background: '#123456', foreground: '#abcdef80' }
 	};
 	assert.deepStrictEqual(validateProductWindowChromeUpdate(update), update);
@@ -139,4 +140,9 @@ void test('native chrome accepts bounded resolved colors and rejects arbitrary s
 		{ ...update.colors, css: 'body {}' }
 	])
 		assert.throws(() => validateProductWindowChromeUpdate({ ...update, colors }));
+	const { followsSystemScheme: _omitted, ...withoutScheme } = update;
+	assert.throws(() => validateProductWindowChromeUpdate(withoutScheme));
+	assert.throws(() =>
+		validateProductWindowChromeUpdate({ ...update, followsSystemScheme: 'yes' })
+	);
 });

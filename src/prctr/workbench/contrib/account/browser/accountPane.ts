@@ -24,7 +24,6 @@ import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows
 import type { ResolvedWorkbenchItem } from '../../../common/workbenchItem.js';
 import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
 import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
-import type { AuthenticatedLayout } from '../../authenticated/browser/authenticatedLayout.js';
 import { AccountPhotoEditor } from './accountPhotoEditor.js';
 import { AccountFeedback } from './accountFeedback.js';
 import { accountMessages as m } from './accountMessages.js';
@@ -46,7 +45,6 @@ export interface AccountModel extends ResolvedWorkbenchItem {
 }
 export interface AccountPaneServices {
 	readonly overlays: WorkbenchOverlayHost;
-	readonly layout: AuthenticatedLayout;
 	readonly customPhotos: Set<string>;
 	readonly hover: (target: HTMLElement, label: string) => IDisposable;
 }
@@ -72,6 +70,8 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 	#refreshing = false;
 	readonly #failedSections = new Set<AccountSection>();
 	#detail: { item: AccountItem; trigger: HTMLElement } | undefined;
+	/** The page's own detail panel beside the list; a row's Details action opens it. */
+	readonly #details: HTMLElement;
 	#detailHost: HTMLElement | undefined;
 	#detailStore = this._register(new DisposableStore());
 	constructor(
@@ -121,6 +121,17 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			})
 		);
 		this.element.append(this.#scroll.getDomNode());
+		this.#details = document.createElement('aside');
+		this.#details.className = 'prctr-account__details';
+		this.#details.hidden = true;
+		this.element.append(this.#details);
+		this._register(
+			addDisposableListener(this.#details, 'keydown', (event) => {
+				if (event.key !== 'Escape' || event.defaultPrevented) return;
+				event.preventDefault();
+				this.closeDetail();
+			})
+		);
 		const observer = new ResizeObserver(() => this.#scroll.scanDomNode());
 		this._register({ dispose: () => observer.disconnect() });
 		observer.observe(content);
@@ -164,12 +175,9 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		this.#subtitle.textContent =
 			this.#section === 'sessions' ? this.text('sessionsDevicesNote') : '';
 		this.#subtitle.hidden = !this.#subtitle.textContent;
+		// Sign-in and security has its own Account page, so Profile shows the profile alone.
 		const sections: AccountSection[] =
-			this.#section === 'profile'
-				? ['profile', 'security']
-				: this.#section === 'sessions'
-					? ['sessions', 'desktops']
-					: [this.#section];
+			this.#section === 'sessions' ? ['sessions', 'desktops'] : [this.#section];
 		for (const section of sections) {
 			const host = this.node('section', 'section', this.#body);
 			host.dataset.section = section;
@@ -179,22 +187,15 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			this.#sections.set(section, { host, content, store, feedback, sequence: 0 });
 		}
 		if (this.#section === 'sessions' && this.services) {
-			this.#content.add(
-				this.services.layout.registerSecondary('account/sessions', (host) => {
-					const element = host.ownerDocument.createElement('section');
-					element.className = 'prctr-account prctr-account--details';
-					host.append(element);
-					this.#detailHost = element;
-					this.renderDetail();
-					return {
-						dispose: () => {
-							this.#detailStore.clear();
-							this.#detailHost = undefined;
-							element.remove();
-						}
-					};
-				})
-			);
+			this.#detailHost = this.#details;
+			this.#content.add({
+				dispose: () => {
+					this.#detailStore.clear();
+					this.#detailHost = undefined;
+					this.#details.hidden = true;
+					this.#details.replaceChildren();
+				}
+			});
 		}
 		this.#content.add(token.onCancellationRequested(() => this.clear()));
 		if (this.client.observe) this.observeSections();
@@ -631,7 +632,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			this.text('details'),
 			(button) => {
 				this.#detail = { item, trigger: button.element };
-				this.services!.layout.showSecondary();
+				if (this.#detailHost) this.#detailHost.hidden = false;
 				this.renderDetail();
 				this.#detailHost?.querySelector<HTMLElement>('h2')?.focus();
 			},
@@ -642,13 +643,13 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		const host = this.#detailHost;
 		if (!host) return;
 		this.#detailStore.clear();
-		host.replaceChildren();
-		const heading = this.heading('details', host);
 		if (!this.#detail) {
-			this.paragraph(this.text('selectDetails'), host);
+			this.closeDetail();
 			return;
 		}
-		const { item, trigger } = this.#detail;
+		host.replaceChildren();
+		const heading = this.heading('details', host);
+		const { item } = this.#detail;
 		heading.textContent = item.name || this.text('details');
 		const fields = this.node('dl', 'fields', host);
 		if ('platform' in item) {
@@ -676,12 +677,17 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			this.row(this.text('lastActive'), this.date(item.lastActivityAt), fields);
 			this.row(this.text('expires'), this.date(item.expiresAt), fields);
 		}
-		this.action(
-			host,
-			this.text('backToList'),
-			() => (trigger.isConnected ? trigger : this.#heading).focus(),
-			this.#detailStore
-		);
+		this.action(host, this.text('backToList'), () => this.closeDetail(), this.#detailStore);
+	}
+	/** Close the detail panel, returning focus to the row that opened it. */
+	private closeDetail(): void {
+		const trigger = this.#detail?.trigger;
+		const hadFocus = this.#details.contains(this.#details.ownerDocument.activeElement);
+		this.#detail = undefined;
+		this.#detailStore.clear();
+		this.#details.hidden = true;
+		this.#details.replaceChildren();
+		if (hadFocus) (trigger?.isConnected ? trigger : this.#heading).focus();
 	}
 	private async loadPhoto(
 		avatar: HTMLElement,

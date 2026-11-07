@@ -3,11 +3,7 @@ import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.
 import { HoverPosition } from '../../../../base/browser/ui/hover/hoverWidget.js';
 import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
 import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import {
-	Disposable,
-	DisposableStore,
-	MutableDisposable
-} from '../../../../base/common/lifecycle.js';
+import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
 import type { CancellationToken } from '../../../../base/common/cancellation.js';
 import { renderMarkdown } from '../../../../base/browser/markdownRenderer.js';
 import { MarkdownString } from '../../../../base/common/htmlContent.js';
@@ -21,10 +17,6 @@ import type { WorkbenchBootstrapContext } from '../../../browser/bootstrap.js';
 import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
 import type { ResolvedWorkbenchItem } from '../../../common/workbenchItem.js';
 import {
-	AUTHENTICATED_LAYOUT_SERVICE,
-	type AuthenticatedLayout
-} from '../../authenticated/browser/authenticatedLayout.js';
-import {
 	AUTHENTICATED_WINDOW_CONTROLS_SERVICE,
 	type AuthenticatedWindowControls
 } from '../../authenticated/browser/authenticatedWindowControls.js';
@@ -33,7 +25,7 @@ import {
 	type AuthenticatedNavigationService,
 	type ActivityView
 } from '../../authenticated/browser/authenticatedNavigation.js';
-import { accountShellMessages } from '../../authenticated/browser/accountShellNavigation.js';
+import { authenticatedMessages } from '../../authenticated/browser/authenticatedMessages.js';
 import { ProductAccess } from './productAccess.js';
 import { examActivityMessages as m } from './examActivityMessages.js';
 import './examActivity.css';
@@ -56,8 +48,10 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 	private readonly pageSubscriptions = new Map<string, { dispose(): void }>();
 	private readonly content = this._register(new DisposableStore());
 	private readonly details = this._register(new DisposableStore());
-	private readonly secondary = this._register(new MutableDisposable());
-	private readonly layoutService: AuthenticatedLayout;
+	/** The page's own detail panel beside the list; choosing a row opens it. */
+	private readonly detailPanel: HTMLElement;
+	private readonly detailContent: HTMLElement;
+	private readonly detailScroll: DomScrollableElement;
 	private readonly controls: AuthenticatedWindowControls;
 	private destination: Page | undefined;
 	private view: ActivityView = 'overview';
@@ -78,7 +72,6 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 	) {
 		super();
 		const document = context.document;
-		this.layoutService = context.getService(AUTHENTICATED_LAYOUT_SERVICE);
 		this.controls = context.getService(AUTHENTICATED_WINDOW_CONTROLS_SERVICE);
 		this.navigation = context.getService(AUTHENTICATED_NAVIGATION_SERVICE);
 		this.view = this.navigation.activityView ?? 'overview';
@@ -89,7 +82,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 					if (this.destination !== 'activity') return;
 					this.selected = undefined;
 					this.detailEpoch++;
-					this.context.shell.setSecondaryVisible(false);
+					this.hideDetails(false);
 					this.updateHeading();
 					this.renderRows();
 					this.updateStatus();
@@ -149,9 +142,31 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			})
 		);
 		this.element.append(this.scroll.getDomNode());
-		const observer = new ResizeObserver(() => this.scroll.scanDomNode());
+		this.detailContent = document.createElement('div');
+		this.detailContent.className = 'prctr-exam-activity__content';
+		const detailViewport = document.createElement('div');
+		detailViewport.className = 'prctr-exam-activity__viewport';
+		detailViewport.append(this.detailContent);
+		this.detailScroll = this._register(
+			new DomScrollableElement(detailViewport, {
+				horizontal: ScrollbarVisibility.Hidden,
+				vertical: ScrollbarVisibility.Auto,
+				verticalScrollbarSize: 8,
+				useShadows: false
+			})
+		);
+		this.detailPanel = document.createElement('aside');
+		this.detailPanel.className = 'prctr-exam-activity__details';
+		this.detailPanel.hidden = true;
+		this.detailPanel.append(this.detailScroll.getDomNode());
+		this.element.append(this.detailPanel);
+		const observer = new ResizeObserver(() => {
+			this.scroll.scanDomNode();
+			this.detailScroll.scanDomNode();
+		});
 		observer.observe(this.page);
 		observer.observe(content);
+		observer.observe(this.detailContent);
 		this._register({ dispose: () => observer.disconnect() });
 		this._register(access.onDidChange(() => this.updateAccess()));
 	}
@@ -182,43 +197,8 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 		this.destination = destination;
 		this.view = this.navigation.activityView ?? 'overview';
 		this.updateHeading();
-		this.layoutService.setDestination(destination);
-		if (destination === 'activity')
-			this.secondary.value = this.layoutService.registerSecondary('activity', (host) => {
-				const store = new DisposableStore();
-				const root = this.context.document.createElement('section');
-				root.className = 'prctr-exam-activity';
-				root.dataset.region = 'details';
-				const viewport = this.context.document.createElement('div');
-				viewport.className = 'prctr-exam-activity__viewport';
-				this.detailHost = this.context.document.createElement('div');
-				this.detailHost.className = 'prctr-exam-activity__content';
-				viewport.append(this.detailHost);
-				const scroll = store.add(
-					new DomScrollableElement(viewport, {
-						horizontal: ScrollbarVisibility.Hidden,
-						vertical: ScrollbarVisibility.Auto,
-						verticalScrollbarSize: 8,
-						useShadows: false
-					})
-				);
-				root.append(scroll.getDomNode());
-				host.append(root);
-				const observer = new ResizeObserver(() => scroll.scanDomNode());
-				observer.observe(this.detailHost);
-				observer.observe(viewport);
-				store.add({
-					dispose: () => {
-						observer.disconnect();
-						this.detailEpoch++;
-						this.details.clear();
-						this.detailHost = undefined;
-						root.remove();
-					}
-				});
-				this.renderDetails();
-				return store;
-			});
+		this.hideDetails(false);
+		this.detailHost = destination === 'activity' ? this.detailContent : undefined;
 		this.updateAccess();
 	}
 	private reset(): void {
@@ -424,7 +404,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			this.body.firstElementChild.textContent = this.description();
 		this.heading.textContent =
 			this.destination === 'activity' && this.view !== 'overview'
-				? this.context.localization.format(accountShellMessages[this.view])
+				? this.context.localization.format(authenticatedMessages[this.view])
 				: this.text(this.destination ?? 'activity');
 	}
 	private visibleItems(): readonly ExamActivity[] {
@@ -581,7 +561,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 						this.focusedRow = button;
 						for (const b of buttons)
 							b.setAttribute('aria-current', String(b === button));
-						this.layoutService.showSecondary();
+						this.detailPanel.hidden = false;
 						this.renderDetails();
 						this.detailHost?.querySelector<HTMLElement>('h2')?.focus();
 					})
@@ -641,8 +621,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 		);
 		this.details.add(
 			addDisposableListener(close, 'click', () => {
-				this.context.shell.setSecondaryVisible(false);
-				this.focusedRow?.focus();
+				this.hideDetails(true);
 			})
 		);
 		header.append(title, close);
@@ -666,8 +645,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			addDisposableListener(host, 'keydown', (event) => {
 				if (event.key === 'Escape') {
 					event.preventDefault();
-					this.context.shell.setSecondaryVisible(false);
-					this.focusedRow?.focus();
+					this.hideDetails(true);
 				}
 			})
 		);
@@ -762,10 +740,19 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			}
 		}
 	}
+	/** Close the detail panel, returning focus to the chosen row when asked. */
+	private hideDetails(restoreFocus: boolean): void {
+		this.detailPanel.hidden = true;
+		if (restoreFocus) this.focusedRow?.focus();
+	}
 	clear(): void {
 		this.destination = undefined;
 		this.reset();
-		this.secondary.clear();
+		this.hideDetails(false);
+		this.detailEpoch++;
+		this.details.clear();
+		this.detailContent.replaceChildren();
+		this.detailHost = undefined;
 	}
 	setVisible(visible: boolean): void {
 		this.element.hidden = !visible;
@@ -781,6 +768,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 	}
 	layout(_width: number, _height: number): void {
 		this.scroll.scanDomNode();
+		this.detailScroll.scanDomNode();
 	}
 	focus(): void {
 		this.heading.focus();

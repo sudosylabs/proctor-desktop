@@ -139,6 +139,142 @@
 	.prctr-workbench [hidden] {
 		display: none;
 	}
+
+	/*
+	 * AuthenticatedWindow's frame: an area rail and a contextual sidebar on the
+	 * window material, then one opaque content surface reaching the window edges.
+	 * On Windows and Linux a title bar strip with the native caption buttons sits
+	 * above it; on macOS the traffic lights sit at the top of the rail.
+	 */
+	.prctr-workbench[data-window-kind='authenticated'] {
+		--prctr-workbench-rail-size: 76px;
+		--prctr-workbench-control-radius: 4px;
+		background: var(--prctr-color-frame-background);
+		grid-template-columns:
+			var(--prctr-workbench-rail-size) var(--prctr-workbench-sidebar-size)
+			minmax(0, 1fr);
+		grid-template-rows: auto auto minmax(0, 1fr);
+	}
+	.prctr-workbench[data-window-kind='authenticated']:not([data-sidebar-presentation='docked']) {
+		grid-template-columns: var(--prctr-workbench-rail-size) 0 minmax(0, 1fr);
+	}
+	:root:is(
+			[data-window-material='glass'],
+			[data-window-material='vibrancy'],
+			[data-window-material='mica']
+		)
+		.prctr-workbench[data-window-kind='authenticated'] {
+		background: transparent;
+	}
+	.prctr-workbench[data-window-kind='authenticated'] .prctr-workbench__titlebar {
+		background: transparent;
+		border: 0;
+		grid-column: 1 / -1;
+		grid-row: 1;
+		padding: 0;
+	}
+	.prctr-workbench[data-window-kind='authenticated'] .prctr-workbench__banner {
+		grid-column: 3;
+		grid-row: 2;
+	}
+	.prctr-workbench[data-window-kind='authenticated'] .prctr-workbench__navigation {
+		border: 0;
+		box-sizing: border-box;
+		grid-column: 1;
+		grid-row: 2 / 4;
+		min-inline-size: 0;
+		overflow-x: hidden;
+		overflow-y: auto;
+		padding-block-start: 12px;
+	}
+	.prctr-workbench[data-window-kind='authenticated'] .prctr-workbench__sidebar {
+		background: var(--prctr-color-frame-sidebar);
+		box-shadow:
+			inset 1px 0 0 var(--prctr-color-frame-divider),
+			inset -1px 0 0 var(--prctr-color-frame-divider);
+		grid-column: 2;
+		grid-row: 2 / 4;
+		overflow: visible;
+		position: relative;
+	}
+	/* Below the docking width the sidebar opens over the content on an opaque frame. */
+	.prctr-workbench[data-window-kind='authenticated'][data-sidebar-presentation='overlay']
+		.prctr-workbench__sidebar {
+		background:
+			linear-gradient(var(--prctr-color-frame-sidebar), var(--prctr-color-frame-sidebar)),
+			var(--prctr-color-frame-background);
+		box-shadow:
+			inset -1px 0 0 var(--prctr-color-frame-divider),
+			var(--prctr-elevation-overlay);
+		grid-column: 2 / 4;
+		inline-size: var(--prctr-workbench-sidebar-size);
+		inset-block: 0;
+		inset-inline-start: 0;
+		max-inline-size: 100%;
+		position: absolute;
+		z-index: 3;
+	}
+	.prctr-workbench[data-window-kind='authenticated'] .prctr-workbench__content {
+		background: var(--prctr-color-background-surface);
+		display: flex;
+		flex-direction: column;
+		grid-column: 3;
+		grid-row: 3;
+	}
+	.prctr-workbench[data-window-kind='authenticated']
+		.prctr-workbench__content
+		> .prctr-pane-host {
+		block-size: auto;
+		flex: 1 1 auto;
+	}
+	.prctr-workbench[data-window-kind='authenticated'] .prctr-workbench__keybinding-feedback {
+		block-size: 1px;
+		clip-path: inset(50%);
+		inline-size: 1px;
+		overflow: hidden;
+		position: absolute;
+		white-space: nowrap;
+	}
+	/* macOS: the title bar is the rail's top, which holds the traffic lights. */
+	.prctr-workbench[data-window-kind='authenticated']:has(
+			> .prctr-workbench__titlebar[data-chrome-mode='nativeTrafficLights']
+		) {
+		--prctr-workbench-control-radius: 6px;
+	}
+	.prctr-workbench[data-window-kind='authenticated']
+		> .prctr-workbench__titlebar[data-chrome-mode='nativeTrafficLights'] {
+		grid-column: 1;
+	}
+	.prctr-workbench[data-window-kind='authenticated']:has(
+			> .prctr-workbench__titlebar[data-chrome-mode='nativeTrafficLights']
+		)
+		> :is(.prctr-workbench__navigation) {
+		padding-block-start: 0;
+	}
+	.prctr-workbench[data-window-kind='authenticated']:has(
+			> .prctr-workbench__titlebar[data-chrome-mode='nativeTrafficLights']
+		)
+		> :is(.prctr-workbench__sidebar, .prctr-workbench__content) {
+		grid-row: 1 / 4;
+	}
+	.prctr-workbench[data-window-kind='authenticated']:has(
+			> .prctr-workbench__titlebar[data-chrome-mode='nativeTrafficLights']
+		)
+		> .prctr-workbench__banner {
+		grid-row: 1;
+	}
+	.prctr-workbench[data-window-kind='authenticated']:has(
+			> .prctr-workbench__titlebar[data-chrome-mode='nativeTrafficLights']
+		):has(> .prctr-workbench__banner:not([hidden]))
+		> .prctr-workbench__content {
+		grid-row: 2 / 4;
+	}
+	@media (forced-colors: active) {
+		.prctr-workbench[data-window-kind='authenticated'] .prctr-workbench__sidebar {
+			border-inline: var(--prctr-shape-stroke-default) solid CanvasText;
+		}
+	}
+
 	@media (forced-colors: active) {
 		.prctr-workbench .prctr-workbench__sidebar-sash:focus-visible,
 		.prctr-workbench .prctr-workbench__panel-sash:focus-visible {

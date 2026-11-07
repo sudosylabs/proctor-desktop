@@ -30,7 +30,7 @@ if (api === undefined) throw new Error('Authenticated preload API is unavailable
 const authenticatedWindow = await bootstrapWorkbench(document, authenticatedComposition, [
 	...commonWorkbenchContributions,
 	createDesktopWorkbenchContribution('authenticated', () => api.bootstrap(), api.windowChrome),
-	createAuthenticatedContribution(api, true),
+	createAuthenticatedContribution(api),
 	createAccountContribution(api.account),
 	createSettingsContribution(
 		api.settings,

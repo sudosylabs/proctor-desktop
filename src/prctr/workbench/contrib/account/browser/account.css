@@ -5,6 +5,10 @@
 			var(--prctr-typography-font-application);
 		min-inline-size: 0;
 		container-type: inline-size;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-rows: minmax(0, 1fr);
+		position: relative;
 	}
 	.prctr-account .prctr-account__scroll,
 	.prctr-account .prctr-account__viewport {
@@ -190,15 +194,27 @@
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: 1px;
 	}
-	.prctr-account.prctr-account--details {
+	/* The page's detail panel sits beside the list, or over it when the page is narrow. */
+	.prctr-account .prctr-account__details {
+		background: var(--prctr-color-background-surface);
+		border-inline-start: var(--prctr-shape-stroke-default) solid
+			var(--prctr-color-border-default);
 		box-sizing: border-box;
-		padding: var(--prctr-spacing-content-large);
+		inline-size: 320px;
 		overflow: auto;
-		block-size: 100%;
+		padding: var(--prctr-spacing-content-large);
 	}
-	.prctr-account.prctr-account--details .prctr-account__row {
+	.prctr-account .prctr-account__details .prctr-account__row {
 		grid-template-columns: 1fr;
 		gap: var(--prctr-spacing-content-small);
+	}
+	@container (max-width: 640px) {
+		.prctr-account .prctr-account__details {
+			border-inline-start: 0;
+			inline-size: auto;
+			inset: 0;
+			position: absolute;
+		}
 	}
 	@container (max-width: 560px) {
 		.prctr-account .prctr-account__item-summary {

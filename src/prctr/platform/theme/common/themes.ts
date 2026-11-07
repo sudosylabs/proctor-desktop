@@ -138,7 +138,14 @@ const semanticColorRoles = {
 	'color.overlay.backdrop': 'widget.shadow',
 	'color.scrollbar.thumb': 'scrollbarSlider.background',
 	'color.scrollbar.thumbHover': 'scrollbarSlider.hoverBackground',
-	'color.scrollbar.thumbActive': 'scrollbarSlider.activeBackground'
+	'color.scrollbar.thumbActive': 'scrollbarSlider.activeBackground',
+	'color.frame.background': 'proctor.frameBackground',
+	'color.frame.sidebar': 'proctor.frameSidebarBackground',
+	'color.frame.divider': 'proctor.frameDivider',
+	'color.navigation.selected': 'proctor.navigationSelectedBackground',
+	'color.navigation.selectedForeground': 'proctor.navigationSelectedForeground',
+	'color.avatar.background': 'proctor.avatarBackground',
+	'color.avatar.foreground': 'proctor.avatarForeground'
 } as const;
 
 export function getTheme(

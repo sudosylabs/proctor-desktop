@@ -1302,8 +1302,6 @@ resources/server-api/openapi.json
 /src/prctr/workbench/browser/composite.ts
 /src/prctr/workbench/browser/dnd.ts
 /src/prctr/workbench/browser/editor.ts
-/src/prctr/workbench/browser/floatingPanels.css
-/src/prctr/workbench/browser/floatingPanels.ts
 /src/prctr/workbench/browser/labels.ts
 /src/prctr/workbench/browser/media/floatingPanels.css
 /src/prctr/workbench/browser/media/part.css
@@ -1442,7 +1440,6 @@ resources/server-api/openapi.json
 /src/prctr/workbench/common/views.ts
 /src/prctr/workbench/common/workbenchItem.ts
 /src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts
-/src/prctr/workbench/contrib/authenticated/browser/authenticatedLayout.ts
 /src/prctr/workbench/contrib/bulkEdit/browser/bulkCellEdits.ts
 /src/prctr/workbench/contrib/bulkEdit/browser/bulkEditService.ts
 /src/prctr/workbench/contrib/bulkEdit/browser/bulkFileEdits.ts

@@ -24,7 +24,7 @@ not replace the review questions in
   with `createElementFactory(document)` from `base/browser/documentElements.ts`,
   so nodes belong to the right window. `proctor/prefer-dom-helpers` rejects the
   global `document.createElement`, and `proctor/prefer-element-factory` rejects
-  raw `createElement` everywhere else. The 22 files in
+  raw `createElement` everywhere else. The files in
   `build/lint/legacyElementCreation.json` predate it; remove a file from that list
   when you migrate it, and never add one.
 - Files carrying `@proctor-vscode-port` belong to a manifest under
