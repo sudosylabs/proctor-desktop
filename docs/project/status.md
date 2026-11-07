@@ -2,12 +2,12 @@
 
 ## Accepted foundation
 
-- AuthenticatedWindow uses a movable Primary Side Bar, one central content region,
-  and an optional page-owned Secondary Side Bar. The titlebar provides visibility
-  controls and the source Customize Layout picker. Its status bar and notification
-  center entrypoint are omitted; CandidateWindow retains its separate layout.
-  See [workbench layout](../architecture/workbench.md) for ownership, persistence,
-  keyboard behavior, and fixed-size regions.
+- AuthenticatedWindow uses a rail-and-sidebar frame: an area rail with the account
+  photo, a resizable, hideable contextual sidebar, and one content surface with
+  back, forward and search, over the system material with the Proctor themes.
+  Its status bar and notification center entrypoint are omitted; CandidateWindow
+  retains its separate layout. See [workbench layout](../architecture/workbench.md)
+  for ownership, persistence, keyboard behavior, and responsive presentation.
 
 - In-app notifications now have a shared model/service, retained center, toast
   scheduling, prompts, source filtering, progress and accessible reading. The
@@ -65,22 +65,16 @@
 ## Accepted presentation migration
 
 [Modern UI and floating panels](../architecture/design-system.md#modern-ui-and-floating-panels)
-are the required UI target. AuthenticatedWindow now uses the admitted
-[Modern workbench cluster](../upstream/vscode-ports/modern-workbench.json): inset
-navigation and content surfaces, shared canvas, default/compact seams, fixed
-section sizing, and a narrow navigation disclosure. Profile, Sessions, and Settings
-use the contained layout and inset scrollable content. The compact account
-trigger sits in the right titlebar action area before native window controls,
-preceded by a sidebar toggle with synchronized icons and device-local restoration.
-The native macOS account popup remains outside clipped part surfaces.
-
-Real Chromium verification covers all four color-scheme categories, both densities, exposed/shared
-edges, RTL, fixed sidebar sizing, constrained 200%-equivalent dimensions, focus restoration,
-and repeated layout. macOS computer-use comparison covers the running Insiders
-shell and the native Proctor profile/session surfaces and account popup. Proctor
-uses its own semantic colors, fixed product topology and account content; it does
-not claim pixel identity with the editor. Windows native chrome/forced-color and
-screen-reader release verification remain with the design-system owner.
+are the required target for VS Code-derived UI and CandidateWindow's shell.
+AuthenticatedWindow instead uses the Proctor-owned
+[rail-and-sidebar frame](../architecture/design-system.md#authenticated-product-presentation);
+the [Modern workbench cluster](../upstream/vscode-ports/modern-workbench.json) now
+covers only the text-button presentation. Account pages (Profile, Sign-in and
+security, Sessions and devices) and Activity show detail in their own panels.
+Browser tests cover the frame's areas, history, sidebar resize, persistence and
+narrow overlay. macOS traffic-light placement, Liquid Glass/vibrancy on a
+resizable window, Windows Mica, forced colors and screen readers still need
+native release verification.
 CandidateWindow's presentation migration remains outstanding; LaunchWindow keeps
 its accepted centered composition.
 

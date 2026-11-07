@@ -43,34 +43,15 @@ still closes the entire AuthenticatedWindow regardless of those responsibilities
 
 ## Own-account destination
 
-The titlebar displays Proctor. A compact account trigger on the right of the
-titlebar shows the user's photo and display name. It sits before right-side
-native window controls, using the chrome owner's reserved control space. At
-constrained widths it retains the avatar and accessible full name. Primary Side
-Bar, Secondary Side Bar and Customize Layout controls precede Settings and the
-account trigger, with vertical separators around Settings. Each titlebar action
-has a source workbench tooltip, including its registered shortcut when available.
-Their icons reflect each bar's physical side and actual visibility.
-Primary visibility and physical position persist in the non-sensitive
-device-scoped `prctr.authenticated.layout` category (schema 2), owned by the
-authenticated layout service and cleared with local application data. The
-schema-1 primary visibility preference remains readable. Responsive hiding
-never overwrites an explicit preference. The account menu
-contains Profile, Sessions, then a separated Log out action. Settings opens from
-its separate titlebar button or the registered Settings shortcut. macOS uses an Electron
-native popup so the OS owns material, selection, accessibility and dismissal;
-Windows and Linux use the admitted VS Code ContextMenuService and Menu controls,
-including source theme tokens, Modern UI menu motion, row selection, keyboard
-navigation, dismissal, and focus restoration. Both paths expose the same account
-actions. macOS material follows the OS appearance and accessibility preferences;
-it is not simulated with browser CSS. Preview compositions must use the same
-production preload and native adapter when demonstrating this menu.
-The native capability accepts
-only a bounded anchor and returns a closed action identifier, with sender
-validation and window-disposal cancellation. It cannot execute arbitrary commands
-or accept a renderer-defined menu tree.
+Account is its own space, opened by the account photo at the bottom of the area
+rail; the photo carries the accent ring while Account is open. Its sidebar lists
+Profile, Sign-in and security, Sessions and devices, Access tokens and Settings,
+then Sign out. Settings opens its existing modal over the current page; the
+registered Settings shortcut opens it too. Access tokens has no page yet and
+shows Sessions and devices until it does. A sign-out failure is reported beside
+Sign out. There is no titlebar account trigger or account popup menu.
 
-Account hosts Profile (including security) and Sessions through one
+Account hosts Profile, Sign-in and security, and Sessions through one
 registered WorkbenchItem resolver and cancellable pane. Profile-photo reads,
 uploads, and removals use the signed-in User and exact image revision. Other
 presentation fields use the server’s administrative User management operation;
@@ -88,7 +69,7 @@ so Remove is shown only for a revision observed after a confirmed upload in this
 window session. Never infer that state from the image or its URL.
 
 Sessions separates the current session, other sessions, and registered desktops.
-Rows expose their own actions; the page-owned Secondary Side Bar discloses
+Rows expose their own actions; the page's own detail panel discloses
 available metadata without inventing location or device facts. Profile does not
 provide secondary content. Section reads fail independently and refresh retains
 previously displayed information. Pending actions and their feedback stay local
@@ -182,10 +163,12 @@ update, branding, or cloud services through aggregate entrypoints.
 
 ## Shell topology
 
-The shell uses the accepted
-[Modern UI floating-panel composition](./design-system.md#modern-ui-and-floating-panels).
-That decision governs region surfaces, gutters, shared edges, internal insets,
-and coordinated layout sizing; the parts below retain their domain ownership.
+CandidateWindow's shell uses the accepted
+[Modern UI floating-panel composition](./design-system.md#modern-ui-and-floating-panels);
+AuthenticatedWindow uses the
+[rail-and-sidebar frame](./design-system.md#authenticated-product-presentation).
+Those decisions govern region surfaces and coordinated layout sizing; the parts
+below retain their domain ownership.
 
 Every workbench uses these structural regions:
 
@@ -198,49 +181,44 @@ Every workbench uses these structural regions:
 - `OverlayHost` owns dialogs, notifications, context menus, gates, quick input,
   and blocking overlays; it is not a grid part.
 
-`AuthenticatedWindow` uses `NavigationPart` as the **Primary Side Bar**, a single
-central `ContentPart`, and `SidebarPart` as the **Secondary Side Bar**. Primary
-navigation selects permitted destinations. The selected valid destination is
-shown; an unavailable selection falls back to the first permitted navigation
-destination. Settings opens its existing modal, preserving the underlying page.
+`AuthenticatedWindow` uses `NavigationPart` as the **area rail**, `SidebarPart`
+as the **contextual sidebar** for the current area, and a single central
+`ContentPart` whose top bar holds Show sidebar (while the sidebar is hidden),
+back and forward, and the window search field. On Windows and Linux
+`TitlebarPart` is a strip above the frame with the native caption buttons; on
+macOS it is the top of the rail, which holds the traffic lights. The frame in
+`workbench/contrib/authenticated` owns the rail, sidebar, top bar and navigation
+state; the shell owns their geometry. The selected valid destination is shown;
+an unavailable selection falls back to the first available area, then Account.
+Settings opens its existing modal, preserving the underlying page.
 
-The authenticated navigation is the union of the server's available product
-areas: My exams, Exam management, and Administration. Account and Settings remain
-independent of those areas. Context is a routing hint; every operation remains
-bound to the privileged current session and reauthorized by the server. Refresh
-and returning to the foreground refetch context, invalidate stale page actions,
-and remove destinations whose access was lost.
+The rail lists the union of the server's available product areas: Activity,
+Exams (exam management) and Administration, then the account photo. Account and
+Settings remain independent of those areas. Context is a routing hint; every
+operation remains bound to the privileged current session and reauthorized by the
+server. Refresh and returning to the foreground refetch context, invalidate stale
+page actions, and remove areas whose access was lost.
 
-My exams uses the candidate activity projection with opaque pagination and a
-page-owned secondary detail selection. Only explicitly released candidate
-remarks are displayed; withheld review state and private manager content are
-absent. Enter and Resume remain unavailable until the production secure
-participation composition is connected. Exam management and Administration
-currently identify their unavailable desktop functionality and show the bounded
-management-scope summary; they do not expose unfinished management actions.
+Activity uses the candidate activity projection with opaque pagination; its
+sidebar lists Overview and the activity categories, and a chosen exam shows in
+the page's own detail panel. Only explicitly released candidate remarks are
+displayed; withheld review state and private manager content are absent. Enter
+and Resume remain unavailable until the production secure participation
+composition is connected. Exams and Administration currently identify their
+unavailable desktop functionality and show the bounded management-scope summary;
+they do not expose unfinished management actions.
 
-The Primary Side Bar starts on the physical left and can move right; the
-Secondary Side Bar always occupies the opposite side, including in RTL. The
-secondary starts closed and only the active page can provide its content. Page
-registrations own disposable renderers; navigating away releases rendered DOM
-and selection state. Own-account subpages have separate page identities. Returning
-to a page starts its secondary closed. An explicit detail-selection intent can
-reveal it. Unsupported pages keep the titlebar secondary toggle disabled.
-
-The titlebar exposes both visibility toggles and the source Customize Layout
-quick picker, narrowed to Visibility and Primary Side Bar Position. It preserves
-item icons, eye/check states, keyboard operation, persistent selection, Close
-and Restore Defaults. Restore Defaults puts Primary left and visible and closes
-Secondary. Primary uses Ctrl/Cmd+B; Secondary uses Ctrl/Cmd+Alt+B. These actions
-are blocked by modal/security gates. This window has no status bar or notification
-center entrypoint; no notification bell is relocated to the titlebar.
-
-The regions have fixed sizes, one content group, and no sashes or split actions.
-Native titlebar dragging, double-click behavior and window-edge resizing remain
-available. At constrained widths Primary becomes a titlebar disclosure; choosing
-a destination restores focus to content. The destination list scrolls
-independently. Floating gutters and borders reduce each grid slot once before
-its content is measured. CandidateWindow layout policy is independent.
+Back and forward retrace places visited in this window, skipping areas no longer
+available. The sidebar is resizable from 200 to 320px with a keyboard-operable
+separator, hideable with its header button, Show sidebar or Ctrl/Cmd+B, and stops
+docking below a 1000px window width (including at 200% zoom), where it opens over
+the content and closes on Escape, a choice or work elsewhere. Ctrl/Cmd+K focuses
+search; back and forward use Alt+Left/Right, or Cmd+[ and Cmd+] on macOS. These
+actions are blocked by modal and security gates. This window has no status bar,
+Secondary Side Bar, layout picker or notification-center entrypoint. Native title
+bar dragging, double-click behavior and window-edge resizing remain available; the
+rail and the top bar's empty space also move the window. CandidateWindow layout
+policy is independent.
 
 `CandidateWindow` additionally exposes a `PanelPart`, currently without a
 contribution; it is reserved for the planned Run output. Candidate navigation initially has `Workspace` and `Exam
@@ -299,6 +277,12 @@ Non-sensitive presentation state declares one scope:
 Every category declares sensitivity, schema version, and cleanup owner.
 Attempt-presentation data is removed after authoritative completion and cannot
 cross to another Principal or Attempt.
+
+AuthenticatedWindow's sidebar visibility and width persist in the non-sensitive
+device-scoped `prctr.authenticated.layout` category, owned by the authenticated
+frame and cleared with local application data. Responsive hiding never
+overwrites an explicit preference, and unreadable storage falls back to a shown
+232px sidebar for that window.
 
 ## Lifecycle and secure transitions
 

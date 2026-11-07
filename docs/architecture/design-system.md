@@ -18,19 +18,36 @@ Every surface should be:
 
 Consistency and accessibility are system requirements. Delight is restrained,
 functional polish that cannot compete with clarity. VS Code-derived surfaces use
-its Modern UI baseline below. AuthenticatedWindow product navigation and pages
-use the institutional dashboard presentation described next, with the same
+its Modern UI baseline below. AuthenticatedWindow uses the rail-and-sidebar
+frame and product pages described next, with the same
 Proctor semantic tokens, themes, accessibility, and lifecycle contracts.
 
 ## Authenticated product presentation
 
 AuthenticatedWindow serves students and institutional staff, including people
-who do not use an IDE. Its product navigation and pages have a Proctor-owned
-presentation: comfortable navigation rows with domain icons, nested task
-categories, restrained inset selection, readable page headings, and purposeful
-spacing. Collection, overview, form, and detail layouts follow the task rather
-than an editor pane or file tree. Preserve the native titlebar, layout toggles,
-Settings and account controls, and Primary/Main/Secondary region behavior.
+who do not use an IDE. It uses a Proctor-owned rail-and-sidebar frame:
+
+- A 76px **area rail** on the window material lists the product areas the
+  server makes available (Activity, Exams, Admin) as icon-and-label entries,
+  with the account photo or initials at the bottom. The photo opens Account and
+  carries the accent ring while Account is open. On macOS the traffic lights sit
+  at the top of the rail.
+- A **contextual sidebar** (default 232px, resizable from 200 to 320px with a
+  keyboard-operable separator, hideable) shows the current area's title and
+  pages; in Account it ends with Sign out. Below a 1000px window width it stops
+  docking and opens over the content instead.
+- One opaque **content surface** reaches the window edges. Its 52px top bar holds
+  Show sidebar (only while the sidebar is hidden), back and forward, and one
+  search field. There is no status bar, Secondary Side Bar, layout picker or
+  titlebar Settings and account control.
+- On Windows and Linux a 32px title bar strip with the product name and the
+  native caption buttons sits above the frame.
+
+Pages follow the task rather than an editor pane or file tree; a page that
+needs detail shows it in its own panel beside its list. IBM Plex Sans and Mono,
+the Proctor palette, and status by shape apply. The purple accent is reserved
+for primary actions, links and the selected state. Controls use a 6px radius on
+macOS and 4px on Windows.
 
 This is an explicit visual exception to the VS Code baseline for these product
 surfaces. It does not authorize replacing admitted settings-editor, menu,
@@ -50,7 +67,9 @@ its implementation because Proctor currently has fewer features. Any required
 product or security divergence must be explicit and verified under the
 [VS Code source policy](../upstream/vscode.md).
 
-Floating panels are the accepted workbench shell composition:
+Floating panels are the accepted shell composition for IDE workbench regions,
+currently CandidateWindow. AuthenticatedWindow uses the rail-and-sidebar frame
+described above instead:
 
 - A continuous window background remains visible around inset workbench surfaces.
 - Sidebar, content/editor, and applicable panel surfaces have their own background,
@@ -64,8 +83,8 @@ Floating panels are the accepted workbench shell composition:
   together with the CSS. Rounded corners alone do not implement this composition.
 
 This is Proctor's product baseline, not an opt-in upstream experiment. Apply it
-to the regions admitted by each workbench composition. LaunchWindow keeps its
-centered sign-in composition; this decision does not add editor/sidebar regions
+to the IDE regions admitted by each workbench composition. LaunchWindow keeps its
+centered sign-in composition and AuthenticatedWindow its frame; this decision does not add editor/sidebar regions
 there or permit detached windows, arbitrary docking, or changes to Candidate
 security. Floating panels are surfaces inside the existing window.
 
@@ -118,7 +137,7 @@ must be local, justified, and verified.
 ## Themes and presentation
 
 Proctor bundles the GitHub VS Code theme collection. GitHub Dark Default is the
-initial selection. Theme names and JSON assets belong to the packaged catalog;
+default `workbench.colorTheme` value. Theme names and JSON assets belong to the packaged catalog;
 light, dark, high-contrast light and high-contrast dark remain scheme categories,
 not a fixed list of four palettes. The four scheme identifiers used by Attempt Configuration resolve through
 catalog aliases.
@@ -148,8 +167,11 @@ retain operating-system material and selection rendering.
 Proctor also bundles its own Proctor Light and Proctor Dark themes, the warm
 neutral palette of the accepted LaunchWindow design. They include the GitHub
 Light Default and Dark Default themes for every role they do not set, including
-syntax colors. LaunchWindow follows the operating-system scheme with these two
-themes. The other windows keep the GitHub default until a decision moves them.
+syntax colors. LaunchWindow and AuthenticatedWindow follow the operating-system
+scheme with these two themes. In AuthenticatedWindow a `workbench.colorTheme`
+the user has set wins and pins the native scheme so the material matches;
+without one the window keeps following the system. CandidateWindow keeps its
+Attempt Configuration scheme.
 Roles VS Code has no color for (tertiary text, pending glyphs, the disabled
 primary fill and the development-server stripes) are registered as `proctor.*`
 colors and exposed as semantic tokens.
@@ -159,13 +181,17 @@ as well as color: success is a check in a circle, error a filled circle with a
 cut-out cross, warning an exclamation in a circle, loading an arc on a quiet
 track, pending a dashed circle and skipped a dash.
 
-LaunchWindow shows the system's window material behind its page: Liquid Glass
+LaunchWindow and AuthenticatedWindow show the system's window material behind
+their pages: Liquid Glass
 on macOS 26 and later, `sidebar` vibrancy when glass cannot attach or on earlier
 macOS, and Mica on Windows 11 22H2 and later. Reduce Transparency and Increase
 Contrast make the window opaque in the theme's canvas color. Electron main owns
 the material and reports it through the window chrome channel. The page marks
 the document root with `data-window-material` and becomes transparent only
-while a material is active; fields, panels and buttons stay opaque.
+while a material is active; fields, panels and buttons stay opaque. In
+AuthenticatedWindow the rail, sidebar and title bar strip show the material and
+the content surface stays opaque; without a material they use the opaque
+`color.frame.background`. AuthenticatedWindow stays resizable and maximizable.
 
 Custom color overrides apply to AuthenticatedWindow. The current server Attempt
 Configuration carries only four scheme identifiers: Candidate freezes that
