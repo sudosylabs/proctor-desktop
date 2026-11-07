@@ -33,6 +33,11 @@ const tokenDefinitions = [
 	{ id: 'color.text.primary', kind: 'color', description: 'Primary text.' },
 	{ id: 'color.text.secondary', kind: 'color', description: 'Secondary text.' },
 	{
+		id: 'color.text.tertiary',
+		kind: 'color',
+		description: 'Quiet supporting text, such as addresses and details.'
+	},
+	{
 		id: 'color.text.disabled',
 		kind: 'color',
 		description: 'Unavailable text with a non-color cue.'
@@ -65,6 +70,11 @@ const tokenDefinitions = [
 	{ id: 'color.interaction.hover', kind: 'color', description: 'Hover feedback surface.' },
 	{ id: 'color.interaction.active', kind: 'color', description: 'Pressed feedback surface.' },
 	{ id: 'color.interaction.selected', kind: 'color', description: 'Selected item surface.' },
+	{
+		id: 'color.interaction.disabled',
+		kind: 'color',
+		description: 'Fill of an unavailable primary action.'
+	},
 	{ id: 'color.selection.background', kind: 'color', description: 'Text selection surface.' },
 	{ id: 'color.selection.foreground', kind: 'color', description: 'Text selection foreground.' },
 	{
@@ -93,6 +103,26 @@ const tokenDefinitions = [
 		description: 'Error foreground paired with text.'
 	},
 	{ id: 'color.feedback.errorBackground', kind: 'color', description: 'Error message surface.' },
+	{
+		id: 'color.feedback.pending',
+		kind: 'color',
+		description: 'Glyph of a step that has not started or was skipped.'
+	},
+	{
+		id: 'color.development.background',
+		kind: 'color',
+		description: 'First stripe of the development-server strip.'
+	},
+	{
+		id: 'color.development.stripe',
+		kind: 'color',
+		description: 'Second stripe of the development-server strip.'
+	},
+	{
+		id: 'color.development.foreground',
+		kind: 'color',
+		description: 'Text of the development-server strip.'
+	},
 	{
 		id: 'color.feedback.info',
 		kind: 'color',

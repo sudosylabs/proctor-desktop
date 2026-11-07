@@ -1,6 +1,8 @@
 import { ColorScheme } from './theme.js';
 export const DEFAULT_THEME = 'GitHub Dark Default';
 export const BUNDLED_THEMES = [
+	{ name: 'Proctor Light', path: 'proctor/light.json', scheme: ColorScheme.LIGHT },
+	{ name: 'Proctor Dark', path: 'proctor/dark.json', scheme: ColorScheme.DARK },
 	{ name: 'GitHub Light Default', path: 'github/light-default.json', scheme: ColorScheme.LIGHT },
 	{
 		name: 'GitHub Light High Contrast',
@@ -35,4 +37,9 @@ export const SCHEME_THEME_NAMES = {
 	highContrastLight: 'GitHub Light High Contrast',
 	hcDark: 'GitHub Dark High Contrast',
 	hcLight: 'GitHub Light High Contrast'
+} as const;
+/** Proctor's own palette, which windows that follow the system scheme use. */
+export const PROCTOR_SCHEME_THEME_NAMES = {
+	light: 'Proctor Light',
+	dark: 'Proctor Dark'
 } as const;

@@ -30,6 +30,8 @@ export interface PresentationPreferences {
 
 export interface BrowserThemeServiceOptions {
 	readonly followSystemColorScheme?: boolean;
+	/** The themes used for each system scheme while following it; the bundled defaults otherwise. */
+	readonly systemThemes?: { readonly light: string; readonly dark: string };
 }
 
 export const BROWSER_THEME_SERVICE = 'prctr.platform.browserTheme';
@@ -55,6 +57,7 @@ export class BrowserThemeService extends Disposable {
 	private readonly reducedMotionQuery: MediaQueryList | undefined;
 	private readonly reducedTransparencyQuery: MediaQueryList | undefined;
 	private followsSystemColorScheme: boolean;
+	private readonly systemThemes: { readonly light: string; readonly dark: string };
 
 	constructor(
 		private readonly document: Document,
@@ -70,12 +73,13 @@ export class BrowserThemeService extends Disposable {
 		this._register(getThemingRegistry().onThemingParticipantAdded(() => this.applyThemeRules()));
 		this.preferences = preferences;
 		this.followsSystemColorScheme = options.followSystemColorScheme === true;
+		this.systemThemes = options.systemThemes ?? { light: 'light', dark: 'dark' };
 		const matchMedia = document.defaultView?.matchMedia?.bind(document.defaultView);
 		this.forcedColorsQuery = matchMedia?.('(forced-colors: active)');
 		this.colorSchemeQuery = matchMedia?.('(prefers-color-scheme: dark)');
 		this.reducedMotionQuery = matchMedia?.('(prefers-reduced-motion: reduce)');
 		this.reducedTransparencyQuery = matchMedia?.('(prefers-reduced-transparency: reduce)');
-		this.currentTheme = getTheme(this.followsSystemColorScheme && this.colorSchemeQuery !== undefined ? this.colorSchemeQuery.matches ? 'dark' : 'light' : initialTheme);
+		this.currentTheme = getTheme(this.followsSystemColorScheme && this.colorSchemeQuery !== undefined ? this.systemTheme(this.colorSchemeQuery) : initialTheme);
 		this.listen(this.forcedColorsQuery, () => { this.applyForcedColors(); this.presentationChangeEmitter.fire(); });
 		this.listen(this.colorSchemeQuery, () => this.applySystemColorScheme());
 		this.listen(this.reducedMotionQuery, () => { this.applyPreferences(); this.presentationChangeEmitter.fire(); });
@@ -181,12 +185,16 @@ export class BrowserThemeService extends Disposable {
 
 	private applySystemColorScheme(): void {
 		if (!this.followsSystemColorScheme || this.colorSchemeQuery === undefined) return;
-		const theme = getTheme(this.colorSchemeQuery.matches ? 'dark' : 'light', this.customizations, this.tokenCustomizations, this.semanticCustomizations);
+		const theme = getTheme(this.systemTheme(this.colorSchemeQuery), this.customizations, this.tokenCustomizations, this.semanticCustomizations);
 		if (theme.settingsId === this.currentTheme.settingsId && JSON.stringify(theme.colors) === JSON.stringify(this.currentTheme.colors)) return;
 		this.currentTheme = theme;
 		this.apply();
 		this.changeEmitter.fire(theme);
 		this.presentationChangeEmitter.fire();
+	}
+
+	private systemTheme(query: MediaQueryList): string {
+		return query.matches ? this.systemThemes.dark : this.systemThemes.light;
 	}
 
 	private listen(query: MediaQueryList | undefined, listener: () => void): void {

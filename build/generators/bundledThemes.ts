@@ -28,6 +28,15 @@ export const bundledThemesGenerator: Generator = {
 				throw new Error(`Bundled theme digest mismatch: ${path}`);
 			resources[path.slice('resources/themes/'.length)] = content;
 		}
+		// Proctor's own themes are authored here, so they carry no upstream digest.
+		for (const path of repository
+			.files()
+			.filter(
+				(path) => path.startsWith('resources/themes/proctor/') && path.endsWith('.json')
+			)
+			.sort()) {
+			resources[path.slice('resources/themes/'.length)] = repository.read(path);
+		}
 		const destination = join(outputRoot, output);
 		mkdirSync(dirname(destination), { recursive: true });
 		writeFileSync(

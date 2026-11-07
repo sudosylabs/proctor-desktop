@@ -35,12 +35,21 @@
 		font-size: 24px;
 	}
 
+	.prctr-semantic-icon > svg {
+		display: block;
+	}
+
+	/* The quiet circle a progress arc travels on. */
+	.prctr-semantic-icon .prctr-semantic-icon__track {
+		stroke: var(--prctr-color-border-default);
+	}
+
 	.prctr-semantic-icon[data-prctr-icon-modifier="disabled"] {
 		opacity: 0.4;
 	}
 
 	.prctr-semantic-icon[data-prctr-icon-modifier="spin"] {
-		animation: prctr-semantic-icon-spin 1.5s steps(30) infinite;
+		animation: prctr-semantic-icon-spin 0.9s linear infinite;
 		transform-origin: center center;
 	}
 }

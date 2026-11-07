@@ -20,6 +20,7 @@ import { bundledThemeSnapshots } from './bundledThemeSnapshots.generated.js';
 import { getColorRegistry } from './colorRegistry.js';
 import './workbenchColors.js';
 import './colors/brandColors.js';
+import './colors/proctorColors.js';
 import { normalizeColorCustomizations } from './colorCustomizations.js';
 import { ColorScheme, isDark, isHighContrast } from './theme.js';
 import { type DesignTokenId } from './tokens.js';
@@ -97,6 +98,7 @@ const semanticColorRoles = {
 	'color.background.raised': 'editorWidget.background',
 	'color.text.primary': 'foreground',
 	'color.text.secondary': 'descriptionForeground',
+	'color.text.tertiary': 'proctor.tertiaryForeground',
 	'color.text.disabled': 'disabledForeground',
 	'color.text.inverse': 'button.foreground',
 	'color.text.link': 'textLink.foreground',
@@ -114,6 +116,7 @@ const semanticColorRoles = {
 	'color.interaction.hover': 'toolbar.hoverBackground',
 	'color.interaction.active': 'toolbar.activeBackground',
 	'color.interaction.selected': 'list.activeSelectionBackground',
+	'color.interaction.disabled': 'proctor.disabledBackground',
 	'color.selection.background': 'selection.background',
 	'color.selection.foreground': 'list.activeSelectionForeground',
 	'color.feedback.success': 'charts.green',
@@ -122,6 +125,10 @@ const semanticColorRoles = {
 	'color.feedback.warningBackground': 'inputValidation.warningBackground',
 	'color.feedback.error': 'errorForeground',
 	'color.feedback.errorBackground': 'inputValidation.errorBackground',
+	'color.feedback.pending': 'proctor.pendingForeground',
+	'color.development.background': 'proctor.developmentBackground',
+	'color.development.stripe': 'proctor.developmentStripe',
+	'color.development.foreground': 'proctor.developmentForeground',
 	'color.feedback.info': 'editorInfo.foreground',
 	'color.feedback.infoBackground': 'inputValidation.infoBackground',
 	'color.editor.background': 'editor.background',

@@ -1086,6 +1086,92 @@ export const tokenCustomizationSchemas: Readonly<Record<string, object>> = {
 			},
 			{
 				"properties": {
+					"[Proctor Light]": {
+						"properties": {
+							"comments": {
+								"description": "Sets the colors and styles for comments",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"strings": {
+								"description": "Sets the colors and styles for strings literals.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"keywords": {
+								"description": "Sets the colors and styles for keywords.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"numbers": {
+								"description": "Sets the colors and styles for number literals.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"types": {
+								"description": "Sets the colors and styles for type declarations and references.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"functions": {
+								"description": "Sets the colors and styles for functions declarations and references.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"variables": {
+								"description": "Sets the colors and styles for variables declarations and references.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"textMateRules": {
+								"description": "Sets colors and styles using textmate theming rules (advanced).",
+								"$ref": "prctr-schema://themes/textmate-colors"
+							},
+							"semanticHighlighting": {
+								"description": "Whether semantic highlighting should be enabled for this theme.",
+								"deprecationMessage": "Use `enabled` in `editor.semanticTokenColorCustomizations` setting instead.",
+								"markdownDeprecationMessage": "Use `enabled` in `#editor.semanticTokenColorCustomizations#` setting instead.",
+								"type": "boolean"
+							}
+						},
+						"additionalProperties": false
+					},
+					"[Proctor Dark]": {
+						"properties": {
+							"comments": {
+								"description": "Sets the colors and styles for comments",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"strings": {
+								"description": "Sets the colors and styles for strings literals.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"keywords": {
+								"description": "Sets the colors and styles for keywords.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"numbers": {
+								"description": "Sets the colors and styles for number literals.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"types": {
+								"description": "Sets the colors and styles for type declarations and references.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"functions": {
+								"description": "Sets the colors and styles for functions declarations and references.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"variables": {
+								"description": "Sets the colors and styles for variables declarations and references.",
+								"$ref": "prctr-schema://themes/textmate-colors#/definitions/colorGroup"
+							},
+							"textMateRules": {
+								"description": "Sets colors and styles using textmate theming rules (advanced).",
+								"$ref": "prctr-schema://themes/textmate-colors"
+							},
+							"semanticHighlighting": {
+								"description": "Whether semantic highlighting should be enabled for this theme.",
+								"deprecationMessage": "Use `enabled` in `editor.semanticTokenColorCustomizations` setting instead.",
+								"markdownDeprecationMessage": "Use `enabled` in `#editor.semanticTokenColorCustomizations#` setting instead.",
+								"type": "boolean"
+							}
+						},
+						"additionalProperties": false
+					},
 					"[GitHub Light Default]": {
 						"properties": {
 							"comments": {
@@ -1549,6 +1635,38 @@ export const tokenCustomizationSchemas: Readonly<Record<string, object>> = {
 			},
 			{
 				"properties": {
+					"[Proctor Light]": {
+						"type": "object",
+						"properties": {
+							"enabled": {
+								"type": "boolean",
+								"description": "Whether semantic highlighting is enabled or disabled for this theme",
+								"suggestSortText": "0_enabled"
+							},
+							"rules": {
+								"$ref": "prctr-schema://themes/token-styling",
+								"description": "Semantic token styling rules for this theme.",
+								"suggestSortText": "0_rules"
+							}
+						},
+						"additionalProperties": false
+					},
+					"[Proctor Dark]": {
+						"type": "object",
+						"properties": {
+							"enabled": {
+								"type": "boolean",
+								"description": "Whether semantic highlighting is enabled or disabled for this theme",
+								"suggestSortText": "0_enabled"
+							},
+							"rules": {
+								"$ref": "prctr-schema://themes/token-styling",
+								"description": "Semantic token styling rules for this theme.",
+								"suggestSortText": "0_rules"
+							}
+						},
+						"additionalProperties": false
+					},
 					"[GitHub Light Default]": {
 						"type": "object",
 						"properties": {

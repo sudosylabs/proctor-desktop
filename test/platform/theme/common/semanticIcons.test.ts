@@ -14,7 +14,10 @@ void test('semantic icon identifiers are unique, stable, and backed by static gl
 	for (const id of identifiers) {
 		const glyph = resolveSemanticIcon(id);
 		assert.strictEqual(glyph.id, id);
-		if ('paths' in glyph) {
+		if ('shapes' in glyph) {
+			assert.ok(glyph.shapes.length > 0);
+			for (const shape of glyph.shapes) assert.ok(/^M/u.test(shape.d));
+		} else if ('paths' in glyph) {
 			assert.ok(glyph.paths.length > 0);
 			for (const path of glyph.paths) assert.ok(/^[Mm]/u.test(path));
 		} else {
