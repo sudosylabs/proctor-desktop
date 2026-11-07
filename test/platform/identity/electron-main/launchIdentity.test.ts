@@ -649,9 +649,11 @@ void test('Session loss retains the Institution and separates validity, custody,
 	} as const;
 	try {
 		coordinator.acceptSessionOutcome(ended);
-		assert.equal(coordinator.projection().state, 'authorizationFailed');
+		// The window checks the server again, so its checklist is never stale.
+		assert.equal(coordinator.projection().state, 'checking');
+		await settle();
+		assert.equal(coordinator.projection().state, 'ready');
 		assert.equal(coordinator.projection().origin, origin);
-		assert.equal(coordinator.projection().institutionName, ended.institutionName);
 		assert.equal(
 			coordinator.projection().sessionOutcome?.sessionValidity,
 			'verificationRequired'
@@ -666,6 +668,7 @@ void test('Session loss retains the Institution and separates validity, custody,
 			remoteRevocation: 'pending'
 		} as const;
 		coordinator.acceptSessionOutcome(pending);
+		assert.equal(coordinator.projection().state, 'authorizationFailed');
 		await coordinator.handleIntent({ kind: 'changeServer' });
 		assert.equal(coordinator.projection().sessionOutcome?.authentication, 'ending');
 		const settled = {
@@ -676,6 +679,8 @@ void test('Session loss retains the Institution and separates validity, custody,
 			remoteRevocation: 'unconfirmed'
 		} as const;
 		coordinator.acceptSessionOutcome(settled);
+		await settle();
+		assert.equal(coordinator.projection().state, 'ready');
 		assert.deepEqual(coordinator.projection().sessionOutcome, settled);
 		coordinator.acceptSessionOutcome(ended);
 		assert.equal(coordinator.projection().sessionOutcome?.sequence, 2);
@@ -686,3 +691,8 @@ void test('Session loss retains the Institution and separates validity, custody,
 		coordinator.dispose();
 	}
 });
+
+/** Lets a check the coordinator started by itself finish. */
+async function settle(): Promise<void> {
+	await new Promise<void>((resolve) => setImmediate(resolve));
+}

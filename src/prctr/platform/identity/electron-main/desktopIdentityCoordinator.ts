@@ -49,6 +49,8 @@ export class DesktopIdentityCoordinator extends Disposable {
 	#generation = 0;
 	#disposed = false;
 	#signingIn = false;
+	/** The last session outcome, shown until the candidate acts. */
+	#sessionOutcome: DesktopSessionOutcome | undefined;
 
 	constructor(private readonly options: DesktopIdentityCoordinatorOptions) {
 		const target = validateDesktopReleaseTarget(options.target);
@@ -65,22 +67,29 @@ export class DesktopIdentityCoordinator extends Disposable {
 	acceptSessionOutcome(value: DesktopSessionOutcome): void {
 		if (this.#disposed) return;
 		const outcome = validateDesktopSessionOutcome(value);
-		const previous = this.#projection.sessionOutcome;
+		const previous = this.#sessionOutcome;
 		if (previous && outcome.sequence < previous.sequence) return;
+		this.#sessionOutcome = outcome;
 		this.#cancel();
-		this.#publish({
-			state: 'authorizationFailed',
-			origin: outcome.origin,
-			institutionName: outcome.institutionName,
-			sessionOutcome: outcome,
-			authorizationFailure: 'verificationRequired'
-		});
+		if (outcome.authentication === 'ending') {
+			this.#publish({
+				state: 'authorizationFailed',
+				origin: outcome.origin,
+				institutionName: outcome.institutionName,
+				authorizationFailure: 'verificationRequired'
+			});
+			return;
+		}
+		// The window shows the outcome over a fresh check, so its checks are never stale.
+		void this.#check(outcome.origin, false);
 	}
 
 	async handleIntent(value: unknown): Promise<void> {
 		if (this.#disposed) throw new Error('Launch identity is disposed');
 		const intent = validateLaunchIdentityIntent(value);
 		if (this.#projection.sessionOutcome?.authentication === 'ending') return;
+		// The outcome notice stays until the candidate acts.
+		this.#sessionOutcome = undefined;
 		switch (intent.kind) {
 			case 'changeServer':
 				this.#cancel();
@@ -204,6 +213,7 @@ export class DesktopIdentityCoordinator extends Disposable {
 	): LaunchIdentityProjection {
 		return validateLaunchIdentityProjection({
 			...presentation,
+			...(this.#sessionOutcome === undefined ? {} : { sessionOutcome: this.#sessionOutcome }),
 			revision,
 			build: {
 				release: this.#target.release,

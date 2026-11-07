@@ -77,7 +77,7 @@ export interface LaunchViewModel {
 	readonly server?: LaunchServer;
 	readonly notice?: LaunchNotice;
 	readonly checklistTitle: MessageDescriptor;
-	/** Always the four checks, in order: reach, institution, version, sign-in. */
+	/** The four checks, in order: reach, institution, version, sign-in; none while a session ends. */
 	readonly steps: readonly ReadinessStep[];
 	readonly status?: LaunchStatus;
 	readonly secondary?: LaunchAction;
@@ -349,24 +349,35 @@ function presentReady(
 	};
 }
 
-/** After sign-out or a failed refresh the window has not re-checked the server, so nothing is shown as done. */
+/**
+ * While a session ends nothing can be checked, so the window shows only the notice.
+ * Afterwards the coordinator checks the server again, and the notice sits above
+ * whatever that check found; a ready server needs no status of its own.
+ */
 function presentSessionOutcome(
 	projection: LaunchIdentityProjection,
 	server: LaunchServer,
 	development: boolean
 ): LaunchViewModel {
-	const outcome = projection.sessionOutcome!;
-	const notice = presentNotice(outcome);
-	const ending = outcome.authentication === 'ending';
+	const { sessionOutcome, ...current } = projection;
+	const notice = presentNotice(sessionOutcome!);
+	if (sessionOutcome!.authentication === 'ending') {
+		return {
+			stage: 'server',
+			fieldInvalid: false,
+			development,
+			server: { ...server, canChange: false },
+			notice,
+			checklistTitle: checks.title,
+			steps: [],
+			primary: action('signIn', labels.signInGeneric, false)
+		};
+	}
+	const { status, ...view } = presentLaunch(current);
 	return {
-		stage: 'server',
-		fieldInvalid: false,
-		development,
-		server: { ...server, canChange: !ending },
+		...view,
 		notice,
-		checklistTitle: checks.title,
-		steps: steps(projection, 'pppp'),
-		primary: action('retry', labels.continue, !ending)
+		...(status === undefined || status.tone === 'success' ? {} : { status })
 	};
 }
 

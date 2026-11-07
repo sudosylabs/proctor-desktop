@@ -6,6 +6,11 @@
 		min-inline-size: 0;
 	}
 
+	/* Nothing is checked while a session ends. */
+	.prctr-launch-checks[hidden] {
+		display: none;
+	}
+
 	.prctr-launch-checks .prctr-launch-checks__title {
 		color: var(--prctr-color-text-secondary);
 		font-size: 12px;

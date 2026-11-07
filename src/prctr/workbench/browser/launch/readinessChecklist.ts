@@ -78,7 +78,9 @@ export class ReadinessChecklist extends Disposable {
 		host.append(this.element);
 	}
 
+	/** Shows the four checks, or hides the checklist when there are none to show. */
 	render(title: MessageDescriptor, steps: readonly ReadinessStep[]): void {
+		this.element.hidden = steps.length === 0;
 		this.title.textContent = this.localization.format(title);
 		steps.forEach((step, index) => {
 			this.renderRow(this.rows[index]!, step);

@@ -188,7 +188,24 @@ export async function runLaunchWindowTests(
 			'Server selection previews four pending checks'
 		);
 
-		input.value = 'example.edu';
+		const prefix = owner.querySelector<HTMLElement>('.prctr-text-field__prefix')!;
+		const type = (value: string): void => {
+			input.value = value;
+			input.setSelectionRange(value.length, value.length);
+			input.dispatchEvent(new Event('input', { bubbles: true }));
+		};
+		type('HTTPS://example.edu');
+		check(
+			input.value === 'example.edu' && !prefix.hidden && input.selectionStart === 11,
+			'A typed https:// must not repeat the fixed prefix'
+		);
+		type('http://127.0.0.1:8080');
+		check(
+			input.value === 'http://127.0.0.1:8080' && prefix.hidden,
+			'Another scheme stays and hides the fixed prefix'
+		);
+		type('example.edu');
+		check(!prefix.hidden, 'The prefix returns once the address has no scheme');
 		button('Continue').click();
 		check(
 			selected === 'example.edu' && form.hidden,
@@ -345,16 +362,23 @@ export async function runLaunchWindowTests(
 			sessionOutcome: ending
 		});
 		check(
-			button('Continue').disabled && !painted(button('Change')),
+			button('Sign in').disabled && !painted(button('Change')),
 			'Sign-out cleanup must settle before a new identity action'
+		);
+		check(
+			rows().every((row) => !painted(row)),
+			'Nothing is checked while a session ends, so no checklist shows'
 		);
 		check(
 			announcer().textContent === 'Signing out…',
 			'Pending cleanup needs its own announcement'
 		);
-		publish('authorizationFailed', {
+		// The coordinator checks the server again once cleanup settles.
+		publish('ready', {
 			origin: ending.origin,
 			institutionName: ending.institutionName,
+			canSignIn: true,
+			authorizationAvailable: true,
 			sessionOutcome: {
 				...ending,
 				authentication: 'signedOut',
@@ -363,8 +387,12 @@ export async function runLaunchWindowTests(
 			}
 		});
 		check(
-			!button('Continue').disabled && painted(button('Change')),
+			!button('Sign in to Example University').disabled && painted(button('Change')),
 			'Settled cleanup must restore recovery actions'
+		);
+		check(
+			rows().every((row) => painted(row) && row.dataset.status === 'done'),
+			'After the fresh check the notice sits above a finished checklist'
 		);
 		check(
 			owner

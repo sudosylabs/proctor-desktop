@@ -182,7 +182,7 @@ test('each sign-in failure explains itself and offers to try again', () => {
 	}
 });
 
-test('session outcomes show a notice and leave the server unchecked', () => {
+test('session outcomes show a notice over the fresh check, and no checklist while ending', () => {
 	const outcome = (extra: Partial<DesktopSessionOutcome>): DesktopSessionOutcome => ({
 		sequence: 1,
 		origin,
@@ -195,23 +195,32 @@ test('session outcomes show a notice and leave the server unchecked', () => {
 		remoteRevocation: 'confirmed',
 		...extra
 	});
-	const present = (extra: Partial<DesktopSessionOutcome>) =>
+	const present = (
+		state: Parameters<typeof projection>[0],
+		extra: Partial<DesktopSessionOutcome>
+	) =>
 		presentLaunch(
-			projection('authorizationFailed', {
-				authorizationFailure: 'verificationRequired',
-				sessionOutcome: outcome(extra)
-			})
+			projection(state, { canSignIn: state === 'ready', sessionOutcome: outcome(extra) })
 		);
-	const cleared = present({});
+	const cleared = present('ready', {});
 	assert.strictEqual(text({ message: cleared.notice!.text }), 'Signed out.');
-	assert.strictEqual(progress(cleared), 'pppp');
+	assert.strictEqual(progress(cleared), 'dddd');
 	assert.strictEqual(cleared.status, undefined);
+	assert.strictEqual(cleared.primary?.kind, 'signIn');
+	assert.strictEqual(cleared.primary?.enabled, true);
 	assert.strictEqual(
-		text({ message: present({ remoteRevocation: 'unconfirmed' }).notice!.text }),
+		text({ message: present('ready', { remoteRevocation: 'unconfirmed' }).notice!.text }),
 		'Signed out on this computer. Proctor couldn’t confirm sign-out with the server.'
 	);
-	const ending = present({ authentication: 'ending', localCleanup: 'pending' });
+	const unreachable = present('unreachable', {});
+	assert.strictEqual(unreachable.notice?.tone, 'success');
+	assert.strictEqual(unreachable.status?.tone, 'failed');
+	const ending = present('authorizationFailed', {
+		authentication: 'ending',
+		localCleanup: 'pending'
+	});
 	assert.strictEqual(ending.notice?.tone, 'active');
+	assert.strictEqual(ending.steps.length, 0);
 	assert.strictEqual(ending.primary?.enabled, false);
 	assert.strictEqual(ending.server?.canChange, false);
 });

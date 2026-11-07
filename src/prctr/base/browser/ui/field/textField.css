@@ -47,6 +47,10 @@
 		outline: none;
 		padding-inline-start: 1px;
 	}
+	/* A value that carries its own prefix starts where the prefix would. */
+	.prctr-text-field .prctr-text-field__prefix[hidden] + .prctr-text-field__input {
+		padding-inline-start: var(--prctr-spacing-control-inline);
+	}
 	.prctr-text-field .prctr-text-field__box:focus-within {
 		border-color: var(--prctr-color-border-focus);
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);

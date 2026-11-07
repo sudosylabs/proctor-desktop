@@ -17,7 +17,7 @@ let fieldSequence = 0;
 export class TextFieldControl extends Disposable {
   readonly element: HTMLDivElement; readonly input: HTMLInputElement;
   readonly #change = this._register(new Emitter<string>()); readonly onDidChange: Event<string> = this.#change.event;
-  readonly #error: HTMLParagraphElement; readonly #unavailable: HTMLParagraphElement; #disposed = false;
+  readonly #error: HTMLParagraphElement; readonly #unavailable: HTMLParagraphElement; #prefix: HTMLSpanElement | undefined; #disposed = false;
   constructor(host: HTMLElement, options: TextFieldOptions) {
     super(); const document = host.ownerDocument; const id = `prctr-field-${++fieldSequence}`;
     this.element = document.createElement('div'); this.element.className = 'prctr-text-field';
@@ -42,6 +42,11 @@ export class TextFieldControl extends Disposable {
   }
   focus(): void { this.input.focus(); }
 
+  /** Shows or hides the fixed prefix, for a value that already carries its own. */
+  setPrefixVisible(visible: boolean): void {
+    if (this.#prefix !== undefined) this.#prefix.hidden = !visible;
+  }
+
   /** The input alone, or the input inside a box that also shows the fixed prefix. */
   #createBox(document: Document, prefix: string | undefined): HTMLElement {
     if (prefix === undefined) {
@@ -53,6 +58,7 @@ export class TextFieldControl extends Disposable {
     prefixElement.className = 'prctr-text-field__prefix';
     prefixElement.setAttribute('aria-hidden', 'true');
     prefixElement.textContent = prefix;
+    this.#prefix = prefixElement;
     box.append(prefixElement, this.input);
     return box;
   }

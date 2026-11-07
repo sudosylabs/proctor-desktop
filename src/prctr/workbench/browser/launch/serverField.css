@@ -47,6 +47,10 @@
 		padding: 0 12px 0 1px;
 	}
 
+	.prctr-launch-server-field .prctr-text-field__prefix[hidden] + .prctr-text-field__input {
+		padding-inline-start: 12px;
+	}
+
 	.prctr-launch-server-field .prctr-text-field__input::placeholder {
 		color: var(--prctr-color-text-tertiary);
 	}
