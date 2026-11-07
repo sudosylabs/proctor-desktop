@@ -15,6 +15,8 @@ export interface MenuEntry {
 	readonly separatorBefore?: boolean;
 	readonly enabled?: boolean;
 	readonly checked?: boolean;
+	/** Removes or ends something; presented in the error colour. */
+	readonly destructive?: boolean;
 	readonly children?: readonly MenuEntry[];
 	readonly run?: () => void | Promise<void>;
 }
@@ -68,6 +70,7 @@ export class MenuControl extends Disposable {
 				button.textContent = item.label;
 				button.tabIndex = -1;
 				button.setAttribute('aria-disabled', String(item.enabled === false));
+				if (item.destructive) button.dataset.destructive = 'true';
 				if (item.checked !== undefined)
 					button.setAttribute('aria-checked', String(item.checked));
 				if (item.children) button.setAttribute('aria-haspopup', 'menu');

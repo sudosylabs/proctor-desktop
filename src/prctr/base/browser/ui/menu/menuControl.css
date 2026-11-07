@@ -45,6 +45,9 @@
 		color: var(--prctr-color-text-disabled);
 		cursor: default;
 	}
+	.prctr-menu button[data-destructive='true']:not([aria-disabled='true']) {
+		color: var(--prctr-color-feedback-error);
+	}
 	.prctr-menu button[aria-checked='true']::before {
 		content: '✓ ';
 	}
