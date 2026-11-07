@@ -189,19 +189,21 @@ export async function runLaunchWindowTests(
 		);
 
 		const prefix = owner.querySelector<HTMLElement>('.prctr-text-field__prefix')!;
-		const type = (value: string): void => {
+		/** Types into the field and returns what it then holds. */
+		const type = (value: string): string => {
 			input.value = value;
 			input.setSelectionRange(value.length, value.length);
 			input.dispatchEvent(new Event('input', { bubbles: true }));
+			return input.value;
 		};
-		type('HTTPS://example.edu');
 		check(
-			input.value === 'example.edu' && !prefix.hidden && input.selectionStart === 11,
+			type('HTTPS://example.edu') === 'example.edu' &&
+				!prefix.hidden &&
+				input.selectionStart === 11,
 			'A typed https:// must not repeat the fixed prefix'
 		);
-		type('http://127.0.0.1:8080');
 		check(
-			input.value === 'http://127.0.0.1:8080' && prefix.hidden,
+			type('http://127.0.0.1:8080') === 'http://127.0.0.1:8080' && prefix.hidden,
 			'Another scheme stays and hides the fixed prefix'
 		);
 		type('example.edu');
