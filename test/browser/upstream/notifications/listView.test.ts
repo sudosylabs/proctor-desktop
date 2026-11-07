@@ -75,7 +75,10 @@ suite('ListView', function () {
 							renderedRows: rows.length,
 							fitContentRows: rows.filter(row => row.style.width === 'fit-content').length
 						});
-						return 100 + rowIndex + paddingLeft + paddingRight + 3;
+						// Borders snap to device pixels, so a 1px border can measure 0.8px at 125% scaling.
+						const style = getComputedStyle(container);
+						const borders = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+						return 100 + rowIndex + paddingLeft + paddingRight + borders;
 					}
 				});
 			},

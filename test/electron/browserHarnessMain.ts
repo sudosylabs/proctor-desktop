@@ -25,6 +25,9 @@ async function runHarness(): Promise<void> {
 		},
 		width: 900
 	});
+	// Windows produces no animation frames for a window that was never shown, and the
+	// fixtures wait on frames; show it without taking focus from the developer.
+	if (process.platform === 'win32') window.showInactive();
 	try {
 		window.webContents.on('did-navigate', () => window.webContents.setZoomFactor(2));
 		await window.loadFile(join(app.getAppPath(), 'index.html'), {

@@ -839,7 +839,7 @@
       "localPath": "test/browser/upstream/notifications/listView.test.ts",
       "licenseRefs": ["vscode-mit"],
       "rationale": "Retain the complete admitted implementation and test behavior, substituting only the reviewed Proctor interfaces, namespace, lifecycle and presentation seams.",
-      "localSha256": "58704860e5657770fd8f1c37053a2cbf2130a09c6a28e01fae7d58efbea5db23",
+      "localSha256": "87776c73a2d74a0772a6760286196327685c9047598297d3afc0e47a856f8dc5",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",

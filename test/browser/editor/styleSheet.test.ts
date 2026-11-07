@@ -94,10 +94,17 @@ suite('Editor stylesheet ownership under production CSP', () => {
 		const initial = document.adoptedStyleSheets.length;
 		const controller = new DefaultStyleController(createStyleSheet(host), 'style-test');
 		try {
-			controller.style({ ...unthemedListStyles, listInactiveFocusBackground: '#010203' });
+			// Whether the active or inactive focus color applies depends on whether the
+			// window has focus, so both carry the color under test.
+			const focused = (color: string) => ({
+				...unthemedListStyles,
+				listFocusBackground: color,
+				listInactiveFocusBackground: color
+			});
+			controller.style(focused('#010203'));
 			host.focus();
 			assert.strictEqual(getComputedStyle(row).backgroundColor, 'rgb(1, 2, 3)');
-			controller.style({ ...unthemedListStyles, listInactiveFocusBackground: '#040506' });
+			controller.style(focused('#040506'));
 			assert.strictEqual(getComputedStyle(row).backgroundColor, 'rgb(4, 5, 6)');
 		} finally {
 			controller.dispose();
