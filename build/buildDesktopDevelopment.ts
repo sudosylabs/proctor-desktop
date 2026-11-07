@@ -4,7 +4,7 @@ import { buildEditorWorker } from './lib/editorWorker.ts';
 import { buildJsonWorker } from './lib/jsonWorker.ts';
 import { buildTextMateWorker } from './lib/textMateWorker.ts';
 import { execFileSync } from 'node:child_process';
-import { cpSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { build } from 'esbuild';
 import {
@@ -29,6 +29,7 @@ cpSync(
 	repositoryPath(`native/target/debug/${nativeFile}`),
 	join(outdir, 'desktop_key_custody.node')
 );
+stageLiquidGlass(outdir);
 await Promise.all([
 	buildEditorWorker(outdir),
 	buildJsonWorker(outdir),
@@ -105,4 +106,23 @@ for (const appearance of ['dark', 'light']) {
 		repositoryPath(`resources/branding/source/lockup/${name}`),
 		join(outdir, 'branding', name)
 	);
+}
+
+/**
+ * Stages @vnilink/elg on macOS beside the main bundle: its CommonJS owner module
+ * and this architecture's prebuild, which main loads by path. Elsewhere the
+ * optional package is not installed and windows use their own fallbacks.
+ */
+function stageLiquidGlass(output: string): void {
+	if (process.platform !== 'darwin') return;
+	const source = repositoryPath('node_modules/@vnilink/elg');
+	const prebuild = join(source, 'prebuilds', `darwin-${process.arch}`, 'node.napi.node');
+	if (!existsSync(prebuild))
+		throw new Error(
+			'Liquid Glass is missing: run npm ci so the optional @vnilink/elg installs'
+		);
+	const target = join(output, 'native', 'elg');
+	cpSync(join(source, 'dist', 'index.cjs'), join(target, 'index.cjs'));
+	cpSync(prebuild, join(target, 'elg.node'));
+	cpSync(join(source, 'LICENSE'), join(target, 'LICENSE'));
 }

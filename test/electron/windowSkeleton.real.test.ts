@@ -80,7 +80,7 @@ void test('three product windows use isolated capability-specific preloads and l
 			assert.ok(item.renderer.windowChrome.titlebarHeight >= 24);
 		}
 	}
-	assert.deepEqual(result.windowChromeOptions.darwin, {
+	const launchFrame = {
 		width: 440,
 		height: 600,
 		minWidth: 440,
@@ -88,25 +88,55 @@ void test('three product windows use isolated capability-specific preloads and l
 		fullscreenable: false,
 		maximizable: false,
 		resizable: false,
-		title: 'Proctor',
-		backgroundColor: '#0d1117',
+		title: 'Proctor'
+	};
+	// macOS 15 shows vibrancy behind a clear window.
+	assert.deepEqual(result.windowChromeOptions.darwin, {
+		...launchFrame,
+		backgroundColor: '#00000000',
+		vibrancy: 'sidebar',
 		titleBarStyle: 'hidden',
 		titleBarOverlay: true,
 		acceptFirstMouse: true
 	});
-	assert.deepEqual(result.windowChromeOptions.darwinRtl, result.windowChromeOptions.darwin);
+	// macOS 26 needs a non-opaque window for Liquid Glass.
+	assert.deepEqual(result.windowChromeOptions.darwinRtl, {
+		...launchFrame,
+		backgroundColor: '#00000000',
+		transparent: true,
+		titleBarStyle: 'hidden',
+		titleBarOverlay: true,
+		acceptFirstMouse: true
+	});
+	// Reduce Transparency keeps the window opaque, but transparent so glass can return later.
+	assert.deepEqual(result.windowChromeOptions.darwinReducedTransparency, {
+		...launchFrame,
+		backgroundColor: '#fbfbfa',
+		transparent: true,
+		titleBarStyle: 'hidden',
+		titleBarOverlay: true,
+		acceptFirstMouse: true
+	});
 	for (const platform of ['win32', 'linux']) {
 		const options = result.windowChromeOptions[platform]!;
 		assert.equal(options.frame, false);
 		assert.equal(options.title, 'Proctor');
-		assert.equal(options.backgroundColor, '#0d1117');
+		assert.equal(options.backgroundColor, '#1b1c1f');
 		assert.equal(options.titleBarStyle, 'hidden');
 		assert.deepEqual(options.titleBarOverlay, {
-			color: '#0d1117',
-			symbolColor: '#7d8590',
+			color: '#1b1c1f',
+			symbolColor: '#ededee',
 			height: 34
 		});
 	}
+	// Windows 11 shows Mica, with the caption buttons on the material.
+	assert.equal(result.windowChromeOptions.win32Mica!.backgroundMaterial, 'mica');
+	assert.equal(result.windowChromeOptions.win32Mica!.backgroundColor, '#00000000');
+	assert.deepEqual(result.windowChromeOptions.win32Mica!.titleBarOverlay, {
+		color: '#00000000',
+		symbolColor: '#ededee',
+		height: 34
+	});
 	assert.deepEqual(result.windowChromeOptions.candidate, {
 		width: 1280,
 		height: 800,

@@ -17,12 +17,14 @@ export const WINDOW_CHROME_CHANNELS = Object.freeze({
 	launch: Object.freeze({
 		configuration: 'prctr:launch:window-chrome:configuration',
 		update: 'prctr:launch:window-chrome:update',
-		fullscreenChanged: 'prctr:launch:window-chrome:fullscreen-changed'
+		fullscreenChanged: 'prctr:launch:window-chrome:fullscreen-changed',
+		materialChanged: 'prctr:launch:window-chrome:material-changed'
 	}),
 	authenticated: Object.freeze({
 		configuration: 'prctr:authenticated:window-chrome:configuration',
 		update: 'prctr:authenticated:window-chrome:update',
-		fullscreenChanged: 'prctr:authenticated:window-chrome:fullscreen-changed'
+		fullscreenChanged: 'prctr:authenticated:window-chrome:fullscreen-changed',
+		materialChanged: 'prctr:authenticated:window-chrome:material-changed'
 	})
 } satisfies Record<
 	ChromeCapableProductWindowKind,
@@ -30,6 +32,7 @@ export const WINDOW_CHROME_CHANNELS = Object.freeze({
 		readonly configuration: string;
 		readonly update: string;
 		readonly fullscreenChanged: string;
+		readonly materialChanged: string;
 	}
 >);
 

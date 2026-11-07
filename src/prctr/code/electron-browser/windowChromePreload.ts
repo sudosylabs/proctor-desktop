@@ -12,6 +12,7 @@ import {
 	validateProductWindowChromeZoomFactor
 } from '../../platform/windows/common/windowChrome.js';
 import { WINDOW_CHROME_CHANNELS } from '../../platform/windows/common/windowChannels.js';
+import { isWindowBackgroundMaterial } from '../../platform/windows/common/windowMaterial.js';
 
 export function createWindowChromePreloadClient(
 	kind: ChromeCapableProductWindowKind
@@ -32,6 +33,18 @@ export function createWindowChromePreloadClient(
 			ipcRenderer.on(channels.fullscreenChanged, receive);
 			return Object.freeze({
 				dispose: () => ipcRenderer.removeListener(channels.fullscreenChanged, receive)
+			});
+		},
+		onDidChangeMaterial: (
+			listener: Parameters<ProductWindowChromeClient['onDidChangeMaterial']>[0]
+		) => {
+			const receive = (_event: unknown, value: unknown): void => {
+				if (!isWindowBackgroundMaterial(value)) return;
+				listener(value);
+			};
+			ipcRenderer.on(channels.materialChanged, receive);
+			return Object.freeze({
+				dispose: () => ipcRenderer.removeListener(channels.materialChanged, receive)
 			});
 		},
 		zoomFactor: () => validateProductWindowChromeZoomFactor(webFrame.getZoomFactor()),

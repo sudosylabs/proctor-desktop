@@ -37,6 +37,9 @@ import type {
 import { PRODUCT_WINDOW_TITLE } from '../common/windowChrome.js';
 import { WINDOW_CHANNELS } from '../common/windowChannels.js';
 import { installLaunchWindowMenu } from './launchWindowMenu.js';
+import { createLiquidGlass } from './liquidGlass.js';
+import { WindowMaterial, windowMaterialCreationOptions } from './windowMaterial.js';
+import { PROCTOR_SCHEME_THEME_NAMES } from '../../theme/common/bundledThemes.js';
 import {
 	validateWindowIntent,
 	type ProductWindowDescriptor,
@@ -59,6 +62,9 @@ export interface ElectronWindowChromeEnvironment {
 	readonly locale: string;
 	readonly macOsRelease: string;
 	readonly initialTheme: ThemeId;
+	/** The operating-system release on every platform; `macOsRelease` when omitted. */
+	readonly osRelease?: string;
+	readonly reducedTransparency?: boolean;
 }
 
 export interface ElectronProductWindowFactoryOptions extends ElectronProductWindowPaths {
@@ -70,6 +76,8 @@ export interface ElectronProductWindowFactoryOptions extends ElectronProductWind
 	readonly examActivity?: ExamActivityService;
 	readonly settings?: UserSettingsSessionService;
 	readonly windowChromeEnvironment?: ElectronWindowChromeEnvironment;
+	/** Where the build staged @vnilink/elg; without it, macOS 26 falls back to vibrancy. */
+	readonly liquidGlassDirectory?: string;
 }
 
 export function assertProductWindowIpcSender(
@@ -96,6 +104,18 @@ export function lockedBrowserWindowOptions(
 		chromeEnvironment.macOsRelease
 	);
 	const theme = getTheme(chromeEnvironment.initialTheme);
+	// LaunchWindow renders with the Proctor palette, so its native colors come from it too.
+	const palette = launch ? getTheme(launchThemeName(theme.isDark)) : theme;
+	const background = palette.values['color.background.canvas'];
+	// Only LaunchWindow shows the system material; other windows stay opaque.
+	const material = launch
+		? windowMaterialCreationOptions(
+				chromeEnvironment.platform,
+				chromeEnvironment.osRelease ?? chromeEnvironment.macOsRelease,
+				launchMaterialPreferences(chromeEnvironment),
+				background
+			)
+		: { backgroundColor: background };
 	return {
 		width: candidate ? 1280 : launch ? 440 : 1180,
 		height: candidate ? 800 : launch ? 600 : 760,
@@ -122,19 +142,19 @@ export function lockedBrowserWindowOptions(
 			: chrome.mode === 'nativeTrafficLights'
 				? {
 						acceptFirstMouse: true,
-						backgroundColor: theme.values['color.background.canvas'],
+						...material,
 						title: PRODUCT_WINDOW_TITLE,
 						titleBarStyle: 'hidden' as const,
 						titleBarOverlay: true
 					}
 				: {
-						backgroundColor: theme.values['color.background.canvas'],
+						...material,
 						frame: false,
 						title: PRODUCT_WINDOW_TITLE,
 						titleBarStyle: 'hidden' as const,
 						titleBarOverlay: {
-							color: theme.values['color.background.canvas'],
-							symbolColor: theme.colors['titleBar.activeForeground'] ?? theme.values['color.text.primary'],
+							color: material.backgroundMaterial === 'mica' ? '#00000000' : background,
+							symbolColor: palette.colors['titleBar.activeForeground'] ?? palette.values['color.text.primary'],
 							height: chrome.titlebarHeight - 1
 						}
 					}),
@@ -154,6 +174,27 @@ export function lockedBrowserWindowOptions(
 	};
 }
 
+function launchThemeName(dark: boolean): string {
+	return dark ? PROCTOR_SCHEME_THEME_NAMES.dark : PROCTOR_SCHEME_THEME_NAMES.light;
+}
+
+/** LaunchWindow's opaque color: the Proctor palette it renders with. */
+function launchBackground(dark: boolean): string {
+	return getTheme(launchThemeName(dark)).values['color.background.canvas'];
+}
+
+function launchMaterialPreferences(environment: ElectronWindowChromeEnvironment): {
+	readonly reducedTransparency: boolean;
+	readonly highContrast: boolean;
+} {
+	return {
+		reducedTransparency: environment.reducedTransparency === true,
+		highContrast:
+			environment.initialTheme === 'highContrastDark' ||
+			environment.initialTheme === 'highContrastLight'
+	};
+}
+
 export function electronWindowChromeEnvironment(): ElectronWindowChromeEnvironment {
 	const platform: ElectronPlatform =
 		process.platform === 'darwin' || process.platform === 'win32' ? process.platform : 'linux';
@@ -161,6 +202,8 @@ export function electronWindowChromeEnvironment(): ElectronWindowChromeEnvironme
 		platform,
 		locale: app.isReady() ? app.getLocale() : 'en',
 		macOsRelease: release(),
+		osRelease: release(),
+		reducedTransparency: nativeTheme.prefersReducedTransparency,
 		initialTheme: nativeTheme.shouldUseHighContrastColors
 			? nativeTheme.shouldUseDarkColors
 				? 'highContrastDark'
@@ -213,6 +256,16 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 						event.preventDefault();
 				});
 			}
+			const material =
+				descriptor.kind === 'launch'
+					? new WindowMaterial(window, {
+							platform: chromeEnvironment.platform,
+							osRelease: chromeEnvironment.osRelease ?? chromeEnvironment.macOsRelease,
+							theme: nativeTheme,
+							background: launchBackground,
+							createGlass: () => createLiquidGlass(this.#options.liquidGlassDirectory)
+						})
+					: undefined;
 			const rendererPath = this.#options.rendererByKind[descriptor.kind];
 			const managed = new ElectronManagedProductWindow(
 				window,
@@ -227,7 +280,8 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 				this.#options.launchIdentity,
 				this.#options.account,
 				this.#options.settings,
-				this.#options.examActivity
+				this.#options.examActivity,
+				material
 			);
 			void window.loadFile(rendererPath).catch(() => {
 				managed.terminate('loadFailed');
@@ -256,6 +310,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 	#accountMenuBridge: AccountMenuIpcBridge | undefined;
 	#settingsNativeBridge: SettingsNativeIpcBridge | undefined;
 	#launchMenu: { dispose(): void } | undefined;
+	#material: WindowMaterial | undefined;
 
 	constructor(
 		window: BrowserWindow,
@@ -270,12 +325,14 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		launchIdentity?: DesktopIdentityCoordinator,
 		account?: AccountService,
 		settings?: UserSettingsSessionService,
-		examActivity?: ExamActivityService
+		examActivity?: ExamActivityService,
+		material?: WindowMaterial
 	) {
 		this.#window = window;
 		this.descriptor = descriptor;
 		this.#bootstrapChannel = bootstrapChannel;
 		this.#intentChannel = intentChannel;
+		this.#material = material;
 		const authorize = (event: IpcMainInvokeEvent): void =>
 			assertProductWindowIpcSender(event, window.webContents, this.#destroyed);
 		const handled: string[] = [];
@@ -307,7 +364,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 						chromeEnvironment.macOsRelease
 					),
 					chromeEnvironment.initialTheme,
-					authorize
+					authorize,
+					material
 				);
 			}
 			if (descriptor.kind === 'launch' && launchIdentity)
@@ -377,7 +435,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#settings,
 				this.#accountMenuBridge,
 				this.#settingsNativeBridge,
-				this.#windowChromeBridge
+				this.#windowChromeBridge,
+				this.#material
 			]) {
 				try {
 					disposable?.dispose();
@@ -451,7 +510,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#settings,
 				this.#accountMenuBridge,
 				this.#settingsNativeBridge,
-			this.#windowChromeBridge
+			this.#windowChromeBridge,
+			this.#material
 		]) {
 			try {
 				disposable?.dispose();

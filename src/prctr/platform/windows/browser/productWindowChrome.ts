@@ -18,6 +18,7 @@ import {
 	validateProductWindowChromeConfiguration,
 	validateProductWindowChromeZoomFactor
 } from '../common/windowChrome.js';
+import type { WindowBackgroundMaterial } from '../common/windowMaterial.js';
 import './productWindowChrome.css';
 
 export const PRODUCT_WINDOW_CHROME_SERVICE = 'prctr.window.chrome';
@@ -45,6 +46,11 @@ export class ProductWindowChrome extends Disposable {
 	): Promise<ProductWindowChrome> {
 		let chrome: ProductWindowChrome | undefined;
 		let pendingFullscreen: boolean | undefined;
+		let pendingMaterial: WindowBackgroundMaterial | undefined;
+		const materialSubscription = client.onDidChangeMaterial((material) => {
+			if (chrome === undefined) pendingMaterial = material;
+			else chrome.#setMaterial(material);
+		});
 		const fullscreenSubscription = client.onDidChangeFullscreen((fullscreen) => {
 			if (chrome === undefined) pendingFullscreen = fullscreen;
 			else chrome.#setFullscreen(fullscreen);
@@ -63,12 +69,16 @@ export class ProductWindowChrome extends Disposable {
 					: Object.freeze({ ...configuration, fullscreen: pendingFullscreen })
 			);
 			chrome._register(fullscreenSubscription);
+			chrome._register(materialSubscription);
 			chrome.#initialize();
+			chrome.#setMaterial(pendingMaterial ?? configuration.material);
 			await chrome.synchronize();
 			return chrome;
 		} catch (error) {
-			if (chrome === undefined) fullscreenSubscription.dispose();
-			else chrome.dispose();
+			if (chrome === undefined) {
+				fullscreenSubscription.dispose();
+				materialSubscription.dispose();
+			} else chrome.dispose();
 			throw error;
 		}
 	}
@@ -207,12 +217,18 @@ export class ProductWindowChrome extends Disposable {
 		return task;
 	}
 
+	/** The page shows the backdrop through itself only while one is active. */
+	#setMaterial(material: WindowBackgroundMaterial): void {
+		this.element.ownerDocument.documentElement.dataset.windowMaterial = material;
+	}
+
 	override dispose(): void {
 		if (this._store.isDisposed) return;
 		for (const element of this.#ownedElements) element.remove();
 		this.element.classList.remove('prctr-product-window-chrome');
 		delete this.element.dataset.chromeMode;
 		delete this.element.dataset.chromePlatform;
+		delete this.element.ownerDocument.documentElement.dataset.windowMaterial;
 		delete this.element.dataset.controlsLocation;
 		delete this.element.dataset.contentDirection;
 		delete this.element.dataset.fullscreen;

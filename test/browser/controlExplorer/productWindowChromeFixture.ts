@@ -27,7 +27,8 @@ const variants: readonly {
 			mode: 'nativeOverlay',
 			controlsLocation: 'right',
 			titlebarHeight: 35,
-			fullscreen: false
+			fullscreen: false,
+			material: 'none' as const
 		}
 	},
 	{
@@ -38,7 +39,8 @@ const variants: readonly {
 			mode: 'nativeOverlay',
 			controlsLocation: 'right',
 			titlebarHeight: 35,
-			fullscreen: false
+			fullscreen: false,
+			material: 'none' as const
 		}
 	},
 	{
@@ -49,7 +51,8 @@ const variants: readonly {
 			mode: 'nativeTrafficLights',
 			controlsLocation: 'left',
 			titlebarHeight: 28,
-			fullscreen: false
+			fullscreen: false,
+			material: 'none' as const
 		}
 	},
 	{
@@ -60,7 +63,8 @@ const variants: readonly {
 			mode: 'nativeTrafficLights',
 			controlsLocation: 'right',
 			titlebarHeight: 32,
-			fullscreen: false
+			fullscreen: false,
+			material: 'none' as const
 		}
 	}
 ]);
@@ -85,6 +89,7 @@ export function productWindowChromeFixture(host: HTMLElement): ControlFixtureRes
 		updates.set(variant.id, variantUpdates);
 		const client: ProductWindowChromeClient = {
 			configuration: async () => variant.configuration,
+			onDidChangeMaterial: () => ({ dispose() {} }),
 			onDidChangeFullscreen: (listener) => {
 				fullscreenListeners.set(variant.id, listener);
 				return {
@@ -327,6 +332,7 @@ async function verifyFailedSetupCleanup(
 			host,
 			{
 				configuration: async () => variants[0]!.configuration,
+				onDidChangeMaterial: () => ({ dispose() {} }),
 				onDidChangeFullscreen: () => ({
 					dispose: () => {
 						fullscreenSubscriptionDisposed = true;
@@ -371,6 +377,7 @@ async function verifyFailedConstructionCleanup(
 			host,
 			{
 				configuration: async () => variants[0]!.configuration,
+				onDidChangeMaterial: () => ({ dispose() {} }),
 				onDidChangeFullscreen: () => ({ dispose() {} }),
 				zoomFactor: () => 1,
 				update: async () => {
@@ -401,6 +408,7 @@ async function verifyDimmedRetry(document: Document): Promise<void> {
 		host,
 		{
 			configuration: async () => variants[0]!.configuration,
+			onDidChangeMaterial: () => ({ dispose() {} }),
 			onDidChangeFullscreen: () => ({ dispose() {} }),
 			zoomFactor: () => 1,
 			update: async (update) => {
@@ -440,6 +448,7 @@ async function verifyDisposalFence(document: Document): Promise<void> {
 		host,
 		{
 			configuration: async () => variants[0]!.configuration,
+			onDidChangeMaterial: () => ({ dispose() {} }),
 			onDidChangeFullscreen: () => ({ dispose() {} }),
 			zoomFactor: () => 1,
 			update: async () => {

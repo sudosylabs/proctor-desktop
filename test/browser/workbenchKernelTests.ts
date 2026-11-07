@@ -87,8 +87,10 @@ function testWindowChromeClient(updates?: ProductWindowChromeUpdate[]): ProductW
 				mode: 'nativeOverlay',
 				controlsLocation: 'right',
 				titlebarHeight: 35,
-				fullscreen: false
+				fullscreen: false,
+				material: 'none' as const
 			}),
+		onDidChangeMaterial: () => ({ dispose() {} }),
 		onDidChangeFullscreen: () => ({ dispose() {} }),
 		zoomFactor: () => 1,
 		update: async (update: ProductWindowChromeUpdate) => {

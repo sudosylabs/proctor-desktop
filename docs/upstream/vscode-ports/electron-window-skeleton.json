@@ -50,7 +50,7 @@
       "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme. LaunchWindow is a fixed 440x600 utility window that cannot be resized, maximized or made fullscreen.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "65a31cc76850963bd6161bb42d3614b0a1afa6ea7f116a49a0d43b61a06bb675"
+      "localSha256": "cdc09fbd80354d612eeae19dc027ff84009fd11ced81b0ff8646d892ca6d4661"
     },
     {
       "upstreamPath": "src/vs/platform/windows/electron-main/windows.ts",
@@ -60,7 +60,7 @@
       "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme. LaunchWindow is a fixed 440x600 utility window that cannot be resized, maximized or made fullscreen.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "65a31cc76850963bd6161bb42d3614b0a1afa6ea7f116a49a0d43b61a06bb675",
+      "localSha256": "cdc09fbd80354d612eeae19dc027ff84009fd11ced81b0ff8646d892ca6d4661",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",
@@ -75,7 +75,7 @@
       "rationale": "Preserve native titlebar color, modal dimming, and physical-height synchronization, the one-pixel Windows border correction, macOS traffic-light centering, Tahoe button geometry, sheet offset, fullscreen notification, retry-safe native update caching, sender authorization, and deterministic teardown behind a product-window-scoped bridge.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronWindowChrome.ts",
-      "localSha256": "5315dc76a0790df940ccadd5155c65497666e1d07662c92a5a0af8aea0a5aacc",
+      "localSha256": "ec6cf18a5af60ddbe3c86611bde6d277a65f917b3b518a4062e667451c1631af",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -99,7 +99,7 @@
       "rationale": "Preserve renderer-to-main theme, modal-dimming, and zoom-aware titlebar updates, forced-color synchronization, disposal fencing, and the macOS first-title workaround while replacing VS Code service decorators and general workbench title services with Proctor's closed chrome client and browser theme service.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/browser/productWindowChrome.ts",
-      "localSha256": "1f9c28e9faa933ad124039603b0e4d22cc3e0cb510947cfff6e1a62cc2ae6b36",
+      "localSha256": "8686c5d4bfca2ab8b9cb0f0a6ab6d03268ef025b3c3c87460c75268606d7b65c",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",

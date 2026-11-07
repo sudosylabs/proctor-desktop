@@ -163,5 +163,8 @@
     "vscode-markdown-languageservice": {
       "vscode-uri": "3.0.7"
     }
+  },
+  "optionalDependencies": {
+    "@vnilink/elg": "0.1.0-rc.1"
   }
 }

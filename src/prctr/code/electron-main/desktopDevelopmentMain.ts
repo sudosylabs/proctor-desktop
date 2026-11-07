@@ -54,7 +54,8 @@ else {
 						launch: join(root, 'launchPreload.cjs'),
 						authenticated: join(root, 'authenticatedPreload.cjs'),
 						candidate: join(root, 'candidatePreload.cjs')
-					}
+					},
+					liquidGlassDirectory: join(root, 'native', 'elg')
 				},
 				nativeKeyModule: join(root, 'desktop_key_custody.node'),
 				callbackBrandingDirectory: join(root, 'branding'),

@@ -1171,6 +1171,24 @@
       "source": "https://www.npmjs.com/package/@electron/asar",
       "license": "MIT",
       "lifecycleScripts": "none"
+    },
+    {
+      "package": "@vnilink/elg",
+      "version": "0.1.0-rc.1",
+      "kind": "production",
+      "purpose": "Attach macOS Liquid Glass behind the LaunchWindow page on macOS 26 and later, with vibrancy and an opaque window as fallbacks.",
+      "owner": "design-system",
+      "source": "https://www.npmjs.com/package/@vnilink/elg/v/0.1.0-rc.1",
+      "license": "MIT",
+      "lifecycleScripts": "none",
+      "processes": ["electron-main"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "A prebuilt macOS Node-API addon adds and removes an AppKit glass view behind one window's content. It accepts only a live window handle from Electron main and never receives renderer input.",
+      "transitiveRisk": "Declares node-gyp-build, which the app never loads: the build stages the package's CommonJS module and this architecture's prebuild, and main loads the addon by path.",
+      "bundleTreatment": "external-platform",
+      "localAlternative": "Electron offers vibrancy but no Liquid Glass API; writing the AppKit bridge again would duplicate this package.",
+      "updateOwner": "design-system",
+      "removalOwner": "design-system"
     }
   ]
 }

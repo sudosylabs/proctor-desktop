@@ -8,6 +8,7 @@ type PackageManifest = {
 	readonly packageManager?: string;
 	readonly dependencies?: Readonly<Record<string, string>>;
 	readonly devDependencies?: Readonly<Record<string, string>>;
+	readonly optionalDependencies?: Readonly<Record<string, string>>;
 	readonly allowScripts?: Readonly<Record<string, boolean>>;
 	readonly scripts?: Readonly<Record<string, string>>;
 };
@@ -42,6 +43,9 @@ export const dependencyCheck: Check = {
 			declared.set(name, { version, kind: 'production' });
 		for (const [name, version] of Object.entries(manifest.devDependencies ?? {}))
 			declared.set(name, { version, kind: 'development' });
+		// Optional dependencies ship on the platforms that can install them, so they are production code.
+		for (const [name, version] of Object.entries(manifest.optionalDependencies ?? {}))
+			declared.set(name, { version, kind: 'production' });
 		for (const [name, declaration] of declared) {
 			const entry = admitted.get(name);
 			if (entry === undefined)

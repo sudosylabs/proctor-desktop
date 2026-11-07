@@ -19,6 +19,13 @@ import {
 	validateProductWindowChromeUpdate
 } from '../common/windowChrome.js';
 import { WINDOW_CHROME_CHANNELS } from '../common/windowChannels.js';
+import type { WindowBackgroundMaterial } from '../common/windowMaterial.js';
+
+/** The window's backdrop, as its owner reports it. */
+export interface ElectronWindowMaterialSource {
+	readonly material: WindowBackgroundMaterial;
+	onDidChange(listener: (material: WindowBackgroundMaterial) => void): { dispose(): void };
+}
 
 export type ElectronPlatform = ProductWindowChromePlatform;
 
@@ -50,6 +57,8 @@ export function resolveProductWindowChromeConfiguration(
 		platform,
 		mode: macos ? 'nativeTrafficLights' : 'nativeOverlay',
 		controlsLocation: macos && isRightToLeftLocale(locale) ? 'right' : macos ? 'left' : 'right',
+		// The bridge reports the live material; a window without an owner has none.
+		material: 'none',
 		titlebarHeight: macos
 			? isTahoeOrNewer(macOsRelease)
 				? MACOS_TAHOE_PRODUCT_TITLEBAR_HEIGHT
@@ -65,6 +74,8 @@ export class ElectronWindowChromeBridge {
 	readonly #ipc: Pick<typeof ipcMain, 'handle' | 'removeHandler'>;
 	readonly #target: ElectronWindowChromeTarget;
 	readonly #authorize: (event: IpcMainInvokeEvent) => void;
+	readonly #material: ElectronWindowMaterialSource | undefined;
+	#materialSubscription: { dispose(): void } | undefined;
 	#disposed = false;
 	#lastUpdate:
 		| { readonly theme: ThemeId; readonly titlebarHeight: number; readonly dimmed: boolean; readonly colors?: ProductWindowChromeColors }
@@ -78,13 +89,15 @@ export class ElectronWindowChromeBridge {
 		kind: ChromeCapableProductWindowKind,
 		configuration: ProductWindowChromeConfiguration,
 		initialTheme: ThemeId,
-		authorize: (event: IpcMainInvokeEvent) => void
+		authorize: (event: IpcMainInvokeEvent) => void,
+		material?: ElectronWindowMaterialSource
 	) {
 		this.#ipc = ipc;
 		this.#target = target;
 		this.#channels = WINDOW_CHROME_CHANNELS[kind];
 		this.#configuration = configuration;
 		this.#authorize = authorize;
+		this.#material = material;
 		const handled: string[] = [];
 		try {
 			this.#apply(initialTheme, configuration.titlebarHeight, false);
@@ -94,7 +107,8 @@ export class ElectronWindowChromeBridge {
 				this.#authorize(event);
 				return Object.freeze({
 					...this.#configuration,
-					fullscreen: this.#target.window.isFullScreen()
+					fullscreen: this.#target.window.isFullScreen(),
+					material: this.#material?.material ?? 'none'
 				});
 			});
 			handled.push(this.#channels.configuration);
@@ -104,6 +118,9 @@ export class ElectronWindowChromeBridge {
 				this.#apply(update.theme, update.titlebarHeight, update.dimmed, update.colors);
 			});
 			handled.push(this.#channels.update);
+			this.#materialSubscription = material?.onDidChange((value) => {
+				this.#sendMaterial(value);
+			});
 		} catch (error) {
 			const cleanupErrors = this.#releaseResources(handled.reverse());
 			if (cleanupErrors.length > 0)
@@ -129,6 +146,7 @@ export class ElectronWindowChromeBridge {
 	#releaseResources(channels: readonly string[]): unknown[] {
 		const errors: unknown[] = [];
 		for (const release of [
+			() => this.#materialSubscription?.dispose(),
 			() => this.#target.window.off('leave-full-screen', this.#onDidLeaveFullScreen),
 			() => this.#target.window.off('enter-full-screen', this.#onDidEnterFullScreen),
 			...channels.map((channel) => () => this.#ipc.removeHandler(channel))
@@ -147,6 +165,17 @@ export class ElectronWindowChromeBridge {
 		this.#target.contents.send(this.#channels.fullscreenChanged, fullscreen);
 	}
 
+	#sendMaterial(material: WindowBackgroundMaterial): void {
+		if (this.#disposed || this.#target.contents.isDestroyed()) return;
+		this.#target.contents.send(this.#channels.materialChanged, material);
+		const last = this.#lastUpdate;
+		if (last !== undefined && this.#configuration.mode === 'nativeOverlay') {
+			// The caption buttons' background follows the material, so apply the last update again.
+			this.#lastUpdate = undefined;
+			this.#apply(last.theme, last.titlebarHeight, last.dimmed, last.colors);
+		}
+	}
+
 	#apply(themeId: ThemeId, titlebarHeight: number, dimmed: boolean, colors?: ProductWindowChromeColors): void {
 		if (this.#disposed || this.#target.window.isDestroyed()) return;
 		if (
@@ -160,8 +189,10 @@ export class ElectronWindowChromeBridge {
 			const theme = getTheme(themeId);
 			const background = colors?.background ?? theme.values['color.background.canvas'];
 			const foreground = colors?.foreground ?? theme.colors['titleBar.activeForeground'] ?? theme.values['color.text.primary'];
+			// Over Mica the caption buttons sit on the material itself.
+			const overMica = this.#material?.material === 'mica';
 			this.#target.window.setTitleBarOverlay({
-				color: dimmed ? dimColor(background) : background,
+				color: overMica ? '#00000000' : dimmed ? dimColor(background) : background,
 				symbolColor: dimmed ? dimColor(foreground) : foreground,
 				height: titlebarHeight - 1
 			});

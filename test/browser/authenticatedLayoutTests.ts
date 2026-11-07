@@ -61,9 +61,11 @@ export async function exerciseAuthenticatedLayout(): Promise<void> {
 						mode: isMacintosh ? 'nativeTrafficLights' : 'nativeOverlay',
 						controlsLocation: isMacintosh ? 'left' : 'right',
 						titlebarHeight: 35,
-						fullscreen: false
+						fullscreen: false,
+						material: 'none' as const
 					};
 				},
+				onDidChangeMaterial: () => ({ dispose() {} }),
 				onDidChangeFullscreen() {
 					return { dispose() {} };
 				},

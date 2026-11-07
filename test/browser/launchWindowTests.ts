@@ -115,7 +115,8 @@ export async function runLaunchWindowTests(
 					mode: 'nativeOverlay',
 					controlsLocation: 'right',
 					titlebarHeight: 35,
-					fullscreen: false
+					fullscreen: false,
+					material: 'none' as const
 				};
 			},
 			zoomFactor: () => 1,
@@ -495,7 +496,8 @@ async function verifySnapshotRace(document: Document): Promise<void> {
 				mode: 'nativeOverlay',
 				controlsLocation: 'right',
 				titlebarHeight: 35,
-				fullscreen: false
+				fullscreen: false,
+				material: 'none' as const
 			}),
 			zoomFactor: () => 1,
 			onDidChangeFullscreen: () => ({ dispose() {} }),

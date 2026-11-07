@@ -2,6 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { isWindowBackgroundMaterial, type WindowBackgroundMaterial } from './windowMaterial.js';
 import type { ProductWindowKind } from './windowProtocol.js';
 
 export const DEFAULT_PRODUCT_TITLEBAR_HEIGHT = 35;
@@ -21,6 +22,8 @@ export interface ProductWindowChromeConfiguration {
 	readonly controlsLocation: ProductWindowControlsLocation;
 	readonly titlebarHeight: number;
 	readonly fullscreen: boolean;
+	/** The backdrop behind the page; the page is transparent wherever it should show through. */
+	readonly material: WindowBackgroundMaterial;
 }
 
 export interface ProductWindowChromeColors {
@@ -38,6 +41,9 @@ export interface ProductWindowChromeUpdate {
 export interface ProductWindowChromeClient {
 	configuration(): Promise<ProductWindowChromeConfiguration>;
 	onDidChangeFullscreen(listener: (fullscreen: boolean) => unknown): { dispose(): void };
+	onDidChangeMaterial(listener: (material: WindowBackgroundMaterial) => unknown): {
+		dispose(): void;
+	};
 	zoomFactor(): number;
 	update(value: ProductWindowChromeUpdate): Promise<void>;
 }
@@ -54,7 +60,8 @@ export function validateProductWindowChromeConfiguration(
 		!isControlsLocation(value.controlsLocation) ||
 		!isConfigurationTitlebarHeight(value.titlebarHeight) ||
 		typeof value.fullscreen !== 'boolean' ||
-		Object.keys(value).length !== 5
+		!isWindowBackgroundMaterial(value.material) ||
+		Object.keys(value).length !== 6
 	)
 		throw new TypeError('Invalid product window chrome configuration');
 	return Object.freeze({
@@ -62,7 +69,8 @@ export function validateProductWindowChromeConfiguration(
 		mode: value.mode,
 		controlsLocation: value.controlsLocation,
 		titlebarHeight: value.titlebarHeight,
-		fullscreen: value.fullscreen
+		fullscreen: value.fullscreen,
+		material: value.material
 	});
 }
 

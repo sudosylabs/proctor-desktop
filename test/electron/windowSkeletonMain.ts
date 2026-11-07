@@ -300,6 +300,24 @@ async function run(): Promise<void> {
 						initialTheme: 'dark'
 					})
 				),
+				win32Mica: pickChromeOptions(
+					lockedBrowserWindowOptions('launch', 'preload.cjs', true, undefined, {
+						platform: 'win32',
+						locale: 'en',
+						macOsRelease: '',
+						osRelease: '10.0.22631',
+						initialTheme: 'dark'
+					})
+				),
+				darwinReducedTransparency: pickChromeOptions(
+					lockedBrowserWindowOptions('launch', 'preload.cjs', true, undefined, {
+						platform: 'darwin',
+						locale: 'en',
+						macOsRelease: '25.0.0',
+						reducedTransparency: true,
+						initialTheme: 'light'
+					})
+				),
 				linux: pickChromeOptions(
 					lockedBrowserWindowOptions('launch', 'preload.cjs', true, undefined, {
 						platform: 'linux',
@@ -988,7 +1006,10 @@ function pickChromeOptions(value: Electron.BrowserWindowConstructorOptions): unk
 		maximizable: value.maximizable,
 		minimizable: value.minimizable,
 		movable: value.movable,
-		resizable: value.resizable
+		resizable: value.resizable,
+		transparent: value.transparent,
+		vibrancy: value.vibrancy,
+		backgroundMaterial: value.backgroundMaterial
 	};
 }
 
