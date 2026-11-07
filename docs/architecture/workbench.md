@@ -47,33 +47,51 @@ Account is its own space, opened by the account photo at the bottom of the area
 rail; the photo carries the accent ring while Account is open. Its sidebar lists
 Profile, Sign-in and security, Sessions and devices, Access tokens and Settings,
 then Sign out. Settings opens its existing modal over the current page; the
-registered Settings shortcut opens it too. Access tokens has no page yet and
-shows Sessions and devices until it does. A sign-out failure is reported beside
+registered Settings shortcut opens it too. A sign-out failure is reported beside
 Sign out. There is no titlebar account trigger or account popup menu.
 
-Account hosts Profile, Sign-in and security, and Sessions through one
-registered WorkbenchItem resolver and cancellable pane. Profile-photo reads,
-uploads, and removals use the signed-in User and exact image revision. Other
-presentation fields use the server’s administrative User management operation;
-the own-account destination presents them read-only. Account data is
-window-session state and is never restored as authoritative data.
+Each Account page is one registered WorkbenchItem resolved into one cancellable
+pane: a heading, a one-line description, any page action, then titled sections.
+Sections read independently through the bound account capability and present
+their own loading, empty, failed and stale states; a failed refresh keeps what
+was shown. Account data is window-session state and is never restored.
 
-Profile presents identity and photo actions, read-only account details, then
-sign-in and security. Photo selection uses the native image chooser and an
-ephemeral, bounded local crop draft before explicit Save. Cancellation before
-submission leaves the saved photo unchanged. The server's normalized rendition
-updates both the page and account trigger after confirmation. Revision conflicts
-require review of the refreshed photo; uncertain outcomes reconcile before retry.
+- Profile shows the photo, name and username, then the read-only account details
+  the institution manages: name, email with its verification state, language,
+  time zone, and the last sign-in, which is this window's own session. An
+  unverified email offers a verification request whose reply never reveals
+  delivery. Exam records due for deletion appear only when the retention read
+  returns notices; notices carry identifiers rather than exam titles, so each is
+  named by its record category and dates.
+- Sign-in and security lists the password and linked providers, two-step
+  verification and remaining recovery codes, and opens the hosted security page.
+- Sessions and devices separates this computer's session, other sessions and
+  registered desktops.
+- Access tokens lists working tokens apart from disabled, expired and revoked
+  ones, and creates tokens.
+
+Row actions are never inline: a row with actions has one actions button that
+opens the window menu. Destructive items are marked and always confirmed in a
+modal alert dialog that explains the consequence; ending this computer's
+session is signing out. Dialogs are native modal dialogs that make the window
+inert, trap focus, and return it to their opener. One change runs at a time.
+An unknown outcome locks the affected row until its list is read again.
+
+Photo selection uses the native image chooser and an ephemeral, bounded local
+crop draft before explicit Save. Cancellation before submission leaves the saved
+photo unchanged. The server's normalized rendition updates both the page and the
+rail photo after confirmation. A revision conflict adopts the refreshed revision
+only when the person saves again; uncertain outcomes reconcile before retry.
 The current server projection does not distinguish custom and default photos,
 so Remove is shown only for a revision observed after a confirmed upload in this
 window session. Never infer that state from the image or its URL.
 
-Sessions separates the current session, other sessions, and registered desktops.
-Rows expose their own actions; the page's own detail panel discloses
-available metadata without inventing location or device facts. Profile does not
-provide secondary content. Section reads fail independently and refresh retains
-previously displayed information. Pending actions and their feedback stay local
-to the affected item; the privileged account service serializes mutations.
+A new token states its name, what it can do and an expiry. The server publishes
+no scope catalogue, so the window offers only the scope its contract names and
+shows any other scope as the server spells it. The window holds no Academic Unit
+list, so it cannot limit a new token to one unit. The one-time credential lives
+only in its dialog: it is copied through the window's privileged clipboard, is
+never stored, logged or announced, and leaves the page when the dialog closes.
 
 A capability specific to AuthenticatedWindow binds every read or action to its
 immutable Principal and Session. The privileged identity owner supplies DPoP
@@ -81,10 +99,8 @@ proof and refresh; the renderer receives whitelisted account metadata. Passwords
 MFA enrollment, and recovery stay on the pinned server's hosted security page.
 That browser session does not renew the desktop session's authentication assurance.
 
-Ending a session or revoking a desktop requires an explicit confirmation.
-Revoking the current desktop uses the same immediate window teardown and protected
-credential cleanup as sign-out, with server revocation already confirmed.
-Unknown mutation outcomes require a fresh read before another attempt.
+This computer's own desktop registration has no remove action; another
+registered desktop is removed only after confirmation.
 
 ## Authenticated product areas
 
