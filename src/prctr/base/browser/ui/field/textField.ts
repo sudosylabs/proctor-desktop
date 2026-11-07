@@ -4,7 +4,14 @@ import { addDisposableListener } from '../../dom.js';
 import './textField.css';
 
 export interface TextFieldState { readonly value: string; readonly disabled?: boolean; readonly readOnly?: boolean; readonly unavailable?: boolean; readonly unavailableMessage?: string; readonly required?: boolean; readonly error?: string; }
-export interface TextFieldOptions extends TextFieldState { readonly label: string; readonly description?: string; readonly inputMode?: HTMLInputElement['inputMode']; readonly autocomplete?: AutoFill; }
+export interface TextFieldOptions extends TextFieldState {
+  readonly label: string;
+  readonly description?: string;
+  readonly inputMode?: HTMLInputElement['inputMode'];
+  readonly autocomplete?: AutoFill;
+  /** Fixed text shown inside the box before the value, such as a URL scheme. It is not part of the value. */
+  readonly prefix?: string;
+}
 
 let fieldSequence = 0;
 export class TextFieldControl extends Disposable {
@@ -19,7 +26,8 @@ export class TextFieldControl extends Disposable {
     const description = document.createElement('p'); description.className = 'prctr-text-field__description'; description.id = `${id}-description`; description.textContent = options.description ?? '';
     this.#error = document.createElement('p'); this.#error.className = 'prctr-text-field__error'; this.#error.id = `${id}-error`;
     this.#unavailable = document.createElement('p'); this.#unavailable.className = 'prctr-text-field__unavailable'; this.#unavailable.id = `${id}-unavailable`;
-    this.element.append(label, this.input, description, this.#error, this.#unavailable); host.append(this.element);
+    this.element.append(label, this.#createBox(document, options.prefix), description, this.#error, this.#unavailable);
+    host.append(this.element);
     this._register(addDisposableListener(this.input, 'input', () => this.#change.fire(this.input.value)));
     this.setState(options);
   }
@@ -33,5 +41,20 @@ export class TextFieldControl extends Disposable {
     this.input.setAttribute('aria-describedby', describedBy); this.element.dataset.state = state.unavailable ? 'unavailable' : state.disabled ? 'disabled' : state.readOnly ? 'readonly' : state.error ? 'invalid' : 'ready';
   }
   focus(): void { this.input.focus(); }
+
+  /** The input alone, or the input inside a box that also shows the fixed prefix. */
+  #createBox(document: Document, prefix: string | undefined): HTMLElement {
+    if (prefix === undefined) {
+      return this.input;
+    }
+    const box = document.createElement('div');
+    box.className = 'prctr-text-field__box';
+    const prefixElement = document.createElement('span');
+    prefixElement.className = 'prctr-text-field__prefix';
+    prefixElement.setAttribute('aria-hidden', 'true');
+    prefixElement.textContent = prefix;
+    box.append(prefixElement, this.input);
+    return box;
+  }
   override dispose(): void { if (this.#disposed) return; this.#disposed = true; super.dispose(); this.element.remove(); }
 }

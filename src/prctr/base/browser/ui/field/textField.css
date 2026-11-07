@@ -24,6 +24,37 @@
 		min-inline-size: 0;
 		padding: var(--prctr-spacing-control-block) var(--prctr-spacing-control-inline);
 	}
+	/* With a prefix, the box draws the field and the input inside it is bare. */
+	.prctr-text-field .prctr-text-field__box {
+		align-items: center;
+		background: var(--prctr-theme-input-background);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-theme-input-border, transparent);
+		border-radius: var(--prctr-shape-radius-small);
+		display: flex;
+		min-inline-size: 0;
+	}
+	.prctr-text-field .prctr-text-field__prefix {
+		color: var(--prctr-theme-input-placeholderForeground);
+		flex: none;
+		padding-inline-start: var(--prctr-spacing-control-inline);
+		user-select: none;
+	}
+	.prctr-text-field .prctr-text-field__box .prctr-text-field__input {
+		background: transparent;
+		border: 0;
+		border-radius: 0;
+		flex: 1;
+		outline: none;
+		padding-inline-start: 1px;
+	}
+	.prctr-text-field .prctr-text-field__box:focus-within {
+		border-color: var(--prctr-color-border-focus);
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
+	}
+	.prctr-text-field[data-state='invalid'] .prctr-text-field__box {
+		border-color: var(--prctr-theme-inputValidation-errorBorder);
+	}
 	.prctr-text-field .prctr-text-field__input::placeholder {
 		color: var(--prctr-theme-input-placeholderForeground);
 	}
@@ -31,6 +62,10 @@
 		border-color: var(--prctr-color-border-focus);
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: 1px;
+	}
+	/* The box shows focus for an input inside it. */
+	.prctr-text-field .prctr-text-field__box .prctr-text-field__input:focus-visible {
+		outline: none;
 	}
 	.prctr-text-field[data-state='invalid'] .prctr-text-field__input {
 		border-color: var(--prctr-theme-inputValidation-errorBorder);
@@ -63,6 +98,7 @@
 		opacity: 0.72;
 	}
 	@media (forced-colors: active) {
+		.prctr-text-field .prctr-text-field__box:focus-within,
 		.prctr-text-field .prctr-text-field__input:focus-visible {
 			border-color: Highlight;
 			outline-color: Highlight;
