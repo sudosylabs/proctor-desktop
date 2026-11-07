@@ -123,10 +123,11 @@ void test('three product windows use isolated capability-specific preloads and l
 		assert.equal(options.title, 'Proctor');
 		assert.equal(options.backgroundColor, '#1b1c1f');
 		assert.equal(options.titleBarStyle, 'hidden');
+		// LaunchWindow keeps the design's 32 px title bar; the overlay leaves its bottom pixel to the page.
 		assert.deepEqual(options.titleBarOverlay, {
 			color: '#1b1c1f',
 			symbolColor: '#ededee',
-			height: 34
+			height: 31
 		});
 	}
 	// Windows 11 shows Mica, with the caption buttons on the material.
@@ -135,7 +136,7 @@ void test('three product windows use isolated capability-specific preloads and l
 	assert.deepEqual(result.windowChromeOptions.win32Mica!.titleBarOverlay, {
 		color: '#00000000',
 		symbolColor: '#ededee',
-		height: 34
+		height: 31
 	});
 	assert.deepEqual(result.windowChromeOptions.candidate, {
 		width: 1280,

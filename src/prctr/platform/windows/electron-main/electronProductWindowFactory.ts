@@ -101,7 +101,8 @@ export function lockedBrowserWindowOptions(
 	const chrome = resolveProductWindowChromeConfiguration(
 		chromeEnvironment.platform,
 		chromeEnvironment.locale,
-		chromeEnvironment.macOsRelease
+		chromeEnvironment.macOsRelease,
+		candidate ? undefined : kind
 	);
 	const theme = getTheme(chromeEnvironment.initialTheme);
 	// LaunchWindow renders with the Proctor palette, so its native colors come from it too.
@@ -361,7 +362,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 					resolveProductWindowChromeConfiguration(
 						chromeEnvironment.platform,
 						chromeEnvironment.locale,
-						chromeEnvironment.macOsRelease
+						chromeEnvironment.macOsRelease,
+						descriptor.kind
 					),
 					chromeEnvironment.initialTheme,
 					authorize,

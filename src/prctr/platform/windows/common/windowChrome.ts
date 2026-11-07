@@ -8,6 +8,10 @@ import type { ProductWindowKind } from './windowProtocol.js';
 export const DEFAULT_PRODUCT_TITLEBAR_HEIGHT = 35;
 export const MACOS_PRODUCT_TITLEBAR_HEIGHT = 28;
 export const MACOS_TAHOE_PRODUCT_TITLEBAR_HEIGHT = 32;
+/** LaunchWindow's title bar on macOS, from the accepted LaunchWindow design. */
+export const LAUNCH_MACOS_TITLEBAR_HEIGHT = 36;
+/** LaunchWindow's title bar on Windows and Linux, from the accepted LaunchWindow design. */
+export const LAUNCH_TITLEBAR_HEIGHT = 32;
 export const MACOS_TRAFFIC_LIGHT_INSET = 70;
 export const PRODUCT_WINDOW_TITLE = 'Proctor';
 

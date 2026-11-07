@@ -10,6 +10,8 @@ import { isTahoeOrNewer } from '../../../base/common/platform.js';
 import { getTheme, type ThemeId } from '../../theme/common/themes.js';
 import {
 	DEFAULT_PRODUCT_TITLEBAR_HEIGHT,
+	LAUNCH_MACOS_TITLEBAR_HEIGHT,
+	LAUNCH_TITLEBAR_HEIGHT,
 	MACOS_PRODUCT_TITLEBAR_HEIGHT,
 	MACOS_TAHOE_PRODUCT_TITLEBAR_HEIGHT,
 	type ChromeCapableProductWindowKind,
@@ -50,16 +52,21 @@ export interface ElectronWindowChromeTarget {
 export function resolveProductWindowChromeConfiguration(
 	platform: ElectronPlatform,
 	locale: string,
-	macOsRelease: string
+	macOsRelease: string,
+	kind?: ChromeCapableProductWindowKind
 ): ProductWindowChromeConfiguration {
 	const macos = platform === 'darwin';
+	// LaunchWindow keeps the accepted design's title bar on every release.
+	const launchHeight = macos ? LAUNCH_MACOS_TITLEBAR_HEIGHT : LAUNCH_TITLEBAR_HEIGHT;
 	return Object.freeze({
 		platform,
 		mode: macos ? 'nativeTrafficLights' : 'nativeOverlay',
 		controlsLocation: macos && isRightToLeftLocale(locale) ? 'right' : macos ? 'left' : 'right',
 		// The bridge reports the live material; a window without an owner has none.
 		material: 'none',
-		titlebarHeight: macos
+		titlebarHeight: kind === 'launch'
+			? launchHeight
+			: macos
 			? isTahoeOrNewer(macOsRelease)
 				? MACOS_TAHOE_PRODUCT_TITLEBAR_HEIGHT
 				: MACOS_PRODUCT_TITLEBAR_HEIGHT
@@ -197,7 +204,8 @@ export class ElectronWindowChromeBridge {
 				height: titlebarHeight - 1
 			});
 		} else {
-			const buttonHeight = this.#configuration.titlebarHeight === 32 ? 14 : 16;
+			// Only the pre-Tahoe standard title bar uses the taller pre-Tahoe button frame.
+			const buttonHeight = this.#configuration.titlebarHeight === MACOS_PRODUCT_TITLEBAR_HEIGHT ? 16 : 14;
 			const offset = Math.floor((titlebarHeight - buttonHeight) / 2);
 			this.#target.window.setWindowButtonPosition(
 				offset === 0 ? null : { x: offset + 1, y: offset }

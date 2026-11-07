@@ -88,7 +88,7 @@
 		flex-direction: column;
 		gap: var(--prctr-launch-gap);
 		min-inline-size: 0;
-		padding: 8px var(--prctr-launch-inset) var(--prctr-spacing-content-large);
+		padding: 10px var(--prctr-launch-inset) var(--prctr-spacing-content-large);
 	}
 
 	.prctr-launch-window .prctr-launch-window__announcer {
