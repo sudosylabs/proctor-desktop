@@ -9,6 +9,7 @@ import { IClipboardService } from '../../../../platform/clipboard/common/clipboa
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
+import { SelectControl } from '../../../../base/browser/ui/select/selectControl.js';
 import { TextFieldControl } from '../../../../base/browser/ui/field/textField.js';
 import { status } from '../../../../base/browser/ui/aria/aria.js';
 import { Disposable, MutableDisposable, toDisposable } from '../../../../base/common/lifecycle.js';
@@ -34,6 +35,7 @@ import { AccountFeedback } from '../widgets/accountFeedback.js';
 import './media/tokenDialogs.css';
 
 const CANCEL_ICON = proctorIconFactory('action.close');
+const SELECT_CARET = proctorIconFactory('action.expand', 14);
 const CREATE_ICON = proctorIconFactory('action.add');
 
 let scopeSequence = 0;
@@ -126,48 +128,50 @@ export class NewTokenDialog extends Disposable {
 			this.scopeList,
 			this.scopeError
 		);
-		this.limit = $('select.prctr-account-token-form__select', {
-			id: `${scopeId}-limit`,
-			attrs: { 'aria-describedby': `${scopeId}-limit-hint` }
-		});
+		// Both lists are Proctor selects, so the chevron keeps its room inside the field.
+		this.limitField = $('div.prctr-account-token-form__field', { hidden: true });
+		this.limit = this._register(
+			new SelectControl<string>(this.limitField, {
+				id: `${scopeId}-limit`,
+				choices: [],
+				value: '',
+				caret: SELECT_CARET
+			})
+		).select;
+		this.limit.setAttribute('aria-describedby', `${scopeId}-limit-hint`);
 		this.limitHint = $('p.prctr-account-token-form__hint', {
 			id: `${scopeId}-limit-hint`,
 			hidden: true,
 			textContent: this.format.text('tokenLimitMore')
 		});
-		this.limitField = $(
-			'div.prctr-account-token-form__field',
-			{ hidden: true },
+		this.limitField.prepend(
 			$('label.prctr-account-token-form__label', {
 				htmlFor: this.limit.id,
 				textContent: this.format.text('tokenLimit')
-			}),
-			this.limit,
-			this.limitHint
+			})
 		);
-		this.expiry = $('select.prctr-account-token-form__select', {
-			id: `${scopeId}-expiry`,
-			required: true
-		});
-		for (const days of tokenExpiryPresets)
-			this.expiry.append(
-				$('option', {
+		this.limitField.append(this.limitHint);
+		const expiryField = $('div.prctr-account-token-form__field');
+		this.expiry = this._register(
+			new SelectControl<string>(expiryField, {
+				id: `${scopeId}-expiry`,
+				choices: tokenExpiryPresets.map((days) => ({
 					value: String(days),
-					selected: days === DEFAULT_TOKEN_EXPIRY,
-					textContent: this.format.text('tokenExpiryOption', {
+					label: this.format.text('tokenExpiryOption', {
 						days,
 						date: this.format.date(tokenExpiry(days, now))
 					})
-				})
-			);
-		const expiryField = $(
-			'div.prctr-account-token-form__field',
-			{},
+				})),
+				value: String(DEFAULT_TOKEN_EXPIRY),
+				caret: SELECT_CARET
+			})
+		).select;
+		this.expiry.required = true;
+		expiryField.prepend(
 			$('label.prctr-account-token-form__label', {
 				htmlFor: this.expiry.id,
 				textContent: this.format.text('tokenExpiry')
-			}),
-			this.expiry
+			})
 		);
 		this.dialog.body.append(
 			fieldset,

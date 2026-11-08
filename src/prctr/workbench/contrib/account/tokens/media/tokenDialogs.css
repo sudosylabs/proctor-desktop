@@ -71,8 +71,7 @@
 		inline-size: 16px;
 		margin: 2px 0 0;
 	}
-	.prctr-account-dialog .prctr-account-token-form__checkbox:focus-visible,
-	.prctr-account-dialog .prctr-account-token-form__select:focus-visible {
+	.prctr-account-dialog .prctr-account-token-form__checkbox:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: 1px;
 	}
@@ -85,14 +84,9 @@
 		display: flex;
 		flex-direction: column;
 	}
-	.prctr-account-dialog .prctr-account-token-form__select {
-		background: var(--prctr-color-background-canvas);
-		block-size: 32px;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
-		border-radius: var(--prctr-workbench-control-radius, 6px);
-		color: var(--prctr-color-text-primary);
-		font: inherit;
-		padding: 0 8px;
+	.prctr-account-dialog .prctr-account-token-form__field > .prctr-select {
+		inline-size: 100%;
+		min-inline-size: 0;
 	}
 	.prctr-account-dialog .prctr-account-token-credential {
 		align-items: center;
