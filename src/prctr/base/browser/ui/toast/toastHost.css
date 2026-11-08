@@ -1,0 +1,110 @@
+@layer controls {
+	.prctr-toast-host {
+		inset-block-end: 20px;
+		inset-inline-end: 20px;
+		max-inline-size: calc(100% - 40px);
+		position: absolute;
+		z-index: 2600;
+	}
+
+	.prctr-toast-host .prctr-toast {
+		align-items: flex-start;
+		background: var(--prctr-color-text-primary);
+		border-radius: 12px;
+		box-shadow: var(--prctr-elevation-overlay);
+		box-sizing: border-box;
+		color: var(--prctr-color-background-canvas);
+		display: flex;
+		font: 13.5px/19px var(--prctr-typography-font-application);
+		gap: 12px;
+		inline-size: 380px;
+		max-inline-size: 100%;
+		padding: 12px 10px 12px 14px;
+	}
+
+	:root[data-prctr-theme='dark'] .prctr-toast-host .prctr-toast {
+		background: #2e3035;
+		color: #ededee;
+	}
+
+	.prctr-toast-host .prctr-toast__icon {
+		display: flex;
+		flex: none;
+		padding-block-start: 1px;
+	}
+
+	.prctr-toast-host .prctr-toast[data-tone='success'] .prctr-toast__icon {
+		color: #62c98c;
+	}
+
+	.prctr-toast-host .prctr-toast[data-tone='failure'] .prctr-toast__icon {
+		color: #ff8a7f;
+	}
+
+	.prctr-toast-host .prctr-toast__text {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 2px;
+		min-inline-size: 0;
+	}
+
+	.prctr-toast-host .prctr-toast__title {
+		font-weight: var(--prctr-typography-weight-medium);
+	}
+
+	.prctr-toast-host .prctr-toast__body {
+		font-size: 13px;
+		opacity: 0.72;
+	}
+
+	.prctr-toast-host .prctr-toast__action,
+	.prctr-toast-host .prctr-toast__close {
+		align-items: center;
+		background: transparent;
+		border: 0;
+		color: inherit;
+		cursor: pointer;
+		display: inline-flex;
+		flex: none;
+		font: inherit;
+		justify-content: center;
+	}
+
+	.prctr-toast-host .prctr-toast__action {
+		background: rgb(255 255 255 / 10%);
+		block-size: 28px;
+		border-radius: 7px;
+		font-size: 12.5px;
+		font-weight: var(--prctr-typography-weight-medium);
+		gap: 6px;
+		padding: 0 10px 0 8px;
+	}
+
+	.prctr-toast-host .prctr-toast__close {
+		block-size: 26px;
+		border-radius: 6px;
+		inline-size: 26px;
+		opacity: 0.72;
+	}
+
+	.prctr-toast-host .prctr-toast__action:hover,
+	.prctr-toast-host .prctr-toast__close:hover {
+		background: rgb(255 255 255 / 14%);
+		opacity: 1;
+	}
+
+	.prctr-toast-host .prctr-toast__action:focus-visible,
+	.prctr-toast-host .prctr-toast__close:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 1px;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-toast-host .prctr-toast {
+			background: Canvas;
+			border: 1px solid CanvasText;
+			color: CanvasText;
+		}
+	}
+}

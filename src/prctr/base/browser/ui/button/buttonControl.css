@@ -1,98 +1,110 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-/* @proctor-vscode-port modern-workbench */
-/* VS Code text-button presentation on Proctor's native button interface.
- * Caller-owned sizing and native disabled/submit semantics are retained. */
+/* Proctor's button: an icon then a label, in five kinds and three sizes. The busy ring takes the
+ * icon's place so the button keeps its width. */
 @layer controls {
 	.prctr-button {
 		align-items: center;
 		background: transparent;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
-		border-radius: var(--prctr-theme-cornerRadius-small);
+		border: var(--prctr-shape-stroke-default) solid transparent;
+		border-radius: 8px;
+		box-sizing: border-box;
 		color: var(--prctr-color-text-primary);
 		cursor: pointer;
 		display: inline-flex;
-		font: normal 12px/16px var(--prctr-typography-font-application);
-		box-sizing: border-box;
-		text-align: center;
-		gap: var(--prctr-spacing-content-small);
+		flex: none;
+		font: var(--prctr-typography-weight-medium) 13.5px/18px
+			var(--prctr-typography-font-application);
+		gap: 6px;
 		justify-content: center;
-		min-block-size: 26px;
+		min-block-size: 34px;
 		min-inline-size: 44px;
-		padding: 4px 8px;
+		padding: 0 14px 0 12px;
 		position: relative;
+		text-align: center;
+		white-space: nowrap;
 	}
 	.prctr-button[hidden] {
 		display: none;
+	}
+	.prctr-button[data-size='small'] {
+		border-radius: 7px;
+		font-size: 13px;
+		min-block-size: 30px;
+		padding: 0 12px 0 10px;
 	}
 	.prctr-button[data-size='large'] {
 		font-size: var(--prctr-typography-body-size);
 		line-height: var(--prctr-typography-body-lineHeight);
 		min-block-size: 40px;
 	}
-	.prctr-button[data-variant='primary'] {
-		background: var(--prctr-theme-button-background);
-		border-color: var(--prctr-theme-button-border, var(--prctr-theme-button-background));
-		color: var(--prctr-theme-button-foreground);
-	}
-	/* The one Proctor-branded primary action on a surface; follows color.brand.* in every theme. */
+	.prctr-button[data-variant='primary'],
 	.prctr-button[data-variant='brand'] {
 		background: var(--prctr-color-brand-accent);
 		border-color: var(--prctr-color-brand-accent);
 		color: var(--prctr-color-brand-onAccent);
 		font-weight: var(--prctr-typography-weight-semibold);
 	}
-	.prctr-button[data-variant='brand']:hover:not(:disabled),
-	.prctr-button[data-variant='brand']:active:not(:disabled) {
+	.prctr-button[data-variant='primary']:hover:not(:disabled),
+	.prctr-button[data-variant='brand']:hover:not(:disabled) {
 		background-color: var(--prctr-color-brand-accentHover);
 		border-color: var(--prctr-color-brand-accentHover);
 	}
 	.prctr-button[data-variant='secondary'] {
-		background: var(--prctr-theme-button-secondaryBackground);
-		border-color: var(
-			--prctr-theme-button-secondaryBorder,
-			var(--prctr-theme-button-border, transparent)
-		);
-		color: var(--prctr-theme-button-secondaryForeground);
+		background: var(--prctr-color-background-raised);
+		border-color: var(--prctr-color-border-strong);
+	}
+	.prctr-button[data-variant='secondary']:hover:not(:disabled) {
+		background: var(--prctr-color-interaction-hover);
+	}
+	.prctr-button[data-variant='ghost'] {
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-button[data-variant='ghost']:hover:not(:disabled) {
+		background: var(--prctr-color-interaction-hover);
+		color: var(--prctr-color-text-primary);
 	}
 	.prctr-button[data-variant='danger'] {
-		background: var(--prctr-color-feedback-errorBackground);
+		background: var(--prctr-color-feedback-error);
 		border-color: var(--prctr-color-feedback-error);
+		color: var(--prctr-color-text-inverse);
+		font-weight: var(--prctr-typography-weight-semibold);
 	}
-	.prctr-button:hover:not(:disabled) {
-		background-color: var(--prctr-theme-button-secondaryHoverBackground);
+	.prctr-button[data-variant='dangerGhost'] {
+		color: var(--prctr-color-feedback-error);
 	}
-	.prctr-button:active:not(:disabled) {
-		background-color: var(--prctr-theme-button-secondaryHoverBackground);
-	}
-	.prctr-button[data-variant='primary']:hover:not(:disabled) {
-		background-color: var(--prctr-theme-button-hoverBackground);
-		border-color: var(--prctr-theme-button-border, var(--prctr-theme-button-hoverBackground));
-	}
-	.prctr-button[data-variant='primary']:active:not(:disabled) {
-		background-color: var(--prctr-theme-button-hoverBackground);
-		border-color: var(--prctr-theme-button-border, var(--prctr-theme-button-hoverBackground));
+	.prctr-button[data-variant='dangerGhost']:hover:not(:disabled) {
+		background: var(--prctr-color-feedback-errorBackground);
 	}
 	.prctr-button:focus-visible {
-		outline: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-focus);
+		outline: 2px solid var(--prctr-color-border-focus);
 		outline-offset: 2px;
 	}
 	.prctr-button:disabled {
 		cursor: default;
-		opacity: 0.4;
+		opacity: 0.45;
 	}
 	.prctr-button .prctr-button__label {
 		overflow-wrap: normal;
 	}
+	.prctr-button[data-busy='true'] > :not(.prctr-button__label, .prctr-button__busy) {
+		display: none;
+	}
 	.prctr-button .prctr-button__busy {
+		animation: prctr-button-spin var(--prctr-motion-duration-slow) linear infinite;
+		block-size: var(--prctr-icon-size-small);
 		border: var(--prctr-shape-stroke-default) solid currentColor;
 		border-inline-end-color: transparent;
 		border-radius: var(--prctr-shape-radius-circle);
-		block-size: var(--prctr-icon-size-small);
 		inline-size: var(--prctr-icon-size-small);
-		animation: prctr-button-spin var(--prctr-motion-duration-slow) linear infinite;
+	}
+	/* With an icon, the ring stands in for it, so the label does not move. */
+	.prctr-button:has(> .prctr-icon) .prctr-button__busy {
+		block-size: 14px;
+		border-width: 1.5px;
+		box-sizing: border-box;
+		flex: none;
+		inline-size: 14px;
+		margin: 1px;
+		order: -1;
 	}
 	@keyframes prctr-button-spin {
 		to {

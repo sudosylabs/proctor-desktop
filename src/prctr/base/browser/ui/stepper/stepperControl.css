@@ -1,0 +1,55 @@
+@layer controls {
+	.prctr-stepper {
+		align-items: center;
+		background: var(--prctr-color-background-raised);
+		block-size: 32px;
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border-radius: 8px;
+		box-sizing: border-box;
+		display: inline-flex;
+		flex: none;
+		gap: 2px;
+		padding: 0 2px;
+	}
+
+	.prctr-stepper .prctr-stepper__button {
+		align-items: center;
+		background: var(--prctr-color-background-surface);
+		block-size: 26px;
+		border: 0;
+		border-radius: 6px;
+		color: var(--prctr-color-text-primary);
+		cursor: pointer;
+		display: inline-flex;
+		inline-size: 26px;
+		justify-content: center;
+		padding: 0;
+	}
+
+	.prctr-stepper .prctr-stepper__button:hover:not(:disabled) {
+		background: var(--prctr-color-interaction-hover);
+	}
+
+	.prctr-stepper .prctr-stepper__button:disabled {
+		cursor: default;
+		opacity: 0.4;
+	}
+
+	.prctr-stepper .prctr-stepper__value {
+		font: 13px/18px var(--prctr-typography-font-monospace);
+		min-inline-size: 54px;
+		text-align: center;
+	}
+
+	.prctr-stepper .prctr-stepper__value:focus-visible {
+		border-radius: 4px;
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 2px;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-stepper {
+			border-color: CanvasText;
+		}
+	}
+}

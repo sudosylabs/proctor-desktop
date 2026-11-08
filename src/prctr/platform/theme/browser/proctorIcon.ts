@@ -70,3 +70,11 @@ export function createProctorIcon(document: Document, state: ProctorIconState): 
 		}
 	};
 }
+
+/** A control icon factory for one Proctor icon, for controls in `base` that take icons. */
+export function proctorIconFactory(
+	id: ProctorIconId,
+	size: ProctorIconSize = 16
+): (document: Document) => ProctorIconControl {
+	return (document) => createProctorIcon(document, { id, size });
+}

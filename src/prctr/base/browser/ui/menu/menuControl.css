@@ -10,11 +10,12 @@
 		max-inline-size: calc(100% - 16px);
 		max-block-size: calc(100% - 16px);
 		overflow: hidden auto;
-		padding: 4px 0;
-		background: var(--prctr-theme-menu-background);
-		color: var(--prctr-theme-menu-foreground);
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-theme-menu-border, transparent);
-		border-radius: var(--prctr-shape-radius-medium);
+		min-inline-size: 200px;
+		padding: 5px;
+		background: var(--prctr-color-background-raised);
+		color: var(--prctr-color-text-primary);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border-radius: 10px;
 		box-shadow: var(--prctr-elevation-overlay);
 	}
 	.prctr-menu button {
@@ -22,19 +23,28 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		font: var(--prctr-typography-body-size)/1 var(--prctr-typography-font-application);
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font: 13.5px/18px var(--prctr-typography-font-application);
 		color: inherit;
 		background: none;
 		border: 0;
+		border-radius: 6px;
 		text-align: start;
-		padding: 0 2em;
-		min-block-size: 24px;
+		padding: 0 10px;
+		min-block-size: 32px;
 		cursor: default;
+	}
+	.prctr-menu .prctr-menu__label {
+		flex: 1;
+		min-inline-size: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	.prctr-menu button:not([aria-disabled='true']):hover,
 	.prctr-menu button:focus {
-		background: var(--prctr-theme-menu-selectionBackground);
-		color: var(--prctr-theme-menu-selectionForeground);
+		background: var(--prctr-color-interaction-hover);
 		outline: none;
 	}
 	.prctr-menu[data-input='keyboard'] button:focus {
@@ -47,6 +57,11 @@
 	}
 	.prctr-menu button[data-destructive='true']:not([aria-disabled='true']) {
 		color: var(--prctr-color-feedback-error);
+		font-weight: var(--prctr-typography-weight-medium);
+	}
+	.prctr-menu button[data-destructive='true']:not([aria-disabled='true']):hover,
+	.prctr-menu button[data-destructive='true']:not([aria-disabled='true']):focus {
+		background: var(--prctr-color-feedback-errorBackground);
 	}
 	.prctr-menu button[aria-checked='true']::before {
 		content: '✓ ';
@@ -59,7 +74,7 @@
 	}
 	.prctr-menu [role='separator'] {
 		border-block-start: var(--prctr-shape-stroke-default) solid
-			var(--prctr-theme-menu-separatorBackground);
-		margin: 5px 0;
+			var(--prctr-color-border-default);
+		margin: 4px 6px;
 	}
 }

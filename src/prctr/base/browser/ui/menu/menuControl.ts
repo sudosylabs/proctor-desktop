@@ -15,8 +15,10 @@ export interface MenuEntry {
 	readonly separatorBefore?: boolean;
 	readonly enabled?: boolean;
 	readonly checked?: boolean;
-	/** Removes or ends something; presented in the error colour. */
+	/** Removes or ends something; presented in the error colour, after a separator, last. */
 	readonly destructive?: boolean;
+	/** The entry's icon, created when the menu shows it and disposed with the row. */
+	readonly icon?: (document: Document) => { readonly element: HTMLElement; dispose(): void };
 	readonly children?: readonly MenuEntry[];
 	readonly run?: () => void | Promise<void>;
 }
@@ -67,7 +69,15 @@ export class MenuControl extends Disposable {
 				const button = root.ownerDocument.createElement('button');
 				button.type = 'button';
 				button.role = item.checked === undefined ? 'menuitem' : 'menuitemcheckbox';
-				button.textContent = item.label;
+				if (item.icon !== undefined) {
+					const icon = item.icon(root.ownerDocument);
+					rowStore.add(icon);
+					button.append(icon.element);
+				}
+				const text = root.ownerDocument.createElement('span');
+				text.className = 'prctr-menu__label';
+				text.textContent = item.label;
+				button.append(text);
 				button.tabIndex = -1;
 				button.setAttribute('aria-disabled', String(item.enabled === false));
 				if (item.destructive) button.dataset.destructive = 'true';

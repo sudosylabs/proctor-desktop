@@ -1,5 +1,6 @@
 import { notificationsFixture } from './notificationsFixture.ts';
 import { controlsFixture } from './sharedControlsFixture.ts';
+import { proctorControlsFixture } from './proctorControlsFixture.ts';
 import { brandLockupFixture } from './brandLockupFixture.ts';
 import { productWindowChromeFixture } from './productWindowChromeFixture.ts';
 import { runLaunchWindowTests } from '../launchWindowTests.ts';
@@ -20,6 +21,11 @@ export interface ControlFixture {
 export const controlExplorerFixtures: readonly ControlFixture[] = Object.freeze([
 	Object.freeze({ id: 'notifications', title: 'Notifications', mount: notificationsFixture }),
 	Object.freeze({ id: 'shared-controls', title: 'Shared controls', mount: controlsFixture }),
+	Object.freeze({
+		id: 'proctor-controls',
+		title: 'Proctor controls',
+		mount: proctorControlsFixture
+	}),
 	Object.freeze({ id: 'brand-lockup', title: 'Brand lockup', mount: brandLockupFixture }),
 	Object.freeze({
 		id: 'product-window-chrome',

@@ -24,7 +24,6 @@ revision, disposition, dependencies, divergence, and evidence):
 - [`electron-window-skeleton`](./electron-window-skeleton.json) — trusted product windows, immutable descriptors, native integrated chrome, preloads, and secure transitions.
 - [`integrated-browser-client`](./integrated-browser-client.json) — policy-enforced Candidate browser and minimized ordered activity.
 - [`localization-runtime`](./localization-runtime.json) — named messages, packaged catalogs, and the private upstream compatibility seam.
-- [`modern-workbench`](./modern-workbench.json) — AuthenticatedWindow floating surfaces, default/compact seams, coordinated insets, resize grips, and Modern UI part spacing.
 - [`performance-foundation`](./performance-foundation.json) — monotonic marks and static local performance budgets.
 - [`platform-commands`](./platform-commands.json) — static command registration, validation, execution, events, and disposal.
 - [`platform-context-conditions`](./platform-context-conditions.json) — parsing, normalization, implication, comparison, regex, and serialization of context expressions.

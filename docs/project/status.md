@@ -68,8 +68,7 @@
 are the required target for VS Code-derived UI and CandidateWindow's shell.
 AuthenticatedWindow instead uses the Proctor-owned
 [rail-and-sidebar frame](../architecture/design-system.md#authenticated-product-presentation);
-the [Modern workbench cluster](../upstream/vscode-ports/modern-workbench.json) now
-covers only the text-button presentation. Account pages (Profile, Sign-in and
+its buttons, menus and form controls are Proctor-owned too. Account pages (Profile, Sign-in and
 security, Sessions and devices) and Activity show detail in their own panels.
 Browser tests cover the frame's areas, history, sidebar resize, persistence and
 narrow overlay. macOS traffic-light placement, Liquid Glass/vibrancy on a

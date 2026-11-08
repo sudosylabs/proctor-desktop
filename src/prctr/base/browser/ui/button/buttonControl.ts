@@ -3,8 +3,13 @@ import { Disposable } from '../../../common/lifecycle.js';
 import { addDisposableListener } from '../../dom.js';
 import './buttonControl.css';
 
-export type ButtonVariant = 'primary' | 'brand' | 'secondary' | 'danger';
-export type ButtonSize = 'default' | 'large';
+/**
+ * `brand` (and its alias `primary`) is the one main action on a surface; `secondary` an ordinary
+ * action; `ghost` a quiet one; `danger` only the confirming action of a destructive dialog;
+ * `dangerGhost` a destructive action that opens such a dialog.
+ */
+export type ButtonVariant = 'primary' | 'brand' | 'secondary' | 'ghost' | 'danger' | 'dangerGhost';
+export type ButtonSize = 'small' | 'default' | 'large';
 export interface ButtonIcon { readonly element: HTMLElement; dispose(): void }
 export interface ButtonState { readonly label: string; readonly accessibleLabel?: string; readonly disabled?: boolean; readonly busy?: boolean; readonly icon?: (document: Document) => ButtonIcon; }
 export interface ButtonOptions extends ButtonState { readonly variant: ButtonVariant; readonly size?: ButtonSize; readonly type?: 'button' | 'submit'; }

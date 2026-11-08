@@ -82,7 +82,6 @@ resources/server-api/openapi.json
 /src/prctr/base/browser/ui/breadcrumbs/breadcrumbsWidget.ts
 /src/prctr/base/browser/ui/button/button.css
 /src/prctr/base/browser/ui/button/button.ts
-/src/prctr/base/browser/ui/button/buttonControl.css
 /src/prctr/base/browser/ui/button/buttonControl.ts
 /src/prctr/base/browser/ui/centered/centeredViewLayout.ts
 /src/prctr/base/browser/ui/codicons/codicon/codicon-modifiers.css

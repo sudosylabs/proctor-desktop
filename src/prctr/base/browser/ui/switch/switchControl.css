@@ -1,0 +1,59 @@
+@layer controls {
+	.prctr-switch {
+		background: var(--prctr-color-border-strong);
+		block-size: 24px;
+		border: 0;
+		border-radius: 12px;
+		cursor: pointer;
+		flex: none;
+		inline-size: 40px;
+		padding: 0;
+		position: relative;
+		transition: background-color var(--prctr-motion-duration-fast) ease;
+	}
+
+	.prctr-switch[aria-checked='true'] {
+		background: var(--prctr-color-brand-accent);
+	}
+
+	.prctr-switch .prctr-switch__knob {
+		background: #ffffff;
+		block-size: 18px;
+		border-radius: 50%;
+		box-shadow: 0 1px 2px rgb(0 0 0 / 25%);
+		inline-size: 18px;
+		inset-block-start: 3px;
+		inset-inline-start: 3px;
+		position: absolute;
+		transition: inset-inline-start var(--prctr-motion-duration-fast) ease;
+	}
+
+	.prctr-switch[aria-checked='true'] .prctr-switch__knob {
+		inset-inline-start: 19px;
+	}
+
+	.prctr-switch:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 2px;
+	}
+
+	.prctr-switch:disabled {
+		cursor: default;
+		opacity: 0.45;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-switch {
+			background: Canvas;
+			border: 1px solid CanvasText;
+		}
+
+		.prctr-switch[aria-checked='true'] {
+			background: Highlight;
+		}
+
+		.prctr-switch .prctr-switch__knob {
+			background: CanvasText;
+		}
+	}
+}

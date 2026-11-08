@@ -29,7 +29,7 @@
       "rationale": "Retain native activation, focus, enabled/busy state, intent events, icon composition, and lifecycle behind a smaller Proctor interface. Adds a Proctor brand variant for the one branded primary action on a surface.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/base/browser/ui/button/buttonControl.ts",
-      "localSha256": "0d4077f3c5754fb13956e0c428fdc5e623310177e7f1ae137a7ee92203d2bcbf"
+      "localSha256": "f15633eabeec29f8e0171a8f70bcae9b9603c84c440b2027d9e961d4f53f9407"
     },
     {
       "upstreamPath": "src/vs/base/browser/ui/inputbox/inputBox.ts",
