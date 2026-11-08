@@ -66,6 +66,12 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 					localization,
 					options.callbackBrandingDirectory
 				),
+				confirmationPages: createDesktopAuthCallbackPages(
+					localization,
+					options.callbackBrandingDirectory,
+					'dark',
+					'confirm'
+				),
 				onAuthenticated: async (identity) => {
 					windows.completeSignIn({
 						kind: 'authenticated',

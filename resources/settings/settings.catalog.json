@@ -1,6 +1,6 @@
 {
   "generatedBy": "settings.registry",
-  "registryFingerprint": "fnv1a64:50f4a625cf517f08",
+  "registryFingerprint": "fnv1a64:a4866316160e9488",
   "settings": [
     {
       "id": "workbench.hover.delay",
@@ -323,7 +323,7 @@
       "titleMessageId": "settings.accessibility.announcements.title",
       "description": "How much Proctor says when something changes.",
       "descriptionMessageId": "settings.accessibility.announcements.description",
-      "default": "auto",
+      "default": "minimal",
       "storage": "portableUser",
       "domain": "accessibility",
       "windows": [

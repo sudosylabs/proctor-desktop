@@ -96,6 +96,8 @@ export interface DesktopAuthorizationOptions {
 	readonly http: DesktopAuthHttp;
 	readonly openBrowser: (url: string) => Promise<void>;
 	readonly callbackPages: LoopbackCallbackPages;
+	/** The same pages worded for Confirm it's you, which never signs anyone in. */
+	readonly confirmationPages: LoopbackCallbackPages;
 	readonly onAuthenticated: (identity: AuthenticatedIdentity) => Promise<void>;
 }
 /** Owns credentials and exchange effects in main; emitted state never contains credentials. */
@@ -904,7 +906,7 @@ export class DesktopAuthorizationService extends Disposable {
 		try {
 			listener = await LoopbackAuthServer.start(
 				state,
-				this.options.callbackPages,
+				this.options.confirmationPages,
 				source.token
 			);
 			const started = await request('/api/v1/auth/desktop/reauthentications', {

@@ -484,7 +484,7 @@ export const SETTINGS_MANIFEST = [
 	{
 		id: 'accessibility.announcementMode',
 		type: 'string',
-		default: 'auto',
+		default: 'minimal',
 		enum: ['auto', 'verbose', 'minimal'],
 		storage: 'portableUser',
 		domain: 'accessibility',

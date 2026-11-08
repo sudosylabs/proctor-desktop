@@ -232,10 +232,16 @@ export const settingsMessages = Object.freeze({
 		defaultMessage: 'Detect automatically',
 		description: 'Screen reader mode choice.'
 	}),
-	announceAuto: defineMessage({
-		id: 'account.settings.announce.auto',
-		defaultMessage: 'Automatic',
-		description: 'Announcement detail choice.'
+	motionFollowSystem: defineMessage({
+		id: 'account.settings.motion.follow.system',
+		defaultMessage: 'Follow {system}',
+		description:
+			'Reduced motion choice: reduce motion only when the operating system asks; {system} is macOS, Windows or Linux.'
+	}),
+	motionAlwaysReduce: defineMessage({
+		id: 'account.settings.motion.always',
+		defaultMessage: 'Always reduce',
+		description: 'Reduced motion choice: reduce motion whatever the operating system says.'
 	}),
 	announceBrief: defineMessage({
 		id: 'account.settings.announce.brief',

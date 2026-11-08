@@ -1,6 +1,6 @@
 {
   "generatedBy": "settings.registry",
-  "registryFingerprint": "fnv1a64:50f4a625cf517f08",
+  "registryFingerprint": "fnv1a64:a4866316160e9488",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": true,
@@ -234,7 +234,7 @@
     },
     "accessibility.announcementMode": {
       "type": "string",
-      "default": "auto",
+      "default": "minimal",
       "enum": [
         "auto",
         "verbose",

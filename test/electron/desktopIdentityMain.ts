@@ -246,6 +246,15 @@ if (probe) {
 							}),
 							join(root, 'branding')
 						),
+						confirmationPages: createDesktopAuthCallbackPages(
+							createLocalization({
+								requestedLocale: 'en',
+								messages: Object.values(callbackPageMessages)
+							}),
+							join(root, 'branding'),
+							'dark',
+							'confirm'
+						),
 						async openBrowser() {
 							browserOpens++;
 							const callback = new URL(String(started.callback_url));

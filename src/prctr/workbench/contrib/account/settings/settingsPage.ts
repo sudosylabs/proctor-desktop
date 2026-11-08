@@ -2,6 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { isMacintosh, isWindows } from '../../../../base/common/platform.js';
 import { IAccountFormatService } from '../accountFormat.js';
 import { IAccountPaneContext } from '../accountPaneContext.js';
 import { ILocalizationService } from '../../../services/localization/common/localization.js';
@@ -430,6 +431,10 @@ export class SettingsPage extends Disposable implements AccountPageView {
 	}
 
 	private choiceLabel(choice: SettingChoice): string {
+		if (choice.label === 'motionFollowSystem')
+			return this.format.text('motionFollowSystem', {
+				system: isMacintosh ? 'macOS' : isWindows ? 'Windows' : 'Linux'
+			});
 		if (choice.label.startsWith('percent:'))
 			return this.format.text('percentValue', { value: Number(choice.label.slice(8)) });
 		if (choice.label.startsWith('number:')) return choice.label.slice(7);
@@ -487,8 +492,13 @@ export class SettingsPage extends Disposable implements AccountPageView {
 			);
 			this.rows.add(stepper.onDidChange((next) => void this.change(row.id, next)));
 		} else if (control.kind === 'segmented') {
-			// Word wrap's other enum values are a kind of On.
-			const selected = row.id === 'editor.wordWrap' && value !== 'off' ? 'on' : String(value);
+			// Word wrap's other enum values are a kind of On; automatic announcements read as Brief.
+			const selected =
+				row.id === 'editor.wordWrap' && value !== 'off'
+					? 'on'
+					: row.id === 'accessibility.announcementMode' && value === 'auto'
+						? 'minimal'
+						: String(value);
 			const segmented = this.rows.add(
 				new SegmentedControl(element, {
 					label: title,

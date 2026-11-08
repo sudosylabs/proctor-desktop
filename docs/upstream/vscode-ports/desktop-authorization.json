@@ -59,10 +59,10 @@
       "upstreamBlob": "3292e2a08fc9f152278d4e9ba9f099eb6418891d",
       "category": "source",
       "disposition": "adapted",
-      "rationale": "Preserves centered container/content, brand, title and subordinate message composition. Static localized HTML is rendered by the privileged owner with escaped strings and embedded assets. Callback received is distinct from verified Session completion. URL-derived product/error/redirect values, script and custom-scheme fallback are excluded by the accepted exact loopback-only flow.",
+      "rationale": "Preserves centered container/content, brand, title and subordinate message composition. Static localized HTML is rendered by the privileged owner with escaped strings and embedded assets. Callback received is distinct from verified Session completion. Confirm it’s you uses the same pages with confirmation wording, since it never signs anyone in. URL-derived product/error/redirect values, script and custom-scheme fallback are excluded by the accepted exact loopback-only flow.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/workbench/node/desktopAuthCallbackPage.ts",
-      "localSha256": "9fe8496942c95e89d200ce9048f56ab1ff2c7ed26f810011f520b2582415d5f4",
+      "localSha256": "d68f0d013c455ecafca12333d2daaff849ecabeb8722ded9e1a19f9f42c2c040",
       "mechanicalTransforms": ["namespace-path-translation", "provenance-marker-insertion"]
     },
     {

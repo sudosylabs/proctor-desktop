@@ -53,14 +53,38 @@ export const callbackPageMessages = {
 		id: 'identity.callback.expired.subtitle',
 		defaultMessage: 'Return to Proctor to check your sign-in.',
 		description: 'The app owns the final Session outcome, including a completed sign-in.'
+	}),
+	confirmInvalidSubtitle: defineMessage({
+		id: 'identity.callback.confirm.invalid.subtitle',
+		defaultMessage: 'This confirmation link could not be verified.',
+		description: 'Safe failure of a Confirm it’s you callback, without echoing input.'
+	}),
+	confirmRetryDetail: defineMessage({
+		id: 'identity.callback.confirm.retry.detail',
+		defaultMessage: 'Return to Proctor and confirm again.',
+		description: 'A fresh confirmation is required; the person stays signed in.'
+	}),
+	confirmExpiredTitle: defineMessage({
+		id: 'identity.callback.confirm.expired.title',
+		defaultMessage: 'This confirmation link is no longer active',
+		description: 'An already used or expired Confirm it’s you callback.'
+	}),
+	confirmExpiredSubtitle: defineMessage({
+		id: 'identity.callback.confirm.expired.subtitle',
+		defaultMessage: 'Return to Proctor to finish your change.',
+		description: 'The app owns the outcome of the confirmation.'
 	})
 };
+
+/** What the browser step was for: signing in, or confirming it is the person before a change. */
+export type CallbackPurpose = 'signIn' | 'confirm';
 
 /** A self-contained page: no requests can race the short-lived callback listener's shutdown. */
 export function createDesktopAuthCallbackPages(
 	localization: LocalizationContext,
 	brandingDirectory: string,
-	themeId: ThemeId = 'dark'
+	themeId: ThemeId = 'dark',
+	purpose: CallbackPurpose = 'signIn'
 ): LoopbackCallbackPages {
 	const theme = getTheme(themeId);
 	const tokens = Object.entries(theme.values)
@@ -86,11 +110,20 @@ export function createDesktopAuthCallbackPages(
 </div></main></body></html>`;
 	const text = (key: keyof typeof callbackPageMessages): string =>
 		localization.format(callbackPageMessages[key]);
+	const confirm = purpose === 'confirm';
 	return Object.freeze({
 		styleHash,
 		received: render(text('receivedTitle'), text('receivedSubtitle'), text('receivedDetail')),
-		invalid: render(text('invalidTitle'), text('invalidSubtitle'), text('retryDetail')),
-		expired: render(text('expiredTitle'), text('expiredSubtitle'), text('receivedDetail'))
+		invalid: render(
+			text('invalidTitle'),
+			text(confirm ? 'confirmInvalidSubtitle' : 'invalidSubtitle'),
+			text(confirm ? 'confirmRetryDetail' : 'retryDetail')
+		),
+		expired: render(
+			text(confirm ? 'confirmExpiredTitle' : 'expiredTitle'),
+			text(confirm ? 'confirmExpiredSubtitle' : 'expiredSubtitle'),
+			text('receivedDetail')
+		)
 	});
 }
 

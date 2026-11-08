@@ -170,7 +170,17 @@ export const settingsLayout: Readonly<Record<SettingsTab, readonly SettingGroup[
 			{
 				title: 'settingsGroupMotion',
 				rows: [
-					{ id: 'accessibility.reducedMotion', control: { kind: 'switch' } },
+					{
+						id: 'accessibility.reducedMotion',
+						// The system's own request always applies; this can only add to it.
+						control: {
+							kind: 'select',
+							choices: [
+								{ value: false, label: 'motionFollowSystem' },
+								{ value: true, label: 'motionAlwaysReduce' }
+							]
+						}
+					},
 					{
 						id: 'workbench.hover.delay',
 						control: {
@@ -205,7 +215,6 @@ export const settingsLayout: Readonly<Record<SettingsTab, readonly SettingGroup[
 						control: {
 							kind: 'segmented',
 							choices: [
-								{ value: 'auto', label: 'announceAuto' },
 								{ value: 'minimal', label: 'announceBrief' },
 								{ value: 'verbose', label: 'announceDetailed' }
 							]

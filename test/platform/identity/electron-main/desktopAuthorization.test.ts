@@ -311,6 +311,7 @@ void test('hosted authorization uses exact wire fields, persists only refresh cu
 		},
 		http,
 		callbackPages,
+		confirmationPages: callbackPages,
 		async openBrowser() {
 			const url = new URL(String(started.callback_url));
 			url.searchParams.set('state', String(started.state));
@@ -382,6 +383,7 @@ void test('a waiting sign-in page can be opened again until the callback arrives
 		},
 		http,
 		callbackPages,
+		confirmationPages: callbackPages,
 		async openBrowser(url) {
 			opened.push(url);
 			if (opened.length === 1) {
@@ -479,6 +481,7 @@ void test('nonce challenge is retried once with a fresh proof, while ambiguous r
 			},
 			http,
 			callbackPages,
+			confirmationPages: callbackPages,
 			async openBrowser() {
 				const url = new URL(String(start.callback_url));
 				url.searchParams.set('state', String(start.state));
@@ -583,6 +586,7 @@ void test('a saved session resumes when the rotated tokens arrive without a new 
 		},
 		http,
 		callbackPages,
+		confirmationPages: callbackPages,
 		async openBrowser() {
 			opened++;
 		},
@@ -656,6 +660,7 @@ void test('ordinary shutdown drains pending rotation and sign-out without restor
 		},
 		http,
 		callbackPages,
+		confirmationPages: callbackPages,
 		async openBrowser() {
 			const url = new URL(String(started.callback_url));
 			url.searchParams.set('state', String(started.state));
@@ -748,6 +753,7 @@ void test('native custody failure stops sign-in before authorization or browser 
 			throw Error('Unexpected request');
 		}),
 		callbackPages,
+		confirmationPages: callbackPages,
 		async openBrowser() {
 			assert.fail('Unexpected browser');
 		},
@@ -833,6 +839,7 @@ void test('sign-out preserves separate local cleanup and remote revocation outco
 			},
 			http,
 			callbackPages,
+			confirmationPages: callbackPages,
 			async openBrowser() {
 				const url = new URL(String(started.callback_url));
 				url.searchParams.set('state', String(started.state));
@@ -1057,6 +1064,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		},
 		http,
 		callbackPages,
+		confirmationPages: callbackPages,
 		async openBrowser(url) {
 			if (url.endsWith('/account/security')) {
 				opened = url;
@@ -1232,6 +1240,7 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 		},
 		http,
 		callbackPages,
+		confirmationPages: callbackPages,
 		async openBrowser(url) {
 			opened.push(url);
 			if (browser === 'wait' && url.includes('/reauthenticate/')) return;
@@ -1400,6 +1409,7 @@ void test('account tokens, email verification and retention notices are bound, s
 		},
 		http,
 		callbackPages,
+		confirmationPages: callbackPages,
 		async openBrowser() {
 			const callback = new URL(String(started.callback_url));
 			callback.searchParams.set('state', String(started.state));

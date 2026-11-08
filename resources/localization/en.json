@@ -1603,12 +1603,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.settings.announce.auto": {
-      "message": "Automatic",
-      "description": "Announcement detail choice.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
-    },
     "account.settings.announce.brief": {
       "message": "Brief",
       "description": "Announcement detail choice.",
@@ -1802,6 +1796,20 @@
       "message": "Relative",
       "description": "Line numbers counted from the cursor line.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.motion.always": {
+      "message": "Always reduce",
+      "description": "Reduced motion choice: reduce motion whatever the operating system says.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.motion.follow.system": {
+      "message": "Follow {system}",
+      "description": "Reduced motion choice: reduce motion only when the operating system asks; {system} is macOS, Windows or Linux.",
+      "placeholders": [
+        "system"
+      ],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.no.match": {
@@ -3393,6 +3401,30 @@
       "description": "Upcoming exam.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
+    },
+    "identity.callback.confirm.expired.subtitle": {
+      "message": "Return to Proctor to finish your change.",
+      "description": "The app owns the outcome of the confirmation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.confirm.expired.title": {
+      "message": "This confirmation link is no longer active",
+      "description": "An already used or expired Confirm it’s you callback.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.confirm.invalid.subtitle": {
+      "message": "This confirmation link could not be verified.",
+      "description": "Safe failure of a Confirm it’s you callback, without echoing input.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
+    },
+    "identity.callback.confirm.retry.detail": {
+      "message": "Return to Proctor and confirm again.",
+      "description": "A fresh confirmation is required; the person stays signed in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/node/desktopAuthCallbackPage.ts"
     },
     "identity.callback.expired.subtitle": {
       "message": "Return to Proctor to check your sign-in.",
