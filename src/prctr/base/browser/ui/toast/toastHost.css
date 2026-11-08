@@ -1,44 +1,46 @@
 @layer controls {
 	.prctr-toast-host {
-		inset-block-end: 20px;
-		inset-inline-end: 20px;
-		max-inline-size: calc(100% - 40px);
+		inset-block-end: 24px;
+		inset-inline-end: 24px;
+		max-inline-size: calc(100% - 48px);
 		position: absolute;
 		z-index: 2600;
 	}
 
 	.prctr-toast-host .prctr-toast {
 		align-items: flex-start;
-		background: var(--prctr-color-text-primary);
+		/* A toast takes the window's own theme; only tooltips are inverse. */
+		background: var(--prctr-color-background-card);
 		border-radius: 12px;
-		box-shadow: var(--prctr-elevation-overlay);
+		box-shadow:
+			0 0 0 1px var(--prctr-color-border-default),
+			var(--prctr-elevation-overlay);
 		box-sizing: border-box;
-		color: var(--prctr-color-background-canvas);
+		color: var(--prctr-color-text-primary);
 		display: flex;
-		font: 13.5px/19px var(--prctr-typography-font-application);
+		font: 13.5px/20px var(--prctr-typography-font-application);
 		gap: 12px;
 		inline-size: 380px;
 		max-inline-size: 100%;
-		padding: 12px 10px 12px 14px;
+		padding: 12px 8px 12px 16px;
 	}
 
 	:root[data-prctr-theme='dark'] .prctr-toast-host .prctr-toast {
-		background: #2e3035;
-		color: #ededee;
+		background: var(--prctr-color-background-raised);
 	}
 
 	.prctr-toast-host .prctr-toast__icon {
 		display: flex;
 		flex: none;
-		padding-block-start: 1px;
+		padding-block-start: 2px;
 	}
 
 	.prctr-toast-host .prctr-toast[data-tone='success'] .prctr-toast__icon {
-		color: #62c98c;
+		color: var(--prctr-color-feedback-success);
 	}
 
 	.prctr-toast-host .prctr-toast[data-tone='failure'] .prctr-toast__icon {
-		color: #ff8a7f;
+		color: var(--prctr-color-feedback-error);
 	}
 
 	.prctr-toast-host .prctr-toast__text {
@@ -54,8 +56,8 @@
 	}
 
 	.prctr-toast-host .prctr-toast__body {
+		color: var(--prctr-color-text-secondary);
 		font-size: 13px;
-		opacity: 0.72;
 	}
 
 	.prctr-toast-host .prctr-toast__action,
@@ -72,8 +74,9 @@
 	}
 
 	.prctr-toast-host .prctr-toast__action {
-		background: rgb(255 255 255 / 10%);
+		background: transparent;
 		block-size: 28px;
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-control);
 		border-radius: 7px;
 		font-size: 12.5px;
 		font-weight: var(--prctr-typography-weight-medium);
@@ -82,21 +85,21 @@
 	}
 
 	.prctr-toast-host .prctr-toast__close {
-		block-size: 26px;
+		block-size: 28px;
 		border-radius: 6px;
-		inline-size: 26px;
-		opacity: 0.72;
+		color: var(--prctr-color-text-tertiary);
+		inline-size: 28px;
 	}
 
 	.prctr-toast-host .prctr-toast__action:hover,
 	.prctr-toast-host .prctr-toast__close:hover {
-		background: rgb(255 255 255 / 14%);
-		opacity: 1;
+		background: var(--prctr-color-interaction-hover);
+		color: var(--prctr-color-text-primary);
 	}
 
 	.prctr-toast-host .prctr-toast__action:focus-visible,
 	.prctr-toast-host .prctr-toast__close:focus-visible {
-		outline: 2px solid currentColor;
+		outline: 2px solid var(--prctr-color-border-focus);
 		outline-offset: 1px;
 	}
 

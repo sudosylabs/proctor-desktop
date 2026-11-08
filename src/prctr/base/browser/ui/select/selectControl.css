@@ -19,7 +19,7 @@
 		cursor: pointer;
 		font: 13px/18px var(--prctr-typography-font-application);
 		inline-size: 100%;
-		padding: 0 32px 0 10px;
+		padding: 0 34px 0 12px;
 	}
 
 	.prctr-select[data-icon] .prctr-select__input {
@@ -49,7 +49,7 @@
 	}
 
 	.prctr-select .prctr-select__caret {
-		inset-inline-end: 10px;
+		inset-inline-end: 12px;
 	}
 
 	@media (forced-colors: active) {
