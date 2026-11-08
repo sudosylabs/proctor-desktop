@@ -34,7 +34,9 @@ void test('a window opened at Settings starts on the Account Settings page', () 
 	assert.deepStrictEqual(model(['exam_management'], 'settings').location, {
 		destination: 'account',
 		activityView: 'overview',
-		accountPage: 'settings'
+		accountPage: 'settings',
+		administrationPage: 'overview',
+		administrationSubject: undefined
 	});
 });
 
@@ -50,7 +52,9 @@ void test('navigation records history and back and forward retrace it', () => {
 	assert.deepStrictEqual(navigation.location, {
 		destination: 'activity',
 		activityView: 'upcoming',
-		accountPage: 'profile'
+		accountPage: 'profile',
+		administrationPage: 'overview',
+		administrationSubject: undefined
 	});
 	assert.ok(navigation.canGoForward);
 	assert.ok(navigation.forward());
@@ -71,4 +75,44 @@ void test('losing an area moves away from it and history skips it', () => {
 	assert.ok(!navigation.canGoBack, 'the removed Activity area is skipped');
 	navigation.setAreas([]);
 	assert.strictEqual(navigation.location.destination, 'account');
+});
+
+void test('an Administration record page keeps its record and back returns to the list', () => {
+	const navigation = model(['administration'], 'administration');
+	assert.ok(navigation.navigate({ administrationPage: 'users' }));
+	assert.ok(
+		navigation.navigate({ administrationPage: 'user', administrationSubject: 'u'.repeat(26) })
+	);
+	assert.deepStrictEqual(
+		[navigation.location.administrationPage, navigation.location.administrationSubject],
+		['user', 'u'.repeat(26)]
+	);
+	assert.ok(
+		navigation.navigate({ administrationPage: 'user', administrationSubject: 'v'.repeat(26) }),
+		'another record is another place'
+	);
+	assert.ok(navigation.back());
+	assert.strictEqual(navigation.location.administrationSubject, 'u'.repeat(26));
+	assert.ok(navigation.navigate({ destination: 'account' }));
+	assert.ok(navigation.back());
+	assert.strictEqual(
+		navigation.location.administrationSubject,
+		'u'.repeat(26),
+		'returning to the area returns to the record'
+	);
+});
+
+void test('a record page without its record opens the list it belongs to', () => {
+	const navigation = model(['administration'], 'administration');
+	navigation.navigate({ administrationPage: 'class' });
+	assert.deepStrictEqual(
+		[navigation.location.administrationPage, navigation.location.administrationSubject],
+		['structure', undefined]
+	);
+	navigation.navigate({ administrationPage: 'users', administrationSubject: 'x'.repeat(26) });
+	assert.strictEqual(
+		navigation.location.administrationSubject,
+		undefined,
+		'a list page carries no record'
+	);
 });

@@ -26,7 +26,7 @@ import { ProductAccess } from './common/productAccess.js';
 import { examActivityMessages as m } from './examActivityMessages.js';
 import './media/examActivity.css';
 
-type Page = 'activity' | 'management' | 'administration';
+type Page = 'activity' | 'management';
 /** Presentation and selection only; identity's bound read capability owns all server requests. */
 export class ExamActivityPane extends Disposable implements WorkbenchPane {
 	readonly element: HTMLElement;
@@ -183,11 +183,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 	setItem(model: ResolvedWorkbenchItem, token: CancellationToken): void {
 		if (token.isCancellationRequested) return;
 		const destination = model.item.logicalIdentity;
-		if (
-			destination !== 'activity' &&
-			destination !== 'management' &&
-			destination !== 'administration'
-		)
+		if (destination !== 'activity' && destination !== 'management')
 			throw new Error('Unknown product page');
 		this.destination = destination;
 		this.view = this.navigation.activityView ?? 'overview';
@@ -235,12 +231,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			);
 			return;
 		}
-		const area =
-			this.destination === 'activity'
-				? 'student_activity'
-				: this.destination === 'management'
-					? 'exam_management'
-					: 'administration';
+		const area = this.destination === 'activity' ? 'student_activity' : 'exam_management';
 		if (!state.context.areas.includes(area)) {
 			this.status.textContent = this.failure = this.text('restricted');
 			return;

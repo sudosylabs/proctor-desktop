@@ -1,0 +1,106 @@
+/* Every AuthenticatedWindow page as drawn in the redesign: a centred column whose width never
+ * grows with the window, a heading with its description and actions, and the page body. */
+@layer contributions {
+	.prctr-page-pane {
+		block-size: 100%;
+		color: var(--prctr-color-text-primary);
+		container-type: inline-size;
+		font-family: var(--prctr-typography-font-application);
+		font-size: 13.5px;
+		line-height: 20px;
+		min-inline-size: 0;
+		position: relative;
+	}
+	/* Doubled so that `hidden` outranks a component rule such as `.prctr-page-pane .x { display: flex }`. */
+	.prctr-page-pane[hidden],
+	.prctr-page-pane [hidden][hidden] {
+		display: none;
+	}
+	/* The shell carries `monaco-workbench`, whose ported rules outline every focused button.
+	   Proctor controls draw their own ring for keyboard focus only. */
+	.prctr-page-pane :focus:not(:focus-visible) {
+		outline: none;
+	}
+	.prctr-page-pane .prctr-page-pane__scroll,
+	.prctr-page-pane .prctr-page-pane__viewport {
+		block-size: 100%;
+	}
+	.prctr-page-pane .prctr-page-pane__viewport {
+		overflow: hidden;
+	}
+	.prctr-page-pane .prctr-page-pane__viewport:focus {
+		outline: none;
+	}
+	/* A wide window adds margin, never line length. */
+	.prctr-page-pane .prctr-page-pane__content {
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+		inline-size: 100%;
+		margin-inline: auto;
+		max-inline-size: calc(760px + 80px);
+		padding: 12px 40px 40px;
+	}
+	.prctr-page-pane[data-width='wide'] .prctr-page-pane__content {
+		max-inline-size: calc(880px + 80px);
+	}
+
+	/* #region Page header */
+	.prctr-page-pane .prctr-page-pane__header {
+		align-items: flex-start;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px 16px;
+	}
+	.prctr-page-pane .prctr-page-pane__heading {
+		display: flex;
+		flex: 1 1 320px;
+		flex-direction: column;
+		gap: 4px;
+		min-inline-size: 0;
+	}
+	.prctr-page-pane .prctr-page-pane__title {
+		font-size: 26px;
+		font-weight: var(--prctr-typography-weight-semibold);
+		letter-spacing: -0.015em;
+		line-height: 34px;
+		margin: 0;
+	}
+	.prctr-page-pane .prctr-page-pane__title:focus {
+		outline: none;
+	}
+	.prctr-page-pane .prctr-page-pane__title:focus-visible {
+		border-radius: 4px;
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 2px;
+	}
+	.prctr-page-pane .prctr-page-pane__description {
+		color: var(--prctr-color-text-secondary);
+		font-size: 14px;
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+	.prctr-page-pane .prctr-page-pane__header-actions {
+		align-items: center;
+		display: flex;
+		flex: none;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.prctr-page-pane .prctr-page-pane__header-actions:empty {
+		display: none;
+	}
+	.prctr-page-pane .prctr-page-pane__body {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+	/* #endregion */
+
+	@container (max-width: 560px) {
+		.prctr-page-pane .prctr-page-pane__content {
+			padding-inline: 16px;
+		}
+	}
+}

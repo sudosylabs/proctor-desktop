@@ -24,7 +24,7 @@ import {
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { AccountConfirmation } from '../widgets/accountConfirmation.js';
 import type { AccountMessage } from '../accountMessages.js';
-import type { AccountPageView } from '../accountPages.js';
+import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import { AccountRead } from '../widgets/accountRead.js';
 import {
 	PageSection,
@@ -41,7 +41,7 @@ const OTHERS = 'session:*';
  * confirmed first. After an unknown outcome a row stays locked until its list is
  * read again.
  */
-export class SessionsPage extends Disposable implements AccountPageView {
+export class SessionsPage extends Disposable implements PageView {
 	private readonly sessions: AccountRead<'sessions'>;
 	private readonly desktops: AccountRead<'desktops'>;
 	private readonly current: PageSection;

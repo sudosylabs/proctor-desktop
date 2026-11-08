@@ -33,7 +33,7 @@ import {
 	type HistoryFilters
 } from '../common/accountPresentation.js';
 import type { AccountMessage } from '../accountMessages.js';
-import type { AccountPageView } from '../accountPages.js';
+import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import './media/auditsPage.css';
 
 const groupMessages: Readonly<Record<HistoryEventGroup, AccountMessage>> = Object.freeze({
@@ -59,7 +59,7 @@ type HistoryState =
  * outcome. Another person is never named; where an event came from is shown
  * only for the person's own actions.
  */
-export class AuditsPage extends Disposable implements AccountPageView {
+export class AuditsPage extends Disposable implements PageView {
 	private readonly period: HTMLSelectElement;
 	private readonly group: HTMLSelectElement;
 	private readonly relation: HTMLSelectElement;

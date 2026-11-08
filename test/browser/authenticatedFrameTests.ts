@@ -131,6 +131,9 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 			authenticatedFrameContribution,
 			inertContribution('prctr.authenticated.exams', ['prctr.authenticated.navigation']),
 			inertContribution('prctr.authenticated.account', ['prctr.authenticated.navigation']),
+			inertContribution('prctr.authenticated.administration', [
+				'prctr.authenticated.navigation'
+			]),
 			settingsContribution
 		],
 		{
@@ -300,6 +303,23 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 		check(
 			nav().current === 'activity' && nav().activityView === 'upcoming',
 			'Back command crosses areas'
+		);
+
+		nav().select('administration');
+		check(
+			[...sidebar.querySelectorAll('.prctr-area-sidebar__section-title')]
+				.filter((title) => !title.closest('[hidden]'))
+				.map((title) => title.textContent)
+				.join() === 'People,Organisation,Access,Records,Operations',
+			'Administration groups its pages under their headings'
+		);
+		entry('users')!.click();
+		check(nav().administration.page === 'users', 'Users opens its Administration page');
+		nav().selectAdministrationPage('user', 'u'.repeat(26));
+		check(
+			entry('users')?.getAttribute('aria-current') === 'page' &&
+				nav().administration.subject === 'u'.repeat(26),
+			'A user’s page keeps Users marked in the sidebar'
 		);
 
 		step('Sign out asks first, and a failure stays in the Account sidebar.');

@@ -28,7 +28,7 @@ import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIc
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { AccountConfirmation } from '../widgets/accountConfirmation.js';
 import type { AccountMessage } from '../accountMessages.js';
-import type { AccountPageView } from '../accountPages.js';
+import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import { AccountRead } from '../widgets/accountRead.js';
 import {
 	PageSection,
@@ -54,7 +54,7 @@ const actionIcons: Readonly<Record<TokenAction, ProctorIconId>> = Object.freeze(
  * now and those that are disabled, expired or revoked. Disabling and enabling
  * apply at once; revoking is permanent and confirmed first.
  */
-export class TokensPage extends Disposable implements AccountPageView {
+export class TokensPage extends Disposable implements PageView {
 	private readonly tokens: AccountRead<'tokens'>;
 	/** Names scopes and Academic Units; tokens still show when it cannot be read. */
 	private readonly grantable: AccountRead<'grantableScopes'>;

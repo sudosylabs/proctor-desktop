@@ -31,6 +31,36 @@ export const accountPages = [
 ] as const;
 export type AccountPage = (typeof accountPages)[number];
 
+export const administrationPages = [
+	'overview',
+	'users',
+	'user',
+	'invitations',
+	'imports',
+	'structure',
+	'class',
+	'periods',
+	'roles',
+	'policy',
+	'audits',
+	'retention',
+	'jobs',
+	'mail'
+] as const;
+export type AdministrationPage = (typeof administrationPages)[number];
+
+/** Pages about one record, opened from a list; each needs the record's id. */
+const administrationSubjectPages: readonly AdministrationPage[] = ['user', 'class'];
+
+/** The list a record's page is opened from, which the sidebar marks while the record is shown. */
+export const administrationParents: Readonly<
+	Partial<Record<AdministrationPage, AdministrationPage>>
+> = Object.freeze({ user: 'users', class: 'structure' });
+
+export function administrationPageNeedsSubject(page: AdministrationPage): boolean {
+	return administrationSubjectPages.includes(page);
+}
+
 const areaDestinations: Readonly<Partial<Record<ProductArea, ProductDestination>>> = Object.freeze({
 	student_activity: 'activity',
 	exam_management: 'management',
@@ -42,6 +72,9 @@ export interface AuthenticatedLocation {
 	readonly destination: AuthenticatedDestination;
 	readonly activityView: ActivityView;
 	readonly accountPage: AccountPage;
+	readonly administrationPage: AdministrationPage;
+	/** The record an Administration record page shows, such as a user's id. */
+	readonly administrationSubject: string | undefined;
 }
 
 export interface AuthenticatedLocationChange {
@@ -79,7 +112,9 @@ export class AuthenticatedNavigationModel extends Disposable {
 			destination: this.resolve(initialDestination),
 			activityView: 'overview',
 			// Settings is an Account page; a window opened at Settings starts there.
-			accountPage: initialDestination === 'settings' ? 'settings' : 'profile'
+			accountPage: initialDestination === 'settings' ? 'settings' : 'profile',
+			administrationPage: 'overview',
+			administrationSubject: undefined
 		});
 	}
 
@@ -154,10 +189,29 @@ export class AuthenticatedNavigationModel extends Disposable {
 	}
 
 	private locationFrom(next: Partial<AuthenticatedLocation>): AuthenticatedLocation {
+		const page = next.administrationPage ?? this.current.administrationPage;
+		const subject =
+			next.administrationPage === undefined
+				? this.current.administrationSubject
+				: next.administrationSubject;
+		// A record page without its record shows the list it belongs to.
+		const administration =
+			administrationPageNeedsSubject(page) && subject === undefined
+				? {
+						administrationPage: administrationParents[page] ?? 'overview',
+						administrationSubject: undefined
+					}
+				: {
+						administrationPage: page,
+						administrationSubject: administrationPageNeedsSubject(page)
+							? subject
+							: undefined
+					};
 		return Object.freeze({
 			destination: this.resolve(next.destination ?? this.current.destination),
 			activityView: next.activityView ?? this.current.activityView,
-			accountPage: next.accountPage ?? this.current.accountPage
+			accountPage: next.accountPage ?? this.current.accountPage,
+			...administration
 		});
 	}
 
@@ -186,5 +240,10 @@ function sameLocation(a: AuthenticatedLocation, b: AuthenticatedLocation): boole
 	if (a.destination !== b.destination) return false;
 	if (a.destination === 'activity') return a.activityView === b.activityView;
 	if (a.destination === 'account') return a.accountPage === b.accountPage;
+	if (a.destination === 'administration')
+		return (
+			a.administrationPage === b.administrationPage &&
+			a.administrationSubject === b.administrationSubject
+		);
 	return true;
 }

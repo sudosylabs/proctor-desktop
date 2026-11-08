@@ -19,8 +19,8 @@ import { ExamActivityPane } from './examActivityPane.js';
 import { examActivityMessages as m } from './examActivityMessages.js';
 
 /**
- * Activity, Exams and Administration: statically admitted product pages; the server's
- * context only selects among these destinations.
+ * Activity and Exams: statically admitted product pages; the server's context only selects
+ * among these destinations and decides which areas the rail shows.
  */
 class ExamActivityContribution extends Disposable {
 	constructor(
@@ -36,7 +36,7 @@ class ExamActivityContribution extends Disposable {
 		const access = this._register(new ProductAccess(client));
 		const typeId = 'prctr.authenticated.exams';
 		const items = new Map<string, WorkbenchItem>();
-		for (const destination of ['activity', 'management', 'administration'] as const) {
+		for (const destination of ['activity', 'management'] as const) {
 			const title = localization.format(m[destination]);
 			items.set(destination, {
 				typeId,

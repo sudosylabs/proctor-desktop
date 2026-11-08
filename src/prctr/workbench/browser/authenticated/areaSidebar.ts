@@ -26,6 +26,8 @@ export interface SidebarEntry {
 	/** Every entry has an icon; the current page shows its fill weight. */
 	readonly icon: ProctorIconId;
 	readonly opensDialog?: boolean;
+	/** The heading of the group this entry starts; later entries stay in it until another starts. */
+	readonly group?: AuthenticatedMessage;
 }
 
 export interface SidebarArea {
@@ -162,7 +164,20 @@ export class AreaSidebar extends Disposable {
 		const group = $('div.prctr-area-sidebar__group', {
 			data: { destination: area.destination }
 		});
+		let section: HTMLElement = group;
 		for (const entry of area.entries) {
+			if (entry.group !== undefined) {
+				const id = `${this.host.id}-${area.destination}-${entry.id}-group`;
+				section = $(
+					'div.prctr-area-sidebar__section',
+					{ attrs: { role: 'group', 'aria-labelledby': id } },
+					$('span.prctr-area-sidebar__section-title', {
+						id,
+						textContent: this.text(entry.group)
+					})
+				);
+				group.append(section);
+			}
 			const icon = this._register(
 				createProctorIcon(this.pages.ownerDocument, { id: entry.icon, size: 18 })
 			);
@@ -175,7 +190,7 @@ export class AreaSidebar extends Disposable {
 				badge
 			);
 			if (entry.opensDialog) button.setAttribute('aria-haspopup', 'dialog');
-			group.append(button);
+			section.append(button);
 			entries.set(entry.id, { button, icon, id: entry.icon, badge });
 			this._register(
 				addDisposableListener(button, 'click', () => {

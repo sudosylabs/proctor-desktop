@@ -21,11 +21,15 @@ import { IAccountService } from '../../services/account/common/account.js';
 import { registerProctorAction } from '../../services/actions/common/proctorActions.js';
 import { IAuthenticatedHostService } from '../../services/authenticatedHost/common/authenticatedHost.js';
 import { ILocalizationService } from '../../services/localization/common/localization.js';
+import type { AdministrationLocation } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import {
 	activityViews,
+	administrationPages,
+	administrationParents,
 	AuthenticatedNavigationModel,
 	type AccountPage,
 	type ActivityView,
+	type AdministrationPage,
 	type AuthenticatedDestination,
 	type AuthenticatedLocation,
 	type AuthenticatedLocationChange
@@ -70,7 +74,30 @@ const sidebarAreas: readonly SidebarArea[] = Object.freeze([
 	{
 		destination: 'administration',
 		title: 'administrationTitle',
-		entries: [{ id: 'overview', label: 'overview', icon: 'area.overview' }]
+		entries: [
+			{ id: 'overview', label: 'overview', icon: 'area.overview' },
+			{ id: 'users', label: 'adminUsers', icon: 'admin.users', group: 'adminGroupPeople' },
+			{ id: 'invitations', label: 'adminInvitations', icon: 'admin.invitations' },
+			{ id: 'imports', label: 'adminImports', icon: 'admin.imports' },
+			{
+				id: 'structure',
+				label: 'adminStructure',
+				icon: 'admin.structure',
+				group: 'adminGroupOrganisation'
+			},
+			{ id: 'periods', label: 'adminPeriods', icon: 'admin.periods' },
+			{ id: 'roles', label: 'adminRoles', icon: 'admin.roles', group: 'adminGroupAccess' },
+			{ id: 'policy', label: 'adminPolicy', icon: 'admin.policy' },
+			{
+				id: 'audits',
+				label: 'adminAudits',
+				icon: 'admin.audits',
+				group: 'adminGroupRecords'
+			},
+			{ id: 'retention', label: 'adminRetention', icon: 'admin.retention' },
+			{ id: 'jobs', label: 'adminJobs', icon: 'admin.jobs', group: 'adminGroupOperations' },
+			{ id: 'mail', label: 'adminMail', icon: 'admin.mail' }
+		]
 	},
 	{
 		destination: 'account',
@@ -108,6 +135,9 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 	readonly onDidChangeActivityView: Event<ActivityView> = this.activityViewEmitter.event;
 	private readonly accountPageEmitter = this._register(new Emitter<AccountPage>());
 	readonly onDidChangeAccountPage: Event<AccountPage> = this.accountPageEmitter.event;
+	private readonly administrationEmitter = this._register(new Emitter<AdministrationLocation>());
+	readonly onDidChangeAdministration: Event<AdministrationLocation> =
+		this.administrationEmitter.event;
 	private readonly sidebarVisibilityEmitter = this._register(new Emitter<boolean>());
 	readonly onDidChangeSidebarVisibility: Event<boolean> = this.sidebarVisibilityEmitter.event;
 
@@ -215,6 +245,11 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 		return this.model.location.accountPage;
 	}
 
+	get administration(): AdministrationLocation {
+		const { administrationPage: page, administrationSubject: subject } = this.model.location;
+		return { page, subject };
+	}
+
 	select(destination: string): void {
 		if (destination === 'settings') {
 			this.selectAccountPage('settings');
@@ -230,6 +265,16 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 
 	selectAccountPage(page: AccountPage): void {
 		this.model.navigate({ destination: 'account', accountPage: page });
+	}
+
+	selectAdministrationPage(page: AdministrationPage, subject?: string): void {
+		if (!administrationPages.includes(page) || !this.model.isAvailable('administration'))
+			return;
+		this.model.navigate({
+			destination: 'administration',
+			administrationPage: page,
+			administrationSubject: subject
+		});
 	}
 
 	setProductAreas(areas: readonly string[]): void {
@@ -419,11 +464,15 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 			this.activityViewEmitter.fire(current.activityView);
 		else if (current.destination === 'account' && previous.accountPage !== current.accountPage)
 			this.accountPageEmitter.fire(current.accountPage);
+		else if (current.destination === 'administration')
+			this.administrationEmitter.fire(this.administration);
 	}
 
 	private onSidebarSelect({ destination, entry }: SidebarSelection): void {
 		if (destination === 'activity') this.selectActivityView(entry as ActivityView);
 		else if (destination === 'account') this.selectAccountPage(entry as AccountPage);
+		else if (destination === 'administration')
+			this.selectAdministrationPage(entry as AdministrationPage);
 		else this.select(destination);
 		if (this.overlayOpen) {
 			this.overlayOpen = false;
@@ -569,7 +618,9 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 
 	/** Without product pages, product areas say so and the content area holds no other page. */
 	private renderUnavailable(destination: AuthenticatedDestination): void {
-		const unavailable = !this.productPages && destination !== 'account';
+		// Activity and Exams need the exam-activity capability; Account and Administration have their own.
+		const unavailable =
+			!this.productPages && destination !== 'account' && destination !== 'administration';
 		this.unavailable.show(unavailable ? this.text(destinationTitles[destination]) : undefined);
 		this.paneHost.element.hidden = unavailable;
 		if (unavailable) void this.paneHost.clear().catch(() => undefined);
@@ -579,6 +630,8 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 function entryOf(location: AuthenticatedLocation): string {
 	if (location.destination === 'activity') return location.activityView;
 	if (location.destination === 'account') return location.accountPage;
+	if (location.destination === 'administration')
+		return administrationParents[location.administrationPage] ?? location.administrationPage;
 	return 'overview';
 }
 

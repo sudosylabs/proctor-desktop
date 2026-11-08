@@ -57,6 +57,86 @@ export const authenticatedMessages = Object.freeze({
 		defaultMessage: 'Overview',
 		description: 'Sidebar page that summarizes an area.'
 	}),
+	adminUsers: defineMessage({
+		id: 'authenticated.nav.administration.users',
+		defaultMessage: 'Users',
+		description: 'Administration sidebar page listing people.'
+	}),
+	adminInvitations: defineMessage({
+		id: 'authenticated.nav.administration.invitations',
+		defaultMessage: 'Invitations',
+		description: 'Administration sidebar page listing invitations.'
+	}),
+	adminImports: defineMessage({
+		id: 'authenticated.nav.administration.imports',
+		defaultMessage: 'Imports',
+		description: 'Administration sidebar page for onboarding imports.'
+	}),
+	adminStructure: defineMessage({
+		id: 'authenticated.nav.administration.structure',
+		defaultMessage: 'Structure',
+		description: 'Administration sidebar page for academic units, programmes and classes.'
+	}),
+	adminPeriods: defineMessage({
+		id: 'authenticated.nav.administration.periods',
+		defaultMessage: 'Academic periods',
+		description: 'Administration sidebar page for academic periods.'
+	}),
+	adminRoles: defineMessage({
+		id: 'authenticated.nav.administration.roles',
+		defaultMessage: 'Roles',
+		description: 'Administration sidebar page for roles.'
+	}),
+	adminPolicy: defineMessage({
+		id: 'authenticated.nav.administration.policy',
+		defaultMessage: 'Access policy',
+		description: 'Administration sidebar page for how people sign in.'
+	}),
+	adminAudits: defineMessage({
+		id: 'authenticated.nav.administration.audits',
+		defaultMessage: 'Audits',
+		description: 'Administration sidebar page for the institution’s audit events.'
+	}),
+	adminRetention: defineMessage({
+		id: 'authenticated.nav.administration.retention',
+		defaultMessage: 'Data retention',
+		description: 'Administration sidebar page for how long records are kept.'
+	}),
+	adminJobs: defineMessage({
+		id: 'authenticated.nav.administration.jobs',
+		defaultMessage: 'Jobs',
+		description: 'Administration sidebar page for background jobs.'
+	}),
+	adminMail: defineMessage({
+		id: 'authenticated.nav.administration.mail',
+		defaultMessage: 'Mail',
+		description: 'Administration sidebar page for mail delivery.'
+	}),
+	adminGroupPeople: defineMessage({
+		id: 'authenticated.nav.administration.group.people',
+		defaultMessage: 'People',
+		description: 'Administration sidebar heading over Users, Invitations and Imports.'
+	}),
+	adminGroupOrganisation: defineMessage({
+		id: 'authenticated.nav.administration.group.organisation',
+		defaultMessage: 'Organisation',
+		description: 'Administration sidebar heading over Structure and Academic periods.'
+	}),
+	adminGroupAccess: defineMessage({
+		id: 'authenticated.nav.administration.group.access',
+		defaultMessage: 'Access',
+		description: 'Administration sidebar heading over Roles and Access policy.'
+	}),
+	adminGroupRecords: defineMessage({
+		id: 'authenticated.nav.administration.group.records',
+		defaultMessage: 'Records',
+		description: 'Administration sidebar heading over Audits and Data retention.'
+	}),
+	adminGroupOperations: defineMessage({
+		id: 'authenticated.nav.administration.group.operations',
+		defaultMessage: 'Operations',
+		description: 'Administration sidebar heading over Jobs and Mail.'
+	}),
 	upcoming: defineMessage({
 		id: 'authenticated.nav.upcoming',
 		defaultMessage: 'Upcoming',

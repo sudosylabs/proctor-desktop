@@ -20,7 +20,7 @@ import {
 } from '../common/accountPresentation.js';
 import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
 import type { AccountMessage } from '../accountMessages.js';
-import type { AccountPageView } from '../accountPages.js';
+import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import { AccountRead } from '../widgets/accountRead.js';
 import {
 	PageSection,
@@ -41,7 +41,7 @@ const twoStepMessages: Readonly<Record<TwoStepStatus, AccountMessage>> = Object.
  * Every change happens on the institution's hosted security page in the browser;
  * this window only opens it and never handles a password.
  */
-export class SecurityPage extends Disposable implements AccountPageView {
+export class SecurityPage extends Disposable implements PageView {
 	private readonly security: AccountRead<'security'>;
 	private readonly ways: PageSection;
 	private readonly twoStep: PageSection;

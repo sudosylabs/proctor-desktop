@@ -14,6 +14,11 @@ const authenticatedWorkbenchManifest = Object.freeze({
 			dependencies: Object.freeze(['prctr.authenticated.navigation' as const])
 		}),
 		Object.freeze({
+			id: 'prctr.authenticated.administration' as const,
+			phase: 'ready' as const,
+			dependencies: Object.freeze(['prctr.authenticated.navigation' as const])
+		}),
+		Object.freeze({
 			id: 'prctr.authenticated.exams' as const,
 			phase: 'ready' as const,
 			dependencies: Object.freeze(['prctr.authenticated.navigation' as const])
@@ -32,6 +37,7 @@ const authenticatedWorkbenchManifest = Object.freeze({
 	itemTypes: Object.freeze([
 		'prctr.authenticated.page',
 		'prctr.authenticated.account',
+		'prctr.authenticated.administration',
 		'prctr.authenticated.exams'
 	]),
 	destinations: Object.freeze(['activity', 'management', 'administration', 'account', 'settings'])

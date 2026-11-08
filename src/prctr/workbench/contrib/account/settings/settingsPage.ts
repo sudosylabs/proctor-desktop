@@ -40,7 +40,7 @@ import {
 	type SettingsTab
 } from './common/settingsPresentation.js';
 import type { AccountMessage } from '../accountMessages.js';
-import type { AccountPageView } from '../accountPages.js';
+import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import './media/settingsPage.css';
 import { SCHEME_THEME_NAMES } from '../../../../platform/theme/common/bundledThemes.js';
 import { getTheme } from '../../../../platform/theme/common/themes.js';
@@ -57,7 +57,7 @@ type Value = string | number | boolean;
  * Nobody edits settings.json; a conflicting save from elsewhere is merged by applying this
  * page's pending changes again on top of the newer settings.
  */
-export class SettingsPage extends Disposable implements AccountPageView {
+export class SettingsPage extends Disposable implements PageView {
 	private readonly status: HTMLElement;
 	private readonly statusIcon: ProctorIconControl;
 	private readonly statusText: HTMLElement;

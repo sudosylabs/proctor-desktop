@@ -143,7 +143,7 @@ export async function exerciseExamActivity(document: Document): Promise<void> {
 		);
 		result.navigation.selectActivityView?.('overview');
 		result.navigation.select('account');
-		await eventually(() => !!root.querySelector('.prctr-account__header'));
+		await eventually(() => !!root.querySelector('.prctr-page-pane__header'));
 		check(!detailsOpen(), 'Account navigation clears exam details');
 		result.navigation.select('management');
 		await eventually(() => !!root.textContent?.includes('Your management access'));
@@ -159,7 +159,7 @@ export async function exerciseExamActivity(document: Document): Promise<void> {
 		check(rows().length === 0, 'Refresh removes stale actionable rows');
 		result.navigation.select('account');
 		delayed!({ kind: 'activity', serverTime: '2026-09-21T08:10:00Z', items: sampleExams });
-		await eventually(() => !!root.querySelector('.prctr-account__header'));
+		await eventually(() => !!root.querySelector('.prctr-page-pane__header'));
 		check(rows().length === 0, 'Late activity response cannot revive previous page');
 		fail = false;
 		result.navigation.select('activity');
@@ -262,7 +262,7 @@ async function exerciseObservedExamActivity(document: Document): Promise<void> {
 		await eventually(() => rows().length === 1);
 		check(!listeners.has('page2'), 'Changed pagination boundaries dispose stale later pages');
 		result.navigation.select('account');
-		await eventually(() => !!root.querySelector('.prctr-account__header'));
+		await eventually(() => !!root.querySelector('.prctr-page-pane__header'));
 		check(!listeners.has(''), 'Hidden pages release their data observation');
 		result.navigation.select('activity');
 		await eventually(() => rows().length === 1);

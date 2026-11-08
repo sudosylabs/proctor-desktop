@@ -66,6 +66,24 @@
 		gap: 2px;
 	}
 
+	.prctr-area-sidebar .prctr-area-sidebar__group:has(> .prctr-area-sidebar__section) {
+		gap: 16px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__section {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__section-title {
+		color: var(--prctr-color-text-tertiary);
+		font-size: 11.5px;
+		font-weight: var(--prctr-typography-weight-medium);
+		line-height: 16px;
+		padding: 0 10px 4px;
+	}
+
 	.prctr-area-sidebar .prctr-area-sidebar__group[hidden],
 	.prctr-area-sidebar .prctr-area-sidebar__status[hidden],
 	.prctr-area-sidebar .prctr-area-sidebar__footer[hidden],

@@ -101,11 +101,6 @@ export const examActivityMessages = {
 		defaultMessage: 'Exam management',
 		description: 'Authorized management area.'
 	}),
-	administration: defineMessage({
-		id: 'exams.page.administration',
-		defaultMessage: 'Administration',
-		description: 'Authorized administration area.'
-	}),
 	subtitle: defineMessage({
 		id: 'exams.page.subtitle',
 		defaultMessage: 'Your scheduled exams, attempts and released results.',

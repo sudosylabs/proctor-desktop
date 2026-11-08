@@ -325,7 +325,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		check(root.querySelector('h1')?.textContent === 'Profile', 'Profile has its heading');
 		check(
 			root
-				.querySelector('.prctr-account__description')
+				.querySelector('.prctr-page-pane__description')
 				?.textContent?.includes('Northfield University'),
 			'Profile describes the institution'
 		);
@@ -880,7 +880,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		assign('sessions');
 		await wait(() => root.textContent!.includes('Lab PC 14'), 'narrow sessions');
 		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-		const viewport = root.querySelector<HTMLElement>('.prctr-account__viewport')!;
+		const viewport = root.querySelector<HTMLElement>('.prctr-page-pane__viewport')!;
 		check(
 			viewport.scrollWidth <= viewport.clientWidth + 1,
 			'Narrow account content does not overflow sideways'

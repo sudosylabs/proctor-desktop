@@ -2,8 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import type { IDisposable } from '../../../base/common/lifecycle.js';
 import type { IInstantiationService } from '../../../platform/instantiation/common/instantiation.js';
+import type { PageView } from '../../browser/authenticated/pages/pagePane.js';
 import type { AccountPage } from '../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
 import type { IAccountFormatService } from './accountFormat.js';
 import type { AccountMessage } from './accountMessages.js';
@@ -14,11 +14,6 @@ import { SessionsPage } from './sessions/sessionsPage.js';
 import { SettingsPage } from './settings/settingsPage.js';
 import { TokensPage } from './tokens/tokensPage.js';
 
-/** One Account page in the content area. Its pane shows it and says when it is visible. */
-export interface AccountPageView extends IDisposable {
-	setVisible(visible: boolean): void;
-}
-
 /** How the Account pane titles, describes and creates one of its pages. */
 export interface AccountPageDescriptor {
 	readonly title: AccountMessage;
@@ -28,7 +23,7 @@ export interface AccountPageDescriptor {
 		instantiationService: IInstantiationService,
 		body: HTMLElement,
 		headerActions: HTMLElement
-	): AccountPageView;
+	): PageView;
 }
 
 /** Every Account page, keyed by the sidebar entry that opens it. */

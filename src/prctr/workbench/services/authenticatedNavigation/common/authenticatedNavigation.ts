@@ -7,16 +7,25 @@ import { createDecorator } from '../../../../platform/instantiation/common/insta
 import type {
 	AccountPage,
 	ActivityView,
+	AdministrationPage,
 	AuthenticatedDestination
 } from './authenticatedNavigationModel.js';
 
 export {
 	accountPages,
 	activityViews,
+	administrationPages,
 	type AccountPage,
 	type ActivityView,
+	type AdministrationPage,
 	type AuthenticatedDestination
 } from './authenticatedNavigationModel.js';
+
+/** An Administration page, with the record it shows when it is a record's page. */
+export interface AdministrationLocation {
+	readonly page: AdministrationPage;
+	readonly subject: string | undefined;
+}
 
 export const IAuthenticatedNavigationService = createDecorator<IAuthenticatedNavigationService>(
 	'authenticatedNavigationService'
@@ -31,16 +40,21 @@ export interface IAuthenticatedNavigationService {
 	readonly current: AuthenticatedDestination;
 	readonly activityView: ActivityView;
 	readonly accountPage: AccountPage;
+	readonly administration: AdministrationLocation;
 	/** The destination changed. */
 	readonly onDidChange: Event<AuthenticatedDestination>;
 	/** The Activity page changed while Activity stayed current. */
 	readonly onDidChangeActivityView: Event<ActivityView>;
 	/** The account page changed while Account stayed current. */
 	readonly onDidChangeAccountPage: Event<AccountPage>;
+	/** The Administration page or its record changed while Administration stayed current. */
+	readonly onDidChangeAdministration: Event<AdministrationLocation>;
 	/** Go to an area, Account or Settings; an unavailable area falls back to an available one. */
 	select(destination: string): void;
 	selectActivityView(view: ActivityView): void;
 	selectAccountPage(page: AccountPage): void;
+	/** Opens an Administration page; a record's page, such as one user, names the record. */
+	selectAdministrationPage(page: AdministrationPage, subject?: string): void;
 	/** Replace the product areas with a fresh, server-confirmed projection. */
 	setProductAreas(areas: readonly string[]): void;
 	/** Show a server-access notice in the sidebar, with an optional way to retry. */

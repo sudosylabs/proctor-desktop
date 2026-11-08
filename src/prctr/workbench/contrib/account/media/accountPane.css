@@ -1,103 +1,6 @@
-/* Account pages as drawn in the redesign: a centred column, grouped lists on white cards with a
- * hairline, a small glyph per row, status as a word, and no decorative fills or shadows. */
+/* Account's own page content: the profile identity, details, notices and footnotes. The pane,
+ * sections and rows are the shell's page parts. */
 @layer contributions {
-	.prctr-account {
-		block-size: 100%;
-		color: var(--prctr-color-text-primary);
-		container-type: inline-size;
-		font-family: var(--prctr-typography-font-application);
-		font-size: 13.5px;
-		line-height: 20px;
-		min-inline-size: 0;
-		position: relative;
-	}
-	/* Doubled so that `hidden` outranks a component rule such as `.prctr-account .x { display: flex }`. */
-	.prctr-account[hidden],
-	.prctr-account [hidden][hidden] {
-		display: none;
-	}
-	/* The shell carries `monaco-workbench`, whose ported rules outline every focused button.
-	   Proctor controls draw their own ring for keyboard focus only. */
-	.prctr-account :focus:not(:focus-visible) {
-		outline: none;
-	}
-	.prctr-account .prctr-account__scroll,
-	.prctr-account .prctr-account__viewport {
-		block-size: 100%;
-	}
-	.prctr-account .prctr-account__viewport {
-		overflow: hidden;
-	}
-	.prctr-account .prctr-account__viewport:focus {
-		outline: none;
-	}
-	/* A wide window adds margin, never line length. */
-	.prctr-account .prctr-account__content {
-		box-sizing: border-box;
-		display: flex;
-		flex-direction: column;
-		gap: 24px;
-		inline-size: 100%;
-		margin-inline: auto;
-		max-inline-size: calc(760px + 80px);
-		padding: 12px 40px 40px;
-	}
-	.prctr-account[data-page='history'] .prctr-account__content {
-		max-inline-size: calc(880px + 80px);
-	}
-
-	/* #region Page header */
-	.prctr-account .prctr-account__header {
-		align-items: flex-start;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px 16px;
-	}
-	.prctr-account .prctr-account__heading {
-		display: flex;
-		flex: 1 1 320px;
-		flex-direction: column;
-		gap: 4px;
-		min-inline-size: 0;
-	}
-	.prctr-account .prctr-account__title {
-		font-size: 26px;
-		font-weight: var(--prctr-typography-weight-semibold);
-		letter-spacing: -0.015em;
-		line-height: 34px;
-		margin: 0;
-	}
-	.prctr-account .prctr-account__title:focus {
-		outline: none;
-	}
-	.prctr-account .prctr-account__title:focus-visible {
-		border-radius: 4px;
-		outline: 2px solid var(--prctr-color-border-focus);
-		outline-offset: 2px;
-	}
-	.prctr-account .prctr-account__description {
-		color: var(--prctr-color-text-secondary);
-		font-size: 14px;
-		margin: 0;
-		overflow-wrap: anywhere;
-	}
-	.prctr-account .prctr-account__header-actions {
-		align-items: center;
-		display: flex;
-		flex: none;
-		flex-wrap: wrap;
-		gap: 8px;
-	}
-	.prctr-account .prctr-account__header-actions:empty {
-		display: none;
-	}
-	.prctr-account .prctr-account__body {
-		display: flex;
-		flex-direction: column;
-		gap: 24px;
-	}
-	/* #endregion */
-
 	/* #region Profile */
 	.prctr-account .prctr-account-profile {
 		display: flex;
@@ -264,12 +167,6 @@
 		min-inline-size: 0;
 	}
 	/* #endregion */
-
-	@container (max-width: 560px) {
-		.prctr-account .prctr-account__content {
-			padding-inline: 16px;
-		}
-	}
 
 	@media (forced-colors: active) {
 		.prctr-account .prctr-account-notice,

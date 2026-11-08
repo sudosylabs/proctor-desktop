@@ -13,6 +13,10 @@ import {
 	AccountFormatService,
 	IAccountFormatService
 } from '../../workbench/contrib/account/accountFormat.js';
+import {
+	AdministrationFormatService,
+	IAdministrationFormatService
+} from '../../workbench/contrib/administration/administrationFormat.js';
 import { AuthenticatedFrame } from '../../workbench/browser/authenticated/authenticatedFrame.js';
 import {
 	IPageFormatService,
@@ -64,6 +68,7 @@ export function authenticatedWindowServices(
 		services.set(IAccountService, new SyncDescriptor(AccountService, [preload.account]));
 		services.set(IPageFormatService, new SyncDescriptor(PageFormatService, [Date.now]));
 		services.set(IAccountFormatService, new SyncDescriptor(AccountFormatService));
+		services.set(IAdministrationFormatService, new SyncDescriptor(AdministrationFormatService));
 		if (preload.examActivity !== undefined) {
 			services.set(IExamActivityService, new ExamActivityService(preload.examActivity));
 		}

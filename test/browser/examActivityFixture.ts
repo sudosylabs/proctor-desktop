@@ -108,6 +108,9 @@ export async function mountExamActivityFixture(
 			authenticatedFrameContribution,
 			examActivityContribution,
 			accountContribution,
+			inertContribution('prctr.authenticated.administration', [
+				'prctr.authenticated.navigation'
+			]),
 			inertContribution('prctr.authenticated.settings', ['prctr.authenticated.navigation'])
 		],
 		{

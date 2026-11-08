@@ -28,7 +28,7 @@ import {
 } from '../common/accountPresentation.js';
 import { AccountConfirmation } from '../widgets/accountConfirmation.js';
 import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
-import type { AccountPageView } from '../accountPages.js';
+import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import { AccountPhotoDialog } from './photoDialog.js';
 import { AccountRead } from '../widgets/accountRead.js';
 import {
@@ -55,7 +55,7 @@ type DetailKey =
  * manages, and any exam records due for deletion. The name and details come from
  * the profile read; the last sign-in is this window's own session.
  */
-export class ProfilePage extends Disposable implements AccountPageView {
+export class ProfilePage extends Disposable implements PageView {
 	private readonly profile: AccountRead<'profile'>;
 	private readonly sessions: AccountRead<'sessions'>;
 	private readonly notices: AccountRead<'notices'>;

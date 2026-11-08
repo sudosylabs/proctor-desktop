@@ -2214,6 +2214,274 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
+    "administration.failure.cancelled": {
+      "message": "Cancelled.",
+      "description": "The person cancelled a confirmation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.conflict": {
+      "message": "Someone else changed this first. Look at the latest version and try again.",
+      "description": "A change was refused because the record changed meanwhile.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.expired": {
+      "message": "That took too long. Try again.",
+      "description": "A confirmation expired.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.invalid": {
+      "message": "The server didn’t accept this. Check what you entered.",
+      "description": "A change was refused as invalid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.no.access": {
+      "message": "You don’t have access to this.",
+      "description": "The server refused the read or change for this person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.not.found": {
+      "message": "It no longer exists, or you can no longer see it.",
+      "description": "The record was removed or is outside what this person may see.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.reauthentication": {
+      "message": "Confirm it’s you to make this change.",
+      "description": "The change needs a recent sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.session.ended": {
+      "message": "You were signed out.",
+      "description": "The session ended while the page was open.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.strong": {
+      "message": "This needs a sign-in with two-step verification.",
+      "description": "The change needs a multi-factor session.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.unavailable": {
+      "message": "The server could not be reached.",
+      "description": "A read or change failed because the server did not answer.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.failure.unconfirmed": {
+      "message": "It isn’t known whether this finished. Check before trying again.",
+      "description": "A change was sent but no answer confirmed it.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.audits.description": {
+      "message": "Everything that changed at {institution}, who did it and when.",
+      "description": "One-line description under the Audits heading.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.audits.description.generic": {
+      "message": "Everything that changed, who did it and when.",
+      "description": "Audits description when the institution name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.audits.title": {
+      "message": "Audits",
+      "description": "Heading of the Administration Audits page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.class.title": {
+      "message": "Class",
+      "description": "Heading of the Administration Class page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.imports.description": {
+      "message": "Add many people at once from a spreadsheet, and review each row before anything changes.",
+      "description": "One-line description under the Imports heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.imports.title": {
+      "message": "Imports",
+      "description": "Heading of the Administration Imports page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.invitations.description": {
+      "message": "Invitations to join classes, units and roles, and how their emails are doing.",
+      "description": "One-line description under the Invitations heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.invitations.title": {
+      "message": "Invitations",
+      "description": "Heading of the Administration Invitations page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.jobs.description": {
+      "message": "Background work such as imports, previews and key rotation.",
+      "description": "One-line description under the Jobs heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.jobs.title": {
+      "message": "Jobs",
+      "description": "Heading of the Administration Jobs page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.mail.description": {
+      "message": "Whether mail from {institution} is being delivered.",
+      "description": "One-line description under the Mail heading.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.mail.description.generic": {
+      "message": "Whether mail is being delivered.",
+      "description": "Mail description when the institution name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.mail.title": {
+      "message": "Mail",
+      "description": "Heading of the Administration Mail page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.overview.description": {
+      "message": "What needs your attention at {institution}.",
+      "description": "One-line description under the Overview heading.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.overview.description.generic": {
+      "message": "What needs your attention.",
+      "description": "Overview description when the institution name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.overview.title": {
+      "message": "Overview",
+      "description": "Heading of the Administration Overview page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.periods.description": {
+      "message": "The terms and years that classes and enrolments belong to.",
+      "description": "One-line description under the Academic periods heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.periods.title": {
+      "message": "Academic periods",
+      "description": "Heading of the Administration Academic periods page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.policy.description": {
+      "message": "How people sign in to {institution} and who may join.",
+      "description": "One-line description under the Access policy heading.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.policy.description.generic": {
+      "message": "How people sign in and who may join.",
+      "description": "Access policy description when the institution name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.policy.title": {
+      "message": "Access policy",
+      "description": "Heading of the Administration Access policy page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.retention.description": {
+      "message": "How long exam records are kept, and what is deleted when.",
+      "description": "One-line description under the Data retention heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.retention.title": {
+      "message": "Data retention",
+      "description": "Heading of the Administration Data retention page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.roles.description": {
+      "message": "What each role lets people do, and where.",
+      "description": "One-line description under the Roles heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.roles.title": {
+      "message": "Roles",
+      "description": "Heading of the Administration Roles page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.structure.description": {
+      "message": "Academic units, their programmes and levels, and the classes in them.",
+      "description": "One-line description under the Structure heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.structure.title": {
+      "message": "Structure",
+      "description": "Heading of the Administration Structure page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.unavailable": {
+      "message": "This Administration page could not be opened.",
+      "description": "Shown in the sidebar when an Administration page fails to open.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.user.title": {
+      "message": "User",
+      "description": "Heading of the Administration User page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.users.description": {
+      "message": "Everyone with an account at {institution}.",
+      "description": "One-line description under the Users heading.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.users.description.generic": {
+      "message": "Everyone with an account.",
+      "description": "Users description when the institution name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.users.title": {
+      "message": "Users",
+      "description": "Heading of the Administration Users page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "authenticated.account.nav.history": {
       "message": "Audits",
       "description": "Account page listing what was done with the account.",
@@ -2285,6 +2553,102 @@
     "authenticated.cancel": {
       "message": "Cancel",
       "description": "Closes a confirmation without doing anything.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.audits": {
+      "message": "Audits",
+      "description": "Administration sidebar page for the institution’s audit events.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.group.access": {
+      "message": "Access",
+      "description": "Administration sidebar heading over Roles and Access policy.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.group.operations": {
+      "message": "Operations",
+      "description": "Administration sidebar heading over Jobs and Mail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.group.organisation": {
+      "message": "Organisation",
+      "description": "Administration sidebar heading over Structure and Academic periods.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.group.people": {
+      "message": "People",
+      "description": "Administration sidebar heading over Users, Invitations and Imports.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.group.records": {
+      "message": "Records",
+      "description": "Administration sidebar heading over Audits and Data retention.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.imports": {
+      "message": "Imports",
+      "description": "Administration sidebar page for onboarding imports.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.invitations": {
+      "message": "Invitations",
+      "description": "Administration sidebar page listing invitations.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.jobs": {
+      "message": "Jobs",
+      "description": "Administration sidebar page for background jobs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.mail": {
+      "message": "Mail",
+      "description": "Administration sidebar page for mail delivery.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.periods": {
+      "message": "Academic periods",
+      "description": "Administration sidebar page for academic periods.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.policy": {
+      "message": "Access policy",
+      "description": "Administration sidebar page for how people sign in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.retention": {
+      "message": "Data retention",
+      "description": "Administration sidebar page for how long records are kept.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.roles": {
+      "message": "Roles",
+      "description": "Administration sidebar page for roles.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.structure": {
+      "message": "Structure",
+      "description": "Administration sidebar page for academic units, programmes and classes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.users": {
+      "message": "Users",
+      "description": "Administration sidebar page listing people.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
     },
@@ -3000,12 +3364,6 @@
     "exams.page.activity": {
       "message": "My exams",
       "description": "Own examination activity page.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
-    },
-    "exams.page.administration": {
-      "message": "Administration",
-      "description": "Authorized administration area.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
