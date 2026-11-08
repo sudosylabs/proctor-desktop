@@ -168,3 +168,14 @@ export const avatarForeground = registerColor(
 	},
 	localize('proctor.avatarForeground', 'Initials of an account that has no photo.')
 );
+
+export const cardBackground = registerColor(
+	'proctor.cardBackground',
+	{
+		light: Color.fromHex('#FFFFFF'),
+		dark: Color.fromHex('#222327'),
+		hcLight: Color.white,
+		hcDark: Color.black
+	},
+	localize('proctor.cardBackground', 'Grouped lists and fields that sit on the window canvas.')
+);

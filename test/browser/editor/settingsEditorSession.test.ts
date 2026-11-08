@@ -34,7 +34,12 @@ export async function exerciseSettingsEditorSession(
 		revision: 'r1',
 		availability: 'available',
 		writable: true,
-		presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
+		presentation: {
+			windowTheme: 'system',
+			highContrast: false,
+			zoomPercent: 100,
+			reducedMotion: false
+		}
 	};
 	copy.accept(acknowledged.source, acknowledged.revision);
 	copy.setReadonly(false);
@@ -191,7 +196,12 @@ async function exerciseProjectionOrdering(copy: SettingsWorkingCopy): Promise<vo
 			revision: 'opaque-base',
 			availability: 'available',
 			writable: true,
-			presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
+			presentation: {
+				windowTheme: 'system',
+				highContrast: false,
+				zoomPercent: 100,
+				reducedMotion: false
+			}
 		};
 		copy.accept(initial.source, initial.revision);
 		copy.setReadonly(false);
@@ -271,7 +281,12 @@ async function exercisePendingConfiguration(
 		revision: 'menu-base',
 		availability: 'available',
 		writable: true,
-		presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
+		presentation: {
+			windowTheme: 'system',
+			highContrast: false,
+			zoomPercent: 100,
+			reducedMotion: false
+		}
 	};
 	copy.accept(acknowledged.source, acknowledged.revision);
 	copy.setReadonly(false);

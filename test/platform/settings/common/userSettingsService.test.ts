@@ -21,7 +21,8 @@ const binding: UserSettingsBinding = Object.freeze({
 	sessionId: 'session:one'
 });
 const defaultPresentation = Object.freeze({
-	theme: 'GitHub Dark Default',
+	windowTheme: 'system',
+	highContrast: false,
 	colorCustomizations: {},
 	zoomPercent: 100,
 	reducedMotion: false
@@ -85,8 +86,14 @@ suite('UserSettingsCoordinator', () => {
 		assert.deepStrictEqual(validateUserSettingsProjection(projection), projection);
 		for (const invalid of [
 			{ ...projection, presentation: { ...defaultPresentation, zoomPercent: 201 } },
-			{ ...projection, presentation: { ...defaultPresentation, theme: 'extension-theme' } },
-			{ ...projection, presentation: { ...defaultPresentation, theme: new String('dark') } },
+			{
+				...projection,
+				presentation: { ...defaultPresentation, windowTheme: 'extension-theme' }
+			},
+			{
+				...projection,
+				presentation: { ...defaultPresentation, windowTheme: new String('dark') }
+			},
 			{ ...projection, presentation: { ...defaultPresentation, constraintReason: 'secret' } },
 			{ ...projection, deviceSettings: { font: 'secret' } },
 			{ ...projection, source: 'x'.repeat(SETTINGS_DOCUMENT_LIMITS.maxBytes + 1) }
@@ -202,12 +209,13 @@ suite('UserSettingsCoordinator', () => {
 		});
 		coordinator.onDidChange((value) => presentations.push(value.presentation));
 		coordinator.preview({
-			source: '{"editor.fontSize":19,"workbench.colorTheme":"light","window.zoomLevel":125,"accessibility.reducedMotion":true}'
+			source: '{"editor.fontSize":19,"window.theme":"light","window.zoomLevel":125,"accessibility.reducedMotion":true}'
 		});
 		assert.strictEqual(coordinator.effective.get('editor.fontSize'), 19);
 		assert.strictEqual(coordinator.projection().source, '{}');
 		assert.deepStrictEqual(coordinator.projection().presentation, {
-			theme: 'GitHub Light Default',
+			windowTheme: 'light',
+			highContrast: false,
 			colorCustomizations: {},
 			zoomPercent: 125,
 			reducedMotion: true
@@ -220,7 +228,8 @@ suite('UserSettingsCoordinator', () => {
 		assert.strictEqual(changes, 4);
 		assert.deepStrictEqual(presentations, [
 			{
-				theme: 'GitHub Light Default',
+				windowTheme: 'light',
+				highContrast: false,
 				colorCustomizations: {},
 				zoomPercent: 125,
 				reducedMotion: true

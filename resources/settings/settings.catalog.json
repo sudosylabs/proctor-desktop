@@ -1,6 +1,6 @@
 {
   "generatedBy": "settings.registry",
-  "registryFingerprint": "fnv1a64:914e33184722dbf9",
+  "registryFingerprint": "fnv1a64:c2d42feb28e048f7",
   "settings": [
     {
       "id": "workbench.hover.delay",
@@ -70,16 +70,31 @@
       "candidate": "nonCandidateOnly"
     },
     {
+      "id": "window.theme",
+      "title": "Window theme",
+      "titleMessageId": "settings.window.theme.title",
+      "description": "For sign-in and this window. Exams use the editor theme.",
+      "descriptionMessageId": "settings.window.theme.description",
+      "default": "system",
+      "storage": "portableUser",
+      "domain": "appearance",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
+    },
+    {
       "id": "workbench.colorTheme",
-      "title": "Color theme",
+      "title": "Editor theme",
       "titleMessageId": "settings.theme.title",
-      "description": "Selects one packaged Proctor color theme.",
+      "description": "Colours for code in the exam editor.",
       "descriptionMessageId": "settings.theme.description",
       "default": "GitHub Dark Default",
       "storage": "portableUser",
       "domain": "appearance",
       "windows": [
-        "authenticated",
         "candidate"
       ],
       "languageOverride": false,

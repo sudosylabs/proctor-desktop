@@ -1,6 +1,6 @@
 @layer controls {
 	.prctr-switch {
-		background: var(--prctr-color-border-strong);
+		background: var(--prctr-color-border-control);
 		block-size: 24px;
 		border: 0;
 		border-radius: 12px;

@@ -1851,7 +1851,12 @@ async function runSettingsModalContributionTest(document: Document): Promise<voi
 		revision: 'revision:live',
 		availability: 'available',
 		writable: true,
-		presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
+		presentation: {
+			windowTheme: 'system',
+			highContrast: false,
+			zoomPercent: 100,
+			reducedMotion: false
+		}
 	};
 	const chromeUpdates: ProductWindowChromeUpdate[] = [];
 	let commitCount = 0,

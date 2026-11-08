@@ -49,8 +49,8 @@
 		border-color: var(--prctr-color-brand-accentHover);
 	}
 	.prctr-button[data-variant='secondary'] {
-		background: var(--prctr-color-background-raised);
-		border-color: var(--prctr-color-border-strong);
+		background: var(--prctr-color-background-card);
+		border-color: var(--prctr-color-border-control);
 	}
 	.prctr-button[data-variant='secondary']:hover:not(:disabled) {
 		background: var(--prctr-color-interaction-hover);

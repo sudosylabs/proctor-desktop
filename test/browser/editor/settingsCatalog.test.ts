@@ -19,12 +19,17 @@ suite('Graphical Settings catalog and target', () => {
 			const keys = settings
 				.filter((setting) => !setting.isLanguageTagSetting)
 				.map((setting) => setting.key);
-			const declared = settingsRegistry.declarations
-				.filter((setting) => setting.candidate !== 'prohibited')
+			// The editor theme belongs to the exam window, so this window's editor omits it.
+			const authenticated = settingsRegistry.declarations
+				.filter(
+					(setting) =>
+						setting.candidate !== 'prohibited' &&
+						setting.windows.includes('authenticated')
+				)
 				.map((setting) => setting.id);
-			assert.deepStrictEqual([...keys].sort(), [...declared].sort());
+			assert.deepStrictEqual([...keys].sort(), [...authenticated].sort());
 			const catalog = settingsEditorLayout.children!.flatMap((section) => section.settings!);
-			assert.deepStrictEqual([...catalog].sort(), [...declared].sort());
+			assert.deepStrictEqual([...catalog].sort(), [...authenticated].sort());
 			const size = settings.find((setting) => setting.key === 'editor.fontSize')!;
 			assert.ok(size.validator?.('2'));
 			assert.ok(!size.validator?.('18'));

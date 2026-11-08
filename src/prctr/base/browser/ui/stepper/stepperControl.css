@@ -1,9 +1,9 @@
 @layer controls {
 	.prctr-stepper {
 		align-items: center;
-		background: var(--prctr-color-background-raised);
+		background: var(--prctr-color-background-card);
 		block-size: 32px;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-control);
 		border-radius: 8px;
 		box-sizing: border-box;
 		display: inline-flex;
@@ -14,7 +14,7 @@
 
 	.prctr-stepper .prctr-stepper__button {
 		align-items: center;
-		background: var(--prctr-color-background-surface);
+		background: var(--prctr-color-background-raised);
 		block-size: 26px;
 		border: 0;
 		border-radius: 6px;

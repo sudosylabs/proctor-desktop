@@ -3765,13 +3765,13 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.theme.description": {
-      "message": "Selects one packaged Proctor color theme.",
+      "message": "Colours for code in the exam editor.",
       "description": "Description of the packaged color theme setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.theme.title": {
-      "message": "Color theme",
+      "message": "Editor theme",
       "description": "Title for the packaged color theme setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -3785,6 +3785,18 @@
     "settings.tokenColorCustomizations.title": {
       "message": "Token color customizations",
       "description": "Title for editor token theme customization.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.window.theme.description": {
+      "message": "For sign-in and this window. Exams use the editor theme.",
+      "description": "Description of the window theme setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.window.theme.title": {
+      "message": "Window theme",
+      "description": "Title for the Proctor Light or Dark choice of the sign-in and signed-in windows.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },

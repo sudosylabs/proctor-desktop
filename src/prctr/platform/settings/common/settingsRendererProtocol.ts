@@ -1,10 +1,12 @@
 import type { IColorCustomizations } from '../../theme/common/colorCustomizations.js';
 import { normalizeColorCustomizations } from '../../theme/common/colorCustomizations.js';
-import { BUNDLED_THEMES } from '../../theme/common/bundledThemes.js';
 import { SETTINGS_DOCUMENT_LIMITS } from './settingsDocument.js';
 
 export interface UserSettingsPresentationProjection {
-	readonly theme: string;
+	/** Proctor Light or Dark for sign-in and the signed-in window, or the system scheme. */
+	readonly windowTheme: 'system' | 'light' | 'dark';
+	/** The high-contrast variant of whichever scheme is shown. */
+	readonly highContrast: boolean;
 	readonly colorCustomizations?: IColorCustomizations;
 	readonly zoomPercent: number;
 	readonly reducedMotion: boolean;
@@ -98,20 +100,16 @@ function validatePresentation(value: unknown): UserSettingsPresentationProjectio
 	if (
 		!isRecord(value) ||
 		!exactKeys(value, [
+			'highContrast',
 			'reducedMotion',
-			'theme',
+			'windowTheme',
 			'zoomPercent',
 			...(value.colorCustomizations === undefined ? [] : ['colorCustomizations'])
 		]) ||
 		(value.colorCustomizations !== undefined &&
 			!normalizeColorCustomizations(value.colorCustomizations)) ||
-		!isOneOf(value.theme, [
-			'dark',
-			'highContrastDark',
-			'highContrastLight',
-			'light',
-			...BUNDLED_THEMES.map((theme) => theme.name)
-		] as const) ||
+		!isOneOf(value.windowTheme, ['system', 'light', 'dark'] as const) ||
+		typeof value.highContrast !== 'boolean' ||
 		!Number.isSafeInteger(value.zoomPercent) ||
 		(value.zoomPercent as number) < 80 ||
 		(value.zoomPercent as number) > 200 ||
@@ -119,7 +117,8 @@ function validatePresentation(value: unknown): UserSettingsPresentationProjectio
 	)
 		throw new TypeError('User Settings presentation projection is invalid');
 	return Object.freeze({
-		theme: value.theme,
+		windowTheme: value.windowTheme,
+		highContrast: value.highContrast,
 		...(value.colorCustomizations === undefined
 			? {}
 			: { colorCustomizations: normalizeColorCustomizations(value.colorCustomizations)! }),

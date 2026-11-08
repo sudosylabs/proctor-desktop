@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port electron-window-skeleton
+import type { WindowAppearanceStore } from '../node/windowAppearanceStore.js';
 import { ExamActivityIpcBridge, type ExamActivityService } from '../../examActivity/electron-main/examActivityIpc.js';
 
 import { bindWindowUserSettings } from '../../settings/electron-main/userSettingsWindow.js';
@@ -76,6 +77,8 @@ export interface ElectronProductWindowFactoryOptions extends ElectronProductWind
 	readonly windowChromeEnvironment?: ElectronWindowChromeEnvironment;
 	/** Where the build staged @vnilink/elg; without it, macOS 26 falls back to vibrancy. */
 	readonly liquidGlassDirectory?: string;
+	/** The scheme last chosen in a signed-in window, which LaunchWindow opens with. */
+	readonly appearance?: WindowAppearanceStore;
 }
 
 export function assertProductWindowIpcSender(
@@ -228,8 +231,9 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 	): ManagedProductWindow {
 		if (this.#options.production && descriptor.kind==='authenticated' && descriptor.developmentOrigin) throw new Error('Production windows cannot use development HTTP');
 		const channels = WINDOW_CHANNELS[descriptor.kind];
-		// Release any scheme a signed-in window pinned, so LaunchWindow opens in the system scheme.
-		if (descriptor.kind === 'launch') nativeTheme.themeSource = 'system';
+		// LaunchWindow opens in the scheme last chosen on this computer, or the system scheme.
+		if (descriptor.kind === 'launch')
+			nativeTheme.themeSource = this.#options.appearance?.read() ?? 'system';
 		const chromeEnvironment =
 			this.#options.windowChromeEnvironment ?? electronWindowChromeEnvironment();
 		const window = new BrowserWindow(
@@ -280,7 +284,8 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 				this.#options.account,
 				this.#options.settings,
 				this.#options.examActivity,
-				material
+				material,
+				this.#options.appearance
 			);
 			void window.loadFile(rendererPath).catch(() => {
 				managed.terminate('loadFailed');
@@ -324,7 +329,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		account?: AccountService,
 		settings?: UserSettingsSessionService,
 		examActivity?: ExamActivityService,
-		material?: WindowMaterial
+		material?: WindowMaterial,
+		appearance?: WindowAppearanceStore
 	) {
 		this.#window = window;
 		this.descriptor = descriptor;
@@ -346,13 +352,14 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 			});
 			handled.push(intentChannel);
 			if (descriptor.kind !== 'candidate') {
-				// LaunchWindow follows the operating-system scheme, so it never pins the native theme.
+				// LaunchWindow never pins the native theme itself; it opens in the remembered scheme.
 				// AuthenticatedWindow pins it only while a chosen theme overrides the system scheme,
-				// so its material matches the page.
+				// so its material matches the page, and that choice is remembered for LaunchWindow.
 				const synchronizeTheme = descriptor.kind === 'launch'
 					? undefined
 					: (scheme: 'light' | 'dark' | 'system') => {
 						nativeTheme.themeSource = scheme;
+						appearance?.write(scheme);
 					};
 				this.#windowChromeBridge = new ElectronWindowChromeBridge(
 					ipc,

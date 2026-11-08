@@ -1,7 +1,7 @@
 @layer controls {
 	.prctr-banner {
 		align-items: center;
-		background: var(--prctr-color-background-surface);
+		background: var(--prctr-color-background-raised);
 		border-radius: 8px;
 		color: var(--prctr-color-text-primary);
 		display: flex;

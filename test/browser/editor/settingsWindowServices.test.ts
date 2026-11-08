@@ -405,7 +405,12 @@ export async function exerciseSettingsWindowServices(): Promise<void> {
 			revision: 'r1',
 			writable: true,
 			availability: 'available',
-			presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
+			presentation: {
+				windowTheme: 'system',
+				highContrast: false,
+				zoomPercent: 100,
+				reducedMotion: false
+			}
 		};
 		const modalOwner = store.add(
 			new SettingsModal(

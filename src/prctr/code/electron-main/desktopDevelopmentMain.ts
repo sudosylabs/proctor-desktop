@@ -1,4 +1,5 @@
 import { acquireDesktopInstanceLock } from '../../platform/identity/electron-main/desktopInstanceLock.js';
+import { FileWindowAppearanceStore } from '../../platform/windows/node/windowAppearanceStore.js';
 import { app, BrowserWindow } from 'electron';
 import { join } from 'node:path';
 import { createDesktopIdentityComposition } from './desktopIdentityComposition.js';
@@ -51,7 +52,10 @@ else {
 	app.once('will-quit', () => instanceLock.dispose());
 	void app
 		.whenReady()
-		.then(() => {
+		.then(() =>
+			FileWindowAppearanceStore.open(join(app.getPath('userData'), 'window-appearance.json'))
+		)
+		.then((appearance) => {
 			const root = app.getAppPath();
 			const desktop = createDesktopIdentityComposition({
 				applicationId: developmentApplicationId,
@@ -75,7 +79,8 @@ else {
 						authenticated: join(root, 'authenticatedPreload.cjs'),
 						candidate: join(root, 'candidatePreload.cjs')
 					},
-					liquidGlassDirectory: join(root, 'native', 'elg')
+					liquidGlassDirectory: join(root, 'native', 'elg'),
+					appearance
 				},
 				nativeKeyModule: join(root, 'desktop_key_custody.node'),
 				callbackBrandingDirectory: join(root, 'branding'),

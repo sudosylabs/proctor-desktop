@@ -105,7 +105,11 @@ void test('settings accepts immutable bounded color data and keeps overrides out
 	const parsed = parseSettingsDocument(source);
 	assert.equal(parsed.valid, true);
 	const settings = new EffectiveSettings(parsed, { window: 'authenticated' });
-	assert.equal(settings.get('workbench.colorTheme'), 'GitHub Dark Dimmed');
+	// The editor theme belongs to the exam window; sign-in and Account use the window theme.
+	assert.equal(
+		new EffectiveSettings(parsed, { window: 'candidate' }).get('workbench.colorTheme'),
+		'GitHub Dark Dimmed'
+	);
 	assert.equal(settings.get('workbench.colorCustomizations')['button.background'], '#1234');
 	assert.throws(() =>
 		new EffectiveSettings(parsed, { window: 'candidate' }).get('workbench.colorCustomizations')

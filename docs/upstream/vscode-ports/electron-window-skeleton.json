@@ -50,7 +50,7 @@
       "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme. LaunchWindow is a fixed 440x600 utility window that cannot be resized, maximized or made fullscreen.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "ebf4e2b198b5b44345344efcb33b8e6bc6db8838098c8627bb8b6f620389b330"
+      "localSha256": "650e4b2b1abc4f72f16a077f2e2ad983a0ff0c4c4fca37c72fd2a3123c9546ce"
     },
     {
       "upstreamPath": "src/vs/platform/windows/electron-main/windows.ts",
@@ -60,7 +60,7 @@
       "rationale": "Retain trusted window creation and lifecycle; AuthenticatedWindow alone installs authorized account, settings, and candidate exam-activity IPC bridges and disposes them on close and creation failure. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. Native focus changes feed the bound API query owner; closed account and activity observations remain sender-authorized and are disposed with the window. LaunchWindow opens in the operating-system color scheme and never pins the native theme. LaunchWindow is a fixed 440x600 utility window that cannot be resized, maximized or made fullscreen.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/electron-main/electronProductWindowFactory.ts",
-      "localSha256": "ebf4e2b198b5b44345344efcb33b8e6bc6db8838098c8627bb8b6f620389b330",
+      "localSha256": "650e4b2b1abc4f72f16a077f2e2ad983a0ff0c4c4fca37c72fd2a3123c9546ce",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "accepted-dependency-substitution",

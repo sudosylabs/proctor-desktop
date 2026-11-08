@@ -9,6 +9,7 @@
     "../test/platform/settings/electron-main/**",
     "../test/platform/serverApi/**",
     "../test/platform/protectedStorage/node/**",
+    "../test/platform/windows/node/**",
     "../test/workbench/services/examSecurity/node/**",
     "../test/platform/settings/node/**",
     "../test/platform/native/node/**"

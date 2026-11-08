@@ -27,6 +27,7 @@
     "../test/platform/settings/electron-main/**/*.ts",
     "../test/platform/serverApi/**/*.ts",
     "../test/platform/protectedStorage/node/**/*.ts",
+    "../test/platform/windows/node/**/*.ts",
     "../test/workbench/services/attemptWorkspace/node/**/*.ts",
     "../test/workbench/services/examSecurity/node/**/*.ts",
     "../test/platform/settings/node/**/*.ts",

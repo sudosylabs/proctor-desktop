@@ -1,5 +1,6 @@
 import { parseSettingsDocument } from '../../../../platform/settings/common/settingsDocument.js';
 import { settingsRegistry } from '../../../../platform/settings/common/settingsRegistry.js';
+import { PROCTOR_SCHEME_THEME_NAMES } from '../../../../platform/theme/common/bundledThemes.js';
 import type { UserSettingsProjection } from '../../../../platform/settings/common/settingsRendererProtocol.js';
 import {
 	WORKBENCH_LIFECYCLE_SERVICE,
@@ -193,10 +194,11 @@ export function createSettingsContribution(
 					'editor.semanticTokenColorCustomizations',
 					parsed.values.get('editor.semanticTokenColorCustomizations') ?? {}
 				);
-				// An explicit theme choice wins; otherwise the window keeps following the system scheme.
-				if (parsed.values.has('workbench.colorTheme'))
+				// A chosen window theme pins Proctor Light or Dark; otherwise the window follows the system.
+				const chosen = windowThemeName(next.presentation, context.document.defaultView);
+				if (chosen !== undefined)
 					presentation.setTheme(
-						next.presentation.theme,
+						chosen,
 						next.presentation.colorCustomizations,
 						tokens,
 						semantic
@@ -339,4 +341,23 @@ export function createSettingsContribution(
 			if (navigation.settingsRequested) open();
 		}
 	};
+}
+
+/**
+ * The theme a window-theme choice pins, or undefined to follow the system. High contrast uses
+ * the high-contrast theme of the scheme shown, which for System is the system's own scheme.
+ */
+export function windowThemeName(
+	presentation: Pick<UserSettingsProjection['presentation'], 'windowTheme' | 'highContrast'>,
+	view: Pick<Window, 'matchMedia'> | null
+): string | undefined {
+	if (!presentation.highContrast)
+		return presentation.windowTheme === 'system'
+			? undefined
+			: PROCTOR_SCHEME_THEME_NAMES[presentation.windowTheme];
+	const dark =
+		presentation.windowTheme === 'dark' ||
+		(presentation.windowTheme === 'system' &&
+			view?.matchMedia('(prefers-color-scheme: dark)').matches === true);
+	return dark ? 'GitHub Dark High Contrast' : 'GitHub Light High Contrast';
 }

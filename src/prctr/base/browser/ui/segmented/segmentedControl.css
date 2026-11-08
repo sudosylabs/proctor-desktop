@@ -1,6 +1,6 @@
 @layer controls {
 	.prctr-segmented {
-		background: var(--prctr-color-background-surface);
+		background: var(--prctr-color-background-raised);
 		border-radius: 9px;
 		display: inline-flex;
 		flex: none;
@@ -27,7 +27,7 @@
 	}
 
 	.prctr-segmented .prctr-segmented__option[aria-checked='true'] {
-		background: var(--prctr-color-background-raised);
+		background: var(--prctr-color-background-card);
 		box-shadow:
 			0 0 0 1px var(--prctr-color-border-default),
 			0 1px 2px rgb(0 0 0 / 8%);

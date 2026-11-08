@@ -10,9 +10,9 @@
 
 	.prctr-select .prctr-select__input {
 		appearance: none;
-		background: var(--prctr-color-background-raised);
+		background: var(--prctr-color-background-card);
 		block-size: 32px;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-control);
 		border-radius: 8px;
 		box-sizing: border-box;
 		color: inherit;

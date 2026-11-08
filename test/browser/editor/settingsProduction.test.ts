@@ -31,7 +31,12 @@ export async function exerciseSettingsProduction(): Promise<void> {
 		revision: 'r1',
 		writable: true,
 		availability: 'available',
-		presentation: { theme: 'dark', zoomPercent: 100, reducedMotion: false }
+		presentation: {
+			windowTheme: 'system',
+			highContrast: false,
+			zoomPercent: 100,
+			reducedMotion: false
+		}
 	};
 	let writes = 0;
 	let commands: ICommandService | undefined;

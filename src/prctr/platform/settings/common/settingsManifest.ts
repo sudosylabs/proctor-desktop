@@ -137,6 +137,29 @@ export const SETTINGS_MANIFEST = [
 		})
 	},
 	{
+		id: 'window.theme',
+		type: 'string',
+		default: 'system',
+		enum: ['system', 'light', 'dark'],
+		storage: 'portableUser',
+		domain: 'appearance',
+		windows: ['authenticated'],
+		languageOverride: false,
+		activation: 'immediate',
+		candidate: 'nonCandidateOnly',
+		title: defineMessage({
+			id: 'settings.window.theme.title',
+			defaultMessage: 'Window theme',
+			description:
+				'Title for the Proctor Light or Dark choice of the sign-in and signed-in windows.'
+		}),
+		description: defineMessage({
+			id: 'settings.window.theme.description',
+			defaultMessage: 'For sign-in and this window. Exams use the editor theme.',
+			description: 'Description of the window theme setting.'
+		})
+	},
+	{
 		id: 'workbench.colorTheme',
 		type: 'string',
 		default: 'GitHub Dark Default',
@@ -157,18 +180,18 @@ export const SETTINGS_MANIFEST = [
 		],
 		storage: 'portableUser',
 		domain: 'appearance',
-		windows: ['authenticated', 'candidate'],
+		windows: ['candidate'],
 		languageOverride: false,
 		activation: 'immediate',
 		candidate: 'eligible',
 		title: defineMessage({
 			id: 'settings.theme.title',
-			defaultMessage: 'Color theme',
+			defaultMessage: 'Editor theme',
 			description: 'Title for the packaged color theme setting.'
 		}),
 		description: defineMessage({
 			id: 'settings.theme.description',
-			defaultMessage: 'Selects one packaged Proctor color theme.',
+			defaultMessage: 'Colours for code in the exam editor.',
 			description: 'Description of the packaged color theme setting.'
 		})
 	},
@@ -644,6 +667,7 @@ export interface SettingValueMap {
 	readonly 'workbench.hover.reducedDelay': number;
 	readonly 'editor.tokenColorCustomizations': ITokenColorCustomizations;
 	readonly 'editor.semanticTokenColorCustomizations': ISemanticTokenColorCustomizations;
+	readonly 'window.theme': 'system' | 'light' | 'dark';
 	readonly 'workbench.colorTheme': string;
 	readonly 'workbench.colorCustomizations': IColorCustomizations;
 	readonly 'workbench.preferHighContrast': boolean;

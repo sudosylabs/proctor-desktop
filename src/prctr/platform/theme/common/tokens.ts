@@ -30,6 +30,11 @@ const tokenDefinitions = [
 	{ id: 'color.background.canvas', kind: 'color', description: 'Window canvas.' },
 	{ id: 'color.background.surface', kind: 'color', description: 'Primary contained surface.' },
 	{ id: 'color.background.raised', kind: 'color', description: 'Raised contained surface.' },
+	{
+		id: 'color.background.card',
+		kind: 'color',
+		description: 'Grouped list or field on the window canvas.'
+	},
 	{ id: 'color.text.primary', kind: 'color', description: 'Primary text.' },
 	{ id: 'color.text.secondary', kind: 'color', description: 'Secondary text.' },
 	{
@@ -55,6 +60,7 @@ const tokenDefinitions = [
 	{ id: 'color.brand.mark', kind: 'color', description: 'Product mark and progress.' },
 	{ id: 'color.border.default', kind: 'color', description: 'Ordinary component boundary.' },
 	{ id: 'color.border.strong', kind: 'color', description: 'Emphasized component boundary.' },
+	{ id: 'color.border.control', kind: 'color', description: 'Boundary of a button or field.' },
 	{ id: 'color.border.focus', kind: 'color', description: 'Keyboard focus indicator.' },
 	{ id: 'color.interaction.accent', kind: 'color', description: 'Primary action surface.' },
 	{
