@@ -4,7 +4,7 @@
 
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
-import { IAccountPaneContext } from '../accountPaneContext.js';
+import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
@@ -88,7 +88,7 @@ export class AuditsPage extends Disposable implements AccountPageView {
 		_headerActions: HTMLElement,
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext
+		@IPagePaneContext private readonly pane: IPagePaneContext
 	) {
 		super();
 		const document = body.ownerDocument;
@@ -198,13 +198,8 @@ export class AuditsPage extends Disposable implements AccountPageView {
 		this.stateIcon = this._register(
 			createProctorIcon(document, { id: 'status.attention', size: 18 })
 		);
-		this.stateText = $('span.prctr-account-section__state-text');
-		this.state = $(
-			'div.prctr-account-section__state',
-			{},
-			this.stateIcon.element,
-			this.stateText
-		);
+		this.stateText = $('span.prctr-page-section__state-text');
+		this.state = $('div.prctr-page-section__state', {}, this.stateIcon.element, this.stateText);
 		this.retry = this._register(
 			new ButtonControl(this.state, {
 				variant: 'secondary',
@@ -213,25 +208,25 @@ export class AuditsPage extends Disposable implements AccountPageView {
 				icon: proctorIconFactory('action.retry', 14)
 			})
 		);
-		this.skeleton = $('div.prctr-account-section__skeleton', {
+		this.skeleton = $('div.prctr-page-section__skeleton', {
 			attrs: { 'aria-hidden': 'true' }
 		});
 		for (let index = 0; index < 4; index++)
 			this.skeleton.append(
 				$(
-					'div.prctr-account-section__skeleton-row',
+					'div.prctr-page-section__skeleton-row',
 					{},
-					$('span.prctr-account-section__skeleton-glyph'),
+					$('span.prctr-page-section__skeleton-glyph'),
 					$(
-						'span.prctr-account-section__skeleton-text',
+						'span.prctr-page-section__skeleton-text',
 						{},
-						$('span.prctr-account-section__skeleton-bar'),
-						$('span.prctr-account-section__skeleton-bar')
+						$('span.prctr-page-section__skeleton-bar'),
+						$('span.prctr-page-section__skeleton-bar')
 					)
 				)
 			);
 		const card = $(
-			'div.prctr-account-section__card.prctr-account-history__card',
+			'div.prctr-page-section__card.prctr-account-history__card',
 			{},
 			this.table,
 			this.skeleton,

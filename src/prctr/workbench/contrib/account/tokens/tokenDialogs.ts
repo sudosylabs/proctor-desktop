@@ -4,7 +4,7 @@
 
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
-import { IAccountPaneContext } from '../accountPaneContext.js';
+import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IClipboardService } from '../../../../platform/clipboard/common/clipboardService.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
@@ -20,7 +20,8 @@ import type {
 	AccountToken
 } from '../../../../platform/account/common/accountProtocol.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import { ConfirmItsYouDialog } from '../widgets/confirmItsYouDialog.js';
+import { ConfirmItsYouDialog } from '../../../browser/authenticated/pages/confirmItsYouDialog.js';
+import { accountReauthentication } from '../widgets/accountReauthentication.js';
 import {
 	DEFAULT_TOKEN_EXPIRY,
 	scopeGrantable,
@@ -30,8 +31,8 @@ import {
 	type TokenExpiryPreset
 } from '../common/accountPresentation.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
-import { AccountDialog } from '../widgets/accountDialog.js';
-import { AccountFeedback } from '../widgets/accountFeedback.js';
+import { PageDialog } from '../../../browser/authenticated/pages/pageDialog.js';
+import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
 import './media/tokenDialogs.css';
 
 const CANCEL_ICON = proctorIconFactory('action.close');
@@ -52,7 +53,7 @@ const NO_LIMIT = '';
 const COPIED_MS = 2000;
 
 export class NewTokenDialog extends Disposable {
-	private readonly dialog: AccountDialog;
+	private readonly dialog: PageDialog;
 	private readonly name: TextFieldControl;
 	private scopes: readonly {
 		readonly scope: AccountGrantableScope;
@@ -66,7 +67,7 @@ export class NewTokenDialog extends Disposable {
 	private readonly limitHint: HTMLElement;
 	private readonly expiry: HTMLSelectElement;
 	private grantable: AccountGrantableScopes | undefined;
-	private readonly feedback: AccountFeedback;
+	private readonly feedback: PageFeedback;
 	private readonly cancel: ButtonControl;
 	private readonly create: ButtonControl;
 	private nameValue = '';
@@ -80,7 +81,7 @@ export class NewTokenDialog extends Disposable {
 		private readonly onDidClose: () => void,
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IPagePaneContext private readonly pane: IPagePaneContext,
 		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
@@ -88,7 +89,7 @@ export class NewTokenDialog extends Disposable {
 		const $ = createElementFactory(document);
 		const now = this.format.now();
 		this.dialog = this._register(
-			new AccountDialog(
+			new PageDialog(
 				document,
 				this.pane.overlays,
 				{
@@ -177,7 +178,7 @@ export class NewTokenDialog extends Disposable {
 			fieldset,
 			$('div.prctr-account-token-form__row', {}, this.limitField, expiryField)
 		);
-		this.feedback = this._register(new AccountFeedback(this.dialog.body));
+		this.feedback = this._register(new PageFeedback(this.dialog.body));
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
@@ -387,7 +388,8 @@ export class NewTokenDialog extends Disposable {
 				this.dialog.show(this.create.element);
 				if (confirmed) void this.send(intent).finally(() => (this.confirming = false));
 				else this.confirming = false;
-			}
+			},
+			accountReauthentication(this.account, this.format)
 		);
 	}
 
@@ -423,9 +425,9 @@ export class NewTokenDialog extends Disposable {
  * it from the page and drops the reference.
  */
 export class TokenCreatedDialog extends Disposable {
-	private readonly dialog: AccountDialog;
+	private readonly dialog: PageDialog;
 	private readonly value: HTMLElement;
-	private readonly feedback: AccountFeedback;
+	private readonly feedback: PageFeedback;
 	private readonly copy: ButtonControl;
 	/** Restores the Copy label after it has said Copied. */
 	private readonly copiedReset = this._register(new MutableDisposable());
@@ -436,7 +438,7 @@ export class TokenCreatedDialog extends Disposable {
 		credential: string,
 		private readonly onDidClose: () => void,
 		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IPagePaneContext private readonly pane: IPagePaneContext,
 		@IClipboardService private readonly clipboard: IClipboardService
 	) {
 		super();
@@ -444,7 +446,7 @@ export class TokenCreatedDialog extends Disposable {
 		const document = this.pane.document;
 		const $ = createElementFactory(document);
 		this.dialog = this._register(
-			new AccountDialog(
+			new PageDialog(
 				document,
 				this.pane.overlays,
 				{
@@ -475,7 +477,7 @@ export class TokenCreatedDialog extends Disposable {
 			})
 		);
 		this._register(this.copy.onDidRequest(() => void this.copyCredential()));
-		this.feedback = this._register(new AccountFeedback(this.dialog.body));
+		this.feedback = this._register(new PageFeedback(this.dialog.body));
 		this.done = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'brand',

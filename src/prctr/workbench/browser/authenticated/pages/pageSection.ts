@@ -2,9 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { IAccountFormatService } from '../accountFormat.js';
-import { IAccountPaneContext } from '../accountPaneContext.js';
-import { IAuthenticatedHoverService } from '../../../browser/authenticated/authenticatedHover.js';
+import { IAuthenticatedHoverService } from '../authenticatedHover.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
@@ -17,12 +15,15 @@ import {
 	proctorIconFactory
 } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
-import { AccountFeedback } from './accountFeedback.js';
-import type { AccountReadState } from './accountRead.js';
+import { IPageFormatService } from './pageFormat.js';
+import { PageFeedback } from './pageFeedback.js';
+import { IPagePaneContext } from './pagePaneContext.js';
+import type { PageReadState } from './pageRead.js';
+import './media/pageSection.css';
 
 let sectionSequence = 0;
 
-export interface AccountRowAction {
+export interface PageRowAction {
 	readonly label: string;
 	readonly icon: ProctorIconId;
 	/** Last in the menu, after a separator, in red; it always opens a confirmation. */
@@ -34,16 +35,16 @@ export interface AccountRowAction {
 /** Chips shown before the rest collapse into "+N". */
 const VISIBLE_CHIPS = 3;
 /** Rows on one page of a section; a longer list gets a pager at the foot of its card. */
-export const ACCOUNT_PAGE_SIZE = 10;
+export const PAGE_SECTION_SIZE = 10;
 
 /** A status word at the end of a row, coloured only when it needs attention. */
-export interface AccountRowStatus {
+export interface PageRowStatus {
 	readonly text: string;
 	readonly icon: ProctorIconId;
 	readonly tone: 'quiet' | 'success' | 'warning' | 'failure';
 }
 
-export interface AccountRowModel {
+export interface PageRowModel {
 	readonly id: string;
 	/** A small glyph saying what the row is, such as a laptop or a key. */
 	readonly glyph: ProctorIconId;
@@ -51,21 +52,21 @@ export interface AccountRowModel {
 	/** Short labels under the title, such as a token's permissions; the first few show. */
 	readonly chips?: readonly string[];
 	readonly detail: string;
-	readonly status?: AccountRowStatus;
+	readonly status?: PageRowStatus;
 	/** The row's one obvious action, shown as a button; all others go in its "⋯" menu. */
-	readonly button?: AccountRowAction;
-	readonly actions?: readonly AccountRowAction[];
+	readonly button?: PageRowAction;
+	readonly actions?: readonly PageRowAction[];
 }
 
 /** A text action for a whole section, such as ending every other session. */
-export interface AccountSectionAction {
+export interface PageSectionAction {
 	readonly label: string;
 	readonly icon: ProctorIconId;
 	readonly destructive?: boolean;
 }
 
 /** An empty section: an optional title, one sentence, and optionally the action that fills it. */
-export interface AccountEmpty {
+export interface PageEmpty {
 	readonly title?: string;
 	readonly text: string;
 	readonly action?: { readonly label: string; readonly icon: ProctorIconId; run(): void };
@@ -74,15 +75,15 @@ export interface AccountEmpty {
 const SKELETON_ROWS = 3;
 
 /**
- * One titled part of an Account page: its heading and description, a grouped list of rows,
+ * One titled part of a page: its heading and description, a grouped list of rows,
  * and its own loading, slow, empty, failed and stale states. Sections read and fail
  * independently, and a failed refresh keeps the rows already shown.
  */
-export class AccountSection extends Disposable {
+export class PageSection extends Disposable {
 	readonly element: HTMLElement;
 	/** Holds section content other than rows, such as a definition list. */
 	readonly content: HTMLElement;
-	readonly feedback: AccountFeedback;
+	readonly feedback: PageFeedback;
 
 	private readonly heading: HTMLHeadingElement;
 	private readonly description: HTMLElement;
@@ -102,7 +103,7 @@ export class AccountSection extends Disposable {
 	private readonly noteRetry: ButtonControl;
 	private readonly rowStore = this._register(new DisposableStore());
 	private readonly pager: PagerControl;
-	private allRows: readonly AccountRowModel[] = [];
+	private allRows: readonly PageRowModel[] = [];
 	private page = 1;
 	private retryHandler: (() => void) | undefined;
 	private readonly action: ButtonControl | undefined;
@@ -115,27 +116,27 @@ export class AccountSection extends Disposable {
 		options: {
 			readonly title: string;
 			readonly description?: string;
-			readonly action?: AccountSectionAction;
+			readonly action?: PageSectionAction;
 		},
-		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IPageFormatService private readonly format: IPageFormatService,
+		@IPagePaneContext private readonly pane: IPagePaneContext,
 		@IAuthenticatedHoverService private readonly hover: IAuthenticatedHoverService
 	) {
 		super();
 		const document = host.ownerDocument;
 		const $ = createElementFactory(document);
-		const id = `prctr-account-section-${++sectionSequence}`;
-		this.heading = $('h2.prctr-account-section__title', {
+		const id = `prctr-page-section-${++sectionSequence}`;
+		this.heading = $('h2.prctr-page-section__title', {
 			id,
 			tabIndex: -1,
 			textContent: options.title
 		});
-		this.description = $('p.prctr-account-section__description', {
+		this.description = $('p.prctr-page-section__description', {
 			hidden: !options.description,
 			textContent: options.description ?? ''
 		});
-		const heading = $('div.prctr-account-section__heading', {}, this.heading, this.description);
-		const header = $('div.prctr-account-section__header', {}, heading);
+		const heading = $('div.prctr-page-section__heading', {}, this.heading, this.description);
+		const header = $('div.prctr-page-section__header', {}, heading);
 		if (options.action !== undefined) {
 			this.action = this._register(
 				new ButtonControl(header, {
@@ -152,9 +153,9 @@ export class AccountSection extends Disposable {
 		this.noteIcon = this._register(
 			createProctorIcon(document, { id: 'status.time', size: 16 })
 		);
-		this.noteText = $('span.prctr-account-section__note-text');
+		this.noteText = $('span.prctr-page-section__note-text');
 		this.note = $(
-			'div.prctr-account-section__note',
+			'div.prctr-page-section__note',
 			{ hidden: true, attrs: { role: 'status' } },
 			this.noteIcon.element,
 			this.noteText
@@ -168,33 +169,33 @@ export class AccountSection extends Disposable {
 			})
 		);
 
-		this.skeleton = $('div.prctr-account-section__skeleton', {
+		this.skeleton = $('div.prctr-page-section__skeleton', {
 			attrs: { 'aria-hidden': 'true' }
 		});
 		for (let index = 0; index < SKELETON_ROWS; index++)
 			this.skeleton.append(
 				$(
-					'div.prctr-account-section__skeleton-row',
+					'div.prctr-page-section__skeleton-row',
 					{},
-					$('span.prctr-account-section__skeleton-glyph'),
+					$('span.prctr-page-section__skeleton-glyph'),
 					$(
-						'span.prctr-account-section__skeleton-text',
+						'span.prctr-page-section__skeleton-text',
 						{},
-						$('span.prctr-account-section__skeleton-bar'),
-						$('span.prctr-account-section__skeleton-bar')
+						$('span.prctr-page-section__skeleton-bar'),
+						$('span.prctr-page-section__skeleton-bar')
 					)
 				)
 			);
 		this.stateIcon = this._register(
 			createProctorIcon(document, { id: 'status.attention', size: 18 })
 		);
-		this.stateTitle = $('strong.prctr-account-section__state-title', { hidden: true });
-		this.stateText = $('span.prctr-account-section__state-text');
+		this.stateTitle = $('strong.prctr-page-section__state-title', { hidden: true });
+		this.stateText = $('span.prctr-page-section__state-text');
 		this.state = $(
-			'div.prctr-account-section__state',
+			'div.prctr-page-section__state',
 			{},
 			this.stateIcon.element,
-			$('span.prctr-account-section__state-body', {}, this.stateTitle, this.stateText)
+			$('span.prctr-page-section__state-body', {}, this.stateTitle, this.stateText)
 		);
 		this.retry = this._register(
 			new ButtonControl(this.state, {
@@ -214,10 +215,10 @@ export class AccountSection extends Disposable {
 		);
 		this.emptyAction.element.hidden = true;
 		this._register(this.emptyAction.onDidRequest(() => this.emptyRun?.()));
-		this.list = $('ul.prctr-account-section__rows', { attrs: { 'aria-labelledby': id } });
-		this.content = $('div.prctr-account-section__content');
+		this.list = $('ul.prctr-page-section__rows', { attrs: { 'aria-labelledby': id } });
+		this.content = $('div.prctr-page-section__content');
 		this.card = $(
-			'div.prctr-account-section__card',
+			'div.prctr-page-section__card',
 			{},
 			this.content,
 			this.list,
@@ -234,13 +235,13 @@ export class AccountSection extends Disposable {
 		this.pager.element.hidden = true;
 		this._register(this.pager.onDidRequestPage((page) => this.showPage(page)));
 		this.element = $(
-			'section.prctr-account-section',
+			'section.prctr-page-section',
 			{ attrs: { 'aria-labelledby': id } },
 			header,
 			this.note,
 			this.card
 		);
-		this.feedback = this._register(new AccountFeedback(this.element));
+		this.feedback = this._register(new PageFeedback(this.element));
 		host.append(this.element);
 		this._register(this.retry.onDidRequest(() => this.retryHandler?.()));
 		this._register(this.noteRetry.onDidRequest(() => this.retryHandler?.()));
@@ -279,11 +280,7 @@ export class AccountSection extends Disposable {
 	 * Presents a read state. `empty` applies only when the read is ready; a failed, slow or
 	 * stale state offers a retry that calls `retry`.
 	 */
-	setState(
-		state: AccountReadState,
-		empty: string | AccountEmpty | false,
-		retry?: () => void
-	): void {
+	setState(state: PageReadState, empty: string | PageEmpty | false, retry?: () => void): void {
 		this.retryHandler = retry;
 		this.element.setAttribute('aria-busy', String(state.kind === 'loading'));
 		this.element.dataset.state = state.kind;
@@ -303,7 +300,7 @@ export class AccountSection extends Disposable {
 			this.clearRows();
 			this.showState('failure', {
 				text: this.format.text('loadFailed', {
-					reason: this.format.failure(state.reason)
+					reason: this.pane.describeFailure(state.reason)
 				})
 			});
 			return;
@@ -311,7 +308,7 @@ export class AccountSection extends Disposable {
 		if (state.kind === 'stale') {
 			this.showNote(
 				'status.offline',
-				this.format.text('staleData', { reason: this.format.failure(state.reason) })
+				this.format.text('staleData', { reason: this.pane.describeFailure(state.reason) })
 			);
 			return;
 		}
@@ -319,9 +316,9 @@ export class AccountSection extends Disposable {
 			this.showState('empty', typeof empty === 'string' ? { text: empty } : empty);
 	}
 
-	setRows(rows: readonly AccountRowModel[]): void {
+	setRows(rows: readonly PageRowModel[]): void {
 		this.allRows = rows;
-		this.page = Math.min(this.page, Math.max(1, Math.ceil(rows.length / ACCOUNT_PAGE_SIZE)));
+		this.page = Math.min(this.page, Math.max(1, Math.ceil(rows.length / PAGE_SECTION_SIZE)));
 		this.renderRows();
 	}
 
@@ -330,34 +327,34 @@ export class AccountSection extends Disposable {
 		this.page = page;
 		this.renderRows();
 		const first = this.list.querySelector<HTMLElement>(
-			'.prctr-account-row__chip-more, .prctr-button, .prctr-account-row__more'
+			'.prctr-page-row__chip-more, .prctr-button, .prctr-page-row__more'
 		);
 		if (first !== null) first.focus();
 		else this.focusHeading();
-		const start = (page - 1) * ACCOUNT_PAGE_SIZE;
+		const start = (page - 1) * PAGE_SECTION_SIZE;
 		this.pane.announce(
 			this.format.text('pageShown', {
 				page,
-				count: Math.ceil(this.allRows.length / ACCOUNT_PAGE_SIZE),
+				count: Math.ceil(this.allRows.length / PAGE_SECTION_SIZE),
 				first: start + 1,
-				last: Math.min(start + ACCOUNT_PAGE_SIZE, this.allRows.length)
+				last: Math.min(start + PAGE_SECTION_SIZE, this.allRows.length)
 			})
 		);
 	}
 
 	private renderRows(): void {
 		const all = this.allRows;
-		const start = (this.page - 1) * ACCOUNT_PAGE_SIZE;
-		const rows = all.slice(start, start + ACCOUNT_PAGE_SIZE);
-		this.pager.element.hidden = all.length <= ACCOUNT_PAGE_SIZE;
-		if (all.length > ACCOUNT_PAGE_SIZE)
+		const start = (this.page - 1) * PAGE_SECTION_SIZE;
+		const rows = all.slice(start, start + PAGE_SECTION_SIZE);
+		this.pager.element.hidden = all.length <= PAGE_SECTION_SIZE;
+		if (all.length > PAGE_SECTION_SIZE)
 			this.pager.setState({
 				page: this.page,
-				pageSize: ACCOUNT_PAGE_SIZE,
+				pageSize: PAGE_SECTION_SIZE,
 				first: start + 1,
 				last: start + rows.length,
 				total: all.length,
-				hasNext: start + ACCOUNT_PAGE_SIZE < all.length
+				hasNext: start + PAGE_SECTION_SIZE < all.length
 			});
 		const document = this.element.ownerDocument;
 		// A row whose actions button had focus keeps it when the list is redrawn.
@@ -377,7 +374,7 @@ export class AccountSection extends Disposable {
 	/** Moves focus to a row's actions button after its menu or dialog closed. */
 	focusRow(id: string): boolean {
 		const button = this.list.querySelector<HTMLElement>(
-			`[data-row-id="${CSS.escape(id)}"] .prctr-account-row__more, [data-row-id="${CSS.escape(id)}"] .prctr-button`
+			`[data-row-id="${CSS.escape(id)}"] .prctr-page-row__more, [data-row-id="${CSS.escape(id)}"] .prctr-button`
 		);
 		button?.focus();
 		return button !== null;
@@ -396,7 +393,7 @@ export class AccountSection extends Disposable {
 		this.noteText.textContent = text;
 	}
 
-	private showState(kind: 'failure' | 'empty', content: AccountEmpty): void {
+	private showState(kind: 'failure' | 'empty', content: PageEmpty): void {
 		this.state.hidden = false;
 		this.state.dataset.kind = kind;
 		this.stateTitle.textContent = content.title ?? '';
@@ -415,27 +412,27 @@ export class AccountSection extends Disposable {
 
 	private createRow(
 		$: ReturnType<typeof createElementFactory>,
-		row: AccountRowModel
+		row: PageRowModel
 	): HTMLLIElement {
 		const document = this.element.ownerDocument;
 		const glyph = this.rowStore.add(createProctorIcon(document, { id: row.glyph, size: 18 }));
-		glyph.element.classList.add('prctr-account-row__glyph');
+		glyph.element.classList.add('prctr-page-row__glyph');
 		const text = $(
-			'span.prctr-account-row__text',
+			'span.prctr-page-row__text',
 			{},
-			$('span.prctr-account-row__title', { textContent: row.title })
+			$('span.prctr-page-row__title', { textContent: row.title })
 		);
 		if (row.chips !== undefined && row.chips.length > 0)
 			text.append(this.createChips($, row.chips));
-		text.append($('span.prctr-account-row__detail', { textContent: row.detail }));
-		const item = $('li.prctr-account-row', { data: { rowId: row.id } }, glyph.element, text);
+		text.append($('span.prctr-page-row__detail', { textContent: row.detail }));
+		const item = $('li.prctr-page-row', { data: { rowId: row.id } }, glyph.element, text);
 		if (row.status !== undefined) {
 			const icon = this.rowStore.add(
 				createProctorIcon(document, { id: row.status.icon, size: 14 })
 			);
 			item.append(
 				$(
-					'span.prctr-account-row__status',
+					'span.prctr-page-row__status',
 					{ data: { tone: row.status.tone } },
 					icon.element,
 					row.status.text
@@ -467,15 +464,15 @@ export class AccountSection extends Disposable {
 	): HTMLElement {
 		const hidden = labels.slice(VISIBLE_CHIPS);
 		const chips = $(
-			'span.prctr-account-row__chips',
+			'span.prctr-page-row__chips',
 			{},
 			...labels
 				.slice(0, VISIBLE_CHIPS)
-				.map((label) => $('span.prctr-account-row__chip', { textContent: label }))
+				.map((label) => $('span.prctr-page-row__chip', { textContent: label }))
 		);
 		if (hidden.length > 0) {
 			const names = hidden.join(', ');
-			const more = $('button.prctr-account-row__chip-more', {
+			const more = $('button.prctr-page-row__chip-more', {
 				type: 'button',
 				textContent: this.format.text('moreChips', { count: hidden.length }),
 				attrs: {
@@ -496,10 +493,10 @@ export class AccountSection extends Disposable {
 	private createMenuButton(
 		$: ReturnType<typeof createElementFactory>,
 		name: string,
-		actions: readonly AccountRowAction[]
+		actions: readonly PageRowAction[]
 	): HTMLButtonElement {
 		const label = this.format.text('rowActions', { name });
-		const button = $('button.prctr-account-row__more', {
+		const button = $('button.prctr-page-row__more', {
 			type: 'button',
 			title: label,
 			attrs: { 'aria-label': label, 'aria-haspopup': 'menu', 'aria-expanded': 'false' }

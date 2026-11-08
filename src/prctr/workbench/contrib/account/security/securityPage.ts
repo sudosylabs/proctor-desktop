@@ -18,11 +18,14 @@ import {
 	twoStepPresentation,
 	type TwoStepStatus
 } from '../common/accountPresentation.js';
-import { AccountFeedback } from '../widgets/accountFeedback.js';
+import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
 import type { AccountMessage } from '../accountMessages.js';
 import type { AccountPageView } from '../accountPages.js';
 import { AccountRead } from '../widgets/accountRead.js';
-import { AccountSection, type AccountRowModel } from '../widgets/accountSection.js';
+import {
+	PageSection,
+	type PageRowModel
+} from '../../../browser/authenticated/pages/pageSection.js';
 
 const twoStepMessages: Readonly<Record<TwoStepStatus, AccountMessage>> = Object.freeze({
 	notOffered: 'twoStepNotOffered',
@@ -40,10 +43,10 @@ const twoStepMessages: Readonly<Record<TwoStepStatus, AccountMessage>> = Object.
  */
 export class SecurityPage extends Disposable implements AccountPageView {
 	private readonly security: AccountRead<'security'>;
-	private readonly ways: AccountSection;
-	private readonly twoStep: AccountSection;
+	private readonly ways: PageSection;
+	private readonly twoStep: PageSection;
 	private readonly open: ButtonControl;
-	private readonly openFeedback: AccountFeedback;
+	private readonly openFeedback: PageFeedback;
 
 	constructor(
 		body: HTMLElement,
@@ -65,14 +68,14 @@ export class SecurityPage extends Disposable implements AccountPageView {
 				icon: proctorIconFactory('action.openExternal')
 			})
 		);
-		this.openFeedback = this._register(new AccountFeedback(body));
+		this.openFeedback = this._register(new PageFeedback(body));
 		this.ways = this._register(
-			this.instantiationService.createInstance(AccountSection, body, {
+			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('waysToSignIn')
 			})
 		);
 		this.twoStep = this._register(
-			this.instantiationService.createInstance(AccountSection, body, {
+			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('twoStep')
 			})
 		);
@@ -110,8 +113,8 @@ export class SecurityPage extends Disposable implements AccountPageView {
 		this.twoStep.setRows(security === undefined ? [] : this.twoStepRows(security));
 	}
 
-	private wayRows(security: AccountSecurity): AccountRowModel[] {
-		const rows: AccountRowModel[] = security.providers.map((provider, index) => ({
+	private wayRows(security: AccountSecurity): PageRowModel[] {
+		const rows: PageRowModel[] = security.providers.map((provider, index) => ({
 			id: `provider-${index}`,
 			glyph: 'object.institution',
 			title: provider.name,
@@ -152,9 +155,9 @@ export class SecurityPage extends Disposable implements AccountPageView {
 			: this.format.text('twoStepAppSince', { date: this.format.date(mfa.enabledAt) });
 	}
 
-	private twoStepRows(security: AccountSecurity): AccountRowModel[] {
+	private twoStepRows(security: AccountSecurity): PageRowModel[] {
 		const presentation = twoStepPresentation(security.mfa);
-		const status: AccountRowModel['status'] =
+		const status: PageRowModel['status'] =
 			presentation.status === 'on'
 				? { text: this.format.text('statusOn'), icon: 'status.success', tone: 'success' }
 				: presentation.status === 'off'
@@ -166,7 +169,7 @@ export class SecurityPage extends Disposable implements AccountPageView {
 								icon: 'status.warning',
 								tone: 'warning'
 							};
-		const rows: AccountRowModel[] = [
+		const rows: PageRowModel[] = [
 			{
 				id: 'two-step',
 				glyph: 'account.security',

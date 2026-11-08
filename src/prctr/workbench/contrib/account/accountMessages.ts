@@ -3,6 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { defineMessage } from '../../../base/common/localization.js';
+import { pageMessages } from '../../browser/authenticated/pages/pageMessages.js';
 import { profileMessages } from './profile/profileMessages.js';
 import { securityMessages } from './security/securityMessages.js';
 import { sessionsMessages } from './sessions/sessionsMessages.js';
@@ -63,26 +64,6 @@ const sharedMessages = Object.freeze({
 		defaultMessage: 'This Account page could not be opened.',
 		description: 'Shown in the sidebar when an Account page fails to open.'
 	}),
-	loading: defineMessage({
-		id: 'account.state.loading',
-		defaultMessage: 'Loading…',
-		description: 'A section is reading its information from the server.'
-	}),
-	stillWaiting: defineMessage({
-		id: 'account.state.still.waiting',
-		defaultMessage: 'Still waiting for {institution}…',
-		description: 'A read is slow; institution is the server’s name.'
-	}),
-	stillWaitingGeneric: defineMessage({
-		id: 'account.state.still.waiting.generic',
-		defaultMessage: 'Still waiting for the server…',
-		description: 'A read is slow and the institution name is unknown.'
-	}),
-	dismiss: defineMessage({
-		id: 'account.dismiss',
-		defaultMessage: 'Dismiss',
-		description: 'Closes a toast.'
-	}),
 	settingsTitle: defineMessage({
 		id: 'account.page.settings.title',
 		defaultMessage: 'Settings',
@@ -98,71 +79,16 @@ const sharedMessages = Object.freeze({
 		defaultMessage: '{value} px',
 		description: 'A size in pixels.'
 	}),
-	loadFailed: defineMessage({
-		id: 'account.state.load.failed',
-		defaultMessage: 'This couldn’t be loaded. {reason}',
-		description: 'A section read failed and nothing is shown; reason explains why.'
-	}),
-	staleData: defineMessage({
-		id: 'account.state.stale',
-		defaultMessage: 'This couldn’t be refreshed, so it may be out of date. {reason}',
-		description: 'A refresh failed; earlier information stays shown.'
-	}),
-	retry: defineMessage({
-		id: 'account.state.retry',
-		defaultMessage: 'Try again',
-		description: 'Retry reading a section.'
-	}),
-	busy: defineMessage({
-		id: 'account.state.busy',
-		defaultMessage: 'Another change is being applied. Try again when it finishes.',
-		description: 'Account changes run one at a time.'
-	}),
 	recheckFirst: defineMessage({
 		id: 'account.state.recheck.first',
 		defaultMessage:
 			'Proctor is checking whether the last change worked. Try again after the list refreshes.',
 		description: 'An action is blocked until an unknown outcome is read again.'
 	}),
-	relativeToday: defineMessage({
-		id: 'account.time.today',
-		defaultMessage: 'today, {time}',
-		description: 'A time earlier today, as in "last active today, 08:41".'
-	}),
-	relativeYesterday: defineMessage({
-		id: 'account.time.yesterday',
-		defaultMessage: 'yesterday, {time}',
-		description: 'A time yesterday, as in "last active yesterday, 17:20".'
-	}),
-	relativeTodayStandalone: defineMessage({
-		id: 'account.time.today.standalone',
-		defaultMessage: 'Today, {time}',
-		description: 'A time earlier today, shown on its own in a table cell.'
-	}),
-	relativeYesterdayStandalone: defineMessage({
-		id: 'account.time.yesterday.standalone',
-		defaultMessage: 'Yesterday, {time}',
-		description: 'A time yesterday, shown on its own in a table cell.'
-	}),
-	detailSeparator: defineMessage({
-		id: 'account.detail.separator',
-		defaultMessage: '{first} · {second}',
-		description: 'Joins two parts of a row description.'
-	}),
-	rowActions: defineMessage({
-		id: 'account.row.actions',
-		defaultMessage: 'Actions for {name}',
-		description: 'Accessible name of a row’s actions menu button and menu.'
-	}),
 	actionFailed: defineMessage({
 		id: 'account.action.failed',
 		defaultMessage: 'That action could not be completed.',
 		description: 'A menu action failed unexpectedly.'
-	}),
-	cancel: defineMessage({
-		id: 'account.action.cancel',
-		defaultMessage: 'Cancel',
-		description: 'Close a dialog without changing anything.'
 	}),
 	failureUnavailable: defineMessage({
 		id: 'account.failure.unavailable',
@@ -211,39 +137,6 @@ const sharedMessages = Object.freeze({
 		id: 'account.tokens.enable.summary',
 		defaultMessage: 'Turns this token back on until it expires.',
 		description: 'What confirming does, when turning a disabled token back on.'
-	}),
-	confirmItsYouTitle: defineMessage({
-		id: 'account.confirm.title',
-		defaultMessage: 'Confirm it’s you',
-		description:
-			'Title of the dialog asking the person to sign in again before a guarded change.'
-	}),
-	confirmItsYouBody: defineMessage({
-		id: 'account.confirm.body',
-		defaultMessage:
-			'{institution} asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.',
-		description: 'Why the person must sign in again; {institution} is the institution’s name.'
-	}),
-	confirmItsYouBodyGeneric: defineMessage({
-		id: 'account.confirm.body.generic',
-		defaultMessage:
-			'Your institution asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.',
-		description: 'Why the person must sign in again, when the institution’s name is unknown.'
-	}),
-	confirmItsYouContinue: defineMessage({
-		id: 'account.confirm.continue',
-		defaultMessage: 'Continue in browser',
-		description: 'Opens the institution’s sign-in page in the system browser.'
-	}),
-	confirmItsYouWaitingButton: defineMessage({
-		id: 'account.confirm.waiting.button',
-		defaultMessage: 'Waiting for your browser…',
-		description: 'The Continue button while the browser step is open.'
-	}),
-	confirmItsYouWaiting: defineMessage({
-		id: 'account.confirm.waiting',
-		defaultMessage: 'Finish in your browser. This continues by itself when you’re done.',
-		description: 'Shown while the person signs in again in the browser.'
 	}),
 	failureCancelled: defineMessage({
 		id: 'account.failure.cancelled',
@@ -395,67 +288,6 @@ const sharedMessages = Object.freeze({
 		id: 'account.platform.other',
 		defaultMessage: 'Other system',
 		description: 'Desktop platform: unknown.'
-	}),
-	pagerName: defineMessage({
-		id: 'account.pager.name',
-		defaultMessage: '{list} pages',
-		description: 'Accessible name of a list\'s pager, such as "Active pages".'
-	}),
-	pagerPrevious: defineMessage({
-		id: 'account.pager.previous',
-		defaultMessage: 'Previous',
-		description: 'Goes to the previous page of a list.'
-	}),
-	pagerNext: defineMessage({
-		id: 'account.pager.next',
-		defaultMessage: 'Next',
-		description: 'Goes to the next page of a list.'
-	}),
-	pagerPage: defineMessage({
-		id: 'account.pager.page',
-		defaultMessage: 'Page {page}',
-		description: 'Accessible name of one numbered page button.'
-	}),
-	pagerRange: defineMessage({
-		id: 'account.pager.range',
-		defaultMessage: '{first}–{last} of {total}',
-		description: 'Which items a page shows, as in "11–20 of 248".'
-	}),
-	pagerRangeAtLeast: defineMessage({
-		id: 'account.pager.range.at.least',
-		defaultMessage: '{first}–{last} of {total}+',
-		description:
-			'Which items a page shows when the count stopped at its ceiling, as in "11–20 of 10,000+".'
-	}),
-	pagerRangeOpen: defineMessage({
-		id: 'account.pager.range.open',
-		defaultMessage: '{first}–{last}',
-		description: 'Which items a page shows when the total is not known.'
-	}),
-	pagerCompact: defineMessage({
-		id: 'account.pager.compact',
-		defaultMessage: 'Page {page} of {count}',
-		description: 'The pager\'s narrow form, as in "Page 12 of 25".'
-	}),
-	pagerCompactOpen: defineMessage({
-		id: 'account.pager.compact.open',
-		defaultMessage: 'Page {page}',
-		description: "The pager's narrow form when the number of pages is not known."
-	}),
-	pageShown: defineMessage({
-		id: 'account.pager.shown',
-		defaultMessage: 'Page {page} of {count}, items {first} to {last}',
-		description: 'Announced after moving to another page of a list.'
-	}),
-	moreChips: defineMessage({
-		id: 'account.row.chips.more',
-		defaultMessage: '+{count}',
-		description: 'A chip standing for the labels not shown, such as "+7".'
-	}),
-	moreChipsLabel: defineMessage({
-		id: 'account.row.chips.more.label',
-		defaultMessage: '{count} more: {names}',
-		description: 'Accessible name of the "+N" chip; {names} lists what it stands for.'
 	}),
 	noInactiveTokens: defineMessage({
 		id: 'account.tokens.inactive.empty',
@@ -730,7 +562,7 @@ const sharedMessages = Object.freeze({
 	})
 });
 
-/** Every Account message, shared and page-owned, by its key. */
+/** Every message the Account contribution registers, shared and page-owned, by its key. */
 export const accountMessages = Object.freeze({
 	...sharedMessages,
 	...profileMessages,
@@ -741,4 +573,7 @@ export const accountMessages = Object.freeze({
 	...settingsMessages
 });
 
-export type AccountMessage = keyof typeof accountMessages;
+/** Account text by key, including the page text the window's frame registers. */
+export const accountText = Object.freeze({ ...pageMessages, ...accountMessages });
+
+export type AccountMessage = keyof typeof accountText;

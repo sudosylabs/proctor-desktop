@@ -4,12 +4,6 @@
   "locale": "en",
   "direction": "ltr",
   "messages": {
-    "account.action.cancel": {
-      "message": "Cancel",
-      "description": "Close a dialog without changing anything.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
     "account.action.failed": {
       "message": "That action could not be completed.",
       "description": "A menu action failed unexpectedly.",
@@ -40,44 +34,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
-    "account.confirm.body": {
-      "message": "{institution} asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.",
-      "description": "Why the person must sign in again; {institution} is the institution’s name.",
-      "placeholders": [
-        "institution"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.confirm.body.generic": {
-      "message": "Your institution asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.",
-      "description": "Why the person must sign in again, when the institution’s name is unknown.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.confirm.continue": {
-      "message": "Continue in browser",
-      "description": "Opens the institution’s sign-in page in the system browser.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.confirm.title": {
-      "message": "Confirm it’s you",
-      "description": "Title of the dialog asking the person to sign in again before a guarded change.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.confirm.waiting": {
-      "message": "Finish in your browser. This continues by itself when you’re done.",
-      "description": "Shown while the person signs in again in the browser.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.confirm.waiting.button": {
-      "message": "Waiting for your browser…",
-      "description": "The Continue button while the browser step is open.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
     "account.desktops.remove.menu": {
       "message": "Remove desktop…",
       "description": "Row menu entry that opens the confirmation to remove a registered desktop.",
@@ -89,21 +45,6 @@
       "description": "Status word: this registered desktop was removed.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
-    },
-    "account.detail.separator": {
-      "message": "{first} · {second}",
-      "description": "Joins two parts of a row description.",
-      "placeholders": [
-        "first",
-        "second"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.dismiss": {
-      "message": "Dismiss",
-      "description": "Closes a toast.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.failure.cancelled": {
       "message": "Stopped before it finished. Nothing changed.",
@@ -758,91 +699,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
-    "account.pager.compact": {
-      "message": "Page {page} of {count}",
-      "description": "The pager's narrow form, as in \"Page 12 of 25\".",
-      "placeholders": [
-        "page",
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.pager.compact.open": {
-      "message": "Page {page}",
-      "description": "The pager's narrow form when the number of pages is not known.",
-      "placeholders": [
-        "page"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.pager.name": {
-      "message": "{list} pages",
-      "description": "Accessible name of a list's pager, such as \"Active pages\".",
-      "placeholders": [
-        "list"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.pager.next": {
-      "message": "Next",
-      "description": "Goes to the next page of a list.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.pager.page": {
-      "message": "Page {page}",
-      "description": "Accessible name of one numbered page button.",
-      "placeholders": [
-        "page"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.pager.previous": {
-      "message": "Previous",
-      "description": "Goes to the previous page of a list.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.pager.range": {
-      "message": "{first}–{last} of {total}",
-      "description": "Which items a page shows, as in \"11–20 of 248\".",
-      "placeholders": [
-        "first",
-        "last",
-        "total"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.pager.range.at.least": {
-      "message": "{first}–{last} of {total}+",
-      "description": "Which items a page shows when the count stopped at its ceiling, as in \"11–20 of 10,000+\".",
-      "placeholders": [
-        "first",
-        "last",
-        "total"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.pager.range.open": {
-      "message": "{first}–{last}",
-      "description": "Which items a page shows when the total is not known.",
-      "placeholders": [
-        "first",
-        "last"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.pager.shown": {
-      "message": "Page {page} of {count}, items {first} to {last}",
-      "description": "Announced after moving to another page of a list.",
-      "placeholders": [
-        "page",
-        "count",
-        "first",
-        "last"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
     "account.pager.shown.open": {
       "message": "Page {page}, items {first} to {last}",
       "description": "Announced after moving to another page when the number of pages is not known.",
@@ -1153,31 +1009,6 @@
       "description": "Confirms a verification request without revealing delivery.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
-    },
-    "account.row.actions": {
-      "message": "Actions for {name}",
-      "description": "Accessible name of a row’s actions menu button and menu.",
-      "placeholders": [
-        "name"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.row.chips.more": {
-      "message": "+{count}",
-      "description": "A chip standing for the labels not shown, such as \"+7\".",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.row.chips.more.label": {
-      "message": "{count} more: {names}",
-      "description": "Accessible name of the \"+N\" chip; {names} lists what it stands for.",
-      "placeholders": [
-        "count",
-        "names"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.security.footnote": {
       "message": "Passwords, two-step verification and recovery codes are changed on {institution}’s security page in your browser. Proctor never asks for your password.",
@@ -1944,57 +1775,9 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
-    "account.state.busy": {
-      "message": "Another change is being applied. Try again when it finishes.",
-      "description": "Account changes run one at a time.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.state.load.failed": {
-      "message": "This couldn’t be loaded. {reason}",
-      "description": "A section read failed and nothing is shown; reason explains why.",
-      "placeholders": [
-        "reason"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.state.loading": {
-      "message": "Loading…",
-      "description": "A section is reading its information from the server.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
     "account.state.recheck.first": {
       "message": "Proctor is checking whether the last change worked. Try again after the list refreshes.",
       "description": "An action is blocked until an unknown outcome is read again.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.state.retry": {
-      "message": "Try again",
-      "description": "Retry reading a section.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.state.stale": {
-      "message": "This couldn’t be refreshed, so it may be out of date. {reason}",
-      "description": "A refresh failed; earlier information stays shown.",
-      "placeholders": [
-        "reason"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.state.still.waiting": {
-      "message": "Still waiting for {institution}…",
-      "description": "A read is slow; institution is the server’s name.",
-      "placeholders": [
-        "institution"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.state.still.waiting.generic": {
-      "message": "Still waiting for the server…",
-      "description": "A read is slow and the institution name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
@@ -2033,38 +1816,6 @@
       "description": "Status word: a password is set.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
-    },
-    "account.time.today": {
-      "message": "today, {time}",
-      "description": "A time earlier today, as in \"last active today, 08:41\".",
-      "placeholders": [
-        "time"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.time.today.standalone": {
-      "message": "Today, {time}",
-      "description": "A time earlier today, shown on its own in a table cell.",
-      "placeholders": [
-        "time"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.time.yesterday": {
-      "message": "yesterday, {time}",
-      "description": "A time yesterday, as in \"last active yesterday, 17:20\".",
-      "placeholders": [
-        "time"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.time.yesterday.standalone": {
-      "message": "Yesterday, {time}",
-      "description": "A time yesterday, shown on its own in a table cell.",
-      "placeholders": [
-        "time"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.tokens.active": {
       "message": "Active",
@@ -4226,6 +3977,255 @@
       "description": "Next step when an update is required.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "page.action.cancel": {
+      "message": "Cancel",
+      "description": "Close a dialog without changing anything.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.body": {
+      "message": "{institution} asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.",
+      "description": "Why the person must sign in again; {institution} is the institution’s name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.body.generic": {
+      "message": "Your institution asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.",
+      "description": "Why the person must sign in again, when the institution’s name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.continue": {
+      "message": "Continue in browser",
+      "description": "Opens the institution’s sign-in page in the system browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.title": {
+      "message": "Confirm it’s you",
+      "description": "Title of the dialog asking the person to sign in again before a guarded change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.waiting": {
+      "message": "Finish in your browser. This continues by itself when you’re done.",
+      "description": "Shown while the person signs in again in the browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.confirm.waiting.button": {
+      "message": "Waiting for your browser…",
+      "description": "The Continue button while the browser step is open.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.detail.separator": {
+      "message": "{first} · {second}",
+      "description": "Joins two parts of a row description.",
+      "placeholders": [
+        "first",
+        "second"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.dismiss": {
+      "message": "Dismiss",
+      "description": "Closes a toast.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.compact": {
+      "message": "Page {page} of {count}",
+      "description": "The pager's narrow form, as in \"Page 12 of 25\".",
+      "placeholders": [
+        "page",
+        "count"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.compact.open": {
+      "message": "Page {page}",
+      "description": "The pager's narrow form when the number of pages is not known.",
+      "placeholders": [
+        "page"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.name": {
+      "message": "{list} pages",
+      "description": "Accessible name of a list's pager, such as \"Active pages\".",
+      "placeholders": [
+        "list"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.next": {
+      "message": "Next",
+      "description": "Goes to the next page of a list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.page": {
+      "message": "Page {page}",
+      "description": "Accessible name of one numbered page button.",
+      "placeholders": [
+        "page"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.previous": {
+      "message": "Previous",
+      "description": "Goes to the previous page of a list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.range": {
+      "message": "{first}–{last} of {total}",
+      "description": "Which items a page shows, as in \"11–20 of 248\".",
+      "placeholders": [
+        "first",
+        "last",
+        "total"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.range.at.least": {
+      "message": "{first}–{last} of {total}+",
+      "description": "Which items a page shows when the count stopped at its ceiling, as in \"11–20 of 10,000+\".",
+      "placeholders": [
+        "first",
+        "last",
+        "total"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.range.open": {
+      "message": "{first}–{last}",
+      "description": "Which items a page shows when the total is not known.",
+      "placeholders": [
+        "first",
+        "last"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.pager.shown": {
+      "message": "Page {page} of {count}, items {first} to {last}",
+      "description": "Announced after moving to another page of a list.",
+      "placeholders": [
+        "page",
+        "count",
+        "first",
+        "last"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.row.actions": {
+      "message": "Actions for {name}",
+      "description": "Accessible name of a row’s actions menu button and menu.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.row.chips.more": {
+      "message": "+{count}",
+      "description": "A chip standing for the labels not shown, such as \"+7\".",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.row.chips.more.label": {
+      "message": "{count} more: {names}",
+      "description": "Accessible name of the \"+N\" chip; {names} lists what it stands for.",
+      "placeholders": [
+        "count",
+        "names"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.state.busy": {
+      "message": "Another change is being applied. Try again when it finishes.",
+      "description": "Account changes run one at a time.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.state.load.failed": {
+      "message": "This couldn’t be loaded. {reason}",
+      "description": "A section read failed and nothing is shown; reason explains why.",
+      "placeholders": [
+        "reason"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.state.loading": {
+      "message": "Loading…",
+      "description": "A section is reading its information from the server.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.state.retry": {
+      "message": "Try again",
+      "description": "Retry reading a section.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.state.stale": {
+      "message": "This couldn’t be refreshed, so it may be out of date. {reason}",
+      "description": "A refresh failed; earlier information stays shown.",
+      "placeholders": [
+        "reason"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.state.still.waiting": {
+      "message": "Still waiting for {institution}…",
+      "description": "A read is slow; institution is the server’s name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.state.still.waiting.generic": {
+      "message": "Still waiting for the server…",
+      "description": "A read is slow and the institution name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.time.today": {
+      "message": "today, {time}",
+      "description": "A time earlier today, as in \"last active today, 08:41\".",
+      "placeholders": [
+        "time"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.time.today.standalone": {
+      "message": "Today, {time}",
+      "description": "A time earlier today, shown on its own in a table cell.",
+      "placeholders": [
+        "time"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.time.yesterday": {
+      "message": "yesterday, {time}",
+      "description": "A time yesterday, as in \"last active yesterday, 17:20\".",
+      "placeholders": [
+        "time"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.time.yesterday.standalone": {
+      "message": "Yesterday, {time}",
+      "description": "A time yesterday, shown on its own in a table cell.",
+      "placeholders": [
+        "time"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
     "settings.accessibility.announcements.description": {
       "message": "How much Proctor says when something changes.",

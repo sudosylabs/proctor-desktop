@@ -4,7 +4,7 @@
 
 import { isMacintosh, isWindows } from '../../../../base/common/platform.js';
 import { IAccountFormatService } from '../accountFormat.js';
-import { IAccountPaneContext } from '../accountPaneContext.js';
+import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { ILocalizationService } from '../../../services/localization/common/localization.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
@@ -85,7 +85,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 		body: HTMLElement,
 		headerActions: HTMLElement,
 		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IPagePaneContext private readonly pane: IPagePaneContext,
 		@ILocalizationService private readonly localization: ILocalizationService,
 		@IUserSettingsService private readonly client: IUserSettingsService
 	) {

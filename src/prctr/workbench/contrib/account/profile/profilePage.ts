@@ -27,11 +27,14 @@ import {
 	noticePresentation
 } from '../common/accountPresentation.js';
 import { AccountConfirmation } from '../widgets/accountConfirmation.js';
-import { AccountFeedback } from '../widgets/accountFeedback.js';
+import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
 import type { AccountPageView } from '../accountPages.js';
 import { AccountPhotoDialog } from './photoDialog.js';
 import { AccountRead } from '../widgets/accountRead.js';
-import { AccountSection, type AccountRowModel } from '../widgets/accountSection.js';
+import {
+	PageSection,
+	type PageRowModel
+} from '../../../browser/authenticated/pages/pageSection.js';
 
 type Photo = Extract<AccountResponse, { kind: 'photo' }>;
 
@@ -63,14 +66,14 @@ export class ProfilePage extends Disposable implements AccountPageView {
 	private readonly changePhoto: ButtonControl;
 	private readonly removePhoto: ButtonControl;
 	private readonly fileInput: HTMLInputElement;
-	private readonly photoFeedback: AccountFeedback;
-	private readonly details: AccountSection;
+	private readonly photoFeedback: PageFeedback;
+	private readonly details: PageSection;
 	private readonly detailRows: Readonly<Record<DetailKey, DetailRow>>;
 	private readonly unverified: HTMLElement;
 	private readonly noteIcon: ProctorIconControl;
 	private readonly sendVerification: ButtonControl;
-	private readonly verificationFeedback: AccountFeedback;
-	private readonly noticeSection: AccountSection;
+	private readonly verificationFeedback: PageFeedback;
+	private readonly noticeSection: PageSection;
 	private readonly noticesMore: HTMLElement;
 	private readonly dialog = this._register(new MutableDisposable());
 
@@ -144,10 +147,10 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		});
 		const identityBlock = $('div.prctr-account-profile', {}, identity, this.fileInput);
 		body.append(identityBlock);
-		this.photoFeedback = this._register(new AccountFeedback(identityBlock));
+		this.photoFeedback = this._register(new PageFeedback(identityBlock));
 
 		this.details = this._register(
-			this.instantiationService.createInstance(AccountSection, body, {
+			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('accountDetails'),
 				description: this.format.institutionText('detailsManaged', 'detailsManagedGeneric')
 			})
@@ -191,7 +194,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		);
 		// A lasting condition of the account, shown as a banner at the top of the page.
 		identityBlock.before(this.unverified);
-		this.verificationFeedback = this._register(new AccountFeedback(body));
+		this.verificationFeedback = this._register(new PageFeedback(body));
 		this.unverified.after(this.verificationFeedback.element);
 
 		const identityContext = this.identity;
@@ -201,7 +204,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			this.details.element.before(this.plainNotice($, this.format.text('noAccess')));
 
 		this.noticeSection = this._register(
-			this.instantiationService.createInstance(AccountSection, body, {
+			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('noticesTitle'),
 				description: this.format.institutionText(
 					'noticesDescription',
@@ -209,7 +212,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 				)
 			})
 		);
-		this.noticesMore = $('p.prctr-account-section__more', {
+		this.noticesMore = $('p.prctr-page-section__more', {
 			hidden: true,
 			textContent: this.format.text('noticesMore')
 		});
@@ -330,7 +333,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		this.noticeSection.hidden = !hasNotices && state.kind !== 'failed';
 		this.noticeSection.setState(state, false, () => void this.notices.refresh());
 		this.noticesMore.hidden = !(data?.more ?? false);
-		const rows: AccountRowModel[] = (data?.notices ?? []).map((notice) => {
+		const rows: PageRowModel[] = (data?.notices ?? []).map((notice) => {
 			const presentation = noticePresentation(notice);
 			return {
 				id: notice.retirementId,

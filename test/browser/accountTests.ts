@@ -7,7 +7,7 @@ import {
 	AccountPane,
 	type AccountModel
 } from '../../src/prctr/workbench/contrib/account/accountPane.ts';
-import { accountMessages } from '../../src/prctr/workbench/contrib/account/accountMessages.ts';
+import { accountText } from '../../src/prctr/workbench/contrib/account/accountMessages.ts';
 import type { AccountPage } from '../../src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigationModel.ts';
 import { WorkbenchOverlayHost } from '../../src/prctr/workbench/browser/overlayHost.ts';
 import { createLocalization } from '../../src/prctr/base/common/localization.ts';
@@ -221,7 +221,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		localization: createLocalization({
 			requestedLocale: 'en',
 			messages: [
-				...Object.values(accountMessages),
+				...Object.values(accountText),
 				...SETTINGS_MANIFEST.flatMap((setting) => [setting.title, setting.description])
 			]
 		}),
@@ -285,22 +285,21 @@ export async function runAccountTests(document: Document): Promise<void> {
 		);
 	const dialog = (): HTMLDialogElement | null => host.querySelector('dialog[open]');
 	const section = (title: string): HTMLElement => {
-		const found = [...root.querySelectorAll<HTMLElement>('.prctr-account-section')].find(
+		const found = [...root.querySelectorAll<HTMLElement>('.prctr-page-section')].find(
 			(candidate) => candidate.querySelector('h2')?.textContent === title
 		);
 		check(found, `Missing section ${title}`);
 		return found;
 	};
 	const row = (title: string): HTMLElement => {
-		const found = [...root.querySelectorAll<HTMLElement>('.prctr-account-row')].find(
-			(candidate) =>
-				candidate.querySelector('.prctr-account-row__title')?.textContent === title
+		const found = [...root.querySelectorAll<HTMLElement>('.prctr-page-row')].find(
+			(candidate) => candidate.querySelector('.prctr-page-row__title')?.textContent === title
 		);
 		check(found, `Missing row ${title}`);
 		return found;
 	};
 	const openMenu = (title: string): HTMLElement => {
-		const more = row(title).querySelector<HTMLButtonElement>('.prctr-account-row__more');
+		const more = row(title).querySelector<HTMLButtonElement>('.prctr-page-row__more');
 		check(more, `Row ${title} has no actions menu`);
 		more.click();
 		const menu = root.querySelector<HTMLElement>('.prctr-menu[role="menu"]');
@@ -332,7 +331,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		);
 		check(
 			root.querySelector(
-				'[data-state="loading"] .prctr-account-section__skeleton:not([hidden])'
+				'[data-state="loading"] .prctr-page-section__skeleton:not([hidden])'
 			) && !root.querySelector('.prctr-account [data-spin]'),
 			'Loading shows grey rows shaped like the content, not a spinner'
 		);
@@ -461,7 +460,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 			root.textContent!.includes('never asks for your password'),
 			'The footnote explains the hosted page'
 		);
-		check(!root.querySelector('.prctr-account-row__more'), 'Security rows have no actions');
+		check(!root.querySelector('.prctr-page-row__more'), 'Security rows have no actions');
 		buttonIn(root, 'Open security page')!.click();
 		await wait(() => account.count('openSecurity') === 1, 'open security');
 		// #endregion
@@ -477,10 +476,10 @@ export async function runAccountTests(document: Document): Promise<void> {
 		);
 		check(section('Other sessions').dataset.state === 'ready', 'Sections fail independently');
 		check(
-			[...root.querySelectorAll('.prctr-account-row button')].every(
+			[...root.querySelectorAll('.prctr-page-row button')].every(
 				(button) =>
-					button.classList.contains('prctr-account-row__more') ||
-					button.closest('.prctr-account-row')?.querySelector('.prctr-account-row__title')
+					button.classList.contains('prctr-page-row__more') ||
+					button.closest('.prctr-page-row')?.querySelector('.prctr-page-row__title')
 						?.textContent === 'Proctor Desktop on Amara’s MacBook Pro'
 			),
 			'Row actions are a menu, except this session’s one obvious action'
@@ -492,15 +491,13 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'desktops retry'
 		);
 		check(
-			!row('Amara’s MacBook Pro').querySelector('.prctr-account-row__more'),
+			!row('Amara’s MacBook Pro').querySelector('.prctr-page-row__more'),
 			'This computer’s desktop has no Remove'
 		);
 
 		let menu: HTMLElement;
 		check(
-			!row('Proctor Desktop on Amara’s MacBook Pro').querySelector(
-				'.prctr-account-row__more'
-			),
+			!row('Proctor Desktop on Amara’s MacBook Pro').querySelector('.prctr-page-row__more'),
 			'This session’s one action is a button, not a menu'
 		);
 		buttonIn(row('Proctor Desktop on Amara’s MacBook Pro'), 'Sign out')!.click();
@@ -512,7 +509,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		check(end.dataset.destructive === 'true', 'Ending a session is destructive');
 		end.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 		check(!root.querySelector('.prctr-menu'), 'Escape closes the menu');
-		const more = row('Lab PC 14').querySelector<HTMLButtonElement>('.prctr-account-row__more')!;
+		const more = row('Lab PC 14').querySelector<HTMLButtonElement>('.prctr-page-row__more')!;
 		check(document.activeElement === more, 'Closing the menu returns focus to its button');
 		menuItem(openMenu('Lab PC 14'), 'End session…').click();
 		await wait(() => dialog() !== null, 'confirmation');
@@ -630,7 +627,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'An unknown scope is shown as the server names it'
 		);
 		check(
-			!row('Old roster import').querySelector('.prctr-account-row__more'),
+			!row('Old roster import').querySelector('.prctr-page-row__more'),
 			'Expired tokens have no actions'
 		);
 		check(

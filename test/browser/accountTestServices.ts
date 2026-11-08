@@ -7,6 +7,10 @@ import { InstantiationService } from '../../src/prctr/platform/instantiation/com
 import { ServiceCollection } from '../../src/prctr/platform/instantiation/common/serviceCollection.ts';
 import type { AuthenticatedWindowDescriptor } from '../../src/prctr/platform/windows/common/windowProtocol.ts';
 import { IAuthenticatedHoverService } from '../../src/prctr/workbench/browser/authenticated/authenticatedHover.ts';
+import {
+	IPageFormatService,
+	PageFormatService
+} from '../../src/prctr/workbench/browser/authenticated/pages/pageFormat.ts';
 import { authenticatedComposition } from '../../src/prctr/workbench/browser/authenticatedManifest.ts';
 import type { WorkbenchOverlayHost } from '../../src/prctr/workbench/browser/overlayHost.ts';
 import {
@@ -58,12 +62,14 @@ export function createAccountTestServices(options: AccountTestServicesOptions): 
 		binding: options.binding
 	});
 	const account = new AccountService(options.account);
+	const pageFormat = new PageFormatService(options.now, localization, windowService);
 	const services = new ServiceCollection(
 		[IWorkbenchWindowService, windowService],
 		[IWorkbenchOverlayService, options.overlays],
 		[ILocalizationService, localization],
 		[IAccountService, account],
-		[IAccountFormatService, new AccountFormatService(options.now, localization, windowService)],
+		[IPageFormatService, pageFormat],
+		[IAccountFormatService, new AccountFormatService(localization, pageFormat)],
 		[IUserSettingsService, new UserSettingsService(options.settings ?? unavailableSettings)],
 		[IClipboardService, new NativeClipboardService(clipboard(options.writeClipboard))],
 		[IAuthenticatedHoverService, titleHover],

@@ -14,6 +14,10 @@ import {
 	IAccountFormatService
 } from '../../workbench/contrib/account/accountFormat.js';
 import { AuthenticatedFrame } from '../../workbench/browser/authenticated/authenticatedFrame.js';
+import {
+	IPageFormatService,
+	PageFormatService
+} from '../../workbench/browser/authenticated/pages/pageFormat.js';
 import { IAuthenticatedNavigationService } from '../../workbench/services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { installAuthenticatedWindowServices } from '../../workbench/browser/authenticated/authenticatedWindowServices.js';
 import {
@@ -58,7 +62,8 @@ export function authenticatedWindowServices(
 			new AuthenticatedHostService(preload, preload.examActivity !== undefined)
 		);
 		services.set(IAccountService, new SyncDescriptor(AccountService, [preload.account]));
-		services.set(IAccountFormatService, new SyncDescriptor(AccountFormatService, [Date.now]));
+		services.set(IPageFormatService, new SyncDescriptor(PageFormatService, [Date.now]));
+		services.set(IAccountFormatService, new SyncDescriptor(AccountFormatService));
 		if (preload.examActivity !== undefined) {
 			services.set(IExamActivityService, new ExamActivityService(preload.examActivity));
 		}

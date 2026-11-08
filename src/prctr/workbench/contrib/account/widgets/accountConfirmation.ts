@@ -3,15 +3,15 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IAccountFormatService } from '../accountFormat.js';
-import { IAccountPaneContext } from '../accountPaneContext.js';
+import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import type { AccountResponse } from '../../../../platform/account/common/accountProtocol.js';
 import { failureNeedsRead } from '../common/accountPresentation.js';
-import { AccountDialog } from './accountDialog.js';
-import { AccountFeedback } from './accountFeedback.js';
+import { PageDialog } from '../../../browser/authenticated/pages/pageDialog.js';
+import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
 
 export interface AccountConfirmationOptions {
 	readonly title: string;
@@ -33,28 +33,28 @@ export interface AccountConfirmationOptions {
  * the change and the dialog stays open, locked, until the server replies.
  */
 export class AccountConfirmation extends Disposable {
-	private readonly dialog: AccountDialog;
+	private readonly dialog: PageDialog;
 	private readonly cancel: ButtonControl;
 	private readonly confirm: ButtonControl;
-	private readonly feedback: AccountFeedback;
+	private readonly feedback: PageFeedback;
 	private working = false;
 
 	constructor(
 		private readonly options: AccountConfirmationOptions,
 		private readonly onDidClose: () => void,
 		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext
+		@IPagePaneContext private readonly pane: IPagePaneContext
 	) {
 		super();
 		this.dialog = this._register(
-			new AccountDialog(
+			new PageDialog(
 				this.pane.document,
 				this.pane.overlays,
 				{ title: options.title, description: options.message, role: 'alertdialog' },
 				this.pane.focusPage
 			)
 		);
-		this.feedback = this._register(new AccountFeedback(this.dialog.body));
+		this.feedback = this._register(new PageFeedback(this.dialog.body));
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',

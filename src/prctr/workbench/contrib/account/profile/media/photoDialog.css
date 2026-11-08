@@ -1,5 +1,5 @@
 @layer contributions {
-	.prctr-account-dialog .prctr-account-photo__stage {
+	.prctr-page-dialog .prctr-account-photo__stage {
 		background: var(--prctr-color-background-canvas);
 		block-size: 248px;
 		border-radius: 8px;
@@ -8,23 +8,23 @@
 		position: relative;
 		touch-action: none;
 	}
-	.prctr-account-dialog .prctr-account-photo__stage:active {
+	.prctr-page-dialog .prctr-account-photo__stage:active {
 		cursor: grabbing;
 	}
-	.prctr-account-dialog .prctr-account-photo__stage[aria-disabled='true'] {
+	.prctr-page-dialog .prctr-account-photo__stage[aria-disabled='true'] {
 		cursor: default;
 	}
-	.prctr-account-dialog .prctr-account-photo__stage:focus-visible {
+	.prctr-page-dialog .prctr-account-photo__stage:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: 2px;
 	}
-	.prctr-account-dialog .prctr-account-photo__canvas {
+	.prctr-page-dialog .prctr-account-photo__canvas {
 		block-size: 100%;
 		display: block;
 		inline-size: 100%;
 	}
 	/* The circle is the saved photo; everything around it is dimmed. */
-	.prctr-account-dialog .prctr-account-photo__circle {
+	.prctr-page-dialog .prctr-account-photo__circle {
 		block-size: 200px;
 		border-radius: 50%;
 		box-shadow:
@@ -36,26 +36,26 @@
 		pointer-events: none;
 		position: absolute;
 	}
-	.prctr-account-dialog .prctr-account-photo__zoom-label {
+	.prctr-page-dialog .prctr-account-photo__zoom-label {
 		align-items: center;
 		color: var(--prctr-color-text-secondary);
 		display: flex;
 		font-size: 13px;
 		gap: 12px;
 	}
-	.prctr-account-dialog .prctr-account-photo__zoom {
+	.prctr-page-dialog .prctr-account-photo__zoom {
 		accent-color: var(--prctr-color-brand-accent);
 		flex: 1;
 		min-inline-size: 0;
 	}
-	.prctr-account-dialog .prctr-account-photo__note {
+	.prctr-page-dialog .prctr-account-photo__note {
 		color: var(--prctr-color-text-secondary);
 		font-size: 13px;
 		margin: 0;
 	}
 
 	@media (forced-colors: active) {
-		.prctr-account-dialog .prctr-account-photo__circle {
+		.prctr-page-dialog .prctr-account-photo__circle {
 			box-shadow: none;
 			outline: 2px solid CanvasText;
 		}

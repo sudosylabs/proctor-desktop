@@ -20,7 +20,11 @@ import type { ResolvedWorkbenchItem } from '../../common/workbenchItem.js';
 import type { AccountPage } from '../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
 import { IAccountFormatService } from './accountFormat.js';
 import { accountPageRegistry, type AccountPageView } from './accountPages.js';
-import { AccountPaneContext, IAccountPaneContext } from './accountPaneContext.js';
+import {
+	IPagePaneContext,
+	PagePaneContext
+} from '../../browser/authenticated/pages/pagePaneContext.js';
+import { accountFailureOf } from './common/accountPresentation.js';
 import './media/accountPane.css';
 
 export interface AccountModel extends ResolvedWorkbenchItem {
@@ -94,16 +98,17 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 				dismissIcon: proctorIconFactory('action.close', 14)
 			})
 		);
-		const context = new AccountPaneContext(
+		const context = new PagePaneContext(
 			document,
 			overlays,
 			this.menu,
 			toasts,
 			format.text('retry'),
-			() => this.focus()
+			() => this.focus(),
+			(reason) => format.failure(accountFailureOf(reason))
 		);
 		this.scopedInstantiationService = this._register(
-			instantiationService.createChild(new ServiceCollection([IAccountPaneContext, context]))
+			instantiationService.createChild(new ServiceCollection([IPagePaneContext, context]))
 		);
 		this.registerListeners();
 	}

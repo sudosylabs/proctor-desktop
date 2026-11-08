@@ -7,7 +7,6 @@ import type {
 	AccountToken
 } from '../../../../../src/prctr/platform/account/common/accountProtocol.ts';
 import {
-	calendarDaysBefore,
 	desktopShape,
 	failureMessage,
 	failureNeedsRead,
@@ -19,7 +18,6 @@ import {
 	orderDesktops,
 	platformKind,
 	providerKind,
-	relativeDay,
 	historyActorMessage,
 	historyEventGroups,
 	historyEventMessage,
@@ -89,14 +87,6 @@ void test('a lost session or authority withdraws shown data instead of keeping i
 	assert.ok(failureWithdrawsData('sessionEnded'));
 	assert.ok(failureWithdrawsData('denied'));
 	assert.ok(!failureWithdrawsData('unavailable'));
-});
-
-void test('relative days follow the local calendar, not 24-hour spans', () => {
-	const lateYesterday = new Date(2026, 10, 6, 23, 30).getTime();
-	assert.strictEqual(relativeDay(NOW - 60_000, NOW), 'today');
-	assert.strictEqual(relativeDay(lateYesterday, NOW), 'yesterday');
-	assert.strictEqual(relativeDay(NOW - 3 * DAY, NOW), 'other');
-	assert.strictEqual(calendarDaysBefore(new Date(2026, 10, 1, 1).getTime(), NOW), 6);
 });
 
 void test('initials take the first letter of the first two names', () => {

@@ -1,5 +1,5 @@
 @layer contributions {
-	.prctr-account-feedback {
+	.prctr-page-feedback {
 		align-items: flex-start;
 		color: var(--prctr-color-text-secondary);
 		display: flex;
@@ -7,17 +7,17 @@
 		gap: 8px;
 		line-height: 19px;
 	}
-	.prctr-account-feedback > .prctr-icon {
+	.prctr-page-feedback > .prctr-icon {
 		flex: none;
 		margin-block-start: 2px;
 	}
-	.prctr-account-feedback[data-kind='success'] > .prctr-icon {
+	.prctr-page-feedback[data-kind='success'] > .prctr-icon {
 		color: var(--prctr-color-feedback-success);
 	}
-	.prctr-account-feedback[data-kind='error'] {
+	.prctr-page-feedback[data-kind='error'] {
 		color: var(--prctr-color-feedback-error);
 	}
-	.prctr-account-feedback[hidden] {
+	.prctr-page-feedback[hidden] {
 		display: none;
 	}
 }

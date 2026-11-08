@@ -4,7 +4,7 @@
 
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
-import { IAccountPaneContext } from '../accountPaneContext.js';
+import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
@@ -26,7 +26,10 @@ import { AccountConfirmation } from '../widgets/accountConfirmation.js';
 import type { AccountMessage } from '../accountMessages.js';
 import type { AccountPageView } from '../accountPages.js';
 import { AccountRead } from '../widgets/accountRead.js';
-import { AccountSection, type AccountRowModel } from '../widgets/accountSection.js';
+import {
+	PageSection,
+	type PageRowModel
+} from '../../../browser/authenticated/pages/pageSection.js';
 
 /** Lock key for ending every other session; it settles with the next sessions read. */
 const OTHERS = 'session:*';
@@ -41,9 +44,9 @@ const OTHERS = 'session:*';
 export class SessionsPage extends Disposable implements AccountPageView {
 	private readonly sessions: AccountRead<'sessions'>;
 	private readonly desktops: AccountRead<'desktops'>;
-	private readonly current: AccountSection;
-	private readonly others: AccountSection;
-	private readonly registered: AccountSection;
+	private readonly current: PageSection;
+	private readonly others: PageSection;
+	private readonly registered: PageSection;
 	private readonly confirmation = this._register(new MutableDisposable());
 	/** Items whose last change has an unknown outcome; they wait for a fresh read. */
 	private readonly unconfirmed = new Set<string>();
@@ -53,7 +56,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		_headerActions: HTMLElement,
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IPagePaneContext private readonly pane: IPagePaneContext,
 		@IAuthenticatedNavigationService
 		private readonly navigation: IAuthenticatedNavigationService,
 		@IInstantiationService private readonly instantiationService: IInstantiationService
@@ -66,12 +69,12 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			this.instantiationService.createInstance(AccountRead<'desktops'>, 'desktops')
 		);
 		this.current = this._register(
-			this.instantiationService.createInstance(AccountSection, body, {
+			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('thisComputer')
 			})
 		);
 		this.others = this._register(
-			this.instantiationService.createInstance(AccountSection, body, {
+			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('otherSessions'),
 				action: {
 					label: this.format.text('endOtherSessions'),
@@ -81,7 +84,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			})
 		);
 		this.registered = this._register(
-			this.instantiationService.createInstance(AccountSection, body, {
+			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('registeredDesktops'),
 				description: this.format.text('registeredDesktopsDescription')
 			})
@@ -198,7 +201,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 				: 'device.laptop';
 	}
 
-	private currentRow(session: AccountSession): AccountRowModel {
+	private currentRow(session: AccountSession): PageRowModel {
 		return {
 			id: session.id,
 			glyph: this.sessionGlyph(session),
@@ -218,7 +221,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		};
 	}
 
-	private sessionRow(session: AccountSession): AccountRowModel {
+	private sessionRow(session: AccountSession): PageRowModel {
 		const name = this.sessionName(session);
 		const key = `session:${session.id}`;
 		return {
@@ -249,7 +252,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		};
 	}
 
-	private desktopRow(desktop: AccountDesktop): AccountRowModel {
+	private desktopRow(desktop: AccountDesktop): PageRowModel {
 		const name = desktop.name || this.format.text('unnamedDesktop');
 		const platform = this.format.text(platformKind(desktop.platform));
 		const key = `desktop:${desktop.id}`;
@@ -323,7 +326,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		readonly confirmIcon?: ProctorIconId;
 		readonly intent: AccountIntent;
 		readonly key: string;
-		readonly section: AccountSection;
+		readonly section: PageSection;
 		readonly read: AccountRead<'sessions'> | AccountRead<'desktops'>;
 		readonly success: AccountMessage;
 	}): void {
@@ -345,7 +348,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		result: AccountResponse,
 		options: {
 			readonly key: string;
-			readonly section: AccountSection;
+			readonly section: PageSection;
 			readonly read: AccountRead<'sessions'> | AccountRead<'desktops'>;
 			readonly success: AccountMessage;
 		}

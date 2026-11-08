@@ -4,15 +4,15 @@
 
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
-import { IAccountPaneContext } from '../accountPaneContext.js';
+import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import type { AccountResponse } from '../../../../platform/account/common/accountProtocol.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
-import { AccountDialog } from '../widgets/accountDialog.js';
-import { AccountFeedback } from '../widgets/accountFeedback.js';
+import { PageDialog } from '../../../browser/authenticated/pages/pageDialog.js';
+import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
 import {
 	decodePhoto,
 	encodePhoto,
@@ -41,13 +41,13 @@ const photoActionIcons = Object.freeze({
  * conflicting or unknown outcome is read again before another save.
  */
 export class AccountPhotoDialog extends Disposable {
-	private readonly dialog: AccountDialog;
+	private readonly dialog: PageDialog;
 	private readonly stage: HTMLElement;
 	private readonly canvas: HTMLCanvasElement;
 	private readonly zoom: HTMLInputElement;
 	private readonly input: HTMLInputElement;
 	private readonly lowResolution: HTMLElement;
-	private readonly feedback: AccountFeedback;
+	private readonly feedback: PageFeedback;
 	private readonly choose: ButtonControl;
 	private readonly cancel: ButtonControl;
 	private readonly save: ButtonControl;
@@ -67,13 +67,13 @@ export class AccountPhotoDialog extends Disposable {
 		private readonly onDidClose: (needsRefresh: boolean) => void,
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext
+		@IPagePaneContext private readonly pane: IPagePaneContext
 	) {
 		super();
 		const document = this.pane.document;
 		const $ = createElementFactory(document);
 		this.dialog = this._register(
-			new AccountDialog(
+			new PageDialog(
 				document,
 				this.pane.overlays,
 				{
@@ -125,9 +125,9 @@ export class AccountPhotoDialog extends Disposable {
 			this.lowResolution,
 			this.input
 		);
-		this.feedback = this._register(new AccountFeedback(this.dialog.body));
+		this.feedback = this._register(new PageFeedback(this.dialog.body));
 		this.choose = this.button('chooseAnother', 'secondary');
-		this.dialog.actions.append($('span.prctr-account-dialog__spacer'));
+		this.dialog.actions.append($('span.prctr-page-dialog__spacer'));
 		this.check = this.button('photoRecheck', 'secondary');
 		this.cancel = this.button('cancel', 'secondary');
 		this.save = this.button('savePhoto', 'brand');

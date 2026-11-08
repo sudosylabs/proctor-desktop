@@ -1,5 +1,5 @@
 @layer contributions {
-	.prctr-account-dialog {
+	.prctr-page-dialog {
 		background: var(--prctr-color-background-card);
 		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
 		border-radius: 12px;
@@ -18,59 +18,59 @@
 		overflow: auto;
 		padding: 22px 22px 18px;
 	}
-	.prctr-account-dialog:not([open]) {
+	.prctr-page-dialog:not([open]) {
 		display: none;
 	}
-	.prctr-account-dialog[data-size='medium'] {
+	.prctr-page-dialog[data-size='medium'] {
 		inline-size: min(500px, calc(100vw - 32px));
 		margin-block-start: min(72px, 10vh);
 	}
-	.prctr-account-dialog::backdrop {
+	.prctr-page-dialog::backdrop {
 		background: var(--prctr-color-overlay-backdrop);
 	}
-	.prctr-account-dialog .prctr-account-dialog__header {
+	.prctr-page-dialog .prctr-page-dialog__header {
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
 	}
-	.prctr-account-dialog .prctr-account-dialog__title {
+	.prctr-page-dialog .prctr-page-dialog__title {
 		font-size: 18px;
 		font-weight: var(--prctr-typography-weight-semibold);
 		line-height: 24px;
 		margin: 0;
 		overflow-wrap: anywhere;
 	}
-	.prctr-account-dialog .prctr-account-dialog__description {
+	.prctr-page-dialog .prctr-page-dialog__description {
 		color: var(--prctr-color-text-secondary);
 		font-size: 13.5px;
 		line-height: 20px;
 		margin: 0;
 		overflow-wrap: anywhere;
 	}
-	.prctr-account-dialog .prctr-account-dialog__body {
+	.prctr-page-dialog .prctr-page-dialog__body {
 		display: flex;
 		flex-direction: column;
 		gap: 18px;
 	}
-	.prctr-account-dialog .prctr-account-dialog__body:empty {
+	.prctr-page-dialog .prctr-page-dialog__body:empty {
 		display: none;
 	}
-	.prctr-account-dialog .prctr-account-dialog__actions {
+	.prctr-page-dialog .prctr-page-dialog__actions {
 		align-items: center;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
 		justify-content: flex-end;
 	}
-	.prctr-account-dialog .prctr-account-dialog__spacer {
+	.prctr-page-dialog .prctr-page-dialog__spacer {
 		flex: 1 1 auto;
 	}
-	.prctr-account-dialog [hidden] {
+	.prctr-page-dialog [hidden] {
 		display: none;
 	}
 
 	@media (forced-colors: active) {
-		.prctr-account-dialog {
+		.prctr-page-dialog {
 			border: var(--prctr-shape-stroke-default) solid CanvasText;
 		}
 	}

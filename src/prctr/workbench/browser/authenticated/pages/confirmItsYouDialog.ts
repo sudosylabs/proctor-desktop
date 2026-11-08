@@ -6,15 +6,29 @@ import { createElementFactory } from '../../../../base/browser/documentElements.
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
-import { IAccountService } from '../../../services/account/common/account.js';
-import { IAccountFormatService } from '../accountFormat.js';
-import { IAccountPaneContext } from '../accountPaneContext.js';
-import { AccountDialog } from './accountDialog.js';
-import { AccountFeedback } from './accountFeedback.js';
+import { PageDialog } from './pageDialog.js';
+import { PageFeedback } from './pageFeedback.js';
+import { IPageFormatService } from './pageFormat.js';
+import { IPagePaneContext } from './pagePaneContext.js';
 import './media/confirmItsYouDialog.css';
 
 const CANCEL_ICON = proctorIconFactory('action.close');
 const CONTINUE_ICON = proctorIconFactory('action.openExternal');
+
+/** How a confirmation in the browser ended. */
+export type ReauthenticationResult =
+	| { readonly kind: 'confirmed' }
+	| { readonly kind: 'cancelled' }
+	/** It failed or could not start; the text says why. */
+	| { readonly kind: 'failed'; readonly text: string };
+
+/** The area's privileged way to confirm it is the person, and to stop a confirmation. */
+export interface ReauthenticationPort {
+	/** Opens the institution's page in the system browser and waits for it to finish. */
+	confirm(): Promise<ReauthenticationResult>;
+	/** Stops a confirmation still waiting for the browser; its `confirm` then resolves. */
+	cancel(): void;
+}
 
 /**
  * Asks the person to confirm it is them before a change the institution guards, such as
@@ -23,8 +37,8 @@ const CONTINUE_ICON = proctorIconFactory('action.openExternal');
  * its owner. Cancel stops a confirmation still waiting for the browser.
  */
 export class ConfirmItsYouDialog extends Disposable {
-	private readonly dialog: AccountDialog;
-	private readonly feedback: AccountFeedback;
+	private readonly dialog: PageDialog;
+	private readonly feedback: PageFeedback;
 	private readonly cancel: ButtonControl;
 	private readonly confirm: ButtonControl;
 	private waiting = false;
@@ -34,14 +48,14 @@ export class ConfirmItsYouDialog extends Disposable {
 		/** What the guarded change will do, one line each, so the person knows what they confirm. */
 		summary: readonly string[],
 		private readonly onDidFinish: (confirmed: boolean) => void,
-		@IAccountService private readonly account: IAccountService,
-		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext
+		private readonly reauthentication: ReauthenticationPort,
+		@IPageFormatService private readonly format: IPageFormatService,
+		@IPagePaneContext private readonly pane: IPagePaneContext
 	) {
 		super();
 		const $ = createElementFactory(this.pane.document);
 		this.dialog = this._register(
-			new AccountDialog(
+			new PageDialog(
 				this.pane.document,
 				this.pane.overlays,
 				{
@@ -58,14 +72,14 @@ export class ConfirmItsYouDialog extends Disposable {
 		if (summary.length > 0)
 			this.dialog.body.append(
 				$(
-					'div.prctr-account-confirm-summary',
+					'div.prctr-page-confirm-summary',
 					{},
 					...summary.map((line, index) =>
 						$(index === 0 ? 'strong' : 'span', { textContent: line })
 					)
 				)
 			);
-		this.feedback = this._register(new AccountFeedback(this.dialog.body));
+		this.feedback = this._register(new PageFeedback(this.dialog.body));
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
@@ -90,30 +104,21 @@ export class ConfirmItsYouDialog extends Disposable {
 		if (this.waiting) return;
 		this.setWaiting(true);
 		this.feedback.set(this.format.text('confirmItsYouWaiting'), 'loading');
-		const result = await this.account.change({ kind: 'reauthenticate' });
+		const result = await this.reauthentication.confirm();
 		if (this._store.isDisposed) return;
 		this.setWaiting(false);
-		if (result !== 'busy' && result.kind === 'success') {
-			this.finish(true);
+		if (result.kind !== 'failed') {
+			this.finish(result.kind === 'confirmed');
 			return;
 		}
-		if (result !== 'busy' && result.kind === 'error' && result.reason === 'cancelled') {
-			this.finish(false);
-			return;
-		}
-		this.feedback.set(
-			result === 'busy'
-				? this.format.text('busy')
-				: this.format.failure(result.kind === 'error' ? result.reason : 'invalid'),
-			'error'
-		);
+		this.feedback.set(result.text, 'error');
 		this.confirm.focus();
 	}
 
 	/** Cancel while waiting stops the browser step; its reply then closes the dialog. */
 	private stop(): void {
 		if (this.waiting) {
-			void this.account.request({ kind: 'cancelReauthentication' });
+			this.reauthentication.cancel();
 			return;
 		}
 		this.finish(false);

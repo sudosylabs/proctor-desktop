@@ -1,5 +1,5 @@
 @layer contributions {
-	.prctr-account-dialog .prctr-account-confirm-summary {
+	.prctr-page-dialog .prctr-page-confirm-summary {
 		background: var(--prctr-color-background-raised);
 		border-radius: 8px;
 		display: flex;
@@ -10,18 +10,18 @@
 		padding: 12px 16px;
 	}
 
-	.prctr-account-dialog .prctr-account-confirm-summary > strong {
+	.prctr-page-dialog .prctr-page-confirm-summary > strong {
 		color: var(--prctr-color-text-primary);
 		font-size: 13.5px;
 		font-weight: var(--prctr-typography-weight-medium);
 	}
 
-	.prctr-account-dialog .prctr-account-confirm-summary > span {
+	.prctr-page-dialog .prctr-page-confirm-summary > span {
 		color: var(--prctr-color-text-secondary);
 	}
 
 	@media (forced-colors: active) {
-		.prctr-account-dialog .prctr-account-confirm-summary {
+		.prctr-page-dialog .prctr-page-confirm-summary {
 			border: 1px solid CanvasText;
 		}
 	}

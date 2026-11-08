@@ -1,5 +1,5 @@
 @layer contributions {
-	.prctr-account-dialog .prctr-account-token-form__scopes {
+	.prctr-page-dialog .prctr-account-token-form__scopes {
 		border: 0;
 		display: flex;
 		flex-direction: column;
@@ -8,13 +8,13 @@
 		min-inline-size: 0;
 		padding: 0;
 	}
-	.prctr-account-dialog .prctr-account-token-form__legend,
-	.prctr-account-dialog .prctr-account-token-form__label {
+	.prctr-page-dialog .prctr-account-token-form__legend,
+	.prctr-page-dialog .prctr-account-token-form__label {
 		font-size: 13px;
 		font-weight: var(--prctr-typography-weight-medium);
 		padding: 0 0 6px;
 	}
-	.prctr-account-dialog .prctr-account-token-form__scope-list {
+	.prctr-page-dialog .prctr-account-token-form__scope-list {
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
@@ -22,73 +22,73 @@
 		overflow-y: auto;
 		padding: 2px;
 	}
-	.prctr-account-dialog .prctr-account-token-form__scope {
+	.prctr-page-dialog .prctr-account-token-form__scope {
 		align-items: flex-start;
 		display: flex;
 		gap: 10px;
 	}
-	.prctr-account-dialog .prctr-account-token-form__scope-text {
+	.prctr-page-dialog .prctr-account-token-form__scope-text {
 		display: flex;
 		flex-direction: column;
 		gap: 2px;
 		min-inline-size: 0;
 	}
-	.prctr-account-dialog .prctr-account-token-form__scope-title {
+	.prctr-page-dialog .prctr-account-token-form__scope-title {
 		font-size: 13.5px;
 	}
-	.prctr-account-dialog .prctr-account-token-form__scope-description,
-	.prctr-account-dialog .prctr-account-token-form__hint,
-	.prctr-account-dialog .prctr-account-token-form__status {
+	.prctr-page-dialog .prctr-account-token-form__scope-description,
+	.prctr-page-dialog .prctr-account-token-form__hint,
+	.prctr-page-dialog .prctr-account-token-form__status {
 		color: var(--prctr-color-text-secondary);
 		font-size: 12.5px;
 		margin: 0;
 	}
-	.prctr-account-dialog .prctr-account-token-form__hint {
+	.prctr-page-dialog .prctr-account-token-form__hint {
 		padding-block-start: 6px;
 	}
-	.prctr-account-dialog .prctr-account-token-form__status--error {
+	.prctr-page-dialog .prctr-account-token-form__status--error {
 		color: var(--prctr-color-feedback-error);
 	}
-	.prctr-account-dialog
+	.prctr-page-dialog
 		.prctr-account-token-form__scope:has(.prctr-account-token-form__checkbox:disabled) {
 		opacity: 0.55;
 	}
-	.prctr-account-dialog .prctr-account-token-form__row {
+	.prctr-page-dialog .prctr-account-token-form__row {
 		display: flex;
 		gap: 12px;
 	}
-	.prctr-account-dialog .prctr-account-token-form__row > .prctr-account-token-form__field {
+	.prctr-page-dialog .prctr-account-token-form__row > .prctr-account-token-form__field {
 		flex: 1;
 		min-inline-size: 0;
 	}
-	.prctr-account-dialog .prctr-account-token-form__row > [hidden] {
+	.prctr-page-dialog .prctr-account-token-form__row > [hidden] {
 		display: none;
 	}
-	.prctr-account-dialog .prctr-account-token-form__checkbox {
+	.prctr-page-dialog .prctr-account-token-form__checkbox {
 		accent-color: var(--prctr-color-brand-accent);
 		block-size: 16px;
 		flex: none;
 		inline-size: 16px;
 		margin: 2px 0 0;
 	}
-	.prctr-account-dialog .prctr-account-token-form__checkbox:focus-visible {
+	.prctr-page-dialog .prctr-account-token-form__checkbox:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: 1px;
 	}
-	.prctr-account-dialog .prctr-account-token-form__error {
+	.prctr-page-dialog .prctr-account-token-form__error {
 		color: var(--prctr-color-feedback-error);
 		font-size: 13px;
 		margin: 0;
 	}
-	.prctr-account-dialog .prctr-account-token-form__field {
+	.prctr-page-dialog .prctr-account-token-form__field {
 		display: flex;
 		flex-direction: column;
 	}
-	.prctr-account-dialog .prctr-account-token-form__field > .prctr-select {
+	.prctr-page-dialog .prctr-account-token-form__field > .prctr-select {
 		inline-size: 100%;
 		min-inline-size: 0;
 	}
-	.prctr-account-dialog .prctr-account-token-credential {
+	.prctr-page-dialog .prctr-account-token-credential {
 		align-items: center;
 		background: var(--prctr-color-background-raised);
 		border-radius: var(--prctr-workbench-control-radius, 6px);
@@ -96,7 +96,7 @@
 		gap: 8px;
 		padding: 8px 8px 8px 12px;
 	}
-	.prctr-account-dialog .prctr-account-token-credential__value {
+	.prctr-page-dialog .prctr-account-token-credential__value {
 		flex: 1;
 		font-family: var(--prctr-typography-font-monospace);
 		font-size: 13px;
@@ -104,16 +104,16 @@
 		overflow-wrap: anywhere;
 		user-select: all;
 	}
-	.prctr-account-dialog .prctr-account-token-credential [data-copied] .prctr-icon {
+	.prctr-page-dialog .prctr-account-token-credential [data-copied] .prctr-icon {
 		color: var(--prctr-color-feedback-success);
 	}
-	.prctr-account-dialog .prctr-account-token-credential__value:focus-visible {
+	.prctr-page-dialog .prctr-account-token-credential__value:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: 2px;
 	}
 
 	@media (forced-colors: active) {
-		.prctr-account-dialog .prctr-account-token-credential {
+		.prctr-page-dialog .prctr-account-token-credential {
 			border: var(--prctr-shape-stroke-default) solid CanvasText;
 		}
 	}

@@ -57,6 +57,11 @@ export function failureMessage(reason: AccountFailure): FailureMessage {
 	return failureMessages[reason];
 }
 
+/** An Account failure named by a page section, which knows failures only as text. */
+export function accountFailureOf(reason: string): AccountFailure {
+	return Object.hasOwn(failureMessages, reason) ? (reason as AccountFailure) : 'unavailable';
+}
+
 /** The outcome is unknown or the item changed, so the list must be read again before a retry. */
 export function failureNeedsRead(reason: AccountFailure): boolean {
 	return reason === 'unconfirmed' || reason === 'conflict' || reason === 'notFound';
@@ -65,28 +70,6 @@ export function failureNeedsRead(reason: AccountFailure): boolean {
 /** The shown data no longer belongs to this window, so it is withdrawn rather than kept as stale. */
 export function failureWithdrawsData(reason: AccountFailure): boolean {
 	return reason === 'sessionEnded' || reason === 'denied' || reason === 'notFound';
-}
-
-// #endregion
-
-// #region Time
-
-/** Whole calendar days from `time` to `now` in the local time zone: 0 is today, 1 is yesterday. */
-export function calendarDaysBefore(time: number, now: number): number {
-	const day = (value: number): number => {
-		const date = new Date(value);
-		return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-	};
-	return Math.round((day(now) - day(time)) / DAY);
-}
-
-export type RelativeDay = 'today' | 'yesterday' | 'other';
-
-export function relativeDay(time: number, now: number): RelativeDay {
-	const days = calendarDaysBefore(time, now);
-	if (days === 0) return 'today';
-	if (days === 1) return 'yesterday';
-	return 'other';
 }
 
 // #endregion

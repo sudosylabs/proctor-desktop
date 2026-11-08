@@ -4,9 +4,10 @@
 
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
-import { IAccountPaneContext } from '../accountPaneContext.js';
+import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import { ConfirmItsYouDialog } from '../widgets/confirmItsYouDialog.js';
+import { ConfirmItsYouDialog } from '../../../browser/authenticated/pages/confirmItsYouDialog.js';
+import { accountReauthentication } from '../widgets/accountReauthentication.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
 import type {
@@ -30,10 +31,10 @@ import type { AccountMessage } from '../accountMessages.js';
 import type { AccountPageView } from '../accountPages.js';
 import { AccountRead } from '../widgets/accountRead.js';
 import {
-	AccountSection,
-	type AccountRowAction,
-	type AccountRowModel
-} from '../widgets/accountSection.js';
+	PageSection,
+	type PageRowAction,
+	type PageRowModel
+} from '../../../browser/authenticated/pages/pageSection.js';
 import { NewTokenDialog, TokenCreatedDialog } from './tokenDialogs.js';
 
 const actionLabels: Readonly<Record<TokenAction, AccountMessage>> = Object.freeze({
@@ -57,8 +58,8 @@ export class TokensPage extends Disposable implements AccountPageView {
 	private readonly tokens: AccountRead<'tokens'>;
 	/** Names scopes and Academic Units; tokens still show when it cannot be read. */
 	private readonly grantable: AccountRead<'grantableScopes'>;
-	private readonly active: AccountSection;
-	private readonly inactive: AccountSection;
+	private readonly active: PageSection;
+	private readonly inactive: PageSection;
 	private readonly create: ButtonControl;
 	private readonly dialog = this._register(new MutableDisposable());
 	private readonly unconfirmed = new Set<string>();
@@ -68,7 +69,7 @@ export class TokensPage extends Disposable implements AccountPageView {
 		headerActions: HTMLElement,
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IPagePaneContext private readonly pane: IPagePaneContext,
 		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
@@ -89,13 +90,13 @@ export class TokensPage extends Disposable implements AccountPageView {
 			})
 		);
 		this.active = this._register(
-			this.instantiationService.createInstance(AccountSection, body, {
+			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('activeTokens'),
 				description: this.format.text('activeTokensDescription')
 			})
 		);
 		this.inactive = this._register(
-			this.instantiationService.createInstance(AccountSection, body, {
+			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('inactiveTokens'),
 				description: this.format.text('inactiveTokensDescription')
 			})
@@ -166,17 +167,17 @@ export class TokensPage extends Disposable implements AccountPageView {
 		this.inactive.setRows(groups.inactive.map((token) => this.row(token)));
 	}
 
-	private row(token: AccountToken): AccountRowModel {
+	private row(token: AccountToken): PageRowModel {
 		const state = tokenState(token, this.format.now());
 		const section = state === 'active' ? this.active : this.inactive;
-		const actions: AccountRowAction[] = tokenActions(state).map((action) => ({
+		const actions: PageRowAction[] = tokenActions(state).map((action) => ({
 			label: this.format.text(actionLabels[action]),
 			icon: actionIcons[action],
 			destructive: action === 'revoke',
 			enabled: !this.unconfirmed.has(token.id),
 			run: () => this.runAction(action, token, section)
 		}));
-		const status: AccountRowModel['status'] =
+		const status: PageRowModel['status'] =
 			state === 'disabled'
 				? {
 						text: this.format.text('tokenDisabledStatus'),
@@ -251,7 +252,7 @@ export class TokensPage extends Disposable implements AccountPageView {
 		return this.format.join(lifetime, used);
 	}
 
-	private runAction(action: TokenAction, token: AccountToken, section: AccountSection): void {
+	private runAction(action: TokenAction, token: AccountToken, section: PageSection): void {
 		if (action === 'revoke') {
 			this.dialog.value = this.instantiationService.createInstance(
 				AccountConfirmation,
@@ -280,7 +281,7 @@ export class TokensPage extends Disposable implements AccountPageView {
 		intent: AccountIntent,
 		action: TokenAction,
 		token: AccountToken,
-		section: AccountSection,
+		section: PageSection,
 		confirmed: boolean
 	): void {
 		void this.account.change(intent).then((result) => {
@@ -301,7 +302,8 @@ export class TokensPage extends Disposable implements AccountPageView {
 						if (this._store.isDisposed) return;
 						if (ok) this.sendToggle(intent, action, token, section, true);
 						else section.focusRow(token.id);
-					}
+					},
+					accountReauthentication(this.account, this.format)
 				);
 				return;
 			}
@@ -317,7 +319,7 @@ export class TokensPage extends Disposable implements AccountPageView {
 	private onChangeComplete(
 		result: AccountResponse,
 		token: AccountToken,
-		section: AccountSection,
+		section: PageSection,
 		success: AccountMessage
 	): void {
 		if (result.kind === 'error') {

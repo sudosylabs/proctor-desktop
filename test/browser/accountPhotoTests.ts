@@ -2,9 +2,9 @@ import { ToastHost } from '../../src/prctr/base/browser/ui/toast/toastHost.ts';
 import { proctorIconFactory } from '../../src/prctr/platform/theme/browser/proctorIcon.ts';
 import { AccountPhotoDialog } from '../../src/prctr/workbench/contrib/account/profile/photoDialog.ts';
 import {
-	AccountPaneContext,
-	IAccountPaneContext
-} from '../../src/prctr/workbench/contrib/account/accountPaneContext.ts';
+	IPagePaneContext,
+	PagePaneContext
+} from '../../src/prctr/workbench/browser/authenticated/pages/pagePaneContext.ts';
 import { ServiceCollection } from '../../src/prctr/platform/instantiation/common/serviceCollection.ts';
 import { createAccountTestServices } from './accountTestServices.ts';
 import { MenuControl } from '../../src/prctr/base/browser/ui/menu/menuControl.ts';
@@ -16,7 +16,7 @@ import {
 } from '../../src/prctr/workbench/contrib/account/profile/photoImage.ts';
 import { WorkbenchOverlayHost } from '../../src/prctr/workbench/browser/overlayHost.ts';
 import { createLocalization } from '../../src/prctr/base/common/localization.ts';
-import { accountMessages } from '../../src/prctr/workbench/contrib/account/accountMessages.ts';
+import { accountText } from '../../src/prctr/workbench/contrib/account/accountMessages.ts';
 import type {
 	AccountIntent,
 	AccountResponse
@@ -128,7 +128,7 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 	};
 	const localization = createLocalization({
 		requestedLocale: 'en',
-		messages: Object.values(accountMessages)
+		messages: Object.values(accountText)
 	});
 	const services = createAccountTestServices({
 		document,
@@ -153,8 +153,8 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 	});
 	const pane = services.instantiationService.createChild(
 		new ServiceCollection([
-			IAccountPaneContext,
-			new AccountPaneContext(
+			IPagePaneContext,
+			new PagePaneContext(
 				document,
 				overlays,
 				menu,
@@ -163,7 +163,8 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 					dismissIcon: proctorIconFactory('action.close', 14)
 				}),
 				'Try again',
-				() => undefined
+				() => undefined,
+				(reason) => reason
 			)
 		])
 	);

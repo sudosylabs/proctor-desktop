@@ -6,10 +6,10 @@ import { createElementFactory } from '../../../../base/browser/documentElements.
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
-import './media/accountDialog.css';
+import type { WorkbenchOverlayHost } from '../../overlayHost.js';
+import './media/pageDialog.css';
 
-export interface AccountDialogOptions {
+export interface PageDialogOptions {
 	readonly title: string;
 	readonly description?: string;
 	/** An alert dialog asks to confirm a consequential change. */
@@ -25,7 +25,7 @@ let dialogSequence = 0;
  * opened it. Escape asks the owner to close, so an owner busy with a change can
  * refuse.
  */
-export class AccountDialog extends Disposable {
+export class PageDialog extends Disposable {
 	readonly element: HTMLDialogElement;
 	/** The dialog's own content, between its heading and its buttons. */
 	readonly body: HTMLElement;
@@ -40,7 +40,7 @@ export class AccountDialog extends Disposable {
 	constructor(
 		document: Document,
 		overlays: WorkbenchOverlayHost,
-		options: AccountDialogOptions,
+		options: PageDialogOptions,
 		fallbackFocus: () => void
 	) {
 		super();
@@ -48,23 +48,23 @@ export class AccountDialog extends Disposable {
 		const active = document.activeElement;
 		this.returnFocus = active instanceof HTMLElement ? active : undefined;
 		const $ = createElementFactory(document);
-		const id = `prctr-account-dialog-${++dialogSequence}`;
-		const title = $('h2.prctr-account-dialog__title', {
+		const id = `prctr-page-dialog-${++dialogSequence}`;
+		const title = $('h2.prctr-page-dialog__title', {
 			id: `${id}-title`,
 			textContent: options.title
 		});
-		const header = $('div.prctr-account-dialog__header', {}, title);
+		const header = $('div.prctr-page-dialog__header', {}, title);
 		if (options.description !== undefined)
 			header.append(
-				$('p.prctr-account-dialog__description', {
+				$('p.prctr-page-dialog__description', {
 					id: `${id}-description`,
 					textContent: options.description
 				})
 			);
-		this.body = $('div.prctr-account-dialog__body');
-		this.actions = $('div.prctr-account-dialog__actions');
+		this.body = $('div.prctr-page-dialog__body');
+		this.actions = $('div.prctr-page-dialog__actions');
 		this.element = $(
-			'dialog.prctr-account-dialog',
+			'dialog.prctr-page-dialog',
 			{
 				data: { size: options.size ?? 'small' },
 				attrs: {

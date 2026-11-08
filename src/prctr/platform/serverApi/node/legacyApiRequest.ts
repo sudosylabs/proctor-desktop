@@ -36,12 +36,13 @@ export function resolveApiRoute(
 				?.map(resolveContract)
 				.find((p) => p.in === 'query' && p.name === name);
 			const schema = param && resolveContract(param.schema);
-			query[name] =
-				schema?.type === 'integer' || schema?.type === 'number'
-					? Number(value)
-					: schema?.type === 'boolean'
-						? value === 'true'
-						: value;
+			// A repeated parameter keeps every value it was given, in order.
+			if (schema?.type === 'array') {
+				const items =
+					schema.items === undefined ? undefined : resolveContract(schema.items);
+				const previous = query[name];
+				query[name] = [...(Array.isArray(previous) ? previous : []), scalar(items, value)];
+			} else query[name] = scalar(schema, value);
 		}
 		const input: ApiRequestInput = {
 			path: params,
@@ -53,4 +54,10 @@ export function resolveApiRoute(
 		return { id: operation.operationId, input: input as ApiInput<ApiOperationId> };
 	}
 	throw new ServerApiError('invalidRequest');
+}
+
+function scalar(schema: { readonly type?: unknown } | undefined, value: string): unknown {
+	if (schema?.type === 'integer' || schema?.type === 'number') return Number(value);
+	if (schema?.type === 'boolean') return value === 'true';
+	return value;
 }

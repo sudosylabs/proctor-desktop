@@ -8,6 +8,7 @@ import { SyncDescriptor } from '../../../platform/instantiation/common/descripto
 import { IAuthenticatedNavigationService } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import type { WorkbenchContributionRegistration } from '../bootstrap.js';
 import { authenticatedMessages } from './authenticatedMessages.js';
+import { pageMessages } from './pages/pageMessages.js';
 
 /**
  * Creates the window's frame. The frame is the window's navigation service, so asking
@@ -19,11 +20,14 @@ class AuthenticatedFrameContribution extends Disposable {
 	}
 }
 
-/** AuthenticatedWindow's frame and navigation; product contributions depend on it. */
+/** AuthenticatedWindow's frame, navigation and shared page text; product contributions depend on it. */
 export const authenticatedFrameContribution: WorkbenchContributionRegistration = Object.freeze({
 	id: 'prctr.authenticated.navigation' as const,
 	phase: 'ready' as const,
 	dependencies: Object.freeze(['prctr.workbench.desktop' as const]),
-	messages: Object.freeze(Object.values(authenticatedMessages) as MessageDescriptor[]),
+	messages: Object.freeze([
+		...Object.values(authenticatedMessages),
+		...Object.values(pageMessages)
+	] as MessageDescriptor[]),
 	descriptor: new SyncDescriptor(AuthenticatedFrameContribution)
 });

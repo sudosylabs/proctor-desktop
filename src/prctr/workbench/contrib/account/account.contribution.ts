@@ -26,7 +26,7 @@ import {
 	IAuthenticatedNavigationService,
 	type AccountPage
 } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
-import { accountMessages as messages } from './accountMessages.js';
+import { accountMessages as messages, accountText } from './accountMessages.js';
 import { accountPageRegistry } from './accountPages.js';
 import { AccountPane, type AccountModel } from './accountPane.js';
 
@@ -153,7 +153,7 @@ export const accountContribution: WorkbenchContributionRegistration = Object.fre
 });
 
 function accountItem(page: AccountPage, localization: ILocalizationService): WorkbenchItem {
-	const title = localization.format(messages[accountPageRegistry[page].title]);
+	const title = localization.format(accountText[accountPageRegistry[page].title]);
 	return {
 		typeId: ACCOUNT_ITEM_TYPE,
 		logicalIdentity: page,
