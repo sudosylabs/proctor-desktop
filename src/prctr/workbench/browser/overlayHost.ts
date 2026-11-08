@@ -2,6 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import type { ControlIconFactory } from '../../base/browser/ui/controlIcon.js';
 import {
 	Disposable,
 	DisposableStore,
@@ -17,6 +18,8 @@ export interface OverlayAction {
 	readonly id: string;
 	readonly label: string;
 	readonly variant: 'danger' | 'primary' | 'secondary';
+	/** The action's icon; every labelled action in sign-in and the signed-in window has one. */
+	readonly icon?: ControlIconFactory;
 	readonly onRequest: () => void;
 }
 export interface ModalOverlayOptions {
@@ -96,7 +99,11 @@ export class WorkbenchOverlayHost extends Disposable {
 		const close = (): void => disposable.dispose();
 		for (const action of options.actions) {
 			const button = store.add(
-				new ButtonControl(actions, { label: action.label, variant: action.variant })
+				new ButtonControl(actions, {
+					label: action.label,
+					variant: action.variant,
+					...(action.icon === undefined ? {} : { icon: action.icon })
+				})
 			);
 			store.add(
 				button.onDidRequest(() => {

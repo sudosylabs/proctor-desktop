@@ -7,8 +7,8 @@ import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
 import type { LocalizationContext } from '../../../../base/common/localization.js';
-import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
-import type { SemanticIconId } from '../../../../platform/theme/common/semanticIcons.js';
+import { createProctorIcon } from '../../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { authenticatedMessages as m, type AuthenticatedMessage } from './authenticatedMessages.js';
 import './contentTopBar.css';
 
@@ -53,13 +53,13 @@ export class ContentTopBar extends Disposable {
 		this.showSidebar = this.createButton(
 			document,
 			'showSidebar',
-			'workbench.sidebarLeft',
+			'action.toggleSidebar',
 			'showSidebar'
 		);
 		this.showSidebar.setAttribute('aria-controls', sidebarId);
 		this.showSidebar.setAttribute('aria-expanded', 'false');
-		this.back = this.createButton(document, 'back', 'navigation.back', 'back');
-		this.forward = this.createButton(document, 'forward', 'navigation.forward', 'forward');
+		this.back = this.createButton(document, 'back', 'action.back', 'back');
+		this.forward = this.createButton(document, 'forward', 'action.forward', 'forward');
 		this.search = $('input.prctr-content-top-bar__input', {
 			type: 'search',
 			placeholder: this.text('searchPlaceholder'),
@@ -68,7 +68,7 @@ export class ContentTopBar extends Disposable {
 		const field = $(
 			'label.prctr-content-top-bar__search',
 			{},
-			this._register(createSemanticIcon(document, { id: 'action.search', size: 16 })).element,
+			this._register(createProctorIcon(document, { id: 'action.search', size: 16 })).element,
 			this.search,
 			$('kbd.prctr-content-top-bar__shortcut', {
 				textContent: searchShortcut.label,
@@ -109,7 +109,7 @@ export class ContentTopBar extends Disposable {
 	private createButton(
 		document: Document,
 		action: TopBarAction,
-		icon: SemanticIconId,
+		icon: ProctorIconId,
 		label: AuthenticatedMessage
 	): HTMLButtonElement {
 		const $ = createElementFactory(document);
@@ -118,7 +118,7 @@ export class ContentTopBar extends Disposable {
 			data: { action },
 			attrs: { 'aria-label': this.text(label) }
 		});
-		button.append(this._register(createSemanticIcon(document, { id: icon, size: 16 })).element);
+		button.append(this._register(createProctorIcon(document, { id: icon, size: 18 })).element);
 		this._register(
 			addDisposableListener(button, 'click', () => {
 				this.actionEmitter.fire(action);

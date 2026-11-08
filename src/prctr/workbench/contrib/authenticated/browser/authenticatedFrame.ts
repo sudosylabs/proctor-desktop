@@ -25,6 +25,8 @@ import {
 	type AuthenticatedLocation,
 	type AuthenticatedLocationChange
 } from '../common/authenticatedNavigationModel.js';
+import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { AreaRail } from './areaRail.js';
 import { AreaSidebar, type SidebarArea, type SidebarSelection } from './areaSidebar.js';
 import { authenticatedMessages as m, type AuthenticatedMessage } from './authenticatedMessages.js';
@@ -41,32 +43,42 @@ import { WindowTitle } from './windowTitle.js';
 /** Below this window width the sidebar stops docking and opens over the content instead. */
 const DOCKED_SIDEBAR_MIN_WINDOW_WIDTH = 1000;
 
+const activityIcons: Readonly<Record<ActivityView, ProctorIconId>> = Object.freeze({
+	overview: 'area.overview',
+	upcoming: 'activity.upcoming',
+	available: 'activity.available',
+	in_progress: 'activity.inProgress',
+	submitted: 'activity.submitted',
+	results_available: 'activity.results',
+	past: 'activity.past'
+});
+
 const sidebarAreas: readonly SidebarArea[] = Object.freeze([
 	{
 		destination: 'activity',
 		title: 'activityTitle',
-		entries: activityViews.map((view) => ({ id: view, label: view }))
+		entries: activityViews.map((view) => ({ id: view, label: view, icon: activityIcons[view] }))
 	},
 	{
 		destination: 'management',
 		title: 'managementTitle',
-		entries: [{ id: 'overview', label: 'overview' }]
+		entries: [{ id: 'overview', label: 'overview', icon: 'area.overview' }]
 	},
 	{
 		destination: 'administration',
 		title: 'administrationTitle',
-		entries: [{ id: 'overview', label: 'overview' }]
+		entries: [{ id: 'overview', label: 'overview', icon: 'area.overview' }]
 	},
 	{
 		destination: 'account',
 		title: 'accountTitle',
 		entries: [
-			{ id: 'profile', label: 'profile' },
-			{ id: 'security', label: 'security' },
-			{ id: 'sessions', label: 'sessions' },
-			{ id: 'tokens', label: 'tokens' },
-			{ id: 'history', label: 'history' },
-			{ id: 'settings', label: 'settings', opensDialog: true }
+			{ id: 'profile', label: 'profile', icon: 'account.profile' },
+			{ id: 'security', label: 'security', icon: 'account.security' },
+			{ id: 'sessions', label: 'sessions', icon: 'account.sessions' },
+			{ id: 'tokens', label: 'tokens', icon: 'account.tokens' },
+			{ id: 'history', label: 'history', icon: 'account.history' },
+			{ id: 'settings', label: 'settings', icon: 'account.settings', opensDialog: true }
 		]
 	}
 ] satisfies SidebarArea[]);
@@ -481,7 +493,35 @@ export class AuthenticatedFrame
 		if (hadFocus && !this.topBar.focusShowSidebar()) this.shell.focusVisiblePart(['content']);
 	}
 
+	/** Asks first; signing out ends this computer's session and returns to LaunchWindow. */
 	signOut(): void {
+		if (this.signingOut || this.shell.overlayHost.visible) return;
+		this.shell.overlayHost.show({
+			kind: 'dialog',
+			title: this.text('signOutConfirmTitle'),
+			message: this.text('signOutConfirmBody'),
+			accessibleLabel: this.text('signOutConfirmTitle'),
+			dismissOnEscape: true,
+			actions: [
+				{
+					id: 'cancel',
+					label: this.text('cancel'),
+					variant: 'secondary',
+					icon: proctorIconFactory('action.close'),
+					onRequest: () => {}
+				},
+				{
+					id: 'signOut',
+					label: this.text('signOut'),
+					variant: 'primary',
+					icon: proctorIconFactory('action.signOut'),
+					onRequest: () => this.signOutNow()
+				}
+			]
+		});
+	}
+
+	private signOutNow(): void {
 		if (this.signingOut) return;
 		this.signingOut = true;
 		this.sidebar.setSigningOut(true);

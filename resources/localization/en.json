@@ -1804,9 +1804,27 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
+    "authenticated.account.sign.out.confirm.body": {
+      "message": "You’ll need to sign in again to use Proctor on this computer. Nothing you submitted is affected.",
+      "description": "What signing out does, in the confirmation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.account.sign.out.confirm.title": {
+      "message": "Sign out of Proctor?",
+      "description": "Title of the confirmation before signing out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
     "authenticated.account.sign.out.failed": {
       "message": "Sign-out could not be completed.",
       "description": "Shown when ending the desktop session fails.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.cancel": {
+      "message": "Cancel",
+      "description": "Closes a confirmation without doing anything.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },

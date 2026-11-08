@@ -7,8 +7,11 @@ import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
 import type { LocalizationContext } from '../../../../base/common/localization.js';
-import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
-import type { SemanticIconId } from '../../../../platform/theme/common/semanticIcons.js';
+import {
+	createProctorIcon,
+	type ProctorIconControl
+} from '../../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import {
 	productDestinations,
 	type AuthenticatedDestination,
@@ -21,12 +24,12 @@ import './areaRail.css';
 const areaPresentation: Readonly<
 	Record<
 		ProductDestination,
-		{ readonly icon: SemanticIconId; readonly label: AuthenticatedMessage }
+		{ readonly icon: ProctorIconId; readonly label: AuthenticatedMessage }
 	>
 > = Object.freeze({
-	activity: { icon: 'product.calendar', label: 'activityArea' },
-	management: { icon: 'product.exams', label: 'managementArea' },
-	administration: { icon: 'product.administration', label: 'administrationArea' }
+	activity: { icon: 'area.activity', label: 'activityArea' },
+	management: { icon: 'area.exams', label: 'managementArea' },
+	administration: { icon: 'area.administration', label: 'administrationArea' }
 });
 
 /** Only the server's normalized WebP rendition is shown as the account photo. */
@@ -43,6 +46,7 @@ export class AreaRail extends Disposable {
 	readonly onDidSelect: Event<AuthenticatedDestination> = this.selectEmitter.event;
 
 	private readonly areas = new Map<ProductDestination, HTMLButtonElement>();
+	private readonly icons = new Map<ProductDestination, ProctorIconControl>();
 	private readonly account: HTMLButtonElement;
 	private readonly avatar: HTMLElement;
 	private readonly initials: string;
@@ -61,8 +65,9 @@ export class AreaRail extends Disposable {
 		for (const destination of productDestinations) {
 			const presentation = areaPresentation[destination];
 			const icon = this._register(
-				createSemanticIcon(document, { id: presentation.icon, size: 20 })
+				createProctorIcon(document, { id: presentation.icon, size: 20 })
 			);
+			this.icons.set(destination, icon);
 			const button = $(
 				'button.prctr-area-rail__area',
 				{ type: 'button', data: { destination } },
@@ -120,6 +125,12 @@ export class AreaRail extends Disposable {
 		for (const [destination, button] of this.areas) {
 			button.hidden = !destinations.includes(destination);
 			setCurrent(button, destination === current);
+			// The current area is drawn in the fill weight.
+			this.icons.get(destination)?.setState({
+				id: areaPresentation[destination].icon,
+				size: 20,
+				filled: destination === current
+			});
 		}
 		setCurrent(this.account, current === 'account');
 		this.roving.update(this.currentButton(current));

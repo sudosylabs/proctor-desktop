@@ -125,8 +125,8 @@ export const frameDivider = registerColor(
 export const navigationSelectedBackground = registerColor(
 	'proctor.navigationSelectedBackground',
 	{
-		light: Color.fromHex('#5C00AA17'),
-		dark: Color.fromHex('#B98AF029'),
+		light: Color.fromHex('#0000000F'),
+		dark: Color.fromHex('#FFFFFF14'),
 		hcLight: Color.fromHex('#0F4A851A'),
 		hcDark: Color.fromHex('#6FC3DF33')
 	},
@@ -139,8 +139,8 @@ export const navigationSelectedBackground = registerColor(
 export const navigationSelectedForeground = registerColor(
 	'proctor.navigationSelectedForeground',
 	{
-		light: Color.fromHex('#3D0072'),
-		dark: Color.fromHex('#EDE0FB'),
+		light: Color.fromHex('#161616'),
+		dark: Color.fromHex('#EDEDEE'),
 		hcLight: Color.fromHex('#292929'),
 		hcDark: Color.white
 	},

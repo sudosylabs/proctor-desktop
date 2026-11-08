@@ -7,7 +7,10 @@
 		flex-direction: column;
 		font-family: var(--prctr-typography-font-application);
 		gap: 4px;
-		padding: 12px 28px 24px;
+		inline-size: 100%;
+		margin-inline: auto;
+		max-inline-size: calc(760px + 80px);
+		padding: 12px 40px 40px;
 	}
 
 	.prctr-unavailable-page[hidden] {
@@ -15,9 +18,10 @@
 	}
 
 	.prctr-unavailable-page .prctr-unavailable-page__title {
-		font-size: 24px;
+		font-size: 26px;
 		font-weight: var(--prctr-typography-weight-semibold);
-		line-height: 32px;
+		letter-spacing: -0.015em;
+		line-height: 34px;
 		margin: 0;
 	}
 

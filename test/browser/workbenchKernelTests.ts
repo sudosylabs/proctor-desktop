@@ -2026,6 +2026,12 @@ async function runSettingsModalContributionTest(document: Document): Promise<voi
 			.querySelector<HTMLButtonElement>('[data-action="signOut"]');
 		if (!signOut) throw Error('Authenticated sign-out action is absent');
 		signOut.click();
+		// Signing out asks first; confirm it.
+		const confirm = [
+			...child.querySelectorAll<HTMLButtonElement>('.prctr-overlay-host__surface button')
+		].find((button) => button.textContent?.trim() === 'Sign out');
+		if (!confirm) throw Error('Sign out does not ask for confirmation');
+		confirm.click();
 		await waitFor(
 			() =>
 				result.shell.part('sidebar').querySelector('.prctr-area-sidebar__feedback')

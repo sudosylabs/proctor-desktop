@@ -1,11 +1,11 @@
 @layer workbench {
 	.prctr-overlay-host {
-		align-items: center;
+		align-items: flex-start;
 		background: var(--prctr-color-overlay-backdrop);
 		display: flex;
 		inset: 0;
 		justify-content: center;
-		padding: var(--prctr-spacing-region);
+		padding: 96px var(--prctr-spacing-region) var(--prctr-spacing-region);
 		position: absolute;
 		z-index: 100;
 	}
@@ -13,29 +13,27 @@
 		display: none;
 	}
 	.prctr-overlay-host .prctr-overlay-host__surface {
-		background: var(--prctr-color-background-raised);
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
-		border-radius: var(--prctr-shape-radius-large);
+		background: var(--prctr-color-background-card);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border-radius: 12px;
 		box-shadow: var(--prctr-elevation-modal);
+		box-sizing: border-box;
 		color: var(--prctr-color-text-primary);
 		display: grid;
-		gap: var(--prctr-spacing-content-large);
-		inline-size: min(32rem, 100%);
+		gap: 6px;
+		inline-size: min(420px, 100%);
 		max-block-size: 100%;
 		overflow: auto;
-		padding: var(--prctr-spacing-region);
+		padding: 22px 22px 18px;
 	}
 	.prctr-overlay-host .prctr-overlay-host__title {
-		font: var(--prctr-typography-weight-semibold)
-			var(--prctr-typography-heading-medium-size)/var(
-				--prctr-typography-heading-medium-lineHeight
-			)
+		font: var(--prctr-typography-weight-semibold) 18px/24px
 			var(--prctr-typography-font-application);
 		margin: 0;
 	}
 	.prctr-overlay-host .prctr-overlay-host__message {
-		font: var(--prctr-typography-weight-regular)
-			var(--prctr-typography-body-size)/var(--prctr-typography-body-lineHeight)
+		color: var(--prctr-color-text-secondary);
+		font: var(--prctr-typography-weight-regular) 13.5px/20px
 			var(--prctr-typography-font-application);
 		margin: 0;
 		overflow-wrap: anywhere;
@@ -43,8 +41,9 @@
 	.prctr-overlay-host .prctr-overlay-host__actions {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--prctr-spacing-content-medium);
+		gap: 8px;
 		justify-content: end;
+		margin-block-start: 12px;
 	}
 	@media (forced-colors: active) {
 		.prctr-overlay-host .prctr-overlay-host__surface {

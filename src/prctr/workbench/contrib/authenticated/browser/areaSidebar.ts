@@ -9,7 +9,11 @@ import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
 import type { LocalizationContext } from '../../../../base/common/localization.js';
 import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
+import {
+	createProctorIcon,
+	type ProctorIconControl
+} from '../../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import type { AuthenticatedDestination } from '../common/authenticatedNavigationModel.js';
 import { authenticatedMessages as m, type AuthenticatedMessage } from './authenticatedMessages.js';
 import { RovingFocus } from './rovingFocus.js';
@@ -19,6 +23,8 @@ import './areaSidebar.css';
 export interface SidebarEntry {
 	readonly id: string;
 	readonly label: AuthenticatedMessage;
+	/** Every entry has an icon; the current page shows its fill weight. */
+	readonly icon: ProctorIconId;
 	readonly opensDialog?: boolean;
 }
 
@@ -35,7 +41,14 @@ export interface SidebarSelection {
 
 interface AreaView {
 	readonly group: HTMLElement;
-	readonly entries: ReadonlyMap<string, HTMLButtonElement>;
+	readonly entries: ReadonlyMap<
+		string,
+		{
+			readonly button: HTMLButtonElement;
+			readonly icon: ProctorIconControl;
+			readonly id: ProctorIconId;
+		}
+	>;
 }
 
 /**
@@ -86,7 +99,7 @@ export class AreaSidebar extends Disposable {
 			}
 		});
 		this.hide.append(
-			this._register(createSemanticIcon(document, { id: 'workbench.sidebarLeft', size: 16 }))
+			this._register(createProctorIcon(document, { id: 'action.toggleSidebar', size: 18 }))
 				.element
 		);
 		this._register(hover(this.hide, this.text('hideSidebar')));
@@ -114,8 +127,7 @@ export class AreaSidebar extends Disposable {
 			data: { action: 'signOut' }
 		});
 		this.signOut.append(
-			this._register(createSemanticIcon(document, { id: 'action.signOut', size: 16 }))
-				.element,
+			this._register(createProctorIcon(document, { id: 'action.signOut', size: 18 })).element,
 			$('span.prctr-area-sidebar__label', { textContent: this.text('signOut') })
 		);
 		this.signOutFeedback = $('p.prctr-area-sidebar__feedback', {
@@ -146,19 +158,30 @@ export class AreaSidebar extends Disposable {
 
 	private createArea(area: SidebarArea): void {
 		const $ = createElementFactory(this.pages.ownerDocument);
-		const entries = new Map<string, HTMLButtonElement>();
+		const entries = new Map<
+			string,
+			{
+				readonly button: HTMLButtonElement;
+				readonly icon: ProctorIconControl;
+				readonly id: ProctorIconId;
+			}
+		>();
 		const group = $('div.prctr-area-sidebar__group', {
 			data: { destination: area.destination }
 		});
 		for (const entry of area.entries) {
+			const icon = this._register(
+				createProctorIcon(this.pages.ownerDocument, { id: entry.icon, size: 18 })
+			);
 			const button = $(
 				'button.prctr-area-sidebar__entry',
 				{ type: 'button', data: { entry: entry.id } },
+				icon.element,
 				$('span.prctr-area-sidebar__label', { textContent: this.text(entry.label) })
 			);
 			if (entry.opensDialog) button.setAttribute('aria-haspopup', 'dialog');
 			group.append(button);
-			entries.set(entry.id, button);
+			entries.set(entry.id, { button, icon, id: entry.icon });
 			this._register(
 				addDisposableListener(button, 'click', () => {
 					this.selectEmitter.fire({ destination: area.destination, entry: entry.id });
@@ -196,8 +219,9 @@ export class AreaSidebar extends Disposable {
 		let current: HTMLButtonElement | undefined;
 		for (const [area, view] of this.areas) {
 			view.group.hidden = area !== destination;
-			for (const [id, button] of view.entries) {
+			for (const [id, { button, icon, id: iconId }] of view.entries) {
 				const selected = area === destination && id === entry;
+				icon.setState({ id: iconId, size: 18, filled: selected });
 				if (selected) {
 					button.setAttribute('aria-current', 'page');
 					current = button;

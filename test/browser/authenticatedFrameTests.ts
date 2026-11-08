@@ -269,16 +269,32 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 			'Back command crosses areas'
 		);
 
-		step('Sign out failure stays in the Account sidebar.');
+		step('Sign out asks first, and a failure stays in the Account sidebar.');
 		photo.click();
-		sidebar.querySelector<HTMLButtonElement>('[data-action="signOut"]')!.click();
+		const signOutEntry = sidebar.querySelector<HTMLButtonElement>('[data-action="signOut"]')!;
+		const confirmation = (): HTMLElement | null =>
+			sidebar.ownerDocument.querySelector<HTMLElement>('.prctr-overlay-host__surface');
+		const dialogButton = (label: string): HTMLButtonElement =>
+			[...confirmation()!.querySelectorAll<HTMLButtonElement>('button')].find(
+				(button) => button.textContent?.trim() === label
+			)!;
+		signOutEntry.click();
+		check(
+			confirmation()?.textContent?.includes('Sign out of Proctor?') === true,
+			'Sign out asks for confirmation'
+		);
+		check(signOuts === 0, 'Nothing signs out before confirming');
+		dialogButton('Cancel').click();
+		check(confirmation() === null && signOuts === 0, 'Cancel keeps the session');
+		signOutEntry.click();
+		dialogButton('Sign out').click();
 		await eventually(
 			() =>
 				sidebar.querySelector('.prctr-area-sidebar__feedback')?.textContent ===
 				'Sign-out could not be completed.',
 			'Sign-out failure is reported'
 		);
-		check(signOuts === 1, 'Sign out ran once');
+		check(Number(signOuts) === 1, 'Sign out ran once');
 
 		step('Hiding and showing the docked sidebar is remembered on the device.');
 		const hide = sidebar.querySelector<HTMLButtonElement>('.prctr-area-sidebar__hide')!;

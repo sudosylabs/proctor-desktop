@@ -122,6 +122,22 @@ export const authenticatedMessages = Object.freeze({
 		defaultMessage: 'Sign out',
 		description: 'Ends the current desktop session.'
 	}),
+	signOutConfirmTitle: defineMessage({
+		id: 'authenticated.account.sign.out.confirm.title',
+		defaultMessage: 'Sign out of Proctor?',
+		description: 'Title of the confirmation before signing out.'
+	}),
+	signOutConfirmBody: defineMessage({
+		id: 'authenticated.account.sign.out.confirm.body',
+		defaultMessage:
+			'You’ll need to sign in again to use Proctor on this computer. Nothing you submitted is affected.',
+		description: 'What signing out does, in the confirmation.'
+	}),
+	cancel: defineMessage({
+		id: 'authenticated.cancel',
+		defaultMessage: 'Cancel',
+		description: 'Closes a confirmation without doing anything.'
+	}),
 	signOutFailed: defineMessage({
 		id: 'authenticated.account.sign.out.failed',
 		defaultMessage: 'Sign-out could not be completed.',

@@ -15,6 +15,14 @@ const icons = {
 	'area.activity': 'calendar-check',
 	'area.exams': 'exam',
 	'area.administration': 'buildings',
+	'area.overview': 'squares-four',
+
+	'activity.upcoming': 'calendar-blank',
+	'activity.available': 'play-circle',
+	'activity.inProgress': 'hourglass',
+	'activity.submitted': 'check-circle',
+	'activity.results': 'seal-check',
+	'activity.past': 'clock-counter-clockwise',
 
 	'account.profile': 'user-circle',
 	'account.security': 'shield-check',

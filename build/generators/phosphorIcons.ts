@@ -41,6 +41,7 @@ const regular = [
 	'funnel',
 	'gear-six',
 	'globe',
+	'hourglass',
 	'info',
 	'key',
 	'laptop',
@@ -61,6 +62,7 @@ const regular = [
 	'shield-check',
 	'sidebar-simple',
 	'sign-out',
+	'squares-four',
 	'sun',
 	'terminal-window',
 	'trash',
@@ -72,13 +74,19 @@ const regular = [
 ] as const;
 const fill = [
 	'buildings',
+	'calendar-blank',
 	'calendar-check',
+	'check-circle',
 	'clock-counter-clockwise',
 	'devices',
 	'exam',
 	'gear-six',
+	'hourglass',
 	'key',
+	'play-circle',
+	'seal-check',
 	'shield-check',
+	'squares-four',
 	'user-circle'
 ] as const;
 
