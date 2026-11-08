@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sha256": "ef9e7d280ef4fdfccd822dec6e5b9140c944d002548ebf8beaa0dbb46d761271",
-  "paths": 238,
+  "sha256": "c23b2d5dfe960c34a4350c4f919c0d92f4ac49847e28606154006be9fb72019e",
+  "paths": 246,
   "operations": [
     {
       "operationId": "runAcademicAdministrationBatch",
@@ -229,6 +229,54 @@
       "operationId": "getDesktopAuthorizationContext",
       "method": "GET",
       "path": "/api/v1/auth/desktop/authorizations/context",
+      "transport": "http"
+    },
+    {
+      "operationId": "startDesktopReauthentication",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/reauthentications",
+      "transport": "http"
+    },
+    {
+      "operationId": "approveDesktopReauthentication",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/reauthentications/approve",
+      "transport": "http"
+    },
+    {
+      "operationId": "authenticateDesktopReauthenticationWithPassword",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/reauthentications/authenticate/password",
+      "transport": "http"
+    },
+    {
+      "operationId": "beginDesktopReauthenticationExternalAuthentication",
+      "method": "GET",
+      "path": "/api/v1/auth/desktop/reauthentications/authenticate/providers/{provider_id}/login",
+      "transport": "http"
+    },
+    {
+      "operationId": "bindDesktopReauthenticationBrowser",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/reauthentications/bind",
+      "transport": "http"
+    },
+    {
+      "operationId": "cancelDesktopReauthentication",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/reauthentications/cancel",
+      "transport": "http"
+    },
+    {
+      "operationId": "completeDesktopReauthentication",
+      "method": "POST",
+      "path": "/api/v1/auth/desktop/reauthentications/complete",
+      "transport": "http"
+    },
+    {
+      "operationId": "getDesktopReauthenticationContext",
+      "method": "GET",
+      "path": "/api/v1/auth/desktop/reauthentications/context",
       "transport": "http"
     },
     {

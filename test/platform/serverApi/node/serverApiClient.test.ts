@@ -33,8 +33,8 @@ const json = (value: unknown, status = 200, headers = {}): HttpResponse => ({
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
 
 void test('every packaged operation has executable request/response schemas, including conditional and non-JSON routes', () => {
-	assert.equal(apiOperations.size, 290);
-	assert.equal(new Set([...apiOperations.values()].map((operation) => operation.path)).size, 238);
+	assert.equal(apiOperations.size, 298);
+	assert.equal(new Set([...apiOperations.values()].map((operation) => operation.path)).size, 246);
 	for (const operation of apiOperations.values()) {
 		for (const parameter of operation.parameters ?? []) {
 			try {
