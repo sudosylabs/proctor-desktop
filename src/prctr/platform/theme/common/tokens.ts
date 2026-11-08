@@ -152,11 +152,6 @@ const tokenDefinitions = [
 		kind: 'color',
 		description: 'Window frame behind the area rail and sidebar when no material shows.'
 	},
-	{
-		id: 'color.frame.sidebar',
-		kind: 'color',
-		description: 'Wash that sets the contextual sidebar apart from the area rail.'
-	},
 	{ id: 'color.frame.divider', kind: 'color', description: 'Hairline between frame regions.' },
 	{
 		id: 'color.navigation.selected',

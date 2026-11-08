@@ -169,8 +169,8 @@ export class ProfilePage extends Disposable implements AccountPageView {
 				icon: SEND_EMAIL_ICON
 			})
 		);
-		// A lasting condition of the account, shown above its details as a banner.
-		this.details.element.before(this.unverified);
+		// A lasting condition of the account, shown as a banner at the top of the page.
+		identityBlock.before(this.unverified);
 		this.verificationFeedback = this._register(new AccountFeedback(body));
 		this.unverified.after(this.verificationFeedback.element);
 

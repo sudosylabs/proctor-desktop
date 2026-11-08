@@ -10,40 +10,51 @@
 		flex-wrap: wrap;
 		gap: 8px;
 	}
-	/* A native select drawn as a Proctor field: icon, value, caret. */
+	/* A button-like field: icon, name, choice, caret, with the native select laid over it. */
 	.prctr-account .prctr-account-history__picker {
 		align-items: center;
-		color: var(--prctr-color-text-secondary);
+		background: var(--prctr-color-background-card);
+		block-size: 32px;
+		border-radius: 8px;
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-control);
+		box-sizing: border-box;
+		color: var(--prctr-color-text-primary);
 		display: inline-flex;
+		font-size: 13px;
+		gap: 6px;
 		max-inline-size: 100%;
+		padding: 0 10px;
 		position: relative;
+		white-space: nowrap;
+	}
+	.prctr-account .prctr-account-history__picker:hover {
+		background: var(--prctr-color-interaction-hover);
+	}
+	.prctr-account .prctr-account-history__picker:focus-within {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
 	}
 	.prctr-account .prctr-account-history__picker > .prctr-icon {
-		pointer-events: none;
-		position: absolute;
+		color: var(--prctr-color-text-secondary);
+		flex: none;
 	}
-	.prctr-account .prctr-account-history__picker > .prctr-icon:first-child {
-		inset-inline-start: 10px;
+	.prctr-account .prctr-account-history__label {
+		color: var(--prctr-color-text-secondary);
 	}
-	.prctr-account .prctr-account-history__picker > .prctr-icon:last-child {
-		inset-inline-end: 10px;
+	.prctr-account .prctr-account-history__value {
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	.prctr-account .prctr-account-history__filter {
 		appearance: none;
-		background: var(--prctr-color-background-card);
-		block-size: 32px;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-control);
-		border-radius: 8px;
-		color: var(--prctr-color-text-primary);
+		block-size: 100%;
 		cursor: pointer;
 		font: inherit;
-		font-size: 13px;
-		max-inline-size: 100%;
-		padding: 0 30px 0 32px;
-	}
-	.prctr-account .prctr-account-history__filter:focus-visible {
-		outline: 2px solid var(--prctr-color-border-focus);
-		outline-offset: 1px;
+		inline-size: 100%;
+		inset: 0;
+		margin: 0;
+		opacity: 0;
+		position: absolute;
 	}
 	.prctr-account .prctr-account-history__shown {
 		color: var(--prctr-color-text-tertiary);
@@ -133,11 +144,8 @@
 		justify-content: center;
 	}
 	@media (forced-colors: active) {
-		.prctr-account .prctr-account-history__picker > .prctr-icon:last-child {
-			display: none;
-		}
-		.prctr-account .prctr-account-history__filter {
-			appearance: auto;
+		.prctr-account .prctr-account-history__picker {
+			border: 1px solid ButtonText;
 		}
 	}
 }

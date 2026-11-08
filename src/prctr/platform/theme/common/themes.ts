@@ -142,7 +142,6 @@ const semanticColorRoles = {
 	'color.scrollbar.thumbHover': 'scrollbarSlider.hoverBackground',
 	'color.scrollbar.thumbActive': 'scrollbarSlider.activeBackground',
 	'color.frame.background': 'proctor.frameBackground',
-	'color.frame.sidebar': 'proctor.frameSidebarBackground',
 	'color.frame.divider': 'proctor.frameDivider',
 	'color.navigation.selected': 'proctor.navigationSelectedBackground',
 	'color.navigation.selectedForeground': 'proctor.navigationSelectedForeground',

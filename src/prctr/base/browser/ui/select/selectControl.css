@@ -10,7 +10,7 @@
 
 	.prctr-select .prctr-select__input {
 		appearance: none;
-		background: var(--prctr-color-background-card);
+		background: var(--prctr-theme-input-background);
 		block-size: 32px;
 		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-control);
 		border-radius: 8px;

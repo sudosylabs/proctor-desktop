@@ -124,23 +124,40 @@ export class HistoryPage extends Disposable implements AccountPageView {
 		] as const)
 			this.outcome.append($('option', { value, textContent: services.text(label) }));
 		this.shown = $('span.prctr-account-history__shown', { attrs: { 'aria-live': 'polite' } });
-		// Each filter is a native select drawn as a Proctor field, with its own icon.
-		const picker = (select: HTMLSelectElement, icon: ProctorIconId): HTMLElement =>
-			$(
+		// Each filter is drawn as a button showing its name and current choice; the native
+		// select lies over it, so the system list, keyboard and screen readers still apply.
+		const picker = (
+			select: HTMLSelectElement,
+			icon: ProctorIconId,
+			label: AccountMessage
+		): HTMLElement => {
+			const value = $('span.prctr-account-history__value');
+			const sync = (): void => {
+				value.textContent = select.selectedOptions[0]?.textContent ?? '';
+			};
+			sync();
+			this._register(addDisposableListener(select, 'change', sync));
+			return $(
 				'span.prctr-account-history__picker',
 				{},
 				this._register(createProctorIcon(document, { id: icon, size: 16 })).element,
-				select,
-				this._register(createProctorIcon(document, { id: 'action.expand', size: 14 }))
-					.element
+				$('span.prctr-account-history__label', {
+					textContent: services.text(label),
+					attrs: { 'aria-hidden': 'true' }
+				}),
+				value,
+				this._register(createProctorIcon(document, { id: 'action.expand', size: 12 }))
+					.element,
+				select
 			);
+		};
 		const filters = $(
 			'div.prctr-account-history__filters',
 			{ attrs: { role: 'group', 'aria-label': services.text('historyTitle') } },
-			picker(this.period, 'object.calendar'),
-			picker(this.group, 'action.filter'),
-			picker(this.relation, 'account.profile'),
-			picker(this.outcome, 'status.success'),
+			picker(this.period, 'object.calendar', 'historyPeriodLabel'),
+			picker(this.group, 'action.filter', 'historyGroupLabel'),
+			picker(this.relation, 'account.profile', 'historyRelationLabel'),
+			picker(this.outcome, 'status.success', 'historyOutcomeLabel'),
 			this.shown
 		);
 
@@ -354,7 +371,7 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			'tr.prctr-account-history__row',
 			{ data: { failed: String(entry.failed) } },
 			$('td.prctr-account-history__when', {
-				textContent: this.services.relative(entry.createdAt),
+				textContent: this.services.relativeStandalone(entry.createdAt),
 				title: this.services.dateTime(entry.createdAt)
 			}),
 			$(

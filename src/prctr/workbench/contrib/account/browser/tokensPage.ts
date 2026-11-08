@@ -104,15 +104,34 @@ export class TokensPage extends Disposable implements AccountPageView {
 		const data = this.tokens.data;
 		const groups = groupTokens(data?.tokens ?? [], this.services.now());
 		const retry = (): void => void this.tokens.refresh();
+		// With no tokens at all the page is one section that says so and offers the first token.
+		const none = data !== undefined && groups.active.length + groups.inactive.length === 0;
+		this.create.element.hidden = none;
+		if (none) this.active.setHeading(this.services.text('yourTokens'));
+		else
+			this.active.setHeading(
+				this.services.text('activeTokens'),
+				this.services.text('activeTokensDescription')
+			);
 		this.active.setState(
 			state,
-			data !== undefined && groups.active.length === 0
-				? this.services.text('noActiveTokens')
-				: false,
+			none
+				? {
+						title: this.services.text('noTokensTitle'),
+						text: this.services.text('noTokensBody'),
+						action: {
+							label: this.services.text('newToken'),
+							icon: 'action.add',
+							run: () => this.openNewToken()
+						}
+					}
+				: data !== undefined && groups.active.length === 0
+					? this.services.text('noActiveTokens')
+					: false,
 			retry
 		);
 		// One read serves both sections, so its loading or failure is shown once, in the first.
-		this.inactive.hidden = data === undefined;
+		this.inactive.hidden = data === undefined || none;
 		this.inactive.setState(
 			data === undefined ? { kind: 'ready' } : state,
 			groups.inactive.length === 0 ? this.services.text('noInactiveTokens') : false,

@@ -54,6 +54,13 @@ export interface AccountSectionAction {
 	readonly destructive?: boolean;
 }
 
+/** An empty section: an optional title, one sentence, and optionally the action that fills it. */
+export interface AccountEmpty {
+	readonly title?: string;
+	readonly text: string;
+	readonly action?: { readonly label: string; readonly icon: ProctorIconId; run(): void };
+}
+
 const SKELETON_ROWS = 3;
 
 /**
@@ -68,6 +75,10 @@ export class AccountSection extends Disposable {
 	readonly feedback: AccountFeedback;
 
 	private readonly heading: HTMLHeadingElement;
+	private readonly description: HTMLElement;
+	private readonly stateTitle: HTMLElement;
+	private readonly emptyAction: ButtonControl;
+	private emptyRun: (() => void) | undefined;
 	private readonly card: HTMLElement;
 	private readonly list: HTMLUListElement;
 	private readonly skeleton: HTMLElement;
@@ -104,11 +115,11 @@ export class AccountSection extends Disposable {
 			tabIndex: -1,
 			textContent: options.title
 		});
-		const heading = $('div.prctr-account-section__heading', {}, this.heading);
-		if (options.description)
-			heading.append(
-				$('p.prctr-account-section__description', { textContent: options.description })
-			);
+		this.description = $('p.prctr-account-section__description', {
+			hidden: !options.description,
+			textContent: options.description ?? ''
+		});
+		const heading = $('div.prctr-account-section__heading', {}, this.heading, this.description);
 		const header = $('div.prctr-account-section__header', {}, heading);
 		if (options.action !== undefined) {
 			this.action = this._register(
@@ -162,12 +173,13 @@ export class AccountSection extends Disposable {
 		this.stateIcon = this._register(
 			createProctorIcon(document, { id: 'status.attention', size: 18 })
 		);
+		this.stateTitle = $('strong.prctr-account-section__state-title', { hidden: true });
 		this.stateText = $('span.prctr-account-section__state-text');
 		this.state = $(
 			'div.prctr-account-section__state',
 			{},
 			this.stateIcon.element,
-			this.stateText
+			$('span.prctr-account-section__state-body', {}, this.stateTitle, this.stateText)
 		);
 		this.retry = this._register(
 			new ButtonControl(this.state, {
@@ -177,6 +189,16 @@ export class AccountSection extends Disposable {
 				icon: proctorIconFactory('action.retry', 14)
 			})
 		);
+		this.emptyAction = this._register(
+			new ButtonControl(this.state, {
+				variant: 'secondary',
+				size: 'small',
+				label: '',
+				icon: proctorIconFactory('action.add', 14)
+			})
+		);
+		this.emptyAction.element.hidden = true;
+		this._register(this.emptyAction.onDidRequest(() => this.emptyRun?.()));
 		this.list = $('ul.prctr-account-section__rows', { attrs: { 'aria-labelledby': id } });
 		this.content = $('div.prctr-account-section__content');
 		this.card = $(
@@ -218,6 +240,13 @@ export class AccountSection extends Disposable {
 		return true;
 	}
 
+	/** Renames the section, such as when an empty page folds two sections into one. */
+	setHeading(title: string, description?: string): void {
+		this.heading.textContent = title;
+		this.description.textContent = description ?? '';
+		this.description.hidden = !description;
+	}
+
 	focusHeading(): void {
 		this.heading.focus();
 	}
@@ -226,7 +255,11 @@ export class AccountSection extends Disposable {
 	 * Presents a read state. `empty` applies only when the read is ready; a failed, slow or
 	 * stale state offers a retry that calls `retry`.
 	 */
-	setState(state: AccountReadState, empty: string | false, retry?: () => void): void {
+	setState(
+		state: AccountReadState,
+		empty: string | AccountEmpty | false,
+		retry?: () => void
+	): void {
 		this.retryHandler = retry;
 		this.element.setAttribute('aria-busy', String(state.kind === 'loading'));
 		this.element.dataset.state = state.kind;
@@ -244,10 +277,11 @@ export class AccountSection extends Disposable {
 		}
 		if (state.kind === 'failed') {
 			this.clearRows();
-			this.showState(
-				'failure',
-				this.services.text('loadFailed', { reason: this.services.failure(state.reason) })
-			);
+			this.showState('failure', {
+				text: this.services.text('loadFailed', {
+					reason: this.services.failure(state.reason)
+				})
+			});
 			return;
 		}
 		if (state.kind === 'stale') {
@@ -257,7 +291,8 @@ export class AccountSection extends Disposable {
 			);
 			return;
 		}
-		if (empty !== false) this.showState('empty', empty);
+		if (empty !== false)
+			this.showState('empty', typeof empty === 'string' ? { text: empty } : empty);
 	}
 
 	setRows(rows: readonly AccountRowModel[]): void {
@@ -298,12 +333,21 @@ export class AccountSection extends Disposable {
 		this.noteText.textContent = text;
 	}
 
-	private showState(kind: 'failure' | 'empty', text: string): void {
+	private showState(kind: 'failure' | 'empty', content: AccountEmpty): void {
 		this.state.hidden = false;
 		this.state.dataset.kind = kind;
-		this.stateText.textContent = text;
+		this.stateTitle.textContent = content.title ?? '';
+		this.stateTitle.hidden = content.title === undefined;
+		this.stateText.textContent = content.text;
 		this.retry.element.hidden = kind !== 'failure';
 		this.stateIcon.element.hidden = kind === 'empty';
+		this.emptyRun = content.action?.run;
+		this.emptyAction.element.hidden = content.action === undefined;
+		if (content.action !== undefined)
+			this.emptyAction.setState({
+				label: content.action.label,
+				icon: proctorIconFactory(content.action.icon, 14)
+			});
 	}
 
 	private createRow(

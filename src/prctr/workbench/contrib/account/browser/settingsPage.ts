@@ -38,6 +38,9 @@ import {
 import type { AccountMessage } from './accountMessages.js';
 import type { AccountPageServices, AccountPageView } from './accountPageServices.js';
 import './settingsPage.css';
+import { SCHEME_THEME_NAMES } from '../../../../platform/theme/common/bundledThemes.js';
+import { getTheme } from '../../../../platform/theme/common/themes.js';
+import type { ControlIconFactory } from '../../../../base/browser/ui/controlIcon.js';
 
 /** The scheme aliases are for the exam window's own choice; the page lists named themes. */
 const SCHEME_ALIASES = new Set(['light', 'dark', 'hcLight', 'hcDark']);
@@ -134,9 +137,11 @@ export class SettingsPage extends Disposable implements AccountPageView {
 			this.find
 		);
 		const toolbar = $('div.prctr-settings-page__toolbar', {}, tablist, find);
-		const root = $('div.prctr-settings-page', {}, toolbar);
+		const root = $('div.prctr-settings-page');
 		body.append(root);
+		// The banner states a condition of the whole page, so it comes before the tabs.
 		this.banner = this._register(new BannerControl(root));
+		root.append(toolbar);
 		this.preview = $('div.prctr-settings-page__preview', { hidden: true });
 		this.groups = $('div.prctr-settings-page__groups', {
 			id: 'prctr-settings-panel',
@@ -497,7 +502,8 @@ export class SettingsPage extends Disposable implements AccountPageView {
 							value: String(choice.value),
 							label: this.choiceLabel(choice)
 						}));
-			const current = String(value);
+			const current =
+				row.id === 'workbench.colorTheme' ? editorThemeName(value) : String(value);
 			if (!choices.some((choice) => choice.value === current))
 				choices.unshift({ value: current, label: current });
 			const select = this.rows.add(
@@ -506,6 +512,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 					value: current,
 					choices,
 					caret: proctorIconFactory('action.expand', 14),
+					...(row.id === 'workbench.colorTheme' ? { icon: themeSwatch(current) } : {}),
 					disabled
 				})
 			);
@@ -526,7 +533,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 		const height = Number(this.settingValue('editor.lineHeight'));
 		const numbers = this.settingValue('editor.lineNumbers') !== 'off';
 		const tab = Number(this.settingValue('editor.tabSize'));
-		const theme = String(this.settingValue('workbench.colorTheme'));
+		const theme = editorThemeName(this.settingValue('workbench.colorTheme'));
 		const indent = ' '.repeat(tab);
 		const lines: readonly (readonly [string, string][])[] = [
 			[
@@ -588,6 +595,45 @@ export class SettingsPage extends Disposable implements AccountPageView {
 	}
 
 	// #endregion
+}
+
+/** A scheme alias such as `dark` is shown as the theme it stands for. */
+function editorThemeName(value: unknown): string {
+	const name = String(value);
+	return name in SCHEME_THEME_NAMES
+		? SCHEME_THEME_NAMES[name as keyof typeof SCHEME_THEME_NAMES]
+		: name;
+}
+
+/** A chip of the theme's editor background, edged with its function colour. */
+function themeSwatch(name: string): ControlIconFactory {
+	return (document) => {
+		const element = createElementFactory(document)('span.prctr-settings-page__swatch', {
+			attrs: { 'aria-hidden': 'true' }
+		});
+		try {
+			const theme = getTheme(name);
+			const rule = theme.colorTheme.tokenColors.find((entry) =>
+				(Array.isArray(entry.scope) ? entry.scope : [entry.scope]).some(
+					(scope) =>
+						typeof scope === 'string' &&
+						scope.split(/[,\s]+/).includes('entity.name.function')
+				)
+			);
+			const set = (property: string, value: string | undefined): void => {
+				if (value !== undefined) element.style.setProperty(property, value);
+			};
+			set('--prctr-swatch-background', theme.colors['editor.background']);
+			set(
+				'--prctr-swatch-border',
+				theme.colors['editorGroup.border'] ?? theme.colors['panel.border']
+			);
+			set('--prctr-swatch-accent', rule?.settings.foreground);
+		} catch {
+			// An unknown theme keeps the neutral swatch.
+		}
+		return { element, dispose: () => element.remove() };
+	};
 }
 
 const tabMessages: Readonly<Record<SettingsTab, AccountMessage>> = Object.freeze({

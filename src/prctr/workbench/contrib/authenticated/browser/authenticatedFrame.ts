@@ -255,6 +255,16 @@ export class AuthenticatedFrame
 		this.rail.setPhoto(dataUrl);
 	}
 
+	setAccountCount(page: AccountPage, count: number | undefined): void {
+		const text =
+			count === undefined || count <= 0
+				? undefined
+				: new Intl.NumberFormat(
+						this.localization.locale === 'pseudo' ? 'en' : this.localization.locale
+					).format(count);
+		this.sidebar.setBadge('account', page, text);
+	}
+
 	// #endregion
 
 	// #region AuthenticatedLayoutService

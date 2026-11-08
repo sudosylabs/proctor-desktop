@@ -69,7 +69,8 @@
 	.prctr-area-sidebar .prctr-area-sidebar__group[hidden],
 	.prctr-area-sidebar .prctr-area-sidebar__status[hidden],
 	.prctr-area-sidebar .prctr-area-sidebar__footer[hidden],
-	.prctr-area-sidebar .prctr-area-sidebar__entry[hidden] {
+	.prctr-area-sidebar .prctr-area-sidebar__entry[hidden],
+	.prctr-area-sidebar .prctr-area-sidebar__badge[hidden] {
 		display: none;
 	}
 
@@ -90,6 +91,25 @@
 		min-block-size: 34px;
 		padding: 0 10px;
 		text-align: start;
+	}
+
+	.prctr-area-sidebar .prctr-area-sidebar__badge {
+		align-items: center;
+		background: var(--prctr-color-background-raised);
+		border-radius: 9px;
+		box-sizing: border-box;
+		color: var(--prctr-color-text-secondary);
+		display: flex;
+		flex: none;
+		font-size: 11.5px;
+		font-weight: var(--prctr-typography-weight-medium);
+		justify-content: center;
+		line-height: 18px;
+		min-inline-size: 20px;
+		padding: 0 6px;
+	}
+	.prctr-area-sidebar .prctr-area-sidebar__entry[aria-current='page'] .prctr-area-sidebar__badge {
+		background: var(--prctr-color-background-card);
 	}
 
 	.prctr-area-sidebar .prctr-area-sidebar__label {

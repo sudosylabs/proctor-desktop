@@ -86,28 +86,14 @@ export const developmentForeground = registerColor(
 export const frameBackground = registerColor(
 	'proctor.frameBackground',
 	{
-		light: Color.fromHex('#EEEEEC'),
-		dark: Color.fromHex('#26272B'),
+		light: Color.fromHex('#F4F3F0'),
+		dark: Color.fromHex('#1E1F22'),
 		hcLight: Color.white,
 		hcDark: Color.black
 	},
 	localize(
 		'proctor.frameBackground',
 		'Window frame behind the area rail and sidebar when no system material shows.'
-	)
-);
-
-export const frameSidebarBackground = registerColor(
-	'proctor.frameSidebarBackground',
-	{
-		light: Color.fromHex('#FFFFFF59'),
-		dark: Color.fromHex('#FFFFFF08'),
-		hcLight: Color.white,
-		hcDark: Color.black
-	},
-	localize(
-		'proctor.frameSidebarBackground',
-		'Wash that sets the contextual sidebar apart from the area rail.'
 	)
 );
 

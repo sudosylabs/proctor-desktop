@@ -1,6 +1,6 @@
 {
   "generatedBy": "settings.registry",
-  "registryFingerprint": "fnv1a64:2801a76bc5ccfd7b",
+  "registryFingerprint": "fnv1a64:50f4a625cf517f08",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": true,
@@ -9,8 +9,8 @@
       "type": "number",
       "default": 500,
       "minimum": 0,
-      "title": "Hover delay",
-      "description": "Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change."
+      "title": "Tooltip delay",
+      "description": "How long to point at something before its tooltip shows."
     },
     "workbench.hover.reducedDelay": {
       "type": "number",
@@ -127,32 +127,32 @@
     "workbench.preferHighContrast": {
       "type": "boolean",
       "default": false,
-      "title": "Prefer high contrast",
-      "description": "Uses a packaged high-contrast theme when stronger accessibility requirements apply."
+      "title": "High contrast",
+      "description": "Stronger borders and text, for either theme."
     },
     "window.zoomLevel": {
       "type": "integer",
       "default": 100,
       "minimum": 80,
       "maximum": 200,
-      "title": "Interface zoom",
-      "description": "Sets bounded interface zoom as a percentage."
+      "title": "Interface size",
+      "description": "Makes everything in Proctor larger or smaller."
     },
     "editor.fontSize": {
       "type": "integer",
       "default": 14,
       "minimum": 12,
       "maximum": 24,
-      "title": "Editor font size",
-      "description": "Sets the editor font size in pixels."
+      "title": "Font size",
+      "description": "Text size in the editor."
     },
     "editor.lineHeight": {
       "type": "integer",
       "default": 22,
       "minimum": 16,
       "maximum": 40,
-      "title": "Editor line height",
-      "description": "Sets the editor line height in pixels."
+      "title": "Line height",
+      "description": "Space between lines in the editor."
     },
     "editor.tabSize": {
       "type": "integer",
@@ -160,7 +160,7 @@
       "minimum": 1,
       "maximum": 8,
       "title": "Tab size",
-      "description": "Sets the displayed indentation width outside an Attempt."
+      "description": "How wide one level of indentation looks."
     },
     "editor.wordWrap": {
       "type": "string",
@@ -172,7 +172,7 @@
         "bounded"
       ],
       "title": "Word wrap",
-      "description": "Controls editor word wrapping outside an Attempt."
+      "description": "Wrap long lines instead of scrolling sideways."
     },
     "editor.lineNumbers": {
       "type": "string",
@@ -183,13 +183,13 @@
         "relative"
       ],
       "title": "Line numbers",
-      "description": "Controls editor line-number presentation outside an Attempt."
+      "description": "Numbers beside each line of code."
     },
     "editor.minimap.enabled": {
       "type": "boolean",
       "default": true,
       "title": "Minimap",
-      "description": "Shows the editor minimap outside an Attempt."
+      "description": "A small outline of the file beside the code."
     },
     "editor.cursorStyle": {
       "type": "string",
@@ -200,7 +200,7 @@
         "underline"
       ],
       "title": "Cursor style",
-      "description": "Selects the editor cursor shape."
+      "description": "The shape of the text cursor."
     },
     "editor.cursorBlinking": {
       "type": "string",
@@ -213,13 +213,13 @@
         "solid"
       ],
       "title": "Cursor blinking",
-      "description": "Selects the editor cursor animation."
+      "description": "How the text cursor animates."
     },
     "accessibility.reducedMotion": {
       "type": "boolean",
       "default": false,
       "title": "Reduced motion",
-      "description": "Reduces nonessential interface animation."
+      "description": "Turns off nonessential animation."
     },
     "accessibility.screenReaderMode": {
       "type": "string",
@@ -230,7 +230,7 @@
         "off"
       ],
       "title": "Screen reader mode",
-      "description": "Controls screen-reader optimized presentation."
+      "description": "Optimises the editor for screen readers."
     },
     "accessibility.announcementMode": {
       "type": "string",
@@ -241,7 +241,7 @@
         "minimal"
       ],
       "title": "Announcements",
-      "description": "Controls the detail of assistive announcements."
+      "description": "How much Proctor says when something changes."
     },
     "workbench.tree.indent": {
       "type": "integer",
@@ -249,15 +249,15 @@
       "minimum": 4,
       "maximum": 20,
       "title": "Tree indentation",
-      "description": "Sets indentation for hierarchical navigation outside an Attempt."
+      "description": "How far nested files are indented."
     },
     "browser.presentation.zoom": {
       "type": "integer",
       "default": 100,
       "minimum": 80,
       "maximum": 200,
-      "title": "Browser zoom",
-      "description": "Sets integrated-browser presentation outside an Attempt."
+      "title": "Page zoom",
+      "description": "Zoom for pages opened in the exam browser."
     }
   },
   "patternProperties": {
@@ -270,16 +270,16 @@
           "default": 14,
           "minimum": 12,
           "maximum": 24,
-          "title": "Editor font size",
-          "description": "Sets the editor font size in pixels."
+          "title": "Font size",
+          "description": "Text size in the editor."
         },
         "editor.lineHeight": {
           "type": "integer",
           "default": 22,
           "minimum": 16,
           "maximum": 40,
-          "title": "Editor line height",
-          "description": "Sets the editor line height in pixels."
+          "title": "Line height",
+          "description": "Space between lines in the editor."
         },
         "editor.tabSize": {
           "type": "integer",
@@ -287,7 +287,7 @@
           "minimum": 1,
           "maximum": 8,
           "title": "Tab size",
-          "description": "Sets the displayed indentation width outside an Attempt."
+          "description": "How wide one level of indentation looks."
         },
         "editor.wordWrap": {
           "type": "string",
@@ -299,7 +299,7 @@
             "bounded"
           ],
           "title": "Word wrap",
-          "description": "Controls editor word wrapping outside an Attempt."
+          "description": "Wrap long lines instead of scrolling sideways."
         },
         "editor.lineNumbers": {
           "type": "string",
@@ -310,13 +310,13 @@
             "relative"
           ],
           "title": "Line numbers",
-          "description": "Controls editor line-number presentation outside an Attempt."
+          "description": "Numbers beside each line of code."
         },
         "editor.minimap.enabled": {
           "type": "boolean",
           "default": true,
           "title": "Minimap",
-          "description": "Shows the editor minimap outside an Attempt."
+          "description": "A small outline of the file beside the code."
         },
         "editor.cursorStyle": {
           "type": "string",
@@ -327,7 +327,7 @@
             "underline"
           ],
           "title": "Cursor style",
-          "description": "Selects the editor cursor shape."
+          "description": "The shape of the text cursor."
         },
         "editor.cursorBlinking": {
           "type": "string",
@@ -340,7 +340,7 @@
             "solid"
           ],
           "title": "Cursor blinking",
-          "description": "Selects the editor cursor animation."
+          "description": "How the text cursor animates."
         }
       }
     }

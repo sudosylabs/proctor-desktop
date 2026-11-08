@@ -43,6 +43,8 @@ export interface AuthenticatedNavigationService {
 	/** Show a server-access notice in the sidebar, with an optional way to retry. */
 	setProductStatus(message: string, retry?: () => void): void;
 	setProfilePhoto(dataUrl: string): void;
+	/** Show how many items an Account page lists beside its sidebar entry; nothing hides it. */
+	setAccountCount(page: AccountPage, count: number | undefined): void;
 	/** Sign out of this window, as the sidebar's Sign out does, reporting a failure beside it. */
 	signOut(): void;
 }

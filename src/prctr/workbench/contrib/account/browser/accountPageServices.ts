@@ -117,12 +117,25 @@ export class AccountPageServices {
 		}).format(time);
 	}
 
-	/** "today, 08:41", "yesterday, 17:20", or a date. */
+	/** "today, 08:41", "yesterday, 17:20", or a date, for use inside a sentence. */
 	relative(time: number): string {
+		return this.relativeTime(time, 'relativeToday', 'relativeYesterday');
+	}
+
+	/** "Today, 08:41", "Yesterday, 17:20", or a date, for a value shown on its own. */
+	relativeStandalone(time: number): string {
+		return this.relativeTime(time, 'relativeTodayStandalone', 'relativeYesterdayStandalone');
+	}
+
+	private relativeTime(
+		time: number,
+		today: 'relativeToday' | 'relativeTodayStandalone',
+		yesterday: 'relativeYesterday' | 'relativeYesterdayStandalone'
+	): string {
 		const day = relativeDay(time, this.now());
 		if (day === 'other') return this.date(time);
 		const clock = new Intl.DateTimeFormat(this.locale, { timeStyle: 'short' }).format(time);
-		return this.text(day === 'today' ? 'relativeToday' : 'relativeYesterday', { time: clock });
+		return this.text(day === 'today' ? today : yesterday, { time: clock });
 	}
 
 	languageName(locale: string): string {

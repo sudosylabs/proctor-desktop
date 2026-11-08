@@ -60,13 +60,12 @@ export const SETTINGS_MANIFEST = [
 		candidate: 'nonCandidateOnly',
 		title: defineMessage({
 			id: 'settings.hover.delay.title',
-			defaultMessage: 'Hover delay',
+			defaultMessage: 'Tooltip delay',
 			description: 'Title for the workbench hover delay setting.'
 		}),
 		description: defineMessage({
 			id: 'settings.hover.delay.description',
-			defaultMessage:
-				'Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change.',
+			defaultMessage: 'How long to point at something before its tooltip shows.',
 			description: 'Description of the source workbench hover delay.'
 		})
 	},
@@ -229,13 +228,12 @@ export const SETTINGS_MANIFEST = [
 		candidate: 'policyConstrained',
 		title: defineMessage({
 			id: 'settings.contrast.title',
-			defaultMessage: 'Prefer high contrast',
+			defaultMessage: 'High contrast',
 			description: 'Title for the high contrast preference.'
 		}),
 		description: defineMessage({
 			id: 'settings.contrast.description',
-			defaultMessage:
-				'Uses a packaged high-contrast theme when stronger accessibility requirements apply.',
+			defaultMessage: 'Stronger borders and text, for either theme.',
 			description: 'Description of the high contrast preference.'
 		})
 	},
@@ -253,12 +251,12 @@ export const SETTINGS_MANIFEST = [
 		candidate: 'policyConstrained',
 		title: defineMessage({
 			id: 'settings.zoom.title',
-			defaultMessage: 'Interface zoom',
+			defaultMessage: 'Interface size',
 			description: 'Title for the interface zoom setting.'
 		}),
 		description: defineMessage({
 			id: 'settings.zoom.description',
-			defaultMessage: 'Sets bounded interface zoom as a percentage.',
+			defaultMessage: 'Makes everything in Proctor larger or smaller.',
 			description: 'Description of the interface zoom setting.'
 		})
 	},
@@ -276,12 +274,12 @@ export const SETTINGS_MANIFEST = [
 		candidate: 'policyConstrained',
 		title: defineMessage({
 			id: 'settings.editor.fontsize.title',
-			defaultMessage: 'Editor font size',
+			defaultMessage: 'Font size',
 			description: 'Title for the editor font size setting.'
 		}),
 		description: defineMessage({
 			id: 'settings.editor.fontsize.description',
-			defaultMessage: 'Sets the editor font size in pixels.',
+			defaultMessage: 'Text size in the editor.',
 			description: 'Description of the editor font size setting.'
 		})
 	},
@@ -299,12 +297,12 @@ export const SETTINGS_MANIFEST = [
 		candidate: 'policyConstrained',
 		title: defineMessage({
 			id: 'settings.editor.lineheight.title',
-			defaultMessage: 'Editor line height',
+			defaultMessage: 'Line height',
 			description: 'Title for the editor line height setting.'
 		}),
 		description: defineMessage({
 			id: 'settings.editor.lineheight.description',
-			defaultMessage: 'Sets the editor line height in pixels.',
+			defaultMessage: 'Space between lines in the editor.',
 			description: 'Description of the editor line height setting.'
 		})
 	},
@@ -327,7 +325,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.editor.tabsize.description',
-			defaultMessage: 'Sets the displayed indentation width outside an Attempt.',
+			defaultMessage: 'How wide one level of indentation looks.',
 			description: 'Description of the editor tab size setting.'
 		})
 	},
@@ -349,7 +347,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.editor.wordwrap.description',
-			defaultMessage: 'Controls editor word wrapping outside an Attempt.',
+			defaultMessage: 'Wrap long lines instead of scrolling sideways.',
 			description: 'Description of the editor word wrap setting.'
 		})
 	},
@@ -371,7 +369,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.editor.linenumbers.description',
-			defaultMessage: 'Controls editor line-number presentation outside an Attempt.',
+			defaultMessage: 'Numbers beside each line of code.',
 			description: 'Description of the editor line numbers setting.'
 		})
 	},
@@ -392,7 +390,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.editor.minimap.description',
-			defaultMessage: 'Shows the editor minimap outside an Attempt.',
+			defaultMessage: 'A small outline of the file beside the code.',
 			description: 'Description of the editor minimap setting.'
 		})
 	},
@@ -414,7 +412,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.editor.cursorstyle.description',
-			defaultMessage: 'Selects the editor cursor shape.',
+			defaultMessage: 'The shape of the text cursor.',
 			description: 'Description of the editor cursor style setting.'
 		})
 	},
@@ -436,7 +434,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.editor.cursorblinking.description',
-			defaultMessage: 'Selects the editor cursor animation.',
+			defaultMessage: 'How the text cursor animates.',
 			description: 'Description of the editor cursor blinking setting.'
 		})
 	},
@@ -457,7 +455,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.accessibility.motion.description',
-			defaultMessage: 'Reduces nonessential interface animation.',
+			defaultMessage: 'Turns off nonessential animation.',
 			description: 'Description of the reduced motion preference.'
 		})
 	},
@@ -479,7 +477,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.accessibility.screenreader.description',
-			defaultMessage: 'Controls screen-reader optimized presentation.',
+			defaultMessage: 'Optimises the editor for screen readers.',
 			description: 'Description of the screen reader mode setting.'
 		})
 	},
@@ -501,7 +499,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.accessibility.announcements.description',
-			defaultMessage: 'Controls the detail of assistive announcements.',
+			defaultMessage: 'How much Proctor says when something changes.',
 			description: 'Description of the assistive announcements setting.'
 		})
 	},
@@ -524,7 +522,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.navigation.indent.description',
-			defaultMessage: 'Sets indentation for hierarchical navigation outside an Attempt.',
+			defaultMessage: 'How far nested files are indented.',
 			description: 'Description of the tree indentation setting.'
 		})
 	},
@@ -542,12 +540,12 @@ export const SETTINGS_MANIFEST = [
 		candidate: 'nonCandidateOnly',
 		title: defineMessage({
 			id: 'settings.browser.zoom.title',
-			defaultMessage: 'Browser zoom',
+			defaultMessage: 'Page zoom',
 			description: 'Title for the integrated browser zoom setting.'
 		}),
 		description: defineMessage({
 			id: 'settings.browser.zoom.description',
-			defaultMessage: 'Sets integrated-browser presentation outside an Attempt.',
+			defaultMessage: 'Zoom for pages opened in the exam browser.',
 			description: 'Description of the integrated browser zoom setting.'
 		})
 	},

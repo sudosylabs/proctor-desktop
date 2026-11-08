@@ -39,16 +39,16 @@ export interface SidebarSelection {
 	readonly entry: string;
 }
 
+interface EntryView {
+	readonly button: HTMLButtonElement;
+	readonly icon: ProctorIconControl;
+	readonly id: ProctorIconId;
+	readonly badge: HTMLElement;
+}
+
 interface AreaView {
 	readonly group: HTMLElement;
-	readonly entries: ReadonlyMap<
-		string,
-		{
-			readonly button: HTMLButtonElement;
-			readonly icon: ProctorIconControl;
-			readonly id: ProctorIconId;
-		}
-	>;
+	readonly entries: ReadonlyMap<string, EntryView>;
 }
 
 /**
@@ -158,14 +158,7 @@ export class AreaSidebar extends Disposable {
 
 	private createArea(area: SidebarArea): void {
 		const $ = createElementFactory(this.pages.ownerDocument);
-		const entries = new Map<
-			string,
-			{
-				readonly button: HTMLButtonElement;
-				readonly icon: ProctorIconControl;
-				readonly id: ProctorIconId;
-			}
-		>();
+		const entries = new Map<string, EntryView>();
 		const group = $('div.prctr-area-sidebar__group', {
 			data: { destination: area.destination }
 		});
@@ -173,15 +166,17 @@ export class AreaSidebar extends Disposable {
 			const icon = this._register(
 				createProctorIcon(this.pages.ownerDocument, { id: entry.icon, size: 18 })
 			);
+			const badge = $('span.prctr-area-sidebar__badge', { hidden: true });
 			const button = $(
 				'button.prctr-area-sidebar__entry',
 				{ type: 'button', data: { entry: entry.id } },
 				icon.element,
-				$('span.prctr-area-sidebar__label', { textContent: this.text(entry.label) })
+				$('span.prctr-area-sidebar__label', { textContent: this.text(entry.label) }),
+				badge
 			);
 			if (entry.opensDialog) button.setAttribute('aria-haspopup', 'dialog');
 			group.append(button);
-			entries.set(entry.id, { button, icon, id: entry.icon });
+			entries.set(entry.id, { button, icon, id: entry.icon, badge });
 			this._register(
 				addDisposableListener(button, 'click', () => {
 					this.selectEmitter.fire({ destination: area.destination, entry: entry.id });
@@ -231,6 +226,14 @@ export class AreaSidebar extends Disposable {
 		this.footer.hidden = destination !== 'account';
 		this.roving.update(current);
 		this.scroll.scanDomNode();
+	}
+
+	/** Show a short count after an entry's label, such as how many sessions it lists. */
+	setBadge(destination: AuthenticatedDestination, entry: string, text: string | undefined): void {
+		const badge = this.areas.get(destination)?.entries.get(entry)?.badge;
+		if (badge === undefined) return;
+		badge.textContent = text ?? '';
+		badge.hidden = text === undefined;
 	}
 
 	setExpanded(expanded: boolean): void {

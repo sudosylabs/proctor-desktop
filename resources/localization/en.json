@@ -440,7 +440,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.history.filter.group": {
-      "message": "Kind of event",
+      "message": "Kind",
       "description": "Accessible name of the event-kind filter.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -494,7 +494,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.history.filter.outcome.all": {
-      "message": "Any outcome",
+      "message": "Any",
       "description": "Outcome filter option: every event.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -713,7 +713,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.page.tokens.description": {
-      "message": "Let a script use Proctor’s API as you, limited to what you choose and only until the date you set.",
+      "message": "Let a script or tool use Proctor as you, with only the permissions you give it.",
       "description": "Description under the Access tokens heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -1880,9 +1880,25 @@
       ],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.time.today.standalone": {
+      "message": "Today, {time}",
+      "description": "A time earlier today, shown on its own in a table cell.",
+      "placeholders": [
+        "time"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.time.yesterday": {
       "message": "yesterday, {time}",
       "description": "A time yesterday, as in \"last active yesterday, 17:20\".",
+      "placeholders": [
+        "time"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.time.yesterday.standalone": {
+      "message": "Yesterday, {time}",
+      "description": "A time yesterday, shown on its own in a table cell.",
       "placeholders": [
         "time"
       ],
@@ -1901,8 +1917,8 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.tokens.active.empty": {
-      "message": "No access tokens yet. A token lets a script, such as a grade export, use Proctor with only the permissions you choose.",
-      "description": "No active tokens.",
+      "message": "No active tokens.",
+      "description": "No active tokens, while disabled or expired ones exist.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -2119,6 +2135,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.tokens.none.body": {
+      "message": "A token lets a script, such as a grade export, use Proctor with only the permissions you choose.",
+      "description": "Empty state explanation on the Access tokens page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.tokens.none.title": {
+      "message": "No access tokens yet",
+      "description": "Empty state title on the Access tokens page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.tokens.revoke": {
       "message": "Revoke",
       "description": "Permanently revoke a token.",
@@ -2186,6 +2214,12 @@
     "account.tokens.scopes.required": {
       "message": "Tick at least one thing the token can do.",
       "description": "No scope is selected.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.tokens.section.all": {
+      "message": "Your tokens",
+      "description": "The one tokens section shown when the person has no tokens.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -3974,7 +4008,7 @@
       "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "settings.accessibility.announcements.description": {
-      "message": "Controls the detail of assistive announcements.",
+      "message": "How much Proctor says when something changes.",
       "description": "Description of the assistive announcements setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -3986,7 +4020,7 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.accessibility.motion.description": {
-      "message": "Reduces nonessential interface animation.",
+      "message": "Turns off nonessential animation.",
       "description": "Description of the reduced motion preference.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -3998,7 +4032,7 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.accessibility.screenreader.description": {
-      "message": "Controls screen-reader optimized presentation.",
+      "message": "Optimises the editor for screen readers.",
       "description": "Description of the screen reader mode setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4010,13 +4044,13 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.browser.zoom.description": {
-      "message": "Sets integrated-browser presentation outside an Attempt.",
+      "message": "Zoom for pages opened in the exam browser.",
       "description": "Description of the integrated browser zoom setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.browser.zoom.title": {
-      "message": "Browser zoom",
+      "message": "Page zoom",
       "description": "Title for the integrated browser zoom setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4040,19 +4074,19 @@
       "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
     },
     "settings.contrast.description": {
-      "message": "Uses a packaged high-contrast theme when stronger accessibility requirements apply.",
+      "message": "Stronger borders and text, for either theme.",
       "description": "Description of the high contrast preference.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.contrast.title": {
-      "message": "Prefer high contrast",
+      "message": "High contrast",
       "description": "Title for the high contrast preference.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.cursorblinking.description": {
-      "message": "Selects the editor cursor animation.",
+      "message": "How the text cursor animates.",
       "description": "Description of the editor cursor blinking setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4064,7 +4098,7 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.cursorstyle.description": {
-      "message": "Selects the editor cursor shape.",
+      "message": "The shape of the text cursor.",
       "description": "Description of the editor cursor style setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4076,31 +4110,31 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.fontsize.description": {
-      "message": "Sets the editor font size in pixels.",
+      "message": "Text size in the editor.",
       "description": "Description of the editor font size setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.fontsize.title": {
-      "message": "Editor font size",
+      "message": "Font size",
       "description": "Title for the editor font size setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.lineheight.description": {
-      "message": "Sets the editor line height in pixels.",
+      "message": "Space between lines in the editor.",
       "description": "Description of the editor line height setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.lineheight.title": {
-      "message": "Editor line height",
+      "message": "Line height",
       "description": "Title for the editor line height setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.linenumbers.description": {
-      "message": "Controls editor line-number presentation outside an Attempt.",
+      "message": "Numbers beside each line of code.",
       "description": "Description of the editor line numbers setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4112,7 +4146,7 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.minimap.description": {
-      "message": "Shows the editor minimap outside an Attempt.",
+      "message": "A small outline of the file beside the code.",
       "description": "Description of the editor minimap setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4124,7 +4158,7 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.tabsize.description": {
-      "message": "Sets the displayed indentation width outside an Attempt.",
+      "message": "How wide one level of indentation looks.",
       "description": "Description of the editor tab size setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4136,7 +4170,7 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.wordwrap.description": {
-      "message": "Controls editor word wrapping outside an Attempt.",
+      "message": "Wrap long lines instead of scrolling sideways.",
       "description": "Description of the editor word wrap setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4148,13 +4182,13 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.hover.delay.description": {
-      "message": "Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change.",
+      "message": "How long to point at something before its tooltip shows.",
       "description": "Description of the source workbench hover delay.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.hover.delay.title": {
-      "message": "Hover delay",
+      "message": "Tooltip delay",
       "description": "Title for the workbench hover delay setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4172,7 +4206,7 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.navigation.indent.description": {
-      "message": "Sets indentation for hierarchical navigation outside an Attempt.",
+      "message": "How far nested files are indented.",
       "description": "Description of the tree indentation setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -4310,13 +4344,13 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.zoom.description": {
-      "message": "Sets bounded interface zoom as a percentage.",
+      "message": "Makes everything in Proctor larger or smaller.",
       "description": "Description of the interface zoom setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.zoom.title": {
-      "message": "Interface zoom",
+      "message": "Interface size",
       "description": "Title for the interface zoom setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"

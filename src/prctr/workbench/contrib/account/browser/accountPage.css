@@ -11,9 +11,15 @@
 		min-inline-size: 0;
 		position: relative;
 	}
+	/* Doubled so that `hidden` outranks a component rule such as `.prctr-account .x { display: flex }`. */
 	.prctr-account[hidden],
-	.prctr-account [hidden] {
+	.prctr-account [hidden][hidden] {
 		display: none;
+	}
+	/* The shell carries `monaco-workbench`, whose ported rules outline every focused button.
+	   Proctor controls draw their own ring for keyboard focus only. */
+	.prctr-account :focus:not(:focus-visible) {
+		outline: none;
 	}
 	.prctr-account .prctr-account__scroll,
 	.prctr-account .prctr-account__viewport {
@@ -178,9 +184,19 @@
 		color: var(--prctr-color-text-secondary);
 		padding-block: 16px;
 	}
-	.prctr-account .prctr-account-section__state-text {
+	.prctr-account .prctr-account-section__state-body {
+		display: flex;
 		flex: 1 1 240px;
+		flex-direction: column;
+		gap: 2px;
 		min-inline-size: 0;
+	}
+	.prctr-account .prctr-account-section__state-title {
+		color: var(--prctr-color-text-primary);
+		font-weight: var(--prctr-typography-weight-semibold);
+	}
+	.prctr-account .prctr-account-section__state-text {
+		max-inline-size: 52ch;
 	}
 	.prctr-account .prctr-account-section__more {
 		color: var(--prctr-color-text-secondary);

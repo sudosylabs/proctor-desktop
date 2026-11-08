@@ -3,7 +3,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Event } from '../../../../base/common/event.js';
-import type { AccountClient } from '../../../../platform/account/common/accountProtocol.js';
+import type { DisposableStore } from '../../../../base/common/lifecycle.js';
+import type {
+	AccountClient,
+	AccountData,
+	AccountIntent,
+	AccountResponse
+} from '../../../../platform/account/common/accountProtocol.js';
 import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
 import type {
 	WorkbenchBootstrapContext,
@@ -134,8 +140,49 @@ export function createAccountContribution(
 				}
 			});
 			show(false);
+			watchCount(
+				client,
+				{ kind: 'read', section: 'sessions' },
+				context.disposables,
+				(data) =>
+					data.section === 'sessions'
+						? navigation.setAccountCount(
+								'sessions',
+								data.sessions.filter((session) => !session.current).length
+							)
+						: undefined
+			);
+			watchCount(client, { kind: 'read', section: 'tokens' }, context.disposables, (data) =>
+				data.section === 'tokens'
+					? navigation.setAccountCount(
+							'tokens',
+							data.tokens.filter((token) => token.revokedAt === undefined).length
+						)
+					: undefined
+			);
 		}
 	});
+}
+
+/** Follows one Account read for a sidebar count; a failure leaves the count as it was. */
+function watchCount(
+	client: AccountClient,
+	intent: AccountIntent,
+	disposables: DisposableStore,
+	apply: (data: AccountData) => void
+): void {
+	let disposed = false;
+	const deliver = (response: AccountResponse): void => {
+		if (!disposed && response.kind === 'data') apply(response.data);
+	};
+	disposables.add({
+		dispose() {
+			disposed = true;
+		}
+	});
+	const subscription = client.observe?.(intent, deliver);
+	if (subscription !== undefined) disposables.add(subscription);
+	else void client.request(intent).then(deliver, () => undefined);
 }
 
 function accountItem(page: AccountPage, context: WorkbenchBootstrapContext): WorkbenchItem {

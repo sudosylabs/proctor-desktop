@@ -55,7 +55,7 @@ export const accountMessages = Object.freeze({
 	tokensDescription: defineMessage({
 		id: 'account.page.tokens.description',
 		defaultMessage:
-			'Let a script use Proctor’s API as you, limited to what you choose and only until the date you set.',
+			'Let a script or tool use Proctor as you, with only the permissions you give it.',
 		description: 'Description under the Access tokens heading.'
 	}),
 	pageUnavailable: defineMessage({
@@ -497,6 +497,16 @@ export const accountMessages = Object.freeze({
 		id: 'account.time.yesterday',
 		defaultMessage: 'yesterday, {time}',
 		description: 'A time yesterday, as in "last active yesterday, 17:20".'
+	}),
+	relativeTodayStandalone: defineMessage({
+		id: 'account.time.today.standalone',
+		defaultMessage: 'Today, {time}',
+		description: 'A time earlier today, shown on its own in a table cell.'
+	}),
+	relativeYesterdayStandalone: defineMessage({
+		id: 'account.time.yesterday.standalone',
+		defaultMessage: 'Yesterday, {time}',
+		description: 'A time yesterday, shown on its own in a table cell.'
 	}),
 	detailSeparator: defineMessage({
 		id: 'account.detail.separator',
@@ -1198,9 +1208,24 @@ export const accountMessages = Object.freeze({
 	}),
 	noActiveTokens: defineMessage({
 		id: 'account.tokens.active.empty',
+		defaultMessage: 'No active tokens.',
+		description: 'No active tokens, while disabled or expired ones exist.'
+	}),
+	yourTokens: defineMessage({
+		id: 'account.tokens.section.all',
+		defaultMessage: 'Your tokens',
+		description: 'The one tokens section shown when the person has no tokens.'
+	}),
+	noTokensTitle: defineMessage({
+		id: 'account.tokens.none.title',
+		defaultMessage: 'No access tokens yet',
+		description: 'Empty state title on the Access tokens page.'
+	}),
+	noTokensBody: defineMessage({
+		id: 'account.tokens.none.body',
 		defaultMessage:
-			'No access tokens yet. A token lets a script, such as a grade export, use Proctor with only the permissions you choose.',
-		description: 'No active tokens.'
+			'A token lets a script, such as a grade export, use Proctor with only the permissions you choose.',
+		description: 'Empty state explanation on the Access tokens page.'
 	}),
 	inactiveTokens: defineMessage({
 		id: 'account.tokens.inactive',
@@ -1686,7 +1711,7 @@ export const accountMessages = Object.freeze({
 	}),
 	historyGroupLabel: defineMessage({
 		id: 'account.history.filter.group',
-		defaultMessage: 'Kind of event',
+		defaultMessage: 'Kind',
 		description: 'Accessible name of the event-kind filter.'
 	}),
 	historyGroupAll: defineMessage({
@@ -1751,7 +1776,7 @@ export const accountMessages = Object.freeze({
 	}),
 	historyOutcomeAll: defineMessage({
 		id: 'account.history.filter.outcome.all',
-		defaultMessage: 'Any outcome',
+		defaultMessage: 'Any',
 		description: 'Outcome filter option: every event.'
 	}),
 	historyOutcomeSuccess: defineMessage({
