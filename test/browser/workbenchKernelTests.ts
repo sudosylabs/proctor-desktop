@@ -1,9 +1,4 @@
-import { ICommandService } from '../../src/prctr/platform/commands/common/commands.js';
-import type { IInstantiationService } from '../../src/prctr/platform/instantiation/common/instantiation.js';
-import { WORKBENCH_INSTANTIATION_SERVICE } from '../../src/prctr/workbench/common/serviceIds.js';
-import { browserSettingsEditorEnvironment } from './editor/settingsEditorEnvironment.js';
 import { runAccountTests } from './accountTests.ts';
-import { createAccountContribution } from '../../src/prctr/workbench/contrib/account/browser/accountContribution.ts';
 import {
 	CancellationToken,
 	type CancellationToken as CancellationTokenType
@@ -15,7 +10,6 @@ import {
 	type WorkbenchBootstrapContext,
 	type WorkbenchContributionRegistration
 } from '../../src/prctr/workbench/browser/bootstrap.ts';
-import { authenticatedComposition } from '../../src/prctr/workbench/browser/authenticatedManifest.ts';
 import { candidateComposition } from '../../src/prctr/workbench/browser/candidateManifest.ts';
 import { bootstrapLaunchWindow } from '../../src/prctr/workbench/browser/launch/launchWindow.ts';
 import { WorkbenchPaneHost } from '../../src/prctr/workbench/browser/paneHost.ts';
@@ -31,10 +25,8 @@ import type {
 	ResolvedWorkbenchItem,
 	WorkbenchItem
 } from '../../src/prctr/workbench/common/workbenchItem.ts';
-import { createAuthenticatedContribution } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.ts';
 import { createExamSecurityContribution } from '../../src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts';
 import { createIntegratedBrowserContribution } from '../../src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts';
-import { createSettingsContribution as createSettingsWithEnvironment } from '../../src/prctr/workbench/contrib/settings/browser/settingsContribution.ts';
 import { commonWorkbenchContributions } from '../../src/prctr/workbench/workbench.common.main.ts';
 import { createDesktopWorkbenchContribution } from '../../src/prctr/code/electron-browser/workbench.desktop.main.ts';
 import type {
@@ -42,7 +34,6 @@ import type {
 	IntegratedBrowserProjection,
 	IntegratedBrowserSurface
 } from '../../src/prctr/platform/integratedBrowser/common/browserProtocol.ts';
-import type { UserSettingsProjection } from '../../src/prctr/platform/settings/common/settingsRendererProtocol.ts';
 import { registerThemingParticipant } from '../../src/prctr/platform/theme/common/themeService.ts';
 import { BrowserThemeService } from '../../src/prctr/platform/theme/browser/themeService.ts';
 import type {
@@ -543,11 +534,10 @@ export async function runWorkbenchKernelBrowserTests(document: Document): Promis
 			'LaunchWindow bootstrap recovery did not retain its owned dark forced-colors presentation'
 		);
 	launchRecovery.frame.remove();
-	await runSettingsModalContributionTest(document);
 	await runIntegratedBrowserPaneTest(document);
 	await runIntegratedBrowserGateLifecycleTest(document);
 	await runExamSecurityContributionTest(document);
-	return 28;
+	return 27;
 }
 
 async function runExecutableKernelTest(document: Document): Promise<void> {
@@ -1829,225 +1819,6 @@ function createItem(id: string): WorkbenchItem {
 		onDidChangePresentation: BaseEvent.None,
 		matches: (other) => other.typeId === 'test' && other.logicalIdentity === id
 	};
-}
-
-/** End-to-end contribution coverage for the current modal; both views and Save
- * operate on Monaco's working copy. The old content-page selectors are retired. */
-async function runSettingsModalContributionTest(document: Document): Promise<void> {
-	// Monaco's window services use the renderer's main window. Preserve the outer
-	// fixture while exercising the real workbench composition in that window.
-	const child = document;
-	const originalNodes = [...document.body.childNodes];
-	const originalAttributes = [...document.documentElement.attributes].map(
-		(attribute) => [attribute.name, attribute.value] as const
-	);
-	for (const node of originalNodes) node.remove();
-	const listeners = new Set<(projection: UserSettingsProjection) => void>();
-	const notify = (projection: UserSettingsProjection): void => {
-		for (const listener of listeners) listener(projection);
-	};
-	let acknowledged: UserSettingsProjection = {
-		source: '{\n // retained\n "editor.fontSize":18, "workbench.tree.indent":12\n}',
-		revision: 'revision:live',
-		availability: 'available',
-		writable: true,
-		presentation: {
-			windowTheme: 'system',
-			highContrast: false,
-			zoomPercent: 100,
-			reducedMotion: false
-		}
-	};
-	const chromeUpdates: ProductWindowChromeUpdate[] = [];
-	let commitCount = 0,
-		cancelCount = 0,
-		previews = 0,
-		rejectCancellation = false;
-	let submitted: { source: string; expectedRevision: string } | undefined;
-	let release: (() => void) | undefined;
-	let barrier: Promise<void> | undefined;
-	let projectionReads = 0;
-	let resolveSnapshot: ((projection: UserSettingsProjection) => void) | undefined;
-	const snapshot = new Promise<UserSettingsProjection>((resolve) => {
-		resolveSnapshot = resolve;
-	});
-	let instantiation: IInstantiationService | undefined;
-	const started = bootstrapWorkbench(
-		child,
-		authenticatedComposition,
-		[
-			...commonWorkbenchContributions,
-			createDesktopWorkbenchContribution(
-				'authenticated',
-				async () => ({
-					kind: 'authenticated',
-					windowId: 'window:modal-settings',
-					institutionOrigin: 'https://institution.example.test',
-					principalId: 'principal:one',
-					sessionId: 'session:one',
-					initialDestination: 'settings'
-				}),
-				testWindowChromeClient(chromeUpdates)
-			),
-			createAccountContribution({
-				request: async () => ({ kind: 'error', reason: 'unavailable' })
-			}),
-			createAuthenticatedContribution({
-				signOut: async () => {
-					throw new Error('sign-out unavailable');
-				},
-				close: async () => {}
-			}),
-			createSettingsWithEnvironment(
-				{
-					projection: async () => (++projectionReads === 1 ? snapshot : acknowledged),
-					onDidChange(listener) {
-						listeners.add(listener);
-						return () => {
-							listeners.delete(listener);
-						};
-					},
-					async preview() {
-						previews++;
-					},
-					async cancelPreview() {
-						cancelCount++;
-						if (rejectCancellation) {
-							rejectCancellation = false;
-							throw Error('ambiguous cancellation');
-						}
-					},
-					async commit(intent) {
-						commitCount++;
-						submitted = intent;
-						await barrier;
-						acknowledged = {
-							...acknowledged,
-							source: intent.source,
-							revision: 'revision:saved'
-						};
-						notify(acknowledged);
-						return { kind: 'success', projection: acknowledged };
-					}
-				},
-				browserSettingsEditorEnvironment
-			)
-		].map((contribution) => ({
-			...contribution,
-			async activate(context: WorkbenchBootstrapContext) {
-				await contribution.activate(context);
-				instantiation = context.getService<IInstantiationService>(
-					WORKBENCH_INSTANTIATION_SERVICE
-				);
-			}
-		}))
-	);
-	const result = await started;
-	await waitFor(() => listeners.size > 0);
-	notify(acknowledged);
-	resolveSnapshot!({ ...acknowledged, source: '{}', revision: 'revision:stale' });
-	try {
-		await waitFor(() => !!child.querySelector('.modal-editor-part .settings-editor')).catch(
-			(error) => {
-				throw new Error(String(error) + ': ' + child.body.innerText);
-			}
-		);
-		if (result.shell.part('content').querySelector('.prctr-settings'))
-			throw Error('Settings unexpectedly mounted the obsolete content page');
-		if (!child.querySelector('[aria-label="Search settings"]'))
-			throw Error('Modal settings search is absent');
-		await waitFor(() => chromeUpdates.at(-1)?.dimmed === true);
-		const commands = instantiation!.invokeFunction((accessor) => accessor.get(ICommandService));
-		const findSetting = async (key: string): Promise<HTMLInputElement> => {
-			await commands.executeCommand('workbench.action.openSettings', '@id:' + key);
-			await waitFor(() => !!child.querySelector(`[data-key="${key}"] input`));
-			return child.querySelector<HTMLInputElement>(`[data-key="${key}"] input`)!;
-		};
-		const indent = await findSetting('workbench.tree.indent');
-		if (indent.value !== '12')
-			throw Error('Modal lost the migrated or newer initial projection');
-		indent.value = '13';
-		indent.dispatchEvent(new Event('input', { bubbles: true }));
-		await waitFor(() => previews > 0);
-		barrier = new Promise<void>((resolve) => {
-			release = resolve;
-		});
-		const save = child.querySelector<HTMLElement>('[aria-label^="Save Settings"]');
-		if (!save) throw Error('Modal save action is absent');
-		save.click();
-		await waitFor(() => commitCount === 1);
-		save.click();
-		await Promise.resolve();
-		if (commitCount !== 1) throw Error('Modal submitted concurrent saves');
-		release!();
-		await waitFor(
-			() =>
-				child
-					.querySelector('.prctr-settings-modal-status')
-					?.textContent?.includes('saved') === true
-		);
-		if (
-			!submitted?.source.includes('// retained') ||
-			submitted.expectedRevision !== 'revision:live' ||
-			!submitted.source.includes('13')
-		)
-			throw Error('Modal save lost comments, migrated edits or live revision');
-		barrier = undefined;
-		const font = await findSetting('editor.fontSize');
-		const beforePreview = previews;
-		font.value = '20';
-		font.dispatchEvent(new Event('input', { bubbles: true }));
-		await waitFor(() => previews > beforePreview);
-		const beforeCancel = cancelCount;
-		rejectCancellation = true;
-		child.querySelector<HTMLElement>('[aria-label^="Discard Settings Changes"]')?.click();
-		await waitFor(() => cancelCount >= beforeCancel + 2);
-		if (!child.querySelector('.prctr-settings-modal-status')?.textContent?.includes('preview'))
-			throw Error('Ambiguous cancellation was not surfaced by the modal');
-		notify({ ...acknowledged, writable: false, availability: 'unavailable' });
-		await waitFor(
-			() =>
-				child.querySelector<HTMLInputElement>('[data-key="editor.fontSize"] input')
-					?.disabled === true
-		);
-		if (
-			!child.querySelector('.prctr-settings-modal-status')?.textContent?.includes('read-only')
-		)
-			throw Error('Unavailable settings did not announce readonly state');
-		await commands.executeCommand('workbench.action.closeModalEditor');
-		await waitFor(() => chromeUpdates.at(-1)?.dimmed === false);
-		if (child.querySelector('.modal-editor-part')) throw Error('Settings modal did not close');
-		result.shell
-			.part('navigation')
-			.querySelector<HTMLButtonElement>('.prctr-area-rail__account')
-			?.click();
-		const signOut = result.shell
-			.part('sidebar')
-			.querySelector<HTMLButtonElement>('[data-action="signOut"]');
-		if (!signOut) throw Error('Authenticated sign-out action is absent');
-		signOut.click();
-		// Signing out asks first; confirm it.
-		const confirm = [
-			...child.querySelectorAll<HTMLButtonElement>('.prctr-overlay-host__surface button')
-		].find((button) => button.textContent?.trim() === 'Sign out');
-		if (!confirm) throw Error('Sign out does not ask for confirmation');
-		confirm.click();
-		await waitFor(
-			() =>
-				result.shell.part('sidebar').querySelector('.prctr-area-sidebar__feedback')
-					?.textContent === 'Sign-out could not be completed.'
-		);
-	} finally {
-		release?.();
-		result.disposables.dispose();
-		document.body.replaceChildren(...originalNodes);
-		// The CSP blocks restoring an inline style attribute; the theme owners return the root styles on dispose.
-		for (const attribute of [...document.documentElement.attributes])
-			if (attribute.name !== 'style')
-				document.documentElement.removeAttribute(attribute.name);
-		for (const [name, value] of originalAttributes)
-			if (name !== 'style') document.documentElement.setAttribute(name, value);
-	}
 }
 
 async function installHarnessStyles(document: Document): Promise<void> {

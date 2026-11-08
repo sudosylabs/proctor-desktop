@@ -596,11 +596,8 @@
     {
       "id": "shared-workbench-presentation",
       "summary": "Source platform and theme classes are installed on the existing Proctor layout root with lifecycle cleanup instead of importing the aggregate upstream Workbench. The complete shared stylesheet and source Modern UI modules consume those classes.",
-      "localPaths": [
-        "src/prctr/workbench/browser/media/style.css",
-        "src/prctr/workbench/services/settings/browser/settingsEditorPartServices.ts"
-      ],
-      "verificationRefs": ["settings-regressions"]
+      "localPaths": ["src/prctr/workbench/browser/media/style.css"],
+      "verificationRefs": ["browser-matrix"]
     }
   ],
   "verification": [
@@ -609,12 +606,6 @@
       "kind": "test",
       "path": "test/browser/upstream/browserOwnerTests.ts",
       "obligation": "Verify the source mechanism and explicit product seams; production integration and complete specification review are separate mandatory acceptance gates."
-    },
-    {
-      "id": "settings-regressions",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Real sandboxed Electron verification of completion acceptance and undo, diagnostics, computed hover/control geometry, Settings and JSON title icons, both view-switch tooltips, packaged font loading and theme transitions."
     }
   ]
 }

@@ -1,5 +1,3 @@
-import '../editor/settingsJsonEditor.test.ts';
-import '../editor/jsonLanguageFeatures.test.ts';
 import '../editor/styleSheet.test.ts';
 import './controls/dialog.test.ts';
 import './controls/toggle.test.ts';
@@ -27,5 +25,3 @@ export async function runBrowserInteractionOwnerTests(): Promise<number> {
 		throw new Error(`Browser interaction owner tests failed:\n${result.failures.join('\n')}`);
 	return result.passed;
 }
-
-import '../editor/settingsCatalog.test.ts';

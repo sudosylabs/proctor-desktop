@@ -25,9 +25,17 @@ void test('only server-listed product areas become destinations, in rail order',
 });
 
 void test('an unavailable initial destination falls back to the first area, then Account', () => {
-	assert.strictEqual(model(['exam_management'], 'settings').location.destination, 'management');
+	assert.strictEqual(model(['exam_management'], 'activity').location.destination, 'management');
 	assert.strictEqual(model([], 'activity').location.destination, 'account');
 	assert.strictEqual(model(['student_activity'], 'account').location.destination, 'account');
+});
+
+void test('a window opened at Settings starts on the Account Settings page', () => {
+	assert.deepStrictEqual(model(['exam_management'], 'settings').location, {
+		destination: 'account',
+		activityView: 'overview',
+		accountPage: 'settings'
+	});
 });
 
 void test('navigation records history and back and forward retrace it', () => {

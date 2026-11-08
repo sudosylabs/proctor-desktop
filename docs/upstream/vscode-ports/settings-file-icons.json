@@ -98,7 +98,7 @@
     },
     {
       "id": "seti-mit",
-      "name": "Seti UI MIT License \u2014 Jesse Weed",
+      "name": "Seti UI MIT License — Jesse Weed",
       "upstreamPaths": ["extensions/theme-seti/ThirdPartyNotices.txt"],
       "localNoticePath": "resources/file-icons/seti/ThirdPartyNotices.txt"
     }
@@ -125,15 +125,15 @@
         "src/prctr/workbench/services/editor/browser/packagedFileIconTheme.ts",
         "src/prctr/workbench/services/editor/browser/editorThemeService.ts"
       ],
-      "verificationRefs": ["settings-regressions"]
+      "verificationRefs": ["source-audit"]
     }
   ],
   "verification": [
     {
-      "id": "settings-regressions",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Real sandboxed Electron verification of completion acceptance and undo, diagnostics, computed hover/control geometry, Settings and JSON title icons, both view-switch tooltips, packaged font loading and theme transitions."
+      "id": "source-audit",
+      "kind": "check",
+      "path": "build/checks/upstreamAudit.ts",
+      "obligation": "Verify the pinned complete Seti font, mapping and notices."
     }
   ]
 }

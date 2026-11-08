@@ -1,9 +1,0 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*//*@proctor-vscode-port settings-editor-contributions*/@layer controls {:where(.prctr-editor-scope) .monaco-editor .unicode-highlight {
-	border: 1px solid var(--prctr-theme-editorUnicodeHighlight-border);
-	background-color: var(--prctr-theme-editorUnicodeHighlight-background);
-	box-sizing: border-box;
-}
-}

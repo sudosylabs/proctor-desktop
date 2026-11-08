@@ -10,6 +10,12 @@ import {
 import { WORKBENCH_COMMAND_SERVICE } from '../../src/prctr/workbench/common/serviceIds.js';
 import type { ICommandService } from '../../src/prctr/platform/commands/common/commands.js';
 import { isMacintosh } from '../../src/prctr/base/common/platform.js';
+import { createSettingsContribution } from '../../src/prctr/workbench/contrib/settings/browser/settingsContribution.js';
+import type { UserSettingsProjection } from '../../src/prctr/platform/settings/common/settingsRendererProtocol.js';
+import {
+	BROWSER_THEME_SERVICE,
+	type BrowserThemeService
+} from '../../src/prctr/platform/theme/browser/themeService.js';
 
 function check(value: unknown, message: string): asserts value {
 	if (!value) throw new Error(`Authenticated frame: ${message}`);
@@ -63,8 +69,40 @@ export async function runAuthenticatedFrameTests(): Promise<void> {
 async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Promise<void> {
 	let navigation!: AuthenticatedNavigationService;
 	let commands!: ICommandService;
-	let settingsRequests = 0;
 	let signOuts = 0;
+	let themes!: BrowserThemeService;
+	const settingsListeners = new Set<(projection: UserSettingsProjection) => void>();
+	let resolveSnapshot!: (projection: UserSettingsProjection) => void;
+	const projection = (
+		presented: Partial<UserSettingsProjection['presentation']>
+	): UserSettingsProjection => ({
+		source: '{}',
+		revision: 'revision:one',
+		availability: 'available',
+		writable: true,
+		presentation: {
+			windowTheme: 'system',
+			highContrast: false,
+			zoomPercent: 100,
+			reducedMotion: false,
+			...presented
+		}
+	});
+	const settingsClient = {
+		projection: () =>
+			new Promise<UserSettingsProjection>((resolve) => {
+				resolveSnapshot = resolve;
+			}),
+		async preview() {},
+		async cancelPreview() {},
+		async commit() {
+			return { kind: 'unavailable' as const };
+		},
+		onDidChange(listener: (projection: UserSettingsProjection) => void) {
+			settingsListeners.add(listener);
+			return () => settingsListeners.delete(listener);
+		}
+	};
 	step('bootstrap');
 	const result = await bootstrapWorkbench(document, authenticatedComposition, [
 		...commonWorkbenchContributions,
@@ -124,15 +162,10 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 			activate(context) {
 				navigation = context.getService(AUTHENTICATED_NAVIGATION_SERVICE);
 				commands = context.getService(WORKBENCH_COMMAND_SERVICE);
-				context.disposables.add(navigation.onDidRequestSettings(() => settingsRequests++));
+				themes = context.getService(BROWSER_THEME_SERVICE);
 			}
 		},
-		{
-			id: 'prctr.authenticated.settings',
-			phase: 'ready',
-			dependencies: ['prctr.authenticated.navigation'],
-			activate() {}
-		}
+		createSettingsContribution(settingsClient)
 	]);
 	const shell = result.shell;
 	const root = shell.element;
@@ -252,15 +285,13 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 		entry('tokens')!.click();
 		check(nav().accountPage === 'tokens', 'Access tokens opens its own page');
 		entry('settings')!.click();
-		check(
-			settingsRequests === 1 && nav().accountPage === 'tokens',
-			'Settings opens its dialog without leaving the page'
-		);
+		check(nav().accountPage === 'settings', 'Settings opens its Account page');
 		check(!topButton('back').disabled, 'Back becomes available');
 		topButton('back').click();
-		check(nav().accountPage === 'sessions', 'Back returns to the previous page');
+		check(nav().accountPage === 'tokens', 'Back returns to the previous page');
 		topButton('forward').click();
-		check(nav().accountPage === 'tokens', 'Forward retraces');
+		check(nav().accountPage === 'settings', 'Forward retraces');
+		await commands.executeCommand('prctr.authenticated.navigateBack');
 		await commands.executeCommand('prctr.authenticated.navigateBack');
 		await commands.executeCommand('prctr.authenticated.navigateBack');
 		await commands.executeCommand('prctr.authenticated.navigateBack');
@@ -400,6 +431,40 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 		await commands.executeCommand('prctr.authenticated.toggleSidebar').catch(() => undefined);
 		check(sidebar.hidden === before, 'Layout changes are blocked behind a modal');
 		gate.dispose();
+
+		step('The window follows the settings it is shown, and Ctrl/Cmd+, opens Settings.');
+		const motion = (): string => themes.presentationPreferences.motion;
+		for (const listener of settingsListeners)
+			listener(projection({ windowTheme: 'dark', reducedMotion: true }));
+		// The first read resolves after a newer change and must not replace it.
+		resolveSnapshot(projection({ windowTheme: 'light' }));
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		check(
+			themes.theme.isDark && !themes.theme.isHighContrast,
+			'A dark window theme pins the dark theme, and a stale read does not replace it'
+		);
+		check(motion() === 'reduced', 'Reduced motion applies');
+		for (const listener of settingsListeners)
+			listener(projection({ windowTheme: 'light', highContrast: true }));
+		check(
+			!themes.theme.isDark && themes.theme.isHighContrast,
+			'High contrast uses the high-contrast theme of the chosen scheme'
+		);
+		check(motion() === 'full', 'Full motion returns');
+		navigation.selectAccountPage('profile');
+		key(document.body, ',', {
+			code: 'Comma',
+			keyCode: 188,
+			metaKey: isMacintosh,
+			ctrlKey: !isMacintosh
+		});
+		await eventually(
+			() => nav().current === 'account' && nav().accountPage === 'settings',
+			'Ctrl/Cmd+, opens Account Settings'
+		);
+		navigation.selectAccountPage('profile');
+		await commands.executeCommand('prctr.authenticated.openSettings');
+		check(nav().accountPage === 'settings', 'The Open Settings command opens Account Settings');
 	} finally {
 		result.disposables.dispose();
 	}

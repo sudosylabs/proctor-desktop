@@ -59,12 +59,12 @@ export const SETTINGS_MANIFEST = [
 		activation: 'immediate',
 		candidate: 'nonCandidateOnly',
 		title: defineMessage({
-			id: 'settings.hoverDelay.title',
+			id: 'settings.hover.delay.title',
 			defaultMessage: 'Hover delay',
 			description: 'Title for the workbench hover delay setting.'
 		}),
 		description: defineMessage({
-			id: 'settings.hoverDelay.description',
+			id: 'settings.hover.delay.description',
 			defaultMessage:
 				'Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change.',
 			description: 'Description of the source workbench hover delay.'
@@ -82,12 +82,12 @@ export const SETTINGS_MANIFEST = [
 		activation: 'immediate',
 		candidate: 'nonCandidateOnly',
 		title: defineMessage({
-			id: 'settings.hoverReducedDelay.title',
+			id: 'settings.hover.reduced.delay.title',
 			defaultMessage: 'Reduced hover delay',
 			description: 'Title for the reduced workbench hover delay setting.'
 		}),
 		description: defineMessage({
-			id: 'settings.hoverReducedDelay.description',
+			id: 'settings.hover.reduced.delay.description',
 			defaultMessage:
 				'Controls the reduced delay in milliseconds used for showing hovers in specific contexts where faster feedback is beneficial.',
 			description: 'Description of the source reduced hover delay.'
@@ -104,12 +104,12 @@ export const SETTINGS_MANIFEST = [
 		activation: 'immediate',
 		candidate: 'nonCandidateOnly',
 		title: defineMessage({
-			id: 'settings.semanticTokenColorCustomizations.title',
+			id: 'settings.semantic.token.colors.title',
 			defaultMessage: 'Semantic token color customizations',
 			description: 'Title for editor token theme customization.'
 		}),
 		description: defineMessage({
-			id: 'settings.semanticTokenColorCustomizations.description',
+			id: 'settings.semantic.token.colors.description',
 			defaultMessage: 'Overrides semantic token colors and styles from the selected theme.',
 			description: 'Description of data-only editor token styles.'
 		})
@@ -125,12 +125,12 @@ export const SETTINGS_MANIFEST = [
 		activation: 'immediate',
 		candidate: 'nonCandidateOnly',
 		title: defineMessage({
-			id: 'settings.tokenColorCustomizations.title',
+			id: 'settings.token.colors.title',
 			defaultMessage: 'Token color customizations',
 			description: 'Title for editor token theme customization.'
 		}),
 		description: defineMessage({
-			id: 'settings.tokenColorCustomizations.description',
+			id: 'settings.token.colors.description',
 			defaultMessage:
 				'Overrides editor syntax colors and font style from the selected theme.',
 			description: 'Description of data-only editor token styles.'

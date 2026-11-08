@@ -4,8 +4,8 @@
   "clusterId": "settings-editor-runtime-services",
   "admission": {
     "workflow": "Full file, dialog, text-resource and optional Tree-sitter mechanisms behind settings-only resource and native window boundaries.",
-    "callers": ["src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts"],
-    "interface": "src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts",
+    "callers": ["test/workbench/services/attemptWorkspace/common/fileServiceProviders.test.ts"],
+    "interface": "src/prctr/platform/files/common/fileService.ts",
     "decision": "docs/architecture/user-settings.md"
   },
   "upstream": {
@@ -126,22 +126,6 @@
       ]
     },
     {
-      "upstreamPath": "src/vs/workbench/services/textresourceProperties/common/textResourcePropertiesService.ts",
-      "localPath": "src/prctr/workbench/services/textresourceProperties/common/textResourcePropertiesService.ts",
-      "upstreamBlob": "e738c3494ecee43e5a359c7c657139c06d1f2bfd",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
-      "licenseRefs": ["vscode-mit"],
-      "localSha256": "ddbec0b994a5d9c6fec8d3102529af4aa9f999e1137b361d153b2d64df254cda",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
       "upstreamPath": "src/vs/workbench/services/treeSitter/browser/treeSitterLibraryService.ts",
       "localPath": "src/prctr/workbench/services/treeSitter/browser/treeSitterLibraryService.ts",
       "upstreamBlob": "5805db6a6ef279ae08c7d1357d61195b869995a8",
@@ -150,22 +134,6 @@
       "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
       "licenseRefs": ["vscode-mit"],
       "localSha256": "7b3d22ad8bc02313833ccdbaa007a2e1b127e1dfe9228a68febaa547d441e66c",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/editor/common/services/textResourceConfigurationService.ts",
-      "localPath": "src/prctr/editor/common/services/textResourceConfigurationService.ts",
-      "upstreamBlob": "6eda008b6efbca5e75a45c4d8fd5d77bc34a67a9",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Recovered the full pinned file before adaptation. Namespace, erased import and explicit recorded product seams preserve the admitted algorithms and source structure.",
-      "licenseRefs": ["vscode-mit"],
-      "localSha256": "8adb7149ba42481b9f3a59ad0504695fc769ad3ad753d9cea717d45db9985481",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",
@@ -693,22 +661,6 @@
       "disposition": "evidence-only",
       "rationale": "Microsoft MIT attribution retained.",
       "licenseRefs": ["vscode-mit"]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/browser/parts/dialogs/dialog.web.contribution.ts",
-      "localPath": "src/prctr/workbench/browser/parts/dialogs/dialogContribution.ts",
-      "upstreamBlob": "7e0e5ce8e9d2f32b388d36dea519388343b712b0",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Extract the source DialogHandlerContribution queue pump for the explicit Settings window owner. Retain confirm/input/prompt/about dispatch and lazy handler creation; use concrete owned services, normalize thrown values, stop processing on disposal, dispose the handler and cancel every remaining queued item.",
-      "licenseRefs": ["vscode-mit"],
-      "localSha256": "ce174339a8819ebb2e7d1d4b48a979c172381d62b35f1fb520ad122efcdaf372",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
     }
   ],
   "licenses": [
@@ -726,18 +678,9 @@
       "summary": "Explicit composition owns the source queue and dialog pump instead of aggregate registration. The owned dialogContribution variant stops its pump, disposes the lazy handler and cancels queued promises on disposal; dialog item close is idempotent. Extension-test automatic confirmation is excluded.",
       "localPaths": [
         "src/prctr/workbench/services/dialogs/common/dialogService.ts",
-        "src/prctr/workbench/browser/parts/dialogs/dialog.web.contribution.ts",
-        "src/prctr/workbench/browser/parts/dialogs/dialogContribution.ts"
+        "src/prctr/workbench/browser/parts/dialogs/dialog.web.contribution.ts"
       ],
-      "verificationRefs": ["sandbox-parsers", "real-model", "dialog-lifecycle"]
-    },
-    {
-      "id": "user-resource-eol",
-      "summary": "Keep original configured/platform EOL selection; the user settings resource has no remote workspace OS authority.",
-      "localPaths": [
-        "src/prctr/workbench/services/textresourceProperties/common/textResourcePropertiesService.ts"
-      ],
-      "verificationRefs": ["sandbox-parsers", "real-model"]
+      "verificationRefs": ["sandbox-parsers"]
     },
     {
       "id": "packaged-tree-sitter",
@@ -746,13 +689,13 @@
         "src/prctr/workbench/services/treeSitter/browser/treeSitterLibraryService.ts",
         "src/prctr/workbench/services/treeSitter/browser/packagedTreeSitterAssets.ts"
       ],
-      "verificationRefs": ["sandbox-parsers", "real-model"]
+      "verificationRefs": ["sandbox-parsers"]
     },
     {
       "id": "dialog-privacy",
       "summary": "Dialog logging identifies operations without copying messages or input values into logs.",
       "localPaths": ["src/prctr/workbench/browser/parts/dialogs/dialogHandler.ts"],
-      "verificationRefs": ["sandbox-parsers", "real-model"]
+      "verificationRefs": ["sandbox-parsers"]
     }
   ],
   "verification": [
@@ -761,18 +704,6 @@
       "kind": "test",
       "path": "test/browser/editor/treeSitterAssets.test.ts",
       "obligation": "Verify the source mechanism and explicit product seams; production integration and complete specification review are separate mandatory acceptance gates."
-    },
-    {
-      "id": "real-model",
-      "kind": "test",
-      "path": "test/browser/editor/settingsJsonEditor.test.ts",
-      "obligation": "Verify the source mechanism and explicit product seams; production integration and complete specification review are separate mandatory acceptance gates."
-    },
-    {
-      "id": "dialog-lifecycle",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Exercise the production Settings dialog pump and queued cancellation on disposal."
     }
   ]
 }

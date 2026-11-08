@@ -21,6 +21,8 @@ import {
 } from '../../authenticated/browser/authenticatedNavigation.js';
 import { accountMessages as messages, type AccountMessage } from './accountMessages.js';
 import { AccountPane, type AccountModel } from './accountPane.js';
+import { SETTINGS_MANIFEST } from '../../../../platform/settings/common/settingsManifest.js';
+import type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
 
 const ACCOUNT_ITEM_TYPE = 'prctr.authenticated.account';
 
@@ -29,12 +31,15 @@ const pageTitles: Readonly<Record<AccountPage, AccountMessage>> = Object.freeze(
 	security: 'securityTitle',
 	sessions: 'sessionsTitle',
 	tokens: 'tokensTitle',
-	history: 'historyTitle'
+	history: 'historyTitle',
+	settings: 'settingsTitle'
 });
 
 export interface AccountContributionOptions {
 	/** Copies a new token's credential through the window's privileged clipboard. */
 	readonly writeClipboard?: (text: string) => Promise<void>;
+	/** The account's settings, edited on the Settings page. */
+	readonly settings?: SettingsRendererClient;
 }
 
 /** Account's pages in the content area, opened from the Account sidebar. */
@@ -46,7 +51,10 @@ export function createAccountContribution(
 		id: 'prctr.authenticated.account',
 		phase: 'ready',
 		dependencies: Object.freeze(['prctr.authenticated.navigation' as const]),
-		messages: Object.values(messages),
+		messages: [
+			...Object.values(messages),
+			...SETTINGS_MANIFEST.flatMap((setting) => [setting.title, setting.description])
+		],
 		activate(context: WorkbenchBootstrapContext): void {
 			const binding = context.getWindowBinding() as AuthenticatedWindowDescriptor;
 			if (binding.kind !== 'authenticated')
@@ -78,6 +86,9 @@ export function createAccountContribution(
 							binding,
 							overlays: context.shell.overlayHost,
 							customPhotos,
+							...(options.settings === undefined
+								? {}
+								: { settings: options.settings }),
 							hooks: {
 								setProfilePhoto: (dataUrl) => navigation.setProfilePhoto(dataUrl),
 								signOut: () => navigation.signOut(),

@@ -1025,22 +1025,6 @@
       ]
     },
     {
-      "upstreamPath": "src/vs/base/browser/ui/resizable/resizable.ts",
-      "localPath": "src/prctr/base/browser/ui/resizable/resizable.ts",
-      "upstreamBlob": "b40f7be9bdc89e57a8ddb2eccd49121075706a98",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Whole original control source retained. Namespace/localization relocation, explicit erased type imports, zero-specificity editor scope and theme variable mapping integrate the same behavior into Proctor.",
-      "licenseRefs": ["vscode-mit"],
-      "localSha256": "a7dc076d9f443c2be2379e69f74974b4d594d5387a6b456c18a19ce1d71f1e2b",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
       "upstreamPath": "src/vs/base/common/marked/marked.js",
       "localPath": "src/prctr/base/common/marked/marked.js",
       "upstreamBlob": "ea5462500bf14e3805b634988b9795b730010889",
@@ -1787,8 +1771,7 @@
       "summary": "Retain the original hover delegation and cached default behavior. Proctor bindings are disposable and store live owner records so teardown in either order never restores a disposed service. Instant delegates remain consumer-owned; shared defaults are window-owned.",
       "localPaths": [
         "src/prctr/base/browser/ui/hover/hoverDelegateFactory.ts",
-        "src/prctr/base/browser/ui/hover/hoverDelegate2.ts",
-        "src/prctr/workbench/services/settings/browser/settingsEditorControlServices.ts"
+        "src/prctr/base/browser/ui/hover/hoverDelegate2.ts"
       ],
       "verificationRefs": ["hover-lifetime"]
     },
@@ -1822,7 +1805,7 @@
         "src/prctr/base/browser/ui/table/table.css",
         "src/prctr/base/browser/ui/table/tableWidget.ts"
       ],
-      "verificationRefs": ["settings-regressions", "hover-lifetime"]
+      "verificationRefs": ["hover-lifetime"]
     }
   ],
   "verification": [
@@ -1837,12 +1820,6 @@
       "kind": "check",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Verify pinned complete files and exact nested third-party runtime/notices. Composed UI, control tests and accessibility matrix remain separate completion requirements."
-    },
-    {
-      "id": "settings-regressions",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Real sandboxed Electron verification of completion acceptance and undo, diagnostics, computed hover/control geometry, Settings and JSON title icons, both view-switch tooltips, packaged font loading and theme transitions."
     },
     {
       "id": "hover-lifetime",

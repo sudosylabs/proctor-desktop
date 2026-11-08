@@ -1,3 +1,6 @@
+import { SETTINGS_MANIFEST } from '../../src/prctr/platform/settings/common/settingsManifest.ts';
+import type { UserSettingsProjection } from '../../src/prctr/platform/settings/common/settingsRendererProtocol.ts';
+import type { SettingsRendererClient } from '../../src/prctr/workbench/services/settings/common/settingsRendererClient.ts';
 import { runAccountPhotoTests } from './accountPhotoTests.ts';
 import {
 	AccountPane,
@@ -167,11 +170,52 @@ export async function runAccountTests(document: Document): Promise<void> {
 	const account = new FakeAccount();
 	const signOuts: number[] = [];
 	const copied: string[] = [];
+	// A fake settings capability: commits succeed against the current revision; one may conflict.
+	let settingsSource = '{}';
+	let settingsRevision = 1;
+	let conflictNext = false;
+	const settingsCommits: string[] = [];
+	const settingsProjection = (): UserSettingsProjection => ({
+		source: settingsSource,
+		revision: `r${settingsRevision}`,
+		availability: 'available',
+		writable: true,
+		presentation: {
+			windowTheme: 'system',
+			highContrast: false,
+			zoomPercent: 100,
+			reducedMotion: false
+		}
+	});
+	const settingsClient: SettingsRendererClient = {
+		projection: async () => settingsProjection(),
+		preview: async () => {},
+		cancelPreview: async () => {},
+		commit: async (intent) => {
+			settingsCommits.push(intent.source);
+			if (conflictNext) {
+				conflictNext = false;
+				settingsSource = '{"editor.fontSize": 18}';
+				settingsRevision++;
+				return { kind: 'conflict', projection: settingsProjection() };
+			}
+			if (intent.expectedRevision !== `r${settingsRevision}`)
+				return { kind: 'conflict', projection: settingsProjection() };
+			settingsSource = intent.source;
+			settingsRevision++;
+			return { kind: 'success', projection: settingsProjection() };
+		},
+		onDidChange: () => () => {}
+	};
 	const pane = new AccountPane(document, {
 		client: account,
+		settings: settingsClient,
 		localization: createLocalization({
 			requestedLocale: 'en',
-			messages: Object.values(accountMessages)
+			messages: [
+				...Object.values(accountMessages),
+				...SETTINGS_MANIFEST.flatMap((setting) => [setting.title, setting.description])
+			]
 		}),
 		binding: {
 			kind: 'authenticated',
@@ -729,6 +773,54 @@ export async function runAccountTests(document: Document): Promise<void> {
 				last?.kind === 'readHistory' && last.status === 'fail' && last.cursor === undefined
 			);
 		}, 'filtered history');
+		// #endregion
+
+		// #region Settings
+		assign('settings');
+		await wait(() => root.textContent!.includes('Window theme'), 'settings page');
+		check(
+			root.querySelector('[role="tab"][aria-selected="true"]')?.textContent === 'Appearance',
+			'Settings opens on Appearance'
+		);
+		check(root.textContent!.includes('Saved'), 'Settings say they are saved');
+		const settingRow = (key: string): HTMLElement =>
+			root.querySelector<HTMLElement>(`[data-setting="${key}"]`)!;
+		[...settingRow('window.theme').querySelectorAll<HTMLButtonElement>('[role="radio"]')]
+			.find((radio) => radio.textContent === 'Dark')!
+			.click();
+		await wait(() => settingsCommits.length === 1, 'theme saved');
+		check(
+			/"window\.theme":\s*"dark"/u.test(settingsCommits[0]!),
+			'The choice is saved by itself'
+		);
+		await wait(() => !!buttonIn(settingRow('window.theme'), 'Reset'), 'reset offered');
+		buttonIn(settingRow('window.theme'), 'Reset')!.click();
+		await wait(() => settingsCommits.length === 2, 'reset saved');
+		check(!settingsCommits[1]!.includes('window.theme'), 'Reset removes the key');
+		buttonIn(root, 'Exam editor')!.click();
+		check(
+			root.textContent!.includes('An exam can set its own editor settings'),
+			'The editor tab says exams can override it'
+		);
+		check(root.querySelector('.prctr-settings-page__code'), 'The editor tab previews code');
+		conflictNext = true;
+		settingRow('editor.fontSize')
+			.querySelector<HTMLButtonElement>('[aria-label="Larger"]')!
+			.click();
+		await wait(() => settingsCommits.length === 4, 'conflict reapplied');
+		check(
+			/"editor\.fontSize":\s*15/u.test(settingsCommits[3]!),
+			'A conflicting save applies this page’s change again on the newer settings'
+		);
+		await wait(() => root.textContent!.includes('Saved'), 'saved after the conflict');
+		const find = root.querySelector<HTMLInputElement>('input[aria-label="Find a setting"]')!;
+		find.value = 'minimap';
+		find.dispatchEvent(new Event('input', { bubbles: true }));
+		check(
+			root.querySelectorAll('[data-setting]').length === 1 &&
+				!!settingRow('editor.minimap.enabled'),
+			'Find a setting narrows to matches across tabs'
+		);
 		// #endregion
 
 		// #region Layout and lifecycle

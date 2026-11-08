@@ -424,15 +424,6 @@
       "localInterface": "src/prctr/platform/configuration/common/configuration.ts"
     },
     {
-      "upstreamPath": "src/vs/platform/extensionResourceLoader/common/extensionResourceLoader.ts",
-      "upstreamBlob": "28a25db97f004f3c81c9aeca39053adc9428cf5a",
-      "category": "source",
-      "disposition": "locally-satisfied",
-      "rationale": "Use the existing Proctor-owned source contract at the exact retained dependency edge; composed behavior and closure are checked through the owning verification.",
-      "licenseRefs": ["vscode-mit"],
-      "localInterface": "src/prctr/platform/extensionResourceLoader/common/extensionResourceLoader.ts"
-    },
-    {
       "upstreamPath": "src/vs/platform/instantiation/common/instantiation.ts",
       "upstreamBlob": "b879acb0ee8da5a824321bd1b9925219fe07af94",
       "category": "source",

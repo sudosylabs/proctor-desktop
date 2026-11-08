@@ -29,6 +29,8 @@ import { ProfilePage } from './profilePage.js';
 import { SecurityPage } from './securityPage.js';
 import { SessionsPage } from './sessionsPage.js';
 import { HistoryPage } from './historyPage.js';
+import { SettingsPage } from './settingsPage.js';
+import type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
 import { TokensPage } from './tokensPage.js';
 import './accountPage.css';
 
@@ -44,6 +46,8 @@ export interface AccountPaneOptions {
 	readonly hooks: AccountWindowHooks;
 	/** Shared across the window's Account panes, so a photo uploaded here stays removable. */
 	readonly customPhotos: Set<string>;
+	/** The account's settings; without it the Settings page says it is unavailable. */
+	readonly settings?: SettingsRendererClient;
 	readonly now?: () => number;
 }
 
@@ -52,7 +56,8 @@ const pageTitles: Readonly<Record<AccountPage, AccountMessage>> = Object.freeze(
 	security: 'securityTitle',
 	sessions: 'sessionsTitle',
 	tokens: 'tokensTitle',
-	history: 'historyTitle'
+	history: 'historyTitle',
+	settings: 'settingsTitle'
 });
 
 /**
@@ -72,6 +77,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 	private readonly services: AccountPageServices;
 	private readonly menu: MenuControl;
 	private readonly toasts: ToastHost;
+	private readonly settings: SettingsRendererClient | undefined;
 	private readonly page = this._register(new MutableDisposable<AccountPageView>());
 	private visible = false;
 
@@ -114,6 +120,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 				onActionError: () => undefined
 			})
 		);
+		this.settings = options.settings;
 		this.toasts = this._register(
 			new ToastHost(this.element, {
 				dismissLabel: options.localization.format(accountMessages.dismiss),
@@ -237,6 +244,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			);
 		if (page === 'sessions') return this.services.text('sessionsDescription');
 		if (page === 'history') return this.services.text('historyDescription');
+		if (page === 'settings') return this.services.text('settingsDescription');
 		return this.services.text('tokensDescription');
 	}
 
@@ -246,6 +254,8 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			return new SecurityPage(this.body, this.headerActions, this.services);
 		if (page === 'sessions') return new SessionsPage(this.body, this.services);
 		if (page === 'history') return new HistoryPage(this.body, this.services);
+		if (page === 'settings' && this.settings !== undefined)
+			return new SettingsPage(this.body, this.headerActions, this.services, this.settings);
 		return new TokensPage(this.body, this.headerActions, this.services);
 	}
 }

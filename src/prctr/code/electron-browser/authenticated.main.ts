@@ -1,5 +1,4 @@
 import type { ExamActivityClient } from '../../platform/examActivity/common/examActivityProtocol.js';
-import { createElectronSettingsEditorEnvironment } from './settingsEditorEnvironment.js';
 import type { SettingsNativeClient } from '../../platform/settings/common/settingsNativeHost.js';
 import { createAccountContribution } from '../../workbench/contrib/account/browser/accountContribution.js';
 import type { AccountClient } from '../../platform/account/common/accountProtocol.js';
@@ -32,12 +31,10 @@ const authenticatedWindow = await bootstrapWorkbench(document, authenticatedComp
 	createDesktopWorkbenchContribution('authenticated', () => api.bootstrap(), api.windowChrome),
 	createAuthenticatedContribution(api),
 	createAccountContribution(api.account, {
-		writeClipboard: (text) => api.settingsNative.clipboard.writeText(text)
+		writeClipboard: (text) => api.settingsNative.clipboard.writeText(text),
+		settings: api.settings
 	}),
-	createSettingsContribution(
-		api.settings,
-		createElectronSettingsEditorEnvironment(api.settingsNative)
-	)
+	createSettingsContribution(api.settings)
 ]);
 globalThis.addEventListener('pagehide', () => authenticatedWindow.disposables.dispose(), {
 	once: true

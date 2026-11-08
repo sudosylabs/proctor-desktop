@@ -12,5 +12,5 @@ void test('packaged editor workers and tokenizers retain language features and b
 			timeout: 25_000
 		}).trim()
 	);
-	assert.deepEqual(result, { passed: true, cycles: 3, hasNode: false });
+	assert.deepEqual(result, { passed: true, hasNode: false });
 });

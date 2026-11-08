@@ -196,7 +196,7 @@
         "src/prctr/platform/theme/common/sizes/baseSizes.ts",
         "test/platform/theme/common/upstream/sizeRegistry.test.ts"
       ],
-      "verificationRefs": ["owner-tests", "editor-geometry", "upstream-audit"]
+      "verificationRefs": ["owner-tests", "upstream-audit"]
     }
   ],
   "verification": [
@@ -205,12 +205,6 @@
       "kind": "test",
       "path": "test/platform/theme/common/upstream/sizeRegistry.test.ts",
       "obligation": "Preserve every original size registry test and default size role."
-    },
-    {
-      "id": "editor-geometry",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Observe the actual editor hover radius under the production theme and stylesheet composition."
     },
     {
       "id": "upstream-audit",

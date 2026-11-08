@@ -10,8 +10,6 @@
   "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts",
   "src/prctr/workbench/contrib/examActivity/browser/examActivityPane.ts",
   "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts",
-  "src/prctr/workbench/contrib/settings/browser/settingsModalStatus.ts",
   "src/prctr/workbench/services/resourcePreview/browser/pdfPreviewEntry.ts",
-  "src/prctr/workbench/services/resourcePreview/browser/sandboxPreviewHost.ts",
-  "src/prctr/workbench/services/settings/browser/settingsEditorPartServices.ts"
+  "src/prctr/workbench/services/resourcePreview/browser/sandboxPreviewHost.ts"
 ]

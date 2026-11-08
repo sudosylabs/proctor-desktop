@@ -4,8 +4,8 @@
   "clusterId": "settings-editor-browser-host",
   "admission": {
     "workflow": "Provide source native menu and clipboard behavior through capability-specific isolated Settings transports.",
-    "callers": ["src/prctr/code/electron-browser/settingsEditorEnvironment.ts"],
-    "interface": "src/prctr/code/electron-browser/settingsEditorEnvironment.ts",
+    "callers": ["src/prctr/workbench/contrib/authenticated/browser/authenticatedWindowControls.ts"],
+    "interface": "src/prctr/platform/contextview/browser/contextMenuService.ts",
     "decision": "docs/architecture/user-settings.md"
   },
   "upstream": {
@@ -37,70 +37,6 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/base/parts/contextmenu/electron-browser/contextmenu.ts",
-      "upstreamBlob": "7b1971d0aa7ebc5d30b3bf9ae51c5e51211da6ca",
-      "localPath": "src/prctr/base/parts/contextmenu/electron-browser/contextmenu.ts",
-      "localSha256": "10d12ab0c85a0cc0acf3b57d813b39e66f709c44a44413d058585d72424a5952",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Preserve native-menu serialization, IDs, submenu state and callbacks; replace renderer Electron IPC with an injected closed popup/cancel transport and handle cancellation/failure without stale callbacks.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/services/clipboard/electron-browser/clipboardService.ts",
-      "upstreamBlob": "98cca5604bba3eca45344d3f15d5f50d60a5ead8",
-      "localPath": "src/prctr/workbench/services/clipboard/electron-browser/clipboardService.ts",
-      "localSha256": "79e6982e3bdc60a35ebd01392b65efdb8399ef731618b03028a53eccc77cb69d",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Retain native clipboard text/find/resource encoding and paste behavior through capability-specific SettingsClipboardClient methods, including same-window paste authorization; no generic native host.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/services/contextmenu/electron-browser/contextmenuService.ts",
-      "upstreamBlob": "c99f5309eeae4989066bd93732769fefb45f8633",
-      "localPath": "src/prctr/workbench/services/contextmenu/electron-browser/contextmenuService.ts",
-      "localSha256": "bf209ecbdec77d5195b51f070aedb373881013a48f0471b51dc6b222ddad805b",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Preserve native versus custom context-menu selection, ordering, keybindings and events. Inject the bounded native transport and dispose/cancel the currently owned popup.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/platform/clipboard/browser/clipboardService.ts",
-      "upstreamBlob": "6e0a6e018d050e9054a01cab40c1bdc881052ed4",
-      "localPath": "src/prctr/platform/clipboard/browser/clipboardService.ts",
-      "localSha256": "8f0715de94ebdf471ff26fabd88c19eb009afed0ac125716ec154af30ed62e19",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
       "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -282,15 +218,6 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/platform/opener/common/opener.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
-      "upstreamPath": "src/vs/base/parts/sandbox/electron-browser/globals.ts",
-      "upstreamBlob": "bd43ae40457815c90e9555c075036b70ef21a800",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/code/electron-browser/settingsEditorEnvironment.ts",
-      "rationale": "Capability-specific preload clients replace generic renderer Electron globals."
     },
     {
       "upstreamPath": "src/vs/platform/clipboard/common/clipboardService.ts",
@@ -582,12 +509,6 @@
   ],
   "dependencies": [
     {
-      "id": "product-composition",
-      "kind": "local-interface",
-      "reference": "src/prctr/code/electron-browser/settingsEditorEnvironment.ts",
-      "rationale": "Closed product owner injects capabilities and registers admitted source mechanics; no upstream aggregate selects the product."
-    },
-    {
       "id": "modern-presentation",
       "kind": "local-interface",
       "reference": "src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts",
@@ -598,19 +519,8 @@
     {
       "id": "settings-only-composition",
       "summary": "Keep the accepted virtual user document, explicit Save, readonly/disposal fences and sandboxed capability clients. Exclude extension loading, workspace/remote/profile targets, AI search, arbitrary files/execution and auxiliary OS windows. Per-file rationale identifies retained symbols and non-mechanical adaptations; generic source contracts retained for dependency compatibility do not activate those products.",
-      "localPaths": [
-        "src/prctr/base/parts/contextmenu/common/contextmenu.ts",
-        "src/prctr/base/parts/contextmenu/electron-browser/contextmenu.ts",
-        "src/prctr/workbench/services/clipboard/electron-browser/clipboardService.ts",
-        "src/prctr/workbench/services/contextmenu/electron-browser/contextmenuService.ts",
-        "src/prctr/code/electron-browser/settingsEditorEnvironment.ts"
-      ],
-      "verificationRefs": [
-        "settings-regressions",
-        "settings-lifecycle",
-        "source-boundaries",
-        "native-transport"
-      ]
+      "localPaths": ["src/prctr/base/parts/contextmenu/common/contextmenu.ts"],
+      "verificationRefs": ["source-boundaries", "native-transport"]
     }
   ],
   "verification": [
@@ -619,18 +529,6 @@
       "kind": "check",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Verify every exact pinned source blob. Adapted file rationale and explicit exclusions own source-to-local differences; this check alone does not establish behavior."
-    },
-    {
-      "id": "settings-regressions",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Exercise the sandboxed Settings composition: completion, diagnostics, styles, icons and browser-service ownership boundaries."
-    },
-    {
-      "id": "settings-lifecycle",
-      "kind": "test",
-      "path": "test/browser/editor/settingsEditorSession.test.ts",
-      "obligation": "Verify modal draft, explicit Save, discard, model identity, cancellation and disposal through the production services."
     },
     {
       "id": "source-boundaries",

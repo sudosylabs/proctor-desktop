@@ -1,13 +1,13 @@
 {
   "generatedBy": "settings.registry",
-  "registryFingerprint": "fnv1a64:c2d42feb28e048f7",
+  "registryFingerprint": "fnv1a64:2801a76bc5ccfd7b",
   "settings": [
     {
       "id": "workbench.hover.delay",
       "title": "Hover delay",
-      "titleMessageId": "settings.hoverDelay.title",
+      "titleMessageId": "settings.hover.delay.title",
       "description": "Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change.",
-      "descriptionMessageId": "settings.hoverDelay.description",
+      "descriptionMessageId": "settings.hover.delay.description",
       "default": 500,
       "platformDefaults": {
         "mac": 1500
@@ -24,9 +24,9 @@
     {
       "id": "workbench.hover.reducedDelay",
       "title": "Reduced hover delay",
-      "titleMessageId": "settings.hoverReducedDelay.title",
+      "titleMessageId": "settings.hover.reduced.delay.title",
       "description": "Controls the reduced delay in milliseconds used for showing hovers in specific contexts where faster feedback is beneficial.",
-      "descriptionMessageId": "settings.hoverReducedDelay.description",
+      "descriptionMessageId": "settings.hover.reduced.delay.description",
       "default": 500,
       "storage": "portableUser",
       "domain": "appearance",
@@ -40,9 +40,9 @@
     {
       "id": "editor.semanticTokenColorCustomizations",
       "title": "Semantic token color customizations",
-      "titleMessageId": "settings.semanticTokenColorCustomizations.title",
+      "titleMessageId": "settings.semantic.token.colors.title",
       "description": "Overrides semantic token colors and styles from the selected theme.",
-      "descriptionMessageId": "settings.semanticTokenColorCustomizations.description",
+      "descriptionMessageId": "settings.semantic.token.colors.description",
       "default": {},
       "storage": "portableUser",
       "domain": "appearance",
@@ -56,9 +56,9 @@
     {
       "id": "editor.tokenColorCustomizations",
       "title": "Token color customizations",
-      "titleMessageId": "settings.tokenColorCustomizations.title",
+      "titleMessageId": "settings.token.colors.title",
       "description": "Overrides editor syntax colors and font style from the selected theme.",
-      "descriptionMessageId": "settings.tokenColorCustomizations.description",
+      "descriptionMessageId": "settings.token.colors.description",
       "default": {},
       "storage": "portableUser",
       "domain": "appearance",

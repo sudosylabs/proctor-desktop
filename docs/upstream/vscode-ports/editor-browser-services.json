@@ -66,54 +66,6 @@
       ]
     },
     {
-      "upstreamPath": "src/vs/platform/userInteraction/browser/userInteractionServiceImpl.ts",
-      "localPath": "src/prctr/platform/userInteraction/browser/userInteractionServiceImpl.ts",
-      "upstreamBlob": "e0431c43297d6fecb6d09fe761c13f91a40e6746",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": ["vscode-mit"],
-      "localSha256": "eb994a5aacc03424cbdd38fa06affe5d5adc895b16db1dd5f2a0244f2c06e5d0",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/platform/markers/common/markerService.ts",
-      "localPath": "src/prctr/platform/markers/common/markerService.ts",
-      "upstreamBlob": "f5ef229288a0354851777ac054b03f8e06e50386",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": ["vscode-mit"],
-      "localSha256": "7bd91264396b6b7b2ac90133cfe26ee97dd759652988778752b3014094f96471",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/editor/common/services/markerDecorationsService.ts",
-      "localPath": "src/prctr/editor/common/services/markerDecorationsService.ts",
-      "upstreamBlob": "c25a85a6915b49de62a73082ef578ca8512bb92f",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Complete original service/model retained with namespace, localization, theme input adapter and erased-type import integration. Concrete editor machinery is not replaced by service stubs.",
-      "licenseRefs": ["vscode-mit"],
-      "localSha256": "44843aae57f060158f463cc2aca2372641743f994d26bf28924404351813eec1",
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
       "upstreamPath": "src/vs/workbench/services/themes/browser/productIconThemeData.ts",
       "localPath": "src/prctr/workbench/services/themes/browser/productIconThemeData.ts",
       "upstreamBlob": "26b01f4101ab7278d1435d3a4495c9574359dfa7",
@@ -776,9 +728,6 @@
         "src/prctr/editor/browser/services/abstractCodeEditorService.ts",
         "src/prctr/platform/layout/browser/layoutService.ts",
         "src/prctr/platform/accessibility/browser/accessibilityService.ts",
-        "src/prctr/platform/userInteraction/browser/userInteractionServiceImpl.ts",
-        "src/prctr/platform/markers/common/markerService.ts",
-        "src/prctr/editor/common/services/markerDecorationsService.ts",
         "src/prctr/workbench/services/themes/browser/productIconThemeData.ts",
         "src/prctr/editor/common/services/getIconClasses.ts",
         "src/prctr/workbench/services/themes/browser/fileIconThemeData.ts",

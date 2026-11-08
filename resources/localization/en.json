@@ -700,6 +700,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.page.settings.description": {
+      "message": "Saved to your account, so they follow you to any computer you sign in on.",
+      "description": "Description under the Settings heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.page.settings.title": {
+      "message": "Settings",
+      "description": "Heading of the Settings page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.page.tokens.description": {
       "message": "Let a script use Proctor’s API as you, limited to what you choose and only until the date you set.",
       "description": "Description under the Access tokens heading.",
@@ -1434,6 +1446,339 @@
     "account.sessions.unnamed.desktop": {
       "message": "Unnamed computer",
       "description": "A registered desktop without a name.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.announce.auto": {
+      "message": "Automatic",
+      "description": "Announcement detail choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.announce.brief": {
+      "message": "Brief",
+      "description": "Announcement detail choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.announce.detailed": {
+      "message": "Detailed",
+      "description": "Announcement detail choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.blink.blink": {
+      "message": "Blink",
+      "description": "Cursor animation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.blink.expand": {
+      "message": "Expand",
+      "description": "Cursor animation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.blink.phase": {
+      "message": "Phase",
+      "description": "Cursor animation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.blink.smooth": {
+      "message": "Smooth",
+      "description": "Cursor animation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.blink.solid": {
+      "message": "Solid",
+      "description": "Cursor animation: no blinking.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.choice.off": {
+      "message": "Off",
+      "description": "A setting choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.choice.on": {
+      "message": "On",
+      "description": "A setting choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.cursor.block": {
+      "message": "Block",
+      "description": "Cursor shape.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.cursor.line": {
+      "message": "Line",
+      "description": "Cursor shape.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.cursor.underline": {
+      "message": "Underline",
+      "description": "Cursor shape.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.delay.long": {
+      "message": "Long · 1 s",
+      "description": "Tooltip delay choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.delay.longer": {
+      "message": "Longer · 1.5 s",
+      "description": "Tooltip delay choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.delay.medium": {
+      "message": "Medium · 0.5 s",
+      "description": "Tooltip delay choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.delay.none": {
+      "message": "None",
+      "description": "Tooltip delay choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.delay.short": {
+      "message": "Short · 0.3 s",
+      "description": "Tooltip delay choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.editor.preview": {
+      "message": "Editor preview",
+      "description": "Accessible name of the code preview.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.editor.preview.label": {
+      "message": "Preview · {theme}, {size} px",
+      "description": "Label above the code preview.",
+      "placeholders": [
+        "theme",
+        "size"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.exam.override": {
+      "message": "An exam can set its own editor settings. When it does, they apply only while you take that exam.",
+      "description": "Banner on the Exam editor tab.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.find": {
+      "message": "Find a setting",
+      "description": "Accessible name and placeholder of the settings filter.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.group.exam.browser": {
+      "message": "Exam browser",
+      "description": "Settings group.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.group.layout": {
+      "message": "Layout",
+      "description": "Settings group for editor layout.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.group.look": {
+      "message": "Look",
+      "description": "Settings group for how the editor looks.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.group.motion": {
+      "message": "Motion and timing",
+      "description": "Settings group.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.group.screen.readers": {
+      "message": "Screen readers",
+      "description": "Settings group.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.group.size": {
+      "message": "Size",
+      "description": "Settings group.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.group.theme": {
+      "message": "Theme",
+      "description": "Settings group.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.invalid": {
+      "message": "That value isn’t allowed.",
+      "description": "Toast body when a value is refused.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.kept.here": {
+      "message": "Your change is kept on this page; try again when the server answers.",
+      "description": "Toast body when a save fails.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.larger": {
+      "message": "Larger",
+      "description": "Increases a number.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.line.numbers.relative": {
+      "message": "Relative",
+      "description": "Line numbers counted from the cursor line.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.no.match": {
+      "message": "No setting matches that.",
+      "description": "Find a setting found nothing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.not.saved": {
+      "message": "Couldn’t save your settings",
+      "description": "Toast title when a save fails.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.not.saved.short": {
+      "message": "Not saved",
+      "description": "The last change could not be saved.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.percent": {
+      "message": "{value}%",
+      "description": "A percentage.",
+      "placeholders": [
+        "value"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.pixels": {
+      "message": "{value} px",
+      "description": "A size in pixels.",
+      "placeholders": [
+        "value"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.read.only": {
+      "message": "Read only",
+      "description": "Settings cannot be changed right now.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.reset": {
+      "message": "Reset",
+      "description": "Puts one setting back to its default.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.reset.named": {
+      "message": "Reset {name}",
+      "description": "Accessible name of a setting’s Reset button.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.saved": {
+      "message": "Saved",
+      "description": "Every change is saved.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.saving": {
+      "message": "Saving…",
+      "description": "A change is being saved.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.screen.reader.auto": {
+      "message": "Detect automatically",
+      "description": "Screen reader mode choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.search.results": {
+      "message": "Matching settings",
+      "description": "Group title while finding a setting.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.smaller": {
+      "message": "Smaller",
+      "description": "Decreases a number.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.tab.accessibility": {
+      "message": "Accessibility",
+      "description": "Settings tab.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.tab.appearance": {
+      "message": "Appearance",
+      "description": "Settings tab.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.tab.browser": {
+      "message": "Browser",
+      "description": "Settings tab for the exam browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.tab.editor": {
+      "message": "Exam editor",
+      "description": "Settings tab for the exam editor.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.theme.dark": {
+      "message": "Dark",
+      "description": "Window theme choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.theme.light": {
+      "message": "Light",
+      "description": "Window theme choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.theme.system": {
+      "message": "System",
+      "description": "Window theme follows the operating system.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.settings.unavailable": {
+      "message": "Settings can’t be changed right now. Your current settings still apply.",
+      "description": "Banner when settings are read only or unavailable.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -3688,6 +4033,12 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
+    "settings.command.open": {
+      "message": "Open Settings",
+      "description": "Command that opens the Settings page of Account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+    },
     "settings.contrast.description": {
       "message": "Uses a packaged high-contrast theme when stronger accessibility requirements apply.",
       "description": "Description of the high contrast preference.",
@@ -3796,25 +4147,25 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.hoverDelay.description": {
+    "settings.hover.delay.description": {
       "message": "Controls the delay in milliseconds after which the hover is shown for workbench items. Already visible items may require a refresh before reflecting this setting change.",
       "description": "Description of the source workbench hover delay.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.hoverDelay.title": {
+    "settings.hover.delay.title": {
       "message": "Hover delay",
       "description": "Title for the workbench hover delay setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.hoverReducedDelay.description": {
+    "settings.hover.reduced.delay.description": {
       "message": "Controls the reduced delay in milliseconds used for showing hovers in specific contexts where faster feedback is beneficial.",
       "description": "Description of the source reduced hover delay.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.hoverReducedDelay.title": {
+    "settings.hover.reduced.delay.title": {
       "message": "Reduced hover delay",
       "description": "Title for the reduced workbench hover delay setting.",
       "placeholders": [],
@@ -3831,6 +4182,12 @@
       "description": "Title for the tree indentation setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.presentation.unavailable": {
+      "message": "Settings are unavailable. Open Settings to try again.",
+      "description": "Notification when the window cannot read the settings it is presented with.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
     },
     "settings.prohibited.autosave.description": {
       "message": "Workspace durability is not a User Setting.",
@@ -3904,13 +4261,13 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.semanticTokenColorCustomizations.description": {
+    "settings.semantic.token.colors.description": {
       "message": "Overrides semantic token colors and styles from the selected theme.",
       "description": "Description of data-only editor token styles.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.semanticTokenColorCustomizations.title": {
+    "settings.semantic.token.colors.title": {
       "message": "Semantic token color customizations",
       "description": "Title for editor token theme customization.",
       "placeholders": [],
@@ -3928,13 +4285,13 @@
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.tokenColorCustomizations.description": {
+    "settings.token.colors.description": {
       "message": "Overrides editor syntax colors and font style from the selected theme.",
       "description": "Description of data-only editor token styles.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
-    "settings.tokenColorCustomizations.title": {
+    "settings.token.colors.title": {
       "message": "Token color customizations",
       "description": "Title for editor token theme customization.",
       "placeholders": [],

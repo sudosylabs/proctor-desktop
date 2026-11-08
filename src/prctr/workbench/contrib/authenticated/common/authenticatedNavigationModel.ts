@@ -21,7 +21,14 @@ export const activityViews = [
 ] as const;
 export type ActivityView = (typeof activityViews)[number];
 
-export const accountPages = ['profile', 'security', 'sessions', 'tokens', 'history'] as const;
+export const accountPages = [
+	'profile',
+	'security',
+	'sessions',
+	'tokens',
+	'history',
+	'settings'
+] as const;
 export type AccountPage = (typeof accountPages)[number];
 
 const areaDestinations: Readonly<Partial<Record<ProductArea, ProductDestination>>> = Object.freeze({
@@ -71,7 +78,8 @@ export class AuthenticatedNavigationModel extends Disposable {
 		this.current = Object.freeze({
 			destination: this.resolve(initialDestination),
 			activityView: 'overview',
-			accountPage: 'profile'
+			// Settings is an Account page; a window opened at Settings starts there.
+			accountPage: initialDestination === 'settings' ? 'settings' : 'profile'
 		});
 	}
 
@@ -155,7 +163,7 @@ export class AuthenticatedNavigationModel extends Disposable {
 
 	/** An unavailable destination falls back to the first available area, then to Account. */
 	private resolve(destination: string): AuthenticatedDestination {
-		if (destination === 'account') return 'account';
+		if (destination === 'account' || destination === 'settings') return 'account';
 		const area = this.available.find((candidate) => candidate === destination);
 		return area ?? this.available[0] ?? 'account';
 	}

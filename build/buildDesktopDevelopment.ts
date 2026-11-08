@@ -1,7 +1,6 @@
 import { nodeEsmRuntime } from './lib/nodeEsmRuntime.ts';
 import { packagedEditorDependencies } from './lib/packagedEditorDependencies.ts';
 import { buildEditorWorker } from './lib/editorWorker.ts';
-import { buildJsonWorker } from './lib/jsonWorker.ts';
 import { buildTextMateWorker } from './lib/textMateWorker.ts';
 import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, writeFileSync } from 'node:fs';
@@ -32,7 +31,6 @@ cpSync(
 stageLiquidGlass(outdir);
 await Promise.all([
 	buildEditorWorker(outdir),
-	buildJsonWorker(outdir),
 	buildTextMateWorker(outdir),
 	build({
 		absWorkingDir: repositoryRoot,

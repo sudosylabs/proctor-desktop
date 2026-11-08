@@ -111,7 +111,7 @@
       "id": "settings-only-composition",
       "summary": "Keep the accepted virtual user document, explicit Save, readonly/disposal fences and sandboxed capability clients. Exclude extension loading, workspace/remote/profile targets, AI search, arbitrary files/execution and auxiliary OS windows. Per-file rationale identifies retained symbols and non-mechanical adaptations; generic source contracts retained for dependency compatibility do not activate those products.",
       "localPaths": ["src/prctr/platform/theme/browser/iconsStyleSheet.ts"],
-      "verificationRefs": ["settings-regressions", "settings-lifecycle", "source-boundaries"]
+      "verificationRefs": ["source-boundaries"]
     }
   ],
   "verification": [
@@ -120,18 +120,6 @@
       "kind": "check",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Verify every exact pinned source blob. Adapted file rationale and explicit exclusions own source-to-local differences; this check alone does not establish behavior."
-    },
-    {
-      "id": "settings-regressions",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Exercise the sandboxed Settings composition: completion, diagnostics, styles, icons and browser-service ownership boundaries."
-    },
-    {
-      "id": "settings-lifecycle",
-      "kind": "test",
-      "path": "test/browser/editor/settingsEditorSession.test.ts",
-      "obligation": "Verify modal draft, explicit Save, discard, model identity, cancellation and disposal through the production services."
     },
     {
       "id": "source-boundaries",

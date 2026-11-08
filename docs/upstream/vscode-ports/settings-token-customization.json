@@ -271,7 +271,7 @@
         "src/prctr/platform/theme/common/tokenColorConfiguration.ts",
         "src/prctr/platform/theme/common/tokenCustomizationTypes.ts"
       ],
-      "verificationRefs": ["settings-regressions", "settings-lifecycle", "source-boundaries"]
+      "verificationRefs": ["source-boundaries"]
     }
   ],
   "verification": [
@@ -280,18 +280,6 @@
       "kind": "check",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Verify every exact pinned source blob. Adapted file rationale and explicit exclusions own source-to-local differences; this check alone does not establish behavior."
-    },
-    {
-      "id": "settings-regressions",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Exercise the sandboxed Settings composition: completion, diagnostics, styles, icons and browser-service ownership boundaries."
-    },
-    {
-      "id": "settings-lifecycle",
-      "kind": "test",
-      "path": "test/browser/editor/settingsEditorSession.test.ts",
-      "obligation": "Verify modal draft, explicit Save, discard, model identity, cancellation and disposal through the production services."
     },
     {
       "id": "source-boundaries",

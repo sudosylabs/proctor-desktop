@@ -6624,7 +6624,7 @@
         "src/prctr/editor/common/services/resolverService.ts",
         "src/prctr/platform/editor/common/editor.ts"
       ],
-      "verificationRefs": ["safe-line-dom", "owned-styles", "settings-csp"]
+      "verificationRefs": ["safe-line-dom", "owned-styles"]
     }
   ],
   "verification": [
@@ -6657,12 +6657,6 @@
       "kind": "test",
       "path": "test/browser/editor/styleSheet.test.ts",
       "obligation": "Verify constructed stylesheet rules and deterministic ownership/disposal."
-    },
-    {
-      "id": "settings-csp",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Exercise production Settings under strict CSP, including stylesheet adoption and editor geometry."
     }
   ]
 }

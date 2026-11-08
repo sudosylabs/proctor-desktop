@@ -34,8 +34,6 @@ export interface AuthenticatedNavigationService {
 	readonly onDidChangeActivityView: Event<ActivityView>;
 	/** The account page changed while Account stayed current. */
 	readonly onDidChangeAccountPage: Event<AccountPage>;
-	readonly onDidRequestSettings: Event<void>;
-	readonly settingsRequested: boolean;
 	/** Go to an area, Account or Settings; an unavailable area falls back to an available one. */
 	select(destination: string): void;
 	selectActivityView(view: ActivityView): void;

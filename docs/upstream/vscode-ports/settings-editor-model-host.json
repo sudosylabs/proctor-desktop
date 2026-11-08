@@ -4,8 +4,8 @@
   "clusterId": "settings-editor-model-host",
   "admission": {
     "workflow": "Resolve, retain and edit the authorized virtual Settings text model, including model references, undo/redo and bounded bulk text edits.",
-    "callers": ["src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts"],
-    "interface": "src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts",
+    "callers": ["src/prctr/workbench/contrib/bulkEdit/browser/bulkCellEdits.ts"],
+    "interface": "src/prctr/workbench/contrib/notebook/common/model/notebookTextModel.ts",
     "decision": "docs/architecture/user-settings.md"
   },
   "upstream": {
@@ -13,22 +13,6 @@
     "revision": "0611f3a8d9a6e8456c75742d876bc1823b4e1df1"
   },
   "items": [
-    {
-      "upstreamPath": "src/vs/editor/common/services/modelUndoRedoParticipant.ts",
-      "upstreamBlob": "ffb0760eb26f4bc7fc3aba6200f7a5150a98a63b",
-      "localPath": "src/prctr/editor/common/services/modelUndoRedoParticipant.ts",
-      "localSha256": "a853828eb9c0c6c8bc09e357059e0d2c4ad72b44e33d0e4b624c1c860532557a",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
     {
       "upstreamPath": "src/vs/workbench/services/search/common/search.ts",
       "upstreamBlob": "b83f76744140206b8d258a7734d6f2b8bccadc21",
@@ -53,22 +37,6 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/services/textmodelResolver/common/textModelResolverService.ts",
-      "upstreamBlob": "1e9ed430cf43a3e42248f2ace519e147bd4eb359",
-      "localPath": "src/prctr/workbench/services/textmodelResolver/common/textModelResolverService.ts",
-      "localSha256": "77f19578fbbdb7551c0ae586bf45ef0ab21803fe6c3194915974749d28ebe494",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Preserve reference-counted model acquisition and provider mechanics with a closed virtual-model factory. Exclude disk/untitled file-service fallbacks; reject after disposal and dispose late-resolving model promises.",
       "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -526,22 +494,6 @@
       ]
     },
     {
-      "upstreamPath": "src/vs/workbench/contrib/bulkEdit/browser/bulkEditService.ts",
-      "upstreamBlob": "a4ba533e180c0b4e27b6e52dc9470b9d60bdedc6",
-      "localPath": "src/prctr/workbench/contrib/bulkEdit/browser/bulkEditService.ts",
-      "localSha256": "cd1521fc6a697b0ec032682674a15e92426c2fdfe4465cad9a4b6c85986d1b98",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Retain bulk text edit conversion, version checks and undo grouping for authorized virtual models. Exclude filesystem/Notebook product mutation and workspace file operations; enforce readonly and disposed-model boundaries.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
       "upstreamPath": "src/vs/workbench/contrib/bulkEdit/browser/opaqueEdits.ts",
       "upstreamBlob": "21e16a8e7a84b9107dfd9a9a6a7a774e164ce6b4",
       "localPath": "src/prctr/workbench/contrib/bulkEdit/browser/opaqueEdits.ts",
@@ -565,22 +517,6 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts",
-      "upstreamBlob": "7813739c162824a6d6568982e82a621497f2f8a1",
-      "localPath": "src/prctr/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts",
-      "localSha256": "497aa6fe021803150728905fdff8bf2fc2d40313f91136693a06cf2b91f3f77e",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Preserve text edit grouping and application; check readonly/disposed model state and wait for every preparation promise before cleaning up and rethrowing a failure.",
       "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -852,15 +788,6 @@
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/base/common/network.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
-      "upstreamPath": "src/vs/workbench/services/textfile/common/textFileEditorModel.ts",
-      "upstreamBlob": "d7058ab39474b6b44e8914753121fe37fd49640e",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts",
-      "rationale": "The closed virtual model factory replaces disk-backed text-file resolution; file/untitled fallback is excluded."
     },
     {
       "upstreamPath": "src/vs/platform/instantiation/common/extensions.ts",
@@ -1592,33 +1519,6 @@
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
-      "upstreamPath": "src/vs/editor/contrib/snippet/browser/snippetController2.ts",
-      "upstreamBlob": "43611a9fc6287030687b4147a2dcfe1a4a7527d2",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/editor/contrib/snippet/browser/snippetController2.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
-      "upstreamPath": "src/vs/editor/contrib/snippet/browser/snippetParser.ts",
-      "upstreamBlob": "8a76e164db6b0e5fcff3f639330db3cfc5e23fa4",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/editor/contrib/snippet/browser/snippetParser.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
-      "upstreamPath": "src/vs/editor/contrib/snippet/browser/snippetSession.ts",
-      "upstreamBlob": "818139c2af37a7359e13c1d11f9e0115882fc0fd",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/editor/contrib/snippet/browser/snippetSession.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
       "upstreamPath": "src/vs/platform/storage/common/storage.ts",
       "upstreamBlob": "2e967d799f77892580d9d195aa4b07a6fc4a7044",
       "category": "source",
@@ -1665,12 +1565,6 @@
   ],
   "dependencies": [
     {
-      "id": "product-composition",
-      "kind": "local-interface",
-      "reference": "src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts",
-      "rationale": "Closed product owner injects capabilities and registers admitted source mechanics; no upstream aggregate selects the product."
-    },
-    {
       "id": "modern-presentation",
       "kind": "local-interface",
       "reference": "src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts",
@@ -1682,14 +1576,10 @@
       "id": "settings-only-composition",
       "summary": "Keep the accepted virtual user document, explicit Save, readonly/disposal fences and sandboxed capability clients. Exclude extension loading, workspace/remote/profile targets, AI search, arbitrary files/execution and auxiliary OS windows. Per-file rationale identifies retained symbols and non-mechanical adaptations; generic source contracts retained for dependency compatibility do not activate those products.",
       "localPaths": [
-        "src/prctr/workbench/services/textmodelResolver/common/textModelResolverService.ts",
         "src/prctr/workbench/contrib/notebook/browser/diff/notebookDiffEditorBrowser.ts",
-        "src/prctr/workbench/contrib/notebook/browser/diff/diffElementViewModel.ts",
-        "src/prctr/workbench/contrib/bulkEdit/browser/bulkEditService.ts",
-        "src/prctr/workbench/contrib/bulkEdit/browser/bulkTextEdits.ts",
-        "src/prctr/workbench/services/settings/browser/settingsWorkingCopy.ts"
+        "src/prctr/workbench/contrib/notebook/browser/diff/diffElementViewModel.ts"
       ],
-      "verificationRefs": ["settings-regressions", "settings-lifecycle", "source-boundaries"]
+      "verificationRefs": ["source-boundaries"]
     }
   ],
   "verification": [
@@ -1698,18 +1588,6 @@
       "kind": "check",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Verify every exact pinned source blob. Adapted file rationale and explicit exclusions own source-to-local differences; this check alone does not establish behavior."
-    },
-    {
-      "id": "settings-regressions",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Exercise the sandboxed Settings composition: completion, diagnostics, styles, icons and browser-service ownership boundaries."
-    },
-    {
-      "id": "settings-lifecycle",
-      "kind": "test",
-      "path": "test/browser/editor/settingsEditorSession.test.ts",
-      "obligation": "Verify modal draft, explicit Save, discard, model identity, cancellation and disposal through the production services."
     },
     {
       "id": "source-boundaries",

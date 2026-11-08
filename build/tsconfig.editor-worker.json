@@ -7,7 +7,6 @@
   },
   "include": [
     "../src/prctr/base/common/thenable.d.ts",
-    "../src/prctr/editor/browser/languages/json/worker/**/*.ts",
     "../src/prctr/editor/browser/worker/**/*.ts",
     "../src/prctr/base/common/vscodeBaseCommonGlobals.d.ts",
     "../src/prctr/workbench/services/textMate/browser/backgroundTokenization/worker/**/*.ts",

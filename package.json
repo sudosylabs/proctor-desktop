@@ -96,8 +96,6 @@
     "morphdom": "2.7.8",
     "path-browserify": "1.0.1",
     "pdfjs-dist": "6.3.289",
-    "vscode-json-languageservice": "6.0.0-next.3",
-    "vscode-languageserver": "10.0.0-next.18",
     "vscode-languageserver-textdocument": "1.0.12",
     "vscode-markdown-languageservice": "0.5.0",
     "vscode-oniguruma": "1.7.0",
@@ -118,8 +116,6 @@
     "@types/wicg-file-system-access": "2023.10.7",
     "@types/ws": "8.18.1",
     "@webgpu/types": "0.1.66",
-    "@xterm/headless": "6.1.0-beta.302",
-    "@xterm/xterm": "6.1.0-beta.303",
     "esbuild": "0.28.2",
     "eslint": "10.8.0",
     "json-schema-to-ts": "3.1.1",
@@ -131,15 +127,10 @@
     "resedit": "3.1.0",
     "sinon": "12.0.1",
     "smol-toml": "1.8.0",
-    "tas-client": "0.4.6",
     "typescript": "6.0.3",
     "typescript-eslint": "8.66.0"
   },
   "overrides": {
-    "vscode-json-languageservice": {
-      "vscode-languageserver-textdocument": "1.0.12",
-      "vscode-languageserver-types": "3.18.0"
-    },
     "sinon": {
       "@sinonjs/commons": "1.8.3",
       "type-detect": "4.0.8",

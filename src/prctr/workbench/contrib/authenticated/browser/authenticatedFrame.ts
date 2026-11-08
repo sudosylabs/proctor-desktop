@@ -78,7 +78,7 @@ const sidebarAreas: readonly SidebarArea[] = Object.freeze([
 			{ id: 'sessions', label: 'sessions', icon: 'account.sessions' },
 			{ id: 'tokens', label: 'tokens', icon: 'account.tokens' },
 			{ id: 'history', label: 'history', icon: 'account.history' },
-			{ id: 'settings', label: 'settings', icon: 'account.settings', opensDialog: true }
+			{ id: 'settings', label: 'settings', icon: 'account.settings' }
 		]
 	}
 ] satisfies SidebarArea[]);
@@ -122,8 +122,6 @@ export class AuthenticatedFrame
 	readonly onDidChangeActivityView: Event<ActivityView> = this.activityViewEmitter.event;
 	private readonly accountPageEmitter = this._register(new Emitter<AccountPage>());
 	readonly onDidChangeAccountPage: Event<AccountPage> = this.accountPageEmitter.event;
-	private readonly settingsEmitter = this._register(new Emitter<void>());
-	readonly onDidRequestSettings: Event<void> = this.settingsEmitter.event;
 	private readonly sidebarVisibilityEmitter = this._register(new Emitter<boolean>());
 	readonly onDidChangeSidebarVisibility: Event<boolean> = this.sidebarVisibilityEmitter.event;
 
@@ -144,7 +142,6 @@ export class AuthenticatedFrame
 	private compact = false;
 	private overlayOpen = false;
 	private shownSidebar: boolean | undefined;
-	private requestedSettings = false;
 	private signingOut = false;
 
 	constructor(
@@ -167,7 +164,6 @@ export class AuthenticatedFrame
 				binding.initialDestination
 			)
 		);
-		this.requestedSettings = binding.initialDestination === 'settings';
 		const sidebarPart = this.shell.part('sidebar');
 		const accountName = binding.identity?.displayName ?? this.text('account');
 		this.rail = this._register(
@@ -230,14 +226,9 @@ export class AuthenticatedFrame
 		return this.model.location.accountPage;
 	}
 
-	get settingsRequested(): boolean {
-		return this.requestedSettings;
-	}
-
 	select(destination: string): void {
 		if (destination === 'settings') {
-			this.requestedSettings = true;
-			this.settingsEmitter.fire();
+			this.selectAccountPage('settings');
 			return;
 		}
 		this.model.navigate({ destination: destination as AuthenticatedDestination });
@@ -436,11 +427,10 @@ export class AuthenticatedFrame
 	}
 
 	private onSidebarSelect({ destination, entry }: SidebarSelection): void {
-		if (destination === 'account' && entry === 'settings') this.select('settings');
-		else if (destination === 'activity') this.selectActivityView(entry as ActivityView);
+		if (destination === 'activity') this.selectActivityView(entry as ActivityView);
 		else if (destination === 'account') this.selectAccountPage(entry as AccountPage);
 		else this.select(destination);
-		if (this.overlayOpen && entry !== 'settings') {
+		if (this.overlayOpen) {
 			this.overlayOpen = false;
 			this.layoutSidebar();
 			this.shell.focusVisiblePart(['content']);

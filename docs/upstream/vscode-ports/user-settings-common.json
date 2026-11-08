@@ -850,10 +850,9 @@
         "src/prctr/platform/settings/common/settingsManifest.ts",
         "src/prctr/platform/settings/common/settingsDefaults.ts",
         "src/prctr/platform/settings/common/settingsConfigurationRegistry.ts",
-        "src/prctr/platform/settings/common/settingsResolution.ts",
-        "src/prctr/workbench/services/settings/browser/settingsJsonLanguageServices.ts"
+        "src/prctr/platform/settings/common/settingsResolution.ts"
       ],
-      "verificationRefs": ["settings-hover-defaults"]
+      "verificationRefs": ["settings-contract-tests"]
     },
     {
       "id": "structured-working-copy-edits",
@@ -867,8 +866,7 @@
         "settings-contract-tests",
         "real-settings-destination",
         "configuration-owner-tests",
-        "configuration-adapter-tests",
-        "settings-hover-defaults"
+        "configuration-adapter-tests"
       ]
     }
   ],
@@ -926,12 +924,6 @@
       "kind": "test",
       "path": "test/platform/settings/common/settingsConfiguration.test.ts",
       "obligation": "Verify real configuration service use, queued structured edits, default removal, comments, language overrides, source replacement/disposal fencing, resource changes and storage failures."
-    },
-    {
-      "id": "settings-hover-defaults",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Verify real action tooltips start from the original platform delay and preserve their source icon presentation."
     }
   ]
 }

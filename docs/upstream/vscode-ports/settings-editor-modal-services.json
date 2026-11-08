@@ -4,8 +4,8 @@
   "clusterId": "settings-editor-modal-services",
   "admission": {
     "workflow": "Supply editor resolution, resource labels, dialogs, Quick Input and explicit Settings commands to the modal composition.",
-    "callers": ["src/prctr/workbench/services/settings/browser/settingsEditorWindowServices.ts"],
-    "interface": "src/prctr/workbench/services/settings/browser/settingsEditorWindowServices.ts",
+    "callers": ["src/prctr/workbench/contrib/authenticated/browser/authenticatedWindowControls.ts"],
+    "interface": "src/prctr/workbench/services/quickinput/browser/quickInputService.ts",
     "decision": "docs/architecture/user-settings.md"
   },
   "upstream": {
@@ -14,22 +14,6 @@
   },
   "items": [
     {
-      "upstreamPath": "src/vs/workbench/services/editor/browser/editorResolverService.ts",
-      "upstreamBlob": "9177442c7fe17f31878bac0b0818627b73ac8b88",
-      "localPath": "src/prctr/workbench/services/editor/browser/editorResolverService.ts",
-      "localSha256": "7b8c1fe58fd6f93355badd6f2453850aefb310425b401557018b943537988d28",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
       "upstreamPath": "src/vs/workbench/services/editor/browser/codeEditorService.ts",
       "upstreamBlob": "e6926522af89a937c0099e2a44b8224c4679bd1d",
       "localPath": "src/prctr/workbench/services/editor/browser/codeEditorService.ts",
@@ -37,54 +21,6 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Retain source algorithms and interaction state; move aggregate service/configuration registration into explicit product composition. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/services/dialogs/browser/abstractFileDialogService.ts",
-      "upstreamBlob": "8786b4ed5f660b81e0326ab79112f9e0abaa3c29",
-      "localPath": "src/prctr/workbench/services/dialogs/browser/editorSaveConfirmation.ts",
-      "localSha256": "cdd2cea23c2455a57d2be037b9772ff79f2170d9d09e079675e202e2df78276c",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Extract the complete AbstractFileDialogService.doShowSaveConfirm body into EditorSaveConfirmation. Retain Save/Dont Save/Cancel outcomes, names and consequences; exclude file pickers and extension-test bypass.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/services/decorations/browser/decorationsService.ts",
-      "upstreamBlob": "5895079c713e50e9bc2a1e896f29a73eabcff4d0",
-      "localPath": "src/prctr/workbench/services/decorations/browser/decorationsService.ts",
-      "localSha256": "7492895a32b17fc8866e7c812fb7b789529cbe8e516b62e876731c41e2be37b7",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Retain source algorithms and interaction state; use disposable constructed stylesheet handles under the strict renderer CSP. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/services/label/common/labelService.ts",
-      "upstreamBlob": "5f166578268446a4b2749493feff955543156215",
-      "localPath": "src/prctr/workbench/services/label/common/labelService.ts",
-      "localSha256": "a649998c1124c4ed048a8037a7d016d9541323d19f61c5ecb0047056502a9052",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Retain source label formatter registration and URI labeling; inject bounded label-environment values rather than the general workbench environment/remote workspace services.",
       "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -110,54 +46,6 @@
       ]
     },
     {
-      "upstreamPath": "src/vs/workbench/browser/parts/editor/textCodeEditor.ts",
-      "upstreamBlob": "44dbef9ffa01484e640597a0f3502ac619091035",
-      "localPath": "src/prctr/workbench/browser/parts/editor/textCodeEditor.ts",
-      "localSha256": "aef05e2b1cdcf085ec3c9b7013b328a5348230988d077901075fe251fabf8e4a",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/browser/parts/editor/textResourceEditor.ts",
-      "upstreamBlob": "147f439bb3557f4916af31b3f396a445b1bdf895",
-      "localPath": "src/prctr/workbench/browser/parts/editor/textResourceEditor.ts",
-      "localSha256": "19307c9113a460bdfe996e27859860bf0d7b8f34e401fa6477c7bdd3817ec07b",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Retain source algorithms and interaction state; adapt source contracts to the virtual Settings composition and explicitly selected service registrations. Exact source differences were reviewed against the pinned file and the accepted user-settings boundary.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/workbench/contrib/preferences/browser/preferences.contribution.ts",
-      "upstreamBlob": "ea5c3474c63362d839970cfb26d0c7019f6c55c9",
-      "localPath": "src/prctr/workbench/contrib/settings/browser/settingsEditorActions.ts",
-      "localSha256": "ac8f400fd59c4327a57fbff7e546735afc664e2c2f59a22947e102b6f6267346",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Retain PreferencesActionsContribution.registerSettingsEditorActions focus/search/history/context-menu routes except AI, SettingsEditorTitleContribution UI/JSON routes preserving the originating modal group, and the Settings open entrypoints plus sanitizeOpenSettingsArgs. Omit workspace/folder/remote/default/profile and keyboard-shortcuts-editor aggregates. Explicit window disposal owns registration; first-row UpArrow uses WorkbenchContrib+1 priority against the list binding; navigation uses ISettingsEditorNavigation and the fixed authorized settings URI.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
       "upstreamPath": "src/vs/platform/window/common/window.ts",
       "upstreamBlob": "357bf62d065e641e2f0c533a265f78a580d298d3",
       "localPath": "src/prctr/platform/window/common/windowFocus.ts",
@@ -165,22 +53,6 @@
       "category": "source",
       "disposition": "adapted",
       "rationale": "Extract the complete FocusMode enum from platform/window/common/window.ts for the narrow window-host contract. General native-window capability declarations remain outside this module.",
-      "licenseRefs": ["vscode-mit"],
-      "mechanicalTransforms": [
-        "namespace-path-translation",
-        "relative-import-rewrite",
-        "accepted-dependency-substitution",
-        "provenance-marker-insertion"
-      ]
-    },
-    {
-      "upstreamPath": "src/vs/platform/uriIdentity/common/uriIdentityService.ts",
-      "upstreamBlob": "8e047e6d2b74e85e977cfa3bc05c42bdc74c7868",
-      "localPath": "src/prctr/platform/uriIdentity/common/uriIdentityService.ts",
-      "localSha256": "b901883e04a0d92cc884901d1571238b04f76dc53227874e831b984ff43236c2",
-      "category": "source",
-      "disposition": "adapted",
-      "rationale": "Pinned implementation body is retained after comment/format normalization. Adapt only module paths, localization imports and erased type-only dependency edges; registration remains selected by the Proctor composition.",
       "licenseRefs": ["vscode-mit"],
       "mechanicalTransforms": [
         "namespace-path-translation",
@@ -459,15 +331,6 @@
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
-      "upstreamPath": "src/vs/workbench/services/editor/common/editorGroupFinder.ts",
-      "upstreamBlob": "138808be5f4790d36aee3df1fabfa0159bdfb1fd",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/services/editor/common/editorGroupFinder.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
       "upstreamPath": "src/vs/workbench/services/editor/common/editorGroupsService.ts",
       "upstreamBlob": "0897af3ee2dfebec5b0aa9ef8e5ed069d9630fbd",
       "category": "source",
@@ -567,15 +430,6 @@
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
-      "upstreamPath": "src/vs/workbench/services/history/common/history.ts",
-      "upstreamBlob": "4340769ed5d3cb3afcb6c579dbcc0b34cffad72f",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/services/history/common/history.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
       "upstreamPath": "src/vs/workbench/services/environment/common/environmentService.ts",
       "upstreamBlob": "3ad7edaa434056d60a8bd4a2892c24800e238d19",
       "category": "source",
@@ -600,15 +454,6 @@
       "licenseRefs": ["vscode-mit"],
       "disposition": "excluded",
       "rationale": "This dependency belongs to omitted source symbols outside the retained extraction: extension discovery, general filesystem/workspace management, profile/Sync initialization, or the separate keyboard-shortcuts editor. The accepted Settings composition admits none of those product destinations; retained algorithms use the recorded local interfaces."
-    },
-    {
-      "upstreamPath": "src/vs/platform/workspaces/common/workspaces.ts",
-      "upstreamBlob": "a2cf9529a744255a6025bbe68a2029072c43d2b8",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/platform/workspaces/common/workspaces.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
       "upstreamPath": "src/vs/platform/files/common/files.ts",
@@ -707,15 +552,6 @@
       "licenseRefs": ["vscode-mit"],
       "disposition": "locally-satisfied",
       "localInterface": "src/prctr/workbench/services/remote/common/remoteAgentService.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
-      "upstreamPath": "src/vs/workbench/services/decorations/common/decorations.ts",
-      "upstreamBlob": "25bb89ebdca1024c69d65e336fd9e708ca3ae739",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/services/decorations/common/decorations.ts",
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
@@ -944,15 +780,6 @@
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
-      "upstreamPath": "src/vs/workbench/browser/parts/editor/textEditor.ts",
-      "upstreamBlob": "817d9febf0f10518c5a95d54c22c1bc3ff77bb27",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/browser/parts/editor/textEditor.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
       "upstreamPath": "src/vs/base/browser/dom.ts",
       "upstreamBlob": "6d7ea0fbd8ee3e0f68cf8feaaaa6f090aaee5742",
       "category": "source",
@@ -1043,15 +870,6 @@
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
-      "upstreamPath": "src/vs/editor/contrib/suggest/browser/suggest.ts",
-      "upstreamBlob": "468a6645a33236f5d7d5dedb1540c835d31db29f",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/editor/contrib/suggest/browser/suggest.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
       "upstreamPath": "src/vs/platform/action/common/actionCommonCategories.ts",
       "upstreamBlob": "0d725e2699376b65d6f8d3e6c08130a44786a519",
       "category": "source",
@@ -1123,24 +941,6 @@
       "rationale": "This dependency belongs to omitted source symbols outside the retained extraction: extension discovery, general filesystem/workspace management, profile/Sync initialization, or the separate keyboard-shortcuts editor. The accepted Settings composition admits none of those product destinations; retained algorithms use the recorded local interfaces."
     },
     {
-      "upstreamPath": "src/vs/workbench/browser/editor.ts",
-      "upstreamBlob": "0bfa0e3285df25d75ffd60f3164886f7d0e8adcd",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/browser/editor.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
-      "upstreamPath": "src/vs/workbench/browser/parts/editor/editorCommandsContext.ts",
-      "upstreamBlob": "eb4cd20a6c5300f36b05520fd23ad8d0094b4f03",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/browser/parts/editor/editorCommandsContext.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
       "upstreamPath": "src/vs/workbench/common/contextkeys.ts",
       "upstreamBlob": "41aace1bdfc9bafa4eacb97c33ac877f3739c5ad",
       "category": "source",
@@ -1167,15 +967,6 @@
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
-      "upstreamPath": "src/vs/workbench/services/preferences/common/preferencesEditorInput.ts",
-      "upstreamBlob": "56b36e15fc85a8c86c16a1ff2cc90c836855bb15",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/services/preferences/common/preferencesEditorInput.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
       "upstreamPath": "src/vs/workbench/services/preferences/common/preferencesModels.ts",
       "upstreamBlob": "4b46012e419c4150e97bd7278434ce2d4ffab79f",
       "category": "source",
@@ -1185,30 +976,12 @@
       "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
-      "upstreamPath": "src/vs/workbench/services/userDataProfile/common/userDataProfile.ts",
-      "upstreamBlob": "a727bfc8448580b16d654d8375e6a03cb14190b7",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/services/userDataProfile/common/userDataProfile.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
       "upstreamPath": "src/vs/workbench/contrib/files/common/files.ts",
       "upstreamBlob": "0eb091699a54dad4486bc3ad3ea0be4237f7bcce",
       "category": "source",
       "licenseRefs": ["vscode-mit"],
       "disposition": "excluded",
       "rationale": "This dependency belongs to omitted source symbols outside the retained extraction: extension discovery, general filesystem/workspace management, profile/Sync initialization, or the separate keyboard-shortcuts editor. The accepted Settings composition admits none of those product destinations; retained algorithms use the recorded local interfaces."
-    },
-    {
-      "upstreamPath": "src/vs/workbench/contrib/preferences/common/preferences.ts",
-      "upstreamBlob": "60ccb7f0f29358137750bb226aa4f5e6a60535b5",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/contrib/preferences/common/preferences.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
       "upstreamPath": "src/vs/workbench/contrib/preferences/common/preferencesContribution.ts",
@@ -1241,33 +1014,6 @@
       "licenseRefs": ["vscode-mit"],
       "disposition": "excluded",
       "rationale": "This dependency belongs to omitted source symbols outside the retained extraction: extension discovery, general filesystem/workspace management, profile/Sync initialization, or the separate keyboard-shortcuts editor. The accepted Settings composition admits none of those product destinations; retained algorithms use the recorded local interfaces."
-    },
-    {
-      "upstreamPath": "src/vs/workbench/contrib/preferences/browser/preferencesIcons.ts",
-      "upstreamBlob": "ce67c88172aa030ca266c44f560b9bf3fbf77d68",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/contrib/preferences/browser/preferencesIcons.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
-      "upstreamPath": "src/vs/workbench/contrib/preferences/browser/preferencesRenderers.ts",
-      "upstreamBlob": "f04786f5babb017783f8f4be3553bec605a76e13",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/contrib/preferences/browser/preferencesRenderers.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
-    },
-    {
-      "upstreamPath": "src/vs/workbench/contrib/preferences/browser/settingsEditor2.ts",
-      "upstreamBlob": "6dc88cdd94a425e71c20f56e1a4af5e33ca8273f",
-      "category": "source",
-      "licenseRefs": ["vscode-mit"],
-      "disposition": "locally-satisfied",
-      "localInterface": "src/prctr/workbench/contrib/preferences/browser/settingsEditor2.ts",
-      "rationale": "Exact dependency is provided by the separately owned source module or declared Proctor interface. Its caller does not select another product aggregate."
     },
     {
       "upstreamPath": "src/vs/base/common/buffer.ts",
@@ -1505,12 +1251,6 @@
   ],
   "dependencies": [
     {
-      "id": "product-composition",
-      "kind": "local-interface",
-      "reference": "src/prctr/workbench/services/settings/browser/settingsEditorWindowServices.ts",
-      "rationale": "Closed product owner injects capabilities and registers admitted source mechanics; no upstream aggregate selects the product."
-    },
-    {
       "id": "modern-presentation",
       "kind": "local-interface",
       "reference": "src/prctr/workbench/contrib/modernUI/browser/modernUI.contribution.ts",
@@ -1522,18 +1262,11 @@
       "id": "settings-only-composition",
       "summary": "Keep the accepted virtual user document, explicit Save, readonly/disposal fences and sandboxed capability clients. Exclude extension loading, workspace/remote/profile targets, AI search, arbitrary files/execution and auxiliary OS windows. Per-file rationale identifies retained symbols and non-mechanical adaptations; generic source contracts retained for dependency compatibility do not activate those products.",
       "localPaths": [
-        "src/prctr/workbench/services/editor/browser/editorResolverService.ts",
         "src/prctr/workbench/services/editor/browser/codeEditorService.ts",
-        "src/prctr/workbench/services/dialogs/browser/editorSaveConfirmation.ts",
-        "src/prctr/workbench/services/decorations/browser/decorationsService.ts",
-        "src/prctr/workbench/services/label/common/labelService.ts",
-        "src/prctr/workbench/browser/parts/editor/textResourceEditor.ts",
-        "src/prctr/workbench/contrib/settings/browser/settingsEditorActions.ts",
         "src/prctr/platform/window/common/windowFocus.ts",
-        "src/prctr/platform/quickinput/browser/quickInputController.ts",
-        "src/prctr/workbench/services/settings/browser/settingsEditorWindowServices.ts"
+        "src/prctr/platform/quickinput/browser/quickInputController.ts"
       ],
-      "verificationRefs": ["settings-regressions", "settings-lifecycle", "source-boundaries"]
+      "verificationRefs": ["source-boundaries"]
     }
   ],
   "verification": [
@@ -1542,18 +1275,6 @@
       "kind": "check",
       "path": "build/checks/upstreamAudit.ts",
       "obligation": "Verify every exact pinned source blob. Adapted file rationale and explicit exclusions own source-to-local differences; this check alone does not establish behavior."
-    },
-    {
-      "id": "settings-regressions",
-      "kind": "test",
-      "path": "test/browser/editor/settingsWindowServices.test.ts",
-      "obligation": "Exercise the sandboxed Settings composition: completion, diagnostics, styles, icons and browser-service ownership boundaries."
-    },
-    {
-      "id": "settings-lifecycle",
-      "kind": "test",
-      "path": "test/browser/editor/settingsEditorSession.test.ts",
-      "obligation": "Verify modal draft, explicit Save, discard, model identity, cancellation and disposal through the production services."
     },
     {
       "id": "source-boundaries",

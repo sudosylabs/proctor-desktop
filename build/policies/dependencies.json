@@ -499,16 +499,6 @@
       "removalOwner": "design-system"
     },
     {
-      "package": "@xterm/xterm",
-      "version": "6.1.0-beta.303",
-      "kind": "development",
-      "purpose": "Compile the admitted workbench driver's type-only terminal reference. No terminal runtime is selected; the erased import emits no package execution.",
-      "owner": "settings-editor",
-      "source": "https://www.npmjs.com/package/@xterm/xterm/v/6.1.0-beta.303",
-      "license": "MIT",
-      "lifecycleScripts": "none"
-    },
-    {
       "package": "electron",
       "version": "44.0.0",
       "kind": "production",
@@ -663,42 +653,6 @@
       "removalOwner": "settings-editor"
     },
     {
-      "package": "vscode-json-languageservice",
-      "version": "6.0.0-next.3",
-      "kind": "production",
-      "purpose": "Retain the exact JSON/JSONC parsing, schema completion, validation, formatting, color, folding and symbol algorithms used by the pinned VS Code JSON language server.",
-      "owner": "settings-editor",
-      "source": "https://www.npmjs.com/package/vscode-json-languageservice/v/6.0.0-next.3",
-      "license": "MIT",
-      "lifecycleScripts": "blocked",
-      "processes": ["authenticated-renderer", "settings-json-worker"],
-      "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
-      "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
-      "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
-      "bundleTreatment": "bundled",
-      "localAlternative": "Reimplementing the language parser, provider algorithms or LSP cancellation/synchronization would weaken the requested upstream behavior and create another engine to maintain.",
-      "updateOwner": "settings-editor",
-      "removalOwner": "settings-editor"
-    },
-    {
-      "package": "vscode-languageserver",
-      "version": "10.0.0-next.18",
-      "kind": "production",
-      "purpose": "Retain the browser-compatible Language Server Protocol connection, incremental document synchronization, cancellation, diagnostics and transport used by the pinned JSON server.",
-      "owner": "settings-editor",
-      "source": "https://www.npmjs.com/package/vscode-languageserver/v/10.0.0-next.18",
-      "license": "MIT",
-      "lifecycleScripts": "blocked",
-      "processes": ["authenticated-renderer", "settings-json-worker"],
-      "networkBehavior": "No direct runtime networking is admitted. The JSON worker resolves packaged schema data through its owning renderer adapter; HTTP, proxy and filesystem request adapters are absent.",
-      "nativeBehavior": "JavaScript and declarations only; no host-native addon or executable is admitted.",
-      "transitiveRisk": "The exact upstream lock versions and integrity digests are checked. Language server Node transports and installation helpers are not reachable from the browser worker bundle.",
-      "bundleTreatment": "bundled",
-      "localAlternative": "Reimplementing the language parser, provider algorithms or LSP cancellation/synchronization would weaken the requested upstream behavior and create another engine to maintain.",
-      "updateOwner": "settings-editor",
-      "removalOwner": "settings-editor"
-    },
-    {
       "package": "vscode-uri",
       "version": "3.1.0",
       "kind": "production",
@@ -801,26 +755,6 @@
       "source": "https://www.npmjs.com/package/@types/sinon/v/10.0.2",
       "license": "MIT",
       "lifecycleScripts": "blocked"
-    },
-    {
-      "package": "tas-client",
-      "version": "0.4.6",
-      "kind": "development",
-      "purpose": "Compile complete upstream type-only service contracts. The Settings composition does not select experimentation or headless terminal runtime services; erased imports emit no package execution.",
-      "owner": "settings-editor",
-      "source": "https://www.npmjs.com/package/tas-client/v/0.4.6",
-      "license": "MIT",
-      "lifecycleScripts": "none"
-    },
-    {
-      "package": "@xterm/headless",
-      "version": "6.1.0-beta.302",
-      "kind": "development",
-      "purpose": "Compile complete upstream type-only service contracts. The Settings composition does not select experimentation or headless terminal runtime services; erased imports emit no package execution.",
-      "owner": "settings-editor",
-      "source": "https://www.npmjs.com/package/@xterm/headless/v/6.1.0-beta.302",
-      "license": "MIT",
-      "lifecycleScripts": "none"
     },
     {
       "package": "vscode-textmate",

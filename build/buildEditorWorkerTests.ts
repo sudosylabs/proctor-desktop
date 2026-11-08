@@ -2,19 +2,17 @@ import { writeFileSync } from 'node:fs';
 import { build } from 'esbuild';
 import { packagedEditorDependencies } from './lib/packagedEditorDependencies.ts';
 import { buildEditorWorker } from './lib/editorWorker.ts';
-import { buildJsonWorker } from './lib/jsonWorker.ts';
 import { buildTextMateWorker } from './lib/textMateWorker.ts';
 import { chromiumTarget, nodeTarget, repositoryRoot, resetBuildOutput } from './lib/paths.ts';
 
 const outdir = resetBuildOutput('editor-worker-tests');
 await Promise.all([
-	buildJsonWorker(outdir),
 	buildEditorWorker(outdir),
 	buildTextMateWorker(outdir),
 	build({
 		absWorkingDir: repositoryRoot,
 		bundle: true,
-		entryPoints: { renderer: 'test/browser/editor/jsonWorker.test.ts' },
+		entryPoints: { renderer: 'test/browser/editor/editorWorkers.test.ts' },
 		format: 'esm',
 		outdir,
 		platform: 'browser',
