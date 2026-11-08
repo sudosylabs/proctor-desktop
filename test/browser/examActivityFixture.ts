@@ -1,17 +1,18 @@
-import {
-	BROWSER_THEME_SERVICE,
-	type BrowserThemeService
-} from '../../src/prctr/platform/theme/browser/themeService.js';
+import { IBrowserThemeService } from '../../src/prctr/platform/theme/browser/themeService.js';
 import { bootstrapWorkbench } from '../../src/prctr/workbench/browser/bootstrap.js';
 import { authenticatedComposition } from '../../src/prctr/workbench/browser/authenticatedManifest.js';
 import { commonWorkbenchContributions } from '../../src/prctr/workbench/workbench.common.main.js';
 import { createDesktopWorkbenchContribution } from '../../src/prctr/code/electron-browser/workbench.desktop.main.js';
-import { createAuthenticatedContribution } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.js';
-import { createAccountContribution } from '../../src/prctr/workbench/contrib/account/browser/accountContribution.js';
+import { authenticatedContribution } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.js';
+import { accountContribution } from '../../src/prctr/workbench/contrib/account/browser/accountContribution.js';
+import { IAuthenticatedNavigationService } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedNavigation.js';
+import { authenticatedWindowServices } from '../../src/prctr/code/electron-browser/authenticatedServices.js';
+import type { SettingsRendererClient } from '../../src/prctr/workbench/services/settings/common/settingsRendererClient.js';
 import {
-	AUTHENTICATED_NAVIGATION_SERVICE,
-	type AuthenticatedNavigationService
-} from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedNavigation.js';
+	inertContribution,
+	unavailableAccount,
+	unusedClipboard
+} from './authenticatedTestServices.js';
 import type {
 	ExamActivity,
 	ExamActivityClient,
@@ -71,18 +72,21 @@ export async function mountExamActivityFixture(
 		'administration'
 	]
 ) {
-	let navigation!: AuthenticatedNavigationService;
-	let theme!: BrowserThemeService;
-	const account = {
-		async request() {
-			return { kind: 'error', reason: 'unavailable' } as const;
-		}
+	const settings: SettingsRendererClient = {
+		projection: () => new Promise(() => {}),
+		async preview() {},
+		async cancelPreview() {},
+		async commit() {
+			return { kind: 'unavailable' as const };
+		},
+		onDidChange: () => () => {}
 	};
-	const result = await bootstrapWorkbench(document, authenticatedComposition, [
-		...commonWorkbenchContributions,
-		createDesktopWorkbenchContribution(
-			'authenticated',
-			async () => ({
+	const result = await bootstrapWorkbench(
+		document,
+		authenticatedComposition,
+		[
+			...commonWorkbenchContributions,
+			createDesktopWorkbenchContribution('authenticated', async () => ({
 				kind: 'authenticated',
 				windowId: 'window:exam-activity-fixture',
 				institutionOrigin: 'https://institution.example.test',
@@ -99,8 +103,13 @@ export async function mountExamActivityFixture(
 					noCurrentAffiliation: false,
 					noAssignedAccess: false
 				}
-			}),
-			{
+			})),
+			authenticatedContribution,
+			accountContribution,
+			inertContribution('prctr.authenticated.settings', ['prctr.authenticated.navigation'])
+		],
+		{
+			windowChrome: {
 				async configuration() {
 					return {
 						platform: isMacintosh ? 'darwin' : 'linux',
@@ -119,24 +128,22 @@ export async function mountExamActivityFixture(
 					return 1;
 				},
 				async update() {}
-			}
-		),
-		createAuthenticatedContribution({
-			async signOut() {},
-			async close() {},
-			account,
-			examActivity: client
-		}),
-		createAccountContribution(account),
-		{
-			id: 'prctr.authenticated.settings',
-			phase: 'ready',
-			dependencies: ['prctr.authenticated.navigation'],
-			activate(context) {
-				navigation = context.getService(AUTHENTICATED_NAVIGATION_SERVICE);
-				theme = context.getService(BROWSER_THEME_SERVICE);
-			}
+			},
+			services: authenticatedWindowServices({
+				async signOut() {},
+				account: unavailableAccount,
+				settings,
+				clipboard: unusedClipboard,
+				examActivity: client
+			})
 		}
-	]);
+	);
+	const [navigation, theme] = result.instantiationService.invokeFunction(
+		(accessor) =>
+			[
+				accessor.get(IAuthenticatedNavigationService),
+				accessor.get(IBrowserThemeService)
+			] as const
+	);
 	return { ...result, navigation, theme };
 }

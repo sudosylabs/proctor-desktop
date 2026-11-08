@@ -4,7 +4,7 @@
   "clusterId": "settings-editor-modal-services",
   "admission": {
     "workflow": "Supply editor resolution, resource labels, dialogs, Quick Input and explicit Settings commands to the modal composition.",
-    "callers": ["src/prctr/workbench/contrib/authenticated/browser/authenticatedWindowControls.ts"],
+    "callers": ["src/prctr/workbench/contrib/authenticated/browser/authenticatedWindowServices.ts"],
     "interface": "src/prctr/workbench/services/quickinput/browser/quickInputService.ts",
     "decision": "docs/architecture/user-settings.md"
   },

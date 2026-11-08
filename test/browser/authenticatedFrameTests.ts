@@ -2,20 +2,19 @@ import { bootstrapWorkbench } from '../../src/prctr/workbench/browser/bootstrap.
 import { authenticatedComposition } from '../../src/prctr/workbench/browser/authenticatedManifest.js';
 import { commonWorkbenchContributions } from '../../src/prctr/workbench/workbench.common.main.js';
 import { createDesktopWorkbenchContribution } from '../../src/prctr/code/electron-browser/workbench.desktop.main.js';
-import { createAuthenticatedContribution } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.js';
-import {
-	AUTHENTICATED_NAVIGATION_SERVICE,
-	type AuthenticatedNavigationService
-} from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedNavigation.js';
-import { WORKBENCH_COMMAND_SERVICE } from '../../src/prctr/workbench/common/serviceIds.js';
-import type { ICommandService } from '../../src/prctr/platform/commands/common/commands.js';
+import { authenticatedContribution } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.js';
+import { IAuthenticatedNavigationService } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedNavigation.js';
+import { ICommandService } from '../../src/prctr/platform/commands/common/commands.js';
 import { isMacintosh } from '../../src/prctr/base/common/platform.js';
-import { createSettingsContribution } from '../../src/prctr/workbench/contrib/settings/browser/settingsContribution.js';
+import { settingsContribution } from '../../src/prctr/workbench/contrib/settings/browser/settingsContribution.js';
 import type { UserSettingsProjection } from '../../src/prctr/platform/settings/common/settingsRendererProtocol.js';
+import { IBrowserThemeService } from '../../src/prctr/platform/theme/browser/themeService.js';
+import { authenticatedWindowServices } from '../../src/prctr/code/electron-browser/authenticatedServices.js';
 import {
-	BROWSER_THEME_SERVICE,
-	type BrowserThemeService
-} from '../../src/prctr/platform/theme/browser/themeService.js';
+	inertContribution,
+	unavailableAccount,
+	unusedClipboard
+} from './authenticatedTestServices.js';
 
 function check(value: unknown, message: string): asserts value {
 	if (!value) throw new Error(`Authenticated frame: ${message}`);
@@ -67,10 +66,7 @@ export async function runAuthenticatedFrameTests(): Promise<void> {
 }
 
 async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Promise<void> {
-	let navigation!: AuthenticatedNavigationService;
-	let commands!: ICommandService;
 	let signOuts = 0;
-	let themes!: BrowserThemeService;
 	const settingsListeners = new Set<(projection: UserSettingsProjection) => void>();
 	let resolveSnapshot!: (projection: UserSettingsProjection) => void;
 	const projection = (
@@ -104,11 +100,12 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 		}
 	};
 	step('bootstrap');
-	const result = await bootstrapWorkbench(document, authenticatedComposition, [
-		...commonWorkbenchContributions,
-		createDesktopWorkbenchContribution(
-			'authenticated',
-			async () => ({
+	const result = await bootstrapWorkbench(
+		document,
+		authenticatedComposition,
+		[
+			...commonWorkbenchContributions,
+			createDesktopWorkbenchContribution('authenticated', async () => ({
 				kind: 'authenticated',
 				windowId: 'window:frame-test',
 				institutionOrigin: 'https://institution.example.test',
@@ -130,8 +127,13 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 					noCurrentAffiliation: false,
 					noAssignedAccess: false
 				}
-			}),
-			{
+			})),
+			authenticatedContribution,
+			inertContribution('prctr.authenticated.account', ['prctr.authenticated.navigation']),
+			settingsContribution
+		],
+		{
+			windowChrome: {
 				async configuration() {
 					return {
 						platform: 'win32',
@@ -146,27 +148,26 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 				onDidChangeFullscreen: () => ({ dispose() {} }),
 				zoomFactor: () => 1,
 				async update() {}
-			}
-		),
-		createAuthenticatedContribution({
-			async signOut() {
-				signOuts++;
-				throw new Error('sign-out unavailable');
 			},
-			async close() {}
-		}),
-		{
-			id: 'prctr.authenticated.account',
-			phase: 'ready',
-			dependencies: ['prctr.authenticated.navigation'],
-			activate(context) {
-				navigation = context.getService(AUTHENTICATED_NAVIGATION_SERVICE);
-				commands = context.getService(WORKBENCH_COMMAND_SERVICE);
-				themes = context.getService(BROWSER_THEME_SERVICE);
-			}
-		},
-		createSettingsContribution(settingsClient)
-	]);
+			services: authenticatedWindowServices({
+				async signOut() {
+					signOuts++;
+					throw new Error('sign-out unavailable');
+				},
+				account: unavailableAccount,
+				settings: settingsClient,
+				clipboard: unusedClipboard
+			})
+		}
+	);
+	const [navigation, commands, themes] = result.instantiationService.invokeFunction(
+		(accessor) =>
+			[
+				accessor.get(IAuthenticatedNavigationService),
+				accessor.get(ICommandService),
+				accessor.get(IBrowserThemeService)
+			] as const
+	);
 	const shell = result.shell;
 	const root = shell.element;
 	const rail = shell.part('navigation');
@@ -182,7 +183,7 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 		content.querySelector<HTMLButtonElement>(
 			`.prctr-content-top-bar__button[data-action="${action}"]`
 		)!;
-	const nav = (): AuthenticatedNavigationService => navigation;
+	const nav = (): IAuthenticatedNavigationService => navigation;
 	const presentation = (): string | undefined => root.dataset.sidebarPresentation;
 	// A timer backs up the frame callback, which an unfocused window may not deliver promptly.
 	const frameLayout = () =>

@@ -4,7 +4,7 @@
   "clusterId": "settings-editor-presentation",
   "admission": {
     "workflow": "Preserve complete SettingsEditor2, renderers and modal EditorPart/group presentation with their exact source contracts and dependency topology. Product-specific exclusions and service adapters remain explicit; copying source alone is not runtime completion.",
-    "callers": ["src/prctr/workbench/contrib/authenticated/browser/authenticatedWindowControls.ts"],
+    "callers": ["src/prctr/workbench/contrib/authenticated/browser/authenticatedWindowServices.ts"],
     "interface": "src/prctr/platform/storage/common/storage.ts",
     "decision": "docs/architecture/design-system.md"
   },

@@ -4,7 +4,7 @@
   "clusterId": "settings-editor-browser-host",
   "admission": {
     "workflow": "Provide source native menu and clipboard behavior through capability-specific isolated Settings transports.",
-    "callers": ["src/prctr/workbench/contrib/authenticated/browser/authenticatedWindowControls.ts"],
+    "callers": ["src/prctr/workbench/contrib/authenticated/browser/authenticatedWindowServices.ts"],
     "interface": "src/prctr/platform/contextview/browser/contextMenuService.ts",
     "decision": "docs/architecture/user-settings.md"
   },

@@ -13,7 +13,6 @@ import { Event } from '../../../../base/common/event.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
 import type { LocalizationContext } from '../../../../base/common/localization.js';
 import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import type { AccountClient } from '../../../../platform/account/common/accountProtocol.js';
 import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
 import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
 import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
@@ -30,7 +29,8 @@ import { SecurityPage } from './securityPage.js';
 import { SessionsPage } from './sessionsPage.js';
 import { HistoryPage } from './historyPage.js';
 import { SettingsPage } from './settingsPage.js';
-import type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
+import type { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
+import type { IAccountService } from '../../../services/account/common/account.js';
 import { TokensPage } from './tokensPage.js';
 import './accountPage.css';
 
@@ -39,15 +39,12 @@ export interface AccountModel extends ResolvedWorkbenchItem {
 }
 
 export interface AccountPaneOptions {
-	readonly client: AccountClient;
+	readonly client: IAccountService;
 	readonly localization: LocalizationContext;
 	readonly binding: AuthenticatedWindowDescriptor;
 	readonly overlays: WorkbenchOverlayHost;
 	readonly hooks: AccountWindowHooks;
-	/** Shared across the window's Account panes, so a photo uploaded here stays removable. */
-	readonly customPhotos: Set<string>;
-	/** The account's settings; without it the Settings page says it is unavailable. */
-	readonly settings?: SettingsRendererClient;
+	readonly settings: IUserSettingsService;
 	readonly now?: () => number;
 }
 
@@ -77,7 +74,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 	private readonly services: AccountPageServices;
 	private readonly menu: MenuControl;
 	private readonly toasts: ToastHost;
-	private readonly settings: SettingsRendererClient | undefined;
+	private readonly settings: IUserSettingsService;
 	private readonly page = this._register(new MutableDisposable<AccountPageView>());
 	private visible = false;
 
@@ -136,7 +133,6 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			this.menu,
 			this.toasts,
 			options.hooks,
-			options.customPhotos,
 			() => this.focus(),
 			options.now
 		);
@@ -250,7 +246,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			return new SecurityPage(this.body, this.headerActions, this.services);
 		if (page === 'sessions') return new SessionsPage(this.body, this.services);
 		if (page === 'history') return new HistoryPage(this.body, this.services);
-		if (page === 'settings' && this.settings !== undefined)
+		if (page === 'settings')
 			return new SettingsPage(this.body, this.headerActions, this.services, this.settings);
 		return new TokensPage(this.body, this.headerActions, this.services);
 	}

@@ -4,6 +4,8 @@
 
 import { addDisposableListener } from '../../base/browser/dom.js';
 import { KeyCode, KeyMod } from '../../base/common/keyCodes.js';
+import { defineMessage } from '../../base/common/localization.js';
+import { Disposable, type DisposableStore } from '../../base/common/lifecycle.js';
 import { MenuId, type Menu, type ResolvedMenuAction } from '../../platform/actions/common/menu.js';
 import { MenuService } from '../../platform/actions/common/contributionMenuService.js';
 import { ICommandService } from '../../platform/commands/common/commands.js';
@@ -12,14 +14,12 @@ import {
 	IContextKeyService,
 	type IContextKey
 } from '../../platform/contextkey/common/contextkey.js';
-import { InstantiationService } from '../../platform/instantiation/common/instantiationService.js';
-import { ServiceCollection } from '../../platform/instantiation/common/serviceCollection.js';
+import type { IInstantiationService } from '../../platform/instantiation/common/instantiation.js';
+import type { ServiceCollection } from '../../platform/instantiation/common/serviceCollection.js';
 import { IKeybindingService } from '../../platform/keybinding/common/keybinding.js';
 import { KeybindingWeight } from '../../platform/keybinding/common/keybindingsRegistry.js';
-import {
-	BROWSER_THEME_SERVICE,
-	type BrowserThemeService
-} from '../../platform/theme/browser/themeService.js';
+import { IBrowserThemeService } from '../../platform/theme/browser/themeService.js';
+import { WorkbenchContentModel } from '../common/contentGroups.js';
 import {
 	CandidateInteractionAllowedContext,
 	WorkbenchDirectionContext,
@@ -31,136 +31,193 @@ import {
 	WorkbenchWindowKindContext,
 	type WorkbenchPartId
 } from '../common/contextKeys.js';
-import {
-	WORKBENCH_LIFECYCLE_SERVICE,
-	type WorkbenchLifecycleService
-} from '../common/lifecycle.js';
-import {
-	WORKBENCH_COMMAND_SERVICE,
-	WORKBENCH_CONTEXT_KEY_SERVICE,
-	WORKBENCH_KEYBINDING_SERVICE,
-	WORKBENCH_MENU_SERVICE,
-	WORKBENCH_SERVICE_COLLECTION,
-	WORKBENCH_INSTANTIATION_SERVICE
-} from '../common/serviceIds.js';
+import { IWorkbenchLifecycleService } from '../common/lifecycle.js';
 import { registerProctorAction } from '../services/actions/common/proctorActions.js';
 import { CommandService } from '../services/commands/common/commandService.js';
 import {
 	BrowserKeybindingService,
 	WorkbenchKeybindingFeedbackService
 } from '../services/keybinding/browser/browserKeybindingService.js';
-import { WORKBENCH_RESET_LAYOUT_MESSAGE, type WorkbenchBootstrapContext } from './bootstrap.js';
+import { ILocalizationService } from '../services/localization/common/localization.js';
+import { WorkbenchPaneHost } from './paneHost.js';
+import { WorkbenchItemResolverRegistry } from './workbenchPane.js';
+import {
+	IWorkbenchItemResolverService,
+	IWorkbenchPaneHostService,
+	IWorkbenchShellService,
+	IWorkbenchWindowService
+} from './workbenchServices.js';
+import type { WorkbenchShell } from './workbenchShell.js';
 
 export const RESET_LAYOUT_COMMAND_ID = 'prctr.workbench.resetLayout';
+export const WORKBENCH_RESET_LAYOUT_MESSAGE = defineMessage({
+	id: 'workbench.layout.reset',
+	defaultMessage: 'Reset layout',
+	description: 'Button that restores composition default region sizes.'
+});
 
-export function activateWorkbenchKernel(context: WorkbenchBootstrapContext): void {
-	const contextKeyService = context.disposables.add(new ContextKeyService());
-	const services = new ServiceCollection([IContextKeyService, contextKeyService]);
-	const instantiationService = context.disposables.add(new InstantiationService(services, true));
-	const commandService = context.disposables.add(new CommandService(instantiationService));
+/**
+ * Adds the services every workbench window shares: context keys, commands, keybindings,
+ * item resolvers and the content area's pane host.
+ */
+export function createWorkbenchKernelServices(
+	services: ServiceCollection,
+	instantiationService: IInstantiationService,
+	disposables: DisposableStore
+): void {
+	const [shell, { document, composition }] = instantiationService.invokeFunction(
+		(accessor) =>
+			[accessor.get(IWorkbenchShellService), accessor.get(IWorkbenchWindowService)] as const
+	);
+	const contextKeyService = disposables.add(new ContextKeyService());
+	services.set(IContextKeyService, contextKeyService);
+	const commandService = disposables.add(new CommandService(instantiationService));
 	services.set(ICommandService, commandService);
-	const menuService = context.disposables.add(
-		new MenuService(commandService, context.localization)
-	);
-	const themeService = context.getService<BrowserThemeService>(BROWSER_THEME_SERVICE);
-	const lifecycle = context.getService<WorkbenchLifecycleService>(WORKBENCH_LIFECYCLE_SERVICE);
-
-	const keys = bindWorkbenchContextKeys(contextKeyService);
-	keys.windowKind.set(context.composition.windowKind);
-	keys.lifecyclePhase.set(lifecycle.phase ?? 'starting');
-	keys.direction.set(context.localization.direction);
-	keys.modal.set(context.shell.overlayHost.visible);
-	updatePresentationKeys(keys, themeService);
-	context.disposables.add(lifecycle.onDidAdvancePhase((phase) => keys.lifecyclePhase.set(phase)));
-	context.disposables.add(
-		context.shell.overlayHost.onDidChangeVisibility((visible) => keys.modal.set(visible))
-	);
-	context.disposables.add(
-		themeService.onDidChangeTheme(() => updatePresentationKeys(keys, themeService))
-	);
-	context.disposables.add(
-		themeService.onDidChangePresentation(() => updatePresentationKeys(keys, themeService))
-	);
-	const updateFocusedPart = (target: EventTarget | null = context.document.activeElement): void =>
-		keys.focusedPart.set(focusedPart(context, target));
-	updateFocusedPart();
-	context.disposables.add(
-		addDisposableListener(
-			context.document,
-			'focusin',
-			(event) => updateFocusedPart(event.target),
-			true
-		)
-	);
-	context.disposables.add(
-		addDisposableListener(
-			context.document,
-			'focusout',
-			() => queueMicrotask(() => updateFocusedPart()),
-			true
-		)
-	);
-
-	const actionRegistration = registerProctorAction({
-		command: {
-			id: RESET_LAYOUT_COMMAND_ID,
-			title: WORKBENCH_RESET_LAYOUT_MESSAGE,
-			precondition: WorkbenchModalContext.toNegated()
-		},
-		handler: () => context.shell.resetLayout(),
-		commandPalette: true,
-		menus: [{ id: MenuId.WorkbenchTitle, group: 'navigation', order: 10 }],
-		keybindings: [
-			{
-				primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.Digit0,
-				weight: KeybindingWeight.WorkbenchContrib,
-				when: WorkbenchModalContext.toNegated()
-			}
-		]
-	});
-	context.disposables.add(actionRegistration);
-	const feedbackElement = context.document.createElement('span');
+	const feedbackElement = document.createElement('span');
 	feedbackElement.className = 'prctr-workbench__keybinding-feedback';
 	feedbackElement.role = 'status';
-	context.shell
-		.part(context.composition.windowKind === 'authenticated' ? 'titlebar' : 'status')
+	shell
+		.part(composition.windowKind === 'authenticated' ? 'titlebar' : 'status')
 		.append(feedbackElement);
-	context.disposables.add({ dispose: () => feedbackElement.remove() });
-	const keybindingService = context.disposables.add(
+	disposables.add({ dispose: () => feedbackElement.remove() });
+	const keybindingService = disposables.add(
 		new BrowserKeybindingService(
-			context.document,
+			document,
 			contextKeyService,
 			commandService,
 			new WorkbenchKeybindingFeedbackService(feedbackElement)
 		)
 	);
 	services.set(IKeybindingService, keybindingService);
-
-	const titleMenu = context.disposables.add(
-		menuService.createMenu(MenuId.WorkbenchTitle, contextKeyService)
+	const resolvers = new WorkbenchItemResolverRegistry();
+	services.set(IWorkbenchItemResolverService, resolvers);
+	services.set(
+		IWorkbenchPaneHostService,
+		disposables.add(new WorkbenchPaneHost(shell.part('content'), resolvers))
 	);
-	const updateResetAction = (): void => {
-		const action = findAction(titleMenu, RESET_LAYOUT_COMMAND_ID);
-		context.shell.setResetLayoutAction(async () => {
-			await action?.run();
-		}, action?.enabled === true);
-	};
-	updateResetAction();
-	context.disposables.add(titleMenu.onDidChange(updateResetAction));
-	// Modal gating remains synchronous; ordinary menu invalidation is deliberately batched.
-	const modalKeys = new Set([WorkbenchModalContext.key]);
-	context.disposables.add(
-		contextKeyService.onDidChangeContext((event) => {
-			if (event.affectsSome(modalKeys)) updateResetAction();
-		})
-	);
+}
 
-	context.setService(WORKBENCH_CONTEXT_KEY_SERVICE, contextKeyService);
-	context.setService(WORKBENCH_COMMAND_SERVICE, commandService);
-	context.setService(WORKBENCH_KEYBINDING_SERVICE, keybindingService);
-	context.setService(WORKBENCH_MENU_SERVICE, menuService);
-	context.setService(WORKBENCH_SERVICE_COLLECTION, services);
-	context.setService(WORKBENCH_INSTANTIATION_SERVICE, instantiationService);
+/**
+ * Binds the window's live context keys, tracks the focused part, and offers Reset layout
+ * through the same menu and keybinding path as every other command.
+ */
+export class WorkbenchKernelContribution extends Disposable {
+	private readonly keys: BoundWorkbenchContextKeys;
+
+	constructor(
+		@IWorkbenchWindowService private readonly window: IWorkbenchWindowService,
+		@IWorkbenchShellService private readonly shell: IWorkbenchShellService,
+		@ILocalizationService localization: ILocalizationService,
+		@IBrowserThemeService private readonly themeService: IBrowserThemeService,
+		@IWorkbenchLifecycleService lifecycle: IWorkbenchLifecycleService,
+		@IContextKeyService private readonly contextKeyService: IContextKeyService,
+		@ICommandService commandService: ICommandService
+	) {
+		super();
+		const composition = window.composition;
+		this._register(
+			new WorkbenchContentModel(
+				composition.layout.maxContentGroups,
+				new Set([
+					...(composition.layout.allowHorizontalSplit ? ['horizontal' as const] : []),
+					...(composition.layout.allowVerticalSplit ? ['vertical' as const] : [])
+				])
+			)
+		);
+		this.keys = bindWorkbenchContextKeys(contextKeyService);
+		this.keys.windowKind.set(composition.windowKind);
+		this.keys.lifecyclePhase.set(lifecycle.phase ?? 'starting');
+		this.keys.direction.set(localization.direction);
+		this.keys.modal.set(shell.overlayHost.visible);
+		this.updatePresentationKeys();
+		this.updateFocusedPart();
+		this._register(lifecycle.onDidAdvancePhase((phase) => this.keys.lifecyclePhase.set(phase)));
+		this.registerListeners();
+		this.registerResetLayout(new MenuService(commandService, localization));
+		shell.layout();
+	}
+
+	private registerListeners(): void {
+		this._register(
+			this.shell.overlayHost.onDidChangeVisibility((visible) => this.keys.modal.set(visible))
+		);
+		this._register(this.themeService.onDidChangeTheme(() => this.updatePresentationKeys()));
+		this._register(
+			this.themeService.onDidChangePresentation(() => this.updatePresentationKeys())
+		);
+		this._register(
+			addDisposableListener(
+				this.window.document,
+				'focusin',
+				(event) => this.updateFocusedPart(event.target),
+				true
+			)
+		);
+		this._register(
+			addDisposableListener(
+				this.window.document,
+				'focusout',
+				() => queueMicrotask(() => this.updateFocusedPart()),
+				true
+			)
+		);
+	}
+
+	private registerResetLayout(menuService: MenuService): void {
+		this._register(menuService);
+		this._register(
+			registerProctorAction({
+				command: {
+					id: RESET_LAYOUT_COMMAND_ID,
+					title: WORKBENCH_RESET_LAYOUT_MESSAGE,
+					precondition: WorkbenchModalContext.toNegated()
+				},
+				handler: () => this.shell.resetLayout(),
+				commandPalette: true,
+				menus: [{ id: MenuId.WorkbenchTitle, group: 'navigation', order: 10 }],
+				keybindings: [
+					{
+						primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.Digit0,
+						weight: KeybindingWeight.WorkbenchContrib,
+						when: WorkbenchModalContext.toNegated()
+					}
+				]
+			})
+		);
+		const titleMenu = this._register(
+			menuService.createMenu(MenuId.WorkbenchTitle, this.contextKeyService)
+		);
+		const updateResetAction = (): void => {
+			const action = findAction(titleMenu, RESET_LAYOUT_COMMAND_ID);
+			this.shell.setResetLayoutAction(async () => {
+				await action?.run();
+			}, action?.enabled === true);
+		};
+		updateResetAction();
+		this._register(titleMenu.onDidChange(updateResetAction));
+		// Modal gating remains synchronous; ordinary menu invalidation is deliberately batched.
+		const modalKeys = new Set([WorkbenchModalContext.key]);
+		this._register(
+			this.contextKeyService.onDidChangeContext((event) => {
+				if (event.affectsSome(modalKeys)) {
+					updateResetAction();
+				}
+			})
+		);
+	}
+
+	private updatePresentationKeys(): void {
+		this.keys.highContrast.set(
+			this.themeService.forcedColorsActive || this.themeService.theme.isHighContrast
+		);
+		this.keys.reducedMotion.set(this.themeService.reducedMotionActive);
+	}
+
+	private updateFocusedPart(
+		target: EventTarget | null = this.window.document.activeElement
+	): void {
+		this.keys.focusedPart.set(focusedPart(this.window.document, this.shell, target));
+	}
 }
 
 interface BoundWorkbenchContextKeys {
@@ -185,18 +242,15 @@ function bindWorkbenchContextKeys(service: IContextKeyService): BoundWorkbenchCo
 		direction: WorkbenchDirectionContext.bindTo(service)
 	});
 }
-function updatePresentationKeys(keys: BoundWorkbenchContextKeys, theme: BrowserThemeService): void {
-	keys.highContrast.set(theme.forcedColorsActive || theme.theme.isHighContrast);
-	keys.reducedMotion.set(theme.reducedMotionActive);
-}
 function focusedPart(
-	context: WorkbenchBootstrapContext,
+	document: Document,
+	shell: WorkbenchShell,
 	target: EventTarget | null
 ): WorkbenchPartId | '' {
-	const HTMLElementConstructor = context.document.defaultView?.HTMLElement;
+	const HTMLElementConstructor = document.defaultView?.HTMLElement;
 	if (HTMLElementConstructor === undefined || !(target instanceof HTMLElementConstructor))
 		return '';
-	if (context.shell.overlayHost.element.contains(target)) return 'overlay';
+	if (shell.overlayHost.element.contains(target)) return 'overlay';
 	const part = target.closest<HTMLElement>('[data-part]')?.dataset.part;
 	return isWorkbenchPart(part) ? part : '';
 }

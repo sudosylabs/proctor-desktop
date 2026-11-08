@@ -157,7 +157,7 @@
         "src/prctr/workbench/browser/authenticatedManifest.ts",
         "src/prctr/workbench/browser/candidateManifest.ts",
         "src/prctr/workbench/browser/workbenchKernel.ts",
-        "src/prctr/workbench/common/serviceIds.ts",
+        "src/prctr/workbench/browser/workbenchServices.ts",
         "src/prctr/workbench/workbench.common.main.ts",
         "src/prctr/code/electron-browser/workbench.desktop.main.ts",
         "src/prctr/code/electron-browser/authenticated.main.ts",

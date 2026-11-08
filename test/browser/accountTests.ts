@@ -1,6 +1,10 @@
+import { AccountService } from '../../src/prctr/workbench/services/account/common/account.ts';
 import { SETTINGS_MANIFEST } from '../../src/prctr/platform/settings/common/settingsManifest.ts';
 import type { UserSettingsProjection } from '../../src/prctr/platform/settings/common/settingsRendererProtocol.ts';
-import type { SettingsRendererClient } from '../../src/prctr/workbench/services/settings/common/settingsRendererClient.ts';
+import {
+	UserSettingsService,
+	type SettingsRendererClient
+} from '../../src/prctr/workbench/services/settings/common/settingsRendererClient.ts';
 import { runAccountPhotoTests } from './accountPhotoTests.ts';
 import {
 	AccountPane,
@@ -213,8 +217,8 @@ export async function runAccountTests(document: Document): Promise<void> {
 		onDidChange: () => () => {}
 	};
 	const pane = new AccountPane(document, {
-		client: account,
-		settings: settingsClient,
+		client: new AccountService(account),
+		settings: new UserSettingsService(settingsClient),
 		localization: createLocalization({
 			requestedLocale: 'en',
 			messages: [
@@ -241,9 +245,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 			}
 		},
 		overlays,
-		customPhotos: new Set(),
 		hooks: {
-			setProfilePhoto() {},
 			signOut: () => signOuts.push(1),
 			writeClipboard: async (text) => {
 				copied.push(text);

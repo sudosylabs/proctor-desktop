@@ -368,8 +368,12 @@ visibility, enablement, and routing only. Services and privileged adapters
 perform authorization. Menus, keybindings, quick input, and overlays come from
 static registrations and localized labels.
 
-The executable kernel instantiates the admitted context-key, instantiation,
-command, menu, and keybinding services in every workbench renderer. Product
+Each workbench renderer has one strict instantiation service. Bootstrap
+registers the shell, window binding, localization, theme, lifecycle and the
+admitted context-key, command and keybinding services; the window composition
+root adds its preload-backed services; and every contribution, pane and child
+view that needs a service is created through it with typed constructor
+injection. Product
 controls resolve their action through the same menu/precondition path used by
 packaged keybindings; direct DOM callbacks do not become a second command path.
 Window kind, lifecycle phase, focused part, modal state, direction, contrast,

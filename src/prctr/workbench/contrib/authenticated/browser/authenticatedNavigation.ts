@@ -3,7 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import type { Event } from '../../../../base/common/event.js';
-import type { IDisposable } from '../../../../base/common/lifecycle.js';
+import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 import type {
 	AccountPage,
 	ActivityView,
@@ -18,18 +18,16 @@ export {
 	type AuthenticatedDestination
 } from '../common/authenticatedNavigationModel.js';
 
-export const AUTHENTICATED_NAVIGATION_SERVICE = 'prctr.authenticated.service.navigation';
-
-/** The window's tooltip: shown on hover and keyboard focus, in the frame's own style. */
-export const AUTHENTICATED_HOVER_SERVICE = 'prctr.authenticated.service.hover';
-export type AuthenticatedHover = (target: HTMLElement, label: string) => IDisposable;
-export const AUTHENTICATED_LAYOUT_SERVICE = 'prctr.authenticated.service.layout';
+export const IAuthenticatedNavigationService = createDecorator<IAuthenticatedNavigationService>(
+	'authenticatedNavigationService'
+);
 
 /**
  * Where AuthenticatedWindow is. Product contributions assign the content area for
  * their own destinations when it changes; the frame owns the rail, sidebar and history.
  */
-export interface AuthenticatedNavigationService {
+export interface IAuthenticatedNavigationService {
+	readonly _serviceBrand: undefined;
 	readonly current: AuthenticatedDestination;
 	readonly activityView: ActivityView;
 	readonly accountPage: AccountPage;
@@ -47,16 +45,8 @@ export interface AuthenticatedNavigationService {
 	setProductAreas(areas: readonly string[]): void;
 	/** Show a server-access notice in the sidebar, with an optional way to retry. */
 	setProductStatus(message: string, retry?: () => void): void;
-	setProfilePhoto(dataUrl: string): void;
 	/** Show how many items an Account page lists beside its sidebar entry; nothing hides it. */
 	setAccountCount(page: AccountPage, count: number | undefined): void;
 	/** Sign out of this window, as the sidebar's Sign out does, reporting a failure beside it. */
 	signOut(): void;
-}
-
-/** The contextual sidebar's visibility, which other window owners may request. */
-export interface AuthenticatedLayoutService {
-	readonly sidebarVisible: boolean;
-	readonly onDidChangeSidebarVisibility: Event<boolean>;
-	setSidebarVisible(visible: boolean): void;
 }

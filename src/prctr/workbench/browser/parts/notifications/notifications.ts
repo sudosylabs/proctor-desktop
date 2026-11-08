@@ -31,8 +31,6 @@ import { createNotificationLabels } from './notificationMessages.js';
 import type { NotificationEffects, NotificationGeometry } from './notificationPresentation.js';
 import './notifications.css';
 
-export const WORKBENCH_NOTIFICATION_SERVICE = 'prctr.workbench.notifications';
-export const WORKBENCH_NOTIFICATION_PROGRESS_SERVICE = 'prctr.workbench.notificationProgress';
 export interface NotificationsOptions {
 	readonly host: HTMLElement;
 	readonly indicatorHost?: HTMLElement;

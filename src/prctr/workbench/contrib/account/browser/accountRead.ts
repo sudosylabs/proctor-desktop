@@ -11,14 +11,13 @@ import type {
 	AccountResponse
 } from '../../../../platform/account/common/accountProtocol.js';
 import { failureWithdrawsData } from '../common/accountPresentation.js';
+import { ACCOUNT_READ_DEADLINE_MS } from '../../../services/account/common/account.js';
 import type { AccountPageServices } from './accountPageServices.js';
 
 export type AccountDataOf<S extends AccountReadSection> = Extract<AccountData, { section: S }>;
 
 /** The answer is slow enough to say so. */
 export const ACCOUNT_READ_SLOW_MS = 8_000;
-/** No answer by now is a failure the person can retry; a read never waits forever. */
-export const ACCOUNT_READ_DEADLINE_MS = 15_000;
 
 export type AccountReadState =
 	| { readonly kind: 'loading'; readonly slow?: boolean }

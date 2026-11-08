@@ -42,8 +42,6 @@ The in-repo reference is the LaunchWindow under
 Other Proctor-authored renderer code is **not** precedent. Known debt to avoid
 copying:
 
-- `WorkbenchBootstrapContext.getService<T>('string-id')`: an untyped service
-  locator. New code takes typed services in its constructor.
 - `base/browser/ui/button/buttonControl.ts`, `field/textField.ts` and the other
   `*Control.ts` files: several statements per line. Use their behavior, not their
   layout.
@@ -159,12 +157,16 @@ class and nothing outlives `dispose()`.
   directly. It wraps the capability-specific client the preload exposes, and
   validates what comes back (`develop-identity-and-exam-security` owns the IPC
   rules).
-- **Bridge from the current kernel:** windows still bootstrap through
-  `WorkbenchBootstrapContext`. Keep any `getService('...')` call inside the
-  contribution's `activate()`, convert it to a typed value there, and pass that
-  into constructors. When a window is rebuilt, give its composition root a
-  `ServiceCollection` and `InstantiationService`
-  (`platform/instantiation/common/`) and register its services there.
+- **Window services:** each window has one strict `InstantiationService`.
+  `bootstrapWorkbench` registers the shell, window, localization, theme,
+  lifecycle and kernel services; the window composition root under
+  `src/prctr/code/electron-browser/` adds its preload-backed services through
+  `WorkbenchBootstrapOptions.services`. Proctor services are never registered
+  with `registerSingleton`.
+- **Contributions:** a registration pairs the manifest descriptor with
+  `descriptor: new SyncDescriptor(SomeContribution)`; the window creates the
+  class at its phase. A contribution with asynchronous work exposes
+  `whenActivated`.
 
 The step is complete when every dependency of a class appears, typed, in its
 constructor.

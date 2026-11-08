@@ -99,7 +99,7 @@
       "rationale": "Preserve renderer-to-main theme, modal-dimming, and zoom-aware titlebar updates, forced-color synchronization, disposal fencing, and the macOS first-title workaround while replacing VS Code service decorators and general workbench title services with Proctor's closed chrome client and browser theme service.",
       "licenseRefs": ["vscode-mit"],
       "localPath": "src/prctr/platform/windows/browser/productWindowChrome.ts",
-      "localSha256": "85bc0b9ff2128e4f44b544010e9ec30e50072d85901690bfb144f3032d1bfa8f",
+      "localSha256": "2140f993acf242131f5992055b954cc17ef0323c036feb1ec011509a115d4d01",
       "mechanicalTransforms": [
         "namespace-path-translation",
         "relative-import-rewrite",

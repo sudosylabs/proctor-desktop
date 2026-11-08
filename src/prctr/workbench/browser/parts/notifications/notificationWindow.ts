@@ -1,63 +1,60 @@
-import type { IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
+import type { DisposableStore } from '../../../../base/common/lifecycle.js';
+import { Emitter } from '../../../../base/common/event.js';
+import { IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
+import type { ServicesAccessor } from '../../../../platform/instantiation/common/instantiation.js';
 import type { NotificationPreferenceBinding } from '../../../services/notification/browser/notificationPreferenceStore.js';
-import { createWindowNotifications } from './notificationComposition.js';
 import {
 	CandidateInteractionAllowedContext,
 	WorkbenchWindowKindContext
 } from '../../../common/contextKeys.js';
-import { Emitter } from '../../../../base/common/event.js';
-import { WORKBENCH_CONTEXT_KEY_SERVICE } from '../../../common/serviceIds.js';
-import {
-	WorkbenchNotifications,
-	WORKBENCH_NOTIFICATION_SERVICE,
-	WORKBENCH_NOTIFICATION_PROGRESS_SERVICE
-} from './notifications.js';
+import { IWorkbenchShellService, IWorkbenchWindowService } from '../../workbenchServices.js';
+import { createWindowNotifications } from './notificationComposition.js';
+import type { WorkbenchNotifications } from './notifications.js';
 import { registerNotificationCommands } from './notificationsCommands.js';
-import type { WorkbenchBootstrapContext } from '../../bootstrap.js';
 
+/** Creates the window's notifications in its overlay host and registers their commands. */
 export function installWorkbenchNotifications(
-	context: WorkbenchBootstrapContext,
-	binding: NotificationPreferenceBinding
+	accessor: ServicesAccessor,
+	binding: NotificationPreferenceBinding,
+	disposables: DisposableStore
 ): WorkbenchNotifications {
-	const keys = context.getService<IContextKeyService>(WORKBENCH_CONTEXT_KEY_SERVICE);
-	const changed = context.disposables.add(new Emitter<void>());
-	context.disposables.add(context.shell.overlayHost.onDidChangeVisibility(() => changed.fire()));
-	context.disposables.add(
+	const keys = accessor.get(IContextKeyService);
+	const shell = accessor.get(IWorkbenchShellService);
+	const { document, composition } = accessor.get(IWorkbenchWindowService);
+	const changed = disposables.add(new Emitter<void>());
+	disposables.add(shell.overlayHost.onDidChangeVisibility(() => changed.fire()));
+	disposables.add(
 		keys.onDidChangeContext((event) => {
-			if (event.affectsSome(new Set([CandidateInteractionAllowedContext.key])))
+			if (event.affectsSome(new Set([CandidateInteractionAllowedContext.key]))) {
 				changed.fire();
+			}
 		})
 	);
+	const status = composition.layout.parts.includes('status') ? shell.part('status') : undefined;
 	const notifications = createWindowNotifications(
-		context.document,
-		context.shell.overlayHost.notificationLayer,
-		context.composition.layout.parts.includes('status')
-			? context.shell.part('status')
-			: undefined,
-		context.shell.part('titlebar'),
-		context.composition.layout.parts.includes('status')
-			? context.shell.part('status')
-			: undefined,
+		document,
+		shell.overlayHost.notificationLayer,
+		status,
+		shell.part('titlebar'),
+		status,
 		binding,
 		() =>
-			!context.shell.overlayHost.visible &&
+			!shell.overlayHost.visible &&
 			(keys.getContextKeyValue(WorkbenchWindowKindContext.key) !== 'candidate' ||
 				keys.getContextKeyValue(CandidateInteractionAllowedContext.key) === true),
 		changed.event,
-		() => context.shell.part('content').focus()
+		() => shell.part('content').focus()
 	);
-	context.disposables.add(notifications);
-	context.setService(WORKBENCH_NOTIFICATION_SERVICE, notifications.service);
-	context.setService(WORKBENCH_NOTIFICATION_PROGRESS_SERVICE, notifications.progress);
-	context.disposables.add(
+	disposables.add(notifications);
+	disposables.add(
 		registerNotificationCommands(
 			notifications,
 			keys,
-			context.composition.windowKind !== 'authenticated'
+			composition.windowKind !== 'authenticated'
 		)
 	);
-	context.disposables.add({
-		dispose: () => context.shell.overlayHost.notificationLayer.replaceChildren()
+	disposables.add({
+		dispose: () => shell.overlayHost.notificationLayer.replaceChildren()
 	});
 	return notifications;
 }

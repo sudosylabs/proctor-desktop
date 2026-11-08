@@ -1,3 +1,4 @@
+import { AccountService } from '../../src/prctr/workbench/services/account/common/account.js';
 import { ToastHost } from '../../src/prctr/base/browser/ui/toast/toastHost.ts';
 import { proctorIconFactory } from '../../src/prctr/platform/theme/browser/proctorIcon.ts';
 import { AccountPhotoDialog } from '../../src/prctr/workbench/contrib/account/browser/accountPhotoDialog.ts';
@@ -133,7 +134,7 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 	});
 	const services = new AccountPageServices(
 		document,
-		client,
+		new AccountService(client),
 		localization,
 		{
 			kind: 'authenticated',
@@ -149,8 +150,7 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 			dismissLabel: 'Dismiss',
 			dismissIcon: proctorIconFactory('action.close', 14)
 		}),
-		{ setProfilePhoto() {}, signOut() {} },
-		new Set(),
+		{ signOut() {} },
 		() => undefined
 	);
 	const button = (label: string) =>

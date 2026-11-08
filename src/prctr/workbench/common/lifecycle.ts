@@ -4,9 +4,12 @@
 
 import { Emitter, type Event } from '../../base/common/event.js';
 import { Disposable } from '../../base/common/lifecycle.js';
+import { createDecorator } from '../../platform/instantiation/common/instantiation.js';
 import { lifecyclePhaseOrdinal, type WorkbenchContributionDescriptor, type WorkbenchLifecyclePhase } from './composition.js';
 
-export const WORKBENCH_LIFECYCLE_SERVICE = 'prctr.workbench.service.lifecycle';
+export const IWorkbenchLifecycleService = createDecorator<IWorkbenchLifecycleService>('workbenchLifecycleService');
+/** The window's lifecycle phase. */
+export type IWorkbenchLifecycleService = WorkbenchLifecycleService;
 
 export interface WorkbenchContribution extends WorkbenchContributionDescriptor {
 	activate(): void | Promise<void>;
@@ -19,6 +22,7 @@ export interface ContributionActivationResult {
 }
 
 export class WorkbenchLifecycleService extends Disposable {
+	declare readonly _serviceBrand: undefined;
 	readonly #phaseEmitter = this._register(new Emitter<WorkbenchLifecyclePhase>());
 	readonly onDidAdvancePhase: Event<WorkbenchLifecyclePhase> = this.#phaseEmitter.event;
 	#phase: WorkbenchLifecyclePhase | undefined;

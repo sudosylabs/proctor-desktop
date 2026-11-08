@@ -12,6 +12,7 @@ import type { IColorCustomizations } from '../common/colorCustomizations.js';
 import { asCssVariableName as asThemeColorVariable } from '../common/colorUtils.js';
 import { Emitter, type Event } from '../../../base/common/event.js';
 import { Disposable } from '../../../base/common/lifecycle.js';
+import { createDecorator } from '../../instantiation/common/instantiation.js';
 import { asCssVariableName, getDesignTokenDefinitions } from '../common/tokens.js';
 import {
 	getTheme,
@@ -34,9 +35,12 @@ export interface BrowserThemeServiceOptions {
 	readonly systemThemes?: { readonly light: string; readonly dark: string };
 }
 
-export const BROWSER_THEME_SERVICE = 'prctr.platform.browserTheme';
+export const IBrowserThemeService = createDecorator<IBrowserThemeService>('browserThemeService');
+/** The window's Proctor theme, presentation preferences and zoom. */
+export type IBrowserThemeService = BrowserThemeService;
 
 export class BrowserThemeService extends Disposable {
+	declare readonly _serviceBrand: undefined;
 	private readonly changeEmitter = this._register(new Emitter<ResolvedTheme>());
 	readonly onDidChangeTheme: Event<ResolvedTheme> = this.changeEmitter.event;
 	private readonly presentationChangeEmitter = this._register(new Emitter<void>());

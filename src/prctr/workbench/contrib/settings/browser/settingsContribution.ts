@@ -2,29 +2,27 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
 import { KeyCode, KeyMod } from '../../../../base/common/keyCodes.js';
-import { DisposableStore, toDisposable } from '../../../../base/common/lifecycle.js';
+import { Disposable, toDisposable } from '../../../../base/common/lifecycle.js';
 import { defineMessage } from '../../../../base/common/localization.js';
-import type { INotificationService } from '../../../../platform/notification/common/notification.js';
+import { INotificationService } from '../../../../platform/notification/common/notification.js';
 import { KeybindingWeight } from '../../../../platform/keybinding/common/keybindingsRegistry.js';
 import { parseSettingsDocument } from '../../../../platform/settings/common/settingsDocument.js';
 import { settingsRegistry } from '../../../../platform/settings/common/settingsRegistry.js';
 import type { UserSettingsProjection } from '../../../../platform/settings/common/settingsRendererProtocol.js';
 import {
-	BROWSER_THEME_SERVICE,
+	IBrowserThemeService,
 	type BrowserThemeService
 } from '../../../../platform/theme/browser/themeService.js';
 import { PROCTOR_SCHEME_THEME_NAMES } from '../../../../platform/theme/common/bundledThemes.js';
 import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
-import { WORKBENCH_NOTIFICATION_SERVICE } from '../../../browser/parts/notifications/notifications.js';
+import { IWorkbenchWindowService } from '../../../browser/workbenchServices.js';
 import { WorkbenchModalContext } from '../../../common/contextKeys.js';
 import { registerProctorAction } from '../../../services/actions/common/proctorActions.js';
-import type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
-import {
-	AUTHENTICATED_NAVIGATION_SERVICE,
-	type AuthenticatedNavigationService
-} from '../../authenticated/browser/authenticatedNavigation.js';
-export type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
+import { ILocalizationService } from '../../../services/localization/common/localization.js';
+import { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
+import { IAuthenticatedNavigationService } from '../../authenticated/browser/authenticatedNavigation.js';
 
 export const OPEN_SETTINGS_COMMAND_ID = 'prctr.authenticated.openSettings';
 
@@ -45,61 +43,69 @@ const messages = Object.freeze({
  * AuthenticatedWindow's settings presentation and the way to Settings: the window follows the
  * account's theme, motion, zoom and color settings, and Ctrl/Cmd+, opens Account › Settings.
  */
-export function createSettingsContribution(
-	client: SettingsRendererClient
-): WorkbenchContributionRegistration {
-	return {
-		id: 'prctr.authenticated.settings',
-		phase: 'ready',
-		dependencies: ['prctr.authenticated.navigation'],
-		messages: Object.values(messages),
-		activate(context) {
-			const store = context.disposables.add(new DisposableStore());
-			const navigation = context.getService<AuthenticatedNavigationService>(
-				AUTHENTICATED_NAVIGATION_SERVICE
-			);
-			const presentation = context.getService<BrowserThemeService>(BROWSER_THEME_SERVICE);
-			const notifications = context.getService<INotificationService>(
-				WORKBENCH_NOTIFICATION_SERVICE
-			);
-			const view = context.document.defaultView;
-			store.add(
-				registerProctorAction({
-					command: {
-						id: OPEN_SETTINGS_COMMAND_ID,
-						title: messages.openSettings,
-						precondition: WorkbenchModalContext.toNegated()
-					},
-					handler: () => navigation.selectAccountPage('settings'),
-					keybindings: [
-						{
-							primary: KeyMod.CtrlCmd | KeyCode.Comma,
-							weight: KeybindingWeight.WorkbenchContrib
-						}
-					],
-					commandPalette: true
-				})
-			);
-			let received = false;
-			const apply = (next: UserSettingsProjection): void => {
-				if (store.isDisposed) return;
-				received = true;
-				applySettingsPresentation(presentation, next, view);
-			};
-			store.add(toDisposable(client.onDidChange(apply)));
-			void client.projection().then(
-				// A change that arrived during the read is newer than the snapshot.
-				(snapshot) => {
-					if (!received) apply(snapshot);
+class SettingsContribution extends Disposable {
+	private received = false;
+
+	constructor(
+		@IUserSettingsService private readonly settings: IUserSettingsService,
+		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService,
+		@IBrowserThemeService private readonly presentation: IBrowserThemeService,
+		@INotificationService private readonly notifications: INotificationService,
+		@ILocalizationService private readonly localization: ILocalizationService,
+		@IWorkbenchWindowService private readonly windowService: IWorkbenchWindowService
+	) {
+		super();
+		this._register(
+			registerProctorAction({
+				command: {
+					id: OPEN_SETTINGS_COMMAND_ID,
+					title: messages.openSettings,
+					precondition: WorkbenchModalContext.toNegated()
 				},
-				() => {
-					if (!store.isDisposed)
-						notifications.error(context.localization.format(messages.loadFailed));
-				}
-			);
+				handler: () => navigation.selectAccountPage('settings'),
+				keybindings: [
+					{
+						primary: KeyMod.CtrlCmd | KeyCode.Comma,
+						weight: KeybindingWeight.WorkbenchContrib
+					}
+				],
+				commandPalette: true
+			})
+		);
+		this._register(toDisposable(settings.onDidChange((next) => this.apply(next))));
+		void this.readProjection();
+	}
+
+	private async readProjection(): Promise<void> {
+		try {
+			const snapshot = await this.settings.projection();
+			// A change that arrived during the read is newer than the snapshot.
+			if (!this.received) {
+				this.apply(snapshot);
+			}
+		} catch {
+			if (!this._store.isDisposed) {
+				this.notifications.error(this.localization.format(messages.loadFailed));
+			}
 		}
-	};
+	}
+
+	private apply(next: UserSettingsProjection): void {
+		if (this._store.isDisposed) {
+			return;
+		}
+		this.received = true;
+		applySettingsPresentation(this.presentation, next, this.windowService.document.defaultView);
+	}
 }
+
+export const settingsContribution: WorkbenchContributionRegistration = Object.freeze({
+	id: 'prctr.authenticated.settings' as const,
+	phase: 'ready' as const,
+	dependencies: Object.freeze(['prctr.authenticated.navigation' as const]),
+	messages: Object.values(messages),
+	descriptor: new SyncDescriptor(SettingsContribution)
+});
 
 /** Applies a projection's window theme, colors, token customizations, motion and zoom. */
 export function applySettingsPresentation(

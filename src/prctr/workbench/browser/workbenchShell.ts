@@ -16,6 +16,7 @@ export interface WorkbenchShellLabels {
 const MIN_REGION = 160;
 let shellSequence = 0;
 export class WorkbenchShell extends Disposable {
+	declare readonly _serviceBrand: undefined;
 	readonly element: HTMLDivElement; readonly overlayHost: WorkbenchOverlayHost;
 	readonly composition: WorkbenchComposition;
 	readonly #parts = new Map<WorkbenchPart, HTMLElement>(); readonly #compactToggles = new Map<'panel' | 'sidebar', HTMLButtonElement>(); readonly #initialSidebar = 260; readonly #initialPanel = 220; readonly #resetButton: HTMLButtonElement;

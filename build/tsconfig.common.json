@@ -214,7 +214,11 @@
     "../src/prctr/workbench/services/textMate/common/tokenizationSupport/tokenizationSupportWithLineLimit.ts",
     "../src/prctr/workbench/services/textMate/common/backgroundTokenization/textMateWorkerHost.ts",
     "../src/prctr/workbench/services/textMate/common/backgroundTokenization/textMateWorkerProtocol.ts",
-    "../src/prctr/workbench/services/resourcePreview/common/**/*.ts"
+    "../src/prctr/workbench/services/resourcePreview/common/**/*.ts",
+    "../src/prctr/workbench/services/localization/common/**/*.ts",
+    "../src/prctr/workbench/services/account/common/**/*.ts",
+    "../src/prctr/workbench/services/examActivity/common/**/*.ts",
+    "../src/prctr/workbench/services/authenticatedHost/common/**/*.ts"
   ],
   "compileOnSave": false
 }

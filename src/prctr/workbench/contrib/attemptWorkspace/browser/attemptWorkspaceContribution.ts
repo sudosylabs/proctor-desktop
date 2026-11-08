@@ -2,12 +2,16 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
+import { Disposable } from '../../../../base/common/lifecycle.js';
 import { defineMessage, type MessageDescriptor } from '../../../../base/common/localization.js';
-import type {
-	WorkbenchBootstrapContext,
-	WorkbenchContributionRegistration
-} from '../../../browser/bootstrap.js';
+import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
+import {
+	IWorkbenchShellService,
+	IWorkbenchWindowService
+} from '../../../browser/workbenchServices.js';
+import { ILocalizationService } from '../../../services/localization/common/localization.js';
 import './attemptWorkspaceContribution.css';
 
 const destinations = Object.freeze({
@@ -35,28 +39,28 @@ const messages = Object.freeze({
 	})
 });
 
-export const attemptWorkspaceContribution: WorkbenchContributionRegistration = Object.freeze({
-	id: 'prctr.candidate.workspace' as const,
-	phase: 'ready' as const,
-	dependencies: Object.freeze(['prctr.workbench.desktop' as const]),
-	messages: Object.freeze([
-		...Object.values(destinations),
-		...Object.values(messages)
-	] as MessageDescriptor[]),
-	activate: (context: WorkbenchBootstrapContext) => {
-		const navigation = context.document.createElement('div');
+/** The Candidate's destinations and their waiting states until the workspace is bound. */
+class AttemptWorkspaceContribution extends Disposable {
+	constructor(
+		@IWorkbenchWindowService window: IWorkbenchWindowService,
+		@IWorkbenchShellService shell: IWorkbenchShellService,
+		@ILocalizationService localization: ILocalizationService
+	) {
+		super();
+		const document = window.document;
+		const navigation = document.createElement('div');
 		navigation.className = 'prctr-attempt-workspace';
 		navigation.dataset.region = 'navigation';
-		const sidebar = context.document.createElement('section');
+		const sidebar = document.createElement('section');
 		sidebar.className = 'prctr-attempt-workspace';
 		sidebar.dataset.region = 'sidebar';
-		const heading = context.document.createElement('h2');
-		const status = context.document.createElement('p');
+		const heading = document.createElement('h2');
+		const status = document.createElement('p');
 		status.setAttribute('role', 'status');
 		sidebar.append(heading, status);
-		context.shell.part('navigation').append(navigation);
-		context.shell.part('sidebar').append(sidebar);
-		context.disposables.add({
+		shell.part('navigation').append(navigation);
+		shell.part('sidebar').append(sidebar);
+		this._register({
 			dispose: () => {
 				navigation.remove();
 				sidebar.remove();
@@ -66,22 +70,22 @@ export const attemptWorkspaceContribution: WorkbenchContributionRegistration = O
 		const select = (id: keyof typeof destinations): void => {
 			for (const [candidate, button] of buttons)
 				button.setAttribute('aria-current', candidate === id ? 'page' : 'false');
-			heading.textContent = context.localization.format(destinations[id]);
-			status.textContent = context.localization.format(
+			heading.textContent = localization.format(destinations[id]);
+			status.textContent = localization.format(
 				id === 'workspace' ? messages.workspaceWaiting : messages.materialsWaiting
 			);
 			sidebar.dataset.destination = id;
 		};
-		for (const id of context.composition.destinations) {
+		for (const id of window.composition.destinations) {
 			const descriptor = destinations[id as keyof typeof destinations];
 			if (descriptor === undefined)
 				throw new Error(`Candidate destination ${id} has no packaged registration`);
-			const button = context.document.createElement('button');
+			const button = document.createElement('button');
 			button.type = 'button';
-			button.textContent = context.localization.format(descriptor);
+			button.textContent = localization.format(descriptor);
 			navigation.append(button);
 			buttons.set(id, button);
-			context.disposables.add(
+			this._register(
 				addDisposableListener(button, 'click', () =>
 					select(id as keyof typeof destinations)
 				)
@@ -89,4 +93,15 @@ export const attemptWorkspaceContribution: WorkbenchContributionRegistration = O
 		}
 		select('workspace');
 	}
+}
+
+export const attemptWorkspaceContribution: WorkbenchContributionRegistration = Object.freeze({
+	id: 'prctr.candidate.workspace' as const,
+	phase: 'ready' as const,
+	dependencies: Object.freeze(['prctr.workbench.desktop' as const]),
+	messages: Object.freeze([
+		...Object.values(destinations),
+		...Object.values(messages)
+	] as MessageDescriptor[]),
+	descriptor: new SyncDescriptor(AttemptWorkspaceContribution)
 });

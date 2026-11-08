@@ -370,7 +370,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			src: photo.dataUrl
 		});
 		this.avatar.replaceChildren(image);
-		this.services.hooks.setProfilePhoto(photo.dataUrl);
+		this.services.setPhoto(photo.dataUrl);
 		this.changePhoto.setState({
 			label: this.services.text('changePhoto'),
 			icon: CHANGE_PHOTO_ICON

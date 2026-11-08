@@ -13,16 +13,15 @@ import type {
 	LocalizationValue
 } from '../../../../base/common/localization.js';
 import type {
-	AccountClient,
 	AccountFailure,
 	AccountIntent,
 	AccountResponse
 } from '../../../../platform/account/common/accountProtocol.js';
+import type { IAccountService } from '../../../services/account/common/account.js';
 import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
 import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
 import { failureMessage, relativeDay } from '../common/accountPresentation.js';
 import { accountMessages, type AccountMessage } from './accountMessages.js';
-import { ACCOUNT_READ_DEADLINE_MS } from './accountRead.js';
 
 /** One Account page in the content area. Its pane shows it and says when it is visible. */
 export interface AccountPageView extends IDisposable {
@@ -31,7 +30,6 @@ export interface AccountPageView extends IDisposable {
 
 /** What Account pages may ask of the rest of the window. */
 export interface AccountWindowHooks {
-	setProfilePhoto(dataUrl: string): void;
 	signOut(): void;
 	/** Copies text through the window's privileged clipboard path, when one exists. */
 	readonly writeClipboard?: (text: string) => Promise<void>;
@@ -45,45 +43,41 @@ export interface AccountWindowHooks {
  * The account capability owns every read and change; pages only present them.
  */
 export class AccountPageServices {
-	/** Revisions of photos uploaded in this window session; only those can be removed. */
-	readonly customPhotos: Set<string>;
-
 	constructor(
 		readonly document: Document,
-		private readonly client: AccountClient,
+		private readonly client: IAccountService,
 		readonly localization: LocalizationContext,
 		readonly binding: AuthenticatedWindowDescriptor,
 		readonly overlays: WorkbenchOverlayHost,
 		readonly menu: MenuControl,
 		private readonly toasts: ToastHost,
 		readonly hooks: AccountWindowHooks,
-		customPhotos: Set<string>,
 		readonly focusPage: () => void,
 		readonly now: () => number = Date.now
-	) {
-		this.customPhotos = customPhotos;
-	}
+	) {}
 
-	private changing = false;
+	/** Revisions of photos uploaded in this window session; only those can be removed. */
+	get customPhotos(): Set<string> {
+		return this.client.customPhotos;
+	}
 
 	/** Whether a change is waiting for the server; the next one waits until it replies. */
 	get isChanging(): boolean {
-		return this.changing;
+		return this.client.isChanging;
 	}
 
 	/** Makes one change at a time; a second request while one is in flight is refused as busy. */
-	async change(intent: AccountIntent): Promise<AccountResponse | 'busy'> {
-		if (this.changing) return 'busy';
-		this.changing = true;
-		try {
-			return await this.request(intent);
-		} finally {
-			this.changing = false;
-		}
+	change(intent: AccountIntent): Promise<AccountResponse | 'busy'> {
+		return this.client.change(intent);
+	}
+
+	/** Shows a photo the account now uses, everywhere the window shows it. */
+	setPhoto(dataUrl: string): void {
+		this.client.setPhoto(dataUrl);
 	}
 
 	get observable(): boolean {
-		return this.client.observe !== undefined;
+		return this.client.observable;
 	}
 
 	get institution(): string | undefined {
@@ -210,46 +204,18 @@ export class AccountPageServices {
 	 * A transport failure becomes a failure reply; a change whose reply was lost is unconfirmed.
 	 * A read that has not answered by the deadline fails, so no page waits forever.
 	 */
-	async request(intent: AccountIntent): Promise<AccountResponse> {
-		try {
-			if (!isRead(intent)) return await this.client.request(intent);
-			let timer: ReturnType<typeof setTimeout> | undefined;
-			const deadline = new Promise<AccountResponse>((resolve) => {
-				timer = setTimeout(
-					() => resolve({ kind: 'error', reason: 'unavailable' }),
-					ACCOUNT_READ_DEADLINE_MS
-				);
-			});
-			try {
-				return await Promise.race([this.client.request(intent), deadline]);
-			} finally {
-				clearTimeout(timer);
-			}
-		} catch {
-			return {
-				kind: 'error',
-				reason: isRead(intent) ? 'unavailable' : 'unconfirmed'
-			};
-		}
+	request(intent: AccountIntent): Promise<AccountResponse> {
+		return this.client.request(intent);
 	}
 
 	observe(
 		intent: AccountIntent,
 		listener: (response: AccountResponse) => void
 	): { dispose(): void } | undefined {
-		return this.client.observe?.(intent, listener);
+		return this.client.observe(intent, listener);
 	}
 
 	private get locale(): string {
 		return this.localization.locale === 'pseudo' ? 'en' : this.localization.locale;
 	}
-}
-
-function isRead(intent: AccountIntent): boolean {
-	return (
-		intent.kind === 'read' ||
-		intent.kind === 'readHistory' ||
-		intent.kind === 'readPhoto' ||
-		intent.kind === 'openSecurity'
-	);
 }

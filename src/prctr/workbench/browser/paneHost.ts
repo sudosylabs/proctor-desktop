@@ -9,6 +9,7 @@ import { WorkbenchItemResolverRegistry, type WorkbenchPane } from './workbenchPa
 import './paneHost.css';
 
 export class WorkbenchPaneHost extends Disposable {
+	declare readonly _serviceBrand: undefined;
 	readonly element: HTMLDivElement;
 	#pane: WorkbenchPane | undefined; #model: ResolvedWorkbenchItem | undefined; #assignment: CancellationTokenSource | undefined; #assignmentSerial: Promise<void> = Promise.resolve(); #sequence = 0; #disposed = false;
 	readonly #resolvers: WorkbenchItemResolverRegistry;

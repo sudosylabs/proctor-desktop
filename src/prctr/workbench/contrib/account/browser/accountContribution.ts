@@ -2,35 +2,35 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
 import { Event } from '../../../../base/common/event.js';
-import type { DisposableStore } from '../../../../base/common/lifecycle.js';
+import { Disposable } from '../../../../base/common/lifecycle.js';
 import type {
-	AccountClient,
 	AccountData,
 	AccountIntent,
 	AccountResponse
 } from '../../../../platform/account/common/accountProtocol.js';
-import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
-import type {
-	WorkbenchBootstrapContext,
-	WorkbenchContributionRegistration
-} from '../../../browser/bootstrap.js';
-import type { WorkbenchPaneHost } from '../../../browser/paneHost.js';
-import type { WorkbenchItemResolverRegistry } from '../../../browser/workbenchPane.js';
+import { IClipboardService } from '../../../../platform/clipboard/common/clipboardService.js';
+import { SETTINGS_MANIFEST } from '../../../../platform/settings/common/settingsManifest.js';
+import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
+import {
+	IWorkbenchItemResolverService,
+	IWorkbenchPaneHostService,
+	IWorkbenchShellService,
+	IWorkbenchWindowService
+} from '../../../browser/workbenchServices.js';
 import type { WorkbenchItem } from '../../../common/workbenchItem.js';
-import { WORKBENCH_ITEM_RESOLVERS, WORKBENCH_PANE_HOST } from '../../../workbench.common.main.js';
+import { IAccountService } from '../../../services/account/common/account.js';
+import { ILocalizationService } from '../../../services/localization/common/localization.js';
+import { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
+import { IAuthenticatedHoverService } from '../../authenticated/browser/authenticatedHover.js';
 import {
 	accountPages,
-	AUTHENTICATED_HOVER_SERVICE,
-	AUTHENTICATED_NAVIGATION_SERVICE,
-	type AccountPage,
-	type AuthenticatedHover,
-	type AuthenticatedNavigationService
+	IAuthenticatedNavigationService,
+	type AccountPage
 } from '../../authenticated/browser/authenticatedNavigation.js';
 import { accountMessages as messages, type AccountMessage } from './accountMessages.js';
 import { AccountPane, type AccountModel } from './accountPane.js';
-import { SETTINGS_MANIFEST } from '../../../../platform/settings/common/settingsManifest.js';
-import type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
 
 const ACCOUNT_ITEM_TYPE = 'prctr.authenticated.account';
 
@@ -43,154 +43,143 @@ const pageTitles: Readonly<Record<AccountPage, AccountMessage>> = Object.freeze(
 	settings: 'settingsTitle'
 });
 
-export interface AccountContributionOptions {
-	/** Copies a new token's credential through the window's privileged clipboard. */
-	readonly writeClipboard?: (text: string) => Promise<void>;
-	/** The account's settings, edited on the Settings page. */
-	readonly settings?: SettingsRendererClient;
-}
-
 /** Account's pages in the content area, opened from the Account sidebar. */
-export function createAccountContribution(
-	client: AccountClient,
-	options: AccountContributionOptions = {}
-): WorkbenchContributionRegistration {
-	return Object.freeze({
-		id: 'prctr.authenticated.account',
-		phase: 'ready',
-		dependencies: Object.freeze(['prctr.authenticated.navigation' as const]),
-		messages: [
-			...Object.values(messages),
-			...SETTINGS_MANIFEST.flatMap((setting) => [setting.title, setting.description])
-		],
-		activate(context: WorkbenchBootstrapContext): void {
-			const binding = context.getWindowBinding() as AuthenticatedWindowDescriptor;
-			if (binding.kind !== 'authenticated')
-				throw new Error('Account requires an authenticated binding');
-			const navigation = context.getService<AuthenticatedNavigationService>(
-				AUTHENTICATED_NAVIGATION_SERVICE
-			);
-			const host = context.getService<WorkbenchPaneHost>(WORKBENCH_PANE_HOST);
-			const registry =
-				context.getService<WorkbenchItemResolverRegistry>(WORKBENCH_ITEM_RESOLVERS);
-			const hover = context.getService<AuthenticatedHover>(AUTHENTICATED_HOVER_SERVICE);
-			const customPhotos = new Set<string>();
-			const items = new Map<AccountPage, WorkbenchItem>(
-				accountPages.map((page) => [page, accountItem(page, context)])
-			);
-			context.disposables.add(
-				registry.register({
-					typeId: ACCOUNT_ITEM_TYPE,
-					async resolve(item): Promise<AccountModel> {
-						const page = accountPages.find(
-							(candidate) => items.get(candidate) === item
-						);
-						if (!page) throw new Error('Unknown account item');
-						return { item, page, dispose() {} };
-					},
-					createPane(document) {
-						return new AccountPane(document, {
-							client,
-							localization: context.localization,
-							binding,
-							overlays: context.shell.overlayHost,
-							customPhotos,
-							...(options.settings === undefined
-								? {}
-								: { settings: options.settings }),
-							hooks: {
-								setProfilePhoto: (dataUrl) => navigation.setProfilePhoto(dataUrl),
-								signOut: () => navigation.signOut(),
-								hover,
-								...(options.writeClipboard === undefined
-									? {}
-									: { writeClipboard: options.writeClipboard })
-							}
-						});
+class AccountContribution extends Disposable {
+	private readonly items: Map<AccountPage, WorkbenchItem>;
+	private disposed = false;
+	private sequence = 0;
+
+	constructor(
+		@IAccountService private readonly account: IAccountService,
+		@IAuthenticatedNavigationService
+		private readonly navigation: IAuthenticatedNavigationService,
+		@IWorkbenchPaneHostService private readonly host: IWorkbenchPaneHostService,
+		@IWorkbenchItemResolverService registry: IWorkbenchItemResolverService,
+		@ILocalizationService private readonly localization: ILocalizationService,
+		@IWorkbenchWindowService windowService: IWorkbenchWindowService,
+		@IWorkbenchShellService shell: IWorkbenchShellService,
+		@IAuthenticatedHoverService hover: IAuthenticatedHoverService,
+		@IClipboardService clipboard: IClipboardService,
+		@IUserSettingsService settings: IUserSettingsService
+	) {
+		super();
+		const binding = windowService.binding;
+		if (binding.kind !== 'authenticated') {
+			throw new Error('Account requires an authenticated binding');
+		}
+		this.items = new Map(accountPages.map((page) => [page, accountItem(page, localization)]));
+		const items = this.items;
+		this._register(
+			registry.register({
+				typeId: ACCOUNT_ITEM_TYPE,
+				async resolve(item): Promise<AccountModel> {
+					const page = accountPages.find((candidate) => items.get(candidate) === item);
+					if (!page) {
+						throw new Error('Unknown account item');
 					}
-				})
-			);
-			let disposed = false;
-			let sequence = 0;
-			const open = async (focus: boolean): Promise<void> => {
-				const serial = ++sequence;
-				const item = items.get(navigation.accountPage);
-				try {
-					if (
-						item &&
-						(await host.assign(item)) &&
-						!disposed &&
-						serial === sequence &&
-						focus
-					)
-						host.focus();
-				} catch {
-					if (!disposed && serial === sequence)
-						navigation.setProductStatus(
-							context.localization.format(messages.pageUnavailable)
-						);
+					return { item, page, dispose() {} };
+				},
+				createPane(document) {
+					return new AccountPane(document, {
+						client: account,
+						localization,
+						binding,
+						overlays: shell.overlayHost,
+						settings,
+						hooks: {
+							signOut: () => navigation.signOut(),
+							hover: (target, label) => hover.setupHover(target, label),
+							writeClipboard: (text) => clipboard.writeText(text)
+						}
+					});
 				}
-			};
-			const show = (focus: boolean): void => {
-				if (navigation.current === 'account') void open(focus);
-				else sequence++;
-			};
-			context.disposables.add(navigation.onDidChange(() => show(true)));
-			context.disposables.add(navigation.onDidChangeAccountPage(() => show(true)));
-			context.disposables.add({
-				dispose() {
-					disposed = true;
-					sequence++;
-				}
-			});
-			show(false);
-			watchCount(
-				client,
-				{ kind: 'read', section: 'sessions' },
-				context.disposables,
-				(data) =>
-					data.section === 'sessions'
-						? navigation.setAccountCount(
-								'sessions',
-								data.sessions.filter((session) => !session.current).length
-							)
-						: undefined
-			);
-			watchCount(client, { kind: 'read', section: 'tokens' }, context.disposables, (data) =>
-				data.section === 'tokens'
-					? navigation.setAccountCount(
-							'tokens',
-							data.tokens.filter((token) => token.revokedAt === undefined).length
-						)
-					: undefined
-			);
+			})
+		);
+		this._register(navigation.onDidChange(() => this.show(true)));
+		this._register(navigation.onDidChangeAccountPage(() => this.show(true)));
+		this._register({
+			dispose: () => {
+				this.disposed = true;
+				this.sequence++;
+			}
+		});
+		this.show(false);
+		this.watchCounts();
+	}
+
+	private show(focus: boolean): void {
+		if (this.navigation.current === 'account') {
+			void this.open(focus);
+		} else {
+			this.sequence++;
 		}
-	});
+	}
+
+	private async open(focus: boolean): Promise<void> {
+		const serial = ++this.sequence;
+		const item = this.items.get(this.navigation.accountPage);
+		try {
+			const assigned = item !== undefined && (await this.host.assign(item));
+			if (assigned && !this.disposed && serial === this.sequence && focus) {
+				this.host.focus();
+			}
+		} catch {
+			if (!this.disposed && serial === this.sequence) {
+				this.navigation.setProductStatus(
+					this.localization.format(messages.pageUnavailable)
+				);
+			}
+		}
+	}
+
+	private watchCounts(): void {
+		this.watchCount({ kind: 'read', section: 'sessions' }, (data) => {
+			if (data.section === 'sessions') {
+				this.navigation.setAccountCount(
+					'sessions',
+					data.sessions.filter((session) => !session.current).length
+				);
+			}
+		});
+		this.watchCount({ kind: 'read', section: 'tokens' }, (data) => {
+			if (data.section === 'tokens') {
+				this.navigation.setAccountCount(
+					'tokens',
+					data.tokens.filter((token) => token.revokedAt === undefined).length
+				);
+			}
+		});
+	}
+
+	/** Follows one Account read for a sidebar count; a failure leaves the count as it was. */
+	private watchCount(intent: AccountIntent, apply: (data: AccountData) => void): void {
+		const deliver = (response: AccountResponse): void => {
+			if (!this.disposed && response.kind === 'data') {
+				apply(response.data);
+			}
+		};
+		const subscription = this.account.observe(intent, deliver);
+		if (subscription !== undefined) {
+			this._register(subscription);
+		} else {
+			void this.account.request(intent).then(deliver, () => undefined);
+		}
+	}
 }
 
-/** Follows one Account read for a sidebar count; a failure leaves the count as it was. */
-function watchCount(
-	client: AccountClient,
-	intent: AccountIntent,
-	disposables: DisposableStore,
-	apply: (data: AccountData) => void
-): void {
-	let disposed = false;
-	const deliver = (response: AccountResponse): void => {
-		if (!disposed && response.kind === 'data') apply(response.data);
-	};
-	disposables.add({
-		dispose() {
-			disposed = true;
-		}
-	});
-	const subscription = client.observe?.(intent, deliver);
-	if (subscription !== undefined) disposables.add(subscription);
-	else void client.request(intent).then(deliver, () => undefined);
-}
+export const accountContribution: WorkbenchContributionRegistration = Object.freeze({
+	id: 'prctr.authenticated.account' as const,
+	phase: 'ready' as const,
+	dependencies: Object.freeze(['prctr.authenticated.navigation' as const]),
+	messages: [
+		...Object.values(messages),
+		...SETTINGS_MANIFEST.flatMap((setting) => [setting.title, setting.description])
+	],
+	descriptor: new SyncDescriptor(AccountContribution)
+});
 
-function accountItem(page: AccountPage, context: WorkbenchBootstrapContext): WorkbenchItem {
-	const title = context.localization.format(messages[pageTitles[page]]);
+function accountItem(page: AccountPage, localization: ILocalizationService): WorkbenchItem {
+	const title = localization.format(messages[pageTitles[page]]);
 	return {
 		typeId: ACCOUNT_ITEM_TYPE,
 		logicalIdentity: page,

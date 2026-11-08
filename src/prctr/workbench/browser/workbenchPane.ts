@@ -21,6 +21,7 @@ export interface WorkbenchItemResolver {
 	createPane(document: Document): WorkbenchPane;
 }
 export class WorkbenchItemResolverRegistry {
+	declare readonly _serviceBrand: undefined;
 	readonly #resolvers = new Map<string, WorkbenchItemResolver>();
 	register(resolver: WorkbenchItemResolver): IDisposable {
 		if (this.#resolvers.has(resolver.typeId))

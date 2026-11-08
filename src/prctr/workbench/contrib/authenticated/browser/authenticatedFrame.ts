@@ -7,18 +7,20 @@ import { alert } from '../../../../base/browser/ui/aria/aria.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { KeyCode, KeyMod } from '../../../../base/common/keyCodes.js';
 import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
-import type {
-	LocalizationContext,
-	LocalizationValue
-} from '../../../../base/common/localization.js';
+import type { LocalizationValue } from '../../../../base/common/localization.js';
 import { isMacintosh } from '../../../../base/common/platform.js';
 import { KeybindingWeight } from '../../../../platform/keybinding/common/keybindingsRegistry.js';
-import type { ProductWindowChrome } from '../../../../platform/windows/browser/productWindowChrome.js';
-import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
-import type { WorkbenchPaneHost } from '../../../browser/paneHost.js';
-import type { WorkbenchShell } from '../../../browser/workbenchShell.js';
+import {
+	IProductWindowChromeService,
+	IWorkbenchPaneHostService,
+	IWorkbenchShellService,
+	IWorkbenchWindowService
+} from '../../../browser/workbenchServices.js';
 import { WorkbenchModalContext } from '../../../common/contextKeys.js';
+import { IAccountService } from '../../../services/account/common/account.js';
 import { registerProctorAction } from '../../../services/actions/common/proctorActions.js';
+import { IAuthenticatedHostService } from '../../../services/authenticatedHost/common/authenticatedHost.js';
+import { ILocalizationService } from '../../../services/localization/common/localization.js';
 import {
 	activityViews,
 	AuthenticatedNavigationModel,
@@ -34,10 +36,8 @@ import { AreaRail } from './areaRail.js';
 import { AreaSidebar, type SidebarArea, type SidebarSelection } from './areaSidebar.js';
 import { authenticatedMessages as m, type AuthenticatedMessage } from './authenticatedMessages.js';
 import { AuthenticatedLayoutState } from './authenticatedLayoutState.js';
-import type {
-	AuthenticatedLayoutService,
-	AuthenticatedNavigationService
-} from './authenticatedNavigation.js';
+import { IAuthenticatedHoverService } from './authenticatedHover.js';
+import type { IAuthenticatedNavigationService } from './authenticatedNavigation.js';
 import { ContentTopBar, type TopBarAction } from './contentTopBar.js';
 import { SidebarSash } from './sidebarSash.js';
 import { UnavailablePage } from './unavailablePage.js';
@@ -94,31 +94,14 @@ const destinationTitles: Readonly<Record<AuthenticatedDestination, Authenticated
 		account: 'accountTitle'
 	});
 
-export interface AuthenticatedFrameClient {
-	signOut(): Promise<void>;
-	readPhoto?(): Promise<string | undefined>;
-}
-
-export interface AuthenticatedFrameOptions {
-	readonly shell: WorkbenchShell;
-	readonly chrome: ProductWindowChrome;
-	readonly paneHost: WorkbenchPaneHost;
-	readonly localization: LocalizationContext;
-	readonly binding: AuthenticatedWindowDescriptor;
-	/** Product pages have a contribution; without one, product areas say they are unavailable. */
-	readonly productPages: boolean;
-	readonly hover: (target: HTMLElement, label: string, command?: string) => IDisposable;
-}
-
 /**
  * AuthenticatedWindow's frame: the area rail, the contextual sidebar and the
  * content top bar, and the navigation and sidebar state they present. Product
  * contributions fill the content area for their own destinations.
  */
-export class AuthenticatedFrame
-	extends Disposable
-	implements AuthenticatedNavigationService, AuthenticatedLayoutService
-{
+export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavigationService {
+	declare readonly _serviceBrand: undefined;
+
 	private readonly destinationEmitter = this._register(new Emitter<AuthenticatedDestination>());
 	readonly onDidChange: Event<AuthenticatedDestination> = this.destinationEmitter.event;
 	private readonly activityViewEmitter = this._register(new Emitter<ActivityView>());
@@ -128,9 +111,6 @@ export class AuthenticatedFrame
 	private readonly sidebarVisibilityEmitter = this._register(new Emitter<boolean>());
 	readonly onDidChangeSidebarVisibility: Event<boolean> = this.sidebarVisibilityEmitter.event;
 
-	private readonly shell: WorkbenchShell;
-	private readonly paneHost: WorkbenchPaneHost;
-	private readonly localization: LocalizationContext;
 	private readonly productPages: boolean;
 	private readonly model: AuthenticatedNavigationModel;
 	private readonly preferences: AuthenticatedLayoutState;
@@ -149,15 +129,23 @@ export class AuthenticatedFrame
 	private readonly institutionName: string | undefined;
 
 	constructor(
-		options: AuthenticatedFrameOptions,
-		private readonly client: AuthenticatedFrameClient
+		@IWorkbenchShellService private readonly shell: IWorkbenchShellService,
+		@IWorkbenchPaneHostService private readonly paneHost: IWorkbenchPaneHostService,
+		@IProductWindowChromeService chrome: IProductWindowChromeService,
+		@IWorkbenchWindowService window: IWorkbenchWindowService,
+		@ILocalizationService private readonly localization: ILocalizationService,
+		@IAuthenticatedHostService private readonly host: IAuthenticatedHostService,
+		@IAccountService private readonly accountService: IAccountService,
+		@IAuthenticatedHoverService hoverService: IAuthenticatedHoverService
 	) {
 		super();
-		this.shell = options.shell;
-		this.paneHost = options.paneHost;
-		this.localization = options.localization;
-		this.productPages = options.productPages;
-		const binding = options.binding;
+		const binding = window.binding;
+		if (binding.kind !== 'authenticated') {
+			throw new Error('The authenticated frame requires an authenticated window binding');
+		}
+		this.productPages = host.hasProductPages;
+		const hover = (target: HTMLElement, label: string, command?: string): IDisposable =>
+			hoverService.setupHover(target, label, command);
 		this.institutionName = binding.identity?.institutionName;
 		const document = this.shell.element.ownerDocument;
 		this.preferences = new AuthenticatedLayoutState(localStorageOf(document));
@@ -172,16 +160,11 @@ export class AuthenticatedFrame
 		const sidebarPart = this.shell.part('sidebar');
 		const accountName = binding.identity?.displayName ?? this.text('account');
 		this.rail = this._register(
-			new AreaRail(
-				this.shell.part('navigation'),
-				this.localization,
-				accountName,
-				options.hover
-			)
+			new AreaRail(this.shell.part('navigation'), this.localization, accountName, hover)
 		);
 		this.shell.part('navigation').setAttribute('aria-label', this.text('areas'));
 		this.sidebar = this._register(
-			new AreaSidebar(sidebarPart, this.localization, sidebarAreas, options.hover)
+			new AreaSidebar(sidebarPart, this.localization, sidebarAreas, hover)
 		);
 		this.sash = this._register(new SidebarSash(sidebarPart, this.text('resizeSidebar')));
 		const content = this.shell.part('content');
@@ -193,23 +176,21 @@ export class AuthenticatedFrame
 				isMacintosh
 					? { label: '⌘K', keys: 'Meta+K' }
 					: { label: 'Ctrl K', keys: 'Control+K' },
-				options.hover
+				hover
 			)
 		);
 		this.unavailable = this._register(new UnavailablePage(content, this.text('waiting')));
-		if (options.chrome.configuration.mode === 'nativeOverlay')
+		if (chrome.configuration.mode === 'nativeOverlay') {
 			this._register(
-				new WindowTitle(
-					options.chrome.element,
-					options.chrome.actions,
-					this.text('productName')
-				)
+				new WindowTitle(chrome.element, chrome.actions, this.text('productName'))
 			);
+		}
 		this.registerActions();
 		this.registerListeners(document);
 		this.observeWidth();
 		this.render();
 		this.layoutSidebar();
+		this._register(this.accountService.onDidChangePhoto((photo) => this.rail.setPhoto(photo)));
 		void this.loadPhoto();
 	}
 
@@ -259,10 +240,6 @@ export class AuthenticatedFrame
 		this.sidebar.setStatus(message, retry);
 	}
 
-	setProfilePhoto(dataUrl: string): void {
-		this.rail.setPhoto(dataUrl);
-	}
-
 	setAccountCount(page: AccountPage, count: number | undefined): void {
 		const text =
 			count === undefined || count <= 0
@@ -275,7 +252,7 @@ export class AuthenticatedFrame
 
 	// #endregion
 
-	// #region AuthenticatedLayoutService
+	// #region Sidebar visibility
 
 	get sidebarVisible(): boolean {
 		return this.presentation() !== 'hidden';
@@ -536,7 +513,7 @@ export class AuthenticatedFrame
 		if (this.signingOut) return;
 		this.signingOut = true;
 		this.sidebar.setSigningOut(true);
-		this.client.signOut().catch(() => {
+		this.host.signOut().catch(() => {
 			if (this._store.isDisposed) return;
 			this.signingOut = false;
 			this.sidebar.setSigningOut(false, this.text('signOutFailed'));
@@ -545,7 +522,7 @@ export class AuthenticatedFrame
 
 	private async loadPhoto(): Promise<void> {
 		try {
-			const photo = await this.client.readPhoto?.();
+			const photo = await this.accountService.readPhoto();
 			if (photo !== undefined && !this._store.isDisposed) this.rail.setPhoto(photo);
 		} catch {
 			/* Initials remain until a confirmed photo arrives. */

@@ -6,10 +6,41 @@ import {
 import { Event as BaseEvent } from '../../src/prctr/base/common/event.ts';
 import { DisposableStore } from '../../src/prctr/base/common/lifecycle.ts';
 import {
+	SyncDescriptor,
+	type SyncDescriptor0
+} from '../../src/prctr/platform/instantiation/common/descriptors.ts';
+import {
+	IInstantiationService,
+	type ServiceIdentifier,
+	type ServicesAccessor
+} from '../../src/prctr/platform/instantiation/common/instantiation.ts';
+import { InstantiationService } from '../../src/prctr/platform/instantiation/common/instantiationService.ts';
+import { ServiceCollection } from '../../src/prctr/platform/instantiation/common/serviceCollection.ts';
+import {
 	bootstrapWorkbench,
-	type WorkbenchBootstrapContext,
+	type IWorkbenchContribution,
 	type WorkbenchContributionRegistration
 } from '../../src/prctr/workbench/browser/bootstrap.ts';
+import {
+	IWorkbenchItemResolverService,
+	IWorkbenchShellService,
+	IWorkbenchWindowService
+} from '../../src/prctr/workbench/browser/workbenchServices.ts';
+import {
+	localizationService,
+	ILocalizationService
+} from '../../src/prctr/workbench/services/localization/common/localization.ts';
+import {
+	CandidateSecurityService,
+	ICandidateSecurityService,
+	type CandidateSecurityRendererClient
+} from '../../src/prctr/workbench/services/examSecurity/common/candidateSecurity.ts';
+import {
+	IIntegratedBrowserService,
+	IntegratedBrowserService,
+	type IntegratedBrowserRendererClient
+} from '../../src/prctr/workbench/services/integratedBrowser/common/integratedBrowser.ts';
+import type { WorkbenchContributionDescriptor } from '../../src/prctr/workbench/common/composition.ts';
 import { candidateComposition } from '../../src/prctr/workbench/browser/candidateManifest.ts';
 import { bootstrapLaunchWindow } from '../../src/prctr/workbench/browser/launch/launchWindow.ts';
 import { WorkbenchPaneHost } from '../../src/prctr/workbench/browser/paneHost.ts';
@@ -25,8 +56,8 @@ import type {
 	ResolvedWorkbenchItem,
 	WorkbenchItem
 } from '../../src/prctr/workbench/common/workbenchItem.ts';
-import { createExamSecurityContribution } from '../../src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts';
-import { createIntegratedBrowserContribution } from '../../src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts';
+import { ExamSecurityContribution } from '../../src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts';
+import { IntegratedBrowserContribution } from '../../src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts';
 import { commonWorkbenchContributions } from '../../src/prctr/workbench/workbench.common.main.ts';
 import { createDesktopWorkbenchContribution } from '../../src/prctr/code/electron-browser/workbench.desktop.main.ts';
 import type {
@@ -41,7 +72,7 @@ import type {
 	ProductWindowChromeUpdate
 } from '../../src/prctr/platform/windows/common/windowChrome.ts';
 import { ContextKeyService } from '../../src/prctr/platform/contextkey/browser/contextKeyService.ts';
-import type { IContextKeyService } from '../../src/prctr/platform/contextkey/common/contextkey.ts';
+import { IContextKeyService } from '../../src/prctr/platform/contextkey/common/contextkey.ts';
 import { isMacintosh } from '../../src/prctr/base/common/platform.ts';
 import {
 	WorkbenchFocusedPartContext,
@@ -49,7 +80,6 @@ import {
 	WorkbenchModalContext,
 	WorkbenchWindowKindContext
 } from '../../src/prctr/workbench/common/contextKeys.ts';
-import { WORKBENCH_CONTEXT_KEY_SERVICE } from '../../src/prctr/workbench/common/serviceIds.ts';
 import type {
 	CandidateLiveCorrection,
 	CandidateSecurityProjection,
@@ -559,13 +589,8 @@ async function runExecutableKernelTest(document: Document): Promise<void> {
 				].includes(descriptor.id)
 		)
 		.map((descriptor) =>
-			Object.freeze({
-				...descriptor,
-				activate: (context: WorkbenchBootstrapContext) => {
-					contextKeys ??= context.getService<IContextKeyService>(
-						WORKBENCH_CONTEXT_KEY_SERVICE
-					);
-				}
+			probeRegistration(descriptor, (accessor) => {
+				contextKeys ??= accessor.get(IContextKeyService);
 			})
 		);
 	const result = await bootstrapWorkbench(child, candidateComposition, [
@@ -715,7 +740,7 @@ async function runWindowBindingFailureTests(document: Document): Promise<void> {
 					'prctr.workbench.desktop'
 				].includes(descriptor.id)
 		)
-		.map((descriptor) => Object.freeze({ ...descriptor, activate: () => {} }));
+		.map((descriptor) => probeRegistration(descriptor, () => {}));
 	const pendingStart = bootstrapWorkbench(pendingDocument, candidateComposition, [
 		...commonWorkbenchContributions,
 		createDesktopWorkbenchContribution('candidate', () => pendingBinding),
@@ -781,11 +806,8 @@ async function runWindowBindingFailureTests(document: Document): Promise<void> {
 					].includes(descriptor.id)
 			)
 			.map((descriptor) =>
-				Object.freeze({
-					...descriptor,
-					activate: () => {
-						capabilityActivations++;
-					}
+				probeRegistration(descriptor, () => {
+					capabilityActivations++;
 				})
 			);
 		await bootstrapWorkbench(candidateDocument, candidateComposition, [
@@ -1655,45 +1677,110 @@ async function runExamSecurityContributionTest(document: Document): Promise<void
 	failureHostElement.remove();
 }
 
+interface TestContributionContext {
+	readonly document: Document;
+	readonly shell: WorkbenchShell;
+	readonly disposables: DisposableStore;
+	readonly registry: WorkbenchItemResolverRegistry;
+}
+
 function createContributionContext(
 	document: Document,
 	shell: WorkbenchShell,
 	disposables: DisposableStore,
-	registry?: WorkbenchItemResolverRegistry
-): WorkbenchBootstrapContext {
-	let binding: unknown;
-	const services = new Map<string, unknown>();
-	services.set(WORKBENCH_CONTEXT_KEY_SERVICE, disposables.add(new ContextKeyService()));
+	registry: WorkbenchItemResolverRegistry = new WorkbenchItemResolverRegistry()
+): TestContributionContext {
+	return { document, shell, disposables, registry };
+}
+
+const testLocalization = localizationService({
+	locale: 'en',
+	direction: 'ltr',
+	format: (descriptor, values = {}) =>
+		descriptor.defaultMessage.replace(
+			/\{([a-z][a-zA-Z0-9]*)\}/gu,
+			(_match, placeholder: string) => String(values[placeholder])
+		)
+});
+
+/** Creates one contribution through a candidate window's services and awaits its activation. */
+async function activateContribution(
+	descriptor: SyncDescriptor0<IWorkbenchContribution>,
+	context: TestContributionContext,
+	services: readonly [ServiceIdentifier<unknown>, unknown][]
+): Promise<void> {
+	const collection = new ServiceCollection(
+		[
+			IWorkbenchWindowService,
+			Object.freeze({
+				_serviceBrand: undefined,
+				document: context.document,
+				composition: candidateComposition,
+				binding: Object.freeze({
+					kind: 'candidate' as const,
+					windowId: 'window:contribution',
+					institutionOrigin: 'https://institution.example.test',
+					principalId: 'principal:contribution',
+					attemptId: 'attempt:contribution',
+					sessionId: 'session:contribution',
+					attemptConfigurationRevision: 'attempt-configuration:contribution',
+					attemptConfigurationDigest: 'sha256:contrib01'
+				})
+			})
+		],
+		[IWorkbenchShellService, context.shell],
+		[ILocalizationService, testLocalization],
+		[IContextKeyService, context.disposables.add(new ContextKeyService())],
+		[IWorkbenchItemResolverService, context.registry],
+		...services
+	);
+	const instantiationService = context.disposables.add(
+		new InstantiationService(collection, true)
+	);
+	const contribution = context.disposables.add(instantiationService.createInstance(descriptor));
+	await contribution.whenActivated;
+}
+
+function createIntegratedBrowserContribution(client: IntegratedBrowserRendererClient) {
 	return {
-		document,
-		composition: candidateComposition,
-		shell,
-		localization: {
-			locale: 'en',
-			direction: 'ltr',
-			format: (descriptor, values = {}) =>
-				descriptor.defaultMessage.replace(
-					/\{([a-z][a-zA-Z0-9]*)\}/gu,
-					(_match, placeholder: string) => String(values[placeholder])
-				)
-		},
-		disposables,
-		setService: (id, value) => {
-			services.set(id, value);
-		},
-		getService: <T>(_id: string): T => {
-			if (registry !== undefined && _id !== WORKBENCH_CONTEXT_KEY_SERVICE)
-				return registry as T;
-			const value = services.get(_id);
-			if (value === undefined) throw new Error(`Service ${_id} is unavailable`);
-			return value as T;
-		},
-		setWindowBinding: (value) => {
-			binding = value;
-		},
-		getWindowBinding: () => binding
+		activate: (context: TestContributionContext) =>
+			activateContribution(new SyncDescriptor(IntegratedBrowserContribution), context, [
+				[IIntegratedBrowserService, new IntegratedBrowserService(client)]
+			])
 	};
 }
+
+function createExamSecurityContribution(client: CandidateSecurityRendererClient) {
+	return {
+		activate: (context: TestContributionContext) =>
+			activateContribution(new SyncDescriptor(ExamSecurityContribution), context, [
+				[ICandidateSecurityService, new CandidateSecurityService(client)]
+			])
+	};
+}
+
+/** A packaged descriptor whose contribution only reports that the window created it. */
+function probeRegistration(
+	descriptor: WorkbenchContributionDescriptor,
+	onCreate: (accessor: ServicesAccessor) => void
+): WorkbenchContributionRegistration {
+	return Object.freeze({
+		...descriptor,
+		descriptor: new SyncDescriptor(ProbeContribution, [onCreate])
+	});
+}
+
+class ProbeContribution {
+	constructor(
+		onCreate: (accessor: ServicesAccessor) => void,
+		@IInstantiationService instantiationService: IInstantiationService
+	) {
+		instantiationService.invokeFunction(onCreate);
+	}
+
+	dispose(): void {}
+}
+
 function securityProjection(
 	revision: number,
 	posture: SecureExamPosture

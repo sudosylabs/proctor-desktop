@@ -4481,7 +4481,7 @@
       "message": "Reset layout",
       "description": "Button that restores composition default region sizes.",
       "placeholders": [],
-      "source": "src/prctr/workbench/browser/bootstrap.ts"
+      "source": "src/prctr/workbench/browser/workbenchKernel.ts"
     },
     "workbench.layout.resize.panel": {
       "message": "Resize panel",

@@ -21,8 +21,6 @@ import {
 import type { WindowBackgroundMaterial } from '../common/windowMaterial.js';
 import './productWindowChrome.css';
 
-export const PRODUCT_WINDOW_CHROME_SERVICE = 'prctr.window.chrome';
-
 export type ProductWindowChromeThemeService = Pick<
 	BrowserThemeService,
 	| 'theme'

@@ -2,29 +2,30 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { defineMessage, type MessageDescriptor } from '../../../../base/common/localization.js';
-import { DisposableStore, type IDisposable } from '../../../../base/common/lifecycle.js';
-import type { IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
+import {
+	Disposable,
+	DisposableStore,
+	type IDisposable
+} from '../../../../base/common/lifecycle.js';
+import { IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
+import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
+import {
+	IWorkbenchShellService,
+	IWorkbenchWindowService
+} from '../../../browser/workbenchServices.js';
 import { CandidateInteractionAllowedContext } from '../../../common/contextKeys.js';
-import { WORKBENCH_CONTEXT_KEY_SERVICE } from '../../../common/serviceIds.js';
+import { ICandidateSecurityService } from '../../../services/examSecurity/common/candidateSecurity.js';
 import type {
 	CandidateCorrectionCapability,
 	CandidateSecurityIntent,
 	CandidateSecurityProjection,
 	SafeSecurityReason
 } from '../../../services/examSecurity/common/securityProjectionProtocol.js';
-import type {
-	WorkbenchBootstrapContext,
-	WorkbenchContributionRegistration
-} from '../../../browser/bootstrap.js';
+import { ILocalizationService } from '../../../services/localization/common/localization.js';
 import './examSecurityContribution.css';
-
-export interface CandidateSecurityRendererClient {
-	projection(): Promise<CandidateSecurityProjection>;
-	intent(intent: CandidateSecurityIntent): Promise<void>;
-	onDidChange(listener: (projection: CandidateSecurityProjection) => void): () => void;
-}
 const messages = Object.freeze({
 	checking: defineMessage({
 		id: 'candidate.security.checking',
@@ -184,225 +185,241 @@ const contributionMessages = Object.freeze([
 	...Object.values(correctionCapabilityMessages)
 ]);
 
-export function createExamSecurityContribution(
-	client: CandidateSecurityRendererClient
-): WorkbenchContributionRegistration {
-	return Object.freeze({
-		id: 'prctr.candidate.examSecurity' as const,
-		phase: 'starting' as const,
-		blocksPhase: true,
-		dependencies: Object.freeze(['prctr.workbench.desktop' as const]),
-		messages: contributionMessages,
-		activate: async (context: WorkbenchBootstrapContext) => {
-			const candidateInteractionAllowed = CandidateInteractionAllowedContext.bindTo(
-				context.getService<IContextKeyService>(WORKBENCH_CONTEXT_KEY_SERVICE)
+/**
+ * The Candidate's exam-security banner and gates. The window fails closed until the
+ * coordinator's projection says which capabilities may continue.
+ */
+export class ExamSecurityContribution extends Disposable {
+	readonly whenActivated: Promise<void>;
+
+	constructor(
+		@ICandidateSecurityService private readonly client: ICandidateSecurityService,
+		@IContextKeyService contextKeyService: IContextKeyService,
+		@IWorkbenchWindowService window: IWorkbenchWindowService,
+		@IWorkbenchShellService shell: IWorkbenchShellService,
+		@ILocalizationService localization: ILocalizationService
+	) {
+		super();
+		this.whenActivated = this.activate(
+			CandidateInteractionAllowedContext.bindTo(contextKeyService),
+			window.document,
+			shell,
+			localization
+		);
+	}
+
+	private async activate(
+		candidateInteractionAllowed: ReturnType<typeof CandidateInteractionAllowedContext.bindTo>,
+		document: Document,
+		shell: IWorkbenchShellService,
+		localization: ILocalizationService
+	): Promise<void> {
+		const root = document.createElement('section');
+		root.className = 'prctr-exam-security';
+		const text = document.createElement('p');
+		text.tabIndex = -1;
+		const actions = document.createElement('div');
+		actions.className = 'prctr-exam-security__actions';
+		const actionListeners = new DisposableStore();
+		const pendingAcknowledgements = new Map<string, number>();
+		root.append(text, actions);
+		shell.part('banner').append(root);
+		this._register({ dispose: () => root.remove() });
+		this._register(actionListeners);
+		let gate: IDisposable | undefined;
+		let gateKey = '';
+		let latestRevision = -1;
+		const apply = (value: CandidateSecurityProjection): void => {
+			if (value.revision < latestRevision) return;
+			latestRevision = value.revision;
+			candidateInteractionAllowed.set(
+				value.canWorkspaceMutate || value.canUseBrowser || value.canSubmit
 			);
-			const root = context.document.createElement('section');
-			root.className = 'prctr-exam-security';
-			const text = context.document.createElement('p');
-			text.tabIndex = -1;
-			const actions = context.document.createElement('div');
-			actions.className = 'prctr-exam-security__actions';
-			const actionListeners = new DisposableStore();
-			const pendingAcknowledgements = new Map<string, number>();
-			root.append(text, actions);
-			context.shell.part('banner').append(root);
-			context.disposables.add({ dispose: () => root.remove() });
-			context.disposables.add(actionListeners);
-			let gate: IDisposable | undefined;
-			let gateKey = '';
-			let latestRevision = -1;
-			const apply = (value: CandidateSecurityProjection): void => {
-				if (value.revision < latestRevision) return;
-				latestRevision = value.revision;
-				candidateInteractionAllowed.set(
-					value.canWorkspaceMutate || value.canUseBrowser || value.canSubmit
+			const active = document.activeElement;
+			const hadBannerFocus = active instanceof HTMLElement && root.contains(active);
+			const focusedCorrectionId =
+				active instanceof HTMLElement && actions.contains(active)
+					? active.dataset.correctionId
+					: undefined;
+			actionListeners.clear();
+			actions.replaceChildren();
+			const condition = value.activeSecurityConditions.some(
+				(item) => item.state === 'required'
+			)
+				? messages.attention
+				: value.activeSecurityConditions.length > 0
+					? messages.checking
+					: undefined;
+			const correction = value.activeCorrections.length > 0 ? messages.correction : undefined;
+			const visible = condition !== undefined || correction !== undefined;
+			text.textContent = localization.format(condition ?? correction ?? messages.checking);
+			shell.setPartVisible('banner', visible);
+			const acknowledgements = value.activeCorrections.filter(
+				(candidate) => candidate.state === 'acknowledgementRequired'
+			);
+			const activeAcknowledgementKeys = new Set(
+				acknowledgements.map((item) => correctionKey(item.correctionId, item.revision))
+			);
+			for (const key of pendingAcknowledgements.keys())
+				if (!activeAcknowledgementKeys.has(key)) pendingAcknowledgements.delete(key);
+			for (const [index, item] of acknowledgements.entries()) {
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.dataset.correctionId = item.correctionId;
+				button.dataset.correctionRevision = String(item.revision);
+				const key = correctionKey(item.correctionId, item.revision);
+				button.disabled = pendingAcknowledgements.has(key);
+				const reason = localization.format(correctionReasonMessages[item.reason]);
+				const capabilities = localizedList(
+					localization.locale,
+					item.affectedCapabilities.map((capability) =>
+						localization.format(correctionCapabilityMessages[capability])
+					)
 				);
-				const active = context.document.activeElement;
-				const hadBannerFocus = active instanceof HTMLElement && root.contains(active);
-				const focusedCorrectionId =
-					active instanceof HTMLElement && actions.contains(active)
-						? active.dataset.correctionId
-						: undefined;
-				actionListeners.clear();
-				actions.replaceChildren();
-				const condition = value.activeSecurityConditions.some(
-					(item) => item.state === 'required'
-				)
-					? messages.attention
-					: value.activeSecurityConditions.length > 0
-						? messages.checking
-						: undefined;
-				const correction =
-					value.activeCorrections.length > 0 ? messages.correction : undefined;
-				const visible = condition !== undefined || correction !== undefined;
-				text.textContent = context.localization.format(
-					condition ?? correction ?? messages.checking
-				);
-				context.shell.setPartVisible('banner', visible);
-				const acknowledgements = value.activeCorrections.filter(
-					(candidate) => candidate.state === 'acknowledgementRequired'
-				);
-				const activeAcknowledgementKeys = new Set(
-					acknowledgements.map((item) => correctionKey(item.correctionId, item.revision))
-				);
-				for (const key of pendingAcknowledgements.keys())
-					if (!activeAcknowledgementKeys.has(key)) pendingAcknowledgements.delete(key);
-				for (const [index, item] of acknowledgements.entries()) {
-					const button = context.document.createElement('button');
-					button.type = 'button';
-					button.dataset.correctionId = item.correctionId;
-					button.dataset.correctionRevision = String(item.revision);
-					const key = correctionKey(item.correctionId, item.revision);
-					button.disabled = pendingAcknowledgements.has(key);
-					const reason = context.localization.format(
-						correctionReasonMessages[item.reason]
-					);
-					const capabilities = localizedList(
-						context.localization.locale,
-						item.affectedCapabilities.map((capability) =>
-							context.localization.format(correctionCapabilityMessages[capability])
-						)
-					);
-					const label = context.localization.format(acknowledgeCorrection, {
-						reason,
-						capabilities,
-						position: index + 1,
-						total: acknowledgements.length
-					});
-					button.textContent = label;
-					button.setAttribute('aria-label', label);
-					actions.append(button);
-					actionListeners.add(
-						addDisposableListener(button, 'click', () => {
-							if (pendingAcknowledgements.has(key)) return;
-							button.disabled = true;
-							pendingAcknowledgements.set(key, value.revision);
-							const intent: CandidateSecurityIntent = {
-								kind: 'security.acknowledgeCorrection',
-								projectionRevision: value.revision,
-								correctionId: item.correctionId,
-								correctionRevision: item.revision
-							};
-							void client.intent(intent).then(
-								() => {
-									if (pendingAcknowledgements.get(key) === value.revision)
-										pendingAcknowledgements.delete(key);
-								},
-								() => {
-									if (pendingAcknowledgements.get(key) !== value.revision) return;
+				const label = localization.format(acknowledgeCorrection, {
+					reason,
+					capabilities,
+					position: index + 1,
+					total: acknowledgements.length
+				});
+				button.textContent = label;
+				button.setAttribute('aria-label', label);
+				actions.append(button);
+				actionListeners.add(
+					addDisposableListener(button, 'click', () => {
+						if (pendingAcknowledgements.has(key)) return;
+						button.disabled = true;
+						pendingAcknowledgements.set(key, value.revision);
+						const intent: CandidateSecurityIntent = {
+							kind: 'security.acknowledgeCorrection',
+							projectionRevision: value.revision,
+							correctionId: item.correctionId,
+							correctionRevision: item.revision
+						};
+						void this.client.intent(intent).then(
+							() => {
+								if (pendingAcknowledgements.get(key) === value.revision)
 									pendingAcknowledgements.delete(key);
-									const current = [
-										...actions.querySelectorAll<HTMLButtonElement>(
-											'button[data-correction-id]'
-										)
-									].find(
-										(candidate) =>
-											candidate.dataset.correctionId === item.correctionId &&
-											candidate.dataset.correctionRevision ===
-												String(item.revision)
-									);
-									if (current !== undefined) current.disabled = false;
-									if (latestRevision === value.revision)
-										text.textContent = context.localization.format(
-											messages.requestFailed
-										);
-								}
-							);
-						})
-					);
-				}
-				if (hadBannerFocus) {
-					const replacement =
-						(focusedCorrectionId === undefined
-							? undefined
-							: [
+							},
+							() => {
+								if (pendingAcknowledgements.get(key) !== value.revision) return;
+								pendingAcknowledgements.delete(key);
+								const current = [
 									...actions.querySelectorAll<HTMLButtonElement>(
-										'button:not(:disabled)'
+										'button[data-correction-id]'
 									)
 								].find(
-									(button) => button.dataset.correctionId === focusedCorrectionId
-								)) ??
-						actions.querySelector<HTMLButtonElement>('button:not(:disabled)');
-					if (replacement !== null && replacement !== undefined) replacement.focus();
-					else if (visible) text.focus();
-					else
-						context.shell.focusVisiblePart(['content', 'panel', 'sidebar', 'titlebar']);
-				}
-				const nextGate = value.paused
-					? 'paused'
+									(candidate) =>
+										candidate.dataset.correctionId === item.correctionId &&
+										candidate.dataset.correctionRevision ===
+											String(item.revision)
+								);
+								if (current !== undefined) current.disabled = false;
+								if (latestRevision === value.revision)
+									text.textContent = localization.format(messages.requestFailed);
+							}
+						);
+					})
+				);
+			}
+			if (hadBannerFocus) {
+				const replacement =
+					(focusedCorrectionId === undefined
+						? undefined
+						: [
+								...actions.querySelectorAll<HTMLButtonElement>(
+									'button:not(:disabled)'
+								)
+							].find(
+								(button) => button.dataset.correctionId === focusedCorrectionId
+							)) ?? actions.querySelector<HTMLButtonElement>('button:not(:disabled)');
+				if (replacement !== null && replacement !== undefined) replacement.focus();
+				else if (visible) text.focus();
+				else shell.focusVisiblePart(['content', 'panel', 'sidebar', 'titlebar']);
+			}
+			const nextGate = value.paused
+				? 'paused'
+				: value.attemptState === 'active' &&
+					  (value.posture === 'checking' || value.posture === 'uninitialized')
+					? 'checking'
 					: value.attemptState === 'active' &&
-						  (value.posture === 'checking' || value.posture === 'uninitialized')
-						? 'checking'
-						: value.attemptState === 'active' &&
-							  (value.posture === 'contained' || value.posture === 'failed')
-							? 'failed'
-							: '';
-				if (nextGate === gateKey) return;
-				gate?.dispose();
-				gate = undefined;
-				gateKey = nextGate;
-				if (nextGate !== '') {
-					const checking = nextGate === 'checking';
-					const paused = nextGate === 'paused';
-					gate = context.shell.overlayHost.show({
-						kind: 'gate',
-						title: context.localization.format(
-							paused
-								? messages.pausedTitle
-								: checking
-									? messages.checkingTitle
-									: messages.failedTitle
-						),
-						message: context.localization.format(
-							paused
-								? messages.pausedMessage
-								: checking
-									? messages.checkingMessage
-									: messages.failedMessage
-						),
-						accessibleLabel: context.localization.format(
-							paused
-								? messages.pausedTitle
-								: checking
-									? messages.checkingTitle
-									: messages.failedTitle
-						),
-						actions: Object.freeze([])
-					});
-				}
-			};
-			const failClosed = (): void => {
-				candidateInteractionAllowed.set(false);
-				text.textContent = context.localization.format(messages.failedMessage);
-				context.shell.setPartVisible('banner', true);
-				if (gateKey === 'failed') return;
-				gate?.dispose();
-				gateKey = 'failed';
-				gate = context.shell.overlayHost.show({
+						  (value.posture === 'contained' || value.posture === 'failed')
+						? 'failed'
+						: '';
+			if (nextGate === gateKey) return;
+			gate?.dispose();
+			gate = undefined;
+			gateKey = nextGate;
+			if (nextGate !== '') {
+				const checking = nextGate === 'checking';
+				const paused = nextGate === 'paused';
+				gate = shell.overlayHost.show({
 					kind: 'gate',
-					title: context.localization.format(messages.failedTitle),
-					message: context.localization.format(messages.failedMessage),
-					accessibleLabel: context.localization.format(messages.failedTitle),
+					title: localization.format(
+						paused
+							? messages.pausedTitle
+							: checking
+								? messages.checkingTitle
+								: messages.failedTitle
+					),
+					message: localization.format(
+						paused
+							? messages.pausedMessage
+							: checking
+								? messages.checkingMessage
+								: messages.failedMessage
+					),
+					accessibleLabel: localization.format(
+						paused
+							? messages.pausedTitle
+							: checking
+								? messages.checkingTitle
+								: messages.failedTitle
+					),
 					actions: Object.freeze([])
 				});
-			};
-			failClosed();
-			const disposeChange = client.onDidChange(apply);
-			context.disposables.add({
-				dispose: () => {
-					disposeChange();
-					gate?.dispose();
-				}
-			});
-			try {
-				apply(await client.projection());
-			} catch {
-				if (latestRevision < 0) failClosed();
 			}
+		};
+		const failClosed = (): void => {
+			candidateInteractionAllowed.set(false);
+			text.textContent = localization.format(messages.failedMessage);
+			shell.setPartVisible('banner', true);
+			if (gateKey === 'failed') return;
+			gate?.dispose();
+			gateKey = 'failed';
+			gate = shell.overlayHost.show({
+				kind: 'gate',
+				title: localization.format(messages.failedTitle),
+				message: localization.format(messages.failedMessage),
+				accessibleLabel: localization.format(messages.failedTitle),
+				actions: Object.freeze([])
+			});
+		};
+		failClosed();
+		const disposeChange = this.client.onDidChange(apply);
+		this._register({
+			dispose: () => {
+				disposeChange();
+				gate?.dispose();
+			}
+		});
+		try {
+			apply(await this.client.projection());
+		} catch {
+			if (latestRevision < 0) failClosed();
 		}
-	});
+	}
 }
+
+export const examSecurityContribution: WorkbenchContributionRegistration = Object.freeze({
+	id: 'prctr.candidate.examSecurity' as const,
+	phase: 'starting' as const,
+	blocksPhase: true,
+	dependencies: Object.freeze(['prctr.workbench.desktop' as const]),
+	messages: contributionMessages,
+	descriptor: new SyncDescriptor(ExamSecurityContribution)
+});
+
 function localizedList(locale: string, values: readonly string[]): string {
 	try {
 		return new Intl.ListFormat(locale === 'pseudo' ? 'en' : locale, {

@@ -13,16 +13,12 @@ import {
 	type ExamActivity,
 	type ExamActivityResponse
 } from '../../../../platform/examActivity/common/examActivityProtocol.js';
-import type { WorkbenchBootstrapContext } from '../../../browser/bootstrap.js';
+import { IHoverService } from '../../../../platform/hover/browser/hover.js';
 import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
 import type { ResolvedWorkbenchItem } from '../../../common/workbenchItem.js';
+import { ILocalizationService } from '../../../services/localization/common/localization.js';
 import {
-	AUTHENTICATED_WINDOW_CONTROLS_SERVICE,
-	type AuthenticatedWindowControls
-} from '../../authenticated/browser/authenticatedWindowControls.js';
-import {
-	AUTHENTICATED_NAVIGATION_SERVICE,
-	type AuthenticatedNavigationService,
+	IAuthenticatedNavigationService,
 	type ActivityView
 } from '../../authenticated/browser/authenticatedNavigation.js';
 import { authenticatedMessages } from '../../authenticated/browser/authenticatedMessages.js';
@@ -52,10 +48,8 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 	private readonly detailPanel: HTMLElement;
 	private readonly detailContent: HTMLElement;
 	private readonly detailScroll: DomScrollableElement;
-	private readonly controls: AuthenticatedWindowControls;
 	private destination: Page | undefined;
 	private view: ActivityView = 'overview';
-	private readonly navigation: AuthenticatedNavigationService;
 	private epoch = 0;
 	private detailEpoch = 0;
 	private items: ExamActivity[] = [];
@@ -67,13 +61,14 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 	private detailHost: HTMLElement | undefined;
 	private focusedRow: HTMLButtonElement | undefined;
 	constructor(
-		private readonly context: WorkbenchBootstrapContext,
-		private readonly access: ProductAccess
+		private readonly document: Document,
+		private readonly access: ProductAccess,
+		@IAuthenticatedNavigationService
+		private readonly navigation: IAuthenticatedNavigationService,
+		@ILocalizationService private readonly localization: ILocalizationService,
+		@IHoverService private readonly hoverService: IHoverService
 	) {
 		super();
-		const document = context.document;
-		this.controls = context.getService(AUTHENTICATED_WINDOW_CONTROLS_SERVICE);
-		this.navigation = context.getService(AUTHENTICATED_NAVIGATION_SERVICE);
 		this.view = this.navigation.activityView ?? 'overview';
 		if (this.navigation.onDidChangeActivityView)
 			this._register(
@@ -109,7 +104,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			})
 		);
 		this._register(
-			this.controls.hover.setupDelayedHover(this.refresh.element, () => ({
+			this.hoverService.setupDelayedHover(this.refresh.element, () => ({
 				content: this.text('retry'),
 				position: { hoverPosition: HoverPosition.BELOW }
 			}))
@@ -171,17 +166,17 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 		this._register(access.onDidChange(() => this.updateAccess()));
 	}
 	private text(key: keyof typeof m): string {
-		return this.context.localization.format(m[key]);
+		return this.localization.format(m[key]);
 	}
 	private paragraph(host: HTMLElement, value: string): HTMLElement {
-		const p = this.context.document.createElement('p');
+		const p = this.document.createElement('p');
 		p.textContent = value;
 		host.append(p);
 		return p;
 	}
 	private date(value: string): string {
 		return new Intl.DateTimeFormat(
-			this.context.localization.locale === 'pseudo' ? 'en' : this.context.localization.locale,
+			this.localization.locale === 'pseudo' ? 'en' : this.localization.locale,
 			{ dateStyle: 'medium', timeStyle: 'short' }
 		).format(new Date(value));
 	}
@@ -224,7 +219,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 	}
 	private updateAccess(): void {
 		if (!this.destination) return;
-		const focused = this.context.document.activeElement;
+		const focused = this.document.activeElement;
 		if (this.rows.contains(focused) || this.detailHost?.contains(focused)) this.heading.focus();
 		this.reset();
 		const state = this.access.state;
@@ -254,7 +249,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			this.paragraph(this.body, this.description());
 			const timezone = this.paragraph(
 				this.body,
-				this.context.localization.format(m.timezone, {
+				this.localization.format(m.timezone, {
 					zone: new Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll('_', ' ')
 				})
 			);
@@ -263,12 +258,12 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 		} else {
 			this.paragraph(this.body, this.text('future'));
 			if (state.context.scopes.length) {
-				const heading = this.context.document.createElement('h2');
+				const heading = this.document.createElement('h2');
 				heading.textContent = this.text('scopes');
 				this.body.append(heading);
-				const list = this.context.document.createElement('ul');
+				const list = this.document.createElement('ul');
 				for (const scope of state.context.scopes) {
-					const item = this.context.document.createElement('li');
+					const item = this.document.createElement('li');
 					item.textContent = scope.name;
 					list.append(item);
 				}
@@ -404,7 +399,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			this.body.firstElementChild.textContent = this.description();
 		this.heading.textContent =
 			this.destination === 'activity' && this.view !== 'overview'
-				? this.context.localization.format(authenticatedMessages[this.view])
+				? this.localization.format(authenticatedMessages[this.view])
 				: this.text(this.destination ?? 'activity');
 	}
 	private visibleItems(): readonly ExamActivity[] {
@@ -428,7 +423,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 				: this.text('empty');
 	}
 	private renderRows(): void {
-		const document = this.context.document;
+		const document = this.document;
 		const active = document.activeElement;
 		const restore = this.rows.contains(active) || this.footer.contains(active);
 		this.content.clear();
@@ -508,9 +503,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 				date.className = 'prctr-exam-activity__date';
 				date.ariaHidden = 'true';
 				const locale =
-					this.context.localization.locale === 'pseudo'
-						? 'en'
-						: this.context.localization.locale;
+					this.localization.locale === 'pseudo' ? 'en' : this.localization.locale;
 				const month = document.createElement('span');
 				month.textContent = new Intl.DateTimeFormat(locale, { month: 'short' }).format(
 					new Date(item.startsAt)
@@ -601,7 +594,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			this.paragraph(host, this.text('emptyDetail'));
 			return;
 		}
-		const document = this.context.document;
+		const document = this.document;
 		const title = document.createElement('h2');
 		title.textContent = item.title;
 		title.tabIndex = -1;
@@ -614,7 +607,7 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 			this.details.add(createSemanticIcon(document, { id: 'action.close' })).element
 		);
 		this.details.add(
-			this.controls.hover.setupDelayedHover(close, () => ({
+			this.hoverService.setupDelayedHover(close, () => ({
 				content: this.text('closeDetails'),
 				position: { hoverPosition: HoverPosition.BELOW }
 			}))
@@ -691,10 +684,9 @@ export class ExamActivityPane extends Disposable implements WorkbenchPane {
 								const heading = document.createElement('h3');
 								heading.textContent = this.text('resultTitle');
 								output.append(heading);
-								resultStatus.textContent = this.context.localization.format(
-									m.released,
-									{ date: this.date(result.releasedAt) }
-								);
+								resultStatus.textContent = this.localization.format(m.released, {
+									date: this.date(result.releasedAt)
+								});
 								if (!result.remarks.trim())
 									this.paragraph(output, this.text('noRemarks'));
 								else {
