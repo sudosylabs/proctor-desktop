@@ -2,8 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { IAccountFormatService } from './accountFormat.js';
-import { IAccountPaneContext } from './accountPaneContext.js';
+import { IAccountFormatService } from '../accountFormat.js';
+import { IAccountPaneContext } from '../accountPaneContext.js';
 import { ILocalizationService } from '../../../services/localization/common/localization.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
@@ -37,10 +37,10 @@ import {
 	type SettingRow,
 	type SettingsSaveStatus,
 	type SettingsTab
-} from '../common/settingsPresentation.js';
-import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageView } from './accountPages.js';
-import './settingsPage.css';
+} from './common/settingsPresentation.js';
+import type { AccountMessage } from '../accountMessages.js';
+import type { AccountPageView } from '../accountPages.js';
+import './media/settingsPage.css';
 import { SCHEME_THEME_NAMES } from '../../../../platform/theme/common/bundledThemes.js';
 import { getTheme } from '../../../../platform/theme/common/themes.js';
 import type { ControlIconFactory } from '../../../../base/browser/ui/controlIcon.js';

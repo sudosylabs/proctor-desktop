@@ -3,7 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IAccountService } from '../../../services/account/common/account.js';
-import { IAccountFormatService } from './accountFormat.js';
+import { IAccountFormatService } from '../accountFormat.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
@@ -18,11 +18,11 @@ import {
 	twoStepPresentation,
 	type TwoStepStatus
 } from '../common/accountPresentation.js';
-import { AccountFeedback } from './accountFeedback.js';
-import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageView } from './accountPages.js';
-import { AccountRead } from './accountRead.js';
-import { AccountSection, type AccountRowModel } from './accountSection.js';
+import { AccountFeedback } from '../widgets/accountFeedback.js';
+import type { AccountMessage } from '../accountMessages.js';
+import type { AccountPageView } from '../accountPages.js';
+import { AccountRead } from '../widgets/accountRead.js';
+import { AccountSection, type AccountRowModel } from '../widgets/accountSection.js';
 
 const twoStepMessages: Readonly<Record<TwoStepStatus, AccountMessage>> = Object.freeze({
 	notOffered: 'twoStepNotOffered',

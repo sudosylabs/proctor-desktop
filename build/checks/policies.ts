@@ -8,6 +8,8 @@ export type SourcePolicy = {
 	readonly layers: readonly string[];
 	readonly environments: Readonly<Record<string, readonly string[]>>;
 	readonly environmentOverrides?: Readonly<Record<string, string>>;
+	/** The environment under a folder whose path names none; otherwise `common`. */
+	readonly defaultEnvironments?: Readonly<Record<string, string>>;
 	readonly testSegments: readonly string[];
 	readonly productionDynamicImportAllowlist: readonly string[];
 	readonly staticAssetImports?: readonly {

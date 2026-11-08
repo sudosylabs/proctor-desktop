@@ -2,30 +2,30 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
-import { Event } from '../../../../base/common/event.js';
-import { Disposable } from '../../../../base/common/lifecycle.js';
-import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
+import { SyncDescriptor } from '../../../platform/instantiation/common/descriptors.js';
+import { Event } from '../../../base/common/event.js';
+import { Disposable } from '../../../base/common/lifecycle.js';
+import { IInstantiationService } from '../../../platform/instantiation/common/instantiation.js';
 import type {
 	AccountData,
 	AccountIntent,
 	AccountResponse
-} from '../../../../platform/account/common/accountProtocol.js';
-import { SETTINGS_MANIFEST } from '../../../../platform/settings/common/settingsManifest.js';
-import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
+} from '../../../platform/account/common/accountProtocol.js';
+import { SETTINGS_MANIFEST } from '../../../platform/settings/common/settingsManifest.js';
+import type { WorkbenchContributionRegistration } from '../../browser/bootstrap.js';
 import {
 	IWorkbenchItemResolverService,
 	IWorkbenchPaneHostService,
 	IWorkbenchWindowService
-} from '../../../browser/workbenchServices.js';
-import type { WorkbenchItem } from '../../../common/workbenchItem.js';
-import { IAccountService } from '../../../services/account/common/account.js';
-import { ILocalizationService } from '../../../services/localization/common/localization.js';
+} from '../../browser/workbenchServices.js';
+import type { WorkbenchItem } from '../../common/workbenchItem.js';
+import { IAccountService } from '../../services/account/common/account.js';
+import { ILocalizationService } from '../../services/localization/common/localization.js';
 import {
 	accountPages,
 	IAuthenticatedNavigationService,
 	type AccountPage
-} from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
+} from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { accountMessages as messages } from './accountMessages.js';
 import { accountPageRegistry } from './accountPages.js';
 import { AccountPane, type AccountModel } from './accountPane.js';

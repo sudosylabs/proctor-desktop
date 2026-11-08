@@ -5,7 +5,7 @@ import { commonWorkbenchContributions } from '../../src/prctr/workbench/workbenc
 import { createDesktopWorkbenchContribution } from '../../src/prctr/code/electron-browser/workbench.desktop.main.js';
 import { authenticatedFrameContribution } from '../../src/prctr/workbench/browser/authenticated/authenticated.contribution.js';
 import { examActivityContribution } from '../../src/prctr/workbench/contrib/examActivity/browser/examActivityContribution.js';
-import { accountContribution } from '../../src/prctr/workbench/contrib/account/browser/accountContribution.js';
+import { accountContribution } from '../../src/prctr/workbench/contrib/account/account.contribution.js';
 import { IAuthenticatedNavigationService } from '../../src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { authenticatedWindowServices } from '../../src/prctr/code/electron-browser/authenticatedServices.js';
 import type { SettingsRendererClient } from '../../src/prctr/workbench/services/settings/common/settingsRendererClient.js';

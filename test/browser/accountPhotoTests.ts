@@ -1,10 +1,10 @@
 import { ToastHost } from '../../src/prctr/base/browser/ui/toast/toastHost.ts';
 import { proctorIconFactory } from '../../src/prctr/platform/theme/browser/proctorIcon.ts';
-import { AccountPhotoDialog } from '../../src/prctr/workbench/contrib/account/browser/accountPhotoDialog.ts';
+import { AccountPhotoDialog } from '../../src/prctr/workbench/contrib/account/profile/photoDialog.ts';
 import {
 	AccountPaneContext,
 	IAccountPaneContext
-} from '../../src/prctr/workbench/contrib/account/browser/accountPaneContext.ts';
+} from '../../src/prctr/workbench/contrib/account/accountPaneContext.ts';
 import { ServiceCollection } from '../../src/prctr/platform/instantiation/common/serviceCollection.ts';
 import { createAccountTestServices } from './accountTestServices.ts';
 import { MenuControl } from '../../src/prctr/base/browser/ui/menu/menuControl.ts';
@@ -13,10 +13,10 @@ import {
 	inspectPhoto,
 	photoCropRect,
 	decodePhoto
-} from '../../src/prctr/workbench/contrib/account/browser/photoImage.ts';
+} from '../../src/prctr/workbench/contrib/account/profile/photoImage.ts';
 import { WorkbenchOverlayHost } from '../../src/prctr/workbench/browser/overlayHost.ts';
 import { createLocalization } from '../../src/prctr/base/common/localization.ts';
-import { accountMessages } from '../../src/prctr/workbench/contrib/account/browser/accountMessages.ts';
+import { accountMessages } from '../../src/prctr/workbench/contrib/account/accountMessages.ts';
 import type {
 	AccountIntent,
 	AccountResponse

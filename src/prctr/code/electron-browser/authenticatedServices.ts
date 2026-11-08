@@ -12,7 +12,7 @@ import type { WorkbenchServicesInitializer } from '../../workbench/browser/boots
 import {
 	AccountFormatService,
 	IAccountFormatService
-} from '../../workbench/contrib/account/browser/accountFormat.js';
+} from '../../workbench/contrib/account/accountFormat.js';
 import { AuthenticatedFrame } from '../../workbench/browser/authenticated/authenticatedFrame.js';
 import { IAuthenticatedNavigationService } from '../../workbench/services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { installAuthenticatedWindowServices } from '../../workbench/browser/authenticated/authenticatedWindowServices.js';

@@ -80,7 +80,7 @@ editing settings and unknown/unsupported fields cannot silently activate.
 ## 5. Edit and persist safely
 
 Edit through the Settings Account page: its tabs come from `SETTINGS_MANIFEST`
-via `workbench/contrib/account/common/settingsPresentation.ts`, and each control
+via `workbench/contrib/account/settings/common/settingsPresentation.ts`, and each control
 writes one key through `SettingsDraft`. A new user-facing setting needs a
 manifest declaration and a presentation row, not a JSON editor. Users never edit
 `settings.json`; object settings stay without UI.
@@ -100,7 +100,7 @@ keep pending changes and never guess authority or cross Principals.
 Keep registry, JSONC grammar, resolution, inspection, schema inputs,
 and immutable projections under `src/prctr/platform/settings/common/`. Keep
 coordinator/network/protected-cache adapters in Electron main. Put the page
-under `src/prctr/workbench/contrib/account/` and presentation application under
+under `src/prctr/workbench/contrib/account/settings/` and presentation application under
 `src/prctr/workbench/contrib/settings/`, both selected from the authenticated
 manifest/`authenticated.main.ts`. `window.theme` picks Proctor Light/Dark for
 LaunchWindow and AuthenticatedWindow; `workbench.colorTheme` is the editor theme

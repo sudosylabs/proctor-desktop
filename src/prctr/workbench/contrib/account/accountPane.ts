@@ -2,26 +2,26 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { createElementFactory } from '../../../../base/browser/documentElements.js';
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
-import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
-import { ToastHost } from '../../../../base/browser/ui/toast/toastHost.js';
-import type { CancellationToken } from '../../../../base/common/cancellation.js';
-import { Event } from '../../../../base/common/event.js';
-import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
-import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import { ServiceCollection } from '../../../../platform/instantiation/common/serviceCollection.js';
-import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
-import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
-import { IWorkbenchOverlayService } from '../../../browser/workbenchServices.js';
-import type { ResolvedWorkbenchItem } from '../../../common/workbenchItem.js';
-import type { AccountPage } from '../../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
+import { createElementFactory } from '../../../base/browser/documentElements.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import { MenuControl } from '../../../base/browser/ui/menu/menuControl.js';
+import { DomScrollableElement } from '../../../base/browser/ui/scrollbar/scrollableElement.js';
+import { ToastHost } from '../../../base/browser/ui/toast/toastHost.js';
+import type { CancellationToken } from '../../../base/common/cancellation.js';
+import { Event } from '../../../base/common/event.js';
+import { Disposable, MutableDisposable } from '../../../base/common/lifecycle.js';
+import { ScrollbarVisibility } from '../../../base/common/scrollable.js';
+import { IInstantiationService } from '../../../platform/instantiation/common/instantiation.js';
+import { ServiceCollection } from '../../../platform/instantiation/common/serviceCollection.js';
+import { proctorIconFactory } from '../../../platform/theme/browser/proctorIcon.js';
+import type { WorkbenchPane } from '../../browser/workbenchPane.js';
+import { IWorkbenchOverlayService } from '../../browser/workbenchServices.js';
+import type { ResolvedWorkbenchItem } from '../../common/workbenchItem.js';
+import type { AccountPage } from '../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
 import { IAccountFormatService } from './accountFormat.js';
 import { accountPageRegistry, type AccountPageView } from './accountPages.js';
 import { AccountPaneContext, IAccountPaneContext } from './accountPaneContext.js';
-import './accountPage.css';
+import './media/accountPane.css';
 
 export interface AccountModel extends ResolvedWorkbenchItem {
 	readonly page: AccountPage;

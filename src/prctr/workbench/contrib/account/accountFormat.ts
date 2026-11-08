@@ -2,13 +2,13 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import type { PagerLabels } from '../../../../base/browser/ui/pager/pagerControl.js';
-import type { LocalizationValue } from '../../../../base/common/localization.js';
-import type { AccountFailure } from '../../../../platform/account/common/accountProtocol.js';
-import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
-import { IWorkbenchWindowService } from '../../../browser/workbenchServices.js';
-import { ILocalizationService } from '../../../services/localization/common/localization.js';
-import { failureMessage, relativeDay } from '../common/accountPresentation.js';
+import type { PagerLabels } from '../../../base/browser/ui/pager/pagerControl.js';
+import type { LocalizationValue } from '../../../base/common/localization.js';
+import type { AccountFailure } from '../../../platform/account/common/accountProtocol.js';
+import { createDecorator } from '../../../platform/instantiation/common/instantiation.js';
+import { IWorkbenchWindowService } from '../../browser/workbenchServices.js';
+import { ILocalizationService } from '../../services/localization/common/localization.js';
+import { failureMessage, relativeDay } from './common/accountPresentation.js';
 import { accountMessages, type AccountMessage } from './accountMessages.js';
 
 export const IAccountFormatService = createDecorator<IAccountFormatService>('accountFormatService');

@@ -9,6 +9,7 @@
     "layers",
     "environments",
     "environmentOverrides",
+    "defaultEnvironments",
     "testSegments",
     "productionDynamicImportAllowlist",
     "cssImportantOverrides"
@@ -41,6 +42,16 @@
       }
     },
     "environmentOverrides": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/path"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/name"
+      }
+    },
+    "defaultEnvironments": {
+      "description": "The environment of a source path under one of these folders when no path segment names one.",
       "type": "object",
       "propertyNames": {
         "$ref": "#/$defs/path"

@@ -7,7 +7,7 @@ import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
-import './accountDialog.css';
+import './media/accountDialog.css';
 
 export interface AccountDialogOptions {
 	readonly title: string;

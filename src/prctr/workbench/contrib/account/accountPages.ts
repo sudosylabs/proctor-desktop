@@ -2,17 +2,17 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import type { IDisposable } from '../../../../base/common/lifecycle.js';
-import type { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import type { AccountPage } from '../../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
+import type { IDisposable } from '../../../base/common/lifecycle.js';
+import type { IInstantiationService } from '../../../platform/instantiation/common/instantiation.js';
+import type { AccountPage } from '../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
 import type { IAccountFormatService } from './accountFormat.js';
 import type { AccountMessage } from './accountMessages.js';
-import { HistoryPage } from './historyPage.js';
-import { ProfilePage } from './profilePage.js';
-import { SecurityPage } from './securityPage.js';
-import { SessionsPage } from './sessionsPage.js';
-import { SettingsPage } from './settingsPage.js';
-import { TokensPage } from './tokensPage.js';
+import { AuditsPage } from './audits/auditsPage.js';
+import { ProfilePage } from './profile/profilePage.js';
+import { SecurityPage } from './security/securityPage.js';
+import { SessionsPage } from './sessions/sessionsPage.js';
+import { SettingsPage } from './settings/settingsPage.js';
+import { TokensPage } from './tokens/tokensPage.js';
 
 /** One Account page in the content area. Its pane shows it and says when it is visible. */
 export interface AccountPageView extends IDisposable {
@@ -63,7 +63,7 @@ export const accountPageRegistry: Readonly<Record<AccountPage, AccountPageDescri
 			title: 'historyTitle',
 			description: (format) => format.text('historyDescription'),
 			create: (instantiationService, body, headerActions) =>
-				instantiationService.createInstance(HistoryPage, body, headerActions)
+				instantiationService.createInstance(AuditsPage, body, headerActions)
 		},
 		settings: {
 			title: 'settingsTitle',

@@ -2,8 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { IAccountFormatService } from './accountFormat.js';
-import { IAccountPaneContext } from './accountPaneContext.js';
+import { IAccountFormatService } from '../accountFormat.js';
+import { IAccountPaneContext } from '../accountPaneContext.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';

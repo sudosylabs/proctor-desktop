@@ -3,8 +3,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IAccountService } from '../../../services/account/common/account.js';
-import { IAccountFormatService } from './accountFormat.js';
-import { IAccountPaneContext } from './accountPaneContext.js';
+import { IAccountFormatService } from '../accountFormat.js';
+import { IAccountPaneContext } from '../accountPaneContext.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
@@ -24,11 +24,15 @@ import {
 } from '../common/accountPresentation.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
-import { AccountConfirmation } from './accountConfirmation.js';
-import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageView } from './accountPages.js';
-import { AccountRead } from './accountRead.js';
-import { AccountSection, type AccountRowAction, type AccountRowModel } from './accountSection.js';
+import { AccountConfirmation } from '../widgets/accountConfirmation.js';
+import type { AccountMessage } from '../accountMessages.js';
+import type { AccountPageView } from '../accountPages.js';
+import { AccountRead } from '../widgets/accountRead.js';
+import {
+	AccountSection,
+	type AccountRowAction,
+	type AccountRowModel
+} from '../widgets/accountSection.js';
 import { NewTokenDialog, TokenCreatedDialog } from './tokenDialogs.js';
 
 const actionLabels: Readonly<Record<TokenAction, AccountMessage>> = Object.freeze({

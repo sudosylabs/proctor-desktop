@@ -3,8 +3,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IAccountService } from '../../../services/account/common/account.js';
-import { IAccountFormatService } from './accountFormat.js';
-import { IAccountPaneContext } from './accountPaneContext.js';
+import { IAccountFormatService } from '../accountFormat.js';
+import { IAccountPaneContext } from '../accountPaneContext.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
@@ -22,11 +22,11 @@ import {
 	platformKind
 } from '../common/accountPresentation.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
-import { AccountConfirmation } from './accountConfirmation.js';
-import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageView } from './accountPages.js';
-import { AccountRead } from './accountRead.js';
-import { AccountSection, type AccountRowModel } from './accountSection.js';
+import { AccountConfirmation } from '../widgets/accountConfirmation.js';
+import type { AccountMessage } from '../accountMessages.js';
+import type { AccountPageView } from '../accountPages.js';
+import { AccountRead } from '../widgets/accountRead.js';
+import { AccountSection, type AccountRowModel } from '../widgets/accountSection.js';
 
 /** Lock key for ending every other session; it settles with the next sessions read. */
 const OTHERS = 'session:*';

@@ -2,8 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import type { EffectiveSettingId } from '../../../../platform/settings/common/settingsManifest.js';
-import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
+import type { EffectiveSettingId } from '../../../../../platform/settings/common/settingsManifest.js';
+import type { ProctorIconId } from '../../../../../platform/theme/common/proctorIcons.js';
 
 /**
  * The Settings page: Proctor's own controls over the registered settings. People never edit

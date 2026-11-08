@@ -123,7 +123,11 @@ function environment(path: string, policy: SourcePolicy): string {
 	const exact = policy.environmentOverrides?.[path];
 	if (exact !== undefined) return exact;
 	const segments = path.split('/');
-	return Object.keys(policy.environments).find((name) => segments.includes(name)) ?? 'common';
+	const named = Object.keys(policy.environments).find((name) => segments.includes(name));
+	if (named !== undefined) return named;
+	const defaults = Object.entries(policy.defaultEnvironments ?? {});
+	const folder = defaults.find(([root]) => path.startsWith(`${root}/`));
+	return folder?.[1] ?? 'common';
 }
 
 export function analyzeSource(repository: Repository): Graph {

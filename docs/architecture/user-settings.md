@@ -106,7 +106,7 @@ Settings is an Account page (`settings` in `accountPages`), opened from the
 Account sidebar or Ctrl/Cmd+, (`prctr.authenticated.openSettings`). Its tabs —
 Appearance, Exam editor, Accessibility and Browser — are built from
 `SETTINGS_MANIFEST` by
-`src/prctr/workbench/contrib/account/common/settingsPresentation.ts`. Find a
+`src/prctr/workbench/contrib/account/settings/common/settingsPresentation.ts`. Find a
 setting searches every tab. Object settings such as color and token
 customizations stay in the manifest and remain effective but have no control.
 
@@ -210,7 +210,7 @@ authority and protected acknowledged cache remain unchanged.
 
 Keep `UserSettingsCoordinator`,
 authenticated transport, and protected cache in Electron main. The Settings page
-lives with the Account pages under `src/prctr/workbench/contrib/account/`.
+lives with the Account pages under `src/prctr/workbench/contrib/account/settings/`.
 `src/prctr/workbench/contrib/settings/` applies effective presentation (window
 theme, motion, zoom, customizations) and owns the Settings keybinding. Both are
 selected through the authenticated manifest and `authenticated.main.ts`

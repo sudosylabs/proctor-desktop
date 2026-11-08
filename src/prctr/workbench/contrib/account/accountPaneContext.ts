@@ -2,12 +2,12 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { status } from '../../../../base/browser/ui/aria/aria.js';
-import type { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
-import type { ToastHost } from '../../../../base/browser/ui/toast/toastHost.js';
-import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
-import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
-import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
+import { status } from '../../../base/browser/ui/aria/aria.js';
+import type { MenuControl } from '../../../base/browser/ui/menu/menuControl.js';
+import type { ToastHost } from '../../../base/browser/ui/toast/toastHost.js';
+import { createDecorator } from '../../../platform/instantiation/common/instantiation.js';
+import { proctorIconFactory } from '../../../platform/theme/browser/proctorIcon.js';
+import type { WorkbenchOverlayHost } from '../../browser/overlayHost.js';
 
 export const IAccountPaneContext = createDecorator<IAccountPaneContext>('accountPaneContext');
 

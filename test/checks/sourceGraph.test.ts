@@ -95,6 +95,39 @@ void test('source graph applies exact aggregate environment classifications', ()
 	assert.deepEqual(analyzeSource(repository).diagnostics, []);
 });
 
+void test('source graph gives folders without an environment segment their default environment', () => {
+	const policy = JSON.stringify({
+		sourceRoot: 'src/prctr',
+		layers: ['base', 'platform', 'editor', 'workbench', 'code'],
+		environments: {
+			common: ['common'],
+			browser: ['common', 'browser'],
+			node: ['common', 'node']
+		},
+		defaultEnvironments: { 'src/prctr/workbench/contrib': 'browser' },
+		testSegments: ['test'],
+		productionDynamicImportAllowlist: []
+	});
+	const browserOnly = new VirtualRepository({
+		'build/policies/source-boundaries.json': policy,
+		'package.json': '{"dependencies":{}}',
+		'src/prctr/workbench/contrib/owner/ownerPage.ts':
+			"import '../../../base/browser/dom.js';\n",
+		'src/prctr/workbench/contrib/owner/common/model.ts': "import '../ownerPage.js';\n",
+		'src/prctr/base/browser/dom.ts': 'export const dom = true;\n'
+	});
+	const diagnostics = analyzeSource(browserOnly).diagnostics;
+	assert.equal(diagnostics.length, 1);
+	assert.equal(diagnostics[0]?.path, 'src/prctr/workbench/contrib/owner/common/model.ts');
+	const nodeImport = new VirtualRepository({
+		'build/policies/source-boundaries.json': policy,
+		'package.json': '{"dependencies":{}}',
+		'src/prctr/workbench/contrib/owner/ownerPage.ts': "import '../../../base/node/files.js';\n",
+		'src/prctr/base/node/files.ts': 'export const files = true;\n'
+	});
+	assert.equal(analyzeSource(nodeImport).diagnostics.length, 1);
+});
+
 void test('CSS important declarations require one exact override-layer exception', async () => {
 	const path = 'src/prctr/workbench/browser/owner.css';
 	const selector = '.prctr-owner .compatibility';

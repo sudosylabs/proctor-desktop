@@ -3,8 +3,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IAccountService } from '../../../services/account/common/account.js';
-import { IAccountFormatService } from './accountFormat.js';
-import { IAccountPaneContext } from './accountPaneContext.js';
+import { IAccountFormatService } from '../accountFormat.js';
+import { IAccountPaneContext } from '../accountPaneContext.js';
 import { IClipboardService } from '../../../../platform/clipboard/common/clipboardService.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
@@ -26,9 +26,9 @@ import {
 	type TokenExpiryPreset
 } from '../common/accountPresentation.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
-import { AccountDialog } from './accountDialog.js';
-import { AccountFeedback } from './accountFeedback.js';
-import './tokenDialogs.css';
+import { AccountDialog } from '../widgets/accountDialog.js';
+import { AccountFeedback } from '../widgets/accountFeedback.js';
+import './media/tokenDialogs.css';
 
 const CANCEL_ICON = proctorIconFactory('action.close');
 const CREATE_ICON = proctorIconFactory('action.add');

@@ -3,16 +3,16 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IAccountService } from '../../../services/account/common/account.js';
-import { IAccountFormatService } from './accountFormat.js';
-import { IAccountPaneContext } from './accountPaneContext.js';
+import { IAccountFormatService } from '../accountFormat.js';
+import { IAccountPaneContext } from '../accountPaneContext.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import type { AccountResponse } from '../../../../platform/account/common/accountProtocol.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
-import { AccountDialog } from './accountDialog.js';
-import { AccountFeedback } from './accountFeedback.js';
+import { AccountDialog } from '../widgets/accountDialog.js';
+import { AccountFeedback } from '../widgets/accountFeedback.js';
 import {
 	decodePhoto,
 	encodePhoto,
@@ -20,7 +20,7 @@ import {
 	PhotoImportError,
 	type PhotoCrop
 } from './photoImage.js';
-import './accountPhotoDialog.css';
+import './media/photoDialog.css';
 
 type Photo = Extract<AccountResponse, { kind: 'photo' }>;
 

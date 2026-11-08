@@ -7,7 +7,7 @@ import type { ProductWindowChromeClient } from '../../platform/windows/common/wi
 import type { AuthenticatedWindowDescriptor } from '../../platform/windows/common/windowProtocol.js';
 import { authenticatedComposition } from '../../workbench/browser/authenticatedManifest.js';
 import { bootstrapWorkbench } from '../../workbench/browser/bootstrap.js';
-import { accountContribution } from '../../workbench/contrib/account/browser/accountContribution.js';
+import { accountContribution } from '../../workbench/contrib/account/account.contribution.js';
 import { authenticatedFrameContribution } from '../../workbench/browser/authenticated/authenticated.contribution.js';
 import { examActivityContribution } from '../../workbench/contrib/examActivity/browser/examActivityContribution.js';
 import { settingsContribution } from '../../workbench/contrib/settings/browser/settingsContribution.js';

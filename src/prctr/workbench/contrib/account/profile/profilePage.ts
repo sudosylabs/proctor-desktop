@@ -3,7 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IAccountService } from '../../../services/account/common/account.js';
-import { IAccountFormatService } from './accountFormat.js';
+import { IAccountFormatService } from '../accountFormat.js';
 import { IWorkbenchWindowService } from '../../../browser/workbenchServices.js';
 import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
@@ -26,12 +26,12 @@ import {
 	initialsOf,
 	noticePresentation
 } from '../common/accountPresentation.js';
-import { AccountConfirmation } from './accountConfirmation.js';
-import { AccountFeedback } from './accountFeedback.js';
-import type { AccountPageView } from './accountPages.js';
-import { AccountPhotoDialog } from './accountPhotoDialog.js';
-import { AccountRead } from './accountRead.js';
-import { AccountSection, type AccountRowModel } from './accountSection.js';
+import { AccountConfirmation } from '../widgets/accountConfirmation.js';
+import { AccountFeedback } from '../widgets/accountFeedback.js';
+import type { AccountPageView } from '../accountPages.js';
+import { AccountPhotoDialog } from './photoDialog.js';
+import { AccountRead } from '../widgets/accountRead.js';
+import { AccountSection, type AccountRowModel } from '../widgets/accountSection.js';
 
 type Photo = Extract<AccountResponse, { kind: 'photo' }>;
 

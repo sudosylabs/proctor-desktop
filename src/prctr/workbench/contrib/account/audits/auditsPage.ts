@@ -3,8 +3,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IAccountService } from '../../../services/account/common/account.js';
-import { IAccountFormatService } from './accountFormat.js';
-import { IAccountPaneContext } from './accountPaneContext.js';
+import { IAccountFormatService } from '../accountFormat.js';
+import { IAccountPaneContext } from '../accountPaneContext.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
@@ -30,9 +30,9 @@ import {
 	type HistoryEventGroup,
 	type HistoryFilters
 } from '../common/accountPresentation.js';
-import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageView } from './accountPages.js';
-import './historyPage.css';
+import type { AccountMessage } from '../accountMessages.js';
+import type { AccountPageView } from '../accountPages.js';
+import './media/auditsPage.css';
 
 const groupMessages: Readonly<Record<HistoryEventGroup, AccountMessage>> = Object.freeze({
 	signIn: 'historyGroupSignIn',
@@ -58,7 +58,7 @@ const HISTORY_PAGE_SIZE = 10;
  * outcome. Another person is never named; where an event came from is shown
  * only for the person's own actions.
  */
-export class HistoryPage extends Disposable implements AccountPageView {
+export class AuditsPage extends Disposable implements AccountPageView {
 	private readonly period: HTMLSelectElement;
 	private readonly group: HTMLSelectElement;
 	private readonly relation: HTMLSelectElement;

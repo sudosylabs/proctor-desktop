@@ -16,7 +16,7 @@ import {
 import {
 	AccountFormatService,
 	IAccountFormatService
-} from '../../src/prctr/workbench/contrib/account/browser/accountFormat.ts';
+} from '../../src/prctr/workbench/contrib/account/accountFormat.ts';
 import {
 	AccountService,
 	IAccountService

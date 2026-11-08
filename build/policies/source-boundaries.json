@@ -14,6 +14,9 @@
   "environmentOverrides": {
     "src/prctr/workbench/workbench.common.main.ts": "browser"
   },
+  "defaultEnvironments": {
+    "src/prctr/workbench/contrib": "browser"
+  },
   "testSegments": ["test"],
   "productionDynamicImportAllowlist": [],
   "cssImportantOverrides": [

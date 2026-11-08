@@ -6,8 +6,8 @@ import { runAccountPhotoTests } from './accountPhotoTests.ts';
 import {
 	AccountPane,
 	type AccountModel
-} from '../../src/prctr/workbench/contrib/account/browser/accountPane.ts';
-import { accountMessages } from '../../src/prctr/workbench/contrib/account/browser/accountMessages.ts';
+} from '../../src/prctr/workbench/contrib/account/accountPane.ts';
+import { accountMessages } from '../../src/prctr/workbench/contrib/account/accountMessages.ts';
 import type { AccountPage } from '../../src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigationModel.ts';
 import { WorkbenchOverlayHost } from '../../src/prctr/workbench/browser/overlayHost.ts';
 import { createLocalization } from '../../src/prctr/base/common/localization.ts';

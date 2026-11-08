@@ -7,7 +7,7 @@ import { alert, status } from '../../../../base/browser/ui/aria/aria.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import { createProctorIcon } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
-import './accountFeedback.css';
+import './media/accountFeedback.css';
 
 export type AccountFeedbackKind = 'info' | 'success' | 'error' | 'loading';
 
