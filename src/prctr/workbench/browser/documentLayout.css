@@ -1,3 +1,6 @@
+/* The one cascade order for every window; this stylesheet is bundled first, so it decides. */
+@layer reset, theme, base, controls, workbench, contributions, overrides;
+
 @layer reset {
 	html,
 	body {

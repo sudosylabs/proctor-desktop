@@ -1,3 +1,5 @@
+// First, so its stylesheet declares the cascade layer order before any other.
+import '../../workbench/browser/documentLayout.js';
 import {
 	bootstrapLaunchWindow,
 	type LaunchRendererClient

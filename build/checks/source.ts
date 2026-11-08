@@ -641,6 +641,13 @@ export const cssCheck: Check = {
 			const roots = new Set<string>();
 			root.walkAtRules('layer', (rule) => {
 				const name = rule.params.trim();
+				// The document reset alone states the whole order, ahead of every other stylesheet.
+				if (
+					rule.nodes === undefined &&
+					path === DOCUMENT_RESET_PATH &&
+					name === CASCADE.join(', ')
+				)
+					return;
 				const index = CASCADE.indexOf(name);
 				if (index < 0)
 					diagnostics.push(

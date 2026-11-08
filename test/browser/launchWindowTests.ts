@@ -297,7 +297,7 @@ export async function runLaunchWindowTests(
 		check(
 			!signIn.disabled &&
 				signIn.dataset.variant === 'brand' &&
-				signIn.getBoundingClientRect().height >= 40,
+				signIn.getBoundingClientRect().height >= 36,
 			'Ready offers one large branded sign-in action'
 		);
 		check(

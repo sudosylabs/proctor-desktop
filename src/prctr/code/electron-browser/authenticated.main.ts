@@ -1,3 +1,5 @@
+// First, so its stylesheet declares the cascade layer order before any other.
+import '../../workbench/browser/documentLayout.js';
 import type { ExamActivityClient } from '../../platform/examActivity/common/examActivityProtocol.js';
 import type { SettingsNativeClient } from '../../platform/settings/common/settingsNativeHost.js';
 import { createAccountContribution } from '../../workbench/contrib/account/browser/accountContribution.js';

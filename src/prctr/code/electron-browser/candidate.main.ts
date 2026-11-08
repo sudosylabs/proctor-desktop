@@ -1,3 +1,5 @@
+// First, so its stylesheet declares the cascade layer order before any other.
+import '../../workbench/browser/documentLayout.js';
 import type { CandidateWindowDescriptor } from '../../platform/windows/common/windowProtocol.js';
 import { bootstrapWorkbench } from '../../workbench/browser/bootstrap.js';
 import { candidateComposition } from '../../workbench/browser/candidateManifest.js';
