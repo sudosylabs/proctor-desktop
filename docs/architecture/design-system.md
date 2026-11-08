@@ -100,8 +100,16 @@ LaunchWindow and AuthenticatedWindow use the Proctor-owned controls in
 - `SegmentedControl`, `SwitchControl`, `StepperControl` and `SelectControl` (a
   styled native select) are the form controls.
 - `BannerControl` states a lasting page condition. `ToastHost` reports the
-  result of an action, bottom right, one at a time; success closes after 5 s and
-  failure stays until dismissed.
+  result of an action, bottom right, one at a time, on the window's own theme
+  surface; success closes after 5 s and failure stays until dismissed. Tooltips
+  are the one inverse surface.
+- `PagerControl` sits at the foot of any list that can hold more than ten items:
+  ten a page, Previous and Next, the first, last, current and neighbouring page
+  numbers with gaps, and the current page in the accent colour without a fill.
+  Without a known total it numbers the pages reached so far. Narrow lists show
+  "Page 3 of 25" instead of numbers.
+- A Copy button confirms in place: for two seconds it reads Copied with a check
+  and keeps its width; no line appears beside it.
 
 Every action, menu item and sidebar entry has an icon. An icon-only button has
 an accessible name and a tooltip. `buttonControl.css` is Proctor-owned; no

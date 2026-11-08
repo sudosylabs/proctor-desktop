@@ -109,7 +109,7 @@ export const authenticatedMessages = Object.freeze({
 	}),
 	history: defineMessage({
 		id: 'authenticated.account.nav.history',
-		defaultMessage: 'Account history',
+		defaultMessage: 'Audits',
 		description: 'Account page listing what was done with the account.'
 	}),
 	settings: defineMessage({

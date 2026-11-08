@@ -3,6 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import type { Event } from '../../../../base/common/event.js';
+import type { IDisposable } from '../../../../base/common/lifecycle.js';
 import type {
 	AccountPage,
 	ActivityView,
@@ -18,6 +19,10 @@ export {
 } from '../common/authenticatedNavigationModel.js';
 
 export const AUTHENTICATED_NAVIGATION_SERVICE = 'prctr.authenticated.service.navigation';
+
+/** The window's tooltip: shown on hover and keyboard focus, in the frame's own style. */
+export const AUTHENTICATED_HOVER_SERVICE = 'prctr.authenticated.service.hover';
+export type AuthenticatedHover = (target: HTMLElement, label: string) => IDisposable;
 export const AUTHENTICATED_LAYOUT_SERVICE = 'prctr.authenticated.service.layout';
 
 /**

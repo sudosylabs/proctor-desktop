@@ -78,8 +78,7 @@ restored.
   all at once; this computer's session is kept.
 - Access tokens lists working tokens apart from disabled, expired and revoked
   ones, and creates tokens.
-- Account history lists the person's own account events, newest first, in
-  pages, filtered by period, kind of event, whether the event was about the
+- Audits lists the person's own account events, newest first, ten a page, filtered by period, kind of event, whether the event was about the
   account or done elsewhere, and outcome. The server names no other person: the
   actor is only the person, an administrator, or Proctor itself, and where an
   event came from is shown only for the person's own actions. An event name this

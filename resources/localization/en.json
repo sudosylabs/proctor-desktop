@@ -152,7 +152,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.history.column.what": {
-      "message": "What happened",
+      "message": "Event",
       "description": "Account history column heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -555,20 +555,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
-    "account.history.more": {
-      "message": "Show older events",
-      "description": "Loads the next page of account history.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
-    },
-    "account.history.shown": {
-      "message": "Events shown: {count}",
-      "description": "How many events the list shows.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
-    },
     "account.history.where.unknown": {
       "message": "Not recorded",
       "description": "Where the event came from is unknown.",
@@ -637,14 +623,14 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.page.history.description": {
-      "message": "What was done with your account, by you, an administrator or Proctor itself.",
-      "description": "Description under the Account history heading.",
+      "message": "Everything done with your account, by you, an administrator or Proctor itself.",
+      "description": "Description under the Audits heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.page.history.title": {
-      "message": "Account history",
-      "description": "Heading of the Account history page.",
+      "message": "Audits",
+      "description": "Heading of the Audits page: what was done with the account.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -720,6 +706,91 @@
       "message": "This Account page could not be opened.",
       "description": "Shown in the sidebar when an Account page fails to open.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.compact": {
+      "message": "Page {page} of {count}",
+      "description": "The pager's narrow form, as in \"Page 12 of 25\".",
+      "placeholders": [
+        "page",
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.compact.open": {
+      "message": "Page {page}",
+      "description": "The pager's narrow form when the number of pages is not known.",
+      "placeholders": [
+        "page"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.name": {
+      "message": "{list} pages",
+      "description": "Accessible name of a list's pager, such as \"Active pages\".",
+      "placeholders": [
+        "list"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.next": {
+      "message": "Next",
+      "description": "Goes to the next page of a list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.page": {
+      "message": "Page {page}",
+      "description": "Accessible name of one numbered page button.",
+      "placeholders": [
+        "page"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.previous": {
+      "message": "Previous",
+      "description": "Goes to the previous page of a list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.range": {
+      "message": "{first}–{last} of {total}",
+      "description": "Which items a page shows, as in \"11–20 of 248\".",
+      "placeholders": [
+        "first",
+        "last",
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.range.open": {
+      "message": "{first}–{last}",
+      "description": "Which items a page shows when the total is not known.",
+      "placeholders": [
+        "first",
+        "last"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.shown": {
+      "message": "Page {page} of {count}, items {first} to {last}",
+      "description": "Announced after moving to another page of a list.",
+      "placeholders": [
+        "page",
+        "count",
+        "first",
+        "last"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.pager.shown.open": {
+      "message": "Page {page}, items {first} to {last}",
+      "description": "Announced after moving to another page when the number of pages is not known.",
+      "placeholders": [
+        "page",
+        "first",
+        "last"
+      ],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.photo.changed.elsewhere": {
@@ -1028,6 +1099,23 @@
       "description": "Accessible name of a row’s actions menu button and menu.",
       "placeholders": [
         "name"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.row.chips.more": {
+      "message": "+{count}",
+      "description": "A chip standing for the labels not shown, such as \"+7\".",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.row.chips.more.label": {
+      "message": "{count} more: {names}",
+      "description": "Accessible name of the \"+N\" chip; {names} lists what it stands for.",
+      "placeholders": [
+        "count",
+        "names"
       ],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -1923,14 +2011,26 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.tokens.active.empty": {
-      "message": "No active tokens.",
-      "description": "No active tokens, while disabled or expired ones exist.",
+      "message": "No active tokens",
+      "description": "Title of the empty Active section while disabled or expired tokens exist.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.tokens.active.empty.body": {
+      "message": "Your other tokens are disabled or expired, so no script can use your account right now. Enable one below, or create a new one.",
+      "description": "Body of the empty Active section while disabled or expired tokens exist.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.tokens.copied": {
-      "message": "Copied.",
-      "description": "The credential was copied.",
+      "message": "Copied to the clipboard.",
+      "description": "Announced to screen readers when the credential was copied.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.tokens.copied.button": {
+      "message": "Copied",
+      "description": "A Copy button's label for a moment after it copied.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -2007,8 +2107,8 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.tokens.disabled.on": {
-      "message": "disabled {date}",
-      "description": "When a token was disabled.",
+      "message": "Disabled {date}",
+      "description": "When a token was disabled, at the start of its details.",
       "placeholders": [
         "date"
       ],
@@ -2033,8 +2133,8 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.tokens.expired": {
-      "message": "expired {date}",
-      "description": "When a token expired.",
+      "message": "Expired {date}",
+      "description": "When a token expired, at the start of its details.",
       "placeholders": [
         "date"
       ],
@@ -2042,7 +2142,15 @@
     },
     "account.tokens.expires": {
       "message": "expires {date}",
-      "description": "When an active token expires.",
+      "description": "When a token expires, after another detail, as in \"Disabled 10 Oct · expires 30 Dec\".",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.tokens.expires.first": {
+      "message": "Expires {date}",
+      "description": "When an active token expires, at the start of its details.",
       "placeholders": [
         "date"
       ],
@@ -2192,8 +2300,8 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.tokens.revoked.on": {
-      "message": "revoked {date}",
-      "description": "When a token was revoked.",
+      "message": "Revoked {date}",
+      "description": "When a token was revoked, at the start of its details.",
       "placeholders": [
         "date"
       ],
@@ -2282,7 +2390,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "authenticated.account.nav.history": {
-      "message": "Account history",
+      "message": "Audits",
       "description": "Account page listing what was done with the account.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"

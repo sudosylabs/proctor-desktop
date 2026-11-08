@@ -1214,8 +1214,74 @@ export const accountMessages = Object.freeze({
 	}),
 	noActiveTokens: defineMessage({
 		id: 'account.tokens.active.empty',
-		defaultMessage: 'No active tokens.',
-		description: 'No active tokens, while disabled or expired ones exist.'
+		defaultMessage: 'No active tokens',
+		description: 'Title of the empty Active section while disabled or expired tokens exist.'
+	}),
+	noActiveTokensBody: defineMessage({
+		id: 'account.tokens.active.empty.body',
+		defaultMessage:
+			'Your other tokens are disabled or expired, so no script can use your account right now. Enable one below, or create a new one.',
+		description: 'Body of the empty Active section while disabled or expired tokens exist.'
+	}),
+	pagerName: defineMessage({
+		id: 'account.pager.name',
+		defaultMessage: '{list} pages',
+		description: 'Accessible name of a list\'s pager, such as "Active pages".'
+	}),
+	pagerPrevious: defineMessage({
+		id: 'account.pager.previous',
+		defaultMessage: 'Previous',
+		description: 'Goes to the previous page of a list.'
+	}),
+	pagerNext: defineMessage({
+		id: 'account.pager.next',
+		defaultMessage: 'Next',
+		description: 'Goes to the next page of a list.'
+	}),
+	pagerPage: defineMessage({
+		id: 'account.pager.page',
+		defaultMessage: 'Page {page}',
+		description: 'Accessible name of one numbered page button.'
+	}),
+	pagerRange: defineMessage({
+		id: 'account.pager.range',
+		defaultMessage: '{first}–{last} of {total}',
+		description: 'Which items a page shows, as in "11–20 of 248".'
+	}),
+	pagerRangeOpen: defineMessage({
+		id: 'account.pager.range.open',
+		defaultMessage: '{first}–{last}',
+		description: 'Which items a page shows when the total is not known.'
+	}),
+	pagerCompact: defineMessage({
+		id: 'account.pager.compact',
+		defaultMessage: 'Page {page} of {count}',
+		description: 'The pager\'s narrow form, as in "Page 12 of 25".'
+	}),
+	pagerCompactOpen: defineMessage({
+		id: 'account.pager.compact.open',
+		defaultMessage: 'Page {page}',
+		description: "The pager's narrow form when the number of pages is not known."
+	}),
+	pageShown: defineMessage({
+		id: 'account.pager.shown',
+		defaultMessage: 'Page {page} of {count}, items {first} to {last}',
+		description: 'Announced after moving to another page of a list.'
+	}),
+	pageShownOpen: defineMessage({
+		id: 'account.pager.shown.open',
+		defaultMessage: 'Page {page}, items {first} to {last}',
+		description: 'Announced after moving to another page when the number of pages is not known.'
+	}),
+	moreChips: defineMessage({
+		id: 'account.row.chips.more',
+		defaultMessage: '+{count}',
+		description: 'A chip standing for the labels not shown, such as "+7".'
+	}),
+	moreChipsLabel: defineMessage({
+		id: 'account.row.chips.more.label',
+		defaultMessage: '{count} more: {names}',
+		description: 'Accessible name of the "+N" chip; {names} lists what it stands for.'
 	}),
 	yourTokens: defineMessage({
 		id: 'account.tokens.section.all',
@@ -1262,22 +1328,28 @@ export const accountMessages = Object.freeze({
 	tokenExpires: defineMessage({
 		id: 'account.tokens.expires',
 		defaultMessage: 'expires {date}',
-		description: 'When an active token expires.'
+		description:
+			'When a token expires, after another detail, as in "Disabled 10 Oct · expires 30 Dec".'
+	}),
+	tokenExpiresFirst: defineMessage({
+		id: 'account.tokens.expires.first',
+		defaultMessage: 'Expires {date}',
+		description: 'When an active token expires, at the start of its details.'
 	}),
 	tokenExpired: defineMessage({
 		id: 'account.tokens.expired',
-		defaultMessage: 'expired {date}',
-		description: 'When a token expired.'
+		defaultMessage: 'Expired {date}',
+		description: 'When a token expired, at the start of its details.'
 	}),
 	tokenRevokedOn: defineMessage({
 		id: 'account.tokens.revoked.on',
-		defaultMessage: 'revoked {date}',
-		description: 'When a token was revoked.'
+		defaultMessage: 'Revoked {date}',
+		description: 'When a token was revoked, at the start of its details.'
 	}),
 	tokenDisabledOn: defineMessage({
 		id: 'account.tokens.disabled.on',
-		defaultMessage: 'disabled {date}',
-		description: 'When a token was disabled.'
+		defaultMessage: 'Disabled {date}',
+		description: 'When a token was disabled, at the start of its details.'
 	}),
 	tokenUsed: defineMessage({
 		id: 'account.tokens.used',
@@ -1447,10 +1519,15 @@ export const accountMessages = Object.freeze({
 		defaultMessage: 'Copy',
 		description: 'Copy the credential.'
 	}),
+	copiedButton: defineMessage({
+		id: 'account.tokens.copied.button',
+		defaultMessage: 'Copied',
+		description: "A Copy button's label for a moment after it copied."
+	}),
 	copied: defineMessage({
 		id: 'account.tokens.copied',
-		defaultMessage: 'Copied.',
-		description: 'The credential was copied.'
+		defaultMessage: 'Copied to the clipboard.',
+		description: 'Announced to screen readers when the credential was copied.'
 	}),
 	copyFailed: defineMessage({
 		id: 'account.tokens.copy.failed',
@@ -1691,14 +1768,14 @@ export const accountMessages = Object.freeze({
 	}),
 	historyTitle: defineMessage({
 		id: 'account.page.history.title',
-		defaultMessage: 'Account history',
-		description: 'Heading of the Account history page.'
+		defaultMessage: 'Audits',
+		description: 'Heading of the Audits page: what was done with the account.'
 	}),
 	historyDescription: defineMessage({
 		id: 'account.page.history.description',
 		defaultMessage:
-			'What was done with your account, by you, an administrator or Proctor itself.',
-		description: 'Description under the Account history heading.'
+			'Everything done with your account, by you, an administrator or Proctor itself.',
+		description: 'Description under the Audits heading.'
 	}),
 	historyPeriodLabel: defineMessage({
 		id: 'account.history.filter.period',
@@ -1795,11 +1872,6 @@ export const accountMessages = Object.freeze({
 		defaultMessage: 'Failed',
 		description: 'Outcome filter option.'
 	}),
-	historyShown: defineMessage({
-		id: 'account.history.shown',
-		defaultMessage: 'Events shown: {count}',
-		description: 'How many events the list shows.'
-	}),
 	historyWhen: defineMessage({
 		id: 'account.history.column.when',
 		defaultMessage: 'When',
@@ -1807,7 +1879,7 @@ export const accountMessages = Object.freeze({
 	}),
 	historyWhat: defineMessage({
 		id: 'account.history.column.what',
-		defaultMessage: 'What happened',
+		defaultMessage: 'Event',
 		description: 'Account history column heading.'
 	}),
 	historyBy: defineMessage({
@@ -1854,11 +1926,6 @@ export const accountMessages = Object.freeze({
 		id: 'account.history.empty',
 		defaultMessage: 'Nothing happened with your account in this period.',
 		description: 'No events match the filters.'
-	}),
-	historyMore: defineMessage({
-		id: 'account.history.more',
-		defaultMessage: 'Show older events',
-		description: 'Loads the next page of account history.'
 	})
 	// #endregion
 });

@@ -177,6 +177,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 	let settingsRevision = 1;
 	let conflictNext = false;
 	const settingsCommits: string[] = [];
+	const settingsPreviews: string[] = [];
 	const settingsProjection = (): UserSettingsProjection => ({
 		source: settingsSource,
 		revision: `r${settingsRevision}`,
@@ -191,7 +192,9 @@ export async function runAccountTests(document: Document): Promise<void> {
 	});
 	const settingsClient: SettingsRendererClient = {
 		projection: async () => settingsProjection(),
-		preview: async () => {},
+		preview: async (intent) => {
+			settingsPreviews.push(intent.source);
+		},
 		cancelPreview: async () => {},
 		commit: async (intent) => {
 			settingsCommits.push(intent.source);
@@ -759,12 +762,29 @@ export async function runAccountTests(document: Document): Promise<void> {
 			first.kind === 'readHistory' && first.createdAfter !== undefined,
 			'History starts with the last 30 days'
 		);
-		buttonIn(root, 'Show older events')!.click();
-		await wait(() => table.textContent!.includes('Signed out'), 'older history');
-		check(table.querySelectorAll('tbody tr').length === 4, 'Older events are appended');
+		const pager = root.querySelector<HTMLElement>('nav.prctr-pager')!;
+		check(!pager.hidden, 'A history with more pages offers a pager');
 		check(
-			buttonIn(root, 'Show older events')?.closest('[hidden]') !== null,
-			'The last page offers no more'
+			pager.querySelector('[aria-current="page"]')?.textContent === '1',
+			'The first page is current'
+		);
+		pager.querySelector<HTMLButtonElement>('[aria-label="Next"]')!.click();
+		await wait(() => table.textContent!.includes('Signed out'), 'next history page');
+		check(table.querySelectorAll('tbody tr').length === 1, 'A page replaces the rows');
+		check(
+			pager.querySelector<HTMLButtonElement>('[aria-label="Next"]')!.disabled,
+			'The last page offers no Next'
+		);
+		check(
+			pager.querySelector('[aria-current="page"]')?.textContent === '2',
+			'The second page is current'
+		);
+		pager.querySelector<HTMLButtonElement>('[aria-label="Previous"]')!.click();
+		await wait(() => table.textContent!.includes('Signed in'), 'previous history page');
+		const back = account.requests.findLast((intent) => intent.kind === 'readHistory')!;
+		check(
+			back.kind === 'readHistory' && back.cursor === undefined,
+			'Previous reads the first page again'
 		);
 		const outcome = root.querySelector<HTMLSelectElement>('select[aria-label="Outcome"]')!;
 		outcome.value = 'fail';
@@ -790,6 +810,11 @@ export async function runAccountTests(document: Document): Promise<void> {
 		[...settingRow('window.theme').querySelectorAll<HTMLButtonElement>('[role="radio"]')]
 			.find((radio) => radio.textContent === 'Dark')!
 			.click();
+		await wait(() => settingsPreviews.length === 1, 'theme applied');
+		check(
+			settingsCommits.length === 0 && /"window\.theme":\s*"dark"/u.test(settingsPreviews[0]!),
+			'A change applies at once, before it is saved'
+		);
 		await wait(() => settingsCommits.length === 1, 'theme saved');
 		check(
 			/"window\.theme":\s*"dark"/u.test(settingsCommits[0]!),
@@ -805,13 +830,24 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'The editor tab says exams can override it'
 		);
 		check(root.querySelector('.prctr-settings-page__code'), 'The editor tab previews code');
+		[...settingRow('editor.lineNumbers').querySelectorAll<HTMLButtonElement>('[role="radio"]')]
+			.find((radio) => radio.textContent === 'Relative')!
+			.click();
+		await wait(
+			() =>
+				[...root.querySelectorAll('.prctr-settings-page__number')]
+					.map((number) => number.textContent)
+					.join(',') === '2,1,3,1,2',
+			'relative line numbers'
+		);
+		await wait(() => settingsCommits.length === 3, 'line numbers saved');
 		conflictNext = true;
 		settingRow('editor.fontSize')
 			.querySelector<HTMLButtonElement>('[aria-label="Larger"]')!
 			.click();
-		await wait(() => settingsCommits.length === 4, 'conflict reapplied');
+		await wait(() => settingsCommits.length === 5, 'conflict reapplied');
 		check(
-			/"editor\.fontSize":\s*15/u.test(settingsCommits[3]!),
+			/"editor\.fontSize":\s*15/u.test(settingsCommits[4]!),
 			'A conflicting save applies this page’s change again on the newer settings'
 		);
 		await wait(() => root.textContent!.includes('Saved'), 'saved after the conflict');

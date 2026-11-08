@@ -4,6 +4,7 @@
 
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
+import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import type { MenuEntry } from '../../../../base/browser/ui/menu/menuControl.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
@@ -28,6 +29,11 @@ export interface AccountRowAction {
 	readonly run: () => void;
 }
 
+/** Chips shown before the rest collapse into "+N". */
+const VISIBLE_CHIPS = 3;
+/** Rows on one page of a section; a longer list gets a pager at the foot of its card. */
+export const ACCOUNT_PAGE_SIZE = 10;
+
 /** A status word at the end of a row, coloured only when it needs attention. */
 export interface AccountRowStatus {
 	readonly text: string;
@@ -40,6 +46,8 @@ export interface AccountRowModel {
 	/** A small glyph saying what the row is, such as a laptop or a key. */
 	readonly glyph: ProctorIconId;
 	readonly title: string;
+	/** Short labels under the title, such as a token's permissions; the first few show. */
+	readonly chips?: readonly string[];
 	readonly detail: string;
 	readonly status?: AccountRowStatus;
 	/** The row's one obvious action, shown as a button; all others go in its "⋯" menu. */
@@ -91,6 +99,9 @@ export class AccountSection extends Disposable {
 	private readonly retry: ButtonControl;
 	private readonly noteRetry: ButtonControl;
 	private readonly rowStore = this._register(new DisposableStore());
+	private readonly pager: PagerControl;
+	private allRows: readonly AccountRowModel[] = [];
+	private page = 1;
 	private retryHandler: (() => void) | undefined;
 	private readonly action: ButtonControl | undefined;
 	private readonly actionEmitter = this._register(new Emitter<void>());
@@ -209,6 +220,15 @@ export class AccountSection extends Disposable {
 			this.skeleton,
 			this.state
 		);
+		this.pager = this._register(
+			new PagerControl(this.card, {
+				labels: services.pagerLabels(options.title),
+				previousIcon: proctorIconFactory('action.back', 14),
+				nextIcon: proctorIconFactory('action.forward', 14)
+			})
+		);
+		this.pager.element.hidden = true;
+		this._register(this.pager.onDidRequestPage((page) => this.showPage(page)));
 		this.element = $(
 			'section.prctr-account-section',
 			{ attrs: { 'aria-labelledby': id } },
@@ -296,6 +316,45 @@ export class AccountSection extends Disposable {
 	}
 
 	setRows(rows: readonly AccountRowModel[]): void {
+		this.allRows = rows;
+		this.page = Math.min(this.page, Math.max(1, Math.ceil(rows.length / ACCOUNT_PAGE_SIZE)));
+		this.renderRows();
+	}
+
+	/** Shows another page, puts focus on its first row and says where the reader is. */
+	private showPage(page: number): void {
+		this.page = page;
+		this.renderRows();
+		const first = this.list.querySelector<HTMLElement>(
+			'.prctr-account-row__chip-more, .prctr-button, .prctr-account-row__more'
+		);
+		if (first !== null) first.focus();
+		else this.focusHeading();
+		const start = (page - 1) * ACCOUNT_PAGE_SIZE;
+		this.services.announce(
+			this.services.text('pageShown', {
+				page,
+				count: Math.ceil(this.allRows.length / ACCOUNT_PAGE_SIZE),
+				first: start + 1,
+				last: Math.min(start + ACCOUNT_PAGE_SIZE, this.allRows.length)
+			})
+		);
+	}
+
+	private renderRows(): void {
+		const all = this.allRows;
+		const start = (this.page - 1) * ACCOUNT_PAGE_SIZE;
+		const rows = all.slice(start, start + ACCOUNT_PAGE_SIZE);
+		this.pager.element.hidden = all.length <= ACCOUNT_PAGE_SIZE;
+		if (all.length > ACCOUNT_PAGE_SIZE)
+			this.pager.setState({
+				page: this.page,
+				pageSize: ACCOUNT_PAGE_SIZE,
+				first: start + 1,
+				last: start + rows.length,
+				total: all.length,
+				hasNext: start + ACCOUNT_PAGE_SIZE < all.length
+			});
 		const document = this.element.ownerDocument;
 		// A row whose actions button had focus keeps it when the list is redrawn.
 		const focused =
@@ -360,9 +419,11 @@ export class AccountSection extends Disposable {
 		const text = $(
 			'span.prctr-account-row__text',
 			{},
-			$('span.prctr-account-row__title', { textContent: row.title }),
-			$('span.prctr-account-row__detail', { textContent: row.detail })
+			$('span.prctr-account-row__title', { textContent: row.title })
 		);
+		if (row.chips !== undefined && row.chips.length > 0)
+			text.append(this.createChips($, row.chips));
+		text.append($('span.prctr-account-row__detail', { textContent: row.detail }));
 		const item = $('li.prctr-account-row', { data: { rowId: row.id } }, glyph.element, text);
 		if (row.status !== undefined) {
 			const icon = this.rowStore.add(
@@ -393,6 +454,41 @@ export class AccountSection extends Disposable {
 		const actions = row.actions ?? [];
 		if (actions.length > 0) item.append(this.createMenuButton($, row.title, actions));
 		return item;
+	}
+
+	/** The first chips, then "+N" whose tooltip and accessible name list the rest. */
+	private createChips(
+		$: ReturnType<typeof createElementFactory>,
+		labels: readonly string[]
+	): HTMLElement {
+		const hidden = labels.slice(VISIBLE_CHIPS);
+		const chips = $(
+			'span.prctr-account-row__chips',
+			{},
+			...labels
+				.slice(0, VISIBLE_CHIPS)
+				.map((label) => $('span.prctr-account-row__chip', { textContent: label }))
+		);
+		if (hidden.length > 0) {
+			const names = hidden.join(', ');
+			const more = $('button.prctr-account-row__chip-more', {
+				type: 'button',
+				textContent: this.services.text('moreChips', { count: hidden.length }),
+				attrs: {
+					'aria-label': this.services.text('moreChipsLabel', {
+						count: hidden.length,
+						names
+					})
+				}
+			});
+			// The tooltip lists one per line; the accessible name above reads them as a sentence.
+			const list = hidden.join('\n');
+			const hover = this.services.hooks.hover;
+			if (hover === undefined) more.title = list;
+			else this.rowStore.add(hover(more, list));
+			chips.append(more);
+		}
+		return chips;
 	}
 
 	private createMenuButton(

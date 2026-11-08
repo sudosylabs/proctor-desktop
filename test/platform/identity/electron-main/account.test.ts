@@ -558,7 +558,7 @@ void test('grantable scopes are bounded and refer only to listed Academic Units'
 });
 
 void test('history queries use the server filter names and parse a minimized page', () => {
-	assert.equal(accountHistoryPath({}), '/api/v1/users/me/audits?limit=50');
+	assert.equal(accountHistoryPath({}), '/api/v1/users/me/audits?limit=10');
 	const path = accountHistoryPath({
 		createdAfter: Date.parse('2026-01-01T00:00:00Z'),
 		createdBefore: Date.parse('2026-02-01T00:00:00Z'),
@@ -569,10 +569,10 @@ void test('history queries use the server filter names and parse a minimized pag
 	});
 	assert.equal(
 		path,
-		'/api/v1/users/me/audits?limit=50&created_after=2026-01-01T00%3A00%3A00.000Z&created_before=2026-02-01T00%3A00%3A00.000Z&event=sign_in.failed&event=sign_out&status=fail&relation=subject&cursor=opaque%2F%2B%3D'
+		'/api/v1/users/me/audits?limit=10&created_after=2026-01-01T00%3A00%3A00.000Z&created_before=2026-02-01T00%3A00%3A00.000Z&event=sign_in.failed&event=sign_out&status=fail&relation=subject&cursor=opaque%2F%2B%3D'
 	);
 	assert.equal(desktopHttpMethod(path), 'GET');
-	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=50&actor=1'));
+	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=10&actor=1'));
 	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=200' as never));
 	for (const intent of [
 		{ kind: 'readHistory', events: ['made.up'] },

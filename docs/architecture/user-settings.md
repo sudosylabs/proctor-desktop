@@ -110,12 +110,13 @@ Appearance, Exam editor, Accessibility and Browser — are built from
 setting searches every tab. Object settings such as color and token
 customizations stay in the manifest and remain effective but have no control.
 
-Each control writes one key through one in-memory `SettingsDraft`. The page
-saves about 400 ms later, sending the complete bounded source with the
+Each control writes one key through one in-memory `SettingsDraft` and previews
+the draft at once, so every window applies the change before it is saved. The
+page saves about 400 ms later, sending the complete bounded source with the
 acknowledged revision and an idempotency key, one save at a time. A revision
 conflict adopts the newer settings and applies the page's unacknowledged changes
 again on top. An ambiguous outcome is retried once. A failure shows Not saved
-and a toast with Try again; the change stays on the page. A changed row offers
+and a toast with Try again; the change stays applied on this computer. A changed row offers
 Reset, which removes the key so the default applies. Server-unavailable state is
 read-only; there is no offline mutation queue. Cache only acknowledged source in
 protected Principal-bound storage.

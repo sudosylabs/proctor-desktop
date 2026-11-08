@@ -18,7 +18,7 @@ export type DesktopHttpPath =
 	| '/api/v1/users/me/sessions'
 	| '/api/v1/users/me/sessions/revoke'
 	| '/api/v1/users/me/sessions/revoke-others'
-	| `/api/v1/users/me/audits?limit=50${string}`
+	| `/api/v1/users/me/audits?limit=10${string}`
 	| '/api/v1/users/me/tokens/grantable-scopes'
 	| '/api/v1/users/me/desktop-registrations'
 	| `/api/v1/users/me/desktop-registrations/${string}`
@@ -95,7 +95,7 @@ function desktopHttpRoute(
 		return 'POST';
 	if (path === '/api/v1/users/me/tokens') return body ? 'POST' : 'GET';
 	if (
-		/^\/api\/v1\/users\/me\/audits\?limit=50(?:&(?:created_after|created_before|event|status|relation|cursor)=(?:[A-Za-z0-9_.!~*'()-]|%[0-9A-F]{2}){1,2048}){0,70}$/u.test(
+		/^\/api\/v1\/users\/me\/audits\?limit=10(?:&(?:created_after|created_before|event|status|relation|cursor)=(?:[A-Za-z0-9_.!~*'()-]|%[0-9A-F]{2}){1,2048}){0,70}$/u.test(
 			path
 		)
 	)

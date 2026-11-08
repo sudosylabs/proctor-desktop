@@ -107,12 +107,13 @@
 		font-size: 12px;
 		font-weight: var(--prctr-typography-weight-medium);
 	}
-	/* The preview shows the editor's dark default palette whatever the window theme is. */
+	/* The preview is drawn in the chosen editor theme; these fall back to GitHub Dark Default. */
 	.prctr-account .prctr-settings-page__code {
-		background: #0d1117;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		background: var(--prctr-preview-background, #0d1117);
+		border: var(--prctr-shape-stroke-default) solid
+			var(--prctr-preview-border, var(--prctr-color-border-default));
 		border-radius: 10px;
-		color: #e6edf3;
+		color: var(--prctr-preview-foreground, #e6edf3);
 		font-family: var(--prctr-typography-font-monospace);
 		overflow: hidden;
 		padding: 12px 0;
@@ -120,27 +121,31 @@
 	}
 	.prctr-account .prctr-settings-page__line {
 		display: flex;
-		padding-inline-end: 14px;
+		padding-inline-end: 16px;
 	}
 	.prctr-account .prctr-settings-page__number {
-		color: #6e7681;
-		flex: none;
-		inline-size: 44px;
-		padding-inline-end: 14px;
 		box-sizing: border-box;
+		color: var(--prctr-preview-line-number, #6e7681);
+		flex: none;
+		font-variant-numeric: tabular-nums;
+		inline-size: 44px;
+		padding-inline-end: 16px;
 		text-align: end;
+	}
+	.prctr-account .prctr-settings-page__number[data-current='true'] {
+		color: var(--prctr-preview-line-number-active, var(--prctr-preview-foreground, #e6edf3));
 	}
 	.prctr-account .prctr-settings-page__line > :first-child:not(.prctr-settings-page__number) {
 		padding-inline-start: 16px;
 	}
 	.prctr-account .prctr-settings-page__code [data-token='keyword'] {
-		color: #ff7b72;
+		color: var(--prctr-preview-keyword, #ff7b72);
 	}
 	.prctr-account .prctr-settings-page__code [data-token='function'] {
-		color: #d2a8ff;
+		color: var(--prctr-preview-function, #d2a8ff);
 	}
 	.prctr-account .prctr-settings-page__code [data-token='number'] {
-		color: #79c0ff;
+		color: var(--prctr-preview-number, #79c0ff);
 	}
 
 	.prctr-account .prctr-settings-page__groups {

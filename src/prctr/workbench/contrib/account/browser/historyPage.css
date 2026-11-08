@@ -2,7 +2,7 @@
 	.prctr-account .prctr-account-history {
 		display: flex;
 		flex-direction: column;
-		gap: 14px;
+		gap: 16px;
 	}
 	.prctr-account .prctr-account-history__filters {
 		align-items: center;
@@ -23,7 +23,7 @@
 		font-size: 13px;
 		gap: 6px;
 		max-inline-size: 100%;
-		padding: 0 10px;
+		padding: 0 12px 0 10px;
 		position: relative;
 		white-space: nowrap;
 	}
@@ -56,92 +56,85 @@
 		opacity: 0;
 		position: absolute;
 	}
-	.prctr-account .prctr-account-history__shown {
-		color: var(--prctr-color-text-tertiary);
-		font-size: 13px;
-		margin-inline-start: auto;
-	}
 	.prctr-account .prctr-account-history__table {
 		border-collapse: collapse;
 		font-size: 13.5px;
 		inline-size: 100%;
+		line-height: 20px;
 		table-layout: fixed;
 	}
 	.prctr-account .prctr-account-history__table[hidden] {
 		display: none;
 	}
+	.prctr-account .prctr-account-history__table:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: -2px;
+	}
+	/* Small, quiet column labels; the data carries the weight. */
 	.prctr-account .prctr-account-history__heading {
-		background: var(--prctr-color-background-raised);
 		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
 		color: var(--prctr-color-text-tertiary);
 		font-size: 12px;
 		font-weight: var(--prctr-typography-weight-medium);
-		padding: 10px 14px;
+		line-height: 16px;
+		padding: 12px 16px 8px;
 		text-align: start;
 	}
-	.prctr-account .prctr-account-history__heading:nth-child(1) {
+	.prctr-account .prctr-account-history__heading[data-column='event'] {
+		inline-size: 34%;
+	}
+	.prctr-account .prctr-account-history__heading[data-column='by'] {
+		inline-size: 14%;
+	}
+	.prctr-account .prctr-account-history__heading[data-column='where'] {
 		inline-size: 22%;
 	}
-	.prctr-account .prctr-account-history__heading:nth-child(2) {
-		inline-size: 38%;
-	}
-	.prctr-account .prctr-account-history__heading:nth-child(3) {
-		inline-size: 16%;
+	.prctr-account .prctr-account-history__heading[data-column='when'] {
+		text-align: end;
 	}
 	.prctr-account .prctr-account-history__row > td {
-		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border-block-start: var(--prctr-shape-stroke-default) solid
+			var(--prctr-color-border-default);
 		overflow-wrap: anywhere;
-		padding: 11px 14px;
+		padding: 12px 16px;
 		vertical-align: middle;
 	}
 	.prctr-account .prctr-account-history__when {
 		color: var(--prctr-color-text-secondary);
-		font-family: var(--prctr-typography-font-monospace);
-		font-size: 12.5px;
+		font-variant-numeric: tabular-nums;
+		text-align: end;
+		white-space: nowrap;
 	}
 	.prctr-account .prctr-account-history__muted {
 		color: var(--prctr-color-text-secondary);
 	}
-	.prctr-account .prctr-account-history__cell {
-		align-items: center;
-		display: flex;
-		gap: 10px;
-		min-inline-size: 0;
-	}
 	.prctr-account .prctr-account-history__what {
 		display: flex;
 		flex-direction: column;
-		gap: 1px;
+		gap: 2px;
 		min-inline-size: 0;
 	}
 	.prctr-account .prctr-account-history__event {
+		color: var(--prctr-color-text-primary);
 		font-weight: var(--prctr-typography-weight-medium);
 	}
 	.prctr-account .prctr-account-history__note {
 		color: var(--prctr-color-text-tertiary);
-		font-size: 12.5px;
+		font-size: 13px;
 	}
-	.prctr-account .prctr-account-history__footer:has(> [hidden]:only-child) {
-		display: none;
+	.prctr-account .prctr-account-history__address {
+		color: var(--prctr-color-text-tertiary);
+		font-size: 12.5px;
+		font-variant-numeric: tabular-nums;
 	}
 }
 
 @layer contributions {
-	.prctr-account .prctr-account-history__row:last-child > td {
-		border-block-end: 0;
+	.prctr-account .prctr-account-history__row:first-child > td {
+		border-block-start: 0;
 	}
-	.prctr-account .prctr-account-history__cell > .prctr-icon {
-		color: var(--prctr-color-text-tertiary);
-	}
-	.prctr-account
-		.prctr-account-history__row[data-failed='true']
-		.prctr-account-history__cell
-		> .prctr-icon {
+	.prctr-account .prctr-account-history__row[data-failed='true'] .prctr-account-history__note {
 		color: var(--prctr-color-feedback-error);
-	}
-	.prctr-account .prctr-account-history__footer {
-		display: flex;
-		justify-content: center;
 	}
 	@media (forced-colors: active) {
 		.prctr-account .prctr-account-history__picker {

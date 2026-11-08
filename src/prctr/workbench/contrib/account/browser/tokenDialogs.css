@@ -110,6 +110,9 @@
 		overflow-wrap: anywhere;
 		user-select: all;
 	}
+	.prctr-account-dialog .prctr-account-token-credential [data-copied] .prctr-icon {
+		color: var(--prctr-color-feedback-success);
+	}
 	.prctr-account-dialog .prctr-account-token-credential__value:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: 2px;

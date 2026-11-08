@@ -6,7 +6,8 @@ import { createElementFactory } from '../../../../base/browser/documentElements.
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { TextFieldControl } from '../../../../base/browser/ui/field/textField.js';
-import { Disposable } from '../../../../base/common/lifecycle.js';
+import { status } from '../../../../base/browser/ui/aria/aria.js';
+import { Disposable, MutableDisposable, toDisposable } from '../../../../base/common/lifecycle.js';
 import type {
 	AccountGrantableScope,
 	AccountGrantableScopes,
@@ -39,6 +40,9 @@ const NO_LIMIT = '';
  * the server says this person may grant; the server checks them again on
  * creation. The one-time credential goes straight to the copy dialog.
  */
+/** How long a Copy button says Copied before it reads Copy again. */
+const COPIED_MS = 2000;
+
 export class NewTokenDialog extends Disposable {
 	private readonly dialog: AccountDialog;
 	private readonly name: TextFieldControl;
@@ -364,6 +368,8 @@ export class TokenCreatedDialog extends Disposable {
 	private readonly value: HTMLElement;
 	private readonly feedback: AccountFeedback;
 	private readonly copy: ButtonControl | undefined;
+	/** Restores the Copy label after it has said Copied. */
+	private readonly copiedReset = this._register(new MutableDisposable());
 	private readonly done: ButtonControl;
 	private credential: string | undefined;
 
@@ -437,11 +443,36 @@ export class TokenCreatedDialog extends Disposable {
 		if (credential === undefined) return;
 		try {
 			await write(credential);
-			if (!this._store.isDisposed) this.feedback.set(this.services.text('copied'), 'success');
+			if (!this._store.isDisposed) this.showCopied();
 		} catch {
 			if (!this._store.isDisposed)
 				this.feedback.set(this.services.text('copyFailed'), 'error');
 		}
+	}
+
+	/** The button itself confirms the copy for a moment, keeping its width; nothing appears below. */
+	private showCopied(): void {
+		const button = this.copy;
+		if (button === undefined) return;
+		const element = button.element;
+		element.style.minInlineSize = `${element.getBoundingClientRect().width}px`;
+		button.setState({
+			label: this.services.text('copiedButton'),
+			icon: proctorIconFactory('action.confirm', 14)
+		});
+		element.dataset.copied = 'true';
+		this.feedback.set();
+		status(this.services.text('copied'));
+		const timer = setTimeout(() => this.copiedReset.clear(), COPIED_MS);
+		this.copiedReset.value = toDisposable(() => {
+			clearTimeout(timer);
+			if (this._store.isDisposed) return;
+			delete element.dataset.copied;
+			button.setState({
+				label: this.services.text('copy'),
+				icon: proctorIconFactory('action.copy', 14)
+			});
+		});
 	}
 
 	override dispose(): void {

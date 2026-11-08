@@ -236,9 +236,20 @@ export class SettingsPage extends Disposable implements AccountPageView {
 			return;
 		}
 		if (this._store.isDisposed) return;
+		this.previewDraft();
 		this.setStatus('saving');
 		this.render();
 		this.scheduleSave();
+	}
+
+	/**
+	 * Applies the changed settings to every window at once; saving to the account follows.
+	 * A failed save leaves the change applied on this computer, as the page says.
+	 */
+	private previewDraft(): void {
+		const draft = this.draft;
+		if (draft === undefined) return;
+		void this.client.preview({ source: draft.source }).catch(() => undefined);
 	}
 
 	private scheduleSave(): void {
@@ -305,6 +316,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 				this.pending.delete(id);
 			}
 		}
+		this.previewDraft();
 		this.render();
 	}
 
@@ -531,7 +543,8 @@ export class SettingsPage extends Disposable implements AccountPageView {
 		const $ = createElementFactory(this.preview.ownerDocument);
 		const size = Number(this.settingValue('editor.fontSize'));
 		const height = Number(this.settingValue('editor.lineHeight'));
-		const numbers = this.settingValue('editor.lineNumbers') !== 'off';
+		const lineNumbers = this.settingValue('editor.lineNumbers');
+		const numbers = lineNumbers !== 'off';
 		const tab = Number(this.settingValue('editor.tabSize'));
 		const theme = editorThemeName(this.settingValue('workbench.colorTheme'));
 		const indent = ' '.repeat(tab);
@@ -571,12 +584,28 @@ export class SettingsPage extends Disposable implements AccountPageView {
 		});
 		code.style.fontSize = `${size}px`;
 		code.style.lineHeight = `${height}px`;
+		// The preview is drawn in the chosen editor theme, whatever the window theme is.
+		const palette = editorPalette(theme);
+		setColor(code, '--prctr-preview-background', palette.background);
+		setColor(code, '--prctr-preview-foreground', palette.foreground);
+		setColor(code, '--prctr-preview-border', palette.border);
+		setColor(code, '--prctr-preview-line-number', palette.lineNumber);
+		setColor(code, '--prctr-preview-line-number-active', palette.activeLineNumber);
+		setColor(code, '--prctr-preview-keyword', palette.keyword);
+		setColor(code, '--prctr-preview-function', palette.function);
+		setColor(code, '--prctr-preview-number', palette.number);
 		lines.forEach((tokens, index) => {
 			const line = $('div.prctr-settings-page__line');
 			if (numbers)
 				line.append(
 					$('span.prctr-settings-page__number', {
-						textContent: String(index + 1),
+						// Relative numbers count from the line holding the cursor, which keeps its own.
+						textContent: String(
+							lineNumbers === 'relative' && index !== PREVIEW_CURSOR_LINE
+								? Math.abs(index - PREVIEW_CURSOR_LINE)
+								: index + 1
+						),
+						data: { current: String(index === PREVIEW_CURSOR_LINE) },
 						attrs: { 'aria-hidden': 'true' }
 					})
 				);
@@ -606,32 +635,61 @@ function editorThemeName(value: unknown): string {
 }
 
 /** A chip of the theme's editor background, edged with its function colour. */
+/** The preview line that holds the cursor, from 0; relative line numbers count from it. */
+const PREVIEW_CURSOR_LINE = 2;
+
+/** The colours of an editor theme that the preview and the theme chip need. */
+interface EditorPalette {
+	readonly background?: string;
+	readonly foreground?: string;
+	readonly border?: string;
+	readonly lineNumber?: string;
+	readonly activeLineNumber?: string;
+	readonly keyword?: string;
+	readonly function?: string;
+	readonly number?: string;
+}
+
+/** Reads a bundled editor theme's colours; an unknown theme gives none, and defaults apply. */
+function editorPalette(name: string): EditorPalette {
+	try {
+		const theme = getTheme(name);
+		const token = (wanted: string): string | undefined =>
+			theme.colorTheme.tokenColors.find((entry) =>
+				(Array.isArray(entry.scope) ? entry.scope : [entry.scope]).some(
+					(scope) => typeof scope === 'string' && scope.split(/[,\s]+/).includes(wanted)
+				)
+			)?.settings.foreground;
+		return {
+			background: theme.colors['editor.background'],
+			foreground: theme.colors['editor.foreground'],
+			border: theme.colors['editorGroup.border'] ?? theme.colors['panel.border'],
+			lineNumber: theme.colors['editorLineNumber.foreground'],
+			activeLineNumber: theme.colors['editorLineNumber.activeForeground'],
+			keyword: token('keyword'),
+			function: token('entity.name.function'),
+			number: token('constant.numeric') ?? token('constant')
+		};
+	} catch {
+		return {};
+	}
+}
+
+function setColor(element: HTMLElement, property: string, value: string | undefined): void {
+	if (value === undefined) element.style.removeProperty(property);
+	else element.style.setProperty(property, value);
+}
+
+/** A chip of the theme's editor background, edged with its function colour. */
 function themeSwatch(name: string): ControlIconFactory {
 	return (document) => {
 		const element = createElementFactory(document)('span.prctr-settings-page__swatch', {
 			attrs: { 'aria-hidden': 'true' }
 		});
-		try {
-			const theme = getTheme(name);
-			const rule = theme.colorTheme.tokenColors.find((entry) =>
-				(Array.isArray(entry.scope) ? entry.scope : [entry.scope]).some(
-					(scope) =>
-						typeof scope === 'string' &&
-						scope.split(/[,\s]+/).includes('entity.name.function')
-				)
-			);
-			const set = (property: string, value: string | undefined): void => {
-				if (value !== undefined) element.style.setProperty(property, value);
-			};
-			set('--prctr-swatch-background', theme.colors['editor.background']);
-			set(
-				'--prctr-swatch-border',
-				theme.colors['editorGroup.border'] ?? theme.colors['panel.border']
-			);
-			set('--prctr-swatch-accent', rule?.settings.foreground);
-		} catch {
-			// An unknown theme keeps the neutral swatch.
-		}
+		const palette = editorPalette(name);
+		setColor(element, '--prctr-swatch-background', palette.background);
+		setColor(element, '--prctr-swatch-border', palette.border);
+		setColor(element, '--prctr-swatch-accent', palette.function);
 		return { element, dispose: () => element.remove() };
 	};
 }

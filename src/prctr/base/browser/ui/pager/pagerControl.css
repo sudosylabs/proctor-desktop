@@ -1,0 +1,114 @@
+@layer controls {
+	.prctr-pager {
+		align-items: center;
+		border-block-start: var(--prctr-shape-stroke-default) solid
+			var(--prctr-color-border-default);
+		box-sizing: border-box;
+		container-type: inline-size;
+		display: flex;
+		font: 13px/18px var(--prctr-typography-font-application);
+		gap: 4px;
+		padding: 8px 8px 8px 16px;
+	}
+
+	.prctr-pager .prctr-pager__range {
+		color: var(--prctr-color-text-secondary);
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+
+	.prctr-pager .prctr-pager__space {
+		flex: 1;
+	}
+
+	.prctr-pager .prctr-pager__pages {
+		align-items: center;
+		display: inline-flex;
+		gap: 4px;
+	}
+
+	.prctr-pager .prctr-pager__step,
+	.prctr-pager .prctr-pager__page {
+		align-items: center;
+		background: transparent;
+		block-size: 32px;
+		border: 0;
+		border-radius: 8px;
+		box-sizing: border-box;
+		cursor: pointer;
+		display: inline-flex;
+		font: inherit;
+		justify-content: center;
+	}
+
+	.prctr-pager .prctr-pager__step {
+		color: var(--prctr-color-text-primary);
+		font-weight: var(--prctr-typography-weight-medium);
+		gap: 4px;
+		padding: 0 8px;
+	}
+
+	.prctr-pager .prctr-pager__page {
+		color: var(--prctr-color-text-secondary);
+		font-variant-numeric: tabular-nums;
+		min-inline-size: 32px;
+		padding: 0 8px;
+	}
+
+	/* The current page is the accent colour in semibold, with no fill. */
+	.prctr-pager .prctr-pager__page[aria-current='page'] {
+		color: var(--prctr-color-text-link);
+		font-weight: var(--prctr-typography-weight-semibold);
+	}
+
+	.prctr-pager .prctr-pager__step:hover:not(:disabled),
+	.prctr-pager .prctr-pager__page:hover:not(:disabled, [aria-current='page']) {
+		background: var(--prctr-color-interaction-hover);
+		color: var(--prctr-color-text-primary);
+	}
+
+	.prctr-pager .prctr-pager__step:disabled,
+	.prctr-pager .prctr-pager__page:disabled {
+		cursor: default;
+		opacity: 0.4;
+	}
+
+	.prctr-pager .prctr-pager__page[aria-current='page']:disabled {
+		opacity: 1;
+	}
+
+	.prctr-pager .prctr-pager__step:focus-visible,
+	.prctr-pager .prctr-pager__page:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: -2px;
+	}
+
+	.prctr-pager .prctr-pager__gap {
+		color: var(--prctr-color-text-tertiary);
+		min-inline-size: 24px;
+		text-align: center;
+	}
+
+	.prctr-pager .prctr-pager__compact {
+		display: none;
+		padding: 0 8px;
+		white-space: nowrap;
+	}
+
+	/* Narrow: numbers give way to "Page 12 of 25"; Previous and Next stay. */
+	@container (max-width: 560px) {
+		.prctr-pager .prctr-pager__pages {
+			display: none;
+		}
+
+		.prctr-pager .prctr-pager__compact {
+			display: inline;
+		}
+	}
+
+	@media (forced-colors: active) {
+		.prctr-pager .prctr-pager__page[aria-current='page'] {
+			border: 1px solid ButtonText;
+		}
+	}
+}

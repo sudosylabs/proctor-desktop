@@ -237,7 +237,7 @@ export function readAccountHistory(raw: unknown): AccountData {
 /** The history path for one query: the server's own filter names, encoded. */
 export function accountHistoryPath(
 	query: AccountHistoryQuery
-): `/api/v1/users/me/audits?limit=50${string}` {
+): `/api/v1/users/me/audits?limit=10${string}` {
 	const search = new URLSearchParams();
 	if (query.createdAfter !== undefined)
 		search.append('created_after', new Date(query.createdAfter).toISOString());
@@ -248,7 +248,7 @@ export function accountHistoryPath(
 	if (query.relation !== undefined) search.append('relation', query.relation);
 	if (query.cursor !== undefined) search.append('cursor', query.cursor);
 	const rest = search.toString();
-	return `/api/v1/users/me/audits?limit=50${rest ? `&${rest}` : ''}`;
+	return `/api/v1/users/me/audits?limit=10${rest ? `&${rest}` : ''}`;
 }
 export function readRevokedSessionCount(raw: unknown): AccountResponse {
 	const r = record(raw);

@@ -7,6 +7,7 @@ import type { MenuControl } from '../../../../base/browser/ui/menu/menuControl.j
 import type { ToastHost } from '../../../../base/browser/ui/toast/toastHost.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { IDisposable } from '../../../../base/common/lifecycle.js';
+import type { PagerLabels } from '../../../../base/browser/ui/pager/pagerControl.js';
 import type {
 	LocalizationContext,
 	LocalizationValue
@@ -34,6 +35,8 @@ export interface AccountWindowHooks {
 	signOut(): void;
 	/** Copies text through the window's privileged clipboard path, when one exists. */
 	readonly writeClipboard?: (text: string) => Promise<void>;
+	/** Shows a tooltip for an element on hover and keyboard focus. */
+	readonly hover?: (target: HTMLElement, label: string) => IDisposable;
 }
 
 /**
@@ -149,6 +152,24 @@ export class AccountPageServices {
 		} catch {
 			return locale;
 		}
+	}
+
+	/** The text of a pager under the list called {@link list}. */
+	pagerLabels(list: string): PagerLabels {
+		return {
+			name: this.text('pagerName', { list }),
+			previous: this.text('pagerPrevious'),
+			next: this.text('pagerNext'),
+			page: (page) => this.text('pagerPage', { page }),
+			range: (first, last, total) =>
+				total === undefined
+					? this.text('pagerRangeOpen', { first, last })
+					: this.text('pagerRange', { first, last, total }),
+			compact: (page, count) =>
+				count === undefined
+					? this.text('pagerCompactOpen', { page })
+					: this.text('pagerCompact', { page, count })
+		};
 	}
 
 	announce(text: string): void {

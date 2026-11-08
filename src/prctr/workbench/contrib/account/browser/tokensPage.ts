@@ -106,7 +106,8 @@ export class TokensPage extends Disposable implements AccountPageView {
 		const retry = (): void => void this.tokens.refresh();
 		// With no tokens at all the page is one section that says so and offers the first token.
 		const none = data !== undefined && groups.active.length + groups.inactive.length === 0;
-		this.create.element.hidden = none;
+		// When the empty Active section offers the first or next token, the header does not repeat it.
+		this.create.element.hidden = none || (data !== undefined && groups.active.length === 0);
 		if (none) this.active.setHeading(this.services.text('yourTokens'));
 		else
 			this.active.setHeading(
@@ -126,17 +127,22 @@ export class TokensPage extends Disposable implements AccountPageView {
 						}
 					}
 				: data !== undefined && groups.active.length === 0
-					? this.services.text('noActiveTokens')
+					? {
+							title: this.services.text('noActiveTokens'),
+							text: this.services.text('noActiveTokensBody'),
+							action: {
+								label: this.services.text('newToken'),
+								icon: 'action.add',
+								run: () => this.openNewToken()
+							}
+						}
 					: false,
 			retry
 		);
 		// One read serves both sections, so its loading or failure is shown once, in the first.
-		this.inactive.hidden = data === undefined || none;
-		this.inactive.setState(
-			data === undefined ? { kind: 'ready' } : state,
-			groups.inactive.length === 0 ? this.services.text('noInactiveTokens') : false,
-			retry
-		);
+		// A section with nothing in it is left out rather than saying so.
+		this.inactive.hidden = data === undefined || groups.inactive.length === 0;
+		this.inactive.setState(data === undefined ? { kind: 'ready' } : state, false, retry);
 		this.active.setRows(groups.active.map((token) => this.row(token)));
 		this.inactive.setRows(groups.inactive.map((token) => this.row(token)));
 	}
@@ -186,6 +192,7 @@ export class TokensPage extends Disposable implements AccountPageView {
 						? 'object.key'
 						: 'status.time',
 			title: token.description,
+			chips: token.scopes.map((scope) => scopeTitle(scope, this.grantable.data?.grantable)),
 			detail: this.detail(token, state),
 			...(status === undefined ? {} : { status }),
 			actions
@@ -200,8 +207,6 @@ export class TokensPage extends Disposable implements AccountPageView {
 	}
 
 	private detail(token: AccountToken, state: TokenState): string {
-		const grantable = this.grantable.data?.grantable;
-		const scopes = token.scopes.map((scope) => scopeTitle(scope, grantable)).join(', ');
 		const date = (time: number): string => this.services.date(time);
 		let lifetime: string;
 		if (state === 'revoked')
@@ -217,14 +222,14 @@ export class TokensPage extends Disposable implements AccountPageView {
 				}),
 				this.services.text('tokenExpires', { date: date(token.expiresAt) })
 			);
-		else lifetime = this.services.text('tokenExpires', { date: date(token.expiresAt) });
+		else lifetime = this.services.text('tokenExpiresFirst', { date: date(token.expiresAt) });
 		const used =
 			token.lastUsedAt === undefined
 				? this.services.text('tokenNeverUsed')
 				: this.services.text('tokenUsed', {
 						when: this.services.relative(token.lastUsedAt)
 					});
-		return this.services.join(this.services.join(scopes, lifetime), used);
+		return this.services.join(lifetime, used);
 	}
 
 	private runAction(action: TokenAction, token: AccountToken, section: AccountSection): void {

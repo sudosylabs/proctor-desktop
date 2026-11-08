@@ -21,8 +21,10 @@ import type { WorkbenchItem } from '../../../common/workbenchItem.js';
 import { WORKBENCH_ITEM_RESOLVERS, WORKBENCH_PANE_HOST } from '../../../workbench.common.main.js';
 import {
 	accountPages,
+	AUTHENTICATED_HOVER_SERVICE,
 	AUTHENTICATED_NAVIGATION_SERVICE,
 	type AccountPage,
+	type AuthenticatedHover,
 	type AuthenticatedNavigationService
 } from '../../authenticated/browser/authenticatedNavigation.js';
 import { accountMessages as messages, type AccountMessage } from './accountMessages.js';
@@ -71,6 +73,7 @@ export function createAccountContribution(
 			const host = context.getService<WorkbenchPaneHost>(WORKBENCH_PANE_HOST);
 			const registry =
 				context.getService<WorkbenchItemResolverRegistry>(WORKBENCH_ITEM_RESOLVERS);
+			const hover = context.getService<AuthenticatedHover>(AUTHENTICATED_HOVER_SERVICE);
 			const customPhotos = new Set<string>();
 			const items = new Map<AccountPage, WorkbenchItem>(
 				accountPages.map((page) => [page, accountItem(page, context)])
@@ -98,6 +101,7 @@ export function createAccountContribution(
 							hooks: {
 								setProfilePhoto: (dataUrl) => navigation.setProfilePhoto(dataUrl),
 								signOut: () => navigation.signOut(),
+								hover,
 								...(options.writeClipboard === undefined
 									? {}
 									: { writeClipboard: options.writeClipboard })

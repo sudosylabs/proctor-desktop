@@ -5,7 +5,8 @@
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
-import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
+import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
+import { Disposable } from '../../../../base/common/lifecycle.js';
 import type {
 	AccountFailure,
 	AccountHistoryEntry
@@ -44,8 +45,11 @@ type HistoryState =
 	| { readonly kind: 'ready' }
 	| { readonly kind: 'failed'; readonly reason: AccountFailure };
 
+/** Events on one page; the server is asked for exactly this many. */
+const HISTORY_PAGE_SIZE = 10;
+
 /**
- * Account history: what was done with the person's account, newest first, as
+ * Audits: what was done with the person's account, newest first, as
  * the server's own account history reports it. Filters choose the period, the
  * kind of event, whether it was about the account or done elsewhere, and the
  * outcome. Another person is never named; where an event came from is shown
@@ -56,22 +60,23 @@ export class HistoryPage extends Disposable implements AccountPageView {
 	private readonly group: HTMLSelectElement;
 	private readonly relation: HTMLSelectElement;
 	private readonly outcome: HTMLSelectElement;
-	private readonly shown: HTMLElement;
 	private readonly table: HTMLTableElement;
 	private readonly rows: HTMLTableSectionElement;
 	private readonly state: HTMLElement;
 	private readonly stateText: HTMLElement;
 	private readonly stateIcon;
 	private readonly skeleton: HTMLElement;
-	private readonly rowIcons = this._register(new DisposableStore());
 	private readonly retry: ButtonControl;
-	private readonly more: ButtonControl;
+	private readonly pager: PagerControl;
 
 	private filters: HistoryFilters = defaultHistoryFilters;
-	private entries: AccountHistoryEntry[] = [];
-	private cursor: string | undefined;
+	private entries: readonly AccountHistoryEntry[] = [];
+	/** The cursor that starts each page reached so far; the first page needs none. */
+	private pageCursors: (string | undefined)[] = [undefined];
+	private page = 1;
+	private hasNext = false;
 	private status: HistoryState = { kind: 'loading' };
-	private loadingMore = false;
+	private loadingPage = false;
 	private sequence = 0;
 	private loaded = false;
 
@@ -123,7 +128,6 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			['fail', 'historyOutcomeFail']
 		] as const)
 			this.outcome.append($('option', { value, textContent: services.text(label) }));
-		this.shown = $('span.prctr-account-history__shown', { attrs: { 'aria-live': 'polite' } });
 		// Each filter is drawn as a button showing its name and current choice; the native
 		// select lies over it, so the system list, keyboard and screen readers still apply.
 		const picker = (
@@ -157,29 +161,29 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			picker(this.period, 'object.calendar', 'historyPeriodLabel'),
 			picker(this.group, 'action.filter', 'historyGroupLabel'),
 			picker(this.relation, 'account.profile', 'historyRelationLabel'),
-			picker(this.outcome, 'status.success', 'historyOutcomeLabel'),
-			this.shown
+			picker(this.outcome, 'status.success', 'historyOutcomeLabel')
 		);
 
-		const heading = (label: AccountMessage): HTMLTableCellElement =>
+		const heading = (label: AccountMessage, column: string): HTMLTableCellElement =>
 			$('th.prctr-account-history__heading', {
 				textContent: services.text(label),
+				data: { column },
 				attrs: { scope: 'col' }
 			});
 		this.rows = $('tbody');
 		this.table = $(
 			'table.prctr-account-history__table',
-			{ attrs: { 'aria-label': services.text('historyTitle') } },
+			{ tabIndex: -1, attrs: { 'aria-label': services.text('historyTitle') } },
 			$(
 				'thead',
 				{},
 				$(
 					'tr',
 					{},
-					heading('historyWhen'),
-					heading('historyWhat'),
-					heading('historyBy'),
-					heading('historyWhere')
+					heading('historyWhat', 'event'),
+					heading('historyBy', 'by'),
+					heading('historyWhere', 'where'),
+					heading('historyWhen', 'when')
 				)
 			),
 			this.rows
@@ -220,40 +224,33 @@ export class HistoryPage extends Disposable implements AccountPageView {
 					)
 				)
 			);
-		const footer = $('div.prctr-account-history__footer');
-		this.more = this._register(
-			new ButtonControl(footer, {
-				variant: 'ghost',
-				label: services.text('historyMore'),
-				icon: proctorIconFactory('account.history')
+		const card = $(
+			'div.prctr-account-section__card.prctr-account-history__card',
+			{},
+			this.table,
+			this.skeleton,
+			this.state
+		);
+		// The server reports no total, so the pager numbers only the pages reached so far.
+		this.pager = this._register(
+			new PagerControl(card, {
+				labels: services.pagerLabels(services.text('historyTitle')),
+				previousIcon: proctorIconFactory('action.back', 14),
+				nextIcon: proctorIconFactory('action.forward', 14)
 			})
 		);
-		body.append(
-			$(
-				'div.prctr-account-history',
-				{},
-				filters,
-				$(
-					'div.prctr-account-section__card.prctr-account-history__card',
-					{},
-					this.table,
-					this.skeleton,
-					this.state
-				),
-				footer
-			)
-		);
+		body.append($('div.prctr-account-history', {}, filters, card));
 
 		for (const control of [this.period, this.group, this.relation, this.outcome])
 			this._register(addDisposableListener(control, 'change', () => this.onFilterChange()));
-		this._register(this.retry.onDidRequest(() => void this.load(false)));
-		this._register(this.more.onDidRequest(() => void this.load(true)));
+		this._register(this.retry.onDidRequest(() => void this.load(this.page)));
+		this._register(this.pager.onDidRequestPage((page) => void this.load(page)));
 		this.render();
 	}
 
 	setVisible(visible: boolean): void {
 		// History is read when first shown and when its filters change; it does not follow changes.
-		if (visible && !this.loaded) void this.load(false);
+		if (visible && !this.loaded) void this.load(1);
 	}
 
 	private onFilterChange(): void {
@@ -266,65 +263,84 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			relation: this.relation.value as HistoryFilters['relation'],
 			outcome: this.outcome.value as HistoryFilters['outcome']
 		};
-		void this.load(false);
+		// Filters start again from the first page.
+		this.pageCursors = [undefined];
+		void this.load(1);
 	}
 
-	/** Reads the first page for the current filters, or the next page of the same query. */
-	private async load(next: boolean): Promise<void> {
-		if (next && (this.cursor === undefined || this.loadingMore)) return;
+	/** Reads one page of the current filters. The first read shows skeletons; a page change keeps the rows until the next arrive. */
+	private async load(page: number): Promise<void> {
+		const cursorIndex = page - 1;
+		if (cursorIndex >= this.pageCursors.length) return;
 		const sequence = ++this.sequence;
 		const query = historyQuery(this.filters, this.services.now());
-		if (next) this.loadingMore = true;
-		else {
-			this.loaded = true;
+		const first = page === 1 && this.pageCursors.length === 1;
+		this.loaded = true;
+		if (first || this.status.kind !== 'ready') {
 			this.entries = [];
-			this.cursor = undefined;
 			this.status = { kind: 'loading' };
-		}
+		} else this.loadingPage = true;
 		this.render();
+		const cursor = this.pageCursors[cursorIndex];
 		const response = await this.services.request({
 			kind: 'readHistory',
 			...query,
-			...(next && this.cursor !== undefined ? { cursor: this.cursor } : {})
+			...(cursor === undefined ? {} : { cursor })
 		});
 		if (this._store.isDisposed || sequence !== this.sequence) return;
-		this.loadingMore = false;
+		const changedPage = this.loadingPage;
+		this.loadingPage = false;
 		if (response.kind === 'data' && response.data.section === 'history') {
-			const known = new Set(this.entries.map((entry) => entry.id));
-			this.entries.push(...response.data.entries.filter((entry) => !known.has(entry.id)));
-			this.cursor = response.data.cursor;
+			this.entries = response.data.entries;
+			this.page = page;
+			this.hasNext = response.data.cursor !== undefined;
+			if (response.data.cursor !== undefined && this.pageCursors.length === page)
+				this.pageCursors.push(response.data.cursor);
 			this.status = { kind: 'ready' };
-		} else if (next) {
-			this.services.announce(
-				this.services.failure(response.kind === 'error' ? response.reason : 'invalid')
-			);
-		} else {
-			this.status = {
-				kind: 'failed',
-				reason: response.kind === 'error' ? response.reason : 'invalid'
-			};
+			this.render();
+			if (changedPage) this.announcePage();
+			return;
 		}
+		const reason = response.kind === 'error' ? response.reason : 'invalid';
+		if (changedPage) this.services.announce(this.services.failure(reason));
+		else this.status = { kind: 'failed', reason };
 		this.render();
+	}
+
+	/** After a page change, focus returns to the table and the new place is said once. */
+	private announcePage(): void {
+		this.table.focus();
+		const first = (this.page - 1) * HISTORY_PAGE_SIZE + 1;
+		this.services.announce(
+			this.services.text('pageShownOpen', {
+				page: this.page,
+				first,
+				last: first + this.entries.length - 1
+			})
+		);
 	}
 
 	private render(): void {
 		const status = this.status;
 		const $ = createElementFactory(this.rows.ownerDocument);
-		this.table.setAttribute('aria-busy', String(status.kind === 'loading' || this.loadingMore));
-		this.rowIcons.clear();
+		this.table.setAttribute('aria-busy', String(status.kind === 'loading' || this.loadingPage));
 		this.rows.replaceChildren(...this.entries.map((entry) => this.row($, entry)));
 		this.skeleton.hidden = status.kind !== 'loading';
 		this.table.hidden = this.entries.length === 0;
-		this.shown.textContent =
-			status.kind === 'ready' && this.entries.length > 0
-				? this.services.text('historyShown', { count: this.entries.length })
-				: '';
-		this.more.element.hidden = status.kind !== 'ready' || this.cursor === undefined;
-		this.more.setState({
-			label: this.services.text('historyMore'),
-			icon: proctorIconFactory('account.history'),
-			busy: this.loadingMore
-		});
+		const paged = status.kind === 'ready' && (this.page > 1 || this.hasNext);
+		this.pager.element.hidden = !paged;
+		if (paged) {
+			const first = (this.page - 1) * HISTORY_PAGE_SIZE + 1;
+			this.pager.setState({
+				page: this.page,
+				pageSize: HISTORY_PAGE_SIZE,
+				first,
+				last: first + this.entries.length - 1,
+				hasNext: this.hasNext,
+				knownPages: this.pageCursors.length,
+				busy: this.loadingPage
+			});
+		}
 		if (status.kind === 'loading') this.showState('loading', this.services.text('loading'));
 		else if (status.kind === 'failed')
 			this.showState(
@@ -367,58 +383,31 @@ export class HistoryPage extends Disposable implements AccountPageView {
 					textContent: notes.reduce((first, second) => this.services.join(first, second))
 				})
 			);
+		const client =
+			entry.client === undefined ? undefined : this.services.text(clientKind(entry.client));
+		const where = $(
+			'span.prctr-account-history__what',
+			{},
+			$('span', {
+				textContent: client ?? entry.ipAddress ?? this.services.text('historyWhereUnknown')
+			})
+		);
+		if (client !== undefined && entry.ipAddress !== undefined)
+			where.append(
+				$('span.prctr-account-history__address', { textContent: entry.ipAddress })
+			);
 		return $(
 			'tr.prctr-account-history__row',
 			{ data: { failed: String(entry.failed) } },
-			$('td.prctr-account-history__when', {
-				textContent: this.services.relativeStandalone(entry.createdAt),
-				title: this.services.dateTime(entry.createdAt)
-			}),
-			$(
-				'td',
-				{},
-				$(
-					'span.prctr-account-history__cell',
-					{},
-					this.rowIcons.add(
-						createProctorIcon(this.rows.ownerDocument, {
-							id: historyGlyph(entry),
-							size: 16
-						})
-					).element,
-					what
-				)
-			),
+			$('td', {}, what),
 			$('td.prctr-account-history__muted', {
 				textContent: this.services.text(historyActorMessage(entry))
 			}),
-			$('td.prctr-account-history__muted', { textContent: this.where(entry) })
+			$('td.prctr-account-history__muted', {}, where),
+			$('td.prctr-account-history__when', {
+				textContent: this.services.relativeStandalone(entry.createdAt),
+				title: this.services.dateTime(entry.createdAt)
+			})
 		);
 	}
-
-	private where(entry: AccountHistoryEntry): string {
-		const client =
-			entry.client === undefined ? undefined : this.services.text(clientKind(entry.client));
-		if (client !== undefined && entry.ipAddress !== undefined)
-			return this.services.join(client, entry.ipAddress);
-		return client ?? entry.ipAddress ?? this.services.text('historyWhereUnknown');
-	}
-}
-
-/** A small glyph for what kind of event it was; a failure always shows as one. */
-function historyGlyph(entry: AccountHistoryEntry): ProctorIconId {
-	if (entry.failed) return 'status.failed';
-	const event = entry.event;
-	if (event.startsWith('sign_in') || event === 'sign_out' || event.startsWith('session'))
-		return 'action.signOut';
-	if (event.startsWith('desktop')) return 'device.laptop';
-	if (event.startsWith('personal_access_token')) return 'object.key';
-	if (event.startsWith('profile_picture')) return 'action.changePhoto';
-	if (event.startsWith('profile')) return 'account.profile';
-	if (event.startsWith('password') || event.startsWith('mfa') || event.startsWith('provider'))
-		return 'account.security';
-	if (event.startsWith('email')) return 'action.sendEmail';
-	if (event.startsWith('role') || event.startsWith('class') || event.startsWith('academic_unit'))
-		return 'object.role';
-	return 'status.info';
 }

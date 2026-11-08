@@ -25,7 +25,9 @@ import { AuthenticatedFrame } from './authenticatedFrame.js';
 import { authenticatedMessages } from './authenticatedMessages.js';
 import {
 	AUTHENTICATED_LAYOUT_SERVICE,
-	AUTHENTICATED_NAVIGATION_SERVICE
+	AUTHENTICATED_NAVIGATION_SERVICE,
+	AUTHENTICATED_HOVER_SERVICE,
+	type AuthenticatedHover
 } from './authenticatedNavigation.js';
 import {
 	AUTHENTICATED_WINDOW_CONTROLS_SERVICE,
@@ -104,6 +106,8 @@ export function createAuthenticatedContribution(
 				)
 			);
 			context.setService(AUTHENTICATED_NAVIGATION_SERVICE, frame);
+			const frameHover: AuthenticatedHover = (target, label) => hover(target, label);
+			context.setService(AUTHENTICATED_HOVER_SERVICE, frameHover);
 			context.setService(AUTHENTICATED_LAYOUT_SERVICE, frame);
 			if (client.examActivity) activateExamActivity(context, client.examActivity);
 		}
