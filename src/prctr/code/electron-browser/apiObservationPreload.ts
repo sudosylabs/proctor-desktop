@@ -16,7 +16,15 @@ export function createApiObserver<I, R>(
 		const changed = (_event: IpcRendererEvent, raw: unknown) => {
 			if (disposed || !raw || typeof raw !== 'object') return;
 			const value = raw as Record<string, unknown>;
-			if (value.id === id) listener(validateResponse(value.response));
+			if (value.id !== id) return;
+			let response: R;
+			try {
+				response = validateResponse(value.response);
+			} catch {
+				// An answer this window cannot trust still ends the wait, as a failure.
+				response = failure;
+			}
+			listener(response);
 		};
 		ipcRenderer.on(`${channel}:change`, changed);
 		void ipcRenderer.invoke(channel, { kind: 'start', id, intent: request }).catch(() => {

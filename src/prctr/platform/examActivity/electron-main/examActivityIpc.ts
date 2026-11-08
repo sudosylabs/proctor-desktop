@@ -43,7 +43,8 @@ export class ExamActivityIpcBridge {
 				validateExamActivityIntent,
 				validateExamActivityResponse,
 				authorize,
-				(intent, listener) => service.observeExamActivity!(bound, intent, listener)
+				(intent, listener) => service.observeExamActivity!(bound, intent, listener),
+				{ kind: 'error', reason: 'unavailable' }
 			);
 		ipc.handle(EXAM_ACTIVITY_CHANNEL, async (event, ...args: unknown[]) => {
 			if (this.#disposed) throw new Error('Exam activity capability is closed');

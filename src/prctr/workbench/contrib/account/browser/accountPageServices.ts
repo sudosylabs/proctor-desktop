@@ -19,6 +19,7 @@ import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows
 import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
 import { failureMessage, relativeDay } from '../common/accountPresentation.js';
 import { accountMessages, type AccountMessage } from './accountMessages.js';
+import { ACCOUNT_READ_DEADLINE_MS } from './accountRead.js';
 
 /** One Account page in the content area. Its pane shows it and says when it is visible. */
 export interface AccountPageView extends IDisposable {
@@ -138,10 +139,25 @@ export class AccountPageServices {
 		status(text);
 	}
 
-	/** A transport failure becomes a failure reply; a change whose reply was lost is unconfirmed. */
+	/**
+	 * A transport failure becomes a failure reply; a change whose reply was lost is unconfirmed.
+	 * A read that has not answered by the deadline fails, so no page waits forever.
+	 */
 	async request(intent: AccountIntent): Promise<AccountResponse> {
 		try {
-			return await this.client.request(intent);
+			if (!isRead(intent)) return await this.client.request(intent);
+			let timer: ReturnType<typeof setTimeout> | undefined;
+			const deadline = new Promise<AccountResponse>((resolve) => {
+				timer = setTimeout(
+					() => resolve({ kind: 'error', reason: 'unavailable' }),
+					ACCOUNT_READ_DEADLINE_MS
+				);
+			});
+			try {
+				return await Promise.race([this.client.request(intent), deadline]);
+			} finally {
+				clearTimeout(timer);
+			}
 		} catch {
 			return {
 				kind: 'error',
@@ -163,5 +179,10 @@ export class AccountPageServices {
 }
 
 function isRead(intent: AccountIntent): boolean {
-	return intent.kind === 'read' || intent.kind === 'readPhoto' || intent.kind === 'openSecurity';
+	return (
+		intent.kind === 'read' ||
+		intent.kind === 'readHistory' ||
+		intent.kind === 'readPhoto' ||
+		intent.kind === 'openSecurity'
+	);
 }

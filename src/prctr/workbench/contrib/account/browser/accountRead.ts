@@ -15,8 +15,13 @@ import type { AccountPageServices } from './accountPageServices.js';
 
 export type AccountDataOf<S extends AccountReadSection> = Extract<AccountData, { section: S }>;
 
+/** The answer is slow enough to say so. */
+export const ACCOUNT_READ_SLOW_MS = 8_000;
+/** No answer by now is a failure the person can retry; a read never waits forever. */
+export const ACCOUNT_READ_DEADLINE_MS = 15_000;
+
 export type AccountReadState =
-	| { readonly kind: 'loading' }
+	| { readonly kind: 'loading'; readonly slow?: boolean }
 	| { readonly kind: 'ready' }
 	/** Nothing could be read. */
 	| { readonly kind: 'failed'; readonly reason: AccountFailure }
@@ -41,6 +46,7 @@ export class AccountRead<S extends AccountReadSection> extends Disposable {
 	private currentData: AccountDataOf<S> | undefined;
 	private currentState: AccountReadState = { kind: 'loading' };
 	private sequence = 0;
+	private readonly timers = this._register(new MutableDisposable());
 
 	constructor(
 		private readonly services: AccountPageServices,
@@ -70,8 +76,10 @@ export class AccountRead<S extends AccountReadSection> extends Disposable {
 				if (!this._store.isDisposed) this.apply(response);
 			}
 		);
-		if (subscription !== undefined) this.observation.value = subscription;
-		else void this.refresh();
+		if (subscription !== undefined) {
+			this.observation.value = subscription;
+			if (this.currentState.kind === 'loading') this.startDeadline();
+		} else void this.refresh();
 	}
 
 	/** Reads again now. Resolves whether the read succeeded and is the newest one. */
@@ -79,12 +87,30 @@ export class AccountRead<S extends AccountReadSection> extends Disposable {
 		const sequence = ++this.sequence;
 		if (this.currentData === undefined && this.currentState.kind !== 'loading')
 			this.setState({ kind: 'loading' });
+		if (this.currentData === undefined) this.startDeadline();
 		const response = await this.services.request({ kind: 'read', section: this.section });
 		if (this._store.isDisposed || sequence !== this.sequence) return false;
 		return this.apply(response);
 	}
 
+	/** Marks the wait as slow, then ends it as a failure, unless an answer arrives first. */
+	private startDeadline(): void {
+		const slow = setTimeout(() => {
+			if (this.currentState.kind === 'loading')
+				this.setState({ kind: 'loading', slow: true });
+		}, ACCOUNT_READ_SLOW_MS);
+		const deadline = setTimeout(() => {
+			if (this.currentState.kind === 'loading')
+				this.setState({ kind: 'failed', reason: 'unavailable' });
+		}, ACCOUNT_READ_DEADLINE_MS);
+		this.timers.value = toDisposable(() => {
+			clearTimeout(slow);
+			clearTimeout(deadline);
+		});
+	}
+
 	private apply(response: AccountResponse): boolean {
+		this.timers.clear();
 		if (response.kind === 'data' && response.data.section === this.section) {
 			const data = response.data as AccountDataOf<S>;
 			const changed = JSON.stringify(data) !== JSON.stringify(this.currentData);

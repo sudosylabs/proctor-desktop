@@ -41,7 +41,8 @@ export class AccountIpcBridge {
 				validateAccountIntent,
 				validateAccountResponse,
 				authorize,
-				(intent, listener) => service.observeAccount!(bound, intent, listener)
+				(intent, listener) => service.observeAccount!(bound, intent, listener),
+				{ kind: 'error', reason: 'unavailable' }
 			);
 		ipc.handle(ACCOUNT_CHANNEL, async (event, ...args: unknown[]) => {
 			if (this.#disposed) throw new Error('Account capability is closed');

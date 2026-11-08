@@ -73,3 +73,48 @@ void test('observations reauthorize every publication and fence stopped or synch
 	assert.equal(disposals, 3);
 	assert.equal(removed, true);
 });
+
+void test('observations deliver to the frame that started them and turn undeliverable answers into the failure', () => {
+	let handler!: (event: IpcMainInvokeEvent, ...args: unknown[]) => unknown;
+	let publish!: (value: unknown) => void;
+	const messages: unknown[] = [];
+	const frame = { send: (_channel: string, value: unknown) => messages.push(value) };
+	let lookups = 0;
+	// Electron resolves senderFrame on each read; later reads may not return the same frame.
+	const event = {
+		sender: { id: 7 },
+		get senderFrame() {
+			return lookups++ === 0 ? frame : null;
+		}
+	} as unknown as IpcMainInvokeEvent;
+	const authorized: unknown[] = [];
+	const bridge = new ApiObservationIpc(
+		{ handle: (_channel, listener) => void (handler = listener), removeHandler: () => {} },
+		'closed-capability:observe',
+		(value) => value,
+		(value) => {
+			if (typeof value !== 'number') throw new TypeError('Invalid response');
+			return value;
+		},
+		(candidate) => {
+			authorized.push(candidate.senderFrame);
+		},
+		(_intent, listener) => {
+			publish = listener as (value: unknown) => void;
+			return { dispose: () => {} };
+		},
+		-1
+	);
+	try {
+		handler(event, { kind: 'start', id: 1, intent: 'read' });
+		publish(5);
+		publish('not a number');
+		assert.deepEqual(messages, [
+			{ id: 1, response: 5 },
+			{ id: 1, response: -1 }
+		]);
+		assert.ok(authorized.slice(1).every((value) => value === frame));
+	} finally {
+		bridge.dispose();
+	}
+});
