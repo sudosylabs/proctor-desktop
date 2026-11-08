@@ -1,0 +1,45 @@
+@layer controls {
+	.prctr-icon {
+		block-size: var(--prctr-icon-size, 16px);
+		display: inline-flex;
+		flex: none;
+		inline-size: var(--prctr-icon-size, 16px);
+	}
+
+	.prctr-icon > svg {
+		block-size: 100%;
+		display: block;
+		inline-size: 100%;
+	}
+
+	.prctr-icon[data-spin] {
+		animation: prctr-icon-spin 0.9s linear infinite;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.prctr-icon[data-spin] {
+			animation: none;
+		}
+	}
+
+	:root[data-prctr-motion='reduced'] .prctr-icon[data-spin] {
+		animation: none;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-icon > svg {
+			fill: CanvasText;
+		}
+
+		button .prctr-icon > svg,
+		a .prctr-icon > svg {
+			fill: currentColor;
+		}
+	}
+}
+
+@keyframes prctr-icon-spin {
+	100% {
+		transform: rotate(360deg);
+	}
+}

@@ -481,6 +481,24 @@
       "removalOwner": "design-system"
     },
     {
+      "package": "@phosphor-icons/core",
+      "version": "2.1.1",
+      "kind": "production",
+      "purpose": "Supply the Phosphor SVG icon paths that the Proctor icon generator copies for LaunchWindow and AuthenticatedWindow; CandidateWindow keeps Codicons.",
+      "owner": "design-system",
+      "source": "https://www.npmjs.com/package/@phosphor-icons/core/v/2.1.1",
+      "license": "MIT",
+      "lifecycleScripts": "blocked",
+      "processes": ["launch-renderer", "authenticated-renderer"],
+      "networkBehavior": "None; only path data for the listed icons is generated into source at build time.",
+      "nativeBehavior": "Static SVG files and metadata; no JavaScript from the package is bundled or executed.",
+      "transitiveRisk": "No dependencies. The generator reads only the listed SVG files.",
+      "bundleTreatment": "bundled",
+      "localAlternative": "Drawing an equivalent icon set by hand would add a separate glyph-maintenance effort and lose a consistent, licensed family.",
+      "updateOwner": "design-system",
+      "removalOwner": "design-system"
+    },
+    {
       "package": "@xterm/xterm",
       "version": "6.1.0-beta.303",
       "kind": "development",

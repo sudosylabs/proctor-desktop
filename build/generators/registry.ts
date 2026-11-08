@@ -2,6 +2,7 @@ import { tokenCustomizationsGenerator } from './tokenCustomizations.ts';
 import { serverApiGenerator } from './serverApi.ts';
 import { productMetadataGenerator } from './productMetadata.ts';
 import { bundledThemesGenerator } from './bundledThemes.ts';
+import { phosphorIconsGenerator } from './phosphorIcons.ts';
 import type { Repository } from '../checks/types.ts';
 import {
 	nativeProtocolGenerator,
@@ -26,6 +27,7 @@ const productGenerators: readonly Generator[] = [
 	tokenCustomizationsGenerator,
 	productMetadataGenerator,
 	bundledThemesGenerator,
+	phosphorIconsGenerator,
 	localizationCatalogGenerator,
 	settingsRegistryGenerator,
 	nativeProtocolGenerator,

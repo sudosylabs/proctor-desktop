@@ -1247,6 +1247,7 @@ resources/server-api/openapi.json
 /src/prctr/platform/theme/common/encodedTokenAttributes.ts
 /src/prctr/platform/theme/common/iconRegistry.ts
 /src/prctr/platform/theme/common/plistParser.ts
+/src/prctr/platform/theme/common/proctorIconGlyphs.generated.ts
 /src/prctr/platform/theme/common/sizeRegistry.ts
 /src/prctr/platform/theme/common/sizeUtils.ts
 /src/prctr/platform/theme/common/sizes/baseSizes.ts
