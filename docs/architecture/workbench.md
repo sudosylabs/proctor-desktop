@@ -58,17 +58,26 @@ was shown. Account data is window-session state and is never restored.
 
 - Profile shows the photo, name and username, then the read-only account details
   the institution manages: name, email with its verification state, language,
-  time zone, and the last sign-in, which is this window's own session. An
-  unverified email offers a verification request whose reply never reveals
-  delivery. Exam records due for deletion appear only when the retention read
-  returns notices; notices carry identifiers rather than exam titles, so each is
-  named by its record category and dates.
-- Sign-in and security lists the password and linked providers, two-step
-  verification and remaining recovery codes, and opens the hosted security page.
+  time zone, when the account began, and the last sign-in, which is this
+  window's own session. An unverified email offers a verification request whose
+  reply never reveals delivery. Exam records due for deletion appear only when
+  the retention read returns notices; each is named by its exam title, with its
+  record category, sitting date and deletion date.
+- Sign-in and security lists the password and when it changed, linked
+  providers, two-step verification with its method and date, and recovery codes
+  left of the set issued, and opens the hosted security page.
 - Sessions and devices separates this computer's session, other sessions and
-  registered desktops.
+  registered desktops. The server marks the current session, and that mark must
+  match the window's bound Session. Other sessions can be ended one by one or
+  all at once; this computer's session is kept.
 - Access tokens lists working tokens apart from disabled, expired and revoked
   ones, and creates tokens.
+- Account history lists the person's own account events, newest first, in
+  pages, filtered by period, kind of event, whether the event was about the
+  account or done elsewhere, and outcome. The server names no other person: the
+  actor is only the person, an administrator, or Proctor itself, and where an
+  event came from is shown only for the person's own actions. An event name this
+  release does not know reads generically rather than failing the page.
 
 Row actions are never inline: a row with actions has one actions button that
 opens the window menu. Destructive items are marked and always confirmed in a
@@ -86,10 +95,12 @@ The current server projection does not distinguish custom and default photos,
 so Remove is shown only for a revision observed after a confirmed upload in this
 window session. Never infer that state from the image or its URL.
 
-A new token states its name, what it can do and an expiry. The server publishes
-no scope catalogue, so the window offers only the scope its contract names and
-shows any other scope as the server spells it. The window holds no Academic Unit
-list, so it cannot limit a new token to one unit. The one-time credential lives
+A new token states its name, what it can do, where it applies and an expiry.
+The scopes and Academic Units offered are the server's grantable-scope read for
+this person: a scope that is not institution-wide is available only once a unit
+where it is grantable is chosen. Token rows title their scopes from the same
+read and show an unknown scope as the server spells it. The server checks every
+requested scope again on creation. The one-time credential lives
 only in its dialog: it is copied through the window's privileged clipboard, is
 never stored, logged or announced, and leaves the page when the dialog closes.
 
