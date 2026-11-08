@@ -13,8 +13,10 @@ Proctor Desktop ships one binary with three trusted window kinds:
   Its lockup, Institution, and action form one centered group on a continuous
   canvas with integrated native window controls. Exit and bounded connection
   diagnostics live in native application menus; its initial window is normal
-  and resizable. The initial theme is dark. The server origin remains available
-  in native diagnostics without repeating it in the main content.
+  and resizable. Its theme is the window theme last chosen on this computer, or
+  the system's. It starts from the Institution last verified on this computer
+  when there is one. The server origin remains available in native diagnostics
+  without repeating it in the main content.
 - `AuthenticatedWindow` is the normal signed-in application. It contains every
   currently authorized student, teacher/Exam Manager, administration, account,
   and settings area. Navigation and server projections never grant authority.

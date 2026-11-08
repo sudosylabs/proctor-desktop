@@ -11,6 +11,7 @@
     "../src/prctr/**/node/**/*.ts",
     "../src/prctr/**/electron-main/**/*.ts",
     "../test/platform/identity/electron-main/**/*.ts",
+    "../test/platform/identity/node/**/*.ts",
     "../test/electron/browserHarnessMain.ts",
     "../test/electron/editorWorkerMain.ts",
     "../test/electron/editorWorker.real.test.ts",

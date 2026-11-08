@@ -85,6 +85,16 @@ distinct localized outcomes. Production origins require HTTPS. An explicit
 development loopback HTTP origin is visibly marked and cannot enter a production
 Candidate Attempt.
 
+The coordinator remembers the canonical origin of the last Institution that
+discovery verified on this computer, in a small device-scoped file under the
+application's user data. It is public server identity, never a credential or
+account fact. At startup LaunchWindow checks that origin as if it had been
+typed, so a returning user sees the Institution and `Sign in` without entering
+the address. A stored value is normalized under the same rules as typed input;
+one that fails them, such as development loopback HTTP in a production build, is
+forgotten. An unreachable or unverified server is never remembered, and
+`Change server` forgets the stored origin before showing the address field.
+
 ## Desktop Authorization and installation proof
 
 LaunchWindow contains no local/external method selector or authentication form.

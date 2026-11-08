@@ -6,6 +6,7 @@ import { DesktopIdentityCoordinator } from '../../platform/identity/electron-mai
 import { DesktopAuthorizationService } from '../../platform/identity/electron-main/desktopAuthorizationService.js';
 import { HttpServerReadinessTransport } from '../../platform/identity/electron-main/httpServerReadinessTransport.js';
 import { DesktopAuthHttp } from '../../platform/identity/node/desktopAuthHttp.js';
+import type { ServerOriginStore } from '../../platform/identity/node/serverOriginStore.js';
 import { OsDesktopCredentialStore } from '../../platform/identity/electron-main/desktopCredentialStore.js';
 import { loadNativeDesktopKeyCustody } from '../../platform/identity/electron-main/nativeDesktopKeyCustody.js';
 import type { DesktopReleaseTarget } from '../../platform/identity/electron-main/serverReadiness.js';
@@ -33,6 +34,8 @@ export interface DesktopIdentityCompositionOptions {
 	readonly callbackBrandingDirectory: string;
 	readonly stateDirectory: string;
 	readonly allowDevelopmentLoopback: boolean;
+	/** The Institution origin last verified on this computer. */
+	readonly rememberedServer: ServerOriginStore;
 	readonly locale: string;
 	readonly onExit: () => void;
 }
@@ -103,7 +106,8 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				target: options.target,
 				transport: new HttpServerReadinessTransport(http.transport),
 				allowDevelopmentLoopback: options.allowDevelopmentLoopback,
-				authorization
+				authorization,
+				rememberedServer: options.rememberedServer
 			})
 		);
 		let shutdownPromise: Promise<void> | undefined;

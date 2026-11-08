@@ -3,6 +3,7 @@ import {
 	type DesktopSessionOutcome
 } from '../common/desktopSessionOutcome.js';
 import { DesktopAuthorizationError } from '../node/desktopAuthorizationError.js';
+import type { ServerOriginStore } from '../node/serverOriginStore.js';
 import {
 	CancellationTokenSource,
 	type CancellationToken
@@ -35,6 +36,11 @@ export interface DesktopIdentityCoordinatorOptions {
 		reopenBrowser(): Promise<void>;
 	};
 	readonly now?: () => number;
+	/**
+	 * The origin last verified on this computer. LaunchWindow starts by checking it; a verified
+	 * Institution replaces it and Change server forgets it.
+	 */
+	readonly rememberedServer?: ServerOriginStore;
 }
 
 /** Privileged owner of selected-server readiness; renderers cannot assert readiness or choose build metadata. */
@@ -58,6 +64,21 @@ export class DesktopIdentityCoordinator extends Disposable {
 		this.#target = target;
 		this.#now = options.now ?? Date.now;
 		this.#projection = this.#makeProjection({ state: 'selectingServer' }, 0);
+		const remembered = this.#rememberedOrigin();
+		if (remembered !== undefined) void this.#check(remembered, false);
+	}
+
+	/** The stored origin, held to the same rules as a typed address; anything else is forgotten. */
+	#rememberedOrigin(): string | undefined {
+		const store = this.options.rememberedServer;
+		const stored = store?.read();
+		if (stored === undefined) return undefined;
+		try {
+			return normalizeServerOrigin(stored, this.options.allowDevelopmentLoopback);
+		} catch {
+			store?.clear();
+			return undefined;
+		}
 	}
 
 	projection(): LaunchIdentityProjection {
@@ -93,6 +114,7 @@ export class DesktopIdentityCoordinator extends Disposable {
 		switch (intent.kind) {
 			case 'changeServer':
 				this.#cancel();
+				this.options.rememberedServer?.clear();
 				this.#publish({ state: 'selectingServer' });
 				return;
 			case 'selectServer': {
@@ -169,6 +191,7 @@ export class DesktopIdentityCoordinator extends Disposable {
 				return;
 			}
 			this.#verifiedIdentity = identity;
+			if (identity) this.options.rememberedServer?.write(identity.origin);
 			if (
 				startAuthorization &&
 				identity &&

@@ -692,6 +692,105 @@ void test('Session loss retains the Institution and separates validity, custody,
 	}
 });
 
+/** An in-memory remembered server that records what the coordinator did with it. */
+function memoryServerStore(initial?: string) {
+	const events: string[] = [];
+	let origin = initial;
+	return {
+		events,
+		read: () => origin,
+		write(value: string) {
+			origin = value;
+			events.push(`write ${value}`);
+		},
+		clear() {
+			origin = undefined;
+			events.push('clear');
+		}
+	};
+}
+
+void test('LaunchWindow starts from the remembered server and remembers each verified Institution', async () => {
+	const remembered = memoryServerStore(origin);
+	const probed: string[] = [];
+	const coordinator = new DesktopIdentityCoordinator({
+		target,
+		transport: {
+			probe: async (value) => {
+				probed.push(value);
+				return probe();
+			}
+		},
+		allowDevelopmentLoopback: false,
+		rememberedServer: remembered
+	});
+	try {
+		assert.equal(coordinator.projection().state, 'checking');
+		await settle();
+		assert.deepEqual(probed, [origin], 'the remembered origin is checked without typing');
+		assert.equal(coordinator.projection().state, 'ready');
+		assert.equal(coordinator.projection().origin, origin);
+		assert.equal(coordinator.projection().institutionName, 'Example University');
+		assert.deepEqual(remembered.events, [`write ${origin}`]);
+
+		await coordinator.handleIntent({ kind: 'changeServer' });
+		assert.equal(coordinator.projection().state, 'selectingServer');
+		assert.deepEqual(remembered.events, [`write ${origin}`, 'clear']);
+		assert.equal(remembered.read(), undefined, 'Change server forgets it');
+
+		await coordinator.handleIntent({ kind: 'selectServer', address: origin });
+		assert.equal(coordinator.projection().state, 'ready');
+		assert.equal(remembered.read(), origin, 'a typed, verified server is remembered');
+	} finally {
+		coordinator.dispose();
+	}
+});
+
+void test('an unverified server is not remembered and an unusable stored one is forgotten', async () => {
+	const unreachable = memoryServerStore();
+	const failing = new DesktopIdentityCoordinator({
+		target,
+		transport: {
+			probe: async () => {
+				throw new Error('offline');
+			}
+		},
+		allowDevelopmentLoopback: false,
+		rememberedServer: unreachable
+	});
+	try {
+		await failing.handleIntent({ kind: 'selectServer', address: origin });
+		assert.equal(failing.projection().state, 'unreachable');
+		assert.deepEqual(unreachable.events, [], 'an unreachable server is not remembered');
+	} finally {
+		failing.dispose();
+	}
+
+	for (const stored of ['http://localhost:8065', 'http://example.test', 'not a server']) {
+		const remembered = memoryServerStore(stored);
+		let probes = 0;
+		const coordinator = new DesktopIdentityCoordinator({
+			target,
+			transport: {
+				probe: async () => {
+					probes++;
+					return probe();
+				}
+			},
+			allowDevelopmentLoopback: false,
+			rememberedServer: remembered
+		});
+		try {
+			await settle();
+			assert.equal(coordinator.projection().state, 'selectingServer', stored);
+			assert.equal(probes, 0, stored);
+			assert.deepEqual(remembered.events, ['clear'], stored);
+		} finally {
+			coordinator.dispose();
+		}
+	}
+});
+
 /** Lets a check the coordinator started by itself finish. */
 async function settle(): Promise<void> {
 	await new Promise<void>((resolve) => setImmediate(resolve));

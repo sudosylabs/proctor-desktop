@@ -1,5 +1,6 @@
 import { acquireDesktopInstanceLock } from '../../platform/identity/electron-main/desktopInstanceLock.js';
 import { FileWindowAppearanceStore } from '../../platform/windows/node/windowAppearanceStore.js';
+import { FileServerOriginStore } from '../../platform/identity/node/serverOriginStore.js';
 import { app, BrowserWindow } from 'electron';
 import { join } from 'node:path';
 import { createDesktopIdentityComposition } from './desktopIdentityComposition.js';
@@ -53,9 +54,14 @@ else {
 	void app
 		.whenReady()
 		.then(() =>
-			FileWindowAppearanceStore.open(join(app.getPath('userData'), 'window-appearance.json'))
+			Promise.all([
+				FileWindowAppearanceStore.open(
+					join(app.getPath('userData'), 'window-appearance.json')
+				),
+				FileServerOriginStore.open(join(app.getPath('userData'), 'institution-server.json'))
+			])
 		)
-		.then((appearance) => {
+		.then(([appearance, rememberedServer]) => {
 			const root = app.getAppPath();
 			const desktop = createDesktopIdentityComposition({
 				applicationId: developmentApplicationId,
@@ -86,6 +92,7 @@ else {
 				callbackBrandingDirectory: join(root, 'branding'),
 				stateDirectory: app.getPath('userData'),
 				allowDevelopmentLoopback: allowHttp,
+				rememberedServer,
 				locale: app.getLocale(),
 				onExit: () => app.quit()
 			});
