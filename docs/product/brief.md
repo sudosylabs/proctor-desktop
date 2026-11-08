@@ -47,7 +47,8 @@ remaining adapters and verified release capability.
 - Reproducing the entire VS Code product or extension ecosystem.
 - Building the renderer with React, Vite, Next.js, or another component
   framework. The accepted renderer model is plain TypeScript, DOM APIs, and
-  co-located CSS following the VS Code workbench style.
+  co-located CSS, with Proctor-owned controls and the
+  [design system](../architecture/design-system.md) across every window.
 - Treating local folders, the local filesystem, or a local PTY as the primary
   application model. Attempt resources are remote-first. Code execution is
   deferred; a Run capability is planned before the first release.

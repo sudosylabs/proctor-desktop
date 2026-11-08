@@ -45,16 +45,20 @@ still closes the entire AuthenticatedWindow regardless of those responsibilities
 
 Account is its own space, opened by the account photo at the bottom of the area
 rail; the photo carries the accent ring while Account is open. Its sidebar lists
-Profile, Sign-in and security, Sessions and devices, Access tokens and Settings,
-then Sign out. Settings opens its existing modal over the current page; the
-registered Settings shortcut opens it too. A sign-out failure is reported beside
-Sign out. There is no titlebar account trigger or account popup menu.
+Profile, Sign-in and security, Sessions and devices, Access tokens, Account
+history and Settings, then Sign out. Ctrl/Cmd+, runs
+`prctr.authenticated.openSettings`, which opens the Settings page. Sign out,
+from the sidebar or the Sessions page, always opens a confirmation first:
+Cancel, or Sign out. A sign-out failure is reported beside Sign out. There is no
+titlebar account trigger or account popup menu.
 
 Each Account page is one registered WorkbenchItem resolved into one cancellable
-pane: a heading, a one-line description, any page action, then titled sections.
-Sections read independently through the bound account capability and present
-their own loading, empty, failed and stale states; a failed refresh keeps what
-was shown. Account data is window-session state and is never restored.
+pane: a heading, a one-line description, any page action, then titled sections,
+in one centred column (760px, 880px for history). Sections read independently
+through the bound account capability and follow the design system's
+[states pattern](./design-system.md#states); every read ends with an answer, a
+failure or a deadline. Account data is window-session state and is never
+restored.
 
 - Profile shows the photo, name and username, then the read-only account details
   the institution manages: name, email with its verification state, language,
@@ -78,9 +82,13 @@ was shown. Account data is window-session state and is never restored.
   actor is only the person, an administrator, or Proctor itself, and where an
   event came from is shown only for the person's own actions. An event name this
   release does not know reads generically rather than failing the page.
+- Settings edits the person's User Settings in four tabs; the
+  [user-settings architecture](./user-settings.md#accountsettings-editing) owns
+  its behavior.
 
 Row actions are never inline: a row with actions has one actions button that
-opens the window menu. Destructive items are marked and always confirmed in a
+opens the window menu. The current session's Sign out is the one inline row
+button. Destructive items come last, end in "…", and are always confirmed in a
 modal alert dialog that explains the consequence; ending this computer's
 session is signing out. Dialogs are native modal dialogs that make the window
 inert, trap focus, and return it to their opener. One change runs at a time.
@@ -217,7 +225,7 @@ macOS it is the top of the rail, which holds the traffic lights. The frame in
 `workbench/contrib/authenticated` owns the rail, sidebar, top bar and navigation
 state; the shell owns their geometry. The selected valid destination is shown;
 an unavailable selection falls back to the first available area, then Account.
-Settings opens its existing modal, preserving the underlying page.
+Settings is an Account page.
 
 The rail lists the union of the server's available product areas: Activity,
 Exams (exam management) and Administration, then the account photo. Account and

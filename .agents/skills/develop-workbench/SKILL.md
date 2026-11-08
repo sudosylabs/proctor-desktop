@@ -23,9 +23,12 @@ for Account/Settings or Attempt Configuration,
 browser items. Use [`adapt-vscode`](../adapt-vscode/SKILL.md) before deriving
 from VS Code.
 
-For shell composition, apply the accepted
+For CandidateWindow shell composition, apply the accepted
 [Modern UI and floating panels baseline](../../../docs/architecture/design-system.md#modern-ui-and-floating-panels)
-when mapping parts, shared edges, gutters, and layout sizing.
+when mapping parts, shared edges, gutters, and layout sizing. AuthenticatedWindow
+uses the [rail-and-sidebar frame](../../../docs/architecture/design-system.md#authenticated-product-presentation):
+Settings is an Account page, Sign out always asks first, and pages use the
+centred column and states pattern.
 
 For user-visible work, also load the design-system architecture and applicable
 product-UI, accessibility, design-system, and layout skills. Write the code with

@@ -38,6 +38,9 @@ verification in the cluster manifest.
 
 For UI source, apply the required
 [Modern UI and floating panels baseline](../architecture/design-system.md#modern-ui-and-floating-panels).
+That baseline covers CandidateWindow and other VS Code-derived UI.
+LaunchWindow and AuthenticatedWindow use Proctor-owned controls, icons and
+pages; VS Code UI is not a source for them.
 The intake must recover the relevant Modern UI styles, base-control dependencies,
 layout calculations, activation, states, and tests together. Use that baseline
 when choosing the source revision and reviewing an existing port; copying only

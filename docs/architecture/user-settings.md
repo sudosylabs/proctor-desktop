@@ -8,8 +8,8 @@ exam security, or override Exam/Attempt state.
 
 The **User Settings Document** is one server-authoritative, Principal-owned,
 bounded JSONC document. Its opaque revision is the condition for mutation.
-`settings.json` is a virtual editing representation, not a host file or Attempt
-Workspace resource.
+`settings.json` is the document's virtual name, not a host file or Attempt
+Workspace resource. Users never edit it directly; the Settings page writes it.
 
 Keep these other state families separate:
 
@@ -102,16 +102,23 @@ window's Principal/Session binding and no Attempt authority. Opening
 CandidateWindow closes the entire AuthenticatedWindow, so the editing surface
 cannot coexist with active candidate participation.
 
-One in-memory `SettingsDraft` supports structured controls and a JSONC editor.
-Both views edit the same source and validation state. Preview affects only the
-current AuthenticatedWindow and reverts on cancel/failure. Explicit save sends
-the complete bounded source with expected revision and idempotency key.
+Settings is an Account page (`settings` in `accountPages`), opened from the
+Account sidebar or Ctrl/Cmd+, (`prctr.authenticated.openSettings`). Its tabs —
+Appearance, Exam editor, Accessibility and Browser — are built from
+`SETTINGS_MANIFEST` by
+`src/prctr/workbench/contrib/account/common/settingsPresentation.ts`. Find a
+setting searches every tab. Object settings such as color and token
+customizations stay in the manifest and remain effective but have no control.
 
-On conflict, retain base, draft, and latest remote source. Auto-merge only
-unambiguous disjoint properties/language entries while preserving comments.
-Same-path, delete/modify, syntax-trivia ambiguity, and unknown completion remain
-explicit. Server-unavailable state is read-only; there is no offline mutation
-queue. Cache only acknowledged source in protected Principal-bound storage.
+Each control writes one key through one in-memory `SettingsDraft`. The page
+saves about 400 ms later, sending the complete bounded source with the
+acknowledged revision and an idempotency key, one save at a time. A revision
+conflict adopts the newer settings and applies the page's unacknowledged changes
+again on top. An ambiguous outcome is retried once. A failure shows Not saved
+and a toast with Try again; the change stays on the page. A changed row offers
+Reset, which removes the key so the default applies. Server-unavailable state is
+read-only; there is no offline mutation queue. Cache only acknowledged source in
+protected Principal-bound storage.
 
 Import/export is absent initially. Diagnostics may name safe key/reason/revision
 metadata but never source JSONC, values, comments, drafts, or conflicts.
@@ -171,10 +178,9 @@ success response is revision metadata and need not echo source. Ambiguous
 completion is verified with the same key.
 
 The parser bounds bytes, depth, properties, string lengths, nesting, and
-language overrides while preserving supported JSONC comments and ordering for
-the editor. Duplicate keys and dangerous/confusable forms produce precise
-diagnostics. A syntax-invalid acknowledged document remains editable but does
-not become effective.
+language overrides while preserving supported JSONC comments and ordering when
+the page edits a key. Duplicate keys and dangerous/confusable forms produce precise
+diagnostics. A syntax-invalid acknowledged document does not become effective.
 
 The registry has one current shape: there are no stored-format versions or
 migrations, and a key the registry no longer declares is an unknown key that
@@ -195,46 +201,19 @@ and applies trusted constraints afterward.
 The configuration engine addresses a settings URI through a resource adapter.
 Storage selection belongs to composition and does not require replacing the
 parser, models, override resolution, inspection, change events, or queued JSONC
-editing. The editing draft supplies a working-copy adapter; explicit Save
+editing. The editing draft supplies a working-copy adapter; the Settings page
 commits its source through the privileged owner. Changing the configured
 persistence policy requires specifying its authority and synchronization
 semantics, but not a replacement configuration engine. The current server
 authority and protected acknowledged cache remain unchanged.
 
 Keep `UserSettingsCoordinator`,
-authenticated transport, and protected cache in Electron main. Put the settings
-destination under `src/prctr/workbench/contrib/settings/` and select it through
-the authenticated manifest and `authenticated.main.ts` composition root.
-
-The accepted Settings presentation uses the VS Code Modern UI modal editor host,
-graphical Settings editor, and Monaco JSONC editor inside AuthenticatedWindow.
-Graphical/JSON switching preserves the modal group and one working-copy draft.
-The modal retains upstream resize, maximize, focus, command and close mechanics;
-this does not make the surrounding workbench sections resizable. Dirty closure
-uses Save, Discard and Cancel, while authentication teardown still revokes the
-editing owner immediately. Structured edits and JSON editing share undo history
-through precise text edits rather than replacing the entire model on each change.
-
-Transfer complete upstream files and their dependency, registration, test, asset
-and Modern UI closure before making documented product adaptations. The existing
-server persistence, static registry, explicit Save and frozen Candidate boundary
-remain the adapter seams. Extension installation, remote/AI settings search,
-workspace/profile settings targets, arbitrary schema/file access and detached
-windows are excluded product integrations, not reasons to simplify admitted
-editor behavior. Packaged JSON language services and syntax/semantic token theme
-machinery are part of the editor admission. Existing ports require explicit
-compatibility verification rather than assuming their interfaces are complete.
-
-The text-edit foundation now preserves upstream composition, inversion, rebasing
-and coordinate transformations with the corresponding seeded regression suites.
-The JSON language server and browser-worker foundation retains upstream provider,
-cache, cancellation and startup behavior. Its schema reader accepts only exact
-packaged resources; worker localization receives bounded inline packaged messages
-instead of fetching an extension-selected URI. The Node transport is test-only.
-The production Settings surface still uses structured controls and a JSONC
-textarea until the modal, graphical editor and browser-editor integration passes
-its full behavioral and visual verification. Foundation source alone does not
-establish delivery of the editor experience.
+authenticated transport, and protected cache in Electron main. The Settings page
+lives with the Account pages under `src/prctr/workbench/contrib/account/`.
+`src/prctr/workbench/contrib/settings/` applies effective presentation (window
+theme, motion, zoom, customizations) and owns the Settings keybinding. Both are
+selected through the authenticated manifest and `authenticated.main.ts`
+composition root.
 
 Candidate consumers depend on an Attempt Configuration projection contract,
 not the User Settings service. Editor, design system, workbench, and
@@ -247,8 +226,9 @@ Verify:
 - registry/schema/catalog/fingerprint parity;
 - JSONC bounds/fuzzing, unknown/prohibited keys, and precedence;
 - conditional writes, idempotent ambiguity, conflict merge, and cache isolation;
-- Account/Settings loading, empty, invalid, conflict, unavailable, save, cancel,
-  keyboard/focus, themes, reduced motion, high contrast, and 200% zoom;
+- Account/Settings loading, invalid, conflict, ambiguous, unavailable, autosave,
+  failure, Reset, Find, keyboard/focus, themes, reduced motion, high contrast,
+  and 200% zoom;
 - Attempt Configuration closed schema, bounds, server validation/freeze,
   unchanged re-entry, incompatible registry/build, and stronger live constraints;
 - absence of settings mutation/source/cache from Candidate preload and of
@@ -258,14 +238,23 @@ Implementation, generators, manifests, tests, and this architecture must agree
 on document authority, AuthenticatedWindow placement, and the closed Attempt
 Configuration subset.
 
-## Color theme settings
+## Theme settings
 
-`workbench.colorTheme` selects from the packaged GitHub theme catalog, also
-accepting the four scheme identifiers. `workbench.colorCustomizations` is bounded object data
-with optional bracketed theme scopes; it is non-Candidate presentation. Both
-are edited in the JSONC destination. Preview and cancellation apply the complete
-selection and overrides together. Color schemas and registry metadata belong
-to the theme engine; a settings document cannot add a color registration.
+`window.theme` (`system`, `light` or `dark`; default `system`) picks Proctor
+Light or Proctor Dark for LaunchWindow and AuthenticatedWindow; `system` follows
+the operating system. `workbench.colorTheme` is the **editor theme**: it selects
+from the packaged GitHub theme catalog, also accepting the four scheme
+identifiers, and applies only to CandidateWindow. `workbench.colorCustomizations`
+is bounded object data with optional bracketed theme scopes and has no control
+on the Settings page. Color schemas and registry metadata belong to the theme
+engine; a settings document cannot add a color registration.
+
+LaunchWindow opens before sign-in, so it uses the scheme last chosen on this
+computer. `FileWindowAppearanceStore`
+(`src/prctr/platform/windows/node/windowAppearanceStore.ts`) remembers the
+signed-in window's scheme in `window-appearance.json` under the user data
+directory, and Electron main applies it through `nativeTheme.themeSource`. That
+file is a device presentation cache, not a User Settings source.
 
 Authenticated startup binds the existing settings coordinator and IPC to the
 current User/Session before the renderer requests its projection. The privileged

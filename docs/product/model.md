@@ -96,9 +96,9 @@ _Avoid_: User when authentication context matters
 **User Settings Document**
 
 One server-authoritative, Principal-owned JSONC document containing portable
-approved IDE and presentation preferences. `settings.json` is its virtual
-user-facing representation rather than a host file or Attempt Workspace
-resource.
+approved IDE and presentation preferences, edited through the Settings page in
+Account. `settings.json` is its virtual name rather than a host file or Attempt
+Workspace resource; users never edit it directly.
 
 _Avoid_: Workspace settings, local settings file, security policy
 

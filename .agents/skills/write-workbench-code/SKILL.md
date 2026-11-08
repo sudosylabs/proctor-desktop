@@ -124,7 +124,10 @@ export class ServerSummary extends Disposable {
   `src/prctr/AGENTS.md` lists the lint rules that enforce this.
 - **Controls.** Use the design-system controls in `base/browser/ui`
   (`ButtonControl`, `TextFieldControl`, `ToggleControl`, `MenuControl`,
-  `ProgressControl`) for single controls, and the ported VS Code widgets (`List`,
+  `ProgressControl`, `SegmentedControl`, `SwitchControl`, `StepperControl`,
+  `SelectControl`, `BannerControl`, `ToastHost`) for single controls, Proctor
+  icons (`createProctorIcon`, `proctorIconFactory`) in LaunchWindow and
+  AuthenticatedWindow, and the ported VS Code widgets (`List`,
   `ActionBar`, `DomScrollableElement`) for collections, toolbars and scrolling.
   Never hand-build a button, field or list that one of these already provides.
 - **Text.** Every visible or announced string comes from a `defineMessage`

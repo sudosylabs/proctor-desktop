@@ -17,10 +17,11 @@ Every surface should be:
   are represented honestly and predictably.
 
 Consistency and accessibility are system requirements. Delight is restrained,
-functional polish that cannot compete with clarity. VS Code-derived surfaces use
-its Modern UI baseline below. AuthenticatedWindow uses the rail-and-sidebar
-frame and product pages described next, with the same
-Proctor semantic tokens, themes, accessibility, and lifecycle contracts.
+functional polish that cannot compete with clarity. CandidateWindow and other
+VS Code-derived surfaces use the Modern UI baseline below. LaunchWindow and
+AuthenticatedWindow use the Proctor-owned presentation, controls, icons and
+states described next, with the same Proctor semantic tokens, themes,
+accessibility, and lifecycle contracts.
 
 ## Authenticated product presentation
 
@@ -45,20 +46,72 @@ who do not use an IDE. It uses a Proctor-owned rail-and-sidebar frame:
 
 Pages follow the task rather than an editor pane or file tree; a page that
 needs detail shows it in its own panel beside its list. IBM Plex Sans and Mono,
-the Proctor palette, and status by shape apply. The purple accent is reserved
-for primary actions, links and the selected state. Controls use a 6px radius on
-macOS and 4px on Windows.
+the Proctor palette, and status by shape apply. Selection in the rail and
+sidebar is a neutral grey with ink text. The purple brand accent is reserved for
+the main action and focus.
 
-This is an explicit visual exception to the VS Code baseline for these product
-surfaces. It does not authorize replacing admitted settings-editor, menu,
-scrollbar, theme, or accessibility machinery with simplified substitutes.
-CandidateWindow retains the IDE presentation. Verify desktop previews in the
-native Electron window; a website preview is not the visual acceptance surface.
+These product surfaces do not follow the VS Code look; Settings is a Proctor
+Account page, not the VS Code Settings editor. CandidateWindow retains the IDE
+presentation. Verify desktop previews in the native Electron window; a website
+preview is not the visual acceptance surface.
+
+### Page layout
+
+- A page's content is one centred column, at most 760px wide (880px for
+  history), with 40px side padding. A wide window adds margin, not line length.
+- Sections are grouped lists on `color.background.card`: 10px radius, a
+  hairline boundary and no shadow. A row is a small glyph, its title and one
+  detail line, then either a status word or one "⋯" actions menu. The current
+  session's Sign out is the one inline row button.
+- A dialog is a card near the top of the window. Its title is a question, its
+  body one sentence on what happens, and its actions Cancel and the verb, both
+  with icons. Signing out always asks first.
+- Decorative flourishes are excluded: no gradient or blob backgrounds, tinted
+  icon tiles, pill chips, illustrated empty states, or shadows on static cards.
+
+### States
+
+Every section uses one states pattern:
+
+- after 300 ms without an answer, skeleton rows shaped like the content appear;
+  pages never show a spinner, and only a busy button spins;
+- at 8 s a "Still waiting for {institution}…" note offers Try again;
+- at 15 s the read fails inline in its section with Try again;
+- a failed refresh keeps the rows already shown and adds a note;
+- an empty section is one plain sentence, plus its action when there is one;
+- offline, actions are disabled rather than hidden.
+
+Every read ends with an answer, a failure or the deadline: `AccountRead` owns
+the deadline, and the observation bridge delivers a failure response rather
+than dropping an answer.
+
+### Proctor controls
+
+LaunchWindow and AuthenticatedWindow use the Proctor-owned controls in
+`src/prctr/base/browser/ui/`:
+
+- `ButtonControl` kinds are `brand`/`primary` for the main action, `secondary`,
+  `ghost`, `danger` only for the confirming action of a destructive dialog, and
+  `dangerGhost` for a destructive action that opens a confirmation. Sizes are
+  small, default and large. A busy ring replaces the button's icon so the label
+  stays put.
+- `MenuControl` entries carry icons. Destructive entries come last after a
+  separator and end in "…".
+- `SegmentedControl`, `SwitchControl`, `StepperControl` and `SelectControl` (a
+  styled native select) are the form controls.
+- `BannerControl` states a lasting page condition. `ToastHost` reports the
+  result of an action, bottom right, one at a time; success closes after 5 s and
+  failure stays until dismissed.
+
+Every action, menu item and sidebar entry has an icon. An icon-only button has
+an accessible name and a tooltip. `buttonControl.css` is Proctor-owned; no
+VS Code port supplies these controls.
 
 ## Modern UI and floating panels
 
 VS Code Modern UI is the required presentation target when copying, adapting,
-updating, or reviewing VS Code-derived UI. Include the applicable Modern UI code
+updating, or reviewing VS Code-derived UI, which today serves CandidateWindow.
+It is not a target for LaunchWindow or AuthenticatedWindow. Include the applicable Modern UI code
 alongside the underlying control implementation and base styles. Preserve its
 composition, spacing relationships, typography hierarchy, states, interaction,
 and layout behavior; map branding, owner namespaces, and semantic tokens to
@@ -136,19 +189,28 @@ must be local, justified, and verified.
 
 ## Themes and presentation
 
-Proctor bundles the GitHub VS Code theme collection. GitHub Dark Default is the
-default `workbench.colorTheme` value. Theme names and JSON assets belong to the packaged catalog;
-light, dark, high-contrast light and high-contrast dark remain scheme categories,
-not a fixed list of four palettes. The four scheme identifiers used by Attempt Configuration resolve through
+LaunchWindow and AuthenticatedWindow use Proctor Light and Proctor Dark
+(`resources/themes/proctor`). The `window.theme` setting (`system`, `light` or
+`dark`; default `system`) picks one; System follows the operating system. High
+contrast shows the GitHub high-contrast theme of the scheme on screen.
+LaunchWindow opens before sign-in and uses the scheme last chosen on this
+computer, which the [user-settings architecture](./user-settings.md#theme-settings)
+describes.
+
+Proctor also bundles the GitHub VS Code theme collection for CandidateWindow.
+`workbench.colorTheme` is the **editor theme**; GitHub Dark Default is its
+default, and it applies only to CandidateWindow. Theme names and JSON assets
+belong to the packaged catalog; light, dark, high-contrast light and
+high-contrast dark remain scheme categories, not a fixed list of four palettes.
+The four scheme identifiers used by Attempt Configuration resolve through
 catalog aliases.
 
-Users select `workbench.colorTheme` and edit `workbench.colorCustomizations` in
-`settings.json`. Overrides preserve VS Code global, theme-scoped, wildcard and
-`default` semantics. Packaged color registrations own names, descriptions,
-scheme defaults and derived-color relationships. User input supplies bounded
+`workbench.colorCustomizations` overrides preserve VS Code global,
+theme-scoped, wildcard and `default` semantics; the Settings page has no
+control for them. Packaged color registrations own names, descriptions, scheme
+defaults and derived-color relationships. User input supplies bounded
 hexadecimal colors or the default sentinel; it never registers a role, executes
-code, loads an extension or supplies CSS. Existing settings authority, explicit
-Save and preview/cancel behavior continue to apply.
+code, loads an extension or supplies CSS.
 
 The color engine preserves VS Code identifiers in theme data and settings.
 Packaged theming participants use the upstream registry and pure CSS collector; the browser owner installs and disposes a constructed stylesheet. Participant code is static product source, never user-supplied CSS. Admitted Modern UI styles also consume the complete pinned size registry through the same collector, preserving typography, spacing, radius, and stroke roles under the Proctor CSS namespace. The existing presentation tokens continue to serve Proctor-owned controls. Proctor retains its system forced-colors rules; no extension environment or user-provided CSS enters this path.
@@ -164,17 +226,16 @@ with light, dark, and high-contrast defaults. Native window controls
 receive a closed, validated foreground/background projection. Native menus
 retain operating-system material and selection rendering.
 
-Proctor also bundles its own Proctor Light and Proctor Dark themes, the warm
-neutral palette of the accepted LaunchWindow design. They include the GitHub
-Light Default and Dark Default themes for every role they do not set, including
-syntax colors. LaunchWindow and AuthenticatedWindow follow the operating-system
-scheme with these two themes. In AuthenticatedWindow a `workbench.colorTheme`
-the user has set wins and pins the native scheme so the material matches;
-without one the window keeps following the system. CandidateWindow keeps its
-Attempt Configuration scheme.
+Proctor Light and Proctor Dark carry the warm neutral palette of the accepted
+LaunchWindow design. They include the GitHub Light Default and Dark Default
+themes for every role they do not set, including syntax colors. The chosen
+scheme also sets the native scheme so the window material matches.
+CandidateWindow keeps its Attempt Configuration scheme.
 Roles VS Code has no color for (tertiary text, pending glyphs, the disabled
 primary fill and the development-server stripes) are registered as `proctor.*`
-colors and exposed as semantic tokens.
+colors and exposed as semantic tokens. `color.background.card` is the surface
+of grouped lists (white in light, a lifted grey in dark), and
+`color.border.control` is the boundary of buttons and fields.
 
 Status glyphs are Proctor-owned SVG shapes on a 16-unit grid, distinct by shape
 as well as color: success is a check in a circle, error a filled circle with a
@@ -283,11 +344,15 @@ reduced-motion or reduced-transparency request wins over remote content.
 Continuous animation requires a static alternative and explicit lifecycle
 ownership.
 
-Callers use Proctor semantic icon identifiers rather than glyph names. Codicons
-are the preferred initial glyph adapter, subject to exact source, dependency,
-and license admission. Proctor-specific concepts use purpose-built glyphs when a
-Codicon would mislead. Standard sizes are 12, 16, 20, and 24 pixels; 16px is the
-normal control icon. Decorative icons are hidden from accessibility APIs, and
+Callers use icon identifiers named by meaning rather than glyph names.
+LaunchWindow and AuthenticatedWindow use Proctor icons from Phosphor
+(`@phosphor-icons/core`, MIT): `build/generators/phosphorIcons.ts` copies a
+literal list into `src/prctr/platform/theme/common/proctorIconGlyphs.generated.ts`,
+`proctorIcons.ts` names them by meaning, and `createProctorIcon` or
+`proctorIconFactory` in `platform/theme/browser/proctorIcon.ts` draws them.
+Use the regular weight; the fill weight marks only the selected place in the
+rail and sidebar. CandidateWindow keeps Codicons through semantic icons.
+Standard sizes are 12, 16, 20, and 24 pixels; 16px is the normal control icon. Decorative icons are hidden from accessibility APIs, and
 icons never communicate state without text or another perceivable cue.
 
 ## CSS and layout

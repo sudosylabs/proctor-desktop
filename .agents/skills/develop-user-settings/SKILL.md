@@ -79,27 +79,32 @@ editing settings and unknown/unsupported fields cannot silently activate.
 
 ## 5. Edit and persist safely
 
-Use the Account/Settings destination in AuthenticatedWindow with one in-memory
-draft for structured and JSONC views. Validate before explicit save. Commit the
-whole bounded source with expected revision/idempotency key and verify ambiguous
-outcomes using the same key.
+Edit through the Settings Account page: its tabs come from `SETTINGS_MANIFEST`
+via `workbench/contrib/account/common/settingsPresentation.ts`, and each control
+writes one key through `SettingsDraft`. A new user-facing setting needs a
+manifest declaration and a presentation row, not a JSON editor. Users never edit
+`settings.json`; object settings stay without UI.
 
-On conflict retain base/draft/latest. Auto-merge only unambiguous disjoint
-properties/language entries while preserving comments; surface same-path,
-delete/modify, and trivia ambiguity. Server-unavailable state is read-only with
-no offline queue. Cache only acknowledged source in protected Principal-bound
-storage.
+The page autosaves about 400 ms after a change, committing the whole bounded
+source with the acknowledged revision and an idempotency key. On conflict adopt
+the newer settings and reapply pending changes; retry an ambiguous outcome once;
+on failure show Not saved with a Try again toast. Reset removes the key.
+Server-unavailable state is read-only with no offline queue. Cache only
+acknowledged source in protected Principal-bound storage.
 
-The step is complete when failure, conflict, cancel, sign-out, and unknown
-completion preserve the draft and never guess authority or cross Principals.
+The step is complete when failure, conflict, sign-out, and unknown completion
+keep pending changes and never guess authority or cross Principals.
 
 ## 6. Place and present
 
 Keep registry, JSONC grammar, resolution, inspection, schema inputs,
 and immutable projections under `src/prctr/platform/settings/common/`. Keep
-coordinator/network/protected-cache adapters in Electron main. Put UI under
-`src/prctr/workbench/contrib/settings/` and select it from the authenticated
-manifest/`authenticated.main.ts`.
+coordinator/network/protected-cache adapters in Electron main. Put the page
+under `src/prctr/workbench/contrib/account/` and presentation application under
+`src/prctr/workbench/contrib/settings/`, both selected from the authenticated
+manifest/`authenticated.main.ts`. `window.theme` picks Proctor Light/Dark for
+LaunchWindow and AuthenticatedWindow; `workbench.colorTheme` is the editor theme
+for CandidateWindow only.
 
 Use product-UI, accessibility, layout, and design-system skills for the page and
 preview. The step is complete when imports, process APIs, Session binding,
@@ -111,7 +116,7 @@ Test registry/generated parity, parser bounds/fuzzing, unknown/prohibited keys,
 precedence, conditional writes, ambiguity/conflict, cache isolation,
 Attempt Configuration closed schema/freeze/rejoin, and Candidate preload
 exclusion. Exercise the Account/Settings page for keyboard/focus, loading,
-invalid, conflict, unavailable, themes, reduced motion, high contrast, and 200%
+invalid, autosave, conflict, ambiguous, failure, Reset, Find, unavailable, themes, reduced motion, high contrast, and 200%
 zoom. Keep values/source/conflicts out of diagnostics.
 
 The work is complete when authority, artifacts, effective values, candidate

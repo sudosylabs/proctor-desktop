@@ -40,8 +40,8 @@
 - The Attempt Workspace boundary separates server snapshot, Desktop Working
   Overlay, and protected recovery/cache. The
   initial adapter is pinned to the server's integer-cursor/five-mutation v1.
-- User Settings remain one server-authoritative virtual JSONC document edited in
-  AuthenticatedWindow. Candidate behavior uses a closed server-validated frozen
+- User Settings remain one server-authoritative virtual JSONC document, edited
+  only through the Settings page in AuthenticatedWindow's Account. Candidate behavior uses a closed server-validated frozen
   Attempt Configuration.
 - The integrated browser is first-release scope with revision-frozen privileged
   navigation and minimized ordered Browser Activity over the candidate network.
@@ -66,12 +66,15 @@
 
 [Modern UI and floating panels](../architecture/design-system.md#modern-ui-and-floating-panels)
 are the required target for VS Code-derived UI and CandidateWindow's shell.
-AuthenticatedWindow instead uses the Proctor-owned
-[rail-and-sidebar frame](../architecture/design-system.md#authenticated-product-presentation);
-its buttons, menus and form controls are Proctor-owned too. Account pages (Profile, Sign-in and
-security, Sessions and devices) and Activity show detail in their own panels.
-Browser tests cover the frame's areas, history, sidebar resize, persistence and
-narrow overlay. macOS traffic-light placement, Liquid Glass/vibrancy on a
+LaunchWindow and AuthenticatedWindow use the Proctor-owned
+[product presentation](../architecture/design-system.md#authenticated-product-presentation):
+Proctor Light and Dark chosen by `window.theme`, Phosphor icons, Proctor
+buttons, menus, form controls, banners and toasts, centred Account pages with
+grouped lists, one states pattern for every section, and a sign-out
+confirmation. Settings is an Account page with autosave; the VS Code Settings
+editor and its JSON language server are deleted. Browser tests and the Control
+Explorer cover the frame, controls and pages. Reviewed Windows, macOS and Linux
+pixel baselines, macOS traffic-light placement, Liquid Glass/vibrancy on a
 resizable window, Windows Mica, forced colors and screen readers still need
 native release verification.
 CandidateWindow's presentation migration remains outstanding; LaunchWindow keeps
@@ -80,8 +83,8 @@ its accepted centered composition.
 ## Desktop implementation state
 
 The repository now contains a source-level Desktop application graph rather than
-only architecture and native foundations. Twenty-one Proctor-owned VS Code port
-clusters have exact manifests under `docs/upstream/vscode-ports/`: localization,
+only architecture and native foundations. Proctor-owned VS Code port clusters
+have exact manifests under `docs/upstream/vscode-ports/`: localization,
 base-common runtime, performance, Codicons and semantic icons, themes and design
 tokens, browser interaction, shared browser controls, context conditions,
 commands, instantiation/registry, actions/menus, keybindings, editor core,
@@ -156,8 +159,8 @@ User Settings includes the static generated registry, JSONC document/draft and
 comment-preserving edits, validation, effective-resolution and
 Attempt Configuration constraints. An Electron-main coordinator owns the
 protected cache and server-authoritative revisions, exposes a bounded preload
-protocol, and fails unavailable state read-only. AuthenticatedWindow has a real
-Account/Settings destination with structured and JSONC views. Production account
+protocol, and fails unavailable state read-only. AuthenticatedWindow's Settings
+page edits one key per control and autosaves against the acknowledged revision. Production account
 transport and protected cache implementations remain composition inputs.
 
 The integrated browser implements strict revision-frozen HTTP(S) policy

@@ -15,10 +15,14 @@ the relevant [product model](../../../docs/product/model.md), and the owning
 architecture topic. For shell or composition behavior, also use
 [`develop-workbench`](../develop-workbench/SKILL.md).
 
-Use the accepted
-[Modern UI and floating panels baseline](../../../docs/architecture/design-system.md#modern-ui-and-floating-panels)
-for shell composition and VS Code-derived UI. Inspect the relevant source and
-running surface through `adapt-vscode` before choosing a different arrangement.
+For LaunchWindow and AuthenticatedWindow, use the
+[Proctor product presentation](../../../docs/architecture/design-system.md#authenticated-product-presentation): its page
+layout, states pattern, Proctor controls and icons, and no decorative
+flourishes; the VS Code look is not a reference there. For CandidateWindow and
+VS Code-derived UI, use the
+[Modern UI and floating panels baseline](../../../docs/architecture/design-system.md#modern-ui-and-floating-panels) and
+inspect the relevant source and running surface through `adapt-vscode` before
+choosing a different arrangement.
 
 Identify the user, task, authoritative state owner, consequential decisions,
 latency and failure states, and what must remain visible. Continue an unresolved
