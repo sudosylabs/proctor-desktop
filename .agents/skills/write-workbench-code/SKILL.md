@@ -39,6 +39,19 @@ The in-repo reference is the LaunchWindow under
 - `launchPresentation.ts`: every state as a table entry, tested in Node without
   a DOM.
 
+The in-repo reference for a contribution with several pages is Account under
+`src/prctr/workbench/contrib/account/`:
+
+- `account.contribution.ts`: an injected class registered with
+  `descriptor: new SyncDescriptor(AccountContribution)`; it registers the item
+  resolver and creates `AccountPane` with `createInstance`.
+- `accountPane.ts`: creates a child instantiation service holding the
+  pane-scoped `IAccountPaneContext` (menu, toasts, focus) and builds each page
+  from `accountPageRegistry`.
+- `accountFormat.ts`: a window service for the feature's text and dates.
+- `widgets/`, and one folder per page: classes whose constructors take plain
+  arguments first, then `@I...` services.
+
 Other Proctor-authored renderer code is **not** precedent. Known debt to avoid
 copying:
 
@@ -51,18 +64,20 @@ The step is complete when you can name the upstream class your code mirrors.
 ## 2. Lay out the feature
 
 ```
-src/prctr/workbench/contrib/<feature>/browser/
+src/prctr/workbench/contrib/<feature>/
   <feature>.contribution.ts   registers the feature: items, actions, contributions
-  <feature>View.ts            the view or pane class
-  <feature>View.css           its styles, imported by <feature>View.ts
+  <feature>Pane.ts            the view or pane class
   <feature>Messages.ts        defineMessage descriptors for its text
+  media/<feature>Pane.css     its styles, imported by <feature>Pane.ts
+  common/                     DOM-free modules that Node tests import
+  widgets/, <page>/           building blocks, then one folder per page
 src/prctr/workbench/services/<area>/common/<area>.ts            interface + createDecorator
 src/prctr/workbench/services/<area>/browser/<area>Service.ts    implementation
 ```
 
-A feature never imports another feature's views. It reaches others through a
-service, a registry, a command or a context key. `source-code-organization` owns
-layer and runtime-folder placement.
+A feature never imports another feature. It reaches others through a service, a
+registry, a command or a context key; `source.graph` enforces this.
+`source-code-organization` owns layer and runtime-folder placement.
 
 The step is complete when each file has one of these roles.
 
@@ -133,7 +148,10 @@ export class ServerSummary extends Disposable {
   `LocalizationContext`.
 - **Children.** A child that needs services is created with
   `instantiationService.createInstance(Child, ...args)`, never `new` with
-  services passed by hand. A child with no services may use `new`.
+  services passed by hand; `proctor/no-new-injectable` rejects the `new`. A
+  child with no services, such as a `base/browser/ui` control, uses `new` and
+  reports back through events. Never pass a bag of services or "hooks" object
+  down to children; each class names the services it uses.
 - **Ownership.** Register every listener, child, emitter and timer with
   `this._register` as you create it. After an `await`, check `this._store.isDisposed`
   before touching DOM or state, and drop a late result whose revision or id is
@@ -167,6 +185,9 @@ class and nothing outlives `dispose()`.
   `descriptor: new SyncDescriptor(SomeContribution)`; the window creates the
   class at its phase. A contribution with asynchronous work exposes
   `whenActivated`.
+- **Scoped services:** a service bound to one pane's DOM, such as its row menu
+  and toasts, lives in a child instantiation service the pane creates
+  (`IAccountPaneContext`). Everything else is window-scoped.
 
 The step is complete when every dependency of a class appears, typed, in its
 constructor.

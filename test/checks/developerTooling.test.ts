@@ -15,7 +15,9 @@ import { readIndex, stagedPaths } from '../../build/lib/indexRepository.ts';
 import { repositoryPath, repositoryRoot, selectFiles } from '../../build/lib/paths.ts';
 import { selectSuites, testSuites, type TestSuite } from '../../build/lib/testSuites.ts';
 import {
+	declareServiceBrand,
 	disposableOwnership,
+	noNewInjectable,
 	noFocusedTests,
 	noSynchronousFileSystem,
 	noUnsafeDoubleAssertion,
@@ -177,6 +179,35 @@ void test('lint rules reject unsafe forms and accept the supported counterparts'
 			{
 				code: 'class Owner { store = new MutableDisposable(); }',
 				errors: [{ messageId: 'mutable' }]
+			}
+		]
+	});
+	tester.run('no-new-injectable', noNewInjectable, {
+		valid: [
+			'class Plain { constructor(readonly value: number) {} }\nnew Plain(1);',
+			'class Page { constructor(@IAccountService readonly account: IAccountService) {} }\ninstantiationService.createInstance(Page);'
+		],
+		invalid: [
+			{
+				code: 'class Page { constructor(host: HTMLElement, @IAccountService readonly account: IAccountService) {} }\nnew Page(host, account);',
+				errors: [{ messageId: 'injectable' }]
+			},
+			{
+				code: 'class Page { constructor(@IAccountService account: IAccountService) {} }\nnew Page(account);',
+				errors: [{ messageId: 'injectable' }]
+			}
+		]
+	});
+	tester.run('declare-service-brand', declareServiceBrand, {
+		valid: ['class Service { declare readonly _serviceBrand: undefined; }'],
+		invalid: [
+			{
+				code: 'class Service { readonly _serviceBrand: undefined; }',
+				errors: [{ messageId: 'brand' }]
+			},
+			{
+				code: 'class Service { declare _serviceBrand: undefined; }',
+				errors: [{ messageId: 'brand' }]
 			}
 		]
 	});

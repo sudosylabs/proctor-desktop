@@ -171,7 +171,10 @@ The
 [`source-code-organization`](../../.agents/skills/source-code-organization/SKILL.md)
 skill owns exact source placement.
 
-Each user-visible capability has one registration entrypoint. Trusted remote
+Each user-visible capability has one registration entrypoint: a
+`<feature>.contribution.ts` that pairs its immutable manifest descriptor with the
+class the window creates, through its instantiation service, at the descriptor's
+phase. Trusted remote
 data may create authorized instances of a packaged destination or capability;
 it cannot provide a manifest, module path, command implementation, or generic
 conditional registration. The initial architecture has no extension host or

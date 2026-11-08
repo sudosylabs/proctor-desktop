@@ -10,6 +10,8 @@ export type SourcePolicy = {
 	readonly environmentOverrides?: Readonly<Record<string, string>>;
 	/** The environment under a folder whose path names none; otherwise `common`. */
 	readonly defaultEnvironments?: Readonly<Record<string, string>>;
+	/** Where Proctor-authored feature contributions live, one folder per feature. */
+	readonly contributionRoot?: string;
 	readonly testSegments: readonly string[];
 	readonly productionDynamicImportAllowlist: readonly string[];
 	readonly staticAssetImports?: readonly {

@@ -10,6 +10,7 @@
     "environments",
     "environmentOverrides",
     "defaultEnvironments",
+    "contributionRoot",
     "testSegments",
     "productionDynamicImportAllowlist",
     "cssImportantOverrides"
@@ -59,6 +60,10 @@
       "additionalProperties": {
         "$ref": "#/$defs/name"
       }
+    },
+    "contributionRoot": {
+      "description": "The folder of Proctor-authored feature contributions, one folder per feature.",
+      "$ref": "#/$defs/path"
     },
     "testSegments": {
       "type": "array",

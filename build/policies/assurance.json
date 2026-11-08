@@ -18,6 +18,8 @@
         "source.deep-modules",
         "source.interface-tests",
         "source.static-contributions",
+        "source.contribution-boundaries",
+        "source.constructor-injection",
         "renderer.plain-dom",
         "renderer.no-ambient-node",
         "renderer.sandboxed",
@@ -112,6 +114,7 @@
       "invariants": [
         "source.namespace",
         "source.layer-direction",
+        "source.contribution-boundaries",
         "renderer.no-ambient-node",
         "runtime.handle-isolation",
         "design.test-code-excluded",
@@ -119,6 +122,18 @@
       ],
       "implementation": "source.graph",
       "evidence": ["build/policies/source-boundaries.json"]
+    },
+    {
+      "id": "constructor-injection-lint",
+      "kind": "source",
+      "status": "active",
+      "owner": "source-organization",
+      "invariants": ["source.constructor-injection"],
+      "evidence": [
+        "eslint.config.mjs",
+        "build/lint/rules.ts",
+        "test/checks/developerTooling.test.ts"
+      ]
     },
     {
       "id": "tooling-graph",

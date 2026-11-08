@@ -6,6 +6,7 @@ import selectorParser from 'postcss-selector-parser';
 import type { Check, Diagnostic, Repository } from './types.ts';
 import { diagnostic } from './types.ts';
 import { readJson } from './policies.ts';
+import { transferredFiles } from '../lib/formatOwnership.ts';
 import type { CompositionPolicy, SourcePolicy } from './policies.ts';
 
 type Edge = {
@@ -128,6 +129,69 @@ function environment(path: string, policy: SourcePolicy): string {
 	const defaults = Object.entries(policy.defaultEnvironments ?? {});
 	const folder = defaults.find(([root]) => path.startsWith(`${root}/`));
 	return folder?.[1] ?? 'common';
+}
+
+/**
+ * Proctor-authored contributions are renderer code: no environment folder except a
+ * `common/` for DOM-free modules, no imports of another contribution, and nothing in the
+ * shell or services reaches into one. Transferred VS Code clusters keep upstream topology.
+ */
+function contributionDiagnostics(
+	repository: Repository,
+	policy: SourcePolicy,
+	edges: readonly Edge[],
+	checkId: string
+): Diagnostic[] {
+	const root = policy.contributionRoot;
+	if (root === undefined) return [];
+	const transferred = transferredFiles(repository);
+	const feature = (path: string): string | undefined =>
+		path.startsWith(`${root}/`) ? path.slice(root.length + 1).split('/')[0] : undefined;
+	const authored = (path: string): boolean => !transferred.has(path) && !isTest(path, policy);
+	const diagnostics: Diagnostic[] = [];
+	const folders = Object.keys(policy.environments).filter((name) => name !== 'common');
+	for (const path of repository.files()) {
+		if (feature(path) === undefined || !isTs(path) || !authored(path)) continue;
+		const segments = path
+			.slice(root.length + 1)
+			.split('/')
+			.slice(1, -1);
+		const folder = segments.find((segment) => folders.includes(segment));
+		if (folder !== undefined)
+			diagnostics.push(
+				diagnostic(
+					checkId,
+					path,
+					`Contribution source sits in a ${folder}/ environment folder.`,
+					'Place contribution code in its feature folder; use common/ only for DOM-free modules that Node tests import.'
+				)
+			);
+	}
+	for (const edge of edges) {
+		if (!authored(edge.from) || !authored(edge.to)) continue;
+		const from = feature(edge.from);
+		const to = feature(edge.to);
+		if (to === undefined || from === to) continue;
+		if (from !== undefined)
+			diagnostics.push(
+				diagnostic(
+					checkId,
+					edge.from,
+					`Contribution ${from} imports contribution ${to}.`,
+					'Share through a workbench service, registry, command or context key instead.'
+				)
+			);
+		else if (edge.from.startsWith('src/prctr/workbench/'))
+			diagnostics.push(
+				diagnostic(
+					checkId,
+					edge.from,
+					`Workbench shell or service imports contribution ${to}.`,
+					'Invert the dependency: the contribution consumes a service the workbench owns, or the window composition root selects it.'
+				)
+			);
+	}
+	return diagnostics;
 }
 
 export function analyzeSource(repository: Repository): Graph {
@@ -395,6 +459,7 @@ export function analyzeSource(repository: Repository): Graph {
 				);
 		}
 	}
+	diagnostics.push(...contributionDiagnostics(repository, policy, edges, checkId));
 	for (const admission of assetImports) {
 		if (!usedAssetImports.has(admission))
 			diagnostics.push(

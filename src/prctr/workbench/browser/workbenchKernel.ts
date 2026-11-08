@@ -71,7 +71,7 @@ export function createWorkbenchKernelServices(
 	);
 	const contextKeyService = disposables.add(new ContextKeyService());
 	services.set(IContextKeyService, contextKeyService);
-	const commandService = disposables.add(new CommandService(instantiationService));
+	const commandService = disposables.add(instantiationService.createInstance(CommandService));
 	services.set(ICommandService, commandService);
 	const feedbackElement = document.createElement('span');
 	feedbackElement.className = 'prctr-workbench__keybinding-feedback';

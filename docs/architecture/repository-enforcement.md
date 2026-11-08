@@ -44,6 +44,11 @@ The active cheap controls cover:
   paths, UTF-8 and whitespace hygiene, and full-SHA GitHub Actions;
 - TypeScript imports, local resolution, NodeNext extensions, source namespace,
   layer/runtime/test direction, cycles, and literal dynamic imports;
+- contribution boundaries: no environment folder but `common/` inside a
+  Proctor-authored `workbench/contrib/<feature>`, no import between
+  contributions, and none from the workbench shell or services into one;
+- constructor injection through typed lint: no `new` for a class whose
+  constructor declares services, and declared service brands;
 - literal composition activation and transitive required/forbidden roots;
 - CSS ownership, cascade names/order, Proctor roots and variables, selector
   scope, and prohibited selectors or unreviewed `!important`;
@@ -59,8 +64,11 @@ Runtime classification normally comes from an explicit environment folder. An
 aggregate whose accepted product name cannot encode that folder uses one exact
 path classification in `source-boundaries.json`; the shared
 `workbench.common.main.ts` aggregate is therefore checked as browser source.
-This classification changes which dependency rules apply and is not a waiver
-from layer, runtime, composition, or cycle checking.
+Proctor-authored contributions carry no environment folder, so
+`defaultEnvironments` classifies `workbench/contrib` as browser source unless a
+path segment such as `common` names another environment. These classifications
+change which dependency rules apply and are not a waiver from layer, runtime,
+composition, or cycle checking.
 
 The text-hygiene check permits absolute-path and `file:` URI literals only in
 marked base-common port source and its transferred owner tests, where those

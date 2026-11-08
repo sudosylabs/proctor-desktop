@@ -17,6 +17,7 @@
   "defaultEnvironments": {
     "src/prctr/workbench/contrib": "browser"
   },
+  "contributionRoot": "src/prctr/workbench/contrib",
   "testSegments": ["test"],
   "productionDynamicImportAllowlist": [],
   "cssImportantOverrides": [

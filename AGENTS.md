@@ -95,12 +95,17 @@ The planned layers are:
 - `code` — Electron entrypoints and process composition.
 
 Dependencies point from `code` toward `workbench`, `editor`, `platform`, and
-`base`, never in the reverse direction. Runtime-specific code uses explicit
-`common`, `browser`, `node`, `electron-browser`, `electron-utility`, or
-`electron-main` folders.
+`base`, never in the reverse direction. Runtime-specific code in `base`,
+`platform`, `editor`, `code`, and `workbench/services` uses explicit `common`,
+`browser`, `node`, `electron-browser`, `electron-utility`, or `electron-main`
+folders. A Proctor-authored `workbench/contrib/<feature>` is renderer code with
+no environment folder; its `common/` holds only DOM-free modules that Node tests
+import. Ported VS Code clusters keep their upstream folders.
 
-Use constructor injection for services. Keep concrete adapters in process
-composition roots. User-visible capabilities enter through explicit
+Identify services with `createDecorator` and inject them through constructors.
+Each window has one strict instantiation service; a class that takes services is
+created with `createInstance`. Keep concrete adapters in process composition
+roots. User-visible capabilities enter through explicit
 Proctor-owned contribution manifests; an upstream aggregate entrypoint never
 chooses the product for us.
 

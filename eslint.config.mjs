@@ -117,6 +117,16 @@ export default [
 		files: ['src/prctr/workbench/node/desktopAuthCallbackPage.ts'],
 		rules: { 'proctor/no-sync-fs': 'off' }
 	},
+	{
+		// Proctor services and the classes that take them are created through the window's
+		// instantiation service; ported clusters keep their upstream construction.
+		files: ['src/prctr/workbench/**/*.ts', 'src/prctr/code/**/*.ts'],
+		ignores: transferred,
+		rules: {
+			'proctor/no-new-injectable': 'error',
+			'proctor/declare-service-brand': 'error'
+		}
+	},
 	{ files: ['test/**/*.ts'], rules: { 'proctor/no-focused-tests': 'error' } },
 	{
 		// Chromium-harness and real-Electron suites run outside the Node runner; checks test build tooling.

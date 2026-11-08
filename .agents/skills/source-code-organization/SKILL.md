@@ -39,6 +39,13 @@ Use the narrowest API set:
 - `electron-utility`: Node.js and Electron utility-process APIs;
 - `electron-main`: Node.js and Electron main-process APIs.
 
+These folders apply in `base`, `platform`, `editor`, `code`, and
+`workbench/services`. A Proctor-authored `workbench/contrib/<feature>` is
+renderer code without environment folders: the source policy's
+`defaultEnvironments` classifies it as `browser`, and a `common/` folder inside
+it holds only DOM-free modules that Node tests import. Ported VS Code clusters
+keep their upstream folders.
+
 Keep Electron, Node.js, and native handles below environment-neutral and
 renderer interfaces. The step is complete when the folder name matches the APIs
 actually imported.
@@ -47,7 +54,31 @@ actually imported.
 
 Use a platform service for a stable capability shared by higher layers. Use a
 workbench service for cross-feature product behavior. Use
-`workbench/contrib/<name>` for one user-visible capability.
+`workbench/contrib/<name>` for one user-visible capability. A window's own frame
+lives beside the shell: `workbench/browser/launch/` for LaunchWindow and
+`workbench/browser/authenticated/` for AuthenticatedWindow, whose navigation
+contract is `workbench/services/authenticatedNavigation`.
+
+Lay a contribution out by what each part is, as `workbench/contrib/account/`
+does:
+
+```
+contrib/<feature>/
+  <feature>.contribution.ts  the registration; the window creates its class at its phase
+  <feature>Pane.ts           the pane, beside its page registry, pane context and services
+  <feature>Messages.ts       shared text; a page's own text lives in the page's folder
+  media/                     the root's styles
+  common/                    DOM-free modules that Node tests import
+  widgets/                   building blocks every page uses
+  <page>/                    one folder per page: the page, its dialogs, messages, media/
+```
+
+Identify each service with `createDecorator` beside its interface. Register
+window services in the window's composition root under
+`src/prctr/code/electron-browser/` (for AuthenticatedWindow,
+`authenticatedServices.ts`) through `WorkbenchBootstrapOptions.services`; never
+with `registerSingleton`. A service bound to one pane's DOM goes in a child
+instantiation service the pane creates.
 
 Place the stable identity contract and renderer projection client in
 `platform/identity`; place attempt-scoped exam-security orchestration in
@@ -67,17 +98,20 @@ schemas, target artifacts, and package layout.
 
 Give each contribution one registration entrypoint. Keep its implementation
 private. Route cross-contribution behavior through one narrow shared contract or
-an owning workbench service. Import contributions only from Proctor-owned
-manifests.
+an owning workbench service; `source.graph` rejects an import from one
+contribution into another and from the shell or services into a contribution.
+Import contributions only from Proctor-owned manifests and window composition
+roots.
 
 Keep static setting declarations, JSONC grammar, resolution,
 inspection, generated-schema inputs, and immutable projections under
 `src/prctr/platform/settings/common/`. Keep privileged settings transport and
 protected-cache ownership in Electron main. Put the editing surface in
-`src/prctr/workbench/contrib/settings/` and select it only from the authenticated
-manifest and `src/prctr/code/electron-browser/authenticated.main.ts`. Use
-[`develop-user-settings`](../develop-user-settings/SKILL.md) for its authority,
-Attempt Configuration, and interface rules.
+`src/prctr/workbench/contrib/account/settings/`, the window presentation in
+`src/prctr/workbench/contrib/settings/`, and select them only from the
+authenticated manifest and `src/prctr/code/electron-browser/authenticated.main.ts`.
+Use [`develop-user-settings`](../develop-user-settings/SKILL.md) for its
+authority, Attempt Configuration, and interface rules.
 
 Keep browser policy/activity contracts and canonicalization under
 `src/prctr/platform/integratedBrowser/common/`, privileged Electron session and
@@ -119,8 +153,12 @@ source-session, process, privacy, failure, and platform-verification contract.
 
 ## 5. Place supporting material
 
-Co-locate focused tests and renderer CSS with the owning module family. Put
-cross-process, smoke, packaging, and full-application tests under root `test/`.
+Co-locate renderer CSS with the owning module family, under its `media/`
+folder. Put tests under root `test/`, mirroring the source path
+(`test/workbench/contrib/account/common/` tests
+`src/prctr/workbench/contrib/account/common/`); Chromium-harness suites live in
+`test/browser/` and build the class under test through a test instantiation
+service with typed doubles of its services.
 Put product assets under `resources/`, build implementation under `build/`, and
 human-facing commands under `scripts/`.
 

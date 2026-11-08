@@ -27,6 +27,13 @@ not replace the review questions in
   raw `createElement` everywhere else. The files in
   `build/lint/legacyElementCreation.json` predate it; remove a file from that list
   when you migrate it, and never add one.
+- `source.graph` rejects an environment folder other than `common/` inside a
+  Proctor-authored `workbench/contrib/<feature>`, an import from one
+  contribution into another, and an import from the workbench shell or services
+  into a contribution.
+- `proctor/no-new-injectable` rejects `new` for a class whose constructor
+  declares services; create it with `createInstance`. `proctor/declare-service-brand`
+  requires `declare readonly _serviceBrand: undefined;` on service classes.
 - Files carrying `@proctor-vscode-port` belong to a manifest under
   `docs/upstream/vscode-ports/`; change them only through
   [`adapt-vscode`](../../.agents/skills/adapt-vscode/SKILL.md).

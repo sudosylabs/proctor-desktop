@@ -1,4 +1,5 @@
 import type { Rule } from 'eslint';
+import ts from 'typescript';
 
 // These are Proctor contracts, not a copy of VS Code's product-specific plugin.
 export const noFocusedTests: Rule.RuleModule = {
@@ -200,6 +201,82 @@ export const preferElementFactory: Rule.RuleModule = {
 	}
 };
 
+interface TypedParserServices {
+	readonly program?: ts.Program | null;
+	readonly esTreeNodeToTSNodeMap?: { get(node: unknown): ts.Node };
+}
+
+/** Whether a class's own constructor declares a parameter decorator, i.e. injected services. */
+function hasInjectedConstructor(declaration: ts.Declaration): boolean {
+	if (!ts.isClassDeclaration(declaration) && !ts.isClassExpression(declaration)) return false;
+	const constructor = declaration.members.find(ts.isConstructorDeclaration);
+	return (
+		constructor?.parameters.some(
+			(parameter) => (ts.getDecorators(parameter)?.length ?? 0) > 0
+		) ?? false
+	);
+}
+
+export const noNewInjectable: Rule.RuleModule = {
+	meta: {
+		type: 'problem',
+		schema: [],
+		messages: {
+			injectable:
+				'{{name}} declares injected services; create it with IInstantiationService.createInstance.'
+		}
+	},
+	create(context) {
+		const services = context.sourceCode.parserServices as TypedParserServices | undefined;
+		const checker = services?.program?.getTypeChecker();
+		const local = new Set<string>();
+		return {
+			'ClassDeclaration MethodDefinition[kind="constructor"] > FunctionExpression > TSParameterProperty[decorators.length>0], ClassDeclaration MethodDefinition[kind="constructor"] > FunctionExpression > Identifier[decorators.length>0]'(
+				node: Rule.Node
+			) {
+				const owner = context.sourceCode
+					.getAncestors(node)
+					.reverse()
+					.find((ancestor) => ancestor.type === 'ClassDeclaration');
+				if (owner?.type === 'ClassDeclaration' && owner.id) local.add(owner.id.name);
+			},
+			'NewExpression[callee.type="Identifier"]:exit'(node: Rule.Node) {
+				if (node.type !== 'NewExpression' || node.callee.type !== 'Identifier') return;
+				const name = node.callee.name;
+				let injected = local.has(name);
+				if (!injected && checker !== undefined && services?.esTreeNodeToTSNodeMap) {
+					let symbol = checker.getSymbolAtLocation(
+						services.esTreeNodeToTSNodeMap.get(node.callee)
+					);
+					if (symbol !== undefined && symbol.flags & ts.SymbolFlags.Alias)
+						symbol = checker.getAliasedSymbol(symbol);
+					injected = (symbol?.declarations ?? []).some(hasInjectedConstructor);
+				}
+				if (injected) context.report({ node, messageId: 'injectable', data: { name } });
+			}
+		};
+	}
+};
+
+export const declareServiceBrand: Rule.RuleModule = {
+	meta: {
+		type: 'problem',
+		schema: [],
+		messages: {
+			brand: 'Declare the service brand as `declare readonly _serviceBrand: undefined;` so no field is emitted.'
+		}
+	},
+	create(context) {
+		return {
+			'PropertyDefinition[key.name="_serviceBrand"]'(node: Rule.Node) {
+				const definition = node as Rule.Node & { declare?: boolean; readonly?: boolean };
+				if (definition.declare !== true || definition.readonly !== true)
+					context.report({ node, messageId: 'brand' });
+			}
+		};
+	}
+};
+
 export const rules = {
 	'no-focused-tests': noFocusedTests,
 	'disposable-ownership': disposableOwnership,
@@ -207,5 +284,7 @@ export const rules = {
 	'no-sync-fs': noSynchronousFileSystem,
 	'require-leak-checked-tests': requireLeakCheckedTests,
 	'prefer-dom-helpers': preferDomHelpers,
-	'prefer-element-factory': preferElementFactory
+	'prefer-element-factory': preferElementFactory,
+	'no-new-injectable': noNewInjectable,
+	'declare-service-brand': declareServiceBrand
 };

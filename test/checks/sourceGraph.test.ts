@@ -128,6 +128,52 @@ void test('source graph gives folders without an environment segment their defau
 	assert.equal(analyzeSource(nodeImport).diagnostics.length, 1);
 });
 
+void test('contributions keep to their feature folder and import no other contribution', () => {
+	const policy = JSON.stringify({
+		sourceRoot: 'src/prctr',
+		layers: ['base', 'platform', 'editor', 'workbench', 'code'],
+		environments: { common: ['common'], browser: ['common', 'browser'] },
+		defaultEnvironments: { 'src/prctr/workbench/contrib': 'browser' },
+		contributionRoot: 'src/prctr/workbench/contrib',
+		testSegments: ['test'],
+		productionDynamicImportAllowlist: []
+	});
+	const problems = (files: Record<string, string>): string[] =>
+		analyzeSource(
+			new VirtualRepository({
+				'build/policies/source-boundaries.json': policy,
+				'package.json': '{"dependencies":{}}',
+				...files
+			})
+		).diagnostics.map((value) => value.problem);
+	assert.deepEqual(
+		problems({
+			'src/prctr/workbench/contrib/owner/ownerPage.ts': "import './common/model.js';\n",
+			'src/prctr/workbench/contrib/owner/common/model.ts': 'export const model = true;\n'
+		}),
+		[]
+	);
+	assert.deepEqual(
+		problems({ 'src/prctr/workbench/contrib/owner/browser/ownerPage.ts': 'export {};\n' }),
+		['Contribution source sits in a browser/ environment folder.']
+	);
+	assert.deepEqual(
+		problems({
+			'src/prctr/workbench/contrib/owner/ownerPage.ts': "import '../other/otherPage.js';\n",
+			'src/prctr/workbench/contrib/other/otherPage.ts': 'export {};\n'
+		}),
+		['Contribution owner imports contribution other.']
+	);
+	assert.deepEqual(
+		problems({
+			'src/prctr/workbench/services/owner/browser/ownerService.ts':
+				"import '../../../contrib/owner/ownerPage.js';\n",
+			'src/prctr/workbench/contrib/owner/ownerPage.ts': 'export {};\n'
+		}),
+		['Workbench shell or service imports contribution owner.']
+	);
+});
+
 void test('CSS important declarations require one exact override-layer exception', async () => {
 	const path = 'src/prctr/workbench/browser/owner.css';
 	const selector = '.prctr-owner .compatibility';
