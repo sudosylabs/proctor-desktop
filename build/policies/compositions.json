@@ -102,7 +102,7 @@
         "src/prctr/workbench/services/integratedBrowser/electron-main"
       ],
       "forbidden": [
-        "src/prctr/workbench/contrib/integratedBrowser/browser",
+        "src/prctr/workbench/contrib/integratedBrowser",
         "src/prctr/platform/native/electron-utility"
       ],
       "allowedDynamicImports": []
@@ -129,7 +129,7 @@
         "src/prctr/platform/settings/common",
         "src/prctr/platform/settings/electron-main"
       ],
-      "forbidden": ["src/prctr/workbench/contrib/settings/browser", "src/prctr/platform/native"],
+      "forbidden": ["src/prctr/workbench/contrib/settings", "src/prctr/platform/native"],
       "allowedDynamicImports": []
     },
     {

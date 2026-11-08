@@ -2,27 +2,27 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
-import { KeyCode, KeyMod } from '../../../../base/common/keyCodes.js';
-import { Disposable, toDisposable } from '../../../../base/common/lifecycle.js';
-import { defineMessage } from '../../../../base/common/localization.js';
-import { INotificationService } from '../../../../platform/notification/common/notification.js';
-import { KeybindingWeight } from '../../../../platform/keybinding/common/keybindingsRegistry.js';
-import { parseSettingsDocument } from '../../../../platform/settings/common/settingsDocument.js';
-import { settingsRegistry } from '../../../../platform/settings/common/settingsRegistry.js';
-import type { UserSettingsProjection } from '../../../../platform/settings/common/settingsRendererProtocol.js';
+import { SyncDescriptor } from '../../../platform/instantiation/common/descriptors.js';
+import { KeyCode, KeyMod } from '../../../base/common/keyCodes.js';
+import { Disposable, toDisposable } from '../../../base/common/lifecycle.js';
+import { defineMessage } from '../../../base/common/localization.js';
+import { INotificationService } from '../../../platform/notification/common/notification.js';
+import { KeybindingWeight } from '../../../platform/keybinding/common/keybindingsRegistry.js';
+import { parseSettingsDocument } from '../../../platform/settings/common/settingsDocument.js';
+import { settingsRegistry } from '../../../platform/settings/common/settingsRegistry.js';
+import type { UserSettingsProjection } from '../../../platform/settings/common/settingsRendererProtocol.js';
 import {
 	IBrowserThemeService,
 	type BrowserThemeService
-} from '../../../../platform/theme/browser/themeService.js';
-import { PROCTOR_SCHEME_THEME_NAMES } from '../../../../platform/theme/common/bundledThemes.js';
-import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
-import { IWorkbenchWindowService } from '../../../browser/workbenchServices.js';
-import { WorkbenchModalContext } from '../../../common/contextKeys.js';
-import { registerProctorAction } from '../../../services/actions/common/proctorActions.js';
-import { ILocalizationService } from '../../../services/localization/common/localization.js';
-import { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
-import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
+} from '../../../platform/theme/browser/themeService.js';
+import { PROCTOR_SCHEME_THEME_NAMES } from '../../../platform/theme/common/bundledThemes.js';
+import type { WorkbenchContributionRegistration } from '../../browser/bootstrap.js';
+import { IWorkbenchWindowService } from '../../browser/workbenchServices.js';
+import { WorkbenchModalContext } from '../../common/contextKeys.js';
+import { registerProctorAction } from '../../services/actions/common/proctorActions.js';
+import { ILocalizationService } from '../../services/localization/common/localization.js';
+import { IUserSettingsService } from '../../services/settings/common/settingsRendererClient.js';
+import { IAuthenticatedNavigationService } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 
 export const OPEN_SETTINGS_COMMAND_ID = 'prctr.authenticated.openSettings';
 

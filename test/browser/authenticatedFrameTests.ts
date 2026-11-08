@@ -6,7 +6,7 @@ import { authenticatedFrameContribution } from '../../src/prctr/workbench/browse
 import { IAuthenticatedNavigationService } from '../../src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { ICommandService } from '../../src/prctr/platform/commands/common/commands.js';
 import { isMacintosh } from '../../src/prctr/base/common/platform.js';
-import { settingsContribution } from '../../src/prctr/workbench/contrib/settings/browser/settingsContribution.js';
+import { settingsContribution } from '../../src/prctr/workbench/contrib/settings/settings.contribution.js';
 import type { UserSettingsProjection } from '../../src/prctr/platform/settings/common/settingsRendererProtocol.js';
 import { IBrowserThemeService } from '../../src/prctr/platform/theme/browser/themeService.js';
 import { authenticatedWindowServices } from '../../src/prctr/code/electron-browser/authenticatedServices.js';

@@ -8,7 +8,7 @@ import {
 import { readExamActivityWire } from '../../../../src/prctr/platform/examActivity/electron-main/examActivityWire.js';
 import { ExamActivityIpcBridge } from '../../../../src/prctr/platform/examActivity/electron-main/examActivityIpc.js';
 import { desktopHttpMethod } from '../../../../src/prctr/platform/identity/node/desktopAuthHttp.js';
-import { ProductAccess } from '../../../../src/prctr/workbench/contrib/examActivity/browser/productAccess.js';
+import { ProductAccess } from '../../../../src/prctr/workbench/contrib/examActivity/common/productAccess.js';
 const id = 'y'.repeat(26);
 const date = '2026-09-11T08:00:00Z';
 void test('exam capability rejects arbitrary paths, binding injection, unsupported actions and excessive cursors', () => {

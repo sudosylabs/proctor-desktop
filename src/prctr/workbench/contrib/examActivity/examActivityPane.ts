@@ -1,30 +1,30 @@
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
-import { HoverPosition } from '../../../../base/browser/ui/hover/hoverWidget.js';
-import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
-import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
-import type { CancellationToken } from '../../../../base/common/cancellation.js';
-import { renderMarkdown } from '../../../../base/browser/markdownRenderer.js';
-import { MarkdownString } from '../../../../base/common/htmlContent.js';
-import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import { ButtonControl } from '../../../base/browser/ui/button/buttonControl.js';
+import { HoverPosition } from '../../../base/browser/ui/hover/hoverWidget.js';
+import { DomScrollableElement } from '../../../base/browser/ui/scrollbar/scrollableElement.js';
+import { ScrollbarVisibility } from '../../../base/common/scrollable.js';
+import { Disposable, DisposableStore } from '../../../base/common/lifecycle.js';
+import type { CancellationToken } from '../../../base/common/cancellation.js';
+import { renderMarkdown } from '../../../base/browser/markdownRenderer.js';
+import { MarkdownString } from '../../../base/common/htmlContent.js';
+import { createSemanticIcon } from '../../../platform/theme/browser/semanticIcon.js';
 import {
 	validateExamActivityResponse,
 	type ExamActivity,
 	type ExamActivityResponse
-} from '../../../../platform/examActivity/common/examActivityProtocol.js';
-import { IHoverService } from '../../../../platform/hover/browser/hover.js';
-import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
-import type { ResolvedWorkbenchItem } from '../../../common/workbenchItem.js';
-import { ILocalizationService } from '../../../services/localization/common/localization.js';
+} from '../../../platform/examActivity/common/examActivityProtocol.js';
+import { IHoverService } from '../../../platform/hover/browser/hover.js';
+import type { WorkbenchPane } from '../../browser/workbenchPane.js';
+import type { ResolvedWorkbenchItem } from '../../common/workbenchItem.js';
+import { ILocalizationService } from '../../services/localization/common/localization.js';
 import {
 	IAuthenticatedNavigationService,
 	type ActivityView
-} from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
-import { authenticatedMessages } from '../../../browser/authenticated/authenticatedMessages.js';
-import { ProductAccess } from './productAccess.js';
+} from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
+import { authenticatedMessages } from '../../browser/authenticated/authenticatedMessages.js';
+import { ProductAccess } from './common/productAccess.js';
 import { examActivityMessages as m } from './examActivityMessages.js';
-import './examActivity.css';
+import './media/examActivity.css';
 
 type Page = 'activity' | 'management' | 'administration';
 /** Presentation and selection only; identity's bound read capability owns all server requests. */

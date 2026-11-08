@@ -218,7 +218,9 @@
     "../src/prctr/workbench/services/localization/common/**/*.ts",
     "../src/prctr/workbench/services/account/common/**/*.ts",
     "../src/prctr/workbench/services/examActivity/common/**/*.ts",
-    "../src/prctr/workbench/services/authenticatedHost/common/**/*.ts"
+    "../src/prctr/workbench/services/authenticatedHost/common/**/*.ts",
+    "../src/prctr/workbench/contrib/attemptWorkspace/common/**/*.ts",
+    "../src/prctr/workbench/contrib/examActivity/common/**/*.ts"
   ],
   "compileOnSave": false
 }

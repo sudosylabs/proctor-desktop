@@ -2,17 +2,17 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { Disposable } from '../../../../base/common/lifecycle.js';
-import { defineMessage, type MessageDescriptor } from '../../../../base/common/localization.js';
-import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
+import { SyncDescriptor } from '../../../platform/instantiation/common/descriptors.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import { Disposable } from '../../../base/common/lifecycle.js';
+import { defineMessage, type MessageDescriptor } from '../../../base/common/localization.js';
+import type { WorkbenchContributionRegistration } from '../../browser/bootstrap.js';
 import {
 	IWorkbenchShellService,
 	IWorkbenchWindowService
-} from '../../../browser/workbenchServices.js';
-import { ILocalizationService } from '../../../services/localization/common/localization.js';
-import './attemptWorkspaceContribution.css';
+} from '../../browser/workbenchServices.js';
+import { ILocalizationService } from '../../services/localization/common/localization.js';
+import './media/attemptWorkspace.css';
 
 const destinations = Object.freeze({
 	workspace: defineMessage({

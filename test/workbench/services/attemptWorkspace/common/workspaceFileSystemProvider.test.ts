@@ -8,7 +8,7 @@ import {
 	AttemptWorkspaceFileSystemProvider,
 	ExamResourceFileSystemProvider,
 	workspaceUri
-} from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts';
+} from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.ts';
 import {
 	DeterministicWorkspaceIds,
 	InMemoryExamResourcePort,

@@ -1,4 +1,4 @@
-import { defineMessage } from '../../../../base/common/localization.js';
+import { defineMessage } from '../../../base/common/localization.js';
 
 export const examActivityMessages = {
 	upcomingDescription: defineMessage({

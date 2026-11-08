@@ -5,7 +5,7 @@ import { URI } from '../../../../../src/prctr/base/common/uri.js';
 import { VSBuffer } from '../../../../../src/prctr/base/common/buffer.js';
 import { FileService } from '../../../../../src/prctr/platform/files/common/fileService.js';
 import { NullLogService } from '../../../../../src/prctr/platform/log/common/log.js';
-import { WorkspaceFileServiceProvider } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/browser/fileServiceProviders.js';
+import { WorkspaceFileServiceProvider } from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/fileServiceProviders.js';
 import { createAttemptWorkspaceSession } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspaceSession.js';
 import { WORKSPACE_V1_DEFAULT_LIMITS } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.js';
 import {
@@ -131,7 +131,7 @@ test('Exam Resource metadata and content are fenced immediately with the catalog
 	const { createExamResourceCatalog } =
 		await import('../../../../../src/prctr/workbench/services/attemptWorkspace/common/examResourceCatalog.js');
 	const { ExamResourceFileServiceProvider } =
-		await import('../../../../../src/prctr/workbench/contrib/attemptWorkspace/browser/fileServiceProviders.js');
+		await import('../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/fileServiceProviders.js');
 	const changes = new Emitter<void>();
 	let allowed = true;
 	const value = {

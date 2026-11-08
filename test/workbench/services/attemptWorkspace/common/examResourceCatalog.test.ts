@@ -7,7 +7,7 @@ import {
 import {
 	ExamResourceFileSystemProvider,
 	examResourceUri
-} from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts';
+} from '../../../../../src/prctr/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.ts';
 import type { ExamResourceEntry } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts';
 import type { ExamResourcePort } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/internalPorts.ts';
 import { InMemoryExamResourcePort } from './inMemoryAdapters.ts';

@@ -2,30 +2,26 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { defineMessage, type MessageDescriptor } from '../../../../base/common/localization.js';
-import {
-	Disposable,
-	DisposableStore,
-	type IDisposable
-} from '../../../../base/common/lifecycle.js';
-import { IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
-import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
+import { SyncDescriptor } from '../../../platform/instantiation/common/descriptors.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import { defineMessage, type MessageDescriptor } from '../../../base/common/localization.js';
+import { Disposable, DisposableStore, type IDisposable } from '../../../base/common/lifecycle.js';
+import { IContextKeyService } from '../../../platform/contextkey/common/contextkey.js';
+import type { WorkbenchContributionRegistration } from '../../browser/bootstrap.js';
 import {
 	IWorkbenchShellService,
 	IWorkbenchWindowService
-} from '../../../browser/workbenchServices.js';
-import { CandidateInteractionAllowedContext } from '../../../common/contextKeys.js';
-import { ICandidateSecurityService } from '../../../services/examSecurity/common/candidateSecurity.js';
+} from '../../browser/workbenchServices.js';
+import { CandidateInteractionAllowedContext } from '../../common/contextKeys.js';
+import { ICandidateSecurityService } from '../../services/examSecurity/common/candidateSecurity.js';
 import type {
 	CandidateCorrectionCapability,
 	CandidateSecurityIntent,
 	CandidateSecurityProjection,
 	SafeSecurityReason
-} from '../../../services/examSecurity/common/securityProjectionProtocol.js';
-import { ILocalizationService } from '../../../services/localization/common/localization.js';
-import './examSecurityContribution.css';
+} from '../../services/examSecurity/common/securityProjectionProtocol.js';
+import { ILocalizationService } from '../../services/localization/common/localization.js';
+import './media/examSecurity.css';
 const messages = Object.freeze({
 	checking: defineMessage({
 		id: 'candidate.security.checking',

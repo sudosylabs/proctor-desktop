@@ -912,13 +912,13 @@ resources/server-api/openapi.json
 /src/prctr/workbench/common/theme.ts
 /src/prctr/workbench/common/views.ts
 /src/prctr/workbench/common/workbenchItem.ts
-/src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts
+/src/prctr/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.ts
 /src/prctr/workbench/contrib/bulkEdit/browser/bulkCellEdits.ts
 /src/prctr/workbench/contrib/bulkEdit/browser/bulkFileEdits.ts
 /src/prctr/workbench/contrib/bulkEdit/browser/opaqueEdits.ts
 /src/prctr/workbench/contrib/extensions/common/extensions.ts
 /src/prctr/workbench/contrib/extensions/common/extensionsInput.ts
-/src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts
+/src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts
 /src/prctr/workbench/contrib/modernUI/browser/media/activityBar.css
 /src/prctr/workbench/contrib/modernUI/browser/media/commandCenter.css
 /src/prctr/workbench/contrib/modernUI/browser/media/editorBorder.css

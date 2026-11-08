@@ -7,9 +7,9 @@
   "src/prctr/workbench/browser/parts/notifications/notifications.ts",
   "src/prctr/workbench/browser/startupSurface.ts",
   "src/prctr/workbench/browser/workbenchKernel.ts",
-  "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts",
-  "src/prctr/workbench/contrib/examActivity/browser/examActivityPane.ts",
-  "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts",
+  "src/prctr/workbench/contrib/attemptWorkspace/attemptWorkspace.contribution.ts",
+  "src/prctr/workbench/contrib/examActivity/examActivityPane.ts",
+  "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts",
   "src/prctr/workbench/services/resourcePreview/browser/pdfPreviewEntry.ts",
   "src/prctr/workbench/services/resourcePreview/browser/sandboxPreviewHost.ts"
 ]

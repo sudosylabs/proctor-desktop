@@ -48,7 +48,7 @@
       "disposition": "behaviorally-reimplemented",
       "rationale": "The Candidate pane owns native WebContentsView bounds, visibility, overlay blocking, focus, isolated zoom conversion and teardown through a closed validated renderer-to-main surface protocol.",
       "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "localPath": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     {
       "upstreamPath": "src/vs/platform/webview/electron-main/webviewMainService.ts",
@@ -112,7 +112,7 @@
         "src/prctr/platform/integratedBrowser/common/browserProtocol.ts",
         "src/prctr/platform/integratedBrowser/electron-main/electronBrowserEnforcer.ts",
         "src/prctr/workbench/services/integratedBrowser/electron-main/integratedBrowserIpc.ts",
-        "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+        "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
       ],
       "verificationRefs": ["browser-pane-test", "packaged-browser-test", "source-check"]
     },

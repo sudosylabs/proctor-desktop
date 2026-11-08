@@ -2,20 +2,20 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import type { CancellationToken } from '../../../../base/common/cancellation.js';
-import { defineMessage, type MessageDescriptor } from '../../../../base/common/localization.js';
-import { Disposable } from '../../../../base/common/lifecycle.js';
-import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import type { IntegratedBrowserIntent, IntegratedBrowserProjection, IntegratedBrowserSurface } from '../../../../platform/integratedBrowser/common/browserProtocol.js';
-import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
-import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
-import { IWorkbenchItemResolverService, IWorkbenchShellService } from '../../../browser/workbenchServices.js';
-import type { ResolvedWorkbenchItem, WorkbenchItem } from '../../../common/workbenchItem.js';
-import { IIntegratedBrowserService } from '../../../services/integratedBrowser/common/integratedBrowser.js';
-import { ILocalizationService } from '../../../services/localization/common/localization.js';
-import './integratedBrowserContribution.css';
+import { SyncDescriptor } from '../../../platform/instantiation/common/descriptors.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import type { CancellationToken } from '../../../base/common/cancellation.js';
+import { defineMessage, type MessageDescriptor } from '../../../base/common/localization.js';
+import { Disposable } from '../../../base/common/lifecycle.js';
+import { IInstantiationService } from '../../../platform/instantiation/common/instantiation.js';
+import type { IntegratedBrowserIntent, IntegratedBrowserProjection, IntegratedBrowserSurface } from '../../../platform/integratedBrowser/common/browserProtocol.js';
+import type { WorkbenchContributionRegistration } from '../../browser/bootstrap.js';
+import type { WorkbenchPane } from '../../browser/workbenchPane.js';
+import { IWorkbenchItemResolverService, IWorkbenchShellService } from '../../browser/workbenchServices.js';
+import type { ResolvedWorkbenchItem, WorkbenchItem } from '../../common/workbenchItem.js';
+import { IIntegratedBrowserService } from '../../services/integratedBrowser/common/integratedBrowser.js';
+import { ILocalizationService } from '../../services/localization/common/localization.js';
+import './media/integratedBrowser.css';
 
 interface ResolvedIntegratedBrowserItem extends ResolvedWorkbenchItem { readonly startRuleId: string }
 const messages = Object.freeze({ title: defineMessage({ id: 'candidate.browser.title', defaultMessage: 'Browser', description: 'Title of the policy-controlled Candidate browser item.' }), location: defineMessage({ id: 'candidate.browser.location', defaultMessage: 'Address', description: 'Accessible label for the Candidate browser address.' }), back: defineMessage({ id: 'candidate.browser.back', defaultMessage: 'Back', description: 'Candidate browser back action.' }), forward: defineMessage({ id: 'candidate.browser.forward', defaultMessage: 'Forward', description: 'Candidate browser forward action.' }), reload: defineMessage({ id: 'candidate.browser.reload', defaultMessage: 'Reload', description: 'Candidate browser reload action.' }), close: defineMessage({ id: 'candidate.browser.close', defaultMessage: 'Close browser', description: 'Candidate browser close action.' }), blocked: defineMessage({ id: 'candidate.browser.blocked', defaultMessage: 'Browser access is currently restricted.', description: 'Candidate browser policy or security gate state.' }), opening: defineMessage({ id: 'candidate.browser.opening', defaultMessage: 'Browser is opening.', description: 'Candidate browser opening state.' }), ready: defineMessage({ id: 'candidate.browser.ready', defaultMessage: 'Browser is ready.', description: 'Candidate browser ready state.' }), closed: defineMessage({ id: 'candidate.browser.closed', defaultMessage: 'Browser is closed.', description: 'Candidate browser closed state.' }), failed: defineMessage({ id: 'candidate.browser.failed', defaultMessage: 'The browser action could not be completed.', description: 'Safe Candidate browser action failure.' }) });

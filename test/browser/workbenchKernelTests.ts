@@ -56,8 +56,8 @@ import type {
 	ResolvedWorkbenchItem,
 	WorkbenchItem
 } from '../../src/prctr/workbench/common/workbenchItem.ts';
-import { ExamSecurityContribution } from '../../src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts';
-import { IntegratedBrowserContribution } from '../../src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts';
+import { ExamSecurityContribution } from '../../src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts';
+import { IntegratedBrowserContribution } from '../../src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts';
 import { commonWorkbenchContributions } from '../../src/prctr/workbench/workbench.common.main.ts';
 import { createDesktopWorkbenchContribution } from '../../src/prctr/code/electron-browser/workbench.desktop.main.ts';
 import type {

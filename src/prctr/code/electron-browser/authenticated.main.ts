@@ -9,8 +9,8 @@ import { authenticatedComposition } from '../../workbench/browser/authenticatedM
 import { bootstrapWorkbench } from '../../workbench/browser/bootstrap.js';
 import { accountContribution } from '../../workbench/contrib/account/account.contribution.js';
 import { authenticatedFrameContribution } from '../../workbench/browser/authenticated/authenticated.contribution.js';
-import { examActivityContribution } from '../../workbench/contrib/examActivity/browser/examActivityContribution.js';
-import { settingsContribution } from '../../workbench/contrib/settings/browser/settingsContribution.js';
+import { examActivityContribution } from '../../workbench/contrib/examActivity/examActivity.contribution.js';
+import { settingsContribution } from '../../workbench/contrib/settings/settings.contribution.js';
 import type { SettingsRendererClient } from '../../workbench/services/settings/common/settingsRendererClient.js';
 import { commonWorkbenchContributions } from '../../workbench/workbench.common.main.js';
 import { authenticatedWindowServices } from './authenticatedServices.js';

@@ -5,7 +5,7 @@
   "admission": {
     "workflow": "Own an Attempt-scoped remote workspace overlay, protected recovery, five-mutation persistence and reconciliation contract, plus a caller-side filesystem projection and separate read-only Exam Resource catalog.",
     "callers": [
-      "src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts"
+      "src/prctr/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.ts"
     ],
     "interface": "src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.ts",
     "decision": "docs/architecture/attempt-workspace.md"
@@ -30,7 +30,7 @@
       "disposition": "behaviorally-reimplemented",
       "rationale": "Retain scheme-scoped provider operations, typed errors, immutable stats and invalidation events while replacing generic filesystem authority and URI identity with Attempt-scoped stable references.",
       "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts"
+      "localPath": "src/prctr/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.ts"
     },
     {
       "upstreamPath": "src/vs/platform/files/common/fileService.ts",
@@ -39,7 +39,7 @@
       "disposition": "behaviorally-reimplemented",
       "rationale": "The existing admitted FileService implementation is retained unchanged in platform/files; the domain facade and typed provider adapter translate its calls into Attempt-scoped authority. This historical behavioral comparison no longer substitutes for the actual FileService.",
       "licenseRefs": ["vscode-mit"],
-      "localPath": "src/prctr/workbench/contrib/attemptWorkspace/browser/workspaceFileSystemProvider.ts"
+      "localPath": "src/prctr/workbench/contrib/attemptWorkspace/common/workspaceFileSystemProvider.ts"
     },
     {
       "upstreamPath": "src/vs/workbench/services/workingCopy/common/workingCopy.ts",

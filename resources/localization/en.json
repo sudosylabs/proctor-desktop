@@ -2673,91 +2673,91 @@
       "message": "Back",
       "description": "Candidate browser back action.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.blocked": {
       "message": "Browser access is currently restricted.",
       "description": "Candidate browser policy or security gate state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.close": {
       "message": "Close browser",
       "description": "Candidate browser close action.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.closed": {
       "message": "Browser is closed.",
       "description": "Candidate browser closed state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.failed": {
       "message": "The browser action could not be completed.",
       "description": "Safe Candidate browser action failure.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.forward": {
       "message": "Forward",
       "description": "Candidate browser forward action.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.location": {
       "message": "Address",
       "description": "Accessible label for the Candidate browser address.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.opening": {
       "message": "Browser is opening.",
       "description": "Candidate browser opening state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.ready": {
       "message": "Browser is ready.",
       "description": "Candidate browser ready state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.reload": {
       "message": "Reload",
       "description": "Candidate browser reload action.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.browser.title": {
       "message": "Browser",
       "description": "Title of the policy-controlled Candidate browser item.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.ts"
+      "source": "src/prctr/workbench/contrib/integratedBrowser/integratedBrowser.contribution.ts"
     },
     "candidate.destination.exam.materials": {
       "message": "Exam materials",
       "description": "Candidate destination for authorized Exam Resources.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
+      "source": "src/prctr/workbench/contrib/attemptWorkspace/attemptWorkspace.contribution.ts"
     },
     "candidate.destination.workspace": {
       "message": "Workspace",
       "description": "Candidate destination for Attempt Workspace files.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
+      "source": "src/prctr/workbench/contrib/attemptWorkspace/attemptWorkspace.contribution.ts"
     },
     "candidate.exam.materials.waiting": {
       "message": "Waiting for authorized Exam Resources.",
       "description": "Exam Resources loading state before the server-bound catalog is available.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
+      "source": "src/prctr/workbench/contrib/attemptWorkspace/attemptWorkspace.contribution.ts"
     },
     "candidate.security.acknowledge": {
       "message": "Acknowledge update",
       "description": "Action that acknowledges one exact live correction.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.acknowledge.correction": {
       "message": "Acknowledge {reason} update for {capabilities} ({position} of {total})",
@@ -2768,421 +2768,421 @@
         "position",
         "total"
       ],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.attention": {
       "message": "An exam security condition requires attention.",
       "description": "Candidate notice for a safe local security condition.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.capability.browser": {
       "message": "browser",
       "description": "Candidate capability affected by a live correction.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.capability.submission": {
       "message": "submission",
       "description": "Candidate capability affected by a live correction.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.capability.workspace": {
       "message": "workspace",
       "description": "Candidate capability affected by a live correction.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.checking": {
       "message": "Exam security checks are in progress.",
       "description": "Candidate notice while required local security checks are incomplete.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.checking.message": {
       "message": "Keep Proctor open while required checks complete.",
       "description": "Instruction in the Candidate security-check gate.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.checking.title": {
       "message": "Checking exam environment",
       "description": "Title of the Candidate security-check gate.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.correction": {
       "message": "An exam update is available.",
       "description": "Candidate notice for an immutable live correction.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.failed.message": {
       "message": "Work is protected. Follow the displayed guidance or contact approved support.",
       "description": "Consequence shown by the fail-closed Candidate security gate.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.failed.title": {
       "message": "Exam environment unavailable",
       "description": "Title of the fail-closed Candidate security gate.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.paused.message": {
       "message": "Work is protected. Editing, browser, and submission actions are paused.",
       "description": "Consequence explained by the Candidate pause gate.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.paused.title": {
       "message": "Exam paused",
       "description": "Title of the mandatory Candidate pause gate.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.candidatewindow": {
       "message": "candidate window",
       "description": "Safe Candidate correction reason for CandidateWindow state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.connection": {
       "message": "connection",
       "description": "Safe Candidate correction reason for connection state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.display": {
       "message": "display",
       "description": "Safe Candidate correction reason for display state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.interactivesession": {
       "message": "interactive session",
       "description": "Safe Candidate correction reason for interactive-session state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.media": {
       "message": "camera or microphone",
       "description": "Safe Candidate correction reason for media state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.network": {
       "message": "network",
       "description": "Safe Candidate correction reason for network state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.pause": {
       "message": "pause",
       "description": "Safe Candidate correction reason for pause state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.policy": {
       "message": "exam policy",
       "description": "Safe Candidate correction reason for exam-policy state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.printing": {
       "message": "printing",
       "description": "Safe Candidate correction reason for printing state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.processapplication": {
       "message": "running application",
       "description": "Safe Candidate correction reason for process/application state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.removablestorage": {
       "message": "removable storage",
       "description": "Safe Candidate correction reason for removable-storage state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.sourcecoverage": {
       "message": "security coverage",
       "description": "Safe Candidate correction reason for observation-source coverage.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.reason.virtualization": {
       "message": "virtualization",
       "description": "Safe Candidate correction reason for virtualization state.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.security.request.failed": {
       "message": "The update acknowledgement was not accepted. The affected actions remain restricted.",
       "description": "Failure state for an exact correction acknowledgement.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examSecurity/browser/examSecurityContribution.ts"
+      "source": "src/prctr/workbench/contrib/examSecurity/examSecurity.contribution.ts"
     },
     "candidate.workspace.waiting": {
       "message": "Waiting for the authoritative Attempt Workspace.",
       "description": "Workspace loading state before the server-bound provider is available.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.ts"
+      "source": "src/prctr/workbench/contrib/attemptWorkspace/attemptWorkspace.contribution.ts"
     },
     "exams.access.ended": {
       "message": "This exam has ended.",
       "description": "Sitting no longer admits candidates.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.ineligible": {
       "message": "You are not currently eligible to enter this exam.",
       "description": "Server eligibility restriction.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.joinable": {
       "message": "This exam is open for entry.",
       "description": "Server currently permits an entry request.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.no.affiliation": {
       "message": "You have no current institution affiliation.",
       "description": "Server context has no current affiliation.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.none": {
       "message": "No exam or management access is assigned to your account.",
       "description": "Server context has no assigned product access.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.not.open": {
       "message": "This exam is not open yet.",
       "description": "Exam cannot currently be entered.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.other.attempt": {
       "message": "You have an unfinished attempt in another exam.",
       "description": "Different unresolved attempt blocks admission.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.paused": {
       "message": "This exam is paused. Wait for it to resume.",
       "description": "Sitting paused by authorized manager.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.reallow": {
       "message": "A manager needs to allow you to re-enter.",
       "description": "Suspended attempt requires reallow.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.result": {
       "message": "Your result has been released.",
       "description": "Explicit result release.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.resumable": {
       "message": "Your attempt can be resumed.",
       "description": "Server currently permits a resume request.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.action.enter": {
       "message": "Enter exam",
       "description": "Admission action, unavailable until secure participation is composed.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.action.more": {
       "message": "Load more",
       "description": "Read the next page of exam activity.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.action.refresh": {
       "message": "Refresh",
       "description": "Read current access and restart exam activity pagination.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.action.result": {
       "message": "View result",
       "description": "Read released candidate remarks.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.action.resume": {
       "message": "Resume attempt",
       "description": "Resume action, unavailable until secure participation is composed.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.action.retry": {
       "message": "Retry",
       "description": "Retry a failed automatic data request.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.admission.unavailable": {
       "message": "Taking exams is not available in this desktop build yet.",
       "description": "Production secure participation is not yet connected; never fake entry.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.collection.partial": {
       "message": "More exams are available. Load more to include them in these sections.",
       "description": "Loaded subset is not the entire exam collection.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.description.available": {
       "message": "Exams currently open for entry.",
       "description": "Available activity description.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.description.history": {
       "message": "Find your earlier exam activity.",
       "description": "Past activity description.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.description.progress": {
       "message": "Your unfinished attempts and their current status.",
       "description": "In progress activity description.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.description.results": {
       "message": "Read the results released to you.",
       "description": "Released results description.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.description.submitted": {
       "message": "Exams with a recorded submission.",
       "description": "Submitted activity description.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.description.upcoming": {
       "message": "Plan ahead for your scheduled exams.",
       "description": "Upcoming activity description.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.details.class": {
       "message": "Class",
       "description": "Exam class.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.details.close": {
       "message": "Close exam details",
       "description": "Close the exam inspector and return to selection.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.details.empty": {
       "message": "Select an exam to see its details.",
       "description": "Empty secondary side bar.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.details.schedule": {
       "message": "Schedule",
       "description": "Scheduled start and end in the local time zone.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.details.submission": {
       "message": "Submitted",
       "description": "Server-recorded submission timestamp.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.details.unit": {
       "message": "Academic unit",
       "description": "Exam academic unit.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.error.cursor": {
       "message": "The list has changed. Refresh to load it again.",
       "description": "Server rejected stale pagination.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.error.not.found": {
       "message": "This result is no longer available.",
       "description": "Released projection removed or no longer accessible.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.error.restricted": {
       "message": "You no longer have access to this area.",
       "description": "Server denied current access.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.error.session.ended": {
       "message": "Your session has ended. Sign in again to continue.",
       "description": "Bound session is no longer valid.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.error.unavailable": {
       "message": "Could not load the latest information. Try refreshing.",
       "description": "Recoverable read failure.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.filter.empty": {
       "message": "No exams in this section.",
       "description": "Empty loaded activity filter.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.filter.partial.empty": {
       "message": "No matching exams loaded yet.",
       "description": "An incomplete collection cannot establish an empty category.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.open.details": {
       "message": "View exam",
       "description": "Inspect exam details before admission.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.overview": {
       "message": "Your exams, at a glance",
       "description": "Student overview introduction.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.page.activity": {
       "message": "My exams",
       "description": "Own examination activity page.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.page.administration": {
       "message": "Administration",
       "description": "Authorized administration area.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.page.count": {
       "message": "{count} exams loaded",
@@ -3190,43 +3190,43 @@
       "placeholders": [
         "count"
       ],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.page.future": {
       "message": "This area is not available in Proctor Desktop yet.",
       "description": "Honest state for management pages not implemented in this release.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.page.management": {
       "message": "Exam management",
       "description": "Authorized management area.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.page.scopes": {
       "message": "Your management access",
       "description": "Server-projected management scope summary.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.page.scopes.more": {
       "message": "You also have access to other areas.",
       "description": "Bounded summary has more scopes.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.page.subtitle": {
       "message": "Your scheduled exams, attempts and released results.",
       "description": "Purpose of student activity.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.result.empty": {
       "message": "No remarks were included with this result.",
       "description": "Released result with empty candidate remarks.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.result.released": {
       "message": "Released {date}",
@@ -3234,13 +3234,13 @@
       "placeholders": [
         "date"
       ],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.result.title": {
       "message": "Released result",
       "description": "Candidate-facing released remarks.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.schedule.timezone": {
       "message": "Times shown in {zone}",
@@ -3248,85 +3248,85 @@
       "placeholders": [
         "zone"
       ],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.section.action": {
       "message": "Available now",
       "description": "Currently available exams heading.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.section.history": {
       "message": "Earlier exams",
       "description": "Past activity heading.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.section.progress": {
       "message": "Continue your exam",
       "description": "Unfinished attempts heading.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.section.recent": {
       "message": "Submissions & results",
       "description": "Completed activity heading.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.section.upcoming": {
       "message": "Coming up",
       "description": "Scheduled exams heading.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.state.empty": {
       "message": "No exams to show yet.",
       "description": "Successful empty exam activity response.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.state.loading": {
       "message": "Loading…",
       "description": "Pending server request.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.status.available": {
       "message": "Available",
       "description": "Available examination activity.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.status.in.progress": {
       "message": "In progress",
       "description": "Unresolved attempt.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.status.past": {
       "message": "Past",
       "description": "Past examination activity.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.status.results.available": {
       "message": "Result available",
       "description": "Explicitly released candidate result.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.status.submitted": {
       "message": "Submitted",
       "description": "Submission recorded.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.status.upcoming": {
       "message": "Upcoming",
       "description": "Upcoming exam.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/examActivity/browser/examActivityMessages.ts"
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "identity.callback.expired.subtitle": {
       "message": "Return to Proctor to check your sign-in.",
@@ -4193,7 +4193,7 @@
       "message": "Open Settings",
       "description": "Command that opens the Settings page of Account.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+      "source": "src/prctr/workbench/contrib/settings/settings.contribution.ts"
     },
     "settings.contrast.description": {
       "message": "Stronger borders and text, for either theme.",
@@ -4343,7 +4343,7 @@
       "message": "Settings are unavailable. Open Settings to try again.",
       "description": "Notification when the window cannot read the settings it is presented with.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+      "source": "src/prctr/workbench/contrib/settings/settings.contribution.ts"
     },
     "settings.prohibited.autosave.description": {
       "message": "Workspace durability is not a User Setting.",

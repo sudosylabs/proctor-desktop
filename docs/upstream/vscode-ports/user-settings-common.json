@@ -6,7 +6,7 @@
     "workflow": "Parse, inspect, resolve and edit settings through the transferred VS Code configuration models, registry and resource-backed service; adapt persistence through one settings URI and preserve privileged server commits and frozen Attempt Configuration.",
     "callers": [
       "src/prctr/platform/settings/electron-main/userSettingsCoordinator.ts",
-      "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts"
+      "src/prctr/workbench/contrib/settings/settings.contribution.ts"
     ],
     "interface": "src/prctr/platform/settings/common/userSettingsService.ts",
     "decision": "docs/architecture/user-settings.md"
@@ -812,7 +812,7 @@
       "id": "authenticated-settings-destination",
       "summary": "AuthenticatedWindow selects one executable Settings destination whose localized structured controls and JSONC editor share a comment-preserving in-memory draft, current-window resolved theme/zoom/motion preview and revert seam, and exact revision-fenced save flow.",
       "localPaths": [
-        "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts",
+        "src/prctr/workbench/contrib/settings/settings.contribution.ts",
         "src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigation.ts",
         "src/prctr/workbench/browser/authenticatedManifest.ts"
       ],

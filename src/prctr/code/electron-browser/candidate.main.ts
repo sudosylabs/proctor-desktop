@@ -4,9 +4,9 @@ import type { ServiceCollection } from '../../platform/instantiation/common/serv
 import type { CandidateWindowDescriptor } from '../../platform/windows/common/windowProtocol.js';
 import { bootstrapWorkbench } from '../../workbench/browser/bootstrap.js';
 import { candidateComposition } from '../../workbench/browser/candidateManifest.js';
-import { attemptWorkspaceContribution } from '../../workbench/contrib/attemptWorkspace/browser/attemptWorkspaceContribution.js';
-import { examSecurityContribution } from '../../workbench/contrib/examSecurity/browser/examSecurityContribution.js';
-import { integratedBrowserContribution } from '../../workbench/contrib/integratedBrowser/browser/integratedBrowserContribution.js';
+import { attemptWorkspaceContribution } from '../../workbench/contrib/attemptWorkspace/attemptWorkspace.contribution.js';
+import { examSecurityContribution } from '../../workbench/contrib/examSecurity/examSecurity.contribution.js';
+import { integratedBrowserContribution } from '../../workbench/contrib/integratedBrowser/integratedBrowser.contribution.js';
 import {
 	CandidateSecurityService,
 	ICandidateSecurityService,
