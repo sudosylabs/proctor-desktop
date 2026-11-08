@@ -22,7 +22,7 @@ import { WorkbenchModalContext } from '../../../common/contextKeys.js';
 import { registerProctorAction } from '../../../services/actions/common/proctorActions.js';
 import { ILocalizationService } from '../../../services/localization/common/localization.js';
 import { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
-import { IAuthenticatedNavigationService } from '../../authenticated/browser/authenticatedNavigation.js';
+import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 
 export const OPEN_SETTINGS_COMMAND_ID = 'prctr.authenticated.openSettings';
 

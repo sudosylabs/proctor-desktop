@@ -9,9 +9,9 @@ import { SyncDescriptor } from '../../platform/instantiation/common/descriptors.
 import type { ServiceCollection } from '../../platform/instantiation/common/serviceCollection.js';
 import type { SettingsClipboardClient } from '../../platform/settings/common/settingsNativeHost.js';
 import type { WorkbenchServicesInitializer } from '../../workbench/browser/bootstrap.js';
-import { AuthenticatedFrame } from '../../workbench/contrib/authenticated/browser/authenticatedFrame.js';
-import { IAuthenticatedNavigationService } from '../../workbench/contrib/authenticated/browser/authenticatedNavigation.js';
-import { installAuthenticatedWindowServices } from '../../workbench/contrib/authenticated/browser/authenticatedWindowServices.js';
+import { AuthenticatedFrame } from '../../workbench/browser/authenticated/authenticatedFrame.js';
+import { IAuthenticatedNavigationService } from '../../workbench/services/authenticatedNavigation/common/authenticatedNavigation.js';
+import { installAuthenticatedWindowServices } from '../../workbench/browser/authenticated/authenticatedWindowServices.js';
 import {
 	AccountService,
 	IAccountService

@@ -1,6 +1,9 @@
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
+import type { MessageDescriptor } from '../../../../base/common/localization.js';
+import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
+import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import {
 	IWorkbenchItemResolverService,
@@ -10,7 +13,7 @@ import {
 import type { WorkbenchItem } from '../../../common/workbenchItem.js';
 import { IExamActivityService } from '../../../services/examActivity/common/examActivity.js';
 import { ILocalizationService } from '../../../services/localization/common/localization.js';
-import { IAuthenticatedNavigationService } from '../../authenticated/browser/authenticatedNavigation.js';
+import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { ProductAccess } from './productAccess.js';
 import { ExamActivityPane } from './examActivityPane.js';
 import { examActivityMessages as m } from './examActivityMessages.js';
@@ -19,7 +22,7 @@ import { examActivityMessages as m } from './examActivityMessages.js';
  * Activity, Exams and Administration: statically admitted product pages; the server's
  * context only selects among these destinations.
  */
-export class ExamActivityContribution extends Disposable {
+class ExamActivityContribution extends Disposable {
 	constructor(
 		@IExamActivityService client: IExamActivityService,
 		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService,
@@ -127,3 +130,11 @@ export class ExamActivityContribution extends Disposable {
 		void access.refresh();
 	}
 }
+
+export const examActivityContribution: WorkbenchContributionRegistration = Object.freeze({
+	id: 'prctr.authenticated.exams' as const,
+	phase: 'ready' as const,
+	dependencies: Object.freeze(['prctr.authenticated.navigation' as const]),
+	messages: Object.freeze(Object.values(m) as MessageDescriptor[]),
+	descriptor: new SyncDescriptor(ExamActivityContribution)
+});

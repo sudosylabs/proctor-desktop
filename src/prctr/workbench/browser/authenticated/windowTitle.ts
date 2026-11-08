@@ -2,10 +2,10 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { createElementFactory } from '../../../../base/browser/documentElements.js';
-import { Disposable } from '../../../../base/common/lifecycle.js';
-import { createProctorMark } from '../../../browser/proctorMark.js';
-import './windowTitle.css';
+import { createElementFactory } from '../../../base/browser/documentElements.js';
+import { Disposable } from '../../../base/common/lifecycle.js';
+import { createProctorMark } from '../proctorMark.js';
+import './media/windowTitle.css';
 
 /**
  * The product name in the Windows and Linux title bar strip, before the native

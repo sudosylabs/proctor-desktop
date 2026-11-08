@@ -20,8 +20,8 @@ import { ILocalizationService } from '../../../services/localization/common/loca
 import {
 	IAuthenticatedNavigationService,
 	type ActivityView
-} from '../../authenticated/browser/authenticatedNavigation.js';
-import { authenticatedMessages } from '../../authenticated/browser/authenticatedMessages.js';
+} from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
+import { authenticatedMessages } from '../../../browser/authenticated/authenticatedMessages.js';
 import { ProductAccess } from './productAccess.js';
 import { examActivityMessages as m } from './examActivityMessages.js';
 import './examActivity.css';

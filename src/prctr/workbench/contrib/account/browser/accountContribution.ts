@@ -23,12 +23,12 @@ import type { WorkbenchItem } from '../../../common/workbenchItem.js';
 import { IAccountService } from '../../../services/account/common/account.js';
 import { ILocalizationService } from '../../../services/localization/common/localization.js';
 import { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
-import { IAuthenticatedHoverService } from '../../authenticated/browser/authenticatedHover.js';
+import { IAuthenticatedHoverService } from '../../../browser/authenticated/authenticatedHover.js';
 import {
 	accountPages,
 	IAuthenticatedNavigationService,
 	type AccountPage
-} from '../../authenticated/browser/authenticatedNavigation.js';
+} from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { accountMessages as messages, type AccountMessage } from './accountMessages.js';
 import { AccountPane, type AccountModel } from './accountPane.js';
 

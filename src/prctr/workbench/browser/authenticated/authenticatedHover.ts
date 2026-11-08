@@ -2,11 +2,11 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { HoverPosition } from '../../../../base/browser/ui/hover/hoverWidget.js';
-import type { IDisposable } from '../../../../base/common/lifecycle.js';
-import { IHoverService } from '../../../../platform/hover/browser/hover.js';
-import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
-import { IKeybindingService } from '../../../../platform/keybinding/common/keybinding.js';
+import { HoverPosition } from '../../../base/browser/ui/hover/hoverWidget.js';
+import type { IDisposable } from '../../../base/common/lifecycle.js';
+import { IHoverService } from '../../../platform/hover/browser/hover.js';
+import { createDecorator } from '../../../platform/instantiation/common/instantiation.js';
+import { IKeybindingService } from '../../../platform/keybinding/common/keybinding.js';
 
 export const IAuthenticatedHoverService = createDecorator<IAuthenticatedHoverService>(
 	'authenticatedHoverService'

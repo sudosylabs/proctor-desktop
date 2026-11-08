@@ -2,9 +2,9 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { createElementFactory } from '../../../../base/browser/documentElements.js';
-import { Disposable } from '../../../../base/common/lifecycle.js';
-import './unavailablePage.css';
+import { createElementFactory } from '../../../base/browser/documentElements.js';
+import { Disposable } from '../../../base/common/lifecycle.js';
+import './media/unavailablePage.css';
 
 /** The content shown for a product area whose capability this window was not given. */
 export class UnavailablePage extends Disposable {

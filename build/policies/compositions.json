@@ -41,7 +41,11 @@
       "kind": "renderer",
       "entrypoint": "src/prctr/code/electron-browser/candidate.main.ts",
       "required": ["src/prctr/workbench/browser", "src/prctr/platform/theme/browser"],
-      "forbidden": ["src/prctr/platform/native", "src/prctr/workbench/contrib/authenticated"],
+      "forbidden": [
+        "src/prctr/platform/native",
+        "src/prctr/workbench/browser/authenticated",
+        "src/prctr/workbench/contrib/account"
+      ],
       "allowedDynamicImports": []
     },
     {

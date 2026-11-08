@@ -2,21 +2,17 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { createElementFactory } from '../../../../base/browser/documentElements.js';
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { Emitter, type Event } from '../../../../base/common/event.js';
-import {
-	Disposable,
-	DisposableStore,
-	MutableDisposable
-} from '../../../../base/common/lifecycle.js';
+import { createElementFactory } from '../../../base/browser/documentElements.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import { Emitter, type Event } from '../../../base/common/event.js';
+import { Disposable, DisposableStore, MutableDisposable } from '../../../base/common/lifecycle.js';
 import {
 	SIDEBAR_DEFAULT_WIDTH,
 	SIDEBAR_MAX_WIDTH,
 	SIDEBAR_MIN_WIDTH,
 	clampSidebarWidth
 } from './authenticatedLayoutState.js';
-import './sidebarSash.css';
+import './media/sidebarSash.css';
 
 const KEYBOARD_STEP = 8;
 const KEYBOARD_LARGE_STEP = 32;

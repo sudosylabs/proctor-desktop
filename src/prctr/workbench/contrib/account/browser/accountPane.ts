@@ -17,7 +17,7 @@ import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows
 import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
 import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
 import type { ResolvedWorkbenchItem } from '../../../common/workbenchItem.js';
-import type { AccountPage } from '../../authenticated/common/authenticatedNavigationModel.js';
+import type { AccountPage } from '../../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
 import { accountMessages, type AccountMessage } from './accountMessages.js';
 import {
 	AccountPageServices,

@@ -813,7 +813,7 @@
       "summary": "AuthenticatedWindow selects one executable Settings destination whose localized structured controls and JSONC editor share a comment-preserving in-memory draft, current-window resolved theme/zoom/motion preview and revert seam, and exact revision-fenced save flow.",
       "localPaths": [
         "src/prctr/workbench/contrib/settings/browser/settingsContribution.ts",
-        "src/prctr/workbench/contrib/authenticated/browser/authenticatedNavigation.ts",
+        "src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigation.ts",
         "src/prctr/workbench/browser/authenticatedManifest.ts"
       ],
       "verificationRefs": ["real-settings-destination"]

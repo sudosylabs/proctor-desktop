@@ -2,7 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import type { PresentationCategory } from '../../../common/restoration.js';
+import type { PresentationCategory } from '../../common/restoration.js';
 
 /** Device-local layout only; never an account setting or an authorization input. */
 export const authenticatedLayoutCategory: PresentationCategory = Object.freeze({

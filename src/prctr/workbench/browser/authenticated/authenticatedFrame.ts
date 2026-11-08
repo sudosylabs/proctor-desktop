@@ -2,25 +2,25 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { alert } from '../../../../base/browser/ui/aria/aria.js';
-import { Emitter, type Event } from '../../../../base/common/event.js';
-import { KeyCode, KeyMod } from '../../../../base/common/keyCodes.js';
-import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
-import type { LocalizationValue } from '../../../../base/common/localization.js';
-import { isMacintosh } from '../../../../base/common/platform.js';
-import { KeybindingWeight } from '../../../../platform/keybinding/common/keybindingsRegistry.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import { alert } from '../../../base/browser/ui/aria/aria.js';
+import { Emitter, type Event } from '../../../base/common/event.js';
+import { KeyCode, KeyMod } from '../../../base/common/keyCodes.js';
+import { Disposable, type IDisposable } from '../../../base/common/lifecycle.js';
+import type { LocalizationValue } from '../../../base/common/localization.js';
+import { isMacintosh } from '../../../base/common/platform.js';
+import { KeybindingWeight } from '../../../platform/keybinding/common/keybindingsRegistry.js';
 import {
 	IProductWindowChromeService,
 	IWorkbenchPaneHostService,
 	IWorkbenchShellService,
 	IWorkbenchWindowService
-} from '../../../browser/workbenchServices.js';
-import { WorkbenchModalContext } from '../../../common/contextKeys.js';
-import { IAccountService } from '../../../services/account/common/account.js';
-import { registerProctorAction } from '../../../services/actions/common/proctorActions.js';
-import { IAuthenticatedHostService } from '../../../services/authenticatedHost/common/authenticatedHost.js';
-import { ILocalizationService } from '../../../services/localization/common/localization.js';
+} from '../workbenchServices.js';
+import { WorkbenchModalContext } from '../../common/contextKeys.js';
+import { IAccountService } from '../../services/account/common/account.js';
+import { registerProctorAction } from '../../services/actions/common/proctorActions.js';
+import { IAuthenticatedHostService } from '../../services/authenticatedHost/common/authenticatedHost.js';
+import { ILocalizationService } from '../../services/localization/common/localization.js';
 import {
 	activityViews,
 	AuthenticatedNavigationModel,
@@ -29,15 +29,15 @@ import {
 	type AuthenticatedDestination,
 	type AuthenticatedLocation,
 	type AuthenticatedLocationChange
-} from '../common/authenticatedNavigationModel.js';
-import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
-import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
+} from '../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
+import { proctorIconFactory } from '../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../platform/theme/common/proctorIcons.js';
 import { AreaRail } from './areaRail.js';
 import { AreaSidebar, type SidebarArea, type SidebarSelection } from './areaSidebar.js';
 import { authenticatedMessages as m, type AuthenticatedMessage } from './authenticatedMessages.js';
 import { AuthenticatedLayoutState } from './authenticatedLayoutState.js';
 import { IAuthenticatedHoverService } from './authenticatedHover.js';
-import type { IAuthenticatedNavigationService } from './authenticatedNavigation.js';
+import type { IAuthenticatedNavigationService } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { ContentTopBar, type TopBarAction } from './contentTopBar.js';
 import { SidebarSash } from './sidebarSash.js';
 import { UnavailablePage } from './unavailablePage.js';

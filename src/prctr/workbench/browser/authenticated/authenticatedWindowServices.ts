@@ -2,58 +2,55 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { setHoverDelegateFactory } from '../../../../base/browser/ui/hover/hoverDelegateFactory.js';
-import { setBaseLayerHoverDelegate } from '../../../../base/browser/ui/hover/hoverDelegate2.js';
-import { toDisposable, type DisposableStore } from '../../../../base/common/lifecycle.js';
-import { OpenerService } from '../../../../editor/browser/services/openerService.js';
-import { ICodeEditorService } from '../../../../editor/browser/services/codeEditorService.js';
-import { IAccessibilityService } from '../../../../platform/accessibility/common/accessibility.js';
-import { AccessibilityService } from '../../../../platform/accessibility/browser/accessibilityService.js';
-import { IMenuService } from '../../../../platform/actions/common/actions.js';
-import { MenuService } from '../../../../platform/actions/common/menuService.js';
-import { IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
+import { setHoverDelegateFactory } from '../../../base/browser/ui/hover/hoverDelegateFactory.js';
+import { setBaseLayerHoverDelegate } from '../../../base/browser/ui/hover/hoverDelegate2.js';
+import { toDisposable, type DisposableStore } from '../../../base/common/lifecycle.js';
+import { OpenerService } from '../../../editor/browser/services/openerService.js';
+import { ICodeEditorService } from '../../../editor/browser/services/codeEditorService.js';
+import { IAccessibilityService } from '../../../platform/accessibility/common/accessibility.js';
+import { AccessibilityService } from '../../../platform/accessibility/browser/accessibilityService.js';
+import { IMenuService } from '../../../platform/actions/common/actions.js';
+import { MenuService } from '../../../platform/actions/common/menuService.js';
+import { IConfigurationService } from '../../../platform/configuration/common/configuration.js';
 import {
 	IContextMenuService,
 	IContextViewService
-} from '../../../../platform/contextview/browser/contextView.js';
-import { ContextMenuService } from '../../../../platform/contextview/browser/contextMenuService.js';
-import { ContextViewService } from '../../../../platform/contextview/browser/contextViewService.js';
-import { IHoverService, WorkbenchHoverDelegate } from '../../../../platform/hover/browser/hover.js';
-import { HoverService } from '../../../../platform/hover/browser/hoverService.js';
-import type { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import type { ServiceCollection } from '../../../../platform/instantiation/common/serviceCollection.js';
-import { ILayoutService } from '../../../../platform/layout/browser/layoutService.js';
-import { IListService, ListService } from '../../../../platform/list/browser/listService.js';
+} from '../../../platform/contextview/browser/contextView.js';
+import { ContextMenuService } from '../../../platform/contextview/browser/contextMenuService.js';
+import { ContextViewService } from '../../../platform/contextview/browser/contextViewService.js';
+import { IHoverService, WorkbenchHoverDelegate } from '../../../platform/hover/browser/hover.js';
+import { HoverService } from '../../../platform/hover/browser/hoverService.js';
+import type { IInstantiationService } from '../../../platform/instantiation/common/instantiation.js';
+import type { ServiceCollection } from '../../../platform/instantiation/common/serviceCollection.js';
+import { ILayoutService } from '../../../platform/layout/browser/layoutService.js';
+import { IListService, ListService } from '../../../platform/list/browser/listService.js';
 import {
 	IMarkdownRendererService,
 	MarkdownRendererService
-} from '../../../../platform/markdown/browser/markdownRenderer.js';
-import { IOpenerService } from '../../../../platform/opener/common/opener.js';
-import { IQuickInputService } from '../../../../platform/quickinput/common/quickInput.js';
+} from '../../../platform/markdown/browser/markdownRenderer.js';
+import { IOpenerService } from '../../../platform/opener/common/opener.js';
+import { IQuickInputService } from '../../../platform/quickinput/common/quickInput.js';
 import {
 	IStorageService,
 	InMemoryStorageService
-} from '../../../../platform/storage/common/storage.js';
-import { ITelemetryService } from '../../../../platform/telemetry/common/telemetry.js';
-import { NullTelemetryService } from '../../../../platform/telemetry/common/telemetryUtils.js';
-import { IBrowserThemeService } from '../../../../platform/theme/browser/themeService.js';
-import { ThemeTypeSelector } from '../../../../platform/theme/common/theme.js';
+} from '../../../platform/storage/common/storage.js';
+import { ITelemetryService } from '../../../platform/telemetry/common/telemetry.js';
+import { NullTelemetryService } from '../../../platform/telemetry/common/telemetryUtils.js';
+import { IBrowserThemeService } from '../../../platform/theme/browser/themeService.js';
+import { ThemeTypeSelector } from '../../../platform/theme/common/theme.js';
 import {
 	IThemeService,
 	getThemeTypeSelector
-} from '../../../../platform/theme/common/themeService.js';
-import {
-	IWorkbenchShellService,
-	IWorkbenchWindowService
-} from '../../../browser/workbenchServices.js';
-import { CodeEditorService } from '../../../services/editor/browser/codeEditorService.js';
-import { EditorThemeService } from '../../../services/editor/browser/editorThemeService.js';
-import { IEditorWorkbenchLayoutService } from '../../../services/layout/browser/editorWorkbenchLayout.js';
-import { EditorWorkbenchLayoutService } from '../../../services/layout/browser/editorWorkbenchLayoutService.js';
-import { Position } from '../../../services/layout/browser/layoutService.js';
-import { QuickInputService } from '../../../services/quickinput/browser/quickInputService.js';
-import { SettingsEditorConfiguration } from '../../../services/settings/common/settingsEditorConfiguration.js';
-import { ModernUIContribution } from '../../modernUI/browser/modernUI.contribution.js';
+} from '../../../platform/theme/common/themeService.js';
+import { IWorkbenchShellService, IWorkbenchWindowService } from '../workbenchServices.js';
+import { CodeEditorService } from '../../services/editor/browser/codeEditorService.js';
+import { EditorThemeService } from '../../services/editor/browser/editorThemeService.js';
+import { IEditorWorkbenchLayoutService } from '../../services/layout/browser/editorWorkbenchLayout.js';
+import { EditorWorkbenchLayoutService } from '../../services/layout/browser/editorWorkbenchLayoutService.js';
+import { Position } from '../../services/layout/browser/layoutService.js';
+import { QuickInputService } from '../../services/quickinput/browser/quickInputService.js';
+import { SettingsEditorConfiguration } from '../../services/settings/common/settingsEditorConfiguration.js';
+import { ModernUIContribution } from '../../contrib/modernUI/browser/modernUI.contribution.js';
 import { AuthenticatedHoverService, IAuthenticatedHoverService } from './authenticatedHover.js';
 
 /**

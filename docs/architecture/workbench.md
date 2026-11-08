@@ -223,8 +223,9 @@ as the **contextual sidebar** for the current area, and a single central
 back and forward, and the window search field. On Windows and Linux
 `TitlebarPart` is a strip above the frame with the native caption buttons; on
 macOS it is the top of the rail, which holds the traffic lights. The frame in
-`workbench/contrib/authenticated` owns the rail, sidebar, top bar and navigation
-state; the shell owns their geometry. The selected valid destination is shown;
+`workbench/browser/authenticated` owns the rail, sidebar, top bar and navigation
+state behind `IAuthenticatedNavigationService` in
+`workbench/services/authenticatedNavigation`; the shell owns their geometry. The selected valid destination is shown;
 an unavailable selection falls back to the first available area, then Account.
 Settings is an Account page.
 

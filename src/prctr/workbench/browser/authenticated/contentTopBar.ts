@@ -2,15 +2,15 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { createElementFactory } from '../../../../base/browser/documentElements.js';
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { Emitter, type Event } from '../../../../base/common/event.js';
-import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
-import type { LocalizationContext } from '../../../../base/common/localization.js';
-import { createProctorIcon } from '../../../../platform/theme/browser/proctorIcon.js';
-import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
+import { createElementFactory } from '../../../base/browser/documentElements.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import { Emitter, type Event } from '../../../base/common/event.js';
+import { Disposable, type IDisposable } from '../../../base/common/lifecycle.js';
+import type { LocalizationContext } from '../../../base/common/localization.js';
+import { createProctorIcon } from '../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../platform/theme/common/proctorIcons.js';
 import { authenticatedMessages as m, type AuthenticatedMessage } from './authenticatedMessages.js';
-import './contentTopBar.css';
+import './media/contentTopBar.css';
 
 export type TopBarAction = 'showSidebar' | 'back' | 'forward';
 

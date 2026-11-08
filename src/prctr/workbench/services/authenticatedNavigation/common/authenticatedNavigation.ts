@@ -8,7 +8,7 @@ import type {
 	AccountPage,
 	ActivityView,
 	AuthenticatedDestination
-} from '../common/authenticatedNavigationModel.js';
+} from './authenticatedNavigationModel.js';
 
 export {
 	accountPages,
@@ -16,7 +16,7 @@ export {
 	type AccountPage,
 	type ActivityView,
 	type AuthenticatedDestination
-} from '../common/authenticatedNavigationModel.js';
+} from './authenticatedNavigationModel.js';
 
 export const IAuthenticatedNavigationService = createDecorator<IAuthenticatedNavigationService>(
 	'authenticatedNavigationService'

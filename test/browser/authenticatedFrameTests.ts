@@ -2,8 +2,8 @@ import { bootstrapWorkbench } from '../../src/prctr/workbench/browser/bootstrap.
 import { authenticatedComposition } from '../../src/prctr/workbench/browser/authenticatedManifest.js';
 import { commonWorkbenchContributions } from '../../src/prctr/workbench/workbench.common.main.js';
 import { createDesktopWorkbenchContribution } from '../../src/prctr/code/electron-browser/workbench.desktop.main.js';
-import { authenticatedContribution } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.js';
-import { IAuthenticatedNavigationService } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedNavigation.js';
+import { authenticatedFrameContribution } from '../../src/prctr/workbench/browser/authenticated/authenticated.contribution.js';
+import { IAuthenticatedNavigationService } from '../../src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { ICommandService } from '../../src/prctr/platform/commands/common/commands.js';
 import { isMacintosh } from '../../src/prctr/base/common/platform.js';
 import { settingsContribution } from '../../src/prctr/workbench/contrib/settings/browser/settingsContribution.js';
@@ -128,7 +128,8 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 					noAssignedAccess: false
 				}
 			})),
-			authenticatedContribution,
+			authenticatedFrameContribution,
+			inertContribution('prctr.authenticated.exams', ['prctr.authenticated.navigation']),
 			inertContribution('prctr.authenticated.account', ['prctr.authenticated.navigation']),
 			settingsContribution
 		],

@@ -2,7 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { defineMessage } from '../../../../base/common/localization.js';
+import { defineMessage } from '../../../base/common/localization.js';
 
 /** Text of AuthenticatedWindow's frame: the area rail, contextual sidebar and content top bar. */
 export const authenticatedMessages = Object.freeze({

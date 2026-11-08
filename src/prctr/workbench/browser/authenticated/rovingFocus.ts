@@ -2,8 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { Disposable } from '../../../../base/common/lifecycle.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import { Disposable } from '../../../base/common/lifecycle.js';
 
 /**
  * One tab stop for a vertical list of buttons. Up and Down move between the shown,

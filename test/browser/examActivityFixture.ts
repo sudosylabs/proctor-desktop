@@ -3,9 +3,10 @@ import { bootstrapWorkbench } from '../../src/prctr/workbench/browser/bootstrap.
 import { authenticatedComposition } from '../../src/prctr/workbench/browser/authenticatedManifest.js';
 import { commonWorkbenchContributions } from '../../src/prctr/workbench/workbench.common.main.js';
 import { createDesktopWorkbenchContribution } from '../../src/prctr/code/electron-browser/workbench.desktop.main.js';
-import { authenticatedContribution } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedContribution.js';
+import { authenticatedFrameContribution } from '../../src/prctr/workbench/browser/authenticated/authenticated.contribution.js';
+import { examActivityContribution } from '../../src/prctr/workbench/contrib/examActivity/browser/examActivityContribution.js';
 import { accountContribution } from '../../src/prctr/workbench/contrib/account/browser/accountContribution.js';
-import { IAuthenticatedNavigationService } from '../../src/prctr/workbench/contrib/authenticated/browser/authenticatedNavigation.js';
+import { IAuthenticatedNavigationService } from '../../src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { authenticatedWindowServices } from '../../src/prctr/code/electron-browser/authenticatedServices.js';
 import type { SettingsRendererClient } from '../../src/prctr/workbench/services/settings/common/settingsRendererClient.js';
 import {
@@ -104,7 +105,8 @@ export async function mountExamActivityFixture(
 					noAssignedAccess: false
 				}
 			})),
-			authenticatedContribution,
+			authenticatedFrameContribution,
+			examActivityContribution,
 			accountContribution,
 			inertContribution('prctr.authenticated.settings', ['prctr.authenticated.navigation'])
 		],

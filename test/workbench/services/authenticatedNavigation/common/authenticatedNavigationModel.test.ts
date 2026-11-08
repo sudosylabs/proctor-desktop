@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import {
 	AuthenticatedNavigationModel,
 	type AuthenticatedLocation
-} from '../../../../../src/prctr/workbench/contrib/authenticated/common/authenticatedNavigationModel.ts';
+} from '../../../../../src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigationModel.ts';
 import { ensureNoDisposablesAreLeakedInTestSuite } from '../../../../base/common/upstream/upstreamTestUtils.ts';
 
 const store = ensureNoDisposablesAreLeakedInTestSuite();

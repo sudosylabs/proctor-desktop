@@ -8,7 +8,8 @@ import type { AuthenticatedWindowDescriptor } from '../../platform/windows/commo
 import { authenticatedComposition } from '../../workbench/browser/authenticatedManifest.js';
 import { bootstrapWorkbench } from '../../workbench/browser/bootstrap.js';
 import { accountContribution } from '../../workbench/contrib/account/browser/accountContribution.js';
-import { authenticatedContribution } from '../../workbench/contrib/authenticated/browser/authenticatedContribution.js';
+import { authenticatedFrameContribution } from '../../workbench/browser/authenticated/authenticated.contribution.js';
+import { examActivityContribution } from '../../workbench/contrib/examActivity/browser/examActivityContribution.js';
 import { settingsContribution } from '../../workbench/contrib/settings/browser/settingsContribution.js';
 import type { SettingsRendererClient } from '../../workbench/services/settings/common/settingsRendererClient.js';
 import { commonWorkbenchContributions } from '../../workbench/workbench.common.main.js';
@@ -36,7 +37,8 @@ const authenticatedWindow = await bootstrapWorkbench(
 	[
 		...commonWorkbenchContributions,
 		createDesktopWorkbenchContribution('authenticated', () => preload.bootstrap()),
-		authenticatedContribution,
+		authenticatedFrameContribution,
+		examActivityContribution,
 		accountContribution,
 		settingsContribution
 	],

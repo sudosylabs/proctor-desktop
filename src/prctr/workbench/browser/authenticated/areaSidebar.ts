@@ -2,22 +2,22 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { createElementFactory } from '../../../../base/browser/documentElements.js';
-import { addDisposableListener } from '../../../../base/browser/dom.js';
-import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
-import { Emitter, type Event } from '../../../../base/common/event.js';
-import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
-import type { LocalizationContext } from '../../../../base/common/localization.js';
-import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
+import { createElementFactory } from '../../../base/browser/documentElements.js';
+import { addDisposableListener } from '../../../base/browser/dom.js';
+import { DomScrollableElement } from '../../../base/browser/ui/scrollbar/scrollableElement.js';
+import { Emitter, type Event } from '../../../base/common/event.js';
+import { Disposable, type IDisposable } from '../../../base/common/lifecycle.js';
+import type { LocalizationContext } from '../../../base/common/localization.js';
+import { ScrollbarVisibility } from '../../../base/common/scrollable.js';
 import {
 	createProctorIcon,
 	type ProctorIconControl
-} from '../../../../platform/theme/browser/proctorIcon.js';
-import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
-import type { AuthenticatedDestination } from '../common/authenticatedNavigationModel.js';
+} from '../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../platform/theme/common/proctorIcons.js';
+import type { AuthenticatedDestination } from '../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
 import { authenticatedMessages as m, type AuthenticatedMessage } from './authenticatedMessages.js';
 import { RovingFocus } from './rovingFocus.js';
-import './areaSidebar.css';
+import './media/areaSidebar.css';
 
 /** One sidebar entry: a page of the area, or an action such as opening Settings. */
 export interface SidebarEntry {
