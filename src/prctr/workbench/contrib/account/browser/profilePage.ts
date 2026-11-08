@@ -32,6 +32,9 @@ interface DetailRow {
 	readonly row: HTMLElement;
 }
 
+type DetailKey =
+	'firstName' | 'lastName' | 'email' | 'language' | 'timeZone' | 'memberSince' | 'lastSignIn';
+
 /**
  * Profile: the photo and name, the read-only account details the institution
  * manages, and any exam records due for deletion. The name and details come from
@@ -50,12 +53,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 	private readonly fileInput: HTMLInputElement;
 	private readonly photoFeedback: AccountFeedback;
 	private readonly details: AccountSection;
-	private readonly detailRows: Readonly<
-		Record<
-			'firstName' | 'lastName' | 'email' | 'language' | 'timeZone' | 'lastSignIn',
-			DetailRow
-		>
-	>;
+	private readonly detailRows: Readonly<Record<DetailKey, DetailRow>>;
 	private readonly unverified: HTMLElement;
 	private readonly sendVerification: ButtonControl;
 	private readonly verificationFeedback: AccountFeedback;
@@ -124,6 +122,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			email: this.detailRow($, list, 'email'),
 			language: this.detailRow($, list, 'language'),
 			timeZone: this.detailRow($, list, 'timeZone'),
+			memberSince: this.detailRow($, list, 'memberSince'),
 			lastSignIn: this.detailRow($, list, 'lastSignIn')
 		};
 		this.detailRows.email.value.classList.add('prctr-account-details__mono');
@@ -201,7 +200,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 	private detailRow(
 		$: ReturnType<typeof createElementFactory>,
 		list: HTMLElement,
-		label: 'firstName' | 'lastName' | 'email' | 'language' | 'timeZone' | 'lastSignIn'
+		label: DetailKey
 	): DetailRow {
 		const value = $('dd.prctr-account-details__value');
 		const note = $('dd.prctr-account-details__note', { hidden: true });
@@ -241,10 +240,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 	}
 
 	private renderDetails(profile: AccountProfile): void {
-		const text = (
-			key: 'firstName' | 'lastName' | 'email' | 'language' | 'timeZone' | 'lastSignIn',
-			value: string | undefined
-		): void => {
+		const text = (key: DetailKey, value: string | undefined): void => {
 			const row = this.detailRows[key];
 			row.value.textContent = value || this.services.text('notProvided');
 			row.value.dataset.empty = String(!value);
@@ -257,6 +253,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			profile.locale === undefined ? undefined : this.services.languageName(profile.locale)
 		);
 		text('timeZone', profile.timezone);
+		text('memberSince', this.services.date(profile.createdAt));
 		const emailNote = this.detailRows.email.note;
 		const verified = profile.emailVerified;
 		emailNote.hidden = profile.email === undefined || verified === undefined;
@@ -288,10 +285,11 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			const presentation = noticePresentation(notice);
 			return {
 				id: notice.retirementId,
-				title: this.services.text(presentation.category),
+				title: notice.examTitle,
 				detail: this.services.join(
 					this.services.text('noticeKind', {
-						date: this.services.date(notice.createdAt)
+						category: this.services.text(presentation.category),
+						date: this.services.date(notice.sittingStartAt)
 					}),
 					this.noticeWhen(presentation.when, presentation.date)
 				),

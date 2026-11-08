@@ -115,10 +115,27 @@ export class SecurityPage extends Disposable implements AccountPageView {
 		rows.push({
 			id: 'password',
 			title: this.services.text('password'),
-			detail: this.services.text(security.password ? 'passwordSet' : 'passwordNotSet'),
+			detail: this.passwordDetail(security),
 			shape: security.password ? 'active' : 'off'
 		});
 		return rows;
+	}
+
+	private passwordDetail(security: AccountSecurity): string {
+		if (!security.password) return this.services.text('passwordNotSet');
+		const changed = security.mfa?.passwordChangedAt;
+		return changed === undefined
+			? this.services.text('passwordSet')
+			: this.services.text('passwordChanged', { date: this.services.date(changed) });
+	}
+
+	private twoStepDetail(security: AccountSecurity, status: TwoStepStatus): string {
+		const mfa = security.mfa;
+		if (status !== 'on' || mfa?.method !== 'authenticatorApp')
+			return this.services.text(twoStepMessages[status]);
+		return mfa.enabledAt === undefined
+			? this.services.text('twoStepOnApp')
+			: this.services.text('twoStepOnSince', { date: this.services.date(mfa.enabledAt) });
 	}
 
 	private twoStepRows(security: AccountSecurity): AccountRowModel[] {
@@ -127,7 +144,7 @@ export class SecurityPage extends Disposable implements AccountPageView {
 			{
 				id: 'two-step',
 				title: this.services.text('twoStep'),
-				detail: this.services.text(twoStepMessages[presentation.status]),
+				detail: this.twoStepDetail(security, presentation.status),
 				shape: presentation.shape
 			}
 		];
@@ -136,12 +153,21 @@ export class SecurityPage extends Disposable implements AccountPageView {
 			rows.push({
 				id: 'recovery-codes',
 				title: this.services.text('recoveryCodes'),
-				detail: this.services.text(
-					recovery.low ? 'recoveryCodesLow' : 'recoveryCodesLeft',
-					{
-						count: recovery.remaining
-					}
-				),
+				detail:
+					recovery.total > 0
+						? this.services.text(
+								recovery.low ? 'recoveryCodesLowOf' : 'recoveryCodesLeftOf',
+								{
+									count: recovery.remaining,
+									total: recovery.total
+								}
+							)
+						: this.services.text(
+								recovery.low ? 'recoveryCodesLow' : 'recoveryCodesLeft',
+								{
+									count: recovery.remaining
+								}
+							),
 				shape: recovery.low ? 'attention' : 'active'
 			});
 		return rows;

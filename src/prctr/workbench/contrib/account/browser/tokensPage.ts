@@ -12,7 +12,7 @@ import type {
 import {
 	failureNeedsRead,
 	groupTokens,
-	scopeLabel,
+	scopeTitle,
 	tokenActions,
 	tokenShape,
 	tokenState,
@@ -39,6 +39,8 @@ const actionLabels: Readonly<Record<TokenAction, AccountMessage>> = Object.freez
  */
 export class TokensPage extends Disposable implements AccountPageView {
 	private readonly tokens: AccountRead<'tokens'>;
+	/** Names scopes and Academic Units; tokens still show when it cannot be read. */
+	private readonly grantable: AccountRead<'grantableScopes'>;
 	private readonly active: AccountSection;
 	private readonly inactive: AccountSection;
 	private readonly create: ButtonControl;
@@ -52,6 +54,7 @@ export class TokensPage extends Disposable implements AccountPageView {
 	) {
 		super();
 		this.tokens = this._register(new AccountRead(services, 'tokens'));
+		this.grantable = this._register(new AccountRead(services, 'grantableScopes'));
 		this.create = this._register(
 			new ButtonControl(headerActions, { variant: 'brand', label: services.text('newToken') })
 		);
@@ -68,6 +71,7 @@ export class TokensPage extends Disposable implements AccountPageView {
 			})
 		);
 		this._register(this.tokens.onDidChange(() => this.render()));
+		this._register(this.grantable.onDidChange(() => this.render()));
 		this._register(this.tokens.onDidRead(() => this.onRead()));
 		this._register(this.create.onDidRequest(() => this.openNewToken()));
 		this.render();
@@ -75,6 +79,7 @@ export class TokensPage extends Disposable implements AccountPageView {
 
 	setVisible(visible: boolean): void {
 		this.tokens.setActive(visible);
+		this.grantable.setActive(visible);
 	}
 
 	private onRead(): void {
@@ -122,18 +127,21 @@ export class TokensPage extends Disposable implements AccountPageView {
 			shape: tokenShape(state),
 			...(token.academicUnitId === undefined
 				? {}
-				: { tag: this.services.text('tokenUnitTag') }),
+				: { tag: this.unitTag(token.academicUnitId) }),
 			actions
 		};
 	}
 
+	private unitTag(id: string): string {
+		const unit = this.grantable.data?.grantable.academicUnits.find((entry) => entry.id === id);
+		return unit === undefined
+			? this.services.text('tokenUnitTag')
+			: this.services.text('tokenUnitNamedTag', { unit: unit.name });
+	}
+
 	private detail(token: AccountToken, state: TokenState): string {
-		const scopes = token.scopes
-			.map((scope) => {
-				const label = scopeLabel(scope);
-				return label === undefined ? scope : this.services.text(label);
-			})
-			.join(', ');
+		const grantable = this.grantable.data?.grantable;
+		const scopes = token.scopes.map((scope) => scopeTitle(scope, grantable)).join(', ');
 		const date = (time: number): string => this.services.date(time);
 		let lifetime: string;
 		if (state === 'revoked')

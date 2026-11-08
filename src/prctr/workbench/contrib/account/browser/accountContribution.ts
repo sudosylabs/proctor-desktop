@@ -28,7 +28,8 @@ const pageTitles: Readonly<Record<AccountPage, AccountMessage>> = Object.freeze(
 	profile: 'profileTitle',
 	security: 'securityTitle',
 	sessions: 'sessionsTitle',
-	tokens: 'tokensTitle'
+	tokens: 'tokensTitle',
+	history: 'historyTitle'
 });
 
 export interface AccountContributionOptions {

@@ -21,7 +21,7 @@ export const activityViews = [
 ] as const;
 export type ActivityView = (typeof activityViews)[number];
 
-export const accountPages = ['profile', 'security', 'sessions', 'tokens'] as const;
+export const accountPages = ['profile', 'security', 'sessions', 'tokens', 'history'] as const;
 export type AccountPage = (typeof accountPages)[number];
 
 const areaDestinations: Readonly<Partial<Record<ProductArea, ProductDestination>>> = Object.freeze({

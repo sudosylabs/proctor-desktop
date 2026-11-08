@@ -67,7 +67,8 @@ const profile = (emailVerified: boolean): AccountResponse =>
 			email: 'amara.okafor@northfield.example',
 			emailVerified,
 			locale: 'en-GB',
-			timezone: 'Europe/London'
+			timezone: 'Europe/London',
+			createdAt: NOW - 400 * DAY
 		}
 	});
 
@@ -132,7 +133,7 @@ const tokens = (): AccountResponse =>
 			{
 				id: id('f'),
 				description: 'Grade export script',
-				scopes: ['examinations:read'],
+				scopes: ['exam.view'],
 				academicUnitId: id('u'),
 				expiresAt: NOW + 100 * DAY,
 				lastUsedAt: NOW - 2 * DAY,
@@ -141,7 +142,7 @@ const tokens = (): AccountResponse =>
 			{
 				id: id('g'),
 				description: 'Marking spreadsheet',
-				scopes: ['examinations:read'],
+				scopes: ['exam.view'],
 				expiresAt: NOW + 50 * DAY,
 				disabledAt: NOW - 25 * DAY,
 				createdAt: NOW - 30 * DAY
@@ -327,7 +328,10 @@ export async function runAccountTests(document: Document): Promise<void> {
 					{
 						retirementId: id('r'),
 						examId: id('x'),
+						examTitle: 'Algorithms final',
 						examSittingId: id('s'),
+						sittingStartAt: NOW - 5 * DAY,
+						sittingEndAt: NOW - 5 * DAY + 3 * 3600_000,
 						submissionId: id('t'),
 						category: 'work',
 						state: 'grace',
@@ -340,7 +344,17 @@ export async function runAccountTests(document: Document): Promise<void> {
 		);
 		assign('profile');
 		await wait(() => !section('Exam records due for deletion').hidden, 'notices section');
-		check(row('Your submitted work'), 'A notice names its record category');
+		check(row('Algorithms final'), 'A notice names its exam');
+		check(
+			row('Algorithms final').textContent!.includes(
+				'Your submitted work from the sitting on'
+			),
+			'A notice names its record kind and sitting'
+		);
+		check(
+			root.textContent!.includes('Member since'),
+			'The profile says when the account began'
+		);
 		check(!root.textContent!.includes(id('x')), 'Notices never show raw identifiers');
 		check(
 			root.textContent!.includes('There are more records'),
@@ -364,7 +378,11 @@ export async function runAccountTests(document: Document): Promise<void> {
 						enabled: true,
 						pending: false,
 						recoveryRequired: false,
-						recoveryCodesRemaining: 2
+						recoveryCodesRemaining: 2,
+						recoveryCodesTotal: 10,
+						method: 'authenticatorApp',
+						enabledAt: NOW - 60 * DAY,
+						passwordChangedAt: NOW - 90 * DAY
 					}
 				}
 			})
@@ -378,6 +396,15 @@ export async function runAccountTests(document: Document): Promise<void> {
 			row('Recovery codes').querySelector('[data-shape="attention"]'),
 			'Few recovery codes read as attention'
 		);
+		check(
+			row('Recovery codes').textContent!.includes('2 of 10 left'),
+			'Recovery codes count against the issued set'
+		);
+		check(
+			row('Two-step verification').textContent!.includes('authenticator app, since'),
+			'Two-step verification names its method and date'
+		);
+		check(row('Password').textContent!.includes('changed'), 'The password change is dated');
 		check(!root.querySelector('input'), 'Security credentials stay on the hosted page');
 		check(
 			root.textContent!.includes('never asks for your password'),
@@ -479,9 +506,49 @@ export async function runAccountTests(document: Document): Promise<void> {
 			);
 			return item?.getAttribute('aria-disabled') === 'false';
 		}, 'fresh read unlocks the row');
+		const endOthers = buttonIn(section('Other sessions'), 'End all other sessions')!;
+		check(endOthers && !endOthers.hidden, 'Other sessions can all be ended at once');
+		account.changes.set('revokeOtherSessions', () => ({ kind: 'sessionsEnded', count: 1 }));
+		endOthers.click();
+		await wait(() => dialog() !== null, 'end others confirmation');
+		check(
+			dialog()!.textContent!.includes('This computer stays signed in'),
+			'Ending other sessions keeps this one'
+		);
+		buttonIn(dialog()!, 'End all other sessions')!.click();
+		await wait(
+			() => section('Other sessions').textContent!.includes('Every other session was ended'),
+			'others ended'
+		);
+		check(account.count('revokeOtherSessions') === 1, 'Other sessions end in one request');
 		// #endregion
 
 		// #region Access tokens
+		account.reads.set('grantableScopes', () =>
+			data({
+				section: 'grantableScopes',
+				grantable: {
+					scopes: [
+						{
+							name: 'exam.view',
+							title: 'View exams',
+							description: 'See exams and their details.',
+							institutionWide: true,
+							academicUnitIds: []
+						},
+						{
+							name: 'class.view',
+							title: 'View classes',
+							description: 'See classes.',
+							institutionWide: false,
+							academicUnitIds: [id('u')]
+						}
+					],
+					academicUnits: [{ id: id('u'), name: 'Computer Science' }],
+					moreAcademicUnits: false
+				}
+			})
+		);
 		account.reads.set('tokens', tokens);
 		assign('tokens');
 		await wait(() => root.textContent!.includes('Grade export script'), 'tokens');
@@ -491,8 +558,12 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'Disabled tokens are inactive'
 		);
 		check(
-			row('Grade export script').textContent!.includes('One academic unit only'),
-			'A unit limit is tagged'
+			row('Grade export script').textContent!.includes('Computer Science only'),
+			'A unit limit names its unit'
+		);
+		check(
+			row('Grade export script').textContent!.includes('View exams'),
+			'Scopes are titled from the server catalogue'
 		);
 		check(
 			row('Old roster import').textContent!.includes('people:read'),
@@ -527,11 +598,22 @@ export async function runAccountTests(document: Document): Promise<void> {
 		buttonIn(root, 'New token')!.click();
 		await wait(() => dialog() !== null, 'new token dialog');
 		const form = dialog()!;
-		check(form.textContent!.includes('Read exams'), 'The contract’s scope is offered');
+		await wait(() => form.textContent!.includes('View exams'), 'grantable scopes');
+		check(form.textContent!.includes('See exams and their details.'), 'Scopes are described');
+		const boxes = [...form.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];
+		const limit = [...form.querySelectorAll<HTMLSelectElement>('select')].find(
+			(select) => select.labels?.[0]?.textContent === 'Limit to'
+		)!;
+		check(limit && !limit.closest('[hidden]'), 'Known units can limit a token');
 		check(
-			!form.querySelector('select[name="unit"]') && !form.textContent!.includes('Limit to'),
-			'No unit choice without known units'
+			boxes[1]!.disabled && !boxes[0]!.disabled,
+			'A unit-only scope waits for a unit to be chosen'
 		);
+		limit.value = id('u');
+		limit.dispatchEvent(new Event('change'));
+		check(!boxes[1]!.disabled, 'Choosing a unit makes its scopes available');
+		limit.value = '';
+		limit.dispatchEvent(new Event('change'));
 		buttonIn(form, 'Create token')!.click();
 		check(form.textContent!.includes('Enter a name.'), 'A token needs a name');
 		check(account.count('createToken') === 0, 'An invalid draft is never sent');
@@ -540,7 +622,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		name.dispatchEvent(new Event('input', { bubbles: true }));
 		buttonIn(form, 'Create token')!.click();
 		check(form.textContent!.includes('Tick at least one'), 'A token needs a scope');
-		form.querySelector<HTMLInputElement>('input[type="checkbox"]')!.click();
+		boxes[0]!.click();
 		account.changes.set('createToken', (intent) => {
 			check(intent.kind === 'createToken', 'createToken intent');
 			return {
@@ -565,7 +647,8 @@ export async function runAccountTests(document: Document): Promise<void> {
 				intent.kind === 'createToken'
 		)!;
 		check(created.description === 'Grade export script 2', 'The name is sent trimmed');
-		check(created.scopes.join() === 'examinations:read', 'Only ticked scopes are sent');
+		check(created.scopes.join() === 'exam.view', 'Only ticked scopes are sent');
+		check(created.academicUnitId === undefined, 'A whole-institution token sends no unit');
 		check(created.expiresAt === NOW + 90 * DAY, 'The default expiry is 90 days');
 		check(dialog()!.textContent!.includes(CREDENTIAL), 'The credential is shown once');
 		buttonIn(dialog()!, 'Copy')!.click();
@@ -576,6 +659,65 @@ export async function runAccountTests(document: Document): Promise<void> {
 			!document.body.textContent!.includes(CREDENTIAL),
 			'The credential leaves the page when the dialog closes'
 		);
+		// #endregion
+
+		// #region Account history
+		const historyEntry = (letter: string, event: string, extra: object = {}) => ({
+			id: id(letter),
+			createdAt: NOW - 3600_000,
+			event,
+			failed: false,
+			relation: 'subject' as const,
+			actor: 'self' as const,
+			...extra
+		});
+		account.changes.set('readHistory', (intent) =>
+			intent.kind === 'readHistory' && intent.cursor === 'next'
+				? data({ section: 'history', entries: [historyEntry('m', 'sign_out')] })
+				: data({
+						section: 'history',
+						cursor: 'next',
+						entries: [
+							historyEntry('j', 'sign_in.succeeded', {
+								client: 'desktop',
+								ipAddress: '81.2.69.160'
+							}),
+							historyEntry('k', 'role.granted', { actor: 'administrator' }),
+							historyEntry('l', 'future.event', { failed: true, actor: 'system' })
+						]
+					})
+		);
+		assign('history');
+		await wait(() => root.textContent!.includes('Signed in'), 'history');
+		const table = root.querySelector('table')!;
+		check(table.textContent!.includes('An administrator'), 'Administrators are never named');
+		check(table.textContent!.includes('81.2.69.160'), 'Own actions show where they came from');
+		check(
+			table.textContent!.includes('Other account activity'),
+			'An unknown event reads generically'
+		);
+		check(table.textContent!.includes('Did not succeed'), 'A failed event says so');
+		const first = account.requests.findLast((intent) => intent.kind === 'readHistory')!;
+		check(
+			first.kind === 'readHistory' && first.createdAfter !== undefined,
+			'History starts with the last 30 days'
+		);
+		buttonIn(root, 'Show older events')!.click();
+		await wait(() => table.textContent!.includes('Signed out'), 'older history');
+		check(table.querySelectorAll('tbody tr').length === 4, 'Older events are appended');
+		check(
+			buttonIn(root, 'Show older events')?.closest('[hidden]') !== null,
+			'The last page offers no more'
+		);
+		const outcome = root.querySelector<HTMLSelectElement>('select[aria-label="Outcome"]')!;
+		outcome.value = 'fail';
+		outcome.dispatchEvent(new Event('change'));
+		await wait(() => {
+			const last = account.requests.findLast((intent) => intent.kind === 'readHistory');
+			return (
+				last?.kind === 'readHistory' && last.status === 'fail' && last.cursor === undefined
+			);
+		}, 'filtered history');
 		// #endregion
 
 		// #region Layout and lifecycle

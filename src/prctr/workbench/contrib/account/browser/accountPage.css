@@ -87,11 +87,44 @@
 		flex-direction: column;
 	}
 	.prctr-account .prctr-account-section__header {
+		align-items: flex-end;
 		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
 		display: flex;
+		gap: 12px;
+		padding-block-end: 10px;
+	}
+	.prctr-account .prctr-account-section__heading {
+		display: flex;
+		flex: 1;
 		flex-direction: column;
 		gap: 2px;
-		padding-block-end: 10px;
+		min-inline-size: 0;
+	}
+	.prctr-account .prctr-account-section__action {
+		background: none;
+		border: 0;
+		border-radius: 4px;
+		color: var(--prctr-color-brand-link);
+		cursor: pointer;
+		font: inherit;
+		font-size: 13px;
+		font-weight: var(--prctr-typography-weight-medium);
+		padding: 0;
+		white-space: nowrap;
+	}
+	.prctr-account .prctr-account-section__action[hidden] {
+		display: none;
+	}
+	.prctr-account .prctr-account-section__action:hover:not(:disabled) {
+		text-decoration: underline;
+	}
+	.prctr-account .prctr-account-section__action:disabled {
+		color: var(--prctr-color-text-tertiary);
+		cursor: default;
+	}
+	.prctr-account .prctr-account-section__action:focus-visible {
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 2px;
 	}
 	.prctr-account .prctr-account-section__title {
 		font-size: 15px;
@@ -440,6 +473,12 @@
 		.prctr-account .prctr-account-notice,
 		.prctr-account .prctr-account-footnote {
 			border: var(--prctr-shape-stroke-default) solid CanvasText;
+		}
+		.prctr-account .prctr-account-section__action {
+			color: LinkText;
+		}
+		.prctr-account .prctr-account-section__action:disabled {
+			color: GrayText;
 		}
 		.prctr-account .prctr-account-row__more:hover,
 		.prctr-account .prctr-account-row__more[aria-expanded='true'] {

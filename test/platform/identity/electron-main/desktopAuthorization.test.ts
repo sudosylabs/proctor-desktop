@@ -1090,7 +1090,7 @@ void test('account tokens, email verification and retention notices are bound, s
 		id: tokenId,
 		user_id: id,
 		description: 'Registrar\u0007 tool',
-		scopes: ['examinations:read'],
+		scopes: ['exam.view'],
 		expires_at: '2027-01-01T00:00:00Z',
 		created_at: '2026-01-01T00:00:00Z',
 		updated_at: '2026-01-01T00:00:00Z',
@@ -1121,7 +1121,7 @@ void test('account tokens, email verification and retention notices are bound, s
 		if (path === '/api/v1/users/me/tokens') {
 			assert.deepEqual(JSON.parse(String(init?.body)), {
 				description: 'CI',
-				scopes: ['examinations:read'],
+				scopes: ['exam.view'],
 				academic_unit_id: registration,
 				expires_at: '2027-01-01T00:00:00.000Z'
 			});
@@ -1156,7 +1156,10 @@ void test('account tokens, email verification and retention notices are bound, s
 					{
 						retirement_id: tokenId,
 						exam_id: registration,
+						exam_title: 'Algorithms final',
 						exam_sitting_id: registration,
+						sitting_start_at: '2025-12-20T09:00:00Z',
+						sitting_end_at: '2025-12-20T12:00:00Z',
 						submission_id: registration,
 						category: 'work',
 						state: 'grace',
@@ -1211,7 +1214,7 @@ void test('account tokens, email verification and retention notices are bound, s
 					{
 						id: tokenId,
 						description: 'Registrar  tool',
-						scopes: ['examinations:read'],
+						scopes: ['exam.view'],
 						expiresAt: Date.parse('2027-01-01T00:00:00Z'),
 						createdAt: Date.parse('2026-01-01T00:00:00Z')
 					}
@@ -1224,7 +1227,7 @@ void test('account tokens, email verification and retention notices are bound, s
 		const create = {
 			kind: 'createToken',
 			description: 'CI',
-			scopes: ['examinations:read'],
+			scopes: ['exam.view'],
 			academicUnitId: registration,
 			expiresAt: Date.parse('2027-01-01T00:00:00Z')
 		} as const;
@@ -1278,7 +1281,10 @@ void test('account tokens, email verification and retention notices are bound, s
 					{
 						retirementId: tokenId,
 						examId: registration,
+						examTitle: 'Algorithms final',
 						examSittingId: registration,
+						sittingStartAt: Date.parse('2025-12-20T09:00:00Z'),
+						sittingEndAt: Date.parse('2025-12-20T12:00:00Z'),
 						submissionId: registration,
 						category: 'work',
 						state: 'grace',

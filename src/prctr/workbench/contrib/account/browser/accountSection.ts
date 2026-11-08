@@ -6,6 +6,7 @@ import { createElementFactory } from '../../../../base/browser/documentElements.
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import type { MenuEntry } from '../../../../base/browser/ui/menu/menuControl.js';
+import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
 import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
 import type { StatusShape } from '../common/accountPresentation.js';
@@ -50,11 +51,20 @@ export class AccountSection extends Disposable {
 	private readonly list: HTMLUListElement;
 	private readonly rowStore = this._register(new DisposableStore());
 	private retryHandler: (() => void) | undefined;
+	private readonly action: HTMLButtonElement | undefined;
+	private readonly actionEmitter = this._register(new Emitter<void>());
+	/** The section's own action, beside its heading, was chosen. */
+	readonly onDidRequestAction: Event<void> = this.actionEmitter.event;
 
 	constructor(
 		host: HTMLElement,
 		private readonly services: AccountPageServices,
-		options: { readonly title: string; readonly description?: string }
+		options: {
+			readonly title: string;
+			readonly description?: string;
+			/** A text action for the whole section, such as ending every other session. */
+			readonly action?: string;
+		}
 	) {
 		super();
 		const document = host.ownerDocument;
@@ -65,11 +75,22 @@ export class AccountSection extends Disposable {
 			tabIndex: -1,
 			textContent: options.title
 		});
-		const header = $('div.prctr-account-section__header', {}, this.heading);
+		const heading = $('div.prctr-account-section__heading', {}, this.heading);
 		if (options.description !== undefined)
-			header.append(
+			heading.append(
 				$('p.prctr-account-section__description', { textContent: options.description })
 			);
+		const header = $('div.prctr-account-section__header', {}, heading);
+		if (options.action !== undefined) {
+			const action = $('button.prctr-account-section__action', {
+				type: 'button',
+				hidden: true,
+				textContent: options.action
+			});
+			this.action = action;
+			header.append(action);
+			this._register(addDisposableListener(action, 'click', () => this.actionEmitter.fire()));
+		}
 		this.stateIcon = this._register(createSemanticIcon(document, { id: 'state.info' }));
 		this.stateText = $('span.prctr-account-section__state-text');
 		this.state = $(
@@ -99,6 +120,19 @@ export class AccountSection extends Disposable {
 
 	set hidden(hidden: boolean) {
 		this.element.hidden = hidden;
+	}
+
+	/** Shows the section action only when it applies, and disables it while it cannot run. */
+	setAction(visible: boolean, enabled = true): void {
+		if (this.action === undefined) return;
+		this.action.hidden = !visible;
+		this.action.disabled = !enabled;
+	}
+
+	focusAction(): boolean {
+		if (this.action === undefined || this.action.hidden) return false;
+		this.action.focus();
+		return true;
 	}
 
 	focusHeading(): void {

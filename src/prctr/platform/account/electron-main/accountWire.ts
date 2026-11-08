@@ -6,6 +6,7 @@ import {
 	accountPage,
 	validateAccountResponse,
 	type AccountData,
+	type AccountHistoryQuery,
 	type AccountBinding,
 	type AccountResponse,
 	type AccountToken
@@ -24,7 +25,8 @@ export function readAccountProfile(raw: unknown, binding: AccountBinding): Accou
 			email: p.email,
 			emailVerified: p.email_verified,
 			locale: p.locale,
-			timezone: p.timezone
+			timezone: p.timezone,
+			createdAt: accountInstant(p.created_at)
 		}
 	});
 }
@@ -47,7 +49,17 @@ export function readAccountSecurity(methods: unknown, mfa: unknown): AccountData
 							enabled: m.enabled,
 							pending: m.pending,
 							recoveryRequired: m.mfa_recovery_required,
-							recoveryCodesRemaining: m.recovery_codes_remaining
+							recoveryCodesRemaining: m.recovery_codes_remaining,
+							recoveryCodesTotal: m.recovery_codes_total,
+							recoveryCodesGeneratedAt: accountInstant(m.recovery_codes_generated_at),
+							method:
+								m.method === undefined
+									? undefined
+									: m.method === 'authenticator_app'
+										? 'authenticatorApp'
+										: m.method,
+							enabledAt: accountInstant(m.enabled_at),
+							passwordChangedAt: accountInstant(m.password_changed_at)
 						}
 		}
 	});
@@ -59,9 +71,12 @@ export function readAccountSessions(raw: unknown, binding: AccountBinding): Acco
 			const s = record(value);
 			if (accountId(s.user_id) !== binding.principalId)
 				throw new TypeError('Account binding mismatch');
+			// The server marks the Session that asked; it must be the one this window is bound to.
+			if (s.current !== (s.id === binding.sessionId))
+				throw new TypeError('Account binding mismatch');
 			return {
 				id: s.id,
-				current: s.id === binding.sessionId,
+				current: s.current,
 				name: s.device_name ?? '',
 				client: s.client_type,
 				method: s.authentication_method,
@@ -154,7 +169,10 @@ export function readAccountNotices(raw: unknown): AccountData {
 			return {
 				retirementId: n.retirement_id,
 				examId: n.exam_id,
+				examTitle: n.exam_title,
 				examSittingId: n.exam_sitting_id,
+				sittingStartAt: accountInstant(n.sitting_start_at),
+				sittingEndAt: accountInstant(n.sitting_end_at),
 				submissionId: n.submission_id,
 				category: n.category,
 				state: n.state,
@@ -166,6 +184,76 @@ export function readAccountNotices(raw: unknown): AccountData {
 		}),
 		more: typeof page.next_cursor === 'string' && page.next_cursor.length > 0
 	});
+}
+export function readAccountGrantableScopes(raw: unknown): AccountData {
+	const g = record(raw);
+	return checked({
+		section: 'grantableScopes',
+		grantable: {
+			scopes: accountList(g.scopes, 128).map((value) => {
+				const c = record(value);
+				return {
+					name: c.name,
+					title: c.title,
+					description: c.description,
+					institutionWide: c.institution_wide,
+					academicUnitIds: c.academic_unit_ids
+				};
+			}),
+			academicUnits: accountList(g.academic_units, 50).map((value) => {
+				const u = record(value);
+				return { id: u.id, name: u.display_name };
+			}),
+			moreAcademicUnits: g.academic_units_has_more
+		}
+	});
+}
+export function readAccountHistory(raw: unknown): AccountData {
+	const page = record(raw);
+	return checked({
+		section: 'history',
+		entries: accountList(page.items, 200).map((value) => {
+			const e = record(value);
+			if (e.status !== 'success' && e.status !== 'fail')
+				throw new TypeError('Invalid history outcome');
+			const entry: Record<string, unknown> = {
+				id: e.id,
+				createdAt: accountInstant(e.created_at),
+				event: e.event,
+				failed: e.status === 'fail',
+				relation: e.relation,
+				actor: record(e.actor).kind,
+				client: e.client_type,
+				ipAddress: e.ip_address,
+				userAgent: e.user_agent
+			};
+			for (const key of Object.keys(entry)) if (entry[key] === undefined) delete entry[key];
+			return entry;
+		}),
+		...(page.next_cursor === undefined ? {} : { cursor: page.next_cursor })
+	});
+}
+/** The history path for one query: the server's own filter names, encoded. */
+export function accountHistoryPath(
+	query: AccountHistoryQuery
+): `/api/v1/users/me/audits?limit=50${string}` {
+	const search = new URLSearchParams();
+	if (query.createdAfter !== undefined)
+		search.append('created_after', new Date(query.createdAfter).toISOString());
+	if (query.createdBefore !== undefined)
+		search.append('created_before', new Date(query.createdBefore).toISOString());
+	for (const event of query.events ?? []) search.append('event', event);
+	if (query.status !== undefined) search.append('status', query.status);
+	if (query.relation !== undefined) search.append('relation', query.relation);
+	if (query.cursor !== undefined) search.append('cursor', query.cursor);
+	const rest = search.toString();
+	return `/api/v1/users/me/audits?limit=50${rest ? `&${rest}` : ''}`;
+}
+export function readRevokedSessionCount(raw: unknown): AccountResponse {
+	const r = record(raw);
+	if (Object.keys(r).join() !== 'revoked_session_count')
+		throw new TypeError('Invalid session revocation');
+	return validateAccountResponse({ kind: 'sessionsEnded', count: r.revoked_session_count });
 }
 function checked(value: unknown): AccountData {
 	const result = validateAccountResponse({ kind: 'data', data: value });

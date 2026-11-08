@@ -11,7 +11,12 @@ import {
 	readAccountNotices,
 	readAccountToken,
 	readAccountTokenCreation,
-	readAccountTokens
+	readAccountTokens,
+	readAccountGrantableScopes,
+	readAccountHistory,
+	readAccountSecurity,
+	readRevokedSessionCount,
+	accountHistoryPath
 } from '../../../../src/prctr/platform/account/electron-main/accountWire.js';
 import { desktopHttpMethod } from '../../../../src/prctr/platform/identity/node/desktopAuthHttp.js';
 const id = 'y'.repeat(26);
@@ -49,6 +54,7 @@ void test('profile response is a bounded whitelist, never a raw server user or p
 			last_name: '',
 			email: 'name@example.test',
 			email_verified: true,
+			created_at: '2025-09-01T08:00:00Z',
 			password_hash: 'SECRET',
 			profile_picture_url: 'https://untrusted.test/tracker'
 		},
@@ -62,7 +68,8 @@ void test('profile response is a bounded whitelist, never a raw server user or p
 			firstName: '',
 			lastName: '',
 			email: 'name@example.test',
-			emailVerified: true
+			emailVerified: true,
+			createdAt: Date.parse('2025-09-01T08:00:00Z')
 		}
 	});
 	assert.ok(!JSON.stringify(data).includes('SECRET'));
@@ -264,7 +271,7 @@ void test('token, verification and notice intents are exact and bounded', () => 
 	const create = {
 		kind: 'createToken',
 		description: 'Registrar tool',
-		scopes: ['examinations:read'],
+		scopes: ['exam.view'],
 		expiresAt: 1798761600000
 	};
 	assert.deepEqual(validateAccountIntent(create), create);
@@ -289,7 +296,7 @@ void test('token, verification and notice intents are exact and bounded', () => 
 		{ ...create, description: 'a'.repeat(257) },
 		{ ...create, description: 'line\nbreak' },
 		{ ...create, scopes: [] },
-		{ ...create, scopes: ['examinations:read', 'examinations:read'] },
+		{ ...create, scopes: ['exam.view', 'exam.view'] },
 		{ ...create, scopes: ['Examinations Read'] },
 		{ ...create, scopes: Array.from({ length: 65 }, (_, i) => `scope${i}`) },
 		{ ...create, expiresAt: '2026-01-01T00:00:00Z' },
@@ -309,7 +316,7 @@ void test('token and notice wire parsers whitelist fields and bind the principal
 		id,
 		user_id: id,
 		description: 'Tool',
-		scopes: ['examinations:read'],
+		scopes: ['exam.view'],
 		academic_unit_id: id,
 		expires_at: '2027-01-01T00:00:00Z',
 		last_used_at: '2026-03-01T00:00:00Z',
@@ -324,7 +331,7 @@ void test('token and notice wire parsers whitelist fields and bind the principal
 			{
 				id,
 				description: 'Tool',
-				scopes: ['examinations:read'],
+				scopes: ['exam.view'],
 				academicUnitId: id,
 				expiresAt: Date.parse('2027-01-01T00:00:00Z'),
 				lastUsedAt: Date.parse('2026-03-01T00:00:00Z'),
@@ -338,9 +345,7 @@ void test('token and notice wire parsers whitelist fields and bind the principal
 		readAccountTokens({ items: [{ ...raw, user_id: 'b'.repeat(26) }] }, binding)
 	);
 	assert.throws(() => readAccountTokens({ items: [raw, raw] }, binding));
-	assert.throws(() =>
-		readAccountTokens({ items: [{ ...raw, scopes: 'examinations:read' }] }, binding)
-	);
+	assert.throws(() => readAccountTokens({ items: [{ ...raw, scopes: 'exam.view' }] }, binding));
 	assert.throws(() => readAccountToken(raw, binding, 'b'.repeat(26)));
 	for (const stale of [{ disabled_at: 0 }, { revoked_at: null }, { created_at: 1 }])
 		assert.throws(() => readAccountTokens({ items: [{ ...raw, ...stale }] }, binding));
@@ -357,7 +362,10 @@ void test('token and notice wire parsers whitelist fields and bind the principal
 	const notice = {
 		retirement_id: id,
 		exam_id: id,
+		exam_title: 'Algorithms final',
 		exam_sitting_id: id,
+		sitting_start_at: '2025-12-20T09:00:00Z',
+		sitting_end_at: '2025-12-20T12:00:00Z',
 		submission_id: id,
 		category: 'browser_activity',
 		state: 'canceled',
@@ -373,7 +381,10 @@ void test('token and notice wire parsers whitelist fields and bind the principal
 			{
 				retirementId: id,
 				examId: id,
+				examTitle: 'Algorithms final',
 				examSittingId: id,
+				sittingStartAt: Date.parse('2025-12-20T09:00:00Z'),
+				sittingEndAt: Date.parse('2025-12-20T12:00:00Z'),
 				submissionId: id,
 				category: 'browser_activity',
 				state: 'canceled',
@@ -418,4 +429,191 @@ void test('token and verification routes map to exact methods and reject bodies 
 	assert.throws(() =>
 		desktopHttpMethod(`/api/v1/users/me/tokens/${id}`, undefined, undefined, true)
 	);
+});
+
+void test('sessions trust the server current mark only when it is this window’s session', () => {
+	const other = 'b'.repeat(26);
+	const session = (sid: string, current: boolean) => ({
+		id: sid,
+		user_id: id,
+		current,
+		client_type: 'web',
+		authentication_method: 'password',
+		created_at: '2026-01-01T00:00:00Z',
+		last_activity_at: '2026-01-02T00:00:00Z',
+		expires_at: '2026-02-01T00:00:00Z'
+	});
+	const data = readAccountSessions(
+		{ items: [session(id, true), session(other, false)] },
+		{ principalId: id, sessionId: id }
+	);
+	assert.ok(
+		data.section === 'sessions' && data.sessions[0]!.current && !data.sessions[1]!.current
+	);
+	assert.throws(() =>
+		readAccountSessions({ items: [session(other, true)] }, { principalId: id, sessionId: id })
+	);
+	assert.throws(() =>
+		readAccountSessions({ items: [session(id, false)] }, { principalId: id, sessionId: id })
+	);
+	assert.deepEqual(readRevokedSessionCount({ revoked_session_count: 2 }), {
+		kind: 'sessionsEnded',
+		count: 2
+	});
+	assert.throws(() => readRevokedSessionCount({ revoked_session_count: -1 }));
+	assert.throws(() => readRevokedSessionCount({ revoked_session_count: 1, extra: true }));
+	assert.equal(desktopHttpMethod('/api/v1/users/me/sessions/revoke-others'), 'POST');
+});
+
+void test('two-step status maps method, dates and the issued recovery-code set', () => {
+	const data = readAccountSecurity(
+		{ password: true, providers: [] },
+		{
+			service_enabled: true,
+			enabled: true,
+			pending: false,
+			mfa_recovery_required: false,
+			recovery_codes_remaining: 7,
+			recovery_codes_total: 10,
+			recovery_codes_generated_at: '2026-01-01T00:00:00Z',
+			method: 'authenticator_app',
+			enabled_at: '2025-12-01T00:00:00Z',
+			password_changed_at: '2025-11-01T00:00:00Z',
+			authentication_method: 'password'
+		}
+	);
+	assert.deepEqual(data.section === 'security' && data.security.mfa, {
+		available: true,
+		enabled: true,
+		pending: false,
+		recoveryRequired: false,
+		recoveryCodesRemaining: 7,
+		recoveryCodesTotal: 10,
+		recoveryCodesGeneratedAt: Date.parse('2026-01-01T00:00:00Z'),
+		enabledAt: Date.parse('2025-12-01T00:00:00Z'),
+		passwordChangedAt: Date.parse('2025-11-01T00:00:00Z'),
+		method: 'authenticatorApp'
+	});
+	assert.throws(() =>
+		readAccountSecurity(
+			{ password: true, providers: [] },
+			{
+				service_enabled: true,
+				enabled: true,
+				pending: false,
+				mfa_recovery_required: false,
+				recovery_codes_remaining: 7,
+				recovery_codes_total: 10,
+				method: 'sms'
+			}
+		)
+	);
+});
+
+void test('grantable scopes are bounded and refer only to listed Academic Units', () => {
+	const unit = 'u'.repeat(26);
+	const raw = {
+		scopes: [
+			{
+				name: 'exam.view',
+				title: 'View exams',
+				description: 'See exams.',
+				resource_types: ['exam'],
+				institution_wide: false,
+				academic_unit_ids: [unit]
+			}
+		],
+		academic_units: [{ id: unit, display_name: 'Computer Science' }],
+		academic_units_has_more: true
+	};
+	assert.deepEqual(readAccountGrantableScopes(raw), {
+		section: 'grantableScopes',
+		grantable: {
+			scopes: [
+				{
+					name: 'exam.view',
+					title: 'View exams',
+					description: 'See exams.',
+					institutionWide: false,
+					academicUnitIds: [unit]
+				}
+			],
+			academicUnits: [{ id: unit, name: 'Computer Science' }],
+			moreAcademicUnits: true
+		}
+	});
+	assert.throws(() =>
+		readAccountGrantableScopes({
+			...raw,
+			scopes: [{ ...raw.scopes[0], academic_unit_ids: ['v'.repeat(26)] }]
+		})
+	);
+	assert.throws(() =>
+		readAccountGrantableScopes({ ...raw, scopes: [raw.scopes[0], raw.scopes[0]] })
+	);
+	assert.throws(() =>
+		readAccountGrantableScopes({ ...raw, scopes: [{ ...raw.scopes[0], name: 'Exam View' }] })
+	);
+	assert.equal(desktopHttpMethod('/api/v1/users/me/tokens/grantable-scopes'), 'GET');
+});
+
+void test('history queries use the server filter names and parse a minimized page', () => {
+	assert.equal(accountHistoryPath({}), '/api/v1/users/me/audits?limit=50');
+	const path = accountHistoryPath({
+		createdAfter: Date.parse('2026-01-01T00:00:00Z'),
+		createdBefore: Date.parse('2026-02-01T00:00:00Z'),
+		events: ['sign_in.failed', 'sign_out'],
+		status: 'fail',
+		relation: 'subject',
+		cursor: 'opaque/+='
+	});
+	assert.equal(
+		path,
+		'/api/v1/users/me/audits?limit=50&created_after=2026-01-01T00%3A00%3A00.000Z&created_before=2026-02-01T00%3A00%3A00.000Z&event=sign_in.failed&event=sign_out&status=fail&relation=subject&cursor=opaque%2F%2B%3D'
+	);
+	assert.equal(desktopHttpMethod(path), 'GET');
+	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=50&actor=1'));
+	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=200' as never));
+	for (const intent of [
+		{ kind: 'readHistory', events: ['made.up'] },
+		{ kind: 'readHistory', events: [] },
+		{ kind: 'readHistory', status: 'maybe' },
+		{ kind: 'readHistory', createdAfter: 10, createdBefore: 10 },
+		{ kind: 'readHistory', cursor: 'has space' },
+		{ kind: 'readHistory', url: 'https://attacker.test' }
+	])
+		assert.throws(() => validateAccountIntent(intent));
+	const entry = {
+		id,
+		created_at: '2026-01-01T00:00:00Z',
+		event: 'sign_in.failed',
+		status: 'fail',
+		relation: 'subject',
+		actor: { kind: 'self' },
+		resource: { type: 'user', id },
+		error_code: 'authentication.invalid_credentials',
+		client_type: 'web',
+		ip_address: '81.2.69.160'
+	};
+	assert.deepEqual(readAccountHistory({ items: [entry], next_cursor: 'next' }), {
+		section: 'history',
+		entries: [
+			{
+				id,
+				createdAt: Date.parse('2026-01-01T00:00:00Z'),
+				event: 'sign_in.failed',
+				failed: true,
+				relation: 'subject',
+				actor: 'self',
+				client: 'web',
+				ipAddress: '81.2.69.160'
+			}
+		],
+		cursor: 'next'
+	});
+	const future = readAccountHistory({ items: [{ ...entry, event: 'passkey.added' }] });
+	assert.ok(future.section === 'history' && future.entries[0]!.event === 'passkey.added');
+	assert.throws(() => readAccountHistory({ items: [{ ...entry, status: 'partial' }] }));
+	assert.throws(() => readAccountHistory({ items: [{ ...entry, actor: { kind: 'person' } }] }));
+	assert.throws(() => readAccountHistory({ items: [entry, entry] }));
 });

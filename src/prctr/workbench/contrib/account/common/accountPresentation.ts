@@ -4,6 +4,11 @@
 
 import type {
 	AccountDesktop,
+	AccountHistoryEntry,
+	AccountHistoryEvent,
+	AccountHistoryQuery,
+	AccountGrantableScope,
+	AccountGrantableScopes,
 	AccountFailure,
 	AccountRetentionNotice,
 	AccountSecurity,
@@ -107,7 +112,7 @@ const noticeCategories: Readonly<
 });
 
 export interface NoticePresentation {
-	/** The record kind; notices carry identifiers, not exam titles, so the category names the record. */
+	/** The kind of record the notice covers; the exam title names where it came from. */
 	readonly category: NoticeCategoryMessage;
 	readonly when: 'noticeDeletedAfter' | 'noticeDeletionCanceled' | 'noticeDeleted';
 	readonly date: number | undefined;
@@ -134,7 +139,12 @@ export interface TwoStepPresentation {
 	readonly status: TwoStepStatus;
 	readonly shape: StatusShape;
 	/** Present only while two-step verification is on. */
-	readonly recovery?: { readonly remaining: number; readonly low: boolean };
+	readonly recovery?: {
+		readonly remaining: number;
+		/** Size of the issued set; 0 when the server does not know it. */
+		readonly total: number;
+		readonly low: boolean;
+	};
 }
 
 export function twoStepPresentation(mfa: AccountSecurity['mfa']): TwoStepPresentation {
@@ -146,7 +156,11 @@ export function twoStepPresentation(mfa: AccountSecurity['mfa']): TwoStepPresent
 		return {
 			status: 'on',
 			shape: 'active',
-			recovery: { remaining, low: remaining <= RECOVERY_CODES_LOW }
+			recovery: {
+				remaining,
+				total: mfa.recoveryCodesTotal,
+				low: remaining <= RECOVERY_CODES_LOW
+			}
 		};
 	}
 	if (mfa.pending) return { status: 'pending', shape: 'attention' };
@@ -249,20 +263,22 @@ export function tokenShape(state: TokenState): StatusShape {
 	return 'off';
 }
 
-export type TokenScopeMessage = 'scopeExaminationsRead';
-
 /**
- * Scopes this window offers for a new token. The server contract publishes no
- * scope catalogue; it names only `examinations:read`, so that is the one offered.
- * The server still validates every requested scope against current authority.
+ * Whether a scope may go on a token limited to `academicUnitId`, or on an
+ * unlimited token when it is absent. The listed units are roots; the server
+ * still checks every requested scope against current authority.
  */
-export const tokenScopeCatalog: readonly {
-	readonly scope: string;
-	readonly label: TokenScopeMessage;
-}[] = Object.freeze([{ scope: 'examinations:read', label: 'scopeExaminationsRead' }]);
+export function scopeGrantable(
+	scope: AccountGrantableScope,
+	academicUnitId: string | undefined
+): boolean {
+	if (scope.institutionWide) return true;
+	return academicUnitId !== undefined && scope.academicUnitIds.includes(academicUnitId);
+}
 
-export function scopeLabel(scope: string): TokenScopeMessage | undefined {
-	return tokenScopeCatalog.find((entry) => entry.scope === scope)?.label;
+/** A scope's title from the catalogue, or its stable name when the catalogue lacks it. */
+export function scopeTitle(scope: string, grantable: AccountGrantableScopes | undefined): string {
+	return grantable?.scopes.find((entry) => entry.name === scope)?.title ?? scope;
 }
 
 export const tokenExpiryPresets = Object.freeze([7, 30, 90, 180, 365] as const);
@@ -293,6 +309,222 @@ export function validateTokenDraft(draft: TokenDraft): TokenDraftErrors {
 	else if (/[\u0000-\u001f\u007f]/u.test(draft.name)) errors.name = 'tokenNameInvalid';
 	if (draft.scopes.length === 0) errors.scopes = 'tokenScopesRequired';
 	return errors;
+}
+
+// #endregion
+
+// #region Account history
+
+export type HistoryEventMessage =
+	| 'historyEventAcademicUnitJoined'
+	| 'historyEventAcademicUnitLeft'
+	| 'historyEventAccountDisabled'
+	| 'historyEventAccountEnabled'
+	| 'historyEventAccountRecoveredByAdministrator'
+	| 'historyEventAffiliationEnded'
+	| 'historyEventAffiliationStarted'
+	| 'historyEventClassEnrolled'
+	| 'historyEventClassTransferredIn'
+	| 'historyEventClassTransferredOut'
+	| 'historyEventClassUnenrolled'
+	| 'historyEventDesktopRegistrationRevoked'
+	| 'historyEventDesktopSignedIn'
+	| 'historyEventEmailChangeUndone'
+	| 'historyEventEmailChanged'
+	| 'historyEventEmailVerified'
+	| 'historyEventInvitationAccepted'
+	| 'historyEventMfaDisabled'
+	| 'historyEventMfaEnabled'
+	| 'historyEventMfaRecoveryCodesRegenerated'
+	| 'historyEventMfaResetByAdministrator'
+	| 'historyEventMfaSetupStarted'
+	| 'historyEventPasswordChanged'
+	| 'historyEventPasswordEnrolled'
+	| 'historyEventPasswordRemoved'
+	| 'historyEventPasswordReset'
+	| 'historyEventPersonalAccessTokenCreated'
+	| 'historyEventPersonalAccessTokenDisabled'
+	| 'historyEventPersonalAccessTokenEnabled'
+	| 'historyEventPersonalAccessTokenRevoked'
+	| 'historyEventProfileChanged'
+	| 'historyEventProfilePictureChanged'
+	| 'historyEventProfilePictureRemoved'
+	| 'historyEventProviderUnlinked'
+	| 'historyEventRoleEnded'
+	| 'historyEventRoleGranted'
+	| 'historyEventSessionRevoked'
+	| 'historyEventSessionsRevokedAll'
+	| 'historyEventSessionsRevokedOthers'
+	| 'historyEventSignInFailed'
+	| 'historyEventSignInSucceeded'
+	| 'historyEventSignOut'
+	| 'historyEventOther';
+
+const historyEventMessages: Readonly<Record<AccountHistoryEvent, HistoryEventMessage>> =
+	Object.freeze({
+		'academic_unit.joined': 'historyEventAcademicUnitJoined',
+		'academic_unit.left': 'historyEventAcademicUnitLeft',
+		'account.disabled': 'historyEventAccountDisabled',
+		'account.enabled': 'historyEventAccountEnabled',
+		'account.recovered_by_administrator': 'historyEventAccountRecoveredByAdministrator',
+		'affiliation.ended': 'historyEventAffiliationEnded',
+		'affiliation.started': 'historyEventAffiliationStarted',
+		'class.enrolled': 'historyEventClassEnrolled',
+		'class.transferred_in': 'historyEventClassTransferredIn',
+		'class.transferred_out': 'historyEventClassTransferredOut',
+		'class.unenrolled': 'historyEventClassUnenrolled',
+		'desktop.registration_revoked': 'historyEventDesktopRegistrationRevoked',
+		'desktop.signed_in': 'historyEventDesktopSignedIn',
+		'email.change_undone': 'historyEventEmailChangeUndone',
+		'email.changed': 'historyEventEmailChanged',
+		'email.verified': 'historyEventEmailVerified',
+		'invitation.accepted': 'historyEventInvitationAccepted',
+		'mfa.disabled': 'historyEventMfaDisabled',
+		'mfa.enabled': 'historyEventMfaEnabled',
+		'mfa.recovery_codes_regenerated': 'historyEventMfaRecoveryCodesRegenerated',
+		'mfa.reset_by_administrator': 'historyEventMfaResetByAdministrator',
+		'mfa.setup_started': 'historyEventMfaSetupStarted',
+		'password.changed': 'historyEventPasswordChanged',
+		'password.enrolled': 'historyEventPasswordEnrolled',
+		'password.removed': 'historyEventPasswordRemoved',
+		'password.reset': 'historyEventPasswordReset',
+		'personal_access_token.created': 'historyEventPersonalAccessTokenCreated',
+		'personal_access_token.disabled': 'historyEventPersonalAccessTokenDisabled',
+		'personal_access_token.enabled': 'historyEventPersonalAccessTokenEnabled',
+		'personal_access_token.revoked': 'historyEventPersonalAccessTokenRevoked',
+		'profile.changed': 'historyEventProfileChanged',
+		'profile_picture.changed': 'historyEventProfilePictureChanged',
+		'profile_picture.removed': 'historyEventProfilePictureRemoved',
+		'provider.unlinked': 'historyEventProviderUnlinked',
+		'role.ended': 'historyEventRoleEnded',
+		'role.granted': 'historyEventRoleGranted',
+		'session.revoked': 'historyEventSessionRevoked',
+		'sessions.revoked_all': 'historyEventSessionsRevokedAll',
+		'sessions.revoked_others': 'historyEventSessionsRevokedOthers',
+		'sign_in.failed': 'historyEventSignInFailed',
+		'sign_in.succeeded': 'historyEventSignInSucceeded',
+		sign_out: 'historyEventSignOut'
+	});
+
+/** The event's label; an event added to the catalogue after this release reads generically. */
+export function historyEventMessage(event: string): HistoryEventMessage {
+	return Object.hasOwn(historyEventMessages, event)
+		? historyEventMessages[event as AccountHistoryEvent]
+		: 'historyEventOther';
+}
+
+export const historyEventGroups = [
+	{
+		id: 'signIn',
+		events: [
+			'sign_in.succeeded',
+			'sign_in.failed',
+			'sign_out',
+			'desktop.signed_in',
+			'session.revoked',
+			'sessions.revoked_all',
+			'sessions.revoked_others',
+			'desktop.registration_revoked'
+		]
+	},
+	{
+		id: 'security',
+		events: [
+			'password.changed',
+			'password.enrolled',
+			'password.removed',
+			'password.reset',
+			'mfa.disabled',
+			'mfa.enabled',
+			'mfa.recovery_codes_regenerated',
+			'mfa.reset_by_administrator',
+			'mfa.setup_started',
+			'provider.unlinked',
+			'email.changed',
+			'email.change_undone',
+			'email.verified',
+			'account.recovered_by_administrator'
+		]
+	},
+	{
+		id: 'tokens',
+		events: [
+			'personal_access_token.created',
+			'personal_access_token.disabled',
+			'personal_access_token.enabled',
+			'personal_access_token.revoked'
+		]
+	},
+	{
+		id: 'profile',
+		events: ['profile.changed', 'profile_picture.changed', 'profile_picture.removed']
+	},
+	{
+		id: 'membership',
+		events: [
+			'academic_unit.joined',
+			'academic_unit.left',
+			'class.enrolled',
+			'class.transferred_in',
+			'class.transferred_out',
+			'class.unenrolled',
+			'affiliation.started',
+			'affiliation.ended',
+			'role.granted',
+			'role.ended',
+			'invitation.accepted'
+		]
+	},
+	{ id: 'status', events: ['account.disabled', 'account.enabled'] }
+] as const satisfies readonly {
+	readonly id: string;
+	readonly events: readonly AccountHistoryEvent[];
+}[];
+export type HistoryEventGroup = (typeof historyEventGroups)[number]['id'];
+
+export const historyPeriods = Object.freeze([7, 30, 90, 365, 'all'] as const);
+export type HistoryPeriod = (typeof historyPeriods)[number];
+export const DEFAULT_HISTORY_PERIOD: HistoryPeriod = 30;
+
+export interface HistoryFilters {
+	readonly period: HistoryPeriod;
+	readonly group: HistoryEventGroup | 'all';
+	readonly relation: 'subject' | 'actor' | 'all';
+	readonly outcome: 'success' | 'fail' | 'all';
+}
+
+export const defaultHistoryFilters: HistoryFilters = Object.freeze({
+	period: DEFAULT_HISTORY_PERIOD,
+	group: 'all',
+	relation: 'all',
+	outcome: 'all'
+});
+
+const MINUTE = 60 * 1000;
+
+/** The server query for a set of filters. The period starts on a whole minute, so re-reads repeat. */
+export function historyQuery(filters: HistoryFilters, now: number): AccountHistoryQuery {
+	const group = historyEventGroups.find((entry) => entry.id === filters.group);
+	return {
+		...(filters.period === 'all'
+			? {}
+			: { createdAfter: Math.floor((now - filters.period * DAY) / MINUTE) * MINUTE }),
+		...(group === undefined ? {} : { events: group.events }),
+		...(filters.outcome === 'all' ? {} : { status: filters.outcome }),
+		...(filters.relation === 'all' ? {} : { relation: filters.relation })
+	};
+}
+
+export type HistoryActorMessage = 'historyBySelf' | 'historyByAdministrator' | 'historyBySystem';
+
+export function historyActorMessage(entry: AccountHistoryEntry): HistoryActorMessage {
+	if (entry.actor === 'self') return 'historyBySelf';
+	if (entry.actor === 'administrator') return 'historyByAdministrator';
+	return 'historyBySystem';
+}
+
+export function historyShape(entry: AccountHistoryEntry): StatusShape {
+	return entry.failed ? 'failure' : 'active';
 }
 
 // #endregion

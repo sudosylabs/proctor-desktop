@@ -107,6 +107,11 @@ export const authenticatedMessages = Object.freeze({
 		defaultMessage: 'Access tokens',
 		description: 'Account page for personal access tokens.'
 	}),
+	history: defineMessage({
+		id: 'authenticated.account.nav.history',
+		defaultMessage: 'Account history',
+		description: 'Account page listing what was done with the account.'
+	}),
 	settings: defineMessage({
 		id: 'authenticated.account.nav.settings',
 		defaultMessage: 'Settings',

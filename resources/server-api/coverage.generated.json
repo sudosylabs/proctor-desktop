@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sha256": "ca968bd062116fb224c56b6e8ce3993b9b1119de280dab43a00a0815387baa76",
-  "paths": 232,
+  "sha256": "c8b38d817db841252d0a00fd88cf9d3e330c5dba7ac6be14ff9eedca80be3c04",
+  "paths": 238,
   "operations": [
     {
       "operationId": "runAcademicAdministrationBatch",
@@ -244,9 +244,21 @@
       "transport": "http"
     },
     {
+      "operationId": "inspectEmailChangeUndo",
+      "method": "POST",
+      "path": "/api/v1/auth/email-change/undo/inspect",
+      "transport": "http"
+    },
+    {
       "operationId": "completeEmailVerification",
       "method": "POST",
       "path": "/api/v1/auth/email-verification/complete",
+      "transport": "http"
+    },
+    {
+      "operationId": "inspectEmailVerification",
+      "method": "POST",
+      "path": "/api/v1/auth/email-verification/inspect",
       "transport": "http"
     },
     {
@@ -1360,6 +1372,12 @@
       "transport": "http"
     },
     {
+      "operationId": "search",
+      "method": "GET",
+      "path": "/api/v1/search",
+      "transport": "http"
+    },
+    {
       "operationId": "reportSecurityPreflight",
       "method": "POST",
       "path": "/api/v1/security-preflights/{security_preflight_id}/report",
@@ -1474,6 +1492,12 @@
       "transport": "http"
     },
     {
+      "operationId": "listCurrentUserAuditEvents",
+      "method": "GET",
+      "path": "/api/v1/users/me/audits",
+      "transport": "http"
+    },
+    {
       "operationId": "getCurrentUserContext",
       "method": "GET",
       "path": "/api/v1/users/me/context",
@@ -1558,6 +1582,12 @@
       "transport": "http"
     },
     {
+      "operationId": "revokeOtherCurrentUserSessions",
+      "method": "POST",
+      "path": "/api/v1/users/me/sessions/revoke-others",
+      "transport": "http"
+    },
+    {
       "operationId": "getCurrentUserSettings",
       "method": "GET",
       "path": "/api/v1/users/me/settings",
@@ -1579,6 +1609,12 @@
       "operationId": "createPersonalAccessToken",
       "method": "POST",
       "path": "/api/v1/users/me/tokens",
+      "transport": "http"
+    },
+    {
+      "operationId": "listGrantablePersonalAccessTokenScopes",
+      "method": "GET",
+      "path": "/api/v1/users/me/tokens/grantable-scopes",
       "transport": "http"
     },
     {

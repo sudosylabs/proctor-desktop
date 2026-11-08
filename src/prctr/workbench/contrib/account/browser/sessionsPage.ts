@@ -23,6 +23,9 @@ import type { AccountPageServices, AccountPageView } from './accountPageServices
 import { AccountRead } from './accountRead.js';
 import { AccountSection, type AccountRowModel } from './accountSection.js';
 
+/** Lock key for ending every other session; it settles with the next sessions read. */
+const OTHERS = 'session:*';
+
 /**
  * Sessions and devices: this computer's session, the other places the account
  * is signed in, and the computers registered for exams. Ending this computer's
@@ -53,7 +56,8 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		this.others = this._register(
 			new AccountSection(body, services, {
 				title: services.text('otherSessions'),
-				description: services.text('otherSessionsDescription')
+				description: services.text('otherSessionsDescription'),
+				action: services.text('endOtherSessions')
 			})
 		);
 		this.registered = this._register(
@@ -62,6 +66,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 				description: services.text('registeredDesktopsDescription')
 			})
 		);
+		this._register(this.others.onDidRequestAction(() => this.confirmEndOthers()));
 		this._register(this.sessions.onDidChange(() => this.renderSessions()));
 		this._register(this.desktops.onDidChange(() => this.renderDesktops()));
 		this._register(this.sessions.onDidRead(() => this.onRead('session:')));
@@ -99,6 +104,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			ready && groups.others.length === 0 ? this.services.text('noOtherSessions') : false,
 			retry
 		);
+		this.others.setAction(groups.others.length > 0, !this.unconfirmed.has(OTHERS));
 		this.current.setRows(groups.current === undefined ? [] : [this.currentRow(groups.current)]);
 		this.others.setRows(groups.others.map((session) => this.sessionRow(session)));
 	}
@@ -113,6 +119,19 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			() => void this.desktops.refresh()
 		);
 		this.registered.setRows(desktops.map((desktop) => this.desktopRow(desktop)));
+	}
+
+	private confirmEndOthers(): void {
+		this.confirm({
+			title: this.services.text('confirmEndOtherSessionsTitle'),
+			message: this.services.text('confirmEndOtherSessionsBody'),
+			confirmLabel: this.services.text('endOtherSessions'),
+			intent: { kind: 'revokeOtherSessions' },
+			key: OTHERS,
+			section: this.others,
+			read: this.sessions,
+			success: 'otherSessionsEnded'
+		});
 	}
 
 	private clientName(session: AccountSession): string {
@@ -260,7 +279,15 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			if (options.key.startsWith('session:')) this.renderSessions();
 			else this.renderDesktops();
 			options.section.feedback.set(this.services.failure(result.reason), 'error');
-		} else options.section.feedback.set(this.services.text(options.success), 'success');
+		} else
+			options.section.feedback.set(
+				this.services.text(
+					result.kind === 'sessionsEnded' && result.count === 0
+						? 'noOtherSessionsEnded'
+						: options.success
+				),
+				'success'
+			);
 		options.section.focusHeading();
 		void options.read.refresh();
 	}

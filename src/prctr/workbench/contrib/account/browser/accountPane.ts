@@ -26,6 +26,7 @@ import {
 import { ProfilePage } from './profilePage.js';
 import { SecurityPage } from './securityPage.js';
 import { SessionsPage } from './sessionsPage.js';
+import { HistoryPage } from './historyPage.js';
 import { TokensPage } from './tokensPage.js';
 import './accountPage.css';
 
@@ -48,7 +49,8 @@ const pageTitles: Readonly<Record<AccountPage, AccountMessage>> = Object.freeze(
 	profile: 'profileTitle',
 	security: 'securityTitle',
 	sessions: 'sessionsTitle',
-	tokens: 'tokensTitle'
+	tokens: 'tokensTitle',
+	history: 'historyTitle'
 });
 
 /**
@@ -223,6 +225,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 				'securityDescriptionGeneric'
 			);
 		if (page === 'sessions') return this.services.text('sessionsDescription');
+		if (page === 'history') return this.services.text('historyDescription');
 		return this.services.text('tokensDescription');
 	}
 
@@ -231,6 +234,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		if (page === 'security')
 			return new SecurityPage(this.body, this.headerActions, this.services);
 		if (page === 'sessions') return new SessionsPage(this.body, this.services);
+		if (page === 'history') return new HistoryPage(this.body, this.services);
 		return new TokensPage(this.body, this.headerActions, this.services);
 	}
 }

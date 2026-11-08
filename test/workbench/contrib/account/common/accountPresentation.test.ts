@@ -20,7 +20,12 @@ import {
 	platformKind,
 	providerKind,
 	relativeDay,
-	scopeLabel,
+	historyActorMessage,
+	historyEventGroups,
+	historyEventMessage,
+	historyQuery,
+	scopeGrantable,
+	scopeTitle,
 	tokenActions,
 	tokenExpiry,
 	tokenShape,
@@ -36,7 +41,7 @@ function token(overrides: Partial<AccountToken>): AccountToken {
 	return {
 		id: 'f'.repeat(26),
 		description: 'Script',
-		scopes: ['examinations:read'],
+		scopes: ['exam.view'],
 		expiresAt: NOW + DAY,
 		createdAt: NOW - DAY,
 		...overrides
@@ -104,7 +109,10 @@ void test('retention notices name their record kind and the relevant date', () =
 	const base: AccountRetentionNotice = {
 		retirementId: 'r'.repeat(26),
 		examId: 'x'.repeat(26),
+		examTitle: 'Algorithms final',
 		examSittingId: 's'.repeat(26),
+		sittingStartAt: NOW - 2 * DAY,
+		sittingEndAt: NOW - 2 * DAY + 3600_000,
 		submissionId: 't'.repeat(26),
 		category: 'browser_activity',
 		state: 'grace',
@@ -130,12 +138,13 @@ void test('two-step verification reads its state, and few recovery codes need at
 		enabled: true,
 		pending: false,
 		recoveryRequired: false,
-		recoveryCodesRemaining: 3
+		recoveryCodesRemaining: 3,
+		recoveryCodesTotal: 10
 	};
 	assert.deepStrictEqual(twoStepPresentation(mfa), {
 		status: 'on',
 		shape: 'active',
-		recovery: { remaining: 3, low: true }
+		recovery: { remaining: 3, total: 10, low: true }
 	});
 	assert.strictEqual(
 		twoStepPresentation({ ...mfa, recoveryCodesRemaining: 8 }).recovery?.low,
@@ -214,16 +223,63 @@ void test('only working and disabled tokens offer actions, and only disabled one
 	assert.strictEqual(tokenShape('revoked'), 'off');
 });
 
-void test('the scope catalogue offers only scopes the server contract names', () => {
-	assert.strictEqual(scopeLabel('examinations:read'), 'scopeExaminationsRead');
-	assert.strictEqual(scopeLabel('people:read'), undefined);
+void test('a scope is grantable where the server says, and is titled from its catalogue', () => {
+	const unit = 'u'.repeat(26);
+	const anywhere = {
+		name: 'exam.view',
+		title: 'View exams',
+		description: 'Read exams.',
+		institutionWide: true,
+		academicUnitIds: []
+	};
+	const scoped = {
+		...anywhere,
+		name: 'class.view',
+		institutionWide: false,
+		academicUnitIds: [unit]
+	};
+	assert.strictEqual(scopeGrantable(anywhere, undefined), true);
+	assert.strictEqual(scopeGrantable(anywhere, unit), true);
+	assert.strictEqual(scopeGrantable(scoped, undefined), false);
+	assert.strictEqual(scopeGrantable(scoped, unit), true);
+	assert.strictEqual(scopeGrantable(scoped, 'v'.repeat(26)), false);
+	const grantable = { scopes: [anywhere], academicUnits: [], moreAcademicUnits: false };
+	assert.strictEqual(scopeTitle('exam.view', grantable), 'View exams');
+	assert.strictEqual(scopeTitle('user.view', grantable), 'user.view');
+	assert.strictEqual(scopeTitle('exam.view', undefined), 'exam.view');
+});
+
+void test('history filters become the server query, and unknown events read generically', () => {
+	assert.deepStrictEqual(
+		historyQuery({ period: 'all', group: 'all', relation: 'all', outcome: 'all' }, NOW),
+		{}
+	);
+	const query = historyQuery(
+		{ period: 30, group: 'tokens', relation: 'subject', outcome: 'fail' },
+		NOW + 1234
+	);
+	assert.strictEqual(query.createdAfter! % 60_000, 0);
+	assert.ok(query.createdAfter! <= NOW + 1234 - 30 * DAY);
+	assert.deepStrictEqual(query.events, historyEventGroups.find((g) => g.id === 'tokens')!.events);
+	assert.strictEqual(query.status, 'fail');
+	assert.strictEqual(query.relation, 'subject');
+	assert.strictEqual(historyEventMessage('sign_in.failed'), 'historyEventSignInFailed');
+	assert.strictEqual(historyEventMessage('future.event'), 'historyEventOther');
+	assert.strictEqual(historyEventMessage('toString'), 'historyEventOther');
+	const entry = {
+		id: 'e'.repeat(26),
+		createdAt: NOW,
+		event: 'role.granted',
+		failed: false,
+		relation: 'subject' as const,
+		actor: 'administrator' as const
+	};
+	assert.strictEqual(historyActorMessage(entry), 'historyByAdministrator');
+	assert.strictEqual(historyActorMessage({ ...entry, actor: 'system' }), 'historyBySystem');
 });
 
 void test('a token draft needs a usable name and at least one scope', () => {
-	assert.deepStrictEqual(
-		validateTokenDraft({ name: 'Export', scopes: ['examinations:read'] }),
-		{}
-	);
+	assert.deepStrictEqual(validateTokenDraft({ name: 'Export', scopes: ['exam.view'] }), {});
 	assert.deepStrictEqual(validateTokenDraft({ name: '   ', scopes: [] }), {
 		name: 'tokenNameRequired',
 		scopes: 'tokenScopesRequired'

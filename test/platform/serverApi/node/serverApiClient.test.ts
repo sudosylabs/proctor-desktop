@@ -33,8 +33,8 @@ const json = (value: unknown, status = 200, headers = {}): HttpResponse => ({
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
 
 void test('every packaged operation has executable request/response schemas, including conditional and non-JSON routes', () => {
-	assert.equal(apiOperations.size, 284);
-	assert.equal(new Set([...apiOperations.values()].map((operation) => operation.path)).size, 232);
+	assert.equal(apiOperations.size, 290);
+	assert.equal(new Set([...apiOperations.values()].map((operation) => operation.path)).size, 238);
 	for (const operation of apiOperations.values()) {
 		for (const parameter of operation.parameters ?? []) {
 			try {
@@ -446,7 +446,7 @@ void test('runtime schemas retain DTO properties named like schema annotations',
 		{
 			description: 'Automation',
 			expires_at: new Date(Date.now() + 60000).toISOString(),
-			scopes: ['read']
+			scopes: ['exam.view']
 		}
 	);
 	assert.throws(
@@ -456,7 +456,7 @@ void test('runtime schemas retain DTO properties named like schema annotations',
 				{
 					description: 5,
 					expires_at: new Date(Date.now() + 60000).toISOString(),
-					scopes: ['read']
+					scopes: ['exam.view']
 				}
 			),
 		ServerApiError

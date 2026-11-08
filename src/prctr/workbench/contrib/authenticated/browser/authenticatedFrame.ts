@@ -65,6 +65,7 @@ const sidebarAreas: readonly SidebarArea[] = Object.freeze([
 			{ id: 'security', label: 'security' },
 			{ id: 'sessions', label: 'sessions' },
 			{ id: 'tokens', label: 'tokens' },
+			{ id: 'history', label: 'history' },
 			{ id: 'settings', label: 'settings', opensDialog: true }
 		]
 	}

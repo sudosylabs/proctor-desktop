@@ -2,8 +2,13 @@ import type { ObservableApiCapability } from '../../serverApi/common/apiObservat
 export const ACCOUNT_CHANNEL = 'prctr:authenticated:account';
 export const accountSections = ['profile', 'security', 'sessions', 'desktops'] as const;
 export type AccountSection = (typeof accountSections)[number];
-/** Every readable section: the navigable sections plus token and retention-notice reads. */
-export const accountReadSections = [...accountSections, 'tokens', 'notices'] as const;
+/** Every readable section: the navigable sections plus token, scope and retention-notice reads. */
+export const accountReadSections = [
+	...accountSections,
+	'tokens',
+	'grantableScopes',
+	'notices'
+] as const;
 export type AccountReadSection = (typeof accountReadSections)[number];
 export const accountNoticeCategories = [
 	'work',
@@ -21,8 +26,67 @@ export const accountNoticeDeliveryStates = [
 	'failed',
 	'canceled'
 ] as const;
+/** The server's closed catalogue of account-history events; labels are the client's. */
+export const accountHistoryEvents = [
+	'academic_unit.joined',
+	'academic_unit.left',
+	'account.disabled',
+	'account.enabled',
+	'account.recovered_by_administrator',
+	'affiliation.ended',
+	'affiliation.started',
+	'class.enrolled',
+	'class.transferred_in',
+	'class.transferred_out',
+	'class.unenrolled',
+	'desktop.registration_revoked',
+	'desktop.signed_in',
+	'email.change_undone',
+	'email.changed',
+	'email.verified',
+	'invitation.accepted',
+	'mfa.disabled',
+	'mfa.enabled',
+	'mfa.recovery_codes_regenerated',
+	'mfa.reset_by_administrator',
+	'mfa.setup_started',
+	'password.changed',
+	'password.enrolled',
+	'password.removed',
+	'password.reset',
+	'personal_access_token.created',
+	'personal_access_token.disabled',
+	'personal_access_token.enabled',
+	'personal_access_token.revoked',
+	'profile.changed',
+	'profile_picture.changed',
+	'profile_picture.removed',
+	'provider.unlinked',
+	'role.ended',
+	'role.granted',
+	'session.revoked',
+	'sessions.revoked_all',
+	'sessions.revoked_others',
+	'sign_in.failed',
+	'sign_in.succeeded',
+	'sign_out'
+] as const;
+export type AccountHistoryEvent = (typeof accountHistoryEvents)[number];
+export const accountHistoryActors = ['self', 'administrator', 'system'] as const;
+/** One history query: every filter is optional and the cursor continues the same query. */
+export interface AccountHistoryQuery {
+	/** Inclusive lower bound, epoch milliseconds. */
+	readonly createdAfter?: number;
+	/** Exclusive upper bound, epoch milliseconds. */
+	readonly createdBefore?: number;
+	readonly events?: readonly AccountHistoryEvent[];
+	readonly status?: 'success' | 'fail';
+	readonly relation?: 'subject' | 'actor';
+	readonly cursor?: string;
+}
 export type AccountIntent =
 	| { readonly kind: 'read'; readonly section: AccountReadSection }
+	| ({ readonly kind: 'readHistory' } & AccountHistoryQuery)
 	| { readonly kind: 'openSecurity' }
 	| { readonly kind: 'readPhoto' }
 	| {
@@ -33,6 +97,7 @@ export type AccountIntent =
 	  }
 	| { readonly kind: 'removePhoto'; readonly etag: string }
 	| { readonly kind: 'revokeSession'; readonly id: string }
+	| { readonly kind: 'revokeOtherSessions' }
 	| { readonly kind: 'revokeDesktop'; readonly id: string }
 	| {
 			readonly kind: 'createToken';
@@ -55,6 +120,8 @@ export interface AccountProfile {
 	readonly emailVerified?: boolean;
 	readonly locale?: string;
 	readonly timezone?: string;
+	/** When the account was created. */
+	readonly createdAt: number;
 }
 export interface AccountSecurity {
 	readonly password: boolean;
@@ -66,6 +133,12 @@ export interface AccountSecurity {
 				readonly pending: boolean;
 				readonly recoveryRequired: boolean;
 				readonly recoveryCodesRemaining: number;
+				/** Size of the live recovery-code set; 0 unless two-step verification is on. */
+				readonly recoveryCodesTotal: number;
+				readonly recoveryCodesGeneratedAt?: number;
+				readonly method?: 'authenticatorApp';
+				readonly enabledAt?: number;
+				readonly passwordChangedAt?: number;
 		  }
 		| undefined;
 }
@@ -104,7 +177,10 @@ export interface AccountToken {
 export interface AccountRetentionNotice {
 	readonly retirementId: string;
 	readonly examId: string;
+	readonly examTitle: string;
 	readonly examSittingId: string;
+	readonly sittingStartAt: number;
+	readonly sittingEndAt: number;
 	readonly submissionId: string;
 	readonly category: (typeof accountNoticeCategories)[number];
 	readonly state: (typeof accountNoticeStates)[number];
@@ -113,12 +189,52 @@ export interface AccountRetentionNotice {
 	readonly deliveryState: (typeof accountNoticeDeliveryStates)[number];
 	readonly canceledAt?: number;
 }
+/** One scope the signed-in user may put on a Personal Access Token. */
+export interface AccountGrantableScope {
+	readonly name: string;
+	readonly title: string;
+	readonly description: string;
+	/** May be granted without an Academic Unit limit, or with any. */
+	readonly institutionWide: boolean;
+	/** Listed units at (and below) which this scope may be granted. */
+	readonly academicUnitIds: readonly string[];
+}
+export interface AccountAcademicUnit {
+	readonly id: string;
+	readonly name: string;
+}
+export interface AccountGrantableScopes {
+	readonly scopes: readonly AccountGrantableScope[];
+	readonly academicUnits: readonly AccountAcademicUnit[];
+	/** More units exist than are listed. */
+	readonly moreAcademicUnits: boolean;
+}
+/** One event of the user's own account history. Another person is never named. */
+export interface AccountHistoryEntry {
+	readonly id: string;
+	readonly createdAt: number;
+	/** A catalogue name; the catalogue may grow, so an unknown name is presented generically. */
+	readonly event: string;
+	readonly failed: boolean;
+	readonly relation: 'subject' | 'actor';
+	readonly actor: (typeof accountHistoryActors)[number];
+	readonly client?: string;
+	readonly ipAddress?: string;
+	readonly userAgent?: string;
+}
 export type AccountData =
 	| { readonly section: 'profile'; readonly profile: AccountProfile }
 	| { readonly section: 'security'; readonly security: AccountSecurity }
 	| { readonly section: 'sessions'; readonly sessions: readonly AccountSession[] }
 	| { readonly section: 'desktops'; readonly desktops: readonly AccountDesktop[] }
 	| { readonly section: 'tokens'; readonly tokens: readonly AccountToken[] }
+	| { readonly section: 'grantableScopes'; readonly grantable: AccountGrantableScopes }
+	| {
+			readonly section: 'history';
+			readonly entries: readonly AccountHistoryEntry[];
+			/** Continues the same query; absent after the final page. */
+			readonly cursor?: string;
+	  }
 	| {
 			readonly section: 'notices';
 			readonly notices: readonly AccountRetentionNotice[];
@@ -141,6 +257,7 @@ export type AccountResponse =
 	/** The one-time credential reply to createToken; never cached, logged or stored. */
 	| { readonly kind: 'tokenCreated'; readonly token: AccountToken; readonly credential: string }
 	| { readonly kind: 'success' }
+	| { readonly kind: 'sessionsEnded'; readonly count: number }
 	| { readonly kind: 'error'; readonly reason: AccountFailure };
 export interface AccountClient extends ObservableApiCapability<AccountIntent, AccountResponse> {
 	request(intent: AccountIntent): Promise<AccountResponse>;
@@ -210,11 +327,14 @@ export function validateAccountIntent(value: unknown): AccountIntent {
 		};
 	}
 	if (
-		(input.kind === 'openSecurity' || input.kind === 'requestEmailVerification') &&
+		(input.kind === 'openSecurity' ||
+			input.kind === 'requestEmailVerification' ||
+			input.kind === 'revokeOtherSessions') &&
 		Object.keys(input).length === 1
 	)
 		return Object.freeze({ kind: input.kind });
 	if (input.kind === 'createToken') return validateCreateToken(input);
+	if (input.kind === 'readHistory') return validateHistoryQuery(input);
 	if (Object.keys(input).length !== 2) throw new TypeError('Invalid account action');
 	if (input.kind === 'read' && accountReadSections.includes(input.section as AccountReadSection))
 		return Object.freeze({ kind: 'read', section: input.section as AccountReadSection });
@@ -227,6 +347,53 @@ export function validateAccountIntent(value: unknown): AccountIntent {
 	)
 		return Object.freeze({ kind: input.kind, id: accountId(input.id) });
 	throw new TypeError('Invalid account action');
+}
+function historyEventName(value: unknown): string {
+	if (typeof value !== 'string' || !/^[a-z][a-z0-9_.]{0,127}$/u.test(value))
+		throw new TypeError('Invalid history event');
+	return value;
+}
+const historyCursor = /^[\x21-\x7e]{1,2048}$/u;
+function validateHistoryQuery(input: Record<string, unknown>): AccountIntent {
+	const allowed = [
+		'kind',
+		'createdAfter',
+		'createdBefore',
+		'events',
+		'status',
+		'relation',
+		'cursor'
+	];
+	if (!Object.keys(input).every((key) => allowed.includes(key)))
+		throw new TypeError('Invalid account action');
+	const query: Record<string, unknown> = { kind: 'readHistory' };
+	if (input.createdAfter !== undefined) query.createdAfter = accountTime(input.createdAfter);
+	if (input.createdBefore !== undefined) query.createdBefore = accountTime(input.createdBefore);
+	if (
+		query.createdAfter !== undefined &&
+		query.createdBefore !== undefined &&
+		(query.createdBefore as number) <= (query.createdAfter as number)
+	)
+		throw new TypeError('Invalid history range');
+	if (input.events !== undefined) {
+		const events = accountList(input.events, 64);
+		if (
+			events.length === 0 ||
+			new Set(events).size !== events.length ||
+			!events.every((event) => accountHistoryEvents.includes(event as AccountHistoryEvent))
+		)
+			throw new TypeError('Invalid history events');
+		query.events = Object.freeze([...(events as AccountHistoryEvent[])]);
+	}
+	if (input.status !== undefined) query.status = accountMember(input.status, ['success', 'fail']);
+	if (input.relation !== undefined)
+		query.relation = accountMember(input.relation, ['subject', 'actor']);
+	if (input.cursor !== undefined) {
+		if (typeof input.cursor !== 'string' || !historyCursor.test(input.cursor))
+			throw new TypeError('Invalid history cursor');
+		query.cursor = input.cursor;
+	}
+	return Object.freeze(query) as AccountIntent;
 }
 const tokenScope = /^[a-z][a-z0-9_.:-]{0,127}$/u;
 function validateCreateToken(input: Record<string, unknown>): AccountIntent {
@@ -283,6 +450,14 @@ function validateToken(value: unknown): AccountToken {
 		createdAt: accountTime(t.createdAt)
 	});
 }
+function optionalTimes(
+	record: Record<string, unknown>,
+	keys: readonly string[]
+): Record<string, number> {
+	const times: Record<string, number> = {};
+	for (const key of keys) if (record[key] !== undefined) times[key] = accountTime(record[key]);
+	return times;
+}
 function accountMember<T extends string>(value: unknown, members: readonly T[]): T {
 	if (!members.includes(value as T)) throw new TypeError('Invalid account state');
 	return value as T;
@@ -311,6 +486,8 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 		return { kind: 'photo', dataUrl: input.dataUrl, etag: accountPhotoEtag(input.etag) };
 	}
 	if (input.kind === 'success') return Object.freeze({ kind: 'success' });
+	if (input.kind === 'sessionsEnded' && Object.keys(input).length === 2)
+		return Object.freeze({ kind: 'sessionsEnded', count: accountTime(input.count) });
 	if (
 		input.kind === 'error' &&
 		[
@@ -343,7 +520,8 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 					? {}
 					: { emailVerified: accountBoolean(p.emailVerified) }),
 				...(p.locale === undefined ? {} : { locale: accountText(p.locale, 128) }),
-				...(p.timezone === undefined ? {} : { timezone: accountText(p.timezone, 128) })
+				...(p.timezone === undefined ? {} : { timezone: accountText(p.timezone, 128) }),
+				createdAt: accountTime(p.createdAt)
 			})
 		};
 	} else if (data.section === 'security') {
@@ -370,7 +548,16 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 								enabled: accountBoolean(m.enabled),
 								pending: accountBoolean(m.pending),
 								recoveryRequired: accountBoolean(m.recoveryRequired),
-								recoveryCodesRemaining: accountTime(m.recoveryCodesRemaining)
+								recoveryCodesRemaining: accountTime(m.recoveryCodesRemaining),
+								recoveryCodesTotal: accountTime(m.recoveryCodesTotal),
+								...optionalTimes(m, [
+									'recoveryCodesGeneratedAt',
+									'enabledAt',
+									'passwordChangedAt'
+								]),
+								...(m.method === undefined
+									? {}
+									: { method: accountMember(m.method, ['authenticatorApp']) })
 							})
 			})
 		};
@@ -419,13 +606,79 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 		};
 		if (new Set(result.tokens.map((token) => token.id)).size !== result.tokens.length)
 			throw new TypeError('Ambiguous account resource list');
+	} else if (data.section === 'grantableScopes') {
+		const g = accountRecord(data.grantable);
+		const academicUnits = accountList(g.academicUnits, 50).map((value) => {
+			const u = accountRecord(value);
+			return Object.freeze({ id: accountId(u.id), name: accountText(u.name, 256) });
+		});
+		const unitIds = new Set(academicUnits.map((unit) => unit.id));
+		const scopes = accountList(g.scopes, 128).map((value) => {
+			const c = accountRecord(value);
+			if (typeof c.name !== 'string' || !tokenScope.test(c.name))
+				throw new TypeError('Invalid token scope');
+			const ids = accountList(c.academicUnitIds, 50).map(accountId);
+			if (!ids.every((id) => unitIds.has(id))) throw new TypeError('Invalid token scope');
+			return Object.freeze({
+				name: c.name,
+				title: accountText(c.title, 256),
+				description: accountText(c.description, 1024),
+				institutionWide: accountBoolean(c.institutionWide),
+				academicUnitIds: Object.freeze(ids)
+			});
+		});
+		if (
+			unitIds.size !== academicUnits.length ||
+			new Set(scopes.map((scope) => scope.name)).size !== scopes.length
+		)
+			throw new TypeError('Ambiguous account resource list');
+		result = {
+			section: 'grantableScopes',
+			grantable: Object.freeze({
+				scopes: Object.freeze(scopes),
+				academicUnits: Object.freeze(academicUnits),
+				moreAcademicUnits: accountBoolean(g.moreAcademicUnits)
+			})
+		};
+	} else if (data.section === 'history') {
+		const entries = accountList(data.entries, 200).map((value) => {
+			const e = accountRecord(value);
+			const optional = (key: string, limit: number) =>
+				e[key] === undefined ? {} : { [key]: accountText(e[key], limit) };
+			return Object.freeze({
+				id: accountId(e.id),
+				createdAt: accountTime(e.createdAt),
+				event: historyEventName(e.event),
+				failed: accountBoolean(e.failed),
+				relation: accountMember(e.relation, ['subject', 'actor'] as const),
+				actor: accountMember(e.actor, accountHistoryActors),
+				...optional('client', 32),
+				...optional('ipAddress', 64),
+				...optional('userAgent', 512)
+			}) as AccountHistoryEntry;
+		});
+		if (new Set(entries.map((entry) => entry.id)).size !== entries.length)
+			throw new TypeError('Ambiguous account resource list');
+		if (
+			data.cursor !== undefined &&
+			(typeof data.cursor !== 'string' || !historyCursor.test(data.cursor))
+		)
+			throw new TypeError('Invalid history cursor');
+		result = {
+			section: 'history',
+			entries: Object.freeze(entries),
+			...(data.cursor === undefined ? {} : { cursor: data.cursor })
+		};
 	} else if (data.section === 'notices') {
 		const notices = accountList(data.notices, 200).map((value) => {
 			const n = accountRecord(value);
 			return Object.freeze({
 				retirementId: accountId(n.retirementId),
 				examId: accountId(n.examId),
+				examTitle: accountText(n.examTitle, 200),
 				examSittingId: accountId(n.examSittingId),
+				sittingStartAt: accountTime(n.sittingStartAt),
+				sittingEndAt: accountTime(n.sittingEndAt),
 				submissionId: accountId(n.submissionId),
 				category: accountMember(n.category, accountNoticeCategories),
 				state: accountMember(n.state, accountNoticeStates),

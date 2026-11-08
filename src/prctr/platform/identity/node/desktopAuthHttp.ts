@@ -17,6 +17,9 @@ export type DesktopHttpPath =
 	| '/api/v1/users/me/mfa'
 	| '/api/v1/users/me/sessions'
 	| '/api/v1/users/me/sessions/revoke'
+	| '/api/v1/users/me/sessions/revoke-others'
+	| `/api/v1/users/me/audits?limit=50${string}`
+	| '/api/v1/users/me/tokens/grantable-scopes'
 	| '/api/v1/users/me/desktop-registrations'
 	| `/api/v1/users/me/desktop-registrations/${string}`
 	| '/api/v1/users/me/tokens'
@@ -92,6 +95,12 @@ function desktopHttpRoute(
 		return 'POST';
 	if (path === '/api/v1/users/me/tokens') return body ? 'POST' : 'GET';
 	if (
+		/^\/api\/v1\/users\/me\/audits\?limit=50(?:&(?:created_after|created_before|event|status|relation|cursor)=(?:[A-Za-z0-9_.!~*'()-]|%[0-9A-F]{2}){1,2048}){0,70}$/u.test(
+			path
+		)
+	)
+		return 'GET';
+	if (
 		[
 			'/api/v1/users/me/retention-notices?limit=200',
 			'/api/v1/users/me/context',
@@ -99,7 +108,8 @@ function desktopHttpRoute(
 			'/api/v1/authentication-methods',
 			'/api/v1/users/me/mfa',
 			'/api/v1/users/me/sessions',
-			'/api/v1/users/me/desktop-registrations'
+			'/api/v1/users/me/desktop-registrations',
+			'/api/v1/users/me/tokens/grantable-scopes'
 		].includes(path)
 	)
 		return 'GET';
@@ -110,6 +120,7 @@ function desktopHttpRoute(
 			'/api/v1/auth/refresh',
 			'/api/v1/auth/logout',
 			'/api/v1/users/me/sessions/revoke',
+			'/api/v1/users/me/sessions/revoke-others',
 			'/api/v1/auth/email-verification/request'
 		].includes(path)
 	)

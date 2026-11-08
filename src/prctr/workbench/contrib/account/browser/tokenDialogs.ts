@@ -7,12 +7,16 @@ import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { TextFieldControl } from '../../../../base/browser/ui/field/textField.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import type { AccountToken } from '../../../../platform/account/common/accountProtocol.js';
+import type {
+	AccountGrantableScope,
+	AccountGrantableScopes,
+	AccountToken
+} from '../../../../platform/account/common/accountProtocol.js';
 import {
 	DEFAULT_TOKEN_EXPIRY,
+	scopeGrantable,
 	tokenExpiry,
 	tokenExpiryPresets,
-	tokenScopeCatalog,
 	validateTokenDraft,
 	type TokenExpiryPreset
 } from '../common/accountPresentation.js';
@@ -23,20 +27,29 @@ import './tokenDialogs.css';
 
 let scopeSequence = 0;
 
+const NO_LIMIT = '';
+
 /**
- * Asks for a new token's name, what it can do and when it expires, then creates
- * it. The server checks the scopes against the person's current authority; the
- * one-time credential goes straight to the copy dialog and nowhere else.
+ * Asks for a new token's name, what it can do, where it applies and when it
+ * expires, then creates it. The scopes and Academic Units offered are the ones
+ * the server says this person may grant; the server checks them again on
+ * creation. The one-time credential goes straight to the copy dialog.
  */
 export class NewTokenDialog extends Disposable {
 	private readonly dialog: AccountDialog;
 	private readonly name: TextFieldControl;
-	private readonly scopes: readonly {
-		readonly scope: string;
+	private scopes: readonly {
+		readonly scope: AccountGrantableScope;
 		readonly input: HTMLInputElement;
-	}[];
+	}[] = [];
+	private readonly scopeList: HTMLElement;
+	private readonly scopeStatus: HTMLElement;
 	private readonly scopeError: HTMLElement;
+	private readonly limit: HTMLSelectElement;
+	private readonly limitField: HTMLElement;
+	private readonly limitHint: HTMLElement;
 	private readonly expiry: HTMLSelectElement;
+	private grantable: AccountGrantableScopes | undefined;
 	private readonly feedback: AccountFeedback;
 	private readonly cancel: ButtonControl;
 	private readonly create: ButtonControl;
@@ -80,27 +93,38 @@ export class NewTokenDialog extends Disposable {
 			id: `${scopeId}-error`,
 			hidden: true
 		});
+		this.scopeStatus = $('p.prctr-account-token-form__status', {
+			id: `${scopeId}-status`,
+			textContent: services.text('tokenScopesLoading')
+		});
+		this.scopeList = $('div.prctr-account-token-form__scope-list', { hidden: true });
 		const fieldset = $(
 			'fieldset.prctr-account-token-form__scopes',
-			{ attrs: { 'aria-describedby': this.scopeError.id } },
-			legend
+			{ attrs: { 'aria-describedby': `${this.scopeStatus.id} ${this.scopeError.id}` } },
+			legend,
+			this.scopeStatus,
+			this.scopeList,
+			this.scopeError
 		);
-		this.scopes = tokenScopeCatalog.map((entry) => {
-			const input = $('input.prctr-account-token-form__checkbox', {
-				type: 'checkbox',
-				value: entry.scope
-			});
-			fieldset.append(
-				$(
-					'label.prctr-account-token-form__scope',
-					{},
-					input,
-					$('span', { textContent: services.text(entry.label) })
-				)
-			);
-			return { scope: entry.scope, input };
+		this.limit = $('select.prctr-account-token-form__select', {
+			id: `${scopeId}-limit`,
+			attrs: { 'aria-describedby': `${scopeId}-limit-hint` }
 		});
-		fieldset.append(this.scopeError);
+		this.limitHint = $('p.prctr-account-token-form__hint', {
+			id: `${scopeId}-limit-hint`,
+			hidden: true,
+			textContent: services.text('tokenLimitMore')
+		});
+		this.limitField = $(
+			'div.prctr-account-token-form__field',
+			{ hidden: true },
+			$('label.prctr-account-token-form__label', {
+				htmlFor: this.limit.id,
+				textContent: services.text('tokenLimit')
+			}),
+			this.limit,
+			this.limitHint
+		);
 		this.expiry = $('select.prctr-account-token-form__select', {
 			id: `${scopeId}-expiry`,
 			required: true
@@ -125,8 +149,10 @@ export class NewTokenDialog extends Disposable {
 			}),
 			this.expiry
 		);
-		// Academic Units are not known to this window, so a token cannot be limited to one here.
-		this.dialog.body.append(fieldset, expiryField);
+		this.dialog.body.append(
+			fieldset,
+			$('div.prctr-account-token-form__row', {}, this.limitField, expiryField)
+		);
 		this.feedback = this._register(new AccountFeedback(this.dialog.body));
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
@@ -141,7 +167,82 @@ export class NewTokenDialog extends Disposable {
 			})
 		);
 		this.registerListeners();
+		this.setWorking(false);
 		this.dialog.show(this.name.input);
+		void this.readGrantable();
+	}
+
+	/** Reads what this person may grant; until it arrives nothing can be ticked or created. */
+	private async readGrantable(): Promise<void> {
+		const result = await this.services.request({ kind: 'read', section: 'grantableScopes' });
+		if (this._store.isDisposed) return;
+		if (result.kind !== 'data' || result.data.section !== 'grantableScopes') {
+			this.scopeStatus.textContent = this.services.failure(
+				result.kind === 'error' ? result.reason : 'invalid'
+			);
+			this.scopeStatus.classList.add('prctr-account-token-form__status--error');
+			return;
+		}
+		this.showGrantable(result.data.grantable);
+	}
+
+	private showGrantable(grantable: AccountGrantableScopes): void {
+		const $ = createElementFactory(this.services.document);
+		this.grantable = grantable;
+		this.scopes = grantable.scopes.map((scope) => {
+			const input = $('input.prctr-account-token-form__checkbox', {
+				type: 'checkbox',
+				value: scope.name
+			});
+			const description = $('span.prctr-account-token-form__scope-description', {
+				textContent: scope.description
+			});
+			this.scopeList.append(
+				$(
+					'label.prctr-account-token-form__scope',
+					{},
+					input,
+					$(
+						'span.prctr-account-token-form__scope-text',
+						{},
+						$('span.prctr-account-token-form__scope-title', {
+							textContent: scope.title
+						}),
+						description
+					)
+				)
+			);
+			return { scope, input };
+		});
+		const empty = grantable.scopes.length === 0;
+		this.scopeStatus.hidden = !empty;
+		this.scopeStatus.textContent = empty ? this.services.text('tokenScopesNone') : '';
+		this.scopeList.hidden = empty;
+		const anywhere = grantable.scopes.some((scope) => scope.institutionWide);
+		if (anywhere)
+			this.limit.append(
+				$('option', { value: NO_LIMIT, textContent: this.services.text('tokenLimitNone') })
+			);
+		for (const unit of grantable.academicUnits)
+			this.limit.append($('option', { value: unit.id, textContent: unit.name }));
+		// A limit is offered only when there is something to choose between.
+		this.limitField.hidden = grantable.academicUnits.length === 0;
+		this.limitHint.hidden = !grantable.moreAcademicUnits;
+		this.setWorking(false);
+	}
+
+	private academicUnitId(): string | undefined {
+		return this.limit.value === NO_LIMIT ? undefined : this.limit.value;
+	}
+
+	/** Scopes that cannot apply where the token is limited are unticked and unavailable. */
+	private applyLimit(): void {
+		const unit = this.academicUnitId();
+		for (const entry of this.scopes) {
+			const grantable = scopeGrantable(entry.scope, unit);
+			if (!grantable) entry.input.checked = false;
+			entry.input.disabled = this.working || !grantable;
+		}
 	}
 
 	private registerListeners(): void {
@@ -153,6 +254,7 @@ export class NewTokenDialog extends Disposable {
 		this._register(this.cancel.onDidRequest(() => this.close()));
 		this._register(this.dialog.onDidRequestCancel(() => this.close()));
 		this._register(this.create.onDidRequest(() => void this.submit()));
+		this._register(addDisposableListener(this.limit, 'change', () => this.applyLimit()));
 		this._register(
 			addDisposableListener(this.name.input, 'keydown', (event) => {
 				if (event.key !== 'Enter') return;
@@ -168,11 +270,11 @@ export class NewTokenDialog extends Disposable {
 	}
 
 	private selectedScopes(): string[] {
-		return this.scopes.filter((entry) => entry.input.checked).map((entry) => entry.scope);
+		return this.scopes.filter((entry) => entry.input.checked).map((entry) => entry.scope.name);
 	}
 
 	private async submit(): Promise<void> {
-		if (this.working) return;
+		if (this.working || this.grantable === undefined || this.scopes.length === 0) return;
 		const scopes = this.selectedScopes();
 		const errors = validateTokenDraft({ name: this.nameValue, scopes });
 		this.name.setState({
@@ -188,9 +290,10 @@ export class NewTokenDialog extends Disposable {
 			return;
 		}
 		if (errors.scopes !== undefined) {
-			this.scopes[0]?.input.focus();
+			this.scopes.find((entry) => !entry.input.disabled)?.input.focus();
 			return;
 		}
+		const academicUnitId = this.academicUnitId();
 		const days = Number(this.expiry.value) as TokenExpiryPreset;
 		this.setWorking(true);
 		this.feedback.set(this.services.text('tokenCreating'), 'loading');
@@ -198,6 +301,7 @@ export class NewTokenDialog extends Disposable {
 			kind: 'createToken',
 			description: this.nameValue.trim(),
 			scopes,
+			...(academicUnitId === undefined ? {} : { academicUnitId }),
 			expiresAt: tokenExpiry(days, this.services.now())
 		});
 		if (this._store.isDisposed) return;
@@ -221,10 +325,15 @@ export class NewTokenDialog extends Disposable {
 	private setWorking(working: boolean): void {
 		this.working = working;
 		this.name.setState({ value: this.nameValue, required: true, disabled: working });
-		for (const entry of this.scopes) entry.input.disabled = working;
+		this.applyLimit();
+		this.limit.disabled = working;
 		this.expiry.disabled = working;
 		this.cancel.setState({ label: this.services.text('cancel'), disabled: working });
-		this.create.setState({ label: this.services.text('createToken'), busy: working });
+		this.create.setState({
+			label: this.services.text('createToken'),
+			busy: working,
+			disabled: !working && this.scopes.length === 0
+		});
 	}
 
 	override dispose(): void {

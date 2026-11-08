@@ -271,6 +271,11 @@ export const accountMessages = Object.freeze({
 		defaultMessage: 'Time zone',
 		description: 'Account detail label.'
 	}),
+	memberSince: defineMessage({
+		id: 'account.profile.member.since',
+		defaultMessage: 'Member since',
+		description: 'Account detail label: when the account was created.'
+	}),
 	lastSignIn: defineMessage({
 		id: 'account.profile.last.sign.in',
 		defaultMessage: 'Last sign-in',
@@ -351,8 +356,9 @@ export const accountMessages = Object.freeze({
 	}),
 	noticeKind: defineMessage({
 		id: 'account.notice.kind',
-		defaultMessage: 'From one exam submission, noticed {date}',
-		description: 'Second line of a retention notice; notices name no exam title.'
+		defaultMessage: '{category} from the sitting on {date}',
+		description:
+			'Second line of a retention notice under the exam title: the record kind and the sitting’s start date.'
 	}),
 	noticeDeletedAfter: defineMessage({
 		id: 'account.notice.deleted.after',
@@ -557,6 +563,31 @@ export const accountMessages = Object.freeze({
 		defaultMessage: 'Recovery codes',
 		description: 'Row title of recovery codes.'
 	}),
+	recoveryCodesLeftOf: defineMessage({
+		id: 'account.security.recovery.codes.left.of',
+		defaultMessage: '{count} of {total} left',
+		description: 'How many of the issued recovery codes remain.'
+	}),
+	recoveryCodesLowOf: defineMessage({
+		id: 'account.security.recovery.codes.low.of',
+		defaultMessage: '{count} of {total} left · get new ones before you run out',
+		description: 'Few of the issued recovery codes remain.'
+	}),
+	twoStepOnSince: defineMessage({
+		id: 'account.security.two.step.on.since',
+		defaultMessage: 'On · authenticator app, since {date}',
+		description: 'Two-step verification is on with an authenticator app, turned on at date.'
+	}),
+	twoStepOnApp: defineMessage({
+		id: 'account.security.two.step.on.app',
+		defaultMessage: 'On · authenticator app',
+		description: 'Two-step verification is on with an authenticator app.'
+	}),
+	passwordChanged: defineMessage({
+		id: 'account.security.password.changed',
+		defaultMessage: 'Set · changed {date}',
+		description: 'A password is set and was last changed at date.'
+	}),
 	recoveryCodesLeft: defineMessage({
 		id: 'account.security.recovery.codes.left',
 		defaultMessage: '{count} left',
@@ -663,6 +694,32 @@ export const accountMessages = Object.freeze({
 		defaultMessage:
 			'{name} loses its key and can’t be used for your exams until you sign in there again. Exam work the server already received is kept.',
 		description: 'Consequences of removing a registered desktop.'
+	}),
+	endOtherSessions: defineMessage({
+		id: 'account.sessions.end.others',
+		defaultMessage: 'End all other sessions',
+		description: 'Section action that ends every session except this one.'
+	}),
+	confirmEndOtherSessionsTitle: defineMessage({
+		id: 'account.sessions.end.others.title',
+		defaultMessage: 'End all other sessions?',
+		description: 'Title of the confirmation before ending every other session.'
+	}),
+	confirmEndOtherSessionsBody: defineMessage({
+		id: 'account.sessions.end.others.body',
+		defaultMessage:
+			'Everywhere else you are signed in is signed out straight away, and anything unsaved there is lost. This computer stays signed in.',
+		description: 'Consequences of ending every other session.'
+	}),
+	otherSessionsEnded: defineMessage({
+		id: 'account.sessions.end.others.done',
+		defaultMessage: 'Every other session was ended.',
+		description: 'Every other session was ended.'
+	}),
+	noOtherSessionsEnded: defineMessage({
+		id: 'account.sessions.end.others.none',
+		defaultMessage: 'There were no other sessions to end.',
+		description: 'Ending other sessions found none.'
 	}),
 	sessionEnded: defineMessage({
 		id: 'account.sessions.ended',
@@ -777,7 +834,12 @@ export const accountMessages = Object.freeze({
 	tokenUnitTag: defineMessage({
 		id: 'account.tokens.unit.tag',
 		defaultMessage: 'One academic unit only',
-		description: 'The token is limited to one Academic Unit.'
+		description: 'The token is limited to one Academic Unit whose name is unknown.'
+	}),
+	tokenUnitNamedTag: defineMessage({
+		id: 'account.tokens.unit.named.tag',
+		defaultMessage: '{unit} only',
+		description: 'The token is limited to the named Academic Unit.'
 	}),
 	tokenExpires: defineMessage({
 		id: 'account.tokens.expires',
@@ -808,11 +870,6 @@ export const accountMessages = Object.freeze({
 		id: 'account.tokens.never.used',
 		defaultMessage: 'never used',
 		description: 'The token has not been used.'
-	}),
-	scopeExaminationsRead: defineMessage({
-		id: 'account.tokens.scope.examinations.read',
-		defaultMessage: 'Read exams',
-		description: 'Token scope examinations:read.'
 	}),
 	disableToken: defineMessage({
 		id: 'account.tokens.disable',
@@ -885,6 +942,31 @@ export const accountMessages = Object.freeze({
 		id: 'account.tokens.scopes',
 		defaultMessage: 'What it can do',
 		description: 'Token scope choices.'
+	}),
+	tokenScopesLoading: defineMessage({
+		id: 'account.tokens.scopes.loading',
+		defaultMessage: 'Finding what you can give a token…',
+		description: 'The grantable token scopes are being read.'
+	}),
+	tokenScopesNone: defineMessage({
+		id: 'account.tokens.scopes.none',
+		defaultMessage: 'There is nothing you can give a token yet.',
+		description: 'The person may grant no token scope.'
+	}),
+	tokenLimit: defineMessage({
+		id: 'account.tokens.limit',
+		defaultMessage: 'Limit to',
+		description: 'Choice of the Academic Unit a token is limited to.'
+	}),
+	tokenLimitNone: defineMessage({
+		id: 'account.tokens.limit.none',
+		defaultMessage: 'Whole institution',
+		description: 'The token is not limited to an Academic Unit.'
+	}),
+	tokenLimitMore: defineMessage({
+		id: 'account.tokens.limit.more',
+		defaultMessage: 'Some academic units are not listed.',
+		description: 'More grantable Academic Units exist than the list shows.'
 	}),
 	tokenExpiry: defineMessage({
 		id: 'account.tokens.expiry',
@@ -971,6 +1053,394 @@ export const accountMessages = Object.freeze({
 		id: 'account.tokens.created',
 		defaultMessage: 'Token created.',
 		description: 'A token was created.'
+	}),
+	// #endregion
+	// #region Account history
+	historyEventAcademicUnitJoined: defineMessage({
+		id: 'account.history.event.academic.unit.joined',
+		defaultMessage: 'Joined an academic unit',
+		description: 'Account history event academic_unit.joined.'
+	}),
+	historyEventAcademicUnitLeft: defineMessage({
+		id: 'account.history.event.academic.unit.left',
+		defaultMessage: 'Left an academic unit',
+		description: 'Account history event academic_unit.left.'
+	}),
+	historyEventAccountDisabled: defineMessage({
+		id: 'account.history.event.account.disabled',
+		defaultMessage: 'Account turned off',
+		description: 'Account history event account.disabled.'
+	}),
+	historyEventAccountEnabled: defineMessage({
+		id: 'account.history.event.account.enabled',
+		defaultMessage: 'Account turned back on',
+		description: 'Account history event account.enabled.'
+	}),
+	historyEventAccountRecoveredByAdministrator: defineMessage({
+		id: 'account.history.event.account.recovered.by.administrator',
+		defaultMessage: 'Account recovered by an administrator',
+		description: 'Account history event account.recovered_by_administrator.'
+	}),
+	historyEventAffiliationEnded: defineMessage({
+		id: 'account.history.event.affiliation.ended',
+		defaultMessage: 'Affiliation ended',
+		description: 'Account history event affiliation.ended.'
+	}),
+	historyEventAffiliationStarted: defineMessage({
+		id: 'account.history.event.affiliation.started',
+		defaultMessage: 'Affiliation started',
+		description: 'Account history event affiliation.started.'
+	}),
+	historyEventClassEnrolled: defineMessage({
+		id: 'account.history.event.class.enrolled',
+		defaultMessage: 'Enrolled in a class',
+		description: 'Account history event class.enrolled.'
+	}),
+	historyEventClassTransferredIn: defineMessage({
+		id: 'account.history.event.class.transferred.in',
+		defaultMessage: 'Moved into a class',
+		description: 'Account history event class.transferred_in.'
+	}),
+	historyEventClassTransferredOut: defineMessage({
+		id: 'account.history.event.class.transferred.out',
+		defaultMessage: 'Moved out of a class',
+		description: 'Account history event class.transferred_out.'
+	}),
+	historyEventClassUnenrolled: defineMessage({
+		id: 'account.history.event.class.unenrolled',
+		defaultMessage: 'Removed from a class',
+		description: 'Account history event class.unenrolled.'
+	}),
+	historyEventDesktopRegistrationRevoked: defineMessage({
+		id: 'account.history.event.desktop.registration.revoked',
+		defaultMessage: 'Removed a registered desktop',
+		description: 'Account history event desktop.registration_revoked.'
+	}),
+	historyEventDesktopSignedIn: defineMessage({
+		id: 'account.history.event.desktop.signed.in',
+		defaultMessage: 'Signed in on Proctor Desktop',
+		description: 'Account history event desktop.signed_in.'
+	}),
+	historyEventEmailChangeUndone: defineMessage({
+		id: 'account.history.event.email.change.undone',
+		defaultMessage: 'Email change undone',
+		description: 'Account history event email.change_undone.'
+	}),
+	historyEventEmailChanged: defineMessage({
+		id: 'account.history.event.email.changed',
+		defaultMessage: 'Changed email address',
+		description: 'Account history event email.changed.'
+	}),
+	historyEventEmailVerified: defineMessage({
+		id: 'account.history.event.email.verified',
+		defaultMessage: 'Verified email address',
+		description: 'Account history event email.verified.'
+	}),
+	historyEventInvitationAccepted: defineMessage({
+		id: 'account.history.event.invitation.accepted',
+		defaultMessage: 'Accepted an invitation',
+		description: 'Account history event invitation.accepted.'
+	}),
+	historyEventMfaDisabled: defineMessage({
+		id: 'account.history.event.mfa.disabled',
+		defaultMessage: 'Turned off two-step verification',
+		description: 'Account history event mfa.disabled.'
+	}),
+	historyEventMfaEnabled: defineMessage({
+		id: 'account.history.event.mfa.enabled',
+		defaultMessage: 'Turned on two-step verification',
+		description: 'Account history event mfa.enabled.'
+	}),
+	historyEventMfaRecoveryCodesRegenerated: defineMessage({
+		id: 'account.history.event.mfa.recovery.codes.regenerated',
+		defaultMessage: 'Got new recovery codes',
+		description: 'Account history event mfa.recovery_codes_regenerated.'
+	}),
+	historyEventMfaResetByAdministrator: defineMessage({
+		id: 'account.history.event.mfa.reset.by.administrator',
+		defaultMessage: 'Two-step verification reset',
+		description: 'Account history event mfa.reset_by_administrator.'
+	}),
+	historyEventMfaSetupStarted: defineMessage({
+		id: 'account.history.event.mfa.setup.started',
+		defaultMessage: 'Started setting up two-step verification',
+		description: 'Account history event mfa.setup_started.'
+	}),
+	historyEventPasswordChanged: defineMessage({
+		id: 'account.history.event.password.changed',
+		defaultMessage: 'Changed password',
+		description: 'Account history event password.changed.'
+	}),
+	historyEventPasswordEnrolled: defineMessage({
+		id: 'account.history.event.password.enrolled',
+		defaultMessage: 'Set a password',
+		description: 'Account history event password.enrolled.'
+	}),
+	historyEventPasswordRemoved: defineMessage({
+		id: 'account.history.event.password.removed',
+		defaultMessage: 'Removed password',
+		description: 'Account history event password.removed.'
+	}),
+	historyEventPasswordReset: defineMessage({
+		id: 'account.history.event.password.reset',
+		defaultMessage: 'Reset password',
+		description: 'Account history event password.reset.'
+	}),
+	historyEventPersonalAccessTokenCreated: defineMessage({
+		id: 'account.history.event.personal.access.token.created',
+		defaultMessage: 'Created an access token',
+		description: 'Account history event personal_access_token.created.'
+	}),
+	historyEventPersonalAccessTokenDisabled: defineMessage({
+		id: 'account.history.event.personal.access.token.disabled',
+		defaultMessage: 'Disabled an access token',
+		description: 'Account history event personal_access_token.disabled.'
+	}),
+	historyEventPersonalAccessTokenEnabled: defineMessage({
+		id: 'account.history.event.personal.access.token.enabled',
+		defaultMessage: 'Turned an access token back on',
+		description: 'Account history event personal_access_token.enabled.'
+	}),
+	historyEventPersonalAccessTokenRevoked: defineMessage({
+		id: 'account.history.event.personal.access.token.revoked',
+		defaultMessage: 'Revoked an access token',
+		description: 'Account history event personal_access_token.revoked.'
+	}),
+	historyEventProfileChanged: defineMessage({
+		id: 'account.history.event.profile.changed',
+		defaultMessage: 'Profile changed',
+		description: 'Account history event profile.changed.'
+	}),
+	historyEventProfilePictureChanged: defineMessage({
+		id: 'account.history.event.profile.picture.changed',
+		defaultMessage: 'Changed profile photo',
+		description: 'Account history event profile_picture.changed.'
+	}),
+	historyEventProfilePictureRemoved: defineMessage({
+		id: 'account.history.event.profile.picture.removed',
+		defaultMessage: 'Removed profile photo',
+		description: 'Account history event profile_picture.removed.'
+	}),
+	historyEventProviderUnlinked: defineMessage({
+		id: 'account.history.event.provider.unlinked',
+		defaultMessage: 'Sign-in provider unlinked',
+		description: 'Account history event provider.unlinked.'
+	}),
+	historyEventRoleEnded: defineMessage({
+		id: 'account.history.event.role.ended',
+		defaultMessage: 'Role ended',
+		description: 'Account history event role.ended.'
+	}),
+	historyEventRoleGranted: defineMessage({
+		id: 'account.history.event.role.granted',
+		defaultMessage: 'Role granted',
+		description: 'Account history event role.granted.'
+	}),
+	historyEventSessionRevoked: defineMessage({
+		id: 'account.history.event.session.revoked',
+		defaultMessage: 'Ended a session',
+		description: 'Account history event session.revoked.'
+	}),
+	historyEventSessionsRevokedAll: defineMessage({
+		id: 'account.history.event.sessions.revoked.all',
+		defaultMessage: 'Ended every session',
+		description: 'Account history event sessions.revoked_all.'
+	}),
+	historyEventSessionsRevokedOthers: defineMessage({
+		id: 'account.history.event.sessions.revoked.others',
+		defaultMessage: 'Ended all other sessions',
+		description: 'Account history event sessions.revoked_others.'
+	}),
+	historyEventSignInFailed: defineMessage({
+		id: 'account.history.event.sign.in.failed',
+		defaultMessage: 'Sign-in failed',
+		description: 'Account history event sign_in.failed.'
+	}),
+	historyEventSignInSucceeded: defineMessage({
+		id: 'account.history.event.sign.in.succeeded',
+		defaultMessage: 'Signed in',
+		description: 'Account history event sign_in.succeeded.'
+	}),
+	historyEventSignOut: defineMessage({
+		id: 'account.history.event.sign.out',
+		defaultMessage: 'Signed out',
+		description: 'Account history event sign_out.'
+	}),
+	historyEventOther: defineMessage({
+		id: 'account.history.event.other',
+		defaultMessage: 'Other account activity',
+		description: 'An account history event this release has no label for.'
+	}),
+	historyTitle: defineMessage({
+		id: 'account.page.history.title',
+		defaultMessage: 'Account history',
+		description: 'Heading of the Account history page.'
+	}),
+	historyDescription: defineMessage({
+		id: 'account.page.history.description',
+		defaultMessage:
+			'What was done with your account, by you, an administrator or Proctor itself.',
+		description: 'Description under the Account history heading.'
+	}),
+	historyPeriodLabel: defineMessage({
+		id: 'account.history.filter.period',
+		defaultMessage: 'Period',
+		description: 'Accessible name of the period filter.'
+	}),
+	historyPeriodDays: defineMessage({
+		id: 'account.history.filter.period.days',
+		defaultMessage: 'Last {days} days',
+		description: 'Period filter option: the last number of days.'
+	}),
+	historyPeriodAll: defineMessage({
+		id: 'account.history.filter.period.all',
+		defaultMessage: 'All time',
+		description: 'Period filter option: no time limit.'
+	}),
+	historyGroupLabel: defineMessage({
+		id: 'account.history.filter.group',
+		defaultMessage: 'Kind of event',
+		description: 'Accessible name of the event-kind filter.'
+	}),
+	historyGroupAll: defineMessage({
+		id: 'account.history.filter.group.all',
+		defaultMessage: 'Any event',
+		description: 'Event-kind filter option: every event.'
+	}),
+	historyGroupSignIn: defineMessage({
+		id: 'account.history.filter.group.sign.in',
+		defaultMessage: 'Sign-in and sessions',
+		description: 'Event-kind filter option.'
+	}),
+	historyGroupSecurity: defineMessage({
+		id: 'account.history.filter.group.security',
+		defaultMessage: 'Password, two-step and email',
+		description: 'Event-kind filter option.'
+	}),
+	historyGroupTokens: defineMessage({
+		id: 'account.history.filter.group.tokens',
+		defaultMessage: 'Access tokens',
+		description: 'Event-kind filter option.'
+	}),
+	historyGroupProfile: defineMessage({
+		id: 'account.history.filter.group.profile',
+		defaultMessage: 'Profile',
+		description: 'Event-kind filter option.'
+	}),
+	historyGroupMembership: defineMessage({
+		id: 'account.history.filter.group.membership',
+		defaultMessage: 'Classes, units and roles',
+		description: 'Event-kind filter option.'
+	}),
+	historyGroupStatus: defineMessage({
+		id: 'account.history.filter.group.status',
+		defaultMessage: 'Account on or off',
+		description: 'Event-kind filter option.'
+	}),
+	historyRelationLabel: defineMessage({
+		id: 'account.history.filter.relation',
+		defaultMessage: 'About',
+		description: 'Accessible name of the subject filter.'
+	}),
+	historyRelationAll: defineMessage({
+		id: 'account.history.filter.relation.all',
+		defaultMessage: 'Anything',
+		description: 'Subject filter option: every event.'
+	}),
+	historyRelationSubject: defineMessage({
+		id: 'account.history.filter.relation.subject',
+		defaultMessage: 'Your account',
+		description: 'Subject filter option: events about the account.'
+	}),
+	historyRelationActor: defineMessage({
+		id: 'account.history.filter.relation.actor',
+		defaultMessage: 'What you did elsewhere',
+		description: 'Subject filter option: events the person performed on something else.'
+	}),
+	historyOutcomeLabel: defineMessage({
+		id: 'account.history.filter.outcome',
+		defaultMessage: 'Outcome',
+		description: 'Accessible name of the outcome filter.'
+	}),
+	historyOutcomeAll: defineMessage({
+		id: 'account.history.filter.outcome.all',
+		defaultMessage: 'Any outcome',
+		description: 'Outcome filter option: every event.'
+	}),
+	historyOutcomeSuccess: defineMessage({
+		id: 'account.history.filter.outcome.success',
+		defaultMessage: 'Succeeded',
+		description: 'Outcome filter option.'
+	}),
+	historyOutcomeFail: defineMessage({
+		id: 'account.history.filter.outcome.fail',
+		defaultMessage: 'Failed',
+		description: 'Outcome filter option.'
+	}),
+	historyShown: defineMessage({
+		id: 'account.history.shown',
+		defaultMessage: 'Events shown: {count}',
+		description: 'How many events the list shows.'
+	}),
+	historyWhen: defineMessage({
+		id: 'account.history.column.when',
+		defaultMessage: 'When',
+		description: 'Account history column heading.'
+	}),
+	historyWhat: defineMessage({
+		id: 'account.history.column.what',
+		defaultMessage: 'What happened',
+		description: 'Account history column heading.'
+	}),
+	historyBy: defineMessage({
+		id: 'account.history.column.by',
+		defaultMessage: 'By',
+		description: 'Account history column heading.'
+	}),
+	historyWhere: defineMessage({
+		id: 'account.history.column.where',
+		defaultMessage: 'Where',
+		description: 'Account history column heading.'
+	}),
+	historyBySelf: defineMessage({
+		id: 'account.history.by.self',
+		defaultMessage: 'You',
+		description: 'The person did it themself.'
+	}),
+	historyByAdministrator: defineMessage({
+		id: 'account.history.by.administrator',
+		defaultMessage: 'An administrator',
+		description: 'Someone with authority over the account did it; they are never named.'
+	}),
+	historyBySystem: defineMessage({
+		id: 'account.history.by.system',
+		defaultMessage: 'Proctor',
+		description: 'No signed-in person did it, such as a background job or an emailed link.'
+	}),
+	historyFailed: defineMessage({
+		id: 'account.history.failed',
+		defaultMessage: 'Did not succeed',
+		description: 'The event failed.'
+	}),
+	historyAboutElsewhere: defineMessage({
+		id: 'account.history.about.elsewhere',
+		defaultMessage: 'Something you did outside your account',
+		description: 'The event is one the person performed on something else.'
+	}),
+	historyWhereUnknown: defineMessage({
+		id: 'account.history.where.unknown',
+		defaultMessage: 'Not recorded',
+		description: 'Where the event came from is unknown.'
+	}),
+	historyEmpty: defineMessage({
+		id: 'account.history.empty',
+		defaultMessage: 'Nothing happened with your account in this period.',
+		description: 'No events match the filters.'
+	}),
+	historyMore: defineMessage({
+		id: 'account.history.more',
+		defaultMessage: 'Show older events',
+		description: 'Loads the next page of account history.'
 	})
 	// #endregion
 });

@@ -1,0 +1,95 @@
+@layer contributions {
+	.prctr-account .prctr-account-history {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+	.prctr-account .prctr-account-history__filters {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.prctr-account .prctr-account-history__filter {
+		background: transparent;
+		block-size: 30px;
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
+		border-radius: var(--prctr-workbench-control-radius, 6px);
+		color: var(--prctr-color-text-primary);
+		font: inherit;
+		font-size: 13px;
+		max-inline-size: 100%;
+		padding: 0 8px;
+	}
+	.prctr-account .prctr-account-history__filter:focus-visible {
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
+	}
+	.prctr-account .prctr-account-history__shown {
+		color: var(--prctr-color-text-tertiary);
+		font-size: 13px;
+		margin-inline-start: auto;
+	}
+	.prctr-account .prctr-account-history__table {
+		border-collapse: collapse;
+		font-size: 13.5px;
+		inline-size: 100%;
+		table-layout: fixed;
+	}
+	.prctr-account .prctr-account-history__table[hidden] {
+		display: none;
+	}
+	.prctr-account .prctr-account-history__heading {
+		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		color: var(--prctr-color-text-tertiary);
+		font-size: 12px;
+		font-weight: var(--prctr-typography-weight-medium);
+		padding: 0 8px 8px;
+		text-align: start;
+	}
+	.prctr-account .prctr-account-history__heading:nth-child(1) {
+		inline-size: 22%;
+	}
+	.prctr-account .prctr-account-history__heading:nth-child(2) {
+		inline-size: 38%;
+	}
+	.prctr-account .prctr-account-history__heading:nth-child(3) {
+		inline-size: 16%;
+	}
+	.prctr-account .prctr-account-history__row > td {
+		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		overflow-wrap: anywhere;
+		padding: 12px 8px;
+		vertical-align: top;
+	}
+	.prctr-account .prctr-account-history__when {
+		color: var(--prctr-color-text-secondary);
+		font-family: var(--prctr-typography-font-monospace);
+		font-size: 12.5px;
+	}
+	.prctr-account .prctr-account-history__muted {
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-account .prctr-account-history__cell {
+		align-items: baseline;
+		display: flex;
+		gap: 10px;
+		min-inline-size: 0;
+	}
+	.prctr-account .prctr-account-history__what {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		min-inline-size: 0;
+	}
+	.prctr-account .prctr-account-history__event {
+		font-weight: var(--prctr-typography-weight-medium);
+	}
+	.prctr-account .prctr-account-history__note {
+		color: var(--prctr-color-text-tertiary);
+		font-size: 12.5px;
+	}
+	.prctr-account .prctr-account-history__footer:has(> [hidden]:only-child) {
+		display: none;
+	}
+}

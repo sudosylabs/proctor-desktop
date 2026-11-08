@@ -401,7 +401,7 @@ export interface paths {
         readonly put?: never;
         /**
          * Exchange an Invitation claim for a purpose-bound browser acceptance transaction
-         * @description Consumes no Invitation yet; it exchanges the one-time claim for a short-lived, same-origin browser handle bound to that exact Invitation purpose. The response omits the original claim and prevents it from entering subsequent browser URLs or logs.
+         * @description Consumes no Invitation yet; it exchanges the one-time claim for a short-lived, same-origin browser handle bound to that exact Invitation purpose. The response omits the original claim and prevents it from entering subsequent browser URLs or logs. It names the address the Invitation was sent to, which acceptance uses and the browser cannot change, and, for a student Class Invitation only, the Class display name; Academic Unit and Role names are never returned.
          */
         readonly post: operations["startBrowserInvitation"];
         readonly delete?: never;
@@ -619,7 +619,7 @@ export interface paths {
         };
         /**
          * Read the safe current hosted-journey context
-         * @description Resolves the scoped binding cookie and returns only the safe device, authentication-choice, expiry, and confirmed-account presentation needed by the current hosted page.
+         * @description Resolves the scoped binding cookie and returns only the safe device, request time, authentication-choice, expiry, and confirmed-account presentation needed by the current hosted page. The account, including its own email address, appears only after this browser has authenticated as that account for the transaction.
          */
         readonly get: operations["getDesktopAuthorizationContext"];
         readonly put?: never;
@@ -670,6 +670,26 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/auth/email-change/undo/inspect": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Read the email change an undo credential would reverse
+         * @description Returns, for one active undo token, the previous address it would restore, the account's current address masked as in the warning mail, and when the change was applied. It never consumes, extends, or reissues the token and records no audit event. It is rate-limited by token and source with the undo policy, and an unknown, malformed, expired, or already used token receives the same generic invalid-credential outcome as the undo itself. The token travels in the body so it stays out of URLs and logs; whether the previous address is still free is decided only by the undo.
+         */
+        readonly post: operations["inspectEmailChangeUndo"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/auth/email-verification/complete": {
         readonly parameters: {
             readonly query?: never;
@@ -684,6 +704,26 @@ export interface paths {
          * @description Consumes one valid short-lived verification token and marks its bound email address verified. The token is single use, cannot verify another address, and an invalid or expired token reveals no account details.
          */
         readonly post: operations["completeEmailVerification"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/auth/email-verification/inspect": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Read the address an email-verification credential would confirm
+         * @description Returns the address bound to one active verification token so the hosted page can name it before the person confirms. It never consumes, extends, or reissues the token and records no audit event. It is rate-limited by token and source with the completion policy, and an unknown, malformed, expired, superseded, or already used token receives the same generic invalid-credential outcome as completion. The token travels in the body so it stays out of URLs and logs; the result is presentation only and completion rechecks the token.
+         */
+        readonly post: operations["inspectEmailVerification"];
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -1211,7 +1251,7 @@ export interface paths {
         };
         /**
          * Get safe same-origin access and desktop compatibility discovery
-         * @description Returns the same-origin, unauthenticated capability document a client uses before choosing a registration or authentication flow. The response contains only safe presentation and compatibility data, is never a substitute for authorization, and is returned with Cache-Control: no-store.
+         * @description Returns the same-origin, unauthenticated capability document a client uses before choosing a registration or authentication flow. The response contains only safe presentation and compatibility data, is never a substitute for authorization, and is returned with Cache-Control: no-store. It also carries two operator-configured presentation facts that apply before and after installation setup: the optional support mailbox hosted pages offer as a contact, and the minimum password length new passwords must meet.
          */
         readonly get: operations["getPublicAccessDiscovery"];
         readonly put?: never;
@@ -4236,6 +4276,26 @@ export interface paths {
         readonly patch: operations["updateRole"];
         readonly trace?: never;
     };
+    readonly "/api/v1/search": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * Search Exams, Classes, and Users
+         * @description Finds Exams by Draft title, Classes by name or display name, and Users by directory fields, each as a literal case-insensitive substring of the trimmed q. Every type is authorized, audited, and scoped exactly as its own list: active Exams the caller may see in the Exam catalog, unarchived Classes within the caller's class.view scope, and enabled Users visible in the User directory. A requested type the caller may not list contributes no items; the request is denied only when the caller may list none of the requested types. Items are grouped by type in the order exam, class, user, each group in its own list order and holding at most limit items. Search answers one bounded page and never continues: next_cursor is always omitted and cursor is rejected. Email addresses are never returned, and the query text is kept out of logs and audit records.
+         */
+        readonly get: operations["search"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/security-preflights/{security_preflight_id}/report": {
         readonly parameters: {
             readonly query?: never;
@@ -4643,6 +4703,26 @@ export interface paths {
         readonly patch?: never;
         readonly trace?: never;
     };
+    readonly "/api/v1/users/me/audits": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * List the current User's own account history
+         * @description Returns one page of the current Session User's own account history, newest first. The history holds events about the User's account, whoever performed them, and account-relevant events the User performed on anything else. Each item carries a stable `event` name from a closed catalogue, which clients label themselves; rows outside the catalogue and unfinished attempts are never returned. Another person is never named: the actor is only `self`, `administrator`, or `system`, and the IP address and user agent appear only on the User's own actions. A resource identity appears only when the resource is the User, the Institution, or an Academic Unit or Class the User has or had a membership or Role Binding at. Personal Access Tokens cannot read this history. Reading it records no authorization decision.
+         */
+        readonly get: operations["listCurrentUserAuditEvents"];
+        readonly put?: never;
+        readonly post?: never;
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
     readonly "/api/v1/users/me/context": {
         readonly parameters: {
             readonly query?: never;
@@ -4732,7 +4812,7 @@ export interface paths {
         };
         /**
          * Get current-user MFA status
-         * @description Returns whether MFA is active, whether a setup is pending, and the count of unused recovery codes for the current User. TOTP secrets and recovery-code values are never returned by this status view.
+         * @description Returns whether MFA is active, whether a setup is pending, and the count of unused recovery codes out of the configured set size for the current User, when the User's own password last changed, and the recent-authentication window: its configured length and, while this Session is recently authenticated, when it ends. TOTP secrets, recovery-code values, and password material are never returned by this status view.
          */
         readonly get: operations["getMFAStatus"];
         readonly put?: never;
@@ -4852,7 +4932,7 @@ export interface paths {
         };
         /**
          * List my retention notices
-         * @description Returns the current Session User’s own durable grace notices, including cancellation and delivery status. The notice grants no examination record access. Reading it neither acknowledges delivery nor changes cleanup. Candidate notices are optional; responsible Exam Managers and institution operators receive them by default. Pending dates are invalidated when grace is canceled.
+         * @description Returns the current Session User’s own durable grace notices, including cancellation and delivery status. The notice grants no examination record access. Reading it neither acknowledges delivery nor changes cleanup. Candidate notices are optional; responsible Exam Managers and institution operators receive them by default. Pending dates are invalidated when grace is canceled. Each notice names the Exam title and the Sitting's scheduled times so the recipient can tell which records it covers; no candidate, answer, or evidence content is included.
          */
         readonly get: operations["listRetentionNotices"];
         readonly put?: never;
@@ -4914,9 +4994,29 @@ export interface paths {
         readonly put?: never;
         /**
          * Revoke all current-user sessions
-         * @description Revokes every active Session belonging to the current User, including the Session making the request. Clients must discard cached credentials and require a new authentication flow afterward.
+         * @description Revokes every active Session belonging to the current User, including the Session making the request, so the caller is signed out too. Clients must discard cached credentials and require a new authentication flow afterward. To stay signed in on this device, use revokeOtherCurrentUserSessions instead.
          */
         readonly post: operations["revokeAllCurrentUserSessions"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/users/me/sessions/revoke-others": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly get?: never;
+        readonly put?: never;
+        /**
+         * Sign out every other current-user session
+         * @description Revokes every active Session belonging to the current User except the Session making the request, which stays signed in; its cookies and credentials are left in place. The response reports how many Sessions were revoked, which is zero when no other Session was active. A personal access token has no Session to keep and is refused.
+         */
+        readonly post: operations["revokeOtherCurrentUserSessions"];
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -4965,6 +5065,26 @@ export interface paths {
          * @description Creates a bounded Personal Access Token after recent interactive authentication and returns its credential exactly once. Requested scopes and any Academic Unit boundary are validated against current authority and policy.
          */
         readonly post: operations["createPersonalAccessToken"];
+        readonly delete?: never;
+        readonly options?: never;
+        readonly head?: never;
+        readonly patch?: never;
+        readonly trace?: never;
+    };
+    readonly "/api/v1/users/me/tokens/grantable-scopes": {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        /**
+         * List grantable Personal Access Token scopes
+         * @description Returns the Personal Access Token scopes the current User may grant right now, with a localized title and description for each. A scope with `institution_wide` set may be granted with no Academic Unit boundary or with any boundary. Otherwise it may be granted only with a boundary at one of its `academic_unit_ids` or at a unit below one of them. `academic_units` lists at most 50 of those delegable roots, ordered by display name; `academic_units_has_more` reports that more exist. Scopes the User cannot grant anywhere are omitted. Creation still rechecks current authority.
+         */
+        readonly get: operations["listGrantablePersonalAccessTokenScopes"];
+        readonly put?: never;
+        readonly post?: never;
         readonly delete?: never;
         readonly options?: never;
         readonly head?: never;
@@ -5581,6 +5701,9 @@ export interface components {
             /** Format: int64 */
             readonly to_revision: number;
         };
+        readonly AccountTokenInspectionRequest: {
+            readonly token: string;
+        };
         readonly AcknowledgeExamCorrectionRequest: {
             readonly expected_current_revision_id: components["schemas"]["ID"];
             /** Format: int64 */
@@ -6030,6 +6153,13 @@ export interface components {
             readonly claim: string;
         };
         readonly BrowserInvitationStartResponse: {
+            /** @description Display name of the Class a student Class Invitation enrolls the invitee in. Omitted for every other purpose. */
+            readonly class_display_name?: string;
+            /**
+             * Format: email
+             * @description Normalized address the Invitation was sent to. Account-creating acceptance gives the new account this address; no acceptance operation takes an address from the browser.
+             */
+            readonly email: string;
             /** Format: date-time */
             readonly expires_at: string;
             readonly handle: string;
@@ -6587,7 +6717,7 @@ export interface components {
             readonly description: string;
             /** Format: date-time */
             readonly expires_at: string;
-            readonly scopes: readonly string[];
+            readonly scopes: readonly components["schemas"]["PersonalAccessTokenScope"][];
         };
         /** @description Canonical and human-facing fields for a new Programme Level. */
         readonly CreateProgrammeLevelRequest: {
@@ -6669,6 +6799,56 @@ export interface components {
             readonly scope_id: components["schemas"]["ID"];
             /** @enum {string} */
             readonly scope_type: "institution" | "academic_unit";
+        };
+        /** @description One of the current User's Sessions, marked when it is the Session that made the request. */
+        readonly CurrentUserSessionResponse: {
+            /** Format: date-time */
+            readonly archived_at?: string;
+            /** Format: date-time */
+            readonly authenticated_at: string;
+            readonly authentication_method: string;
+            readonly authentication_strength: string;
+            /** @enum {string} */
+            readonly client_type: "desktop" | "cli" | "web";
+            /** Format: date-time */
+            readonly created_at: string;
+            /** @description True for the Session that made the request. */
+            readonly current: boolean;
+            /** @enum {string} */
+            readonly desktop_architecture?: "arm64" | "x64";
+            readonly desktop_build_id?: string;
+            /** @enum {string} */
+            readonly desktop_platform?: "darwin" | "win32" | "linux";
+            readonly desktop_realtime_protocol?: number;
+            readonly desktop_registration_id?: components["schemas"]["ID"];
+            readonly desktop_release?: string;
+            readonly device_id?: string;
+            readonly device_name?: string;
+            /** Format: date-time */
+            readonly expires_at: string;
+            readonly id: components["schemas"]["ID"];
+            /** Format: date-time */
+            readonly idle_expires_at: string;
+            /** Format: date-time */
+            readonly last_activity_at: string;
+            /** Format: date-time */
+            readonly mfa_completed_at?: string;
+            /** @description Ordinary access remains unavailable until a new local authenticator is activated. */
+            readonly mfa_recovery_required: boolean;
+            /**
+             * Format: date-time
+             * @description Most recent verified fresh primary proof for the original Session method; does not replace initial authentication or MFA history.
+             */
+            readonly reauthenticated_at?: string;
+            /** @description Localized presentation of revocation_reason_code. */
+            readonly revocation_reason?: string;
+            /** @enum {string} */
+            readonly revocation_reason_code?: "mfa_reset" | "account_disabled" | "access_policy_changed" | "administrator_all_sessions" | "administrator_session" | "authentication_audit_failed" | "desktop_authorization_failed" | "desktop_registration_revoked" | "email_change_undone" | "external_identity_unlinked" | "inactive_user" | "password_changed" | "password_removed" | "password_reset" | "refresh_replay" | "user_all_sessions" | "user_logout" | "user_other_sessions" | "user_session";
+            /** Format: date-time */
+            readonly revoked_at?: string;
+            /** Format: date-time */
+            readonly updated_at: string;
+            readonly user_id: components["schemas"]["ID"];
         };
         readonly DeclareDeliveryGaps: {
             /** Format: int64 */
@@ -6793,6 +6973,11 @@ export interface components {
         };
         readonly DesktopAuthorizationAccountResponse: {
             readonly display_name: string;
+            /**
+             * Format: email
+             * @description The authenticated account's own email address, shown so the person can confirm which account the Desktop will use.
+             */
+            readonly email: string;
             readonly id: string;
             readonly username: string;
         };
@@ -6816,6 +7001,11 @@ export interface components {
             readonly expires_at: string;
             readonly external_providers: readonly components["schemas"]["ExternalAuthenticationProviderResponse"][];
             readonly local_login_enabled: boolean;
+            /**
+             * Format: date-time
+             * @description When Proctor Desktop started this authorization request.
+             */
+            readonly requested_at: string;
             /** @enum {string} */
             readonly state: "bound" | "authenticated";
         };
@@ -7090,11 +7280,32 @@ export interface components {
             /** @constant */
             readonly visibility_class_id: "examiner_restricted";
         };
+        readonly EmailChangeUndoInspectionResponse: {
+            /**
+             * Format: date-time
+             * @description When the email change was applied.
+             */
+            readonly changed_at: string;
+            /** @description The account's current address, masked as in the email-change warning (first character, up to three asterisks, and the domain). */
+            readonly masked_current_email: string;
+            /**
+             * Format: email
+             * @description The previous address the undo would restore; the token was mailed to it.
+             */
+            readonly restored_email: string;
+        };
         readonly EmailChangeUndoRequest: {
             readonly token: string;
         };
         readonly EmailVerificationCompletionRequest: {
             readonly token: string;
+        };
+        readonly EmailVerificationInspectionResponse: {
+            /**
+             * Format: email
+             * @description The address the token was issued for and would mark verified.
+             */
+            readonly email: string;
         };
         readonly EndExamAttemptByManagerRequest: {
             /** Format: int64 */
@@ -7911,6 +8122,8 @@ export interface components {
             readonly exam_revision_id: components["schemas"]["ID"];
             /** @description SHA-256 digest of the immutable sealed Workspace manifest. */
             readonly manifest_digest: components["schemas"]["SHA256"];
+            /** @description Short receipt code the candidate can read out to identify this Submission, such as `MBY3-KBMN-EB83-TFW1`. It is minted once when the Submission seals, is unique across Submissions, and every replay returns it unchanged. It is sixteen Crockford base32 characters (no I, L, O, or U) in groups of four separated by hyphens. */
+            readonly receipt_code: string;
             /** @constant */
             readonly state: "submitted";
             readonly submission_id: components["schemas"]["ID"];
@@ -8510,13 +8723,43 @@ export interface components {
             /** @enum {string} */
             readonly authentication_strength: "single_factor" | "multi_factor";
             readonly enabled: boolean;
+            /**
+             * Format: date-time
+             * @description When two-step verification was turned on. Present only while enabled.
+             */
+            readonly enabled_at?: string;
+            /**
+             * @description The second factor in use. Present while two-step verification is enabled or pending; more methods may be added later.
+             * @enum {string}
+             */
+            readonly method?: "authenticator_app";
             /** @description Whether this Session is restricted to fresh primary proof and local authenticator enrollment after an assisted reset. */
             readonly mfa_recovery_required: boolean;
+            /**
+             * Format: date-time
+             * @description When the User's active password credential was last set or changed. Omitted for an account without a password credential.
+             */
+            readonly password_changed_at?: string;
             readonly pending: boolean;
             /** Format: date-time */
             readonly pending_expires_at?: string;
+            /** @description Configured recent-authentication window (`Authentication.RecentAuthenticationTTL`) in whole minutes, rounded down. */
+            readonly recent_authentication_minutes: number;
             readonly recently_authenticated: boolean;
+            /**
+             * Format: date-time
+             * @description When this Session's recent-authentication window ends. Present only while `recently_authenticated` is true.
+             */
+            readonly recently_authenticated_until?: string;
+            /**
+             * Format: date-time
+             * @description When the live recovery-code set was issued. Omitted when there is none.
+             */
+            readonly recovery_codes_generated_at?: string;
+            /** @description Unused codes in the live recovery-code set; 0 unless enabled. */
             readonly recovery_codes_remaining: number;
+            /** @description Size of the live recovery-code set the User was given, used codes included, so it stays true if the configured count later changes; 0 unless enabled. */
+            readonly recovery_codes_total: number;
             /** @description Whether local authenticator enrollment and verification are currently available. */
             readonly service_enabled: boolean;
         };
@@ -9100,6 +9343,30 @@ export interface components {
             readonly credential: string;
             readonly token: components["schemas"]["PersonalAccessTokenResponse"];
         };
+        readonly PersonalAccessTokenGrantableAcademicUnit: {
+            readonly display_name: string;
+            readonly id: components["schemas"]["ID"];
+        };
+        readonly PersonalAccessTokenGrantableScope: {
+            /** @description The listed `academic_units` at which the scope is grantable; it is also grantable at any unit below them. */
+            readonly academic_unit_ids: readonly components["schemas"]["ID"][];
+            /** @description One localized sentence explaining what the scope allows. */
+            readonly description: string;
+            /** @description True when the scope may be granted without an Academic Unit boundary, or with any boundary. */
+            readonly institution_wide: boolean;
+            readonly name: components["schemas"]["PersonalAccessTokenScope"];
+            /** @description The resource types the action applies to. */
+            readonly resource_types: readonly ("academic_period" | "academic_unit" | "class" | "exam" | "exam_sitting" | "institution" | "programme" | "programme_level" | "submission" | "user")[];
+            /** @description Short localized title. */
+            readonly title: string;
+        };
+        readonly PersonalAccessTokenGrantableScopesResponse: {
+            /** @description At most 50 Academic Unit roots at which at least one scope is grantable, ordered by display name. */
+            readonly academic_units: readonly components["schemas"]["PersonalAccessTokenGrantableAcademicUnit"][];
+            /** @description True when more grantable roots exist than are listed. */
+            readonly academic_units_has_more: boolean;
+            readonly scopes: readonly components["schemas"]["PersonalAccessTokenGrantableScope"][];
+        };
         /** @description One page of the collection in its stable order. */
         readonly PersonalAccessTokenListResponse: {
             readonly items: readonly components["schemas"]["PersonalAccessTokenResponse"][];
@@ -9126,6 +9393,11 @@ export interface components {
             readonly updated_at: string;
             readonly user_id: components["schemas"]["ID"];
         };
+        /**
+         * @description An action a Personal Access Token may carry. The grantable-scopes operation reports which of them the current User may grant.
+         * @enum {string}
+         */
+        readonly PersonalAccessTokenScope: "academic.progression.manage" | "academic_audit.view" | "academic_period.manage" | "academic_period.view" | "academic_unit.manage" | "academic_unit.members.manage" | "academic_unit.members.view" | "academic_unit.view" | "audit.view" | "class.manage" | "class.members.manage" | "class.members.view" | "class.view" | "exam.attempt.browser_activity.view" | "exam.create" | "exam.create.override" | "exam.manage" | "exam.manage.override" | "exam.publish" | "exam.publish.override" | "exam.sitting.create" | "exam.sitting.create.override" | "exam.sitting.manage" | "exam.sitting.manage.override" | "exam.sitting.view" | "exam.sitting.view.override" | "exam.view" | "exam.view.override" | "institution.manage" | "invitation.create" | "invitation.manage" | "invitation.view" | "job.manage" | "job.view" | "mail.manage" | "mail.view" | "onboarding_batch.manage" | "onboarding_batch.view" | "programme.manage" | "programme.view" | "programme_level.manage" | "programme_level.view" | "session.manage" | "session.view" | "submission.release" | "submission.release.override" | "submission.review" | "submission.review.override" | "submission.view" | "submission.view.override" | "user.manage" | "user.profile_picture.manage" | "user.view";
         readonly PrepareSecurityPreflightRequest: {
             readonly attempt_id?: string;
             readonly configuration_manifest_fingerprint: string;
@@ -9246,12 +9518,19 @@ export interface components {
             readonly initialized: boolean;
             readonly installation_id?: components["schemas"]["ID"];
             readonly institution?: components["schemas"]["PublicInstitutionPresentationResponse"];
+            /** @description Minimum number of characters a new local password must contain (`Authentication.Password.MinimumLength`). Other password rules still apply and are reported when a password is rejected. */
+            readonly password_minimum_length: number;
             /**
              * Format: int64
              * @description Current Access Policy revision when the installation is initialized.
              */
             readonly policy_revision?: number;
             readonly providers: readonly components["schemas"]["ExternalAuthenticationProviderResponse"][];
+            /**
+             * Format: email
+             * @description Operator-configured help mailbox (`Mail.SupportAddress`) that hosted pages offer as a contact. Omitted when none is configured.
+             */
+            readonly support_address?: string;
         };
         /** @description Safe Institution identity suitable for unauthenticated sign-in presentation. */
         readonly PublicInstitutionPresentationResponse: {
@@ -9473,9 +9752,21 @@ export interface components {
             readonly delivery_state: "pending" | "queued" | "sending" | "accepted" | "suppressed" | "failed" | "canceled";
             readonly exam_id: components["schemas"]["ID"];
             readonly exam_sitting_id: components["schemas"]["ID"];
+            /** @description Immutable title of the Exam Revision the Sitting delivered. Shown to every recipient of the notice, even one who no longer has access to the Exam. */
+            readonly exam_title: string;
             /** Format: date-time */
             readonly retire_after: string;
             readonly retirement_id: components["schemas"]["ID"];
+            /**
+             * Format: date-time
+             * @description Scheduled end of the Sitting whose records the notice covers.
+             */
+            readonly sitting_end_at: string;
+            /**
+             * Format: date-time
+             * @description Scheduled start of the Sitting whose records the notice covers.
+             */
+            readonly sitting_start_at: string;
             /** @enum {string} */
             readonly state: "grace" | "canceled" | "retired";
             readonly submission_id: components["schemas"]["ID"];
@@ -9632,6 +9923,10 @@ export interface components {
             /** @enum {string} */
             readonly state: "grace" | "canceled" | "retired";
         };
+        /** @description How many of the current User's other Sessions this request revoked. */
+        readonly RevokeOtherSessionsResponse: {
+            readonly revoked_session_count: number;
+        };
         readonly RevokeSessionRequest: {
             readonly session_id: components["schemas"]["ID"];
         };
@@ -9731,6 +10026,52 @@ export interface components {
             /** Format: date-time */
             readonly scheduled_start_at: string;
         };
+        /** @description An unarchived Class within the caller's class.view scope. */
+        readonly SearchClassItem: {
+            readonly display_name: string;
+            readonly id: components["schemas"]["ID"];
+            readonly programme_level_id: components["schemas"]["ID"];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            readonly type: "class";
+        };
+        /** @description An Exam the caller may see in the Exam catalog, titled by its current Draft. */
+        readonly SearchExamItem: {
+            readonly academic_unit_id: components["schemas"]["ID"];
+            readonly id: components["schemas"]["ID"];
+            /** @description Current Draft title. */
+            readonly title: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            readonly type: "exam";
+        };
+        /** @description One search match, discriminated by type. */
+        readonly SearchItem: components["schemas"]["SearchExamItem"] | components["schemas"]["SearchClassItem"] | components["schemas"]["SearchUserItem"];
+        /** @description At most limit matches of each requested type, grouped by type. Search never continues, so next_cursor is always omitted. */
+        readonly SearchResponse: {
+            readonly items: readonly components["schemas"]["SearchItem"][];
+            readonly next_cursor?: components["schemas"]["NextCursor"];
+        };
+        /**
+         * @description Kind of search result.
+         * @enum {string}
+         */
+        readonly SearchType: "exam" | "class" | "user";
+        /** @description A User visible in the caller's User directory. The email address is never included. */
+        readonly SearchUserItem: {
+            readonly display_name: string;
+            readonly id: components["schemas"]["ID"];
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            readonly type: "user";
+            readonly username: string;
+        };
         readonly SecurityCatalogBinding: {
             readonly catalog_id: string;
             readonly digest: string;
@@ -9806,6 +10147,57 @@ export interface components {
             /** Format: date-time */
             readonly server_time: string;
         };
+        /**
+         * @description Stable name of one account-relevant event. The catalogue is closed and may grow; clients own the labels and should present an unknown name generically.
+         * @enum {string}
+         */
+        readonly SelfAuditEvent: "academic_unit.joined" | "academic_unit.left" | "account.disabled" | "account.enabled" | "account.recovered_by_administrator" | "affiliation.ended" | "affiliation.started" | "class.enrolled" | "class.transferred_in" | "class.transferred_out" | "class.unenrolled" | "desktop.registration_revoked" | "desktop.signed_in" | "email.change_undone" | "email.changed" | "email.verified" | "invitation.accepted" | "mfa.disabled" | "mfa.enabled" | "mfa.recovery_codes_regenerated" | "mfa.reset_by_administrator" | "mfa.setup_started" | "password.changed" | "password.enrolled" | "password.removed" | "password.reset" | "personal_access_token.created" | "personal_access_token.disabled" | "personal_access_token.enabled" | "personal_access_token.revoked" | "profile.changed" | "profile_picture.changed" | "profile_picture.removed" | "provider.unlinked" | "role.ended" | "role.granted" | "session.revoked" | "sessions.revoked_all" | "sessions.revoked_others" | "sign_in.failed" | "sign_in.succeeded" | "sign_out";
+        /** @description One event in the current User's own account history. */
+        readonly SelfAuditEventResponse: {
+            readonly actor: {
+                /**
+                 * @description Who performed the event: the User, another person with authority over the account, or work with no signed-in actor such as a background Job, offline recovery, or an emailed link.
+                 * @enum {string}
+                 */
+                readonly kind: "self" | "administrator" | "system";
+            };
+            /** @description Kind of client the event came from, when recorded. */
+            readonly client_type?: string;
+            /**
+             * Format: date-time
+             * @description Time the event began.
+             */
+            readonly created_at: string;
+            /** @description Stable safe failure category of a failed event. */
+            readonly error_code?: string;
+            readonly event: components["schemas"]["SelfAuditEvent"];
+            readonly id: components["schemas"]["ID"];
+            /** @description Network address of the User's own action; omitted for anyone else's. */
+            readonly ip_address?: string;
+            /**
+             * @description `subject` when the event is about the User's account; `actor` when the User performed it on anything else.
+             * @enum {string}
+             */
+            readonly relation: "subject" | "actor";
+            readonly resource: {
+                readonly id?: components["schemas"]["ID"];
+                /** @description Stable type of the resource the event was recorded against. */
+                readonly type: string;
+            };
+            /**
+             * @description Outcome of the event.
+             * @enum {string}
+             */
+            readonly status: "success" | "fail";
+            /** @description User agent of the User's own action; omitted for anyone else's. */
+            readonly user_agent?: string;
+        };
+        /** @description One bounded page of the current User's own account history. */
+        readonly SelfAuditListResponse: {
+            readonly items: readonly components["schemas"]["SelfAuditEventResponse"][];
+            /** @description Opaque continuation for the next page, omitted after the final page. */
+            readonly next_cursor?: string;
+        };
         readonly SequenceRange: {
             /** Format: int64 */
             readonly first: number;
@@ -9857,7 +10249,7 @@ export interface components {
             /** @description Localized presentation of revocation_reason_code. */
             readonly revocation_reason?: string;
             /** @enum {string} */
-            readonly revocation_reason_code?: "account_disabled" | "access_policy_changed" | "administrator_all_sessions" | "administrator_session" | "authentication_audit_failed" | "desktop_authorization_failed" | "desktop_registration_revoked" | "email_change_undone" | "external_identity_unlinked" | "inactive_user" | "mfa_reset" | "password_changed" | "password_removed" | "password_reset" | "refresh_replay" | "user_all_sessions" | "user_logout" | "user_session";
+            readonly revocation_reason_code?: "account_disabled" | "access_policy_changed" | "administrator_all_sessions" | "administrator_session" | "authentication_audit_failed" | "desktop_authorization_failed" | "desktop_registration_revoked" | "email_change_undone" | "external_identity_unlinked" | "inactive_user" | "mfa_reset" | "password_changed" | "password_removed" | "password_reset" | "refresh_replay" | "user_all_sessions" | "user_logout" | "user_other_sessions" | "user_session";
             /** Format: date-time */
             readonly revoked_at?: string;
             /** Format: date-time */
@@ -9866,7 +10258,7 @@ export interface components {
         };
         /** @description One page of the collection in its stable order. */
         readonly SessionListResponse: {
-            readonly items: readonly components["schemas"]["SessionResponse"][];
+            readonly items: readonly components["schemas"]["CurrentUserSessionResponse"][];
             readonly next_cursor?: components["schemas"]["NextCursor"];
         };
         readonly SessionResponse: {
@@ -9909,7 +10301,7 @@ export interface components {
             /** @description Localized presentation of revocation_reason_code. */
             readonly revocation_reason?: string;
             /** @enum {string} */
-            readonly revocation_reason_code?: "mfa_reset" | "account_disabled" | "access_policy_changed" | "administrator_all_sessions" | "administrator_session" | "authentication_audit_failed" | "desktop_authorization_failed" | "desktop_registration_revoked" | "email_change_undone" | "external_identity_unlinked" | "inactive_user" | "password_changed" | "password_removed" | "password_reset" | "refresh_replay" | "user_all_sessions" | "user_logout" | "user_session";
+            readonly revocation_reason_code?: "mfa_reset" | "account_disabled" | "access_policy_changed" | "administrator_all_sessions" | "administrator_session" | "authentication_audit_failed" | "desktop_authorization_failed" | "desktop_registration_revoked" | "email_change_undone" | "external_identity_unlinked" | "inactive_user" | "password_changed" | "password_removed" | "password_reset" | "refresh_replay" | "user_all_sessions" | "user_logout" | "user_other_sessions" | "user_session";
             /** Format: date-time */
             readonly revoked_at?: string;
             /** Format: date-time */
@@ -10992,6 +11384,38 @@ export interface components {
             };
             content: {
                 readonly "application/json": components["schemas"]["DesktopRegistrationListResponse"];
+            };
+        };
+        /** @description The email change the active undo token would reverse */
+        readonly EmailChangeUndoInspected: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "changed_at": "2026-08-01T00:00:00Z",
+                 *       "masked_current_email": "s***@example.org",
+                 *       "restored_email": "student.one@example.edu"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["EmailChangeUndoInspectionResponse"];
+            };
+        };
+        /** @description The address the active verification token would confirm */
+        readonly EmailVerificationInspected: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "email": "student.one@example.edu"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["EmailVerificationInspectionResponse"];
             };
         };
         /** @description Bounded manager-safe Exam Attempt collection */
@@ -12082,6 +12506,21 @@ export interface components {
                 readonly "text/csv": Uint8Array;
             };
         };
+        /** @description Every other current-user Session was revoked */
+        readonly OtherSessionsRevoked: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "revoked_session_count": 3
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["RevokeOtherSessionsResponse"];
+            };
+        };
         /** @description The existing Session after successful fresh proof. */
         readonly PasswordReauthenticationOK: {
             headers: {
@@ -12100,6 +12539,53 @@ export interface components {
             };
             content: {
                 readonly "application/json": components["schemas"]["PersonalAccessTokenCreationResponse"];
+            };
+        };
+        /** @description Grantable Personal Access Token scopes */
+        readonly PersonalAccessTokenGrantableScopesOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["NoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "academic_units": [
+                 *         {
+                 *           "display_name": "School of Computing",
+                 *           "id": "ybndrfg8ejkmcpqxot1uwisza3"
+                 *         }
+                 *       ],
+                 *       "academic_units_has_more": false,
+                 *       "scopes": [
+                 *         {
+                 *           "academic_unit_ids": [
+                 *             "ybndrfg8ejkmcpqxot1uwisza3"
+                 *           ],
+                 *           "description": "Read the installation's audit history.",
+                 *           "institution_wide": true,
+                 *           "name": "audit.view",
+                 *           "resource_types": [
+                 *             "institution"
+                 *           ],
+                 *           "title": "View audit history"
+                 *         },
+                 *         {
+                 *           "academic_unit_ids": [
+                 *             "ybndrfg8ejkmcpqxot1uwisza3"
+                 *           ],
+                 *           "description": "Read exams you manage, including drafts and revisions.",
+                 *           "institution_wide": false,
+                 *           "name": "exam.view",
+                 *           "resource_types": [
+                 *             "exam"
+                 *           ],
+                 *           "title": "View exams"
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["PersonalAccessTokenGrantableScopesResponse"];
             };
         };
         /** @description Personal Access Token collection */
@@ -12504,6 +12990,39 @@ export interface components {
                 readonly "application/json": components["schemas"]["RoleResponse"];
             };
         };
+        /** @description Matches of each requested type within the caller's list visibility. */
+        readonly SearchOK: {
+            headers: {
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "items": [
+                 *         {
+                 *           "academic_unit_id": "ybndrfg8ejkmcpqxot1uwisza4",
+                 *           "id": "ybndrfg8ejkmcpqxot1uwisza3",
+                 *           "title": "Algorithms midterm",
+                 *           "type": "exam"
+                 *         },
+                 *         {
+                 *           "display_name": "Algorithms, group A",
+                 *           "id": "ybndrfg8ejkmcpqxot1uwisza5",
+                 *           "programme_level_id": "ybndrfg8ejkmcpqxot1uwisza6",
+                 *           "type": "class"
+                 *         },
+                 *         {
+                 *           "display_name": "Ada Example",
+                 *           "id": "ybndrfg8ejkmcpqxot1uwisza7",
+                 *           "type": "user",
+                 *           "username": "ada.example"
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["SearchResponse"];
+            };
+        };
         /** @description The exact retained active security receipt and frozen configuration for its owning registered Desktop Session. */
         readonly SecurityPolicyRecoveryOK: {
             headers: {
@@ -12530,6 +13049,55 @@ export interface components {
             };
             content: {
                 readonly "application/json": components["schemas"]["SecurityPreflightResult"];
+            };
+        };
+        /** @description One page of the current User's own account history. */
+        readonly SelfAuditListOK: {
+            headers: {
+                readonly "Cache-Control": components["headers"]["PrivateNoStore"];
+                readonly [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "items": [
+                 *         {
+                 *           "actor": {
+                 *             "kind": "self"
+                 *           },
+                 *           "client_type": "web",
+                 *           "created_at": "2026-08-01T09:30:00Z",
+                 *           "event": "password.changed",
+                 *           "id": "ybndrfg8ejkmcpqxot1uwisza3",
+                 *           "ip_address": "192.0.2.10",
+                 *           "relation": "subject",
+                 *           "resource": {
+                 *             "id": "ybndrfg8ejkmcpqxot1uwisza4",
+                 *             "type": "user"
+                 *           },
+                 *           "status": "success",
+                 *           "user_agent": "Mozilla/5.0"
+                 *         },
+                 *         {
+                 *           "actor": {
+                 *             "kind": "administrator"
+                 *           },
+                 *           "client_type": "web",
+                 *           "created_at": "2026-07-30T14:05:00Z",
+                 *           "event": "mfa.reset_by_administrator",
+                 *           "id": "ybndrfg8ejkmcpqxot1uwisza5",
+                 *           "relation": "subject",
+                 *           "resource": {
+                 *             "id": "ybndrfg8ejkmcpqxot1uwisza4",
+                 *             "type": "user"
+                 *           },
+                 *           "status": "success"
+                 *         }
+                 *       ],
+                 *       "next_cursor": "eyJjcmVhdGVkX2F0IjoiMjAyNi0wNy0zMFQxNDowNTowMFoifQ"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["SelfAuditListResponse"];
             };
         };
         /** @description Accepted */
@@ -13397,10 +13965,10 @@ export interface components {
                 /**
                  * @example {
                  *       "academic_unit_id": "ybndrfg8ejkmcpqxot1uwisza3",
-                 *       "description": "Read examination schedules from the registrar tool",
+                 *       "description": "Read exams from the registrar tool",
                  *       "expires_at": "2027-01-01T00:00:00Z",
                  *       "scopes": [
-                 *         "examinations:read"
+                 *         "exam.view"
                  *       ]
                  *     }
                  */
@@ -13718,6 +14286,28 @@ export interface components {
                  *     }
                  */
                 readonly "application/json": components["schemas"]["FinalDeliveryDeclaration"];
+            };
+        };
+        /** @description Supplies the undo token from the link fragment; it is read, not consumed. */
+        readonly InspectEmailChangeUndo: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "token": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["AccountTokenInspectionRequest"];
+            };
+        };
+        /** @description Supplies the email-verification token from the link fragment; it is read, not consumed. */
+        readonly InspectEmailVerification: {
+            readonly content: {
+                /**
+                 * @example {
+                 *       "token": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                 *     }
+                 */
+                readonly "application/json": components["schemas"]["AccountTokenInspectionRequest"];
             };
         };
         /** @description The local login identifier, password, client type, optional device presentation, and optional MFA proof. Credentials are sensitive and must never be logged. */
@@ -15332,6 +15922,21 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly inspectEmailChangeUndo: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["InspectEmailChangeUndo"];
+        readonly responses: {
+            readonly 200: components["responses"]["EmailChangeUndoInspected"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 429: components["responses"]["TooManyRequests"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly completeEmailVerification: {
         readonly parameters: {
             readonly query?: never;
@@ -15342,6 +15947,21 @@ export interface operations {
         readonly requestBody: components["requestBodies"]["CompleteEmailVerification"];
         readonly responses: {
             readonly 204: components["responses"]["SensitiveNoContent"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 429: components["responses"]["TooManyRequests"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly inspectEmailVerification: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody: components["requestBodies"]["InspectEmailVerification"];
+        readonly responses: {
+            readonly 200: components["responses"]["EmailVerificationInspected"];
             readonly 400: components["responses"]["BadRequest"];
             readonly 429: components["responses"]["TooManyRequests"];
             readonly 503: components["responses"]["ServiceUnavailable"];
@@ -20090,6 +20710,33 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly search: {
+        readonly parameters: {
+            readonly query: {
+                /** @description Search text of 2 to 100 characters after trimming, matched as a literal case-insensitive substring. */
+                readonly q: string;
+                /** @description Repeated result type filter, such as types=exam&types=user. Omit it to search every type; a type may not repeat. */
+                readonly types?: readonly components["schemas"]["SearchType"][];
+                /** @description Maximum number of items of each type. */
+                readonly limit?: number;
+                /** @description Not accepted. Search answers one bounded page and never issues next_cursor, so any cursor is rejected with request.invalid. */
+                readonly cursor?: string;
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["SearchOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 404: components["responses"]["NotFound"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly reportSecurityPreflight: {
         readonly parameters: {
             readonly query?: never;
@@ -20539,6 +21186,37 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly listCurrentUserAuditEvents: {
+        readonly parameters: {
+            readonly query?: {
+                /** @description Maximum number of items in the page. */
+                readonly limit?: components["parameters"]["PageLimit"];
+                /** @description Opaque next_cursor from the previous page, returned unchanged; omit it for the first page. */
+                readonly cursor?: components["parameters"]["PageCursor"];
+                /** @description Return only events recorded at or after this RFC 3339 instant. */
+                readonly created_after?: string;
+                /** @description Return only events recorded before this RFC 3339 instant; it must be later than `created_after`. */
+                readonly created_before?: string;
+                /** @description Return only these events. Repeat the parameter to select several; omit it for all. */
+                readonly event?: readonly components["schemas"]["SelfAuditEvent"][];
+                /** @description Return only events with this outcome. */
+                readonly status?: "success" | "fail";
+                /** @description Return only events about the User's account (`subject`) or only events the User performed on anything else (`actor`). Omit it for both. */
+                readonly relation?: "subject" | "actor";
+            };
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["SelfAuditListOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly getCurrentUserContext: {
         readonly parameters: {
             readonly query?: never;
@@ -20818,6 +21496,23 @@ export interface operations {
             readonly 503: components["responses"]["ServiceUnavailable"];
         };
     };
+    readonly revokeOtherCurrentUserSessions: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["OtherSessionsRevoked"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     readonly getCurrentUserSettings: {
         readonly parameters: {
             readonly query?: never;
@@ -20892,6 +21587,23 @@ export interface operations {
             readonly 403: components["responses"]["Forbidden"];
             readonly 404: components["responses"]["NotFound"];
             readonly 409: components["responses"]["Conflict"];
+            readonly 500: components["responses"]["InternalError"];
+            readonly 503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    readonly listGrantablePersonalAccessTokenScopes: {
+        readonly parameters: {
+            readonly query?: never;
+            readonly header?: never;
+            readonly path?: never;
+            readonly cookie?: never;
+        };
+        readonly requestBody?: never;
+        readonly responses: {
+            readonly 200: components["responses"]["PersonalAccessTokenGrantableScopesOK"];
+            readonly 400: components["responses"]["BadRequest"];
+            readonly 401: components["responses"]["Unauthorized"];
+            readonly 403: components["responses"]["Forbidden"];
             readonly 500: components["responses"]["InternalError"];
             readonly 503: components["responses"]["ServiceUnavailable"];
         };

@@ -54,7 +54,11 @@ import {
 	readAccountNotices,
 	readAccountToken,
 	readAccountTokenCreation,
-	readAccountTokens
+	readAccountTokens,
+	readAccountGrantableScopes,
+	readAccountHistory,
+	accountHistoryPath,
+	readRevokedSessionCount
 } from '../../account/electron-main/accountWire.js';
 import {
 	createDPoPProof,
@@ -499,9 +503,17 @@ export class DesktopAuthorizationService extends Disposable {
 	/** Closed account capability: credentials, URLs, and arbitrary requests never cross IPC. */
 	async account(binding: AccountBinding, raw: AccountIntent): Promise<AccountResponse> {
 		const intent = validateAccountIntent(raw);
-		if (intent.kind !== 'read' && intent.kind !== 'readPhoto') {
+		if (
+			intent.kind !== 'read' &&
+			intent.kind !== 'readPhoto' &&
+			intent.kind !== 'readHistory'
+		) {
 			const result = await this.accountUncached(binding, intent);
-			if (result.kind === 'success' || result.kind === 'tokenCreated')
+			if (
+				result.kind === 'success' ||
+				result.kind === 'tokenCreated' ||
+				result.kind === 'sessionsEnded'
+			)
 				await this.#api?.invalidate(['account']);
 			return result;
 		}
@@ -573,6 +585,7 @@ export class DesktopAuthorizationService extends Disposable {
 		};
 		const mutation =
 			intent.kind === 'revokeSession' ||
+			intent.kind === 'revokeOtherSessions' ||
 			intent.kind === 'revokeDesktop' ||
 			intent.kind === 'uploadPhoto' ||
 			intent.kind === 'removePhoto' ||
@@ -672,6 +685,18 @@ export class DesktopAuthorizationService extends Disposable {
 				});
 				return response.status === 204 ? { kind: 'success' } : failed(response);
 			}
+			if (intent.kind === 'revokeOtherSessions') {
+				const response = await request('/api/v1/users/me/sessions/revoke-others');
+				return response.status === 200
+					? readRevokedSessionCount(response.value)
+					: failed(response);
+			}
+			if (intent.kind === 'readHistory') {
+				const response = await request(accountHistoryPath(intent));
+				return response.status === 200
+					? { kind: 'data', data: readAccountHistory(response.value) }
+					: failed(response);
+			}
 			if (intent.kind === 'revokeDesktop') {
 				const response = await request(
 					`/api/v1/users/me/desktop-registrations/${intent.id}`
@@ -718,12 +743,15 @@ export class DesktopAuthorizationService extends Disposable {
 				sessions: '/api/v1/users/me/sessions',
 				desktops: '/api/v1/users/me/desktop-registrations',
 				tokens: '/api/v1/users/me/tokens',
+				grantableScopes: '/api/v1/users/me/tokens/grantable-scopes',
 				notices: '/api/v1/users/me/retention-notices?limit=200'
 			} as const;
 			const response = await request(paths[intent.section]);
 			if (response.status !== 200) return failed(response);
 			if (intent.section === 'tokens')
 				return { kind: 'data', data: readAccountTokens(response.value, binding) };
+			if (intent.section === 'grantableScopes')
+				return { kind: 'data', data: readAccountGrantableScopes(response.value) };
 			if (intent.section === 'notices')
 				return { kind: 'data', data: readAccountNotices(response.value) };
 			if (intent.section === 'profile')

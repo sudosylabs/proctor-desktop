@@ -14,16 +14,62 @@
 		font-weight: var(--prctr-typography-weight-medium);
 		padding: 0 0 6px;
 	}
+	.prctr-account-dialog .prctr-account-token-form__scope-list {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		max-block-size: 220px;
+		overflow-y: auto;
+		padding: 2px;
+	}
 	.prctr-account-dialog .prctr-account-token-form__scope {
-		align-items: center;
+		align-items: flex-start;
 		display: flex;
 		gap: 10px;
+	}
+	.prctr-account-dialog .prctr-account-token-form__scope-text {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		min-inline-size: 0;
+	}
+	.prctr-account-dialog .prctr-account-token-form__scope-title {
+		font-size: 13.5px;
+	}
+	.prctr-account-dialog .prctr-account-token-form__scope-description,
+	.prctr-account-dialog .prctr-account-token-form__hint,
+	.prctr-account-dialog .prctr-account-token-form__status {
+		color: var(--prctr-color-text-secondary);
+		font-size: 12.5px;
+		margin: 0;
+	}
+	.prctr-account-dialog .prctr-account-token-form__hint {
+		padding-block-start: 6px;
+	}
+	.prctr-account-dialog .prctr-account-token-form__status--error {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-account-dialog
+		.prctr-account-token-form__scope:has(.prctr-account-token-form__checkbox:disabled) {
+		opacity: 0.55;
+	}
+	.prctr-account-dialog .prctr-account-token-form__row {
+		display: flex;
+		gap: 12px;
+	}
+	.prctr-account-dialog .prctr-account-token-form__row > .prctr-account-token-form__field {
+		flex: 1;
+		min-inline-size: 0;
+	}
+	.prctr-account-dialog .prctr-account-token-form__row > [hidden] {
+		display: none;
 	}
 	.prctr-account-dialog .prctr-account-token-form__checkbox {
 		accent-color: var(--prctr-color-brand-accent);
 		block-size: 16px;
+		flex: none;
 		inline-size: 16px;
-		margin: 0;
+		margin: 2px 0 0;
 	}
 	.prctr-account-dialog .prctr-account-token-form__checkbox:focus-visible,
 	.prctr-account-dialog .prctr-account-token-form__select:focus-visible {
