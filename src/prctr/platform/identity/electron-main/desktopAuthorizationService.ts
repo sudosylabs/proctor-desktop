@@ -358,7 +358,7 @@ export class DesktopAuthorizationService extends Disposable {
 					}
 				);
 			}
-			return parseTokens(result);
+			return parseTokens(result, nonce);
 		} finally {
 			this.#pendingSignInPage = undefined;
 			await listener.stop();
@@ -403,17 +403,19 @@ export class DesktopAuthorizationService extends Disposable {
 				token,
 				false
 			);
-			if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce)
+			if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce) {
+				nonce = result.nonce;
 				result = await this.#requestProof(
 					saved.origin,
 					'/api/v1/auth/refresh',
 					key,
 					saved.refreshToken,
-					result.nonce,
+					nonce,
 					token,
 					false
 				);
-			const next = parseTokens(result);
+			}
+			const next = parseTokens(result, nonce);
 			if (
 				next.sessionId !== saved.sessionId ||
 				next.principalId !== saved.principalId ||

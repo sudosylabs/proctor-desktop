@@ -49,7 +49,11 @@ export function errorCode(result: DesktopHttpResult): string | undefined {
 	const error = result.value as Record<string, unknown>;
 	return typeof error.code === 'string' ? error.code : undefined;
 }
-export function parseTokens(result: DesktopHttpResult): DesktopTokens {
+/**
+ * Reads issued tokens. The server may omit `DPoP-Nonce` on success; the nonce the request just
+ * used was accepted, so it stays current until a challenge says otherwise.
+ */
+export function parseTokens(result: DesktopHttpResult, requestNonce: string): DesktopTokens {
 	if (result.status !== 200) throw new DesktopAuthorizationError('rejected');
 	const body = record(result.value);
 	const session = record(body.session);
@@ -69,6 +73,6 @@ export function parseTokens(result: DesktopHttpResult): DesktopTokens {
 		refreshToken: credential(tokens.refresh_token),
 		accessExpiresAt: expiry(tokens.access_expires_at),
 		refreshExpiresAt: expiry(tokens.refresh_expires_at),
-		nonce: credential(result.nonce)
+		nonce: credential(result.nonce ?? requestNonce)
 	});
 }

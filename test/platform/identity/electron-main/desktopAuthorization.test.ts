@@ -513,6 +513,94 @@ void test('nonce challenge is retried once with a fresh proof, while ambiguous r
 	}
 });
 
+void test('a saved session resumes when the rotated tokens arrive without a new nonce', async () => {
+	const key = softwareTestKey();
+	const { crv, kty, x, y } = key.publicJwk;
+	const challenge = random();
+	const savedRefresh = random();
+	let stored: StoredDesktopSession | undefined = {
+		phase: 'usable',
+		origin: identity.origin,
+		institutionId: identity.institutionId,
+		installationId: identity.installationId,
+		principalId: id,
+		sessionId,
+		registrationId: registration,
+		keyThumbprint: createHash('sha256')
+			.update(JSON.stringify({ crv, kty, x, y }))
+			.digest('base64url'),
+		refreshToken: savedRefresh,
+		refreshExpiresAt: Date.now() + 3600000
+	};
+	let refreshes = 0;
+	let contextNonce: unknown;
+	let opened = 0;
+	const http = new DesktopAuthHttp(async (input, init) => {
+		const path = new URL(String(input)).pathname;
+		if (path.endsWith('/refresh')) {
+			if (++refreshes === 1)
+				return response(
+					{ code: 'authentication.dpop.use_nonce' },
+					401,
+					challenge,
+					'application/problem+json'
+				);
+			// The contract promises no DPoP-Nonce header on a successful rotation.
+			return new Response(JSON.stringify(tokens()), {
+				status: 200,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
+		if (path.endsWith('/context')) {
+			const proof = new Headers(init?.headers).get('DPoP')!;
+			contextNonce = JSON.parse(
+				Buffer.from(proof.split('.')[1]!, 'base64url').toString()
+			).nonce;
+			return response(context());
+		}
+		if (path.endsWith('/logout')) return new Response(null, { status: 204 });
+		throw Error('Unexpected route');
+	});
+	const service = new DesktopAuthorizationService({
+		applicationId: 'fr.sudosy.proctor.test',
+		target,
+		keys: {
+			async loadOrCreate() {
+				return key;
+			},
+			async delete() {}
+		},
+		credentials: {
+			async read() {
+				return stored;
+			},
+			async write(_scope, value) {
+				stored = value;
+			},
+			async delete() {
+				stored = undefined;
+			}
+		},
+		http,
+		callbackPages,
+		async openBrowser() {
+			opened++;
+		},
+		async onAuthenticated() {}
+	});
+	try {
+		await service.start(identity, CancellationToken.None);
+		assert.equal(refreshes, 2);
+		assert.equal(opened, 0, 'a resumed session needs no browser sign-in');
+		assert.equal(stored?.phase, 'usable');
+		assert.notEqual(stored?.refreshToken, savedRefresh);
+		assert.equal(contextNonce, challenge, 'the accepted nonce is kept for the next proof');
+		await service.signOut();
+	} finally {
+		service.dispose();
+	}
+});
+
 void test('ordinary shutdown drains pending rotation and sign-out without restoring credentials', async () => {
 	const key = softwareTestKey();
 	let started: Record<string, unknown>;
