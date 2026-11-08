@@ -2,6 +2,9 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountFormatService } from './accountFormat.js';
+import { IAccountPaneContext } from './accountPaneContext.js';
+import { ILocalizationService } from '../../../services/localization/common/localization.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { BannerControl } from '../../../../base/browser/ui/banner/bannerControl.js';
@@ -22,7 +25,7 @@ import {
 	proctorIconFactory,
 	type ProctorIconControl
 } from '../../../../platform/theme/browser/proctorIcon.js';
-import type { SettingsRendererClient } from '../../../services/settings/common/settingsRendererClient.js';
+import { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
 import {
 	matchingRows,
 	SETTINGS_SAVE_DELAY_MS,
@@ -36,7 +39,7 @@ import {
 	type SettingsTab
 } from '../common/settingsPresentation.js';
 import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageServices, AccountPageView } from './accountPageServices.js';
+import type { AccountPageView } from './accountPages.js';
 import './settingsPage.css';
 import { SCHEME_THEME_NAMES } from '../../../../platform/theme/common/bundledThemes.js';
 import { getTheme } from '../../../../platform/theme/common/themes.js';
@@ -80,8 +83,10 @@ export class SettingsPage extends Disposable implements AccountPageView {
 	constructor(
 		body: HTMLElement,
 		headerActions: HTMLElement,
-		private readonly services: AccountPageServices,
-		private readonly client: SettingsRendererClient
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@ILocalizationService private readonly localization: ILocalizationService,
+		@IUserSettingsService private readonly client: IUserSettingsService
 	) {
 		super();
 		const document = body.ownerDocument;
@@ -99,7 +104,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 		headerActions.append(this.status);
 
 		const tablist = $('div.prctr-settings-page__tabs', {
-			attrs: { role: 'tablist', 'aria-label': services.text('settingsTitle') }
+			attrs: { role: 'tablist', 'aria-label': this.format.text('settingsTitle') }
 		});
 		this.tabs = settingsTabs.map((tab) => {
 			const button = $(
@@ -107,7 +112,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 				{ type: 'button', attrs: { role: 'tab', 'aria-controls': 'prctr-settings-panel' } },
 				this._register(createProctorIcon(document, { id: settingsTabIcons[tab], size: 16 }))
 					.element,
-				services.text(tabMessages[tab])
+				this.format.text(tabMessages[tab])
 			);
 			tablist.append(button);
 			this._register(addDisposableListener(button, 'click', () => this.selectTab(tab)));
@@ -127,8 +132,8 @@ export class SettingsPage extends Disposable implements AccountPageView {
 		);
 		this.find = $('input.prctr-settings-page__find-input', {
 			type: 'search',
-			placeholder: services.text('findSetting'),
-			attrs: { 'aria-label': services.text('findSetting') }
+			placeholder: this.format.text('findSetting'),
+			attrs: { 'aria-label': this.format.text('findSetting') }
 		});
 		const find = $(
 			'label.prctr-settings-page__find',
@@ -229,8 +234,8 @@ export class SettingsPage extends Disposable implements AccountPageView {
 			await draft.set(id, value);
 		} catch {
 			this.pending.delete(id);
-			this.services.toast(this.services.text('settingsNotSaved'), {
-				body: this.services.text('settingsInvalid')
+			this.pane.toast(this.format.text('settingsNotSaved'), {
+				body: this.format.text('settingsInvalid')
 			});
 			this.render();
 			return;
@@ -297,8 +302,8 @@ export class SettingsPage extends Disposable implements AccountPageView {
 		}
 		this.ambiguousRetried = false;
 		this.setStatus('failed');
-		this.services.toast(this.services.text('settingsNotSaved'), {
-			body: this.services.text('settingsKeptHere'),
+		this.pane.toast(this.format.text('settingsNotSaved'), {
+			body: this.format.text('settingsKeptHere'),
 			retry: () => {
 				this.setStatus('saving');
 				void this.save();
@@ -339,7 +344,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 		const entry = presentation[status];
 		this.status.dataset.status = status;
 		this.statusIcon.setState({ id: entry.icon, size: 16 });
-		this.statusText.textContent = this.services.text(entry.text);
+		this.statusText.textContent = this.format.text(entry.text);
 	}
 
 	// #endregion
@@ -370,13 +375,13 @@ export class SettingsPage extends Disposable implements AccountPageView {
 			this.banner.show({
 				tone: 'neutral',
 				icon: proctorIconFactory('status.locked', 18),
-				text: this.services.text('settingsUnavailable')
+				text: this.format.text('settingsUnavailable')
 			});
 		else if (this.tab === 'editor' && this.query.trim() === '')
 			this.banner.show({
 				tone: 'info',
 				icon: proctorIconFactory('status.info', 18),
-				text: this.services.text('settingsExamOverride')
+				text: this.format.text('settingsExamOverride')
 			});
 		else this.banner.hide();
 		const searching = this.query.trim() !== '';
@@ -397,7 +402,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 			if (group.rows.length === 0)
 				card.append(
 					$('p.prctr-settings-page__empty', {
-						textContent: this.services.text('settingsNoMatch')
+						textContent: this.format.text('settingsNoMatch')
 					})
 				);
 			this.groups.append(
@@ -405,7 +410,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 					'section.prctr-settings-page__group',
 					{},
 					$('h2.prctr-settings-page__group-title', {
-						textContent: this.services.text(group.title as AccountMessage)
+						textContent: this.format.text(group.title as AccountMessage)
 					}),
 					card
 				)
@@ -419,16 +424,16 @@ export class SettingsPage extends Disposable implements AccountPageView {
 	} {
 		const declaration = settingsRegistry.declaration(id)!;
 		return {
-			title: this.services.localization.format(declaration.title),
-			description: this.services.localization.format(declaration.description)
+			title: this.localization.format(declaration.title),
+			description: this.localization.format(declaration.description)
 		};
 	}
 
 	private choiceLabel(choice: SettingChoice): string {
 		if (choice.label.startsWith('percent:'))
-			return this.services.text('percentValue', { value: Number(choice.label.slice(8)) });
+			return this.format.text('percentValue', { value: Number(choice.label.slice(8)) });
 		if (choice.label.startsWith('number:')) return choice.label.slice(7);
-		return this.services.text(choice.label as AccountMessage);
+		return this.format.text(choice.label as AccountMessage);
 	}
 
 	private renderRow($: ReturnType<typeof createElementFactory>, row: SettingRow): HTMLElement {
@@ -451,8 +456,8 @@ export class SettingsPage extends Disposable implements AccountPageView {
 				new ButtonControl(element, {
 					variant: 'ghost',
 					size: 'small',
-					label: this.services.text('resetSetting'),
-					accessibleLabel: this.services.text('resetSettingNamed', { name: title }),
+					label: this.format.text('resetSetting'),
+					accessibleLabel: this.format.text('resetSettingNamed', { name: title }),
 					icon: proctorIconFactory('action.reset', 14),
 					disabled
 				})
@@ -472,9 +477,9 @@ export class SettingsPage extends Disposable implements AccountPageView {
 					value: Number(value),
 					minimum: control.minimum,
 					maximum: control.maximum,
-					format: (current) => this.services.text('pixels', { value: current }),
-					decreaseLabel: this.services.text('smaller'),
-					increaseLabel: this.services.text('larger'),
+					format: (current) => this.format.text('pixels', { value: current }),
+					decreaseLabel: this.format.text('smaller'),
+					increaseLabel: this.format.text('larger'),
 					decreaseIcon: proctorIconFactory('action.decrease', 12),
 					increaseIcon: proctorIconFactory('action.increase', 12),
 					disabled
@@ -580,7 +585,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 			]
 		];
 		const code = $('div.prctr-settings-page__code', {
-			attrs: { 'aria-label': this.services.text('editorPreview') }
+			attrs: { 'aria-label': this.format.text('editorPreview') }
 		});
 		code.style.fontSize = `${size}px`;
 		code.style.lineHeight = `${height}px`;
@@ -617,7 +622,7 @@ export class SettingsPage extends Disposable implements AccountPageView {
 		});
 		this.preview.replaceChildren(
 			$('span.prctr-settings-page__preview-label', {
-				textContent: this.services.text('editorPreviewLabel', { theme, size })
+				textContent: this.format.text('editorPreviewLabel', { theme, size })
 			}),
 			code
 		);

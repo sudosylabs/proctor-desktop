@@ -9,6 +9,10 @@ import { SyncDescriptor } from '../../platform/instantiation/common/descriptors.
 import type { ServiceCollection } from '../../platform/instantiation/common/serviceCollection.js';
 import type { SettingsClipboardClient } from '../../platform/settings/common/settingsNativeHost.js';
 import type { WorkbenchServicesInitializer } from '../../workbench/browser/bootstrap.js';
+import {
+	AccountFormatService,
+	IAccountFormatService
+} from '../../workbench/contrib/account/browser/accountFormat.js';
 import { AuthenticatedFrame } from '../../workbench/browser/authenticated/authenticatedFrame.js';
 import { IAuthenticatedNavigationService } from '../../workbench/services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { installAuthenticatedWindowServices } from '../../workbench/browser/authenticated/authenticatedWindowServices.js';
@@ -54,6 +58,7 @@ export function authenticatedWindowServices(
 			new AuthenticatedHostService(preload, preload.examActivity !== undefined)
 		);
 		services.set(IAccountService, new SyncDescriptor(AccountService, [preload.account]));
+		services.set(IAccountFormatService, new SyncDescriptor(AccountFormatService, [Date.now]));
 		if (preload.examActivity !== undefined) {
 			services.set(IExamActivityService, new ExamActivityService(preload.examActivity));
 		}

@@ -2,60 +2,30 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { ToastHost } from '../../../../base/browser/ui/toast/toastHost.js';
-import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
 import { DomScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
+import { ToastHost } from '../../../../base/browser/ui/toast/toastHost.js';
 import type { CancellationToken } from '../../../../base/common/cancellation.js';
 import { Event } from '../../../../base/common/event.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
-import type { LocalizationContext } from '../../../../base/common/localization.js';
 import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
-import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
-import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
+import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
+import { ServiceCollection } from '../../../../platform/instantiation/common/serviceCollection.js';
+import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
+import { IWorkbenchOverlayService } from '../../../browser/workbenchServices.js';
 import type { ResolvedWorkbenchItem } from '../../../common/workbenchItem.js';
 import type { AccountPage } from '../../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
-import { accountMessages, type AccountMessage } from './accountMessages.js';
-import {
-	AccountPageServices,
-	type AccountPageView,
-	type AccountWindowHooks
-} from './accountPageServices.js';
-import { ProfilePage } from './profilePage.js';
-import { SecurityPage } from './securityPage.js';
-import { SessionsPage } from './sessionsPage.js';
-import { HistoryPage } from './historyPage.js';
-import { SettingsPage } from './settingsPage.js';
-import type { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
-import type { IAccountService } from '../../../services/account/common/account.js';
-import { TokensPage } from './tokensPage.js';
+import { IAccountFormatService } from './accountFormat.js';
+import { accountPageRegistry, type AccountPageView } from './accountPages.js';
+import { AccountPaneContext, IAccountPaneContext } from './accountPaneContext.js';
 import './accountPage.css';
 
 export interface AccountModel extends ResolvedWorkbenchItem {
 	readonly page: AccountPage;
 }
-
-export interface AccountPaneOptions {
-	readonly client: IAccountService;
-	readonly localization: LocalizationContext;
-	readonly binding: AuthenticatedWindowDescriptor;
-	readonly overlays: WorkbenchOverlayHost;
-	readonly hooks: AccountWindowHooks;
-	readonly settings: IUserSettingsService;
-	readonly now?: () => number;
-}
-
-const pageTitles: Readonly<Record<AccountPage, AccountMessage>> = Object.freeze({
-	profile: 'profileTitle',
-	security: 'securityTitle',
-	sessions: 'sessionsTitle',
-	tokens: 'tokensTitle',
-	history: 'historyTitle',
-	settings: 'settingsTitle'
-});
 
 /**
  * The Account pages' pane in the content area: the page heading and description,
@@ -71,14 +41,18 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 	private readonly description: HTMLElement;
 	private readonly headerActions: HTMLElement;
 	private readonly body: HTMLElement;
-	private readonly services: AccountPageServices;
 	private readonly menu: MenuControl;
-	private readonly toasts: ToastHost;
-	private readonly settings: IUserSettingsService;
+	/** Creates the pane's pages with its row menu, toasts and focus in scope. */
+	private readonly scopedInstantiationService: IInstantiationService;
 	private readonly page = this._register(new MutableDisposable<AccountPageView>());
 	private visible = false;
 
-	constructor(document: Document, options: AccountPaneOptions) {
+	constructor(
+		document: Document,
+		@IInstantiationService instantiationService: IInstantiationService,
+		@IWorkbenchOverlayService overlays: IWorkbenchOverlayService,
+		@IAccountFormatService private readonly format: IAccountFormatService
+	) {
 		super();
 		const $ = createElementFactory(document);
 		this.heading = $('h1.prctr-account__title', { tabIndex: -1 });
@@ -108,33 +82,28 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		this.element = $('section.prctr-account', {}, this.scroll.getDomNode());
 		this.menu = this._register(
 			new MenuControl(this.element, {
-				canInteract: () => !options.overlays.visible,
-				onDidChangeInteraction: Event.map(
-					options.overlays.onDidChangeVisibility,
-					() => undefined
-				),
+				canInteract: () => !overlays.visible,
+				onDidChangeInteraction: Event.map(overlays.onDidChangeVisibility, () => undefined),
 				restoreFocus: () => this.focus(),
 				onActionError: () => undefined
 			})
 		);
-		this.settings = options.settings;
-		this.toasts = this._register(
+		const toasts = this._register(
 			new ToastHost(this.element, {
-				dismissLabel: options.localization.format(accountMessages.dismiss),
+				dismissLabel: format.text('dismiss'),
 				dismissIcon: proctorIconFactory('action.close', 14)
 			})
 		);
-		this.services = new AccountPageServices(
+		const context = new AccountPaneContext(
 			document,
-			options.client,
-			options.localization,
-			options.binding,
-			options.overlays,
+			overlays,
 			this.menu,
-			this.toasts,
-			options.hooks,
-			() => this.focus(),
-			options.now
+			toasts,
+			format.text('retry'),
+			() => this.focus()
+		);
+		this.scopedInstantiationService = this._register(
+			instantiationService.createChild(new ServiceCollection([IAccountPaneContext, context]))
 		);
 		this.registerListeners();
 	}
@@ -190,9 +159,14 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		this.element.dataset.page = page;
 		this.heading.id = `prctr-account-${page}-title`;
 		this.element.setAttribute('aria-labelledby', this.heading.id);
-		this.heading.textContent = this.services.text(pageTitles[page]);
-		this.description.textContent = this.pageDescription(page);
-		this.page.value = this.createPage(page);
+		const descriptor = accountPageRegistry[page];
+		this.heading.textContent = this.format.text(descriptor.title);
+		this.description.textContent = descriptor.description(this.format);
+		this.page.value = descriptor.create(
+			this.scopedInstantiationService,
+			this.body,
+			this.headerActions
+		);
 		this.page.value.setVisible(this.visible);
 		this.scroll.setScrollPosition({ scrollTop: 0 });
 	}
@@ -228,26 +202,5 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		this.clear();
 		super.dispose();
 		this.element.remove();
-	}
-
-	private pageDescription(page: AccountPage): string {
-		if (page === 'profile')
-			return this.services.institutionText('profileDescription', 'profileDescriptionGeneric');
-		if (page === 'security') return this.services.text('securityDescription');
-		if (page === 'sessions') return this.services.text('sessionsDescription');
-		if (page === 'history') return this.services.text('historyDescription');
-		if (page === 'settings') return this.services.text('settingsDescription');
-		return this.services.text('tokensDescription');
-	}
-
-	private createPage(page: AccountPage): AccountPageView {
-		if (page === 'profile') return new ProfilePage(this.body, this.services);
-		if (page === 'security')
-			return new SecurityPage(this.body, this.headerActions, this.services);
-		if (page === 'sessions') return new SessionsPage(this.body, this.services);
-		if (page === 'history') return new HistoryPage(this.body, this.services);
-		if (page === 'settings')
-			return new SettingsPage(this.body, this.headerActions, this.services, this.settings);
-		return new TokensPage(this.body, this.headerActions, this.services);
 	}
 }

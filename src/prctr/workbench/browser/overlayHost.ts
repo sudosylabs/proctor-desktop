@@ -32,6 +32,7 @@ export interface ModalOverlayOptions {
 }
 
 export class WorkbenchOverlayHost extends Disposable {
+	declare readonly _serviceBrand: undefined;
 	readonly element: HTMLDivElement;
 	readonly notificationLayer: HTMLDivElement;
 	readonly #visibility = this._register(new Emitter<boolean>());

@@ -2,6 +2,11 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountService } from '../../../services/account/common/account.js';
+import { IAccountFormatService } from './accountFormat.js';
+import { IWorkbenchWindowService } from '../../../browser/workbenchServices.js';
+import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
+import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
@@ -23,7 +28,7 @@ import {
 } from '../common/accountPresentation.js';
 import { AccountConfirmation } from './accountConfirmation.js';
 import { AccountFeedback } from './accountFeedback.js';
-import type { AccountPageServices, AccountPageView } from './accountPageServices.js';
+import type { AccountPageView } from './accountPages.js';
 import { AccountPhotoDialog } from './accountPhotoDialog.js';
 import { AccountRead } from './accountRead.js';
 import { AccountSection, type AccountRowModel } from './accountSection.js';
@@ -72,22 +77,37 @@ export class ProfilePage extends Disposable implements AccountPageView {
 	private photo: Photo | undefined;
 	private photoRead = 0;
 
+	/** Who the window's privileged binding says is signed in, before the profile is read. */
+	private readonly identity: AuthenticatedWindowDescriptor['identity'];
+
 	constructor(
 		body: HTMLElement,
-		private readonly services: AccountPageServices
+		_headerActions: HTMLElement,
+		@IAccountService private readonly account: IAccountService,
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IWorkbenchWindowService windowService: IWorkbenchWindowService,
+		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
+		const binding = windowService.binding;
+		this.identity = binding.kind === 'authenticated' ? binding.identity : undefined;
 		const document = body.ownerDocument;
 		const $ = createElementFactory(document);
-		this.profile = this._register(new AccountRead(services, 'profile'));
-		this.sessions = this._register(new AccountRead(services, 'sessions'));
-		this.notices = this._register(new AccountRead(services, 'notices'));
+		this.profile = this._register(
+			this.instantiationService.createInstance(AccountRead<'profile'>, 'profile')
+		);
+		this.sessions = this._register(
+			this.instantiationService.createInstance(AccountRead<'sessions'>, 'sessions')
+		);
+		this.notices = this._register(
+			this.instantiationService.createInstance(AccountRead<'notices'>, 'notices')
+		);
 
 		this.avatar = $('span.prctr-account-profile__avatar', { attrs: { 'aria-hidden': 'true' } });
 		this.name = $('p.prctr-account-profile__name');
 		this.username = $('p.prctr-account-profile__username');
 		const names = $('div.prctr-account-profile__names', {}, this.name, this.username);
-		if (services.institution !== undefined)
+		if (this.format.institution !== undefined)
 			names.append(
 				$(
 					'p.prctr-account-profile__institution',
@@ -95,7 +115,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 					this._register(
 						createProctorIcon(document, { id: 'object.institution', size: 14 })
 					).element,
-					services.institution
+					this.format.institution
 				)
 			);
 		const identity = $('div.prctr-account-profile__identity', {}, this.avatar, names);
@@ -104,14 +124,14 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		this.removePhoto = this._register(
 			new ButtonControl(photoActions, {
 				variant: 'ghost',
-				label: services.text('removePhoto'),
+				label: this.format.text('removePhoto'),
 				icon: proctorIconFactory('action.delete')
 			})
 		);
 		this.changePhoto = this._register(
 			new ButtonControl(photoActions, {
 				variant: 'secondary',
-				label: services.text('changePhoto'),
+				label: this.format.text('changePhoto'),
 				icon: CHANGE_PHOTO_ICON,
 				disabled: true
 			})
@@ -127,9 +147,9 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		this.photoFeedback = this._register(new AccountFeedback(identityBlock));
 
 		this.details = this._register(
-			new AccountSection(body, services, {
-				title: services.text('accountDetails'),
-				description: services.institutionText('detailsManaged', 'detailsManagedGeneric')
+			this.instantiationService.createInstance(AccountSection, body, {
+				title: this.format.text('accountDetails'),
+				description: this.format.institutionText('detailsManaged', 'detailsManagedGeneric')
 			})
 		);
 		const list = $('dl.prctr-account-details');
@@ -153,7 +173,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			createProctorIcon(document, { id: 'action.sendEmail', size: 18 })
 		);
 		const noticeText = $('p.prctr-account-notice__text', {
-			textContent: services.text('unverifiedNotice')
+			textContent: this.format.text('unverifiedNotice')
 		});
 		this.unverified = $(
 			'div.prctr-account-notice',
@@ -165,7 +185,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			new ButtonControl(this.unverified, {
 				variant: 'secondary',
 				size: 'small',
-				label: services.text('sendVerification'),
+				label: this.format.text('sendVerification'),
 				icon: SEND_EMAIL_ICON
 			})
 		);
@@ -174,16 +194,16 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		this.verificationFeedback = this._register(new AccountFeedback(body));
 		this.unverified.after(this.verificationFeedback.element);
 
-		const identityContext = services.binding.identity;
+		const identityContext = this.identity;
 		if (identityContext?.noCurrentAffiliation)
-			this.details.element.before(this.plainNotice($, services.text('noAffiliation')));
+			this.details.element.before(this.plainNotice($, this.format.text('noAffiliation')));
 		if (identityContext?.noAssignedAccess)
-			this.details.element.before(this.plainNotice($, services.text('noAccess')));
+			this.details.element.before(this.plainNotice($, this.format.text('noAccess')));
 
 		this.noticeSection = this._register(
-			new AccountSection(body, services, {
-				title: services.text('noticesTitle'),
-				description: services.institutionText(
+			this.instantiationService.createInstance(AccountSection, body, {
+				title: this.format.text('noticesTitle'),
+				description: this.format.institutionText(
 					'noticesDescription',
 					'noticesDescriptionGeneric'
 				)
@@ -191,7 +211,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		);
 		this.noticesMore = $('p.prctr-account-section__more', {
 			hidden: true,
-			textContent: services.text('noticesMore')
+			textContent: this.format.text('noticesMore')
 		});
 		this.noticeSection.element.append(this.noticesMore);
 		this.noticeSection.hidden = true;
@@ -231,7 +251,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		const row = $(
 			'div.prctr-account-details__row',
 			{},
-			$('dt.prctr-account-details__label', { textContent: this.services.text(label) }),
+			$('dt.prctr-account-details__label', { textContent: this.format.text(label) }),
 			value,
 			note
 		);
@@ -250,7 +270,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		list.hidden = data === undefined;
 		const displayName =
 			data === undefined
-				? (this.services.binding.identity?.displayName ?? '')
+				? (this.identity?.displayName ?? '')
 				: data.displayName || data.username;
 		this.name.textContent = displayName;
 		this.username.textContent = data?.username ?? '';
@@ -266,7 +286,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 	private renderDetails(profile: AccountProfile): void {
 		const text = (key: DetailKey, value: string | undefined): void => {
 			const row = this.detailRows[key];
-			row.value.textContent = value || this.services.text('notProvided');
+			row.value.textContent = value || this.format.text('notProvided');
 			row.value.dataset.empty = String(!value);
 		};
 		text('firstName', profile.firstName);
@@ -274,17 +294,17 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		text('email', profile.email);
 		text(
 			'language',
-			profile.locale === undefined ? undefined : this.services.languageName(profile.locale)
+			profile.locale === undefined ? undefined : this.format.languageName(profile.locale)
 		);
 		text('timeZone', profile.timezone);
-		text('memberSince', this.services.date(profile.createdAt));
+		text('memberSince', this.format.date(profile.createdAt));
 		const emailNote = this.detailRows.email.note;
 		const verified = profile.emailVerified;
 		emailNote.hidden = profile.email === undefined || verified === undefined;
 		emailNote.dataset.verified = String(verified === true);
 		emailNote.replaceChildren(
 			this.noteIcon.element,
-			this.services.text(verified ? 'emailVerified' : 'emailUnverified')
+			this.format.text(verified ? 'emailVerified' : 'emailUnverified')
 		);
 		this.noteIcon.setState({ id: verified ? 'status.verified' : 'status.warning', size: 14 });
 		this.unverified.hidden = profile.email === undefined || verified !== false;
@@ -294,9 +314,9 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		if (current !== undefined)
 			text(
 				'lastSignIn',
-				this.services.text('lastSignInValue', {
-					when: this.services.relative(current.createdAt),
-					client: this.services.text(clientKind(current.client))
+				this.format.text('lastSignInValue', {
+					when: this.format.relative(current.createdAt),
+					client: this.format.text(clientKind(current.client))
 				})
 			);
 	}
@@ -318,12 +338,12 @@ export class ProfilePage extends Disposable implements AccountPageView {
 						? 'object.browserActivity'
 						: 'object.file',
 				title: notice.examTitle,
-				detail: this.services.join(
-					this.services.text('noticeKind', {
-						category: this.services.text(presentation.category),
-						date: this.services.date(notice.sittingStartAt)
+				detail: this.format.join(
+					this.format.text('noticeKind', {
+						category: this.format.text(presentation.category),
+						date: this.format.date(notice.sittingStartAt)
 					}),
-					this.services.date(notice.createdAt)
+					this.format.date(notice.createdAt)
 				),
 				status: {
 					text: this.noticeWhen(presentation.when, presentation.date),
@@ -340,27 +360,27 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		when: 'noticeDeletedAfter' | 'noticeDeletionCanceled' | 'noticeDeleted',
 		date: number | undefined
 	): string {
-		if (when === 'noticeDeleted') return this.services.text('noticeDeleted');
-		if (date === undefined) return this.services.text('noticeDeletionCanceledUndated');
-		return this.services.text(when, { date: this.services.date(date) });
+		if (when === 'noticeDeleted') return this.format.text('noticeDeleted');
+		if (date === undefined) return this.format.text('noticeDeletionCanceledUndated');
+		return this.format.text(when, { date: this.format.date(date) });
 	}
 
 	// #region Photo
 
 	private async loadPhoto(): Promise<void> {
 		const read = ++this.photoRead;
-		const result = await this.services.request({ kind: 'readPhoto' });
+		const result = await this.account.request({ kind: 'readPhoto' });
 		if (this._store.isDisposed || read !== this.photoRead) return;
 		if (result.kind === 'photo') {
 			this.applyPhoto(result);
 			return;
 		}
 		this.changePhoto.setState({
-			label: this.services.text('changePhoto'),
+			label: this.format.text('changePhoto'),
 			icon: CHANGE_PHOTO_ICON,
 			disabled: true
 		});
-		this.photoFeedback.set(this.services.text('photoUnavailable'), 'error');
+		this.photoFeedback.set(this.format.text('photoUnavailable'), 'error');
 	}
 
 	private applyPhoto(photo: Photo): void {
@@ -370,12 +390,12 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			src: photo.dataUrl
 		});
 		this.avatar.replaceChildren(image);
-		this.services.setPhoto(photo.dataUrl);
+		this.account.setPhoto(photo.dataUrl);
 		this.changePhoto.setState({
-			label: this.services.text('changePhoto'),
+			label: this.format.text('changePhoto'),
 			icon: CHANGE_PHOTO_ICON
 		});
-		this.removePhoto.element.hidden = !this.services.customPhotos.has(photo.etag);
+		this.removePhoto.element.hidden = !this.account.customPhotos.has(photo.etag);
 	}
 
 	private onFileChosen(): void {
@@ -383,15 +403,15 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		this.fileInput.value = '';
 		if (!file || !this.photo) return;
 		this.photoFeedback.set();
-		this.dialog.value = new AccountPhotoDialog(
-			this.services,
+		this.dialog.value = this.instantiationService.createInstance(
+			AccountPhotoDialog,
 			this.photo.etag,
 			file,
 			(photo) => {
 				if (this._store.isDisposed) return;
-				this.services.customPhotos.add(photo.etag);
+				this.account.customPhotos.add(photo.etag);
 				this.applyPhoto(photo);
-				this.photoFeedback.set(this.services.text('photoUpdated'), 'success');
+				this.photoFeedback.set(this.format.text('photoUpdated'), 'success');
 			},
 			(needsRefresh) => {
 				if (this._store.isDisposed) return;
@@ -407,19 +427,19 @@ export class ProfilePage extends Disposable implements AccountPageView {
 	private confirmRemovePhoto(): void {
 		const photo = this.photo;
 		if (photo === undefined) return;
-		this.dialog.value = new AccountConfirmation(
-			this.services,
+		this.dialog.value = this.instantiationService.createInstance(
+			AccountConfirmation,
 			{
-				title: this.services.text('confirmRemovePhotoTitle'),
-				message: this.services.text('confirmRemovePhotoBody'),
-				confirmLabel: this.services.text('removePhoto'),
-				run: () => this.services.change({ kind: 'removePhoto', etag: photo.etag }),
+				title: this.format.text('confirmRemovePhotoTitle'),
+				message: this.format.text('confirmRemovePhotoBody'),
+				confirmLabel: this.format.text('removePhoto'),
+				run: () => this.account.change({ kind: 'removePhoto', etag: photo.etag }),
 				onDidComplete: (result) => {
 					if (result.kind === 'success') {
-						this.services.customPhotos.delete(photo.etag);
-						this.photoFeedback.set(this.services.text('photoRemoved'), 'success');
+						this.account.customPhotos.delete(photo.etag);
+						this.photoFeedback.set(this.format.text('photoRemoved'), 'success');
 					} else if (result.kind === 'error') {
-						this.photoFeedback.set(this.services.failure(result.reason), 'error');
+						this.photoFeedback.set(this.format.failure(result.reason), 'error');
 					}
 					this.photo = undefined;
 					void this.loadPhoto();
@@ -434,19 +454,19 @@ export class ProfilePage extends Disposable implements AccountPageView {
 
 	private async requestVerification(): Promise<void> {
 		this.sendVerification.setState({
-			label: this.services.text('sendVerification'),
+			label: this.format.text('sendVerification'),
 			icon: SEND_EMAIL_ICON,
 			busy: true
 		});
-		const result = await this.services.change({ kind: 'requestEmailVerification' });
+		const result = await this.account.change({ kind: 'requestEmailVerification' });
 		if (this._store.isDisposed) return;
 		this.sendVerification.setState({
-			label: this.services.text('sendVerification'),
+			label: this.format.text('sendVerification'),
 			icon: SEND_EMAIL_ICON
 		});
-		if (result === 'busy') this.verificationFeedback.set(this.services.text('busy'), 'error');
+		if (result === 'busy') this.verificationFeedback.set(this.format.text('busy'), 'error');
 		else if (result.kind === 'error')
-			this.verificationFeedback.set(this.services.failure(result.reason), 'error');
-		else this.verificationFeedback.set(this.services.text('verificationSent'), 'success');
+			this.verificationFeedback.set(this.format.failure(result.reason), 'error');
+		else this.verificationFeedback.set(this.format.text('verificationSent'), 'success');
 	}
 }

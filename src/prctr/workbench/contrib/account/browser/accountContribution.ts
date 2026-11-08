@@ -5,43 +5,32 @@
 import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
 import { Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
+import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import type {
 	AccountData,
 	AccountIntent,
 	AccountResponse
 } from '../../../../platform/account/common/accountProtocol.js';
-import { IClipboardService } from '../../../../platform/clipboard/common/clipboardService.js';
 import { SETTINGS_MANIFEST } from '../../../../platform/settings/common/settingsManifest.js';
 import type { WorkbenchContributionRegistration } from '../../../browser/bootstrap.js';
 import {
 	IWorkbenchItemResolverService,
 	IWorkbenchPaneHostService,
-	IWorkbenchShellService,
 	IWorkbenchWindowService
 } from '../../../browser/workbenchServices.js';
 import type { WorkbenchItem } from '../../../common/workbenchItem.js';
 import { IAccountService } from '../../../services/account/common/account.js';
 import { ILocalizationService } from '../../../services/localization/common/localization.js';
-import { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
-import { IAuthenticatedHoverService } from '../../../browser/authenticated/authenticatedHover.js';
 import {
 	accountPages,
 	IAuthenticatedNavigationService,
 	type AccountPage
 } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
-import { accountMessages as messages, type AccountMessage } from './accountMessages.js';
+import { accountMessages as messages } from './accountMessages.js';
+import { accountPageRegistry } from './accountPages.js';
 import { AccountPane, type AccountModel } from './accountPane.js';
 
 const ACCOUNT_ITEM_TYPE = 'prctr.authenticated.account';
-
-const pageTitles: Readonly<Record<AccountPage, AccountMessage>> = Object.freeze({
-	profile: 'profileTitle',
-	security: 'securityTitle',
-	sessions: 'sessionsTitle',
-	tokens: 'tokensTitle',
-	history: 'historyTitle',
-	settings: 'settingsTitle'
-});
 
 /** Account's pages in the content area, opened from the Account sidebar. */
 class AccountContribution extends Disposable {
@@ -57,14 +46,10 @@ class AccountContribution extends Disposable {
 		@IWorkbenchItemResolverService registry: IWorkbenchItemResolverService,
 		@ILocalizationService private readonly localization: ILocalizationService,
 		@IWorkbenchWindowService windowService: IWorkbenchWindowService,
-		@IWorkbenchShellService shell: IWorkbenchShellService,
-		@IAuthenticatedHoverService hover: IAuthenticatedHoverService,
-		@IClipboardService clipboard: IClipboardService,
-		@IUserSettingsService settings: IUserSettingsService
+		@IInstantiationService instantiationService: IInstantiationService
 	) {
 		super();
-		const binding = windowService.binding;
-		if (binding.kind !== 'authenticated') {
+		if (windowService.binding.kind !== 'authenticated') {
 			throw new Error('Account requires an authenticated binding');
 		}
 		this.items = new Map(accountPages.map((page) => [page, accountItem(page, localization)]));
@@ -80,18 +65,7 @@ class AccountContribution extends Disposable {
 					return { item, page, dispose() {} };
 				},
 				createPane(document) {
-					return new AccountPane(document, {
-						client: account,
-						localization,
-						binding,
-						overlays: shell.overlayHost,
-						settings,
-						hooks: {
-							signOut: () => navigation.signOut(),
-							hover: (target, label) => hover.setupHover(target, label),
-							writeClipboard: (text) => clipboard.writeText(text)
-						}
-					});
+					return instantiationService.createInstance(AccountPane, document);
 				}
 			})
 		);
@@ -179,7 +153,7 @@ export const accountContribution: WorkbenchContributionRegistration = Object.fre
 });
 
 function accountItem(page: AccountPage, localization: ILocalizationService): WorkbenchItem {
-	const title = localization.format(messages[pageTitles[page]]);
+	const title = localization.format(messages[accountPageRegistry[page].title]);
 	return {
 		typeId: ACCOUNT_ITEM_TYPE,
 		logicalIdentity: page,

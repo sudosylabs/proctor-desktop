@@ -2,6 +2,9 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountService } from '../../../services/account/common/account.js';
+import { IAccountFormatService } from './accountFormat.js';
+import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
@@ -17,7 +20,7 @@ import {
 } from '../common/accountPresentation.js';
 import { AccountFeedback } from './accountFeedback.js';
 import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageServices, AccountPageView } from './accountPageServices.js';
+import type { AccountPageView } from './accountPages.js';
 import { AccountRead } from './accountRead.js';
 import { AccountSection, type AccountRowModel } from './accountSection.js';
 
@@ -45,28 +48,32 @@ export class SecurityPage extends Disposable implements AccountPageView {
 	constructor(
 		body: HTMLElement,
 		headerActions: HTMLElement,
-		private readonly services: AccountPageServices
+		@IAccountService private readonly account: IAccountService,
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
 		const document = body.ownerDocument;
 		const $ = createElementFactory(document);
-		this.security = this._register(new AccountRead(services, 'security'));
+		this.security = this._register(
+			this.instantiationService.createInstance(AccountRead<'security'>, 'security')
+		);
 		this.open = this._register(
 			new ButtonControl(headerActions, {
 				variant: 'secondary',
-				label: services.text('openSecurity'),
+				label: this.format.text('openSecurity'),
 				icon: proctorIconFactory('action.openExternal')
 			})
 		);
 		this.openFeedback = this._register(new AccountFeedback(body));
 		this.ways = this._register(
-			new AccountSection(body, services, {
-				title: services.text('waysToSignIn')
+			this.instantiationService.createInstance(AccountSection, body, {
+				title: this.format.text('waysToSignIn')
 			})
 		);
 		this.twoStep = this._register(
-			new AccountSection(body, services, {
-				title: services.text('twoStep')
+			this.instantiationService.createInstance(AccountSection, body, {
+				title: this.format.text('twoStep')
 			})
 		);
 		const lock = this._register(createProctorIcon(document, { id: 'status.locked', size: 16 }));
@@ -76,7 +83,7 @@ export class SecurityPage extends Disposable implements AccountPageView {
 				{},
 				lock.element,
 				$('p.prctr-account-footnote__text', {
-					textContent: services.institutionText(
+					textContent: this.format.institutionText(
 						'securityFootnote',
 						'securityFootnoteGeneric'
 					)
@@ -108,11 +115,11 @@ export class SecurityPage extends Disposable implements AccountPageView {
 			id: `provider-${index}`,
 			glyph: 'object.institution',
 			title: provider.name,
-			detail: this.services.text(
+			detail: this.format.text(
 				providerKind(provider.type) === 'singleSignOn' ? 'singleSignOn' : 'otherProvider'
 			),
 			status: {
-				text: this.services.text('statusLinked'),
+				text: this.format.text('statusLinked'),
 				icon: 'action.confirm',
 				tone: 'success'
 			}
@@ -121,17 +128,17 @@ export class SecurityPage extends Disposable implements AccountPageView {
 		rows.push({
 			id: 'password',
 			glyph: 'object.password',
-			title: this.services.text('password'),
+			title: this.format.text('password'),
 			detail: !security.password
-				? this.services.text('passwordNotSet')
+				? this.format.text('passwordNotSet')
 				: changed === undefined
-					? this.services.text('passwordSet')
-					: this.services.text('passwordChangedOn', {
-							date: this.services.date(changed)
+					? this.format.text('passwordSet')
+					: this.format.text('passwordChangedOn', {
+							date: this.format.date(changed)
 						}),
 			status: security.password
-				? { text: this.services.text('statusSet'), icon: 'action.confirm', tone: 'success' }
-				: { text: this.services.text('statusNotSet'), icon: 'action.close', tone: 'quiet' }
+				? { text: this.format.text('statusSet'), icon: 'action.confirm', tone: 'success' }
+				: { text: this.format.text('statusNotSet'), icon: 'action.close', tone: 'quiet' }
 		});
 		return rows;
 	}
@@ -139,23 +146,23 @@ export class SecurityPage extends Disposable implements AccountPageView {
 	private twoStepDetail(security: AccountSecurity, status: TwoStepStatus): string {
 		const mfa = security.mfa;
 		if (status !== 'on' || mfa?.method !== 'authenticatorApp')
-			return this.services.text(twoStepMessages[status]);
+			return this.format.text(twoStepMessages[status]);
 		return mfa.enabledAt === undefined
-			? this.services.text('twoStepApp')
-			: this.services.text('twoStepAppSince', { date: this.services.date(mfa.enabledAt) });
+			? this.format.text('twoStepApp')
+			: this.format.text('twoStepAppSince', { date: this.format.date(mfa.enabledAt) });
 	}
 
 	private twoStepRows(security: AccountSecurity): AccountRowModel[] {
 		const presentation = twoStepPresentation(security.mfa);
 		const status: AccountRowModel['status'] =
 			presentation.status === 'on'
-				? { text: this.services.text('statusOn'), icon: 'status.success', tone: 'success' }
+				? { text: this.format.text('statusOn'), icon: 'status.success', tone: 'success' }
 				: presentation.status === 'off'
-					? { text: this.services.text('statusOff'), icon: 'action.close', tone: 'quiet' }
+					? { text: this.format.text('statusOff'), icon: 'action.close', tone: 'quiet' }
 					: presentation.status === 'notOffered'
 						? undefined
 						: {
-								text: this.services.text('statusNeedsAttention'),
+								text: this.format.text('statusNeedsAttention'),
 								icon: 'status.warning',
 								tone: 'warning'
 							};
@@ -163,7 +170,7 @@ export class SecurityPage extends Disposable implements AccountPageView {
 			{
 				id: 'two-step',
 				glyph: 'account.security',
-				title: this.services.text('twoStep'),
+				title: this.format.text('twoStep'),
 				detail: this.twoStepDetail(security, presentation.status),
 				...(status === undefined ? {} : { status })
 			}
@@ -174,21 +181,21 @@ export class SecurityPage extends Disposable implements AccountPageView {
 			rows.push({
 				id: 'recovery-codes',
 				glyph: 'object.key',
-				title: this.services.text('recoveryCodes'),
+				title: this.format.text('recoveryCodes'),
 				detail:
 					mfa?.recoveryCodesGeneratedAt === undefined
-						? this.services.text('recoveryCodesOnce')
-						: this.services.text('recoveryCodesIssued', {
-								date: this.services.date(mfa.recoveryCodesGeneratedAt)
+						? this.format.text('recoveryCodesOnce')
+						: this.format.text('recoveryCodesIssued', {
+								date: this.format.date(mfa.recoveryCodesGeneratedAt)
 							}),
 				status: {
 					text:
 						recovery.total > 0
-							? this.services.text('recoveryCodesLeftOf', {
+							? this.format.text('recoveryCodesLeftOf', {
 									count: recovery.remaining,
 									total: recovery.total
 								})
-							: this.services.text('recoveryCodesLeft', {
+							: this.format.text('recoveryCodesLeft', {
 									count: recovery.remaining
 								}),
 					icon: recovery.low ? 'status.warning' : 'status.info',
@@ -200,12 +207,12 @@ export class SecurityPage extends Disposable implements AccountPageView {
 
 	private async openSecurityPage(): Promise<void> {
 		const icon = proctorIconFactory('action.openExternal');
-		this.open.setState({ label: this.services.text('openSecurity'), busy: true, icon });
-		const result = await this.services.request({ kind: 'openSecurity' });
+		this.open.setState({ label: this.format.text('openSecurity'), busy: true, icon });
+		const result = await this.account.request({ kind: 'openSecurity' });
 		if (this._store.isDisposed) return;
-		this.open.setState({ label: this.services.text('openSecurity'), icon });
+		this.open.setState({ label: this.format.text('openSecurity'), icon });
 		if (result.kind === 'error')
-			this.openFeedback.set(this.services.failure(result.reason), 'error');
-		else this.openFeedback.set(this.services.text('securityOpened'), 'success');
+			this.openFeedback.set(this.format.failure(result.reason), 'error');
+		else this.openFeedback.set(this.format.text('securityOpened'), 'success');
 	}
 }

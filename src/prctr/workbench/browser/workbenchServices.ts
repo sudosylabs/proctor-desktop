@@ -6,6 +6,7 @@ import { createDecorator } from '../../platform/instantiation/common/instantiati
 import type { ProductWindowChrome } from '../../platform/windows/browser/productWindowChrome.js';
 import type { ProductWindowDescriptor } from '../../platform/windows/common/windowProtocol.js';
 import type { WorkbenchComposition } from '../common/composition.js';
+import type { WorkbenchOverlayHost } from './overlayHost.js';
 import type { WorkbenchPaneHost } from './paneHost.js';
 import type { WorkbenchItemResolverRegistry } from './workbenchPane.js';
 import type { WorkbenchShell } from './workbenchShell.js';
@@ -28,6 +29,11 @@ export const IWorkbenchShellService =
 	createDecorator<IWorkbenchShellService>('workbenchShellService');
 /** The window's regions, overlay host and layout. */
 export type IWorkbenchShellService = WorkbenchShell;
+
+export const IWorkbenchOverlayService =
+	createDecorator<IWorkbenchOverlayService>('workbenchOverlayService');
+/** The window's dialogs, gates and blocking overlays, and whether one is shown. */
+export type IWorkbenchOverlayService = WorkbenchOverlayHost;
 
 export const IWorkbenchPaneHostService = createDecorator<IWorkbenchPaneHostService>(
 	'workbenchPaneHostService'

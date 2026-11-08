@@ -1,8 +1,12 @@
-import { AccountService } from '../../src/prctr/workbench/services/account/common/account.js';
 import { ToastHost } from '../../src/prctr/base/browser/ui/toast/toastHost.ts';
 import { proctorIconFactory } from '../../src/prctr/platform/theme/browser/proctorIcon.ts';
 import { AccountPhotoDialog } from '../../src/prctr/workbench/contrib/account/browser/accountPhotoDialog.ts';
-import { AccountPageServices } from '../../src/prctr/workbench/contrib/account/browser/accountPageServices.ts';
+import {
+	AccountPaneContext,
+	IAccountPaneContext
+} from '../../src/prctr/workbench/contrib/account/browser/accountPaneContext.ts';
+import { ServiceCollection } from '../../src/prctr/platform/instantiation/common/serviceCollection.ts';
+import { createAccountTestServices } from './accountTestServices.ts';
 import { MenuControl } from '../../src/prctr/base/browser/ui/menu/menuControl.ts';
 import { Event as Events } from '../../src/prctr/base/common/event.ts';
 import {
@@ -126,32 +130,42 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 		requestedLocale: 'en',
 		messages: Object.values(accountMessages)
 	});
-	const menu = new MenuControl(host, {
-		canInteract: () => true,
-		onDidChangeInteraction: Events.None,
-		restoreFocus: () => undefined,
-		onActionError: () => undefined
-	});
-	const services = new AccountPageServices(
+	const services = createAccountTestServices({
 		document,
-		new AccountService(client),
+		overlays,
+		account: client,
 		localization,
-		{
+		now: Date.now,
+		binding: {
 			kind: 'authenticated',
 			windowId: 'test:photo',
 			institutionOrigin: 'https://institution.example.test',
 			principalId: 'y'.repeat(26),
 			sessionId: 'b'.repeat(26),
 			initialDestination: 'account'
-		},
-		overlays,
-		menu,
-		new ToastHost(host, {
-			dismissLabel: 'Dismiss',
-			dismissIcon: proctorIconFactory('action.close', 14)
-		}),
-		{ signOut() {} },
-		() => undefined
+		}
+	});
+	const menu = new MenuControl(host, {
+		canInteract: () => true,
+		onDidChangeInteraction: Events.None,
+		restoreFocus: () => undefined,
+		onActionError: () => undefined
+	});
+	const pane = services.instantiationService.createChild(
+		new ServiceCollection([
+			IAccountPaneContext,
+			new AccountPaneContext(
+				document,
+				overlays,
+				menu,
+				new ToastHost(host, {
+					dismissLabel: 'Dismiss',
+					dismissIcon: proctorIconFactory('action.close', 14)
+				}),
+				'Try again',
+				() => undefined
+			)
+		])
 	);
 	const button = (label: string) =>
 		[...document.querySelectorAll<HTMLButtonElement>('dialog button')].find(
@@ -159,8 +173,8 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 		)!;
 	const dialogText = (): string => document.querySelector('dialog')?.textContent ?? '';
 	const open = () =>
-		new AccountPhotoDialog(
-			services,
+		pane.createInstance(
+			AccountPhotoDialog,
 			initial,
 			file,
 			() => saved++,

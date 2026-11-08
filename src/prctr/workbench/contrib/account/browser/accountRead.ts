@@ -11,8 +11,10 @@ import type {
 	AccountResponse
 } from '../../../../platform/account/common/accountProtocol.js';
 import { failureWithdrawsData } from '../common/accountPresentation.js';
-import { ACCOUNT_READ_DEADLINE_MS } from '../../../services/account/common/account.js';
-import type { AccountPageServices } from './accountPageServices.js';
+import {
+	ACCOUNT_READ_DEADLINE_MS,
+	IAccountService
+} from '../../../services/account/common/account.js';
 
 export type AccountDataOf<S extends AccountReadSection> = Extract<AccountData, { section: S }>;
 
@@ -48,8 +50,8 @@ export class AccountRead<S extends AccountReadSection> extends Disposable {
 	private readonly timers = this._register(new MutableDisposable());
 
 	constructor(
-		private readonly services: AccountPageServices,
-		readonly section: S
+		readonly section: S,
+		@IAccountService private readonly account: IAccountService
 	) {
 		super();
 		this._register(toDisposable(() => this.sequence++));
@@ -69,7 +71,7 @@ export class AccountRead<S extends AccountReadSection> extends Disposable {
 			return;
 		}
 		if (this.observation.value !== undefined) return;
-		const subscription = this.services.observe(
+		const subscription = this.account.observe(
 			{ kind: 'read', section: this.section },
 			(response) => {
 				if (!this._store.isDisposed) this.apply(response);
@@ -87,7 +89,7 @@ export class AccountRead<S extends AccountReadSection> extends Disposable {
 		if (this.currentData === undefined && this.currentState.kind !== 'loading')
 			this.setState({ kind: 'loading' });
 		if (this.currentData === undefined) this.startDeadline();
-		const response = await this.services.request({ kind: 'read', section: this.section });
+		const response = await this.account.request({ kind: 'read', section: this.section });
 		if (this._store.isDisposed || sequence !== this.sequence) return false;
 		return this.apply(response);
 	}

@@ -2,6 +2,9 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountFormatService } from './accountFormat.js';
+import { IAccountPaneContext } from './accountPaneContext.js';
+import { IAuthenticatedHoverService } from '../../../browser/authenticated/authenticatedHover.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
@@ -15,7 +18,6 @@ import {
 } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { AccountFeedback } from './accountFeedback.js';
-import type { AccountPageServices } from './accountPageServices.js';
 import type { AccountReadState } from './accountRead.js';
 
 let sectionSequence = 0;
@@ -110,12 +112,14 @@ export class AccountSection extends Disposable {
 
 	constructor(
 		host: HTMLElement,
-		private readonly services: AccountPageServices,
 		options: {
 			readonly title: string;
 			readonly description?: string;
 			readonly action?: AccountSectionAction;
-		}
+		},
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IAuthenticatedHoverService private readonly hover: IAuthenticatedHoverService
 	) {
 		super();
 		const document = host.ownerDocument;
@@ -159,7 +163,7 @@ export class AccountSection extends Disposable {
 			new ButtonControl(this.note, {
 				variant: 'secondary',
 				size: 'small',
-				label: services.text('retry'),
+				label: this.format.text('retry'),
 				icon: proctorIconFactory('action.retry', 14)
 			})
 		);
@@ -196,7 +200,7 @@ export class AccountSection extends Disposable {
 			new ButtonControl(this.state, {
 				variant: 'secondary',
 				size: 'small',
-				label: services.text('retry'),
+				label: this.format.text('retry'),
 				icon: proctorIconFactory('action.retry', 14)
 			})
 		);
@@ -222,7 +226,7 @@ export class AccountSection extends Disposable {
 		);
 		this.pager = this._register(
 			new PagerControl(this.card, {
-				labels: services.pagerLabels(options.title),
+				labels: this.format.pagerLabels(options.title),
 				previousIcon: proctorIconFactory('action.back', 14),
 				nextIcon: proctorIconFactory('action.forward', 14)
 			})
@@ -291,15 +295,15 @@ export class AccountSection extends Disposable {
 			if (state.slow === true)
 				this.showNote(
 					'status.time',
-					this.services.institutionText('stillWaiting', 'stillWaitingGeneric')
+					this.format.institutionText('stillWaiting', 'stillWaitingGeneric')
 				);
 			return;
 		}
 		if (state.kind === 'failed') {
 			this.clearRows();
 			this.showState('failure', {
-				text: this.services.text('loadFailed', {
-					reason: this.services.failure(state.reason)
+				text: this.format.text('loadFailed', {
+					reason: this.format.failure(state.reason)
 				})
 			});
 			return;
@@ -307,7 +311,7 @@ export class AccountSection extends Disposable {
 		if (state.kind === 'stale') {
 			this.showNote(
 				'status.offline',
-				this.services.text('staleData', { reason: this.services.failure(state.reason) })
+				this.format.text('staleData', { reason: this.format.failure(state.reason) })
 			);
 			return;
 		}
@@ -331,8 +335,8 @@ export class AccountSection extends Disposable {
 		if (first !== null) first.focus();
 		else this.focusHeading();
 		const start = (page - 1) * ACCOUNT_PAGE_SIZE;
-		this.services.announce(
-			this.services.text('pageShown', {
+		this.pane.announce(
+			this.format.text('pageShown', {
 				page,
 				count: Math.ceil(this.allRows.length / ACCOUNT_PAGE_SIZE),
 				first: start + 1,
@@ -473,9 +477,9 @@ export class AccountSection extends Disposable {
 			const names = hidden.join(', ');
 			const more = $('button.prctr-account-row__chip-more', {
 				type: 'button',
-				textContent: this.services.text('moreChips', { count: hidden.length }),
+				textContent: this.format.text('moreChips', { count: hidden.length }),
 				attrs: {
-					'aria-label': this.services.text('moreChipsLabel', {
+					'aria-label': this.format.text('moreChipsLabel', {
 						count: hidden.length,
 						names
 					})
@@ -483,9 +487,7 @@ export class AccountSection extends Disposable {
 			});
 			// The tooltip lists one per line; the accessible name above reads them as a sentence.
 			const list = hidden.join('\n');
-			const hover = this.services.hooks.hover;
-			if (hover === undefined) more.title = list;
-			else this.rowStore.add(hover(more, list));
+			this.rowStore.add(this.hover.setupHover(more, list));
 			chips.append(more);
 		}
 		return chips;
@@ -496,7 +498,7 @@ export class AccountSection extends Disposable {
 		name: string,
 		actions: readonly AccountRowAction[]
 	): HTMLButtonElement {
-		const label = this.services.text('rowActions', { name });
+		const label = this.format.text('rowActions', { name });
 		const button = $('button.prctr-account-row__more', {
 			type: 'button',
 			title: label,
@@ -522,12 +524,12 @@ export class AccountSection extends Disposable {
 			run: action.run
 		}));
 		const open = (): void => {
-			this.services.menu.show(button, entries, label);
-			if (!this.services.menu.visible) return;
+			this.pane.menu.show(button, entries, label);
+			if (!this.pane.menu.visible) return;
 			button.setAttribute('aria-expanded', 'true');
 			const store = this.rowStore.add(new DisposableStore());
 			store.add(
-				this.services.menu.onDidChangeVisibility((visible) => {
+				this.pane.menu.onDidChangeVisibility((visible) => {
 					if (visible) return;
 					button.setAttribute('aria-expanded', 'false');
 					this.rowStore.delete(store);

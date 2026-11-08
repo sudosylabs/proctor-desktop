@@ -2,6 +2,9 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountService } from '../../../services/account/common/account.js';
+import { IAccountFormatService } from './accountFormat.js';
+import { IAccountPaneContext } from './accountPaneContext.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
@@ -10,7 +13,6 @@ import type { AccountResponse } from '../../../../platform/account/common/accoun
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import { AccountDialog } from './accountDialog.js';
 import { AccountFeedback } from './accountFeedback.js';
-import type { AccountPageServices } from './accountPageServices.js';
 import {
 	decodePhoto,
 	encodePhoto,
@@ -59,24 +61,26 @@ export class AccountPhotoDialog extends Disposable {
 	private pointer: { readonly id: number; x: number; y: number } | undefined;
 
 	constructor(
-		private readonly services: AccountPageServices,
 		private etag: string,
 		file: File,
 		private readonly onDidSave: (photo: Photo) => void,
-		private readonly onDidClose: (needsRefresh: boolean) => void
+		private readonly onDidClose: (needsRefresh: boolean) => void,
+		@IAccountService private readonly account: IAccountService,
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IAccountPaneContext private readonly pane: IAccountPaneContext
 	) {
 		super();
-		const document = services.document;
+		const document = this.pane.document;
 		const $ = createElementFactory(document);
 		this.dialog = this._register(
 			new AccountDialog(
 				document,
-				services.overlays,
+				this.pane.overlays,
 				{
-					title: services.text('photoDialogTitle'),
-					description: services.text('photoDialogHelp')
+					title: this.format.text('photoDialogTitle'),
+					description: this.format.text('photoDialogHelp')
 				},
-				services.focusPage
+				this.pane.focusPage
 			)
 		);
 		this.canvas = $('canvas.prctr-account-photo__canvas');
@@ -86,7 +90,7 @@ export class AccountPhotoDialog extends Disposable {
 				tabIndex: 0,
 				attrs: {
 					role: 'img',
-					'aria-label': services.text('photoCropLabel'),
+					'aria-label': this.format.text('photoCropLabel'),
 					'aria-disabled': 'true'
 				}
 			},
@@ -103,7 +107,7 @@ export class AccountPhotoDialog extends Disposable {
 		});
 		this.lowResolution = $('p.prctr-account-photo__note', {
 			hidden: true,
-			textContent: services.text('photoLowResolution')
+			textContent: this.format.text('photoLowResolution')
 		});
 		this.input = $('input', {
 			type: 'file',
@@ -115,7 +119,7 @@ export class AccountPhotoDialog extends Disposable {
 			$(
 				'label.prctr-account-photo__zoom-label',
 				{},
-				$('span', { textContent: services.text('photoZoom') }),
+				$('span', { textContent: this.format.text('photoZoom') }),
 				this.zoom
 			),
 			this.lowResolution,
@@ -140,7 +144,7 @@ export class AccountPhotoDialog extends Disposable {
 		return this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant,
-				label: this.services.text(key),
+				label: this.format.text(key),
 				icon: proctorIconFactory(photoActionIcons[key])
 			})
 		);
@@ -224,24 +228,24 @@ export class AccountPhotoDialog extends Disposable {
 	private update(): void {
 		const ready = this.bitmap !== undefined && !this.busy;
 		this.save.setState({
-			label: this.services.text('savePhoto'),
+			label: this.format.text('savePhoto'),
 			icon: proctorIconFactory(photoActionIcons.savePhoto),
 			disabled: !ready || this.needsCheck,
 			busy: this.busy && this.bitmap !== undefined
 		});
 		this.cancel.setState({
-			label: this.services.text('cancel'),
+			label: this.format.text('cancel'),
 			icon: proctorIconFactory(photoActionIcons.cancel),
 			disabled: this.busy
 		});
 		this.choose.setState({
-			label: this.services.text('chooseAnother'),
+			label: this.format.text('chooseAnother'),
 			icon: proctorIconFactory(photoActionIcons.chooseAnother),
 			disabled: this.busy
 		});
 		this.check.element.hidden = !this.needsCheck;
 		this.check.setState({
-			label: this.services.text('photoRecheck'),
+			label: this.format.text('photoRecheck'),
 			icon: proctorIconFactory(photoActionIcons.photoRecheck),
 			disabled: this.busy
 		});
@@ -253,7 +257,7 @@ export class AccountPhotoDialog extends Disposable {
 		if (this.busy) return;
 		const generation = ++this.generation;
 		this.busy = true;
-		this.feedback.set(this.services.text('photoPreparing'), 'loading');
+		this.feedback.set(this.format.text('photoPreparing'), 'loading');
 		this.update();
 		try {
 			const bitmap = await decodePhoto(file);
@@ -270,7 +274,7 @@ export class AccountPhotoDialog extends Disposable {
 		} catch (error) {
 			if (!this._store.isDisposed && generation === this.generation)
 				this.feedback.set(
-					this.services.text(
+					this.format.text(
 						error instanceof PhotoImportError ? error.reason : 'photoInvalid'
 					),
 					'error'
@@ -307,7 +311,7 @@ export class AccountPhotoDialog extends Disposable {
 		};
 		const width = this.stage.clientWidth;
 		const height = this.stage.clientHeight;
-		const ratio = this.services.document.defaultView?.devicePixelRatio ?? 1;
+		const ratio = this.pane.document.defaultView?.devicePixelRatio ?? 1;
 		this.canvas.width = Math.max(1, Math.round(width * ratio));
 		this.canvas.height = Math.max(1, Math.round(height * ratio));
 		const context = this.canvas.getContext('2d');
@@ -330,20 +334,20 @@ export class AccountPhotoDialog extends Disposable {
 		const bitmap = this.bitmap;
 		if (this.busy || !bitmap || this.needsCheck) return;
 		this.busy = true;
-		this.feedback.set(this.services.text('photoSaving'), 'loading');
+		this.feedback.set(this.format.text('photoSaving'), 'loading');
 		this.update();
 		let bytes: Uint8Array;
 		try {
-			bytes = await encodePhoto(this.services.document, bitmap, this.crop);
+			bytes = await encodePhoto(this.pane.document, bitmap, this.crop);
 		} catch {
 			if (this._store.isDisposed) return;
 			this.busy = false;
-			this.feedback.set(this.services.text('photoInvalid'), 'error');
+			this.feedback.set(this.format.text('photoInvalid'), 'error');
 			this.update();
 			return;
 		}
 		if (this._store.isDisposed) return;
-		const result = await this.services.request({
+		const result = await this.account.request({
 			kind: 'uploadPhoto',
 			bytes,
 			mediaType: 'image/png',
@@ -360,7 +364,7 @@ export class AccountPhotoDialog extends Disposable {
 			result.reason !== 'unconfirmed' &&
 			result.reason !== 'conflict'
 		) {
-			this.feedback.set(this.services.failure(result.reason), 'error');
+			this.feedback.set(this.format.failure(result.reason), 'error');
 			this.update();
 			this.save.focus();
 			return;
@@ -373,15 +377,15 @@ export class AccountPhotoDialog extends Disposable {
 	private async reconcile(saved: boolean): Promise<void> {
 		if (this.busy) return;
 		this.busy = true;
-		this.feedback.set(this.services.text('photoChecking'), 'loading');
+		this.feedback.set(this.format.text('photoChecking'), 'loading');
 		this.update();
-		const result = await this.services.request({ kind: 'readPhoto' });
+		const result = await this.account.request({ kind: 'readPhoto' });
 		if (this._store.isDisposed) return;
 		this.busy = false;
 		if (result.kind !== 'photo') {
 			this.needsCheck = true;
 			this.feedback.set(
-				this.services.text(saved ? 'photoSavedUnconfirmed' : 'photoCheckAgain'),
+				this.format.text(saved ? 'photoSavedUnconfirmed' : 'photoCheckAgain'),
 				'error'
 			);
 			this.update();
@@ -396,9 +400,7 @@ export class AccountPhotoDialog extends Disposable {
 		this.needsCheck = false;
 		const changedElsewhere = result.etag !== this.etag;
 		this.etag = result.etag;
-		this.feedback.set(
-			changedElsewhere ? this.services.text('photoChangedElsewhere') : undefined
-		);
+		this.feedback.set(changedElsewhere ? this.format.text('photoChangedElsewhere') : undefined);
 		this.update();
 		this.save.focus();
 	}

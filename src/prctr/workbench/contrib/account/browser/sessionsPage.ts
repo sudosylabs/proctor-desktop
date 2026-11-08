@@ -2,6 +2,11 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountService } from '../../../services/account/common/account.js';
+import { IAccountFormatService } from './accountFormat.js';
+import { IAccountPaneContext } from './accountPaneContext.js';
+import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
+import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
 import type {
 	AccountDesktop,
@@ -19,7 +24,7 @@ import {
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { AccountConfirmation } from './accountConfirmation.js';
 import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageServices, AccountPageView } from './accountPageServices.js';
+import type { AccountPageView } from './accountPages.js';
 import { AccountRead } from './accountRead.js';
 import { AccountSection, type AccountRowModel } from './accountSection.js';
 
@@ -45,28 +50,40 @@ export class SessionsPage extends Disposable implements AccountPageView {
 
 	constructor(
 		body: HTMLElement,
-		private readonly services: AccountPageServices
+		_headerActions: HTMLElement,
+		@IAccountService private readonly account: IAccountService,
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IAuthenticatedNavigationService
+		private readonly navigation: IAuthenticatedNavigationService,
+		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
-		this.sessions = this._register(new AccountRead(services, 'sessions'));
-		this.desktops = this._register(new AccountRead(services, 'desktops'));
+		this.sessions = this._register(
+			this.instantiationService.createInstance(AccountRead<'sessions'>, 'sessions')
+		);
+		this.desktops = this._register(
+			this.instantiationService.createInstance(AccountRead<'desktops'>, 'desktops')
+		);
 		this.current = this._register(
-			new AccountSection(body, services, { title: services.text('thisComputer') })
+			this.instantiationService.createInstance(AccountSection, body, {
+				title: this.format.text('thisComputer')
+			})
 		);
 		this.others = this._register(
-			new AccountSection(body, services, {
-				title: services.text('otherSessions'),
+			this.instantiationService.createInstance(AccountSection, body, {
+				title: this.format.text('otherSessions'),
 				action: {
-					label: services.text('endOtherSessions'),
+					label: this.format.text('endOtherSessions'),
 					icon: 'action.end',
 					destructive: true
 				}
 			})
 		);
 		this.registered = this._register(
-			new AccountSection(body, services, {
-				title: services.text('registeredDesktops'),
-				description: services.text('registeredDesktopsDescription')
+			this.instantiationService.createInstance(AccountSection, body, {
+				title: this.format.text('registeredDesktops'),
+				description: this.format.text('registeredDesktopsDescription')
 			})
 		);
 		this._register(this.others.onDidRequestAction(() => this.confirmEndOthers()));
@@ -99,12 +116,12 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		const ready = this.sessions.data !== undefined;
 		this.current.setState(
 			state,
-			ready && groups.current === undefined ? this.services.text('noCurrentSession') : false,
+			ready && groups.current === undefined ? this.format.text('noCurrentSession') : false,
 			retry
 		);
 		this.others.setState(
 			state,
-			ready && groups.others.length === 0 ? this.services.text('noOtherSessions') : false,
+			ready && groups.others.length === 0 ? this.format.text('noOtherSessions') : false,
 			retry
 		);
 		this.others.setAction(groups.others.length > 0, !this.unconfirmed.has(OTHERS));
@@ -117,7 +134,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		this.registered.setState(
 			this.desktops.state,
 			this.desktops.data !== undefined && desktops.length === 0
-				? this.services.text('noDesktops')
+				? this.format.text('noDesktops')
 				: false,
 			() => void this.desktops.refresh()
 		);
@@ -126,9 +143,9 @@ export class SessionsPage extends Disposable implements AccountPageView {
 
 	private confirmEndOthers(): void {
 		this.confirm({
-			title: this.services.text('confirmEndOtherSessionsTitle'),
-			message: this.services.text('confirmEndOtherSessionsBody'),
-			confirmLabel: this.services.text('endOtherSessions'),
+			title: this.format.text('confirmEndOtherSessionsTitle'),
+			message: this.format.text('confirmEndOtherSessionsBody'),
+			confirmLabel: this.format.text('endOtherSessions'),
 			intent: { kind: 'revokeOtherSessions' },
 			key: OTHERS,
 			section: this.others,
@@ -138,7 +155,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 	}
 
 	private clientName(session: AccountSession): string {
-		return this.services.text(clientKind(session.client));
+		return this.format.text(clientKind(session.client));
 	}
 
 	private sessionName(session: AccountSession): string {
@@ -154,22 +171,22 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		const parts: string[] = [];
 		if (!session.current && session.name && session.name !== this.clientName(session))
 			parts.push(this.clientName(session));
-		if (session.platform) parts.push(this.services.text(platformKind(session.platform)));
-		const signedIn = { when: this.services.relative(session.createdAt) };
+		if (session.platform) parts.push(this.format.text(platformKind(session.platform)));
+		const signedIn = { when: this.format.relative(session.createdAt) };
 		if (session.current || parts.length === 0)
 			parts.push(
-				this.services.text(
+				this.format.text(
 					parts.length === 0 ? 'sessionSignedInFirst' : 'sessionSignedIn',
 					signedIn
 				)
 			);
 		if (!session.current)
 			parts.push(
-				this.services.text('sessionActive', {
-					when: this.services.relative(session.lastActivityAt)
+				this.format.text('sessionActive', {
+					when: this.format.relative(session.lastActivityAt)
 				})
 			);
-		return parts.reduce((detail, part) => this.services.join(detail, part));
+		return parts.reduce((detail, part) => this.format.join(detail, part));
 	}
 
 	private sessionGlyph(session: AccountSession): ProctorIconId {
@@ -188,15 +205,15 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			title: this.sessionName(session),
 			detail: this.sessionDetail(session),
 			status: {
-				text: this.services.text('thisSession'),
+				text: this.format.text('thisSession'),
 				icon: 'status.success',
 				tone: 'quiet'
 			},
 			// Signing out asks first, in the window's own confirmation.
 			button: {
-				label: this.services.text('signOut'),
+				label: this.format.text('signOut'),
 				icon: 'action.signOut',
-				run: () => this.services.hooks.signOut()
+				run: () => this.navigation.signOut()
 			}
 		};
 	}
@@ -211,15 +228,15 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			detail: this.sessionDetail(session),
 			actions: [
 				{
-					label: this.services.text('endSessionEllipsis'),
+					label: this.format.text('endSessionEllipsis'),
 					icon: 'action.end',
 					destructive: true,
 					enabled: !this.unconfirmed.has(key),
 					run: () =>
 						this.confirm({
-							title: this.services.text('confirmEndSessionTitle', { name }),
-							message: this.services.text('confirmEndSessionBody', { name }),
-							confirmLabel: this.services.text('endSession'),
+							title: this.format.text('confirmEndSessionTitle', { name }),
+							message: this.format.text('confirmEndSessionBody', { name }),
+							confirmLabel: this.format.text('endSession'),
 							confirmIcon: 'action.end',
 							intent: { kind: 'revokeSession', id: session.id },
 							key,
@@ -233,19 +250,19 @@ export class SessionsPage extends Disposable implements AccountPageView {
 	}
 
 	private desktopRow(desktop: AccountDesktop): AccountRowModel {
-		const name = desktop.name || this.services.text('unnamedDesktop');
-		const platform = this.services.text(platformKind(desktop.platform));
+		const name = desktop.name || this.format.text('unnamedDesktop');
+		const platform = this.format.text(platformKind(desktop.platform));
 		const key = `desktop:${desktop.id}`;
 		const detail = desktop.revoked
-			? this.services.text('desktopRemovedSummary', {
+			? this.format.text('desktopRemovedSummary', {
 					platform,
-					registered: this.services.date(desktop.createdAt)
+					registered: this.format.date(desktop.createdAt)
 				})
-			: this.services.text('desktopSummary', {
+			: this.format.text('desktopSummary', {
 					platform,
 					release: desktop.release,
-					registered: this.services.date(desktop.createdAt),
-					used: this.services.relative(desktop.lastUsedAt)
+					registered: this.format.date(desktop.createdAt),
+					used: this.format.relative(desktop.lastUsedAt)
 				});
 		const removable = !desktop.current && !desktop.revoked;
 		return {
@@ -256,7 +273,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			...(desktop.current
 				? {
 						status: {
-							text: this.services.text('thisComputer'),
+							text: this.format.text('thisComputer'),
 							icon: 'status.success' as const,
 							tone: 'quiet' as const
 						}
@@ -264,7 +281,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 				: desktop.revoked
 					? {
 							status: {
-								text: this.services.text('desktopRemovedStatus'),
+								text: this.format.text('desktopRemovedStatus'),
 								icon: 'action.close' as const,
 								tone: 'quiet' as const
 							}
@@ -273,19 +290,19 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			actions: removable
 				? [
 						{
-							label: this.services.text('removeDesktopEllipsis'),
+							label: this.format.text('removeDesktopEllipsis'),
 							icon: 'action.delete',
 							destructive: true,
 							enabled: !this.unconfirmed.has(key),
 							run: () =>
 								this.confirm({
-									title: this.services.text('confirmRemoveDesktopTitle', {
+									title: this.format.text('confirmRemoveDesktopTitle', {
 										name
 									}),
-									message: this.services.text('confirmRemoveDesktopBody', {
+									message: this.format.text('confirmRemoveDesktopBody', {
 										name
 									}),
-									confirmLabel: this.services.text('removeDesktop'),
+									confirmLabel: this.format.text('removeDesktop'),
 									confirmIcon: 'action.delete',
 									intent: { kind: 'revokeDesktop', id: desktop.id },
 									key,
@@ -310,14 +327,14 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		readonly read: AccountRead<'sessions'> | AccountRead<'desktops'>;
 		readonly success: AccountMessage;
 	}): void {
-		this.confirmation.value = new AccountConfirmation(
-			this.services,
+		this.confirmation.value = this.instantiationService.createInstance(
+			AccountConfirmation,
 			{
 				title: options.title,
 				message: options.message,
 				confirmLabel: options.confirmLabel,
 				...(options.confirmIcon === undefined ? {} : { confirmIcon: options.confirmIcon }),
-				run: () => this.services.change(options.intent),
+				run: () => this.account.change(options.intent),
 				onDidComplete: (result) => this.onChangeComplete(result, options)
 			},
 			() => undefined
@@ -338,10 +355,10 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			// Redraw so the row's action is locked while the list is read again.
 			if (options.key.startsWith('session:')) this.renderSessions();
 			else this.renderDesktops();
-			options.section.feedback.set(this.services.failure(result.reason), 'error');
+			options.section.feedback.set(this.format.failure(result.reason), 'error');
 		} else
-			this.services.toast(
-				this.services.text(
+			this.pane.toast(
+				this.format.text(
 					result.kind === 'sessionsEnded' && result.count === 0
 						? 'noOtherSessionsEnded'
 						: options.success

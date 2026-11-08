@@ -2,6 +2,10 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountService } from '../../../services/account/common/account.js';
+import { IAccountFormatService } from './accountFormat.js';
+import { IAccountPaneContext } from './accountPaneContext.js';
+import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
 import type {
@@ -22,7 +26,7 @@ import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIc
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { AccountConfirmation } from './accountConfirmation.js';
 import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageServices, AccountPageView } from './accountPageServices.js';
+import type { AccountPageView } from './accountPages.js';
 import { AccountRead } from './accountRead.js';
 import { AccountSection, type AccountRowAction, type AccountRowModel } from './accountSection.js';
 import { NewTokenDialog, TokenCreatedDialog } from './tokenDialogs.js';
@@ -57,28 +61,38 @@ export class TokensPage extends Disposable implements AccountPageView {
 	constructor(
 		body: HTMLElement,
 		headerActions: HTMLElement,
-		private readonly services: AccountPageServices
+		@IAccountService private readonly account: IAccountService,
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
-		this.tokens = this._register(new AccountRead(services, 'tokens'));
-		this.grantable = this._register(new AccountRead(services, 'grantableScopes'));
+		this.tokens = this._register(
+			this.instantiationService.createInstance(AccountRead<'tokens'>, 'tokens')
+		);
+		this.grantable = this._register(
+			this.instantiationService.createInstance(
+				AccountRead<'grantableScopes'>,
+				'grantableScopes'
+			)
+		);
 		this.create = this._register(
 			new ButtonControl(headerActions, {
 				variant: 'brand',
-				label: services.text('newToken'),
+				label: this.format.text('newToken'),
 				icon: proctorIconFactory('action.add')
 			})
 		);
 		this.active = this._register(
-			new AccountSection(body, services, {
-				title: services.text('activeTokens'),
-				description: services.text('activeTokensDescription')
+			this.instantiationService.createInstance(AccountSection, body, {
+				title: this.format.text('activeTokens'),
+				description: this.format.text('activeTokensDescription')
 			})
 		);
 		this.inactive = this._register(
-			new AccountSection(body, services, {
-				title: services.text('inactiveTokens'),
-				description: services.text('inactiveTokensDescription')
+			this.instantiationService.createInstance(AccountSection, body, {
+				title: this.format.text('inactiveTokens'),
+				description: this.format.text('inactiveTokensDescription')
 			})
 		);
 		this._register(this.tokens.onDidChange(() => this.render()));
@@ -102,36 +116,36 @@ export class TokensPage extends Disposable implements AccountPageView {
 	private render(): void {
 		const state = this.tokens.state;
 		const data = this.tokens.data;
-		const groups = groupTokens(data?.tokens ?? [], this.services.now());
+		const groups = groupTokens(data?.tokens ?? [], this.format.now());
 		const retry = (): void => void this.tokens.refresh();
 		// With no tokens at all the page is one section that says so and offers the first token.
 		const none = data !== undefined && groups.active.length + groups.inactive.length === 0;
 		// When the empty Active section offers the first or next token, the header does not repeat it.
 		this.create.element.hidden = none || (data !== undefined && groups.active.length === 0);
-		if (none) this.active.setHeading(this.services.text('yourTokens'));
+		if (none) this.active.setHeading(this.format.text('yourTokens'));
 		else
 			this.active.setHeading(
-				this.services.text('activeTokens'),
-				this.services.text('activeTokensDescription')
+				this.format.text('activeTokens'),
+				this.format.text('activeTokensDescription')
 			);
 		this.active.setState(
 			state,
 			none
 				? {
-						title: this.services.text('noTokensTitle'),
-						text: this.services.text('noTokensBody'),
+						title: this.format.text('noTokensTitle'),
+						text: this.format.text('noTokensBody'),
 						action: {
-							label: this.services.text('newToken'),
+							label: this.format.text('newToken'),
 							icon: 'action.add',
 							run: () => this.openNewToken()
 						}
 					}
 				: data !== undefined && groups.active.length === 0
 					? {
-							title: this.services.text('noActiveTokens'),
-							text: this.services.text('noActiveTokensBody'),
+							title: this.format.text('noActiveTokens'),
+							text: this.format.text('noActiveTokensBody'),
 							action: {
-								label: this.services.text('newToken'),
+								label: this.format.text('newToken'),
 								icon: 'action.add',
 								run: () => this.openNewToken()
 							}
@@ -148,10 +162,10 @@ export class TokensPage extends Disposable implements AccountPageView {
 	}
 
 	private row(token: AccountToken): AccountRowModel {
-		const state = tokenState(token, this.services.now());
+		const state = tokenState(token, this.format.now());
 		const section = state === 'active' ? this.active : this.inactive;
 		const actions: AccountRowAction[] = tokenActions(state).map((action) => ({
-			label: this.services.text(actionLabels[action]),
+			label: this.format.text(actionLabels[action]),
 			icon: actionIcons[action],
 			destructive: action === 'revoke',
 			enabled: !this.unconfirmed.has(token.id),
@@ -160,19 +174,19 @@ export class TokensPage extends Disposable implements AccountPageView {
 		const status: AccountRowModel['status'] =
 			state === 'disabled'
 				? {
-						text: this.services.text('tokenDisabledStatus'),
+						text: this.format.text('tokenDisabledStatus'),
 						icon: 'action.disable',
 						tone: 'quiet'
 					}
 				: state === 'expired'
 					? {
-							text: this.services.text('tokenExpiredStatus'),
+							text: this.format.text('tokenExpiredStatus'),
 							icon: 'status.time',
 							tone: 'quiet'
 						}
 					: state === 'revoked'
 						? {
-								text: this.services.text('tokenRevokedStatus'),
+								text: this.format.text('tokenRevokedStatus'),
 								icon: 'action.close',
 								tone: 'quiet'
 							}
@@ -202,46 +216,46 @@ export class TokensPage extends Disposable implements AccountPageView {
 	private unitTag(id: string): string {
 		const unit = this.grantable.data?.grantable.academicUnits.find((entry) => entry.id === id);
 		return unit === undefined
-			? this.services.text('tokenUnitTag')
-			: this.services.text('tokenUnitNamedTag', { unit: unit.name });
+			? this.format.text('tokenUnitTag')
+			: this.format.text('tokenUnitNamedTag', { unit: unit.name });
 	}
 
 	private detail(token: AccountToken, state: TokenState): string {
-		const date = (time: number): string => this.services.date(time);
+		const date = (time: number): string => this.format.date(time);
 		let lifetime: string;
 		if (state === 'revoked')
-			lifetime = this.services.text('tokenRevokedOn', {
+			lifetime = this.format.text('tokenRevokedOn', {
 				date: date(token.revokedAt ?? token.expiresAt)
 			});
 		else if (state === 'expired')
-			lifetime = this.services.text('tokenExpired', { date: date(token.expiresAt) });
+			lifetime = this.format.text('tokenExpired', { date: date(token.expiresAt) });
 		else if (state === 'disabled')
-			lifetime = this.services.join(
-				this.services.text('tokenDisabledOn', {
+			lifetime = this.format.join(
+				this.format.text('tokenDisabledOn', {
 					date: date(token.disabledAt ?? token.createdAt)
 				}),
-				this.services.text('tokenExpires', { date: date(token.expiresAt) })
+				this.format.text('tokenExpires', { date: date(token.expiresAt) })
 			);
-		else lifetime = this.services.text('tokenExpiresFirst', { date: date(token.expiresAt) });
+		else lifetime = this.format.text('tokenExpiresFirst', { date: date(token.expiresAt) });
 		const used =
 			token.lastUsedAt === undefined
-				? this.services.text('tokenNeverUsed')
-				: this.services.text('tokenUsed', {
-						when: this.services.relative(token.lastUsedAt)
+				? this.format.text('tokenNeverUsed')
+				: this.format.text('tokenUsed', {
+						when: this.format.relative(token.lastUsedAt)
 					});
-		return this.services.join(lifetime, used);
+		return this.format.join(lifetime, used);
 	}
 
 	private runAction(action: TokenAction, token: AccountToken, section: AccountSection): void {
 		if (action === 'revoke') {
-			this.dialog.value = new AccountConfirmation(
-				this.services,
+			this.dialog.value = this.instantiationService.createInstance(
+				AccountConfirmation,
 				{
-					title: this.services.text('confirmRevokeTitle', { name: token.description }),
-					message: this.services.text('confirmRevokeBody'),
-					confirmLabel: this.services.text('confirmRevokeAction'),
+					title: this.format.text('confirmRevokeTitle', { name: token.description }),
+					message: this.format.text('confirmRevokeBody'),
+					confirmLabel: this.format.text('confirmRevokeAction'),
 					confirmIcon: 'action.delete',
-					run: () => this.services.change({ kind: 'revokeToken', id: token.id }),
+					run: () => this.account.change({ kind: 'revokeToken', id: token.id }),
 					onDidComplete: (result) =>
 						this.onChangeComplete(result, token, section, 'tokenRevoked')
 				},
@@ -253,10 +267,10 @@ export class TokensPage extends Disposable implements AccountPageView {
 			kind: action === 'disable' ? 'disableToken' : 'enableToken',
 			id: token.id
 		};
-		void this.services.change(intent).then((result) => {
+		void this.account.change(intent).then((result) => {
 			if (this._store.isDisposed) return;
 			if (result === 'busy') {
-				section.feedback.set(this.services.text('busy'), 'error');
+				section.feedback.set(this.format.text('busy'), 'error');
 				return;
 			}
 			this.onChangeComplete(
@@ -279,19 +293,19 @@ export class TokensPage extends Disposable implements AccountPageView {
 				this.unconfirmed.add(token.id);
 				this.render();
 			}
-			section.feedback.set(this.services.failure(result.reason), 'error');
+			section.feedback.set(this.format.failure(result.reason), 'error');
 			if (!failureNeedsRead(result.reason)) {
 				section.focusRow(token.id);
 				return;
 			}
-		} else this.services.toast(this.services.text(success));
+		} else this.pane.toast(this.format.text(success));
 		section.focusHeading();
 		void this.tokens.refresh();
 	}
 
 	private openNewToken(): void {
-		this.dialog.value = new NewTokenDialog(
-			this.services,
+		this.dialog.value = this.instantiationService.createInstance(
+			NewTokenDialog,
 			(token, credential) => this.showCredential(token, credential),
 			() => undefined
 		);
@@ -299,11 +313,15 @@ export class TokensPage extends Disposable implements AccountPageView {
 
 	/** The credential passes straight into its dialog; this page never keeps it. */
 	private showCredential(token: AccountToken, credential: string): void {
-		this.dialog.value = new TokenCreatedDialog(this.services, credential, () => {
-			if (this._store.isDisposed) return;
-			this.services.toast(this.services.text('tokenCreated'));
-			if (!this.active.focusRow(token.id)) this.create.focus();
-		});
+		this.dialog.value = this.instantiationService.createInstance(
+			TokenCreatedDialog,
+			credential,
+			() => {
+				if (this._store.isDisposed) return;
+				this.pane.toast(this.format.text('tokenCreated'));
+				if (!this.active.focusRow(token.id)) this.create.focus();
+			}
+		);
 		void this.tokens.refresh();
 	}
 }

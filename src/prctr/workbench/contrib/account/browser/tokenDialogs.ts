@@ -2,6 +2,10 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountService } from '../../../services/account/common/account.js';
+import { IAccountFormatService } from './accountFormat.js';
+import { IAccountPaneContext } from './accountPaneContext.js';
+import { IClipboardService } from '../../../../platform/clipboard/common/clipboardService.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
@@ -24,7 +28,6 @@ import {
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import { AccountDialog } from './accountDialog.js';
 import { AccountFeedback } from './accountFeedback.js';
-import type { AccountPageServices } from './accountPageServices.js';
 import './tokenDialogs.css';
 
 const CANCEL_ICON = proctorIconFactory('action.close');
@@ -65,36 +68,38 @@ export class NewTokenDialog extends Disposable {
 	private working = false;
 
 	constructor(
-		private readonly services: AccountPageServices,
 		private readonly onDidCreate: (token: AccountToken, credential: string) => void,
-		private readonly onDidClose: () => void
+		private readonly onDidClose: () => void,
+		@IAccountService private readonly account: IAccountService,
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IAccountPaneContext private readonly pane: IAccountPaneContext
 	) {
 		super();
-		const document = services.document;
+		const document = this.pane.document;
 		const $ = createElementFactory(document);
-		const now = services.now();
+		const now = this.format.now();
 		this.dialog = this._register(
 			new AccountDialog(
 				document,
-				services.overlays,
+				this.pane.overlays,
 				{
-					title: services.text('newTokenTitle'),
-					description: services.text('newTokenDescription'),
+					title: this.format.text('newTokenTitle'),
+					description: this.format.text('newTokenDescription'),
 					size: 'medium'
 				},
-				services.focusPage
+				this.pane.focusPage
 			)
 		);
 		this.name = this._register(
 			new TextFieldControl(this.dialog.body, {
-				label: services.text('tokenName'),
-				description: services.text('tokenNameHint'),
+				label: this.format.text('tokenName'),
+				description: this.format.text('tokenNameHint'),
 				value: '',
 				required: true
 			})
 		);
 		const legend = $('legend.prctr-account-token-form__legend', {
-			textContent: services.text('tokenScopes')
+			textContent: this.format.text('tokenScopes')
 		});
 		const scopeId = `prctr-account-token-scopes-${++scopeSequence}`;
 		this.scopeError = $('p.prctr-account-token-form__error', {
@@ -103,7 +108,7 @@ export class NewTokenDialog extends Disposable {
 		});
 		this.scopeStatus = $('p.prctr-account-token-form__status', {
 			id: `${scopeId}-status`,
-			textContent: services.text('tokenScopesLoading')
+			textContent: this.format.text('tokenScopesLoading')
 		});
 		this.scopeList = $('div.prctr-account-token-form__scope-list', { hidden: true });
 		const fieldset = $(
@@ -121,14 +126,14 @@ export class NewTokenDialog extends Disposable {
 		this.limitHint = $('p.prctr-account-token-form__hint', {
 			id: `${scopeId}-limit-hint`,
 			hidden: true,
-			textContent: services.text('tokenLimitMore')
+			textContent: this.format.text('tokenLimitMore')
 		});
 		this.limitField = $(
 			'div.prctr-account-token-form__field',
 			{ hidden: true },
 			$('label.prctr-account-token-form__label', {
 				htmlFor: this.limit.id,
-				textContent: services.text('tokenLimit')
+				textContent: this.format.text('tokenLimit')
 			}),
 			this.limit,
 			this.limitHint
@@ -142,9 +147,9 @@ export class NewTokenDialog extends Disposable {
 				$('option', {
 					value: String(days),
 					selected: days === DEFAULT_TOKEN_EXPIRY,
-					textContent: services.text('tokenExpiryOption', {
+					textContent: this.format.text('tokenExpiryOption', {
 						days,
-						date: services.date(tokenExpiry(days, now))
+						date: this.format.date(tokenExpiry(days, now))
 					})
 				})
 			);
@@ -153,7 +158,7 @@ export class NewTokenDialog extends Disposable {
 			{},
 			$('label.prctr-account-token-form__label', {
 				htmlFor: this.expiry.id,
-				textContent: services.text('tokenExpiry')
+				textContent: this.format.text('tokenExpiry')
 			}),
 			this.expiry
 		);
@@ -165,14 +170,14 @@ export class NewTokenDialog extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				label: services.text('cancel'),
+				label: this.format.text('cancel'),
 				icon: CANCEL_ICON
 			})
 		);
 		this.create = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'brand',
-				label: services.text('createToken'),
+				label: this.format.text('createToken'),
 				icon: CREATE_ICON
 			})
 		);
@@ -184,10 +189,10 @@ export class NewTokenDialog extends Disposable {
 
 	/** Reads what this person may grant; until it arrives nothing can be ticked or created. */
 	private async readGrantable(): Promise<void> {
-		const result = await this.services.request({ kind: 'read', section: 'grantableScopes' });
+		const result = await this.account.request({ kind: 'read', section: 'grantableScopes' });
 		if (this._store.isDisposed) return;
 		if (result.kind !== 'data' || result.data.section !== 'grantableScopes') {
-			this.scopeStatus.textContent = this.services.failure(
+			this.scopeStatus.textContent = this.format.failure(
 				result.kind === 'error' ? result.reason : 'invalid'
 			);
 			this.scopeStatus.classList.add('prctr-account-token-form__status--error');
@@ -197,7 +202,7 @@ export class NewTokenDialog extends Disposable {
 	}
 
 	private showGrantable(grantable: AccountGrantableScopes): void {
-		const $ = createElementFactory(this.services.document);
+		const $ = createElementFactory(this.pane.document);
 		this.grantable = grantable;
 		this.scopes = grantable.scopes.map((scope) => {
 			const input = $('input.prctr-account-token-form__checkbox', {
@@ -226,12 +231,12 @@ export class NewTokenDialog extends Disposable {
 		});
 		const empty = grantable.scopes.length === 0;
 		this.scopeStatus.hidden = !empty;
-		this.scopeStatus.textContent = empty ? this.services.text('tokenScopesNone') : '';
+		this.scopeStatus.textContent = empty ? this.format.text('tokenScopesNone') : '';
 		this.scopeList.hidden = empty;
 		const anywhere = grantable.scopes.some((scope) => scope.institutionWide);
 		if (anywhere)
 			this.limit.append(
-				$('option', { value: NO_LIMIT, textContent: this.services.text('tokenLimitNone') })
+				$('option', { value: NO_LIMIT, textContent: this.format.text('tokenLimitNone') })
 			);
 		for (const unit of grantable.academicUnits)
 			this.limit.append($('option', { value: unit.id, textContent: unit.name }));
@@ -290,11 +295,11 @@ export class NewTokenDialog extends Disposable {
 		this.name.setState({
 			value: this.nameValue,
 			required: true,
-			...(errors.name === undefined ? {} : { error: this.services.text(errors.name) })
+			...(errors.name === undefined ? {} : { error: this.format.text(errors.name) })
 		});
 		this.scopeError.hidden = errors.scopes === undefined;
 		this.scopeError.textContent =
-			errors.scopes === undefined ? '' : this.services.text(errors.scopes);
+			errors.scopes === undefined ? '' : this.format.text(errors.scopes);
 		if (errors.name !== undefined) {
 			this.name.input.focus();
 			return;
@@ -306,13 +311,13 @@ export class NewTokenDialog extends Disposable {
 		const academicUnitId = this.academicUnitId();
 		const days = Number(this.expiry.value) as TokenExpiryPreset;
 		this.setWorking(true);
-		this.feedback.set(this.services.text('tokenCreating'), 'loading');
-		const result = await this.services.change({
+		this.feedback.set(this.format.text('tokenCreating'), 'loading');
+		const result = await this.account.change({
 			kind: 'createToken',
 			description: this.nameValue.trim(),
 			scopes,
 			...(academicUnitId === undefined ? {} : { academicUnitId }),
-			expiresAt: tokenExpiry(days, this.services.now())
+			expiresAt: tokenExpiry(days, this.format.now())
 		});
 		if (this._store.isDisposed) return;
 		this.setWorking(false);
@@ -323,10 +328,10 @@ export class NewTokenDialog extends Disposable {
 		}
 		this.feedback.set(
 			result === 'busy'
-				? this.services.text('busy')
+				? this.format.text('busy')
 				: result.kind === 'error'
-					? this.services.failure(result.reason)
-					: this.services.failure('invalid'),
+					? this.format.failure(result.reason)
+					: this.format.failure('invalid'),
 			'error'
 		);
 		this.create.focus();
@@ -339,12 +344,12 @@ export class NewTokenDialog extends Disposable {
 		this.limit.disabled = working;
 		this.expiry.disabled = working;
 		this.cancel.setState({
-			label: this.services.text('cancel'),
+			label: this.format.text('cancel'),
 			icon: CANCEL_ICON,
 			disabled: working
 		});
 		this.create.setState({
-			label: this.services.text('createToken'),
+			label: this.format.text('createToken'),
 			icon: CREATE_ICON,
 			busy: working,
 			disabled: !working && this.scopes.length === 0
@@ -367,31 +372,33 @@ export class TokenCreatedDialog extends Disposable {
 	private readonly dialog: AccountDialog;
 	private readonly value: HTMLElement;
 	private readonly feedback: AccountFeedback;
-	private readonly copy: ButtonControl | undefined;
+	private readonly copy: ButtonControl;
 	/** Restores the Copy label after it has said Copied. */
 	private readonly copiedReset = this._register(new MutableDisposable());
 	private readonly done: ButtonControl;
 	private credential: string | undefined;
 
 	constructor(
-		private readonly services: AccountPageServices,
 		credential: string,
-		private readonly onDidClose: () => void
+		private readonly onDidClose: () => void,
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IClipboardService private readonly clipboard: IClipboardService
 	) {
 		super();
 		this.credential = credential;
-		const document = services.document;
+		const document = this.pane.document;
 		const $ = createElementFactory(document);
 		this.dialog = this._register(
 			new AccountDialog(
 				document,
-				services.overlays,
+				this.pane.overlays,
 				{
-					title: services.text('tokenCreatedTitle'),
-					description: services.text('tokenCreatedBody'),
+					title: this.format.text('tokenCreatedTitle'),
+					description: this.format.text('tokenCreatedBody'),
 					size: 'medium'
 				},
-				services.focusPage
+				this.pane.focusPage
 			)
 		);
 		this.value = $('span.prctr-account-token-credential__value', {
@@ -400,29 +407,25 @@ export class TokenCreatedDialog extends Disposable {
 			attrs: {
 				role: 'textbox',
 				'aria-readonly': 'true',
-				'aria-label': services.text('tokenCredentialLabel')
+				'aria-label': this.format.text('tokenCredentialLabel')
 			}
 		});
 		const row = $('div.prctr-account-token-credential', {}, this.value);
 		this.dialog.body.append(row);
-		const write = services.hooks.writeClipboard;
-		if (write !== undefined) {
-			this.copy = this._register(
-				new ButtonControl(row, {
-					variant: 'secondary',
-					size: 'small',
-					label: services.text('copy'),
-					icon: proctorIconFactory('action.copy', 14)
-				})
-			);
-			this._register(this.copy.onDidRequest(() => void this.copyCredential(write)));
-		}
+		this.copy = this._register(
+			new ButtonControl(row, {
+				variant: 'secondary',
+				size: 'small',
+				label: this.format.text('copy'),
+				icon: proctorIconFactory('action.copy', 14)
+			})
+		);
+		this._register(this.copy.onDidRequest(() => void this.copyCredential()));
 		this.feedback = this._register(new AccountFeedback(this.dialog.body));
-		if (write === undefined) this.feedback.set(services.text('selectToCopy'));
 		this.done = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'brand',
-				label: services.text('done'),
+				label: this.format.text('done'),
 				icon: proctorIconFactory('action.confirm')
 			})
 		);
@@ -433,20 +436,19 @@ export class TokenCreatedDialog extends Disposable {
 	}
 
 	private selectCredential(): void {
-		const selection = this.services.document.getSelection();
+		const selection = this.pane.document.getSelection();
 		if (selection === null) return;
 		selection.selectAllChildren(this.value);
 	}
 
-	private async copyCredential(write: (text: string) => Promise<void>): Promise<void> {
+	private async copyCredential(): Promise<void> {
 		const credential = this.credential;
 		if (credential === undefined) return;
 		try {
-			await write(credential);
+			await this.clipboard.writeText(credential);
 			if (!this._store.isDisposed) this.showCopied();
 		} catch {
-			if (!this._store.isDisposed)
-				this.feedback.set(this.services.text('copyFailed'), 'error');
+			if (!this._store.isDisposed) this.feedback.set(this.format.text('copyFailed'), 'error');
 		}
 	}
 
@@ -457,19 +459,19 @@ export class TokenCreatedDialog extends Disposable {
 		const element = button.element;
 		element.style.minInlineSize = `${element.getBoundingClientRect().width}px`;
 		button.setState({
-			label: this.services.text('copiedButton'),
+			label: this.format.text('copiedButton'),
 			icon: proctorIconFactory('action.confirm', 14)
 		});
 		element.dataset.copied = 'true';
 		this.feedback.set();
-		status(this.services.text('copied'));
+		status(this.format.text('copied'));
 		const timer = setTimeout(() => this.copiedReset.clear(), COPIED_MS);
 		this.copiedReset.value = toDisposable(() => {
 			clearTimeout(timer);
 			if (this._store.isDisposed) return;
 			delete element.dataset.copied;
 			button.setState({
-				label: this.services.text('copy'),
+				label: this.format.text('copy'),
 				icon: proctorIconFactory('action.copy', 14)
 			});
 		});
@@ -479,7 +481,7 @@ export class TokenCreatedDialog extends Disposable {
 		if (this._store.isDisposed) return;
 		this.credential = undefined;
 		this.value.textContent = '';
-		this.services.document.getSelection()?.removeAllRanges();
+		this.pane.document.getSelection()?.removeAllRanges();
 		super.dispose();
 		this.onDidClose();
 	}

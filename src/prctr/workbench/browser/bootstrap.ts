@@ -40,6 +40,7 @@ import {
 } from './workbenchKernel.js';
 import {
 	IProductWindowChromeService,
+	IWorkbenchOverlayService,
 	IWorkbenchShellService,
 	IWorkbenchWindowService
 } from './workbenchServices.js';
@@ -203,6 +204,7 @@ export async function bootstrapWorkbench(
 			[ILocalizationService, localizationService(localization)],
 			[IBrowserThemeService, themeService],
 			[IWorkbenchShellService, shell],
+			[IWorkbenchOverlayService, shell.overlayHost],
 			[IWorkbenchLifecycleService, lifecycle]
 		);
 		const instantiationService = disposables.add(new InstantiationService(services, true));

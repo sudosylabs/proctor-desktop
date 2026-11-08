@@ -2,6 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountFormatService } from './accountFormat.js';
+import { IAccountPaneContext } from './accountPaneContext.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
@@ -10,7 +12,6 @@ import type { AccountResponse } from '../../../../platform/account/common/accoun
 import { failureNeedsRead } from '../common/accountPresentation.js';
 import { AccountDialog } from './accountDialog.js';
 import { AccountFeedback } from './accountFeedback.js';
-import type { AccountPageServices } from './accountPageServices.js';
 
 export interface AccountConfirmationOptions {
 	readonly title: string;
@@ -39,17 +40,18 @@ export class AccountConfirmation extends Disposable {
 	private working = false;
 
 	constructor(
-		private readonly services: AccountPageServices,
 		private readonly options: AccountConfirmationOptions,
-		private readonly onDidClose: () => void
+		private readonly onDidClose: () => void,
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IAccountPaneContext private readonly pane: IAccountPaneContext
 	) {
 		super();
 		this.dialog = this._register(
 			new AccountDialog(
-				services.document,
-				services.overlays,
+				this.pane.document,
+				this.pane.overlays,
 				{ title: options.title, description: options.message, role: 'alertdialog' },
-				services.focusPage
+				this.pane.focusPage
 			)
 		);
 		this.feedback = this._register(new AccountFeedback(this.dialog.body));
@@ -57,7 +59,7 @@ export class AccountConfirmation extends Disposable {
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
 				icon: proctorIconFactory('action.close'),
-				label: services.text('cancel')
+				label: this.format.text('cancel')
 			})
 		);
 		this.confirm = this._register(
@@ -87,7 +89,7 @@ export class AccountConfirmation extends Disposable {
 		this.working = true;
 		this.feedback.set();
 		this.cancel.setState({
-			label: this.services.text('cancel'),
+			label: this.format.text('cancel'),
 			disabled: true,
 			icon: proctorIconFactory('action.close')
 		});
@@ -102,12 +104,12 @@ export class AccountConfirmation extends Disposable {
 			return;
 		}
 		this.cancel.setState({
-			label: this.services.text('cancel'),
+			label: this.format.text('cancel'),
 			icon: proctorIconFactory('action.close')
 		});
 		this.confirm.setState({ label: this.options.confirmLabel, icon });
 		this.feedback.set(
-			result === 'busy' ? this.services.text('busy') : this.services.failure(result.reason),
+			result === 'busy' ? this.format.text('busy') : this.format.failure(result.reason),
 			'error'
 		);
 		this.confirm.focus();

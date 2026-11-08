@@ -2,6 +2,9 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { IAccountService } from '../../../services/account/common/account.js';
+import { IAccountFormatService } from './accountFormat.js';
+import { IAccountPaneContext } from './accountPaneContext.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
@@ -28,7 +31,7 @@ import {
 	type HistoryFilters
 } from '../common/accountPresentation.js';
 import type { AccountMessage } from './accountMessages.js';
-import type { AccountPageServices, AccountPageView } from './accountPageServices.js';
+import type { AccountPageView } from './accountPages.js';
 import './historyPage.css';
 
 const groupMessages: Readonly<Record<HistoryEventGroup, AccountMessage>> = Object.freeze({
@@ -82,14 +85,17 @@ export class HistoryPage extends Disposable implements AccountPageView {
 
 	constructor(
 		body: HTMLElement,
-		private readonly services: AccountPageServices
+		_headerActions: HTMLElement,
+		@IAccountService private readonly account: IAccountService,
+		@IAccountFormatService private readonly format: IAccountFormatService,
+		@IAccountPaneContext private readonly pane: IAccountPaneContext
 	) {
 		super();
 		const document = body.ownerDocument;
 		const $ = createElementFactory(document);
 		const select = (label: AccountMessage): HTMLSelectElement =>
 			$('select.prctr-account-history__filter', {
-				attrs: { 'aria-label': services.text(label) }
+				attrs: { 'aria-label': this.format.text(label) }
 			});
 		this.period = select('historyPeriodLabel');
 		for (const period of historyPeriods)
@@ -99,19 +105,19 @@ export class HistoryPage extends Disposable implements AccountPageView {
 					selected: period === defaultHistoryFilters.period,
 					textContent:
 						period === 'all'
-							? services.text('historyPeriodAll')
-							: services.text('historyPeriodDays', { days: period })
+							? this.format.text('historyPeriodAll')
+							: this.format.text('historyPeriodDays', { days: period })
 				})
 			);
 		this.group = select('historyGroupLabel');
 		this.group.append(
-			$('option', { value: 'all', textContent: services.text('historyGroupAll') })
+			$('option', { value: 'all', textContent: this.format.text('historyGroupAll') })
 		);
 		for (const group of historyEventGroups)
 			this.group.append(
 				$('option', {
 					value: group.id,
-					textContent: services.text(groupMessages[group.id])
+					textContent: this.format.text(groupMessages[group.id])
 				})
 			);
 		this.relation = select('historyRelationLabel');
@@ -120,14 +126,14 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			['subject', 'historyRelationSubject'],
 			['actor', 'historyRelationActor']
 		] as const)
-			this.relation.append($('option', { value, textContent: services.text(label) }));
+			this.relation.append($('option', { value, textContent: this.format.text(label) }));
 		this.outcome = select('historyOutcomeLabel');
 		for (const [value, label] of [
 			['all', 'historyOutcomeAll'],
 			['success', 'historyOutcomeSuccess'],
 			['fail', 'historyOutcomeFail']
 		] as const)
-			this.outcome.append($('option', { value, textContent: services.text(label) }));
+			this.outcome.append($('option', { value, textContent: this.format.text(label) }));
 		// Each filter is drawn as a button showing its name and current choice; the native
 		// select lies over it, so the system list, keyboard and screen readers still apply.
 		const picker = (
@@ -146,7 +152,7 @@ export class HistoryPage extends Disposable implements AccountPageView {
 				{},
 				this._register(createProctorIcon(document, { id: icon, size: 16 })).element,
 				$('span.prctr-account-history__label', {
-					textContent: services.text(label),
+					textContent: this.format.text(label),
 					attrs: { 'aria-hidden': 'true' }
 				}),
 				value,
@@ -157,7 +163,7 @@ export class HistoryPage extends Disposable implements AccountPageView {
 		};
 		const filters = $(
 			'div.prctr-account-history__filters',
-			{ attrs: { role: 'group', 'aria-label': services.text('historyTitle') } },
+			{ attrs: { role: 'group', 'aria-label': this.format.text('historyTitle') } },
 			picker(this.period, 'object.calendar', 'historyPeriodLabel'),
 			picker(this.group, 'action.filter', 'historyGroupLabel'),
 			picker(this.relation, 'account.profile', 'historyRelationLabel'),
@@ -166,14 +172,14 @@ export class HistoryPage extends Disposable implements AccountPageView {
 
 		const heading = (label: AccountMessage, column: string): HTMLTableCellElement =>
 			$('th.prctr-account-history__heading', {
-				textContent: services.text(label),
+				textContent: this.format.text(label),
 				data: { column },
 				attrs: { scope: 'col' }
 			});
 		this.rows = $('tbody');
 		this.table = $(
 			'table.prctr-account-history__table',
-			{ tabIndex: -1, attrs: { 'aria-label': services.text('historyTitle') } },
+			{ tabIndex: -1, attrs: { 'aria-label': this.format.text('historyTitle') } },
 			$(
 				'thead',
 				{},
@@ -203,7 +209,7 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			new ButtonControl(this.state, {
 				variant: 'secondary',
 				size: 'small',
-				label: services.text('retry'),
+				label: this.format.text('retry'),
 				icon: proctorIconFactory('action.retry', 14)
 			})
 		);
@@ -234,7 +240,7 @@ export class HistoryPage extends Disposable implements AccountPageView {
 		// The server reports no total, so the pager numbers only the pages reached so far.
 		this.pager = this._register(
 			new PagerControl(card, {
-				labels: services.pagerLabels(services.text('historyTitle')),
+				labels: this.format.pagerLabels(this.format.text('historyTitle')),
 				previousIcon: proctorIconFactory('action.back', 14),
 				nextIcon: proctorIconFactory('action.forward', 14)
 			})
@@ -273,7 +279,7 @@ export class HistoryPage extends Disposable implements AccountPageView {
 		const cursorIndex = page - 1;
 		if (cursorIndex >= this.pageCursors.length) return;
 		const sequence = ++this.sequence;
-		const query = historyQuery(this.filters, this.services.now());
+		const query = historyQuery(this.filters, this.format.now());
 		const first = page === 1 && this.pageCursors.length === 1;
 		this.loaded = true;
 		if (first || this.status.kind !== 'ready') {
@@ -282,7 +288,7 @@ export class HistoryPage extends Disposable implements AccountPageView {
 		} else this.loadingPage = true;
 		this.render();
 		const cursor = this.pageCursors[cursorIndex];
-		const response = await this.services.request({
+		const response = await this.account.request({
 			kind: 'readHistory',
 			...query,
 			...(cursor === undefined ? {} : { cursor })
@@ -302,7 +308,7 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			return;
 		}
 		const reason = response.kind === 'error' ? response.reason : 'invalid';
-		if (changedPage) this.services.announce(this.services.failure(reason));
+		if (changedPage) this.pane.announce(this.format.failure(reason));
 		else this.status = { kind: 'failed', reason };
 		this.render();
 	}
@@ -311,8 +317,8 @@ export class HistoryPage extends Disposable implements AccountPageView {
 	private announcePage(): void {
 		this.table.focus();
 		const first = (this.page - 1) * HISTORY_PAGE_SIZE + 1;
-		this.services.announce(
-			this.services.text('pageShownOpen', {
+		this.pane.announce(
+			this.format.text('pageShownOpen', {
 				page: this.page,
 				first,
 				last: first + this.entries.length - 1
@@ -341,14 +347,14 @@ export class HistoryPage extends Disposable implements AccountPageView {
 				busy: this.loadingPage
 			});
 		}
-		if (status.kind === 'loading') this.showState('loading', this.services.text('loading'));
+		if (status.kind === 'loading') this.showState('loading', this.format.text('loading'));
 		else if (status.kind === 'failed')
 			this.showState(
 				'error',
-				this.services.text('loadFailed', { reason: this.services.failure(status.reason) })
+				this.format.text('loadFailed', { reason: this.format.failure(status.reason) })
 			);
 		else if (this.entries.length === 0)
-			this.showState('empty', this.services.text('historyEmpty'));
+			this.showState('empty', this.format.text('historyEmpty'));
 		else this.state.hidden = true;
 	}
 
@@ -368,28 +374,28 @@ export class HistoryPage extends Disposable implements AccountPageView {
 	): HTMLTableRowElement {
 		const notes: string[] = [];
 		if (entry.failed && entry.event !== 'sign_in.failed')
-			notes.push(this.services.text('historyFailed'));
-		if (entry.relation === 'actor') notes.push(this.services.text('historyAboutElsewhere'));
+			notes.push(this.format.text('historyFailed'));
+		if (entry.relation === 'actor') notes.push(this.format.text('historyAboutElsewhere'));
 		const what = $(
 			'span.prctr-account-history__what',
 			{},
 			$('span.prctr-account-history__event', {
-				textContent: this.services.text(historyEventMessage(entry.event))
+				textContent: this.format.text(historyEventMessage(entry.event))
 			})
 		);
 		if (notes.length > 0)
 			what.append(
 				$('span.prctr-account-history__note', {
-					textContent: notes.reduce((first, second) => this.services.join(first, second))
+					textContent: notes.reduce((first, second) => this.format.join(first, second))
 				})
 			);
 		const client =
-			entry.client === undefined ? undefined : this.services.text(clientKind(entry.client));
+			entry.client === undefined ? undefined : this.format.text(clientKind(entry.client));
 		const where = $(
 			'span.prctr-account-history__what',
 			{},
 			$('span', {
-				textContent: client ?? entry.ipAddress ?? this.services.text('historyWhereUnknown')
+				textContent: client ?? entry.ipAddress ?? this.format.text('historyWhereUnknown')
 			})
 		);
 		if (client !== undefined && entry.ipAddress !== undefined)
@@ -401,12 +407,12 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			{ data: { failed: String(entry.failed) } },
 			$('td', {}, what),
 			$('td.prctr-account-history__muted', {
-				textContent: this.services.text(historyActorMessage(entry))
+				textContent: this.format.text(historyActorMessage(entry))
 			}),
 			$('td.prctr-account-history__muted', {}, where),
 			$('td.prctr-account-history__when', {
-				textContent: this.services.relativeStandalone(entry.createdAt),
-				title: this.services.dateTime(entry.createdAt)
+				textContent: this.format.relativeStandalone(entry.createdAt),
+				title: this.format.dateTime(entry.createdAt)
 			})
 		);
 	}
