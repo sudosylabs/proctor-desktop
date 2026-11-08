@@ -130,8 +130,15 @@ export const authenticatedMessages = Object.freeze({
 	signOutConfirmBody: defineMessage({
 		id: 'authenticated.account.sign.out.confirm.body',
 		defaultMessage:
+			'You’ll need to sign in with {institution} again to use Proctor on this computer. Nothing you submitted is affected.',
+		description:
+			'What signing out does, in the confirmation. {institution} is the institution’s name.'
+	}),
+	signOutConfirmBodyGeneric: defineMessage({
+		id: 'authenticated.account.sign.out.confirm.body.generic',
+		defaultMessage:
 			'You’ll need to sign in again to use Proctor on this computer. Nothing you submitted is affected.',
-		description: 'What signing out does, in the confirmation.'
+		description: 'What signing out does, when the institution’s name is unknown.'
 	}),
 	cancel: defineMessage({
 		id: 'authenticated.cancel',

@@ -79,6 +79,7 @@ export function readAccountSessions(raw: unknown, binding: AccountBinding): Acco
 				current: s.current,
 				name: s.device_name ?? '',
 				client: s.client_type,
+				platform: s.desktop_platform ?? '',
 				method: s.authentication_method,
 				createdAt: accountInstant(s.created_at),
 				lastActivityAt: accountInstant(s.last_activity_at),

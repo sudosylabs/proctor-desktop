@@ -7,7 +7,10 @@ import { alert } from '../../../../base/browser/ui/aria/aria.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { KeyCode, KeyMod } from '../../../../base/common/keyCodes.js';
 import { Disposable, type IDisposable } from '../../../../base/common/lifecycle.js';
-import type { LocalizationContext } from '../../../../base/common/localization.js';
+import type {
+	LocalizationContext,
+	LocalizationValue
+} from '../../../../base/common/localization.js';
 import { isMacintosh } from '../../../../base/common/platform.js';
 import { KeybindingWeight } from '../../../../platform/keybinding/common/keybindingsRegistry.js';
 import type { ProductWindowChrome } from '../../../../platform/windows/browser/productWindowChrome.js';
@@ -143,6 +146,7 @@ export class AuthenticatedFrame
 	private overlayOpen = false;
 	private shownSidebar: boolean | undefined;
 	private signingOut = false;
+	private readonly institutionName: string | undefined;
 
 	constructor(
 		options: AuthenticatedFrameOptions,
@@ -154,6 +158,7 @@ export class AuthenticatedFrame
 		this.localization = options.localization;
 		this.productPages = options.productPages;
 		const binding = options.binding;
+		this.institutionName = binding.identity?.institutionName;
 		const document = this.shell.element.ownerDocument;
 		this.preferences = new AuthenticatedLayoutState(localStorageOf(document));
 		this.sidebarPreferred = this.preferences.sidebarVisible;
@@ -208,8 +213,11 @@ export class AuthenticatedFrame
 		void this.loadPhoto();
 	}
 
-	private text(key: AuthenticatedMessage): string {
-		return this.localization.format(m[key]);
+	private text(
+		key: AuthenticatedMessage,
+		values?: Readonly<Record<string, LocalizationValue>>
+	): string {
+		return this.localization.format(m[key], values);
 	}
 
 	// #region AuthenticatedNavigationService
@@ -499,7 +507,10 @@ export class AuthenticatedFrame
 		this.shell.overlayHost.show({
 			kind: 'dialog',
 			title: this.text('signOutConfirmTitle'),
-			message: this.text('signOutConfirmBody'),
+			message:
+				this.institutionName === undefined
+					? this.text('signOutConfirmBodyGeneric')
+					: this.text('signOutConfirmBody', { institution: this.institutionName }),
 			accessibleLabel: this.text('signOutConfirmTitle'),
 			dismissOnEscape: true,
 			actions: [

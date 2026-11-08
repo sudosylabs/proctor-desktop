@@ -175,6 +175,7 @@ void test('sessions split into this computer and the rest', () => {
 		current: false,
 		name: '',
 		client: 'web',
+		platform: '',
 		method: 'password',
 		createdAt: 1,
 		lastActivityAt: 1,

@@ -145,12 +145,31 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		return session.name || this.clientName(session);
 	}
 
+	/**
+	 * "macOS · signed in today, 08:41" for this computer; for another session, what the title
+	 * does not already say, then when it was last used: "Proctor Desktop · Windows · active 5 Nov",
+	 * or "Signed in yesterday, 17:20 · active today, 09:12" when nothing else is known.
+	 */
 	private sessionDetail(session: AccountSession): string {
-		return this.services.text('sessionSummary', {
-			client: this.clientName(session),
-			signedIn: this.services.relative(session.createdAt),
-			active: this.services.relative(session.lastActivityAt)
-		});
+		const parts: string[] = [];
+		if (!session.current && session.name && session.name !== this.clientName(session))
+			parts.push(this.clientName(session));
+		if (session.platform) parts.push(this.services.text(platformKind(session.platform)));
+		const signedIn = { when: this.services.relative(session.createdAt) };
+		if (session.current || parts.length === 0)
+			parts.push(
+				this.services.text(
+					parts.length === 0 ? 'sessionSignedInFirst' : 'sessionSignedIn',
+					signedIn
+				)
+			);
+		if (!session.current)
+			parts.push(
+				this.services.text('sessionActive', {
+					when: this.services.relative(session.lastActivityAt)
+				})
+			);
+		return parts.reduce((detail, part) => this.services.join(detail, part));
 	}
 
 	private sessionGlyph(session: AccountSession): ProctorIconId {

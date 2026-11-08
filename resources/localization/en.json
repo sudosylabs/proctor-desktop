@@ -669,16 +669,8 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.page.security.description": {
-      "message": "How you sign in to Proctor at {institution}, and what protects your account.",
-      "description": "Description under the Sign-in and security heading.",
-      "placeholders": [
-        "institution"
-      ],
-      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
-    },
-    "account.page.security.description.generic": {
       "message": "How you sign in to Proctor, and what protects your account.",
-      "description": "Sign-in and security description when the institution name is unknown.",
+      "description": "Description under the Sign-in and security heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -1040,7 +1032,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.security.footnote": {
-      "message": "Changes happen on {institution}’s security page, in your browser. Proctor never asks for your password in this window.",
+      "message": "Passwords, two-step verification and recovery codes are changed on {institution}’s security page in your browser. Proctor never asks for your password.",
       "description": "Where security changes happen.",
       "placeholders": [
         "institution"
@@ -1048,7 +1040,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.security.footnote.generic": {
-      "message": "Changes happen on your institution’s security page, in your browser. Proctor never asks for your password in this window.",
+      "message": "Passwords, two-step verification and recovery codes are changed on your institution’s security page in your browser. Proctor never asks for your password.",
       "description": "Where security changes happen when the institution name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -1261,6 +1253,14 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.sessions.active": {
+      "message": "active {when}",
+      "description": "Part of a session row's second line: when the session was last used.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.sessions.current.empty": {
       "message": "This window’s session isn’t listed. It may have just ended.",
       "description": "The current session is missing from the list.",
@@ -1421,13 +1421,19 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
-    "account.sessions.summary": {
-      "message": "{client} · signed in {signedIn} · last active {active}",
-      "description": "Second line of a session row.",
+    "account.sessions.signed.in": {
+      "message": "signed in {when}",
+      "description": "Part of a session row's second line, after the device, as in \"macOS · signed in today, 08:41\".",
       "placeholders": [
-        "client",
-        "signedIn",
-        "active"
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.sessions.signed.in.first": {
+      "message": "Signed in {when}",
+      "description": "Start of a session row's second line, as in \"Signed in yesterday, 17:20 · active today, 09:12\".",
+      "placeholders": [
+        "when"
       ],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
@@ -2318,8 +2324,16 @@
       "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },
     "authenticated.account.sign.out.confirm.body": {
+      "message": "You’ll need to sign in with {institution} again to use Proctor on this computer. Nothing you submitted is affected.",
+      "description": "What signing out does, in the confirmation. {institution} is the institution’s name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
+    },
+    "authenticated.account.sign.out.confirm.body.generic": {
       "message": "You’ll need to sign in again to use Proctor on this computer. Nothing you submitted is affected.",
-      "description": "What signing out does, in the confirmation.",
+      "description": "What signing out does, when the institution’s name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/authenticated/browser/authenticatedMessages.ts"
     },

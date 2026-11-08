@@ -28,14 +28,8 @@ export const accountMessages = Object.freeze({
 	}),
 	securityDescription: defineMessage({
 		id: 'account.page.security.description',
-		defaultMessage:
-			'How you sign in to Proctor at {institution}, and what protects your account.',
-		description: 'Description under the Sign-in and security heading.'
-	}),
-	securityDescriptionGeneric: defineMessage({
-		id: 'account.page.security.description.generic',
 		defaultMessage: 'How you sign in to Proctor, and what protects your account.',
-		description: 'Sign-in and security description when the institution name is unknown.'
+		description: 'Description under the Sign-in and security heading.'
 	}),
 	sessionsTitle: defineMessage({
 		id: 'account.page.sessions.title',
@@ -997,13 +991,13 @@ export const accountMessages = Object.freeze({
 	securityFootnote: defineMessage({
 		id: 'account.security.footnote',
 		defaultMessage:
-			'Changes happen on {institution}’s security page, in your browser. Proctor never asks for your password in this window.',
+			'Passwords, two-step verification and recovery codes are changed on {institution}’s security page in your browser. Proctor never asks for your password.',
 		description: 'Where security changes happen.'
 	}),
 	securityFootnoteGeneric: defineMessage({
 		id: 'account.security.footnote.generic',
 		defaultMessage:
-			'Changes happen on your institution’s security page, in your browser. Proctor never asks for your password in this window.',
+			'Passwords, two-step verification and recovery codes are changed on your institution’s security page in your browser. Proctor never asks for your password.',
 		description: 'Where security changes happen when the institution name is unknown.'
 	}),
 	// #endregion
@@ -1127,10 +1121,22 @@ export const accountMessages = Object.freeze({
 		defaultMessage: 'Desktop removed.',
 		description: 'A registered desktop was removed.'
 	}),
-	sessionSummary: defineMessage({
-		id: 'account.sessions.summary',
-		defaultMessage: '{client} · signed in {signedIn} · last active {active}',
-		description: 'Second line of a session row.'
+	sessionSignedIn: defineMessage({
+		id: 'account.sessions.signed.in',
+		defaultMessage: 'signed in {when}',
+		description:
+			'Part of a session row\'s second line, after the device, as in "macOS · signed in today, 08:41".'
+	}),
+	sessionSignedInFirst: defineMessage({
+		id: 'account.sessions.signed.in.first',
+		defaultMessage: 'Signed in {when}',
+		description:
+			'Start of a session row\'s second line, as in "Signed in yesterday, 17:20 · active today, 09:12".'
+	}),
+	sessionActive: defineMessage({
+		id: 'account.sessions.active',
+		defaultMessage: 'active {when}',
+		description: "Part of a session row's second line: when the session was last used."
 	}),
 	desktopSummary: defineMessage({
 		id: 'account.sessions.desktop.summary',

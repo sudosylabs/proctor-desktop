@@ -147,6 +147,8 @@ export interface AccountSession {
 	readonly current: boolean;
 	readonly name: string;
 	readonly client: string;
+	/** The Desktop's operating system, empty for other clients. */
+	readonly platform: string;
 	readonly method: string;
 	readonly createdAt: number;
 	readonly lastActivityAt: number;
@@ -572,6 +574,7 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 						current: accountBoolean(s.current),
 						name: accountText(s.name),
 						client: accountText(s.client, 64),
+						platform: accountText(s.platform, 64),
 						method: accountText(s.method, 64),
 						createdAt: accountTime(s.createdAt),
 						lastActivityAt: accountTime(s.lastActivityAt),

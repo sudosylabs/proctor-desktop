@@ -237,11 +237,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 	private pageDescription(page: AccountPage): string {
 		if (page === 'profile')
 			return this.services.institutionText('profileDescription', 'profileDescriptionGeneric');
-		if (page === 'security')
-			return this.services.institutionText(
-				'securityDescription',
-				'securityDescriptionGeneric'
-			);
+		if (page === 'security') return this.services.text('securityDescription');
 		if (page === 'sessions') return this.services.text('sessionsDescription');
 		if (page === 'history') return this.services.text('historyDescription');
 		if (page === 'settings') return this.services.text('settingsDescription');
