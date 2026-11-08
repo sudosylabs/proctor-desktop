@@ -81,7 +81,7 @@ async function run(): Promise<void> {
 			async readSettings() {
 				return {
 					acknowledged: {
-						source: '{"workbench.colorTheme":"GitHub Dark Dimmed"}',
+						source: '{"window.theme":"dark"}',
 						revision: 'r'.repeat(26)
 					},
 					writable: true
@@ -200,14 +200,14 @@ async function run(): Promise<void> {
       }
       else if (bootstrap.kind === 'authenticated') {
  const initial = await api.settings.projection();
- if (initial.presentation.theme !== 'GitHub Dark Dimmed') throw new Error('Bound settings did not load on authenticated startup');
- const source = JSON.stringify({'workbench.colorTheme':'GitHub Light Default','workbench.colorCustomizations':{'button.background':'#123456'}});
+ if (initial.presentation.windowTheme !== 'dark') throw new Error('Bound settings did not load on authenticated startup');
+ const source = JSON.stringify({'window.theme':'light','workbench.colorCustomizations':{'button.background':'#123456'}});
  await api.settings.preview({source});
  if ((await api.settings.projection()).presentation.colorCustomizations['button.background'] !== '#123456') throw new Error('Theme preview did not cross bound settings IPC');
  await api.settings.cancelPreview();
- if ((await api.settings.projection()).presentation.theme !== 'GitHub Dark Dimmed') throw new Error('Theme cancel did not restore server source');
+ if ((await api.settings.projection()).presentation.windowTheme !== 'dark') throw new Error('Theme cancel did not restore server source');
  const saved = await api.settings.commit({source,expectedRevision:initial.revision,idempotencyKey:'settings:test'});
- if (saved.kind !== 'success' || saved.projection.presentation.theme !== 'GitHub Light Default') throw new Error('Theme commit failed through production window binding');
+ if (saved.kind !== 'success' || saved.projection.presentation.windowTheme !== 'light') throw new Error('Theme commit failed through production window binding');
  await api.joinAttempt('attempt-2');
  }
       else { await api.requestDeparture(); await api.browser.surface({ visible: true, focus: true, bounds: { x: -10, y: 10, width: 100000, height: 100000 } }); if (await api.browser.surfaceFocus() !== false) throw new Error('unexpected integrated browser focus'); }
