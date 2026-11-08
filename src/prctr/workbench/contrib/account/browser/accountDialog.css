@@ -1,9 +1,8 @@
 @layer contributions {
 	.prctr-account-dialog {
-		background: var(--prctr-color-background-surface);
-		border: 0;
-		/* Dialogs take the window's large radius: 12px on macOS, 8px on Windows. */
-		border-radius: calc(var(--prctr-workbench-control-radius, 6px) * 2);
+		background: var(--prctr-color-background-card);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
+		border-radius: 12px;
 		box-shadow: var(--prctr-elevation-modal);
 		box-sizing: border-box;
 		color: var(--prctr-color-text-primary);
@@ -12,18 +11,18 @@
 		font-family: var(--prctr-typography-font-application);
 		font-size: 13.5px;
 		gap: 18px;
-		inline-size: min(400px, calc(100vw - 32px));
+		inline-size: min(420px, calc(100vw - 32px));
 		line-height: 20px;
-		margin-block-start: min(140px, 15vh);
+		margin-block-start: min(96px, 12vh);
 		max-block-size: calc(100vh - 32px);
 		overflow: auto;
-		padding: 22px 24px 20px;
+		padding: 22px 22px 18px;
 	}
 	.prctr-account-dialog:not([open]) {
 		display: none;
 	}
 	.prctr-account-dialog[data-size='medium'] {
-		inline-size: min(460px, calc(100vw - 32px));
+		inline-size: min(500px, calc(100vw - 32px));
 		margin-block-start: min(72px, 10vh);
 	}
 	.prctr-account-dialog::backdrop {
@@ -35,7 +34,7 @@
 		gap: 6px;
 	}
 	.prctr-account-dialog .prctr-account-dialog__title {
-		font-size: 17px;
+		font-size: 18px;
 		font-weight: var(--prctr-typography-weight-semibold);
 		line-height: 24px;
 		margin: 0;
@@ -43,7 +42,8 @@
 	}
 	.prctr-account-dialog .prctr-account-dialog__description {
 		color: var(--prctr-color-text-secondary);
-		line-height: 1.5;
+		font-size: 13.5px;
+		line-height: 20px;
 		margin: 0;
 		overflow-wrap: anywhere;
 	}

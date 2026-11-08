@@ -4,6 +4,8 @@
 
 import { status } from '../../../../base/browser/ui/aria/aria.js';
 import type { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
+import type { ToastHost } from '../../../../base/browser/ui/toast/toastHost.js';
+import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { IDisposable } from '../../../../base/common/lifecycle.js';
 import type {
 	LocalizationContext,
@@ -50,6 +52,7 @@ export class AccountPageServices {
 		readonly binding: AuthenticatedWindowDescriptor,
 		readonly overlays: WorkbenchOverlayHost,
 		readonly menu: MenuControl,
+		private readonly toasts: ToastHost,
 		readonly hooks: AccountWindowHooks,
 		customPhotos: Set<string>,
 		readonly focusPage: () => void,
@@ -137,6 +140,36 @@ export class AccountPageServices {
 
 	announce(text: string): void {
 		status(text);
+	}
+
+	/**
+	 * Reports the result of something the person just did. A success leaves on its own; a
+	 * failure stays until dismissed and can offer to try again.
+	 */
+	toast(title: string, failure?: { readonly body?: string; readonly retry?: () => void }): void {
+		if (failure === undefined) {
+			this.toasts.show({
+				tone: 'success',
+				icon: proctorIconFactory('status.success', 18),
+				title
+			});
+			return;
+		}
+		this.toasts.show({
+			tone: 'failure',
+			icon: proctorIconFactory('status.attention', 18),
+			title,
+			...(failure.body === undefined ? {} : { body: failure.body }),
+			...(failure.retry === undefined
+				? {}
+				: {
+						action: {
+							label: this.text('retry'),
+							icon: proctorIconFactory('action.retry', 14),
+							run: failure.retry
+						}
+					})
+		});
 	}
 
 	/**

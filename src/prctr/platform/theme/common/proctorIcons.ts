@@ -76,6 +76,7 @@ const icons = {
 	'object.browserActivity': 'browser',
 	'object.calendar': 'calendar-blank',
 	'object.file': 'file-text',
+	'object.image': 'image',
 	'object.institution': 'buildings',
 	'object.key': 'key',
 	'object.password': 'password',

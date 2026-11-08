@@ -40,6 +40,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.desktops.remove.menu": {
+      "message": "Remove desktop…",
+      "description": "Row menu entry that opens the confirmation to remove a registered desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.desktops.removed.status": {
+      "message": "Removed",
+      "description": "Status word: this registered desktop was removed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.detail.separator": {
       "message": "{first} · {second}",
       "description": "Joins two parts of a row description.",
@@ -47,6 +59,12 @@
         "first",
         "second"
       ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.dismiss": {
+      "message": "Dismiss",
+      "description": "Closes a toast.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.failure.conflict": {
@@ -1055,6 +1073,14 @@
       ],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.security.password.changed.on": {
+      "message": "Changed {date}",
+      "description": "When the password was last changed.",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.security.password.not.set": {
       "message": "Not set",
       "description": "No password is set.",
@@ -1071,6 +1097,14 @@
       "message": "Recovery codes",
       "description": "Row title of recovery codes.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.security.recovery.codes.issued": {
+      "message": "Issued {date} · each code works once",
+      "description": "When the recovery codes were issued.",
+      "placeholders": [
+        "date"
+      ],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.security.recovery.codes.left": {
@@ -1107,6 +1141,12 @@
       ],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.security.recovery.codes.once": {
+      "message": "Each code works once",
+      "description": "Recovery codes detail when the issue date is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.security.single.sign.on": {
       "message": "Single sign-on",
       "description": "A linked institution sign-in provider.",
@@ -1117,6 +1157,20 @@
       "message": "Two-step verification",
       "description": "Heading and row title of two-step verification.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.security.two.step.app": {
+      "message": "Authenticator app",
+      "description": "Two-step verification uses an authenticator app.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.security.two.step.app.since": {
+      "message": "Authenticator app · on since {date}",
+      "description": "Two-step verification uses an authenticator app, on since date.",
+      "placeholders": [
+        "date"
+      ],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.security.two.step.description": {
@@ -1257,6 +1311,12 @@
       "placeholders": [
         "name"
       ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.sessions.end.menu": {
+      "message": "End session…",
+      "description": "Row menu entry that opens the confirmation to end a session.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.sessions.end.others": {
@@ -1417,6 +1477,56 @@
       ],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.state.still.waiting": {
+      "message": "Still waiting for {institution}…",
+      "description": "A read is slow; institution is the server’s name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.state.still.waiting.generic": {
+      "message": "Still waiting for the server…",
+      "description": "A read is slow and the institution name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.status.attention": {
+      "message": "Needs attention",
+      "description": "Status word: something about two-step verification needs the person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.status.linked": {
+      "message": "Linked",
+      "description": "Status word: a sign-in provider is linked.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.status.not.set": {
+      "message": "Not set",
+      "description": "Status word: no password is set.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.status.off": {
+      "message": "Off",
+      "description": "Status word: two-step verification is off.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.status.on": {
+      "message": "On",
+      "description": "Status word: two-step verification is on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.status.set": {
+      "message": "Set",
+      "description": "Status word: a password is set.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.time.today": {
       "message": "today, {time}",
       "description": "A time earlier today, as in \"last active today, 08:41\".",
@@ -1446,7 +1556,7 @@
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
     "account.tokens.active.empty": {
-      "message": "You have no active tokens.",
+      "message": "No access tokens yet. A token lets a script, such as a grade export, use Proctor with only the permissions you choose.",
       "description": "No active tokens.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
@@ -1682,6 +1792,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },
+    "account.tokens.revoke.menu": {
+      "message": "Revoke…",
+      "description": "Row menu entry that opens the confirmation to revoke a token.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
     "account.tokens.revoke.title": {
       "message": "Revoke {name}?",
       "description": "Title of the revoke confirmation.",
@@ -1731,6 +1847,24 @@
     "account.tokens.select.to.copy": {
       "message": "Select the token and copy it.",
       "description": "How to copy when no clipboard is available.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.tokens.status.disabled": {
+      "message": "Disabled",
+      "description": "Status word: the token is turned off.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.tokens.status.expired": {
+      "message": "Expired",
+      "description": "Status word: the token has expired.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
+    },
+    "account.tokens.status.revoked": {
+      "message": "Revoked",
+      "description": "Status word: the token was revoked.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/browser/accountMessages.ts"
     },

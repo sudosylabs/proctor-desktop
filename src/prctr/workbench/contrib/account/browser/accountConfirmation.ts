@@ -3,6 +3,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
+import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import type { AccountResponse } from '../../../../platform/account/common/accountProtocol.js';
 import { failureNeedsRead } from '../common/accountPresentation.js';
@@ -14,6 +16,8 @@ export interface AccountConfirmationOptions {
 	readonly title: string;
 	readonly message: string;
 	readonly confirmLabel: string;
+	/** The confirming action's icon; ending something by default. */
+	readonly confirmIcon?: ProctorIconId;
 	/** Performs the change once the person confirms. */
 	readonly run: () => Promise<AccountResponse | 'busy'>;
 	/**
@@ -52,13 +56,15 @@ export class AccountConfirmation extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
+				icon: proctorIconFactory('action.close'),
 				label: services.text('cancel')
 			})
 		);
 		this.confirm = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'danger',
-				label: options.confirmLabel
+				label: options.confirmLabel,
+				icon: proctorIconFactory(options.confirmIcon ?? 'action.end')
 			})
 		);
 		this.registerListeners();
@@ -80,8 +86,13 @@ export class AccountConfirmation extends Disposable {
 		if (this.working) return;
 		this.working = true;
 		this.feedback.set();
-		this.cancel.setState({ label: this.services.text('cancel'), disabled: true });
-		this.confirm.setState({ label: this.options.confirmLabel, busy: true });
+		this.cancel.setState({
+			label: this.services.text('cancel'),
+			disabled: true,
+			icon: proctorIconFactory('action.close')
+		});
+		const icon = proctorIconFactory(this.options.confirmIcon ?? 'action.end');
+		this.confirm.setState({ label: this.options.confirmLabel, busy: true, icon });
 		const result = await this.options.run();
 		if (this._store.isDisposed) return;
 		this.working = false;
@@ -90,8 +101,11 @@ export class AccountConfirmation extends Disposable {
 			this.options.onDidComplete(result);
 			return;
 		}
-		this.cancel.setState({ label: this.services.text('cancel') });
-		this.confirm.setState({ label: this.options.confirmLabel });
+		this.cancel.setState({
+			label: this.services.text('cancel'),
+			icon: proctorIconFactory('action.close')
+		});
+		this.confirm.setState({ label: this.options.confirmLabel, icon });
 		this.feedback.set(
 			result === 'busy' ? this.services.text('busy') : this.services.failure(result.reason),
 			'error'

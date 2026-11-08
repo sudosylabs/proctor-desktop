@@ -42,6 +42,7 @@ const regular = [
 	'gear-six',
 	'globe',
 	'hourglass',
+	'image',
 	'info',
 	'key',
 	'laptop',

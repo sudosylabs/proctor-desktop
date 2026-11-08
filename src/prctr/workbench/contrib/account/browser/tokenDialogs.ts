@@ -20,10 +20,14 @@ import {
 	validateTokenDraft,
 	type TokenExpiryPreset
 } from '../common/accountPresentation.js';
+import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import { AccountDialog } from './accountDialog.js';
 import { AccountFeedback } from './accountFeedback.js';
 import type { AccountPageServices } from './accountPageServices.js';
 import './tokenDialogs.css';
+
+const CANCEL_ICON = proctorIconFactory('action.close');
+const CREATE_ICON = proctorIconFactory('action.add');
 
 let scopeSequence = 0;
 
@@ -157,13 +161,15 @@ export class NewTokenDialog extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				label: services.text('cancel')
+				label: services.text('cancel'),
+				icon: CANCEL_ICON
 			})
 		);
 		this.create = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'brand',
-				label: services.text('createToken')
+				label: services.text('createToken'),
+				icon: CREATE_ICON
 			})
 		);
 		this.registerListeners();
@@ -328,9 +334,14 @@ export class NewTokenDialog extends Disposable {
 		this.applyLimit();
 		this.limit.disabled = working;
 		this.expiry.disabled = working;
-		this.cancel.setState({ label: this.services.text('cancel'), disabled: working });
+		this.cancel.setState({
+			label: this.services.text('cancel'),
+			icon: CANCEL_ICON,
+			disabled: working
+		});
 		this.create.setState({
 			label: this.services.text('createToken'),
+			icon: CREATE_ICON,
 			busy: working,
 			disabled: !working && this.scopes.length === 0
 		});
@@ -391,7 +402,12 @@ export class TokenCreatedDialog extends Disposable {
 		const write = services.hooks.writeClipboard;
 		if (write !== undefined) {
 			this.copy = this._register(
-				new ButtonControl(row, { variant: 'secondary', label: services.text('copy') })
+				new ButtonControl(row, {
+					variant: 'secondary',
+					size: 'small',
+					label: services.text('copy'),
+					icon: proctorIconFactory('action.copy', 14)
+				})
 			);
 			this._register(this.copy.onDidRequest(() => void this.copyCredential(write)));
 		}
@@ -400,7 +416,8 @@ export class TokenCreatedDialog extends Disposable {
 		this.done = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'brand',
-				label: services.text('done')
+				label: services.text('done'),
+				icon: proctorIconFactory('action.confirm')
 			})
 		);
 		this._register(this.done.onDidRequest(() => this.dispose()));

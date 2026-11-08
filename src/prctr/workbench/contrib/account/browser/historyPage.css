@@ -10,19 +10,39 @@
 		flex-wrap: wrap;
 		gap: 8px;
 	}
+	/* A native select drawn as a Proctor field: icon, value, caret. */
+	.prctr-account .prctr-account-history__picker {
+		align-items: center;
+		color: var(--prctr-color-text-secondary);
+		display: inline-flex;
+		max-inline-size: 100%;
+		position: relative;
+	}
+	.prctr-account .prctr-account-history__picker > .prctr-icon {
+		pointer-events: none;
+		position: absolute;
+	}
+	.prctr-account .prctr-account-history__picker > .prctr-icon:first-child {
+		inset-inline-start: 10px;
+	}
+	.prctr-account .prctr-account-history__picker > .prctr-icon:last-child {
+		inset-inline-end: 10px;
+	}
 	.prctr-account .prctr-account-history__filter {
-		background: transparent;
-		block-size: 30px;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-strong);
-		border-radius: var(--prctr-workbench-control-radius, 6px);
+		appearance: none;
+		background: var(--prctr-color-background-card);
+		block-size: 32px;
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-control);
+		border-radius: 8px;
 		color: var(--prctr-color-text-primary);
+		cursor: pointer;
 		font: inherit;
 		font-size: 13px;
 		max-inline-size: 100%;
-		padding: 0 8px;
+		padding: 0 30px 0 32px;
 	}
 	.prctr-account .prctr-account-history__filter:focus-visible {
-		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline: 2px solid var(--prctr-color-border-focus);
 		outline-offset: 1px;
 	}
 	.prctr-account .prctr-account-history__shown {
@@ -40,11 +60,12 @@
 		display: none;
 	}
 	.prctr-account .prctr-account-history__heading {
+		background: var(--prctr-color-background-raised);
 		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
 		color: var(--prctr-color-text-tertiary);
 		font-size: 12px;
 		font-weight: var(--prctr-typography-weight-medium);
-		padding: 0 8px 8px;
+		padding: 10px 14px;
 		text-align: start;
 	}
 	.prctr-account .prctr-account-history__heading:nth-child(1) {
@@ -59,8 +80,8 @@
 	.prctr-account .prctr-account-history__row > td {
 		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
 		overflow-wrap: anywhere;
-		padding: 12px 8px;
-		vertical-align: top;
+		padding: 11px 14px;
+		vertical-align: middle;
 	}
 	.prctr-account .prctr-account-history__when {
 		color: var(--prctr-color-text-secondary);
@@ -71,7 +92,7 @@
 		color: var(--prctr-color-text-secondary);
 	}
 	.prctr-account .prctr-account-history__cell {
-		align-items: baseline;
+		align-items: center;
 		display: flex;
 		gap: 10px;
 		min-inline-size: 0;
@@ -91,5 +112,32 @@
 	}
 	.prctr-account .prctr-account-history__footer:has(> [hidden]:only-child) {
 		display: none;
+	}
+}
+
+@layer contributions {
+	.prctr-account .prctr-account-history__row:last-child > td {
+		border-block-end: 0;
+	}
+	.prctr-account .prctr-account-history__cell > .prctr-icon {
+		color: var(--prctr-color-text-tertiary);
+	}
+	.prctr-account
+		.prctr-account-history__row[data-failed='true']
+		.prctr-account-history__cell
+		> .prctr-icon {
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-account .prctr-account-history__footer {
+		display: flex;
+		justify-content: center;
+	}
+	@media (forced-colors: active) {
+		.prctr-account .prctr-account-history__picker > .prctr-icon:last-child {
+			display: none;
+		}
+		.prctr-account .prctr-account-history__filter {
+			appearance: auto;
+		}
 	}
 }

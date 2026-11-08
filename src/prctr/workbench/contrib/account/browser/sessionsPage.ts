@@ -11,12 +11,12 @@ import type {
 } from '../../../../platform/account/common/accountProtocol.js';
 import {
 	clientKind,
-	desktopShape,
 	failureNeedsRead,
 	groupSessions,
 	orderDesktops,
 	platformKind
 } from '../common/accountPresentation.js';
+import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { AccountConfirmation } from './accountConfirmation.js';
 import type { AccountMessage } from './accountMessages.js';
 import type { AccountPageServices, AccountPageView } from './accountPageServices.js';
@@ -56,8 +56,11 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		this.others = this._register(
 			new AccountSection(body, services, {
 				title: services.text('otherSessions'),
-				description: services.text('otherSessionsDescription'),
-				action: services.text('endOtherSessions')
+				action: {
+					label: services.text('endOtherSessions'),
+					icon: 'action.end',
+					destructive: true
+				}
 			})
 		);
 		this.registered = this._register(
@@ -150,16 +153,32 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		});
 	}
 
+	private sessionGlyph(session: AccountSession): ProctorIconId {
+		const kind = clientKind(session.client);
+		return kind === 'clientWeb'
+			? 'device.browser'
+			: kind === 'clientCli'
+				? 'device.cli'
+				: 'device.laptop';
+	}
+
 	private currentRow(session: AccountSession): AccountRowModel {
 		return {
 			id: session.id,
+			glyph: this.sessionGlyph(session),
 			title: this.sessionName(session),
 			detail: this.sessionDetail(session),
-			shape: 'active',
-			tag: this.services.text('thisSession'),
-			actions: [
-				{ label: this.services.text('signOut'), run: () => this.services.hooks.signOut() }
-			]
+			status: {
+				text: this.services.text('thisSession'),
+				icon: 'status.success',
+				tone: 'quiet'
+			},
+			// Signing out asks first, in the window's own confirmation.
+			button: {
+				label: this.services.text('signOut'),
+				icon: 'action.signOut',
+				run: () => this.services.hooks.signOut()
+			}
 		};
 	}
 
@@ -168,12 +187,13 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		const key = `session:${session.id}`;
 		return {
 			id: session.id,
+			glyph: this.sessionGlyph(session),
 			title: name,
 			detail: this.sessionDetail(session),
-			shape: 'idle',
 			actions: [
 				{
-					label: this.services.text('endSession'),
+					label: this.services.text('endSessionEllipsis'),
+					icon: 'action.end',
 					destructive: true,
 					enabled: !this.unconfirmed.has(key),
 					run: () =>
@@ -181,6 +201,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 							title: this.services.text('confirmEndSessionTitle', { name }),
 							message: this.services.text('confirmEndSessionBody', { name }),
 							confirmLabel: this.services.text('endSession'),
+							confirmIcon: 'action.end',
 							intent: { kind: 'revokeSession', id: session.id },
 							key,
 							section: this.others,
@@ -210,14 +231,31 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		const removable = !desktop.current && !desktop.revoked;
 		return {
 			id: desktop.id,
+			glyph: desktop.platform === 'darwin' ? 'device.laptop' : 'device.desktop',
 			title: name,
 			detail,
-			shape: desktopShape(desktop),
-			...(desktop.current ? { tag: this.services.text('thisComputer') } : {}),
+			...(desktop.current
+				? {
+						status: {
+							text: this.services.text('thisComputer'),
+							icon: 'status.success' as const,
+							tone: 'quiet' as const
+						}
+					}
+				: desktop.revoked
+					? {
+							status: {
+								text: this.services.text('desktopRemovedStatus'),
+								icon: 'action.close' as const,
+								tone: 'quiet' as const
+							}
+						}
+					: {}),
 			actions: removable
 				? [
 						{
-							label: this.services.text('removeDesktop'),
+							label: this.services.text('removeDesktopEllipsis'),
+							icon: 'action.delete',
 							destructive: true,
 							enabled: !this.unconfirmed.has(key),
 							run: () =>
@@ -229,6 +267,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 										name
 									}),
 									confirmLabel: this.services.text('removeDesktop'),
+									confirmIcon: 'action.delete',
 									intent: { kind: 'revokeDesktop', id: desktop.id },
 									key,
 									section: this.registered,
@@ -245,6 +284,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 		readonly title: string;
 		readonly message: string;
 		readonly confirmLabel: string;
+		readonly confirmIcon?: ProctorIconId;
 		readonly intent: AccountIntent;
 		readonly key: string;
 		readonly section: AccountSection;
@@ -257,6 +297,7 @@ export class SessionsPage extends Disposable implements AccountPageView {
 				title: options.title,
 				message: options.message,
 				confirmLabel: options.confirmLabel,
+				...(options.confirmIcon === undefined ? {} : { confirmIcon: options.confirmIcon }),
 				run: () => this.services.change(options.intent),
 				onDidComplete: (result) => this.onChangeComplete(result, options)
 			},
@@ -280,13 +321,12 @@ export class SessionsPage extends Disposable implements AccountPageView {
 			else this.renderDesktops();
 			options.section.feedback.set(this.services.failure(result.reason), 'error');
 		} else
-			options.section.feedback.set(
+			this.services.toast(
 				this.services.text(
 					result.kind === 'sessionsEnded' && result.count === 0
 						? 'noOtherSessionsEnded'
 						: options.success
-				),
-				'success'
+				)
 			);
 		options.section.focusHeading();
 		void options.read.refresh();

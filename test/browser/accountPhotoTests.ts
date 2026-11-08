@@ -1,3 +1,5 @@
+import { ToastHost } from '../../src/prctr/base/browser/ui/toast/toastHost.ts';
+import { proctorIconFactory } from '../../src/prctr/platform/theme/browser/proctorIcon.ts';
 import { AccountPhotoDialog } from '../../src/prctr/workbench/contrib/account/browser/accountPhotoDialog.ts';
 import { AccountPageServices } from '../../src/prctr/workbench/contrib/account/browser/accountPageServices.ts';
 import { MenuControl } from '../../src/prctr/base/browser/ui/menu/menuControl.ts';
@@ -143,6 +145,10 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 		},
 		overlays,
 		menu,
+		new ToastHost(host, {
+			dismissLabel: 'Dismiss',
+			dismissIcon: proctorIconFactory('action.close', 14)
+		}),
 		{ setProfilePhoto() {}, signOut() {} },
 		new Set(),
 		() => undefined

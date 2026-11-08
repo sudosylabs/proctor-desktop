@@ -71,6 +71,111 @@ export const accountMessages = Object.freeze({
 		defaultMessage: 'Loading…',
 		description: 'A section is reading its information from the server.'
 	}),
+	stillWaiting: defineMessage({
+		id: 'account.state.still.waiting',
+		defaultMessage: 'Still waiting for {institution}…',
+		description: 'A read is slow; institution is the server’s name.'
+	}),
+	stillWaitingGeneric: defineMessage({
+		id: 'account.state.still.waiting.generic',
+		defaultMessage: 'Still waiting for the server…',
+		description: 'A read is slow and the institution name is unknown.'
+	}),
+	statusLinked: defineMessage({
+		id: 'account.status.linked',
+		defaultMessage: 'Linked',
+		description: 'Status word: a sign-in provider is linked.'
+	}),
+	statusSet: defineMessage({
+		id: 'account.status.set',
+		defaultMessage: 'Set',
+		description: 'Status word: a password is set.'
+	}),
+	statusNotSet: defineMessage({
+		id: 'account.status.not.set',
+		defaultMessage: 'Not set',
+		description: 'Status word: no password is set.'
+	}),
+	statusOn: defineMessage({
+		id: 'account.status.on',
+		defaultMessage: 'On',
+		description: 'Status word: two-step verification is on.'
+	}),
+	statusOff: defineMessage({
+		id: 'account.status.off',
+		defaultMessage: 'Off',
+		description: 'Status word: two-step verification is off.'
+	}),
+	statusNeedsAttention: defineMessage({
+		id: 'account.status.attention',
+		defaultMessage: 'Needs attention',
+		description: 'Status word: something about two-step verification needs the person.'
+	}),
+	passwordChangedOn: defineMessage({
+		id: 'account.security.password.changed.on',
+		defaultMessage: 'Changed {date}',
+		description: 'When the password was last changed.'
+	}),
+	twoStepApp: defineMessage({
+		id: 'account.security.two.step.app',
+		defaultMessage: 'Authenticator app',
+		description: 'Two-step verification uses an authenticator app.'
+	}),
+	twoStepAppSince: defineMessage({
+		id: 'account.security.two.step.app.since',
+		defaultMessage: 'Authenticator app · on since {date}',
+		description: 'Two-step verification uses an authenticator app, on since date.'
+	}),
+	recoveryCodesIssued: defineMessage({
+		id: 'account.security.recovery.codes.issued',
+		defaultMessage: 'Issued {date} · each code works once',
+		description: 'When the recovery codes were issued.'
+	}),
+	recoveryCodesOnce: defineMessage({
+		id: 'account.security.recovery.codes.once',
+		defaultMessage: 'Each code works once',
+		description: 'Recovery codes detail when the issue date is unknown.'
+	}),
+	endSessionEllipsis: defineMessage({
+		id: 'account.sessions.end.menu',
+		defaultMessage: 'End session…',
+		description: 'Row menu entry that opens the confirmation to end a session.'
+	}),
+	removeDesktopEllipsis: defineMessage({
+		id: 'account.desktops.remove.menu',
+		defaultMessage: 'Remove desktop…',
+		description: 'Row menu entry that opens the confirmation to remove a registered desktop.'
+	}),
+	desktopRemovedStatus: defineMessage({
+		id: 'account.desktops.removed.status',
+		defaultMessage: 'Removed',
+		description: 'Status word: this registered desktop was removed.'
+	}),
+	revokeTokenEllipsis: defineMessage({
+		id: 'account.tokens.revoke.menu',
+		defaultMessage: 'Revoke…',
+		description: 'Row menu entry that opens the confirmation to revoke a token.'
+	}),
+	tokenDisabledStatus: defineMessage({
+		id: 'account.tokens.status.disabled',
+		defaultMessage: 'Disabled',
+		description: 'Status word: the token is turned off.'
+	}),
+	tokenExpiredStatus: defineMessage({
+		id: 'account.tokens.status.expired',
+		defaultMessage: 'Expired',
+		description: 'Status word: the token has expired.'
+	}),
+	tokenRevokedStatus: defineMessage({
+		id: 'account.tokens.status.revoked',
+		defaultMessage: 'Revoked',
+		description: 'Status word: the token was revoked.'
+	}),
+	dismiss: defineMessage({
+		id: 'account.dismiss',
+		defaultMessage: 'Dismiss',
+		description: 'Closes a toast.'
+	}),
 	loadFailed: defineMessage({
 		id: 'account.state.load.failed',
 		defaultMessage: 'This couldn’t be loaded. {reason}',
@@ -812,7 +917,8 @@ export const accountMessages = Object.freeze({
 	}),
 	noActiveTokens: defineMessage({
 		id: 'account.tokens.active.empty',
-		defaultMessage: 'You have no active tokens.',
+		defaultMessage:
+			'No access tokens yet. A token lets a script, such as a grade export, use Proctor with only the permissions you choose.',
 		description: 'No active tokens.'
 	}),
 	inactiveTokens: defineMessage({

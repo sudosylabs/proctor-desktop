@@ -5,12 +5,16 @@
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
-import { Disposable } from '../../../../base/common/lifecycle.js';
+import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
 import type {
 	AccountFailure,
 	AccountHistoryEntry
 } from '../../../../platform/account/common/accountProtocol.js';
-import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
+import {
+	createProctorIcon,
+	proctorIconFactory
+} from '../../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import {
 	clientKind,
 	defaultHistoryFilters,
@@ -19,7 +23,6 @@ import {
 	historyEventMessage,
 	historyPeriods,
 	historyQuery,
-	historyShape,
 	type HistoryEventGroup,
 	type HistoryFilters
 } from '../common/accountPresentation.js';
@@ -59,6 +62,8 @@ export class HistoryPage extends Disposable implements AccountPageView {
 	private readonly state: HTMLElement;
 	private readonly stateText: HTMLElement;
 	private readonly stateIcon;
+	private readonly skeleton: HTMLElement;
+	private readonly rowIcons = this._register(new DisposableStore());
 	private readonly retry: ButtonControl;
 	private readonly more: ButtonControl;
 
@@ -119,13 +124,23 @@ export class HistoryPage extends Disposable implements AccountPageView {
 		] as const)
 			this.outcome.append($('option', { value, textContent: services.text(label) }));
 		this.shown = $('span.prctr-account-history__shown', { attrs: { 'aria-live': 'polite' } });
+		// Each filter is a native select drawn as a Proctor field, with its own icon.
+		const picker = (select: HTMLSelectElement, icon: ProctorIconId): HTMLElement =>
+			$(
+				'span.prctr-account-history__picker',
+				{},
+				this._register(createProctorIcon(document, { id: icon, size: 16 })).element,
+				select,
+				this._register(createProctorIcon(document, { id: 'action.expand', size: 14 }))
+					.element
+			);
 		const filters = $(
 			'div.prctr-account-history__filters',
 			{ attrs: { role: 'group', 'aria-label': services.text('historyTitle') } },
-			this.period,
-			this.group,
-			this.relation,
-			this.outcome,
+			picker(this.period, 'object.calendar'),
+			picker(this.group, 'action.filter'),
+			picker(this.relation, 'account.profile'),
+			picker(this.outcome, 'status.success'),
 			this.shown
 		);
 
@@ -153,7 +168,9 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			this.rows
 		);
 
-		this.stateIcon = this._register(createSemanticIcon(document, { id: 'state.info' }));
+		this.stateIcon = this._register(
+			createProctorIcon(document, { id: 'status.attention', size: 18 })
+		);
 		this.stateText = $('span.prctr-account-section__state-text');
 		this.state = $(
 			'div.prctr-account-section__state',
@@ -162,13 +179,53 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			this.stateText
 		);
 		this.retry = this._register(
-			new ButtonControl(this.state, { variant: 'secondary', label: services.text('retry') })
+			new ButtonControl(this.state, {
+				variant: 'secondary',
+				size: 'small',
+				label: services.text('retry'),
+				icon: proctorIconFactory('action.retry', 14)
+			})
 		);
+		this.skeleton = $('div.prctr-account-section__skeleton', {
+			attrs: { 'aria-hidden': 'true' }
+		});
+		for (let index = 0; index < 4; index++)
+			this.skeleton.append(
+				$(
+					'div.prctr-account-section__skeleton-row',
+					{},
+					$('span.prctr-account-section__skeleton-glyph'),
+					$(
+						'span.prctr-account-section__skeleton-text',
+						{},
+						$('span.prctr-account-section__skeleton-bar'),
+						$('span.prctr-account-section__skeleton-bar')
+					)
+				)
+			);
 		const footer = $('div.prctr-account-history__footer');
 		this.more = this._register(
-			new ButtonControl(footer, { variant: 'secondary', label: services.text('historyMore') })
+			new ButtonControl(footer, {
+				variant: 'ghost',
+				label: services.text('historyMore'),
+				icon: proctorIconFactory('account.history')
+			})
 		);
-		body.append($('div.prctr-account-history', {}, filters, this.table, this.state, footer));
+		body.append(
+			$(
+				'div.prctr-account-history',
+				{},
+				filters,
+				$(
+					'div.prctr-account-section__card.prctr-account-history__card',
+					{},
+					this.table,
+					this.skeleton,
+					this.state
+				),
+				footer
+			)
+		);
 
 		for (const control of [this.period, this.group, this.relation, this.outcome])
 			this._register(addDisposableListener(control, 'change', () => this.onFilterChange()));
@@ -237,14 +294,20 @@ export class HistoryPage extends Disposable implements AccountPageView {
 		const status = this.status;
 		const $ = createElementFactory(this.rows.ownerDocument);
 		this.table.setAttribute('aria-busy', String(status.kind === 'loading' || this.loadingMore));
+		this.rowIcons.clear();
 		this.rows.replaceChildren(...this.entries.map((entry) => this.row($, entry)));
+		this.skeleton.hidden = status.kind !== 'loading';
 		this.table.hidden = this.entries.length === 0;
 		this.shown.textContent =
 			status.kind === 'ready' && this.entries.length > 0
 				? this.services.text('historyShown', { count: this.entries.length })
 				: '';
 		this.more.element.hidden = status.kind !== 'ready' || this.cursor === undefined;
-		this.more.setState({ label: this.services.text('historyMore'), busy: this.loadingMore });
+		this.more.setState({
+			label: this.services.text('historyMore'),
+			icon: proctorIconFactory('account.history'),
+			busy: this.loadingMore
+		});
 		if (status.kind === 'loading') this.showState('loading', this.services.text('loading'));
 		else if (status.kind === 'failed')
 			this.showState(
@@ -261,12 +324,9 @@ export class HistoryPage extends Disposable implements AccountPageView {
 		this.state.dataset.kind = kind;
 		this.stateText.textContent = text;
 		this.retry.element.hidden = kind !== 'error';
-		this.stateIcon.setState(
-			kind === 'loading'
-				? { id: 'state.loading', modifier: 'spin' }
-				: { id: kind === 'empty' ? 'state.info' : 'state.warning' }
-		);
-		this.stateIcon.element.hidden = kind === 'empty';
+		this.state.hidden = kind === 'loading';
+		this.state.dataset.kind = kind === 'error' ? 'failure' : kind;
+		this.stateIcon.element.hidden = kind !== 'error';
 	}
 
 	private row(
@@ -303,10 +363,12 @@ export class HistoryPage extends Disposable implements AccountPageView {
 				$(
 					'span.prctr-account-history__cell',
 					{},
-					$('span.prctr-account-row__status', {
-						data: { shape: historyShape(entry) },
-						attrs: { 'aria-hidden': 'true' }
-					}),
+					this.rowIcons.add(
+						createProctorIcon(this.rows.ownerDocument, {
+							id: historyGlyph(entry),
+							size: 16
+						})
+					).element,
 					what
 				)
 			),
@@ -324,4 +386,22 @@ export class HistoryPage extends Disposable implements AccountPageView {
 			return this.services.join(client, entry.ipAddress);
 		return client ?? entry.ipAddress ?? this.services.text('historyWhereUnknown');
 	}
+}
+
+/** A small glyph for what kind of event it was; a failure always shows as one. */
+function historyGlyph(entry: AccountHistoryEntry): ProctorIconId {
+	if (entry.failed) return 'status.failed';
+	const event = entry.event;
+	if (event.startsWith('sign_in') || event === 'sign_out' || event.startsWith('session'))
+		return 'action.signOut';
+	if (event.startsWith('desktop')) return 'device.laptop';
+	if (event.startsWith('personal_access_token')) return 'object.key';
+	if (event.startsWith('profile_picture')) return 'action.changePhoto';
+	if (event.startsWith('profile')) return 'account.profile';
+	if (event.startsWith('password') || event.startsWith('mfa') || event.startsWith('provider'))
+		return 'account.security';
+	if (event.startsWith('email')) return 'action.sendEmail';
+	if (event.startsWith('role') || event.startsWith('class') || event.startsWith('academic_unit'))
+		return 'object.role';
+	return 'status.info';
 }

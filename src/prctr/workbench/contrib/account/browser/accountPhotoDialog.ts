@@ -7,6 +7,7 @@ import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import type { AccountResponse } from '../../../../platform/account/common/accountProtocol.js';
+import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import { AccountDialog } from './accountDialog.js';
 import { AccountFeedback } from './accountFeedback.js';
 import type { AccountPageServices } from './accountPageServices.js';
@@ -24,6 +25,13 @@ type Photo = Extract<AccountResponse, { kind: 'photo' }>;
 /** The circle's diameter in CSS pixels; the saved photo is the square behind it. */
 const CIRCLE = 200;
 const SAVED_SIZE = 512;
+
+const photoActionIcons = Object.freeze({
+	chooseAnother: 'object.image',
+	photoRecheck: 'action.retry',
+	cancel: 'action.close',
+	savePhoto: 'action.confirm'
+} as const);
 
 /**
  * A local crop draft of one chosen image. Nothing reaches the server until Save;
@@ -130,7 +138,11 @@ export class AccountPhotoDialog extends Disposable {
 		variant: 'secondary' | 'brand'
 	): ButtonControl {
 		return this._register(
-			new ButtonControl(this.dialog.actions, { variant, label: this.services.text(key) })
+			new ButtonControl(this.dialog.actions, {
+				variant,
+				label: this.services.text(key),
+				icon: proctorIconFactory(photoActionIcons[key])
+			})
 		);
 	}
 
@@ -213,13 +225,26 @@ export class AccountPhotoDialog extends Disposable {
 		const ready = this.bitmap !== undefined && !this.busy;
 		this.save.setState({
 			label: this.services.text('savePhoto'),
+			icon: proctorIconFactory(photoActionIcons.savePhoto),
 			disabled: !ready || this.needsCheck,
 			busy: this.busy && this.bitmap !== undefined
 		});
-		this.cancel.setState({ label: this.services.text('cancel'), disabled: this.busy });
-		this.choose.setState({ label: this.services.text('chooseAnother'), disabled: this.busy });
+		this.cancel.setState({
+			label: this.services.text('cancel'),
+			icon: proctorIconFactory(photoActionIcons.cancel),
+			disabled: this.busy
+		});
+		this.choose.setState({
+			label: this.services.text('chooseAnother'),
+			icon: proctorIconFactory(photoActionIcons.chooseAnother),
+			disabled: this.busy
+		});
 		this.check.element.hidden = !this.needsCheck;
-		this.check.setState({ label: this.services.text('photoRecheck'), disabled: this.busy });
+		this.check.setState({
+			label: this.services.text('photoRecheck'),
+			icon: proctorIconFactory(photoActionIcons.photoRecheck),
+			disabled: this.busy
+		});
 		this.zoom.disabled = !ready;
 		this.stage.setAttribute('aria-disabled', String(!ready));
 	}

@@ -2,6 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { ToastHost } from '../../../../base/browser/ui/toast/toastHost.js';
+import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
@@ -17,7 +19,7 @@ import type { WorkbenchOverlayHost } from '../../../browser/overlayHost.js';
 import type { WorkbenchPane } from '../../../browser/workbenchPane.js';
 import type { ResolvedWorkbenchItem } from '../../../common/workbenchItem.js';
 import type { AccountPage } from '../../authenticated/common/authenticatedNavigationModel.js';
-import type { AccountMessage } from './accountMessages.js';
+import { accountMessages, type AccountMessage } from './accountMessages.js';
 import {
 	AccountPageServices,
 	type AccountPageView,
@@ -69,6 +71,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 	private readonly body: HTMLElement;
 	private readonly services: AccountPageServices;
 	private readonly menu: MenuControl;
+	private readonly toasts: ToastHost;
 	private readonly page = this._register(new MutableDisposable<AccountPageView>());
 	private visible = false;
 
@@ -111,6 +114,12 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 				onActionError: () => undefined
 			})
 		);
+		this.toasts = this._register(
+			new ToastHost(this.element, {
+				dismissLabel: options.localization.format(accountMessages.dismiss),
+				dismissIcon: proctorIconFactory('action.close', 14)
+			})
+		);
 		this.services = new AccountPageServices(
 			document,
 			options.client,
@@ -118,6 +127,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			options.binding,
 			options.overlays,
 			this.menu,
+			this.toasts,
 			options.hooks,
 			options.customPhotos,
 			() => this.focus(),
@@ -174,6 +184,7 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 		this.clear();
 		if (token.isCancellationRequested) return;
 		const page = (model as AccountModel).page;
+		this.element.dataset.page = page;
 		this.heading.id = `prctr-account-${page}-title`;
 		this.element.setAttribute('aria-labelledby', this.heading.id);
 		this.heading.textContent = this.services.text(pageTitles[page]);

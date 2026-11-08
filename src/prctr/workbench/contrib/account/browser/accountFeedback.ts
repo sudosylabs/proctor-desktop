@@ -5,7 +5,8 @@
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { alert, status } from '../../../../base/browser/ui/aria/aria.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
+import { createProctorIcon } from '../../../../platform/theme/browser/proctorIcon.js';
+import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import './accountFeedback.css';
 
 export type AccountFeedbackKind = 'info' | 'success' | 'error' | 'loading';
@@ -22,7 +23,9 @@ export class AccountFeedback extends Disposable {
 	constructor(host: HTMLElement) {
 		super();
 		const $ = createElementFactory(host.ownerDocument);
-		this.icon = this._register(createSemanticIcon(host.ownerDocument, { id: 'state.info' }));
+		this.icon = this._register(
+			createProctorIcon(host.ownerDocument, { id: 'status.info', size: 16 })
+		);
 		this.label = $('span.prctr-account-feedback__text');
 		this.element = $(
 			'div.prctr-account-feedback',
@@ -41,10 +44,7 @@ export class AccountFeedback extends Disposable {
 		this.element.hidden = text === undefined;
 		this.element.dataset.kind = kind;
 		this.label.textContent = text ?? '';
-		this.icon.setState({
-			id: iconOf(kind),
-			...(kind === 'loading' ? { modifier: 'spin' as const } : {})
-		});
+		this.icon.setState({ id: iconOf(kind), size: 16, spin: kind === 'loading' });
 		if (text === undefined || kind === 'loading') return;
 		if (kind === 'error') alert(text);
 		else status(text);
@@ -56,9 +56,9 @@ export class AccountFeedback extends Disposable {
 	}
 }
 
-function iconOf(kind: AccountFeedbackKind) {
-	if (kind === 'loading') return 'state.loading' as const;
-	if (kind === 'error') return 'state.error' as const;
-	if (kind === 'success') return 'state.success' as const;
-	return 'state.info' as const;
+function iconOf(kind: AccountFeedbackKind): ProctorIconId {
+	if (kind === 'loading') return 'status.busy';
+	if (kind === 'error') return 'status.attention';
+	if (kind === 'success') return 'status.success';
+	return 'status.info';
 }

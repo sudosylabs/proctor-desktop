@@ -7,11 +7,11 @@
 		gap: 8px;
 		line-height: 19px;
 	}
-	.prctr-account-feedback > .prctr-semantic-icon {
+	.prctr-account-feedback > .prctr-icon {
 		flex: none;
-		margin-block-start: 1px;
+		margin-block-start: 2px;
 	}
-	.prctr-account-feedback[data-kind='success'] > .prctr-semantic-icon {
+	.prctr-account-feedback[data-kind='success'] > .prctr-icon {
 		color: var(--prctr-color-feedback-success);
 	}
 	.prctr-account-feedback[data-kind='error'] {

@@ -10,7 +10,11 @@ import type {
 	AccountProfile,
 	AccountResponse
 } from '../../../../platform/account/common/accountProtocol.js';
-import { createSemanticIcon } from '../../../../platform/theme/browser/semanticIcon.js';
+import {
+	createProctorIcon,
+	proctorIconFactory,
+	type ProctorIconControl
+} from '../../../../platform/theme/browser/proctorIcon.js';
 import {
 	clientKind,
 	groupSessions,
@@ -31,6 +35,9 @@ interface DetailRow {
 	readonly note: HTMLElement;
 	readonly row: HTMLElement;
 }
+
+const CHANGE_PHOTO_ICON = proctorIconFactory('action.changePhoto');
+const SEND_EMAIL_ICON = proctorIconFactory('action.sendEmail', 14);
 
 type DetailKey =
 	'firstName' | 'lastName' | 'email' | 'language' | 'timeZone' | 'memberSince' | 'lastSignIn';
@@ -55,6 +62,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 	private readonly details: AccountSection;
 	private readonly detailRows: Readonly<Record<DetailKey, DetailRow>>;
 	private readonly unverified: HTMLElement;
+	private readonly noteIcon: ProctorIconControl;
 	private readonly sendVerification: ButtonControl;
 	private readonly verificationFeedback: AccountFeedback;
 	private readonly noticeSection: AccountSection;
@@ -78,25 +86,34 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		this.avatar = $('span.prctr-account-profile__avatar', { attrs: { 'aria-hidden': 'true' } });
 		this.name = $('p.prctr-account-profile__name');
 		this.username = $('p.prctr-account-profile__username');
-		const identity = $(
-			'div.prctr-account-profile__identity',
-			{},
-			this.avatar,
-			$('div.prctr-account-profile__names', {}, this.name, this.username)
-		);
+		const names = $('div.prctr-account-profile__names', {}, this.name, this.username);
+		if (services.institution !== undefined)
+			names.append(
+				$(
+					'p.prctr-account-profile__institution',
+					{},
+					this._register(
+						createProctorIcon(document, { id: 'object.institution', size: 14 })
+					).element,
+					services.institution
+				)
+			);
+		const identity = $('div.prctr-account-profile__identity', {}, this.avatar, names);
 		const photoActions = $('div.prctr-account-profile__photo-actions');
 		identity.append(photoActions);
+		this.removePhoto = this._register(
+			new ButtonControl(photoActions, {
+				variant: 'ghost',
+				label: services.text('removePhoto'),
+				icon: proctorIconFactory('action.delete')
+			})
+		);
 		this.changePhoto = this._register(
 			new ButtonControl(photoActions, {
 				variant: 'secondary',
 				label: services.text('changePhoto'),
+				icon: CHANGE_PHOTO_ICON,
 				disabled: true
-			})
-		);
-		this.removePhoto = this._register(
-			new ButtonControl(photoActions, {
-				variant: 'secondary',
-				label: services.text('removePhoto')
 			})
 		);
 		this.removePhoto.element.hidden = true;
@@ -125,12 +142,15 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			memberSince: this.detailRow($, list, 'memberSince'),
 			lastSignIn: this.detailRow($, list, 'lastSignIn')
 		};
+		this.noteIcon = this._register(
+			createProctorIcon(document, { id: 'status.verified', size: 14 })
+		);
 		this.detailRows.email.value.classList.add('prctr-account-details__mono');
 		this.detailRows.timeZone.value.classList.add('prctr-account-details__mono');
 		this.details.content.append(list);
 
 		const noticeIcon = this._register(
-			createSemanticIcon(document, { id: 'state.warning', size: 16 })
+			createProctorIcon(document, { id: 'action.sendEmail', size: 18 })
 		);
 		const noticeText = $('p.prctr-account-notice__text', {
 			textContent: services.text('unverifiedNotice')
@@ -144,17 +164,21 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		this.sendVerification = this._register(
 			new ButtonControl(this.unverified, {
 				variant: 'secondary',
-				label: services.text('sendVerification')
+				size: 'small',
+				label: services.text('sendVerification'),
+				icon: SEND_EMAIL_ICON
 			})
 		);
-		this.details.content.append(this.unverified);
-		this.verificationFeedback = this._register(new AccountFeedback(this.details.content));
+		// A lasting condition of the account, shown above its details as a banner.
+		this.details.element.before(this.unverified);
+		this.verificationFeedback = this._register(new AccountFeedback(body));
+		this.unverified.after(this.verificationFeedback.element);
 
 		const identityContext = services.binding.identity;
 		if (identityContext?.noCurrentAffiliation)
-			this.details.content.append(this.plainNotice($, services.text('noAffiliation')));
+			this.details.element.before(this.plainNotice($, services.text('noAffiliation')));
 		if (identityContext?.noAssignedAccess)
-			this.details.content.append(this.plainNotice($, services.text('noAccess')));
+			this.details.element.before(this.plainNotice($, services.text('noAccess')));
 
 		this.noticeSection = this._register(
 			new AccountSection(body, services, {
@@ -258,7 +282,11 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		const verified = profile.emailVerified;
 		emailNote.hidden = profile.email === undefined || verified === undefined;
 		emailNote.dataset.verified = String(verified === true);
-		emailNote.textContent = this.services.text(verified ? 'emailVerified' : 'emailUnverified');
+		emailNote.replaceChildren(
+			this.noteIcon.element,
+			this.services.text(verified ? 'emailVerified' : 'emailUnverified')
+		);
+		this.noteIcon.setState({ id: verified ? 'status.verified' : 'status.warning', size: 14 });
 		this.unverified.hidden = profile.email === undefined || verified !== false;
 		const current = groupSessions(this.sessions.data?.sessions ?? []).current;
 		const lastSignIn = this.detailRows.lastSignIn;
@@ -285,15 +313,24 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			const presentation = noticePresentation(notice);
 			return {
 				id: notice.retirementId,
+				glyph:
+					notice.category === 'browser_activity'
+						? 'object.browserActivity'
+						: 'object.file',
 				title: notice.examTitle,
 				detail: this.services.join(
 					this.services.text('noticeKind', {
 						category: this.services.text(presentation.category),
 						date: this.services.date(notice.sittingStartAt)
 					}),
-					this.noticeWhen(presentation.when, presentation.date)
+					this.services.date(notice.createdAt)
 				),
-				shape: presentation.when === 'noticeDeletedAfter' ? 'attention' : 'off'
+				status: {
+					text: this.noticeWhen(presentation.when, presentation.date),
+					icon:
+						presentation.when === 'noticeDeletedAfter' ? 'status.time' : 'action.close',
+					tone: presentation.when === 'noticeDeletedAfter' ? 'warning' : 'quiet'
+				}
 			};
 		});
 		this.noticeSection.setRows(rows);
@@ -318,7 +355,11 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			this.applyPhoto(result);
 			return;
 		}
-		this.changePhoto.setState({ label: this.services.text('changePhoto'), disabled: true });
+		this.changePhoto.setState({
+			label: this.services.text('changePhoto'),
+			icon: CHANGE_PHOTO_ICON,
+			disabled: true
+		});
 		this.photoFeedback.set(this.services.text('photoUnavailable'), 'error');
 	}
 
@@ -330,7 +371,10 @@ export class ProfilePage extends Disposable implements AccountPageView {
 		});
 		this.avatar.replaceChildren(image);
 		this.services.hooks.setProfilePhoto(photo.dataUrl);
-		this.changePhoto.setState({ label: this.services.text('changePhoto') });
+		this.changePhoto.setState({
+			label: this.services.text('changePhoto'),
+			icon: CHANGE_PHOTO_ICON
+		});
 		this.removePhoto.element.hidden = !this.services.customPhotos.has(photo.etag);
 	}
 
@@ -391,11 +435,15 @@ export class ProfilePage extends Disposable implements AccountPageView {
 	private async requestVerification(): Promise<void> {
 		this.sendVerification.setState({
 			label: this.services.text('sendVerification'),
+			icon: SEND_EMAIL_ICON,
 			busy: true
 		});
 		const result = await this.services.change({ kind: 'requestEmailVerification' });
 		if (this._store.isDisposed) return;
-		this.sendVerification.setState({ label: this.services.text('sendVerification') });
+		this.sendVerification.setState({
+			label: this.services.text('sendVerification'),
+			icon: SEND_EMAIL_ICON
+		});
 		if (result === 'busy') this.verificationFeedback.set(this.services.text('busy'), 'error');
 		else if (result.kind === 'error')
 			this.verificationFeedback.set(this.services.failure(result.reason), 'error');
