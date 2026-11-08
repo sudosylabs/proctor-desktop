@@ -189,6 +189,8 @@
 		padding-block-start: 12px;
 	}
 	.prctr-workbench[data-window-kind='authenticated'] .prctr-workbench__sidebar {
+		/* The rail and sidebar share the frame's one tint. */
+		background: transparent;
 		box-shadow: inset -1px 0 0 var(--prctr-color-frame-divider);
 		grid-column: 2;
 		grid-row: 2 / 4;
