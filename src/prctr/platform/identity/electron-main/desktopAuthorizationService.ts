@@ -113,6 +113,8 @@ export class DesktopAuthorizationService extends Disposable {
 	#shutdown: Promise<void> | undefined;
 	#outcomeSequence = 0;
 	#accountMutation: object | undefined;
+	/** A confirmation waiting for the system browser; the renderer may stop it. */
+	#reauthentication: CancellationTokenSource | undefined;
 	/** The sign-in page a browser is completing, kept so it can be opened again until it expires. */
 	#pendingSignInPage: { readonly url: string; readonly expiresAt: number } | undefined;
 	#api: ServerApiClient | undefined;
@@ -585,6 +587,11 @@ export class DesktopAuthorizationService extends Disposable {
 			if (this.#disposed || this.#session !== session || this.#generation !== generation)
 				throw new DesktopAuthorizationError('cancelled');
 		};
+		// Stopping a confirmation is never blocked by the confirmation it stops.
+		if (intent.kind === 'cancelReauthentication') {
+			this.#reauthentication?.cancel();
+			return { kind: 'success' };
+		}
 		const mutation =
 			intent.kind === 'revokeSession' ||
 			intent.kind === 'revokeOtherSessions' ||
@@ -595,7 +602,8 @@ export class DesktopAuthorizationService extends Disposable {
 			intent.kind === 'disableToken' ||
 			intent.kind === 'enableToken' ||
 			intent.kind === 'revokeToken' ||
-			intent.kind === 'requestEmailVerification';
+			intent.kind === 'requestEmailVerification' ||
+			intent.kind === 'reauthenticate';
 		if (mutation && this.#accountMutation) return { kind: 'error', reason: 'unavailable' };
 		const operation = {};
 		if (mutation) this.#accountMutation = operation;
@@ -637,6 +645,10 @@ export class DesktopAuthorizationService extends Disposable {
 				}
 				if (code === 'authentication.reauthentication_required')
 					return { kind: 'error', reason: 'reauthenticationRequired' };
+				if (code === 'authentication.desktop_reauthentication.denied')
+					return { kind: 'error', reason: 'denied' };
+				if (code === 'authentication.desktop_reauthentication.invalid')
+					return { kind: 'error', reason: 'invalid' };
 				if (code === 'authentication.strong_required')
 					return { kind: 'error', reason: 'strongAuthenticationRequired' };
 				return {
@@ -693,6 +705,8 @@ export class DesktopAuthorizationService extends Disposable {
 					? readRevokedSessionCount(response.value)
 					: failed(response);
 			}
+			if (intent.kind === 'reauthenticate')
+				return await this.#reauthenticate(session, request, failed, current);
 			if (intent.kind === 'readHistory') {
 				const response = await request(accountHistoryPath(intent));
 				return response.status === 200
@@ -870,6 +884,65 @@ export class DesktopAuthorizationService extends Disposable {
 		}
 		return result;
 	}
+	/**
+	 * Confirms it is the person on the institution's own page in the system browser, as Desktop
+	 * Authorization does: an exact loopback callback, state and a PKCE S256 challenge. Success
+	 * refreshes the existing session's recent sign-in; no session is issued and nothing rotates.
+	 */
+	async #reauthenticate(
+		session: CurrentSession,
+		request: (path: DesktopHttpPath, body?: unknown) => Promise<DesktopHttpResult>,
+		failed: (result: DesktopHttpResult) => Promise<AccountResponse>,
+		current: () => void
+	): Promise<AccountResponse> {
+		this.#reauthentication?.cancel();
+		const source = new CancellationTokenSource(this.#operations.token);
+		this.#reauthentication = source;
+		const state = randomBytes(32).toString('base64url');
+		const verifier = randomBytes(32).toString('base64url');
+		let listener: LoopbackAuthServer | undefined;
+		try {
+			listener = await LoopbackAuthServer.start(
+				state,
+				this.options.callbackPages,
+				source.token
+			);
+			const started = await request('/api/v1/auth/desktop/reauthentications', {
+				callback_url: listener.callbackURL,
+				state,
+				code_challenge: createHash('sha256').update(verifier).digest('base64url')
+			});
+			if (started.status !== 201) return await failed(started);
+			const value = record(started.value);
+			const page = new URL(boundedText(value.authorization_url, 4096));
+			// Only the institution's own page may be opened.
+			if (page.origin !== session.identity.origin || page.username || page.password)
+				return { kind: 'error', reason: 'invalid' };
+			listener.expireAt(expiry(value.expires_at));
+			current();
+			await this.options.openBrowser(page.href);
+			const code = await listener.waitForCode();
+			current();
+			const completed = await request('/api/v1/auth/desktop/reauthentications/complete', {
+				code,
+				code_verifier: verifier,
+				state
+			});
+			return completed.status === 200 ? { kind: 'success' } : await failed(completed);
+		} catch (error) {
+			if (error instanceof DesktopAuthorizationError) {
+				if (error.reason === 'cancelled') return { kind: 'error', reason: 'cancelled' };
+				if (error.reason === 'timedOut') return { kind: 'error', reason: 'expired' };
+				if (error.reason === 'callbackInvalid') return { kind: 'error', reason: 'invalid' };
+			}
+			return { kind: 'error', reason: 'unavailable' };
+		} finally {
+			await listener?.stop().catch(() => undefined);
+			if (this.#reauthentication === source) this.#reauthentication = undefined;
+			source.dispose();
+		}
+	}
+
 	private async protectedRequest(
 		session: CurrentSession,
 		generation: number,

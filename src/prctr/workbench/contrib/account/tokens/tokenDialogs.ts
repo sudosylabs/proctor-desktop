@@ -15,8 +15,11 @@ import { Disposable, MutableDisposable, toDisposable } from '../../../../base/co
 import type {
 	AccountGrantableScope,
 	AccountGrantableScopes,
+	AccountIntent,
 	AccountToken
 } from '../../../../platform/account/common/accountProtocol.js';
+import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
+import { ConfirmItsYouDialog } from '../widgets/confirmItsYouDialog.js';
 import {
 	DEFAULT_TOKEN_EXPIRY,
 	scopeGrantable,
@@ -66,13 +69,17 @@ export class NewTokenDialog extends Disposable {
 	private readonly create: ButtonControl;
 	private nameValue = '';
 	private working = false;
+	/** Confirm it's you is open or its retry is in flight; a second refusal is then reported. */
+	private confirming = false;
+	private readonly confirmation = this._register(new MutableDisposable<ConfirmItsYouDialog>());
 
 	constructor(
 		private readonly onDidCreate: (token: AccountToken, credential: string) => void,
 		private readonly onDidClose: () => void,
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
-		@IAccountPaneContext private readonly pane: IAccountPaneContext
+		@IAccountPaneContext private readonly pane: IAccountPaneContext,
+		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
 		const document = this.pane.document;
@@ -288,6 +295,10 @@ export class NewTokenDialog extends Disposable {
 		return this.scopes.filter((entry) => entry.input.checked).map((entry) => entry.scope.name);
 	}
 
+	private selectedScopeTitles(): string[] {
+		return this.scopes.filter((entry) => entry.input.checked).map((entry) => entry.scope.title);
+	}
+
 	private async submit(): Promise<void> {
 		if (this.working || this.grantable === undefined || this.scopes.length === 0) return;
 		const scopes = this.selectedScopes();
@@ -310,20 +321,38 @@ export class NewTokenDialog extends Disposable {
 		}
 		const academicUnitId = this.academicUnitId();
 		const days = Number(this.expiry.value) as TokenExpiryPreset;
-		this.setWorking(true);
-		this.feedback.set(this.format.text('tokenCreating'), 'loading');
-		const result = await this.account.change({
+		await this.send({
 			kind: 'createToken',
 			description: this.nameValue.trim(),
 			scopes,
 			...(academicUnitId === undefined ? {} : { academicUnitId }),
 			expiresAt: tokenExpiry(days, this.format.now())
 		});
+	}
+
+	/**
+	 * Sends the request. When the institution wants a recent sign-in first, the form steps aside
+	 * for Confirm it's you and the same request is sent again once confirmed; nothing was created
+	 * by the refused attempt.
+	 */
+	private async send(intent: Extract<AccountIntent, { kind: 'createToken' }>): Promise<void> {
+		this.setWorking(true);
+		this.feedback.set(this.format.text('tokenCreating'), 'loading');
+		const result = await this.account.change(intent);
 		if (this._store.isDisposed) return;
 		this.setWorking(false);
 		if (result !== 'busy' && result.kind === 'tokenCreated') {
 			this.dispose();
 			this.onDidCreate(result.token, result.credential);
+			return;
+		}
+		if (
+			result !== 'busy' &&
+			result.kind === 'error' &&
+			result.reason === 'reauthenticationRequired' &&
+			!this.confirming
+		) {
+			this.confirm(intent);
 			return;
 		}
 		this.feedback.set(
@@ -335,6 +364,27 @@ export class NewTokenDialog extends Disposable {
 			'error'
 		);
 		this.create.focus();
+	}
+
+	private confirm(intent: Extract<AccountIntent, { kind: 'createToken' }>): void {
+		this.confirming = true;
+		this.feedback.set();
+		this.dialog.element.close();
+		const summary = [
+			intent.description,
+			this.selectedScopeTitles().join(', '),
+			this.expiry.selectedOptions[0]?.textContent ?? ''
+		].filter((line) => line !== '');
+		this.confirmation.value = this.instantiationService.createInstance(
+			ConfirmItsYouDialog,
+			summary,
+			(confirmed) => {
+				if (this._store.isDisposed) return;
+				this.dialog.show(this.create.element);
+				if (confirmed) void this.send(intent).finally(() => (this.confirming = false));
+				else this.confirming = false;
+			}
+		);
 	}
 
 	private setWorking(working: boolean): void {

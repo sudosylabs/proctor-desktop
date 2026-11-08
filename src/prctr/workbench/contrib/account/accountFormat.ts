@@ -25,6 +25,8 @@ export interface IAccountFormatService {
 	institutionText(named: AccountMessage, generic: AccountMessage): string;
 	failure(reason: AccountFailure): string;
 	join(first: string, second: string): string;
+	/** A whole number with the locale's grouping, as in "10,000". */
+	count(value: number): string;
 	date(time: number): string;
 	dateTime(time: number): string;
 	/** "today, 08:41", "yesterday, 17:20", or a date, for use inside a sentence. */
@@ -73,6 +75,11 @@ export class AccountFormatService implements IAccountFormatService {
 		return this.text('detailSeparator', { first, second });
 	}
 
+	/** A whole number with the locale's grouping, as in "10,000". */
+	count(value: number): string {
+		return new Intl.NumberFormat(this.locale).format(value);
+	}
+
 	date(time: number): string {
 		return new Intl.DateTimeFormat(this.locale, { dateStyle: 'medium' }).format(time);
 	}
@@ -110,10 +117,14 @@ export class AccountFormatService implements IAccountFormatService {
 			previous: this.text('pagerPrevious'),
 			next: this.text('pagerNext'),
 			page: (page) => this.text('pagerPage', { page }),
-			range: (first, last, total) =>
+			range: (first, last, total, atLeast) =>
 				total === undefined
 					? this.text('pagerRangeOpen', { first, last })
-					: this.text('pagerRange', { first, last, total }),
+					: this.text(atLeast ? 'pagerRangeAtLeast' : 'pagerRange', {
+							first,
+							last,
+							total: this.count(total)
+						}),
 			compact: (page, count) =>
 				count === undefined
 					? this.text('pagerCompactOpen', { page })

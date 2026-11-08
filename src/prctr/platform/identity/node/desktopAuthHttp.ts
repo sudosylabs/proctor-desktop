@@ -8,6 +8,8 @@ export type DesktopHttpPath =
 	| `/api/v1/exam-attempts/${string}/result`
 	| '/api/v1/auth/desktop/authorizations'
 	| '/api/v1/auth/desktop/token'
+	| '/api/v1/auth/desktop/reauthentications'
+	| '/api/v1/auth/desktop/reauthentications/complete'
 	| '/api/v1/auth/refresh'
 	| '/api/v1/auth/logout'
 	| '/api/v1/users/me/settings'
@@ -18,7 +20,7 @@ export type DesktopHttpPath =
 	| '/api/v1/users/me/sessions'
 	| '/api/v1/users/me/sessions/revoke'
 	| '/api/v1/users/me/sessions/revoke-others'
-	| `/api/v1/users/me/audits?limit=10${string}`
+	| `/api/v1/users/me/audits?limit=${number}${string}`
 	| '/api/v1/users/me/tokens/grantable-scopes'
 	| '/api/v1/users/me/desktop-registrations'
 	| `/api/v1/users/me/desktop-registrations/${string}`
@@ -95,7 +97,7 @@ function desktopHttpRoute(
 		return 'POST';
 	if (path === '/api/v1/users/me/tokens') return body ? 'POST' : 'GET';
 	if (
-		/^\/api\/v1\/users\/me\/audits\?limit=10(?:&(?:created_after|created_before|event|status|relation|cursor)=(?:[A-Za-z0-9_.!~*'()-]|%[0-9A-F]{2}){1,2048}){0,70}$/u.test(
+		/^\/api\/v1\/users\/me\/audits\?limit=(?:[1-9]|10)(?:&(?:created_after|created_before|event|status|relation|order|cursor)=(?:[A-Za-z0-9_.!~*'()-]|%[0-9A-F]{2}){1,2048}){0,70}$/u.test(
 			path
 		)
 	)
@@ -117,6 +119,8 @@ function desktopHttpRoute(
 		[
 			'/api/v1/auth/desktop/authorizations',
 			'/api/v1/auth/desktop/token',
+			'/api/v1/auth/desktop/reauthentications',
+			'/api/v1/auth/desktop/reauthentications/complete',
 			'/api/v1/auth/refresh',
 			'/api/v1/auth/logout',
 			'/api/v1/users/me/sessions/revoke',

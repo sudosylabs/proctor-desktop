@@ -6,6 +6,7 @@ import {
 	accountPage,
 	validateAccountResponse,
 	type AccountData,
+	ACCOUNT_HISTORY_PAGE_SIZE,
 	type AccountHistoryQuery,
 	type AccountBinding,
 	type AccountResponse,
@@ -26,7 +27,8 @@ export function readAccountProfile(raw: unknown, binding: AccountBinding): Accou
 			emailVerified: p.email_verified,
 			locale: p.locale,
 			timezone: p.timezone,
-			createdAt: accountInstant(p.created_at)
+			createdAt: accountInstant(p.created_at),
+			photoKind: p.profile_picture_kind
 		}
 	});
 }
@@ -231,13 +233,16 @@ export function readAccountHistory(raw: unknown): AccountData {
 			for (const key of Object.keys(entry)) if (entry[key] === undefined) delete entry[key];
 			return entry;
 		}),
-		...(page.next_cursor === undefined ? {} : { cursor: page.next_cursor })
+		...(page.next_cursor === undefined ? {} : { cursor: page.next_cursor }),
+		...(page.total === undefined
+			? {}
+			: { total: page.total, totalIsLowerBound: page.total_is_lower_bound === true })
 	});
 }
 /** The history path for one query: the server's own filter names, encoded. */
 export function accountHistoryPath(
 	query: AccountHistoryQuery
-): `/api/v1/users/me/audits?limit=10${string}` {
+): `/api/v1/users/me/audits?limit=${number}${string}` {
 	const search = new URLSearchParams();
 	if (query.createdAfter !== undefined)
 		search.append('created_after', new Date(query.createdAfter).toISOString());
@@ -246,9 +251,11 @@ export function accountHistoryPath(
 	for (const event of query.events ?? []) search.append('event', event);
 	if (query.status !== undefined) search.append('status', query.status);
 	if (query.relation !== undefined) search.append('relation', query.relation);
+	if (query.order !== undefined) search.append('order', query.order);
 	if (query.cursor !== undefined) search.append('cursor', query.cursor);
 	const rest = search.toString();
-	return `/api/v1/users/me/audits?limit=10${rest ? `&${rest}` : ''}`;
+	const limit = query.limit ?? ACCOUNT_HISTORY_PAGE_SIZE;
+	return `/api/v1/users/me/audits?limit=${limit}${rest ? `&${rest}` : ''}`;
 }
 export function readRevokedSessionCount(raw: unknown): AccountResponse {
 	const r = record(raw);

@@ -40,6 +40,44 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
+    "account.confirm.body": {
+      "message": "{institution} asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.",
+      "description": "Why the person must sign in again; {institution} is the institution’s name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
+    "account.confirm.body.generic": {
+      "message": "Your institution asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.",
+      "description": "Why the person must sign in again, when the institution’s name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
+    "account.confirm.continue": {
+      "message": "Continue in browser",
+      "description": "Opens the institution’s sign-in page in the system browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
+    "account.confirm.title": {
+      "message": "Confirm it’s you",
+      "description": "Title of the dialog asking the person to sign in again before a guarded change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
+    "account.confirm.waiting": {
+      "message": "Finish in your browser. This continues by itself when you’re done.",
+      "description": "Shown while the person signs in again in the browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
+    "account.confirm.waiting.button": {
+      "message": "Waiting for your browser…",
+      "description": "The Continue button while the browser step is open.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
     "account.desktops.remove.menu": {
       "message": "Remove desktop…",
       "description": "Row menu entry that opens the confirmation to remove a registered desktop.",
@@ -67,6 +105,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
+    "account.failure.cancelled": {
+      "message": "Stopped before it finished. Nothing changed.",
+      "description": "The person cancelled a browser step, or it was cancelled in Proctor.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
     "account.failure.conflict": {
       "message": "This changed somewhere else. The list is being refreshed; review it and try again.",
       "description": "The item changed concurrently.",
@@ -76,6 +120,12 @@
     "account.failure.denied": {
       "message": "Your account isn’t allowed to do this.",
       "description": "The server denied the action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
+    "account.failure.expired": {
+      "message": "The page in your browser expired before you finished. Try again.",
+      "description": "A browser step was not completed in time.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
@@ -756,6 +806,16 @@
     "account.pager.range": {
       "message": "{first}–{last} of {total}",
       "description": "Which items a page shows, as in \"11–20 of 248\".",
+      "placeholders": [
+        "first",
+        "last",
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
+    "account.pager.range.at.least": {
+      "message": "{first}–{last} of {total}+",
+      "description": "Which items a page shows when the count stopped at its ceiling, as in \"11–20 of 10,000+\".",
       "placeholders": [
         "first",
         "last",
@@ -2125,6 +2185,12 @@
       "description": "Turn a disabled token back on.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.enable.summary": {
+      "message": "Turns this token back on until it expires.",
+      "description": "What confirming does, when turning a disabled token back on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.tokens.enabled": {
       "message": "Token enabled.",

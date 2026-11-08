@@ -6,6 +6,7 @@ import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
 import { IAccountPaneContext } from '../accountPaneContext.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
+import { ConfirmItsYouDialog } from '../widgets/confirmItsYouDialog.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
 import type {
@@ -271,10 +272,37 @@ export class TokensPage extends Disposable implements AccountPageView {
 			kind: action === 'disable' ? 'disableToken' : 'enableToken',
 			id: token.id
 		};
+		this.sendToggle(intent, action, token, section, false);
+	}
+
+	/** Turning a token back on may need a recent sign-in: Confirm it's you, then the same request again. */
+	private sendToggle(
+		intent: AccountIntent,
+		action: TokenAction,
+		token: AccountToken,
+		section: AccountSection,
+		confirmed: boolean
+	): void {
 		void this.account.change(intent).then((result) => {
 			if (this._store.isDisposed) return;
 			if (result === 'busy') {
 				section.feedback.set(this.format.text('busy'), 'error');
+				return;
+			}
+			if (
+				!confirmed &&
+				result.kind === 'error' &&
+				result.reason === 'reauthenticationRequired'
+			) {
+				this.dialog.value = this.instantiationService.createInstance(
+					ConfirmItsYouDialog,
+					[token.description, this.format.text('tokenEnableSummary')],
+					(ok) => {
+						if (this._store.isDisposed) return;
+						if (ok) this.sendToggle(intent, action, token, section, true);
+						else section.focusRow(token.id);
+					}
+				);
 				return;
 			}
 			this.onChangeComplete(

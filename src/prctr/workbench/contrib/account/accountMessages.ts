@@ -207,6 +207,54 @@ const sharedMessages = Object.freeze({
 			'This changed somewhere else. The list is being refreshed; review it and try again.',
 		description: 'The item changed concurrently.'
 	}),
+	tokenEnableSummary: defineMessage({
+		id: 'account.tokens.enable.summary',
+		defaultMessage: 'Turns this token back on until it expires.',
+		description: 'What confirming does, when turning a disabled token back on.'
+	}),
+	confirmItsYouTitle: defineMessage({
+		id: 'account.confirm.title',
+		defaultMessage: 'Confirm it’s you',
+		description:
+			'Title of the dialog asking the person to sign in again before a guarded change.'
+	}),
+	confirmItsYouBody: defineMessage({
+		id: 'account.confirm.body',
+		defaultMessage:
+			'{institution} asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.',
+		description: 'Why the person must sign in again; {institution} is the institution’s name.'
+	}),
+	confirmItsYouBodyGeneric: defineMessage({
+		id: 'account.confirm.body.generic',
+		defaultMessage:
+			'Your institution asks you to sign in again before this change. It opens in your browser, and Proctor continues as soon as you’re back.',
+		description: 'Why the person must sign in again, when the institution’s name is unknown.'
+	}),
+	confirmItsYouContinue: defineMessage({
+		id: 'account.confirm.continue',
+		defaultMessage: 'Continue in browser',
+		description: 'Opens the institution’s sign-in page in the system browser.'
+	}),
+	confirmItsYouWaitingButton: defineMessage({
+		id: 'account.confirm.waiting.button',
+		defaultMessage: 'Waiting for your browser…',
+		description: 'The Continue button while the browser step is open.'
+	}),
+	confirmItsYouWaiting: defineMessage({
+		id: 'account.confirm.waiting',
+		defaultMessage: 'Finish in your browser. This continues by itself when you’re done.',
+		description: 'Shown while the person signs in again in the browser.'
+	}),
+	failureCancelled: defineMessage({
+		id: 'account.failure.cancelled',
+		defaultMessage: 'Stopped before it finished. Nothing changed.',
+		description: 'The person cancelled a browser step, or it was cancelled in Proctor.'
+	}),
+	failureExpired: defineMessage({
+		id: 'account.failure.expired',
+		defaultMessage: 'The page in your browser expired before you finished. Try again.',
+		description: 'A browser step was not completed in time.'
+	}),
 	failureInvalid: defineMessage({
 		id: 'account.failure.invalid',
 		defaultMessage: 'The server didn’t accept this. Check the details and try again.',
@@ -372,6 +420,12 @@ const sharedMessages = Object.freeze({
 		id: 'account.pager.range',
 		defaultMessage: '{first}–{last} of {total}',
 		description: 'Which items a page shows, as in "11–20 of 248".'
+	}),
+	pagerRangeAtLeast: defineMessage({
+		id: 'account.pager.range.at.least',
+		defaultMessage: '{first}–{last} of {total}+',
+		description:
+			'Which items a page shows when the count stopped at its ceiling, as in "11–20 of 10,000+".'
 	}),
 	pagerRangeOpen: defineMessage({
 		id: 'account.pager.range.open',

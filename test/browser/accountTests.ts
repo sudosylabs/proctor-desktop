@@ -72,7 +72,8 @@ const profile = (emailVerified: boolean): AccountResponse =>
 			emailVerified,
 			locale: 'en-GB',
 			timezone: 'Europe/London',
-			createdAt: NOW - 400 * DAY
+			createdAt: NOW - 400 * DAY,
+			photoKind: 'default'
 		}
 	});
 
@@ -682,8 +683,14 @@ export async function runAccountTests(document: Document): Promise<void> {
 		buttonIn(form, 'Create token')!.click();
 		check(form.textContent!.includes('Tick at least one'), 'A token needs a scope');
 		boxes[0]!.click();
+		let refusedOnce = false;
 		account.changes.set('createToken', (intent) => {
 			check(intent.kind === 'createToken', 'createToken intent');
+			// The institution wants a recent sign-in first; the same request then succeeds.
+			if (!refusedOnce) {
+				refusedOnce = true;
+				return failure('reauthenticationRequired');
+			}
 			return {
 				kind: 'tokenCreated',
 				credential: CREDENTIAL,
@@ -698,9 +705,20 @@ export async function runAccountTests(document: Document): Promise<void> {
 		});
 		buttonIn(form, 'Create token')!.click();
 		await wait(
+			() => !!dialog()?.textContent?.includes('Confirm it’s you'),
+			'confirm it is you'
+		);
+		check(
+			dialog()!.textContent!.includes('Grade export script 2'),
+			'Confirming says what will be created'
+		);
+		buttonIn(dialog()!, 'Continue in browser')!.click();
+		await wait(
 			() => !!dialog()?.textContent?.includes('Copy your token now'),
 			'credential dialog'
 		);
+		check(account.count('reauthenticate') === 1, 'Confirming runs the browser step once');
+		check(account.count('createToken') === 2, 'The refused request is sent again');
 		const created = account.requests.find(
 			(intent): intent is Extract<AccountIntent, { kind: 'createToken' }> =>
 				intent.kind === 'createToken'

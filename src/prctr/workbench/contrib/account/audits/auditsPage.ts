@@ -10,9 +10,11 @@ import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import type {
-	AccountFailure,
-	AccountHistoryEntry
+import {
+	ACCOUNT_HISTORY_PAGE_SIZE,
+	type AccountFailure,
+	type AccountHistoryEntry,
+	type AccountHistoryQuery
 } from '../../../../platform/account/common/accountProtocol.js';
 import {
 	createProctorIcon,
@@ -49,7 +51,6 @@ type HistoryState =
 	| { readonly kind: 'failed'; readonly reason: AccountFailure };
 
 /** Events on one page; the server is asked for exactly this many. */
-const HISTORY_PAGE_SIZE = 10;
 
 /**
  * Audits: what was done with the person's account, newest first, as
@@ -75,9 +76,8 @@ export class AuditsPage extends Disposable implements AccountPageView {
 	private filters: HistoryFilters = defaultHistoryFilters;
 	private entries: readonly AccountHistoryEntry[] = [];
 	/** The cursor that starts each page reached so far; the first page needs none. */
-	private pageCursors: (string | undefined)[] = [undefined];
+	private paging = new HistoryPaging();
 	private page = 1;
-	private hasNext = false;
 	private status: HistoryState = { kind: 'loading' };
 	private loadingPage = false;
 	private sequence = 0;
@@ -270,38 +270,34 @@ export class AuditsPage extends Disposable implements AccountPageView {
 			outcome: this.outcome.value as HistoryFilters['outcome']
 		};
 		// Filters start again from the first page.
-		this.pageCursors = [undefined];
+		this.paging = new HistoryPaging();
 		void this.load(1);
 	}
 
-	/** Reads one page of the current filters. The first read shows skeletons; a page change keeps the rows until the next arrive. */
+	/**
+	 * Reads one page of the current filters. The first read shows skeletons; a page change keeps
+	 * the rows until the next arrive. Pages are reached from the newest end by cursor, and from
+	 * the oldest end by reading oldest first, so the last page is one request away.
+	 */
 	private async load(page: number): Promise<void> {
-		const cursorIndex = page - 1;
-		if (cursorIndex >= this.pageCursors.length) return;
+		const paging = this.paging;
+		const request = paging.request(page);
+		if (request === undefined) return;
 		const sequence = ++this.sequence;
 		const query = historyQuery(this.filters, this.format.now());
-		const first = page === 1 && this.pageCursors.length === 1;
 		this.loaded = true;
-		if (first || this.status.kind !== 'ready') {
+		if (this.status.kind !== 'ready') {
 			this.entries = [];
 			this.status = { kind: 'loading' };
 		} else this.loadingPage = true;
 		this.render();
-		const cursor = this.pageCursors[cursorIndex];
-		const response = await this.account.request({
-			kind: 'readHistory',
-			...query,
-			...(cursor === undefined ? {} : { cursor })
-		});
+		const response = await this.account.request({ kind: 'readHistory', ...query, ...request });
 		if (this._store.isDisposed || sequence !== this.sequence) return;
 		const changedPage = this.loadingPage;
 		this.loadingPage = false;
 		if (response.kind === 'data' && response.data.section === 'history') {
-			this.entries = response.data.entries;
+			this.entries = paging.accept(page, request, response.data);
 			this.page = page;
-			this.hasNext = response.data.cursor !== undefined;
-			if (response.data.cursor !== undefined && this.pageCursors.length === page)
-				this.pageCursors.push(response.data.cursor);
 			this.status = { kind: 'ready' };
 			this.render();
 			if (changedPage) this.announcePage();
@@ -316,13 +312,13 @@ export class AuditsPage extends Disposable implements AccountPageView {
 	/** After a page change, focus returns to the table and the new place is said once. */
 	private announcePage(): void {
 		this.table.focus();
-		const first = (this.page - 1) * HISTORY_PAGE_SIZE + 1;
+		const first = (this.page - 1) * ACCOUNT_HISTORY_PAGE_SIZE + 1;
+		const last = first + this.entries.length - 1;
+		const count = this.paging.pageCount;
 		this.pane.announce(
-			this.format.text('pageShownOpen', {
-				page: this.page,
-				first,
-				last: first + this.entries.length - 1
-			})
+			count === undefined
+				? this.format.text('pageShownOpen', { page: this.page, first, last })
+				: this.format.text('pageShown', { page: this.page, count, first, last })
 		);
 	}
 
@@ -333,17 +329,21 @@ export class AuditsPage extends Disposable implements AccountPageView {
 		this.rows.replaceChildren(...this.entries.map((entry) => this.row($, entry)));
 		this.skeleton.hidden = status.kind !== 'loading';
 		this.table.hidden = this.entries.length === 0;
-		const paged = status.kind === 'ready' && (this.page > 1 || this.hasNext);
+		const paging = this.paging;
+		const paged = status.kind === 'ready' && (this.page > 1 || paging.reachable(this.page + 1));
 		this.pager.element.hidden = !paged;
 		if (paged) {
-			const first = (this.page - 1) * HISTORY_PAGE_SIZE + 1;
+			const first = (this.page - 1) * ACCOUNT_HISTORY_PAGE_SIZE + 1;
 			this.pager.setState({
 				page: this.page,
-				pageSize: HISTORY_PAGE_SIZE,
+				pageSize: ACCOUNT_HISTORY_PAGE_SIZE,
 				first,
 				last: first + this.entries.length - 1,
-				hasNext: this.hasNext,
-				knownPages: this.pageCursors.length,
+				...(paging.total === undefined
+					? {}
+					: { total: paging.total, totalIsLowerBound: paging.totalIsLowerBound }),
+				hasNext: paging.reachable(this.page + 1),
+				knownPages: paging.pageCount ?? paging.furthestReached,
 				busy: this.loadingPage
 			});
 		}
@@ -415,5 +415,78 @@ export class AuditsPage extends Disposable implements AccountPageView {
 				title: this.format.dateTime(entry.createdAt)
 			})
 		);
+	}
+}
+
+type PageRequest = Pick<AccountHistoryQuery, 'order' | 'limit' | 'cursor'>;
+
+/**
+ * Where each page of one query can be read from. The server pages by cursor and counts only on
+ * a first page, so pages are reached from the newest end with descending cursors and from the
+ * oldest end with ascending ones; the last page is read oldest first with its exact size.
+ */
+class HistoryPaging {
+	/** The cursor that reads each page newest first; page 1 needs none. */
+	private readonly newest = new Map<number, string | undefined>([[1, undefined]]);
+	/** The cursor that reads each page oldest first, counting back from the last. */
+	private readonly oldest = new Map<number, string>();
+	total: number | undefined;
+	totalIsLowerBound = false;
+	furthestReached = 1;
+
+	/** The number of pages, when the count is exact. */
+	get pageCount(): number | undefined {
+		return this.total === undefined || this.totalIsLowerBound
+			? undefined
+			: Math.max(1, Math.ceil(this.total / ACCOUNT_HISTORY_PAGE_SIZE));
+	}
+
+	reachable(page: number): boolean {
+		const count = this.pageCount;
+		if (page < 1 || (count !== undefined && page > count)) return false;
+		return this.newest.has(page) || this.oldest.has(page) || page === count;
+	}
+
+	request(page: number): PageRequest | undefined {
+		if (this.newest.has(page)) {
+			const cursor = this.newest.get(page);
+			return cursor === undefined ? {} : { cursor };
+		}
+		const count = this.pageCount;
+		if (count !== undefined && page === count) {
+			// The last page holds whatever is left over, read oldest first.
+			const size = this.total! % ACCOUNT_HISTORY_PAGE_SIZE || ACCOUNT_HISTORY_PAGE_SIZE;
+			return { order: 'asc', limit: size };
+		}
+		const cursor = this.oldest.get(page);
+		return cursor === undefined ? undefined : { order: 'asc', cursor };
+	}
+
+	/** Records where the neighbouring pages are and returns the page newest first. */
+	accept(
+		page: number,
+		request: PageRequest,
+		data: {
+			readonly entries: readonly AccountHistoryEntry[];
+			readonly cursor?: string;
+			readonly total?: number;
+			readonly totalIsLowerBound?: boolean;
+		}
+	): readonly AccountHistoryEntry[] {
+		if (data.total !== undefined && this.total === undefined && request.order !== 'asc') {
+			this.total = data.total;
+			this.totalIsLowerBound = data.totalIsLowerBound === true;
+		}
+		this.furthestReached = Math.max(this.furthestReached, page);
+		if (request.order === 'asc') {
+			if (data.cursor !== undefined && page > 1 && !this.newest.has(page - 1))
+				this.oldest.set(page - 1, data.cursor);
+			return [...data.entries].reverse();
+		}
+		if (data.cursor !== undefined) {
+			this.newest.set(page + 1, data.cursor);
+			this.furthestReached = Math.max(this.furthestReached, page + 1);
+		}
+		return data.entries;
 	}
 }

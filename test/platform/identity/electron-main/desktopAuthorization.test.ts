@@ -1016,6 +1016,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 				created_at: '1970-01-01T00:00:00Z',
 				updated_at: '1970-01-01T00:00:00Z',
 				profile_picture_url: '',
+				profile_picture_kind: 'default',
 				password_hash: 'never project'
 			});
 		}
@@ -1159,6 +1160,123 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 			reason: 'sessionEnded'
 		});
 		assert.equal(seen.length, count);
+	} finally {
+		service.dispose();
+	}
+});
+
+void test('Confirm it’s you refreshes the session in the browser, never issues a session, and can be cancelled', async () => {
+	const key = softwareTestKey();
+	let started: Record<string, unknown> = {};
+	let stored: StoredDesktopSession | undefined;
+	let exchanges = 0;
+	let browser: 'answer' | 'wait' = 'answer';
+	let pageOrigin = 'https://example.edu';
+	const opened: string[] = [];
+	const completions: Record<string, unknown>[] = [];
+	const http = new DesktopAuthHttp(async (input, init) => {
+		const path = new URL(String(input)).pathname;
+		if (path.endsWith('/desktop/authorizations')) {
+			started = JSON.parse(String(init?.body));
+			return response(
+				{
+					authorization_url: 'https://example.edu/desktop/authorize',
+					expires_at: new Date(Date.now() + 60000).toISOString()
+				},
+				201
+			);
+		}
+		if (path.endsWith('/token')) {
+			exchanges++;
+			return response(tokens());
+		}
+		if (path.endsWith('/refresh')) return response(tokens());
+		if (path.endsWith('/context')) return response(context());
+		if (path.endsWith('/logout')) return new Response(null, { status: 204 });
+		assert.ok(new Headers(init?.headers).get('DPoP'), `${path} is sender-constrained`);
+		if (path === '/api/v1/auth/desktop/reauthentications') {
+			started = JSON.parse(String(init?.body));
+			return response(
+				{
+					authorization_url: `${pageOrigin}/reauthenticate/desktop?handle=safe`,
+					expires_at: new Date(Date.now() + 60000).toISOString()
+				},
+				201
+			);
+		}
+		if (path === '/api/v1/auth/desktop/reauthentications/complete') {
+			completions.push(JSON.parse(String(init?.body)));
+			return response({ recently_authenticated_until: '2026-01-01T00:15:00Z' });
+		}
+		throw new Error('Unexpected route');
+	});
+	const service = new DesktopAuthorizationService({
+		applicationId: 'fr.sudosy.proctor.test',
+		target,
+		keys: {
+			async loadOrCreate() {
+				return key;
+			},
+			async delete() {}
+		},
+		credentials: {
+			async read() {
+				return stored;
+			},
+			async write(_scope, value) {
+				stored = value;
+			},
+			async delete() {
+				stored = undefined;
+			}
+		},
+		http,
+		callbackPages,
+		async openBrowser(url) {
+			opened.push(url);
+			if (browser === 'wait' && url.includes('/reauthenticate/')) return;
+			const callback = new URL(String(started.callback_url));
+			callback.searchParams.set('state', String(started.state));
+			callback.searchParams.set('code', random());
+			await fetch(callback);
+		},
+		async onAuthenticated() {}
+	});
+	try {
+		await service.start(identity, CancellationToken.None);
+		const binding = { principalId: id, sessionId };
+		assert.deepEqual(await service.account(binding, { kind: 'reauthenticate' }), {
+			kind: 'success'
+		});
+		assert.equal(Object.keys(started).sort().join(), 'callback_url,code_challenge,state');
+		assert.match(String(started.callback_url), /^http:\/\/127\.0\.0\.1:\d+\/[A-Za-z0-9_-]+$/u);
+		const completion = completions[0]!;
+		assert.equal(completion.state, started.state);
+		assert.equal(
+			createHash('sha256').update(String(completion.code_verifier)).digest('base64url'),
+			started.code_challenge,
+			'complete proves the challenge it started with'
+		);
+		assert.ok(opened.at(-1)!.startsWith('https://example.edu/reauthenticate/desktop'));
+		assert.equal(exchanges, 1, 'confirming never issues a new session');
+
+		browser = 'wait';
+		const waiting = service.account(binding, { kind: 'reauthenticate' });
+		await new Promise((resolve) => setTimeout(resolve, 30));
+		assert.deepEqual(await service.account(binding, { kind: 'cancelReauthentication' }), {
+			kind: 'success'
+		});
+		assert.deepEqual(await waiting, { kind: 'error', reason: 'cancelled' });
+		assert.equal(completions.length, 1, 'a cancelled confirmation is never completed');
+
+		browser = 'answer';
+		pageOrigin = 'https://elsewhere.example';
+		const before = opened.length;
+		assert.deepEqual(await service.account(binding, { kind: 'reauthenticate' }), {
+			kind: 'error',
+			reason: 'invalid'
+		});
+		assert.equal(opened.length, before, 'a page on another origin is never opened');
 	} finally {
 		service.dispose();
 	}

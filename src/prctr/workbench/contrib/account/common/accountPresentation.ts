@@ -35,7 +35,9 @@ export type FailureMessage =
 	| 'failureNotFound'
 	| 'failureUnconfirmed'
 	| 'failureConflict'
-	| 'failureInvalid';
+	| 'failureInvalid'
+	| 'failureCancelled'
+	| 'failureExpired';
 
 const failureMessages: Readonly<Record<AccountFailure, FailureMessage>> = Object.freeze({
 	unavailable: 'failureUnavailable',
@@ -46,7 +48,9 @@ const failureMessages: Readonly<Record<AccountFailure, FailureMessage>> = Object
 	notFound: 'failureNotFound',
 	unconfirmed: 'failureUnconfirmed',
 	conflict: 'failureConflict',
-	invalid: 'failureInvalid'
+	invalid: 'failureInvalid',
+	cancelled: 'failureCancelled',
+	expired: 'failureExpired'
 });
 
 export function failureMessage(reason: AccountFailure): FailureMessage {

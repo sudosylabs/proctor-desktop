@@ -17,8 +17,8 @@ export interface PagerLabels {
 	readonly next: string;
 	/** The accessible name of one numbered page button. */
 	page(page: number): string;
-	/** "11–20 of 248", or "11–20" when the total is unknown. */
-	range(first: number, last: number, total: number | undefined): string;
+	/** "11–20 of 248", "11–20 of 10,000+" when the count stopped at a ceiling, or "11–20" when unknown. */
+	range(first: number, last: number, total: number | undefined, atLeast: boolean): string;
 	/** "Page 12 of 25", or "Page 12" when the count is unknown: the narrow form. */
 	compact(page: number, pageCount: number | undefined): string;
 }
@@ -33,6 +33,8 @@ export interface PagerState {
 	readonly last: number;
 	/** Known only when the source reports its size. */
 	readonly total?: number;
+	/** The source stopped counting at {@link total}; there may be more, so there is no last page. */
+	readonly totalIsLowerBound?: boolean;
 	/** Whether another page follows; without a total this is all that is known. */
 	readonly hasNext: boolean;
 	/** Pages reached so far, when the total is unknown; they are the numbers offered. */
@@ -121,10 +123,15 @@ export class PagerControl extends Disposable {
 		this.state = state;
 		const { labels } = this.options;
 		const pageCount =
-			state.total === undefined
+			state.total === undefined || state.totalIsLowerBound === true
 				? undefined
 				: Math.max(1, Math.ceil(state.total / Math.max(1, state.pageSize)));
-		this.range.textContent = labels.range(state.first, state.last, state.total);
+		this.range.textContent = labels.range(
+			state.first,
+			state.last,
+			state.total,
+			state.totalIsLowerBound === true
+		);
 		this.compact.textContent = labels.compact(state.page, pageCount);
 		this.previous.disabled = state.page <= 1 || state.busy === true;
 		this.next.disabled = !state.hasNext || state.busy === true;

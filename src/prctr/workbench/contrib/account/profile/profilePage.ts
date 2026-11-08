@@ -265,6 +265,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 
 	private renderProfile(): void {
 		const data = this.profile.data?.profile;
+		this.renderRemovePhoto();
 		this.details.setState(this.profile.state, false, () => void this.profile.refresh());
 		const list = this.details.content;
 		list.hidden = data === undefined;
@@ -395,7 +396,13 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			label: this.format.text('changePhoto'),
 			icon: CHANGE_PHOTO_ICON
 		});
-		this.removePhoto.element.hidden = !this.account.customPhotos.has(photo.etag);
+		this.renderRemovePhoto();
+	}
+
+	/** Remove is offered only for the person's own upload, as the account itself reports it. */
+	private renderRemovePhoto(): void {
+		this.removePhoto.element.hidden =
+			this.photo === undefined || this.profile.data?.profile.photoKind !== 'custom';
 	}
 
 	private onFileChosen(): void {
@@ -409,8 +416,9 @@ export class ProfilePage extends Disposable implements AccountPageView {
 			file,
 			(photo) => {
 				if (this._store.isDisposed) return;
-				this.account.customPhotos.add(photo.etag);
 				this.applyPhoto(photo);
+				// The account now reports the upload as the person's own.
+				void this.profile.refresh();
 				this.photoFeedback.set(this.format.text('photoUpdated'), 'success');
 			},
 			(needsRefresh) => {
@@ -436,7 +444,7 @@ export class ProfilePage extends Disposable implements AccountPageView {
 				run: () => this.account.change({ kind: 'removePhoto', etag: photo.etag }),
 				onDidComplete: (result) => {
 					if (result.kind === 'success') {
-						this.account.customPhotos.delete(photo.etag);
+						void this.profile.refresh();
 						this.photoFeedback.set(this.format.text('photoRemoved'), 'success');
 					} else if (result.kind === 'error') {
 						this.photoFeedback.set(this.format.failure(result.reason), 'error');

@@ -74,6 +74,9 @@ export const accountHistoryEvents = [
 export type AccountHistoryEvent = (typeof accountHistoryEvents)[number];
 export const accountHistoryActors = ['self', 'administrator', 'system'] as const;
 /** One history query: every filter is optional and the cursor continues the same query. */
+/** Events on one page of account history. */
+export const ACCOUNT_HISTORY_PAGE_SIZE = 10;
+
 export interface AccountHistoryQuery {
 	/** Inclusive lower bound, epoch milliseconds. */
 	readonly createdAfter?: number;
@@ -82,6 +85,10 @@ export interface AccountHistoryQuery {
 	readonly events?: readonly AccountHistoryEvent[];
 	readonly status?: 'success' | 'fail';
 	readonly relation?: 'subject' | 'actor';
+	/** Newest first unless asked otherwise; a cursor continues only the order that made it. */
+	readonly order?: 'asc' | 'desc';
+	/** Events on the page, 1 to 10; 10 when absent. A short last page is read oldest first. */
+	readonly limit?: number;
 	readonly cursor?: string;
 }
 export type AccountIntent =
@@ -110,7 +117,14 @@ export type AccountIntent =
 	| { readonly kind: 'disableToken'; readonly id: string }
 	| { readonly kind: 'enableToken'; readonly id: string }
 	| { readonly kind: 'revokeToken'; readonly id: string }
-	| { readonly kind: 'requestEmailVerification' };
+	| { readonly kind: 'requestEmailVerification' }
+	/**
+	 * Confirms it is the person in the system browser, refreshing the session's recent sign-in so
+	 * a change that needs one can be sent again. Ends when the browser step completes or fails.
+	 */
+	| { readonly kind: 'reauthenticate' }
+	/** Stops a confirmation still waiting for the browser. */
+	| { readonly kind: 'cancelReauthentication' };
 export interface AccountProfile {
 	readonly username: string;
 	readonly displayName: string;
@@ -122,6 +136,8 @@ export interface AccountProfile {
 	readonly timezone?: string;
 	/** When the account was created. */
 	readonly createdAt: number;
+	/** Whether the photo is the person's own upload or the generated default; only their own can be removed. */
+	readonly photoKind: 'custom' | 'default';
 }
 export interface AccountSecurity {
 	readonly password: boolean;
@@ -236,6 +252,10 @@ export type AccountData =
 			readonly entries: readonly AccountHistoryEntry[];
 			/** Continues the same query; absent after the final page. */
 			readonly cursor?: string;
+			/** How many events match the query; only the first page of a query carries it. */
+			readonly total?: number;
+			/** The count stopped at its ceiling, so there are at least {@link total}. */
+			readonly totalIsLowerBound?: boolean;
 	  }
 	| {
 			readonly section: 'notices';
@@ -252,7 +272,11 @@ export type AccountFailure =
 	| 'notFound'
 	| 'unconfirmed'
 	| 'conflict'
-	| 'invalid';
+	| 'invalid'
+	/** The person stopped a step in the browser, or it was cancelled here. */
+	| 'cancelled'
+	/** The browser step was not finished in time. */
+	| 'expired';
 export type AccountResponse =
 	| { readonly kind: 'photo'; readonly dataUrl: string; readonly etag: string }
 	| { readonly kind: 'data'; readonly data: AccountData }
@@ -331,7 +355,9 @@ export function validateAccountIntent(value: unknown): AccountIntent {
 	if (
 		(input.kind === 'openSecurity' ||
 			input.kind === 'requestEmailVerification' ||
-			input.kind === 'revokeOtherSessions') &&
+			input.kind === 'revokeOtherSessions' ||
+			input.kind === 'reauthenticate' ||
+			input.kind === 'cancelReauthentication') &&
 		Object.keys(input).length === 1
 	)
 		return Object.freeze({ kind: input.kind });
@@ -364,6 +390,8 @@ function validateHistoryQuery(input: Record<string, unknown>): AccountIntent {
 		'events',
 		'status',
 		'relation',
+		'order',
+		'limit',
 		'cursor'
 	];
 	if (!Object.keys(input).every((key) => allowed.includes(key)))
@@ -390,6 +418,17 @@ function validateHistoryQuery(input: Record<string, unknown>): AccountIntent {
 	if (input.status !== undefined) query.status = accountMember(input.status, ['success', 'fail']);
 	if (input.relation !== undefined)
 		query.relation = accountMember(input.relation, ['subject', 'actor']);
+	if (input.order !== undefined) query.order = accountMember(input.order, ['asc', 'desc']);
+	if (input.limit !== undefined) {
+		if (
+			typeof input.limit !== 'number' ||
+			!Number.isInteger(input.limit) ||
+			input.limit < 1 ||
+			input.limit > ACCOUNT_HISTORY_PAGE_SIZE
+		)
+			throw new TypeError('Invalid history page size');
+		query.limit = input.limit;
+	}
 	if (input.cursor !== undefined) {
 		if (typeof input.cursor !== 'string' || !historyCursor.test(input.cursor))
 			throw new TypeError('Invalid history cursor');
@@ -501,7 +540,9 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 			'notFound',
 			'unconfirmed',
 			'conflict',
-			'invalid'
+			'invalid',
+			'cancelled',
+			'expired'
 		].includes(input.reason as string)
 	)
 		return Object.freeze({ kind: 'error', reason: input.reason as AccountFailure });
@@ -523,7 +564,8 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 					: { emailVerified: accountBoolean(p.emailVerified) }),
 				...(p.locale === undefined ? {} : { locale: accountText(p.locale, 128) }),
 				...(p.timezone === undefined ? {} : { timezone: accountText(p.timezone, 128) }),
-				createdAt: accountTime(p.createdAt)
+				createdAt: accountTime(p.createdAt),
+				photoKind: accountMember(p.photoKind, ['custom', 'default'])
 			})
 		};
 	} else if (data.section === 'security') {
@@ -667,10 +709,21 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 			(typeof data.cursor !== 'string' || !historyCursor.test(data.cursor))
 		)
 			throw new TypeError('Invalid history cursor');
+		if (
+			data.total !== undefined &&
+			(typeof data.total !== 'number' || !Number.isSafeInteger(data.total) || data.total < 0)
+		)
+			throw new TypeError('Invalid history total');
 		result = {
 			section: 'history',
 			entries: Object.freeze(entries),
-			...(data.cursor === undefined ? {} : { cursor: data.cursor })
+			...(data.cursor === undefined ? {} : { cursor: data.cursor }),
+			...(data.total === undefined
+				? {}
+				: {
+						total: data.total as number,
+						totalIsLowerBound: accountBoolean(data.totalIsLowerBound ?? false)
+					})
 		};
 	} else if (data.section === 'notices') {
 		const notices = accountList(data.notices, 200).map((value) => {

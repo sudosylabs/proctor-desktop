@@ -29,8 +29,6 @@ export interface IAccountService {
 	readonly observable: boolean;
 	/** Whether a change is waiting for the server; the next one waits until it replies. */
 	readonly isChanging: boolean;
-	/** Revisions of photos uploaded in this window session; only those can be removed. */
-	readonly customPhotos: Set<string>;
 	/** The profile photo changed, as a data URL. */
 	readonly onDidChangePhoto: Event<string>;
 
@@ -54,8 +52,6 @@ export interface IAccountService {
 
 export class AccountService extends Disposable implements IAccountService {
 	declare readonly _serviceBrand: undefined;
-
-	readonly customPhotos = new Set<string>();
 
 	private readonly photoEmitter = this._register(new Emitter<string>());
 	readonly onDidChangePhoto: Event<string> = this.photoEmitter.event;

@@ -56,7 +56,8 @@ void test('profile response is a bounded whitelist, never a raw server user or p
 			email_verified: true,
 			created_at: '2025-09-01T08:00:00Z',
 			password_hash: 'SECRET',
-			profile_picture_url: 'https://untrusted.test/tracker'
+			profile_picture_url: 'https://untrusted.test/tracker',
+			profile_picture_kind: 'custom'
 		},
 		{ principalId: id, sessionId: id }
 	);
@@ -69,7 +70,8 @@ void test('profile response is a bounded whitelist, never a raw server user or p
 			lastName: '',
 			email: 'name@example.test',
 			emailVerified: true,
-			createdAt: Date.parse('2025-09-01T08:00:00Z')
+			createdAt: Date.parse('2025-09-01T08:00:00Z'),
+			photoKind: 'custom'
 		}
 	});
 	assert.ok(!JSON.stringify(data).includes('SECRET'));
@@ -574,12 +576,22 @@ void test('history queries use the server filter names and parse a minimized pag
 	assert.equal(desktopHttpMethod(path), 'GET');
 	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=10&actor=1'));
 	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=200' as never));
+	// The last page is read oldest first with exactly what is left over.
+	const last = accountHistoryPath({ order: 'asc', limit: 4 });
+	assert.equal(last, '/api/v1/users/me/audits?limit=4&order=asc');
+	assert.equal(desktopHttpMethod(last), 'GET');
+	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=0' as never));
+	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=11' as never));
 	for (const intent of [
 		{ kind: 'readHistory', events: ['made.up'] },
 		{ kind: 'readHistory', events: [] },
 		{ kind: 'readHistory', status: 'maybe' },
 		{ kind: 'readHistory', createdAfter: 10, createdBefore: 10 },
 		{ kind: 'readHistory', cursor: 'has space' },
+		{ kind: 'readHistory', order: 'sideways' },
+		{ kind: 'readHistory', limit: 0 },
+		{ kind: 'readHistory', limit: 11 },
+		{ kind: 'readHistory', limit: 2.5 },
 		{ kind: 'readHistory', url: 'https://attacker.test' }
 	])
 		assert.throws(() => validateAccountIntent(intent));
@@ -611,6 +623,30 @@ void test('history queries use the server filter names and parse a minimized pag
 		],
 		cursor: 'next'
 	});
+	assert.deepEqual(
+		readAccountHistory({ items: [entry], total: 10000, total_is_lower_bound: true }),
+		{
+			section: 'history',
+			entries: [
+				{
+					id,
+					createdAt: Date.parse('2026-01-01T00:00:00Z'),
+					event: 'sign_in.failed',
+					failed: true,
+					relation: 'subject',
+					actor: 'self',
+					client: 'web',
+					ipAddress: '81.2.69.160'
+				}
+			],
+			total: 10000,
+			totalIsLowerBound: true
+		}
+	);
+	assert.throws(() => readAccountHistory({ items: [entry], total: -1 }));
+	for (const intent of [{ kind: 'reauthenticate' }, { kind: 'cancelReauthentication' }])
+		assert.deepEqual(validateAccountIntent(intent), intent);
+	assert.throws(() => validateAccountIntent({ kind: 'reauthenticate', url: 'https://x.test' }));
 	const future = readAccountHistory({ items: [{ ...entry, event: 'passkey.added' }] });
 	assert.ok(future.section === 'history' && future.entries[0]!.event === 'passkey.added');
 	assert.throws(() => readAccountHistory({ items: [{ ...entry, status: 'partial' }] }));
