@@ -83,7 +83,10 @@ export interface AdminFormOptions {
 	 */
 	submit(
 		values: AdminFormValues
-	): AdministrationChangeIntent | { readonly field: string; readonly error: string };
+	):
+		| AdministrationChangeIntent
+		| { readonly field: string; readonly error: string }
+		| Promise<AdministrationChangeIntent | { readonly field: string; readonly error: string }>;
 	/** What the change does, if the person must confirm it is them. */
 	summary(values: AdminFormValues): readonly string[];
 	/** Called once the change succeeded, or failed in a way that needs a fresh read. */
@@ -291,14 +294,16 @@ export class AdminFormDialog extends Disposable {
 			missing.focus();
 			return;
 		}
-		const intent = this.options.submit(values);
+		this.setWorking(true);
+		const intent = await this.options.submit(values);
+		if (this._store.isDisposed) return;
 		if ('field' in intent) {
+			this.setWorking(false);
 			const field = this.fields.find((candidate) => candidate.spec.id === intent.field);
 			field?.setError(intent.error);
 			field?.focus();
 			return;
 		}
-		this.setWorking(true);
 		const result = await this.changes.send(intent, this.options.summary(values));
 		if (this._store.isDisposed) return;
 		this.setWorking(false);

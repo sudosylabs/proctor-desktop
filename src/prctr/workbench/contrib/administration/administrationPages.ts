@@ -9,8 +9,11 @@ import type { IAdministrationFormatService } from './administrationFormat.js';
 import type { AdministrationMessage } from './administrationMessages.js';
 import { ImportPage } from './imports/importPage.js';
 import { ImportsPage } from './imports/importsPage.js';
+import { ClassPage } from './class/classPage.js';
 import { InvitationsPage } from './invitations/invitationsPage.js';
 import { OverviewPage } from './overview/overviewPage.js';
+import { PeriodsPage } from './periods/periodsPage.js';
+import { StructurePage } from './structure/structurePage.js';
 import { UserPage } from './user/userPage.js';
 import { UsersPage } from './users/usersPage.js';
 
@@ -110,9 +113,21 @@ export const administrationPageRegistry: Readonly<
 	import: record('importTitle', 'narrow', (i, body, actions, id) =>
 		i.createInstance(ImportPage, body, actions, id)
 	),
-	structure: list('structureTitle', (f) => f.text('structureDescription'), 'wide'),
-	class: record('classTitle', 'wide'),
-	periods: list('periodsTitle', (f) => f.text('periodsDescription'), 'wide'),
+	structure: list(
+		'structureTitle',
+		(f) => f.text('structureDescription'),
+		'wide',
+		(i, body, actions) => i.createInstance(StructurePage, body, actions)
+	),
+	class: record('classTitle', 'wide', (i, body, actions, id) =>
+		i.createInstance(ClassPage, body, actions, id)
+	),
+	periods: list(
+		'periodsTitle',
+		(f) => f.text('periodsDescription'),
+		'wide',
+		(i, body, actions) => i.createInstance(PeriodsPage, body, actions)
+	),
 	roles: list('rolesTitle', (f) => f.text('rolesDescription'), 'wide'),
 	policy: list(
 		'policyTitle',

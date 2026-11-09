@@ -3343,6 +3343,652 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.structure.archive": {
+      "message": "Archive…",
+      "description": "Archives a programme, level or class after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.archive.body": {
+      "message": "It’s hidden from new work and kept in history. Anything still inside it has to be archived first.",
+      "description": "Confirmation body before archiving.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.archive.confirm": {
+      "message": "Archive",
+      "description": "Confirms archiving.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.archive.title": {
+      "message": "Archive {name}?",
+      "description": "Confirmation title before archiving.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.archived": {
+      "message": "{name} is archived",
+      "description": "Toast after archiving.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.column.enrolled": {
+      "message": "Enrolled",
+      "description": "Class members column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.column.status": {
+      "message": "Status",
+      "description": "Class members column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.column.student": {
+      "message": "Student",
+      "description": "Class members column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.current": {
+      "message": "Current",
+      "description": "Filter choice: current enrolments.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.description": {
+      "message": "{name} · {period}",
+      "description": "Description of one class: its short name and academic period.",
+      "placeholders": [
+        "name",
+        "period"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.edit": {
+      "message": "Edit…",
+      "description": "Edits the class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.edit.title": {
+      "message": "Edit {name}",
+      "description": "Title of the dialog that edits a class.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.end": {
+      "message": "End enrolment…",
+      "description": "Ends an enrolment after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.end.body": {
+      "message": "They leave the class now. Their submissions and results are kept.",
+      "description": "Confirmation body before ending an enrolment.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.end.confirm": {
+      "message": "End enrolment",
+      "description": "Confirms ending an enrolment.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.end.title": {
+      "message": "End {name}’s enrolment?",
+      "description": "Confirmation title before ending an enrolment.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.ended": {
+      "message": "Ended {date}",
+      "description": "An ended enrolment.",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.ended.toast": {
+      "message": "{name} left the class",
+      "description": "Toast after ending an enrolment.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.enroll": {
+      "message": "Enroll existing…",
+      "description": "Opens the dialog that enrols an existing account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.enroll.body": {
+      "message": "They need a student affiliation. Anyone already in another class this period is moved here.",
+      "description": "Body of the enrol dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.enroll.confirm": {
+      "message": "Enroll",
+      "description": "Confirms enrolling.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.enroll.title": {
+      "message": "Enroll someone in {name}",
+      "description": "Title of the enrol dialog.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.enrolled": {
+      "message": "Enrolled",
+      "description": "A current enrolment.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.enrolled.toast": {
+      "message": "{name} is enrolled",
+      "description": "Toast after enrolling.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.enrollment": {
+      "message": "Enrolment",
+      "description": "Filter: current enrolments or all of them.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.history": {
+      "message": "Including ended",
+      "description": "Filter choice: every enrolment.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.invite": {
+      "message": "Invite students",
+      "description": "Opens the invitation dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.more": {
+      "message": "More actions",
+      "description": "Accessible name of the class’s menu button.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.new": {
+      "message": "New class",
+      "description": "Creates a class in the chosen unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.new.title": {
+      "message": "New class in {name}",
+      "description": "Title of the dialog that creates a class.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.person": {
+      "message": "Username or email",
+      "description": "Field: who to enrol.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.person.not.found": {
+      "message": "No one with that username or email.",
+      "description": "Error when the person is not found.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.students": {
+      "message": "Students",
+      "description": "Section with a class’s members.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.students.empty": {
+      "message": "No one is enrolled yet.",
+      "description": "A class with no members.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.trail": {
+      "message": "Structure",
+      "description": "The trail step back to Structure.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.class.unknown.person": {
+      "message": "Someone you can’t see",
+      "description": "A member whose account cannot be read.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.classes": {
+      "message": "Classes",
+      "description": "Section with a unit’s classes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.classes.empty": {
+      "message": "No classes in this unit.",
+      "description": "A unit with no classes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.collapse": {
+      "message": "Hide units in {name}",
+      "description": "Accessible name of the button that hides a unit’s sub-units.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.column.class": {
+      "message": "Class",
+      "description": "Classes table column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.column.level": {
+      "message": "Programme level",
+      "description": "Classes table column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.column.period": {
+      "message": "Period",
+      "description": "Classes table column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.create": {
+      "message": "Create",
+      "description": "Confirms creating a unit, programme, level or class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.expand": {
+      "message": "Show units in {name}",
+      "description": "Accessible name of the button that shows a unit’s sub-units.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.field.description": {
+      "message": "Description",
+      "description": "Field: an optional description.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.field.display.name": {
+      "message": "Display name",
+      "description": "Field: the name people see.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.field.level": {
+      "message": "Programme level",
+      "description": "Field: which level a class belongs to.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.field.name": {
+      "message": "Short name",
+      "description": "Field: an identifier-like name such as CS.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.field.period": {
+      "message": "Academic period",
+      "description": "Field: which period a class runs in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.level.new": {
+      "message": "Add level",
+      "description": "Creates a level in the chosen programme.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.level.new.title": {
+      "message": "New level in {name}",
+      "description": "Title of the dialog that creates a level.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.levels": {
+      "message": "Levels",
+      "description": "Opens a programme’s levels.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.levels.empty": {
+      "message": "No levels yet. Add the first year or stage.",
+      "description": "A programme with no levels.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.levels.none": {
+      "message": "No levels yet",
+      "description": "A programme with no levels.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.levels.of": {
+      "message": "Levels: {levels}",
+      "description": "Detail of a programme listing its levels.",
+      "placeholders": [
+        "levels"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.levels.title": {
+      "message": "Levels in {programme}",
+      "description": "Section with one programme’s levels.",
+      "placeholders": [
+        "programme"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.needs.level": {
+      "message": "Add a programme and a level first.",
+      "description": "Shown when a class cannot be created yet.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods": {
+      "message": "Academic periods",
+      "description": "Structure page action that opens Academic periods.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.archived": {
+      "message": "Archived",
+      "description": "An archived period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.column.dates": {
+      "message": "Dates",
+      "description": "Periods column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.column.name": {
+      "message": "Period",
+      "description": "Periods column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.column.owner": {
+      "message": "Belongs to",
+      "description": "Periods column: the institution or a unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.column.status": {
+      "message": "Status",
+      "description": "Periods column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.current": {
+      "message": "Current",
+      "description": "A period running now.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.edit.title": {
+      "message": "Edit {name}",
+      "description": "Title of the dialog that edits a period.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.empty": {
+      "message": "No academic periods yet. Create the first term or year.",
+      "description": "Shown when there are no periods.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.empty.filtered": {
+      "message": "No periods match.",
+      "description": "Shown when the search finds nothing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.end": {
+      "message": "Ends",
+      "description": "Field: the last day.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.find": {
+      "message": "Find a period",
+      "description": "Search field above the academic periods.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.institution": {
+      "message": "The whole institution",
+      "description": "Period owner choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.new": {
+      "message": "New period",
+      "description": "Creates an academic period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.new.title": {
+      "message": "New academic period",
+      "description": "Title of the dialog that creates a period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.owner": {
+      "message": "Belongs to",
+      "description": "Field: the institution or a unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.past": {
+      "message": "Past",
+      "description": "A period that has ended.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.range": {
+      "message": "{start} – {end}",
+      "description": "A period’s dates.",
+      "placeholders": [
+        "start",
+        "end"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.start": {
+      "message": "Starts",
+      "description": "Field: the first day.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.table": {
+      "message": "Academic periods",
+      "description": "Accessible name of the periods table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.upcoming": {
+      "message": "Upcoming",
+      "description": "A period starting later.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.programme.new": {
+      "message": "New programme",
+      "description": "Creates a programme in the chosen unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.programme.new.title": {
+      "message": "New programme in {name}",
+      "description": "Title of the dialog that creates a programme.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.programmes": {
+      "message": "Programmes",
+      "description": "Section with a unit’s programmes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.programmes.empty": {
+      "message": "No programmes in this unit.",
+      "description": "A unit with no programmes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.rename": {
+      "message": "Rename…",
+      "description": "Renames a programme or level.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.rename.title": {
+      "message": "Rename {name}",
+      "description": "Title of the dialog that renames a programme or level.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.save": {
+      "message": "Save",
+      "description": "Confirms an edit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.saved": {
+      "message": "{name} is saved",
+      "description": "Toast after a create or edit.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.add.sub": {
+      "message": "Add sub-unit",
+      "description": "Creates a unit under the chosen one.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.archive": {
+      "message": "Archive unit…",
+      "description": "Archives the chosen unit after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.choose": {
+      "message": "Choose a unit to see its programmes and classes.",
+      "description": "Shown before a unit is chosen.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.description": {
+      "message": "Description",
+      "description": "Unit detail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.edit": {
+      "message": "Edit",
+      "description": "Edits the chosen unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.edit.title": {
+      "message": "Edit {name}",
+      "description": "Title of the dialog that edits a unit.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.kind": {
+      "message": "Name",
+      "description": "Unit detail: its short name.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.new": {
+      "message": "New unit",
+      "description": "Creates a top-level academic unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.new.title": {
+      "message": "New unit",
+      "description": "Title of the dialog that creates a top-level unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.part.of": {
+      "message": "Part of",
+      "description": "Unit detail: its parent unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.sub.title": {
+      "message": "New unit in {name}",
+      "description": "Title of the dialog that creates a sub-unit.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.unit.top": {
+      "message": "The institution",
+      "description": "A unit with no parent.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.units": {
+      "message": "Units",
+      "description": "Heading of the tree of academic units.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.units.none": {
+      "message": "No units yet. Create the first one.",
+      "description": "Shown when there are no academic units.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
     "administration.user.affiliation.add": {
       "message": "Add affiliation",
       "description": "Opens the dialog that adds an affiliation.",

@@ -1,0 +1,511 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Proctor contributors. All rights reserved.
+ *--------------------------------------------------------------------------------------------*/
+
+import { defineMessage } from '../../../../base/common/localization.js';
+
+/** Text of the Structure, Class and Academic periods pages. */
+export const structureMessages = Object.freeze({
+	structurePeriods: defineMessage({
+		id: 'administration.structure.periods',
+		defaultMessage: 'Academic periods',
+		description: 'Structure page action that opens Academic periods.'
+	}),
+	structureUnits: defineMessage({
+		id: 'administration.structure.units',
+		defaultMessage: 'Units',
+		description: 'Heading of the tree of academic units.'
+	}),
+	structureNewUnit: defineMessage({
+		id: 'administration.structure.unit.new',
+		defaultMessage: 'New unit',
+		description: 'Creates a top-level academic unit.'
+	}),
+	structureExpand: defineMessage({
+		id: 'administration.structure.expand',
+		defaultMessage: 'Show units in {name}',
+		description: 'Accessible name of the button that shows a unit’s sub-units.'
+	}),
+	structureCollapse: defineMessage({
+		id: 'administration.structure.collapse',
+		defaultMessage: 'Hide units in {name}',
+		description: 'Accessible name of the button that hides a unit’s sub-units.'
+	}),
+	structureNoUnits: defineMessage({
+		id: 'administration.structure.units.none',
+		defaultMessage: 'No units yet. Create the first one.',
+		description: 'Shown when there are no academic units.'
+	}),
+	structureChooseUnit: defineMessage({
+		id: 'administration.structure.unit.choose',
+		defaultMessage: 'Choose a unit to see its programmes and classes.',
+		description: 'Shown before a unit is chosen.'
+	}),
+	structureKind: defineMessage({
+		id: 'administration.structure.unit.kind',
+		defaultMessage: 'Name',
+		description: 'Unit detail: its short name.'
+	}),
+	structurePartOf: defineMessage({
+		id: 'administration.structure.unit.part.of',
+		defaultMessage: 'Part of',
+		description: 'Unit detail: its parent unit.'
+	}),
+	structureTopLevel: defineMessage({
+		id: 'administration.structure.unit.top',
+		defaultMessage: 'The institution',
+		description: 'A unit with no parent.'
+	}),
+	structureDescriptionLabel: defineMessage({
+		id: 'administration.structure.unit.description',
+		defaultMessage: 'Description',
+		description: 'Unit detail.'
+	}),
+	structureEdit: defineMessage({
+		id: 'administration.structure.unit.edit',
+		defaultMessage: 'Edit',
+		description: 'Edits the chosen unit.'
+	}),
+	structureAddSubUnit: defineMessage({
+		id: 'administration.structure.unit.add.sub',
+		defaultMessage: 'Add sub-unit',
+		description: 'Creates a unit under the chosen one.'
+	}),
+	structureArchiveUnit: defineMessage({
+		id: 'administration.structure.unit.archive',
+		defaultMessage: 'Archive unit…',
+		description: 'Archives the chosen unit after confirming.'
+	}),
+	structureProgrammes: defineMessage({
+		id: 'administration.structure.programmes',
+		defaultMessage: 'Programmes',
+		description: 'Section with a unit’s programmes.'
+	}),
+	structureProgrammesEmpty: defineMessage({
+		id: 'administration.structure.programmes.empty',
+		defaultMessage: 'No programmes in this unit.',
+		description: 'A unit with no programmes.'
+	}),
+	structureNewProgramme: defineMessage({
+		id: 'administration.structure.programme.new',
+		defaultMessage: 'New programme',
+		description: 'Creates a programme in the chosen unit.'
+	}),
+	structureLevelsOf: defineMessage({
+		id: 'administration.structure.levels.of',
+		defaultMessage: 'Levels: {levels}',
+		description: 'Detail of a programme listing its levels.'
+	}),
+	structureNoLevels: defineMessage({
+		id: 'administration.structure.levels.none',
+		defaultMessage: 'No levels yet',
+		description: 'A programme with no levels.'
+	}),
+	structureLevels: defineMessage({
+		id: 'administration.structure.levels',
+		defaultMessage: 'Levels',
+		description: 'Opens a programme’s levels.'
+	}),
+	structureLevelsTitle: defineMessage({
+		id: 'administration.structure.levels.title',
+		defaultMessage: 'Levels in {programme}',
+		description: 'Section with one programme’s levels.'
+	}),
+	structureLevelsEmpty: defineMessage({
+		id: 'administration.structure.levels.empty',
+		defaultMessage: 'No levels yet. Add the first year or stage.',
+		description: 'A programme with no levels.'
+	}),
+	structureNewLevel: defineMessage({
+		id: 'administration.structure.level.new',
+		defaultMessage: 'Add level',
+		description: 'Creates a level in the chosen programme.'
+	}),
+	structureClasses: defineMessage({
+		id: 'administration.structure.classes',
+		defaultMessage: 'Classes',
+		description: 'Section with a unit’s classes.'
+	}),
+	structureClassesEmpty: defineMessage({
+		id: 'administration.structure.classes.empty',
+		defaultMessage: 'No classes in this unit.',
+		description: 'A unit with no classes.'
+	}),
+	structureNewClass: defineMessage({
+		id: 'administration.structure.class.new',
+		defaultMessage: 'New class',
+		description: 'Creates a class in the chosen unit.'
+	}),
+	structureClassColumn: defineMessage({
+		id: 'administration.structure.column.class',
+		defaultMessage: 'Class',
+		description: 'Classes table column.'
+	}),
+	structureLevelColumn: defineMessage({
+		id: 'administration.structure.column.level',
+		defaultMessage: 'Programme level',
+		description: 'Classes table column.'
+	}),
+	structurePeriodColumn: defineMessage({
+		id: 'administration.structure.column.period',
+		defaultMessage: 'Period',
+		description: 'Classes table column.'
+	}),
+	structureRename: defineMessage({
+		id: 'administration.structure.rename',
+		defaultMessage: 'Rename…',
+		description: 'Renames a programme or level.'
+	}),
+	structureArchive: defineMessage({
+		id: 'administration.structure.archive',
+		defaultMessage: 'Archive…',
+		description: 'Archives a programme, level or class after confirming.'
+	}),
+	structureArchiveTitle: defineMessage({
+		id: 'administration.structure.archive.title',
+		defaultMessage: 'Archive {name}?',
+		description: 'Confirmation title before archiving.'
+	}),
+	structureArchiveBody: defineMessage({
+		id: 'administration.structure.archive.body',
+		defaultMessage:
+			'It’s hidden from new work and kept in history. Anything still inside it has to be archived first.',
+		description: 'Confirmation body before archiving.'
+	}),
+	structureArchiveConfirm: defineMessage({
+		id: 'administration.structure.archive.confirm',
+		defaultMessage: 'Archive',
+		description: 'Confirms archiving.'
+	}),
+	structureArchived: defineMessage({
+		id: 'administration.structure.archived',
+		defaultMessage: '{name} is archived',
+		description: 'Toast after archiving.'
+	}),
+	structureSaved: defineMessage({
+		id: 'administration.structure.saved',
+		defaultMessage: '{name} is saved',
+		description: 'Toast after a create or edit.'
+	}),
+	structureName: defineMessage({
+		id: 'administration.structure.field.name',
+		defaultMessage: 'Short name',
+		description: 'Field: an identifier-like name such as CS.'
+	}),
+	structureDisplayName: defineMessage({
+		id: 'administration.structure.field.display.name',
+		defaultMessage: 'Display name',
+		description: 'Field: the name people see.'
+	}),
+	structureDescriptionField: defineMessage({
+		id: 'administration.structure.field.description',
+		defaultMessage: 'Description',
+		description: 'Field: an optional description.'
+	}),
+	structureLevel: defineMessage({
+		id: 'administration.structure.field.level',
+		defaultMessage: 'Programme level',
+		description: 'Field: which level a class belongs to.'
+	}),
+	structurePeriod: defineMessage({
+		id: 'administration.structure.field.period',
+		defaultMessage: 'Academic period',
+		description: 'Field: which period a class runs in.'
+	}),
+	structureNewUnitTitle: defineMessage({
+		id: 'administration.structure.unit.new.title',
+		defaultMessage: 'New unit',
+		description: 'Title of the dialog that creates a top-level unit.'
+	}),
+	structureSubUnitTitle: defineMessage({
+		id: 'administration.structure.unit.sub.title',
+		defaultMessage: 'New unit in {name}',
+		description: 'Title of the dialog that creates a sub-unit.'
+	}),
+	structureEditUnitTitle: defineMessage({
+		id: 'administration.structure.unit.edit.title',
+		defaultMessage: 'Edit {name}',
+		description: 'Title of the dialog that edits a unit.'
+	}),
+	structureNewProgrammeTitle: defineMessage({
+		id: 'administration.structure.programme.new.title',
+		defaultMessage: 'New programme in {name}',
+		description: 'Title of the dialog that creates a programme.'
+	}),
+	structureRenameTitle: defineMessage({
+		id: 'administration.structure.rename.title',
+		defaultMessage: 'Rename {name}',
+		description: 'Title of the dialog that renames a programme or level.'
+	}),
+	structureNewLevelTitle: defineMessage({
+		id: 'administration.structure.level.new.title',
+		defaultMessage: 'New level in {name}',
+		description: 'Title of the dialog that creates a level.'
+	}),
+	structureNewClassTitle: defineMessage({
+		id: 'administration.structure.class.new.title',
+		defaultMessage: 'New class in {name}',
+		description: 'Title of the dialog that creates a class.'
+	}),
+	structureCreate: defineMessage({
+		id: 'administration.structure.create',
+		defaultMessage: 'Create',
+		description: 'Confirms creating a unit, programme, level or class.'
+	}),
+	structureSave: defineMessage({
+		id: 'administration.structure.save',
+		defaultMessage: 'Save',
+		description: 'Confirms an edit.'
+	}),
+	structureNeedsLevel: defineMessage({
+		id: 'administration.structure.needs.level',
+		defaultMessage: 'Add a programme and a level first.',
+		description: 'Shown when a class cannot be created yet.'
+	}),
+	classTrail: defineMessage({
+		id: 'administration.structure.class.trail',
+		defaultMessage: 'Structure',
+		description: 'The trail step back to Structure.'
+	}),
+	classDescription: defineMessage({
+		id: 'administration.structure.class.description',
+		defaultMessage: '{name} · {period}',
+		description: 'Description of one class: its short name and academic period.'
+	}),
+	classStudents: defineMessage({
+		id: 'administration.structure.class.students',
+		defaultMessage: 'Students',
+		description: 'Section with a class’s members.'
+	}),
+	classStudentsEmpty: defineMessage({
+		id: 'administration.structure.class.students.empty',
+		defaultMessage: 'No one is enrolled yet.',
+		description: 'A class with no members.'
+	}),
+	classEnrollment: defineMessage({
+		id: 'administration.structure.class.enrollment',
+		defaultMessage: 'Enrolment',
+		description: 'Filter: current enrolments or all of them.'
+	}),
+	classCurrent: defineMessage({
+		id: 'administration.structure.class.current',
+		defaultMessage: 'Current',
+		description: 'Filter choice: current enrolments.'
+	}),
+	classHistory: defineMessage({
+		id: 'administration.structure.class.history',
+		defaultMessage: 'Including ended',
+		description: 'Filter choice: every enrolment.'
+	}),
+	classStudentColumn: defineMessage({
+		id: 'administration.structure.class.column.student',
+		defaultMessage: 'Student',
+		description: 'Class members column.'
+	}),
+	classEnrolledColumn: defineMessage({
+		id: 'administration.structure.class.column.enrolled',
+		defaultMessage: 'Enrolled',
+		description: 'Class members column.'
+	}),
+	classStatusColumn: defineMessage({
+		id: 'administration.structure.class.column.status',
+		defaultMessage: 'Status',
+		description: 'Class members column.'
+	}),
+	classEnrolled: defineMessage({
+		id: 'administration.structure.class.enrolled',
+		defaultMessage: 'Enrolled',
+		description: 'A current enrolment.'
+	}),
+	classEnded: defineMessage({
+		id: 'administration.structure.class.ended',
+		defaultMessage: 'Ended {date}',
+		description: 'An ended enrolment.'
+	}),
+	classEnroll: defineMessage({
+		id: 'administration.structure.class.enroll',
+		defaultMessage: 'Enroll existing…',
+		description: 'Opens the dialog that enrols an existing account.'
+	}),
+	classEnrollTitle: defineMessage({
+		id: 'administration.structure.class.enroll.title',
+		defaultMessage: 'Enroll someone in {name}',
+		description: 'Title of the enrol dialog.'
+	}),
+	classEnrollBody: defineMessage({
+		id: 'administration.structure.class.enroll.body',
+		defaultMessage:
+			'They need a student affiliation. Anyone already in another class this period is moved here.',
+		description: 'Body of the enrol dialog.'
+	}),
+	classPerson: defineMessage({
+		id: 'administration.structure.class.person',
+		defaultMessage: 'Username or email',
+		description: 'Field: who to enrol.'
+	}),
+	classPersonNotFound: defineMessage({
+		id: 'administration.structure.class.person.not.found',
+		defaultMessage: 'No one with that username or email.',
+		description: 'Error when the person is not found.'
+	}),
+	classEnrollConfirm: defineMessage({
+		id: 'administration.structure.class.enroll.confirm',
+		defaultMessage: 'Enroll',
+		description: 'Confirms enrolling.'
+	}),
+	classEnrolledToast: defineMessage({
+		id: 'administration.structure.class.enrolled.toast',
+		defaultMessage: '{name} is enrolled',
+		description: 'Toast after enrolling.'
+	}),
+	classInvite: defineMessage({
+		id: 'administration.structure.class.invite',
+		defaultMessage: 'Invite students',
+		description: 'Opens the invitation dialog.'
+	}),
+	classEnd: defineMessage({
+		id: 'administration.structure.class.end',
+		defaultMessage: 'End enrolment…',
+		description: 'Ends an enrolment after confirming.'
+	}),
+	classEndTitle: defineMessage({
+		id: 'administration.structure.class.end.title',
+		defaultMessage: 'End {name}’s enrolment?',
+		description: 'Confirmation title before ending an enrolment.'
+	}),
+	classEndBody: defineMessage({
+		id: 'administration.structure.class.end.body',
+		defaultMessage: 'They leave the class now. Their submissions and results are kept.',
+		description: 'Confirmation body before ending an enrolment.'
+	}),
+	classEndConfirm: defineMessage({
+		id: 'administration.structure.class.end.confirm',
+		defaultMessage: 'End enrolment',
+		description: 'Confirms ending an enrolment.'
+	}),
+	classEndedToast: defineMessage({
+		id: 'administration.structure.class.ended.toast',
+		defaultMessage: '{name} left the class',
+		description: 'Toast after ending an enrolment.'
+	}),
+	classUnknownPerson: defineMessage({
+		id: 'administration.structure.class.unknown.person',
+		defaultMessage: 'Someone you can’t see',
+		description: 'A member whose account cannot be read.'
+	}),
+	classEdit: defineMessage({
+		id: 'administration.structure.class.edit',
+		defaultMessage: 'Edit…',
+		description: 'Edits the class.'
+	}),
+	classEditTitle: defineMessage({
+		id: 'administration.structure.class.edit.title',
+		defaultMessage: 'Edit {name}',
+		description: 'Title of the dialog that edits a class.'
+	}),
+	classMore: defineMessage({
+		id: 'administration.structure.class.more',
+		defaultMessage: 'More actions',
+		description: 'Accessible name of the class’s menu button.'
+	}),
+	periodsFind: defineMessage({
+		id: 'administration.structure.periods.find',
+		defaultMessage: 'Find a period',
+		description: 'Search field above the academic periods.'
+	}),
+	periodsNew: defineMessage({
+		id: 'administration.structure.periods.new',
+		defaultMessage: 'New period',
+		description: 'Creates an academic period.'
+	}),
+	periodsTable: defineMessage({
+		id: 'administration.structure.periods.table',
+		defaultMessage: 'Academic periods',
+		description: 'Accessible name of the periods table.'
+	}),
+	periodsName: defineMessage({
+		id: 'administration.structure.periods.column.name',
+		defaultMessage: 'Period',
+		description: 'Periods column.'
+	}),
+	periodsOwner: defineMessage({
+		id: 'administration.structure.periods.column.owner',
+		defaultMessage: 'Belongs to',
+		description: 'Periods column: the institution or a unit.'
+	}),
+	periodsDates: defineMessage({
+		id: 'administration.structure.periods.column.dates',
+		defaultMessage: 'Dates',
+		description: 'Periods column.'
+	}),
+	periodsStatus: defineMessage({
+		id: 'administration.structure.periods.column.status',
+		defaultMessage: 'Status',
+		description: 'Periods column.'
+	}),
+	periodsCurrent: defineMessage({
+		id: 'administration.structure.periods.current',
+		defaultMessage: 'Current',
+		description: 'A period running now.'
+	}),
+	periodsUpcoming: defineMessage({
+		id: 'administration.structure.periods.upcoming',
+		defaultMessage: 'Upcoming',
+		description: 'A period starting later.'
+	}),
+	periodsPast: defineMessage({
+		id: 'administration.structure.periods.past',
+		defaultMessage: 'Past',
+		description: 'A period that has ended.'
+	}),
+	periodsArchivedState: defineMessage({
+		id: 'administration.structure.periods.archived',
+		defaultMessage: 'Archived',
+		description: 'An archived period.'
+	}),
+	periodsDateRange: defineMessage({
+		id: 'administration.structure.periods.range',
+		defaultMessage: '{start} – {end}',
+		description: 'A period’s dates.'
+	}),
+	periodsEmpty: defineMessage({
+		id: 'administration.structure.periods.empty',
+		defaultMessage: 'No academic periods yet. Create the first term or year.',
+		description: 'Shown when there are no periods.'
+	}),
+	periodsNoMatch: defineMessage({
+		id: 'administration.structure.periods.empty.filtered',
+		defaultMessage: 'No periods match.',
+		description: 'Shown when the search finds nothing.'
+	}),
+	periodsNewTitle: defineMessage({
+		id: 'administration.structure.periods.new.title',
+		defaultMessage: 'New academic period',
+		description: 'Title of the dialog that creates a period.'
+	}),
+	periodsEditTitle: defineMessage({
+		id: 'administration.structure.periods.edit.title',
+		defaultMessage: 'Edit {name}',
+		description: 'Title of the dialog that edits a period.'
+	}),
+	periodsOwnerField: defineMessage({
+		id: 'administration.structure.periods.owner',
+		defaultMessage: 'Belongs to',
+		description: 'Field: the institution or a unit.'
+	}),
+	periodsInstitution: defineMessage({
+		id: 'administration.structure.periods.institution',
+		defaultMessage: 'The whole institution',
+		description: 'Period owner choice.'
+	}),
+	periodsStart: defineMessage({
+		id: 'administration.structure.periods.start',
+		defaultMessage: 'Starts',
+		description: 'Field: the first day.'
+	}),
+	periodsEnd: defineMessage({
+		id: 'administration.structure.periods.end',
+		defaultMessage: 'Ends',
+		description: 'Field: the last day.'
+	})
+});

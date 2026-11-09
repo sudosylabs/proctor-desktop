@@ -220,6 +220,11 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		this.showPage(1, false);
 	}
 
+	/** Draws the shown rows again, as once names they show have arrived. */
+	redraw(): void {
+		if (this.items.length > 0) this.renderRows(this.items);
+	}
+
 	/** Reads the shown page again, as after a change to one of its rows. */
 	refresh(): Promise<boolean> {
 		return this.read.value?.refresh() ?? Promise.resolve(false);
