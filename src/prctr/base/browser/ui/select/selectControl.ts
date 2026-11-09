@@ -23,6 +23,8 @@ export interface SelectOptions<T extends string> {
 	readonly icon?: ControlIconFactory;
 	readonly caret: ControlIconFactory;
 	readonly disabled?: boolean;
+	/** As wide as the chosen value, as a filter in a bar is; otherwise at least 200 pixels. */
+	readonly fit?: 'content';
 }
 
 /**
@@ -56,6 +58,7 @@ export class SelectControl<T extends string> extends Disposable {
 		caret.element.classList.add('prctr-select__caret');
 		this.element.append(this.select, caret.element);
 		this.element.toggleAttribute('data-icon', options.icon !== undefined);
+		this.element.toggleAttribute('data-fit', options.fit === 'content');
 		this._register(
 			addDisposableListener(this.select, 'change', () =>
 				this.changeEmitter.fire(this.select.value as T)

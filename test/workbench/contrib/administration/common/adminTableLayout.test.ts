@@ -26,10 +26,10 @@ void test('a wide table keeps every column and its share widths', () => {
 	assert.equal(plan.minimum, 240 + 140 + 140 + 120 + 120 + 44);
 });
 
-void test('lesser columns fold first, and shares give way once anything folds', () => {
+void test('lesser columns fold first, and the shown ones keep their widths', () => {
 	const medium = foldColumns(users, kinds, 760, { more: true });
 	assert.deepEqual(medium.hidden, [2]);
-	assert.deepEqual(medium.widths, [undefined, undefined, undefined, undefined, undefined]);
+	assert.deepEqual(medium.widths, ['34%', '22%', '18%', '13%', undefined]);
 	assert.equal(medium.foldInto, 0);
 	const narrow = foldColumns(users, kinds, 660, { more: true });
 	assert.deepEqual(narrow.hidden, [2, 3]);

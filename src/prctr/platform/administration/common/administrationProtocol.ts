@@ -1043,8 +1043,9 @@ const mailDeliveryShape = {
 } as const;
 const mailDeliveryDetailShape = {
 	...mailDeliveryShape,
-	targetUserId: 'id',
-	messageId: 'text'
+	/** Left out for an email to an invitee who has no account yet. */
+	targetUserId: { optional: 'id' },
+	messageId: 'longText'
 } as const;
 const countShape = { optional: { shape: { count: 'count', atLeast: 'flag' } } } as const;
 const rekeyShape = {

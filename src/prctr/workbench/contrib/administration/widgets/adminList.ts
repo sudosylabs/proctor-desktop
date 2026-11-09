@@ -445,7 +445,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 							this.total?.atLeast === true
 						)
 					});
-		this.range.hidden = !paged && this.total === undefined;
+		this.range.hidden = !paged;
 		this.steps.hidden = !paged;
 		this.previous.setState({
 			label: this.format.text('pagerPrevious'),

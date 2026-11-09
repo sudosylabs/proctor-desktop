@@ -152,8 +152,13 @@ export const invitationsMessages = Object.freeze({
 	}),
 	invitationsAny: defineMessage({
 		id: 'administration.invitations.filter.any',
-		defaultMessage: 'Any',
-		description: 'Filter choice that shows everything.'
+		defaultMessage: 'Any status',
+		description: 'Status filter choice that shows every invitation.'
+	}),
+	invitationsAnyKind: defineMessage({
+		id: 'administration.invitations.filter.any.kind',
+		defaultMessage: 'Any kind',
+		description: 'Kind filter choice that shows every invitation.'
 	}),
 	invitationStatePending: defineMessage({
 		id: 'administration.invitations.state.pending',

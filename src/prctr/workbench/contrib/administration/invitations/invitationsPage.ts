@@ -116,7 +116,7 @@ export class InvitationsPage extends Disposable implements PageView {
 			format.text('invitationsKind'),
 			'action.filter',
 			[
-				{ value: ANY, label: format.text('invitationsAny') },
+				{ value: ANY, label: format.text('invitationsAnyKind') },
 				...invitationPurposes.map((purpose) => ({
 					value: purpose,
 					label: format.text(PURPOSE_TEXT[purpose])
@@ -146,7 +146,9 @@ export class InvitationsPage extends Disposable implements PageView {
 									invitation.delivery?.failureCode === undefined
 										? ''
 										: format.code('problem', invitation.delivery.failureCode),
-								secondaryTone: 'fail',
+								...(invitation.delivery?.failureCode === undefined
+									? {}
+									: { secondaryTone: 'fail' as const }),
 								strong: true
 							})
 						},

@@ -122,7 +122,9 @@ export class MailPage extends Disposable implements PageView {
 									delivery.failureCode === undefined
 										? ''
 										: format.code('problem', delivery.failureCode),
-								secondaryTone: 'fail',
+								...(delivery.failureCode === undefined
+									? {}
+									: { secondaryTone: 'fail' as const }),
 								strong: true
 							})
 						},

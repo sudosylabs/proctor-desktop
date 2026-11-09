@@ -52,8 +52,8 @@ export interface AdminTablePlan {
 }
 
 /**
- * Which columns a table of `width` pixels shows. Lesser columns fold first; a share width is
- * dropped once anything folds, so the remaining columns divide the space. When the minimum
+ * Which columns a table of `width` pixels shows. Lesser columns fold first; the others keep
+ * their widths, and a column without one takes the space freed. When the minimum
  * widths of what is left still exceed the table, the first column keeps its minimum and the
  * table scrolls.
  */
@@ -81,10 +81,9 @@ export function foldColumns(
 		(edges.select === true ? ADMIN_EDGE_COLUMN : 0) +
 		(edges.more === true ? ADMIN_EDGE_COLUMN : 0);
 	const overflows = minimum > width;
-	const widths = columns.map((column, index) => {
-		if (overflows && index === first) return `${mins[index]}px`;
-		if (column.width === undefined) return undefined;
-		return hidden.length === 0 || column.width.endsWith('px') ? column.width : undefined;
-	});
+	// Shown columns keep their widths; the column without one takes what folding frees.
+	const widths = columns.map((column, index) =>
+		overflows && index === first ? `${mins[index]}px` : column.width
+	);
 	return { hidden, widths, minimum, first, foldInto };
 }

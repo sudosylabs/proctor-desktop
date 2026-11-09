@@ -4595,8 +4595,14 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.filter.any": {
-      "message": "Any",
-      "description": "Filter choice that shows everything.",
+      "message": "Any status",
+      "description": "Status filter choice that shows every invitation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.filter.any.kind": {
+      "message": "Any kind",
+      "description": "Kind filter choice that shows every invitation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
@@ -5350,7 +5356,7 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.jobs.any": {
-      "message": "Any",
+      "message": "Any status",
       "description": "Filter choice: every job.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
@@ -5482,7 +5488,7 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.mail.any": {
-      "message": "Any",
+      "message": "Any status",
       "description": "Filter choice: every delivery.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
@@ -8273,7 +8279,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.affiliation.any": {
-      "message": "Any",
+      "message": "Any affiliation",
       "description": "The affiliation filter shows everyone.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -8405,7 +8411,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.filter.status.any": {
-      "message": "Any",
+      "message": "Any status",
       "description": "Users filter choice: active and disabled accounts.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -8524,7 +8530,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.unit.any": {
-      "message": "Any",
+      "message": "Any unit",
       "description": "The unit filter shows everyone.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"

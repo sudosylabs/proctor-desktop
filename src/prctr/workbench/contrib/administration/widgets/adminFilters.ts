@@ -136,7 +136,8 @@ export class AdminFilters extends Disposable {
 				choices,
 				value,
 				icon: proctorIconFactory(icon, 16),
-				caret: proctorIconFactory('action.expand', 14)
+				caret: proctorIconFactory('action.expand', 14),
+				fit: 'content'
 			})
 		);
 		this._register(select.onDidChange(onChange));

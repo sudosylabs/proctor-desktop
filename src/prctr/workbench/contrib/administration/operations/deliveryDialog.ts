@@ -97,14 +97,14 @@ export class DeliveryDialog extends Disposable {
 				? this.format.text('deliveryNoProblem')
 				: this.format.code('problem', delivery.failureCode)
 		);
-		const user = await readOnce(this.administration, {
-			kind: 'user',
-			id: delivery.targetUserId
-		});
+		const user =
+			delivery.targetUserId === undefined
+				? undefined
+				: await readOnce(this.administration, { kind: 'user', id: delivery.targetUserId });
 		if (this._store.isDisposed) return;
 		const state = this.format.text(this.stateText(delivery.state));
 		renderDetails(this.details, [
-			...(user.kind === 'data'
+			...(user?.kind === 'data'
 				? [{ label: this.format.text('deliveryFor'), value: user.value.displayName }]
 				: []),
 			{ label: this.format.text('deliveryKind'), value: kind },

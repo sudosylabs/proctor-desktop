@@ -13,7 +13,7 @@ export const operationsMessages = Object.freeze({
 	}),
 	jobsAny: defineMessage({
 		id: 'administration.operations.jobs.any',
-		defaultMessage: 'Any',
+		defaultMessage: 'Any status',
 		description: 'Filter choice: every job.'
 	}),
 	jobQueued: defineMessage({
@@ -184,7 +184,7 @@ export const operationsMessages = Object.freeze({
 	}),
 	mailAny: defineMessage({
 		id: 'administration.operations.mail.any',
-		defaultMessage: 'Any',
+		defaultMessage: 'Any status',
 		description: 'Filter choice: every delivery.'
 	}),
 	mailQueued: defineMessage({
