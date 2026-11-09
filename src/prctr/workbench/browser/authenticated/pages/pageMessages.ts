@@ -132,6 +132,16 @@ export const pageMessages = Object.freeze({
 		defaultMessage: 'Page {page} of {count}, items {first} to {last}',
 		description: 'Announced after moving to another page of a list.'
 	}),
+	pageShownOpen: defineMessage({
+		id: 'page.pager.shown.open',
+		defaultMessage: 'Page {page}, items {first} to {last}',
+		description: 'Announced after moving to another page when the number of pages is not known.'
+	}),
+	pageTrail: defineMessage({
+		id: 'page.trail',
+		defaultMessage: 'Breadcrumb',
+		description: 'Accessible name of the trail of pages above a record’s page.'
+	}),
 	moreChips: defineMessage({
 		id: 'page.row.chips.more',
 		defaultMessage: '+{count}',

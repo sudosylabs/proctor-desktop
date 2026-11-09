@@ -3,9 +3,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { defineMessage } from '../../../base/common/localization.js';
+import { importsMessages } from './imports/importsMessages.js';
+import { overviewMessages } from './overview/overviewMessages.js';
+import { invitationsMessages } from './invitations/invitationsMessages.js';
+import { userMessages } from './user/userMessages.js';
+import { usersMessages } from './users/usersMessages.js';
 
-/** Text the Administration pane and every Administration page share: page headings and failures. */
-export const administrationMessages = Object.freeze({
+/** Text every Administration page shares: page headings and failures. */
+const sharedMessages = Object.freeze({
 	overviewTitle: defineMessage({
 		id: 'administration.page.overview.title',
 		defaultMessage: 'Overview',
@@ -163,10 +168,25 @@ export const administrationMessages = Object.freeze({
 		defaultMessage: 'Whether mail is being delivered.',
 		description: 'Mail description when the institution name is unknown.'
 	}),
+	importTitle: defineMessage({
+		id: 'administration.page.import.title',
+		defaultMessage: 'Import',
+		description: 'Heading of one onboarding import before its details load.'
+	}),
 	pageUnavailable: defineMessage({
 		id: 'administration.page.unavailable',
 		defaultMessage: 'This Administration page could not be opened.',
 		description: 'Shown in the sidebar when an Administration page fails to open.'
+	}),
+	fieldRequired: defineMessage({
+		id: 'administration.field.required',
+		defaultMessage: 'This is required.',
+		description: 'Shown under a required form field left empty.'
+	}),
+	fieldRefused: defineMessage({
+		id: 'administration.field.refused',
+		defaultMessage: 'The server didn’t accept this. Check it and try again.',
+		description: 'Shown under a form field the server refused.'
 	}),
 	failureUnavailable: defineMessage({
 		id: 'administration.failure.unavailable',
@@ -224,6 +244,16 @@ export const administrationMessages = Object.freeze({
 		defaultMessage: 'That took too long. Try again.',
 		description: 'A confirmation expired.'
 	})
+});
+
+/** Every message the Administration contribution registers, by its key. */
+export const administrationMessages = Object.freeze({
+	...sharedMessages,
+	...usersMessages,
+	...userMessages,
+	...invitationsMessages,
+	...importsMessages,
+	...overviewMessages
 });
 
 export type AdministrationMessage = keyof typeof administrationMessages;

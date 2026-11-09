@@ -1,0 +1,29 @@
+@layer contributions {
+	.prctr-admin-import-form {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		padding: 16px;
+	}
+	.prctr-admin-import-form .prctr-admin-import-form__file {
+		display: none;
+	}
+	.prctr-admin-import-form .prctr-admin-import-form__file-row {
+		align-items: center;
+		display: flex;
+		gap: 12px;
+		min-inline-size: 0;
+	}
+	.prctr-admin-import-form .prctr-admin-import-form__file-name {
+		color: var(--prctr-color-text-secondary);
+		font-size: 13px;
+		min-inline-size: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.prctr-admin-import-form .prctr-admin-import-form__actions {
+		display: flex;
+		justify-content: flex-end;
+	}
+}

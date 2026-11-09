@@ -1,4 +1,5 @@
 import { runAccountTests } from './accountTests.ts';
+import { runAdministrationTests } from './administrationTests.ts';
 import {
 	CancellationToken,
 	type CancellationToken as CancellationTokenType
@@ -121,6 +122,7 @@ function testWindowChromeClient(updates?: ProductWindowChromeUpdate[]): ProductW
 
 export async function runWorkbenchKernelBrowserTests(document: Document): Promise<number> {
 	await runAccountTests(document);
+	await runAdministrationTests(document);
 	await runThemePreferenceTest(document);
 	await runExecutableKernelTest(document);
 	await runWindowBindingFailureTests(document);

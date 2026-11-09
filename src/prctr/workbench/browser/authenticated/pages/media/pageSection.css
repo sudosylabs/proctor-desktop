@@ -43,6 +43,7 @@
 		border-radius: 10px;
 		overflow: hidden;
 	}
+	.prctr-page-section .prctr-page-section__footer:empty,
 	.prctr-page-section .prctr-page-section__content:empty {
 		display: none;
 	}

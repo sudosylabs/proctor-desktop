@@ -1,0 +1,52 @@
+@layer contributions {
+	.prctr-admin-filters {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.prctr-admin-filters .prctr-admin-filters__find {
+		align-items: center;
+		background: var(--prctr-color-background-card);
+		block-size: 34px;
+		border-radius: 8px;
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-control);
+		box-sizing: border-box;
+		color: var(--prctr-color-text-tertiary);
+		display: flex;
+		flex: 0 1 320px;
+		gap: 8px;
+		min-inline-size: 200px;
+		padding: 0 12px;
+	}
+	.prctr-admin-filters .prctr-admin-filters__find:focus-within {
+		box-shadow: inset 0 0 0 2px var(--prctr-color-border-focus);
+	}
+	.prctr-admin-filters .prctr-admin-filters__input {
+		background: transparent;
+		border: 0;
+		color: var(--prctr-color-text-primary);
+		flex: 1;
+		font: inherit;
+		font-size: 13.5px;
+		min-inline-size: 0;
+		outline: none;
+	}
+	.prctr-admin-filters .prctr-admin-filters__select {
+		display: flex;
+		flex: none;
+	}
+	.prctr-admin-filters .prctr-admin-filters__spacer {
+		flex: 1;
+	}
+	.prctr-admin-filters .prctr-admin-filters__note {
+		color: var(--prctr-color-text-tertiary);
+		font-size: 13px;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-admin-filters .prctr-admin-filters__find {
+			border: 1px solid CanvasText;
+		}
+	}
+}

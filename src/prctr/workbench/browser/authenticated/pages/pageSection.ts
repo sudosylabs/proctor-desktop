@@ -83,6 +83,8 @@ export class PageSection extends Disposable {
 	readonly element: HTMLElement;
 	/** Holds section content other than rows, such as a definition list. */
 	readonly content: HTMLElement;
+	/** The foot of the card, for a pager its owner drives, such as one the server pages. */
+	readonly footer: HTMLElement;
 	readonly feedback: PageFeedback;
 
 	private readonly heading: HTMLHeadingElement;
@@ -234,6 +236,10 @@ export class PageSection extends Disposable {
 		);
 		this.pager.element.hidden = true;
 		this._register(this.pager.onDidRequestPage((page) => this.showPage(page)));
+		this.footer = $('div.prctr-page-section__footer');
+		this.card.append(this.footer);
+		// A section without a title or action, such as a page's only table, shows no header.
+		header.hidden = !options.title && options.action === undefined;
 		this.element = $(
 			'section.prctr-page-section',
 			{ attrs: { 'aria-labelledby': id } },
@@ -399,7 +405,8 @@ export class PageSection extends Disposable {
 		this.stateTitle.textContent = content.title ?? '';
 		this.stateTitle.hidden = content.title === undefined;
 		this.stateText.textContent = content.text;
-		this.retry.element.hidden = kind !== 'failure';
+		// A failure that trying again cannot fix, such as a refusal, offers no retry.
+		this.retry.element.hidden = kind !== 'failure' || this.retryHandler === undefined;
 		this.stateIcon.element.hidden = kind === 'empty';
 		this.emptyRun = content.action?.run;
 		this.emptyAction.element.hidden = content.action === undefined;

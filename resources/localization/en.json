@@ -699,16 +699,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
-    "account.pager.shown.open": {
-      "message": "Page {page}, items {first} to {last}",
-      "description": "Announced after moving to another page when the number of pages is not known.",
-      "placeholders": [
-        "page",
-        "first",
-        "last"
-      ],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
-    },
     "account.photo.changed.elsewhere": {
       "message": "Your photo was changed somewhere else. Save to replace it with this one.",
       "description": "A newer photo exists; saving again replaces it.",
@@ -2280,6 +2270,871 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.field.refused": {
+      "message": "The server didn’t accept this. Check it and try again.",
+      "description": "Shown under a form field the server refused.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.field.required": {
+      "message": "This is required.",
+      "description": "Shown under a required form field left empty.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.imports.cancel": {
+      "message": "Cancel import…",
+      "description": "Cancels an import after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.cancel.body": {
+      "message": "Rows not yet imported are left out. Anything already imported stays.",
+      "description": "Confirmation body before cancelling an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.cancel.confirm": {
+      "message": "Cancel import",
+      "description": "Confirms cancelling an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.cancel.title": {
+      "message": "Cancel this import?",
+      "description": "Confirmation title before cancelling an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.cancelled": {
+      "message": "The import is cancelled",
+      "description": "Toast after an import is cancelled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.checking": {
+      "message": "Checking the rows… This page updates on its own.",
+      "description": "Shown while the server reads the file.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.choose": {
+      "message": "Choose file…",
+      "description": "Button that opens the file picker.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.commit.all": {
+      "message": "Import {count} rows",
+      "description": "Imports every row; count is how many.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.commit.body": {
+      "message": "Accounts, enrolments and invitations are created as the rows say. Rows with errors are left out.",
+      "description": "Confirmation body before importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.commit.title": {
+      "message": "Import these rows?",
+      "description": "Confirmation title before importing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.commit.valid": {
+      "message": "Import the {count} ready rows",
+      "description": "Imports only the rows without errors.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.description": {
+      "message": "{rows} rows · uploaded {when}",
+      "description": "Description of one import.",
+      "placeholders": [
+        "rows",
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.errors": {
+      "message": "Errors",
+      "description": "Count of rows that will be left out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.failed": {
+      "message": "Failed",
+      "description": "Count of rows that failed to import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.file": {
+      "message": "CSV file",
+      "description": "Field: the file to upload.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.file.hint": {
+      "message": "A CSV file of up to 10 MB with a header row.",
+      "description": "Hint under the file field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.file.required": {
+      "message": "Choose a CSV file.",
+      "description": "Error when no file is chosen.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.file.too.large": {
+      "message": "That file is larger than 10 MB. Split it into smaller files.",
+      "description": "Error when the file is too large.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.importing": {
+      "message": "Importing… This page updates on its own.",
+      "description": "Shown while the server imports the rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.left.out": {
+      "message": "{count} rows can’t be imported and will be left out. Fix them in the file and upload it again, or import the rest now.",
+      "description": "Notice when some rows have errors.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.mode": {
+      "message": "The file adds",
+      "description": "Field: what the rows of the file do.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.mode.administration": {
+      "message": "Changes to units, classes and roles",
+      "description": "Import mode.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.mode.institution": {
+      "message": "People to the institution",
+      "description": "Import mode.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.mode.progression": {
+      "message": "Students moving to their next class",
+      "description": "Import mode created by a student progression.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.mode.students": {
+      "message": "Students to a class",
+      "description": "Import mode.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.mode.teachers": {
+      "message": "Teachers to a unit",
+      "description": "Import mode.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.new.file": {
+      "message": "Upload a new file",
+      "description": "Opens Imports to upload another file.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.no.file": {
+      "message": "No file chosen",
+      "description": "Shown before a file is chosen.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.ready": {
+      "message": "Ready",
+      "description": "Count of rows that will import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.row": {
+      "message": "Row {row} · {reference}",
+      "description": "Title of one row of an import.",
+      "placeholders": [
+        "row",
+        "reference"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.row.code": {
+      "message": "{code}",
+      "description": "The server’s code for a row’s problem.",
+      "placeholders": [
+        "code"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.row.done": {
+      "message": "Imported",
+      "description": "Row status after import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.row.duplicate": {
+      "message": "Duplicate",
+      "description": "Row status: repeats an earlier row.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.row.failed": {
+      "message": "Failed",
+      "description": "Row status after a failed import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.row.invalid": {
+      "message": "Left out",
+      "description": "Row status: it has an error.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.row.skipped": {
+      "message": "Skipped",
+      "description": "Row status: left out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.row.valid": {
+      "message": "Ready",
+      "description": "Row status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.rows": {
+      "message": "Rows that need a look",
+      "description": "Section with the rows that have a problem.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.rows.description": {
+      "message": "Errors first. Everything else imports as written.",
+      "description": "Description of the rows section.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.rows.more": {
+      "message": "Only the first 100 rows are shown.",
+      "description": "Shown when the preview has more rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.rows.none": {
+      "message": "Every row is ready to import.",
+      "description": "Shown when no row has a problem.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.skipped": {
+      "message": "Skipped",
+      "description": "Count of rows left out or already done.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.started": {
+      "message": "Importing. This page updates as it goes.",
+      "description": "Toast after an import starts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.state.canceled": {
+      "message": "Cancelled",
+      "description": "Import state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.state.completed": {
+      "message": "Imported",
+      "description": "Import state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.state.completed.errors": {
+      "message": "Imported with errors",
+      "description": "Import state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.state.executing": {
+      "message": "Importing",
+      "description": "Import state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.state.failed": {
+      "message": "Failed",
+      "description": "Import state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.state.parsing": {
+      "message": "Checking",
+      "description": "Import state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.state.ready": {
+      "message": "Ready to review",
+      "description": "Import state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.state.uploading": {
+      "message": "Uploading",
+      "description": "Import state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.succeeded": {
+      "message": "Imported",
+      "description": "Count of rows imported.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.summary": {
+      "message": "Summary",
+      "description": "Section with the counts of an import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.total": {
+      "message": "Rows",
+      "description": "Count of all rows in the file.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.trail": {
+      "message": "Imports",
+      "description": "The trail step back to Imports.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.upload": {
+      "message": "Upload a file",
+      "description": "Section where a CSV file is chosen and uploaded.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.upload.button": {
+      "message": "Upload and review",
+      "description": "Uploads the file and opens its review.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.upload.description": {
+      "message": "Nothing changes until you review the rows and choose to import them.",
+      "description": "Description of the upload section.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.uploaded": {
+      "message": "The file is uploaded. Checking its rows…",
+      "description": "Toast after a file is uploaded.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.invitations.action.resend": {
+      "message": "Resend email",
+      "description": "Row action that sends the invitation email again.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.action.revoke": {
+      "message": "Revoke…",
+      "description": "Row action that revokes an invitation after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.column.expires": {
+      "message": "Expires",
+      "description": "Invitations column with the expiry date.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.column.invitee": {
+      "message": "Invitee",
+      "description": "Invitations column with the email address.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.column.kind": {
+      "message": "Invited as",
+      "description": "Invitations column with what they are invited to.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.column.status": {
+      "message": "Status",
+      "description": "Invitations column with the state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.empty": {
+      "message": "No invitations yet. Invite people to add them here.",
+      "description": "Invitations list with none at all.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.empty.filtered": {
+      "message": "No invitations match these filters.",
+      "description": "Invitations list with no matches.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.filter.any": {
+      "message": "Any",
+      "description": "Filter choice that shows everything.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.filter.kind": {
+      "message": "Kind",
+      "description": "Invitations filter by what people are invited to.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.filter.status": {
+      "message": "Status",
+      "description": "Invitations filter by state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.find": {
+      "message": "Find by exact email",
+      "description": "Search field above the list of invitations; the server matches whole addresses.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.body": {
+      "message": "Each person gets an email with a link that works once. Invitations expire if they’re not accepted.",
+      "description": "Description of the invitation dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.choose": {
+      "message": "Choose…",
+      "description": "Placeholder choice before one is made.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.class": {
+      "message": "Class",
+      "description": "Label of the class choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.emails": {
+      "message": "Email addresses",
+      "description": "Label of the box of email addresses.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.emails.hint": {
+      "message": "One per line or separated by commas, up to 200. To invite more, import a CSV file.",
+      "description": "Hint under the box of email addresses.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.emails.invalid": {
+      "message": "These aren’t email addresses: {addresses}",
+      "description": "Error naming the entries that are not email addresses.",
+      "placeholders": [
+        "addresses"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.emails.required": {
+      "message": "Enter at least one email address.",
+      "description": "Error when no address is given.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.emails.too.many": {
+      "message": "That’s {count} addresses. Invite up to 200 at a time, or import a CSV file.",
+      "description": "Error when more than 200 addresses are given.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.kind": {
+      "message": "Invite",
+      "description": "Label of the choice of what people are invited to.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.kind.role": {
+      "message": "People to a role",
+      "description": "Invite choice: people get an institution-wide role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.kind.students": {
+      "message": "Students to a class",
+      "description": "Invite choice: students join a class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.kind.teachers": {
+      "message": "Teachers to a unit",
+      "description": "Invite choice: teachers join an academic unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.loading": {
+      "message": "Loading choices…",
+      "description": "Shown while units, classes or roles load.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.more": {
+      "message": "Only the first 50 are listed.",
+      "description": "Shown when there are more choices than listed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.no.classes": {
+      "message": "This unit has no classes.",
+      "description": "Shown when the chosen unit has no classes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.partly": {
+      "message": "{sent} sent. These couldn’t be sent: {addresses}",
+      "description": "Shown in the dialog when some invitations could not be sent.",
+      "placeholders": [
+        "sent",
+        "addresses"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.role.label": {
+      "message": "Role",
+      "description": "Label of the role choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.send.many": {
+      "message": "Send {count} invitations",
+      "description": "Send button; count is how many addresses.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.send.none": {
+      "message": "Send invitations",
+      "description": "Send button before any address is entered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.send.one": {
+      "message": "Send 1 invitation",
+      "description": "Send button for one address.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.sent.body": {
+      "message": "They’re listed under Invitations until accepted.",
+      "description": "Toast body after invitations are sent.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.sent.many": {
+      "message": "{count} invitations sent",
+      "description": "Toast after invitations are sent; count is how many.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.sent.one": {
+      "message": "Invitation sent",
+      "description": "Toast after one invitation is sent.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.title": {
+      "message": "Invite people",
+      "description": "Title of the dialog that sends invitations.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.unit": {
+      "message": "Unit",
+      "description": "Label of the academic unit choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.kind.institution.role": {
+      "message": "Role at the institution",
+      "description": "Invitation to an institution-wide role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.kind.student": {
+      "message": "Student in a class",
+      "description": "Invitation to join a class as a student.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.kind.teacher": {
+      "message": "Teacher in a unit",
+      "description": "Invitation to teach in an academic unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.kind.unit.role": {
+      "message": "Role in a unit",
+      "description": "Invitation to a role in an academic unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.resent": {
+      "message": "The invitation email was sent again to {email}",
+      "description": "Toast after resending an invitation.",
+      "placeholders": [
+        "email"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.revoke.body": {
+      "message": "The link in their email stops working. You can invite them again later.",
+      "description": "Confirmation body before revoking an invitation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.revoke.confirm": {
+      "message": "Revoke invitation",
+      "description": "Confirms revoking an invitation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.revoke.title": {
+      "message": "Revoke the invitation to {email}?",
+      "description": "Confirmation title before revoking an invitation.",
+      "placeholders": [
+        "email"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.revoked": {
+      "message": "The invitation to {email} is revoked",
+      "description": "Toast after revoking an invitation.",
+      "placeholders": [
+        "email"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.state.accepted": {
+      "message": "Accepted",
+      "description": "Invitation accepted.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.state.bounced": {
+      "message": "Not delivered",
+      "description": "The invitation email could not be delivered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.state.expired": {
+      "message": "Expired",
+      "description": "Invitation expired.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.state.pending": {
+      "message": "Pending",
+      "description": "Invitation not yet accepted.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.state.revoked": {
+      "message": "Revoked",
+      "description": "Invitation revoked.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.state.superseded": {
+      "message": "Replaced",
+      "description": "Invitation replaced by a newer one.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.table": {
+      "message": "Invitations",
+      "description": "Accessible name of the table of invitations.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.overview.all.clear": {
+      "message": "Nothing needs your attention right now.",
+      "description": "Shown when nothing needs attention.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.attention": {
+      "message": "Needs attention",
+      "description": "Section listing what an administrator should look at.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.audits.open": {
+      "message": "Open audits",
+      "description": "Opens Audits.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.cleanup.detail": {
+      "message": "Records past their retention period wait until cleanup resumes.",
+      "description": "Detail of the paused cleanup item.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.cleanup.paused": {
+      "message": "Record cleanup is paused",
+      "description": "Attention item: automatic deletion is paused.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.invitations": {
+      "message": "{count} invitations are waiting to be accepted",
+      "description": "Attention item: several pending invitations.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.invitations.detail": {
+      "message": "The next expires {when}",
+      "description": "Detail of the pending invitations item.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.invitations.one": {
+      "message": "An invitation is waiting to be accepted",
+      "description": "Attention item: one pending invitation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.invitations.open": {
+      "message": "Open invitations",
+      "description": "Opens Invitations.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.jobs.detail": {
+      "message": "Last failure {when}",
+      "description": "Detail of the failed jobs item.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.jobs.failed": {
+      "message": "{count} jobs failed",
+      "description": "Attention item: several jobs failed; count may read “10 or more”.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.jobs.failed.one": {
+      "message": "A job failed",
+      "description": "Attention item: one background job failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.jobs.open": {
+      "message": "Open jobs",
+      "description": "Opens Jobs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.mail.detail": {
+      "message": "Most recent to {recipient}",
+      "description": "Detail of the failed mail item.",
+      "placeholders": [
+        "recipient"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.mail.failed": {
+      "message": "{count} emails couldn’t be delivered",
+      "description": "Attention item: several emails failed.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.mail.failed.one": {
+      "message": "An email couldn’t be delivered",
+      "description": "Attention item: one email failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.mail.open": {
+      "message": "Open mail",
+      "description": "Opens Mail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.many": {
+      "message": "10 or more",
+      "description": "A count the server stops at; used inside other messages.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.recent": {
+      "message": "Recent administrative changes",
+      "description": "Section with the latest audit events.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.recent.empty": {
+      "message": "No changes yet.",
+      "description": "Shown when there are no audit events.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.refused": {
+      "message": "Refused",
+      "description": "A change that was refused or failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.retention.open": {
+      "message": "Review cleanup",
+      "description": "Opens Data retention.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
+    "administration.overview.succeeded": {
+      "message": "Done",
+      "description": "A change that succeeded.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/overview/overviewMessages.ts"
+    },
     "administration.page.audits.description": {
       "message": "Everything that changed at {institution}, who did it and when.",
       "description": "One-line description under the Audits heading.",
@@ -2303,6 +3158,12 @@
     "administration.page.class.title": {
       "message": "Class",
       "description": "Heading of the Administration Class page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.page.import.title": {
+      "message": "Import",
+      "description": "Heading of one onboarding import before its details load.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
@@ -2481,6 +3342,771 @@
       "description": "Heading of the Administration Users page.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.user.affiliation.add": {
+      "message": "Add affiliation",
+      "description": "Opens the dialog that adds an affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.added": {
+      "message": "Affiliation added",
+      "description": "Toast after an affiliation is added.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.end": {
+      "message": "End affiliation…",
+      "description": "Row action that ends an affiliation after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.end.body": {
+      "message": "It ends now. A student with a current class enrolment keeps it until the enrolment ends.",
+      "description": "Confirmation body before ending an affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.end.confirm": {
+      "message": "End affiliation",
+      "description": "Confirms ending an affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.end.title": {
+      "message": "End this affiliation?",
+      "description": "Confirmation title before ending an affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.ended": {
+      "message": "Affiliation ended",
+      "description": "Toast after an affiliation ends.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.external": {
+      "message": "External",
+      "description": "Affiliation kind.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.kind": {
+      "message": "Affiliation",
+      "description": "Field: student, teacher, staff or external.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.save": {
+      "message": "Add affiliation",
+      "description": "Confirms adding an affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.staff": {
+      "message": "Staff",
+      "description": "Affiliation kind.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.student": {
+      "message": "Student",
+      "description": "Affiliation kind.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliation.teacher": {
+      "message": "Teacher",
+      "description": "Affiliation kind.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliations": {
+      "message": "Affiliations",
+      "description": "Section with how a user belongs to the institution.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.affiliations.empty": {
+      "message": "No affiliations yet.",
+      "description": "A user with no affiliations.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.current": {
+      "message": "Current",
+      "description": "Status of an affiliation or role that applies now.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.description": {
+      "message": "{email} · username {username} · member since {date}",
+      "description": "Description under a user’s name; email may be absent.",
+      "placeholders": [
+        "email",
+        "username",
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.description.no.email": {
+      "message": "Username {username} · member since {date}",
+      "description": "Description under a user’s name when they have no email.",
+      "placeholders": [
+        "username",
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.display.name": {
+      "message": "Display name",
+      "description": "Profile field: the name others see.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.edit": {
+      "message": "Edit",
+      "description": "Opens the dialog that edits a user’s profile.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.edit.save": {
+      "message": "Save",
+      "description": "Saves a user’s profile.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.edit.title": {
+      "message": "Edit {name}’s profile",
+      "description": "Title of the dialog that edits a user’s profile.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email": {
+      "message": "Email",
+      "description": "Profile field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.change": {
+      "message": "Change email…",
+      "description": "Menu action that changes a user’s email.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.change.body": {
+      "message": "A link to confirm goes to the new address, and a link to undo goes to the old one.",
+      "description": "Body of the change email dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.change.confirm": {
+      "message": "Change email",
+      "description": "Confirms changing the email.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.change.title": {
+      "message": "Change {name}’s email",
+      "description": "Title of the change email dialog.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.changed": {
+      "message": "A confirmation link is on its way to the new address",
+      "description": "Toast after the email change starts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.invalid": {
+      "message": "Enter an email address.",
+      "description": "Error for an invalid email address.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.marked": {
+      "message": "{name}’s email is marked verified",
+      "description": "Toast after marking the email verified.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.new": {
+      "message": "New email",
+      "description": "Field: the new email address.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.unverified": {
+      "message": "Not verified",
+      "description": "The email address is not verified yet.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.verified": {
+      "message": "Verified",
+      "description": "The email address is verified.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.email.verify": {
+      "message": "Mark email verified",
+      "description": "Menu action that marks the email verified.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.ended": {
+      "message": "Ended",
+      "description": "Status of an affiliation or role that has ended.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.ends": {
+      "message": "Ends",
+      "description": "Field: when something ends; empty means no end.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.ends.before.start": {
+      "message": "The end must come after the start.",
+      "description": "Error when an end date is before the start.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.ends.hint": {
+      "message": "Empty means it has no end date.",
+      "description": "Hint under an end date.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.first.name": {
+      "message": "First name",
+      "description": "Profile field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.language": {
+      "message": "Language",
+      "description": "Profile field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.language.hint": {
+      "message": "A language tag such as en-GB, or empty to use the institution’s.",
+      "description": "Hint under the language field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.last.name": {
+      "message": "Last name",
+      "description": "Profile field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.last.sign.in": {
+      "message": "Last sign-in",
+      "description": "Profile field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.more": {
+      "message": "More actions",
+      "description": "Accessible name of the button with a user’s less common actions.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.never": {
+      "message": "Never",
+      "description": "A user who has never signed in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.none": {
+      "message": "Not set",
+      "description": "A profile field with no value.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.period": {
+      "message": "From {start} to {end}",
+      "description": "Detail of an affiliation or role with an end.",
+      "placeholders": [
+        "start",
+        "end"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.period.open": {
+      "message": "From {start} · no end date",
+      "description": "Detail of an affiliation or role with no end.",
+      "placeholders": [
+        "start"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.profile": {
+      "message": "Profile",
+      "description": "Section with a user’s names, email, language and time zone.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role": {
+      "message": "Role",
+      "description": "Field: which role to grant.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role.end": {
+      "message": "End role…",
+      "description": "Row action that ends a role after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role.end.body": {
+      "message": "They lose what this role lets them do straight away.",
+      "description": "Confirmation body before ending a role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role.end.confirm": {
+      "message": "End role",
+      "description": "Confirms ending a role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role.end.title": {
+      "message": "End {role}?",
+      "description": "Confirmation title before ending a role; role is its name.",
+      "placeholders": [
+        "role"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role.ended": {
+      "message": "Role ended",
+      "description": "Toast after a role ends.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role.grant": {
+      "message": "Grant role",
+      "description": "Opens the dialog that grants a role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role.grant.save": {
+      "message": "Grant role",
+      "description": "Confirms granting a role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role.granted": {
+      "message": "Role granted",
+      "description": "Toast after a role is granted.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.role.unknown": {
+      "message": "A role you can’t see",
+      "description": "A role binding whose role is not listed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.roles": {
+      "message": "Roles",
+      "description": "Section with the roles a user holds and where.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.roles.empty": {
+      "message": "No roles. They can only use what their affiliations allow.",
+      "description": "A user with no roles.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.saved": {
+      "message": "{name}’s profile is saved",
+      "description": "Toast after a profile is saved.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.scope.class": {
+      "message": "Class",
+      "description": "A role held in one class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.scope.institution": {
+      "message": "Institution",
+      "description": "A role held across the institution.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.scope.unit": {
+      "message": "Academic unit",
+      "description": "A role held in one academic unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.session.cli": {
+      "message": "Command line",
+      "description": "A session from the command line.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.session.desktop": {
+      "message": "Proctor Desktop",
+      "description": "A session in Proctor Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.session.detail": {
+      "message": "Signed in {signedIn} · active {active}",
+      "description": "Detail of one session.",
+      "placeholders": [
+        "signedIn",
+        "active"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.session.end": {
+      "message": "Sign out",
+      "description": "Row action that ends one session.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.session.ended": {
+      "message": "Signed out of that session",
+      "description": "Toast after one session ends.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.session.other": {
+      "message": "Other client",
+      "description": "A session from another client.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.session.web": {
+      "message": "Web browser",
+      "description": "A session in a web browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.sessions": {
+      "message": "Sessions",
+      "description": "Section with where a user is signed in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.sessions.empty": {
+      "message": "They aren’t signed in anywhere.",
+      "description": "A user with no open sessions.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.starts": {
+      "message": "Starts",
+      "description": "Field: when something starts; empty means now.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.starts.hint": {
+      "message": "Empty starts it now.",
+      "description": "Hint under a start date.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.timezone": {
+      "message": "Time zone",
+      "description": "Profile field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.timezone.hint": {
+      "message": "A time zone such as Europe/London, or empty to use the institution’s.",
+      "description": "Hint under the time zone field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.trail.users": {
+      "message": "Users",
+      "description": "The trail step back to the list of users.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.two.step.body": {
+      "message": "Their authenticator and recovery codes stop working, and they set up two-step verification again at their next sign-in. Only do this once you know it’s them.",
+      "description": "Body of the reset dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.two.step.confirm": {
+      "message": "Reset two-step verification",
+      "description": "Confirms the reset.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.two.step.done": {
+      "message": "{name}’s two-step verification is reset",
+      "description": "Toast after the reset.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.two.step.reason": {
+      "message": "Reason",
+      "description": "Field: why two-step verification is reset.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.two.step.reference": {
+      "message": "Verification reference",
+      "description": "Field: a reference for how identity was checked, such as a ticket.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.two.step.reset": {
+      "message": "Reset two-step…",
+      "description": "Opens the dialog that resets two-step verification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.two.step.title": {
+      "message": "Reset {name}’s two-step verification?",
+      "description": "Title of the reset dialog.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.two.step.verified": {
+      "message": "I checked who they are",
+      "description": "Attestation required before resetting two-step verification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.two.step.verified.required": {
+      "message": "Confirm you checked who they are.",
+      "description": "Error when the attestation is not ticked.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.upcoming": {
+      "message": "Upcoming",
+      "description": "Status of an affiliation or role that starts later.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.username": {
+      "message": "Username",
+      "description": "Profile field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.where": {
+      "message": "Where",
+      "description": "Field: where a role applies.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.where.institution": {
+      "message": "Everywhere at the institution",
+      "description": "Role scope: the whole institution.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.users.action.disable": {
+      "message": "Disable account…",
+      "description": "Row action that disables a user’s account after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.action.enable": {
+      "message": "Enable account",
+      "description": "Row action that lets a disabled user sign in again.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.action.import": {
+      "message": "Import",
+      "description": "Users page action that opens Imports.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.action.invite": {
+      "message": "Invite people",
+      "description": "Users page action that opens the invitation dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.action.open": {
+      "message": "Open",
+      "description": "Row action that opens a user’s page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.action.sign.out": {
+      "message": "Sign out everywhere…",
+      "description": "Row action that ends all of a user’s sessions after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.column.last.active": {
+      "message": "Last active",
+      "description": "Users table column with when they were last active.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.column.person": {
+      "message": "Person",
+      "description": "Users table column with the name and email.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.column.status": {
+      "message": "Status",
+      "description": "Users table column with Active or Disabled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.column.username": {
+      "message": "Username",
+      "description": "Users table column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.disable.body": {
+      "message": "They’re signed out everywhere at once and can’t sign in until the account is enabled again. Their submissions, results and history are kept.",
+      "description": "Confirmation body before disabling an account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.disable.confirm": {
+      "message": "Disable account",
+      "description": "Confirms disabling an account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.disable.title": {
+      "message": "Disable {name}’s account?",
+      "description": "Confirmation title before disabling an account; name is the person.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.disabled.toast": {
+      "message": "{name}’s account is disabled",
+      "description": "Toast after an account is disabled.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.empty": {
+      "message": "No one has an account yet.",
+      "description": "Users list with no accounts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.empty.filtered": {
+      "message": "No one matches. Try another name or include disabled accounts.",
+      "description": "Users list with no matches for the filters.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.enabled.toast": {
+      "message": "{name} can sign in again",
+      "description": "Toast after an account is enabled.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.status": {
+      "message": "Status",
+      "description": "Filter over the list of users by whether accounts are disabled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.status.active": {
+      "message": "Active",
+      "description": "Users filter choice: only accounts that can sign in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.status.any": {
+      "message": "Any",
+      "description": "Users filter choice: active and disabled accounts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.find": {
+      "message": "Find by name, email or username",
+      "description": "Search field above the list of users.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.never.active": {
+      "message": "Never",
+      "description": "A user who has never been active.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.sign.out.body": {
+      "message": "Every session on every device ends now. They can sign in again straight away.",
+      "description": "Confirmation body before ending all of a user’s sessions.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.sign.out.confirm": {
+      "message": "Sign out everywhere",
+      "description": "Confirms ending all of a user’s sessions.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.sign.out.title": {
+      "message": "Sign {name} out everywhere?",
+      "description": "Confirmation title before ending all of a user’s sessions.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.signed.out.toast": {
+      "message": "{name} is signed out everywhere",
+      "description": "Toast after all of a user’s sessions end.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.status.active": {
+      "message": "Active",
+      "description": "Status of an account that can sign in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.status.disabled": {
+      "message": "Disabled",
+      "description": "Status of an account that cannot sign in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.table": {
+      "message": "Users",
+      "description": "Accessible name of the table of users.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "authenticated.account.nav.history": {
       "message": "Audits",
@@ -4480,6 +6106,16 @@
       ],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
+    "page.pager.shown.open": {
+      "message": "Page {page}, items {first} to {last}",
+      "description": "Announced after moving to another page when the number of pages is not known.",
+      "placeholders": [
+        "page",
+        "first",
+        "last"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
     "page.row.actions": {
       "message": "Actions for {name}",
       "description": "Accessible name of a row’s actions menu button and menu.",
@@ -4583,6 +6219,12 @@
       "placeholders": [
         "time"
       ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.trail": {
+      "message": "Breadcrumb",
+      "description": "Accessible name of the trail of pages above a record’s page.",
+      "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
     "settings.accessibility.announcements.description": {

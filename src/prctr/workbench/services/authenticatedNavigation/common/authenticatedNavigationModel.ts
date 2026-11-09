@@ -37,6 +37,7 @@ export const administrationPages = [
 	'user',
 	'invitations',
 	'imports',
+	'import',
 	'structure',
 	'class',
 	'periods',
@@ -50,12 +51,12 @@ export const administrationPages = [
 export type AdministrationPage = (typeof administrationPages)[number];
 
 /** Pages about one record, opened from a list; each needs the record's id. */
-const administrationSubjectPages: readonly AdministrationPage[] = ['user', 'class'];
+const administrationSubjectPages: readonly AdministrationPage[] = ['user', 'import', 'class'];
 
 /** The list a record's page is opened from, which the sidebar marks while the record is shown. */
 export const administrationParents: Readonly<
 	Partial<Record<AdministrationPage, AdministrationPage>>
-> = Object.freeze({ user: 'users', class: 'structure' });
+> = Object.freeze({ user: 'users', import: 'imports', class: 'structure' });
 
 export function administrationPageNeedsSubject(page: AdministrationPage): boolean {
 	return administrationSubjectPages.includes(page);

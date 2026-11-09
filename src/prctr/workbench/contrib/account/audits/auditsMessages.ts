@@ -6,11 +6,6 @@ import { defineMessage } from '../../../../base/common/localization.js';
 
 /** Text of the Account Audits page. */
 export const auditsMessages = Object.freeze({
-	pageShownOpen: defineMessage({
-		id: 'account.pager.shown.open',
-		defaultMessage: 'Page {page}, items {first} to {last}',
-		description: 'Announced after moving to another page when the number of pages is not known.'
-	}),
 	historyPeriodLabel: defineMessage({
 		id: 'account.history.filter.period',
 		defaultMessage: 'Period',

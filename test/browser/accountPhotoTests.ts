@@ -164,7 +164,8 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 				}),
 				'Try again',
 				() => undefined,
-				(reason) => reason
+				(reason) => reason,
+				() => undefined
 			)
 		])
 	);

@@ -1,6 +1,7 @@
 import type { IDisposable } from '../../src/prctr/base/common/lifecycle.ts';
 import type { LocalizationContext } from '../../src/prctr/base/common/localization.ts';
 import type { AccountClient } from '../../src/prctr/platform/account/common/accountProtocol.ts';
+import type { AdministrationClient } from '../../src/prctr/platform/administration/common/administrationProtocol.ts';
 import { IClipboardService } from '../../src/prctr/platform/clipboard/common/clipboardService.ts';
 import type { IInstantiationService } from '../../src/prctr/platform/instantiation/common/instantiation.ts';
 import { InstantiationService } from '../../src/prctr/platform/instantiation/common/instantiationService.ts';
@@ -25,6 +26,14 @@ import {
 	AccountService,
 	IAccountService
 } from '../../src/prctr/workbench/services/account/common/account.ts';
+import {
+	AdministrationService,
+	IAdministrationService
+} from '../../src/prctr/workbench/services/administration/common/administration.ts';
+import {
+	AdministrationFormatService,
+	IAdministrationFormatService
+} from '../../src/prctr/workbench/contrib/administration/administrationFormat.ts';
 import { IAuthenticatedNavigationService } from '../../src/prctr/workbench/services/authenticatedNavigation/common/authenticatedNavigation.ts';
 import { NativeClipboardService } from '../../src/prctr/workbench/services/clipboard/browser/nativeClipboardService.ts';
 import {
@@ -47,9 +56,13 @@ export interface AccountTestServicesOptions {
 	readonly settings?: SettingsRendererClient;
 	readonly signOut?: () => void;
 	readonly writeClipboard?: (text: string) => Promise<void>;
+	/** Administration's capability, for Administration pages. */
+	readonly administration?: AdministrationClient;
+	/** Receives Administration navigation, such as opening a user's page. */
+	readonly openAdministration?: (page: string, subject?: string) => void;
 }
 
-/** The services an Account pane and its pages take, over test doubles of the window's. */
+/** The services an Account or Administration pane and its pages take, over test doubles of the window's. */
 export function createAccountTestServices(options: AccountTestServicesOptions): {
 	readonly instantiationService: IInstantiationService;
 	readonly dispose: () => void;
@@ -62,6 +75,9 @@ export function createAccountTestServices(options: AccountTestServicesOptions): 
 		binding: options.binding
 	});
 	const account = new AccountService(options.account);
+	const administration = new AdministrationService(
+		options.administration ?? unavailableAdministration
+	);
 	const pageFormat = new PageFormatService(options.now, localization, windowService);
 	const services = new ServiceCollection(
 		[IWorkbenchWindowService, windowService],
@@ -73,7 +89,12 @@ export function createAccountTestServices(options: AccountTestServicesOptions): 
 		[IUserSettingsService, new UserSettingsService(options.settings ?? unavailableSettings)],
 		[IClipboardService, new NativeClipboardService(clipboard(options.writeClipboard))],
 		[IAuthenticatedHoverService, titleHover],
-		[IAuthenticatedNavigationService, navigation(options.signOut ?? (() => undefined))]
+		[
+			IAuthenticatedNavigationService,
+			navigation(options.signOut ?? (() => undefined), options.openAdministration)
+		],
+		[IAdministrationFormatService, new AdministrationFormatService(localization, pageFormat)],
+		[IAdministrationService, administration]
 	);
 	const instantiationService = new InstantiationService(services, true);
 	return {
@@ -81,6 +102,7 @@ export function createAccountTestServices(options: AccountTestServicesOptions): 
 		dispose: () => {
 			instantiationService.dispose();
 			account.dispose();
+			administration.dispose();
 		}
 	};
 }
@@ -93,6 +115,12 @@ const unavailableSettings: SettingsRendererClient = Object.freeze({
 		return { kind: 'unavailable' as const };
 	},
 	onDidChange: () => () => {}
+});
+
+const unavailableAdministration: AdministrationClient = Object.freeze({
+	async request() {
+		return { kind: 'error' as const, reason: 'unavailable' as const };
+	}
 });
 
 /** Shows hovers as native titles, so tests can read what a row would show. */
@@ -122,7 +150,10 @@ function clipboard(writeText: ((text: string) => Promise<void>) | undefined) {
 }
 
 /** Account only signs out through navigation; every other navigation call is unexpected. */
-function navigation(signOut: () => void): IAuthenticatedNavigationService {
+function navigation(
+	signOut: () => void,
+	openAdministration: ((page: string, subject?: string) => void) | undefined
+): IAuthenticatedNavigationService {
 	const unexpected = (): never => {
 		throw new Error('Account pages do not navigate in this test');
 	};
@@ -140,7 +171,7 @@ function navigation(signOut: () => void): IAuthenticatedNavigationService {
 		select: unexpected,
 		selectActivityView: unexpected,
 		selectAccountPage: unexpected,
-		selectAdministrationPage: unexpected,
+		selectAdministrationPage: openAdministration ?? unexpected,
 		setProductAreas: unexpected,
 		setProductStatus: unexpected,
 		setAccountCount: unexpected,

@@ -10,16 +10,20 @@ import { ToastHost } from '../../../../base/browser/ui/toast/toastHost.js';
 import { Event } from '../../../../base/common/event.js';
 import {
 	Disposable,
+	DisposableStore,
 	MutableDisposable,
 	type IDisposable
 } from '../../../../base/common/lifecycle.js';
 import { ScrollbarVisibility } from '../../../../base/common/scrollable.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { ServiceCollection } from '../../../../platform/instantiation/common/serviceCollection.js';
-import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
+import {
+	createProctorIcon,
+	proctorIconFactory
+} from '../../../../platform/theme/browser/proctorIcon.js';
 import { IWorkbenchOverlayService } from '../../workbenchServices.js';
 import { IPageFormatService } from './pageFormat.js';
-import { IPagePaneContext, PagePaneContext } from './pagePaneContext.js';
+import { IPagePaneContext, PagePaneContext, type PageHeading } from './pagePaneContext.js';
 import './media/pagePane.css';
 
 /** One page in the content area. Its pane shows it and says when it is visible. */
@@ -65,6 +69,10 @@ export class PagePane extends Disposable {
 	private readonly description: HTMLElement;
 	private readonly headerActions: HTMLElement;
 	private readonly body: HTMLElement;
+	private readonly trail: HTMLElement;
+	private readonly initials: HTMLElement;
+	private readonly status: HTMLElement;
+	private readonly trailStore = this._register(new DisposableStore());
 	private readonly menu: MenuControl;
 	/** Creates the pane's pages with its row menu, toasts and focus in scope. */
 	private readonly scopedInstantiationService: IInstantiationService;
@@ -84,16 +92,31 @@ export class PagePane extends Disposable {
 		this.description = $('p.prctr-page-pane__description');
 		this.headerActions = $('div.prctr-page-pane__header-actions');
 		this.body = $('div.prctr-page-pane__body');
+		this.trail = $('nav.prctr-page-pane__trail', {
+			hidden: true,
+			attrs: { 'aria-label': format.text('pageTrail') }
+		});
+		this.initials = $('span.prctr-page-pane__initials', {
+			hidden: true,
+			attrs: { 'aria-hidden': 'true' }
+		});
+		this.status = $('span.prctr-page-pane__status', { hidden: true });
 		const header = $(
 			'header.prctr-page-pane__header',
 			{},
-			$('div.prctr-page-pane__heading', {}, this.heading, this.description),
+			this.initials,
+			$(
+				'div.prctr-page-pane__heading',
+				{},
+				$('div.prctr-page-pane__title-row', {}, this.heading, this.status),
+				this.description
+			),
 			this.headerActions
 		);
 		this.viewport = $(
 			'div.prctr-page-pane__viewport',
 			{ tabIndex: -1 },
-			$('div.prctr-page-pane__content', {}, header, this.body)
+			$('div.prctr-page-pane__content', {}, this.trail, header, this.body)
 		);
 		this.scroll = this._register(
 			new DomScrollableElement(this.viewport, {
@@ -127,7 +150,8 @@ export class PagePane extends Disposable {
 			toasts,
 			format.text('retry'),
 			() => this.focus(),
-			(reason) => options.describeFailure(reason)
+			(reason) => options.describeFailure(reason),
+			(heading) => this.setHeading(heading)
 		);
 		this.scopedInstantiationService = this._register(
 			instantiationService.createChild(new ServiceCollection([IPagePaneContext, context]))
@@ -186,7 +210,7 @@ export class PagePane extends Disposable {
 		this.element.dataset.width = content.width ?? 'narrow';
 		this.heading.id = `prctr-page-${content.id}-title`;
 		this.element.setAttribute('aria-labelledby', this.heading.id);
-		this.setHeading(content.title, content.description);
+		this.setHeading({ title: content.title, description: content.description });
 		this.page.value = content.create(
 			this.scopedInstantiationService,
 			this.body,
@@ -197,15 +221,48 @@ export class PagePane extends Disposable {
 	}
 
 	/** Renames the shown page, such as when a record's page learns the record's name. */
-	setHeading(title: string, description: string): void {
-		this.heading.textContent = title;
-		this.description.textContent = description;
-		this.description.hidden = description.length === 0;
+	setHeading(heading: PageHeading): void {
+		this.heading.textContent = heading.title;
+		this.description.textContent = heading.description;
+		this.description.hidden = heading.description.length === 0;
+		this.initials.textContent = heading.initials ?? '';
+		this.initials.hidden = heading.initials === undefined;
+		this.status.textContent = heading.status?.text ?? '';
+		this.status.dataset.tone = heading.status?.tone ?? 'neutral';
+		this.status.hidden = heading.status === undefined;
+		this.renderTrail(heading.trail ?? []);
+	}
+
+	private renderTrail(trail: NonNullable<PageHeading['trail']>): void {
+		this.trailStore.clear();
+		const $ = createElementFactory(this.trail.ownerDocument);
+		this.trail.replaceChildren();
+		this.trail.hidden = trail.length === 0;
+		for (const step of trail) {
+			const link = $('button.prctr-page-pane__trail-step', {
+				type: 'button',
+				textContent: step.label
+			});
+			this.trailStore.add(addDisposableListener(link, 'click', () => step.open()));
+			const separator = this.trailStore.add(
+				createProctorIcon(this.trail.ownerDocument, { id: 'action.forward', size: 12 })
+			);
+			separator.element.setAttribute('aria-hidden', 'true');
+			this.trail.append(link, separator.element);
+		}
+		if (trail.length > 0)
+			this.trail.append(
+				$('span.prctr-page-pane__trail-current', {
+					textContent: this.heading.textContent ?? '',
+					attrs: { 'aria-current': 'page' }
+				})
+			);
 	}
 
 	clear(): void {
 		this.menu.hide(false);
 		this.page.clear();
+		this.trailStore.clear();
 		this.body.replaceChildren();
 		this.headerActions.replaceChildren();
 	}
