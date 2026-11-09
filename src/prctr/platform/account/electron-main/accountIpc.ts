@@ -1,23 +1,23 @@
 import { ApiObservationIpc } from '../../serverApi/electron-main/apiObservationIpc.js';
 import type { ApiSubscription } from '../../serverApi/common/apiObservation.js';
+import type { SessionBinding } from '../../serverApi/common/projection.js';
 import type { IpcMain, IpcMainInvokeEvent } from 'electron/main';
 import {
 	ACCOUNT_CHANNEL,
 	validateAccountIntent,
 	validateAccountResponse,
-	type AccountBinding,
 	type AccountIntent,
 	type AccountResponse
 } from '../common/accountProtocol.js';
 
 export interface AccountService {
 	observeAccount?(
-		binding: AccountBinding,
+		binding: SessionBinding,
 		intent: AccountIntent,
 		listener: (response: AccountResponse) => void
 	): ApiSubscription;
-	setApiFocused?(binding: AccountBinding, focused: boolean): void;
-	account(binding: AccountBinding, intent: AccountIntent): Promise<AccountResponse>;
+	setApiFocused?(binding: SessionBinding, focused: boolean): void;
+	account(binding: SessionBinding, intent: AccountIntent): Promise<AccountResponse>;
 }
 
 /** One capability owned by one authenticated main frame and immutable Session Binding. */
@@ -26,7 +26,7 @@ export class AccountIpcBridge {
 	private readonly observation: ApiObservationIpc<AccountIntent, AccountResponse> | undefined;
 	constructor(
 		private readonly ipc: Pick<IpcMain, 'handle' | 'removeHandler'>,
-		binding: AccountBinding,
+		binding: SessionBinding,
 		service: AccountService,
 		authorize: (event: IpcMainInvokeEvent) => void
 	) {

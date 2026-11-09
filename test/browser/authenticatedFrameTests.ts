@@ -13,6 +13,7 @@ import { authenticatedWindowServices } from '../../src/prctr/code/electron-brows
 import {
 	inertContribution,
 	unavailableAccount,
+	unavailableAdministration,
 	unusedClipboard
 } from './authenticatedTestServices.js';
 
@@ -159,6 +160,7 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 					throw new Error('sign-out unavailable');
 				},
 				account: unavailableAccount,
+				administration: unavailableAdministration,
 				settings: settingsClient,
 				clipboard: unusedClipboard
 			})

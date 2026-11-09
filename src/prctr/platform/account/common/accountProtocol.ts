@@ -1,4 +1,13 @@
 import type { ObservableApiCapability } from '../../serverApi/common/apiObservation.js';
+import {
+	projectionFlag,
+	projectionId,
+	projectionList,
+	projectionMember,
+	projectionRecord,
+	projectionText,
+	projectionTime
+} from '../../serverApi/common/projection.js';
 export const ACCOUNT_CHANNEL = 'prctr:authenticated:account';
 export const accountSections = ['profile', 'security', 'sessions', 'desktops'] as const;
 export type AccountSection = (typeof accountSections)[number];
@@ -288,52 +297,8 @@ export type AccountResponse =
 export interface AccountClient extends ObservableApiCapability<AccountIntent, AccountResponse> {
 	request(intent: AccountIntent): Promise<AccountResponse>;
 }
-export interface AccountBinding {
-	readonly principalId: string;
-	readonly sessionId: string;
-}
-
-export function accountRecord(value: unknown): Record<string, unknown> {
-	if (typeof value !== 'object' || value === null || Array.isArray(value))
-		throw new TypeError('Invalid account data');
-	return value as Record<string, unknown>;
-}
-export function accountText(value: unknown, limit = 512): string {
-	if (typeof value !== 'string' || value.length > limit)
-		throw new TypeError('Invalid account text');
-	return value.replace(/[\u0000-\u001f\u007f]/gu, ' ');
-}
-export function accountId(value: unknown): string {
-	if (typeof value !== 'string' || !/^[ybndrfg8ejkmcpqxot1uwisza345h769]{26}$/u.test(value))
-		throw new TypeError('Invalid account resource');
-	return value;
-}
-export function accountBoolean(value: unknown): boolean {
-	if (typeof value !== 'boolean') throw new TypeError('Invalid account flag');
-	return value;
-}
-export function accountTime(value: unknown): number {
-	if (!Number.isSafeInteger(value) || Number(value) < 0 || Number(value) > 8640000000000000)
-		throw new TypeError('Invalid account timestamp');
-	return Number(value);
-}
-export function accountList(value: unknown, limit = 256): unknown[] {
-	if (!Array.isArray(value) || value.length > limit) throw new TypeError('Invalid account list');
-	return value;
-}
-/** Reads one page of a server collection; only its first page is presented. */
-export function accountPage(value: unknown, limit = 256): unknown[] {
-	return accountList(accountRecord(value).items, limit);
-}
-/** Reads a server RFC 3339 UTC instant as epoch milliseconds; absence stays absent. */
-export function accountInstant(value: unknown): number | undefined {
-	if (value === undefined) return undefined;
-	if (typeof value !== 'string' || value.length > 40 || !/Z$/u.test(value))
-		throw new TypeError('Invalid account timestamp');
-	return accountTime(Date.parse(value));
-}
 export function validateAccountIntent(value: unknown): AccountIntent {
-	const input = accountRecord(value);
+	const input = projectionRecord(value);
 	if (input.kind === 'readPhoto' && Object.keys(input).length === 1) return { kind: 'readPhoto' };
 	if (input.kind === 'removePhoto' && Object.keys(input).length === 2)
 		return { kind: 'removePhoto', etag: accountPhotoEtag(input.etag) };
@@ -373,7 +338,7 @@ export function validateAccountIntent(value: unknown): AccountIntent {
 		input.kind === 'enableToken' ||
 		input.kind === 'revokeToken'
 	)
-		return Object.freeze({ kind: input.kind, id: accountId(input.id) });
+		return Object.freeze({ kind: input.kind, id: projectionId(input.id) });
 	throw new TypeError('Invalid account action');
 }
 function historyEventName(value: unknown): string {
@@ -397,8 +362,9 @@ function validateHistoryQuery(input: Record<string, unknown>): AccountIntent {
 	if (!Object.keys(input).every((key) => allowed.includes(key)))
 		throw new TypeError('Invalid account action');
 	const query: Record<string, unknown> = { kind: 'readHistory' };
-	if (input.createdAfter !== undefined) query.createdAfter = accountTime(input.createdAfter);
-	if (input.createdBefore !== undefined) query.createdBefore = accountTime(input.createdBefore);
+	if (input.createdAfter !== undefined) query.createdAfter = projectionTime(input.createdAfter);
+	if (input.createdBefore !== undefined)
+		query.createdBefore = projectionTime(input.createdBefore);
 	if (
 		query.createdAfter !== undefined &&
 		query.createdBefore !== undefined &&
@@ -406,7 +372,7 @@ function validateHistoryQuery(input: Record<string, unknown>): AccountIntent {
 	)
 		throw new TypeError('Invalid history range');
 	if (input.events !== undefined) {
-		const events = accountList(input.events, 64);
+		const events = projectionList(input.events, 64);
 		if (
 			events.length === 0 ||
 			new Set(events).size !== events.length ||
@@ -415,10 +381,11 @@ function validateHistoryQuery(input: Record<string, unknown>): AccountIntent {
 			throw new TypeError('Invalid history events');
 		query.events = Object.freeze([...(events as AccountHistoryEvent[])]);
 	}
-	if (input.status !== undefined) query.status = accountMember(input.status, ['success', 'fail']);
+	if (input.status !== undefined)
+		query.status = projectionMember(input.status, ['success', 'fail']);
 	if (input.relation !== undefined)
-		query.relation = accountMember(input.relation, ['subject', 'actor']);
-	if (input.order !== undefined) query.order = accountMember(input.order, ['asc', 'desc']);
+		query.relation = projectionMember(input.relation, ['subject', 'actor']);
+	if (input.order !== undefined) query.order = projectionMember(input.order, ['asc', 'desc']);
 	if (input.limit !== undefined) {
 		if (
 			typeof input.limit !== 'number' ||
@@ -451,14 +418,14 @@ function validateCreateToken(input: Record<string, unknown>): AccountIntent {
 		/[\u0000-\u001f\u007f]/u.test(input.description)
 	)
 		throw new TypeError('Invalid token description');
-	const scopes = accountList(input.scopes, 64);
+	const scopes = projectionList(input.scopes, 64);
 	if (
 		scopes.length === 0 ||
 		new Set(scopes).size !== scopes.length ||
 		!scopes.every((scope) => typeof scope === 'string' && tokenScope.test(scope))
 	)
 		throw new TypeError('Invalid token scopes');
-	const expiresAt = accountTime(input.expiresAt);
+	const expiresAt = projectionTime(input.expiresAt);
 	if (expiresAt === 0) throw new TypeError('Invalid token expiry');
 	return Object.freeze({
 		kind: 'createToken',
@@ -466,29 +433,31 @@ function validateCreateToken(input: Record<string, unknown>): AccountIntent {
 		scopes: Object.freeze([...(scopes as string[])]),
 		...(input.academicUnitId === undefined
 			? {}
-			: { academicUnitId: accountId(input.academicUnitId) }),
+			: { academicUnitId: projectionId(input.academicUnitId) }),
 		expiresAt
 	});
 }
 function validateToken(value: unknown): AccountToken {
-	const t = accountRecord(value);
-	const scopes = accountList(t.scopes, 64).map((scope) => {
+	const t = projectionRecord(value);
+	const scopes = projectionList(t.scopes, 64).map((scope) => {
 		if (typeof scope !== 'string' || !tokenScope.test(scope))
 			throw new TypeError('Invalid token scope');
 		return scope;
 	});
 	const optionalTime = (key: string) =>
-		t[key] === undefined ? {} : { [key]: accountTime(t[key]) };
+		t[key] === undefined ? {} : { [key]: projectionTime(t[key]) };
 	return Object.freeze({
-		id: accountId(t.id),
-		description: accountText(t.description, 512),
+		id: projectionId(t.id),
+		description: projectionText(t.description, 512),
 		scopes: Object.freeze(scopes),
-		...(t.academicUnitId === undefined ? {} : { academicUnitId: accountId(t.academicUnitId) }),
-		expiresAt: accountTime(t.expiresAt),
+		...(t.academicUnitId === undefined
+			? {}
+			: { academicUnitId: projectionId(t.academicUnitId) }),
+		expiresAt: projectionTime(t.expiresAt),
 		...optionalTime('lastUsedAt'),
 		...optionalTime('disabledAt'),
 		...optionalTime('revokedAt'),
-		createdAt: accountTime(t.createdAt)
+		createdAt: projectionTime(t.createdAt)
 	});
 }
 function optionalTimes(
@@ -496,15 +465,11 @@ function optionalTimes(
 	keys: readonly string[]
 ): Record<string, number> {
 	const times: Record<string, number> = {};
-	for (const key of keys) if (record[key] !== undefined) times[key] = accountTime(record[key]);
+	for (const key of keys) if (record[key] !== undefined) times[key] = projectionTime(record[key]);
 	return times;
 }
-function accountMember<T extends string>(value: unknown, members: readonly T[]): T {
-	if (!members.includes(value as T)) throw new TypeError('Invalid account state');
-	return value as T;
-}
 export function validateAccountResponse(value: unknown): AccountResponse {
-	const input = accountRecord(value);
+	const input = projectionRecord(value);
 	if (input.kind === 'tokenCreated') {
 		if (
 			typeof input.credential !== 'string' ||
@@ -528,7 +493,7 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 	}
 	if (input.kind === 'success') return Object.freeze({ kind: 'success' });
 	if (input.kind === 'sessionsEnded' && Object.keys(input).length === 2)
-		return Object.freeze({ kind: 'sessionsEnded', count: accountTime(input.count) });
+		return Object.freeze({ kind: 'sessionsEnded', count: projectionTime(input.count) });
 	if (
 		input.kind === 'error' &&
 		[
@@ -547,40 +512,40 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 	)
 		return Object.freeze({ kind: 'error', reason: input.reason as AccountFailure });
 	if (input.kind !== 'data') throw new TypeError('Invalid account response');
-	const data = accountRecord(input.data);
+	const data = projectionRecord(input.data);
 	let result: AccountData;
 	if (data.section === 'profile') {
-		const p = accountRecord(data.profile);
+		const p = projectionRecord(data.profile);
 		result = {
 			section: 'profile',
 			profile: Object.freeze({
-				username: accountText(p.username),
-				displayName: accountText(p.displayName),
-				firstName: accountText(p.firstName),
-				lastName: accountText(p.lastName),
-				...(p.email === undefined ? {} : { email: accountText(p.email) }),
+				username: projectionText(p.username),
+				displayName: projectionText(p.displayName),
+				firstName: projectionText(p.firstName),
+				lastName: projectionText(p.lastName),
+				...(p.email === undefined ? {} : { email: projectionText(p.email) }),
 				...(p.emailVerified === undefined
 					? {}
-					: { emailVerified: accountBoolean(p.emailVerified) }),
-				...(p.locale === undefined ? {} : { locale: accountText(p.locale, 128) }),
-				...(p.timezone === undefined ? {} : { timezone: accountText(p.timezone, 128) }),
-				createdAt: accountTime(p.createdAt),
-				photoKind: accountMember(p.photoKind, ['custom', 'default'])
+					: { emailVerified: projectionFlag(p.emailVerified) }),
+				...(p.locale === undefined ? {} : { locale: projectionText(p.locale, 128) }),
+				...(p.timezone === undefined ? {} : { timezone: projectionText(p.timezone, 128) }),
+				createdAt: projectionTime(p.createdAt),
+				photoKind: projectionMember(p.photoKind, ['custom', 'default'])
 			})
 		};
 	} else if (data.section === 'security') {
-		const s = accountRecord(data.security);
-		const m = s.mfa === undefined ? undefined : accountRecord(s.mfa);
+		const s = projectionRecord(data.security);
+		const m = s.mfa === undefined ? undefined : projectionRecord(s.mfa);
 		result = {
 			section: 'security',
 			security: Object.freeze({
-				password: accountBoolean(s.password),
+				password: projectionFlag(s.password),
 				providers: Object.freeze(
-					accountList(s.providers, 64).map((value) => {
-						const p = accountRecord(value);
+					projectionList(s.providers, 64).map((value) => {
+						const p = projectionRecord(value);
 						return Object.freeze({
-							name: accountText(p.name),
-							type: accountText(p.type, 64)
+							name: projectionText(p.name),
+							type: projectionText(p.type, 64)
 						});
 					})
 				),
@@ -588,12 +553,12 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 					m === undefined
 						? undefined
 						: Object.freeze({
-								available: accountBoolean(m.available),
-								enabled: accountBoolean(m.enabled),
-								pending: accountBoolean(m.pending),
-								recoveryRequired: accountBoolean(m.recoveryRequired),
-								recoveryCodesRemaining: accountTime(m.recoveryCodesRemaining),
-								recoveryCodesTotal: accountTime(m.recoveryCodesTotal),
+								available: projectionFlag(m.available),
+								enabled: projectionFlag(m.enabled),
+								pending: projectionFlag(m.pending),
+								recoveryRequired: projectionFlag(m.recoveryRequired),
+								recoveryCodesRemaining: projectionTime(m.recoveryCodesRemaining),
+								recoveryCodesTotal: projectionTime(m.recoveryCodesTotal),
 								...optionalTimes(m, [
 									'recoveryCodesGeneratedAt',
 									'enabledAt',
@@ -601,7 +566,7 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 								]),
 								...(m.method === undefined
 									? {}
-									: { method: accountMember(m.method, ['authenticatorApp']) })
+									: { method: projectionMember(m.method, ['authenticatorApp']) })
 							})
 			})
 		};
@@ -609,18 +574,18 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 		result = {
 			section: 'sessions',
 			sessions: Object.freeze(
-				accountList(data.sessions).map((value) => {
-					const s = accountRecord(value);
+				projectionList(data.sessions).map((value) => {
+					const s = projectionRecord(value);
 					return Object.freeze({
-						id: accountId(s.id),
-						current: accountBoolean(s.current),
-						name: accountText(s.name),
-						client: accountText(s.client, 64),
-						platform: accountText(s.platform, 64),
-						method: accountText(s.method, 64),
-						createdAt: accountTime(s.createdAt),
-						lastActivityAt: accountTime(s.lastActivityAt),
-						expiresAt: accountTime(s.expiresAt)
+						id: projectionId(s.id),
+						current: projectionFlag(s.current),
+						name: projectionText(s.name),
+						client: projectionText(s.client, 64),
+						platform: projectionText(s.platform, 64),
+						method: projectionText(s.method, 64),
+						createdAt: projectionTime(s.createdAt),
+						lastActivityAt: projectionTime(s.lastActivityAt),
+						expiresAt: projectionTime(s.expiresAt)
 					});
 				})
 			)
@@ -629,17 +594,17 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 		result = {
 			section: 'desktops',
 			desktops: Object.freeze(
-				accountList(data.desktops).map((value) => {
-					const d = accountRecord(value);
+				projectionList(data.desktops).map((value) => {
+					const d = projectionRecord(value);
 					return Object.freeze({
-						id: accountId(d.id),
-						current: accountBoolean(d.current),
-						name: accountText(d.name),
-						platform: accountText(d.platform, 64),
-						release: accountText(d.release, 64),
-						createdAt: accountTime(d.createdAt),
-						lastUsedAt: accountTime(d.lastUsedAt),
-						revoked: accountBoolean(d.revoked)
+						id: projectionId(d.id),
+						current: projectionFlag(d.current),
+						name: projectionText(d.name),
+						platform: projectionText(d.platform, 64),
+						release: projectionText(d.release, 64),
+						createdAt: projectionTime(d.createdAt),
+						lastUsedAt: projectionTime(d.lastUsedAt),
+						revoked: projectionFlag(d.revoked)
 					});
 				})
 			)
@@ -647,28 +612,28 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 	} else if (data.section === 'tokens') {
 		result = {
 			section: 'tokens',
-			tokens: Object.freeze(accountList(data.tokens).map(validateToken))
+			tokens: Object.freeze(projectionList(data.tokens).map(validateToken))
 		};
 		if (new Set(result.tokens.map((token) => token.id)).size !== result.tokens.length)
 			throw new TypeError('Ambiguous account resource list');
 	} else if (data.section === 'grantableScopes') {
-		const g = accountRecord(data.grantable);
-		const academicUnits = accountList(g.academicUnits, 50).map((value) => {
-			const u = accountRecord(value);
-			return Object.freeze({ id: accountId(u.id), name: accountText(u.name, 256) });
+		const g = projectionRecord(data.grantable);
+		const academicUnits = projectionList(g.academicUnits, 50).map((value) => {
+			const u = projectionRecord(value);
+			return Object.freeze({ id: projectionId(u.id), name: projectionText(u.name, 256) });
 		});
 		const unitIds = new Set(academicUnits.map((unit) => unit.id));
-		const scopes = accountList(g.scopes, 128).map((value) => {
-			const c = accountRecord(value);
+		const scopes = projectionList(g.scopes, 128).map((value) => {
+			const c = projectionRecord(value);
 			if (typeof c.name !== 'string' || !tokenScope.test(c.name))
 				throw new TypeError('Invalid token scope');
-			const ids = accountList(c.academicUnitIds, 50).map(accountId);
+			const ids = projectionList(c.academicUnitIds, 50).map(projectionId);
 			if (!ids.every((id) => unitIds.has(id))) throw new TypeError('Invalid token scope');
 			return Object.freeze({
 				name: c.name,
-				title: accountText(c.title, 256),
-				description: accountText(c.description, 1024),
-				institutionWide: accountBoolean(c.institutionWide),
+				title: projectionText(c.title, 256),
+				description: projectionText(c.description, 1024),
+				institutionWide: projectionFlag(c.institutionWide),
 				academicUnitIds: Object.freeze(ids)
 			});
 		});
@@ -682,21 +647,21 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 			grantable: Object.freeze({
 				scopes: Object.freeze(scopes),
 				academicUnits: Object.freeze(academicUnits),
-				moreAcademicUnits: accountBoolean(g.moreAcademicUnits)
+				moreAcademicUnits: projectionFlag(g.moreAcademicUnits)
 			})
 		};
 	} else if (data.section === 'history') {
-		const entries = accountList(data.entries, 200).map((value) => {
-			const e = accountRecord(value);
+		const entries = projectionList(data.entries, 200).map((value) => {
+			const e = projectionRecord(value);
 			const optional = (key: string, limit: number) =>
-				e[key] === undefined ? {} : { [key]: accountText(e[key], limit) };
+				e[key] === undefined ? {} : { [key]: projectionText(e[key], limit) };
 			return Object.freeze({
-				id: accountId(e.id),
-				createdAt: accountTime(e.createdAt),
+				id: projectionId(e.id),
+				createdAt: projectionTime(e.createdAt),
 				event: historyEventName(e.event),
-				failed: accountBoolean(e.failed),
-				relation: accountMember(e.relation, ['subject', 'actor'] as const),
-				actor: accountMember(e.actor, accountHistoryActors),
+				failed: projectionFlag(e.failed),
+				relation: projectionMember(e.relation, ['subject', 'actor'] as const),
+				actor: projectionMember(e.actor, accountHistoryActors),
 				...optional('client', 32),
 				...optional('ipAddress', 64),
 				...optional('userAgent', 512)
@@ -722,26 +687,26 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 				? {}
 				: {
 						total: data.total as number,
-						totalIsLowerBound: accountBoolean(data.totalIsLowerBound ?? false)
+						totalIsLowerBound: projectionFlag(data.totalIsLowerBound ?? false)
 					})
 		};
 	} else if (data.section === 'notices') {
-		const notices = accountList(data.notices, 200).map((value) => {
-			const n = accountRecord(value);
+		const notices = projectionList(data.notices, 200).map((value) => {
+			const n = projectionRecord(value);
 			return Object.freeze({
-				retirementId: accountId(n.retirementId),
-				examId: accountId(n.examId),
-				examTitle: accountText(n.examTitle, 200),
-				examSittingId: accountId(n.examSittingId),
-				sittingStartAt: accountTime(n.sittingStartAt),
-				sittingEndAt: accountTime(n.sittingEndAt),
-				submissionId: accountId(n.submissionId),
-				category: accountMember(n.category, accountNoticeCategories),
-				state: accountMember(n.state, accountNoticeStates),
-				createdAt: accountTime(n.createdAt),
-				retireAfter: accountTime(n.retireAfter),
-				deliveryState: accountMember(n.deliveryState, accountNoticeDeliveryStates),
-				...(n.canceledAt === undefined ? {} : { canceledAt: accountTime(n.canceledAt) })
+				retirementId: projectionId(n.retirementId),
+				examId: projectionId(n.examId),
+				examTitle: projectionText(n.examTitle, 200),
+				examSittingId: projectionId(n.examSittingId),
+				sittingStartAt: projectionTime(n.sittingStartAt),
+				sittingEndAt: projectionTime(n.sittingEndAt),
+				submissionId: projectionId(n.submissionId),
+				category: projectionMember(n.category, accountNoticeCategories),
+				state: projectionMember(n.state, accountNoticeStates),
+				createdAt: projectionTime(n.createdAt),
+				retireAfter: projectionTime(n.retireAfter),
+				deliveryState: projectionMember(n.deliveryState, accountNoticeDeliveryStates),
+				...(n.canceledAt === undefined ? {} : { canceledAt: projectionTime(n.canceledAt) })
 			});
 		});
 		if (new Set(notices.map((notice) => notice.retirementId)).size !== notices.length)
@@ -749,7 +714,7 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 		result = {
 			section: 'notices',
 			notices: Object.freeze(notices),
-			more: accountBoolean(data.more)
+			more: projectionFlag(data.more)
 		};
 	} else throw new TypeError('Invalid account section');
 	if (result.section === 'sessions' || result.section === 'desktops') {

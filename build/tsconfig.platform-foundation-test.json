@@ -6,6 +6,7 @@
   },
   "exclude": [
     "../test/platform/identity/electron-main/**",
+    "../test/platform/administration/electron-main/**",
     "../test/platform/identity/node/**",
     "../test/platform/settings/electron-main/**",
     "../test/platform/serverApi/**",

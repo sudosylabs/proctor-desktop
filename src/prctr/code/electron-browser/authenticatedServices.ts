@@ -3,6 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import type { AccountClient } from '../../platform/account/common/accountProtocol.js';
+import type { AdministrationClient } from '../../platform/administration/common/administrationProtocol.js';
 import { IClipboardService } from '../../platform/clipboard/common/clipboardService.js';
 import type { ExamActivityClient } from '../../platform/examActivity/common/examActivityProtocol.js';
 import { SyncDescriptor } from '../../platform/instantiation/common/descriptors.js';
@@ -29,6 +30,10 @@ import {
 	IAccountService
 } from '../../workbench/services/account/common/account.js';
 import {
+	AdministrationService,
+	IAdministrationService
+} from '../../workbench/services/administration/common/administration.js';
+import {
 	AuthenticatedHostService,
 	IAuthenticatedHostService
 } from '../../workbench/services/authenticatedHost/common/authenticatedHost.js';
@@ -47,6 +52,7 @@ import {
 export interface AuthenticatedPreloadCapabilities {
 	signOut(): Promise<void>;
 	readonly account: AccountClient;
+	readonly administration: AdministrationClient;
 	readonly settings: SettingsRendererClient;
 	readonly clipboard: SettingsClipboardClient;
 	/** Present when the window was given the product pages. */
@@ -66,6 +72,10 @@ export function authenticatedWindowServices(
 			new AuthenticatedHostService(preload, preload.examActivity !== undefined)
 		);
 		services.set(IAccountService, new SyncDescriptor(AccountService, [preload.account]));
+		services.set(
+			IAdministrationService,
+			new SyncDescriptor(AdministrationService, [preload.administration])
+		);
 		services.set(IPageFormatService, new SyncDescriptor(PageFormatService, [Date.now]));
 		services.set(IAccountFormatService, new SyncDescriptor(AccountFormatService));
 		services.set(IAdministrationFormatService, new SyncDescriptor(AdministrationFormatService));

@@ -1,6 +1,7 @@
 // First, so its stylesheet declares the cascade layer order before any other.
 import '../../workbench/browser/documentLayout.js';
 import type { AccountClient } from '../../platform/account/common/accountProtocol.js';
+import type { AdministrationClient } from '../../platform/administration/common/administrationProtocol.js';
 import type { ExamActivityClient } from '../../platform/examActivity/common/examActivityProtocol.js';
 import type { SettingsNativeClient } from '../../platform/settings/common/settingsNativeHost.js';
 import type { ProductWindowChromeClient } from '../../platform/windows/common/windowChrome.js';
@@ -25,6 +26,7 @@ interface AuthenticatedPreloadApi {
 	readonly settings: SettingsRendererClient;
 	readonly settingsNative: SettingsNativeClient;
 	readonly account: AccountClient;
+	readonly administration: AdministrationClient;
 	readonly examActivity: ExamActivityClient;
 }
 const api = (globalThis as unknown as { readonly proctorAuthenticated?: AuthenticatedPreloadApi })
@@ -49,6 +51,7 @@ const authenticatedWindow = await bootstrapWorkbench(
 		services: authenticatedWindowServices({
 			signOut: () => preload.signOut(),
 			account: preload.account,
+			administration: preload.administration,
 			settings: preload.settings,
 			clipboard: preload.settingsNative.clipboard,
 			examActivity: preload.examActivity

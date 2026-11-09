@@ -217,6 +217,7 @@
     "../src/prctr/workbench/services/resourcePreview/common/**/*.ts",
     "../src/prctr/workbench/services/localization/common/**/*.ts",
     "../src/prctr/workbench/services/account/common/**/*.ts",
+    "../src/prctr/workbench/services/administration/common/**/*.ts",
     "../src/prctr/workbench/services/examActivity/common/**/*.ts",
     "../src/prctr/workbench/services/authenticatedHost/common/**/*.ts",
     "../src/prctr/workbench/contrib/attemptWorkspace/common/**/*.ts",

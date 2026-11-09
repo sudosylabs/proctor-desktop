@@ -1,9 +1,9 @@
 import { mountExamActivityFixture, sampleExams } from './examActivityFixture.js';
 import type {
 	ExamActivityIntent,
-	ExamActivityResponse,
-	ProductArea
+	ExamActivityResponse
 } from '../../src/prctr/platform/examActivity/common/examActivityProtocol.js';
+import type { ProductArea } from '../../src/prctr/platform/identity/common/authenticatedIdentity.js';
 
 function check(value: unknown, message: string): asserts value {
 	if (!value) throw new Error(message);

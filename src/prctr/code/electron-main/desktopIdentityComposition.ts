@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { DisposableStore } from '../../base/common/lifecycle.js';
 import { DesktopIdentityCoordinator } from '../../platform/identity/electron-main/desktopIdentityCoordinator.js';
+import { AdministrationService } from '../../platform/administration/electron-main/administrationService.js';
 import { DesktopAuthorizationService } from '../../platform/identity/electron-main/desktopAuthorizationService.js';
 import { HttpServerReadinessTransport } from '../../platform/identity/electron-main/httpServerReadinessTransport.js';
 import { DesktopAuthHttp } from '../../platform/identity/node/desktopAuthHttp.js';
@@ -28,7 +29,7 @@ export interface DesktopIdentityCompositionOptions {
 	readonly applicationId: string;
 	readonly window: Omit<
 		ElectronProductWindowFactoryOptions,
-		'launchIdentity' | 'account' | 'settings' | 'examActivity'
+		'launchIdentity' | 'account' | 'administration' | 'settings' | 'examActivity'
 	>;
 	readonly nativeKeyModule: string;
 	readonly callbackBrandingDirectory: string;
@@ -96,6 +97,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				}
 			})
 		);
+		const administration = owned.add(new AdministrationService(authorization));
 		const connectivity = () => authorization.setApiOnline(net.isOnline());
 		const connectivityTimer = setInterval(connectivity, 5000);
 		connectivityTimer.unref();
@@ -127,6 +129,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				...options.window,
 				launchIdentity: identity,
 				account: authorization,
+				administration,
 				examActivity: authorization,
 				settings: authorization
 			}),

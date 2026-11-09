@@ -1,7 +1,7 @@
 import { ApiObservationIpc } from '../../serverApi/electron-main/apiObservationIpc.js';
 import type { ApiSubscription } from '../../serverApi/common/apiObservation.js';
 import type { IpcMain, IpcMainInvokeEvent } from 'electron/main';
-import type { AccountBinding } from '../../account/common/accountProtocol.js';
+import type { SessionBinding } from '../../serverApi/common/projection.js';
 import {
 	EXAM_ACTIVITY_CHANNEL,
 	validateExamActivityIntent,
@@ -12,13 +12,13 @@ import {
 
 export interface ExamActivityService {
 	observeExamActivity?(
-		binding: AccountBinding,
+		binding: SessionBinding,
 		intent: ExamActivityIntent,
 		listener: (response: ExamActivityResponse) => void
 	): ApiSubscription;
-	setApiFocused?(binding: AccountBinding, focused: boolean): void;
+	setApiFocused?(binding: SessionBinding, focused: boolean): void;
 	examActivity(
-		binding: AccountBinding,
+		binding: SessionBinding,
 		intent: ExamActivityIntent
 	): Promise<ExamActivityResponse>;
 }
@@ -28,7 +28,7 @@ export class ExamActivityIpcBridge {
 		ApiObservationIpc<ExamActivityIntent, ExamActivityResponse> | undefined;
 	constructor(
 		private readonly ipc: Pick<IpcMain, 'handle' | 'removeHandler'>,
-		binding: AccountBinding,
+		binding: SessionBinding,
 		service: ExamActivityService,
 		authorize: (event: IpcMainInvokeEvent) => void
 	) {

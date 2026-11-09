@@ -1,3 +1,13 @@
+/** The product areas the server may present; presence never grants an operation inside one. */
+export const productAreas = [
+	'account',
+	'settings',
+	'student_activity',
+	'exam_management',
+	'administration'
+] as const;
+export type ProductArea = (typeof productAreas)[number];
+
 /** Sanitized account context. Navigation availability never grants an operation. */
 export interface AuthenticatedIdentity {
 	readonly principalId: string;
@@ -5,9 +15,7 @@ export interface AuthenticatedIdentity {
 	readonly institutionOrigin: string;
 	readonly institutionName: string;
 	readonly displayName: string;
-	readonly availableProductAreas: readonly (
-		'account' | 'settings' | 'student_activity' | 'exam_management' | 'administration'
-	)[];
+	readonly availableProductAreas: readonly ProductArea[];
 	readonly noCurrentAffiliation: boolean;
 	readonly noAssignedAccess: boolean;
 }
@@ -24,17 +32,8 @@ export function validateAuthenticatedIdentity(value: unknown): AuthenticatedIden
 		typeof item.noCurrentAffiliation !== 'boolean' ||
 		typeof item.noAssignedAccess !== 'boolean' ||
 		!Array.isArray(item.availableProductAreas) ||
-		item.availableProductAreas.length > 5 ||
-		item.availableProductAreas.some(
-			(v) =>
-				![
-					'account',
-					'settings',
-					'student_activity',
-					'exam_management',
-					'administration'
-				].includes(v as string)
-		)
+		item.availableProductAreas.length > productAreas.length ||
+		item.availableProductAreas.some((v) => !productAreas.includes(v as ProductArea))
 	)
 		throw new TypeError('Invalid authenticated context');
 	return Object.freeze({

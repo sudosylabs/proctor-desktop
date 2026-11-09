@@ -1,19 +1,21 @@
 import {
-	accountRecord as record,
-	accountId,
-	accountInstant,
-	accountList,
-	accountPage,
+	projectionRecord as record,
+	projectionId as accountId,
+	projectionInstant as accountInstant,
+	projectionList as accountList,
+	projectionPage as accountPage,
+	type SessionBinding
+} from '../../serverApi/common/projection.js';
+import {
 	validateAccountResponse,
 	type AccountData,
 	ACCOUNT_HISTORY_PAGE_SIZE,
 	type AccountHistoryQuery,
-	type AccountBinding,
 	type AccountResponse,
 	type AccountToken
 } from '../common/accountProtocol.js';
 
-export function readAccountProfile(raw: unknown, binding: AccountBinding): AccountData {
+export function readAccountProfile(raw: unknown, binding: SessionBinding): AccountData {
 	const p = record(raw);
 	if (accountId(p.id) !== binding.principalId) throw new TypeError('Account binding mismatch');
 	return checked({
@@ -66,7 +68,7 @@ export function readAccountSecurity(methods: unknown, mfa: unknown): AccountData
 		}
 	});
 }
-export function readAccountSessions(raw: unknown, binding: AccountBinding): AccountData {
+export function readAccountSessions(raw: unknown, binding: SessionBinding): AccountData {
 	return checked({
 		section: 'sessions',
 		sessions: accountPage(raw).map((value) => {
@@ -113,7 +115,7 @@ export function readAccountDesktops(raw: unknown, currentRegistrationId: string)
 		})
 	});
 }
-function tokenProjection(raw: unknown, binding: AccountBinding): Record<string, unknown> {
+function tokenProjection(raw: unknown, binding: SessionBinding): Record<string, unknown> {
 	const t = record(raw);
 	if (accountId(t.user_id) !== binding.principalId)
 		throw new TypeError('Account binding mismatch');
@@ -132,21 +134,21 @@ function tokenProjection(raw: unknown, binding: AccountBinding): Record<string, 
 		if (projection[key] === undefined) delete projection[key];
 	return projection;
 }
-export function readAccountTokens(raw: unknown, binding: AccountBinding): AccountData {
+export function readAccountTokens(raw: unknown, binding: SessionBinding): AccountData {
 	return checked({
 		section: 'tokens',
 		tokens: accountPage(raw).map((value) => tokenProjection(value, binding))
 	});
 }
 /** Parses one token returned by disable/enable and binds it to the requested record. */
-export function readAccountToken(raw: unknown, binding: AccountBinding, id: string): AccountToken {
+export function readAccountToken(raw: unknown, binding: SessionBinding, id: string): AccountToken {
 	const data = checked({ section: 'tokens', tokens: [tokenProjection(raw, binding)] });
 	if (data.section !== 'tokens' || data.tokens[0]?.id !== id)
 		throw new TypeError('Account token mismatch');
 	return data.tokens[0];
 }
 /** The credential crosses only this one reply; callers must not cache, log or store it. */
-export function readAccountTokenCreation(raw: unknown, binding: AccountBinding): AccountResponse {
+export function readAccountTokenCreation(raw: unknown, binding: SessionBinding): AccountResponse {
 	const c = record(raw);
 	if (Object.keys(c).sort().join() !== 'credential,token')
 		throw new TypeError('Invalid token creation');
