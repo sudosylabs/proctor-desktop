@@ -2204,6 +2204,465 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
+    "administration.access.after.apply": {
+      "message": "When you apply",
+      "description": "Section with what applying also does.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.allowed": {
+      "message": "Allowed",
+      "description": "A permission the role has.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.applied": {
+      "message": "The access policy is applied",
+      "description": "Toast after applying the policy.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.apply": {
+      "message": "Apply changes",
+      "description": "Applies the access policy after checking it.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.area": {
+      "message": "Area",
+      "description": "Permissions column: what the permission is about.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.auto.provision": {
+      "message": "Anyone from the provider",
+      "description": "Provider admission: anyone the provider signs in gets an account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.availability": {
+      "message": "Availability",
+      "description": "Desktop compatibility detail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.available": {
+      "message": "Available",
+      "description": "Proctor Desktop can be used.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.blocked": {
+      "message": "This change can’t be applied: {reasons}",
+      "description": "Shown when the server’s check finds problems.",
+      "placeholders": [
+        "reasons"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.blocker.admin": {
+      "message": "no system administrator would be able to sign in",
+      "description": "The change would lock out every administrator.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.blocker.admission": {
+      "message": "{provider} can’t admit people that way",
+      "description": "A provider that does not support the chosen admission.",
+      "placeholders": [
+        "provider"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.blocker.mail": {
+      "message": "invitations need mail, which isn’t set up",
+      "description": "Invitations cannot work without mail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.blocker.provider": {
+      "message": "{provider} isn’t available",
+      "description": "A provider that cannot be used.",
+      "placeholders": [
+        "provider"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.built.in": {
+      "message": "Built-in role",
+      "description": "A role that comes with Proctor and cannot be changed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.built.in.note": {
+      "message": "Built-in roles can’t be changed. Make a custom role to adjust what people can do.",
+      "description": "Shown for a built-in role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.checking": {
+      "message": "Checking the change…",
+      "description": "Shown while the server checks the policy.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.choose": {
+      "message": "Choose a role to see what it allows.",
+      "description": "Shown before a role is chosen.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.custom": {
+      "message": "Custom role",
+      "description": "A role the institution made.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.delete": {
+      "message": "Delete role…",
+      "description": "Deletes a custom role after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.delete.body": {
+      "message": "People who hold it lose what it allows. Built-in roles are not affected.",
+      "description": "Confirmation body before deleting a role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.delete.confirm": {
+      "message": "Delete role",
+      "description": "Confirms deleting a role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.delete.title": {
+      "message": "Delete {name}?",
+      "description": "Confirmation title before deleting a role.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.deleted": {
+      "message": "{name} is deleted",
+      "description": "Toast after deleting a role.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.desktop": {
+      "message": "Proctor Desktop sign-in",
+      "description": "Setting: people may sign in to Proctor Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.desktop.description": {
+      "message": "People can sign in to this app. Turning it off signs no one out of a sitting in progress.",
+      "description": "Description of the Desktop sign-in setting.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.desktop.edit": {
+      "message": "Edit",
+      "description": "Edits the Desktop compatibility policy.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.desktop.edit.title": {
+      "message": "Proctor Desktop policy",
+      "description": "Title of the Desktop compatibility dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.desktop.saved": {
+      "message": "The Proctor Desktop policy is saved",
+      "description": "Toast after saving the Desktop compatibility policy.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.desktop.section": {
+      "message": "Proctor Desktop",
+      "description": "Section with the Desktop compatibility policy.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.discard": {
+      "message": "Discard changes",
+      "description": "Puts the access policy back as it was.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.edit": {
+      "message": "Edit",
+      "description": "Edits a custom role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.edit.title": {
+      "message": "Edit {name}",
+      "description": "Title of the dialog that edits a role.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.history": {
+      "message": "Changes",
+      "description": "Section with the policy’s past changes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.history.detail": {
+      "message": "{fields} · {when}",
+      "description": "Detail of a past change.",
+      "placeholders": [
+        "fields",
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.history.empty": {
+      "message": "The policy hasn’t changed yet.",
+      "description": "Shown when the policy has no history.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.history.row": {
+      "message": "Revision {revision}",
+      "description": "A past change of the policy.",
+      "placeholders": [
+        "revision"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.invitation.password": {
+      "message": "Passwords for invited people",
+      "description": "Setting: invited people may set a password.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.invitation.password.description": {
+      "message": "Someone who accepts an invitation can choose a password.",
+      "description": "Description of the setting.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.invitation.required": {
+      "message": "With an invitation",
+      "description": "Provider admission: new people need an invitation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.invitations": {
+      "message": "Invitations",
+      "description": "Setting: invitations let people join.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.invitations.description": {
+      "message": "People can join by accepting an invitation.",
+      "description": "Description of the invitation setting.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.kind": {
+      "message": "Kind",
+      "description": "Role detail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.linked.only": {
+      "message": "Existing accounts only",
+      "description": "Provider admission: only accounts already linked.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.list": {
+      "message": "Roles",
+      "description": "Heading of the list of roles.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.local.login": {
+      "message": "Passwords",
+      "description": "Setting: people may sign in with a password.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.local.login.description": {
+      "message": "People with a password can sign in with it.",
+      "description": "Description of the password setting.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.maintenance": {
+      "message": "Under maintenance",
+      "description": "Proctor Desktop is paused for maintenance.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.message": {
+      "message": "Message",
+      "description": "Desktop compatibility detail: shown to people during maintenance.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.minimum": {
+      "message": "Oldest version allowed",
+      "description": "Desktop compatibility detail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.name": {
+      "message": "Name",
+      "description": "Role detail: its identifier.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.name.hint": {
+      "message": "A short identifier such as teaching_assistant. It can’t change later.",
+      "description": "Hint under a role’s identifier.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.new": {
+      "message": "New role",
+      "description": "Creates a custom role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.new.title": {
+      "message": "New role",
+      "description": "Title of the dialog that creates a role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.none": {
+      "message": "No roles.",
+      "description": "Shown when there are no roles.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.not.allowed": {
+      "message": "Not allowed",
+      "description": "A permission the role lacks.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.permission.count": {
+      "message": "Allows",
+      "description": "Role detail: how many permissions it has.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.permission.total": {
+      "message": "{count} permissions",
+      "description": "How many permissions a role has.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.permissions": {
+      "message": "Permissions",
+      "description": "Section with what a role allows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.permissions.description": {
+      "message": "What people with this role can do, by area.",
+      "description": "Description of the permissions section.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.permissions.field": {
+      "message": "Permissions",
+      "description": "Field: the permissions a role allows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.permissions.hint": {
+      "message": "Only permissions an existing role has are listed. System administrator permissions can’t be given to a custom role.",
+      "description": "Hint under the permissions field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.permissions.none": {
+      "message": "This role allows nothing yet.",
+      "description": "A role with no permissions.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.policy.none": {
+      "message": "None",
+      "description": "No value.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.previewing": {
+      "message": "You’re changing the access policy. Nothing happens until you apply it.",
+      "description": "Banner while the policy has unapplied changes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.providers": {
+      "message": "Sign-in providers",
+      "description": "Section with single sign-on providers.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.providers.empty": {
+      "message": "No single sign-on providers are set up on the server.",
+      "description": "Shown when there are no providers.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.registration": {
+      "message": "Open registration",
+      "description": "Setting: anyone may create an account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.registration.description": {
+      "message": "Anyone can create an account without an invitation.",
+      "description": "Description of the open registration setting.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.revoke": {
+      "message": "Sign everyone out who no longer qualifies",
+      "description": "Option: end sessions that the new policy would not allow.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.revoked.builds": {
+      "message": "Blocked builds",
+      "description": "Desktop compatibility detail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.revoked.hint": {
+      "message": "Build identifiers, one per line.",
+      "description": "Hint under the blocked builds field.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.saved": {
+      "message": "{name} is saved",
+      "description": "Toast after a role is saved.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.access.sign.in": {
+      "message": "Sign-in",
+      "description": "Section with how people sign in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
     "administration.failure.cancelled": {
       "message": "Cancelled.",
       "description": "The person cancelled a confirmation.",

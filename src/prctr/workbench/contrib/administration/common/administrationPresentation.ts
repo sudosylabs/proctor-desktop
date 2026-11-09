@@ -55,3 +55,38 @@ export function readableCode(code: string): string {
 	const words = code.replace(/[._:/-]+/gu, ' ').trim();
 	return words === '' ? code : words[0]!.toLocaleUpperCase() + words.slice(1);
 }
+
+export type PermissionCell = 'allowed' | 'denied' | 'absent';
+
+/**
+ * Permissions such as `exam.view` and `academic_unit.members.manage` as a grid: the area is
+ * everything before the last dot, the verb the last word. A cell is allowed when the role holds
+ * it, denied when the catalogue offers it, and absent when no such permission exists.
+ */
+export function permissionMatrix(
+	catalogue: readonly string[],
+	held: readonly string[]
+): {
+	readonly verbs: readonly string[];
+	readonly areas: readonly { readonly area: string; readonly cells: readonly PermissionCell[] }[];
+} {
+	const split = (code: string): readonly [string, string] => {
+		const dot = code.lastIndexOf('.');
+		return dot < 0 ? [code, ''] : [code.slice(0, dot), code.slice(dot + 1)];
+	};
+	const all = [...new Set([...catalogue, ...held])];
+	const verbs = [...new Set(all.map((code) => split(code)[1]))].sort();
+	const areas = [...new Set(all.map((code) => split(code)[0]))].sort();
+	const holds = new Set(held);
+	const offers = new Set(all);
+	return {
+		verbs,
+		areas: areas.map((area) => ({
+			area,
+			cells: verbs.map((verb) => {
+				const code = verb === '' ? area : `${area}.${verb}`;
+				return holds.has(code) ? 'allowed' : offers.has(code) ? 'denied' : 'absent';
+			})
+		}))
+	};
+}

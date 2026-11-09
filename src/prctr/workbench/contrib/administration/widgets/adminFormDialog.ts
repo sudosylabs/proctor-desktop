@@ -66,9 +66,23 @@ export type AdminFormField =
 			readonly id: string;
 			readonly label: string;
 			readonly value?: boolean;
+	  }
+	/** Several choices at once, such as a role's permissions, grouped under headings. */
+	| {
+			readonly kind: 'checklist';
+			readonly id: string;
+			readonly label: string;
+			readonly groups: readonly {
+				readonly label: string;
+				readonly choices: readonly SelectChoice<string>[];
+			}[];
+			readonly value: readonly string[];
+			readonly hint?: string;
 	  };
 
-export type AdminFormValues = Readonly<Record<string, string | number | boolean | undefined>>;
+export type AdminFormValues = Readonly<
+	Record<string, string | number | boolean | readonly string[] | undefined>
+>;
 
 export interface AdminFormOptions {
 	readonly title: string;
@@ -95,7 +109,7 @@ export interface AdminFormOptions {
 
 interface FieldView {
 	readonly spec: AdminFormField;
-	value(): string | number | boolean | undefined;
+	value(): string | number | boolean | readonly string[] | undefined;
 	setError(error: string | undefined): void;
 	focus(): void;
 }
@@ -236,6 +250,45 @@ export class AdminFormDialog extends Disposable {
 					focus: () => input.focus()
 				};
 			}
+			case 'checklist': {
+				const field = adminField(host, spec.label, spec.hint);
+				const boxes: HTMLInputElement[] = [];
+				const list = $('div.prctr-admin-form__checklist', {
+					attrs: { role: 'group', 'aria-labelledby': `${field.id}-label` }
+				});
+				field.element.querySelector('label')?.setAttribute('id', `${field.id}-label`);
+				for (const group of spec.groups) {
+					const items = group.choices.map((choice) => {
+						const box = $('input.prctr-admin-form__checkbox', {
+							type: 'checkbox',
+							value: choice.value
+						});
+						box.checked = spec.value.includes(choice.value);
+						boxes.push(box);
+						return $(
+							'label.prctr-admin-form__check',
+							{},
+							box,
+							$('span', { textContent: choice.label })
+						);
+					});
+					list.append(
+						$(
+							'fieldset.prctr-admin-form__group',
+							{},
+							$('legend.prctr-admin-form__group-title', { textContent: group.label }),
+							...items
+						)
+					);
+				}
+				field.element.append(list, field.hint);
+				return {
+					spec,
+					value: () => boxes.filter((box) => box.checked).map((box) => box.value),
+					setError: (error) => this.setHint(field.hint, list, spec.hint, error),
+					focus: () => boxes[0]?.focus()
+				};
+			}
 			case 'check': {
 				const input = $('input.prctr-admin-form__checkbox', { type: 'checkbox' });
 				input.checked = spec.value === true;
@@ -273,7 +326,8 @@ export class AdminFormDialog extends Disposable {
 	}
 
 	private values(): AdminFormValues {
-		const values: Record<string, string | number | boolean | undefined> = {};
+		const values: Record<string, string | number | boolean | readonly string[] | undefined> =
+			{};
 		for (const field of this.fields) values[field.spec.id] = field.value();
 		return values;
 	}

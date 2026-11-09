@@ -13,6 +13,8 @@ import { ClassPage } from './class/classPage.js';
 import { InvitationsPage } from './invitations/invitationsPage.js';
 import { OverviewPage } from './overview/overviewPage.js';
 import { PeriodsPage } from './periods/periodsPage.js';
+import { PolicyPage } from './policy/policyPage.js';
+import { RolesPage } from './roles/rolesPage.js';
 import { StructurePage } from './structure/structurePage.js';
 import { UserPage } from './user/userPage.js';
 import { UsersPage } from './users/usersPage.js';
@@ -128,11 +130,17 @@ export const administrationPageRegistry: Readonly<
 		'wide',
 		(i, body, actions) => i.createInstance(PeriodsPage, body, actions)
 	),
-	roles: list('rolesTitle', (f) => f.text('rolesDescription'), 'wide'),
+	roles: list(
+		'rolesTitle',
+		(f) => f.text('rolesDescription'),
+		'wide',
+		(i, body, actions) => i.createInstance(RolesPage, body, actions)
+	),
 	policy: list(
 		'policyTitle',
 		(f) => f.institutionText('policyDescription', 'policyDescriptionGeneric'),
-		'narrow'
+		'narrow',
+		(i, body, actions) => i.createInstance(PolicyPage, body, actions)
 	),
 	audits: list(
 		'auditsTitle',
