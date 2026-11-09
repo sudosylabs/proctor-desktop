@@ -3444,6 +3444,406 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
+    "administration.operations.job.cancel": {
+      "message": "Cancel…",
+      "description": "Cancels a job after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.cancel.body": {
+      "message": "It stops at its next safe point. Work already done stays.",
+      "description": "Confirmation body before cancelling a job.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.cancel.confirm": {
+      "message": "Cancel job",
+      "description": "Confirms cancelling a job.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.cancel.requested": {
+      "message": "Cancelling",
+      "description": "Job status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.cancel.title": {
+      "message": "Cancel this job?",
+      "description": "Confirmation title before cancelling a job.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.canceled": {
+      "message": "Cancelled",
+      "description": "Job status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.cancelled": {
+      "message": "The job is cancelling",
+      "description": "Toast after cancelling a job.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.failed": {
+      "message": "Failed",
+      "description": "Job status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.queued": {
+      "message": "Queued",
+      "description": "Job status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.retried": {
+      "message": "The job is queued again",
+      "description": "Toast after retrying a job.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.retry": {
+      "message": "Retry",
+      "description": "Runs a failed job again.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.running": {
+      "message": "Running",
+      "description": "Job status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.succeeded": {
+      "message": "Done",
+      "description": "Job status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.any": {
+      "message": "Any",
+      "description": "Filter choice: every job.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.attempts": {
+      "message": "Attempt {attempt} of {maximum}",
+      "description": "How many times a job has run.",
+      "placeholders": [
+        "attempt",
+        "maximum"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.column.job": {
+      "message": "Job",
+      "description": "Jobs column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.column.progress": {
+      "message": "Progress",
+      "description": "Jobs column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.column.status": {
+      "message": "Status",
+      "description": "Jobs column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.column.updated": {
+      "message": "Updated",
+      "description": "Jobs column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.empty": {
+      "message": "No jobs yet.",
+      "description": "Shown when there are no jobs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.empty.filtered": {
+      "message": "No jobs with this status.",
+      "description": "Shown when the filter finds nothing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.stage": {
+      "message": "{stage} · {current} of {total}",
+      "description": "A job’s progress.",
+      "placeholders": [
+        "stage",
+        "current",
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.status": {
+      "message": "Status",
+      "description": "Filter over the jobs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.table": {
+      "message": "Jobs",
+      "description": "Accessible name of the jobs table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.accepted": {
+      "message": "Delivered",
+      "description": "Delivery state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.any": {
+      "message": "Any",
+      "description": "Filter choice: every delivery.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.cancel": {
+      "message": "Cancel",
+      "description": "Cancels a queued delivery.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.canceled": {
+      "message": "Cancelled",
+      "description": "Delivery state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.cancelled": {
+      "message": "The message won’t be sent",
+      "description": "Toast after cancelling a delivery.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.column.recipient": {
+      "message": "Recipient",
+      "description": "Deliveries column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.column.status": {
+      "message": "Status",
+      "description": "Deliveries column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.column.template": {
+      "message": "Message",
+      "description": "Deliveries column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.column.updated": {
+      "message": "Updated",
+      "description": "Deliveries column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.delayed": {
+      "message": "Mail is delayed. Messages are waiting longer than usual.",
+      "description": "Mail health.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.deliveries": {
+      "message": "Deliveries",
+      "description": "Section with the mail deliveries.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.disabled": {
+      "message": "Mail isn’t set up on the server, so invitations and notices can’t be sent.",
+      "description": "Mail health.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.empty": {
+      "message": "No deliveries yet.",
+      "description": "Shown when there are no deliveries.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.empty.filtered": {
+      "message": "No deliveries with this status.",
+      "description": "Shown when the filter finds nothing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.failed": {
+      "message": "Not delivered",
+      "description": "Delivery state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.filter.state": {
+      "message": "Status",
+      "description": "Filter over deliveries.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.health": {
+      "message": "Delivery",
+      "description": "Section with mail health.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.healthy": {
+      "message": "Mail is being delivered.",
+      "description": "Mail health.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.key.mail": {
+      "message": "Mail key {key}",
+      "description": "A key protecting stored mail.",
+      "placeholders": [
+        "key"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.key.mfa": {
+      "message": "Two-step key {key}",
+      "description": "A key protecting two-step secrets.",
+      "placeholders": [
+        "key"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.key.primary": {
+      "message": "Primary",
+      "description": "The key new data uses.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.key.retire": {
+      "message": "Retire…",
+      "description": "Starts retiring a key after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.key.retire.body": {
+      "message": "A job re-encrypts what it protects with the primary key. Follow it under Jobs.",
+      "description": "Confirmation body before retiring a key.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.key.retire.confirm": {
+      "message": "Retire key",
+      "description": "Confirms retiring a key.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.key.retire.title": {
+      "message": "Retire this key?",
+      "description": "Confirmation title before retiring a key.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.key.retiring": {
+      "message": "Retiring the key. Follow it under Jobs.",
+      "description": "Toast after starting to retire a key.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.key.uses": {
+      "message": "Protects {count} items",
+      "description": "How much a key protects.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.keys": {
+      "message": "Encryption keys",
+      "description": "Section with the keys that protect stored mail and two-step secrets.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.keys.description": {
+      "message": "Retiring a key re-encrypts what it protects with the primary key, then removes it.",
+      "description": "Description of the keys section.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.keys.strong": {
+      "message": "Keys are shown to a sign-in with two-step verification only.",
+      "description": "Shown when keys need a stronger sign-in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.outage": {
+      "message": "The mail server isn’t accepting messages. They’re queued and retried.",
+      "description": "Mail health.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.queue": {
+      "message": "{state}: {count}",
+      "description": "How many deliveries are in one state.",
+      "placeholders": [
+        "state",
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.queued": {
+      "message": "Queued",
+      "description": "Delivery state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.retried": {
+      "message": "The message is queued again",
+      "description": "Toast after retrying a delivery.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.retry": {
+      "message": "Retry",
+      "description": "Sends a failed delivery again.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.sending": {
+      "message": "Sending",
+      "description": "Delivery state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.suppressed": {
+      "message": "Suppressed",
+      "description": "Delivery state: the address refuses mail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.test": {
+      "message": "Send test email",
+      "description": "Sends a test email to the signed-in person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.test.sent": {
+      "message": "A test email is on its way to you",
+      "description": "Toast after sending a test email.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.unknown": {
+      "message": "Mail health isn’t known yet.",
+      "description": "Mail health.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.overview.all.clear": {
       "message": "Nothing needs your attention right now.",
       "description": "Shown when nothing needs attention.",
@@ -3801,6 +4201,368 @@
       "description": "Heading of the Administration Users page.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.records.audits.changes": {
+      "message": "Changes",
+      "description": "Filter choice: only events that changed something.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.column.actor": {
+      "message": "By",
+      "description": "Audit column: who did it.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.column.event": {
+      "message": "Event",
+      "description": "Audit column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.column.outcome": {
+      "message": "Outcome",
+      "description": "Audit column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.column.when": {
+      "message": "When",
+      "description": "Audit column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.empty": {
+      "message": "No events yet.",
+      "description": "Shown when there are no audit events.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.empty.filtered": {
+      "message": "No events match.",
+      "description": "Shown when filters find nothing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.everything": {
+      "message": "Everything",
+      "description": "Filter choice: every event, including reads.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.find": {
+      "message": "Filter by action, such as user.disable",
+      "description": "Search field above the audit events; the server matches the whole action.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.page.reads": {
+      "message": "Reads on this page are hidden.",
+      "description": "Note when a page holds only reads.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.show": {
+      "message": "Show",
+      "description": "Filter: changes only or every event.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.system": {
+      "message": "Proctor",
+      "description": "An event with no person behind it.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.table": {
+      "message": "Audit events",
+      "description": "Accessible name of the audit table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.audit": {
+      "message": "Audit events",
+      "description": "Retention period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.browser": {
+      "message": "Browser activity",
+      "description": "Retention period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.changed": {
+      "message": "Cleanup is {state}",
+      "description": "Toast after changing cleanup.",
+      "placeholders": [
+        "state"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.cleanup": {
+      "message": "Automatic cleanup",
+      "description": "Section with whether eligible records are deleted.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.column.category": {
+      "message": "Kind",
+      "description": "Records column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.column.status": {
+      "message": "Status",
+      "description": "Records column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.column.submission": {
+      "message": "Submission",
+      "description": "Records column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.days": {
+      "message": "{count} days",
+      "description": "A number of days.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.days.hint": {
+      "message": "Whole days. 0 keeps them until deleted by hand.",
+      "description": "Hint under a retention period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.days.invalid": {
+      "message": "Enter a whole number of days from 0 to 36500.",
+      "description": "Error for an invalid number of days.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.edit": {
+      "message": "Edit",
+      "description": "Edits the retention policy.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.edit.title": {
+      "message": "How long records are kept",
+      "description": "Title of the retention policy dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.eligible": {
+      "message": "{eligible} of {total} eligible · {held} held",
+      "description": "Counts for one kind of record.",
+      "placeholders": [
+        "eligible",
+        "total",
+        "held"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.eligible.on": {
+      "message": "Eligible {date}",
+      "description": "A record that becomes eligible on a date.",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.enable": {
+      "message": "Turn on cleanup…",
+      "description": "Turns automatic cleanup on after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.enable.body": {
+      "message": "Records past their retention period and grace are deleted for good, as the preview shows. This can’t be undone for what is deleted.",
+      "description": "Confirmation body before turning cleanup on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.enable.confirm": {
+      "message": "Turn on cleanup",
+      "description": "Confirms turning cleanup on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.enable.title": {
+      "message": "Turn on automatic cleanup?",
+      "description": "Confirmation title before turning cleanup on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.exports": {
+      "message": "Exports",
+      "description": "Retention period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.grace": {
+      "message": "Grace before deleting",
+      "description": "Days records wait after becoming eligible.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.held": {
+      "message": "Held",
+      "description": "A record kept by a preservation hold.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.integrity": {
+      "message": "Integrity evidence",
+      "description": "Retention period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.kept": {
+      "message": "Kept",
+      "description": "A record not yet eligible.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.needs.preview": {
+      "message": "Preview cleanup first, then turn it on from the preview.",
+      "description": "Note before cleanup can be turned on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.never": {
+      "message": "Kept until deleted by hand",
+      "description": "A retention period of zero days.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.notices": {
+      "message": "Tell candidates",
+      "description": "Whether candidates are told when their records will be deleted.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.off": {
+      "message": "Off",
+      "description": "A setting that is off.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.on": {
+      "message": "On",
+      "description": "A setting that is on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.pause": {
+      "message": "Pause cleanup",
+      "description": "Pauses automatic cleanup.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.policy": {
+      "message": "How long records are kept",
+      "description": "Section with the retention periods.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.preview": {
+      "message": "Preview cleanup",
+      "description": "Asks the server what cleanup would delete.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.preview.expires": {
+      "message": "This preview expires {when}.",
+      "description": "Description of a cleanup preview.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.preview.title": {
+      "message": "What cleanup would delete",
+      "description": "Section with a cleanup preview.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.receipts": {
+      "message": "Receipts",
+      "description": "Category of records.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.records": {
+      "message": "Records",
+      "description": "Section with each submission’s retention.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.records.empty": {
+      "message": "No records yet.",
+      "description": "Shown when there are no records.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.retired": {
+      "message": "Deleted {date}",
+      "description": "A record already deleted.",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.saved": {
+      "message": "The retention policy is saved",
+      "description": "Toast after saving the policy.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.security": {
+      "message": "Security records",
+      "description": "Retention period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.state": {
+      "message": "Cleanup",
+      "description": "Cleanup detail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.state.disabled": {
+      "message": "Never turned on",
+      "description": "Cleanup state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.state.enabled": {
+      "message": "Running",
+      "description": "Cleanup state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.state.paused": {
+      "message": "Paused",
+      "description": "Cleanup state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.submissions": {
+      "message": "Submissions and results",
+      "description": "Retention period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.work": {
+      "message": "Work",
+      "description": "Category of records.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.structure.archive": {
       "message": "Archive…",

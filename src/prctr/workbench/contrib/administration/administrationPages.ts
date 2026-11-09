@@ -15,6 +15,10 @@ import { OverviewPage } from './overview/overviewPage.js';
 import { PeriodsPage } from './periods/periodsPage.js';
 import { PolicyPage } from './policy/policyPage.js';
 import { RolesPage } from './roles/rolesPage.js';
+import { AuditsPage } from './records/auditsPage.js';
+import { RetentionPage } from './records/retentionPage.js';
+import { JobsPage } from './operations/jobsPage.js';
+import { MailPage } from './operations/mailPage.js';
 import { StructurePage } from './structure/structurePage.js';
 import { UserPage } from './user/userPage.js';
 import { UsersPage } from './users/usersPage.js';
@@ -46,6 +50,7 @@ type CreateRecord = (
 	subject: string
 ) => PageView;
 
+/** A record's page opened without its record shows nothing; navigation opens its list instead. */
 function emptyPage(): PageView {
 	return { setVisible() {}, dispose() {} };
 }
@@ -54,28 +59,22 @@ function list(
 	title: AdministrationMessage,
 	description: (format: IAdministrationFormatService) => string,
 	width: 'narrow' | 'wide',
-	create?: Create
+	create: Create
 ): AdministrationPageDescriptor {
-	return {
-		title,
-		description,
-		width,
-		create: (instantiationService, body, headerActions) =>
-			create === undefined ? emptyPage() : create(instantiationService, body, headerActions)
-	};
+	return { title, description, width, create };
 }
 
 function record(
 	title: AdministrationMessage,
 	width: 'narrow' | 'wide',
-	create?: CreateRecord
+	create: CreateRecord
 ): AdministrationPageDescriptor {
 	return {
 		title,
 		description: () => '',
 		width,
 		create: (instantiationService, body, headerActions, subject) =>
-			create === undefined || subject === undefined
+			subject === undefined
 				? emptyPage()
 				: create(instantiationService, body, headerActions, subject)
 	};
@@ -145,13 +144,25 @@ export const administrationPageRegistry: Readonly<
 	audits: list(
 		'auditsTitle',
 		(f) => f.institutionText('auditsDescription', 'auditsDescriptionGeneric'),
-		'wide'
+		'wide',
+		(i, body, actions) => i.createInstance(AuditsPage, body, actions)
 	),
-	retention: list('retentionTitle', (f) => f.text('retentionDescription'), 'narrow'),
-	jobs: list('jobsTitle', (f) => f.text('jobsDescription'), 'wide'),
+	retention: list(
+		'retentionTitle',
+		(f) => f.text('retentionDescription'),
+		'narrow',
+		(i, body, actions) => i.createInstance(RetentionPage, body, actions)
+	),
+	jobs: list(
+		'jobsTitle',
+		(f) => f.text('jobsDescription'),
+		'wide',
+		(i, body, actions) => i.createInstance(JobsPage, body, actions)
+	),
 	mail: list(
 		'mailTitle',
 		(f) => f.institutionText('mailDescription', 'mailDescriptionGeneric'),
-		'wide'
+		'wide',
+		(i, body, actions) => i.createInstance(MailPage, body, actions)
 	)
 });

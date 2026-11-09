@@ -12,15 +12,10 @@ import {
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
-import { readableCode } from '../common/administrationPresentation.js';
+import { isReadAction, readableCode } from '../common/administrationPresentation.js';
 import { readOnce, readPages } from '../widgets/adminReads.js';
 
 const RECENT_CHANGES = 5;
-
-/** An audit action that only read something, such as `user.view`. */
-function isRead(action: string): boolean {
-	return /(^|[._])(view|read|list|search)$/u.test(action);
-}
 
 /**
  * What needs an administrator now: failed jobs, undelivered mail, invitations waiting and
@@ -83,7 +78,7 @@ export class OverviewPage extends Disposable implements PageView {
 			return;
 		}
 		const changes = audits.value.items
-			.filter((audit) => !isRead(audit.action))
+			.filter((audit) => !isReadAction(audit.action))
 			.slice(0, RECENT_CHANGES);
 		this.recent.setState(
 			{ kind: 'ready' },

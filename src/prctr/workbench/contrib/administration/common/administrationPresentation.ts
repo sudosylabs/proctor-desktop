@@ -90,3 +90,8 @@ export function permissionMatrix(
 		}))
 	};
 }
+
+/** An audit action that only read something, such as `user.view`. */
+export function isReadAction(action: string): boolean {
+	return /(^|[._])(view|read|list|search)$/u.test(action);
+}

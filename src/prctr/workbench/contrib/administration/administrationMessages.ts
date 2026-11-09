@@ -4,7 +4,9 @@
 
 import { defineMessage } from '../../../base/common/localization.js';
 import { importsMessages } from './imports/importsMessages.js';
+import { operationsMessages } from './operations/operationsMessages.js';
 import { overviewMessages } from './overview/overviewMessages.js';
+import { recordsMessages } from './records/recordsMessages.js';
 import { rolesMessages } from './roles/rolesMessages.js';
 import { structureMessages } from './structure/structureMessages.js';
 import { invitationsMessages } from './invitations/invitationsMessages.js';
@@ -257,7 +259,9 @@ export const administrationMessages = Object.freeze({
 	...importsMessages,
 	...overviewMessages,
 	...structureMessages,
-	...rolesMessages
+	...rolesMessages,
+	...recordsMessages,
+	...operationsMessages
 });
 
 export type AdministrationMessage = keyof typeof administrationMessages;

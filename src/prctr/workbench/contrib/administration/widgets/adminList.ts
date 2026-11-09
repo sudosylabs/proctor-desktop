@@ -97,6 +97,8 @@ export interface AdminListOptions<K extends AdminListKind> {
 	rowId(item: AdminListItem<K>): string;
 	/** The row's name, for its actions button. */
 	rowName(item: AdminListItem<K>): string;
+	/** Rows the page leaves out of the shown page, such as the audit log's reads. */
+	hidden?(item: AdminListItem<K>): boolean;
 	/** Opens the row's own page from its first cell. */
 	open?(item: AdminListItem<K>): void;
 	/** The row's actions; the destructive ones come last after a separator. */
@@ -222,7 +224,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 
 	/** Draws the shown rows again, as once names they show have arrived. */
 	redraw(): void {
-		if (this.items.length > 0) this.renderRows(this.items);
+		this.renderRows(this.items);
 	}
 
 	/** Reads the shown page again, as after a change to one of its rows. */
@@ -336,8 +338,10 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	private renderRows(items: readonly AdminListItem<K>[]): void {
 		this.rowStore.clear();
 		const $ = createElementFactory(this.body.ownerDocument);
+		const hidden = this.options.hidden;
+		const shown = hidden === undefined ? items : items.filter((item) => !hidden(item));
 		this.body.replaceChildren(
-			...items.map((item) => {
+			...shown.map((item) => {
 				const row = $('tr', { data: { rowId: this.options.rowId(item) } });
 				this.options.columns.forEach((column, index) => {
 					const cell = $('td', { data: { align: column.align ?? 'start' } });
@@ -365,7 +369,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 				return row;
 			})
 		);
-		this.table.hidden = items.length === 0;
+		this.table.hidden = shown.length === 0;
 	}
 
 	private renderCell($: ReturnType<typeof createElementFactory>, cell: AdminCell): HTMLElement {

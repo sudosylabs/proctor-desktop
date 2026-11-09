@@ -303,6 +303,29 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 			),
 			'The change names the person'
 		);
+
+		// Every page opens and settles, even where the scripted server refuses its reads.
+		for (const page of [
+			'overview',
+			'invitations',
+			'imports',
+			'structure',
+			'periods',
+			'roles',
+			'policy',
+			'audits',
+			'retention',
+			'jobs',
+			'mail'
+		] as const) {
+			assign(page);
+			await new Promise<void>((resolve) => setTimeout(resolve, 30));
+			check((root.querySelector('h1')?.textContent ?? '') !== '', `${page} has a heading`);
+		}
+		assign('class', id(1));
+		await wait(() => root.querySelector('h1')?.textContent !== '', 'class heading');
+		assign('import', id(1));
+		await wait(() => root.querySelector('h1')?.textContent !== '', 'import heading');
 	} finally {
 		pane.dispose();
 		services.dispose();
