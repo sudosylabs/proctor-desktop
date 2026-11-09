@@ -10,6 +10,7 @@ import {
 	type ApiOperationId,
 	type ApiResponse
 } from '../../serverApi/common/serverApi.js';
+import type { components } from '../../serverApi/common/serverApi.generated.js';
 import type { ApiSubscription } from '../../serverApi/common/apiObservation.js';
 import {
 	ProjectionFailure,
@@ -30,6 +31,9 @@ import {
 	type AdministrationResponse
 } from '../common/administrationProtocol.js';
 import * as wire from './administrationWire.js';
+
+type AuditAction = components['schemas']['AuditAction'];
+type ResourceType = components['schemas']['ResourceType'];
 
 export type AdministrationApi = Pick<ServerApiClient, 'request' | 'fetchTask' | 'observeTask'>;
 
@@ -758,8 +762,9 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 			query: {
 				...page(i),
 				actor_id: i.actorId,
-				action: i.action,
-				resource_type: i.resourceType,
+				// The contract's request validation refuses a name outside its catalogue.
+				action: i.action as AuditAction | undefined,
+				resource_type: i.resourceType as ResourceType | undefined,
 				resource_id: i.resourceId
 			}
 		}),

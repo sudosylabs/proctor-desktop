@@ -33,8 +33,8 @@ const json = (value: unknown, status = 200, headers = {}): HttpResponse => ({
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
 
 void test('every packaged operation has executable request/response schemas, including conditional and non-JSON routes', () => {
-	assert.equal(apiOperations.size, 298);
-	assert.equal(new Set([...apiOperations.values()].map((operation) => operation.path)).size, 246);
+	assert.equal(apiOperations.size, 301);
+	assert.equal(new Set([...apiOperations.values()].map((operation) => operation.path)).size, 247);
 	for (const operation of apiOperations.values()) {
 		for (const parameter of operation.parameters ?? []) {
 			try {
@@ -177,7 +177,7 @@ void test('errors preserve problem fields and Retry-After while malformed respon
 		type: 'about:blank',
 		title: 'Invalid',
 		status: 429,
-		code: 'rate.limit',
+		code: 'authentication.rate_limited',
 		fields: { name: 'required' },
 		request_id: 'request-1'
 	};

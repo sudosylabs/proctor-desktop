@@ -439,7 +439,7 @@ void test('one change runs at a time, confirmation maps to closed reasons, and d
 			});
 			return json({
 				id,
-				type: 'onboarding.import',
+				type: 'onboarding_import.execute',
 				status: 'queued',
 				revision: 1,
 				attempt_count: 0,
