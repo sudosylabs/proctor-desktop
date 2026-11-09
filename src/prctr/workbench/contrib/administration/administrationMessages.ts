@@ -48,7 +48,8 @@ export const administrationMessages = Object.freeze({
 	}),
 	invitationsDescription: defineMessage({
 		id: 'administration.page.invitations.description',
-		defaultMessage: 'Invitations to join classes, units and roles, and how their emails are doing.',
+		defaultMessage:
+			'Invitations to join classes, units and roles, and how their emails are doing.',
 		description: 'One-line description under the Invitations heading.'
 	}),
 	importsTitle: defineMessage({
@@ -58,7 +59,8 @@ export const administrationMessages = Object.freeze({
 	}),
 	importsDescription: defineMessage({
 		id: 'administration.page.imports.description',
-		defaultMessage: 'Add many people at once from a spreadsheet, and review each row before anything changes.',
+		defaultMessage:
+			'Add many people at once from a spreadsheet, and review each row before anything changes.',
 		description: 'One-line description under the Imports heading.'
 	}),
 	structureTitle: defineMessage({
@@ -203,7 +205,8 @@ export const administrationMessages = Object.freeze({
 	}),
 	failureConflict: defineMessage({
 		id: 'administration.failure.conflict',
-		defaultMessage: 'Someone else changed this first. Look at the latest version and try again.',
+		defaultMessage:
+			'Someone else changed this first. Look at the latest version and try again.',
 		description: 'A change was refused because the record changed meanwhile.'
 	}),
 	failureInvalid: defineMessage({

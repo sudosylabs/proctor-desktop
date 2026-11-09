@@ -99,7 +99,9 @@ class AdministrationContribution extends Disposable {
 			if (assigned && !this.disposed && serial === this.sequence && focus) this.host.focus();
 		} catch {
 			if (!this.disposed && serial === this.sequence)
-				this.navigation.setProductStatus(this.localization.format(messages.pageUnavailable));
+				this.navigation.setProductStatus(
+					this.localization.format(messages.pageUnavailable)
+				);
 		}
 	}
 
@@ -115,7 +117,9 @@ class AdministrationContribution extends Disposable {
 			restorable: false,
 			onDidChangePresentation: Event.None,
 			matches(other) {
-				return other.typeId === this.typeId && other.logicalIdentity === this.logicalIdentity;
+				return (
+					other.typeId === this.typeId && other.logicalIdentity === this.logicalIdentity
+				);
 			}
 		};
 	}
