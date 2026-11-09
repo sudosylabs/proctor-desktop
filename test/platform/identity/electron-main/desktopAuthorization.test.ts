@@ -1520,3 +1520,178 @@ void test('account tokens, email verification and retention notices are bound, s
 		service.dispose();
 	}
 });
+
+void test('administration runs on the bound Session: DPoP signed, cached, invalidated by changes and fenced after a rejected credential', async () => {
+	const { AdministrationService } =
+		await import('../../../../src/prctr/platform/administration/electron-main/administrationService.js');
+	const key = softwareTestKey();
+	let started: Record<string, unknown> = {};
+	let stored: StoredDesktopSession | undefined;
+	const seen: string[] = [];
+	let institutionReads = 0;
+	let revoked = false;
+	const http = new DesktopAuthHttp(async (input, init) => {
+		const url = new URL(String(input));
+		const path = url.pathname;
+		if (path.endsWith('/authorizations')) {
+			started = JSON.parse(String(init?.body));
+			return response(
+				{
+					authorization_url: 'https://example.edu/desktop/authorize',
+					expires_at: new Date(Date.now() + 60000).toISOString()
+				},
+				201
+			);
+		}
+		if (path.endsWith('/token') || path.endsWith('/refresh')) return response(tokens());
+		if (path.endsWith('/context')) return response(context());
+		if (path.endsWith('/logout')) return new Response(null, { status: 204 });
+		const headers = new Headers(init?.headers);
+		assert.ok(headers.get('DPoP'));
+		assert.match(headers.get('Authorization') ?? '', /^DPoP /u);
+		seen.push(`${String(init?.method)} ${path}${url.search}`);
+		if (revoked)
+			return response(
+				{ type: 'about:blank', title: 'Gone', status: 401, code: 'authentication.revoked' },
+				401
+			);
+		if (path === '/api/v1/institution') {
+			institutionReads++;
+			return response({
+				id: registration,
+				name: 'example',
+				display_name: 'Example University',
+				description: '',
+				exam_capacity: {
+					resource_maximum_bytes: 1,
+					resource_maximum_count: 1,
+					workspace_maximum_entries: 1,
+					workspace_maximum_file_bytes: 1,
+					workspace_maximum_total_bytes: 1
+				},
+				created_at: '2026-01-01T00:00:00Z',
+				updated_at: '2026-01-01T00:00:00Z'
+			});
+		}
+		if (path === '/api/v1/roles')
+			return response(
+				{
+					type: 'about:blank',
+					title: 'Denied',
+					status: 403,
+					code: 'authorization.denied'
+				},
+				403
+			);
+		if (path === '/api/v1/desktop-compatibility-policy') {
+			assert.equal(init?.method, 'PUT');
+			assert.match(headers.get('Idempotency-Key') ?? '', /^[A-Za-z0-9_-]{43}$/u);
+			return response({
+				administrator_message: '',
+				availability: 'ready',
+				minimum_desktop_release: '1.0.0',
+				revoked_desktop_build_ids: [],
+				revision: 2,
+				created_at: '2026-01-01T00:00:00Z',
+				updated_at: '2026-01-01T00:00:00Z'
+			});
+		}
+		throw new Error('Unexpected route');
+	});
+	const service = new DesktopAuthorizationService({
+		applicationId: 'fr.sudosy.proctor.test',
+		target,
+		keys: {
+			async loadOrCreate() {
+				return key;
+			},
+			async delete() {}
+		},
+		credentials: {
+			async read() {
+				return stored;
+			},
+			async write(_scope, value) {
+				stored = value;
+			},
+			async delete() {
+				stored = undefined;
+			}
+		},
+		http,
+		callbackPages,
+		confirmationPages: callbackPages,
+		async openBrowser() {
+			const callback = new URL(String(started.callback_url));
+			callback.searchParams.set('state', String(started.state));
+			callback.searchParams.set('code', random());
+			await fetch(callback);
+		},
+		async onAuthenticated() {}
+	});
+	const administration = new AdministrationService(service);
+	try {
+		await service.start(identity, CancellationToken.None);
+		const binding = { principalId: id, sessionId };
+		const institution = {
+			kind: 'data',
+			data: {
+				resource: 'institution',
+				value: {
+					id: registration,
+					name: 'example',
+					displayName: 'Example University',
+					description: ''
+				}
+			}
+		};
+		assert.deepEqual(
+			await administration.administration(binding, { kind: 'institution' }),
+			institution
+		);
+		await administration.administration(binding, { kind: 'institution' });
+		assert.equal(institutionReads, 1, 'administration reads use the Session cache');
+		assert.deepEqual(
+			await administration.administration(
+				{ principalId: sessionId, sessionId },
+				{ kind: 'institution' }
+			),
+			{ kind: 'error', reason: 'sessionEnded' }
+		);
+		assert.deepEqual(
+			await administration.administration(binding, { kind: 'roles', limit: 10 }),
+			{
+				kind: 'error',
+				reason: 'noAccess'
+			}
+		);
+		assert.deepEqual(
+			await administration.administration(binding, {
+				kind: 'replaceDesktopCompatibility',
+				expectedRevision: 1,
+				availability: 'ready',
+				minimumRelease: '1.0.0',
+				message: '',
+				revokedBuildIds: []
+			}),
+			{ kind: 'success' }
+		);
+		await administration.administration(binding, { kind: 'institution' });
+		assert.equal(institutionReads, 2, 'a change invalidates administration reads');
+		revoked = true;
+		assert.deepEqual(
+			await administration.administration(binding, { kind: 'disableUser', id: registration }),
+			{ kind: 'error', reason: 'sessionEnded' }
+		);
+		assert.equal(stored, undefined, 'a rejected credential signs the Session out');
+		assert.deepEqual(await administration.administration(binding, { kind: 'institution' }), {
+			kind: 'error',
+			reason: 'sessionEnded'
+		});
+		assert.ok(seen.includes('PUT /api/v1/desktop-compatibility-policy'));
+		assert.ok(seen.includes(`POST /api/v1/users/${registration}/disable`));
+	} finally {
+		administration.dispose();
+		service.dispose();
+	}
+});

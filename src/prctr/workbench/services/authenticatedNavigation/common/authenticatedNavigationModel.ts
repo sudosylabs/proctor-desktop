@@ -4,7 +4,7 @@
 
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import type { ProductArea } from '../../../../platform/examActivity/common/examActivityProtocol.js';
+import type { ProductArea } from '../../../../platform/identity/common/authenticatedIdentity.js';
 
 export const productDestinations = ['activity', 'management', 'administration'] as const;
 export type ProductDestination = (typeof productDestinations)[number];

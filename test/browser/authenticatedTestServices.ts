@@ -1,11 +1,19 @@
 import { Disposable } from '../../src/prctr/base/common/lifecycle.js';
 import type { AccountClient } from '../../src/prctr/platform/account/common/accountProtocol.js';
+import type { AdministrationClient } from '../../src/prctr/platform/administration/common/administrationProtocol.js';
 import { SyncDescriptor } from '../../src/prctr/platform/instantiation/common/descriptors.js';
 import type { SettingsClipboardClient } from '../../src/prctr/platform/settings/common/settingsNativeHost.js';
 import type { WorkbenchContributionRegistration } from '../../src/prctr/workbench/browser/bootstrap.js';
 
 /** An account whose every read is unavailable, for windows whose test is not about Account. */
 export const unavailableAccount: AccountClient = Object.freeze({
+	async request() {
+		return { kind: 'error', reason: 'unavailable' } as const;
+	}
+});
+
+/** Administration whose every read is unavailable, for windows whose test is not about it. */
+export const unavailableAdministration: AdministrationClient = Object.freeze({
 	async request() {
 		return { kind: 'error', reason: 'unavailable' } as const;
 	}

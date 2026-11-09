@@ -12,13 +12,14 @@ import type { SettingsRendererClient } from '../../src/prctr/workbench/services/
 import {
 	inertContribution,
 	unavailableAccount,
+	unavailableAdministration,
 	unusedClipboard
 } from './authenticatedTestServices.js';
 import type {
 	ExamActivity,
-	ExamActivityClient,
-	ProductArea
+	ExamActivityClient
 } from '../../src/prctr/platform/examActivity/common/examActivityProtocol.js';
+import type { ProductArea } from '../../src/prctr/platform/identity/common/authenticatedIdentity.js';
 import { isMacintosh } from '../../src/prctr/base/common/platform.js';
 
 export const sampleExams: readonly ExamActivity[] = [
@@ -134,6 +135,7 @@ export async function mountExamActivityFixture(
 			services: authenticatedWindowServices({
 				async signOut() {},
 				account: unavailableAccount,
+				administration: unavailableAdministration,
 				settings,
 				clipboard: unusedClipboard,
 				examActivity: client

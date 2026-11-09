@@ -1,14 +1,7 @@
 import type { ObservableApiCapability } from '../../serverApi/common/apiObservation.js';
+import { productAreas, type ProductArea } from '../../identity/common/authenticatedIdentity.js';
 /** Session-bound read capability. Routing context is never action authorization. */
 export const EXAM_ACTIVITY_CHANNEL = 'prctr:authenticated:exam-activity';
-export const productAreas = [
-	'account',
-	'settings',
-	'student_activity',
-	'exam_management',
-	'administration'
-] as const;
-export type ProductArea = (typeof productAreas)[number];
 export const activityStates = [
 	'upcoming',
 	'available',

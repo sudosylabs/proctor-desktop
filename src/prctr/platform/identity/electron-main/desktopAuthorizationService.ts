@@ -1,6 +1,11 @@
 import { ServerApiClient, type ApiObservation } from '../../serverApi/node/serverApiClient.js';
 import { resolveApiRoute } from '../../serverApi/node/legacyApiRequest.js';
 import { ServerApiError } from '../../serverApi/common/serverApi.js';
+import {
+	ProjectionFailure,
+	projectRead,
+	type SessionBinding
+} from '../../serverApi/common/projection.js';
 import { decodeJson, type HttpResponse } from '../../serverApi/node/serverHttpTransport.js';
 import type { PreparedApiRequest } from '../../serverApi/node/apiRequest.js';
 import {
@@ -42,7 +47,7 @@ import {
 import {
 	validateAccountIntent,
 	validateAccountResponse,
-	type AccountBinding,
+	type AccountFailure,
 	type AccountIntent,
 	type AccountResponse
 } from '../../account/common/accountProtocol.js';
@@ -507,22 +512,11 @@ export class DesktopAuthorizationService extends Disposable {
 	}
 
 	/** Closed account capability: credentials, URLs, and arbitrary requests never cross IPC. */
-	async account(binding: AccountBinding, raw: AccountIntent): Promise<AccountResponse> {
+	async account(binding: SessionBinding, raw: AccountIntent): Promise<AccountResponse> {
 		const intent = validateAccountIntent(raw);
-		if (
-			intent.kind !== 'read' &&
-			intent.kind !== 'readPhoto' &&
-			intent.kind !== 'readHistory'
-		) {
-			const result = await this.accountUncached(binding, intent);
-			if (
-				result.kind === 'success' ||
-				result.kind === 'tokenCreated' ||
-				result.kind === 'sessionsEnded'
-			)
-				await this.#api?.invalidate(['account']);
-			return result;
-		}
+		if (intent.kind !== 'read' && intent.kind !== 'readPhoto' && intent.kind !== 'readHistory')
+			// A change through the typed client already invalidates every cached read.
+			return this.accountUncached(binding, intent);
 		try {
 			return await this.apiForSession(binding).fetchTask(['account', intent], (signal) =>
 				projectRead((capture) => this.accountUncached(binding, intent, signal, capture))
@@ -540,7 +534,7 @@ export class DesktopAuthorizationService extends Disposable {
 		}
 	}
 	observeAccount(
-		binding: AccountBinding,
+		binding: SessionBinding,
 		raw: AccountIntent,
 		listener: (response: AccountResponse) => void
 	): ApiObservation {
@@ -566,11 +560,23 @@ export class DesktopAuthorizationService extends Disposable {
 	setApiOnline(online: boolean): void {
 		this.#api?.setOnline(online);
 	}
-	setApiFocused(binding: AccountBinding, focused: boolean): void {
+	setApiFocused(binding: SessionBinding, focused: boolean): void {
 		this.apiForSession(binding).setFocused(focused);
 	}
+	/** Confirm it's you for another capability of the same Session, as Account does. */
+	async reauthenticate(binding: SessionBinding): Promise<'success' | AccountFailure> {
+		const result = await this.account(binding, { kind: 'reauthenticate' });
+		return result.kind === 'success'
+			? 'success'
+			: result.kind === 'error'
+				? result.reason
+				: 'unavailable';
+	}
+	cancelReauthentication(binding: SessionBinding): void {
+		void this.account(binding, { kind: 'cancelReauthentication' });
+	}
 	private async accountUncached(
-		binding: AccountBinding,
+		binding: SessionBinding,
 		raw: AccountIntent,
 		signal?: AbortSignal,
 		captureFailure?: (failure: ServerApiError) => void
@@ -807,7 +813,7 @@ export class DesktopAuthorizationService extends Disposable {
 	}
 
 	/** Full typed client is available only to privileged, session-bound capability owners. */
-	apiForSession(binding: AccountBinding): ServerApiClient {
+	apiForSession(binding: SessionBinding): ServerApiClient {
 		const session = this.#session;
 		if (
 			!session ||
@@ -999,7 +1005,7 @@ export class DesktopAuthorizationService extends Disposable {
 		}
 	}
 	async examActivity(
-		binding: AccountBinding,
+		binding: SessionBinding,
 		raw: ExamActivityIntent
 	): Promise<ExamActivityResponse> {
 		const intent = validateExamActivityIntent(raw);
@@ -1025,7 +1031,7 @@ export class DesktopAuthorizationService extends Disposable {
 		}
 	}
 	observeExamActivity(
-		binding: AccountBinding,
+		binding: SessionBinding,
 		raw: ExamActivityIntent,
 		listener: (response: ExamActivityResponse) => void
 	): ApiObservation {
@@ -1050,7 +1056,7 @@ export class DesktopAuthorizationService extends Disposable {
 	}
 	/** Read-only product capability bound to the same authenticated session as account/settings. */
 	private async examActivityUncached(
-		binding: AccountBinding,
+		binding: SessionBinding,
 		raw: ExamActivityIntent,
 		signal?: AbortSignal,
 		captureFailure?: (failure: ServerApiError) => void
@@ -1106,7 +1112,7 @@ export class DesktopAuthorizationService extends Disposable {
 		}
 	}
 	async readSettings(
-		binding: AccountBinding
+		binding: SessionBinding
 	): ReturnType<UserSettingsSessionService['readSettings']> {
 		const session = this.#session,
 			generation = this.#generation;
@@ -1136,7 +1142,7 @@ export class DesktopAuthorizationService extends Disposable {
 		}
 	}
 	async commitSettings(
-		binding: AccountBinding,
+		binding: SessionBinding,
 		raw: SettingsCommitRequest
 	): Promise<SettingsCommitResult> {
 		const request = validateUserSettingsCommitIntent(raw);
@@ -1351,31 +1357,4 @@ export class DesktopAuthorizationService extends Disposable {
 function thumbprint(key: DesktopSigningKey): string {
 	const { crv, kty, x, y } = key.publicJwk;
 	return createHash('sha256').update(JSON.stringify({ crv, kty, x, y })).digest('base64url');
-}
-
-class ProjectionFailure extends ServerApiError {
-	constructor(
-		readonly response: AccountResponse | ExamActivityResponse,
-		failure?: ServerApiError
-	) {
-		super(
-			failure?.kind ??
-				(response.kind === 'error' && response.reason === 'sessionEnded'
-					? 'sessionEnded'
-					: 'invalidResponse'),
-			failure?.status,
-			failure?.problem,
-			failure?.retryAfterMs
-		);
-	}
-}
-async function projectRead<T extends AccountResponse | ExamActivityResponse>(
-	read: (capture: (failure: ServerApiError) => void) => Promise<T>
-): Promise<T> {
-	let failure: ServerApiError | undefined;
-	const result = await read((value) => {
-		failure = value;
-	});
-	if (result.kind === 'error') throw new ProjectionFailure(result, failure);
-	return result;
 }

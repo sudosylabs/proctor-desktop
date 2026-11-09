@@ -17,6 +17,7 @@ import { tmpdir } from 'node:os';
 import { loadNativeDesktopKeyCustody } from '../../src/prctr/platform/identity/electron-main/nativeDesktopKeyCustody.js';
 import { OsDesktopCredentialStore } from '../../src/prctr/platform/identity/electron-main/desktopCredentialStore.js';
 import { DesktopAuthorizationService } from '../../src/prctr/platform/identity/electron-main/desktopAuthorizationService.js';
+import { AdministrationService } from '../../src/prctr/platform/administration/electron-main/administrationService.js';
 import { DesktopAuthHttp } from '../../src/prctr/platform/identity/node/desktopAuthHttp.js';
 import {
 	installationKeyScope,
@@ -94,6 +95,7 @@ if (probe) {
 						new ElectronProductWindowFactory({
 							production: false,
 							account: service,
+							administration: new AdministrationService(service),
 							examActivity: service,
 							settings: service,
 							launchIdentity: launch,
@@ -180,6 +182,25 @@ if (probe) {
 						assert.ok(headers.get('Authorization')?.startsWith('DPoP '));
 						assert.ok(headers.get('DPoP'));
 						return response({ server_time: '2026-09-11T08:00:00Z', items: [] });
+					}
+					if (path === '/api/v1/institution') {
+						assert.equal(init?.method, 'GET');
+						assert.ok(new Headers(init?.headers).get('DPoP'));
+						return response({
+							id: 'e'.repeat(26),
+							name: 'test',
+							display_name: 'Test Institution',
+							description: '',
+							exam_capacity: {
+								resource_maximum_bytes: 1,
+								resource_maximum_count: 1,
+								workspace_maximum_entries: 1,
+								workspace_maximum_file_bytes: 1,
+								workspace_maximum_total_bytes: 1
+							},
+							created_at: '1970-01-01T00:00:00Z',
+							updated_at: '1970-01-01T00:00:00Z'
+						});
 					}
 					if (path === '/api/v1/users/me')
 						return response({
@@ -319,6 +340,28 @@ if (probe) {
      });
     })`),
 					{ kind: 'activity', serverTime: '2026-09-11T08:00:00Z', items: [] }
+				);
+				assert.deepEqual(
+					await window.webContents.executeJavaScript(
+						"globalThis.proctorAuthenticated.administration.request({kind:'institution'})"
+					),
+					{
+						kind: 'data',
+						data: {
+							resource: 'institution',
+							value: {
+								id: 'e'.repeat(26),
+								name: 'test',
+								displayName: 'Test Institution',
+								description: ''
+							}
+						}
+					}
+				);
+				await assert.rejects(
+					window.webContents.executeJavaScript(
+						"globalThis.proctorAuthenticated.administration.request({kind:'institution', url:'https://attacker.test'})"
+					)
 				);
 				assert.equal(
 					await window.webContents.executeJavaScript('typeof process'),

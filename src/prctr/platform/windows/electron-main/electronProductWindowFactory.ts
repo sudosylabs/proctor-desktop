@@ -22,6 +22,7 @@ import {
 	type WebContents
 } from 'electron';
 import { AccountIpcBridge, type AccountService } from '../../account/electron-main/accountIpc.js';
+import { AdministrationIpcBridge, type AdministrationIpcService } from '../../administration/electron-main/administrationIpc.js';
 import { release } from 'node:os';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
@@ -72,6 +73,7 @@ export interface ElectronProductWindowFactoryOptions extends ElectronProductWind
 	readonly ipc?: Pick<typeof ipcMain, 'handle' | 'removeHandler'>;
 	readonly launchIdentity?: DesktopIdentityCoordinator;
 	readonly account?: AccountService;
+	readonly administration?: AdministrationIpcService;
 	readonly examActivity?: ExamActivityService;
 	readonly settings?: UserSettingsSessionService;
 	readonly windowChromeEnvironment?: ElectronWindowChromeEnvironment;
@@ -284,6 +286,7 @@ export class ElectronProductWindowFactory implements ProductWindowFactory {
 				this.#options.account,
 				this.#options.settings,
 				this.#options.examActivity,
+				this.#options.administration,
 				material,
 				this.#options.appearance
 			);
@@ -310,6 +313,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 	#windowChromeBridge: ElectronWindowChromeBridge | undefined;
 	#accountBridge: AccountIpcBridge | undefined;
 	#examActivityBridge: ExamActivityIpcBridge | undefined;
+	#administrationBridge: AdministrationIpcBridge | undefined;
 	#settings: {dispose(): void} | undefined;
 	#settingsNativeBridge: SettingsNativeIpcBridge | undefined;
 	#launchMenu: { dispose(): void } | undefined;
@@ -329,6 +333,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		account?: AccountService,
 		settings?: UserSettingsSessionService,
 		examActivity?: ExamActivityService,
+		administration?: AdministrationIpcService,
 		material?: WindowMaterial,
 		appearance?: WindowAppearanceStore
 	) {
@@ -390,6 +395,8 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#examActivityBridge = new ExamActivityIpcBridge(ipc, descriptor, examActivity, authorize);
 			if (descriptor.kind === 'authenticated' && account)
 				this.#accountBridge = new AccountIpcBridge(ipc, descriptor, account, authorize);
+			if (descriptor.kind === 'authenticated' && administration)
+				this.#administrationBridge = new AdministrationIpcBridge(ipc, descriptor, administration, authorize);
 			if (descriptor.kind === 'authenticated' && account?.setApiFocused) {
 				const focused = (value: boolean) => {
 					try { account.setApiFocused!(descriptor, value); }
@@ -438,6 +445,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 				this.#launchIdentityBridge,
 				this.#accountBridge,
 				this.#examActivityBridge,
+				this.#administrationBridge,
 				this.#settings,
 				this.#settingsNativeBridge,
 				this.#windowChromeBridge,
@@ -512,6 +520,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 			this.#launchIdentityBridge,
 				this.#accountBridge,
 				this.#examActivityBridge,
+				this.#administrationBridge,
 				this.#settings,
 				this.#settingsNativeBridge,
 			this.#windowChromeBridge,

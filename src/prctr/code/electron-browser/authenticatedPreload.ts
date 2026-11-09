@@ -9,6 +9,11 @@ import {
 	validateAccountIntent,
 	validateAccountResponse
 } from '../../platform/account/common/accountProtocol.js';
+import {
+	ADMINISTRATION_CHANNEL,
+	validateAdministrationIntent,
+	validateAdministrationResponse
+} from '../../platform/administration/common/administrationProtocol.js';
 import { contextBridge, ipcRenderer } from 'electron';
 import {
 	AUTHENTICATED_SETTINGS_CHANNELS,
@@ -78,6 +83,21 @@ contextBridge.exposeInMainWorld(
 			request: async (intent: unknown) =>
 				validateAccountResponse(
 					await ipcRenderer.invoke(ACCOUNT_CHANNEL, validateAccountIntent(intent))
+				)
+		}),
+		administration: Object.freeze({
+			observe: createApiObserver(
+				`${ADMINISTRATION_CHANNEL}:observe`,
+				validateAdministrationIntent,
+				validateAdministrationResponse,
+				{ kind: 'error', reason: 'unavailable' }
+			),
+			request: async (intent: unknown) =>
+				validateAdministrationResponse(
+					await ipcRenderer.invoke(
+						ADMINISTRATION_CHANNEL,
+						validateAdministrationIntent(intent)
+					)
 				)
 		}),
 		settings: Object.freeze({
