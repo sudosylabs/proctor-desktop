@@ -18,7 +18,7 @@ const ACTION = /^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,127}$/u;
 
 /**
  * Everything that happened at the institution, newest first: who did what to which record and
- * whether the server allowed it. Reads are recorded too; they are hidden unless asked for, and
+ * whether the server allowed it. Reads are recorded too; they can be hidden, and
  * a page holding only reads says so rather than looking empty.
  */
 export class AuditsPage extends Disposable implements PageView {
@@ -26,7 +26,7 @@ export class AuditsPage extends Disposable implements PageView {
 	private readonly names = new Map<string, string>();
 	private readonly filters: AdminFilters;
 	private query: AdminListQuery<'audits'> = {};
-	private everything = false;
+	private everything = true;
 
 	constructor(
 		body: HTMLElement,
@@ -46,10 +46,10 @@ export class AuditsPage extends Disposable implements PageView {
 			format.text('auditsShow'),
 			'action.filter',
 			[
-				{ value: 'changes', label: format.text('auditsChanges') },
-				{ value: 'everything', label: format.text('auditsEverything') }
+				{ value: 'everything', label: format.text('auditsEverything') },
+				{ value: 'changes', label: format.text('auditsChanges') }
 			],
-			'changes',
+			'everything',
 			(choice) => {
 				this.everything = choice === 'everything';
 				this.list.redraw();

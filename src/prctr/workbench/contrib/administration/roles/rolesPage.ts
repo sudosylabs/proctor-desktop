@@ -229,7 +229,16 @@ export class RolesPage extends Disposable implements PageView {
 	/** The role's permissions as areas by verbs, a tick where it allows the pair. */
 	private renderGrid(role: Role): void {
 		this.gridStore.clear();
-		const matrix = permissionMatrix(this.catalogue(), role.permissions);
+		// Only the areas the role reaches, and only the verbs those areas offer, so the grid fits.
+		const areas = new Set(
+			role.permissions.map((code) => code.slice(0, Math.max(0, code.lastIndexOf('.'))))
+		);
+		const matrix = permissionMatrix(
+			this.catalogue().filter((code) =>
+				areas.has(code.slice(0, Math.max(0, code.lastIndexOf('.'))))
+			),
+			role.permissions
+		);
 		this.permissions.setState(
 			{ kind: 'ready' },
 			role.permissions.length === 0 ? this.format.text('rolesNoPermissions') : false

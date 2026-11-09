@@ -378,7 +378,8 @@ export class StructurePage extends Disposable implements PageView {
 			})
 		);
 		this.renderProgrammes();
-		void this.classes.value?.refresh();
+		// Class rows name their level, which is known only now.
+		this.classes.value?.redraw();
 	}
 
 	private renderProgrammes(): void {

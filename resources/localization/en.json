@@ -4203,7 +4203,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.records.audits.changes": {
-      "message": "Changes",
+      "message": "Changes only",
       "description": "Filter choice: only events that changed something.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -4245,7 +4245,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.audits.everything": {
-      "message": "Everything",
+      "message": "Every event",
       "description": "Filter choice: every event, including reads.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"

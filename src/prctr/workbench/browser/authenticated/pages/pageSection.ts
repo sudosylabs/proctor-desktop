@@ -254,6 +254,11 @@ export class PageSection extends Disposable {
 		this.setState({ kind: 'loading' }, false);
 	}
 
+	override dispose(): void {
+		super.dispose();
+		this.element.remove();
+	}
+
 	set hidden(hidden: boolean) {
 		this.element.hidden = hidden;
 	}

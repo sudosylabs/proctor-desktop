@@ -18,12 +18,12 @@ export const recordsMessages = Object.freeze({
 	}),
 	auditsChanges: defineMessage({
 		id: 'administration.records.audits.changes',
-		defaultMessage: 'Changes',
+		defaultMessage: 'Changes only',
 		description: 'Filter choice: only events that changed something.'
 	}),
 	auditsEverything: defineMessage({
 		id: 'administration.records.audits.everything',
-		defaultMessage: 'Everything',
+		defaultMessage: 'Every event',
 		description: 'Filter choice: every event, including reads.'
 	}),
 	auditsTable: defineMessage({
