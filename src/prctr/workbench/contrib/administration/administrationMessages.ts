@@ -15,6 +15,26 @@ import { usersMessages } from './users/usersMessages.js';
 
 /** Text every Administration page shares: page headings and failures. */
 const sharedMessages = Object.freeze({
+	listShowing: defineMessage({
+		id: 'administration.list.showing',
+		defaultMessage: 'Showing {range}',
+		description: 'Under a table: which rows it shows, as in "Showing 1–10 of 1,284".'
+	}),
+	listScrollHint: defineMessage({
+		id: 'administration.list.scroll.hint',
+		defaultMessage: 'Scroll sideways for more columns',
+		description: 'Under a table that is wider than the window and scrolls sideways.'
+	}),
+	listSelectRow: defineMessage({
+		id: 'administration.list.select.row',
+		defaultMessage: 'Select {name}',
+		description: 'Accessible name of the checkbox that selects one table row.'
+	}),
+	listSelectPage: defineMessage({
+		id: 'administration.list.select.page',
+		defaultMessage: 'Select every row on this page',
+		description: 'Accessible name of the checkbox in a table header that selects all its rows.'
+	}),
 	overviewTitle: defineMessage({
 		id: 'administration.page.overview.title',
 		defaultMessage: 'Overview',

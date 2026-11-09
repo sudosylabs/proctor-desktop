@@ -13,6 +13,7 @@ const regular = [
 	'archive',
 	'arrow-clockwise',
 	'arrow-counter-clockwise',
+	'arrow-right',
 	'arrow-square-out',
 	'arrows-left-right',
 	'browser',
@@ -41,6 +42,8 @@ const regular = [
 	'download-simple',
 	'envelope-simple',
 	'exam',
+	'eye',
+	'file-csv',
 	'file-text',
 	'funnel',
 	'gear-six',
@@ -74,6 +77,7 @@ const regular = [
 	'sidebar-simple',
 	'sign-out',
 	'squares-four',
+	'student',
 	'sun',
 	'terminal-window',
 	'trash',
@@ -97,6 +101,7 @@ const fill = [
 	'devices',
 	'exam',
 	'gear-six',
+	'graduation-cap',
 	'hourglass',
 	'identification-card',
 	'key',
@@ -107,7 +112,9 @@ const fill = [
 	'squares-four',
 	'tree-structure',
 	'user-circle',
-	'users-three'
+	'users-three',
+	'warning-circle',
+	'x-circle'
 ] as const;
 
 export const phosphorIconsGenerator: Generator = {

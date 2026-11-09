@@ -3444,6 +3444,34 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
+    "administration.list.scroll.hint": {
+      "message": "Scroll sideways for more columns",
+      "description": "Under a table that is wider than the window and scrolls sideways.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.list.select.page": {
+      "message": "Select every row on this page",
+      "description": "Accessible name of the checkbox in a table header that selects all its rows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.list.select.row": {
+      "message": "Select {name}",
+      "description": "Accessible name of the checkbox that selects one table row.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.list.showing": {
+      "message": "Showing {range}",
+      "description": "Under a table: which rows it shows, as in \"Showing 1–10 of 1,284\".",
+      "placeholders": [
+        "range"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.operations.job.cancel": {
       "message": "Cancel…",
       "description": "Cancels a job after confirming.",

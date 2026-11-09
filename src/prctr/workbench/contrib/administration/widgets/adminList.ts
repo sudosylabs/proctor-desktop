@@ -4,8 +4,8 @@
 
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
+import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import type { MenuEntry } from '../../../../base/browser/ui/menu/menuControl.js';
-import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import {
 	Disposable,
@@ -36,7 +36,15 @@ import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneC
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { administrationFailureWithdraws } from '../common/administrationPresentation.js';
+import {
+	foldColumns,
+	type AdminColumnLayout,
+	type AdminTablePlan,
+	type AdminTone
+} from '../common/adminTableLayout.js';
 import './media/adminList.css';
+
+export type { AdminTone } from '../common/adminTableLayout.js';
 
 /** Every read that answers one page of a list. */
 export type AdminListKind = {
@@ -58,8 +66,6 @@ export type AdminListQuery<K extends AdminListKind> = Omit<
 	'kind' | 'cursor' | 'limit'
 >;
 
-export type AdminTone = 'ok' | 'warn' | 'fail' | 'neutral';
-
 /** What one table cell shows, in the forms the Administration boards draw. */
 export type AdminCell =
 	| {
@@ -73,17 +79,31 @@ export type AdminCell =
 			readonly secondary?: string;
 			/** Names the row, as an email does in a list of invitations. */
 			readonly strong?: boolean;
-			/** Dates and codes line up as tabular figures. */
+			/** Dates and counts line up as tabular figures. */
 			readonly mono?: boolean;
+			/** Ordinary text reads in the primary colour; the rest of a row is quieter. */
+			readonly quiet?: boolean;
+			/** The second line names a problem. */
+			readonly secondaryTone?: 'fail';
 	  }
-	| { readonly kind: 'status'; readonly text: string; readonly tone: AdminTone }
-	| { readonly kind: 'check'; readonly on: boolean; readonly label: string };
+	/** A glyph and a word; the glyph follows the tone unless the cell names its own. */
+	| {
+			readonly kind: 'status';
+			readonly text: string;
+			readonly tone: AdminTone;
+			readonly icon?: ProctorIconId;
+	  }
+	| { readonly kind: 'check'; readonly on: boolean; readonly label: string }
+	/** The row's one obvious action, such as Retry. */
+	| {
+			readonly kind: 'button';
+			readonly label: string;
+			readonly icon: ProctorIconId;
+			readonly run: () => void;
+	  }
+	| { readonly kind: 'empty' };
 
-export interface AdminColumn<T> {
-	readonly label: string;
-	/** A share of the table, as in "30%"; the remaining columns divide the rest. */
-	readonly width?: string;
-	readonly align?: 'start' | 'end' | 'center';
+export interface AdminColumn<T> extends AdminColumnLayout {
 	cell(item: T): AdminCell;
 }
 
@@ -95,7 +115,7 @@ export interface AdminListOptions<K extends AdminListKind> {
 	readonly label: string;
 	readonly columns: readonly AdminColumn<AdminListItem<K>>[];
 	rowId(item: AdminListItem<K>): string;
-	/** The row's name, for its actions button. */
+	/** The row's name, for its actions button and its checkbox. */
 	rowName(item: AdminListItem<K>): string;
 	/** Rows the page leaves out of the shown page, such as the audit log's reads. */
 	hidden?(item: AdminListItem<K>): boolean;
@@ -103,23 +123,49 @@ export interface AdminListOptions<K extends AdminListKind> {
 	open?(item: AdminListItem<K>): void;
 	/** The row's actions; the destructive ones come last after a separator. */
 	actions?(item: AdminListItem<K>): readonly PageRowAction[];
+	/** Rows can be chosen for one change to all of them. */
+	readonly selectable?: boolean;
 	readonly empty: string | PageEmpty;
 	/** Rows other filters would show; replaces `empty` while any filter is set. */
 	readonly filteredEmpty?: string;
 	readonly action?: { readonly label: string; readonly icon: ProctorIconId };
 }
 
+/** Status glyphs by tone, as the boards draw them. */
+const toneIcons: Readonly<
+	Record<AdminTone, { readonly id: ProctorIconId; readonly filled?: true }>
+> = {
+	ok: { id: 'status.success' },
+	warn: { id: 'status.attention' },
+	fail: { id: 'status.attention', filled: true },
+	neutral: { id: 'status.info' },
+	busy: { id: 'status.busy' }
+};
+
 /**
- * One server-paged list shown as a table in a card: ten rows at a time, Previous and Next
- * by the cursors the server issued, and the section's loading, slow, failed, stale and empty
- * states. The server never gives a total, so the range names only the rows shown. A refusal
- * reads as a calm state without a retry, since trying again cannot change the answer.
+ * One server-paged list shown as a table without a card: hairline rows, ten at a time,
+ * Previous and Next by the cursors the server issued, and the section's loading, slow, failed,
+ * stale and empty states. As the table narrows, its lesser columns fold into the first
+ * column's second line; only when what is left still cannot fit does it scroll sideways with
+ * its first column pinned. The first page carries the list's total when the server counts it.
+ * A refusal reads as a calm state without a retry, since trying again cannot change the answer.
  */
 export class AdminList<K extends AdminListKind> extends Disposable {
 	readonly section: PageSection;
+	private readonly root: HTMLElement;
+	private readonly wrap: HTMLElement;
+	private readonly frame: HTMLElement;
 	private readonly table: HTMLTableElement;
+	private readonly colgroup: HTMLTableColElement;
+	private readonly headRow: HTMLTableRowElement;
 	private readonly body: HTMLTableSectionElement;
-	private readonly pager: PagerControl;
+	private readonly foot: HTMLElement;
+	private readonly range: HTMLElement;
+	private readonly hint: HTMLElement;
+	private readonly steps: HTMLElement;
+	private readonly previous: ButtonControl;
+	private readonly next: ButtonControl;
+	private readonly pageAll: HTMLInputElement | undefined;
 	private readonly rowStore = this._register(new DisposableStore());
 	private readonly read = this._register(
 		new MutableDisposable<
@@ -132,6 +178,9 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	private readonly loadEmitter = this._register(new Emitter<readonly AdminListItem<K>[]>());
 	/** A page of rows arrived. */
 	readonly onDidLoad: Event<readonly AdminListItem<K>[]> = this.loadEmitter.event;
+	private readonly selectionEmitter = this._register(new Emitter<readonly AdminListItem<K>[]>());
+	/** The chosen rows changed. */
+	readonly onDidChangeSelection: Event<readonly AdminListItem<K>[]> = this.selectionEmitter.event;
 
 	private query: AdminListQuery<K>;
 	/** The cursor that reads each page; the first page needs none. */
@@ -139,6 +188,11 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	private page = 1;
 	private active = false;
 	private items: readonly AdminListItem<K>[] = [];
+	/** The first page's count, kept while the person moves through later pages. */
+	private total: { readonly count: number; readonly atLeast: boolean } | undefined;
+	private readonly chosen = new Set<string>();
+	private width = 0;
+	private folded = '';
 
 	constructor(
 		host: HTMLElement,
@@ -156,54 +210,101 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 			instantiationService.createInstance(PageSection, host, {
 				title: options.title ?? '',
 				...(options.description === undefined ? {} : { description: options.description }),
-				...(options.action === undefined ? {} : { action: options.action })
+				...(options.action === undefined ? {} : { action: options.action }),
+				plain: true
 			})
 		);
 		this.section.setAction(options.action !== undefined);
-		const $ = createElementFactory(host.ownerDocument);
+		const document = host.ownerDocument;
+		const $ = createElementFactory(document);
 		this.body = $('tbody');
-		const headers = options.columns.map((column) =>
-			$('th', {
-				textContent: column.label,
-				attrs: { scope: 'col' },
-				data: { align: column.align ?? 'start' }
-			})
-		);
-		const widths = options.columns.map((column) => {
-			const col = $('col');
-			if (column.width !== undefined) col.style.width = column.width;
-			return col;
-		});
-		if (options.actions !== undefined) {
-			headers.push($('th', { data: { align: 'end' } }));
-			const col = $('col');
-			col.style.width = '56px';
-			widths.push(col);
-		}
+		this.colgroup = $('colgroup');
+		this.headRow = $('tr');
 		this.table = $(
-			'table.prctr-admin-list',
+			'table.prctr-admin-list__table',
 			{ attrs: { 'aria-label': options.label } },
-			$('colgroup', {}, ...widths),
-			$('thead', {}, $('tr', {}, ...headers)),
+			this.colgroup,
+			$('thead', {}, this.headRow),
 			this.body
 		);
-		this.section.content.append(this.table);
-		this.pager = this._register(
-			new PagerControl(this.section.footer, {
-				labels: format.pagerLabels(options.label),
-				previousIcon: proctorIconFactory('action.back', 14),
-				nextIcon: proctorIconFactory('action.forward', 14)
+		if (options.selectable === true) {
+			this.pageAll = $('input.prctr-admin-list__select', {
+				type: 'checkbox',
+				attrs: { 'aria-label': format.text('listSelectPage') }
+			});
+			this._register(
+				addDisposableListener(this.pageAll, 'change', () => {
+					const on = this.pageAll!.checked;
+					for (const item of this.shownItems())
+						if (on) this.chosen.add(options.rowId(item));
+						else this.chosen.delete(options.rowId(item));
+					this.renderRows();
+					this.selectionEmitter.fire(this.selection);
+				})
+			);
+		}
+		this.frame = $('div.prctr-admin-list__frame', {}, this.table);
+		this.range = $('span.prctr-admin-list__range');
+		this.hint = $('span.prctr-admin-list__hint', {
+			textContent: format.text('listScrollHint')
+		});
+		this.steps = $('div.prctr-admin-list__steps', {
+			attrs: { role: 'navigation', 'aria-label': format.pagerLabels(options.label).name }
+		});
+		this.previous = this._register(
+			new ButtonControl(this.steps, {
+				variant: 'secondary',
+				size: 'small',
+				label: format.text('pagerPrevious'),
+				icon: proctorIconFactory('action.back', 14)
 			})
 		);
-		this.pager.element.hidden = true;
-		this._register(this.pager.onDidRequestPage((page) => this.showPage(page, true)));
-		this.table.hidden = true;
+		this.next = this._register(
+			new ButtonControl(this.steps, {
+				variant: 'secondary',
+				size: 'small',
+				label: format.text('pagerNext'),
+				icon: proctorIconFactory('action.forward', 14)
+			})
+		);
+		this._register(this.previous.onDidRequest(() => this.showPage(this.page - 1, true)));
+		this._register(this.next.onDidRequest(() => this.showPage(this.page + 1, true)));
+		this.foot = $(
+			'div.prctr-admin-list__foot',
+			{},
+			$('div.prctr-admin-list__notes', {}, this.range, this.hint),
+			this.steps
+		);
+		this.wrap = $(
+			'div.prctr-admin-list__wrap',
+			{},
+			this.frame,
+			$('div.prctr-admin-list__fade', { attrs: { 'aria-hidden': 'true' } })
+		);
+		this.root = $('div.prctr-admin-list', {}, this.wrap, this.foot);
+		this.section.content.append(this.root);
+		this.wrap.hidden = true;
+		this.foot.hidden = true;
+		this._register(
+			addDisposableListener(this.frame, 'scroll', () => this.updateFade(), { passive: true })
+		);
+		const view = document.defaultView;
+		if (view?.ResizeObserver !== undefined) {
+			const observer = new view.ResizeObserver(() => this.layout());
+			observer.observe(this.section.content);
+			this._register({ dispose: () => observer.disconnect() });
+		}
 		this.showPage(1, false);
 	}
 
 	/** The rows on the page shown. */
 	get rows(): readonly AdminListItem<K>[] {
 		return this.items;
+	}
+
+	/** The rows chosen on the page shown. */
+	get selection(): readonly AdminListItem<K>[] {
+		return this.items.filter((item) => this.chosen.has(this.options.rowId(item)));
 	}
 
 	get onDidRequestAction(): Event<void> {
@@ -219,12 +320,20 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	setQuery(query: AdminListQuery<K>): void {
 		this.query = query;
 		this.cursors = [undefined];
+		this.total = undefined;
 		this.showPage(1, false);
+	}
+
+	clearSelection(): void {
+		if (this.chosen.size === 0) return;
+		this.chosen.clear();
+		this.renderRows();
+		this.selectionEmitter.fire([]);
 	}
 
 	/** Draws the shown rows again, as once names they show have arrived. */
 	redraw(): void {
-		this.renderRows(this.items);
+		this.renderRows();
 	}
 
 	/** Reads the shown page again, as after a change to one of its rows. */
@@ -233,8 +342,9 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	}
 
 	focusRow(id: string): boolean {
+		const row = `[data-row-id="${CSS.escape(id)}"]`;
 		const target = this.body.querySelector<HTMLElement>(
-			`[data-row-id="${CSS.escape(id)}"] .prctr-admin-list__more, [data-row-id="${CSS.escape(id)}"] .prctr-admin-list__open`
+			`${row} .prctr-admin-list__more, ${row} .prctr-admin-list__open, ${row} .prctr-admin-list__select`
 		);
 		target?.focus();
 		return target !== null;
@@ -243,6 +353,10 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	private showPage(page: number, announce: boolean): void {
 		if (page < 1 || page > this.cursors.length) return;
 		this.page = page;
+		if (this.chosen.size > 0) {
+			this.chosen.clear();
+			this.selectionEmitter.fire([]);
+		}
 		const cursor = this.cursors[page - 1];
 		const intent = {
 			...this.query,
@@ -282,7 +396,13 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		const read = this.read.value;
 		if (read === undefined) return;
 		const data = read.data as
-			{ readonly items: readonly AdminListItem<K>[]; readonly cursor?: string } | undefined;
+			| {
+					readonly items: readonly AdminListItem<K>[];
+					readonly cursor?: string;
+					readonly total?: number;
+					readonly totalAtLeast?: boolean;
+			  }
+			| undefined;
 		const state = read.state;
 		const retry =
 			state.kind === 'failed' && !retriable(state.reason)
@@ -299,77 +419,223 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		this.section.setState(state, empty, retry);
 		if (data === undefined) {
 			this.items = [];
-			this.table.hidden = true;
-			this.pager.element.hidden = true;
+			this.wrap.hidden = true;
+			this.foot.hidden = true;
 			return;
 		}
 		this.items = data.items;
+		if (this.page === 1 && data.total !== undefined)
+			this.total = { count: data.total, atLeast: data.totalAtLeast === true };
 		if (data.cursor !== undefined) this.cursors[this.page] = data.cursor;
 		else this.cursors.length = this.page;
-		this.renderRows(data.items);
+		this.renderRows();
 		const first = (this.page - 1) * ADMINISTRATION_PAGE_SIZE + 1;
+		const last = first + data.items.length - 1;
 		const hasNext = data.cursor !== undefined;
-		this.pager.element.hidden = this.page === 1 && !hasNext;
-		this.pager.setState({
-			page: this.page,
-			pageSize: ADMINISTRATION_PAGE_SIZE,
-			first,
-			last: first + data.items.length - 1,
-			hasNext,
-			knownPages: this.cursors.length
+		const paged = this.page > 1 || hasNext;
+		const labels = this.format.pagerLabels(this.options.label);
+		this.range.textContent =
+			data.items.length === 0
+				? ''
+				: this.format.text('listShowing', {
+						range: labels.range(
+							first,
+							last,
+							this.total?.count,
+							this.total?.atLeast === true
+						)
+					});
+		this.range.hidden = !paged && this.total === undefined;
+		this.steps.hidden = !paged;
+		this.previous.setState({
+			label: this.format.text('pagerPrevious'),
+			icon: proctorIconFactory('action.back', 14),
+			disabled: this.page === 1
 		});
+		this.next.setState({
+			label: this.format.text('pagerNext'),
+			icon: proctorIconFactory('action.forward', 14),
+			disabled: !hasNext
+		});
+		this.updateFoot();
 		if (state.kind === 'ready') this.loadEmitter.fire(data.items);
 		if (this.announce && state.kind === 'ready') {
 			this.announce = false;
-			this.pane.announce(
-				this.format.text('pageShownOpen', {
-					page: this.page,
-					first,
-					last: first + data.items.length - 1
-				})
-			);
+			this.pane.announce(this.format.text('pageShownOpen', { page: this.page, first, last }));
 			const target = this.body.querySelector<HTMLElement>(
-				'.prctr-admin-list__open, .prctr-admin-list__more'
+				'.prctr-admin-list__open, .prctr-admin-list__more, .prctr-admin-list__select'
 			);
 			if (target !== null) target.focus();
 		}
 	}
 
-	private renderRows(items: readonly AdminListItem<K>[]): void {
+	private shownItems(): readonly AdminListItem<K>[] {
+		const hidden = this.options.hidden;
+		return hidden === undefined ? this.items : this.items.filter((item) => !hidden(item));
+	}
+
+	/** Folds columns again when the table's width crosses a threshold. */
+	private layout(): void {
+		const width = this.section.content.clientWidth;
+		if (width === 0 || width === this.width) return;
+		this.width = width;
+		const plan = this.plan();
+		const key = plan.hidden.join();
+		if (key !== this.folded) this.renderRows();
+		else this.applyOverflow(plan.minimum);
+	}
+
+	/** The table is 24 pixels wider than its column, so cell text lines up with the heading. */
+	private tableWidth(): number {
+		return (this.width || this.section.content.clientWidth) + 24;
+	}
+
+	private plan(): AdminTablePlan {
+		return foldColumns(this.options.columns, this.sampleKinds(), this.tableWidth(), {
+			select: this.options.selectable === true,
+			more: this.options.actions !== undefined
+		});
+	}
+
+	private sampleKinds(): readonly string[] {
+		const sample = this.shownItems()[0];
+		return this.options.columns.map((column) =>
+			sample === undefined ? 'text' : sampleKind(column.cell(sample))
+		);
+	}
+
+	private renderRows(): void {
 		this.rowStore.clear();
 		const $ = createElementFactory(this.body.ownerDocument);
-		const hidden = this.options.hidden;
-		const shown = hidden === undefined ? items : items.filter((item) => !hidden(item));
-		this.body.replaceChildren(
-			...shown.map((item) => {
-				const row = $('tr', { data: { rowId: this.options.rowId(item) } });
-				this.options.columns.forEach((column, index) => {
-					const cell = $('td', { data: { align: column.align ?? 'start' } });
-					const content = this.renderCell($, column.cell(item));
-					if (index === 0 && this.options.open !== undefined) {
-						const open = $(
-							'button.prctr-admin-list__open',
-							{ type: 'button' },
-							content
-						);
-						this.rowStore.add(
-							addDisposableListener(open, 'click', () => this.options.open!(item))
-						);
-						cell.append(open);
-					} else cell.append(content);
-					row.append(cell);
+		const shown = this.shownItems();
+		const columns = this.options.columns;
+		const plan = this.plan();
+		this.folded = plan.hidden.join();
+		const visible = columns.map((_, index) => !plan.hidden.includes(index));
+		const target = plan.foldInto;
+
+		// Columns and their header.
+		const cols: HTMLTableColElement[] = [];
+		const headers: HTMLTableCellElement[] = [];
+		if (this.pageAll !== undefined) {
+			cols.push($('col', { data: { kind: 'select' } }));
+			headers.push($('th', { data: { kind: 'select' } }, this.pageAll));
+		}
+		columns.forEach((column, index) => {
+			if (!visible[index]) return;
+			const col = $('col');
+			const width = plan.widths[index];
+			if (width !== undefined) col.style.width = width;
+			cols.push(col);
+			headers.push(
+				$('th', {
+					textContent: column.label,
+					attrs: { scope: 'col' },
+					data: { align: column.align ?? 'start' }
+				})
+			);
+		});
+		if (this.options.actions !== undefined) {
+			cols.push($('col', { data: { kind: 'more' } }));
+			headers.push($('th', { data: { kind: 'more' } }));
+		}
+		this.colgroup.replaceChildren(...cols);
+		this.headRow.replaceChildren(...headers);
+
+		// Rows.
+		let twoLines = false;
+		const rows = shown.map((item) => {
+			const id = this.options.rowId(item);
+			const name = this.options.rowName(item);
+			const on = this.chosen.has(id);
+			const cells = columns.map((column) => column.cell(item));
+			const extra = plan.hidden
+				.map((index) => foldedText(columns[index]!, cells[index]!))
+				.filter((text): text is string => text !== undefined);
+			const row = $('tr', { data: { rowId: id, selected: String(on) } });
+			if (this.pageAll !== undefined) {
+				const box = $('input.prctr-admin-list__select', {
+					type: 'checkbox',
+					attrs: { 'aria-label': this.format.text('listSelectRow', { name }) }
 				});
-				if (this.options.actions !== undefined) {
-					const actions = this.options.actions(item);
-					const cell = $('td', { data: { align: 'end' } });
-					if (actions.length > 0)
-						cell.append(this.createMenuButton($, this.options.rowName(item), actions));
-					row.append(cell);
-				}
-				return row;
-			})
-		);
-		this.table.hidden = shown.length === 0;
+				box.checked = on;
+				this.rowStore.add(
+					addDisposableListener(box, 'change', () => {
+						if (box.checked) this.chosen.add(id);
+						else this.chosen.delete(id);
+						row.dataset.selected = String(box.checked);
+						this.updatePageAll();
+						this.selectionEmitter.fire(this.selection);
+					})
+				);
+				row.append($('td', { data: { kind: 'select' } }, box));
+			}
+			columns.forEach((column, index) => {
+				if (!visible[index]) return;
+				let cell = cells[index]!;
+				if (index === target && extra.length > 0) cell = withSecondLine(cell, extra);
+				if (
+					(cell.kind === 'text' && (cell.secondary ?? '') !== '') ||
+					(cell.kind === 'person' && (cell.detail ?? '') !== '')
+				)
+					twoLines = true;
+				const td = $('td', {
+					data: {
+						align: column.align ?? 'start',
+						kind: cell.kind,
+						wrap: String(column.wrap === true)
+					}
+				});
+				const content = this.renderCell($, cell);
+				if (index === plan.first && this.options.open !== undefined) {
+					const open = $('button.prctr-admin-list__open', { type: 'button' }, content);
+					this.rowStore.add(
+						addDisposableListener(open, 'click', () => this.options.open!(item))
+					);
+					td.append(open);
+				} else td.append(content);
+				row.append(td);
+			});
+			if (this.options.actions !== undefined) {
+				const actions = this.options.actions(item);
+				const td = $('td', { data: { kind: 'more' } });
+				if (actions.length > 0) td.append(this.createMenuButton($, name, actions));
+				row.append(td);
+			}
+			return row;
+		});
+		this.body.replaceChildren(...rows);
+		this.body.dataset.lines = twoLines ? '2' : '1';
+		this.wrap.hidden = shown.length === 0;
+		this.updatePageAll();
+		this.applyOverflow(plan.minimum);
+	}
+
+	private applyOverflow(minimum: number): void {
+		const overflows = minimum > this.tableWidth();
+		this.wrap.dataset.overflow = String(overflows);
+		this.table.style.minWidth = overflows ? `${minimum}px` : '';
+		this.updateFade();
+		this.updateFoot();
+	}
+
+	private updateFade(): void {
+		const end = this.frame.scrollLeft + this.frame.clientWidth >= this.frame.scrollWidth - 1;
+		this.wrap.dataset.end = String(end);
+	}
+
+	private updateFoot(): void {
+		this.hint.hidden = this.wrap.dataset.overflow !== 'true';
+		this.foot.hidden =
+			this.wrap.hidden || (this.range.hidden && this.steps.hidden && this.hint.hidden);
+	}
+
+	private updatePageAll(): void {
+		if (this.pageAll === undefined) return;
+		const ids = this.shownItems().map((item) => this.options.rowId(item));
+		const count = ids.filter((id) => this.chosen.has(id)).length;
+		this.pageAll.checked = count > 0 && count === ids.length;
+		this.pageAll.indeterminate = count > 0 && count < ids.length;
 	}
 
 	private renderCell($: ReturnType<typeof createElementFactory>, cell: AdminCell): HTMLElement {
@@ -389,7 +655,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 							data: { strong: 'true' },
 							textContent: cell.name
 						}),
-						...(cell.detail === undefined
+						...(cell.detail === undefined || cell.detail === ''
 							? []
 							: [$('span.prctr-admin-list__secondary', { textContent: cell.detail })])
 					)
@@ -402,23 +668,43 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 						textContent: cell.primary,
 						data: {
 							strong: String(cell.strong === true),
-							mono: String(cell.mono === true)
+							mono: String(cell.mono === true),
+							quiet: String(cell.quiet === true)
 						}
 					}),
 					...(cell.secondary === undefined || cell.secondary === ''
 						? []
-						: [$('span.prctr-admin-list__secondary', { textContent: cell.secondary })])
+						: [
+								$('span.prctr-admin-list__secondary', {
+									textContent: cell.secondary,
+									data: { tone: cell.secondaryTone ?? '' }
+								})
+							])
 				);
-			case 'status':
+			case 'status': {
+				const glyph = toneIcons[cell.tone];
+				const icon = this.rowStore.add(
+					createProctorIcon(this.body.ownerDocument, {
+						id: cell.icon ?? glyph.id,
+						size: 16,
+						...(cell.icon === undefined && glyph.filled ? { filled: true } : {})
+					})
+				);
 				return $(
 					'span.prctr-admin-list__status',
 					{ data: { tone: cell.tone } },
-					$('span.prctr-admin-list__dot', { attrs: { 'aria-hidden': 'true' } }),
+					$(
+						'span.prctr-admin-list__glyph',
+						{ attrs: { 'aria-hidden': 'true' } },
+						icon.element
+					),
 					cell.text
 				);
+			}
 			case 'check': {
 				const element = $('span.prctr-admin-list__check', {
-					attrs: { role: 'img', 'aria-label': cell.label }
+					attrs: { role: 'img', 'aria-label': cell.label },
+					data: { on: String(cell.on) }
 				});
 				if (cell.on)
 					element.append(
@@ -435,6 +721,21 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 					);
 				return element;
 			}
+			case 'button': {
+				const holder = $('span.prctr-admin-list__button');
+				const button = this.rowStore.add(
+					new ButtonControl(holder, {
+						variant: 'secondary',
+						size: 'small',
+						label: cell.label,
+						icon: proctorIconFactory(cell.icon, 14)
+					})
+				);
+				this.rowStore.add(button.onDidRequest(cell.run));
+				return holder;
+			}
+			case 'empty':
+				return $('span');
 		}
 	}
 
@@ -490,6 +791,33 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		);
 		return button;
 	}
+}
+
+function sampleKind(cell: AdminCell): string {
+	return cell.kind === 'text' && cell.mono === true ? 'mono' : cell.kind;
+}
+
+/** A folded cell's value, labelled when a bare value would not say what it is. */
+function foldedText<T>(column: AdminColumn<T>, cell: AdminCell): string | undefined {
+	const value =
+		cell.kind === 'text'
+			? cell.primary
+			: cell.kind === 'person'
+				? cell.name
+				: cell.kind === 'status'
+					? cell.text
+					: undefined;
+	if (value === undefined || value === '' || value === '—') return undefined;
+	const labelled = column.foldLabel ?? (cell.kind === 'text' && cell.mono === true);
+	return labelled ? `${column.label} ${value}` : value;
+}
+
+function withSecondLine(cell: AdminCell, extra: readonly string[]): AdminCell {
+	if (cell.kind === 'text')
+		return { ...cell, secondary: [cell.secondary, ...extra].filter(Boolean).join(' · ') };
+	if (cell.kind === 'person')
+		return { ...cell, detail: [cell.detail, ...extra].filter(Boolean).join(' · ') };
+	return cell;
 }
 
 /** A refusal or a lost session will not change by trying again. */

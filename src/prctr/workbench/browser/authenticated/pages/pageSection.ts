@@ -119,6 +119,8 @@ export class PageSection extends Disposable {
 			readonly title: string;
 			readonly description?: string;
 			readonly action?: PageSectionAction;
+			/** Content that draws its own edges, such as a table of hairline rows, needs no card. */
+			readonly plain?: boolean;
 		},
 		@IPageFormatService private readonly format: IPageFormatService,
 		@IPagePaneContext private readonly pane: IPagePaneContext,
@@ -221,7 +223,7 @@ export class PageSection extends Disposable {
 		this.content = $('div.prctr-page-section__content');
 		this.card = $(
 			'div.prctr-page-section__card',
-			{},
+			{ data: { plain: String(options.plain === true) } },
 			this.content,
 			this.list,
 			this.skeleton,
