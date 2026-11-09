@@ -73,15 +73,10 @@ export class AccountPhotoDialog extends Disposable {
 		const document = this.pane.document;
 		const $ = createElementFactory(document);
 		this.dialog = this._register(
-			new PageDialog(
-				document,
-				this.pane.overlays,
-				{
-					title: this.format.text('photoDialogTitle'),
-					description: this.format.text('photoDialogHelp')
-				},
-				this.pane.focusPage
-			)
+			new PageDialog(this.pane, {
+				title: this.format.text('photoDialogTitle'),
+				description: this.format.text('photoDialogHelp')
+			})
 		);
 		this.canvas = $('canvas.prctr-account-photo__canvas');
 		this.stage = $(

@@ -7882,6 +7882,12 @@
       ],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
+    "page.dialog.close": {
+      "message": "Close",
+      "description": "The × button in a dialog’s header, which closes it without changing anything.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
     "page.dismiss": {
       "message": "Dismiss",
       "description": "Closes a toast.",

@@ -1265,6 +1265,7 @@ export const englishCatalog: LocalizationCatalog = Object.freeze({
     "page.confirm.waiting": "Finish in your browser. This continues by itself when you’re done.",
     "page.confirm.waiting.button": "Waiting for your browser…",
     "page.detail.separator": "{first} · {second}",
+    "page.dialog.close": "Close",
     "page.dismiss": "Dismiss",
     "page.pager.compact": "Page {page} of {count}",
     "page.pager.compact.open": "Page {page}",

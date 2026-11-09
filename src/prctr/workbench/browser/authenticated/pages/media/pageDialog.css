@@ -1,3 +1,5 @@
+/* A page dialog in three bands: a header with ×, a body that scrolls behind the footer with
+ * no visible scrollbar, and a footer that keeps the actions in view. */
 @layer contributions {
 	.prctr-page-dialog {
 		background: var(--prctr-color-background-card);
@@ -10,31 +12,44 @@
 		flex-direction: column;
 		font-family: var(--prctr-typography-font-application);
 		font-size: 13.5px;
-		gap: 18px;
-		inline-size: min(420px, calc(100vw - 32px));
+		inline-size: min(480px, calc(100vw - 48px));
 		line-height: 20px;
 		margin-block-start: min(96px, 12vh);
-		max-block-size: calc(100vh - 32px);
-		overflow: auto;
-		padding: 22px 22px 18px;
+		max-block-size: calc(100vh - 96px);
+		overflow: hidden;
+		padding: 0;
 	}
 	.prctr-page-dialog:not([open]) {
 		display: none;
 	}
 	.prctr-page-dialog[data-size='medium'] {
-		inline-size: min(500px, calc(100vw - 32px));
+		inline-size: min(560px, calc(100vw - 48px));
 		margin-block-start: min(72px, 10vh);
+	}
+	.prctr-page-dialog[data-size='large'] {
+		inline-size: min(720px, calc(100vw - 48px));
+		margin-block-start: min(48px, 8vh);
 	}
 	.prctr-page-dialog::backdrop {
 		background: var(--prctr-color-overlay-backdrop);
 	}
 	.prctr-page-dialog .prctr-page-dialog__header {
+		align-items: flex-start;
 		display: flex;
+		flex: none;
+		gap: 16px;
+		padding: 20px 16px 16px 24px;
+	}
+	.prctr-page-dialog .prctr-page-dialog__heading {
+		display: flex;
+		flex: 1 1 auto;
 		flex-direction: column;
 		gap: 6px;
+		min-inline-size: 0;
+		padding-block-start: 4px;
 	}
 	.prctr-page-dialog .prctr-page-dialog__title {
-		font-size: 18px;
+		font-size: 17px;
 		font-weight: var(--prctr-typography-weight-semibold);
 		line-height: 24px;
 		margin: 0;
@@ -47,20 +62,75 @@
 		margin: 0;
 		overflow-wrap: anywhere;
 	}
+	.prctr-page-dialog .prctr-page-dialog__close {
+		align-items: center;
+		background: transparent;
+		block-size: 30px;
+		border: 0;
+		border-radius: 8px;
+		color: var(--prctr-color-text-secondary);
+		cursor: pointer;
+		display: inline-flex;
+		flex: none;
+		inline-size: 30px;
+		justify-content: center;
+		padding: 0;
+	}
+	.prctr-page-dialog .prctr-page-dialog__close:hover {
+		background: var(--prctr-color-interaction-hover);
+		color: var(--prctr-color-text-primary);
+	}
+	.prctr-page-dialog .prctr-page-dialog__close:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
+	}
 	.prctr-page-dialog .prctr-page-dialog__body {
 		display: flex;
+		flex: 1 1 auto;
 		flex-direction: column;
-		gap: 18px;
+		gap: 20px;
+		min-block-size: 0;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+		padding: 4px 24px 24px;
+		scrollbar-width: none;
+	}
+	.prctr-page-dialog .prctr-page-dialog__body::-webkit-scrollbar {
+		display: none;
 	}
 	.prctr-page-dialog .prctr-page-dialog__body:empty {
 		display: none;
 	}
+	.prctr-page-dialog .prctr-page-dialog__footer {
+		align-items: center;
+		box-shadow:
+			0 -1px 0 var(--prctr-color-border-default),
+			0 -8px 16px -12px rgb(0 0 0 / 0.18);
+		box-sizing: border-box;
+		display: flex;
+		flex: none;
+		gap: 12px;
+		min-block-size: 64px;
+		padding: 12px 24px;
+		position: relative;
+	}
+	.prctr-page-dialog .prctr-page-dialog__footnote {
+		color: var(--prctr-color-text-tertiary);
+		flex: 1 1 auto;
+		font-size: 13px;
+		margin: 0;
+		min-inline-size: 0;
+	}
 	.prctr-page-dialog .prctr-page-dialog__actions {
 		align-items: center;
 		display: flex;
+		flex: 1 0 auto;
 		flex-wrap: wrap;
 		gap: 8px;
 		justify-content: flex-end;
+	}
+	.prctr-page-dialog .prctr-page-dialog__footnote:not([hidden]) + .prctr-page-dialog__actions {
+		flex: none;
 	}
 	.prctr-page-dialog .prctr-page-dialog__spacer {
 		flex: 1 1 auto;
@@ -72,6 +142,10 @@
 	@media (forced-colors: active) {
 		.prctr-page-dialog {
 			border: var(--prctr-shape-stroke-default) solid CanvasText;
+		}
+		.prctr-page-dialog .prctr-page-dialog__footer {
+			border-block-start: 1px solid CanvasText;
+			box-shadow: none;
 		}
 	}
 }

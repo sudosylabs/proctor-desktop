@@ -124,12 +124,11 @@ export class AdminConfirmation extends Disposable {
 	) {
 		super();
 		this.dialog = this._register(
-			new PageDialog(
-				this.pane.document,
-				this.pane.overlays,
-				{ title: options.title, description: options.message, role: 'alertdialog' },
-				this.pane.focusPage
-			)
+			new PageDialog(this.pane, {
+				title: options.title,
+				description: options.message,
+				role: 'alertdialog'
+			})
 		);
 		this.feedback = this._register(new PageFeedback(this.dialog.body));
 		this.cancel = this._register(

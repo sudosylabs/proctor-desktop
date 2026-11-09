@@ -55,19 +55,14 @@ export class ConfirmItsYouDialog extends Disposable {
 		super();
 		const $ = createElementFactory(this.pane.document);
 		this.dialog = this._register(
-			new PageDialog(
-				this.pane.document,
-				this.pane.overlays,
-				{
-					title: this.format.text('confirmItsYouTitle'),
-					description: this.format.institutionText(
-						'confirmItsYouBody',
-						'confirmItsYouBodyGeneric'
-					),
-					size: 'small'
-				},
-				this.pane.focusPage
-			)
+			new PageDialog(this.pane, {
+				title: this.format.text('confirmItsYouTitle'),
+				description: this.format.institutionText(
+					'confirmItsYouBody',
+					'confirmItsYouBodyGeneric'
+				),
+				size: 'small'
+			})
 		);
 		if (summary.length > 0)
 			this.dialog.body.append(

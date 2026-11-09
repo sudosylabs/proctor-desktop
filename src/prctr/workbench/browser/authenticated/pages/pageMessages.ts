@@ -31,6 +31,11 @@ export const pageMessages = Object.freeze({
 		defaultMessage: 'This couldn’t be refreshed, so it may be out of date. {reason}',
 		description: 'A refresh failed; earlier information stays shown.'
 	}),
+	closeDialog: defineMessage({
+		id: 'page.dialog.close',
+		defaultMessage: 'Close',
+		description: 'The × button in a dialog’s header, which closes it without changing anything.'
+	}),
 	retry: defineMessage({
 		id: 'page.state.retry',
 		defaultMessage: 'Try again',

@@ -89,16 +89,11 @@ export class NewTokenDialog extends Disposable {
 		const $ = createElementFactory(document);
 		const now = this.format.now();
 		this.dialog = this._register(
-			new PageDialog(
-				document,
-				this.pane.overlays,
-				{
-					title: this.format.text('newTokenTitle'),
-					description: this.format.text('newTokenDescription'),
-					size: 'medium'
-				},
-				this.pane.focusPage
-			)
+			new PageDialog(this.pane, {
+				title: this.format.text('newTokenTitle'),
+				description: this.format.text('newTokenDescription'),
+				size: 'medium'
+			})
 		);
 		this.name = this._register(
 			new TextFieldControl(this.dialog.body, {
@@ -446,16 +441,11 @@ export class TokenCreatedDialog extends Disposable {
 		const document = this.pane.document;
 		const $ = createElementFactory(document);
 		this.dialog = this._register(
-			new PageDialog(
-				document,
-				this.pane.overlays,
-				{
-					title: this.format.text('tokenCreatedTitle'),
-					description: this.format.text('tokenCreatedBody'),
-					size: 'medium'
-				},
-				this.pane.focusPage
-			)
+			new PageDialog(this.pane, {
+				title: this.format.text('tokenCreatedTitle'),
+				description: this.format.text('tokenCreatedBody'),
+				size: 'medium'
+			})
 		);
 		this.value = $('span.prctr-account-token-credential__value', {
 			tabIndex: 0,

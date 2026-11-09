@@ -137,18 +137,11 @@ export class AdminFormDialog extends Disposable {
 		super();
 		this.changes = this._register(instantiationService.createInstance(AdminChanges));
 		this.dialog = this._register(
-			new PageDialog(
-				pane.document,
-				pane.overlays,
-				{
-					title: options.title,
-					...(options.description === undefined
-						? {}
-						: { description: options.description }),
-					size: 'medium'
-				},
-				pane.focusPage
-			)
+			new PageDialog(pane, {
+				title: options.title,
+				...(options.description === undefined ? {} : { description: options.description }),
+				size: 'medium'
+			})
 		);
 		for (const spec of options.fields) this.fields.push(this.createField(spec));
 		this.feedback = this._register(new PageFeedback(this.dialog.body));

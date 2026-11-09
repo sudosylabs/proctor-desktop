@@ -38,6 +38,8 @@ export interface IPagePaneContext {
 	readonly document: Document;
 	readonly overlays: WorkbenchOverlayHost;
 	readonly menu: MenuControl;
+	/** The accessible name of a dialog's × button. */
+	readonly closeLabel: string;
 	/** Moves focus to the page heading, as when a dialog closes without another target. */
 	focusPage(): void;
 	announce(text: string): void;
@@ -61,6 +63,7 @@ export class PagePaneContext implements IPagePaneContext {
 		readonly menu: MenuControl,
 		private readonly toasts: ToastHost,
 		private readonly retryLabel: string,
+		readonly closeLabel: string,
 		private readonly focus: () => void,
 		private readonly failureText: (reason: string) => string,
 		private readonly heading: (heading: PageHeading) => void

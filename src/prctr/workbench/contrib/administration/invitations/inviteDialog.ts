@@ -64,16 +64,11 @@ export class InviteDialog extends Disposable {
 		super();
 		this.changes = this._register(instantiationService.createInstance(AdminChanges));
 		this.dialog = this._register(
-			new PageDialog(
-				pane.document,
-				pane.overlays,
-				{
-					title: format.text('inviteTitle'),
-					description: format.text('inviteBody'),
-					size: 'medium'
-				},
-				pane.focusPage
-			)
+			new PageDialog(pane, {
+				title: format.text('inviteTitle'),
+				description: format.text('inviteBody'),
+				size: 'medium'
+			})
 		);
 		const body = this.dialog.body;
 		const kindField = adminField(body, format.text('inviteKind'));
