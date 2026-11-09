@@ -31,6 +31,14 @@ export const IAuthenticatedNavigationService = createDecorator<IAuthenticatedNav
 	'authenticatedNavigationService'
 );
 
+/** What the rail tells the person about their access or the connection. */
+export interface ProductStatus {
+	readonly tone: 'info' | 'problem';
+	readonly title: string;
+	readonly detail?: string;
+	readonly retry?: () => void;
+}
+
 /** A count beside an Administration sidebar entry. */
 export interface AdministrationCount {
 	readonly count: number;
@@ -64,8 +72,11 @@ export interface IAuthenticatedNavigationService {
 	selectAdministrationPage(page: AdministrationPage, subject?: string): void;
 	/** Replace the product areas with a fresh, server-confirmed projection. */
 	setProductAreas(areas: readonly string[]): void;
-	/** Show a server-access notice in the sidebar, with an optional way to retry. */
-	setProductStatus(message: string, retry?: () => void): void;
+	/**
+	 * Show a fact about the person's access, or a problem reaching the server, in the rail above
+	 * the account; a problem can offer to try again. Nothing removes it.
+	 */
+	setProductStatus(status: ProductStatus | undefined): void;
 	/** Show how many items an Account page lists beside its sidebar entry; nothing hides it. */
 	setAccountCount(page: AccountPage, count: number | undefined): void;
 	/**

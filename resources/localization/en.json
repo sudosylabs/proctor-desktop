@@ -8976,8 +8976,8 @@
       "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
     },
     "authenticated.shell.retry": {
-      "message": "Refresh access",
-      "description": "Refresh permitted product areas from the server.",
+      "message": "Try again",
+      "description": "In the rail’s note about a problem reaching the server: reads access again.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
     },
@@ -9341,14 +9341,26 @@
       "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
     "exams.access.no.affiliation": {
-      "message": "You have no current institution affiliation.",
+      "message": "Your institution doesn’t list you as a student, teacher or staff member right now, so Exams has nothing to show. An administrator adds this; Proctor updates on its own when they do.",
       "description": "Server context has no current affiliation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
+    "exams.access.no.affiliation.title": {
+      "message": "No current affiliation",
+      "description": "Title of the rail note when the server lists no current affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
+    },
     "exams.access.none": {
-      "message": "No exam or management access is assigned to your account.",
+      "message": "No exam or management access is assigned to your account. An administrator grants it; Proctor updates on its own when they do.",
       "description": "Server context has no assigned product access.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
+    },
+    "exams.access.none.title": {
+      "message": "No access assigned",
+      "description": "Title of the rail note when the server assigns no product access.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },
@@ -9367,6 +9379,12 @@
     "exams.access.paused": {
       "message": "This exam is paused. Wait for it to resume.",
       "description": "Sitting paused by authorized manager.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
+    },
+    "exams.access.problem": {
+      "message": "Proctor couldn’t check your access",
+      "description": "Title of the rail note when the server could not be read.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/examActivity/examActivityMessages.ts"
     },

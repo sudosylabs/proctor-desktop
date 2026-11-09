@@ -99,9 +99,10 @@ class AccountContribution extends Disposable {
 			}
 		} catch {
 			if (!this.disposed && serial === this.sequence) {
-				this.navigation.setProductStatus(
-					this.localization.format(messages.pageUnavailable)
-				);
+				this.navigation.setProductStatus({
+					tone: 'problem',
+					title: this.localization.format(messages.pageUnavailable)
+				});
 			}
 		}
 	}

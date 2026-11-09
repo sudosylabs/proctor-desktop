@@ -181,15 +181,32 @@ export const examActivityMessages = {
 		defaultMessage: 'The list has changed. Refresh to load it again.',
 		description: 'Server rejected stale pagination.'
 	}),
+	noAffiliationTitle: defineMessage({
+		id: 'exams.access.no.affiliation.title',
+		defaultMessage: 'No current affiliation',
+		description: 'Title of the rail note when the server lists no current affiliation.'
+	}),
 	noAffiliation: defineMessage({
 		id: 'exams.access.no.affiliation',
-		defaultMessage: 'You have no current institution affiliation.',
+		defaultMessage:
+			'Your institution doesn’t list you as a student, teacher or staff member right now, so Exams has nothing to show. An administrator adds this; Proctor updates on its own when they do.',
 		description: 'Server context has no current affiliation.'
+	}),
+	noAccessTitle: defineMessage({
+		id: 'exams.access.none.title',
+		defaultMessage: 'No access assigned',
+		description: 'Title of the rail note when the server assigns no product access.'
 	}),
 	noAccess: defineMessage({
 		id: 'exams.access.none',
-		defaultMessage: 'No exam or management access is assigned to your account.',
+		defaultMessage:
+			'No exam or management access is assigned to your account. An administrator grants it; Proctor updates on its own when they do.',
 		description: 'Server context has no assigned product access.'
+	}),
+	accessProblem: defineMessage({
+		id: 'exams.access.problem',
+		defaultMessage: 'Proctor couldn’t check your access',
+		description: 'Title of the rail note when the server could not be read.'
 	}),
 	upcoming: defineMessage({
 		id: 'exams.status.upcoming',

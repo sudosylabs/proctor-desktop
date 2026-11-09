@@ -85,7 +85,6 @@
 	}
 
 	.prctr-area-sidebar .prctr-area-sidebar__group[hidden],
-	.prctr-area-sidebar .prctr-area-sidebar__status[hidden],
 	.prctr-area-sidebar .prctr-area-sidebar__footer[hidden],
 	.prctr-area-sidebar .prctr-area-sidebar__entry[hidden],
 	.prctr-area-sidebar .prctr-area-sidebar__badge[hidden] {
@@ -162,21 +161,6 @@
 	.prctr-area-sidebar .prctr-area-sidebar__hide:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: -2px;
-	}
-
-	.prctr-area-sidebar .prctr-area-sidebar__status {
-		color: var(--prctr-color-text-secondary);
-		display: flex;
-		flex: none;
-		flex-direction: column;
-		font-size: 12.5px;
-		gap: 4px;
-		line-height: 18px;
-	}
-
-	.prctr-area-sidebar .prctr-area-sidebar__status-text {
-		margin: 0;
-		padding-inline: 10px;
 	}
 
 	.prctr-area-sidebar .prctr-area-sidebar__footer {

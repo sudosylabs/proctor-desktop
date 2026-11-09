@@ -138,9 +138,10 @@ class AdministrationContribution extends Disposable {
 			if (assigned && !this.disposed && serial === this.sequence && focus) this.host.focus();
 		} catch {
 			if (!this.disposed && serial === this.sequence)
-				this.navigation.setProductStatus(
-					this.localization.format(messages.pageUnavailable)
-				);
+				this.navigation.setProductStatus({
+					tone: 'problem',
+					title: this.localization.format(messages.pageUnavailable)
+				});
 		}
 	}
 

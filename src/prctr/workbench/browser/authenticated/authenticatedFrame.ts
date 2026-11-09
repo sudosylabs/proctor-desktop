@@ -23,7 +23,8 @@ import { IAuthenticatedHostService } from '../../services/authenticatedHost/comm
 import { ILocalizationService } from '../../services/localization/common/localization.js';
 import type {
 	AdministrationCount,
-	AdministrationLocation
+	AdministrationLocation,
+	ProductStatus
 } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import {
 	activityViews,
@@ -285,8 +286,20 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 		this.model.setAreas(areas);
 	}
 
-	setProductStatus(message: string, retry?: () => void): void {
-		this.sidebar.setStatus(message, retry);
+	setProductStatus(status: ProductStatus | undefined): void {
+		const retry = status?.retry;
+		this.rail.setNotice(
+			status === undefined
+				? undefined
+				: {
+						tone: status.tone,
+						title: status.title,
+						...(status.detail === undefined ? {} : { detail: status.detail }),
+						...(retry === undefined
+							? {}
+							: { retry: { label: this.text('retry'), run: retry } })
+					}
+		);
 	}
 
 	setAccountCount(page: AccountPage, count: number | undefined): void {

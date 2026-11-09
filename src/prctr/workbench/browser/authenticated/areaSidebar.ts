@@ -71,16 +71,12 @@ export class AreaSidebar extends Disposable {
 	private readonly hide: HTMLButtonElement;
 	private readonly pages: HTMLElement;
 	private readonly scroll: DomScrollableElement;
-	private readonly status: HTMLElement;
-	private readonly statusText: HTMLElement;
-	private readonly statusRetry: HTMLButtonElement;
 	private readonly footer: HTMLElement;
 	private readonly signOut: HTMLButtonElement;
 	private readonly signOutFeedback: HTMLElement;
 	private readonly areas = new Map<AuthenticatedDestination, AreaView>();
 	private readonly areaTitles = new Map<AuthenticatedDestination, AuthenticatedMessage>();
 	private readonly roving: RovingFocus;
-	private retry: (() => void) | undefined;
 
 	constructor(
 		private readonly host: HTMLElement,
@@ -117,13 +113,6 @@ export class AreaSidebar extends Disposable {
 				useShadows: false
 			})
 		);
-		this.statusText = $('p.prctr-area-sidebar__status-text', { attrs: { role: 'status' } });
-		this.statusRetry = $('button.prctr-area-sidebar__entry', {
-			type: 'button',
-			textContent: this.text('retry')
-		});
-		this.status = $('div.prctr-area-sidebar__status', {}, this.statusText, this.statusRetry);
-		this.status.hidden = true;
 		this.signOut = $('button.prctr-area-sidebar__entry', {
 			type: 'button',
 			data: { action: 'signOut' }
@@ -142,7 +131,6 @@ export class AreaSidebar extends Disposable {
 			{},
 			header,
 			this.scroll.getDomNode(),
-			this.status,
 			this.footer
 		);
 		host.setAttribute('aria-labelledby', this.title.id);
@@ -215,11 +203,6 @@ export class AreaSidebar extends Disposable {
 				this.signOutEmitter.fire();
 			})
 		);
-		this._register(
-			addDisposableListener(this.statusRetry, 'click', () => {
-				this.retry?.();
-			})
-		);
 	}
 
 	/** Show the current area, marking `entry` as its current page. */
@@ -259,13 +242,6 @@ export class AreaSidebar extends Disposable {
 
 	setExpanded(expanded: boolean): void {
 		this.hide.setAttribute('aria-expanded', String(expanded));
-	}
-
-	setStatus(message: string, retry?: () => void): void {
-		this.retry = retry;
-		this.statusText.textContent = message;
-		this.statusRetry.hidden = retry === undefined;
-		this.status.hidden = message.length === 0;
 	}
 
 	setSigningOut(signingOut: boolean, failure?: string): void {

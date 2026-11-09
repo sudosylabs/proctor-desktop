@@ -237,8 +237,8 @@ export const authenticatedMessages = Object.freeze({
 	}),
 	retry: defineMessage({
 		id: 'authenticated.shell.retry',
-		defaultMessage: 'Refresh access',
-		description: 'Refresh permitted product areas from the server.'
+		defaultMessage: 'Try again',
+		description: 'In the rail’s note about a problem reaching the server: reads access again.'
 	}),
 	hideSidebar: defineMessage({
 		id: 'authenticated.shell.hide.sidebar',

@@ -81,9 +81,12 @@ class ExamActivityContribution extends Disposable {
 				})
 				.catch(() => {
 					if (!disposed && serial === sequence)
-						navigation.setProductStatus?.(localization.format(m.unavailable), () =>
-							select(destination, true)
-						);
+						navigation.setProductStatus?.({
+							tone: 'problem',
+							title: localization.format(m.accessProblem),
+							detail: localization.format(m.unavailable),
+							retry: () => select(destination, true)
+						});
 				});
 		};
 		this._register(navigation.onDidChange((destination) => select(destination, true)));
@@ -92,13 +95,21 @@ class ExamActivityContribution extends Disposable {
 				if (access.state?.kind === 'context') {
 					const c = access.state.context;
 					navigation.setProductAreas?.(c.areas);
+					// A fact about the person: the context is followed, so nothing needs pressing.
 					navigation.setProductStatus?.(
 						c.noAffiliation
-							? localization.format(m.noAffiliation)
+							? {
+									tone: 'info',
+									title: localization.format(m.noAffiliationTitle),
+									detail: localization.format(m.noAffiliation)
+								}
 							: c.noAccess
-								? localization.format(m.noAccess)
-								: '',
-						c.noAffiliation || c.noAccess ? () => void access.refresh() : undefined
+								? {
+										tone: 'info',
+										title: localization.format(m.noAccessTitle),
+										detail: localization.format(m.noAccess)
+									}
+								: undefined
 					);
 				} else if (access.state?.kind === 'error') {
 					if (
@@ -106,10 +117,12 @@ class ExamActivityContribution extends Disposable {
 						access.state.reason === 'sessionEnded'
 					)
 						navigation.setProductAreas?.([]);
-					navigation.setProductStatus?.(
-						localization.format(m[access.state.reason]),
-						() => void access.refresh()
-					);
+					navigation.setProductStatus?.({
+						tone: 'problem',
+						title: localization.format(m.accessProblem),
+						detail: localization.format(m[access.state.reason]),
+						retry: () => void access.refresh()
+					});
 				}
 			})
 		);

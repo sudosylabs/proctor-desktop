@@ -5,7 +5,7 @@
 import { createElementFactory } from '../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../base/browser/dom.js';
 import { Emitter, type Event } from '../../../base/common/event.js';
-import { Disposable, type IDisposable } from '../../../base/common/lifecycle.js';
+import { Disposable, MutableDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import type { LocalizationContext } from '../../../base/common/localization.js';
 import {
 	createProctorIcon,
@@ -32,8 +32,22 @@ const areaPresentation: Readonly<
 	administration: { icon: 'area.administration', label: 'administrationArea' }
 });
 
+/**
+ * Something about the person or the connection the window wants them to know, shown in the rail
+ * just above the account: a fact, such as having no current affiliation, or a problem reaching
+ * the server, which can offer to try again.
+ */
+export interface RailNotice {
+	readonly tone: 'info' | 'problem';
+	readonly title: string;
+	readonly detail?: string;
+	readonly retry?: { readonly label: string; run(): void };
+}
+
 /** Only the server's normalized WebP rendition is shown as the account photo. */
 const PHOTO_PATTERN = /^data:image\/webp;base64,/u;
+
+let noteSequence = 0;
 
 /**
  * The slim rail on the window material: one entry per available product area and
@@ -48,9 +62,19 @@ export class AreaRail extends Disposable {
 	private readonly areas = new Map<ProductDestination, HTMLButtonElement>();
 	private readonly icons = new Map<ProductDestination, ProctorIconControl>();
 	private readonly account: HTMLButtonElement;
+	private readonly notice: HTMLButtonElement;
+	private readonly noticeIcon: ProctorIconControl;
+	private readonly note: HTMLElement;
+	private readonly noteIcon: ProctorIconControl;
+	private readonly noteTitle: HTMLElement;
+	private readonly noteDetail: HTMLElement;
+	private readonly noteRetry: HTMLButtonElement;
+	private current: RailNotice | undefined;
 	private readonly avatar: HTMLElement;
 	private readonly initials: string;
 	private readonly roving: RovingFocus;
+	private readonly noticeHover: (target: HTMLElement, label: string) => IDisposable;
+	private readonly noticeHoverStore = this._register(new MutableDisposable());
 
 	constructor(
 		host: HTMLElement,
@@ -95,9 +119,44 @@ export class AreaRail extends Disposable {
 			},
 			this.avatar
 		);
-		this.element = $('div.prctr-area-rail', {}, list, this.account);
+		this.noticeIcon = this._register(
+			createProctorIcon(document, { id: 'status.info', size: 20 })
+		);
+		this.notice = $(
+			'button.prctr-area-rail__notice',
+			{
+				type: 'button',
+				hidden: true,
+				attrs: { 'aria-haspopup': 'dialog', 'aria-expanded': 'false' }
+			},
+			this.noticeIcon.element
+		);
+		this.noteIcon = this._register(
+			createProctorIcon(document, { id: 'status.info', size: 18 })
+		);
+		this.noteTitle = $('strong.prctr-area-rail__note-title', {
+			id: `prctr-area-rail-note-${++noteSequence}`
+		});
+		this.noteDetail = $('p.prctr-area-rail__note-detail');
+		this.noteRetry = $('button.prctr-area-rail__note-retry', { type: 'button' });
+		this.note = $(
+			'div.prctr-area-rail__note',
+			{
+				hidden: true,
+				tabIndex: -1,
+				attrs: { role: 'dialog', 'aria-labelledby': this.noteTitle.id }
+			},
+			$(
+				'span.prctr-area-rail__note-icon',
+				{ attrs: { 'aria-hidden': 'true' } },
+				this.noteIcon.element
+			),
+			$('div.prctr-area-rail__note-text', {}, this.noteTitle, this.noteDetail, this.noteRetry)
+		);
+		this.element = $('div.prctr-area-rail', {}, list, this.notice, this.account, this.note);
 		host.append(this.element);
 		this._register(hover(this.account, accountLabel));
+		this.noticeHover = hover;
 		this.roving = this._register(new RovingFocus(this.element));
 		this.registerListeners();
 	}
@@ -119,6 +178,73 @@ export class AreaRail extends Disposable {
 				this.selectEmitter.fire('account');
 			})
 		);
+		this._register(
+			addDisposableListener(this.notice, 'click', () =>
+				this.setNoteOpen(this.note.hidden === true)
+			)
+		);
+		this._register(
+			addDisposableListener(this.noteRetry, 'click', () => {
+				const retry = this.current?.retry;
+				this.setNoteOpen(false);
+				retry?.run();
+			})
+		);
+		this._register(
+			addDisposableListener(this.element.ownerDocument, 'keydown', (event) => {
+				if (event.key !== 'Escape' || this.note.hidden) return;
+				event.stopPropagation();
+				this.setNoteOpen(false);
+				this.notice.focus();
+			})
+		);
+		this._register(
+			addDisposableListener(this.element.ownerDocument, 'pointerdown', (event) => {
+				const target = event.target;
+				if (this.note.hidden || !(target instanceof Node)) return;
+				if (this.note.contains(target) || this.notice.contains(target)) return;
+				this.setNoteOpen(false);
+			})
+		);
+	}
+
+	/** Shows, changes or removes the notice above the account; an open note follows it. */
+	setNotice(notice: RailNotice | undefined): void {
+		this.current = notice;
+		this.notice.hidden = notice === undefined;
+		if (notice === undefined) {
+			this.setNoteOpen(false);
+			this.noticeHoverStore.clear();
+			return;
+		}
+		const icon = notice.tone === 'problem' ? 'status.offline' : 'status.info';
+		this.noticeIcon.setState({ id: icon, size: 20 });
+		this.noteIcon.setState({ id: icon, size: 18 });
+		this.notice.dataset.tone = notice.tone;
+		this.note.dataset.tone = notice.tone;
+		this.notice.setAttribute('aria-label', notice.title);
+		this.noticeHoverStore.value = this.noticeHover(this.notice, notice.title);
+		this.noteTitle.textContent = notice.title;
+		this.noteDetail.textContent = notice.detail ?? '';
+		this.noteDetail.hidden = notice.detail === undefined || notice.detail === '';
+		this.noteRetry.textContent = notice.retry?.label ?? '';
+		this.noteRetry.hidden = notice.retry === undefined;
+	}
+
+	private setNoteOpen(open: boolean): void {
+		if (open === !this.note.hidden) return;
+		this.note.hidden = !open;
+		this.notice.setAttribute('aria-expanded', String(open));
+		if (!open) return;
+		// The note opens beside the rail, its foot level with the notice's.
+		const rail = this.element.getBoundingClientRect();
+		const button = this.notice.getBoundingClientRect();
+		const view = this.element.ownerDocument.defaultView;
+		const height = view?.innerHeight ?? button.bottom;
+		this.note.style.insetInlineStart = `${rail.right + 8}px`;
+		this.note.style.insetBlockEnd = `${Math.max(8, height - button.bottom)}px`;
+		if (!this.noteRetry.hidden) this.noteRetry.focus();
+		else this.note.focus();
 	}
 
 	render(destinations: readonly ProductDestination[], current: AuthenticatedDestination): void {

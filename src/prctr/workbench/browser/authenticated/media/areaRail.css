@@ -104,7 +104,105 @@
 		object-fit: cover;
 	}
 
+	/* A fact about the person or the connection, just above the account. */
+	.prctr-area-rail .prctr-area-rail__notice {
+		align-items: center;
+		background: transparent;
+		block-size: 38px;
+		border: 0;
+		border-radius: 10px;
+		color: var(--prctr-color-text-secondary);
+		cursor: pointer;
+		display: flex;
+		flex: none;
+		inline-size: 38px;
+		justify-content: center;
+		margin-block-start: auto;
+		padding: 0;
+		-webkit-app-region: no-drag;
+	}
+	.prctr-area-rail .prctr-area-rail__notice[hidden],
+	.prctr-area-rail .prctr-area-rail__note[hidden],
+	.prctr-area-rail .prctr-area-rail__note [hidden] {
+		display: none;
+	}
+	.prctr-area-rail .prctr-area-rail__notice:not([hidden]) + .prctr-area-rail__account {
+		margin-block-start: 0;
+	}
+	.prctr-area-rail .prctr-area-rail__notice:hover,
+	.prctr-area-rail .prctr-area-rail__notice[aria-expanded='true'] {
+		background: var(--prctr-color-interaction-hover);
+		color: var(--prctr-color-text-primary);
+	}
+	.prctr-area-rail .prctr-area-rail__notice[data-tone='problem'],
+	.prctr-area-rail .prctr-area-rail__note[data-tone='problem'] .prctr-area-rail__note-icon {
+		color: var(--prctr-color-feedback-error);
+	}
+
+	/* The note it opens, beside the rail, its foot level with the notice. */
+	.prctr-area-rail .prctr-area-rail__note {
+		background: var(--prctr-color-background-raised);
+		border-radius: 10px;
+		box-shadow: var(--prctr-elevation-overlay);
+		box-sizing: border-box;
+		color: var(--prctr-color-text-primary);
+		cursor: default;
+		display: flex;
+		gap: 10px;
+		inline-size: 300px;
+		padding: 12px 14px;
+		position: fixed;
+		z-index: 30;
+		-webkit-app-region: no-drag;
+	}
+	.prctr-area-rail .prctr-area-rail__note:focus-visible {
+		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
+		outline-offset: 2px;
+	}
+	.prctr-area-rail .prctr-area-rail__note-icon {
+		color: var(--prctr-color-text-secondary);
+		display: flex;
+		flex: none;
+		padding-block-start: 1px;
+	}
+	.prctr-area-rail .prctr-area-rail__note-text {
+		display: flex;
+		flex: 1;
+		flex-direction: column;
+		gap: 4px;
+		min-inline-size: 0;
+	}
+	.prctr-area-rail .prctr-area-rail__note-title {
+		font-size: 13.5px;
+		font-weight: var(--prctr-typography-weight-semibold);
+		line-height: 20px;
+	}
+	.prctr-area-rail .prctr-area-rail__note-detail {
+		color: var(--prctr-color-text-secondary);
+		font-size: 13px;
+		line-height: 19px;
+		margin: 0;
+	}
+	.prctr-area-rail .prctr-area-rail__note-retry {
+		align-self: flex-start;
+		background: var(--prctr-color-background-card);
+		block-size: 30px;
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-control);
+		border-radius: 8px;
+		color: var(--prctr-color-text-primary);
+		cursor: pointer;
+		font: inherit;
+		font-size: 13px;
+		margin-block-start: 8px;
+		padding: 0 12px;
+	}
+	.prctr-area-rail .prctr-area-rail__note-retry:hover {
+		background: var(--prctr-color-interaction-hover);
+	}
+
 	.prctr-area-rail .prctr-area-rail__area:focus-visible,
+	.prctr-area-rail .prctr-area-rail__notice:focus-visible,
+	.prctr-area-rail .prctr-area-rail__note-retry:focus-visible,
 	.prctr-area-rail .prctr-area-rail__account:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
 		outline-offset: 1px;

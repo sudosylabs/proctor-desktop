@@ -437,12 +437,26 @@ async function exerciseFrame(document: Document, frame: HTMLIFrameElement): Prom
 			areas().every((button) => button.hidden) && nav().current === 'account',
 			'Losing every area leaves Account'
 		);
-		navigation.setProductStatus('No access is assigned.', () => undefined);
+		navigation.setProductStatus({ tone: 'info', title: 'No access assigned' });
+		const notice = document.querySelector<HTMLButtonElement>('.prctr-area-rail__notice')!;
 		check(
-			sidebar.textContent?.includes('No access is assigned.') &&
-				sidebar.textContent.includes('Refresh access'),
-			'Access notice appears in the sidebar'
+			!notice.hidden &&
+				notice.getAttribute('aria-label') === 'No access assigned' &&
+				!sidebar.textContent?.includes('No access assigned'),
+			'An access fact sits in the rail above the account, not in the sidebar'
 		);
+		notice.click();
+		const note = document.querySelector<HTMLElement>('.prctr-area-rail__note')!;
+		check(
+			!note.hidden &&
+				notice.getAttribute('aria-expanded') === 'true' &&
+				note.querySelector<HTMLElement>('.prctr-area-rail__note-retry')!.hidden,
+			'Its note opens beside the rail, with nothing to press'
+		);
+		key(note, 'Escape');
+		check(note.hidden && document.activeElement === notice, 'Escape closes the note');
+		navigation.setProductStatus(undefined);
+		check(notice.hidden, 'The notice leaves with the fact');
 
 		step('Cmd/Ctrl+K focuses search; a modal blocks frame shortcuts.');
 		key(document.body, 'k', { code: 'KeyK', metaKey: isMacintosh, ctrlKey: !isMacintosh });
