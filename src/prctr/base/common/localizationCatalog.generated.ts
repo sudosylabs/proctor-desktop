@@ -819,6 +819,7 @@ export const englishCatalog: LocalizationCatalog = Object.freeze({
     "administration.mail.delivery.queued": "Queued",
     "administration.mail.delivery.retry": "Retry delivery",
     "administration.mail.delivery.status": "Status",
+    "administration.mail.delivery.status.attempt.one": "{state} after 1 attempt",
     "administration.mail.delivery.status.attempts": "{state} after {count} attempts",
     "administration.mail.delivery.title": "{kind} to {recipient}",
     "administration.mail.open": "Details",

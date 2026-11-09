@@ -5081,6 +5081,14 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.mail.delivery.status.attempt.one": {
+      "message": "{state} after 1 attempt",
+      "description": "A delivery’s state after a single try, as in \"Delivered after 1 attempt\".",
+      "placeholders": [
+        "state"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.mail.delivery.status.attempts": {
       "message": "{state} after {count} attempts",
       "description": "A delivery’s state and how many tries, as in \"Not delivered after 3 attempts\".",

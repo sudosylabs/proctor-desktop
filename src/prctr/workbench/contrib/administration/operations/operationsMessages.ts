@@ -615,5 +615,10 @@ export const operationsMessages = Object.freeze({
 		id: 'administration.mail.delivery.no.problem',
 		defaultMessage: 'Nothing went wrong with this email.',
 		description: 'A delivery without a failure.'
+	}),
+	deliveryStatusAttemptOne: defineMessage({
+		id: 'administration.mail.delivery.status.attempt.one',
+		defaultMessage: '{state} after 1 attempt',
+		description: 'A delivery’s state after a single try, as in "Delivered after 1 attempt".'
 	})
 });

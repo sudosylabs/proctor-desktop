@@ -175,7 +175,7 @@ export class InvitationsPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('invitationsColumnExpires'),
-							width: '12%',
+							width: '120px',
 							align: 'end',
 							priority: 2,
 							cell: (invitation) => ({
