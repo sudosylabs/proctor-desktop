@@ -38,7 +38,12 @@ export function projectData<R extends AdministrationResource>(
 /** One page; the server is asked for at most a page, and a longer answer is refused. */
 export function projectPage<R extends AdministrationResource, T>(
 	resource: R,
-	page: { readonly items: readonly T[]; readonly next_cursor?: string },
+	page: {
+		readonly items: readonly T[];
+		readonly next_cursor?: string;
+		readonly total?: number;
+		readonly total_is_lower_bound?: boolean;
+	},
 	item: (value: T) => Item<R>,
 	extra: Omit<AdministrationValue<R>, 'items' | 'cursor'> = {} as Omit<
 		AdministrationValue<R>,
@@ -49,11 +54,16 @@ export function projectPage<R extends AdministrationResource, T>(
 	return projectData(resource, {
 		...extra,
 		items: page.items.map(item),
-		...(page.next_cursor ? { cursor: page.next_cursor } : {})
+		...(page.next_cursor ? { cursor: page.next_cursor } : {}),
+		...(page.total === undefined
+			? {}
+			: { total: page.total, totalAtLeast: page.total_is_lower_bound === true })
 	} as unknown as AdministrationValue<R>);
 }
 
-export function user(u: Schema<'UserProfileResponse'>): AdministrationValue<'user'> {
+export function user(
+	u: Schema<'UserProfileResponse'> | Schema<'UserDirectoryEntryResponse'>
+): AdministrationValue<'user'> {
 	return {
 		id: u.id,
 		username: u.username,
@@ -69,6 +79,38 @@ export function user(u: Schema<'UserProfileResponse'>): AdministrationValue<'use
 		disabledAt: optionalAt(u.disabled_at),
 		lastLoginAt: optionalAt(u.last_login_at),
 		lastActivityAt: optionalAt(u.last_activity_at)
+	};
+}
+/** The photo the server rendered; anything but WebP is refused. */
+export function userPhoto(value: unknown, etag: string | undefined): AdministrationResponse {
+	if (!(value instanceof Uint8Array)) throw new TypeError('Invalid profile photo');
+	const bytes = Buffer.from(value);
+	if (bytes.toString('ascii', 0, 4) !== 'RIFF' || bytes.toString('ascii', 8, 12) !== 'WEBP')
+		throw new TypeError('Invalid profile photo');
+	return projectData('userPhoto', {
+		dataUrl: `data:image/webp;base64,${bytes.toString('base64')}`,
+		etag: etag ?? ''
+	});
+}
+export function userEntry(u: Schema<'UserDirectoryEntryResponse'>): Item<'users'> {
+	const summary = u.summary;
+	return {
+		...user(u),
+		summary: summary && {
+			affiliations: summary.affiliations.map((affiliation) => ({
+				kind: affiliation.kind,
+				units: affiliation.academic_units.map((unit) => ({ id: unit.id, name: unit.name })),
+				unitsMore: affiliation.academic_units_more
+			})),
+			affiliationsMore: summary.affiliations_more,
+			roles: summary.roles?.map((role) => ({
+				roleId: role.role_id,
+				displayName: role.display_name,
+				scopeType: role.scope_type,
+				scopeName: role.scope_name
+			})),
+			rolesMore: summary.roles_more
+		}
 	};
 }
 export function userSession(s: Schema<'SessionAdministrationResponse'>): Item<'userSessions'> {
@@ -118,13 +160,11 @@ export function invitation(
 	};
 }
 const IMPORT_ROWS = 100;
-export function onboardingImport(
-	i: Schema<'OnboardingImportResponse'>
-): AdministrationValue<'onboardingImport'> {
-	const rows = i.rows ?? [];
+export function importSummary(i: Schema<'OnboardingImportResponse'>): Item<'onboardingImports'> {
 	return {
 		id: i.id,
 		mode: i.mode,
+		fileName: i.file_name,
 		scopeType: i.scope_type,
 		scopeId: i.scope_id,
 		roleId: i.role_id,
@@ -143,6 +183,21 @@ export function onboardingImport(
 		createdAt: at(i.created_at),
 		updatedAt: at(i.updated_at),
 		expiresAt: at(i.expires_at),
+		sourceClassId: i.source_class_id,
+		sourceClassName: i.source_class_name,
+		sourcePeriodId: i.source_period_id,
+		destinationClassId: i.destination_class_id,
+		destinationClassName: i.destination_class_name,
+		destinationPeriodId: i.destination_period_id,
+		effectiveAt: optionalAt(i.effective_at)
+	};
+}
+export function onboardingImport(
+	i: Schema<'OnboardingImportResponse'>
+): AdministrationValue<'onboardingImport'> {
+	const rows = i.rows ?? [];
+	return {
+		...importSummary(i),
 		rows: rows.slice(0, IMPORT_ROWS).map((row) => ({
 			row: row.row,
 			reference: row.reference,
@@ -203,6 +258,25 @@ export function classMember(m: Schema<'ClassMemberResponse'>): Item<'classMember
 		academicPeriodId: m.academic_period_id,
 		startAt: at(m.start_at),
 		endAt: optionalAt(m.end_at)
+	};
+}
+export function unitMember(m: Schema<'AcademicUnitMemberListItemResponse'>): Item<'unitMembers'> {
+	return {
+		id: m.id,
+		userId: m.user_id,
+		unitId: m.academic_unit_id,
+		startAt: at(m.start_at),
+		endAt: optionalAt(m.end_at),
+		user: {
+			displayName: m.user.display_name,
+			username: m.user.username,
+			email: m.user.email
+		},
+		rolesHere: m.roles_here?.map((role) => ({
+			roleId: role.role_id,
+			displayName: role.display_name
+		})),
+		rolesHereMore: m.roles_here_more
 	};
 }
 export function academicPeriod(p: Schema<'AcademicPeriodResponse'>): Item<'academicPeriods'> {
@@ -304,7 +378,8 @@ export function audit(a: Schema<'AuditEventResponse'>): Item<'audits'> {
 		method: a.authentication_method,
 		ipAddress: a.ip_address,
 		userAgent: a.user_agent,
-		errorCode: a.error_code
+		errorCode: a.error_code,
+		reason: a.reason
 	};
 }
 export function retentionPolicy(
@@ -402,7 +477,20 @@ export function job(j: Schema<'JobResponse'>): AdministrationValue<'job'> {
 			stage: j.progress.stage,
 			current: j.progress.current,
 			total: j.progress.total
-		}
+		},
+		createdById: j.created_by_user_id,
+		createdByName: j.created_by_display_name,
+		subject: j.subject
+	};
+}
+export function jobAttempt(a: Schema<'JobAttemptResponse'>): Item<'jobAttempts'> {
+	return {
+		id: a.id,
+		number: a.number,
+		status: a.status,
+		startedAt: at(a.started_at),
+		completedAt: optionalAt(a.completed_at),
+		errorCode: a.public_error_code
 	};
 }
 export function mailDelivery(d: Schema<'MailDeliveryResponse'>): Item<'mailDeliveries'> {
@@ -418,6 +506,26 @@ export function mailDelivery(d: Schema<'MailDeliveryResponse'>): Item<'mailDeliv
 		acceptedAt: optionalAt(d.accepted_at),
 		failedAt: optionalAt(d.failed_at),
 		failureCode: d.public_failure_code
+	};
+}
+export function mailDeliveryDetail(
+	d: Schema<'MailDeliveryResponse'>
+): AdministrationValue<'mailDelivery'> {
+	return { ...mailDelivery(d), targetUserId: d.target_user_id, messageId: d.message_id };
+}
+export function administrationCounts(
+	c: Schema<'AdministrationCountsResponse'>
+): AdministrationValue<'counts'> {
+	const count = (value: number | undefined, atLeast: boolean | undefined) =>
+		value === undefined ? undefined : { count: value, atLeast: atLeast === true };
+	return {
+		pendingInvitations: count(c.pending_invitations, c.pending_invitations_is_lower_bound),
+		failedJobs: count(c.failed_jobs, c.failed_jobs_is_lower_bound),
+		failedMailDeliveries: count(
+			c.failed_mail_deliveries,
+			c.failed_mail_deliveries_is_lower_bound
+		),
+		openImports: count(c.open_onboarding_imports, c.open_onboarding_imports_is_lower_bound)
 	};
 }
 const METRICS = 64;
@@ -483,6 +591,23 @@ export function invitationBatch(b: Schema<'InvitationBatchResponse'>): Administr
 			index: item.index,
 			status: item.status,
 			invitationId: item.invitation_id,
+			errorCode: item.error_code
+		}))
+	};
+	return validateAdministrationResponse({ kind: 'batchResult', result });
+}
+export function academicBatch(
+	b: Schema<'AcademicAdministrationBatchResponse'>
+): AdministrationResponse {
+	const result: AdministrationBatchResult = {
+		operation: b.operation,
+		succeeded: b.succeeded,
+		failed: b.failed,
+		noOp: b.no_op,
+		items: b.items.map((item) => ({
+			index: item.index,
+			status: item.status,
+			resourceId: item.resource_id,
 			errorCode: item.error_code
 		}))
 	};

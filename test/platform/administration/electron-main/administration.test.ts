@@ -142,7 +142,7 @@ void test('administration boundary accepts only exact, bounded intents and freez
 		{ kind: 'searchUsers', limit: 10 },
 		{ kind: 'operation', operationId: 'replaceCurrentUserSettings' },
 		{ kind: 'jobs', limit: 10, status: ['queued', 'queued', 'unknown'] },
-		{ kind: 'disableUser', id, reason: 'extra' },
+		{ kind: 'disableUser', id, note: 'extra' },
 		{ kind: 'createAffiliation', userId: id, affiliation: 'student', startAt: 10, endAt: 10 },
 		{
 			kind: 'resetUserMfa',
@@ -197,7 +197,7 @@ void test('administration replies are closed shapes with at most one page of ite
 	);
 	for (const value of [
 		{ kind: 'data', data: { resource: 'operation', value: {} } },
-		{ kind: 'data', data: { resource: 'affiliations', value: { items: [item], total: 1 } } },
+		{ kind: 'data', data: { resource: 'affiliations', value: { items: [item], count: 1 } } },
 		{
 			kind: 'data',
 			data: { resource: 'affiliations', value: { items: Array(11).fill(item) } }
@@ -300,6 +300,154 @@ void test('reads are whitelist projections bound to one page and one cached quer
 			await h.service.administration({ principalId: other, sessionId: other }, intent),
 			{ kind: 'error', reason: 'sessionEnded' }
 		);
+	} finally {
+		h.dispose();
+	}
+});
+
+void test('the directory carries summaries and totals, and counts leave out what is hidden', async () => {
+	const unit = 'u'.repeat(26);
+	const h = harness((request) => {
+		const route = path(request);
+		if (route.startsWith('GET /api/v1/users?'))
+			return json({
+				items: [
+					userDto({
+						summary: {
+							affiliations: [
+								{
+									kind: 'student',
+									academic_units: [{ id: unit, name: 'Computer Science' }],
+									academic_units_more: 2
+								}
+							],
+							affiliations_more: 0,
+							roles: [
+								{
+									role_id: unit,
+									display_name: 'Teacher',
+									scope_type: 'academic_unit',
+									scope_id: unit,
+									scope_name: 'Computer Science'
+								}
+							],
+							roles_more: 1
+						}
+					})
+				],
+				total: 10000,
+				total_is_lower_bound: true
+			});
+		if (route === 'GET /api/v1/administration/counts')
+			return json({ failed_jobs: 2, failed_jobs_is_lower_bound: false });
+		throw new Error(`Unexpected ${route}`);
+	});
+	try {
+		const users = await h.service.administration(binding, {
+			kind: 'users',
+			affiliation: ['student', 'staff'],
+			academicUnitId: unit,
+			limit: 10
+		});
+		assert.equal(
+			path(h.requests[0]!),
+			`GET /api/v1/users?affiliation=student&affiliation=staff&academic_unit_id=${unit}&limit=10`
+		);
+		assert.ok(users.kind === 'data' && users.data.resource === 'users');
+		assert.equal(users.data.value.total, 10000);
+		assert.equal(users.data.value.totalAtLeast, true);
+		assert.deepEqual(users.data.value.items[0]!.summary, {
+			affiliations: [
+				{
+					kind: 'student',
+					units: [{ id: unit, name: 'Computer Science' }],
+					unitsMore: 2
+				}
+			],
+			affiliationsMore: 0,
+			roles: [
+				{
+					roleId: unit,
+					displayName: 'Teacher',
+					scopeType: 'academic_unit',
+					scopeName: 'Computer Science'
+				}
+			],
+			rolesMore: 1
+		});
+		assert.deepEqual(await h.service.administration(binding, { kind: 'counts' }), {
+			kind: 'data',
+			data: { resource: 'counts', value: { failedJobs: { count: 2, atLeast: false } } }
+		});
+	} finally {
+		h.dispose();
+	}
+});
+
+void test('a disable sends its reason, and academic batches carry a key and per-item results', async () => {
+	const h = harness((request) => {
+		const route = path(request);
+		if (route === `POST /api/v1/users/${id}/disable`) return json(userDto({ disabled_at: at }));
+		if (route === 'POST /api/v1/academic-administration-batches')
+			return json({
+				operation: 'class.enroll',
+				succeeded: 1,
+				failed: 1,
+				no_op: 0,
+				items: [
+					{ index: 0, status: 'succeeded', resource_id: other },
+					{
+						index: 1,
+						status: 'failed',
+						error_code: 'class_member.student_affiliation_required'
+					}
+				]
+			});
+		throw new Error(`Unexpected ${route}`);
+	});
+	try {
+		assert.deepEqual(
+			await h.service.administration(binding, {
+				kind: 'disableUser',
+				id,
+				reason: 'Left the programme.'
+			}),
+			{ kind: 'success' }
+		);
+		assert.deepEqual(JSON.parse(String(h.requests[0]!.body)), {
+			reason: 'Left the programme.'
+		});
+		assert.throws(() =>
+			validateAdministrationIntent({ kind: 'disableUser', id, reason: 'x'.repeat(501) })
+		);
+		const result = await h.service.administration(binding, {
+			kind: 'runAcademicBatch',
+			operation: 'class.enroll',
+			scopeType: 'class',
+			scopeId: other,
+			items: [
+				{ key: 'a', userId: id },
+				{ key: 'b', userId: other }
+			]
+		});
+		assert.match(h.requests[1]!.headers?.['Idempotency-Key'] ?? '', /^[A-Za-z0-9_-]{43}$/u);
+		assert.deepEqual(result, {
+			kind: 'batchResult',
+			result: {
+				operation: 'class.enroll',
+				succeeded: 1,
+				failed: 1,
+				noOp: 0,
+				items: [
+					{ index: 0, status: 'succeeded', resourceId: other },
+					{
+						index: 1,
+						status: 'failed',
+						errorCode: 'class_member.student_affiliation_required'
+					}
+				]
+			}
+		});
 	} finally {
 		h.dispose();
 	}

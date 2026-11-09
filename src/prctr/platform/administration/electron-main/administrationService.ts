@@ -54,6 +54,22 @@ export interface AdministrationSessionPort {
 export const administrationOperations: ReadonlySet<ApiOperationId> = new Set<ApiOperationId>([
 	'searchUsers',
 	'getUserProfile',
+	'getUserProfilePicture',
+	'uploadUserProfilePicture',
+	'removeUserProfilePicture',
+	'runAcademicAdministrationBatch',
+	'getAdministrationCounts',
+	'listOnboardingImports',
+	'listStudentProgressions',
+	'getStudentProgression',
+	'dryRunStudentProgression',
+	'cancelStudentProgression',
+	'commitStudentProgression',
+	'listAcademicUnitMembers',
+	'createAcademicUnitMember',
+	'endAcademicUnitMember',
+	'listJobAttempts',
+	'getMailDelivery',
 	'updateUserProfile',
 	'disableUser',
 	'enableUser',
@@ -186,7 +202,11 @@ interface Route<I extends RoutedKind> {
 function route<I extends RoutedKind, K extends ApiOperationId>(
 	operation: K,
 	input: (intent: AdministrationIntentOf<I>, idempotencyKey: string) => ApiInput<K>,
-	project: (value: Success<K>, intent: AdministrationIntentOf<I>) => AdministrationResponse
+	project: (
+		value: Success<K>,
+		intent: AdministrationIntentOf<I>,
+		headers: Readonly<Record<string, string>>
+	) => AdministrationResponse
 ): Route<I> {
 	return {
 		operation,
@@ -194,7 +214,7 @@ function route<I extends RoutedKind, K extends ApiOperationId>(
 			const result = await api.request(operation, input(intent, idempotencyKey), {
 				signal
 			});
-			return project(result.value as Success<K>, intent);
+			return project(result.value as Success<K>, intent, result.headers ?? {});
 		}
 	};
 }
@@ -216,6 +236,9 @@ const key = (idempotencyKey: string) => ({ 'Idempotency-Key': idempotencyKey });
 const period = (intent: { readonly startAt?: number; readonly endAt?: number }) => ({
 	start_at: iso(intent.startAt),
 	end_at: iso(intent.endAt)
+});
+const expiry = (intent: { readonly expiresInDays?: number }) => ({
+	expires_in_days: intent.expiresInDays
 });
 const naming = (intent: {
 	readonly name?: string;
@@ -239,8 +262,58 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 	// Users
 	users: route(
 		'searchUsers',
-		(i) => ({ query: { ...page(i), q: i.q, include_disabled: i.includeDisabled } }),
-		(v) => wire.projectPage('users', v, wire.user)
+		(i) => ({
+			query: {
+				...page(i),
+				q: i.q,
+				include_disabled: i.includeDisabled,
+				affiliation: i.affiliation && [...i.affiliation],
+				academic_unit_id: i.academicUnitId
+			}
+		}),
+		(v) => wire.projectPage('users', v, wire.userEntry)
+	),
+	userPhoto: route(
+		'getUserProfilePicture',
+		(i) => ({ path: { user_id: i.userId }, query: { size: 256 as const } }),
+		(v, _i, headers) => wire.userPhoto(v, headers.etag)
+	),
+	replaceUserPhoto: route(
+		'uploadUserProfilePicture',
+		(i) => ({
+			path: { user_id: i.userId },
+			...(i.etag === undefined ? {} : { header: { 'If-Match': i.etag } }),
+			body: i.image,
+			mediaType: i.mediaType
+		}),
+		success
+	),
+	removeUserPhoto: route(
+		'removeUserProfilePicture',
+		(i) => ({ path: { user_id: i.userId }, header: { 'If-Match': i.etag } }),
+		success
+	),
+	runAcademicBatch: route(
+		'runAcademicAdministrationBatch',
+		(i, k) => ({
+			header: key(k),
+			body: {
+				operation: i.operation,
+				scope_type: i.scopeType,
+				scope_id: i.scopeId,
+				items: i.items.map((item) =>
+					body({
+						key: item.key,
+						user_id: item.userId,
+						relationship_id: item.relationshipId,
+						role_id: item.roleId,
+						affiliation_kind: item.affiliationKind,
+						...period(item)
+					})
+				)
+			}
+		}),
+		(v) => wire.academicBatch(v)
 	),
 	user: route(
 		'getUserProfile',
@@ -275,7 +348,11 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		}),
 		success
 	),
-	disableUser: route('disableUser', (i) => ({ path: { user_id: i.id } }), success),
+	disableUser: route(
+		'disableUser',
+		(i) => ({ path: { user_id: i.id }, body: { reason: i.reason ?? '' } }),
+		success
+	),
 	enableUser: route('enableUser', (i) => ({ path: { user_id: i.id } }), success),
 	revokeUserSessions: route(
 		'revokeUserSessions',
@@ -338,7 +415,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		'issueInstitutionRoleInvitation',
 		(i) => ({
 			path: { institution_id: i.institutionId },
-			body: body({ email: i.email, role_id: i.roleId, ...period(i) })
+			body: body({ email: i.email, role_id: i.roleId, ...period(i), ...expiry(i) })
 		}),
 		(v) => created(v.id)
 	),
@@ -346,7 +423,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		'issueAcademicUnitRoleInvitation',
 		(i) => ({
 			path: { academic_unit_id: i.unitId },
-			body: body({ email: i.email, role_id: i.roleId, ...period(i) })
+			body: body({ email: i.email, role_id: i.roleId, ...period(i), ...expiry(i) })
 		}),
 		(v) => created(v.id)
 	),
@@ -354,7 +431,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		'issueTeacherAcademicUnitInvitation',
 		(i) => ({
 			path: { academic_unit_id: i.unitId },
-			body: body({ email: i.email, role_id: i.roleId, ...period(i) })
+			body: body({ email: i.email, role_id: i.roleId, ...period(i), ...expiry(i) })
 		}),
 		(v) => created(v.id)
 	),
@@ -362,7 +439,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		'issueStudentClassInvitation',
 		(i) => ({
 			path: { class_id: i.classId },
-			body: body({ email: i.email, ...period(i) })
+			body: body({ email: i.email, ...period(i), ...expiry(i) })
 		}),
 		(v) => created(v.id)
 	),
@@ -381,7 +458,8 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 						role_id: item.roleId,
 						invitation_id: item.invitationId,
 						expected_revision: item.expectedRevision,
-						...period(item)
+						...period(item),
+						...expiry(item)
 					})
 				)
 			}
@@ -400,7 +478,8 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 				institution_id: i.institutionId,
 				academic_unit_id: i.academicUnitId,
 				class_id: i.classId,
-				...period(i)
+				...period(i),
+				...expiry(i)
 			})
 		}),
 		(v) => created(v.id)
@@ -421,6 +500,55 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		}),
 		success
 	),
+	onboardingImports: route(
+		'listOnboardingImports',
+		(i) => ({ query: { ...page(i), state: i.state && [...i.state] } }),
+		(v) => wire.projectPage('onboardingImports', v, wire.importSummary)
+	),
+	studentProgressions: route(
+		'listStudentProgressions',
+		(i) => ({
+			query: {
+				...page(i),
+				state: i.state && [...i.state],
+				source_class_id: i.sourceClassId,
+				destination_class_id: i.destinationClassId
+			}
+		}),
+		(v) => wire.projectPage('studentProgressions', v, wire.importSummary)
+	),
+	studentProgression: route(
+		'getStudentProgression',
+		(i) => ({ path: { student_progression_id: i.id } }),
+		(v) => wire.projectData('studentProgression', wire.onboardingImport(v))
+	),
+	checkProgression: route(
+		'dryRunStudentProgression',
+		(i) => ({
+			body: {
+				source_period_id: i.sourcePeriodId,
+				source_class_id: i.sourceClassId,
+				destination_period_id: i.destinationPeriodId,
+				destination_class_id: i.destinationClassId,
+				effective_at: iso(i.effectiveAt)!
+			}
+		}),
+		(v) => created(v.id)
+	),
+	cancelProgression: route(
+		'cancelStudentProgression',
+		(i) => ({ path: { student_progression_id: i.id } }),
+		success
+	),
+	commitProgression: route(
+		'commitStudentProgression',
+		(i, k) => ({
+			path: { student_progression_id: i.id },
+			header: key(k),
+			body: { expected_revision: i.expectedRevision, preview_digest: i.previewDigest }
+		}),
+		success
+	),
 	onboardingImport: route(
 		'getOnboardingImport',
 		(i) => ({ path: { onboarding_import_id: i.id } }),
@@ -433,7 +561,8 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 				mode: i.mode,
 				scope_type: i.scopeType,
 				scope_id: i.scopeId,
-				role_id: i.roleId
+				role_id: i.roleId,
+				file_name: i.fileName
 			},
 			body: i.csv,
 			mediaType: 'text/csv'
@@ -612,6 +741,27 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		(i) => ({ path: { class_id: i.id }, body: { expected_revision: i.expectedRevision } }),
 		success
 	),
+	unitMembers: route(
+		'listAcademicUnitMembers',
+		(i) => ({
+			path: { academic_unit_id: i.unitId },
+			query: { ...page(i), history: i.history }
+		}),
+		(v) => wire.projectPage('unitMembers', v, wire.unitMember)
+	),
+	addUnitMember: route(
+		'createAcademicUnitMember',
+		(i) => ({
+			path: { academic_unit_id: i.unitId },
+			body: body({ user_id: i.userId, start_at: iso(i.startAt) })
+		}),
+		(v) => created(v.id)
+	),
+	endUnitMember: route(
+		'endAcademicUnitMember',
+		(i) => ({ path: { academic_unit_member_id: i.id } }),
+		success
+	),
 	classMembers: route(
 		'listClassMembers',
 		(i) => ({ path: { class_id: i.classId }, query: { ...page(i), history: i.history } }),
@@ -765,7 +915,9 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 				// The contract's request validation refuses a name outside its catalogue.
 				action: i.action as AuditAction | undefined,
 				resource_type: i.resourceType as ResourceType | undefined,
-				resource_id: i.resourceId
+				resource_id: i.resourceId,
+				created_after: iso(i.createdAfter),
+				created_before: iso(i.createdBefore)
 			}
 		}),
 		(v) => wire.projectPage('audits', v, wire.audit)
@@ -838,6 +990,11 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		(i) => ({ path: { job_id: i.id } }),
 		(v) => wire.projectData('job', wire.job(v))
 	),
+	jobAttempts: route(
+		'listJobAttempts',
+		(i) => ({ path: { job_id: i.jobId }, query: page(i) }),
+		(v) => wire.projectPage('jobAttempts', v, wire.jobAttempt)
+	),
 	cancelJob: route('cancelJob', (i) => ({ path: { job_id: i.id } }), success),
 	retryJob: route('retryJob', (i) => ({ path: { job_id: i.id } }), success),
 	// Mail and MFA keys
@@ -845,6 +1002,16 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		'listMailDeliveries',
 		(i) => ({ query: { ...page(i), state: i.state && [...i.state] } }),
 		(v) => wire.projectPage('mailDeliveries', v, wire.mailDelivery)
+	),
+	mailDelivery: route(
+		'getMailDelivery',
+		(i) => ({ path: { mail_delivery_id: i.id } }),
+		(v) => wire.projectData('mailDelivery', wire.mailDeliveryDetail(v))
+	),
+	counts: route(
+		'getAdministrationCounts',
+		() => ({}),
+		(v) => wire.projectData('counts', wire.administrationCounts(v))
 	),
 	mailMetrics: route(
 		'getMailMetrics',
@@ -919,6 +1086,10 @@ const collections = new Set<AdministrationIntent['kind']>([
 	'programmeLevels',
 	'levelClasses',
 	'classMembers',
+	'unitMembers',
+	'onboardingImports',
+	'studentProgressions',
+	'jobAttempts',
 	'academicPeriods',
 	'roles',
 	'roleBindings',

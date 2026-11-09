@@ -19,7 +19,7 @@ import {
  * operation: a refusal is an answer, never a hint that something exists.
  */
 export const ADMINISTRATION_CHANNEL = 'prctr:authenticated:administration';
-/** Items on one page of an administration list. The server reports no totals. */
+/** Items on one page of an administration list. */
 export const ADMINISTRATION_PAGE_SIZE = 10;
 
 // #region Field language
@@ -67,6 +67,18 @@ interface ScalarValues {
 	readonly batchKey: string;
 	/** A CSV file of at most 10 MiB. */
 	readonly csv: Uint8Array;
+	/** Why an administrator did something, up to 500 characters; only line breaks are allowed. */
+	readonly reason: string;
+	/** How many days an invitation stays open: 1 to 30. */
+	readonly expiryDays: number;
+	/** The name of a file the person chose: 1 to 255 characters, no control characters. */
+	readonly fileName: string;
+	/** The strong revision of one profile photo. */
+	readonly etag: string;
+	/** A PNG, JPEG or WebP image of at most 5 MiB. */
+	readonly image: Uint8Array;
+	/** A profile photo the server rendered, as a WebP data URL. */
+	readonly photo: string;
 }
 interface ListField {
 	readonly list: Field;
@@ -106,7 +118,8 @@ const scalarPatterns: Partial<Record<ScalarField, RegExp>> = {
 	buildId: /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u,
 	release: /^[0-9A-Za-z][0-9A-Za-z.+-]{0,63}$/u,
 	batchKey: /^[A-Za-z0-9._~-]{1,128}$/u,
-	email: /^[^\s@\u0000-\u001f\u007f]{1,64}@[^\s@\u0000-\u001f\u007f]{1,189}$/u
+	email: /^[^\s@\u0000-\u001f\u007f]{1,64}@[^\s@\u0000-\u001f\u007f]{1,189}$/u,
+	etag: /^"[a-f0-9]{64}"$/u
 };
 function typed(value: unknown, limit: number, allowLineBreaks = false): string {
 	if (
@@ -157,6 +170,31 @@ function readScalar(kind: ScalarField, value: unknown): unknown {
 		}
 		case 'description':
 			return typed(value, 2048, true);
+		case 'reason':
+			return typed(value, 500, true);
+		case 'expiryDays':
+			return integer(value, 1, 30);
+		case 'fileName': {
+			const name = typed(value, 255);
+			if (name.length === 0) throw new TypeError('Invalid administration file name');
+			return name;
+		}
+		case 'image':
+			if (
+				!(value instanceof Uint8Array) ||
+				value.byteLength < 1 ||
+				value.byteLength > 5 * 1024 * 1024
+			)
+				throw new TypeError('Invalid administration image');
+			return value.slice();
+		case 'photo':
+			if (
+				typeof value !== 'string' ||
+				value.length > 3 * 1024 * 1024 ||
+				!/^data:image\/webp;base64,[A-Za-z0-9+/]+={0,2}$/u.test(value)
+			)
+				throw new TypeError('Invalid administration photo');
+			return value;
 		case 'search': {
 			const search = typed(value, 100);
 			if (search.length === 0) throw new TypeError('Invalid administration search');
@@ -325,6 +363,36 @@ export const mailHealth = [
 	'mail.queue_delayed'
 ] as const;
 export const batchItemStates = ['succeeded', 'no_op', 'failed'] as const;
+export const academicBatchOperations = [
+	'affiliation.add',
+	'affiliation.end',
+	'academic_unit_member.add',
+	'academic_unit_member.end',
+	'class.enroll',
+	'class.end',
+	'class.transfer',
+	'role_binding.create',
+	'role_binding.end',
+	'user.enable',
+	'user.disable',
+	'user_sessions.revoke'
+] as const;
+export const jobAttemptStates = [
+	'running',
+	'succeeded',
+	'failed',
+	'canceled',
+	'lease_expired',
+	'incompatible'
+] as const;
+export const photoMediaTypes = ['image/png', 'image/jpeg', 'image/webp'] as const;
+/** The counts the sidebar badges show; each is left out when the person can't list it. */
+export const administrationCounts = [
+	'pendingInvitations',
+	'failedJobs',
+	'failedMailDeliveries',
+	'openImports'
+] as const;
 
 // #endregion
 
@@ -334,6 +402,7 @@ const page = { cursor: { optional: 'cursor' }, limit: 'pageLimit' } as const;
 const byId = { id: 'id' } as const;
 const revised = { id: 'id', expectedRevision: 'count' } as const;
 const period = { startAt: { optional: 'instant' }, endAt: { optional: 'instant' } } as const;
+const expiry = { expiresInDays: { optional: 'expiryDays' } } as const;
 const naming = {
 	name: 'label',
 	displayName: 'label',
@@ -360,8 +429,15 @@ const accessSettings = {
 
 /** One read per resource, with its exact filters. */
 export const administrationReads = {
-	users: { ...page, q: { optional: 'search' }, includeDisabled: { optional: 'flag' } },
+	users: {
+		...page,
+		q: { optional: 'search' },
+		includeDisabled: { optional: 'flag' },
+		affiliation: { optional: { list: affiliationKinds, max: affiliationKinds.length } },
+		academicUnitId: { optional: 'id' }
+	},
 	user: byId,
+	userPhoto: { userId: 'id' },
 	userSessions: { ...page, userId: 'id', includeRevoked: { optional: 'flag' } },
 	affiliations: { ...page, userId: 'id' },
 	invitations: {
@@ -372,10 +448,22 @@ export const administrationReads = {
 		targetId: { optional: 'id' }
 	},
 	invitation: byId,
+	onboardingImports: {
+		...page,
+		state: { optional: { list: importStates, max: importStates.length } }
+	},
 	onboardingImport: byId,
+	studentProgressions: {
+		...page,
+		state: { optional: { list: importStates, max: importStates.length } },
+		sourceClassId: { optional: 'id' },
+		destinationClassId: { optional: 'id' }
+	},
+	studentProgression: byId,
 	institution: {},
 	academicUnits: { ...page, q: { optional: 'search' } },
 	unitChildren: { ...page, unitId: 'id' },
+	unitMembers: { ...page, unitId: 'id', history: { optional: 'flag' } },
 	unitClasses: { ...page, unitId: 'id', q: { optional: 'search' } },
 	unitProgrammes: { ...page, unitId: 'id', q: { optional: 'search' } },
 	programmeLevels: { ...page, programmeId: 'id', q: { optional: 'search' } },
@@ -397,7 +485,9 @@ export const administrationReads = {
 		actorId: { optional: 'id' },
 		action: { optional: 'code' },
 		resourceType: { optional: 'code' },
-		resourceId: { optional: 'id' }
+		resourceId: { optional: 'id' },
+		createdAfter: { optional: 'instant' },
+		createdBefore: { optional: 'instant' }
 	},
 	retentionPolicy: {},
 	retentionControl: {},
@@ -405,11 +495,14 @@ export const administrationReads = {
 	retentionRecords: page,
 	jobs: { ...page, status: { optional: { list: jobStates, max: jobStates.length } } },
 	job: byId,
+	jobAttempts: { ...page, jobId: 'id' },
 	mailDeliveries: {
 		...page,
 		state: { optional: { list: mailDeliveryStates, max: mailDeliveryStates.length } }
 	},
+	mailDelivery: byId,
 	mailMetrics: {},
+	counts: {},
 	mfaKeys: {},
 	mailKeys: {},
 	mfaRekey: { jobId: 'id' },
@@ -428,7 +521,7 @@ export const administrationChanges = {
 		locale: { optional: 'code' },
 		timezone: { optional: 'code' }
 	},
-	disableUser: byId,
+	disableUser: { id: 'id', reason: { optional: 'reason' } },
 	enableUser: byId,
 	revokeUserSessions: { userId: 'id' },
 	revokeUserSession: { userId: 'id', sessionId: 'id' },
@@ -442,11 +535,42 @@ export const administrationChanges = {
 	verifyUserEmail: { userId: 'id' },
 	createAffiliation: { userId: 'id', affiliation: affiliationKinds, ...period },
 	endAffiliation: byId,
+	replaceUserPhoto: {
+		userId: 'id',
+		image: 'image',
+		mediaType: photoMediaTypes,
+		etag: { optional: 'etag' }
+	},
+	removeUserPhoto: { userId: 'id', etag: 'etag' },
+	runAcademicBatch: {
+		operation: academicBatchOperations,
+		scopeType: invitationScopeTypes,
+		scopeId: 'id',
+		items: {
+			list: {
+				shape: {
+					key: 'batchKey',
+					userId: { optional: 'id' },
+					relationshipId: { optional: 'id' },
+					roleId: { optional: 'id' },
+					affiliationKind: { optional: ['student', 'teacher', 'staff'] },
+					...period
+				}
+			},
+			max: 200
+		}
+	},
 	// Invitations and onboarding imports
-	inviteToInstitution: { institutionId: 'id', email: 'email', roleId: 'id', ...period },
-	inviteToUnit: { unitId: 'id', email: 'email', roleId: 'id', ...period },
-	inviteTeacher: { unitId: 'id', email: 'email', roleId: 'id', ...period },
-	inviteStudent: { classId: 'id', email: 'email', ...period },
+	inviteToInstitution: {
+		institutionId: 'id',
+		email: 'email',
+		roleId: 'id',
+		...period,
+		...expiry
+	},
+	inviteToUnit: { unitId: 'id', email: 'email', roleId: 'id', ...period, ...expiry },
+	inviteTeacher: { unitId: 'id', email: 'email', roleId: 'id', ...period, ...expiry },
+	inviteStudent: { classId: 'id', email: 'email', ...period, ...expiry },
 	runInvitationBatch: {
 		operation: invitationBatchOperations,
 		scopeType: invitationScopeTypes,
@@ -459,7 +583,8 @@ export const administrationChanges = {
 					roleId: { optional: 'id' },
 					invitationId: { optional: 'id' },
 					expectedRevision: { optional: 'count' },
-					...period
+					...period,
+					...expiry
 				}
 			},
 			max: 200
@@ -473,7 +598,8 @@ export const administrationChanges = {
 		institutionId: { optional: 'id' },
 		academicUnitId: { optional: 'id' },
 		classId: { optional: 'id' },
-		...period
+		...period,
+		...expiry
 	},
 	resendInvitation: revised,
 	revokeInvitation: revised,
@@ -482,10 +608,20 @@ export const administrationChanges = {
 		scopeType: invitationScopeTypes,
 		scopeId: 'id',
 		roleId: { optional: 'id' },
+		fileName: { optional: 'fileName' },
 		csv: 'csv'
 	},
 	cancelImport: byId,
 	commitImport: { ...revised, policy: importCommitPolicies, previewDigest: 'digest' },
+	checkProgression: {
+		sourcePeriodId: 'id',
+		sourceClassId: 'id',
+		destinationPeriodId: 'id',
+		destinationClassId: 'id',
+		effectiveAt: 'instant'
+	},
+	cancelProgression: byId,
+	commitProgression: { ...revised, previewDigest: 'digest' },
 	// Academic structure
 	updateInstitution: renaming,
 	createRootUnit: naming,
@@ -508,6 +644,8 @@ export const administrationChanges = {
 	archiveClass: revised,
 	enrollClassMember: { classId: 'id', userId: 'id', ...period },
 	endClassMember: byId,
+	addUnitMember: { unitId: 'id', userId: 'id', startAt: { optional: 'instant' } },
+	endUnitMember: byId,
 	createAcademicPeriod: {
 		ownerType: periodOwnerTypes,
 		ownerId: 'id',
@@ -624,7 +762,11 @@ export function validateAdministrationIntent(value: unknown): AdministrationInte
 function pageOf<S extends Shape>(item: S) {
 	return {
 		items: { list: { shape: item }, max: ADMINISTRATION_PAGE_SIZE },
-		cursor: { optional: 'cursor' }
+		cursor: { optional: 'cursor' },
+		/** On a first page only: how many items the whole list holds, at most 10,000. */
+		total: { optional: 'count' },
+		/** The list holds at least `total` items. */
+		totalAtLeast: { optional: 'flag' }
 	} as const;
 }
 const userShape = {
@@ -642,6 +784,39 @@ const userShape = {
 	disabledAt: { optional: 'instant' },
 	lastLoginAt: { optional: 'instant' },
 	lastActivityAt: { optional: 'instant' }
+} as const;
+/** A person's current affiliations and roles, as the Users list shows them. */
+const userSummaryShape = {
+	affiliations: {
+		list: {
+			shape: {
+				kind: affiliationKinds,
+				units: { list: { shape: { id: 'id', name: 'text' } }, max: 2 },
+				unitsMore: 'count'
+			}
+		},
+		max: 3
+	},
+	affiliationsMore: 'count',
+	/** Left out when the person can't see role grants. */
+	roles: {
+		optional: {
+			list: {
+				shape: {
+					roleId: 'id',
+					displayName: 'text',
+					scopeType: invitationScopeTypes,
+					scopeName: 'text'
+				}
+			},
+			max: 3
+		}
+	},
+	rolesMore: { optional: 'count' }
+} as const;
+const userEntryShape = {
+	...userShape,
+	summary: { optional: { shape: userSummaryShape } }
 } as const;
 const userSessionShape = {
 	id: 'id',
@@ -690,9 +865,10 @@ const invitationShape = {
 		}
 	}
 } as const;
-const importShape = {
+const importSummaryShape = {
 	id: 'id',
 	mode: [...importModes, 'student_progression'],
+	fileName: { optional: 'text' },
 	scopeType: invitationScopeTypes,
 	scopeId: 'id',
 	roleId: { optional: 'id' },
@@ -711,6 +887,17 @@ const importShape = {
 	createdAt: 'instant',
 	updatedAt: 'instant',
 	expiresAt: 'instant',
+	/** A progression's classes and the day students move on. */
+	sourceClassId: { optional: 'id' },
+	sourceClassName: { optional: 'text' },
+	sourcePeriodId: { optional: 'id' },
+	destinationClassId: { optional: 'id' },
+	destinationClassName: { optional: 'text' },
+	destinationPeriodId: { optional: 'id' },
+	effectiveAt: { optional: 'instant' }
+} as const;
+const importShape = {
+	...importSummaryShape,
 	/** The first rows of the preview or report. */
 	rows: {
 		list: {
@@ -748,6 +935,21 @@ const classMemberShape = {
 	academicPeriodId: 'id',
 	startAt: 'instant',
 	endAt: { optional: 'instant' }
+} as const;
+const unitMemberShape = {
+	id: 'id',
+	userId: 'id',
+	unitId: 'id',
+	startAt: 'instant',
+	endAt: { optional: 'instant' },
+	user: {
+		shape: { displayName: 'text', username: 'text', email: { optional: 'text' } }
+	},
+	/** Left out when the person can't see role grants in the unit. */
+	rolesHere: {
+		optional: { list: { shape: { roleId: 'id', displayName: 'text' } }, max: 5 }
+	},
+	rolesHereMore: { optional: 'count' }
 } as const;
 const periodShape = {
 	...structured,
@@ -788,7 +990,9 @@ const auditShape = {
 	method: { optional: 'text' },
 	ipAddress: { optional: 'text' },
 	userAgent: { optional: 'text' },
-	errorCode: { optional: 'text' }
+	errorCode: { optional: 'text' },
+	/** Why an account was disabled; only institution-wide readers see it. */
+	reason: { optional: 'longText' }
 } as const;
 const retentionCounts = {
 	total: 'count',
@@ -810,7 +1014,19 @@ const jobShape = {
 	startedAt: { optional: 'instant' },
 	completedAt: { optional: 'instant' },
 	errorCode: { optional: 'text' },
-	progress: { optional: { shape: { stage: 'text', current: 'count', total: 'count' } } }
+	progress: { optional: { shape: { stage: 'text', current: 'count', total: 'count' } } },
+	createdById: { optional: 'id' },
+	createdByName: { optional: 'text' },
+	/** What the job works on, such as an exam's title. */
+	subject: { optional: 'text' }
+} as const;
+const jobAttemptShape = {
+	id: 'id',
+	number: 'count',
+	status: jobAttemptStates,
+	startedAt: 'instant',
+	completedAt: { optional: 'instant' },
+	errorCode: { optional: 'code' }
 } as const;
 const mailDeliveryShape = {
 	id: 'id',
@@ -825,6 +1041,12 @@ const mailDeliveryShape = {
 	failedAt: { optional: 'instant' },
 	failureCode: { optional: 'text' }
 } as const;
+const mailDeliveryDetailShape = {
+	...mailDeliveryShape,
+	targetUserId: 'id',
+	messageId: 'text'
+} as const;
+const countShape = { optional: { shape: { count: 'count', atLeast: 'flag' } } } as const;
 const rekeyShape = {
 	jobId: 'id',
 	status: jobStates,
@@ -840,16 +1062,21 @@ const rekeyShape = {
 
 /** What each read answers, plus the access policy preflight. */
 export const administrationResources = {
-	users: pageOf(userShape),
+	users: pageOf(userEntryShape),
 	user: userShape,
+	userPhoto: { dataUrl: 'photo', etag: 'etag' },
 	userSessions: pageOf(userSessionShape),
 	affiliations: pageOf(affiliationShape),
 	invitations: pageOf(invitationShape),
 	invitation: invitationShape,
+	onboardingImports: pageOf(importSummaryShape),
 	onboardingImport: importShape,
+	studentProgressions: pageOf(importSummaryShape),
+	studentProgression: importShape,
 	institution: { ...named, archivedAt: { optional: 'instant' } },
 	academicUnits: pageOf(unitShape),
 	unitChildren: pageOf(unitShape),
+	unitMembers: pageOf(unitMemberShape),
 	unitClasses: pageOf(classShape),
 	unitProgrammes: pageOf(programmeShape),
 	programmeLevels: pageOf(levelShape),
@@ -954,7 +1181,12 @@ export const administrationResources = {
 	},
 	jobs: pageOf(jobShape),
 	job: jobShape,
+	jobAttempts: pageOf(jobAttemptShape),
 	mailDeliveries: pageOf(mailDeliveryShape),
+	mailDelivery: mailDeliveryDetailShape,
+	counts: Object.fromEntries(administrationCounts.map((name) => [name, countShape])) as {
+		readonly [N in (typeof administrationCounts)[number]]: typeof countShape;
+	},
 	mailMetrics: {
 		health: mailHealth,
 		queues: {
@@ -1004,7 +1236,7 @@ export type AdministrationData = {
 }[AdministrationResource];
 
 const batchResultShape = {
-	operation: invitationBatchOperations,
+	operation: [...invitationBatchOperations, ...academicBatchOperations],
 	succeeded: 'count',
 	failed: 'count',
 	noOp: 'count',
@@ -1014,6 +1246,8 @@ const batchResultShape = {
 				index: 'count',
 				status: batchItemStates,
 				invitationId: { optional: 'id' },
+				/** What an academic change created or ended. */
+				resourceId: { optional: 'id' },
 				errorCode: { optional: 'code' }
 			}
 		},
