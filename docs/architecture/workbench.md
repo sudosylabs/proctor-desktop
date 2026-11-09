@@ -244,9 +244,34 @@ sidebar lists Overview and the activity categories, and a chosen exam shows in
 the page's own detail panel. Only explicitly released candidate remarks are
 displayed; withheld review state and private manager content are absent. Enter
 and Resume remain unavailable until the production secure participation
-composition is connected. Exams and Administration currently identify their
-unavailable desktop functionality and show the bounded management-scope summary;
-they do not expose unfinished management actions.
+composition is connected. Exams currently identifies its unavailable desktop
+functionality and shows the bounded management-scope summary; it does not expose
+unfinished management actions.
+
+Administration is its own contribution, `workbench/contrib/administration`. Its
+sidebar groups Overview, People (Users, Invitations, Imports), Organisation
+(Structure, Academic periods), Access (Roles, Access policy), Records (Audits,
+Data retention) and Operations (Jobs, Mail). A record's page (one user, one
+import, one class) carries the record's id in the navigation location and keeps
+its list marked in the sidebar. The server's product areas decide only whether
+the area appears; the server has no endpoint that lists what a person may do, so
+every page is shown and each read or change the server refuses reads as a calm
+state without a retry. Lists are paged by the server ten at a time with Previous
+and Next by cursor and show no total, because the server gives none. A change
+that needs a recent sign-in runs Confirm it's you and is sent again; one that
+needs two-step verification says so.
+
+The privileged capability behind it, `platform/administration`, allows only a
+literal set of server operations and calls them through the typed operation
+client (`apiForSession(binding).request(operationId, input)`) rather than the
+transitional path allow-list, adds an `Idempotency-Key` where the contract
+requires one, and maps refusals to `noAccess` and `strongRequired`.
+
+Every area's pages are built from the shell page parts in
+`workbench/browser/authenticated/pages`: `PagePane` (heading, description, trail,
+status, actions, scrolling body, row menu and toasts), `PageSection`, `PageRead`,
+`PageDialog`, `PageFeedback` and `ConfirmItsYouDialog`. A contribution supplies
+its failure wording and, for Confirm it's you, its reauthentication port.
 
 Back and forward retrace places visited in this window, skipping areas no longer
 available. The sidebar is resizable from 200 to 320px with a keyboard-operable

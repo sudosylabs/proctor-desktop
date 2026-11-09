@@ -57,8 +57,16 @@ preview is not the visual acceptance surface.
 
 ### Page layout
 
-- A page's content is one centred column, at most 760px wide (880px for
-  history), with 40px side padding. A wide window adds margin, not line length.
+- A page's content is one centred column, at most 760px wide (880px for pages
+  built around a table), with 40px side padding. A wide window adds margin, not
+  line length.
+- A record's page (one user, one class) opens with a trail back to its list,
+  then the record's name with initials for a person and a status word beside
+  it.
+- A table in a card puts column labels in the quiet text colour, hairlines
+  between rows, people as initials with a name and one detail line, status as a
+  coloured dot and word, and one "⋯" menu per row. A bar of search and select
+  filters sits above it.
 - Sections are grouped lists on `color.background.card`: 10px radius, a
   hairline boundary and no shadow. A row is a small glyph, its title and one
   detail line, then either a status word or one "⋯" actions menu. The current
@@ -81,9 +89,11 @@ Every section uses one states pattern:
 - an empty section is one plain sentence, plus its action when there is one;
 - offline, actions are disabled rather than hidden.
 
-Every read ends with an answer, a failure or the deadline: `AccountRead` owns
-the deadline, and the observation bridge delivers a failure response rather
-than dropping an answer.
+Every read ends with an answer, a failure or the deadline: `PageRead` in
+`workbench/browser/authenticated/pages` owns the deadline for every area, and the
+observation bridge delivers a failure response rather than dropping an answer. A
+refusal shows its sentence without Try again, since trying again cannot change
+it.
 
 ### Proctor controls
 
@@ -103,7 +113,8 @@ LaunchWindow and AuthenticatedWindow use the Proctor-owned controls in
   result of an action, bottom right, one at a time, on the window's own theme
   surface; success closes after 5 s and failure stays until dismissed. Tooltips
   are the one inverse surface.
-- `PagerControl` sits at the foot of any list that can hold more than ten items:
+- `PagerControl` sits at the foot of any list that can hold more than ten items
+  (a list the server pages shows the rows' range without a total):
   ten a page, Previous and Next, the first, last, current and neighbouring page
   numbers with gaps, and the current page in the accent colour without a fill.
   Without a known total it numbers the pages reached so far. Narrow lists show

@@ -191,6 +191,15 @@ scoped-role, and system-administration responsibilities remain separately
 authorized and may overlap with student activity. Desktop presents the available
 product areas without deriving exclusivity or permission from an affiliation.
 
+Account and Administration changes the server guards with a recent sign-in are
+confirmed in the system browser: main starts a Desktop reauthentication against
+the server-returned same-origin page, waits for its loopback callback, completes
+it with the PKCE verifier, and refreshes the same Desktop Session's recency
+without issuing a new Session. The renderer only asks for it and may cancel it;
+the change is then sent again. A change that needs a multi-factor Session
+(`authentication.strong_required`) is reported as such and never retried, and
+Personal Access Tokens never reach these operations.
+
 Refresh is single-flight. Ambiguous credential rotation enters
 `verificationRequired` rather than replaying an old credential. Security-related
 connection closure triggers authoritative verification. Sign-out immediately
