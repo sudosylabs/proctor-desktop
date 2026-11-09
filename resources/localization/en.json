@@ -6100,6 +6100,140 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.policy.blocker.mfa": {
+      "message": "two-step verification is off on this server",
+      "description": "Why the change can’t be applied: the server has two-step verification turned off.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.blocker.other": {
+      "message": "the server refused it ({code})",
+      "description": "Why the change can’t be applied, for a reason the desktop doesn’t know yet.",
+      "placeholders": [
+        "code"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.day.one": {
+      "message": "1 day",
+      "description": "A session length of one day.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.days": {
+      "message": "{count} days",
+      "description": "A session length in days.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.effect.confirm": {
+      "message": "Apply changes",
+      "description": "Confirms the access policy change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.effect.sessions": {
+      "message": "{count} staff sessions without a second step end.",
+      "description": "What requiring two-step does to open sessions.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.effect.shorter": {
+      "message": "Open sessions get the shorter length too.",
+      "description": "What shortening a session length does.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.effect.staff": {
+      "message": "{count} staff must set up two-step verification before they can open Proctor.",
+      "description": "What requiring two-step does to staff without it.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.effect.title": {
+      "message": "Apply this access policy?",
+      "description": "Confirms an access policy change that affects people.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.hour.one": {
+      "message": "1 hour",
+      "description": "A session length of one hour.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.hours": {
+      "message": "{count} hours",
+      "description": "A session length in hours.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.minutes": {
+      "message": "{count} minutes",
+      "description": "A session length in minutes.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.session.absolute": {
+      "message": "Longest session",
+      "description": "Access policy choice: the most a sign-in lasts, active or not.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.session.absolute.description": {
+      "message": "After this, everyone signs in again, however active they are.",
+      "description": "Explains the overall session length.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.session.default": {
+      "message": "Default · {length}",
+      "description": "The deployment’s default session length, as in \"Default · 12 hours\".",
+      "placeholders": [
+        "length"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.session.idle": {
+      "message": "Session ends after inactivity",
+      "description": "Access policy choice: how long a sign-in lasts without activity.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.session.idle.description": {
+      "message": "How long someone can be away before signing in again.",
+      "description": "Explains the idle session length.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.staff.mfa": {
+      "message": "Two-step required for staff",
+      "description": "Access policy switch: everyone who holds a role must use two-step verification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.staff.mfa.description": {
+      "message": "Anyone who holds a role, anywhere, signs in with a second step.",
+      "description": "Explains the staff two-step switch.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
+    "administration.policy.staff.mfa.waiting": {
+      "message": "Two-step verification is off on this server, so this waits until it’s turned on.",
+      "description": "Shown when the rule is on but the server can’t enforce it yet.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
+    },
     "administration.progression.checked": {
       "message": "Checked {when}",
       "description": "Under a progression: when the server checked who moves.",
@@ -9830,6 +9964,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
+    "launch.checks.detail.twostep": {
+      "message": "Two-step verification needed",
+      "description": "Sign-in needs the person to set up two-step verification first.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
     "launch.checks.detail.unavailable": {
       "message": "Temporarily unavailable",
       "description": "Server temporarily unavailable.",
@@ -10342,6 +10482,18 @@
     "launch.status.timedout.body": {
       "message": "It may be busy, or your connection may be slow. Retry in a moment.",
       "description": "Next step after a timeout.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.twostep": {
+      "message": "Set up two-step verification to continue",
+      "description": "The institution requires two-step verification and the person has none.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
+    },
+    "launch.status.twostep.body": {
+      "message": "Your institution requires it for staff. Proctor opened your account’s security page in your browser; set it up there, then sign in again.",
+      "description": "Next step when two-step verification must be set up before signing in.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },

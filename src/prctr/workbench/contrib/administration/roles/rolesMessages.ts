@@ -373,5 +373,109 @@ export const rolesMessages = Object.freeze({
 		id: 'administration.access.desktop.saved',
 		defaultMessage: 'The Proctor Desktop policy is saved',
 		description: 'Toast after saving the Desktop compatibility policy.'
+	}),
+	policyStaffMfa: defineMessage({
+		id: 'administration.policy.staff.mfa',
+		defaultMessage: 'Two-step required for staff',
+		description:
+			'Access policy switch: everyone who holds a role must use two-step verification.'
+	}),
+	policyStaffMfaDescription: defineMessage({
+		id: 'administration.policy.staff.mfa.description',
+		defaultMessage: 'Anyone who holds a role, anywhere, signs in with a second step.',
+		description: 'Explains the staff two-step switch.'
+	}),
+	policyStaffMfaWaiting: defineMessage({
+		id: 'administration.policy.staff.mfa.waiting',
+		defaultMessage:
+			'Two-step verification is off on this server, so this waits until it’s turned on.',
+		description: 'Shown when the rule is on but the server can’t enforce it yet.'
+	}),
+	policySessionIdle: defineMessage({
+		id: 'administration.policy.session.idle',
+		defaultMessage: 'Session ends after inactivity',
+		description: 'Access policy choice: how long a sign-in lasts without activity.'
+	}),
+	policySessionIdleDescription: defineMessage({
+		id: 'administration.policy.session.idle.description',
+		defaultMessage: 'How long someone can be away before signing in again.',
+		description: 'Explains the idle session length.'
+	}),
+	policySessionAbsolute: defineMessage({
+		id: 'administration.policy.session.absolute',
+		defaultMessage: 'Longest session',
+		description: 'Access policy choice: the most a sign-in lasts, active or not.'
+	}),
+	policySessionAbsoluteDescription: defineMessage({
+		id: 'administration.policy.session.absolute.description',
+		defaultMessage: 'After this, everyone signs in again, however active they are.',
+		description: 'Explains the overall session length.'
+	}),
+	policySessionDefault: defineMessage({
+		id: 'administration.policy.session.default',
+		defaultMessage: 'Default · {length}',
+		description: 'The deployment’s default session length, as in "Default · 12 hours".'
+	}),
+	policyMinutes: defineMessage({
+		id: 'administration.policy.minutes',
+		defaultMessage: '{count} minutes',
+		description: 'A session length in minutes.'
+	}),
+	policyHours: defineMessage({
+		id: 'administration.policy.hours',
+		defaultMessage: '{count} hours',
+		description: 'A session length in hours.'
+	}),
+	policyHourOne: defineMessage({
+		id: 'administration.policy.hour.one',
+		defaultMessage: '1 hour',
+		description: 'A session length of one hour.'
+	}),
+	policyDays: defineMessage({
+		id: 'administration.policy.days',
+		defaultMessage: '{count} days',
+		description: 'A session length in days.'
+	}),
+	policyDayOne: defineMessage({
+		id: 'administration.policy.day.one',
+		defaultMessage: '1 day',
+		description: 'A session length of one day.'
+	}),
+	policyBlockerMfa: defineMessage({
+		id: 'administration.policy.blocker.mfa',
+		defaultMessage: 'two-step verification is off on this server',
+		description:
+			'Why the change can’t be applied: the server has two-step verification turned off.'
+	}),
+	policyBlockerOther: defineMessage({
+		id: 'administration.policy.blocker.other',
+		defaultMessage: 'the server refused it ({code})',
+		description: 'Why the change can’t be applied, for a reason the desktop doesn’t know yet.'
+	}),
+	policyEffectTitle: defineMessage({
+		id: 'administration.policy.effect.title',
+		defaultMessage: 'Apply this access policy?',
+		description: 'Confirms an access policy change that affects people.'
+	}),
+	policyEffectStaff: defineMessage({
+		id: 'administration.policy.effect.staff',
+		defaultMessage:
+			'{count} staff must set up two-step verification before they can open Proctor.',
+		description: 'What requiring two-step does to staff without it.'
+	}),
+	policyEffectSessions: defineMessage({
+		id: 'administration.policy.effect.sessions',
+		defaultMessage: '{count} staff sessions without a second step end.',
+		description: 'What requiring two-step does to open sessions.'
+	}),
+	policyEffectShorter: defineMessage({
+		id: 'administration.policy.effect.shorter',
+		defaultMessage: 'Open sessions get the shorter length too.',
+		description: 'What shortening a session length does.'
+	}),
+	policyEffectConfirm: defineMessage({
+		id: 'administration.policy.effect.confirm',
+		defaultMessage: 'Apply changes',
+		description: 'Confirms the access policy change.'
 	})
 });

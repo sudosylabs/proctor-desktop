@@ -367,7 +367,19 @@ export class DesktopAuthorizationService extends Disposable {
 					}
 				);
 			}
-			return parseTokens(result, nonce);
+			try {
+				return parseTokens(result, nonce);
+			} catch (error) {
+				// The institution requires two-step verification first; its own page sets it up.
+				if (
+					error instanceof DesktopAuthorizationError &&
+					error.reason === 'twoStepSetupRequired'
+				)
+					await this.options
+						.openBrowser(new URL('/account/security', identity.origin).href)
+						.catch(() => undefined);
+				throw error;
+			}
 		} finally {
 			this.#pendingSignInPage = undefined;
 			await listener.stop();

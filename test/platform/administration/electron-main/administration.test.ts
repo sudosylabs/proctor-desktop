@@ -453,6 +453,49 @@ void test('a disable sends its reason, and academic batches carry a key and per-
 	}
 });
 
+void test('the access policy sends the two-step rule and session lengths, null keeping a default', async () => {
+	const h = harness((request) => {
+		assert.equal(path(request), 'POST /api/v1/access-policy/preflight');
+		return json({
+			blockers: [{ code: 'mfa_unavailable' }],
+			role_holders_without_mfa_count: 14,
+			role_holder_single_factor_session_count: 41
+		});
+	});
+	try {
+		const result = await h.service.administration(binding, {
+			kind: 'preflightAccessPolicy',
+			expectedRevision: 3,
+			localLogin: true,
+			publicRegistration: false,
+			invitationAdmission: true,
+			invitationLocalCredential: true,
+			desktopAuthorization: true,
+			providerAdmissions: [],
+			roleHolderMfaRequired: true,
+			sessionIdleMinutes: 720,
+			revokeExistingSessions: false
+		});
+		const sent = JSON.parse(String(h.requests[0]!.body)) as Record<string, unknown>;
+		assert.equal(sent.role_holder_mfa_required, true);
+		assert.equal(sent.session_idle_minutes, 720);
+		assert.equal(sent.session_absolute_minutes, null);
+		assert.deepEqual(result, {
+			kind: 'data',
+			data: {
+				resource: 'accessPolicyPreflight',
+				value: {
+					blockers: [{ code: 'mfa_unavailable' }],
+					roleHoldersWithoutMfa: 14,
+					singleFactorSessions: 41
+				}
+			}
+		});
+	} finally {
+		h.dispose();
+	}
+});
+
 void test('changes that the contract deduplicates send a fresh key and reuse it on the retry', async () => {
 	let failFirst = true;
 	const h = harness((request) => {

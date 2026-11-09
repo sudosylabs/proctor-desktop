@@ -252,6 +252,11 @@ const signInFailures: Readonly<
 		detail: checks.keyStorage,
 		head: status.keyStorageHead,
 		body: status.keyStorageBody
+	},
+	twoStepSetupRequired: {
+		detail: checks.twoStepSetup,
+		head: status.twoStepHead,
+		body: status.twoStepBody
 	}
 };
 

@@ -9,6 +9,8 @@ export class DesktopAuthorizationError extends Error {
 			| 'rejected'
 			| 'verificationRequired'
 			| 'storageUnavailable'
+			/** The institution requires two-step verification and the person has none yet. */
+			| 'twoStepSetupRequired'
 	) {
 		super(`Desktop authorization ${reason}`);
 		this.name = 'DesktopAuthorizationError';

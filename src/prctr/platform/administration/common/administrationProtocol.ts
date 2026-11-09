@@ -71,6 +71,8 @@ interface ScalarValues {
 	readonly reason: string;
 	/** How many days an invitation stays open: 1 to 30. */
 	readonly expiryDays: number;
+	/** A session length in minutes: 1 to 527,040, a leap year. */
+	readonly minutes: number;
 	/** The name of a file the person chose: 1 to 255 characters, no control characters. */
 	readonly fileName: string;
 	/** The strong revision of one profile photo. */
@@ -174,6 +176,8 @@ function readScalar(kind: ScalarField, value: unknown): unknown {
 			return typed(value, 500, true);
 		case 'expiryDays':
 			return integer(value, 1, 30);
+		case 'minutes':
+			return integer(value, 1, 527040);
 		case 'fileName': {
 			const name = typed(value, 255);
 			if (name.length === 0) throw new TypeError('Invalid administration file name');
@@ -320,13 +324,17 @@ export const accessPolicyFields = [
 	'invitation_local_credential_enabled',
 	'desktop_authorization_enabled',
 	'provider_admissions',
+	'role_holder_mfa_required',
+	'session_idle_minutes',
+	'session_absolute_minutes',
 	'revoke_existing_sessions'
 ] as const;
 export const accessPolicyBlockers = [
 	'provider_unavailable',
 	'provider_admission_unsupported',
 	'invitation_delivery_unavailable',
-	'last_system_administrator_path'
+	'last_system_administrator_path',
+	'mfa_unavailable'
 ] as const;
 export const desktopAvailabilities = ['ready', 'maintenance'] as const;
 export const retentionControlStates = ['disabled', 'enabled', 'paused'] as const;
@@ -424,6 +432,11 @@ const accessSettings = {
 		list: { shape: { providerId: 'code', mode: providerAdmissionModes } },
 		max: 64
 	},
+	/** Everyone who holds a role must sign in with two-step verification. */
+	roleHolderMfaRequired: 'flag',
+	/** Left out to keep the deployment's default. */
+	sessionIdleMinutes: { optional: 'minutes' },
+	sessionAbsoluteMinutes: { optional: 'minutes' },
 	revokeExistingSessions: 'flag'
 } as const;
 
@@ -1045,6 +1058,8 @@ const mailDeliveryDetailShape = {
 	...mailDeliveryShape,
 	/** Left out for an email to an invitee who has no account yet. */
 	targetUserId: { optional: 'id' },
+	/** Present instead of the user for an email to an invitee. */
+	targetInvitationId: { optional: 'id' },
 	messageId: 'longText'
 } as const;
 const countShape = { optional: { shape: { count: 'count', atLeast: 'flag' } } } as const;
@@ -1095,6 +1110,16 @@ export const administrationResources = {
 		invitationLocalCredential: 'flag',
 		desktopAuthorization: 'flag',
 		durableMail: 'flag',
+		roleHolderMfaRequired: 'flag',
+		/** False while two-step verification is off on the server, so the rule waits. */
+		roleHolderMfaEnforced: 'flag',
+		/** Absent while the deployment's default applies. */
+		sessionIdleMinutes: { optional: 'count' },
+		sessionIdleDefault: 'count',
+		sessionIdleMaximum: 'count',
+		sessionAbsoluteMinutes: { optional: 'count' },
+		sessionAbsoluteDefault: 'count',
+		sessionAbsoluteMaximum: 'count',
 		providers: {
 			list: { shape: { id: 'code', displayName: 'text', type: 'text' } },
 			max: 64
@@ -1110,7 +1135,7 @@ export const administrationResources = {
 					toRevision: 'count',
 					changedAt: 'instant',
 					actorId: 'id',
-					changedFields: { list: accessPolicyFields, max: accessPolicyFields.length }
+					changedFields: { list: 'code', max: 32 }
 				}
 			},
 			max: 100
@@ -1119,9 +1144,11 @@ export const administrationResources = {
 	},
 	accessPolicyPreflight: {
 		blockers: {
-			list: { shape: { code: accessPolicyBlockers, providerId: { optional: 'code' } } },
+			list: { shape: { code: 'code', providerId: { optional: 'code' } } },
 			max: 66
-		}
+		},
+		roleHoldersWithoutMfa: 'count',
+		singleFactorSessions: 'count'
 	},
 	desktopCompatibility: {
 		revision: 'count',

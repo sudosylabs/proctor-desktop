@@ -255,6 +255,9 @@ const accessSettings = (intent: Omit<AdministrationIntentOf<'replaceAccessPolicy
 	provider_admissions: Object.fromEntries(
 		intent.providerAdmissions.map((admission) => [admission.providerId, admission.mode])
 	),
+	role_holder_mfa_required: intent.roleHolderMfaRequired,
+	session_idle_minutes: intent.sessionIdleMinutes ?? null,
+	session_absolute_minutes: intent.sessionAbsoluteMinutes ?? null,
 	revoke_existing_sessions: intent.revokeExistingSessions
 });
 

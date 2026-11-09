@@ -54,7 +54,17 @@ export function errorCode(result: DesktopHttpResult): string | undefined {
  * used was accepted, so it stays current until a challenge says otherwise.
  */
 export function parseTokens(result: DesktopHttpResult, requestNonce: string): DesktopTokens {
-	if (result.status !== 200) throw new DesktopAuthorizationError('rejected');
+	if (result.status !== 200) {
+		const problem = result.value;
+		if (
+			typeof problem === 'object' &&
+			problem !== null &&
+			(problem as { readonly code?: unknown }).code ===
+				'authentication.mfa.enrollment_required'
+		)
+			throw new DesktopAuthorizationError('twoStepSetupRequired');
+		throw new DesktopAuthorizationError('rejected');
+	}
 	const body = record(result.value);
 	const session = record(body.session);
 	const tokens = record(body.tokens);

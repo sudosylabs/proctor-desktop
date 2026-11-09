@@ -321,6 +321,14 @@ export function accessPolicy(
 		invitationLocalCredential: p.invitation_local_credential_enabled,
 		desktopAuthorization: p.desktop_authorization_enabled,
 		durableMail: p.durable_mail,
+		roleHolderMfaRequired: p.role_holder_mfa_required,
+		roleHolderMfaEnforced: p.role_holder_mfa_enforced,
+		sessionIdleMinutes: p.session_idle_minutes ?? undefined,
+		sessionIdleDefault: p.session_idle_minutes_default,
+		sessionIdleMaximum: p.session_idle_minutes_maximum,
+		sessionAbsoluteMinutes: p.session_absolute_minutes ?? undefined,
+		sessionAbsoluteDefault: p.session_absolute_minutes_default,
+		sessionAbsoluteMaximum: p.session_absolute_minutes_maximum,
 		providers: p.available_providers.map((provider) => ({
 			id: provider.id,
 			displayName: provider.display_name,
@@ -347,7 +355,9 @@ export function accessPolicyPreflight(
 		blockers: p.blockers.map((blocker) => ({
 			code: blocker.code,
 			providerId: blocker.provider_id
-		}))
+		})),
+		roleHoldersWithoutMfa: p.role_holders_without_mfa_count,
+		singleFactorSessions: p.role_holder_single_factor_session_count
 	};
 }
 export function desktopCompatibility(
@@ -511,7 +521,12 @@ export function mailDelivery(d: Schema<'MailDeliveryResponse'>): Item<'mailDeliv
 export function mailDeliveryDetail(
 	d: Schema<'MailDeliveryResponse'>
 ): AdministrationValue<'mailDelivery'> {
-	return { ...mailDelivery(d), targetUserId: d.target_user_id, messageId: d.message_id };
+	return {
+		...mailDelivery(d),
+		targetUserId: d.target_user_id,
+		targetInvitationId: d.target_invitation_id,
+		messageId: d.message_id
+	};
 }
 export function administrationCounts(
 	c: Schema<'AdministrationCountsResponse'>

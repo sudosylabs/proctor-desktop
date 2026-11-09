@@ -291,6 +291,11 @@ export const checklistMessages = Object.freeze({
 		defaultMessage: 'Not accepted',
 		description: 'Server rejected sign-in.'
 	}),
+	twoStepSetup: defineMessage({
+		id: 'launch.checks.detail.twostep',
+		defaultMessage: 'Two-step verification needed',
+		description: 'Sign-in needs the person to set up two-step verification first.'
+	}),
 	sessionNotVerified: defineMessage({
 		id: 'launch.checks.detail.sessionnotverified',
 		defaultMessage: 'Sign in again',
@@ -533,6 +538,17 @@ export const statusMessages = Object.freeze({
 		id: 'launch.status.rejected.body',
 		defaultMessage: 'Try again.',
 		description: 'Next step after rejection.'
+	}),
+	twoStepHead: defineMessage({
+		id: 'launch.status.twostep',
+		defaultMessage: 'Set up two-step verification to continue',
+		description: 'The institution requires two-step verification and the person has none.'
+	}),
+	twoStepBody: defineMessage({
+		id: 'launch.status.twostep.body',
+		defaultMessage:
+			'Your institution requires it for staff. Proctor opened your account’s security page in your browser; set it up there, then sign in again.',
+		description: 'Next step when two-step verification must be set up before signing in.'
 	}),
 	keyStorageHead: defineMessage({
 		id: 'launch.status.keystorage',

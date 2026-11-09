@@ -61,7 +61,8 @@ export interface LaunchIdentityProjection {
 		| 'unavailable'
 		| 'rejected'
 		| 'verificationRequired'
-		| 'storageUnavailable';
+		| 'storageUnavailable'
+		| 'twoStepSetupRequired';
 }
 
 export type LaunchIdentityIntent =
@@ -127,7 +128,8 @@ export function validateLaunchIdentityProjection(value: unknown): LaunchIdentity
 				'unavailable',
 				'rejected',
 				'verificationRequired',
-				'storageUnavailable'
+				'storageUnavailable',
+				'twoStepSetupRequired'
 			].includes(value.authorizationFailure as string))
 	)
 		throw new TypeError('Invalid authorization failure');

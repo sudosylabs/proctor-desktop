@@ -29,7 +29,7 @@ import { PageSection } from '../../../browser/authenticated/pages/pageSection.js
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { readableCode } from '../common/administrationPresentation.js';
-import { AdminChanges } from '../widgets/adminChanges.js';
+import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { renderDetails } from '../widgets/adminDetails.js';
 import { AdminFormDialog } from '../widgets/adminFormDialog.js';
 import { adminRead } from '../widgets/adminReads.js';
@@ -52,8 +52,16 @@ interface Draft {
 	invitationLocalCredential: boolean;
 	desktopAuthorization: boolean;
 	admissions: Map<string, Mode>;
+	roleHolderMfaRequired: boolean;
+	/** Undefined keeps the deployment's default. */
+	sessionIdleMinutes: number | undefined;
+	sessionAbsoluteMinutes: number | undefined;
 	revokeExistingSessions: boolean;
 }
+
+const DEFAULT = 'default';
+const IDLE_MINUTES = [15, 30, 60, 120, 240, 480, 720] as const;
+const ABSOLUTE_MINUTES = [240, 480, 720, 1440, 4320, 10080, 43200] as const;
 
 const FLAGS: readonly {
 	readonly flag: Flag;
@@ -181,6 +189,9 @@ export class PolicyPage extends Disposable implements PageView {
 			admissions: new Map(
 				policy.providerAdmissions.map((admission) => [admission.providerId, admission.mode])
 			),
+			roleHolderMfaRequired: policy.roleHolderMfaRequired,
+			sessionIdleMinutes: policy.sessionIdleMinutes,
+			sessionAbsoluteMinutes: policy.sessionAbsoluteMinutes,
 			revokeExistingSessions: false
 		};
 	}
@@ -190,6 +201,12 @@ export class PolicyPage extends Disposable implements PageView {
 		const draft = this.draft;
 		if (policy === undefined || draft === undefined) return false;
 		if (FLAGS.some(({ flag }) => draft[flag] !== policy[flag])) return true;
+		if (
+			draft.roleHolderMfaRequired !== policy.roleHolderMfaRequired ||
+			draft.sessionIdleMinutes !== policy.sessionIdleMinutes ||
+			draft.sessionAbsoluteMinutes !== policy.sessionAbsoluteMinutes
+		)
+			return true;
 		const current = new Map(
 			policy.providerAdmissions.map((admission) => [admission.providerId, admission.mode])
 		);
@@ -256,6 +273,47 @@ export class PolicyPage extends Disposable implements PageView {
 							})
 						);
 					})
+				),
+				row(
+					this.format.text('policyStaffMfa'),
+					policy.roleHolderMfaRequired && !policy.roleHolderMfaEnforced
+						? this.format.text('policyStaffMfaWaiting')
+						: this.format.text('policyStaffMfaDescription'),
+					(host) => {
+						const toggle = this.controls.add(
+							new SwitchControl(host, {
+								label: this.format.text('policyStaffMfa'),
+								on: draft.roleHolderMfaRequired,
+								disabled: this.working
+							})
+						);
+						this.controls.add(
+							toggle.onDidChange((on) => {
+								draft.roleHolderMfaRequired = on;
+								this.updateButtons();
+							})
+						);
+					}
+				),
+				this.lengthRow(
+					row,
+					'policySessionIdle',
+					'policySessionIdleDescription',
+					IDLE_MINUTES,
+					policy.sessionIdleDefault,
+					policy.sessionIdleMaximum,
+					() => draft.sessionIdleMinutes,
+					(minutes) => (draft.sessionIdleMinutes = minutes)
+				),
+				this.lengthRow(
+					row,
+					'policySessionAbsolute',
+					'policySessionAbsoluteDescription',
+					ABSOLUTE_MINUTES,
+					policy.sessionAbsoluteDefault,
+					policy.sessionAbsoluteMaximum,
+					() => draft.sessionAbsoluteMinutes,
+					(minutes) => (draft.sessionAbsoluteMinutes = minutes)
 				)
 			)
 		);
@@ -330,6 +388,71 @@ export class PolicyPage extends Disposable implements PageView {
 		this.updateButtons();
 	}
 
+	/** A session length chosen from presets up to the server's maximum, or its default. */
+	private lengthRow(
+		row: (
+			title: string,
+			description: string,
+			control: (host: HTMLElement) => void
+		) => HTMLElement,
+		title: AdministrationText,
+		description: AdministrationText,
+		presets: readonly number[],
+		fallback: number,
+		maximum: number,
+		value: () => number | undefined,
+		set: (minutes: number | undefined) => void
+	): HTMLElement {
+		const current = value();
+		const lengths = [
+			...new Set([
+				...presets.filter((minutes) => minutes <= maximum),
+				...(current ? [current] : [])
+			])
+		].sort((a, b) => a - b);
+		return row(this.format.text(title), this.format.text(description), (host) => {
+			const select = this.controls.add(
+				new SelectControl<string>(host, {
+					label: this.format.text(title),
+					value: current === undefined ? DEFAULT : String(current),
+					caret: proctorIconFactory('action.expand', 14),
+					choices: [
+						{
+							value: DEFAULT,
+							label: this.format.text('policySessionDefault', {
+								length: this.length(fallback)
+							})
+						},
+						...lengths.map((minutes) => ({
+							value: String(minutes),
+							label: this.length(minutes)
+						}))
+					],
+					disabled: this.working
+				})
+			);
+			this.controls.add(
+				select.onDidChange((choice) => {
+					set(choice === DEFAULT ? undefined : Number(choice));
+					this.updateButtons();
+				})
+			);
+		});
+	}
+
+	/** "30 minutes", "12 hours", "7 days". */
+	private length(minutes: number): string {
+		if (minutes % 1440 === 0)
+			return minutes === 1440
+				? this.format.text('policyDayOne')
+				: this.format.text('policyDays', { count: this.format.count(minutes / 1440) });
+		if (minutes % 60 === 0)
+			return minutes === 60
+				? this.format.text('policyHourOne')
+				: this.format.text('policyHours', { count: this.format.count(minutes / 60) });
+		return this.format.text('policyMinutes', { count: this.format.count(minutes) });
+	}
+
 	private updateButtons(): void {
 		const changed = this.changed();
 		if (changed && !this.working)
@@ -367,6 +490,13 @@ export class PolicyPage extends Disposable implements PageView {
 				providerId,
 				mode
 			})),
+			roleHolderMfaRequired: draft.roleHolderMfaRequired,
+			...(draft.sessionIdleMinutes === undefined
+				? {}
+				: { sessionIdleMinutes: draft.sessionIdleMinutes }),
+			...(draft.sessionAbsoluteMinutes === undefined
+				? {}
+				: { sessionAbsoluteMinutes: draft.sessionAbsoluteMinutes }),
 			revokeExistingSessions: draft.revokeExistingSessions
 		};
 	}
@@ -415,12 +545,77 @@ export class PolicyPage extends Disposable implements PageView {
 				});
 			return;
 		}
+		const effects = this.effects(
+			check.kind === 'data' && check.data.resource === 'accessPolicyPreflight'
+				? check.data.value
+				: undefined
+		);
+		if (effects.length > 0) {
+			this.finish();
+			this.dialog.value = this.instantiationService.createInstance(
+				AdminConfirmation,
+				{
+					title: this.format.text('policyEffectTitle'),
+					message: effects.join(' '),
+					confirmLabel: this.format.text('policyEffectConfirm'),
+					confirmIcon: 'action.confirm',
+					destructive: false,
+					run: () =>
+						this.changes.send({ kind: 'replaceAccessPolicy', ...settings }, summary),
+					onDidComplete: (result) => this.applied(result)
+				},
+				() => this.apply.focus()
+			);
+			return;
+		}
 		const result = await this.changes.send(
 			{ kind: 'replaceAccessPolicy', ...settings },
 			summary
 		);
 		if (this._store.isDisposed) return;
 		this.finish();
+		this.applied(result);
+	}
+
+	/** What the change does to people, in sentences, from the server's preflight. */
+	private effects(preflight: AdministrationValue<'accessPolicyPreflight'> | undefined): string[] {
+		const policy = this.policy.data;
+		const draft = this.draft;
+		if (preflight === undefined || policy === undefined || draft === undefined) return [];
+		const effects: string[] = [];
+		if (draft.roleHolderMfaRequired && !policy.roleHolderMfaRequired) {
+			if (preflight.roleHoldersWithoutMfa > 0)
+				effects.push(
+					this.format.text('policyEffectStaff', {
+						count: this.format.count(preflight.roleHoldersWithoutMfa)
+					})
+				);
+			if (preflight.singleFactorSessions > 0)
+				effects.push(
+					this.format.text('policyEffectSessions', {
+						count: this.format.count(preflight.singleFactorSessions)
+					})
+				);
+		}
+		const shorter = (next: number | undefined, now: number | undefined, fallback: number) =>
+			(next ?? fallback) < (now ?? fallback);
+		if (
+			shorter(
+				draft.sessionIdleMinutes,
+				policy.sessionIdleMinutes,
+				policy.sessionIdleDefault
+			) ||
+			shorter(
+				draft.sessionAbsoluteMinutes,
+				policy.sessionAbsoluteMinutes,
+				policy.sessionAbsoluteDefault
+			)
+		)
+			effects.push(this.format.text('policyEffectShorter'));
+		return effects;
+	}
+
+	private applied(result: AdministrationResponse | 'busy'): void {
 		if (result !== 'busy' && result.kind !== 'error') {
 			this.draft = undefined;
 			this.pane.toast(this.format.text('policyApplied'));
@@ -453,7 +648,10 @@ export class PolicyPage extends Disposable implements PageView {
 			return this.format.text('policyBlockerAdmission', { provider });
 		if (code === 'invitation_delivery_unavailable')
 			return this.format.text('policyBlockerMail');
-		return this.format.text('policyBlockerAdmin');
+		if (code === 'mfa_unavailable') return this.format.text('policyBlockerMfa');
+		if (code === 'last_system_administrator_path')
+			return this.format.text('policyBlockerAdmin');
+		return this.format.text('policyBlockerOther', { code: readableCode(code) });
 	}
 
 	private renderDesktop(): void {
