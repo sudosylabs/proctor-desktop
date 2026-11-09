@@ -14,8 +14,7 @@ import type {
 	AdministrationFailure,
 	AdministrationResponse,
 	AdministrationValue,
-	importRowStates,
-	importStates
+	importRowStates
 } from '../../../../platform/administration/common/administrationProtocol.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
@@ -33,25 +32,13 @@ import { IAdministrationFormatService, type AdministrationText } from '../admini
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { renderDetails } from '../widgets/adminDetails.js';
 import { adminRead } from '../widgets/adminReads.js';
-import { IMPORT_MODE_TEXT } from './importsPage.js';
+import { IMPORT_MODE_TEXT, IMPORT_STATE_TEXT } from './importsPage.js';
 
 type Import = AdministrationValue<'onboardingImport'>;
-type State = (typeof importStates)[number];
 type RowState = (typeof importRowStates)[number];
 
 /** While the server works through a file, the page reads it again this often. */
 const WORKING_REFRESH_MS = 2_000;
-
-const STATE_TEXT: Readonly<Record<State, AdministrationText>> = {
-	uploading: 'importStateUploading',
-	parsing: 'importStateParsing',
-	preview_ready: 'importStateReady',
-	executing: 'importStateExecuting',
-	completed: 'importStateCompleted',
-	completed_with_errors: 'importStateCompletedWithErrors',
-	canceled: 'importStateCanceled',
-	failed: 'importStateFailed'
-};
 
 const ROW_STATUS: Readonly<
 	Record<RowState, { readonly text: AdministrationText; readonly tone: PageRowStatus['tone'] }>
@@ -174,14 +161,14 @@ export class ImportPage extends Disposable implements PageView {
 			return;
 		}
 		this.pane.setHeading({
-			title: this.format.text(IMPORT_MODE_TEXT[data.mode]),
+			title: data.fileName ?? this.format.text(IMPORT_MODE_TEXT[data.mode]),
 			description: this.format.text('importDescription', {
 				rows: this.format.count(data.totalRows),
 				when: this.format.relative(data.createdAt)
 			}),
 			trail,
 			status: {
-				text: this.format.text(STATE_TEXT[data.state]),
+				text: this.format.text(IMPORT_STATE_TEXT[data.state]),
 				tone:
 					data.state === 'failed' || data.state === 'completed_with_errors'
 						? 'fail'

@@ -507,5 +507,112 @@ export const structureMessages = Object.freeze({
 		id: 'administration.structure.periods.end',
 		defaultMessage: 'Ends',
 		description: 'Field: the last day.'
+	}),
+	structureViews: defineMessage({
+		id: 'administration.structure.views',
+		defaultMessage: 'What to show for this unit',
+		description: 'Accessible name of the tabs under a unit.'
+	}),
+	structureTabContents: defineMessage({
+		id: 'administration.structure.tab.contents',
+		defaultMessage: 'Programmes and classes',
+		description: 'Tab of a unit’s programmes and classes.'
+	}),
+	structureTabMembers: defineMessage({
+		id: 'administration.structure.tab.members',
+		defaultMessage: 'Members',
+		description: 'Tab of the people who belong to a unit.'
+	}),
+	unitMembers: defineMessage({
+		id: 'administration.unit.members',
+		defaultMessage: 'Members',
+		description: 'Section and table of a unit’s members.'
+	}),
+	unitMembersDescription: defineMessage({
+		id: 'administration.unit.members.description',
+		defaultMessage:
+			'Staff who belong to this unit. Belonging grants nothing on its own; roles do.',
+		description: 'Explains unit membership.'
+	}),
+	unitMemberColumn: defineMessage({
+		id: 'administration.unit.member.column',
+		defaultMessage: 'Member',
+		description: 'Column naming a unit member.'
+	}),
+	unitRolesHere: defineMessage({
+		id: 'administration.unit.roles.here',
+		defaultMessage: 'Roles here',
+		description: 'Column of the roles a member holds in this unit.'
+	}),
+	unitSince: defineMessage({
+		id: 'administration.unit.since',
+		defaultMessage: 'Since',
+		description: 'Column of when someone joined a unit.'
+	}),
+	unitNoRoleHere: defineMessage({
+		id: 'administration.unit.no.role.here',
+		defaultMessage: 'No role here',
+		description: 'A member who holds no role in the unit.'
+	}),
+	unitMembersEmpty: defineMessage({
+		id: 'administration.unit.members.empty',
+		defaultMessage: 'No one belongs to this unit yet.',
+		description: 'A unit without members.'
+	}),
+	unitAddMember: defineMessage({
+		id: 'administration.unit.add.member',
+		defaultMessage: 'Add member',
+		description: 'Adds a person to a unit.'
+	}),
+	unitAddMemberTitle: defineMessage({
+		id: 'administration.unit.add.member.title',
+		defaultMessage: 'Add a member to {unit}',
+		description: 'Title of the dialog that adds a unit member.'
+	}),
+	unitAddMemberBody: defineMessage({
+		id: 'administration.unit.add.member.body',
+		defaultMessage:
+			'They belong to the unit from today. To let them do something here, grant them a role too.',
+		description: 'Explains adding a unit member.'
+	}),
+	unitAddMemberField: defineMessage({
+		id: 'administration.unit.add.member.field',
+		defaultMessage: 'Username or email',
+		description: 'Label of the person to add.'
+	}),
+	unitAddMemberNotFound: defineMessage({
+		id: 'administration.unit.add.member.not.found',
+		defaultMessage: 'No account has this username or email.',
+		description: 'Error when the person isn’t found.'
+	}),
+	unitMemberAdded: defineMessage({
+		id: 'administration.unit.member.added',
+		defaultMessage: '{name} is now a member',
+		description: 'Toast after adding a unit member.'
+	}),
+	unitEndMember: defineMessage({
+		id: 'administration.unit.end.member',
+		defaultMessage: 'End membership…',
+		description: 'Ends someone’s membership of a unit.'
+	}),
+	unitEndMemberTitle: defineMessage({
+		id: 'administration.unit.end.member.title',
+		defaultMessage: 'End {name}’s membership?',
+		description: 'Confirms ending a unit membership.'
+	}),
+	unitEndMemberBody: defineMessage({
+		id: 'administration.unit.end.member.body',
+		defaultMessage: 'They stop belonging to this unit today. Their roles elsewhere stay.',
+		description: 'Explains ending a unit membership.'
+	}),
+	unitEndMemberConfirm: defineMessage({
+		id: 'administration.unit.end.member.confirm',
+		defaultMessage: 'End membership',
+		description: 'Confirms ending a unit membership.'
+	}),
+	unitMemberEnded: defineMessage({
+		id: 'administration.unit.member.ended',
+		defaultMessage: '{name} no longer belongs here',
+		description: 'Toast after ending a unit membership.'
 	})
 });

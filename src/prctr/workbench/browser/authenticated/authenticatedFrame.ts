@@ -21,7 +21,10 @@ import { IAccountService } from '../../services/account/common/account.js';
 import { registerProctorAction } from '../../services/actions/common/proctorActions.js';
 import { IAuthenticatedHostService } from '../../services/authenticatedHost/common/authenticatedHost.js';
 import { ILocalizationService } from '../../services/localization/common/localization.js';
-import type { AdministrationLocation } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
+import type {
+	AdministrationCount,
+	AdministrationLocation
+} from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import {
 	activityViews,
 	administrationPages,
@@ -86,6 +89,7 @@ const sidebarAreas: readonly SidebarArea[] = Object.freeze([
 				group: 'adminGroupOrganisation'
 			},
 			{ id: 'periods', label: 'adminPeriods', icon: 'admin.periods' },
+			{ id: 'progression', label: 'adminProgression', icon: 'admin.progression' },
 			{ id: 'roles', label: 'adminRoles', icon: 'admin.roles', group: 'adminGroupAccess' },
 			{ id: 'policy', label: 'adminPolicy', icon: 'admin.policy' },
 			{
@@ -293,6 +297,16 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 						this.localization.locale === 'pseudo' ? 'en' : this.localization.locale
 					).format(count);
 		this.sidebar.setBadge('account', page, text);
+	}
+
+	setAdministrationCount(page: AdministrationPage, count: AdministrationCount | undefined): void {
+		const text =
+			count === undefined || count.count <= 0
+				? undefined
+				: new Intl.NumberFormat(
+						this.localization.locale === 'pseudo' ? 'en' : this.localization.locale
+					).format(count.count) + (count.atLeast ? '+' : '');
+		this.sidebar.setBadge('administration', page, text, count?.attention === true);
 	}
 
 	// #endregion

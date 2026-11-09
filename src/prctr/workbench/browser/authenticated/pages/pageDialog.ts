@@ -53,6 +53,8 @@ export class PageDialog extends Disposable {
 
 	private readonly footnote: HTMLElement;
 	private readonly close: HTMLButtonElement;
+	private readonly title: HTMLElement;
+	private readonly description: HTMLElement;
 
 	private readonly cancelEmitter = this._register(new Emitter<void>());
 	/** Escape or × asked to close the dialog. */
@@ -73,6 +75,7 @@ export class PageDialog extends Disposable {
 			id: `${id}-title`,
 			textContent: options.title
 		});
+		this.title = title;
 		this.close = $('button.prctr-page-dialog__close', {
 			type: 'button',
 			title: host.closeLabel,
@@ -82,14 +85,12 @@ export class PageDialog extends Disposable {
 			this._register(createProctorIcon(document, { id: 'action.close', size: 16 })).element
 		);
 		this.close.hidden = options.closable === false;
-		const heading = $('div.prctr-page-dialog__heading', {}, title);
-		if (options.description !== undefined)
-			heading.append(
-				$('p.prctr-page-dialog__description', {
-					id: `${id}-description`,
-					textContent: options.description
-				})
-			);
+		this.description = $('p.prctr-page-dialog__description', {
+			id: `${id}-description`,
+			textContent: options.description ?? '',
+			hidden: options.description === undefined
+		});
+		const heading = $('div.prctr-page-dialog__heading', {}, title, this.description);
 		const header = $('div.prctr-page-dialog__header', {}, heading, this.close);
 		this.body = $('div.prctr-page-dialog__body');
 		this.footnote = $('p.prctr-page-dialog__footnote', {
@@ -105,9 +106,7 @@ export class PageDialog extends Disposable {
 				attrs: {
 					role: options.role ?? 'dialog',
 					'aria-labelledby': title.id,
-					...(options.description === undefined
-						? {}
-						: { 'aria-describedby': `${id}-description` })
+					'aria-describedby': `${id}-description`
 				}
 			},
 			header,
@@ -140,6 +139,13 @@ export class PageDialog extends Disposable {
 		});
 		observer.observe(this.body);
 		this._register({ dispose: () => observer.disconnect() });
+	}
+
+	/** Renames the dialog, as once what it shows has loaded. */
+	setHeading(title: string, description?: string): void {
+		this.title.textContent = title;
+		this.description.textContent = description ?? '';
+		this.description.hidden = description === undefined;
 	}
 
 	/** The quiet line beside the actions, such as "3 addresses · 1 to fix". */

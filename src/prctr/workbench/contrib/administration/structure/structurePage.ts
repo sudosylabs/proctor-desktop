@@ -32,9 +32,10 @@ import {
 	type AdminFormField,
 	type AdminFormValues
 } from '../widgets/adminFormDialog.js';
-import { AdminList } from '../widgets/adminList.js';
+import { AdminList, type AdminListItem } from '../widgets/adminList.js';
+import { AdminTabs } from '../widgets/adminTabs.js';
 import { AdminMenuButton } from '../widgets/adminMenuButton.js';
-import { readPages } from '../widgets/adminReads.js';
+import { readOnce, readPages } from '../widgets/adminReads.js';
 import { UnitTree, type AdminUnit } from './unitTree.js';
 import './media/structurePage.css';
 
@@ -67,6 +68,10 @@ export class StructurePage extends Disposable implements PageView {
 	private readonly programmes: PageSection;
 	private readonly levels: PageSection;
 	private readonly classes = this._register(new MutableDisposable<AdminList<'unitClasses'>>());
+	private readonly members = this._register(new MutableDisposable<AdminList<'unitMembers'>>());
+	private readonly membersHost: HTMLElement;
+	private readonly memberAction = this._register(new MutableDisposable());
+	private readonly views: AdminTabs<'contents' | 'members'>;
 	private readonly classesHost: HTMLElement;
 	private readonly classAction = this._register(new MutableDisposable());
 	private readonly menu: AdminMenuButton;
@@ -80,6 +85,7 @@ export class StructurePage extends Disposable implements PageView {
 	private periodChoices: readonly { readonly value: string; readonly label: string }[] = [];
 	private visible = false;
 	private sequence = 0;
+	private memberName = '';
 
 	constructor(
 		body: HTMLElement,
@@ -158,6 +164,19 @@ export class StructurePage extends Disposable implements PageView {
 				action: { label: format.text('structureNewProgramme'), icon: 'action.add' }
 			})
 		);
+		this.views = this._register(
+			new AdminTabs(
+				main,
+				format.text('structureViews'),
+				[
+					{ id: 'contents', label: format.text('structureTabContents') },
+					{ id: 'members', label: format.text('structureTabMembers') }
+				],
+				'contents'
+			)
+		);
+		this._register(this.views.onDidChange(() => this.showView()));
+		main.append(this.programmes.element);
 		this._register(this.programmes.onDidRequestAction(() => this.createProgramme()));
 		this.levels = this._register(
 			instantiationService.createInstance(PageSection, main, {
@@ -167,7 +186,8 @@ export class StructurePage extends Disposable implements PageView {
 		);
 		this._register(this.levels.onDidRequestAction(() => this.createLevel()));
 		this.classesHost = $('div');
-		main.append(this.classesHost);
+		this.membersHost = $('div');
+		main.append(this.classesHost, this.membersHost);
 		this._register(this.tree.onDidSelect((unit) => void this.showUnit(unit)));
 		void this.showUnit(undefined);
 	}
@@ -175,7 +195,8 @@ export class StructurePage extends Disposable implements PageView {
 	setVisible(visible: boolean): void {
 		const first = visible && !this.visible;
 		this.visible = visible;
-		this.classes.value?.setActive(visible);
+		this.classes.value?.setActive(visible && this.views.value === 'contents');
+		this.members.value?.setActive(visible && this.views.value === 'members');
 		if (first) void this.loadTree();
 	}
 
@@ -216,17 +237,21 @@ export class StructurePage extends Disposable implements PageView {
 		this.unit = unit;
 		this.programme = undefined;
 		const chosen = unit !== undefined;
-		this.programmes.hidden = !chosen;
+		this.views.element.hidden = !chosen;
 		this.levels.hidden = true;
-		this.classesHost.hidden = !chosen;
 		this.details.setAction(chosen);
 		this.menu.element.hidden = !chosen;
 		if (unit === undefined) {
 			this.details.setHeading(this.format.text('structureChooseUnit'));
 			this.details.content.replaceChildren();
 			this.classes.clear();
+			this.members.clear();
+			this.programmes.hidden = true;
+			this.classesHost.hidden = true;
+			this.membersHost.hidden = true;
 			return;
 		}
+		this.showMembers(unit);
 		this.details.setHeading(unit.displayName, unit.description || undefined);
 		renderDetails(this.details.content, [
 			{ label: this.format.text('structureKind'), value: unit.name },
@@ -302,8 +327,171 @@ export class StructurePage extends Disposable implements PageView {
 			}
 		);
 		this.classAction.value = this.classes.value.onDidRequestAction(() => this.createClass());
-		this.classes.value.setActive(this.visible);
+		this.showView();
 		await this.loadProgrammes(serial);
+	}
+
+	/** Shows the chosen tab's view of the unit. */
+	private showView(): void {
+		const members = this.views.value === 'members';
+		const chosen = this.unit !== undefined;
+		this.programmes.hidden = !chosen || members;
+		this.levels.hidden = !chosen || members || this.programme === undefined;
+		this.classesHost.hidden = !chosen || members;
+		this.membersHost.hidden = !chosen || !members;
+		this.classes.value?.setActive(this.visible && !members);
+		this.members.value?.setActive(this.visible && members);
+	}
+
+	private showMembers(unit: AdminUnit): void {
+		this.members.value = this.instantiationService.createInstance(
+			AdminList<'unitMembers'>,
+			this.membersHost,
+			'unitMembers',
+			{ unitId: unit.id },
+			{
+				title: this.format.text('unitMembers'),
+				description: this.format.text('unitMembersDescription'),
+				label: this.format.text('unitMembers'),
+				action: { label: this.format.text('unitAddMember'), icon: 'action.invite' },
+				columns: [
+					{
+						label: this.format.text('unitMemberColumn'),
+						min: 240,
+						cell: (member) => ({
+							kind: 'person',
+							name: member.user.displayName,
+							detail: member.user.email ?? member.user.username
+						})
+					},
+					{
+						label: this.format.text('unitRolesHere'),
+						width: '26%',
+						priority: 3,
+						cell: (member) => ({
+							kind: 'text',
+							primary:
+								member.rolesHere === undefined
+									? this.format.text('usersNoRole')
+									: member.rolesHere.length === 0
+										? this.format.text('unitNoRoleHere')
+										: member.rolesHere
+												.map((role) => role.displayName)
+												.join(', ') +
+											((member.rolesHereMore ?? 0) > 0
+												? ` +${this.format.count(member.rolesHereMore!)}`
+												: ''),
+							quiet: true
+						})
+					},
+					{
+						label: this.format.text('unitSince'),
+						width: '120px',
+						align: 'end',
+						priority: 2,
+						cell: (member) => ({
+							kind: 'text',
+							primary: this.format.date(member.startAt),
+							mono: true,
+							quiet: true
+						})
+					}
+				],
+				rowId: (member) => member.id,
+				rowName: (member) => member.user.displayName,
+				open: (member) => this.navigation.selectAdministrationPage('user', member.userId),
+				actions: (member) => [
+					{
+						label: this.format.text('userOpen'),
+						icon: 'action.openExternal',
+						run: () => this.navigation.selectAdministrationPage('user', member.userId)
+					},
+					{
+						label: this.format.text('unitEndMember'),
+						icon: 'action.end',
+						destructive: true,
+						run: () => this.endMember(member)
+					}
+				],
+				empty: this.format.text('unitMembersEmpty')
+			}
+		);
+		this.memberAction.value = this.members.value.onDidRequestAction(() => this.addMember(unit));
+	}
+
+	private addMember(unit: AdminUnit): void {
+		this.dialog.value = this.instantiationService.createInstance(AdminFormDialog, {
+			title: this.format.text('unitAddMemberTitle', { unit: unit.displayName }),
+			description: this.format.text('unitAddMemberBody'),
+			size: 'small',
+			fields: [
+				{
+					kind: 'text',
+					id: 'person',
+					label: this.format.text('unitAddMemberField'),
+					required: true
+				}
+			],
+			confirmLabel: this.format.text('unitAddMember'),
+			confirmIcon: 'action.invite',
+			submit: async (values) => {
+				const wanted = String(values.person).trim();
+				const found = await readOnce(this.administration, {
+					kind: 'users',
+					q: wanted.slice(0, 100),
+					limit: 10
+				});
+				const user =
+					found.kind === 'data'
+						? found.value.items.find(
+								(candidate) =>
+									candidate.username.toLowerCase() === wanted.toLowerCase() ||
+									candidate.email?.toLowerCase() === wanted.toLowerCase()
+							)
+						: undefined;
+				if (user === undefined)
+					return { field: 'person', error: this.format.text('unitAddMemberNotFound') };
+				this.memberName = user.displayName;
+				return { kind: 'addUnitMember', unitId: unit.id, userId: user.id };
+			},
+			summary: () => [this.format.text('unitAddMember'), unit.displayName],
+			onDidComplete: (result) => {
+				this.pane.toast(
+					result.kind === 'error'
+						? this.format.failure(result.reason)
+						: this.format.text('unitMemberAdded', { name: this.memberName })
+				);
+				void this.members.value?.refresh();
+			}
+		});
+	}
+
+	private endMember(member: AdminListItem<'unitMembers'>): void {
+		const name = member.user.displayName;
+		this.dialog.value = this.instantiationService.createInstance(
+			AdminConfirmation,
+			{
+				title: this.format.text('unitEndMemberTitle', { name }),
+				message: this.format.text('unitEndMemberBody'),
+				confirmLabel: this.format.text('unitEndMemberConfirm'),
+				confirmIcon: 'action.end',
+				destructive: true,
+				run: () =>
+					this.changes.send({ kind: 'endUnitMember', id: member.id }, [
+						this.format.text('unitEndMemberConfirm'),
+						name
+					]),
+				onDidComplete: (result) => {
+					this.pane.toast(
+						result.kind === 'error'
+							? this.format.failure(result.reason)
+							: this.format.text('unitMemberEnded', { name })
+					);
+					void this.members.value?.refresh();
+				}
+			},
+			() => this.members.value?.focusRow(member.id)
+		);
 	}
 
 	/** The chosen unit's less common actions, in the page header's menu. */

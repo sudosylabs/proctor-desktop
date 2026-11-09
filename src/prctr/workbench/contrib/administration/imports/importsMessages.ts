@@ -302,5 +302,45 @@ export const importsMessages = Object.freeze({
 		id: 'administration.imports.state.failed',
 		defaultMessage: 'Failed',
 		description: 'Import state.'
+	}),
+	importsRecent: defineMessage({
+		id: 'administration.imports.recent',
+		defaultMessage: 'Recent imports',
+		description: 'Section of files uploaded before.'
+	}),
+	importsRecentTable: defineMessage({
+		id: 'administration.imports.recent.table',
+		defaultMessage: 'Recent imports',
+		description: 'Accessible name of the table of earlier imports.'
+	}),
+	importsColumnFile: defineMessage({
+		id: 'administration.imports.column.file',
+		defaultMessage: 'File',
+		description: 'Column of an import’s file and kind.'
+	}),
+	importsColumnRows: defineMessage({
+		id: 'administration.imports.column.rows',
+		defaultMessage: 'Rows',
+		description: 'Column of how many rows a file had.'
+	}),
+	importsColumnUploaded: defineMessage({
+		id: 'administration.imports.column.uploaded',
+		defaultMessage: 'Uploaded',
+		description: 'Column of when a file was uploaded.'
+	}),
+	importsColumnStatus: defineMessage({
+		id: 'administration.imports.column.status',
+		defaultMessage: 'Status',
+		description: 'Column of where an import stands.'
+	}),
+	importsRecentEmpty: defineMessage({
+		id: 'administration.imports.recent.empty',
+		defaultMessage: 'No files uploaded yet.',
+		description: 'No earlier imports.'
+	}),
+	importsUnnamed: defineMessage({
+		id: 'administration.imports.unnamed',
+		defaultMessage: 'A CSV file',
+		description: 'An import whose file name isn’t known.'
 	})
 });

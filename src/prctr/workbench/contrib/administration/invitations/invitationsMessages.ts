@@ -274,5 +274,61 @@ export const invitationsMessages = Object.freeze({
 		id: 'administration.invitations.revoked',
 		defaultMessage: 'The invitation to {email} is revoked',
 		description: 'Toast after revoking an invitation.'
+	}),
+	inviteRemove: defineMessage({
+		id: 'administration.invitations.invite.remove',
+		defaultMessage: 'Remove {address}',
+		description: 'Accessible name of a chip’s × in a list of addresses or people.'
+	}),
+	inviteAddAddress: defineMessage({
+		id: 'administration.invitations.invite.add.address',
+		defaultMessage: 'Add an address',
+		description: 'Placeholder of the field that takes email addresses.'
+	}),
+	inviteChipsHint: defineMessage({
+		id: 'administration.invitations.invite.chips.hint',
+		defaultMessage:
+			'Press Enter, a comma or a space after each address, or paste a list. Up to 200; to invite more, import a CSV file.',
+		description: 'Hint under the email addresses.'
+	}),
+	inviteAddressIncomplete: defineMessage({
+		id: 'administration.invitations.invite.address.incomplete',
+		defaultMessage: 'This address is incomplete',
+		description: 'Why an address chip is red.'
+	}),
+	inviteAddressesFix: defineMessage({
+		id: 'administration.invitations.invite.addresses.fix',
+		defaultMessage: 'Remove or correct the addresses in red first.',
+		description: 'Error when some addresses aren’t valid.'
+	}),
+	inviteFootnoteOne: defineMessage({
+		id: 'administration.invitations.invite.footnote.one',
+		defaultMessage: '1 address',
+		description: 'Footnote: how many addresses the dialog sends to. One.'
+	}),
+	inviteFootnote: defineMessage({
+		id: 'administration.invitations.invite.footnote',
+		defaultMessage: '{count} addresses',
+		description: 'Footnote: how many addresses the dialog sends to. Two or more.'
+	}),
+	inviteFootnoteFix: defineMessage({
+		id: 'administration.invitations.invite.footnote.fix',
+		defaultMessage: '{addresses} · {fix} to fix',
+		description: 'Footnote when some addresses need fixing, as in "3 addresses · 1 to fix".'
+	}),
+	inviteExpires: defineMessage({
+		id: 'administration.invitations.invite.expires',
+		defaultMessage: 'Expires',
+		description: 'Label of how long an invitation stays open.'
+	}),
+	inviteExpiresIn: defineMessage({
+		id: 'administration.invitations.invite.expires.in',
+		defaultMessage: 'In {days} days · {date}',
+		description: 'One choice of how long an invitation stays open, as in "In 14 days · 22 Nov".'
+	}),
+	invitationsColumnBy: defineMessage({
+		id: 'administration.invitations.column.by',
+		defaultMessage: 'Invited by',
+		description: 'Invitations column naming who sent the invitation.'
 	})
 });

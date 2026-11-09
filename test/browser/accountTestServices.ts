@@ -175,6 +175,7 @@ function navigation(
 		setProductAreas: unexpected,
 		setProductStatus: unexpected,
 		setAccountCount: unexpected,
+		setAdministrationCount: unexpected,
 		signOut
 	});
 }

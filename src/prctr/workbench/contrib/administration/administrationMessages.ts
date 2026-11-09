@@ -3,9 +3,16 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { defineMessage } from '../../../base/common/localization.js';
+import {
+	jobStageMessages,
+	jobTypeMessages,
+	mailTemplateMessages,
+	problemCodeMessages
+} from './codes/codeMessages.js';
 import { importsMessages } from './imports/importsMessages.js';
 import { operationsMessages } from './operations/operationsMessages.js';
 import { overviewMessages } from './overview/overviewMessages.js';
+import { progressionMessages } from './progression/progressionMessages.js';
 import { recordsMessages } from './records/recordsMessages.js';
 import { rolesMessages } from './roles/rolesMessages.js';
 import { structureMessages } from './structure/structureMessages.js';
@@ -281,7 +288,12 @@ export const administrationMessages = Object.freeze({
 	...structureMessages,
 	...rolesMessages,
 	...recordsMessages,
-	...operationsMessages
+	...operationsMessages,
+	...progressionMessages,
+	...problemCodeMessages,
+	...jobTypeMessages,
+	...jobStageMessages,
+	...mailTemplateMessages
 });
 
 export type AdministrationMessage = keyof typeof administrationMessages;

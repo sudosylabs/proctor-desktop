@@ -14,7 +14,15 @@ import { AdminList, type AdminListItem, type AdminListQuery } from '../widgets/a
 import { readOnce } from '../widgets/adminReads.js';
 
 type Audit = AdminListItem<'audits'>;
-const ACTION = /^[A-Za-z0-9][A-Za-z0-9_.:/-]{0,127}$/u;
+type Period = 'day' | 'week' | 'month' | 'any';
+const DAY = 24 * 60 * 60 * 1000;
+
+/** The audit query for events in the chosen period up to now. */
+function since(period: Period, now: number): AdminListQuery<'audits'> {
+	if (period === 'any') return {};
+	const days = period === 'day' ? 1 : period === 'week' ? 7 : 30;
+	return { createdAfter: now - days * DAY };
+}
 
 /**
  * Everything that happened at the institution, newest first: who did what to which record and
@@ -25,7 +33,7 @@ export class AuditsPage extends Disposable implements PageView {
 	private readonly list: AdminList<'audits'>;
 	private readonly names = new Map<string, string>();
 	private readonly filters: AdminFilters;
-	private query: AdminListQuery<'audits'> = {};
+	private query: AdminListQuery<'audits'>;
 	private everything = true;
 
 	constructor(
@@ -37,11 +45,23 @@ export class AuditsPage extends Disposable implements PageView {
 		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService
 	) {
 		super();
+		this.query = since('week', format.now());
 		this.filters = this._register(new AdminFilters(body));
-		this.filters.addSearch(format.text('auditsFind'), (action) => {
-			this.query = action !== undefined && ACTION.test(action) ? { action } : {};
-			this.list.setQuery(this.query);
-		});
+		this.filters.addSelect<Period>(
+			format.text('auditsPeriod'),
+			'object.calendar',
+			[
+				{ value: 'week', label: format.text('auditsPeriodWeek') },
+				{ value: 'day', label: format.text('auditsPeriodDay') },
+				{ value: 'month', label: format.text('auditsPeriodMonth') },
+				{ value: 'any', label: format.text('auditsPeriodAny') }
+			],
+			'week',
+			(period) => {
+				this.query = since(period, format.now());
+				this.list.setQuery(this.query);
+			}
+		);
 		this.filters.addSelect<'changes' | 'everything'>(
 			format.text('auditsShow'),
 			'action.filter',
@@ -62,30 +82,45 @@ export class AuditsPage extends Disposable implements PageView {
 				columns: [
 					{
 						label: format.text('auditsEvent'),
-						width: '40%',
+						min: 240,
 						cell: (audit) => ({
 							kind: 'text',
 							primary: readableCode(audit.action),
-							secondary: readableCode(audit.resourceType),
+							secondary:
+								audit.reason === undefined
+									? readableCode(audit.resourceType)
+									: format.text('auditsReason', { reason: audit.reason }),
 							strong: true
 						})
 					},
 					{
 						label: format.text('auditsActor'),
-						width: '26%',
+						width: '20%',
+						foldLabel: true,
 						cell: (audit) => ({
 							kind: 'text',
 							primary:
 								audit.actorId === undefined
 									? format.text('auditsSystem')
 									: (this.names.get(audit.actorId) ??
-										format.text('inviteLoading')),
-							...(audit.ipAddress === undefined ? {} : { secondary: audit.ipAddress })
+										format.text('inviteLoading'))
+						})
+					},
+					{
+						label: format.text('auditsWhere'),
+						width: '22%',
+						priority: 3,
+						cell: (audit) => ({
+							kind: 'text',
+							primary: this.client(audit.client),
+							secondary: audit.ipAddress ?? '',
+							quiet: true
 						})
 					},
 					{
 						label: format.text('auditsOutcome'),
-						width: '14%',
+						width: '120px',
+						priority: 2,
 						cell: (audit) =>
 							audit.status === 'success' || audit.status === 'succeeded'
 								? {
@@ -101,6 +136,7 @@ export class AuditsPage extends Disposable implements PageView {
 					},
 					{
 						label: format.text('auditsWhen'),
+						width: '140px',
 						align: 'end',
 						cell: (audit) => ({
 							kind: 'text',
@@ -133,6 +169,19 @@ export class AuditsPage extends Disposable implements PageView {
 				void this.loadNames(audits);
 			})
 		);
+	}
+
+	private client(client: string | undefined): string {
+		switch (client) {
+			case 'desktop':
+				return this.format.text('clientDesktop');
+			case 'web':
+				return this.format.text('clientBrowser');
+			case 'cli':
+				return this.format.text('clientCommandLine');
+			default:
+				return client === undefined ? '' : readableCode(client);
+		}
 	}
 
 	setVisible(visible: boolean): void {

@@ -21,23 +21,52 @@ const SEARCH_SETTLE_MS = 300;
 
 /**
  * The bar above an Administration list: a search field, the list's filters as selects, and a
- * short note at the end, such as how many rows a page shows.
+ * short note at the end, such as how many rows a page shows. While rows are chosen, the bar
+ * shows how many and the changes that apply to all of them instead.
  */
 export class AdminFilters extends Disposable {
 	readonly element: HTMLElement;
+	/** Where the owner puts the changes for chosen rows. */
+	readonly selectionActions: HTMLElement;
 	private readonly note: HTMLElement;
+	private readonly selection: HTMLElement;
+	private readonly selectionCount: HTMLElement;
 
 	constructor(host: HTMLElement) {
 		super();
 		const $ = createElementFactory(host.ownerDocument);
 		this.note = $('span.prctr-admin-filters__note', { attrs: { 'aria-live': 'polite' } });
+		this.selectionCount = $('span.prctr-admin-filters__count', {
+			attrs: { 'aria-live': 'polite' }
+		});
+		this.selectionActions = $('div.prctr-admin-filters__actions');
+		this.selection = $(
+			'div.prctr-admin-filters__selection',
+			{ attrs: { role: 'toolbar' } },
+			this.selectionCount,
+			this.selectionActions
+		);
+		this.selection.hidden = true;
 		this.element = $(
 			'div.prctr-admin-filters',
 			{},
 			$('span.prctr-admin-filters__spacer'),
-			this.note
+			this.note,
+			this.selection
 		);
 		host.append(this.element);
+	}
+
+	/**
+	 * Shows the chosen rows' count and changes in place of the filters; `undefined` brings the
+	 * filters back. `label` names the toolbar.
+	 */
+	setSelection(count: string | undefined, label?: string): void {
+		const selecting = count !== undefined;
+		this.element.dataset.selecting = String(selecting);
+		this.selection.hidden = !selecting;
+		this.selectionCount.textContent = count ?? '';
+		if (label !== undefined) this.selection.setAttribute('aria-label', label);
 	}
 
 	/** A search field; `onChange` hears the settled text, or undefined once it is cleared. */

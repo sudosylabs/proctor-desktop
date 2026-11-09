@@ -516,6 +516,17 @@ export class UserPage extends Disposable implements PageView {
 				icon: 'status.verified',
 				run: () => void this.markVerified(user)
 			});
+		actions.push({
+			label: this.format.text('userReplacePhoto'),
+			icon: 'object.image',
+			run: () => this.actions.replacePhoto(user)
+		});
+		if (user.photoKind === 'custom')
+			actions.push({
+				label: this.format.text('userRemovePhoto'),
+				icon: 'action.delete',
+				run: () => this.actions.removePhoto(user)
+			});
 		actions.push(...this.actions.for(user, false));
 		return actions;
 	}

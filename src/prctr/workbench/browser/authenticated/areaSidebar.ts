@@ -244,10 +244,16 @@ export class AreaSidebar extends Disposable {
 	}
 
 	/** Show a short count after an entry's label, such as how many sessions it lists. */
-	setBadge(destination: AuthenticatedDestination, entry: string, text: string | undefined): void {
+	setBadge(
+		destination: AuthenticatedDestination,
+		entry: string,
+		text: string | undefined,
+		attention = false
+	): void {
 		const badge = this.areas.get(destination)?.entries.get(entry)?.badge;
 		if (badge === undefined) return;
 		badge.textContent = text ?? '';
+		badge.dataset.attention = String(attention);
 		badge.hidden = text === undefined;
 	}
 

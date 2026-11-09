@@ -129,6 +129,9 @@
 	.prctr-area-sidebar .prctr-area-sidebar__entry[aria-current='page'] .prctr-area-sidebar__badge {
 		background: var(--prctr-color-background-card);
 	}
+	.prctr-area-sidebar .prctr-area-sidebar__badge[data-attention='true'] {
+		color: var(--prctr-color-feedback-error);
+	}
 
 	.prctr-area-sidebar .prctr-area-sidebar__label {
 		flex: 1;

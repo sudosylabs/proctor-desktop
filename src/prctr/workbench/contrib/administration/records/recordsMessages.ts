@@ -296,5 +296,55 @@ export const recordsMessages = Object.freeze({
 		id: 'administration.records.retention.kept',
 		defaultMessage: 'Kept',
 		description: 'A record not yet eligible.'
+	}),
+	auditsPeriod: defineMessage({
+		id: 'administration.audits.period',
+		defaultMessage: 'Period',
+		description: 'Filter of how far back the audit log reaches.'
+	}),
+	auditsPeriodDay: defineMessage({
+		id: 'administration.audits.period.day',
+		defaultMessage: 'Last 24 hours',
+		description: 'The audit log shows the last day.'
+	}),
+	auditsPeriodWeek: defineMessage({
+		id: 'administration.audits.period.week',
+		defaultMessage: 'Last 7 days',
+		description: 'The audit log shows the last week.'
+	}),
+	auditsPeriodMonth: defineMessage({
+		id: 'administration.audits.period.month',
+		defaultMessage: 'Last 30 days',
+		description: 'The audit log shows the last month.'
+	}),
+	auditsPeriodAny: defineMessage({
+		id: 'administration.audits.period.any',
+		defaultMessage: 'Any time',
+		description: 'The audit log shows everything.'
+	}),
+	auditsWhere: defineMessage({
+		id: 'administration.audits.where',
+		defaultMessage: 'Where',
+		description: 'Column of the app and address an event came from.'
+	}),
+	auditsReason: defineMessage({
+		id: 'administration.audits.reason',
+		defaultMessage: 'Reason: {reason}',
+		description: 'Under an event: why an administrator did it.'
+	}),
+	clientDesktop: defineMessage({
+		id: 'administration.client.desktop',
+		defaultMessage: 'Proctor Desktop',
+		description: 'An event that came from Proctor Desktop.'
+	}),
+	clientBrowser: defineMessage({
+		id: 'administration.client.browser',
+		defaultMessage: 'Web browser',
+		description: 'An event that came from a web browser.'
+	}),
+	clientCommandLine: defineMessage({
+		id: 'administration.client.cli',
+		defaultMessage: 'Command line',
+		description: 'An event that came from the command-line tool.'
 	})
 });

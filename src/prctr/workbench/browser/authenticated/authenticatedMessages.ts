@@ -82,6 +82,11 @@ export const authenticatedMessages = Object.freeze({
 		defaultMessage: 'Academic periods',
 		description: 'Administration sidebar page for academic periods.'
 	}),
+	adminProgression: defineMessage({
+		id: 'authenticated.nav.administration.progression',
+		defaultMessage: 'Progression',
+		description: 'Administration sidebar page for moving students on to their next class.'
+	}),
 	adminRoles: defineMessage({
 		id: 'authenticated.nav.administration.roles',
 		defaultMessage: 'Roles',

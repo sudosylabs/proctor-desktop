@@ -12,6 +12,8 @@ import {
 import { pageMessages } from '../../browser/authenticated/pages/pageMessages.js';
 import { ILocalizationService } from '../../services/localization/common/localization.js';
 import { administrationMessages } from './administrationMessages.js';
+import { jobStages, jobTypes, mailTemplates, problemCodes } from './codes/codeMessages.js';
+import { readableCode } from './common/administrationPresentation.js';
 
 /** Administration text by key, including the page text the window's frame registers. */
 export const administrationText = Object.freeze({ ...pageMessages, ...administrationMessages });
@@ -29,7 +31,18 @@ export interface IAdministrationFormatService extends PageFormat {
 	institutionText(named: AdministrationText, generic: AdministrationText): string;
 	/** The sentence for an Administration failure reason. */
 	failure(reason: string): string;
+	/** Words for one of the server's codes; an unknown code reads as its own words. */
+	code(catalogue: AdministrationCatalogue, code: string): string;
 }
+
+/** The server catalogues the desktop words itself. */
+export type AdministrationCatalogue = 'problem' | 'jobType' | 'jobStage' | 'mailKind';
+const catalogues = {
+	problem: problemCodes,
+	jobType: jobTypes,
+	jobStage: jobStages,
+	mailKind: mailTemplates
+} as const;
 
 const failureMessages: Readonly<Record<string, AdministrationText>> = Object.freeze({
 	unavailable: 'failureUnavailable',
@@ -76,6 +89,12 @@ export class AdministrationFormatService implements IAdministrationFormatService
 		return this.text(
 			Object.hasOwn(failureMessages, reason) ? failureMessages[reason] : 'failureUnavailable'
 		);
+	}
+
+	code(catalogue: AdministrationCatalogue, code: string): string {
+		const table: Readonly<Record<string, string>> = catalogues[catalogue];
+		const key = Object.hasOwn(table, code) ? table[code] : undefined;
+		return key === undefined ? readableCode(code) : this.text(key as AdministrationText);
 	}
 
 	join(first: string, second: string): string {

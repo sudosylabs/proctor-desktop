@@ -2,7 +2,6 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import { SegmentedControl } from '../../../../base/browser/ui/segmented/segmentedControl.js';
 import {
@@ -23,13 +22,17 @@ import { IAdministrationService } from '../../../services/administration/common/
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { parseEmails } from '../common/administrationPresentation.js';
 import { AdminChanges } from '../widgets/adminChanges.js';
-import { adminField, adminTextArea } from '../widgets/adminForm.js';
+import { AdminChips } from '../widgets/adminChips.js';
+import { adminField } from '../widgets/adminForm.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 
 type InviteKind = 'students' | 'teachers' | 'role';
 
 const NONE = '';
 const MAXIMUM_ADDRESSES = 200;
+/** How long an invitation may stay open; the server allows 1 to 30 days. */
+const EXPIRY_DAYS = [3, 7, 14, 30] as const;
+const DEFAULT_EXPIRY_DAYS = 7;
 
 /**
  * Invites up to 200 people at once: students to a class, teachers to an academic unit with
@@ -38,8 +41,9 @@ const MAXIMUM_ADDRESSES = 200;
  */
 export class InviteDialog extends Disposable {
 	private readonly dialog: PageDialog;
-	private readonly emails: HTMLTextAreaElement;
+	private readonly emails: AdminChips;
 	private readonly emailHint: HTMLElement;
+	private readonly expiry: SelectControl<string>;
 	private readonly unit: SelectControl<string>;
 	private readonly unitField: HTMLElement;
 	private readonly klass: SelectControl<string>;
@@ -88,11 +92,35 @@ export class InviteDialog extends Disposable {
 		const emailField = adminField(
 			body,
 			format.text('inviteEmails'),
-			format.text('inviteEmailsHint')
+			format.text('inviteChipsHint')
 		);
-		this.emails = adminTextArea(emailField, 4);
+		this.emails = this._register(
+			new AdminChips(emailField.element, {
+				label: format.text('inviteEmails'),
+				removeLabel: (chip) => format.text('inviteRemove', { address: chip.label }),
+				describedBy: emailField.hint.id,
+				input: {
+					placeholder: format.text('inviteAddAddress'),
+					parse: (text) => {
+						const parsed = parseEmails(text);
+						return [
+							...parsed.valid.map((email) => ({
+								id: email.toLowerCase(),
+								label: email
+							})),
+							...parsed.invalid.map((entry) => ({
+								id: `invalid:${entry}`,
+								label: entry,
+								problem: format.text('inviteAddressIncomplete')
+							}))
+						];
+					}
+				}
+			})
+		);
+		emailField.element.append(emailField.hint);
 		this.emailHint = emailField.hint;
-		this._register(addDisposableListener(this.emails, 'input', () => this.update()));
+		this._register(this.emails.onDidChange(() => this.update()));
 
 		const unitField = adminField(body, format.text('inviteUnit'));
 		this.unitField = unitField.element;
@@ -110,6 +138,23 @@ export class InviteDialog extends Disposable {
 		this.roleField = roleField.element;
 		this.role = this._register(this.select(roleField, format.text('inviteRoleLabel')));
 		this._register(this.role.onDidChange(() => this.update()));
+
+		const expiryField = adminField(body, format.text('inviteExpires'));
+		const day = 24 * 60 * 60 * 1000;
+		this.expiry = this._register(
+			new SelectControl<string>(expiryField.element, {
+				label: format.text('inviteExpires'),
+				choices: EXPIRY_DAYS.map((days) => ({
+					value: String(days),
+					label: format.text('inviteExpiresIn', {
+						days,
+						date: format.date(format.now() + days * day)
+					})
+				})),
+				value: String(DEFAULT_EXPIRY_DAYS),
+				caret: proctorIconFactory('action.expand', 14)
+			})
+		);
 
 		this.feedback = this._register(new PageFeedback(body));
 		this.cancel = this._register(
@@ -131,7 +176,8 @@ export class InviteDialog extends Disposable {
 		this._register(this.dialog.onDidRequestCancel(() => this.close()));
 		this._register(this.send.onDidRequest(() => void this.submit()));
 		this.setKind('students');
-		this.dialog.show(this.emails);
+		this.dialog.show(this.emails.element);
+		this.emails.focus();
 		void this.loadChoices();
 	}
 
@@ -230,17 +276,31 @@ export class InviteDialog extends Disposable {
 
 	/** The addresses entered and whether they and the chosen target can be sent. */
 	private update(): { readonly addresses: readonly string[]; readonly ready: boolean } {
-		const parsed = parseEmails(this.emails.value);
+		const chips = this.emails.chips;
+		const valid = chips.filter((chip) => chip.problem === undefined).map((chip) => chip.label);
+		const invalid = chips.length - valid.length;
+		const parsed = { valid };
 		let error: string | undefined;
-		if (parsed.invalid.length > 0)
-			error = this.format.text('inviteEmailsInvalid', {
-				addresses: parsed.invalid.slice(0, 5).join(', ')
-			});
-		else if (parsed.valid.length > MAXIMUM_ADDRESSES)
-			error = this.format.text('inviteEmailsTooMany', { count: parsed.valid.length });
-		this.emailHint.textContent = error ?? this.format.text('inviteEmailsHint');
+		if (invalid > 0) error = this.format.text('inviteAddressesFix');
+		else if (valid.length > MAXIMUM_ADDRESSES)
+			error = this.format.text('inviteEmailsTooMany', { count: valid.length });
+		this.emailHint.textContent = error ?? this.format.text('inviteChipsHint');
 		this.emailHint.dataset.error = String(error !== undefined);
-		this.emails.setAttribute('aria-invalid', String(error !== undefined));
+		this.emails.setInvalid(error !== undefined);
+		const addresses =
+			chips.length === 1
+				? this.format.text('inviteFootnoteOne')
+				: this.format.text('inviteFootnote', { count: this.format.count(chips.length) });
+		this.dialog.setFootnote(
+			chips.length === 0
+				? undefined
+				: invalid > 0
+					? this.format.text('inviteFootnoteFix', {
+							addresses,
+							fix: this.format.count(invalid)
+						})
+					: addresses
+		);
 		const target =
 			this.kind === 'students'
 				? this.klass.select.value
@@ -269,7 +329,12 @@ export class InviteDialog extends Disposable {
 	}
 
 	private intent(addresses: readonly string[]): AdministrationChangeIntent {
-		const items = addresses.map((email, index) => ({ key: `invite-${index + 1}`, email }));
+		const expiresInDays = Number(this.expiry.select.value);
+		const items = addresses.map((email, index) => ({
+			key: `invite-${index + 1}`,
+			email,
+			expiresInDays
+		}));
 		if (this.kind === 'students')
 			return {
 				kind: 'runInvitationBatch',
@@ -297,16 +362,19 @@ export class InviteDialog extends Disposable {
 	}
 
 	private async submit(): Promise<void> {
+		this.emails.commit();
 		const { addresses, ready } = this.update();
 		if (!ready) {
 			if (addresses.length === 0) {
 				this.emailHint.textContent = this.format.text('inviteEmailsRequired');
 				this.emailHint.dataset.error = 'true';
+				this.emails.setInvalid(true);
 				this.emails.focus();
 			}
 			return;
 		}
 		this.working = true;
+		this.dialog.setClosable(false);
 		this.feedback.set();
 		this.cancel.setState({
 			label: this.format.text('cancel'),
@@ -324,6 +392,7 @@ export class InviteDialog extends Disposable {
 		]);
 		if (this._store.isDisposed) return;
 		this.working = false;
+		this.dialog.setClosable(true);
 		this.cancel.setState({
 			label: this.format.text('cancel'),
 			icon: proctorIconFactory('action.close')
@@ -351,7 +420,7 @@ export class InviteDialog extends Disposable {
 			return;
 		}
 		// Keep only the addresses that still need sending.
-		this.emails.value = failed.join('\n');
+		this.emails.set(failed.map((email) => ({ id: email.toLowerCase(), label: email })));
 		this.update();
 		this.feedback.set(
 			this.format.text('invitePartly', { sent, addresses: failed.join(', ') }),

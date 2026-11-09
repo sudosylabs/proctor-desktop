@@ -41,22 +41,37 @@ export const administrationPages = [
 	'structure',
 	'class',
 	'periods',
+	'progression',
+	'progressionReview',
 	'roles',
 	'policy',
 	'audits',
 	'retention',
 	'jobs',
+	'job',
 	'mail'
 ] as const;
 export type AdministrationPage = (typeof administrationPages)[number];
 
 /** Pages about one record, opened from a list; each needs the record's id. */
-const administrationSubjectPages: readonly AdministrationPage[] = ['user', 'import', 'class'];
+const administrationSubjectPages: readonly AdministrationPage[] = [
+	'user',
+	'import',
+	'class',
+	'progressionReview',
+	'job'
+];
 
 /** The list a record's page is opened from, which the sidebar marks while the record is shown. */
 export const administrationParents: Readonly<
 	Partial<Record<AdministrationPage, AdministrationPage>>
-> = Object.freeze({ user: 'users', import: 'imports', class: 'structure' });
+> = Object.freeze({
+	user: 'users',
+	import: 'imports',
+	class: 'structure',
+	progressionReview: 'progression',
+	job: 'jobs'
+});
 
 export function administrationPageNeedsSubject(page: AdministrationPage): boolean {
 	return administrationSubjectPages.includes(page);

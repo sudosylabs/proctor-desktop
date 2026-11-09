@@ -10,7 +10,10 @@ import {
 	type SelectChoice
 } from '../../../../base/browser/ui/select/selectControl.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import type { importModes } from '../../../../platform/administration/common/administrationProtocol.js';
+import type {
+	importModes,
+	importStates
+} from '../../../../platform/administration/common/administrationProtocol.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
@@ -23,9 +26,22 @@ import { IAdministrationFormatService, type AdministrationText } from '../admini
 import { AdminChanges } from '../widgets/adminChanges.js';
 import { adminField } from '../widgets/adminForm.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
+import { AdminList } from '../widgets/adminList.js';
 import './media/importsPage.css';
 
 type Mode = (typeof importModes)[number];
+type State = (typeof importStates)[number];
+
+export const IMPORT_STATE_TEXT: Readonly<Record<State, AdministrationText>> = {
+	uploading: 'importStateUploading',
+	parsing: 'importStateParsing',
+	preview_ready: 'importStateReady',
+	executing: 'importStateExecuting',
+	completed: 'importStateCompleted',
+	completed_with_errors: 'importStateCompletedWithErrors',
+	canceled: 'importStateCanceled',
+	failed: 'importStateFailed'
+};
 
 export const IMPORT_MODE_TEXT: Readonly<Record<Mode | 'student_progression', AdministrationText>> =
 	{
@@ -59,6 +75,7 @@ export class ImportsPage extends Disposable implements PageView {
 	private readonly changes: AdminChanges;
 	private institutionId: string | undefined;
 	private working = false;
+	private readonly recent: AdminList<'onboardingImports'>;
 
 	constructor(
 		body: HTMLElement,
@@ -162,9 +179,85 @@ export class ImportsPage extends Disposable implements PageView {
 		this._register(this.upload.onDidRequest(() => void this.send()));
 		this.update();
 		void this.loadChoices();
+		this.recent = this._register(
+			instantiationService.createInstance(
+				AdminList<'onboardingImports'>,
+				body,
+				'onboardingImports',
+				{},
+				{
+					title: format.text('importsRecent'),
+					label: format.text('importsRecentTable'),
+					columns: [
+						{
+							label: format.text('importsColumnFile'),
+							min: 220,
+							cell: (item) => ({
+								kind: 'text',
+								primary: item.fileName ?? format.text('importsUnnamed'),
+								secondary: format.text(IMPORT_MODE_TEXT[item.mode]),
+								strong: true
+							})
+						},
+						{
+							label: format.text('importsColumnRows'),
+							width: '80px',
+							align: 'end',
+							priority: 3,
+							foldLabel: true,
+							cell: (item) => ({
+								kind: 'text',
+								primary: format.count(item.totalRows),
+								mono: true
+							})
+						},
+						{
+							label: format.text('importsColumnUploaded'),
+							width: '130px',
+							align: 'end',
+							priority: 2,
+							cell: (item) => ({
+								kind: 'text',
+								primary: format.relativeStandalone(item.createdAt),
+								mono: true,
+								quiet: true
+							})
+						},
+						{
+							label: format.text('importsColumnStatus'),
+							width: '170px',
+							cell: (item) => ({
+								kind: 'status',
+								text: format.text(IMPORT_STATE_TEXT[item.state]),
+								tone:
+									item.state === 'failed' ||
+									item.state === 'completed_with_errors'
+										? 'fail'
+										: item.state === 'completed'
+											? 'ok'
+											: item.state === 'preview_ready'
+												? 'warn'
+												: item.state === 'canceled'
+													? 'neutral'
+													: 'busy',
+								...(item.state === 'preview_ready'
+									? { icon: 'status.review' as const }
+									: {})
+							})
+						}
+					],
+					rowId: (item) => item.id,
+					rowName: (item) => item.fileName ?? format.text('importsUnnamed'),
+					open: (item) => navigation.selectAdministrationPage('import', item.id),
+					empty: format.text('importsRecentEmpty')
+				}
+			)
+		);
 	}
 
-	setVisible(): void {}
+	setVisible(visible: boolean): void {
+		this.recent.setActive(visible);
+	}
 
 	private picker(host: HTMLElement, label: string): SelectControl<string> {
 		return new SelectControl<string>(host, {
@@ -307,12 +400,14 @@ export class ImportsPage extends Disposable implements PageView {
 		if (this._store.isDisposed) return;
 		const mode = this.mode.select.value as Mode;
 		const roleId = this.role.select.value;
+		const fileName = file.name.replace(/[\u0000-\u001f\u007f]/gu, '').slice(0, 255);
 		const result = await this.changes.send(
 			{
 				kind: 'uploadImport',
 				mode,
 				...scope,
 				...(roleId !== NONE && !this.roleField.hidden ? { roleId } : {}),
+				...(fileName === '' ? {} : { fileName }),
 				csv
 			},
 			[file.name, this.format.text(IMPORT_MODE_TEXT[mode])]

@@ -30,6 +30,7 @@ import { IAdministrationFormatService, type AdministrationText } from '../admini
 import { readableCode } from '../common/administrationPresentation.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { AdminFilters } from '../widgets/adminFilters.js';
+import { DeliveryDialog } from './deliveryDialog.js';
 import { AdminList, type AdminListItem, type AdminTone } from '../widgets/adminList.js';
 import { adminRead, readOnce } from '../widgets/adminReads.js';
 
@@ -112,43 +113,51 @@ export class MailPage extends Disposable implements PageView {
 					label: format.text('mailDeliveries'),
 					columns: [
 						{
-							label: format.text('mailRecipient'),
-							width: '34%',
+							label: format.text('mailColumnTo'),
+							min: 220,
 							cell: (delivery) => ({
 								kind: 'text',
 								primary: delivery.recipient,
+								secondary:
+									delivery.failureCode === undefined
+										? ''
+										: format.code('problem', delivery.failureCode),
+								secondaryTone: 'fail',
 								strong: true
 							})
 						},
 						{
-							label: format.text('mailTemplate'),
-							width: '26%',
+							label: format.text('mailColumnKind'),
+							width: '20%',
+							priority: 2,
 							cell: (delivery) => ({
 								kind: 'text',
-								primary: readableCode(delivery.template),
-								...(delivery.failureCode === undefined
-									? {}
-									: { secondary: readableCode(delivery.failureCode) })
-							})
-						},
-						{
-							label: format.text('mailUpdated'),
-							width: '18%',
-							cell: (delivery) => ({
-								kind: 'text',
-								primary: format.relativeStandalone(delivery.updatedAt),
-								mono: true
+								primary: format.code('mailKind', delivery.template),
+								quiet: true
 							})
 						},
 						{
 							label: format.text('mailStatus'),
+							width: '130px',
 							cell: (delivery) => ({
 								kind: 'status',
 								text: format.text(STATE[delivery.state].text),
 								tone: STATE[delivery.state].tone
 							})
+						},
+						{
+							label: format.text('mailUpdated'),
+							width: '130px',
+							align: 'end',
+							cell: (delivery) => ({
+								kind: 'text',
+								primary: format.relativeStandalone(delivery.updatedAt),
+								mono: true,
+								quiet: true
+							})
 						}
 					],
+					open: (delivery) => this.openDelivery(delivery),
 					rowId: (delivery) => delivery.id,
 					rowName: (delivery) => delivery.recipient,
 					actions: (delivery) => this.actions(delivery),
@@ -221,7 +230,25 @@ export class MailPage extends Disposable implements PageView {
 		this.health.hidden = metrics.queues.every((queue) => queue.count === 0);
 	}
 
+	private openDelivery(delivery: Delivery): void {
+		this.dialog.value = this.instantiationService.createInstance(
+			DeliveryDialog,
+			delivery.id,
+			(state) => STATE[state].text,
+			() => void this.list.refresh()
+		);
+	}
+
 	private actions(delivery: Delivery): readonly PageRowAction[] {
+		const open: PageRowAction = {
+			label: this.format.text('mailOpen'),
+			icon: 'action.openExternal',
+			run: () => this.openDelivery(delivery)
+		};
+		return [open, ...this.changeActions(delivery)];
+	}
+
+	private changeActions(delivery: Delivery): readonly PageRowAction[] {
 		if (delivery.state === 'failed' || delivery.state === 'canceled')
 			return [
 				{

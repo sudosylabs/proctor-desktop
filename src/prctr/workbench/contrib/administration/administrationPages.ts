@@ -17,7 +17,10 @@ import { PolicyPage } from './policy/policyPage.js';
 import { RolesPage } from './roles/rolesPage.js';
 import { AuditsPage } from './records/auditsPage.js';
 import { RetentionPage } from './records/retentionPage.js';
+import { JobPage } from './operations/jobPage.js';
 import { JobsPage } from './operations/jobsPage.js';
+import { ProgressionPage } from './progression/progressionPage.js';
+import { ProgressionReviewPage } from './progression/progressionReviewPage.js';
 import { MailPage } from './operations/mailPage.js';
 import { StructurePage } from './structure/structurePage.js';
 import { UserPage } from './user/userPage.js';
@@ -129,6 +132,15 @@ export const administrationPageRegistry: Readonly<
 		'wide',
 		(i, body, actions) => i.createInstance(PeriodsPage, body, actions)
 	),
+	progression: list(
+		'progressionTitle',
+		(f) => f.text('progressionDescription'),
+		'wide',
+		(i, body, actions) => i.createInstance(ProgressionPage, body, actions)
+	),
+	progressionReview: record('reviewTitle', 'narrow', (i, body, actions, id) =>
+		i.createInstance(ProgressionReviewPage, body, actions, id)
+	),
 	roles: list(
 		'rolesTitle',
 		(f) => f.text('rolesDescription'),
@@ -158,6 +170,9 @@ export const administrationPageRegistry: Readonly<
 		(f) => f.text('jobsDescription'),
 		'wide',
 		(i, body, actions) => i.createInstance(JobsPage, body, actions)
+	),
+	job: record('jobTitle', 'narrow', (i, body, actions, id) =>
+		i.createInstance(JobPage, body, actions, id)
 	),
 	mail: list(
 		'mailTitle',

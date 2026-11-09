@@ -91,6 +91,8 @@ export interface AdminFormOptions {
 	readonly confirmLabel: string;
 	readonly confirmIcon: ProctorIconId;
 	readonly destructive?: boolean;
+	/** 560 pixels wide unless the form is short. */
+	readonly size?: 'small' | 'medium' | 'large';
 	/**
 	 * Builds the change from the values, or names the field that needs fixing and why. Text
 	 * values arrive trimmed; an empty optional field is undefined.
@@ -140,7 +142,7 @@ export class AdminFormDialog extends Disposable {
 			new PageDialog(pane, {
 				title: options.title,
 				...(options.description === undefined ? {} : { description: options.description }),
-				size: 'medium'
+				size: options.size ?? 'medium'
 			})
 		);
 		for (const spec of options.fields) this.fields.push(this.createField(spec));
@@ -381,6 +383,7 @@ export class AdminFormDialog extends Disposable {
 
 	private setWorking(working: boolean): void {
 		this.working = working;
+		this.dialog.setClosable(!working);
 		this.cancel.setState({
 			label: this.format.text('cancel'),
 			icon: proctorIconFactory('action.close'),

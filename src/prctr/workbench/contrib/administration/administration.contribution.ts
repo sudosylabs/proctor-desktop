@@ -19,6 +19,9 @@ import {
 	type AdministrationLocation
 } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { ILocalizationService } from '../../services/localization/common/localization.js';
+import type { AdministrationResponse } from '../../../platform/administration/common/administrationProtocol.js';
+import type { ApiSubscription } from '../../../platform/serverApi/common/apiObservation.js';
+import { IAdministrationService } from '../../services/administration/common/administration.js';
 import { administrationMessages as messages } from './administrationMessages.js';
 import { administrationPageRegistry } from './administrationPages.js';
 import { AdministrationPane, type AdministrationModel } from './administrationPane.js';
@@ -41,6 +44,7 @@ class AdministrationContribution extends Disposable {
 		@IWorkbenchPaneHostService private readonly host: IWorkbenchPaneHostService,
 		@IWorkbenchItemResolverService registry: IWorkbenchItemResolverService,
 		@ILocalizationService private readonly localization: ILocalizationService,
+		@IAdministrationService private readonly administration: IAdministrationService,
 		@IInstantiationService instantiationService: IInstantiationService
 	) {
 		super();
@@ -81,6 +85,41 @@ class AdministrationContribution extends Disposable {
 			}
 		});
 		this.show(false);
+		this.watchCounts();
+	}
+
+	/**
+	 * Follows what waits on the sidebar's pages. A count the person can't list is left out; a
+	 * refusal of every count stops following them.
+	 */
+	private watchCounts(): void {
+		let subscription: ApiSubscription | undefined;
+		let stopped = false;
+		const deliver = (response: AdministrationResponse): void => {
+			if (this.disposed || stopped) return;
+			if (response.kind === 'error') {
+				if (response.reason === 'noAccess' || response.reason === 'sessionEnded') {
+					stopped = true;
+					subscription?.dispose();
+				}
+				return;
+			}
+			if (response.kind !== 'data' || response.data.resource !== 'counts') return;
+			const counts = response.data.value;
+			this.navigation.setAdministrationCount('invitations', counts.pendingInvitations);
+			this.navigation.setAdministrationCount('imports', counts.openImports);
+			this.navigation.setAdministrationCount(
+				'jobs',
+				counts.failedJobs && { ...counts.failedJobs, attention: true }
+			);
+			this.navigation.setAdministrationCount(
+				'mail',
+				counts.failedMailDeliveries && { ...counts.failedMailDeliveries, attention: true }
+			);
+		};
+		subscription = this.administration.observe({ kind: 'counts' }, deliver);
+		if (subscription !== undefined) this._register(subscription);
+		else void this.administration.request({ kind: 'counts' }).then(deliver, () => undefined);
 	}
 
 	private readonly itemFor: (location: AdministrationLocation) => WorkbenchItem;

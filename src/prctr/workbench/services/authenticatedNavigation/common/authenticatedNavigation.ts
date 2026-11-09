@@ -31,6 +31,13 @@ export const IAuthenticatedNavigationService = createDecorator<IAuthenticatedNav
 	'authenticatedNavigationService'
 );
 
+/** A count beside an Administration sidebar entry. */
+export interface AdministrationCount {
+	readonly count: number;
+	readonly atLeast: boolean;
+	readonly attention?: boolean;
+}
+
 /**
  * Where AuthenticatedWindow is. Product contributions assign the content area for
  * their own destinations when it changes; the frame owns the rail, sidebar and history.
@@ -61,6 +68,11 @@ export interface IAuthenticatedNavigationService {
 	setProductStatus(message: string, retry?: () => void): void;
 	/** Show how many items an Account page lists beside its sidebar entry; nothing hides it. */
 	setAccountCount(page: AccountPage, count: number | undefined): void;
+	/**
+	 * Show how many items wait on an Administration page, such as pending invitations; `atLeast`
+	 * adds "+" and `attention` marks failures. Nothing, or zero, hides it.
+	 */
+	setAdministrationCount(page: AdministrationPage, count: AdministrationCount | undefined): void;
 	/** Sign out of this window, as the sidebar's Sign out does, reporting a failure beside it. */
 	signOut(): void;
 }

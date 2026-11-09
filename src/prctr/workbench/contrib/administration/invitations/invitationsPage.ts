@@ -18,15 +18,18 @@ import type { PageView } from '../../../browser/authenticated/pages/pagePane.js'
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import type { PageRowAction } from '../../../browser/authenticated/pages/pageSection.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
+import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { AdminFilters } from '../widgets/adminFilters.js';
 import {
 	AdminList,
 	type AdminListItem,
+	type AdminCell,
 	type AdminListQuery,
 	type AdminTone
 } from '../widgets/adminList.js';
+import { readOnce } from '../widgets/adminReads.js';
 import { InviteDialog } from './inviteDialog.js';
 
 type Invitation = AdminListItem<'invitations'>;
@@ -55,6 +58,8 @@ export class InvitationsPage extends Disposable implements PageView {
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
 	private readonly changes: AdminChanges;
 	private query: AdminListQuery<'invitations'> = { state: 'pending' };
+	/** Who sent each invitation, read once per inviter. */
+	private readonly names = new Map<string, string>();
 
 	constructor(
 		body: HTMLElement,
@@ -62,7 +67,8 @@ export class InvitationsPage extends Disposable implements PageView {
 		@IInstantiationService private readonly instantiationService: IInstantiationService,
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
 		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService,
-		@IPagePaneContext private readonly pane: IPagePaneContext
+		@IPagePaneContext private readonly pane: IPagePaneContext,
+		@IAdministrationService private readonly administration: IAdministrationService
 	) {
 		super();
 		this.changes = this._register(instantiationService.createInstance(AdminChanges));
@@ -131,28 +137,50 @@ export class InvitationsPage extends Disposable implements PageView {
 					columns: [
 						{
 							label: format.text('invitationsColumnInvitee'),
-							width: '38%',
+							width: '34%',
+							min: 220,
 							cell: (invitation) => ({
 								kind: 'text',
 								primary: invitation.email,
+								secondary:
+									invitation.delivery?.failureCode === undefined
+										? ''
+										: format.code('problem', invitation.delivery.failureCode),
+								secondaryTone: 'fail',
 								strong: true
 							})
 						},
 						{
 							label: format.text('invitationsColumnKind'),
-							width: '26%',
+							width: '24%',
 							cell: (invitation) => ({
 								kind: 'text',
 								primary: format.text(PURPOSE_TEXT[invitation.purpose])
 							})
 						},
 						{
+							label: format.text('invitationsColumnBy'),
+							width: '18%',
+							priority: 3,
+							foldLabel: true,
+							cell: (invitation) => ({
+								kind: 'text',
+								primary:
+									this.names.get(invitation.inviterId) ??
+									format.text('inviteLoading'),
+								quiet: true
+							})
+						},
+						{
 							label: format.text('invitationsColumnExpires'),
-							width: '16%',
+							width: '12%',
+							align: 'end',
+							priority: 2,
 							cell: (invitation) => ({
 								kind: 'text',
 								primary: format.date(invitation.expiresAt),
-								mono: true
+								mono: true,
+								quiet: true
 							})
 						},
 						{
@@ -168,21 +196,45 @@ export class InvitationsPage extends Disposable implements PageView {
 				}
 			)
 		);
+		this._register(this.list.onDidLoad((invitations) => void this.loadNames(invitations)));
 	}
 
-	private status(invitation: Invitation): { kind: 'status'; text: string; tone: AdminTone } {
+	private async loadNames(invitations: readonly Invitation[]): Promise<void> {
+		const missing = [...new Set(invitations.map((invitation) => invitation.inviterId))].filter(
+			(id) => !this.names.has(id)
+		);
+		if (missing.length === 0) return;
+		const users = await Promise.all(
+			missing.map((id) => readOnce(this.administration, { kind: 'user', id }))
+		);
+		if (this._store.isDisposed) return;
+		missing.forEach((id, index) => {
+			const user = users[index]!;
+			this.names.set(
+				id,
+				user.kind === 'data'
+					? user.value.displayName
+					: this.format.text('classUnknownPerson')
+			);
+		});
+		this.list.redraw();
+	}
+
+	private status(invitation: Invitation): AdminCell {
 		const failed =
 			invitation.state === 'pending' &&
 			(invitation.delivery?.state === 'failed' ||
 				invitation.delivery?.state === 'suppressed');
 		if (failed)
 			return { kind: 'status', text: this.format.text('invitationBounced'), tone: 'fail' };
-		const tone: AdminTone =
-			invitation.state === 'pending'
-				? 'warn'
-				: invitation.state === 'accepted'
-					? 'ok'
-					: 'neutral';
+		if (invitation.state === 'pending')
+			return {
+				kind: 'status',
+				text: this.format.text(STATE_TEXT.pending),
+				tone: 'warn',
+				icon: 'status.time'
+			};
+		const tone: AdminTone = invitation.state === 'accepted' ? 'ok' : 'neutral';
 		return { kind: 'status', text: this.format.text(STATE_TEXT[invitation.state]), tone };
 	}
 

@@ -2663,6 +2663,1389 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
+    "administration.affiliation.external": {
+      "message": "External",
+      "description": "An external affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.affiliation.staff": {
+      "message": "Staff",
+      "description": "A staff affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.affiliation.student": {
+      "message": "Student",
+      "description": "A student affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.affiliation.teacher": {
+      "message": "Teacher",
+      "description": "A teacher affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.audits.period": {
+      "message": "Period",
+      "description": "Filter of how far back the audit log reaches.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.audits.period.any": {
+      "message": "Any time",
+      "description": "The audit log shows everything.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.audits.period.day": {
+      "message": "Last 24 hours",
+      "description": "The audit log shows the last day.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.audits.period.month": {
+      "message": "Last 30 days",
+      "description": "The audit log shows the last month.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.audits.period.week": {
+      "message": "Last 7 days",
+      "description": "The audit log shows the last week.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.audits.reason": {
+      "message": "Reason: {reason}",
+      "description": "Under an event: why an administrator did it.",
+      "placeholders": [
+        "reason"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.audits.where": {
+      "message": "Where",
+      "description": "Column of the app and address an event came from.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.bulk.class": {
+      "message": "Class",
+      "description": "Label of the class to enrol people in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.disable.body": {
+      "message": "They’re signed out everywhere at once and can’t sign in until their account is enabled again. Their submissions, results and history are kept.",
+      "description": "Explains disabling several accounts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.disable.confirm": {
+      "message": "Disable {count} accounts",
+      "description": "Confirms disabling the chosen accounts. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.disable.confirm.one": {
+      "message": "Disable 1 account",
+      "description": "Confirms disabling the chosen accounts. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.disable.title": {
+      "message": "Disable {count} accounts?",
+      "description": "Confirms disabling the chosen people’s accounts. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.disable.title.one": {
+      "message": "Disable 1 account?",
+      "description": "Confirms disabling the chosen people’s accounts. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enable.body": {
+      "message": "They can sign in again.",
+      "description": "Explains enabling several accounts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enable.confirm": {
+      "message": "Enable {count} accounts",
+      "description": "Confirms enabling the chosen accounts. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enable.confirm.one": {
+      "message": "Enable 1 account",
+      "description": "Confirms enabling the chosen accounts. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enable.title": {
+      "message": "Enable {count} accounts?",
+      "description": "Confirms enabling the chosen people’s accounts. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enable.title.one": {
+      "message": "Enable 1 account?",
+      "description": "Confirms enabling the chosen people’s accounts. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enrol.body": {
+      "message": "They join the class from the date you choose. Each person is handled on their own, so one who can’t be enrolled doesn’t stop the others.",
+      "description": "Explains enrolling several people.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enrol.confirm": {
+      "message": "Enrol {count} people",
+      "description": "Confirms enrolling the chosen people. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enrol.confirm.one": {
+      "message": "Enrol 1 person",
+      "description": "Confirms enrolling the chosen people. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enrol.title": {
+      "message": "Enrol {count} people in a class",
+      "description": "Title of the dialog that enrols chosen people. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.enrol.title.one": {
+      "message": "Enrol 1 person in a class",
+      "description": "Title of the dialog that enrols chosen people. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.from": {
+      "message": "From",
+      "description": "Label of the day a bulk change starts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.from.hint": {
+      "message": "Their enrolment starts on this date and appears in the class at once.",
+      "description": "Hint under the start date of an enrolment.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.grant.body": {
+      "message": "The role applies where you choose: the whole institution or one unit. Each person is handled on their own.",
+      "description": "Explains granting a role to several people.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.grant.confirm": {
+      "message": "Grant to {count} people",
+      "description": "Confirms granting the role. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.grant.confirm.one": {
+      "message": "Grant to 1 person",
+      "description": "Confirms granting the role. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.grant.title": {
+      "message": "Grant {count} people a role",
+      "description": "Title of the dialog that grants chosen people a role. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.grant.title.one": {
+      "message": "Grant 1 person a role",
+      "description": "Title of the dialog that grants chosen people a role. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.people": {
+      "message": "People",
+      "description": "Label of the chosen people in a bulk dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.people.count": {
+      "message": "{count} people",
+      "description": "Footnote of a bulk dialog: how many people it changes. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.people.count.one": {
+      "message": "1 person",
+      "description": "Footnote of a bulk dialog: how many people it changes. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.result.all": {
+      "message": "Done for all {count} people",
+      "description": "Toast when a change applied to everyone chosen. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.result.all.one": {
+      "message": "Done for 1 person",
+      "description": "Toast when a change applied to everyone chosen. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.result.body": {
+      "message": "Fix what’s below and try those people again on their own; the others are already done.",
+      "description": "Explains a partly applied change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.result.close": {
+      "message": "Done",
+      "description": "Closes the result of a change for several people.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.result.done": {
+      "message": "Done",
+      "description": "A person the change applied to.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.result.same": {
+      "message": "Already as asked, nothing changed",
+      "description": "A person the change didn’t need to change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.result.title": {
+      "message": "{done} of {count} done",
+      "description": "Title of the result of a change for several people, as in \"2 of 3 done\".",
+      "placeholders": [
+        "done",
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.role": {
+      "message": "Role",
+      "description": "Label of the role to grant.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.sign.out.body": {
+      "message": "Every session they have ends now, on every device. They can sign in again straight away.",
+      "description": "Explains signing several people out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.sign.out.title": {
+      "message": "Sign {count} people out everywhere?",
+      "description": "Confirms ending every session of the chosen people. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.sign.out.title.one": {
+      "message": "Sign 1 person out everywhere?",
+      "description": "Confirms ending every session of the chosen people. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.unit": {
+      "message": "Unit",
+      "description": "Label of the unit whose classes or roles a bulk dialog offers.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.where": {
+      "message": "Where",
+      "description": "Label of where a role applies.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.where.institution": {
+      "message": "The whole institution",
+      "description": "A role that applies everywhere.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.client.browser": {
+      "message": "Web browser",
+      "description": "An event that came from a web browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.client.cli": {
+      "message": "Command line",
+      "description": "An event that came from the command-line tool.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.client.desktop": {
+      "message": "Proctor Desktop",
+      "description": "An event that came from Proctor Desktop.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.code.job.audit.attempt.sweep": {
+      "message": "Audit sweep",
+      "description": "A kind of background job, for `audit.attempt_sweep`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.command.outcome.cleanup": {
+      "message": "Command cleanup",
+      "description": "A kind of background job, for `command_outcome.cleanup`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.exam.export.build": {
+      "message": "Exam export",
+      "description": "A kind of background job, for `exam_export.build`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.exam.export.cleanup": {
+      "message": "Export cleanup",
+      "description": "A kind of background job, for `exam_export.cleanup`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.exam.sitting.lifecycle": {
+      "message": "Sitting schedule",
+      "description": "A kind of background job, for `exam_sitting.lifecycle`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.exam.sitting.lifecycle.recovery": {
+      "message": "Sitting recovery",
+      "description": "A kind of background job, for `exam_sitting.lifecycle_recovery`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.exam.sitting.sealing": {
+      "message": "Sitting sealing",
+      "description": "A kind of background job, for `exam_sitting.sealing`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.file.purge.expired.content": {
+      "message": "File cleanup",
+      "description": "A kind of background job, for `file.purge_expired_content`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.invitation.maintenance": {
+      "message": "Invitation upkeep",
+      "description": "A kind of background job, for `invitation.maintenance`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.job.cleanup": {
+      "message": "Job cleanup",
+      "description": "A kind of background job, for `job.cleanup`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.mail.cleanup": {
+      "message": "Mail cleanup",
+      "description": "A kind of background job, for `mail.cleanup`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.mail.deliver": {
+      "message": "Email delivery",
+      "description": "A kind of background job, for `mail.deliver`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.mail.deliver.credential": {
+      "message": "Sign-in email",
+      "description": "A kind of background job, for `mail.deliver_credential`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.mail.expand.sitting": {
+      "message": "Sitting email",
+      "description": "A kind of background job, for `mail.expand_sitting`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.mail.rekey": {
+      "message": "Mail key rotation",
+      "description": "A kind of background job, for `mail.rekey`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.mfa.rekey": {
+      "message": "Two-step key rotation",
+      "description": "A kind of background job, for `mfa.rekey`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.onboarding.import.execute": {
+      "message": "Onboarding import",
+      "description": "A kind of background job, for `onboarding_import.execute`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.onboarding.import.parse": {
+      "message": "Import check",
+      "description": "A kind of background job, for `onboarding_import.parse`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.profile.picture.generate.default": {
+      "message": "Profile photo",
+      "description": "A kind of background job, for `profile_picture.generate_default`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.profile.picture.reconcile.defaults": {
+      "message": "Photo upkeep",
+      "description": "A kind of background job, for `profile_picture.reconcile_defaults`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.retention.expire": {
+      "message": "Retention expiry",
+      "description": "A kind of background job, for `retention.expire`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.retention.notices": {
+      "message": "Retention notices",
+      "description": "A kind of background job, for `retention.notices`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.retention.purge": {
+      "message": "Record cleanup",
+      "description": "A kind of background job, for `retention.purge`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.retention.reconcile": {
+      "message": "Retention check",
+      "description": "A kind of background job, for `retention.reconcile`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.session.purge.retired": {
+      "message": "Session cleanup",
+      "description": "A kind of background job, for `session.purge_retired`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.job.student.progression.preview": {
+      "message": "Progression check",
+      "description": "A kind of background job, for `student_progression.preview`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.academic.academic.unit.assigned": {
+      "message": "Unit membership",
+      "description": "A kind of email Proctor sends, for `academic.academic_unit_assigned`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.academic.academic.unit.assignment.ended": {
+      "message": "Unit membership ended",
+      "description": "A kind of email Proctor sends, for `academic.academic_unit_assignment_ended`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.academic.class.enrolled": {
+      "message": "Class enrolment",
+      "description": "A kind of email Proctor sends, for `academic.class_enrolled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.academic.class.enrollment.ended": {
+      "message": "Enrolment ended",
+      "description": "A kind of email Proctor sends, for `academic.class_enrollment_ended`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.academic.class.transferred": {
+      "message": "Class transfer",
+      "description": "A kind of email Proctor sends, for `academic.class_transferred`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.access.academic.unit.role.invitation": {
+      "message": "Invitation",
+      "description": "A kind of email Proctor sends, for `access.academic_unit_role_invitation`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.access.institution.role.invitation": {
+      "message": "Invitation",
+      "description": "A kind of email Proctor sends, for `access.institution_role_invitation`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.access.invitation.accepted": {
+      "message": "Invitation accepted",
+      "description": "A kind of email Proctor sends, for `access.invitation_accepted`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.access.invitation.revoked": {
+      "message": "Invitation withdrawn",
+      "description": "A kind of email Proctor sends, for `access.invitation_revoked`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.access.student.class.invitation": {
+      "message": "Invitation",
+      "description": "A kind of email Proctor sends, for `access.student_class_invitation`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.access.teacher.academic.unit.invitation": {
+      "message": "Invitation",
+      "description": "A kind of email Proctor sends, for `access.teacher_academic_unit_invitation`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.authorization.institution.role.assigned": {
+      "message": "Role granted",
+      "description": "A kind of email Proctor sends, for `authorization.institution_role_assigned`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.authorization.institution.role.ended": {
+      "message": "Role ended",
+      "description": "A kind of email Proctor sends, for `authorization.institution_role_ended`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.authorization.scoped.role.assigned": {
+      "message": "Role granted",
+      "description": "A kind of email Proctor sends, for `authorization.scoped_role_assigned`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.authorization.scoped.role.ended": {
+      "message": "Role ended",
+      "description": "A kind of email Proctor sends, for `authorization.scoped_role_ended`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.manager.added": {
+      "message": "Exam manager added",
+      "description": "A kind of email Proctor sends, for `exam.manager_added`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.manager.removed": {
+      "message": "Exam manager removed",
+      "description": "A kind of email Proctor sends, for `exam.manager_removed`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.ownership.transferred.from.you": {
+      "message": "Exam handed over",
+      "description": "A kind of email Proctor sends, for `exam.ownership_transferred_from_you`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.ownership.transferred.to.you": {
+      "message": "Exam handed over",
+      "description": "A kind of email Proctor sends, for `exam.ownership_transferred_to_you`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.result.released": {
+      "message": "Result released",
+      "description": "A kind of email Proctor sends, for `exam.result_released`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.retention.scheduled": {
+      "message": "Records cleanup notice",
+      "description": "A kind of email Proctor sends, for `exam.retention_scheduled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.sitting.assignment.removed": {
+      "message": "Sitting removed",
+      "description": "A kind of email Proctor sends, for `exam.sitting_assignment_removed`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.sitting.canceled": {
+      "message": "Sitting cancelled",
+      "description": "A kind of email Proctor sends, for `exam.sitting_canceled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.sitting.rescheduled": {
+      "message": "Sitting moved",
+      "description": "A kind of email Proctor sends, for `exam.sitting_rescheduled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.sitting.scheduled": {
+      "message": "Sitting scheduled",
+      "description": "A kind of email Proctor sends, for `exam.sitting_scheduled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.submission.automatically.sealed": {
+      "message": "Submission sealed",
+      "description": "A kind of email Proctor sends, for `exam.submission_automatically_sealed`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.submission.manager.ended": {
+      "message": "Submission ended",
+      "description": "A kind of email Proctor sends, for `exam.submission_manager_ended`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.exam.submission.received": {
+      "message": "Submission received",
+      "description": "A kind of email Proctor sends, for `exam.submission_received`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.account.disabled": {
+      "message": "Account disabled",
+      "description": "A kind of email Proctor sends, for `identity.account_disabled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.account.enabled": {
+      "message": "Account enabled",
+      "description": "A kind of email Proctor sends, for `identity.account_enabled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.email.change.verify.new": {
+      "message": "Email change",
+      "description": "A kind of email Proctor sends, for `identity.email_change_verify_new`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.email.change.warning.old": {
+      "message": "Email change notice",
+      "description": "A kind of email Proctor sends, for `identity.email_change_warning_old`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.email.verified.by.admin": {
+      "message": "Email verified",
+      "description": "A kind of email Proctor sends, for `identity.email_verified_by_admin`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.mfa.disabled": {
+      "message": "Two-step turned off",
+      "description": "A kind of email Proctor sends, for `identity.mfa_disabled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.mfa.enabled": {
+      "message": "Two-step turned on",
+      "description": "A kind of email Proctor sends, for `identity.mfa_enabled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.mfa.recovery.codes.regenerated": {
+      "message": "New recovery codes",
+      "description": "A kind of email Proctor sends, for `identity.mfa_recovery_codes_regenerated`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.mfa.reset": {
+      "message": "Two-step reset",
+      "description": "A kind of email Proctor sends, for `identity.mfa_reset`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.password.changed": {
+      "message": "Password changed",
+      "description": "A kind of email Proctor sends, for `identity.password_changed`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.password.reset": {
+      "message": "Password reset",
+      "description": "A kind of email Proctor sends, for `identity.password_reset`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.personal.access.token.created": {
+      "message": "Token created",
+      "description": "A kind of email Proctor sends, for `identity.personal_access_token_created`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.personal.access.token.disabled": {
+      "message": "Token turned off",
+      "description": "A kind of email Proctor sends, for `identity.personal_access_token_disabled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.personal.access.token.enabled": {
+      "message": "Token turned on",
+      "description": "A kind of email Proctor sends, for `identity.personal_access_token_enabled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.personal.access.token.revoked": {
+      "message": "Token revoked",
+      "description": "A kind of email Proctor sends, for `identity.personal_access_token_revoked`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.sessions.revoked.by.admin": {
+      "message": "Signed out by an administrator",
+      "description": "A kind of email Proctor sends, for `identity.sessions_revoked_by_admin`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.identity.verify.email": {
+      "message": "Email verification",
+      "description": "A kind of email Proctor sends, for `identity.verify_email`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.mail.system.mail.test": {
+      "message": "Test email",
+      "description": "A kind of email Proctor sends, for `system.mail_test`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.academic.unit.member.conflict": {
+      "message": "Already a member of this unit.",
+      "description": "Why the server refused or stopped something, for the code `academic_unit_member.conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.academic.unit.member.invalid": {
+      "message": "This unit membership isn’t valid.",
+      "description": "Why the server refused or stopped something, for the code `academic_unit_member.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.administration.unavailable": {
+      "message": "Administration isn’t available right now.",
+      "description": "Why the server refused or stopped something, for the code `administration.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.affiliation.conflict": {
+      "message": "Already has this affiliation for these dates.",
+      "description": "Why the server refused or stopped something, for the code `affiliation.conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.affiliation.invalid": {
+      "message": "This affiliation isn’t valid.",
+      "description": "Why the server refused or stopped something, for the code `affiliation.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.affiliation.student.has.active.enrollment": {
+      "message": "Is still enrolled in a class, so the student affiliation can’t end.",
+      "description": "Why the server refused or stopped something, for the code `affiliation.student_has_active_enrollment`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.audit.unavailable": {
+      "message": "The change couldn’t be recorded in Audits, so it wasn’t made.",
+      "description": "Why the server refused or stopped something, for the code `audit.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.authentication.reauthentication.required": {
+      "message": "Needs you to confirm it’s you first.",
+      "description": "Why the server refused or stopped something, for the code `authentication.reauthentication_required`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.authentication.strong.required": {
+      "message": "Needs a sign-in with two-step verification.",
+      "description": "Why the server refused or stopped something, for the code `authentication.strong_required`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.authentication.token.invalid": {
+      "message": "Your sign-in ended.",
+      "description": "Why the server refused or stopped something, for the code `authentication.token_invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.authorization.denied": {
+      "message": "You don’t have access to do this.",
+      "description": "Why the server refused or stopped something, for the code `authorization.denied`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.authorization.request.invalid": {
+      "message": "This request can’t be checked for access.",
+      "description": "Why the server refused or stopped something, for the code `authorization.request.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.authorization.unavailable": {
+      "message": "Access couldn’t be checked right now.",
+      "description": "Why the server refused or stopped something, for the code `authorization.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.class.enrollment.conflict": {
+      "message": "Is already enrolled in a class of this level for this period.",
+      "description": "Why the server refused or stopped something, for the code `class.enrollment_conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.class.member.invalid": {
+      "message": "This enrolment isn’t valid.",
+      "description": "Why the server refused or stopped something, for the code `class_member.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.class.member.student.affiliation.required": {
+      "message": "Isn’t a student here yet, so can’t join a class.",
+      "description": "Why the server refused or stopped something, for the code `class_member.student_affiliation_required`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.database.unavailable": {
+      "message": "Storage didn’t answer in time.",
+      "description": "Why the server refused or stopped something, for the code `database.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.dependency.unavailable": {
+      "message": "A service Proctor relies on didn’t answer.",
+      "description": "Why the server refused or stopped something, for the code `dependency.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.exam.export.expired": {
+      "message": "The export expired before it finished.",
+      "description": "Why the server refused or stopped something, for the code `exam.export.expired`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.exam.export.unavailable": {
+      "message": "The export isn’t available.",
+      "description": "Why the server refused or stopped something, for the code `exam.export.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.file.backend.unavailable": {
+      "message": "File storage didn’t answer.",
+      "description": "Why the server refused or stopped something, for the code `file.backend_unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.idempotency.conflict": {
+      "message": "A different change was already sent with this request.",
+      "description": "Why the server refused or stopped something, for the code `idempotency.conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.idempotency.in.progress": {
+      "message": "The same change is still being made.",
+      "description": "Why the server refused or stopped something, for the code `idempotency.in_progress`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.invitation.class.period.conflict": {
+      "message": "The class isn’t open in the chosen period.",
+      "description": "Why the server refused or stopped something, for the code `invitation.class_period_conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.invitation.conflict": {
+      "message": "Already has an open invitation for this.",
+      "description": "Why the server refused or stopped something, for the code `invitation.conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.invitation.invalid": {
+      "message": "This invitation isn’t valid.",
+      "description": "Why the server refused or stopped something, for the code `invitation.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.invitation.mail.unavailable": {
+      "message": "Invitation email can’t be sent right now.",
+      "description": "Why the server refused or stopped something, for the code `invitation.mail_unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.invitation.role.not.delegable": {
+      "message": "You can’t give this role to others.",
+      "description": "Why the server refused or stopped something, for the code `invitation.role_not_delegable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.invitation.unavailable": {
+      "message": "Invitations aren’t available right now.",
+      "description": "Why the server refused or stopped something, for the code `invitation.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.job.canceled": {
+      "message": "The job was cancelled.",
+      "description": "Why the server refused or stopped something, for the code `job.canceled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.job.checkpoint.invalid": {
+      "message": "The job’s saved progress couldn’t be used.",
+      "description": "Why the server refused or stopped something, for the code `job.checkpoint.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.job.command.invalid": {
+      "message": "The job was given something it can’t do.",
+      "description": "Why the server refused or stopped something, for the code `job.command.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.job.invariant.failed": {
+      "message": "The job stopped to keep records consistent.",
+      "description": "Why the server refused or stopped something, for the code `job.invariant_failed`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.delivery.canceled": {
+      "message": "Delivery was cancelled.",
+      "description": "Why the server refused or stopped something, for the code `mail.delivery.canceled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.delivery.conflict": {
+      "message": "The delivery changed while this was sent.",
+      "description": "Why the server refused or stopped something, for the code `mail.delivery.conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.delivery.expired": {
+      "message": "Delivery stopped trying after its deadline.",
+      "description": "Why the server refused or stopped something, for the code `mail.delivery.expired`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.delivery.failed": {
+      "message": "The email couldn’t be delivered.",
+      "description": "Why the server refused or stopped something, for the code `mail.delivery.failed`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.delivery.not.found": {
+      "message": "The delivery no longer exists.",
+      "description": "Why the server refused or stopped something, for the code `mail.delivery.not_found`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.delivery.obsolete": {
+      "message": "The email was no longer needed.",
+      "description": "Why the server refused or stopped something, for the code `mail.delivery.obsolete`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.delivery.recipient.ineligible": {
+      "message": "The person can no longer receive this email.",
+      "description": "Why the server refused or stopped something, for the code `mail.delivery.recipient_ineligible`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.delivery.suppressed.disabled": {
+      "message": "Not sent because the account is disabled.",
+      "description": "Why the server refused or stopped something, for the code `mail.delivery.suppressed_disabled`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.delivery.unavailable": {
+      "message": "Mail delivery isn’t available.",
+      "description": "Why the server refused or stopped something, for the code `mail.delivery.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.message.invalid": {
+      "message": "The email couldn’t be built.",
+      "description": "Why the server refused or stopped something, for the code `mail.message.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.operator.retry": {
+      "message": "Retried by an administrator.",
+      "description": "Why the server refused or stopped something, for the code `mail.operator.retry`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.payload.unavailable": {
+      "message": "The email’s content is no longer available.",
+      "description": "Why the server refused or stopped something, for the code `mail.payload.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.rekey.fenced": {
+      "message": "Another key rotation took over.",
+      "description": "Why the server refused or stopped something, for the code `mail.rekey.fenced`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.rekey.incomplete": {
+      "message": "Not every email was re-encrypted.",
+      "description": "Why the server refused or stopped something, for the code `mail.rekey.incomplete`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.rekey.invariant.failed": {
+      "message": "Key rotation stopped to keep mail consistent.",
+      "description": "Why the server refused or stopped something, for the code `mail.rekey.invariant_failed`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.rekey.payload.unavailable": {
+      "message": "Some email content couldn’t be read to re-encrypt it.",
+      "description": "Why the server refused or stopped something, for the code `mail.rekey.payload_unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.rekey.primary.mismatch": {
+      "message": "The primary mail key changed during rotation.",
+      "description": "Why the server refused or stopped something, for the code `mail.rekey.primary_mismatch`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.sitting.bundle.unavailable": {
+      "message": "The sitting’s email bundle isn’t available.",
+      "description": "Why the server refused or stopped something, for the code `mail.sitting.bundle_unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.sitting.invalid": {
+      "message": "The sitting’s email couldn’t be built.",
+      "description": "Why the server refused or stopped something, for the code `mail.sitting.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.sitting.recipient.unavailable": {
+      "message": "A recipient of the sitting’s email isn’t available.",
+      "description": "Why the server refused or stopped something, for the code `mail.sitting.recipient_unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.sitting.unavailable": {
+      "message": "The sitting isn’t available for email.",
+      "description": "Why the server refused or stopped something, for the code `mail.sitting.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.transport.acceptance.uncertain": {
+      "message": "The mail server may not have accepted it.",
+      "description": "Why the server refused or stopped something, for the code `mail.transport.acceptance_uncertain`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.transport.permanent": {
+      "message": "The receiving server refused it for good.",
+      "description": "Why the server refused or stopped something, for the code `mail.transport.permanent`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.transport.temporary": {
+      "message": "The receiving server asked to try again later.",
+      "description": "Why the server refused or stopped something, for the code `mail.transport.temporary`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.transport.unknown": {
+      "message": "The mail server gave an unknown answer.",
+      "description": "Why the server refused or stopped something, for the code `mail.transport.unknown`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mail.unavailable": {
+      "message": "Email can’t be sent right now.",
+      "description": "Why the server refused or stopped something, for the code `mail.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mfa.rekey.fenced": {
+      "message": "Another key rotation took over.",
+      "description": "Why the server refused or stopped something, for the code `mfa.rekey.fenced`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mfa.rekey.incomplete": {
+      "message": "Not every two-step secret was resealed.",
+      "description": "Why the server refused or stopped something, for the code `mfa.rekey.incomplete`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mfa.rekey.invariant.failed": {
+      "message": "Key rotation stopped to keep two-step secrets consistent.",
+      "description": "Why the server refused or stopped something, for the code `mfa.rekey.invariant_failed`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mfa.rekey.primary.mismatch": {
+      "message": "The primary two-step key changed during rotation.",
+      "description": "Why the server refused or stopped something, for the code `mfa.rekey.primary_mismatch`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.mfa.rekey.secret.unavailable": {
+      "message": "Some two-step secrets couldn’t be read.",
+      "description": "Why the server refused or stopped something, for the code `mfa.rekey.secret_unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.onboarding.batch.duplicate": {
+      "message": "Appears more than once in this list.",
+      "description": "Why the server refused or stopped something, for the code `onboarding_batch.duplicate`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.onboarding.import.authorization.lost": {
+      "message": "You lost access while the import ran.",
+      "description": "Why the server refused or stopped something, for the code `onboarding_import.authorization_lost`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.onboarding.import.file.invalid": {
+      "message": "The file couldn’t be read as CSV.",
+      "description": "Why the server refused or stopped something, for the code `onboarding_import.file_invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.request.invalid": {
+      "message": "Something in this request isn’t valid.",
+      "description": "Why the server refused or stopped something, for the code `request.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.resource.not.found": {
+      "message": "No longer exists, or you can’t see it.",
+      "description": "Why the server refused or stopped something, for the code `resource.not_found`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.retention.unavailable": {
+      "message": "Retention isn’t available right now.",
+      "description": "Why the server refused or stopped something, for the code `retention.unavailable`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.role.binding.conflict": {
+      "message": "Already has this role here.",
+      "description": "Why the server refused or stopped something, for the code `role_binding.conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.role.binding.invalid": {
+      "message": "This role can’t be granted here.",
+      "description": "Why the server refused or stopped something, for the code `role_binding.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.role.binding.last.system.admin": {
+      "message": "Is the last system administrator, so this role must stay.",
+      "description": "Why the server refused or stopped something, for the code `role_binding.last_system_admin`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.role.binding.system.admin.scope.invalid": {
+      "message": "System administrator can only be granted institution-wide.",
+      "description": "Why the server refused or stopped something, for the code `role_binding.system_admin_scope_invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.session.not.found": {
+      "message": "Has no sessions to end.",
+      "description": "Why the server refused or stopped something, for the code `session.not_found`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.student.progression.authorization.lost": {
+      "message": "You lost access while the progression ran.",
+      "description": "Why the server refused or stopped something, for the code `student_progression.authorization_lost`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.student.progression.conflict": {
+      "message": "Another progression already moves these students.",
+      "description": "Why the server refused or stopped something, for the code `student_progression.conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.student.progression.destination.conflict": {
+      "message": "Already enrolled in the class they’d move to.",
+      "description": "Why the server refused or stopped something, for the code `student_progression.destination_conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.student.progression.destination.exists": {
+      "message": "Already enrolled in the class they’d move to.",
+      "description": "Why the server refused or stopped something, for the code `student_progression.destination_exists`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.student.progression.effective.date.conflict": {
+      "message": "The move date clashes with an enrolment.",
+      "description": "Why the server refused or stopped something, for the code `student_progression.effective_date_conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.student.progression.ineligible.target": {
+      "message": "Can’t move to that class.",
+      "description": "Why the server refused or stopped something, for the code `student_progression.ineligible_target`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.student.progression.lineage.conflict": {
+      "message": "The classes aren’t in a sequence a progression can follow.",
+      "description": "Why the server refused or stopped something, for the code `student_progression.lineage_conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.student.progression.roster.too.large": {
+      "message": "The class has too many students for one progression.",
+      "description": "Why the server refused or stopped something, for the code `student_progression.roster_too_large`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.student.progression.target.conflict": {
+      "message": "The class they’d move to changed.",
+      "description": "Why the server refused or stopped something, for the code `student_progression.target_conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.user.conflict": {
+      "message": "Clashes with another account.",
+      "description": "Why the server refused or stopped something, for the code `user.conflict`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.user.invalid": {
+      "message": "This account change isn’t valid.",
+      "description": "Why the server refused or stopped something, for the code `user.invalid`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.user.last.system.admin": {
+      "message": "Is the last system administrator, so the account must stay enabled.",
+      "description": "Why the server refused or stopped something, for the code `user.last_system_admin`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.problem.user.not.found": {
+      "message": "The account no longer exists.",
+      "description": "Why the server refused or stopped something, for the code `user.not_found`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.stage.completed": {
+      "message": "Finished",
+      "description": "How far a background job got, for `completed`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.stage.executing": {
+      "message": "Running",
+      "description": "How far a background job got, for `executing`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.stage.expanding": {
+      "message": "Preparing",
+      "description": "How far a background job got, for `expanding`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.stage.purging": {
+      "message": "Deleting",
+      "description": "How far a background job got, for `purging`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.stage.reconciling": {
+      "message": "Checking",
+      "description": "How far a background job got, for `reconciling`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.stage.reencrypting": {
+      "message": "Re-encrypting",
+      "description": "How far a background job got, for `reencrypting`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.stage.resealing": {
+      "message": "Resealing",
+      "description": "How far a background job got, for `resealing`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.code.stage.sealing": {
+      "message": "Sealing",
+      "description": "How far a background job got, for `sealing`.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/codes/codeMessages.ts"
+    },
+    "administration.duration.hours": {
+      "message": "{count} h",
+      "description": "A short duration in hours, as in \"2 h\".",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.duration.minutes": {
+      "message": "{count} min",
+      "description": "A short duration in minutes, as in \"4 min\".",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.duration.seconds": {
+      "message": "{count} s",
+      "description": "A short duration in seconds, as in \"48 s\".",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.failure.cancelled": {
       "message": "Cancelled.",
       "description": "The person cancelled a confirmation.",
@@ -2780,6 +4163,30 @@
     "administration.imports.choose": {
       "message": "Choose file…",
       "description": "Button that opens the file picker.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.column.file": {
+      "message": "File",
+      "description": "Column of an import’s file and kind.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.column.rows": {
+      "message": "Rows",
+      "description": "Column of how many rows a file had.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.column.status": {
+      "message": "Status",
+      "description": "Column of where an import stands.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.column.uploaded": {
+      "message": "Uploaded",
+      "description": "Column of when a file was uploaded.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -2921,6 +4328,24 @@
     "administration.imports.ready": {
       "message": "Ready",
       "description": "Count of rows that will import.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.recent": {
+      "message": "Recent imports",
+      "description": "Section of files uploaded before.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.recent.empty": {
+      "message": "No files uploaded yet.",
+      "description": "No earlier imports.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.recent.table": {
+      "message": "Recent imports",
+      "description": "Accessible name of the table of earlier imports.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -3085,6 +4510,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
+    "administration.imports.unnamed": {
+      "message": "A CSV file",
+      "description": "An import whose file name isn’t known.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
     "administration.imports.upload": {
       "message": "Upload a file",
       "description": "Section where a CSV file is chosen and uploaded.",
@@ -3118,6 +4549,12 @@
     "administration.invitations.action.revoke": {
       "message": "Revoke…",
       "description": "Row action that revokes an invitation after confirming.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.column.by": {
+      "message": "Invited by",
+      "description": "Invitations column naming who sent the invitation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
@@ -3181,9 +4618,33 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
+    "administration.invitations.invite.add.address": {
+      "message": "Add an address",
+      "description": "Placeholder of the field that takes email addresses.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.address.incomplete": {
+      "message": "This address is incomplete",
+      "description": "Why an address chip is red.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.addresses.fix": {
+      "message": "Remove or correct the addresses in red first.",
+      "description": "Error when some addresses aren’t valid.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
     "administration.invitations.invite.body": {
       "message": "Each person gets an email with a link that works once. Invitations expire if they’re not accepted.",
       "description": "Description of the invitation dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.chips.hint": {
+      "message": "Press Enter, a comma or a space after each address, or paste a list. Up to 200; to invite more, import a CSV file.",
+      "description": "Hint under the email addresses.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
@@ -3231,6 +4692,44 @@
       "placeholders": [
         "count"
       ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.expires": {
+      "message": "Expires",
+      "description": "Label of how long an invitation stays open.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.expires.in": {
+      "message": "In {days} days · {date}",
+      "description": "One choice of how long an invitation stays open, as in \"In 14 days · 22 Nov\".",
+      "placeholders": [
+        "days",
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.footnote": {
+      "message": "{count} addresses",
+      "description": "Footnote: how many addresses the dialog sends to. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.footnote.fix": {
+      "message": "{addresses} · {fix} to fix",
+      "description": "Footnote when some addresses need fixing, as in \"3 addresses · 1 to fix\".",
+      "placeholders": [
+        "addresses",
+        "fix"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.footnote.one": {
+      "message": "1 address",
+      "description": "Footnote: how many addresses the dialog sends to. One.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.invite.kind": {
@@ -3281,6 +4780,14 @@
       "placeholders": [
         "sent",
         "addresses"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.remove": {
+      "message": "Remove {address}",
+      "description": "Accessible name of a chip’s × in a list of addresses or people.",
+      "placeholders": [
+        "address"
       ],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
@@ -3472,6 +4979,225 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.mail.column.kind": {
+      "message": "Kind",
+      "description": "Column of what kind of email it is.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.column.to": {
+      "message": "To",
+      "description": "Column of who an email went to.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.cancel": {
+      "message": "Cancel delivery",
+      "description": "Stops sending the email.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.close": {
+      "message": "Close",
+      "description": "Closes a delivery’s details.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.deadline": {
+      "message": "Stops trying",
+      "description": "Label of when Proctor stops retrying an email.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.delivered": {
+      "message": "Delivered",
+      "description": "Label of when the receiving server accepted it.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.for": {
+      "message": "For",
+      "description": "Label of the person an email is for.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.hidden": {
+      "message": "Addresses are partly hidden here.",
+      "description": "Footnote of a delivery’s details.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.kind": {
+      "message": "Kind",
+      "description": "Label of what kind of email it is.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.last.attempt": {
+      "message": "Last attempt",
+      "description": "Label of the latest try to send it.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.loading": {
+      "message": "Loading this delivery…",
+      "description": "While one delivery is read.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.message.id": {
+      "message": "Message ID",
+      "description": "Label of the email’s message identifier.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.no.problem": {
+      "message": "Nothing went wrong with this email.",
+      "description": "A delivery without a failure.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.queued": {
+      "message": "Queued",
+      "description": "Label of when an email was queued.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.retry": {
+      "message": "Retry delivery",
+      "description": "Sends the email again.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.status": {
+      "message": "Status",
+      "description": "Label of where a delivery stands.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.status.attempts": {
+      "message": "{state} after {count} attempts",
+      "description": "A delivery’s state and how many tries, as in \"Not delivered after 3 attempts\".",
+      "placeholders": [
+        "state",
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.title": {
+      "message": "{kind} to {recipient}",
+      "description": "Title of one delivery’s details, as in \"Invitation to r.s•••@example\".",
+      "placeholders": [
+        "kind",
+        "recipient"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.open": {
+      "message": "Details",
+      "description": "Opens one delivery’s details.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.attempt.canceled": {
+      "message": "Cancelled",
+      "description": "An attempt that was cancelled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.attempt.failed": {
+      "message": "Failed",
+      "description": "An attempt that failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.attempt.incompatible": {
+      "message": "Couldn’t run",
+      "description": "An attempt a worker couldn’t run because it was too old or too new.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.attempt.lease.expired": {
+      "message": "Stalled",
+      "description": "An attempt whose worker stopped answering, so its turn ran out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.attempt.running": {
+      "message": "Running",
+      "description": "An attempt that is still running.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.attempt.succeeded": {
+      "message": "Done",
+      "description": "An attempt that finished.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.about": {
+      "message": "About",
+      "description": "Label of what a job works on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.attempt.ended": {
+      "message": "Ended",
+      "description": "Column of when an attempt ended.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.attempt.error": {
+      "message": "Error",
+      "description": "Column of why an attempt failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.attempt.number": {
+      "message": "Attempt",
+      "description": "Column of an attempt’s number.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.attempt.outcome": {
+      "message": "Outcome",
+      "description": "Column of how an attempt ended.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.attempt.started": {
+      "message": "Started",
+      "description": "Column of when an attempt started.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.attempts": {
+      "message": "Attempts",
+      "description": "Section of each time a job ran.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.attempts.description": {
+      "message": "Each attempt runs on its own; one that stalls is retried automatically until the limit. Retry starts again from where the job got to.",
+      "description": "Explains a job’s attempts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.attempts.empty": {
+      "message": "The job hasn’t run yet.",
+      "description": "A job without attempts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.attempts.used": {
+      "message": "tried {attempt} of {maximum} times",
+      "description": "Part of a job’s description: how many tries it used.",
+      "placeholders": [
+        "attempt",
+        "maximum"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.job.cancel": {
       "message": "Cancel…",
       "description": "Cancels a job after confirming.",
@@ -3514,9 +5240,58 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.job.description": {
+      "message": "Started {when} · {attempts}",
+      "description": "Under a job’s heading when who started it isn’t known.",
+      "placeholders": [
+        "when",
+        "attempts"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.description.by": {
+      "message": "Started by {name} {when} · {attempts}",
+      "description": "Under a job’s heading; when reads like \"today at 09:12\".",
+      "placeholders": [
+        "name",
+        "when",
+        "attempts"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.details": {
+      "message": "Job",
+      "description": "Section of a job’s facts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.job.failed": {
       "message": "Failed",
       "description": "Job status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.kind": {
+      "message": "Kind",
+      "description": "Label of a job’s kind.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.last.error": {
+      "message": "Last error",
+      "description": "Label of why a job last failed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.none": {
+      "message": "—",
+      "description": "A job fact that has no value.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.progress": {
+      "message": "Got as far as",
+      "description": "Label of a job’s progress.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -3544,9 +5319,33 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.job.started.at": {
+      "message": "Started",
+      "description": "Label of when a job started.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.job.succeeded": {
       "message": "Done",
       "description": "Job status.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.title": {
+      "message": "Job",
+      "description": "Heading of one job’s page before it loads.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.trail": {
+      "message": "Jobs",
+      "description": "The trail link from a job back to the Jobs list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.job.updated.at": {
+      "message": "Last update",
+      "description": "Label of when a job last changed.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -3563,6 +5362,27 @@
         "attempt",
         "maximum"
       ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.attempts.column": {
+      "message": "Attempts",
+      "description": "Column of how many times a job was tried.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.attempts.of": {
+      "message": "{attempt} of {maximum}",
+      "description": "How many tries a job used, as in \"2 of 3\".",
+      "placeholders": [
+        "attempt",
+        "maximum"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.cancel.short": {
+      "message": "Cancel",
+      "description": "A job row’s button that asks to stop it.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.jobs.column.job": {
@@ -3601,6 +5421,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.jobs.not.started": {
+      "message": "Not yet",
+      "description": "In the Started column: the job is waiting to run.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.jobs.stage": {
       "message": "{stage} · {current} of {total}",
       "description": "A job’s progress.",
@@ -3611,15 +5437,41 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.jobs.started": {
+      "message": "Started",
+      "description": "Column of when a job started.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.started.by": {
+      "message": "Started by {name}",
+      "description": "Under a job: who started it.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.jobs.status": {
       "message": "Status",
       "description": "Filter over the jobs.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.jobs.still.running": {
+      "message": "Running",
+      "description": "In the Took column: the job hasn’t finished.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.jobs.table": {
       "message": "Jobs",
       "description": "Accessible name of the jobs table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.took": {
+      "message": "Took",
+      "description": "Column of how long a job ran.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -4162,6 +6014,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
+    "administration.page.progression.description": {
+      "message": "Move a class’s students on to their next class, such as Year 1 to Year 2. Every move is checked and reviewed before anyone changes class.",
+      "description": "One-line description under the Progression heading.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.page.progression.title": {
+      "message": "Progression",
+      "description": "Heading of the Progression page.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
     "administration.page.retention.description": {
       "message": "How long exam records are kept, and what is deleted when.",
       "description": "One-line description under the Data retention heading.",
@@ -4229,6 +6093,345 @@
       "description": "Heading of the Administration Users page.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.progression.checked": {
+      "message": "Checked {when}",
+      "description": "Under a progression: when the server checked who moves.",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.body": {
+      "message": "Choose the class students are in now and the class they move on to. Nothing changes until you’ve reviewed who moves and confirmed.",
+      "description": "Explains the new-progression dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.check": {
+      "message": "Check who moves",
+      "description": "Starts the server’s check of a progression.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.checking": {
+      "message": "Checking who moves. The review opens when it’s ready.",
+      "description": "Toast after starting a progression check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.from": {
+      "message": "From",
+      "description": "Label of the class students are in now.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.same": {
+      "message": "Choose a different class to move on to.",
+      "description": "Error when From and To are the same class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.title": {
+      "message": "New progression",
+      "description": "Title of the dialog that starts a progression.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.to": {
+      "message": "To",
+      "description": "Label of the class students move on to.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.to.hint": {
+      "message": "Their enrolment in the first class ends the day before; their work and results there are kept.",
+      "description": "Explains what happens to the old enrolment.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.unit": {
+      "message": "Unit",
+      "description": "Label of the unit whose classes the dialog offers.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.when": {
+      "message": "Moves on",
+      "description": "Label of the day students change class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.dialog.when.hint": {
+      "message": "Usually the first day of the new period.",
+      "description": "Hint under the move date.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.empty": {
+      "message": "No progressions yet. Start one to move a class on to its next class.",
+      "description": "The Progression page has nothing to list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.move": {
+      "message": "Move",
+      "description": "Column naming the classes a progression moves students between.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.moves.on": {
+      "message": "Moves on",
+      "description": "Column of the day students change class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.new": {
+      "message": "New progression",
+      "description": "Starts choosing classes for a new progression.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.pair": {
+      "message": "{source} → {destination}",
+      "description": "A progression’s classes, as in \"Programming 1 → Programming 2\".",
+      "placeholders": [
+        "source",
+        "destination"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.button": {
+      "message": "Review",
+      "description": "A progression row’s button that opens its review.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.cancel": {
+      "message": "Cancel progression",
+      "description": "Ends a progression without moving anyone.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.cancel.body": {
+      "message": "Nobody moves. You can start a new one later.",
+      "description": "Explains cancelling a progression.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.cancel.title": {
+      "message": "Cancel this progression?",
+      "description": "Title of the confirmation before cancelling a progression.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.cancelled": {
+      "message": "Progression cancelled",
+      "description": "Toast after cancelling a progression.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.checking": {
+      "message": "Checking who moves. This page updates when it’s ready.",
+      "description": "Banner while the server checks.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.commit": {
+      "message": "Move {count} students",
+      "description": "Confirms a reviewed progression.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.commit.body": {
+      "message": "Each student joins the new class on the move date and leaves the old one the day before. Their work and results are kept.",
+      "description": "Explains what moving does.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.commit.title": {
+      "message": "Move these students?",
+      "description": "Title of the confirmation before moving students.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.description": {
+      "message": "Moves on {date} · checked {when}",
+      "description": "Under a review’s heading.",
+      "placeholders": [
+        "date",
+        "when"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.left.out": {
+      "message": "Left out",
+      "description": "A student the progression can’t move.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.moved": {
+      "message": "Moved",
+      "description": "How many students changed class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.moving": {
+      "message": "Moving",
+      "description": "How many students change class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.moving.banner": {
+      "message": "Moving students. This page updates as it goes.",
+      "description": "Banner while students move.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.not.moved": {
+      "message": "Didn’t move",
+      "description": "How many students the progression couldn’t move.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.rows": {
+      "message": "Students who won’t move",
+      "description": "Section of students left where they are.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.rows.description": {
+      "message": "Everyone else moves as listed in the report.",
+      "description": "Explains the students list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.rows.none": {
+      "message": "Everyone moves.",
+      "description": "No student is left out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.skipped": {
+      "message": "Skipped",
+      "description": "A student the progression leaves out without a problem.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.started": {
+      "message": "Moving students",
+      "description": "Toast after confirming a progression.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.stay.banner": {
+      "message": "{count} students won’t move. They stay in their class with their enrolment as it is, and you can move them on their own later.",
+      "description": "Banner when some students won’t move.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.staying": {
+      "message": "Staying",
+      "description": "How many students stay where they are.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.student": {
+      "message": "Row {row} · {reference}",
+      "description": "A student in the review, by row and reference.",
+      "placeholders": [
+        "row",
+        "reference"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.summary": {
+      "message": "Who moves",
+      "description": "Section of a progression’s counts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.title": {
+      "message": "Progression",
+      "description": "Heading of a progression’s review before it loads.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.review.trail": {
+      "message": "Progression",
+      "description": "The trail link from a review back to the Progression list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.state.cancelled": {
+      "message": "Cancelled",
+      "description": "A progression that was cancelled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.state.checking": {
+      "message": "Checking",
+      "description": "A progression the server is still checking.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.state.failed": {
+      "message": "Failed",
+      "description": "A progression that couldn’t finish.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.state.moved": {
+      "message": "Moved",
+      "description": "A progression that has finished.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.state.moved.problems": {
+      "message": "Moved, some didn’t",
+      "description": "A finished progression in which some students didn’t move.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.state.moving": {
+      "message": "Moving",
+      "description": "A progression that is moving students.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.state.ready": {
+      "message": "Ready to review",
+      "description": "A checked progression waiting for review.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.status": {
+      "message": "Status",
+      "description": "Column of a progression’s state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.students": {
+      "message": "Students",
+      "description": "Column of how many students a progression covers.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.table": {
+      "message": "Progressions",
+      "description": "Accessible name of the progressions table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.unknown.class": {
+      "message": "A class",
+      "description": "Stands in for a class whose name isn’t known.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
     },
     "administration.records.audits.changes": {
       "message": "Changes only",
@@ -5150,6 +7353,18 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
+    "administration.structure.tab.contents": {
+      "message": "Programmes and classes",
+      "description": "Tab of a unit’s programmes and classes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.tab.members": {
+      "message": "Members",
+      "description": "Tab of the people who belong to a unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
     "administration.structure.unit.add.sub": {
       "message": "Add sub-unit",
       "description": "Creates a unit under the chosen one.",
@@ -5235,6 +7450,128 @@
     "administration.structure.units.none": {
       "message": "No units yet. Create the first one.",
       "description": "Shown when there are no academic units.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.views": {
+      "message": "What to show for this unit",
+      "description": "Accessible name of the tabs under a unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.add.member": {
+      "message": "Add member",
+      "description": "Adds a person to a unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.add.member.body": {
+      "message": "They belong to the unit from today. To let them do something here, grant them a role too.",
+      "description": "Explains adding a unit member.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.add.member.field": {
+      "message": "Username or email",
+      "description": "Label of the person to add.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.add.member.not.found": {
+      "message": "No account has this username or email.",
+      "description": "Error when the person isn’t found.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.add.member.title": {
+      "message": "Add a member to {unit}",
+      "description": "Title of the dialog that adds a unit member.",
+      "placeholders": [
+        "unit"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.end.member": {
+      "message": "End membership…",
+      "description": "Ends someone’s membership of a unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.end.member.body": {
+      "message": "They stop belonging to this unit today. Their roles elsewhere stay.",
+      "description": "Explains ending a unit membership.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.end.member.confirm": {
+      "message": "End membership",
+      "description": "Confirms ending a unit membership.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.end.member.title": {
+      "message": "End {name}’s membership?",
+      "description": "Confirms ending a unit membership.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.member.added": {
+      "message": "{name} is now a member",
+      "description": "Toast after adding a unit member.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.member.column": {
+      "message": "Member",
+      "description": "Column naming a unit member.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.member.ended": {
+      "message": "{name} no longer belongs here",
+      "description": "Toast after ending a unit membership.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.members": {
+      "message": "Members",
+      "description": "Section and table of a unit’s members.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.members.description": {
+      "message": "Staff who belong to this unit. Belonging grants nothing on its own; roles do.",
+      "description": "Explains unit membership.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.members.empty": {
+      "message": "No one belongs to this unit yet.",
+      "description": "A unit without members.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.no.role.here": {
+      "message": "No role here",
+      "description": "A member who holds no role in the unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.roles.here": {
+      "message": "Roles here",
+      "description": "Column of the roles a member holds in this unit.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.unit.since": {
+      "message": "Since",
+      "description": "Column of when someone joined a unit.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
@@ -5352,6 +7689,26 @@
         "date"
       ],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.disable.reason": {
+      "message": "Reason",
+      "description": "Label of why an account is disabled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.user.disable.reason.hint": {
+      "message": "Optional. Kept in Audits; {name} doesn’t see it.",
+      "description": "Hint under the reason for disabling an account.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.user.disable.reason.long": {
+      "message": "Keep the reason under 500 characters.",
+      "description": "Error when the reason is too long.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.user.display.name": {
       "message": "Display name",
@@ -5544,11 +7901,65 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
+    "administration.user.photo.removed": {
+      "message": "{name}’s photo is removed",
+      "description": "Toast after removing a photo.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.user.photo.replaced": {
+      "message": "{name}’s photo is updated",
+      "description": "Toast after replacing a photo.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.user.photo.unsupported": {
+      "message": "Choose a PNG, JPEG or WebP image under 5 MB.",
+      "description": "Toast when the chosen file can’t be a photo.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
     "administration.user.profile": {
       "message": "Profile",
       "description": "Section with a user’s names, email, language and time zone.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
+    },
+    "administration.user.remove.photo": {
+      "message": "Remove photo…",
+      "description": "Removes someone’s own profile photo.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.user.remove.photo.body": {
+      "message": "Their initials are shown instead until they add a new one.",
+      "description": "Explains removing a photo.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.user.remove.photo.confirm": {
+      "message": "Remove photo",
+      "description": "Confirms removing a photo.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.user.remove.photo.title": {
+      "message": "Remove {name}’s photo?",
+      "description": "Confirms removing someone’s photo.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.user.replace.photo": {
+      "message": "Replace photo…",
+      "description": "Chooses a new profile photo for someone.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.user.role": {
       "message": "Role",
@@ -5855,6 +8266,54 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
+    "administration.users.affiliation": {
+      "message": "Affiliation",
+      "description": "Filter and column of a person’s affiliation with the institution.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.affiliation.any": {
+      "message": "Any",
+      "description": "The affiliation filter shows everyone.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.bulk.clear": {
+      "message": "Clear selection",
+      "description": "Unchooses every chosen person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.bulk.disable": {
+      "message": "Disable…",
+      "description": "Disables the chosen people’s accounts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.bulk.enable": {
+      "message": "Enable",
+      "description": "Enables the chosen people’s accounts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.bulk.enrol": {
+      "message": "Enrol in a class…",
+      "description": "Enrols the chosen people in one class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.bulk.grant": {
+      "message": "Grant role…",
+      "description": "Grants the chosen people one role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.bulk.sign.out": {
+      "message": "Sign out everywhere",
+      "description": "Ends every session of the chosen people.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
     "administration.users.column.last.active": {
       "message": "Last active",
       "description": "Users table column with when they were last active.",
@@ -5864,6 +8323,12 @@
     "administration.users.column.person": {
       "message": "Person",
       "description": "Users table column with the name and email.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.column.roles": {
+      "message": "Roles",
+      "description": "Column of the roles a person holds.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
@@ -5951,9 +8416,58 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
+    "administration.users.more": {
+      "message": "{list} +{count}",
+      "description": "A short list followed by how many more aren’t shown, as in \"Teacher, Exam manager +2\".",
+      "placeholders": [
+        "list",
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
     "administration.users.never.active": {
       "message": "Never",
       "description": "A user who has never been active.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.no.affiliation": {
+      "message": "No affiliation",
+      "description": "A person with no current affiliation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.no.role": {
+      "message": "—",
+      "description": "A person who holds no role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.selected": {
+      "message": "{count} selected",
+      "description": "How many people are chosen in the Users table. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.selected.one": {
+      "message": "1 selected",
+      "description": "How many people are chosen in the Users table. One person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.selection.label": {
+      "message": "Changes for {count} selected people",
+      "description": "Accessible name of the toolbar for chosen people. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.selection.label.one": {
+      "message": "Changes for 1 selected person",
+      "description": "Accessible name of the toolbar for chosen people. One person.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
@@ -6000,6 +8514,18 @@
     "administration.users.table": {
       "message": "Users",
       "description": "Accessible name of the table of users.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.unit": {
+      "message": "Unit",
+      "description": "Filter of the academic unit people belong to.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.unit.any": {
+      "message": "Any",
+      "description": "The unit filter shows everyone.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
@@ -6146,6 +8672,12 @@
     "authenticated.nav.administration.policy": {
       "message": "Access policy",
       "description": "Administration sidebar page for how people sign in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
+    },
+    "authenticated.nav.administration.progression": {
+      "message": "Progression",
+      "description": "Administration sidebar page for moving students on to their next class.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
     },

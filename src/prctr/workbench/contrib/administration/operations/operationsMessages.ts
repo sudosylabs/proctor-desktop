@@ -328,5 +328,292 @@ export const operationsMessages = Object.freeze({
 		id: 'administration.operations.mail.keys.strong',
 		defaultMessage: 'Keys are shown to a sign-in with two-step verification only.',
 		description: 'Shown when keys need a stronger sign-in.'
+	}),
+	jobsStarted: defineMessage({
+		id: 'administration.operations.jobs.started',
+		defaultMessage: 'Started',
+		description: 'Column of when a job started.'
+	}),
+	jobsTook: defineMessage({
+		id: 'administration.operations.jobs.took',
+		defaultMessage: 'Took',
+		description: 'Column of how long a job ran.'
+	}),
+	jobsAttemptsColumn: defineMessage({
+		id: 'administration.operations.jobs.attempts.column',
+		defaultMessage: 'Attempts',
+		description: 'Column of how many times a job was tried.'
+	}),
+	jobsAttemptsOf: defineMessage({
+		id: 'administration.operations.jobs.attempts.of',
+		defaultMessage: '{attempt} of {maximum}',
+		description: 'How many tries a job used, as in "2 of 3".'
+	}),
+	jobsStartedBy: defineMessage({
+		id: 'administration.operations.jobs.started.by',
+		defaultMessage: 'Started by {name}',
+		description: 'Under a job: who started it.'
+	}),
+	jobsStillRunning: defineMessage({
+		id: 'administration.operations.jobs.still.running',
+		defaultMessage: 'Running',
+		description: 'In the Took column: the job hasn’t finished.'
+	}),
+	jobsNotStarted: defineMessage({
+		id: 'administration.operations.jobs.not.started',
+		defaultMessage: 'Not yet',
+		description: 'In the Started column: the job is waiting to run.'
+	}),
+	jobsCancelShort: defineMessage({
+		id: 'administration.operations.jobs.cancel.short',
+		defaultMessage: 'Cancel',
+		description: 'A job row’s button that asks to stop it.'
+	}),
+	durationSeconds: defineMessage({
+		id: 'administration.duration.seconds',
+		defaultMessage: '{count} s',
+		description: 'A short duration in seconds, as in "48 s".'
+	}),
+	durationMinutes: defineMessage({
+		id: 'administration.duration.minutes',
+		defaultMessage: '{count} min',
+		description: 'A short duration in minutes, as in "4 min".'
+	}),
+	durationHours: defineMessage({
+		id: 'administration.duration.hours',
+		defaultMessage: '{count} h',
+		description: 'A short duration in hours, as in "2 h".'
+	}),
+	jobTitle: defineMessage({
+		id: 'administration.operations.job.title',
+		defaultMessage: 'Job',
+		description: 'Heading of one job’s page before it loads.'
+	}),
+	jobTrail: defineMessage({
+		id: 'administration.operations.job.trail',
+		defaultMessage: 'Jobs',
+		description: 'The trail link from a job back to the Jobs list.'
+	}),
+	jobDescriptionBy: defineMessage({
+		id: 'administration.operations.job.description.by',
+		defaultMessage: 'Started by {name} {when} · {attempts}',
+		description: 'Under a job’s heading; when reads like "today at 09:12".'
+	}),
+	jobDescription: defineMessage({
+		id: 'administration.operations.job.description',
+		defaultMessage: 'Started {when} · {attempts}',
+		description: 'Under a job’s heading when who started it isn’t known.'
+	}),
+	jobAttemptsUsed: defineMessage({
+		id: 'administration.operations.job.attempts.used',
+		defaultMessage: 'tried {attempt} of {maximum} times',
+		description: 'Part of a job’s description: how many tries it used.'
+	}),
+	jobDetails: defineMessage({
+		id: 'administration.operations.job.details',
+		defaultMessage: 'Job',
+		description: 'Section of a job’s facts.'
+	}),
+	jobKind: defineMessage({
+		id: 'administration.operations.job.kind',
+		defaultMessage: 'Kind',
+		description: 'Label of a job’s kind.'
+	}),
+	jobAbout: defineMessage({
+		id: 'administration.operations.job.about',
+		defaultMessage: 'About',
+		description: 'Label of what a job works on.'
+	}),
+	jobStartedAt: defineMessage({
+		id: 'administration.operations.job.started.at',
+		defaultMessage: 'Started',
+		description: 'Label of when a job started.'
+	}),
+	jobUpdatedAt: defineMessage({
+		id: 'administration.operations.job.updated.at',
+		defaultMessage: 'Last update',
+		description: 'Label of when a job last changed.'
+	}),
+	jobProgressLabel: defineMessage({
+		id: 'administration.operations.job.progress',
+		defaultMessage: 'Got as far as',
+		description: 'Label of a job’s progress.'
+	}),
+	jobLastError: defineMessage({
+		id: 'administration.operations.job.last.error',
+		defaultMessage: 'Last error',
+		description: 'Label of why a job last failed.'
+	}),
+	jobNone: defineMessage({
+		id: 'administration.operations.job.none',
+		defaultMessage: '—',
+		description: 'A job fact that has no value.'
+	}),
+	jobAttempts: defineMessage({
+		id: 'administration.operations.job.attempts',
+		defaultMessage: 'Attempts',
+		description: 'Section of each time a job ran.'
+	}),
+	jobAttemptsDescription: defineMessage({
+		id: 'administration.operations.job.attempts.description',
+		defaultMessage:
+			'Each attempt runs on its own; one that stalls is retried automatically until the limit. Retry starts again from where the job got to.',
+		description: 'Explains a job’s attempts.'
+	}),
+	jobAttemptNumber: defineMessage({
+		id: 'administration.operations.job.attempt.number',
+		defaultMessage: 'Attempt',
+		description: 'Column of an attempt’s number.'
+	}),
+	jobAttemptStarted: defineMessage({
+		id: 'administration.operations.job.attempt.started',
+		defaultMessage: 'Started',
+		description: 'Column of when an attempt started.'
+	}),
+	jobAttemptEnded: defineMessage({
+		id: 'administration.operations.job.attempt.ended',
+		defaultMessage: 'Ended',
+		description: 'Column of when an attempt ended.'
+	}),
+	jobAttemptOutcome: defineMessage({
+		id: 'administration.operations.job.attempt.outcome',
+		defaultMessage: 'Outcome',
+		description: 'Column of how an attempt ended.'
+	}),
+	jobAttemptError: defineMessage({
+		id: 'administration.operations.job.attempt.error',
+		defaultMessage: 'Error',
+		description: 'Column of why an attempt failed.'
+	}),
+	jobAttemptsEmpty: defineMessage({
+		id: 'administration.operations.job.attempts.empty',
+		defaultMessage: 'The job hasn’t run yet.',
+		description: 'A job without attempts.'
+	}),
+	attemptRunning: defineMessage({
+		id: 'administration.operations.attempt.running',
+		defaultMessage: 'Running',
+		description: 'An attempt that is still running.'
+	}),
+	attemptSucceeded: defineMessage({
+		id: 'administration.operations.attempt.succeeded',
+		defaultMessage: 'Done',
+		description: 'An attempt that finished.'
+	}),
+	attemptFailed: defineMessage({
+		id: 'administration.operations.attempt.failed',
+		defaultMessage: 'Failed',
+		description: 'An attempt that failed.'
+	}),
+	attemptCanceled: defineMessage({
+		id: 'administration.operations.attempt.canceled',
+		defaultMessage: 'Cancelled',
+		description: 'An attempt that was cancelled.'
+	}),
+	attemptLeaseExpired: defineMessage({
+		id: 'administration.operations.attempt.lease.expired',
+		defaultMessage: 'Stalled',
+		description: 'An attempt whose worker stopped answering, so its turn ran out.'
+	}),
+	attemptIncompatible: defineMessage({
+		id: 'administration.operations.attempt.incompatible',
+		defaultMessage: 'Couldn’t run',
+		description: 'An attempt a worker couldn’t run because it was too old or too new.'
+	}),
+	mailColumnTo: defineMessage({
+		id: 'administration.mail.column.to',
+		defaultMessage: 'To',
+		description: 'Column of who an email went to.'
+	}),
+	mailColumnKind: defineMessage({
+		id: 'administration.mail.column.kind',
+		defaultMessage: 'Kind',
+		description: 'Column of what kind of email it is.'
+	}),
+	mailOpen: defineMessage({
+		id: 'administration.mail.open',
+		defaultMessage: 'Details',
+		description: 'Opens one delivery’s details.'
+	}),
+	deliveryTitle: defineMessage({
+		id: 'administration.mail.delivery.title',
+		defaultMessage: '{kind} to {recipient}',
+		description: 'Title of one delivery’s details, as in "Invitation to r.s•••@example".'
+	}),
+	deliveryLoading: defineMessage({
+		id: 'administration.mail.delivery.loading',
+		defaultMessage: 'Loading this delivery…',
+		description: 'While one delivery is read.'
+	}),
+	deliveryFor: defineMessage({
+		id: 'administration.mail.delivery.for',
+		defaultMessage: 'For',
+		description: 'Label of the person an email is for.'
+	}),
+	deliveryKind: defineMessage({
+		id: 'administration.mail.delivery.kind',
+		defaultMessage: 'Kind',
+		description: 'Label of what kind of email it is.'
+	}),
+	deliveryStatus: defineMessage({
+		id: 'administration.mail.delivery.status',
+		defaultMessage: 'Status',
+		description: 'Label of where a delivery stands.'
+	}),
+	deliveryStatusAttempts: defineMessage({
+		id: 'administration.mail.delivery.status.attempts',
+		defaultMessage: '{state} after {count} attempts',
+		description:
+			'A delivery’s state and how many tries, as in "Not delivered after 3 attempts".'
+	}),
+	deliveryQueued: defineMessage({
+		id: 'administration.mail.delivery.queued',
+		defaultMessage: 'Queued',
+		description: 'Label of when an email was queued.'
+	}),
+	deliveryLastAttempt: defineMessage({
+		id: 'administration.mail.delivery.last.attempt',
+		defaultMessage: 'Last attempt',
+		description: 'Label of the latest try to send it.'
+	}),
+	deliveryDelivered: defineMessage({
+		id: 'administration.mail.delivery.delivered',
+		defaultMessage: 'Delivered',
+		description: 'Label of when the receiving server accepted it.'
+	}),
+	deliveryDeadline: defineMessage({
+		id: 'administration.mail.delivery.deadline',
+		defaultMessage: 'Stops trying',
+		description: 'Label of when Proctor stops retrying an email.'
+	}),
+	deliveryMessageId: defineMessage({
+		id: 'administration.mail.delivery.message.id',
+		defaultMessage: 'Message ID',
+		description: 'Label of the email’s message identifier.'
+	}),
+	deliveryHidden: defineMessage({
+		id: 'administration.mail.delivery.hidden',
+		defaultMessage: 'Addresses are partly hidden here.',
+		description: 'Footnote of a delivery’s details.'
+	}),
+	deliveryClose: defineMessage({
+		id: 'administration.mail.delivery.close',
+		defaultMessage: 'Close',
+		description: 'Closes a delivery’s details.'
+	}),
+	deliveryRetry: defineMessage({
+		id: 'administration.mail.delivery.retry',
+		defaultMessage: 'Retry delivery',
+		description: 'Sends the email again.'
+	}),
+	deliveryCancel: defineMessage({
+		id: 'administration.mail.delivery.cancel',
+		defaultMessage: 'Cancel delivery',
+		description: 'Stops sending the email.'
+	}),
+	deliveryNoProblem: defineMessage({
+		id: 'administration.mail.delivery.no.problem',
+		defaultMessage: 'Nothing went wrong with this email.',
+		description: 'A delivery without a failure.'
 	})
 });
