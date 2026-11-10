@@ -158,7 +158,7 @@ export class UsersPage extends Disposable implements PageView {
 					},
 					{
 						label: format.text('usersColumnLastActive'),
-						width: '136px',
+						width: '168px',
 						align: 'end',
 						priority: 2,
 						foldLabel: true,
