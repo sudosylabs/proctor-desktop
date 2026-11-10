@@ -63,7 +63,7 @@ export const usersMessages = Object.freeze({
 	}),
 	usersNeverActive: defineMessage({
 		id: 'administration.users.never.active',
-		defaultMessage: 'Never',
+		defaultMessage: '—',
 		description: 'A user who has never been active.'
 	}),
 	userActive: defineMessage({
@@ -93,7 +93,7 @@ export const usersMessages = Object.freeze({
 	}),
 	userDisable: defineMessage({
 		id: 'administration.users.action.disable',
-		defaultMessage: 'Disable account…',
+		defaultMessage: 'Disable account',
 		description: 'Row action that disables a user’s account after confirming.'
 	}),
 	userEnable: defineMessage({
@@ -103,7 +103,7 @@ export const usersMessages = Object.freeze({
 	}),
 	userSignOutEverywhere: defineMessage({
 		id: 'administration.users.action.sign.out',
-		defaultMessage: 'Sign out everywhere…',
+		defaultMessage: 'Sign out everywhere',
 		description: 'Row action that ends all of a user’s sessions after confirming.'
 	}),
 	userDisableTitle: defineMessage({
@@ -236,12 +236,12 @@ export const usersMessages = Object.freeze({
 	}),
 	usersBulkEnrol: defineMessage({
 		id: 'administration.users.bulk.enrol',
-		defaultMessage: 'Enrol in a class…',
+		defaultMessage: 'Enrol in a class',
 		description: 'Enrols the chosen people in one class.'
 	}),
 	usersBulkGrant: defineMessage({
 		id: 'administration.users.bulk.grant',
-		defaultMessage: 'Grant role…',
+		defaultMessage: 'Grant role',
 		description: 'Grants the chosen people one role.'
 	}),
 	usersBulkSignOut: defineMessage({
@@ -251,7 +251,7 @@ export const usersMessages = Object.freeze({
 	}),
 	usersBulkDisable: defineMessage({
 		id: 'administration.users.bulk.disable',
-		defaultMessage: 'Disable…',
+		defaultMessage: 'Disable',
 		description: 'Disables the chosen people’s accounts.'
 	}),
 	usersBulkEnable: defineMessage({
@@ -486,12 +486,12 @@ export const usersMessages = Object.freeze({
 	}),
 	userReplacePhoto: defineMessage({
 		id: 'administration.user.replace.photo',
-		defaultMessage: 'Replace photo…',
+		defaultMessage: 'Replace photo',
 		description: 'Chooses a new profile photo for someone.'
 	}),
 	userRemovePhoto: defineMessage({
 		id: 'administration.user.remove.photo',
-		defaultMessage: 'Remove photo…',
+		defaultMessage: 'Remove photo',
 		description: 'Removes someone’s own profile photo.'
 	}),
 	userRemovePhotoTitle: defineMessage({
@@ -523,5 +523,10 @@ export const usersMessages = Object.freeze({
 		id: 'administration.user.photo.unsupported',
 		defaultMessage: 'Choose a PNG, JPEG or WebP image under 5 MB.',
 		description: 'Toast when the chosen file can’t be a photo.'
+	}),
+	usersBulkMore: defineMessage({
+		id: 'administration.users.bulk.more',
+		defaultMessage: 'More changes for the selected people',
+		description: 'Accessible name of the ⋯ menu in the selection bar.'
 	})
 });

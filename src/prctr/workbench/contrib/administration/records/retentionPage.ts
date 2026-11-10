@@ -219,6 +219,7 @@ export class RetentionPage extends Disposable implements PageView {
 					],
 					rowId: (record) => `${record.submissionId}:${record.category}`,
 					rowName: (record) => record.submissionId,
+					icon: 'admin.retention',
 					empty: format.text('retentionRecordsEmpty')
 				}
 			)

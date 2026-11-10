@@ -7,7 +7,6 @@ import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle
 import type { importStates } from '../../../../platform/administration/common/administrationProtocol.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
-import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
@@ -23,17 +22,16 @@ export const PROGRESSION_STATE: Readonly<
 		{
 			readonly text: AdministrationText;
 			readonly tone: AdminTone;
-			readonly icon?: ProctorIconId;
 		}
 	>
 > = {
 	uploading: { text: 'stateChecking', tone: 'busy' },
 	parsing: { text: 'stateChecking', tone: 'busy' },
-	preview_ready: { text: 'stateReady', tone: 'warn', icon: 'status.review' },
+	preview_ready: { text: 'stateReady', tone: 'warn' },
 	executing: { text: 'stateMoving', tone: 'busy' },
 	completed: { text: 'stateMoved', tone: 'ok' },
 	completed_with_errors: { text: 'stateMovedWithProblems', tone: 'fail' },
-	canceled: { text: 'stateCancelled', tone: 'neutral', icon: 'status.prohibited' },
+	canceled: { text: 'stateCancelled', tone: 'neutral' },
 	failed: { text: 'stateFailed', tone: 'fail' }
 };
 
@@ -129,8 +127,7 @@ export class ProgressionPage extends Disposable implements PageView {
 								return {
 									kind: 'status',
 									text: format.text(state.text),
-									tone: state.tone,
-									...(state.icon === undefined ? {} : { icon: state.icon })
+									tone: state.tone
 								};
 							}
 						},
@@ -152,6 +149,7 @@ export class ProgressionPage extends Disposable implements PageView {
 					rowId: (progression) => progression.id,
 					rowName: (progression) => progressionName(format, progression),
 					open: review,
+					icon: 'admin.progression',
 					empty: format.text('progressionEmpty')
 				}
 			)

@@ -7,6 +7,10 @@ import { createElementFactory } from '../../../../base/browser/documentElements.
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
+import {
+	createStatusBadge,
+	type StatusBadgeTone
+} from '../../../../base/browser/ui/badge/statusBadge.js';
 import type { MenuEntry } from '../../../../base/browser/ui/menu/menuControl.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
@@ -37,11 +41,22 @@ const VISIBLE_CHIPS = 3;
 /** Rows on one page of a section; a longer list gets a pager at the foot of its card. */
 export const PAGE_SECTION_SIZE = 10;
 
-/** A status word at the end of a row, coloured only when it needs attention. */
+/** A status word, shown as a badge: green when fine, yellow when it needs a look, red for a problem. */
 export interface PageRowStatus {
 	readonly text: string;
-	readonly icon: ProctorIconId;
 	readonly tone: 'quiet' | 'success' | 'warning' | 'failure';
+}
+
+const badgeTones: Readonly<Record<PageRowStatus['tone'], StatusBadgeTone>> = {
+	quiet: 'neutral',
+	success: 'success',
+	warning: 'warning',
+	failure: 'danger'
+};
+
+/** A row status as a badge. */
+export function createRowBadge(document: Document, status: PageRowStatus): HTMLElement {
+	return createStatusBadge(document, { text: status.text, tone: badgeTones[status.tone] });
 }
 
 export interface PageRowModel {
@@ -52,7 +67,12 @@ export interface PageRowModel {
 	/** Short labels under the title, such as a token's permissions; the first few show. */
 	readonly chips?: readonly string[];
 	readonly detail: string;
+	/** A badge at the end of the row, as for a setting's state. */
 	readonly status?: PageRowStatus;
+	/** A badge right after the title, as for whether an affiliation is current. */
+	readonly titleBadge?: PageRowStatus;
+	/** Marks the row you are using, such as this session, with a pin; the text is its tooltip. */
+	readonly here?: string;
 	/** The row's one obvious action, shown as a button; all others go in its "⋯" menu. */
 	readonly button?: PageRowAction;
 	readonly actions?: readonly PageRowAction[];
@@ -67,6 +87,8 @@ export interface PageSectionAction {
 
 /** An empty section: an optional title, one sentence, and optionally the action that fills it. */
 export interface PageEmpty {
+	/** Drawn in a circle above the words when the section stands alone on a plain page. */
+	readonly icon?: ProctorIconId;
 	readonly title?: string;
 	readonly text: string;
 	readonly action?: { readonly label: string; readonly icon: ProctorIconId; run(): void };
@@ -98,6 +120,9 @@ export class PageSection extends Disposable {
 	private readonly state: HTMLElement;
 	private readonly stateText: HTMLElement;
 	private readonly stateIcon;
+	private readonly stateGlyph: HTMLElement;
+	private readonly plain: boolean;
+	private readonly stateActions: HTMLElement;
 	private readonly note: HTMLElement;
 	private readonly noteText: HTMLElement;
 	private readonly noteIcon;
@@ -127,6 +152,7 @@ export class PageSection extends Disposable {
 		@IAuthenticatedHoverService private readonly hover: IAuthenticatedHoverService
 	) {
 		super();
+		this.plain = options.plain === true;
 		const document = host.ownerDocument;
 		const $ = createElementFactory(document);
 		const id = `prctr-page-section-${++sectionSequence}`;
@@ -191,18 +217,21 @@ export class PageSection extends Disposable {
 				)
 			);
 		this.stateIcon = this._register(
-			createProctorIcon(document, { id: 'status.attention', size: 18 })
+			createProctorIcon(document, { id: 'status.attention', size: this.plain ? 22 : 18 })
 		);
+		this.stateGlyph = $('span.prctr-page-section__state-glyph', {}, this.stateIcon.element);
+		this.stateActions = $('span.prctr-page-section__state-actions');
 		this.stateTitle = $('strong.prctr-page-section__state-title', { hidden: true });
 		this.stateText = $('span.prctr-page-section__state-text');
 		this.state = $(
 			'div.prctr-page-section__state',
 			{},
-			this.stateIcon.element,
-			$('span.prctr-page-section__state-body', {}, this.stateTitle, this.stateText)
+			this.stateGlyph,
+			$('span.prctr-page-section__state-body', {}, this.stateTitle, this.stateText),
+			this.stateActions
 		);
 		this.retry = this._register(
-			new ButtonControl(this.state, {
+			new ButtonControl(this.stateActions, {
 				variant: 'secondary',
 				size: 'small',
 				label: this.format.text('retry'),
@@ -210,8 +239,8 @@ export class PageSection extends Disposable {
 			})
 		);
 		this.emptyAction = this._register(
-			new ButtonControl(this.state, {
-				variant: 'secondary',
+			new ButtonControl(this.stateActions, {
+				variant: options.plain === true ? 'brand' : 'secondary',
 				size: 'small',
 				label: '',
 				icon: proctorIconFactory('action.add', 14)
@@ -311,7 +340,7 @@ export class PageSection extends Disposable {
 		}
 		if (state.kind === 'failed') {
 			this.clearRows();
-			this.showState('failure', {
+			this.showState(state.reason === 'denied' ? 'denied' : 'failure', {
 				text: this.format.text('loadFailed', {
 					reason: this.pane.describeFailure(state.reason)
 				})
@@ -406,7 +435,7 @@ export class PageSection extends Disposable {
 		this.noteText.textContent = text;
 	}
 
-	private showState(kind: 'failure' | 'empty', content: PageEmpty): void {
+	private showState(kind: 'failure' | 'denied' | 'empty', content: PageEmpty): void {
 		this.state.hidden = false;
 		this.state.dataset.kind = kind;
 		this.stateTitle.textContent = content.title ?? '';
@@ -414,7 +443,14 @@ export class PageSection extends Disposable {
 		this.stateText.textContent = content.text;
 		// A failure that trying again cannot fix, such as a refusal, offers no retry.
 		this.retry.element.hidden = kind !== 'failure' || this.retryHandler === undefined;
-		this.stateIcon.element.hidden = kind === 'empty';
+		const icon =
+			kind === 'failure'
+				? 'status.attention'
+				: kind === 'denied'
+					? 'status.locked'
+					: content.icon;
+		this.stateGlyph.hidden = icon === undefined;
+		if (icon !== undefined) this.stateIcon.setState({ id: icon, size: this.plain ? 22 : 18 });
 		this.emptyRun = content.action?.run;
 		this.emptyAction.element.hidden = content.action === undefined;
 		if (content.action !== undefined)
@@ -431,28 +467,28 @@ export class PageSection extends Disposable {
 		const document = this.element.ownerDocument;
 		const glyph = this.rowStore.add(createProctorIcon(document, { id: row.glyph, size: 18 }));
 		glyph.element.classList.add('prctr-page-row__glyph');
-		const text = $(
-			'span.prctr-page-row__text',
+		const title = $(
+			'span.prctr-page-row__heading',
 			{},
 			$('span.prctr-page-row__title', { textContent: row.title })
 		);
+		if (row.titleBadge !== undefined) title.append(createRowBadge(document, row.titleBadge));
+		if (row.here !== undefined)
+			title.append(
+				createStatusBadge(document, {
+					icon: this.rowStore.add(
+						createProctorIcon(document, { id: 'status.here', size: 14 })
+					),
+					label: row.here,
+					tone: 'success'
+				})
+			);
+		const text = $('span.prctr-page-row__text', {}, title);
 		if (row.chips !== undefined && row.chips.length > 0)
 			text.append(this.createChips($, row.chips));
 		text.append($('span.prctr-page-row__detail', { textContent: row.detail }));
 		const item = $('li.prctr-page-row', { data: { rowId: row.id } }, glyph.element, text);
-		if (row.status !== undefined) {
-			const icon = this.rowStore.add(
-				createProctorIcon(document, { id: row.status.icon, size: 14 })
-			);
-			item.append(
-				$(
-					'span.prctr-page-row__status',
-					{ data: { tone: row.status.tone } },
-					icon.element,
-					row.status.text
-				)
-			);
-		}
+		if (row.status !== undefined) item.append(createRowBadge(document, row.status));
 		if (row.button !== undefined) {
 			const action = row.button;
 			const button = this.rowStore.add(

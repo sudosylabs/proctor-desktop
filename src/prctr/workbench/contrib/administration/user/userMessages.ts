@@ -8,12 +8,12 @@ import { defineMessage } from '../../../../base/common/localization.js';
 export const userMessages = Object.freeze({
 	userDescription: defineMessage({
 		id: 'administration.user.description',
-		defaultMessage: '{email} · username {username} · member since {date}',
+		defaultMessage: '{email} · Username {username} · Member since {date}',
 		description: 'Description under a user’s name; email may be absent.'
 	}),
 	userDescriptionNoEmail: defineMessage({
 		id: 'administration.user.description.no.email',
-		defaultMessage: 'Username {username} · member since {date}',
+		defaultMessage: 'Username {username} · Member since {date}',
 		description: 'Description under a user’s name when they have no email.'
 	}),
 	userTrailUsers: defineMessage({
@@ -78,12 +78,12 @@ export const userMessages = Object.freeze({
 	}),
 	userLastSignIn: defineMessage({
 		id: 'administration.user.last.sign.in',
-		defaultMessage: 'Last sign-in',
+		defaultMessage: 'Last seen',
 		description: 'Profile field.'
 	}),
 	userNone: defineMessage({
 		id: 'administration.user.none',
-		defaultMessage: 'Not set',
+		defaultMessage: '—',
 		description: 'A profile field with no value.'
 	}),
 	userNever: defineMessage({
@@ -183,7 +183,7 @@ export const userMessages = Object.freeze({
 	}),
 	userPeriodOpen: defineMessage({
 		id: 'administration.user.period.open',
-		defaultMessage: 'From {start} · no end date',
+		defaultMessage: 'From {start} · No end date',
 		description: 'Detail of an affiliation or role with no end.'
 	}),
 	userPeriod: defineMessage({
@@ -218,7 +218,7 @@ export const userMessages = Object.freeze({
 	}),
 	userEndAffiliation: defineMessage({
 		id: 'administration.user.affiliation.end',
-		defaultMessage: 'End affiliation…',
+		defaultMessage: 'End affiliation',
 		description: 'Row action that ends an affiliation after confirming.'
 	}),
 	userEndAffiliationTitle: defineMessage({
@@ -299,7 +299,7 @@ export const userMessages = Object.freeze({
 	}),
 	userEndRole: defineMessage({
 		id: 'administration.user.role.end',
-		defaultMessage: 'End role…',
+		defaultMessage: 'End role',
 		description: 'Row action that ends a role after confirming.'
 	}),
 	userEndRoleTitle: defineMessage({
@@ -339,7 +339,7 @@ export const userMessages = Object.freeze({
 	}),
 	userSessionDetail: defineMessage({
 		id: 'administration.user.session.detail',
-		defaultMessage: 'Signed in {signedIn} · active {active}',
+		defaultMessage: 'Signed in {signedIn} · Active {active}',
 		description: 'Detail of one session.'
 	}),
 	userSessionDesktop: defineMessage({
@@ -374,7 +374,7 @@ export const userMessages = Object.freeze({
 	}),
 	userResetTwoStep: defineMessage({
 		id: 'administration.user.two.step.reset',
-		defaultMessage: 'Reset two-step…',
+		defaultMessage: 'Reset two-step',
 		description: 'Opens the dialog that resets two-step verification.'
 	}),
 	userResetTwoStepTitle: defineMessage({
@@ -420,7 +420,7 @@ export const userMessages = Object.freeze({
 	}),
 	userChangeEmail: defineMessage({
 		id: 'administration.user.email.change',
-		defaultMessage: 'Change email…',
+		defaultMessage: 'Change email',
 		description: 'Menu action that changes a user’s email.'
 	}),
 	userChangeEmailTitle: defineMessage({

@@ -8,12 +8,12 @@ import { defineMessage } from '../../../../base/common/localization.js';
 export const sessionsMessages = Object.freeze({
 	endSessionEllipsis: defineMessage({
 		id: 'account.sessions.end.menu',
-		defaultMessage: 'End session…',
+		defaultMessage: 'End session',
 		description: 'Row menu entry that opens the confirmation to end a session.'
 	}),
 	removeDesktopEllipsis: defineMessage({
 		id: 'account.desktops.remove.menu',
-		defaultMessage: 'Remove desktop…',
+		defaultMessage: 'Remove desktop',
 		description: 'Row menu entry that opens the confirmation to remove a registered desktop.'
 	}),
 	desktopRemovedStatus: defineMessage({
@@ -149,12 +149,12 @@ export const sessionsMessages = Object.freeze({
 	desktopSummary: defineMessage({
 		id: 'account.sessions.desktop.summary',
 		defaultMessage:
-			'{platform} · Proctor {release} · registered {registered} · last used {used}',
+			'{platform} · Proctor {release} · Registered {registered} · Last used {used}',
 		description: 'Second line of a registered desktop row.'
 	}),
 	desktopRemovedSummary: defineMessage({
 		id: 'account.sessions.desktop.removed.summary',
-		defaultMessage: '{platform} · removed · registered {registered}',
+		defaultMessage: '{platform} · Removed · Registered {registered}',
 		description: 'Second line of a removed desktop row.'
 	}),
 	unnamedDesktop: defineMessage({

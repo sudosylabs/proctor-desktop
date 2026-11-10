@@ -80,6 +80,7 @@ const icons = {
 	'status.review': 'eye',
 	'status.waiting': 'hourglass',
 	'status.failed': 'x-circle',
+	'status.here': 'map-pin',
 	'status.info': 'info',
 	'status.locked': 'lock-simple',
 	'status.offline': 'cloud-slash',
@@ -90,10 +91,13 @@ const icons = {
 	'status.verified': 'seal-check',
 	'status.warning': 'warning',
 
+	'device.apple': 'apple-logo',
 	'device.browser': 'globe',
 	'device.cli': 'terminal-window',
 	'device.desktop': 'desktop',
 	'device.laptop': 'laptop',
+	'device.linux': 'linux-logo',
+	'device.windows': 'windows-logo',
 
 	'object.browserActivity': 'browser',
 	'object.calendar': 'calendar-blank',

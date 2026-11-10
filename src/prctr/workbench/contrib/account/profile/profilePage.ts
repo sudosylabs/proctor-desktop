@@ -2,6 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge.js';
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
 import { IWorkbenchWindowService } from '../../../browser/workbenchServices.js';
@@ -17,8 +18,7 @@ import type {
 } from '../../../../platform/account/common/accountProtocol.js';
 import {
 	createProctorIcon,
-	proctorIconFactory,
-	type ProctorIconControl
+	proctorIconFactory
 } from '../../../../platform/theme/browser/proctorIcon.js';
 import {
 	clientKind,
@@ -70,7 +70,6 @@ export class ProfilePage extends Disposable implements PageView {
 	private readonly details: PageSection;
 	private readonly detailRows: Readonly<Record<DetailKey, DetailRow>>;
 	private readonly unverified: HTMLElement;
-	private readonly noteIcon: ProctorIconControl;
 	private readonly sendVerification: ButtonControl;
 	private readonly verificationFeedback: PageFeedback;
 	private readonly noticeSection: PageSection;
@@ -165,9 +164,6 @@ export class ProfilePage extends Disposable implements PageView {
 			memberSince: this.detailRow($, list, 'memberSince'),
 			lastSignIn: this.detailRow($, list, 'lastSignIn')
 		};
-		this.noteIcon = this._register(
-			createProctorIcon(document, { id: 'status.verified', size: 14 })
-		);
 		this.detailRows.email.value.classList.add('prctr-account-details__mono');
 		this.detailRows.timeZone.value.classList.add('prctr-account-details__mono');
 		this.details.content.append(list);
@@ -305,12 +301,12 @@ export class ProfilePage extends Disposable implements PageView {
 		const emailNote = this.detailRows.email.note;
 		const verified = profile.emailVerified;
 		emailNote.hidden = profile.email === undefined || verified === undefined;
-		emailNote.dataset.verified = String(verified === true);
 		emailNote.replaceChildren(
-			this.noteIcon.element,
-			this.format.text(verified ? 'emailVerified' : 'emailUnverified')
+			createStatusBadge(emailNote.ownerDocument, {
+				text: this.format.text(verified ? 'emailVerified' : 'emailUnverified'),
+				tone: verified ? 'success' : 'warning'
+			})
 		);
-		this.noteIcon.setState({ id: verified ? 'status.verified' : 'status.warning', size: 14 });
 		this.unverified.hidden = profile.email === undefined || verified !== false;
 		const current = groupSessions(this.sessions.data?.sessions ?? []).current;
 		const lastSignIn = this.detailRows.lastSignIn;
@@ -319,7 +315,7 @@ export class ProfilePage extends Disposable implements PageView {
 			text(
 				'lastSignIn',
 				this.format.text('lastSignInValue', {
-					when: this.format.relative(current.createdAt),
+					when: this.format.relativeStandalone(current.createdAt),
 					client: this.format.text(clientKind(current.client))
 				})
 			);

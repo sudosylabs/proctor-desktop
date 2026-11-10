@@ -103,7 +103,7 @@ export const operationsMessages = Object.freeze({
 	}),
 	jobCancel: defineMessage({
 		id: 'administration.operations.job.cancel',
-		defaultMessage: 'Cancel…',
+		defaultMessage: 'Cancel',
 		description: 'Cancels a job after confirming.'
 	}),
 	jobCancelTitle: defineMessage({
@@ -300,7 +300,7 @@ export const operationsMessages = Object.freeze({
 	}),
 	mailKeyRetire: defineMessage({
 		id: 'administration.operations.mail.key.retire',
-		defaultMessage: 'Retire…',
+		defaultMessage: 'Retire',
 		description: 'Starts retiring a key after confirming.'
 	}),
 	mailKeyRetireTitle: defineMessage({
@@ -406,7 +406,7 @@ export const operationsMessages = Object.freeze({
 	}),
 	jobAttemptsUsed: defineMessage({
 		id: 'administration.operations.job.attempts.used',
-		defaultMessage: 'tried {attempt} of {maximum} times',
+		defaultMessage: 'Tried {attempt} of {maximum} times',
 		description: 'Part of a job’s description: how many tries it used.'
 	}),
 	jobDetails: defineMessage({

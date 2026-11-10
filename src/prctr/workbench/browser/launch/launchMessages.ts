@@ -49,7 +49,7 @@ export const launchMessages = Object.freeze({
 	}),
 	development: defineMessage({
 		id: 'launch.development',
-		defaultMessage: 'Development server · plain HTTP on this computer',
+		defaultMessage: 'Development server · Plain HTTP on this computer',
 		description: 'Strip shown when an explicitly enabled development server uses HTTP loopback.'
 	}),
 	continue: defineMessage({

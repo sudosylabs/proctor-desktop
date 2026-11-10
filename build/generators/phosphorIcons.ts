@@ -11,6 +11,7 @@ const output = 'src/prctr/platform/theme/common/proctorIconGlyphs.generated.ts';
  */
 const regular = [
 	'archive',
+	'apple-logo',
 	'arrow-clockwise',
 	'arrow-counter-clockwise',
 	'arrow-right',
@@ -55,10 +56,12 @@ const regular = [
 	'info',
 	'key',
 	'laptop',
+	'linux-logo',
 	'lock-key',
 	'lock-simple',
 	'magnifying-glass',
 	'magnifying-glass-plus',
+	'map-pin',
 	'minus',
 	'monitor',
 	'moon',
@@ -88,6 +91,7 @@ const regular = [
 	'users-three',
 	'warning',
 	'warning-circle',
+	'windows-logo',
 	'x',
 	'x-circle'
 ] as const;

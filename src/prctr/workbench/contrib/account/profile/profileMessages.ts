@@ -98,8 +98,8 @@ export const profileMessages = Object.freeze({
 	}),
 	lastSignIn: defineMessage({
 		id: 'account.profile.last.sign.in',
-		defaultMessage: 'Last sign-in',
-		description: 'Account detail label: when this window’s session signed in.'
+		defaultMessage: 'Last seen',
+		description: 'Account detail label: when the account was last active, here.'
 	}),
 	lastSignInValue: defineMessage({
 		id: 'account.profile.last.sign.in.value',

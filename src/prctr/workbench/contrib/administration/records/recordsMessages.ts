@@ -218,7 +218,7 @@ export const recordsMessages = Object.freeze({
 	}),
 	retentionEnable: defineMessage({
 		id: 'administration.records.retention.enable',
-		defaultMessage: 'Turn on cleanup…',
+		defaultMessage: 'Turn on cleanup',
 		description: 'Turns automatic cleanup on after confirming.'
 	}),
 	retentionEnableTitle: defineMessage({

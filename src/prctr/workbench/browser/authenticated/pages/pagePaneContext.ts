@@ -19,8 +19,10 @@ export interface PageHeading {
 	readonly trail?: readonly { readonly label: string; open(): void }[];
 	/** A status word beside the title, coloured only when it needs attention. */
 	readonly status?: { readonly text: string; readonly tone: 'ok' | 'warn' | 'fail' | 'neutral' };
-	/** Initials shown before the title, as for a person. */
+	/** Initials shown before the title, as for a person, until `photo` arrives. */
 	readonly initials?: string;
+	/** The person's picture as a data URL, shown in place of the initials. */
+	readonly photo?: string;
 }
 
 /** A failed result's detail and, when it can be repeated, how to try again. */

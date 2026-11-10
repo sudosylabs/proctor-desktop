@@ -159,6 +159,7 @@ export class AuditsPage extends Disposable implements PageView {
 										navigation.selectAdministrationPage('user', audit.actorId!)
 								}
 							],
+				icon: 'admin.audits',
 				empty: format.text('auditsEmpty'),
 				filteredEmpty: format.text('auditsNoMatch')
 			})

@@ -254,7 +254,6 @@ export class StructurePage extends Disposable implements PageView {
 		this.showMembers(unit);
 		this.details.setHeading(unit.displayName, unit.description || undefined);
 		renderDetails(this.details.content, [
-			{ label: this.format.text('structureKind'), value: unit.name },
 			{
 				label: this.format.text('structurePartOf'),
 				value:
@@ -281,7 +280,6 @@ export class StructurePage extends Disposable implements PageView {
 						cell: (klass) => ({
 							kind: 'text',
 							primary: klass.displayName,
-							secondary: klass.name,
 							strong: true
 						})
 					},
@@ -640,7 +638,7 @@ export class StructurePage extends Disposable implements PageView {
 				id: level.id,
 				glyph: 'admin.structure',
 				title: level.displayName,
-				detail: level.description || level.name,
+				detail: level.description || level.displayName,
 				actions: [
 					{
 						label: this.format.text('structureRename'),

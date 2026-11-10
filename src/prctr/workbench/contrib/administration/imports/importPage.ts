@@ -32,7 +32,7 @@ import { IAdministrationFormatService, type AdministrationText } from '../admini
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { renderDetails } from '../widgets/adminDetails.js';
 import { adminRead } from '../widgets/adminReads.js';
-import { IMPORT_MODE_TEXT, IMPORT_STATE_TEXT } from './importsPage.js';
+import { IMPORT_MODE_TEXT, IMPORT_STATE_TEXT } from './importText.js';
 
 type Import = AdministrationValue<'onboardingImport'>;
 type RowState = (typeof importRowStates)[number];
@@ -255,12 +255,6 @@ export class ImportPage extends Disposable implements PageView {
 					detail: row.code ?? row.operation,
 					status: {
 						text: this.format.text(status.text),
-						icon:
-							status.tone === 'failure'
-								? 'status.failed'
-								: status.tone === 'warning'
-									? 'status.attention'
-									: 'status.success',
 						tone: status.tone
 					}
 				};

@@ -48,12 +48,12 @@ export const securityMessages = Object.freeze({
 	}),
 	twoStepAppSince: defineMessage({
 		id: 'account.security.two.step.app.since',
-		defaultMessage: 'Authenticator app · on since {date}',
+		defaultMessage: 'Authenticator app · On since {date}',
 		description: 'Two-step verification uses an authenticator app, on since date.'
 	}),
 	recoveryCodesIssued: defineMessage({
 		id: 'account.security.recovery.codes.issued',
-		defaultMessage: 'Issued {date} · each code works once',
+		defaultMessage: 'Issued {date} · Each code works once',
 		description: 'When the recovery codes were issued.'
 	}),
 	recoveryCodesOnce: defineMessage({
@@ -108,22 +108,22 @@ export const securityMessages = Object.freeze({
 	}),
 	twoStepOff: defineMessage({
 		id: 'account.security.two.step.off',
-		defaultMessage: 'Off · turn it on from the security page',
+		defaultMessage: 'Off · Turn it on from the security page',
 		description: 'Two-step verification is off.'
 	}),
 	twoStepPending: defineMessage({
 		id: 'account.security.two.step.pending',
-		defaultMessage: 'Setup isn’t finished · finish it on the security page',
+		defaultMessage: 'Setup isn’t finished · Finish it on the security page',
 		description: 'Two-step verification enrolment is pending.'
 	}),
 	twoStepRecoveryRequired: defineMessage({
 		id: 'account.security.two.step.recovery.required',
-		defaultMessage: 'Needs recovery · set it up again on the security page',
+		defaultMessage: 'Needs recovery · Set it up again on the security page',
 		description: 'Two-step verification needs recovery.'
 	}),
 	twoStepServiceUnavailable: defineMessage({
 		id: 'account.security.two.step.service.unavailable',
-		defaultMessage: 'Unavailable right now · try again later',
+		defaultMessage: 'Unavailable right now · Try again later',
 		description: 'The two-step service is unavailable.'
 	}),
 	twoStepNotOffered: defineMessage({

@@ -4,6 +4,10 @@
 
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
+import {
+	createStatusBadge,
+	type StatusBadgeTone
+} from '../../../../base/browser/ui/badge/statusBadge.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import type { MenuEntry } from '../../../../base/browser/ui/menu/menuControl.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
@@ -72,6 +76,8 @@ export type AdminCell =
 			readonly kind: 'person';
 			readonly name: string;
 			readonly detail?: string;
+			/** The person's picture as a data URL, once read. */
+			readonly photo?: string;
 	  }
 	| {
 			readonly kind: 'text';
@@ -86,12 +92,11 @@ export type AdminCell =
 			/** The second line names a problem. */
 			readonly secondaryTone?: 'fail';
 	  }
-	/** A glyph and a word; the glyph follows the tone unless the cell names its own. */
+	/** A status word, shown as a badge without an icon. */
 	| {
 			readonly kind: 'status';
 			readonly text: string;
 			readonly tone: AdminTone;
-			readonly icon?: ProctorIconId;
 	  }
 	| { readonly kind: 'check'; readonly on: boolean; readonly label: string }
 	/** The row's one obvious action, such as Retry. */
@@ -126,20 +131,20 @@ export interface AdminListOptions<K extends AdminListKind> {
 	/** Rows can be chosen for one change to all of them. */
 	readonly selectable?: boolean;
 	readonly empty: string | PageEmpty;
+	/** Drawn above the empty and filtered-empty states. */
+	readonly icon?: ProctorIconId;
 	/** Rows other filters would show; replaces `empty` while any filter is set. */
 	readonly filteredEmpty?: string;
 	readonly action?: { readonly label: string; readonly icon: ProctorIconId };
 }
 
-/** Status glyphs by tone, as the boards draw them. */
-const toneIcons: Readonly<
-	Record<AdminTone, { readonly id: ProctorIconId; readonly filled?: true }>
-> = {
-	ok: { id: 'status.success' },
-	warn: { id: 'status.attention' },
-	fail: { id: 'status.attention', filled: true },
-	neutral: { id: 'status.info' },
-	busy: { id: 'status.busy' }
+/** Badge colours by tone. */
+const badgeTones: Readonly<Record<AdminTone, StatusBadgeTone>> = {
+	ok: 'success',
+	warn: 'warning',
+	fail: 'danger',
+	neutral: 'neutral',
+	busy: 'accent'
 };
 
 /**
@@ -410,12 +415,14 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 				: () => void read.refresh();
 		const filtered = this.options.filteredEmpty !== undefined && hasFilter(this.query);
 		// The section's empty state applies only when the table has no rows of its own.
+		const shown = filtered ? this.options.filteredEmpty! : this.options.empty;
 		const empty =
 			data !== undefined && data.items.length > 0
 				? false
-				: filtered
-					? this.options.filteredEmpty!
-					: this.options.empty;
+				: {
+						icon: this.options.icon,
+						...(typeof shown === 'string' ? { text: shown } : shown)
+					};
 		this.section.setState(state, empty, retry);
 		if (data === undefined) {
 			this.items = [];
@@ -640,32 +647,45 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 
 	private renderCell($: ReturnType<typeof createElementFactory>, cell: AdminCell): HTMLElement {
 		switch (cell.kind) {
-			case 'person':
+			case 'person': {
+				// The person's picture, their own or the default the server draws; initials
+				// stand in only until it has arrived.
+				const avatar = $('span.prctr-admin-list__avatar', {
+					attrs: { 'aria-hidden': 'true' }
+				});
+				if (cell.photo !== undefined)
+					avatar.append($('img', { alt: '', src: cell.photo, draggable: false }));
+				else avatar.textContent = initialsOf(cell.name);
 				return $(
 					'span.prctr-admin-list__person',
 					{},
-					$('span.prctr-admin-list__avatar', {
-						textContent: initialsOf(cell.name),
-						attrs: { 'aria-hidden': 'true' }
-					}),
+					avatar,
 					$(
 						'span.prctr-admin-list__text',
 						{},
 						$('span.prctr-admin-list__primary', {
 							data: { strong: 'true' },
-							textContent: cell.name
+							textContent: cell.name,
+							title: cell.name
 						}),
 						...(cell.detail === undefined || cell.detail === ''
 							? []
-							: [$('span.prctr-admin-list__secondary', { textContent: cell.detail })])
+							: [
+									$('span.prctr-admin-list__secondary', {
+										textContent: cell.detail,
+										title: cell.detail
+									})
+								])
 					)
 				);
+			}
 			case 'text':
 				return $(
 					'span.prctr-admin-list__text',
 					{},
 					$('span.prctr-admin-list__primary', {
 						textContent: cell.primary,
+						title: cell.primary,
 						data: {
 							strong: String(cell.strong === true),
 							mono: String(cell.mono === true),
@@ -677,30 +697,16 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 						: [
 								$('span.prctr-admin-list__secondary', {
 									textContent: cell.secondary,
+									title: cell.secondary,
 									data: { tone: cell.secondaryTone ?? '' }
 								})
 							])
 				);
-			case 'status': {
-				const glyph = toneIcons[cell.tone];
-				const icon = this.rowStore.add(
-					createProctorIcon(this.body.ownerDocument, {
-						id: cell.icon ?? glyph.id,
-						size: 16,
-						...(cell.icon === undefined && glyph.filled ? { filled: true } : {})
-					})
-				);
-				return $(
-					'span.prctr-admin-list__status',
-					{ data: { tone: cell.tone } },
-					$(
-						'span.prctr-admin-list__glyph',
-						{ attrs: { 'aria-hidden': 'true' } },
-						icon.element
-					),
-					cell.text
-				);
-			}
+			case 'status':
+				return createStatusBadge(this.body.ownerDocument, {
+					text: cell.text,
+					tone: badgeTones[cell.tone]
+				});
 			case 'check': {
 				const element = $('span.prctr-admin-list__check', {
 					attrs: { role: 'img', 'aria-label': cell.label },

@@ -35,11 +35,8 @@ import { initialsOf } from '../widgets/adminList.js';
 import { AdminMenuButton } from '../widgets/adminMenuButton.js';
 import { adminRead, readPages, readUnitTree } from '../widgets/adminReads.js';
 
-type Read<K extends 'user' | 'affiliations' | 'roleBindings' | 'userSessions'> = PageRead<
-	AdministrationValue<K>,
-	AdministrationFailure,
-	AdministrationResponse
->;
+type Read<K extends 'user' | 'userPhoto' | 'affiliations' | 'roleBindings' | 'userSessions'> =
+	PageRead<AdministrationValue<K>, AdministrationFailure, AdministrationResponse>;
 
 const AFFILIATION_TEXT: Readonly<Record<(typeof affiliationKinds)[number], AdministrationText>> = {
 	student: 'userAffiliationStudent',
@@ -56,6 +53,7 @@ const EMAIL = /^[^\s@]{1,64}@[^\s@]+\.[^\s@]+$/u;
  */
 export class UserPage extends Disposable implements PageView {
 	private readonly user: Read<'user'>;
+	private readonly photo: Read<'userPhoto'>;
 	private readonly affiliations: Read<'affiliations'>;
 	private readonly bindings: Read<'roleBindings'>;
 	private readonly sessions: Read<'userSessions'>;
@@ -111,6 +109,7 @@ export class UserPage extends Disposable implements PageView {
 		);
 
 		this.user = this._register(adminRead(administration, { kind: 'user', id: userId }));
+		this.photo = this._register(adminRead(administration, { kind: 'userPhoto', userId }));
 		this.affiliations = this._register(
 			adminRead(administration, { kind: 'affiliations', userId, limit: 10 })
 		);
@@ -149,6 +148,7 @@ export class UserPage extends Disposable implements PageView {
 		);
 
 		this._register(this.user.onDidChange(() => this.renderUser()));
+		this._register(this.photo.onDidChange(() => this.renderUser()));
 		this._register(this.affiliations.onDidChange(() => this.renderAffiliations()));
 		this._register(this.bindings.onDidChange(() => this.renderRoles()));
 		this._register(this.sessions.onDidChange(() => this.renderSessions()));
@@ -178,11 +178,13 @@ export class UserPage extends Disposable implements PageView {
 	setVisible(visible: boolean): void {
 		for (const read of [this.user, this.affiliations, this.bindings, this.sessions])
 			read.setActive(visible);
+		this.photo.setActive(visible);
 	}
 
 	private async refreshAll(): Promise<void> {
 		await Promise.all([
 			this.user.refresh(),
+			this.photo.refresh(),
 			this.affiliations.refresh(),
 			this.bindings.refresh(),
 			this.sessions.refresh()
@@ -249,6 +251,7 @@ export class UserPage extends Disposable implements PageView {
 						}),
 			trail: [this.usersStep()],
 			initials: initialsOf(user.displayName),
+			...(this.photo.data === undefined ? {} : { photo: this.photo.data.dataUrl }),
 			status:
 				user.disabledAt === undefined
 					? { text: this.format.text('userActive'), tone: 'ok' }
@@ -292,10 +295,11 @@ export class UserPage extends Disposable implements PageView {
 			},
 			{
 				label: this.format.text('userLastSignIn'),
-				value:
-					user.lastLoginAt === undefined
-						? this.format.text('userNever')
-						: this.format.relativeStandalone(user.lastLoginAt)
+				...value(
+					(user.lastActivityAt ?? user.lastLoginAt) === undefined
+						? undefined
+						: this.format.relativeStandalone((user.lastActivityAt ?? user.lastLoginAt)!)
+				)
 			}
 		]);
 	}
@@ -326,7 +330,7 @@ export class UserPage extends Disposable implements PageView {
 					glyph: 'object.institution',
 					title: this.format.text(AFFILIATION_TEXT[affiliation.kind]),
 					detail: this.period(affiliation.startAt, affiliation.endAt),
-					status: this.periodStatus(affiliation.startAt, affiliation.endAt),
+					titleBadge: this.periodStatus(affiliation.startAt, affiliation.endAt),
 					actions: ended
 						? []
 						: [
@@ -414,7 +418,7 @@ export class UserPage extends Disposable implements PageView {
 						this.scopeName(binding.scopeType, binding.scopeId),
 						this.period(binding.startAt, binding.endAt)
 					),
-					status: this.periodStatus(binding.startAt, binding.endAt),
+					titleBadge: this.periodStatus(binding.startAt, binding.endAt),
 					actions
 				};
 			})
@@ -483,10 +487,9 @@ export class UserPage extends Disposable implements PageView {
 	private periodStatus(start: number, end: number | undefined): PageRowModel['status'] {
 		const now = this.format.now();
 		if (end !== undefined && end <= now)
-			return { text: this.format.text('userEnded'), icon: 'status.time', tone: 'quiet' };
-		if (start > now)
-			return { text: this.format.text('userUpcoming'), icon: 'status.time', tone: 'quiet' };
-		return { text: this.format.text('userCurrent'), icon: 'status.success', tone: 'success' };
+			return { text: this.format.text('userEnded'), tone: 'quiet' };
+		if (start > now) return { text: this.format.text('userUpcoming'), tone: 'quiet' };
+		return { text: this.format.text('userCurrent'), tone: 'success' };
 	}
 
 	private scopeName(type: string, id: string): string {

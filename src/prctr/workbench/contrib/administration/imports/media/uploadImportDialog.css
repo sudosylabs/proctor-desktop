@@ -3,7 +3,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
-		padding: 16px;
 	}
 	.prctr-admin-import-form .prctr-admin-import-form__file {
 		display: none;
@@ -21,9 +20,5 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-	}
-	.prctr-admin-import-form .prctr-admin-import-form__actions {
-		display: flex;
-		justify-content: flex-end;
 	}
 }

@@ -106,12 +106,6 @@
 		gap: 5px;
 		white-space: nowrap;
 	}
-	.prctr-account .prctr-account-details__note[data-verified='true'] {
-		color: var(--prctr-color-feedback-success);
-	}
-	.prctr-account .prctr-account-details__note[data-verified='false'] {
-		color: var(--prctr-color-feedback-warning);
-	}
 	@container (max-width: 480px) {
 		.prctr-account .prctr-account-details__row {
 			grid-template-columns: minmax(0, 1fr) auto;

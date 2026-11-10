@@ -163,6 +163,7 @@ export class MailPage extends Disposable implements PageView {
 					rowId: (delivery) => delivery.id,
 					rowName: (delivery) => delivery.recipient,
 					actions: (delivery) => this.actions(delivery),
+					icon: 'admin.mail',
 					empty: format.text('mailEmpty'),
 					filteredEmpty: format.text('mailNoMatch')
 				}
@@ -380,7 +381,6 @@ export class MailPage extends Disposable implements PageView {
 				? {
 						status: {
 							text: this.format.text('mailKeyPrimary'),
-							icon: 'status.verified' as const,
 							tone: 'success' as const
 						}
 					}

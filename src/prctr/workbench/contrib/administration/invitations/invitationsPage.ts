@@ -193,6 +193,7 @@ export class InvitationsPage extends Disposable implements PageView {
 					rowId: (invitation) => invitation.id,
 					rowName: (invitation) => invitation.email,
 					actions: (invitation) => this.actions(invitation),
+					icon: 'admin.invitations',
 					empty: format.text('invitationsEmpty'),
 					filteredEmpty: format.text('invitationsNoMatch')
 				}
@@ -233,8 +234,7 @@ export class InvitationsPage extends Disposable implements PageView {
 			return {
 				kind: 'status',
 				text: this.format.text(STATE_TEXT.pending),
-				tone: 'warn',
-				icon: 'status.time'
+				tone: 'warn'
 			};
 		const tone: AdminTone = invitation.state === 'accepted' ? 'ok' : 'neutral';
 		return { kind: 'status', text: this.format.text(STATE_TEXT[invitation.state]), tone };

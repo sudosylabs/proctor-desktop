@@ -6,6 +6,7 @@ import { createElementFactory } from '../../../../base/browser/documentElements.
 import {
 	Disposable,
 	MutableDisposable,
+	toDisposable,
 	type IDisposable
 } from '../../../../base/common/lifecycle.js';
 import type {
@@ -31,6 +32,7 @@ export type AdminUser = AdministrationValue<'user'>;
  */
 export class UserActions extends Disposable {
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
+	private readonly photoInput = this._register(new MutableDisposable());
 	private readonly changes: AdminChanges;
 
 	constructor(
@@ -133,18 +135,25 @@ export class UserActions extends Disposable {
 
 	/** Replaces the person's photo with an image file the administrator chooses. */
 	replacePhoto(user: AdminUser): void {
-		const input = createElementFactory(this.pane.document)('input', {
+		// The picker opens only from an input that is in the document, as Account's is.
+		const document = this.pane.document;
+		const input = createElementFactory(document)('input', {
 			type: 'file',
-			attrs: { accept: 'image/png,image/jpeg,image/webp' }
+			hidden: true,
+			attrs: { accept: '.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp' }
 		});
+		this.photoInput.value = toDisposable(() => input.remove());
+		document.body.append(input);
 		input.addEventListener(
 			'change',
 			() => {
 				const file = input.files?.[0];
+				this.photoInput.clear();
 				if (file !== undefined) void this.uploadPhoto(user, file);
 			},
 			{ once: true }
 		);
+		input.addEventListener('cancel', () => this.photoInput.clear(), { once: true });
 		input.click();
 	}
 
@@ -172,7 +181,7 @@ export class UserActions extends Disposable {
 	}
 
 	private async uploadPhoto(user: AdminUser, file: File): Promise<void> {
-		const mediaType = file.type;
+		const mediaType = photoMediaType(file);
 		if (
 			!(
 				mediaType === 'image/png' ||
@@ -251,4 +260,17 @@ export class UserActions extends Disposable {
 			() => this.restoreFocus(user.id)
 		);
 	}
+}
+
+/** The image's type, from the file or, when the system reports none, its extension. */
+function photoMediaType(file: File): string {
+	if (file.type !== '') return file.type;
+	const extension = file.name.toLowerCase().split('.').at(-1);
+	return extension === 'png'
+		? 'image/png'
+		: extension === 'jpg' || extension === 'jpeg'
+			? 'image/jpeg'
+			: extension === 'webp'
+				? 'image/webp'
+				: '';
 }

@@ -66,7 +66,6 @@ export class PeriodsPage extends Disposable implements PageView {
 							cell: (period) => ({
 								kind: 'text',
 								primary: period.displayName,
-								secondary: period.name,
 								strong: true
 							})
 						},
@@ -117,6 +116,7 @@ export class PeriodsPage extends Disposable implements PageView {
 										run: () => this.archive(period)
 									}
 								],
+					icon: 'admin.periods',
 					empty: format.text('periodsEmpty'),
 					filteredEmpty: format.text('periodsNoMatch')
 				}

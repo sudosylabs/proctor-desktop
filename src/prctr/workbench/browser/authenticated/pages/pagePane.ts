@@ -2,6 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
@@ -226,11 +227,34 @@ export class PagePane extends Disposable {
 		this.heading.textContent = heading.title;
 		this.description.textContent = heading.description;
 		this.description.hidden = heading.description.length === 0;
-		this.initials.textContent = heading.initials ?? '';
-		this.initials.hidden = heading.initials === undefined;
-		this.status.textContent = heading.status?.text ?? '';
-		this.status.dataset.tone = heading.status?.tone ?? 'neutral';
-		this.status.hidden = heading.status === undefined;
+		if (heading.photo !== undefined && /^data:image\/webp;base64,/u.test(heading.photo)) {
+			const image = createElementFactory(this.initials.ownerDocument)('img', {
+				alt: '',
+				src: heading.photo,
+				draggable: false
+			});
+			this.initials.replaceChildren(image);
+		} else this.initials.textContent = heading.initials ?? '';
+		this.initials.hidden = heading.initials === undefined && heading.photo === undefined;
+		const status = heading.status;
+		this.status.replaceChildren(
+			...(status === undefined
+				? []
+				: [
+						createStatusBadge(this.status.ownerDocument, {
+							text: status.text,
+							tone:
+								status.tone === 'ok'
+									? 'success'
+									: status.tone === 'warn'
+										? 'warning'
+										: status.tone === 'fail'
+											? 'danger'
+											: 'neutral'
+						})
+					])
+		);
+		this.status.hidden = status === undefined;
 		this.renderTrail(heading.trail ?? []);
 	}
 

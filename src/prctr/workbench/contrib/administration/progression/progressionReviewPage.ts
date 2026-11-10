@@ -240,7 +240,6 @@ export class ProgressionReviewPage extends Disposable implements PageView {
 					detail: row.code === undefined ? '' : this.format.code('problem', row.code),
 					status: {
 						text: this.format.text(failed ? 'reviewLeftOut' : 'reviewSkipped'),
-						icon: failed ? 'status.failed' : 'status.attention',
 						tone: failed ? 'failure' : 'warning'
 					}
 				};

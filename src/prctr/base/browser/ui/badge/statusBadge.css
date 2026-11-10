@@ -1,0 +1,49 @@
+/* A status word on a tinted pill: 22 px high, 6 px corners, 12 px medium text, no icon. */
+@layer controls {
+	.prctr-status-badge {
+		align-items: center;
+		background: color-mix(in srgb, var(--prctr-color-text-secondary) 14%, transparent);
+		block-size: 22px;
+		border-radius: 6px;
+		box-sizing: border-box;
+		color: var(--prctr-color-text-secondary);
+		display: inline-flex;
+		flex: none;
+		font-family: var(--prctr-typography-font-application);
+		font-size: 12px;
+		font-weight: var(--prctr-typography-weight-medium);
+		justify-content: center;
+		line-height: 1;
+		padding: 0 8px;
+		white-space: nowrap;
+	}
+	.prctr-status-badge[data-tone='success'] {
+		background: color-mix(in srgb, var(--prctr-color-feedback-success) 16%, transparent);
+		color: var(--prctr-color-feedback-success);
+	}
+	.prctr-status-badge[data-tone='warning'] {
+		background: color-mix(in srgb, var(--prctr-color-feedback-warning) 16%, transparent);
+		color: var(--prctr-color-feedback-warning);
+	}
+	.prctr-status-badge[data-tone='danger'] {
+		background: color-mix(in srgb, var(--prctr-color-feedback-error) 14%, transparent);
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-status-badge[data-tone='accent'] {
+		background: color-mix(in srgb, var(--prctr-color-brand-accent) 14%, transparent);
+		color: var(--prctr-color-brand-link);
+	}
+	.prctr-status-badge[data-icon-only='true'] {
+		inline-size: 24px;
+		padding: 0;
+	}
+
+	@media (forced-colors: active) {
+		.prctr-status-badge {
+			border: 1px solid CanvasText;
+			forced-color-adjust: none;
+			background: Canvas;
+			color: CanvasText;
+		}
+	}
+}

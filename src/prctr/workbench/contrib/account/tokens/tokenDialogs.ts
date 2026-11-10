@@ -170,8 +170,8 @@ export class NewTokenDialog extends Disposable {
 			})
 		);
 		this.dialog.body.append(
-			fieldset,
-			$('div.prctr-account-token-form__row', {}, this.limitField, expiryField)
+			$('div.prctr-account-token-form__row', {}, this.limitField, expiryField),
+			fieldset
 		);
 		this.feedback = this._register(new PageFeedback(this.dialog.body));
 		this.cancel = this._register(
@@ -211,31 +211,40 @@ export class NewTokenDialog extends Disposable {
 	private showGrantable(grantable: AccountGrantableScopes): void {
 		const $ = createElementFactory(this.pane.document);
 		this.grantable = grantable;
-		this.scopes = grantable.scopes.map((scope) => {
-			const input = $('input.prctr-account-token-form__checkbox', {
-				type: 'checkbox',
-				value: scope.name
-			});
-			const description = $('span.prctr-account-token-form__scope-description', {
-				textContent: scope.description
+		// One row per area, such as Exams, with that area's permissions side by side; each
+		// permission's own description is its tooltip, so the list stays short.
+		const areas = groupScopesByArea(grantable.scopes);
+		const scopes: {
+			readonly scope: AccountGrantableScope;
+			readonly input: HTMLInputElement;
+		}[] = [];
+		for (const area of areas) {
+			const choices = area.scopes.map(({ scope, verb }) => {
+				const input = $('input.prctr-account-token-form__checkbox', {
+					type: 'checkbox',
+					value: scope.name,
+					attrs: { 'aria-label': scope.title }
+				});
+				this._register(addDisposableListener(input, 'change', () => this.updateFootnote()));
+				scopes.push({ scope, input });
+				return $(
+					'label.prctr-account-token-form__scope',
+					{ title: scope.description },
+					input,
+					$('span.prctr-account-token-form__scope-title', { textContent: verb })
+				);
 			});
 			this.scopeList.append(
 				$(
-					'label.prctr-account-token-form__scope',
-					{},
-					input,
-					$(
-						'span.prctr-account-token-form__scope-text',
-						{},
-						$('span.prctr-account-token-form__scope-title', {
-							textContent: scope.title
-						}),
-						description
-					)
+					'div.prctr-account-token-form__area',
+					{ attrs: { role: 'group', 'aria-label': area.label } },
+					$('span.prctr-account-token-form__area-name', { textContent: area.label }),
+					$('span.prctr-account-token-form__area-scopes', {}, ...choices)
 				)
 			);
-			return { scope, input };
-		});
+		}
+		this.scopes = scopes;
+		this.updateFootnote();
 		const empty = grantable.scopes.length === 0;
 		this.scopeStatus.hidden = !empty;
 		this.scopeStatus.textContent = empty ? this.format.text('tokenScopesNone') : '';
@@ -251,6 +260,18 @@ export class NewTokenDialog extends Disposable {
 		this.limitField.hidden = grantable.academicUnits.length === 0;
 		this.limitHint.hidden = !grantable.moreAcademicUnits;
 		this.setWorking(false);
+	}
+
+	/** "3 permissions", beside the buttons. */
+	private updateFootnote(): void {
+		const count = this.selectedScopes().length;
+		this.dialog.setFootnote(
+			count === 0
+				? undefined
+				: count === 1
+					? this.format.text('tokenScopeCountOne')
+					: this.format.text('tokenScopeCount', { count })
+		);
 	}
 
 	private academicUnitId(): string | undefined {
@@ -531,4 +552,32 @@ export class TokenCreatedDialog extends Disposable {
 		super.dispose();
 		this.onDidClose();
 	}
+}
+
+/**
+ * Permissions such as `exam.view` and `exam.manage.override` grouped by what they act on: the
+ * area is everything before the action, and an override reads as the action "for any".
+ */
+export function groupScopesByArea(scopes: readonly AccountGrantableScope[]): readonly {
+	readonly label: string;
+	readonly scopes: readonly { readonly scope: AccountGrantableScope; readonly verb: string }[];
+}[] {
+	const areas = new Map<string, { scope: AccountGrantableScope; verb: string }[]>();
+	for (const scope of scopes) {
+		const parts = scope.name.split('.');
+		const override = parts.at(-1) === 'override' && parts.length > 2;
+		const verbPart = override ? parts.at(-2)! : (parts.at(-1) ?? scope.name);
+		const area = parts.slice(0, override ? -2 : -1).join('.') || scope.name;
+		const verb = words(verbPart) + (override ? ' (any)' : '');
+		const list = areas.get(area) ?? [];
+		list.push({ scope, verb });
+		areas.set(area, list);
+	}
+	return [...areas].map(([area, list]) => ({ label: words(area), scopes: list }));
+}
+
+/** `academic_unit.members` → "Academic unit members". */
+function words(code: string): string {
+	const text = code.replace(/[._]+/gu, ' ').trim();
+	return text === '' ? code : text[0]!.toLocaleUpperCase() + text.slice(1);
 }

@@ -216,27 +216,27 @@ const sharedMessages = Object.freeze({
 	}),
 	recoveryCodesLowOf: defineMessage({
 		id: 'account.security.recovery.codes.low.of',
-		defaultMessage: '{count} of {total} left · get new ones before you run out',
+		defaultMessage: '{count} of {total} left · Get new ones before you run out',
 		description: 'Few of the issued recovery codes remain.'
 	}),
 	twoStepOnSince: defineMessage({
 		id: 'account.security.two.step.on.since',
-		defaultMessage: 'On · authenticator app, since {date}',
+		defaultMessage: 'On · Authenticator app, since {date}',
 		description: 'Two-step verification is on with an authenticator app, turned on at date.'
 	}),
 	twoStepOnApp: defineMessage({
 		id: 'account.security.two.step.on.app',
-		defaultMessage: 'On · authenticator app',
+		defaultMessage: 'On · Authenticator app',
 		description: 'Two-step verification is on with an authenticator app.'
 	}),
 	passwordChanged: defineMessage({
 		id: 'account.security.password.changed',
-		defaultMessage: 'Set · changed {date}',
+		defaultMessage: 'Set · Changed {date}',
 		description: 'A password is set and was last changed at date.'
 	}),
 	recoveryCodesLow: defineMessage({
 		id: 'account.security.recovery.codes.low',
-		defaultMessage: '{count} left · get new ones before you run out',
+		defaultMessage: '{count} left · Get new ones before you run out',
 		description: 'Few recovery codes remain.'
 	}),
 	otherSessionsDescription: defineMessage({

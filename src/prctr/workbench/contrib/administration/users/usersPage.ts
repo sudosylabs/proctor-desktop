@@ -11,6 +11,7 @@ import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIc
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
+import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAdministrationFormatService, type AdministrationText } from '../administrationFormat.js';
 import { InviteDialog } from '../invitations/inviteDialog.js';
@@ -21,8 +22,9 @@ import {
 	type AdminListItem,
 	type AdminListQuery
 } from '../widgets/adminList.js';
-import { readUnitTree, unitLabel } from '../widgets/adminReads.js';
+import { readOnce, readUnitTree, unitLabel } from '../widgets/adminReads.js';
 import { BulkUserChanges } from './bulkUserChanges.js';
+import { AdminMenuButton } from '../widgets/adminMenuButton.js';
 import { UserActions, type AdminUser } from './userActions.js';
 
 type Status = 'active' | 'any';
@@ -46,6 +48,8 @@ export class UsersPage extends Disposable implements PageView {
 	private disableButton: ButtonControl | undefined;
 	private readonly invite = this._register(new MutableDisposable<InviteDialog>());
 	private query: AdminListQuery<'users'> = {};
+	/** Each person's picture, read once: their own or the default the server draws. */
+	private readonly photos = new Map<string, string>();
 
 	constructor(
 		body: HTMLElement,
@@ -53,7 +57,8 @@ export class UsersPage extends Disposable implements PageView {
 		@IInstantiationService private readonly instantiationService: IInstantiationService,
 		@IAdministrationService private readonly administration: IAdministrationService,
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
-		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService
+		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService,
+		@IPagePaneContext private readonly pane: IPagePaneContext
 	) {
 		super();
 		const importButton = this._register(
@@ -130,11 +135,15 @@ export class UsersPage extends Disposable implements PageView {
 					{
 						label: format.text('usersColumnPerson'),
 						width: '34%',
-						cell: (user) => ({
-							kind: 'person',
-							name: user.displayName,
-							detail: user.email ?? user.username
-						})
+						cell: (user) => {
+							const photo = this.photos.get(user.id);
+							return {
+								kind: 'person',
+								name: user.displayName,
+								detail: user.email ?? user.username,
+								...(photo === undefined ? {} : { photo })
+							};
+						}
 					},
 					{
 						label: format.text('usersAffiliation'),
@@ -171,8 +180,7 @@ export class UsersPage extends Disposable implements PageView {
 								: {
 										kind: 'status',
 										text: format.text('userDisabled'),
-										tone: 'neutral',
-										icon: 'status.prohibited'
+										tone: 'neutral'
 									}
 					}
 				],
@@ -180,11 +188,13 @@ export class UsersPage extends Disposable implements PageView {
 				rowName: (user) => user.displayName,
 				open: (user) => navigation.selectAdministrationPage('user', user.id),
 				actions: (user) => actions.for(user, true),
+				icon: 'admin.users',
 				empty: format.text('usersEmpty'),
 				filteredEmpty: format.text('usersNoMatch')
 			})
 		);
 		this._register(this.list.onDidChangeSelection((users) => this.showSelection(users)));
+		this._register(this.list.onDidLoad((users) => void this.loadPhotos(users)));
 		void this.loadUnits();
 	}
 
@@ -208,15 +218,58 @@ export class UsersPage extends Disposable implements PageView {
 		};
 		button(format.text('usersBulkEnrol'), 'object.student', (users) => this.bulk.enrol(users));
 		button(format.text('usersBulkGrant'), 'admin.roles', (users) => this.bulk.grant(users));
-		button(format.text('usersBulkSignOut'), 'action.signOut', (users) =>
-			this.bulk.signOut(users)
+		// The less used changes give way to ⋯ when the bar is narrow, so it never wraps.
+		const signOut = (users: readonly AdminUser[]): void => this.bulk.signOut(users);
+		const enable = (users: readonly AdminUser[]): void =>
+			this.bulk.enable(users.filter((user) => user.disabledAt !== undefined));
+		const disable = (users: readonly AdminUser[]): void =>
+			this.bulk.disable(users.filter((user) => user.disabledAt === undefined));
+		button(
+			format.text('usersBulkSignOut'),
+			'action.signOut',
+			signOut
+		).element.dataset.secondary = 'true';
+		this.enableButton = button(format.text('usersBulkEnable'), 'action.enable', enable);
+		this.enableButton.element.dataset.secondary = 'true';
+		this.disableButton = button(format.text('usersBulkDisable'), 'action.end', disable);
+		this.disableButton.element.dataset.secondary = 'true';
+		const more = this._register(
+			new AdminMenuButton(
+				host,
+				format.text('usersBulkMore'),
+				() => {
+					const users = this.list.selection;
+					return [
+						{
+							label: format.text('usersBulkSignOut'),
+							icon: 'action.signOut' as const,
+							run: () => signOut(users)
+						},
+						...(users.some((user) => user.disabledAt !== undefined)
+							? [
+									{
+										label: format.text('usersBulkEnable'),
+										icon: 'action.enable' as const,
+										run: () => enable(users)
+									}
+								]
+							: []),
+						...(users.some((user) => user.disabledAt === undefined)
+							? [
+									{
+										label: format.text('usersBulkDisable'),
+										icon: 'action.end' as const,
+										destructive: true,
+										run: () => disable(users)
+									}
+								]
+							: [])
+					];
+				},
+				this.pane
+			)
 		);
-		this.enableButton = button(format.text('usersBulkEnable'), 'action.enable', (users) =>
-			this.bulk.enable(users.filter((user) => user.disabledAt !== undefined))
-		);
-		this.disableButton = button(format.text('usersBulkDisable'), 'action.end', (users) =>
-			this.bulk.disable(users.filter((user) => user.disabledAt === undefined))
-		);
+		more.element.dataset.overflow = 'true';
 		const clear = this._register(
 			new ButtonControl(host, {
 				variant: 'ghost',
@@ -283,6 +336,25 @@ export class UsersPage extends Disposable implements PageView {
 	private more(items: readonly string[], more: number): string {
 		const list = items.join(', ');
 		return more > 0 ? this.format.text('usersMore', { list, count: more }) : list;
+	}
+
+	private async loadPhotos(users: readonly AdminListItem<'users'>[]): Promise<void> {
+		const missing = users.filter((user) => !this.photos.has(user.id));
+		if (missing.length === 0) return;
+		const photos = await Promise.all(
+			missing.map((user) =>
+				readOnce(this.administration, { kind: 'userPhoto', userId: user.id })
+			)
+		);
+		if (this._store.isDisposed) return;
+		let changed = false;
+		missing.forEach((user, index) => {
+			const photo = photos[index]!;
+			if (photo.kind !== 'data') return;
+			this.photos.set(user.id, photo.value.dataUrl);
+			changed = true;
+		});
+		if (changed) this.list.redraw();
 	}
 
 	private async loadUnits(): Promise<void> {

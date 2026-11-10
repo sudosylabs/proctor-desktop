@@ -85,8 +85,81 @@
 		padding: 10px 10px 10px 16px;
 		box-sizing: border-box;
 	}
-	.prctr-page-section .prctr-page-section__state[data-kind='failure'] > .prctr-icon {
+	.prctr-page-section .prctr-page-section__state-glyph {
+		display: flex;
+		flex: none;
+	}
+	.prctr-page-section .prctr-page-section__state-glyph[hidden] {
+		display: none;
+	}
+	.prctr-page-section
+		.prctr-page-section__state[data-kind='failure']
+		.prctr-page-section__state-glyph {
 		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-page-section
+		.prctr-page-section__state[data-kind='denied']
+		.prctr-page-section__state-glyph {
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-page-section .prctr-page-section__state-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	/* A plain section stands alone on its page, so its states are a centred block: an icon in a
+	 * tinted circle, a title, one or two sentences and the actions that answer them. */
+	.prctr-page-section .prctr-page-section__card[data-plain='true'] .prctr-page-section__state {
+		align-items: center;
+		flex-direction: column;
+		flex-wrap: nowrap;
+		gap: 12px;
+		padding: 56px 16px;
+		text-align: center;
+	}
+	.prctr-page-section
+		.prctr-page-section__card[data-plain='true']
+		.prctr-page-section__state-glyph {
+		align-items: center;
+		background: color-mix(in srgb, var(--prctr-color-brand-accent) 14%, transparent);
+		block-size: 48px;
+		border-radius: 50%;
+		color: var(--prctr-color-brand-link);
+		inline-size: 48px;
+		justify-content: center;
+	}
+	.prctr-page-section
+		.prctr-page-section__card[data-plain='true']
+		.prctr-page-section__state[data-kind='failure']
+		.prctr-page-section__state-glyph {
+		background: color-mix(in srgb, var(--prctr-color-feedback-error) 14%, transparent);
+		color: var(--prctr-color-feedback-error);
+	}
+	.prctr-page-section
+		.prctr-page-section__card[data-plain='true']
+		.prctr-page-section__state[data-kind='denied']
+		.prctr-page-section__state-glyph {
+		background: var(--prctr-color-interaction-hover);
+		color: var(--prctr-color-text-secondary);
+	}
+	.prctr-page-section
+		.prctr-page-section__card[data-plain='true']
+		.prctr-page-section__state-body {
+		align-items: center;
+		flex: none;
+		gap: 4px;
+	}
+	.prctr-page-section
+		.prctr-page-section__card[data-plain='true']
+		.prctr-page-section__state-title {
+		font-size: 15px;
+	}
+	.prctr-page-section
+		.prctr-page-section__card[data-plain='true']
+		.prctr-page-section__state-actions {
+		justify-content: center;
+		margin-block-start: 4px;
 	}
 	.prctr-page-section .prctr-page-section__state[data-kind='empty'] {
 		color: var(--prctr-color-text-secondary);
@@ -199,6 +272,12 @@
 		gap: 2px;
 		min-inline-size: 0;
 	}
+	.prctr-page-section .prctr-page-row__heading {
+		align-items: center;
+		display: flex;
+		gap: 8px;
+		min-inline-size: 0;
+	}
 	.prctr-page-section .prctr-page-row__title {
 		font-size: 14px;
 		font-weight: var(--prctr-typography-weight-medium);
@@ -251,28 +330,15 @@
 		outline-offset: 1px;
 	}
 	@media (forced-colors: active) {
+		.prctr-page-section
+			.prctr-page-section__card[data-plain='true']
+			.prctr-page-section__state-glyph {
+			border: 1px solid CanvasText;
+		}
 		.prctr-page-section .prctr-page-row__chip,
 		.prctr-page-section .prctr-page-row__chip-more {
 			border: 1px solid CanvasText;
 		}
-	}
-	.prctr-page-section .prctr-page-row__status {
-		align-items: center;
-		color: var(--prctr-color-text-secondary);
-		display: inline-flex;
-		flex: none;
-		font-size: 13px;
-		gap: 5px;
-		white-space: nowrap;
-	}
-	.prctr-page-section .prctr-page-row__status[data-tone='success'] {
-		color: var(--prctr-color-feedback-success);
-	}
-	.prctr-page-section .prctr-page-row__status[data-tone='warning'] {
-		color: var(--prctr-color-feedback-warning);
-	}
-	.prctr-page-section .prctr-page-row__status[data-tone='failure'] {
-		color: var(--prctr-color-feedback-error);
 	}
 	.prctr-page-section .prctr-page-row__more {
 		align-items: center;

@@ -68,7 +68,7 @@ export const importsMessages = Object.freeze({
 	}),
 	importsChooseFile: defineMessage({
 		id: 'administration.imports.choose',
-		defaultMessage: 'Choose file…',
+		defaultMessage: 'Choose file',
 		description: 'Button that opens the file picker.'
 	}),
 	importsNoFile: defineMessage({
@@ -93,7 +93,7 @@ export const importsMessages = Object.freeze({
 	}),
 	importDescription: defineMessage({
 		id: 'administration.imports.description',
-		defaultMessage: '{rows} rows · uploaded {when}',
+		defaultMessage: '{rows} rows · Uploaded {when}',
 		description: 'Description of one import.'
 	}),
 	importChecking: defineMessage({
@@ -235,7 +235,7 @@ export const importsMessages = Object.freeze({
 	}),
 	importCancel: defineMessage({
 		id: 'administration.imports.cancel',
-		defaultMessage: 'Cancel import…',
+		defaultMessage: 'Cancel import',
 		description: 'Cancels an import after confirming.'
 	}),
 	importCancelTitle: defineMessage({
@@ -335,8 +335,14 @@ export const importsMessages = Object.freeze({
 	}),
 	importsRecentEmpty: defineMessage({
 		id: 'administration.imports.recent.empty',
-		defaultMessage: 'No files uploaded yet.',
-		description: 'No earlier imports.'
+		defaultMessage: 'No imports yet',
+		description: 'Title of the empty Imports list.'
+	}),
+	importsRecentEmptyText: defineMessage({
+		id: 'administration.imports.recent.empty.text',
+		defaultMessage:
+			'Upload a CSV of students for a class, teachers for a unit, or people with a role. You review every row before anyone is added.',
+		description: 'Explains the empty Imports list.'
 	}),
 	importsUnnamed: defineMessage({
 		id: 'administration.imports.unnamed',

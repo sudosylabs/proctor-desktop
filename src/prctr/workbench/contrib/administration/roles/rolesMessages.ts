@@ -93,7 +93,7 @@ export const rolesMessages = Object.freeze({
 	}),
 	rolesDelete: defineMessage({
 		id: 'administration.access.delete',
-		defaultMessage: 'Delete role…',
+		defaultMessage: 'Delete role',
 		description: 'Deletes a custom role after confirming.'
 	}),
 	rolesDeleteTitle: defineMessage({

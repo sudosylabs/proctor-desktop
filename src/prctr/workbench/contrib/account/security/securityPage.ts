@@ -123,7 +123,6 @@ export class SecurityPage extends Disposable implements PageView {
 			),
 			status: {
 				text: this.format.text('statusLinked'),
-				icon: 'action.confirm',
 				tone: 'success'
 			}
 		}));
@@ -140,8 +139,8 @@ export class SecurityPage extends Disposable implements PageView {
 							date: this.format.date(changed)
 						}),
 			status: security.password
-				? { text: this.format.text('statusSet'), icon: 'action.confirm', tone: 'success' }
-				: { text: this.format.text('statusNotSet'), icon: 'action.close', tone: 'quiet' }
+				? { text: this.format.text('statusSet'), tone: 'success' }
+				: { text: this.format.text('statusNotSet'), tone: 'quiet' }
 		});
 		return rows;
 	}
@@ -159,14 +158,13 @@ export class SecurityPage extends Disposable implements PageView {
 		const presentation = twoStepPresentation(security.mfa);
 		const status: PageRowModel['status'] =
 			presentation.status === 'on'
-				? { text: this.format.text('statusOn'), icon: 'status.success', tone: 'success' }
+				? { text: this.format.text('statusOn'), tone: 'success' }
 				: presentation.status === 'off'
-					? { text: this.format.text('statusOff'), icon: 'action.close', tone: 'quiet' }
+					? { text: this.format.text('statusOff'), tone: 'failure' }
 					: presentation.status === 'notOffered'
 						? undefined
 						: {
 								text: this.format.text('statusNeedsAttention'),
-								icon: 'status.warning',
 								tone: 'warning'
 							};
 		const rows: PageRowModel[] = [
@@ -201,7 +199,6 @@ export class SecurityPage extends Disposable implements PageView {
 							: this.format.text('recoveryCodesLeft', {
 									count: recovery.remaining
 								}),
-					icon: recovery.low ? 'status.warning' : 'status.info',
 					tone: recovery.low ? 'warning' : 'quiet'
 				}
 			});

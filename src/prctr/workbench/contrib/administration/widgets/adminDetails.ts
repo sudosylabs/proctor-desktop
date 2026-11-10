@@ -3,6 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
+import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge.js';
 import './media/adminDetails.css';
 
 export interface AdminDetail {
@@ -10,7 +11,7 @@ export interface AdminDetail {
 	readonly value: string;
 	/** The value is missing, shown in the quiet colour. */
 	readonly empty?: boolean;
-	/** A word after the value, such as Verified. */
+	/** A badge after the value, such as Verified. */
 	readonly note?: { readonly text: string; readonly tone: 'ok' | 'warn' | 'neutral' };
 }
 
@@ -33,10 +34,19 @@ export function renderDetails(host: HTMLElement, details: readonly AdminDetail[]
 					...(detail.note === undefined
 						? []
 						: [
-								$('dd.prctr-admin-details__note', {
-									textContent: detail.note.text,
-									data: { tone: detail.note.tone }
-								})
+								$(
+									'dd.prctr-admin-details__note',
+									{},
+									createStatusBadge(host.ownerDocument, {
+										text: detail.note.text,
+										tone:
+											detail.note.tone === 'ok'
+												? 'success'
+												: detail.note.tone === 'warn'
+													? 'warning'
+													: 'neutral'
+									})
+								)
 							])
 				)
 			)

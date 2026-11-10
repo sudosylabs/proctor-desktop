@@ -69,8 +69,9 @@ export class PageFormatService implements IPageFormatService {
 		return institution === undefined ? this.text(generic) : this.text(named, { institution });
 	}
 
+	/** "A · B", where B starts with a capital, as every part of a detail line does. */
 	join(first: string, second: string): string {
-		return this.text('detailSeparator', { first, second });
+		return this.text('detailSeparator', { first, second: capitalize(second, this.locale) });
 	}
 
 	count(value: number): string {
@@ -143,4 +144,12 @@ export class PageFormatService implements IPageFormatService {
 	private get locale(): string {
 		return this.localization.locale === 'pseudo' ? 'en' : this.localization.locale;
 	}
+}
+
+/** The text with its first letter in upper case, as each part of a detail line starts. */
+export function capitalize(text: string, locale?: string): string {
+	const first = text.codePointAt(0);
+	if (first === undefined) return text;
+	const letter = String.fromCodePoint(first);
+	return letter.toLocaleUpperCase(locale) + text.slice(letter.length);
 }

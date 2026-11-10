@@ -63,7 +63,7 @@
 		line-height: 20px;
 	}
 	.prctr-admin-form .prctr-admin-form__checkbox {
-		accent-color: var(--prctr-color-border-focus);
+		accent-color: var(--prctr-color-brand-accent);
 		block-size: 16px;
 		flex: none;
 		inline-size: 16px;

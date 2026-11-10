@@ -175,13 +175,7 @@ export class ClassPage extends Disposable implements PageView {
 		if (this.periodName === '') void this.loadPeriod(klass.academicPeriodId);
 		this.pane.setHeading({
 			title: klass.displayName,
-			description:
-				this.periodName === ''
-					? klass.name
-					: this.format.text('classDescription', {
-							name: klass.name,
-							period: this.periodName
-						}),
+			description: this.periodName,
 			trail
 		});
 	}

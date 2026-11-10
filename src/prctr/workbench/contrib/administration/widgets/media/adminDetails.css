@@ -33,12 +33,6 @@
 		font-size: 13px;
 		margin: 0;
 	}
-	.prctr-admin-details .prctr-admin-details__note[data-tone='ok'] {
-		color: var(--prctr-color-feedback-success);
-	}
-	.prctr-admin-details .prctr-admin-details__note[data-tone='warn'] {
-		color: var(--prctr-color-feedback-warning);
-	}
 	@container (max-width: 480px) {
 		.prctr-admin-details .prctr-admin-details__row {
 			flex-wrap: wrap;

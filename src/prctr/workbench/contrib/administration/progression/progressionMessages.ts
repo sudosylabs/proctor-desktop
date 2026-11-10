@@ -176,7 +176,7 @@ export const progressionMessages = Object.freeze({
 	}),
 	reviewDescription: defineMessage({
 		id: 'administration.progression.review.description',
-		defaultMessage: 'Moves on {date} · checked {when}',
+		defaultMessage: 'Moves on {date} · Checked {when}',
 		description: 'Under a review’s heading.'
 	}),
 	reviewSummary: defineMessage({

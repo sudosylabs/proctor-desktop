@@ -257,7 +257,7 @@ export const invitationsMessages = Object.freeze({
 	}),
 	invitationRevoke: defineMessage({
 		id: 'administration.invitations.action.revoke',
-		defaultMessage: 'Revoke…',
+		defaultMessage: 'Revoke',
 		description: 'Row action that revokes an invitation after confirming.'
 	}),
 	invitationRevokeTitle: defineMessage({

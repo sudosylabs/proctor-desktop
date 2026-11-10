@@ -8,7 +8,7 @@ import { defineMessage } from '../../../../base/common/localization.js';
 export const tokensMessages = Object.freeze({
 	revokeTokenEllipsis: defineMessage({
 		id: 'account.tokens.revoke.menu',
-		defaultMessage: 'Revoke…',
+		defaultMessage: 'Revoke',
 		description: 'Row menu entry that opens the confirmation to revoke a token.'
 	}),
 	tokenDisabledStatus: defineMessage({
@@ -287,5 +287,15 @@ export const tokensMessages = Object.freeze({
 		id: 'account.tokens.created',
 		defaultMessage: 'Token created.',
 		description: 'A token was created.'
+	}),
+	tokenScopeCountOne: defineMessage({
+		id: 'account.tokens.scope.count.one',
+		defaultMessage: '1 permission',
+		description: 'Beside the new-token buttons: how many permissions are ticked. One.'
+	}),
+	tokenScopeCount: defineMessage({
+		id: 'account.tokens.scope.count',
+		defaultMessage: '{count} permissions',
+		description: 'Beside the new-token buttons: how many permissions are ticked. Two or more.'
 	})
 });

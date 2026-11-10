@@ -35,7 +35,7 @@
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.desktops.remove.menu": {
-      "message": "Remove desktop…",
+      "message": "Remove desktop",
       "description": "Row menu entry that opens the confirmation to remove a registered desktop.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
@@ -882,8 +882,8 @@
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
     "account.profile.last.sign.in": {
-      "message": "Last sign-in",
-      "description": "Account detail label: when this window’s session signed in.",
+      "message": "Last seen",
+      "description": "Account detail label: when the account was last active, here.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
@@ -1039,7 +1039,7 @@
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
     "account.security.password.changed": {
-      "message": "Set · changed {date}",
+      "message": "Set · Changed {date}",
       "description": "A password is set and was last changed at date.",
       "placeholders": [
         "date"
@@ -1073,7 +1073,7 @@
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
     "account.security.recovery.codes.issued": {
-      "message": "Issued {date} · each code works once",
+      "message": "Issued {date} · Each code works once",
       "description": "When the recovery codes were issued.",
       "placeholders": [
         "date"
@@ -1098,7 +1098,7 @@
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
     "account.security.recovery.codes.low": {
-      "message": "{count} left · get new ones before you run out",
+      "message": "{count} left · Get new ones before you run out",
       "description": "Few recovery codes remain.",
       "placeholders": [
         "count"
@@ -1106,7 +1106,7 @@
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.security.recovery.codes.low.of": {
-      "message": "{count} of {total} left · get new ones before you run out",
+      "message": "{count} of {total} left · Get new ones before you run out",
       "description": "Few of the issued recovery codes remain.",
       "placeholders": [
         "count",
@@ -1139,7 +1139,7 @@
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
     "account.security.two.step.app.since": {
-      "message": "Authenticator app · on since {date}",
+      "message": "Authenticator app · On since {date}",
       "description": "Two-step verification uses an authenticator app, on since date.",
       "placeholders": [
         "date"
@@ -1159,7 +1159,7 @@
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
     "account.security.two.step.off": {
-      "message": "Off · turn it on from the security page",
+      "message": "Off · Turn it on from the security page",
       "description": "Two-step verification is off.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
@@ -1171,13 +1171,13 @@
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
     "account.security.two.step.on.app": {
-      "message": "On · authenticator app",
+      "message": "On · Authenticator app",
       "description": "Two-step verification is on with an authenticator app.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.security.two.step.on.since": {
-      "message": "On · authenticator app, since {date}",
+      "message": "On · Authenticator app, since {date}",
       "description": "Two-step verification is on with an authenticator app, turned on at date.",
       "placeholders": [
         "date"
@@ -1185,19 +1185,19 @@
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.security.two.step.pending": {
-      "message": "Setup isn’t finished · finish it on the security page",
+      "message": "Setup isn’t finished · Finish it on the security page",
       "description": "Two-step verification enrolment is pending.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
     "account.security.two.step.recovery.required": {
-      "message": "Needs recovery · set it up again on the security page",
+      "message": "Needs recovery · Set it up again on the security page",
       "description": "Two-step verification needs recovery.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
     "account.security.two.step.service.unavailable": {
-      "message": "Unavailable right now · try again later",
+      "message": "Unavailable right now · Try again later",
       "description": "The two-step service is unavailable.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
@@ -1243,7 +1243,7 @@
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.desktop.removed.summary": {
-      "message": "{platform} · removed · registered {registered}",
+      "message": "{platform} · Removed · Registered {registered}",
       "description": "Second line of a removed desktop row.",
       "placeholders": [
         "platform",
@@ -1252,7 +1252,7 @@
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.desktop.summary": {
-      "message": "{platform} · Proctor {release} · registered {registered} · last used {used}",
+      "message": "{platform} · Proctor {release} · Registered {registered} · Last used {used}",
       "description": "Second line of a registered desktop row.",
       "placeholders": [
         "platform",
@@ -1295,7 +1295,7 @@
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.end.menu": {
-      "message": "End session…",
+      "message": "End session",
       "description": "Row menu entry that opens the confirmation to end a session.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
@@ -2095,7 +2095,7 @@
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.revoke.menu": {
-      "message": "Revoke…",
+      "message": "Revoke",
       "description": "Row menu entry that opens the confirmation to revoke a token.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
@@ -2120,6 +2120,20 @@
       "placeholders": [
         "date"
       ],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.scope.count": {
+      "message": "{count} permissions",
+      "description": "Beside the new-token buttons: how many permissions are ticked. Two or more.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.scope.count.one": {
+      "message": "1 permission",
+      "description": "Beside the new-token buttons: how many permissions are ticked. One.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.scopes": {
@@ -2319,7 +2333,7 @@
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
     "administration.access.delete": {
-      "message": "Delete role…",
+      "message": "Delete role",
       "description": "Deletes a custom role after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
@@ -4125,7 +4139,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.imports.cancel": {
-      "message": "Cancel import…",
+      "message": "Cancel import",
       "description": "Cancels an import after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
@@ -4161,7 +4175,7 @@
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
     "administration.imports.choose": {
-      "message": "Choose file…",
+      "message": "Choose file",
       "description": "Button that opens the file picker.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
@@ -4219,7 +4233,7 @@
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
     "administration.imports.description": {
-      "message": "{rows} rows · uploaded {when}",
+      "message": "{rows} rows · Uploaded {when}",
       "description": "Description of one import.",
       "placeholders": [
         "rows",
@@ -4338,8 +4352,14 @@
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
     "administration.imports.recent.empty": {
-      "message": "No files uploaded yet.",
-      "description": "No earlier imports.",
+      "message": "No imports yet",
+      "description": "Title of the empty Imports list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
+    },
+    "administration.imports.recent.empty.text": {
+      "message": "Upload a CSV of students for a class, teachers for a unit, or people with a role. You review every row before anyone is added.",
+      "description": "Explains the empty Imports list.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/imports/importsMessages.ts"
     },
@@ -4547,7 +4567,7 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.action.revoke": {
-      "message": "Revoke…",
+      "message": "Revoke",
       "description": "Row action that revokes an invitation after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -5204,7 +5224,7 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.job.attempts.used": {
-      "message": "tried {attempt} of {maximum} times",
+      "message": "Tried {attempt} of {maximum} times",
       "description": "Part of a job’s description: how many tries it used.",
       "placeholders": [
         "attempt",
@@ -5213,7 +5233,7 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.job.cancel": {
-      "message": "Cancel…",
+      "message": "Cancel",
       "description": "Cancels a job after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
@@ -5620,7 +5640,7 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.mail.key.retire": {
-      "message": "Retire…",
+      "message": "Retire",
       "description": "Starts retiring a key after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
@@ -6406,7 +6426,7 @@
       "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
     },
     "administration.progression.review.description": {
-      "message": "Moves on {date} · checked {when}",
+      "message": "Moves on {date} · Checked {when}",
       "description": "Under a review’s heading.",
       "placeholders": [
         "date",
@@ -6754,7 +6774,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.enable": {
-      "message": "Turn on cleanup…",
+      "message": "Turn on cleanup",
       "description": "Turns automatic cleanup on after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -6944,7 +6964,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.structure.archive": {
-      "message": "Archive…",
+      "message": "Archive",
       "description": "Archives a programme, level or class after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
@@ -7001,17 +7021,8 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
-    "administration.structure.class.description": {
-      "message": "{name} · {period}",
-      "description": "Description of one class: its short name and academic period.",
-      "placeholders": [
-        "name",
-        "period"
-      ],
-      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
-    },
     "administration.structure.class.edit": {
-      "message": "Edit…",
+      "message": "Edit",
       "description": "Edits the class.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
@@ -7025,7 +7036,7 @@
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.class.end": {
-      "message": "End enrolment…",
+      "message": "End enrolment",
       "description": "Ends an enrolment after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
@@ -7474,7 +7485,7 @@
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.rename": {
-      "message": "Rename…",
+      "message": "Rename",
       "description": "Renames a programme or level.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
@@ -7520,7 +7531,7 @@
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.unit.archive": {
-      "message": "Archive unit…",
+      "message": "Archive unit",
       "description": "Archives the chosen unit after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
@@ -7549,12 +7560,6 @@
       "placeholders": [
         "name"
       ],
-      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
-    },
-    "administration.structure.unit.kind": {
-      "message": "Name",
-      "description": "Unit detail: its short name.",
-      "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.unit.new": {
@@ -7640,7 +7645,7 @@
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.unit.end.member": {
-      "message": "End membership…",
+      "message": "End membership",
       "description": "Ends someone’s membership of a unit.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
@@ -7736,7 +7741,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.affiliation.end": {
-      "message": "End affiliation…",
+      "message": "End affiliation",
       "description": "Row action that ends an affiliation after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
@@ -7820,7 +7825,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.description": {
-      "message": "{email} · username {username} · member since {date}",
+      "message": "{email} · Username {username} · Member since {date}",
       "description": "Description under a user’s name; email may be absent.",
       "placeholders": [
         "email",
@@ -7830,7 +7835,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.description.no.email": {
-      "message": "Username {username} · member since {date}",
+      "message": "Username {username} · Member since {date}",
       "description": "Description under a user’s name when they have no email.",
       "placeholders": [
         "username",
@@ -7891,7 +7896,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.email.change": {
-      "message": "Change email…",
+      "message": "Change email",
       "description": "Menu action that changes a user’s email.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
@@ -8009,7 +8014,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.last.sign.in": {
-      "message": "Last sign-in",
+      "message": "Last seen",
       "description": "Profile field.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
@@ -8027,7 +8032,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.none": {
-      "message": "Not set",
+      "message": "—",
       "description": "A profile field with no value.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
@@ -8042,7 +8047,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.period.open": {
-      "message": "From {start} · no end date",
+      "message": "From {start} · No end date",
       "description": "Detail of an affiliation or role with no end.",
       "placeholders": [
         "start"
@@ -8078,7 +8083,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.remove.photo": {
-      "message": "Remove photo…",
+      "message": "Remove photo",
       "description": "Removes someone’s own profile photo.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -8104,7 +8109,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.user.replace.photo": {
-      "message": "Replace photo…",
+      "message": "Replace photo",
       "description": "Chooses a new profile photo for someone.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -8116,7 +8121,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.role.end": {
-      "message": "End role…",
+      "message": "End role",
       "description": "Row action that ends a role after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
@@ -8222,7 +8227,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.session.detail": {
-      "message": "Signed in {signedIn} · active {active}",
+      "message": "Signed in {signedIn} · Active {active}",
       "description": "Detail of one session.",
       "placeholders": [
         "signedIn",
@@ -8329,7 +8334,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.two.step.reset": {
-      "message": "Reset two-step…",
+      "message": "Reset two-step",
       "description": "Opens the dialog that resets two-step verification.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
@@ -8379,7 +8384,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.users.action.disable": {
-      "message": "Disable account…",
+      "message": "Disable account",
       "description": "Row action that disables a user’s account after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -8409,7 +8414,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.action.sign.out": {
-      "message": "Sign out everywhere…",
+      "message": "Sign out everywhere",
       "description": "Row action that ends all of a user’s sessions after confirming.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -8433,7 +8438,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.bulk.disable": {
-      "message": "Disable…",
+      "message": "Disable",
       "description": "Disables the chosen people’s accounts.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -8445,14 +8450,20 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.bulk.enrol": {
-      "message": "Enrol in a class…",
+      "message": "Enrol in a class",
       "description": "Enrols the chosen people in one class.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.bulk.grant": {
-      "message": "Grant role…",
+      "message": "Grant role",
       "description": "Grants the chosen people one role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.bulk.more": {
+      "message": "More changes for the selected people",
+      "description": "Accessible name of the ⋯ menu in the selection bar.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
@@ -8574,7 +8585,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.never.active": {
-      "message": "Never",
+      "message": "—",
       "description": "A user who has never been active.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
@@ -10087,7 +10098,7 @@
       "source": "src/prctr/workbench/browser/launch/launchMessages.ts"
     },
     "launch.development": {
-      "message": "Development server · plain HTTP on this computer",
+      "message": "Development server · Plain HTTP on this computer",
       "description": "Strip shown when an explicitly enabled development server uses HTTP loopback.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/launch/launchMessages.ts"

@@ -192,13 +192,14 @@ export class SessionsPage extends Disposable implements PageView {
 		return parts.reduce((detail, part) => this.format.join(detail, part));
 	}
 
+	/** A browser's globe, the command line's terminal, or the Desktop's operating system logo. */
 	private sessionGlyph(session: AccountSession): ProctorIconId {
 		const kind = clientKind(session.client);
 		return kind === 'clientWeb'
 			? 'device.browser'
 			: kind === 'clientCli'
 				? 'device.cli'
-				: 'device.laptop';
+				: platformGlyph(session.platform);
 	}
 
 	private currentRow(session: AccountSession): PageRowModel {
@@ -207,11 +208,7 @@ export class SessionsPage extends Disposable implements PageView {
 			glyph: this.sessionGlyph(session),
 			title: this.sessionName(session),
 			detail: this.sessionDetail(session),
-			status: {
-				text: this.format.text('thisSession'),
-				icon: 'status.success',
-				tone: 'quiet'
-			},
+			here: this.format.text('thisSession'),
 			// Signing out asks first, in the window's own confirmation.
 			button: {
 				label: this.format.text('signOut'),
@@ -270,22 +267,15 @@ export class SessionsPage extends Disposable implements PageView {
 		const removable = !desktop.current && !desktop.revoked;
 		return {
 			id: desktop.id,
-			glyph: desktop.platform === 'darwin' ? 'device.laptop' : 'device.desktop',
+			glyph: platformGlyph(desktop.platform),
 			title: name,
 			detail,
 			...(desktop.current
-				? {
-						status: {
-							text: this.format.text('thisComputer'),
-							icon: 'status.success' as const,
-							tone: 'quiet' as const
-						}
-					}
+				? { here: this.format.text('thisComputer') }
 				: desktop.revoked
 					? {
 							status: {
 								text: this.format.text('desktopRemovedStatus'),
-								icon: 'action.close' as const,
 								tone: 'quiet' as const
 							}
 						}
@@ -370,4 +360,15 @@ export class SessionsPage extends Disposable implements PageView {
 		options.section.focusHeading();
 		void options.read.refresh();
 	}
+}
+
+/** The operating system's logo, or a plain desktop when it is not known. */
+function platformGlyph(platform: string): ProctorIconId {
+	return platform === 'darwin'
+		? 'device.apple'
+		: platform === 'win32'
+			? 'device.windows'
+			: platform === 'linux'
+				? 'device.linux'
+				: 'device.desktop';
 }

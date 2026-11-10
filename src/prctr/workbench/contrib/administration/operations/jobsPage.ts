@@ -174,6 +174,7 @@ export class JobsPage extends Disposable implements PageView {
 					open: (job) => navigation.selectAdministrationPage('job', job.id),
 					rowId: (job) => job.id,
 					rowName: (job) => format.code('jobType', job.type),
+					icon: 'admin.jobs',
 					empty: format.text('jobsEmpty'),
 					filteredEmpty: format.text('jobsNoMatch')
 				}

@@ -381,7 +381,7 @@ export class PolicyPage extends Disposable implements PageView {
 					title: this.format.text('policyHistoryRow', { revision: change.toRevision }),
 					detail: this.format.text('policyHistoryDetail', {
 						fields: change.changedFields.map(readableCode).join(', '),
-						when: this.format.relative(change.changedAt)
+						when: this.format.relativeStandalone(change.changedAt)
 					})
 				}))
 		);

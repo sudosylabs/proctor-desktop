@@ -41,11 +41,6 @@ export const structureMessages = Object.freeze({
 		defaultMessage: 'Choose a unit to see its programmes and classes.',
 		description: 'Shown before a unit is chosen.'
 	}),
-	structureKind: defineMessage({
-		id: 'administration.structure.unit.kind',
-		defaultMessage: 'Name',
-		description: 'Unit detail: its short name.'
-	}),
 	structurePartOf: defineMessage({
 		id: 'administration.structure.unit.part.of',
 		defaultMessage: 'Part of',
@@ -73,7 +68,7 @@ export const structureMessages = Object.freeze({
 	}),
 	structureArchiveUnit: defineMessage({
 		id: 'administration.structure.unit.archive',
-		defaultMessage: 'Archive unit…',
+		defaultMessage: 'Archive unit',
 		description: 'Archives the chosen unit after confirming.'
 	}),
 	structureProgrammes: defineMessage({
@@ -153,12 +148,12 @@ export const structureMessages = Object.freeze({
 	}),
 	structureRename: defineMessage({
 		id: 'administration.structure.rename',
-		defaultMessage: 'Rename…',
+		defaultMessage: 'Rename',
 		description: 'Renames a programme or level.'
 	}),
 	structureArchive: defineMessage({
 		id: 'administration.structure.archive',
-		defaultMessage: 'Archive…',
+		defaultMessage: 'Archive',
 		description: 'Archives a programme, level or class after confirming.'
 	}),
 	structureArchiveTitle: defineMessage({
@@ -267,11 +262,6 @@ export const structureMessages = Object.freeze({
 		defaultMessage: 'Structure',
 		description: 'The trail step back to Structure.'
 	}),
-	classDescription: defineMessage({
-		id: 'administration.structure.class.description',
-		defaultMessage: '{name} · {period}',
-		description: 'Description of one class: its short name and academic period.'
-	}),
 	classStudents: defineMessage({
 		id: 'administration.structure.class.students',
 		defaultMessage: 'Students',
@@ -365,7 +355,7 @@ export const structureMessages = Object.freeze({
 	}),
 	classEnd: defineMessage({
 		id: 'administration.structure.class.end',
-		defaultMessage: 'End enrolment…',
+		defaultMessage: 'End enrolment',
 		description: 'Ends an enrolment after confirming.'
 	}),
 	classEndTitle: defineMessage({
@@ -395,7 +385,7 @@ export const structureMessages = Object.freeze({
 	}),
 	classEdit: defineMessage({
 		id: 'administration.structure.class.edit',
-		defaultMessage: 'Edit…',
+		defaultMessage: 'Edit',
 		description: 'Edits the class.'
 	}),
 	classEditTitle: defineMessage({
@@ -592,7 +582,7 @@ export const structureMessages = Object.freeze({
 	}),
 	unitEndMember: defineMessage({
 		id: 'administration.unit.end.member',
-		defaultMessage: 'End membership…',
+		defaultMessage: 'End membership',
 		description: 'Ends someone’s membership of a unit.'
 	}),
 	unitEndMemberTitle: defineMessage({

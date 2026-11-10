@@ -352,9 +352,9 @@ export async function runAccountTests(document: Document): Promise<void> {
 		await wait(() => {
 			const signIn = [
 				...root.querySelectorAll<HTMLElement>('.prctr-account-details__row')
-			].find((candidate) => candidate.querySelector('dt')?.textContent === 'Last sign-in');
+			].find((candidate) => candidate.querySelector('dt')?.textContent === 'Last seen');
 			return !!signIn && !signIn.hidden && signIn.textContent!.includes('Proctor Desktop');
-		}, 'last sign-in from this window’s session');
+		}, 'last seen from this window’s session');
 		check(
 			section('Exam records due for deletion').hidden,
 			'Retention notices are absent when there are none'
@@ -451,7 +451,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'Recovery codes count against the issued set'
 		);
 		check(
-			row('Two-step verification').textContent!.includes('Authenticator app · on since'),
+			row('Two-step verification').textContent!.includes('Authenticator app · On since'),
 			'Two-step verification names its method and date'
 		);
 		check(row('Password').textContent!.includes('Changed'), 'The password change is dated');
@@ -505,13 +505,13 @@ export async function runAccountTests(document: Document): Promise<void> {
 		check(account.count('revokeSession') === 0, 'Signing out is not a remote revocation here');
 
 		menu = openMenu('Lab PC 14');
-		const end = menuItem(menu, 'End session…');
+		const end = menuItem(menu, 'End session');
 		check(end.dataset.destructive === 'true', 'Ending a session is destructive');
 		end.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 		check(!root.querySelector('.prctr-menu'), 'Escape closes the menu');
 		const more = row('Lab PC 14').querySelector<HTMLButtonElement>('.prctr-page-row__more')!;
 		check(document.activeElement === more, 'Closing the menu returns focus to its button');
-		menuItem(openMenu('Lab PC 14'), 'End session…').click();
+		menuItem(openMenu('Lab PC 14'), 'End session').click();
 		await wait(() => dialog() !== null, 'confirmation');
 		check(
 			dialog()!.getAttribute('role') === 'alertdialog',
@@ -528,7 +528,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		check(document.activeElement === more, 'Cancel returns focus to the row');
 
 		account.changes.set('revokeSession', () => failure('strongAuthenticationRequired'));
-		menuItem(openMenu('Lab PC 14'), 'End session…').click();
+		menuItem(openMenu('Lab PC 14'), 'End session').click();
 		await wait(() => dialog() !== null, 'confirmation again');
 		buttonIn(dialog()!, 'End session')!.click();
 		await wait(
@@ -541,7 +541,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		account.changes.set('revokeSession', () => failure('unconfirmed'));
 		let resolveSessions: ((value: AccountResponse) => void) | undefined;
 		account.reads.set('sessions', () => new Promise((resolve) => (resolveSessions = resolve)));
-		menuItem(openMenu('Lab PC 14'), 'End session…').click();
+		menuItem(openMenu('Lab PC 14'), 'End session').click();
 		await wait(() => dialog() !== null, 'confirmation for unknown outcome');
 		buttonIn(dialog()!, 'End session')!.click();
 		await wait(() => !dialog(), 'unknown outcome closes the dialog');
@@ -551,13 +551,13 @@ export async function runAccountTests(document: Document): Promise<void> {
 		);
 		menu = openMenu('Lab PC 14');
 		check(
-			menuItem(menu, 'End session…').getAttribute('aria-disabled') === 'true',
+			menuItem(menu, 'End session').getAttribute('aria-disabled') === 'true',
 			'An unknown outcome locks the row until the list is read again'
 		);
 		menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 		resolveSessions?.(sessions());
 		await wait(() => {
-			const item = buttonIn(openMenu('Lab PC 14'), 'End session…');
+			const item = buttonIn(openMenu('Lab PC 14'), 'End session');
 			root.querySelector('.prctr-menu')?.dispatchEvent(
 				new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
 			);
@@ -633,7 +633,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		check(
 			[...openMenu('Marking spreadsheet').querySelectorAll('button')]
 				.map((item) => item.textContent)
-				.join() === 'Enable,Revoke…',
+				.join() === 'Enable,Revoke',
 			'A disabled token can be enabled or revoked'
 		);
 		root.querySelector('.prctr-menu')?.dispatchEvent(
@@ -643,7 +643,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		menuItem(openMenu('Grade export script'), 'Disable').click();
 		await wait(() => account.count('disableToken') === 1, 'disable runs without confirmation');
 
-		menuItem(openMenu('Grade export script'), 'Revoke…').click();
+		menuItem(openMenu('Grade export script'), 'Revoke').click();
 		await wait(() => dialog() !== null, 'revoke confirmation');
 		check(
 			dialog()!.textContent!.includes('Revoke Grade export script?'),
@@ -655,8 +655,13 @@ export async function runAccountTests(document: Document): Promise<void> {
 		buttonIn(root, 'New token')!.click();
 		await wait(() => dialog() !== null, 'new token dialog');
 		const form = dialog()!;
-		await wait(() => form.textContent!.includes('View exams'), 'grantable scopes');
-		check(form.textContent!.includes('See exams and their details.'), 'Scopes are described');
+		const scopeBox = (title: string) =>
+			form.querySelector<HTMLInputElement>(`input[type="checkbox"][aria-label="${title}"]`);
+		await wait(() => scopeBox('View exams') !== null, 'grantable scopes');
+		check(
+			scopeBox('View exams')!.closest('label')?.title === 'See exams and their details.',
+			'Scopes are described'
+		);
 		const boxes = [...form.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];
 		const limit = [...form.querySelectorAll<HTMLSelectElement>('select')].find(
 			(select) => select.labels?.[0]?.textContent === 'Limit to'

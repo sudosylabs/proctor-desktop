@@ -1,6 +1,7 @@
 @layer contributions {
 	.prctr-admin-filters {
 		align-items: center;
+		container-type: inline-size;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px;
@@ -68,9 +69,24 @@
 	}
 	.prctr-admin-filters .prctr-admin-filters__actions {
 		display: flex;
-		flex-wrap: wrap;
+		flex-wrap: nowrap;
 		gap: 6px;
 		justify-content: flex-end;
+	}
+	.prctr-admin-filters .prctr-admin-filters__count {
+		white-space: nowrap;
+	}
+	/* Wide, every change is a button; narrow, the less used ones move into ⋯. */
+	.prctr-admin-filters .prctr-admin-filters__actions > [data-overflow='true'] {
+		display: none;
+	}
+	@container (max-width: 820px) {
+		.prctr-admin-filters .prctr-admin-filters__actions > [data-secondary='true'] {
+			display: none;
+		}
+		.prctr-admin-filters .prctr-admin-filters__actions > [data-overflow='true'] {
+			display: inline-flex;
+		}
 	}
 
 	@media (forced-colors: active) {

@@ -181,26 +181,22 @@ export class TokensPage extends Disposable implements PageView {
 			state === 'disabled'
 				? {
 						text: this.format.text('tokenDisabledStatus'),
-						icon: 'action.disable',
-						tone: 'quiet'
+						tone: 'warning'
 					}
 				: state === 'expired'
 					? {
 							text: this.format.text('tokenExpiredStatus'),
-							icon: 'status.time',
-							tone: 'quiet'
+							tone: 'failure'
 						}
 					: state === 'revoked'
 						? {
 								text: this.format.text('tokenRevokedStatus'),
-								icon: 'action.close',
-								tone: 'quiet'
+								tone: 'failure'
 							}
 						: token.academicUnitId === undefined
 							? undefined
 							: {
 									text: this.unitTag(token.academicUnitId),
-									icon: 'object.institution',
 									tone: 'quiet'
 								};
 		return {
