@@ -58,13 +58,23 @@ export const recordsMessages = Object.freeze({
 	}),
 	auditsEmpty: defineMessage({
 		id: 'administration.records.audits.empty',
-		defaultMessage: 'No events yet.',
-		description: 'Shown when there are no audit events.'
+		defaultMessage: 'No events yet',
+		description: 'Title of the empty Audits list.'
+	}),
+	auditsEmptyText: defineMessage({
+		id: 'administration.records.audits.empty.text',
+		defaultMessage: 'Changes people make at your institution show here as they happen.',
+		description: 'Explains the empty Audits list.'
 	}),
 	auditsNoMatch: defineMessage({
 		id: 'administration.records.audits.empty.filtered',
-		defaultMessage: 'No events match.',
-		description: 'Shown when filters find nothing.'
+		defaultMessage: 'Nothing in this period',
+		description: 'Title when no event falls in the chosen period.'
+	}),
+	auditsNoMatchText: defineMessage({
+		id: 'administration.records.audits.empty.filtered.text',
+		defaultMessage: 'Choose a longer period to see older events.',
+		description: 'Explains how to see older audit events.'
 	}),
 	auditsPageReads: defineMessage({
 		id: 'administration.records.audits.page.reads',

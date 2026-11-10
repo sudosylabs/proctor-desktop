@@ -78,8 +78,13 @@ export const usersMessages = Object.freeze({
 	}),
 	usersEmpty: defineMessage({
 		id: 'administration.users.empty',
-		defaultMessage: 'No one has an account yet.',
-		description: 'Users list with no accounts.'
+		defaultMessage: 'No one has an account yet',
+		description: 'Title of the empty Users list.'
+	}),
+	usersEmptyText: defineMessage({
+		id: 'administration.users.empty.text',
+		defaultMessage: 'People appear here once they accept an invitation or are imported.',
+		description: 'Explains the empty Users list.'
 	}),
 	usersNoMatch: defineMessage({
 		id: 'administration.users.empty.filtered',

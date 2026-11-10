@@ -69,8 +69,14 @@ export const progressionMessages = Object.freeze({
 	}),
 	progressionEmpty: defineMessage({
 		id: 'administration.progression.empty',
-		defaultMessage: 'No progressions yet. Start one to move a class on to its next class.',
-		description: 'The Progression page has nothing to list.'
+		defaultMessage: 'No progressions yet',
+		description: 'Title of the empty Progression list.'
+	}),
+	progressionEmptyText: defineMessage({
+		id: 'administration.progression.empty.text',
+		defaultMessage:
+			'Move a class’s students on to their next class. Nothing changes until you review who moves.',
+		description: 'Explains the empty Progression list.'
 	}),
 	stateChecking: defineMessage({
 		id: 'administration.progression.state.checking',

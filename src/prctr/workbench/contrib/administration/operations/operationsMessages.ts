@@ -83,8 +83,13 @@ export const operationsMessages = Object.freeze({
 	}),
 	jobsEmpty: defineMessage({
 		id: 'administration.operations.jobs.empty',
-		defaultMessage: 'No jobs yet.',
-		description: 'Shown when there are no jobs.'
+		defaultMessage: 'No jobs yet',
+		description: 'Title of the empty Jobs list.'
+	}),
+	jobsEmptyText: defineMessage({
+		id: 'administration.operations.jobs.empty.text',
+		defaultMessage: 'Imports, exports and cleanup show here once they start.',
+		description: 'Explains the empty Jobs list.'
 	}),
 	jobsNoMatch: defineMessage({
 		id: 'administration.operations.jobs.empty.filtered',
@@ -239,8 +244,14 @@ export const operationsMessages = Object.freeze({
 	}),
 	mailEmpty: defineMessage({
 		id: 'administration.operations.mail.empty',
-		defaultMessage: 'No deliveries yet.',
-		description: 'Shown when there are no deliveries.'
+		defaultMessage: 'No email sent yet',
+		description: 'Title of the empty list of mail deliveries.'
+	}),
+	mailEmptyText: defineMessage({
+		id: 'administration.operations.mail.empty.text',
+		defaultMessage:
+			'Invitations, verification and sign-in help show here once Proctor sends them.',
+		description: 'Explains the empty list of mail deliveries.'
 	}),
 	mailNoMatch: defineMessage({
 		id: 'administration.operations.mail.empty.filtered',

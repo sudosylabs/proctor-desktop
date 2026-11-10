@@ -460,8 +460,13 @@ export const structureMessages = Object.freeze({
 	}),
 	periodsEmpty: defineMessage({
 		id: 'administration.structure.periods.empty',
-		defaultMessage: 'No academic periods yet. Create the first term or year.',
-		description: 'Shown when there are no periods.'
+		defaultMessage: 'No academic periods yet',
+		description: 'Title of the empty list of academic periods.'
+	}),
+	periodsEmptyText: defineMessage({
+		id: 'administration.structure.periods.empty.text',
+		defaultMessage: 'Create the first term or year, then give classes their period.',
+		description: 'Explains the empty list of academic periods.'
 	}),
 	periodsNoMatch: defineMessage({
 		id: 'administration.structure.periods.empty.filtered',

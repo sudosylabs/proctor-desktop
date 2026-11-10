@@ -175,7 +175,10 @@ export class JobsPage extends Disposable implements PageView {
 					rowId: (job) => job.id,
 					rowName: (job) => format.code('jobType', job.type),
 					icon: 'admin.jobs',
-					empty: format.text('jobsEmpty'),
+					empty: {
+						title: format.text('jobsEmpty'),
+						text: format.text('jobsEmptyText')
+					},
 					filteredEmpty: format.text('jobsNoMatch')
 				}
 			)

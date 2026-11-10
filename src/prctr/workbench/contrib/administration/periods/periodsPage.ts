@@ -117,7 +117,15 @@ export class PeriodsPage extends Disposable implements PageView {
 									}
 								],
 					icon: 'admin.periods',
-					empty: format.text('periodsEmpty'),
+					empty: {
+						title: format.text('periodsEmpty'),
+						text: format.text('periodsEmptyText'),
+						action: {
+							label: format.text('periodsNew'),
+							icon: 'action.add',
+							run: () => void this.edit(undefined)
+						}
+					},
 					filteredEmpty: format.text('periodsNoMatch')
 				}
 			)

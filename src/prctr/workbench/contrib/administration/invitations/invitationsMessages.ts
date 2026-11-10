@@ -237,8 +237,14 @@ export const invitationsMessages = Object.freeze({
 	}),
 	invitationsEmpty: defineMessage({
 		id: 'administration.invitations.empty',
-		defaultMessage: 'No invitations yet. Invite people to add them here.',
-		description: 'Invitations list with none at all.'
+		defaultMessage: 'No pending invitations',
+		description: 'Title when no invitation is waiting to be accepted.'
+	}),
+	invitationsEmptyText: defineMessage({
+		id: 'administration.invitations.empty.text',
+		defaultMessage:
+			'Everyone you invited has answered. Invite more people, or show accepted and expired invitations.',
+		description: 'Explains the empty list of pending invitations.'
 	}),
 	invitationsNoMatch: defineMessage({
 		id: 'administration.invitations.empty.filtered',

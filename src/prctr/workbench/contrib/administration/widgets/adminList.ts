@@ -134,7 +134,12 @@ export interface AdminListOptions<K extends AdminListKind> {
 	/** Drawn above the empty and filtered-empty states. */
 	readonly icon?: ProctorIconId;
 	/** Rows other filters would show; replaces `empty` while any filter is set. */
-	readonly filteredEmpty?: string;
+	readonly filteredEmpty?: string | PageEmpty;
+	/**
+	 * Whether the query narrows what the person would see by default. Without it, any set
+	 * field counts, which suits lists that start unfiltered.
+	 */
+	readonly filtered?: (query: AdminListQuery<K>) => boolean;
 	readonly action?: { readonly label: string; readonly icon: ProctorIconId };
 }
 
@@ -413,7 +418,9 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 			state.kind === 'failed' && !retriable(state.reason)
 				? undefined
 				: () => void read.refresh();
-		const filtered = this.options.filteredEmpty !== undefined && hasFilter(this.query);
+		const filtered =
+			this.options.filteredEmpty !== undefined &&
+			(this.options.filtered?.(this.query) ?? hasFilter(this.query));
 		// The section's empty state applies only when the table has no rows of its own.
 		const shown = filtered ? this.options.filteredEmpty! : this.options.empty;
 		const empty =

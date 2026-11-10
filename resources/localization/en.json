@@ -4603,14 +4603,20 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.empty": {
-      "message": "No invitations yet. Invite people to add them here.",
-      "description": "Invitations list with none at all.",
+      "message": "No pending invitations",
+      "description": "Title when no invitation is waiting to be accepted.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.empty.filtered": {
       "message": "No invitations match these filters.",
       "description": "Invitations list with no matches.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.empty.text": {
+      "message": "Everyone you invited has answered. Invite more people, or show accepted and expired invitations.",
+      "description": "Explains the empty list of pending invitations.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
@@ -5444,14 +5450,20 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.jobs.empty": {
-      "message": "No jobs yet.",
-      "description": "Shown when there are no jobs.",
+      "message": "No jobs yet",
+      "description": "Title of the empty Jobs list.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.jobs.empty.filtered": {
       "message": "No jobs with this status.",
       "description": "Shown when the filter finds nothing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.empty.text": {
+      "message": "Imports, exports and cleanup show here once they start.",
+      "description": "Explains the empty Jobs list.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -5582,14 +5594,20 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.mail.empty": {
-      "message": "No deliveries yet.",
-      "description": "Shown when there are no deliveries.",
+      "message": "No email sent yet",
+      "description": "Title of the empty list of mail deliveries.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.mail.empty.filtered": {
       "message": "No deliveries with this status.",
       "description": "Shown when the filter finds nothing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.empty.text": {
+      "message": "Invitations, verification and sign-in help show here once Proctor sends them.",
+      "description": "Explains the empty list of mail deliveries.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -6337,8 +6355,14 @@
       "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
     },
     "administration.progression.empty": {
-      "message": "No progressions yet. Start one to move a class on to its next class.",
-      "description": "The Progression page has nothing to list.",
+      "message": "No progressions yet",
+      "description": "Title of the empty Progression list.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
+    "administration.progression.empty.text": {
+      "message": "Move a class’s students on to their next class. Nothing changes until you review who moves.",
+      "description": "Explains the empty Progression list.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
     },
@@ -6632,14 +6656,26 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.audits.empty": {
-      "message": "No events yet.",
-      "description": "Shown when there are no audit events.",
+      "message": "No events yet",
+      "description": "Title of the empty Audits list.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.audits.empty.filtered": {
-      "message": "No events match.",
-      "description": "Shown when filters find nothing.",
+      "message": "Nothing in this period",
+      "description": "Title when no event falls in the chosen period.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.empty.filtered.text": {
+      "message": "Choose a longer period to see older events.",
+      "description": "Explains how to see older audit events.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.empty.text": {
+      "message": "Changes people make at your institution show here as they happen.",
+      "description": "Explains the empty Audits list.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
@@ -7378,14 +7414,20 @@
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.periods.empty": {
-      "message": "No academic periods yet. Create the first term or year.",
-      "description": "Shown when there are no periods.",
+      "message": "No academic periods yet",
+      "description": "Title of the empty list of academic periods.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.periods.empty.filtered": {
       "message": "No periods match.",
       "description": "Shown when the search finds nothing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.periods.empty.text": {
+      "message": "Create the first term or year, then give classes their period.",
+      "description": "Explains the empty list of academic periods.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
@@ -8532,14 +8574,20 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.empty": {
-      "message": "No one has an account yet.",
-      "description": "Users list with no accounts.",
+      "message": "No one has an account yet",
+      "description": "Title of the empty Users list.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.empty.filtered": {
       "message": "No one matches. Try another name or include disabled accounts.",
       "description": "Users list with no matches for the filters.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.empty.text": {
+      "message": "People appear here once they accept an invitation or are imported.",
+      "description": "Explains the empty Users list.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },

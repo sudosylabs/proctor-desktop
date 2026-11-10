@@ -160,8 +160,14 @@ export class AuditsPage extends Disposable implements PageView {
 								}
 							],
 				icon: 'admin.audits',
-				empty: format.text('auditsEmpty'),
-				filteredEmpty: format.text('auditsNoMatch')
+				empty: {
+					title: format.text('auditsEmpty'),
+					text: format.text('auditsEmptyText')
+				},
+				filteredEmpty: {
+					title: format.text('auditsNoMatch'),
+					text: format.text('auditsNoMatchText')
+				}
 			})
 		);
 		this._register(

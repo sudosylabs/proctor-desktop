@@ -89,11 +89,10 @@ export class InvitationsPage extends Disposable implements PageView {
 				icon: proctorIconFactory('action.invite')
 			})
 		);
-		this._register(
-			invite.onDidRequest(() => {
-				this.dialog.value = instantiationService.createInstance(InviteDialog);
-			})
-		);
+		const openInvite = (): void => {
+			this.dialog.value = instantiationService.createInstance(InviteDialog);
+		};
+		this._register(invite.onDidRequest(openInvite));
 
 		const filters = this._register(new AdminFilters(body));
 		filters.addSearch(format.text('invitationsFind'), (text) =>
@@ -194,8 +193,21 @@ export class InvitationsPage extends Disposable implements PageView {
 					rowName: (invitation) => invitation.email,
 					actions: (invitation) => this.actions(invitation),
 					icon: 'admin.invitations',
-					empty: format.text('invitationsEmpty'),
-					filteredEmpty: format.text('invitationsNoMatch')
+					empty: {
+						title: format.text('invitationsEmpty'),
+						text: format.text('invitationsEmptyText'),
+						action: {
+							label: format.text('usersInvite'),
+							icon: 'action.invite',
+							run: openInvite
+						}
+					},
+					filteredEmpty: format.text('invitationsNoMatch'),
+					// Pending is where the page starts, so only another choice counts as filtering.
+					filtered: (query) =>
+						query.email !== undefined ||
+						query.purpose !== undefined ||
+						query.state !== 'pending'
 				}
 			)
 		);

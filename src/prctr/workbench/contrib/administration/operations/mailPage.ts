@@ -164,7 +164,15 @@ export class MailPage extends Disposable implements PageView {
 					rowName: (delivery) => delivery.recipient,
 					actions: (delivery) => this.actions(delivery),
 					icon: 'admin.mail',
-					empty: format.text('mailEmpty'),
+					empty: {
+						title: format.text('mailEmpty'),
+						text: format.text('mailEmptyText'),
+						action: {
+							label: format.text('mailSendTest'),
+							icon: 'admin.mail',
+							run: () => void this.sendTest(test)
+						}
+					},
 					filteredEmpty: format.text('mailNoMatch')
 				}
 			)

@@ -150,7 +150,15 @@ export class ProgressionPage extends Disposable implements PageView {
 					rowName: (progression) => progressionName(format, progression),
 					open: review,
 					icon: 'admin.progression',
-					empty: format.text('progressionEmpty')
+					empty: {
+						title: format.text('progressionEmpty'),
+						text: format.text('progressionEmptyText'),
+						action: {
+							label: format.text('progressionNew'),
+							icon: 'action.continue',
+							run: () => this.openNew()
+						}
+					}
 				}
 			)
 		);

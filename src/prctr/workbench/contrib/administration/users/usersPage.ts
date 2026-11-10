@@ -189,7 +189,15 @@ export class UsersPage extends Disposable implements PageView {
 				open: (user) => navigation.selectAdministrationPage('user', user.id),
 				actions: (user) => actions.for(user, true),
 				icon: 'admin.users',
-				empty: format.text('usersEmpty'),
+				empty: {
+					title: format.text('usersEmpty'),
+					text: format.text('usersEmptyText'),
+					action: {
+						label: format.text('usersInvite'),
+						icon: 'action.invite',
+						run: () => this.openInvite()
+					}
+				},
 				filteredEmpty: format.text('usersNoMatch')
 			})
 		);
