@@ -7,6 +7,7 @@ import { createDesktopIdentityComposition } from './desktopIdentityComposition.j
 import { developmentApplicationId } from '../../platform/product/common/productMetadata.generated.js';
 import {
 	REFUSED_SWITCH_EXIT_CODE,
+	isDebuggingArgument,
 	refusedDebuggingSwitch
 } from '../../platform/environment/electron-main/debuggingSwitches.js';
 
@@ -31,6 +32,8 @@ for (let i = 0; i < args.length; i++) {
 	if (args[i] === '--release' && args[i + 1]) release = args[++i]!;
 	else if (args[i] === '--build-id' && args[i + 1]) buildId = args[++i]!;
 	else if (args[i] === '--allow-http-loopback') allowHttp = true;
+	// A checkout keeps its debugging switches (see above); Chromium and Node read them, not us.
+	else if (isDebuggingArgument(args[i]!)) continue;
 	else throw new Error('Unknown Desktop development argument');
 }
 app.setName('Proctor Development');

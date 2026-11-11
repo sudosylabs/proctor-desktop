@@ -31,6 +31,18 @@ const CHROMIUM_SWITCHES = [
 const NODE_INSPECTOR = /^--inspect(?:-brk|-port|-publish-uid)?(?:=|$)/;
 
 /**
+ * Whether one process argument is a debugging switch, in the `--name` or `--name=value` form
+ * Chromium and Node read. A source checkout passes these through to Chromium and Node, so its
+ * own argument parser skips them rather than treating them as unknown.
+ */
+export function isDebuggingArgument(argument: string): boolean {
+	if (NODE_INSPECTOR.test(argument)) return true;
+	return CHROMIUM_SWITCHES.some(
+		(name) => argument === `--${name}` || argument.startsWith(`--${name}=`)
+	);
+}
+
+/**
  * The debugging switch an installed build must refuse, or undefined. Remote debugging
  * and Node's inspector would let anyone who can start Proctor drive its windows,
  * read their pages and act as the candidate, so an installed build exits before

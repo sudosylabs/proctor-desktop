@@ -1,6 +1,9 @@
 import assert from 'node:assert';
 import { suite, test } from '../../../base/common/upstream/testAdapter.ts';
-import { refusedDebuggingSwitch } from '../../../../src/prctr/platform/environment/electron-main/debuggingSwitches.ts';
+import {
+	isDebuggingArgument,
+	refusedDebuggingSwitch
+} from '../../../../src/prctr/platform/environment/electron-main/debuggingSwitches.ts';
 
 suite('debugging switches', () => {
 	const launch = (built: boolean, switches: readonly string[], argv: readonly string[] = []) => ({
@@ -49,6 +52,26 @@ suite('debugging switches', () => {
 			refusedDebuggingSwitch(launch(true, ['lang'], ['/Applications/Proctor'])),
 			undefined
 		);
+	});
+
+	test('debugging arguments are told apart from other arguments', () => {
+		for (const argument of [
+			'--remote-debugging-port=9222',
+			'--remote-debugging-address=127.0.0.1',
+			'--remote-debugging-pipe',
+			'--auto-open-devtools-for-tabs',
+			'--inspect',
+			'--inspect-brk=9229'
+		])
+			assert.strictEqual(isDebuggingArgument(argument), true, argument);
+		for (const argument of [
+			'--allow-http-loopback',
+			'--release',
+			'--remote-debugging-portal',
+			'--inspector-shaped',
+			'remote-debugging-port'
+		])
+			assert.strictEqual(isDebuggingArgument(argument), false, argument);
 	});
 
 	test('a source checkout keeps its debugging switches', () => {
