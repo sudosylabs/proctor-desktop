@@ -6,7 +6,7 @@ import { DesktopIdentityCoordinator } from '../../platform/identity/electron-mai
 import { AdministrationService } from '../../platform/administration/electron-main/administrationService.js';
 import { DesktopAuthorizationService } from '../../platform/identity/electron-main/desktopAuthorizationService.js';
 import { HttpServerReadinessTransport } from '../../platform/identity/electron-main/httpServerReadinessTransport.js';
-import { DesktopAuthHttp } from '../../platform/identity/node/desktopAuthHttp.js';
+import { ServerHttpTransport } from '../../platform/serverApi/node/serverHttpTransport.js';
 import type { ServerOriginStore } from '../../platform/identity/node/serverOriginStore.js';
 import { OsDesktopCredentialStore } from '../../platform/identity/electron-main/desktopCredentialStore.js';
 import { loadNativeDesktopKeyCustody } from '../../platform/identity/electron-main/nativeDesktopKeyCustody.js';
@@ -54,14 +54,14 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 			catalogs: []
 		});
 		let windows: ProductWindowCoordinator;
-		const http = new DesktopAuthHttp();
+		const http = new ServerHttpTransport();
 		const authorization = owned.add(
 			new DesktopAuthorizationService({
 				target: options.target,
 				applicationId: options.applicationId,
 				keys: loadNativeDesktopKeyCustody(options.nativeKeyModule),
 				credentials: new OsDesktopCredentialStore(join(options.stateDirectory, 'identity')),
-				http,
+				transport: http,
 				openBrowser: async (url) => shell.openExternal(url),
 				callbackPages: createDesktopAuthCallbackPages(
 					localization,
@@ -112,7 +112,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 		const identity = owned.add(
 			new DesktopIdentityCoordinator({
 				target: options.target,
-				transport: new HttpServerReadinessTransport(http.transport),
+				transport: new HttpServerReadinessTransport(http),
 				allowDevelopmentLoopback: options.allowDevelopmentLoopback,
 				authorization,
 				rememberedServer: options.rememberedServer

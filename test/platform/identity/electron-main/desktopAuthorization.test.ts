@@ -20,7 +20,11 @@ import {
 	CancellationToken
 } from '../../../../src/prctr/base/common/cancellation.js';
 import { LoopbackAuthServer } from '../../../../src/prctr/platform/identity/node/loopbackAuthServer.js';
-import { DesktopAuthHttp } from '../../../../src/prctr/platform/identity/node/desktopAuthHttp.js';
+import { ServerHttpTransport } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
+import { encodeRequest } from '../../../../src/prctr/platform/serverApi/node/requestEncoding.js';
+import { decodeResponse } from '../../../../src/prctr/platform/serverApi/node/responseDecoding.js';
+import { ServerApiError } from '../../../../src/prctr/platform/serverApi/common/serverApi.js';
+import { sendWithDPoP } from '../../../../src/prctr/platform/identity/node/dpopExchange.js';
 import { DesktopAuthorizationService } from '../../../../src/prctr/platform/identity/electron-main/desktopAuthorizationService.js';
 import {
 	createDPoPProof,
@@ -211,7 +215,16 @@ function tokens() {
 			user_id: id,
 			desktop_registration_id: registration,
 			client_type: 'desktop',
-			mfa_recovery_required: false
+			mfa_recovery_required: false,
+			mfa_enrollment_required: false,
+			authentication_method: 'password',
+			authentication_strength: 'single_factor',
+			created_at: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+			authenticated_at: new Date().toISOString(),
+			last_activity_at: new Date().toISOString(),
+			idle_expires_at: new Date(Date.now() + 3600000).toISOString(),
+			expires_at: new Date(Date.now() + 3600000).toISOString()
 		},
 		tokens: {
 			token_type: 'DPoP',
@@ -234,7 +247,8 @@ function context() {
 			id,
 			username: 'candidate',
 			display_name: 'Candidate',
-			profile_picture_reference: ''
+			profile_picture_reference: '',
+			profile_picture_kind: 'default'
 		},
 		current_desktop_registration_id: registration,
 		available_product_areas: ['account', 'settings'],
@@ -254,7 +268,7 @@ void test('hosted authorization uses exact wire fields, persists only refresh cu
 	let startCount = 0;
 	let exchangeCount = 0;
 	let refreshCount = 0;
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const http = new ServerHttpTransport(async (input, init) => {
 		const path = new URL(String(input)).pathname;
 		assert.equal(init?.credentials, 'omit');
 		assert.equal(init?.redirect, 'manual');
@@ -309,7 +323,7 @@ void test('hosted authorization uses exact wire fields, persists only refresh cu
 				stored = undefined;
 			}
 		},
-		http,
+		transport: http,
 		callbackPages,
 		confirmationPages: callbackPages,
 		async openBrowser() {
@@ -343,7 +357,7 @@ void test('a waiting sign-in page can be opened again until the callback arrives
 	let started: Record<string, unknown> = {};
 	let stored: StoredDesktopSession | undefined;
 	const opened: string[] = [];
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const http = new ServerHttpTransport(async (input, init) => {
 		const path = new URL(String(input)).pathname;
 		if (path.endsWith('/authorizations')) {
 			started = JSON.parse(String(init?.body));
@@ -381,7 +395,7 @@ void test('a waiting sign-in page can be opened again until the callback arrives
 				stored = undefined;
 			}
 		},
-		http,
+		transport: http,
 		callbackPages,
 		confirmationPages: callbackPages,
 		async openBrowser(url) {
@@ -419,7 +433,7 @@ void test('a sign-in the institution refuses until two-step is set up opens the 
 	let started: Record<string, unknown> = {};
 	let stored: StoredDesktopSession | undefined;
 	const opened: string[] = [];
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const http = new ServerHttpTransport(async (input, init) => {
 		const path = new URL(String(input)).pathname;
 		if (path.endsWith('/authorizations')) {
 			started = JSON.parse(String(init?.body));
@@ -463,7 +477,7 @@ void test('a sign-in the institution refuses until two-step is set up opens the 
 				stored = undefined;
 			}
 		},
-		http,
+		transport: http,
 		callbackPages,
 		confirmationPages: callbackPages,
 		async openBrowser(url) {
@@ -504,7 +518,7 @@ void test('nonce challenge is retried once with a fresh proof, while ambiguous r
 		let exchanged = 0;
 		let revoked = false;
 		let rotating = false;
-		const http = new DesktopAuthHttp(async (input, init) => {
+		const http = new ServerHttpTransport(async (input, init) => {
 			const path = new URL(String(input)).pathname;
 			if (path.endsWith('/authorizations')) {
 				start = JSON.parse(String(init?.body));
@@ -560,7 +574,7 @@ void test('nonce challenge is retried once with a fresh proof, while ambiguous r
 					stored = undefined;
 				}
 			},
-			http,
+			transport: http,
 			callbackPages,
 			confirmationPages: callbackPages,
 			async openBrowser() {
@@ -619,7 +633,7 @@ void test('a saved session resumes when the rotated tokens arrive without a new 
 	let refreshes = 0;
 	let contextNonce: unknown;
 	let opened = 0;
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const http = new ServerHttpTransport(async (input, init) => {
 		const path = new URL(String(input)).pathname;
 		if (path.endsWith('/refresh')) {
 			if (++refreshes === 1)
@@ -665,7 +679,7 @@ void test('a saved session resumes when the rotated tokens arrive without a new 
 				stored = undefined;
 			}
 		},
-		http,
+		transport: http,
 		callbackPages,
 		confirmationPages: callbackPages,
 		async openBrowser() {
@@ -699,7 +713,7 @@ void test('ordinary shutdown drains pending rotation and sign-out without restor
 	const barrier = new Promise<void>((resolve) => {
 		releaseWrite = resolve;
 	});
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const http = new ServerHttpTransport(async (input, init) => {
 		const path = new URL(String(input)).pathname;
 		if (path.endsWith('/authorizations')) {
 			started = JSON.parse(String(init?.body));
@@ -739,7 +753,7 @@ void test('ordinary shutdown drains pending rotation and sign-out without restor
 				stored = undefined;
 			}
 		},
-		http,
+		transport: http,
 		callbackPages,
 		confirmationPages: callbackPages,
 		async openBrowser() {
@@ -802,10 +816,17 @@ void test('identity HTTP rejects redirects, oversized JSON, and malformed nonce 
 			headers: { 'Content-Type': 'application/json', 'DPoP-Nonce': 'invalid' }
 		})
 	]) {
-		const http = new DesktopAuthHttp(async () => result);
+		const transport = new ServerHttpTransport(async () => result);
+		const request = encodeRequest(identity.origin, 'getCurrentUserContext', {});
 		await assert.rejects(
-			http.request(identity.origin, '/api/v1/users/me/context', CancellationToken.None),
-			(error) => error instanceof Error && error.message === 'Desktop authorization rejected'
+			async () => {
+				const { response } = await sendWithDPoP(transport, request, undefined, undefined);
+				decodeResponse(request.operation, response);
+			},
+			(error) =>
+				error instanceof ServerApiError &&
+				(error.kind === 'redirectBlocked' || error.kind === 'invalidResponse') &&
+				!error.message.includes('privateServerDetail')
 		);
 	}
 });
@@ -829,7 +850,7 @@ void test('native custody failure stops sign-in before authorization or browser 
 			async write() {},
 			async delete() {}
 		},
-		http: new DesktopAuthHttp(async () => {
+		transport: new ServerHttpTransport(async () => {
 			crossedBoundary = true;
 			throw Error('Unexpected request');
 		}),
@@ -868,7 +889,7 @@ void test('sign-out preserves separate local cleanup and remote revocation outco
 		let cleanup = false;
 		const outcomes: import('../../../../src/prctr/platform/identity/common/desktopSessionOutcome.js').DesktopSessionOutcome[] =
 			[];
-		const http = new DesktopAuthHttp(async (input, init) => {
+		const http = new ServerHttpTransport(async (input, init) => {
 			const path = new URL(String(input)).pathname;
 			if (path.endsWith('/authorizations')) {
 				started = JSON.parse(String(init?.body));
@@ -918,7 +939,7 @@ void test('sign-out preserves separate local cleanup and remote revocation outco
 					stored = undefined;
 				}
 			},
-			http,
+			transport: http,
 			callbackPages,
 			confirmationPages: callbackPages,
 			async openBrowser() {
@@ -1012,7 +1033,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 	let settingsMode = 'success';
 	let settingsWrites = 0;
 	const settingsSource = '{\n  "workbench.colorTheme": "GitHub Dark Dimmed"\n}';
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const http = new ServerHttpTransport(async (input, init) => {
 		const path = new URL(String(input)).pathname;
 		if (path.endsWith('/authorizations')) {
 			started = JSON.parse(String(init?.body));
@@ -1143,7 +1164,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 				stored = undefined;
 			}
 		},
-		http,
+		transport: http,
 		callbackPages,
 		confirmationPages: callbackPages,
 		async openBrowser(url) {
@@ -1263,7 +1284,7 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 	let pageOrigin = 'https://example.edu';
 	const opened: string[] = [];
 	const completions: Record<string, unknown>[] = [];
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const http = new ServerHttpTransport(async (input, init) => {
 		const path = new URL(String(input)).pathname;
 		if (path.endsWith('/desktop/authorizations')) {
 			started = JSON.parse(String(init?.body));
@@ -1319,7 +1340,7 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 				stored = undefined;
 			}
 		},
-		http,
+		transport: http,
 		callbackPages,
 		confirmationPages: callbackPages,
 		async openBrowser(url) {
@@ -1392,7 +1413,7 @@ void test('account tokens, email verification and retention notices are bound, s
 		updated_at: '2026-01-01T00:00:00Z',
 		...overrides
 	});
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const http = new ServerHttpTransport(async (input, init) => {
 		const url = new URL(String(input));
 		const path = url.pathname;
 		if (path.endsWith('/authorizations')) {
@@ -1488,7 +1509,7 @@ void test('account tokens, email verification and retention notices are bound, s
 				stored = undefined;
 			}
 		},
-		http,
+		transport: http,
 		callbackPages,
 		confirmationPages: callbackPages,
 		async openBrowser() {
@@ -1611,7 +1632,7 @@ void test('administration runs on the bound Session: DPoP signed, cached, invali
 	const seen: string[] = [];
 	let institutionReads = 0;
 	let revoked = false;
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const http = new ServerHttpTransport(async (input, init) => {
 		const url = new URL(String(input));
 		const path = url.pathname;
 		if (path.endsWith('/authorizations')) {
@@ -1699,7 +1720,7 @@ void test('administration runs on the bound Session: DPoP signed, cached, invali
 				stored = undefined;
 			}
 		},
-		http,
+		transport: http,
 		callbackPages,
 		confirmationPages: callbackPages,
 		async openBrowser() {

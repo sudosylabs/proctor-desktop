@@ -1,14 +1,20 @@
 import { ServerApiClient, type ApiObservation } from '../../serverApi/node/serverApiClient.js';
 import { resolveApiRoute } from '../../serverApi/node/legacyApiRequest.js';
-import { ServerApiError } from '../../serverApi/common/serverApi.js';
+import {
+	ServerApiError,
+	type ApiInput,
+	type ApiOperationId
+} from '../../serverApi/common/serverApi.js';
 import {
 	ProjectionFailure,
 	projectRead,
 	type SessionBinding
 } from '../../serverApi/common/projection.js';
-import type { HttpResponse } from '../../serverApi/node/serverHttpTransport.js';
-import { decodeJsonBody } from '../../serverApi/node/responseDecoding.js';
-import type { EncodedApiRequest } from '../../serverApi/node/requestEncoding.js';
+import type { ServerHttpTransport } from '../../serverApi/node/serverHttpTransport.js';
+import { decodeResponse } from '../../serverApi/node/responseDecoding.js';
+import { encodeRequest, type ApiRequestInput } from '../../serverApi/node/requestEncoding.js';
+import { problemCode, sendWithDPoP, type DPoPBinding } from '../node/dpopExchange.js';
+import { SessionRequestSigner } from './sessionRequestSigner.js';
 import {
 	validateExamActivityIntent,
 	type ExamActivityIntent,
@@ -38,7 +44,6 @@ import type { DesktopReleaseTarget, VerifiedServerIdentity } from './serverReadi
 import { LoopbackAuthServer, type LoopbackCallbackPages } from '../node/loopbackAuthServer.js';
 import { DesktopAuthorizationError } from '../node/desktopAuthorizationError.js';
 import {
-	DesktopAuthHttp,
 	desktopHttpMethod,
 	type DesktopHttpPath,
 	type DesktopPhotoRequest,
@@ -67,7 +72,6 @@ import {
 	readRevokedSessionCount
 } from '../../account/electron-main/accountWire.js';
 import {
-	createDPoPProof,
 	installationKeyScope,
 	type DesktopSigningKey,
 	type DesktopKeyCustody
@@ -83,6 +87,7 @@ import {
 	expiry,
 	parseTokens,
 	errorCode,
+	type DesktopExchangeResult,
 	type DesktopTokens
 } from '../node/desktopAuthProtocol.js';
 
@@ -99,7 +104,8 @@ export interface DesktopAuthorizationOptions {
 	readonly applicationId: string;
 	readonly keys: DesktopKeyCustody;
 	readonly credentials: DesktopCredentialStore;
-	readonly http: DesktopAuthHttp;
+	/** The single HTTP boundary every authentication and Session request goes through. */
+	readonly transport: ServerHttpTransport;
 	readonly openBrowser: (url: string) => Promise<void>;
 	readonly callbackPages: LoopbackCallbackPages;
 	/** The same pages worded for Confirm it's you, which never signs anyone in. */
@@ -231,36 +237,34 @@ export class DesktopAuthorizationService extends Disposable {
 			current();
 			this.#session = session;
 			const activeSession = session;
+			const refreshing = () => this.#refresh !== undefined;
+			const signer = new SessionRequestSigner(this.options.transport, {
+				credentials: () =>
+					this.#session === activeSession &&
+					this.#generation === generation &&
+					!this.#disposed
+						? {
+								key: activeSession.key,
+								accessToken: activeSession.tokens.accessToken,
+								accessExpiresAt: activeSession.tokens.accessExpiresAt,
+								nonce: activeSession.tokens.nonce
+							}
+						: undefined,
+				recordNonce: (nonce) => {
+					activeSession.tokens = { ...activeSession.tokens, nonce };
+				},
+				refresh: () => this.refresh(),
+				get refreshing() {
+					return refreshing();
+				},
+				endSession: () => {
+					if (this.#session === activeSession) void this.signOut();
+				}
+			});
 			this.#api = new ServerApiClient(
 				identity.origin,
-				(request) => this.executeApiRequest(activeSession, generation, request),
-				async (url, challenge) => {
-					if (
-						this.#session !== activeSession ||
-						this.#generation !== generation ||
-						this.#disposed
-					)
-						throw new ServerApiError('sessionEnded');
-					if (challenge?.nonce)
-						activeSession.tokens = { ...activeSession.tokens, nonce: challenge.nonce };
-					if (this.#refresh || activeSession.tokens.accessExpiresAt <= Date.now() + 5000)
-						await this.refresh();
-					const credential = activeSession.tokens.accessToken;
-					const proof = await createDPoPProof(
-						activeSession.key,
-						'GET',
-						url,
-						activeSession.tokens.nonce,
-						credential
-					);
-					if (
-						this.#session !== activeSession ||
-						this.#generation !== generation ||
-						this.#disposed
-					)
-						throw new ServerApiError('sessionEnded');
-					return { Authorization: `DPoP ${credential}`, DPoP: proof };
-				}
+				(request) => signer.execute(request),
+				(url, challenge) => signer.authorizeUpgrade(url, challenge)
 			);
 			await this.options.onAuthenticated(projection);
 			current();
@@ -291,10 +295,9 @@ export class DesktopAuthorizationService extends Disposable {
 		const listener = await LoopbackAuthServer.start(state, this.options.callbackPages, token);
 		try {
 			const target = this.#selectors();
-			const started = await this.options.http.request(
+			const started = await this.#exchange(
 				identity.origin,
-				'/api/v1/auth/desktop/authorizations',
-				token,
+				'startDesktopAuthorization',
 				{
 					body: {
 						...target,
@@ -304,7 +307,10 @@ export class DesktopAuthorizationService extends Disposable {
 						public_jwk: key.publicJwk,
 						device_name: 'Proctor Desktop'
 					}
-				}
+				} as ApiInput<'startDesktopAuthorization'>,
+				undefined,
+				undefined,
+				token
 			);
 			if (started.status !== 201) throw new DesktopAuthorizationError('rejected');
 			const value = record(started.value);
@@ -324,10 +330,10 @@ export class DesktopAuthorizationService extends Disposable {
 			const code = await listener.waitForCode();
 			this.#pendingSignInPage = undefined;
 			if (Date.now() >= expiresAt) throw new DesktopAuthorizationError('timedOut');
-			let result = await this.options.http.request(
+			// A nonce challenge is answered before the code is consumed, so it is retried once.
+			const result = await this.#exchange(
 				identity.origin,
-				'/api/v1/auth/desktop/token',
-				token,
+				'exchangeDesktopAuthorizationCode',
 				{
 					body: {
 						...target,
@@ -335,39 +341,13 @@ export class DesktopAuthorizationService extends Disposable {
 						state,
 						code_verifier: verifier,
 						public_jwk: key.publicJwk
-					},
-					proof: await createDPoPProof(
-						key,
-						'POST',
-						`${identity.origin}/api/v1/auth/desktop/token`,
-						nonce
-					)
-				}
-			);
-			// A nonce rejection occurs before code consumption. Only this explicit response permits one retry.
-			if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce) {
-				nonce = result.nonce;
-				result = await this.options.http.request(
-					identity.origin,
-					'/api/v1/auth/desktop/token',
-					token,
-					{
-						body: {
-							...target,
-							code,
-							state,
-							code_verifier: verifier,
-							public_jwk: key.publicJwk
-						},
-						proof: await createDPoPProof(
-							key,
-							'POST',
-							`${identity.origin}/api/v1/auth/desktop/token`,
-							nonce
-						)
 					}
-				);
-			}
+				} as ApiInput<'exchangeDesktopAuthorizationCode'>,
+				{ key },
+				nonce,
+				token
+			);
+			nonce = result.nonce ?? nonce;
 			try {
 				return parseTokens(result, nonce);
 			} catch (error) {
@@ -416,27 +396,15 @@ export class DesktopAuthorizationService extends Disposable {
 		await this.options.credentials.write(scope, { ...saved, phase: 'rotationPending' });
 		try {
 			if (token.isCancellationRequested) throw new DesktopAuthorizationError('cancelled');
-			let result = await this.#requestProof(
+			const result = await this.#exchange(
 				saved.origin,
-				'/api/v1/auth/refresh',
-				key,
-				saved.refreshToken,
+				'refreshSession',
+				{},
+				{ key, credential: saved.refreshToken },
 				nonce,
-				token,
-				false
+				token
 			);
-			if (errorCode(result) === 'authentication.dpop.use_nonce' && result.nonce) {
-				nonce = result.nonce;
-				result = await this.#requestProof(
-					saved.origin,
-					'/api/v1/auth/refresh',
-					key,
-					saved.refreshToken,
-					nonce,
-					token,
-					false
-				);
-			}
+			nonce = result.nonce ?? nonce;
 			const next = parseTokens(result, nonce);
 			if (
 				next.sessionId !== saved.sessionId ||
@@ -464,45 +432,64 @@ export class DesktopAuthorizationService extends Disposable {
 			throw new DesktopAuthorizationError('verificationRequired');
 		}
 	}
-	async #requestProof(
+	/**
+	 * One authentication operation: encoded from the packaged contract, signed when `binding` is
+	 * given, its success body decoded and validated, its failure reduced to the server's code.
+	 */
+	async #exchange<K extends ApiOperationId>(
 		origin: string,
-		path: '/api/v1/auth/refresh' | '/api/v1/auth/logout' | '/api/v1/users/me/context',
-		key: DesktopSigningKey,
-		secret: string,
-		nonce: string,
-		token: CancellationToken,
-		access = true
-	): Promise<DesktopHttpResult> {
-		const proof = await createDPoPProof(
-			key,
-			path === '/api/v1/users/me/context' ? 'GET' : 'POST',
-			`${origin}${path}`,
-			nonce,
-			access ? secret : undefined
-		);
-		return this.options.http.request(origin, path, token, { proof, credential: secret });
+		id: K,
+		input: ApiInput<K>,
+		binding: DPoPBinding | undefined,
+		nonce: string | undefined,
+		token: CancellationToken
+	): Promise<DesktopExchangeResult> {
+		const controller = new AbortController();
+		const cancellation = token.onCancellationRequested(() => controller.abort());
+		if (token.isCancellationRequested) controller.abort();
+		try {
+			const request = encodeRequest(origin, id, input as ApiRequestInput);
+			const exchange = await sendWithDPoP(
+				this.options.transport,
+				{ ...request, signal: controller.signal },
+				binding,
+				nonce
+			);
+			const response = exchange.response;
+			const value =
+				response.status < 400
+					? decodeResponse(request.operation, response).value
+					: { code: problemCode(response) };
+			return {
+				status: response.status,
+				value,
+				...(exchange.nonce === undefined ? {} : { nonce: exchange.nonce })
+			};
+		} catch (error) {
+			if (token.isCancellationRequested) throw new DesktopAuthorizationError('cancelled');
+			if (error instanceof DesktopAuthorizationError) throw error;
+			if (
+				error instanceof ServerApiError &&
+				['invalidRequest', 'invalidResponse', 'redirectBlocked'].includes(error.kind)
+			)
+				throw new DesktopAuthorizationError('rejected');
+			throw new DesktopAuthorizationError('verificationRequired');
+		} finally {
+			cancellation.dispose();
+		}
 	}
 	async #context(
 		session: CurrentSession,
 		token: CancellationToken
 	): Promise<AuthenticatedIdentity> {
-		let response = await this.#requestProof(
+		const response = await this.#exchange(
 			session.identity.origin,
-			'/api/v1/users/me/context',
-			session.key,
-			session.tokens.accessToken,
+			'getCurrentUserContext',
+			{},
+			{ key: session.key, credential: session.tokens.accessToken, accessToken: true },
 			session.tokens.nonce,
 			token
 		);
-		if (errorCode(response) === 'authentication.dpop.use_nonce' && response.nonce)
-			response = await this.#requestProof(
-				session.identity.origin,
-				'/api/v1/users/me/context',
-				session.key,
-				session.tokens.accessToken,
-				response.nonce,
-				token
-			);
 		if (response.status !== 200) throw new DesktopAuthorizationError('rejected');
 		if (response.nonce) session.tokens = { ...session.tokens, nonce: response.nonce };
 		const context = record(response.value);
@@ -837,72 +824,6 @@ export class DesktopAuthorizationService extends Disposable {
 		)
 			throw new ServerApiError('sessionEnded');
 		return this.#api;
-	}
-	private async executeApiRequest(
-		session: CurrentSession,
-		generation: number,
-		request: EncodedApiRequest
-	): Promise<HttpResponse> {
-		const current = () => {
-			if (this.#disposed || this.#session !== session || this.#generation !== generation)
-				throw new ServerApiError('sessionEnded');
-			if (request.signal?.aborted) throw new ServerApiError('cancelled');
-		};
-		current();
-		if (request.operation.auth === 'public') return this.options.http.transport.send(request);
-		if (request.operation.auth === 'refresh_credential_required')
-			throw new ServerApiError('invalidRequest');
-		if (this.#refresh || session.tokens.accessExpiresAt <= Date.now() + 5000)
-			await this.refresh();
-		const send = async () => {
-			current();
-			const accessToken = session.tokens.accessToken;
-			const proof = await createDPoPProof(
-				session.key,
-				request.method,
-				request.url,
-				session.tokens.nonce,
-				accessToken
-			);
-			current();
-			const result = await this.options.http.transport.send({
-				...request,
-				headers: { ...request.headers, DPoP: proof, Authorization: `DPoP ${accessToken}` }
-			});
-			current();
-			const nonce = result.headers['dpop-nonce'];
-			if (nonce) {
-				if (!/^[A-Za-z0-9_-]{43}$/u.test(nonce))
-					throw new ServerApiError('invalidResponse');
-				session.tokens = { ...session.tokens, nonce };
-			}
-			return result;
-		};
-		const code = (result: HttpResponse): string | undefined => {
-			if (result.status < 400) return undefined;
-			try {
-				const value = decodeJsonBody(result);
-				return value &&
-					typeof value === 'object' &&
-					'code' in value &&
-					typeof value.code === 'string'
-					? value.code
-					: undefined;
-			} catch {
-				return undefined;
-			}
-		};
-		let result = await send();
-		if (code(result) === 'authentication.dpop.use_nonce' && result.headers['dpop-nonce'])
-			result = await send();
-		if (result.status === 401 && code(result) === 'authentication.invalid_token') {
-			await this.refresh();
-			current();
-			result = await send();
-			if (code(result) === 'authentication.dpop.use_nonce' && result.headers['dpop-nonce'])
-				result = await send();
-		}
-		return result;
 	}
 	/**
 	 * Confirms it is the person on the institution's own page in the system browser, as Desktop
@@ -1330,23 +1251,14 @@ export class DesktopAuthorizationService extends Disposable {
 	}
 
 	async #revoke(session: CurrentSession): Promise<void> {
-		let response = await this.#requestProof(
+		const response = await this.#exchange(
 			session.identity.origin,
-			'/api/v1/auth/logout',
-			session.key,
-			session.tokens.accessToken,
+			'logout',
+			{},
+			{ key: session.key, credential: session.tokens.accessToken, accessToken: true },
 			session.tokens.nonce,
 			CancellationToken.None
 		);
-		if (errorCode(response) === 'authentication.dpop.use_nonce' && response.nonce)
-			response = await this.#requestProof(
-				session.identity.origin,
-				'/api/v1/auth/logout',
-				session.key,
-				session.tokens.accessToken,
-				response.nonce,
-				CancellationToken.None
-			);
 		if (response.status !== 204) throw new DesktopAuthorizationError('unavailable');
 	}
 	/** Ordinary shutdown joins sign-out before releasing custody or destroying outcome listeners. */

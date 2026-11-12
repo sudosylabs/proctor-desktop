@@ -161,13 +161,16 @@ void test('profile photo intents bound bytes, media types and exact strong revis
 });
 
 void test('profile photo transport binds image bytes and If-Match without following remote image URLs', async () => {
-	const { DesktopAuthHttp } =
-		await import('../../../../src/prctr/platform/identity/node/desktopAuthHttp.js');
-	const { CancellationToken } = await import('../../../../src/prctr/base/common/cancellation.js');
+	const { ServerHttpTransport } =
+		await import('../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js');
+	const { encodeRequest } =
+		await import('../../../../src/prctr/platform/serverApi/node/requestEncoding.js');
+	const { decodeResponse } =
+		await import('../../../../src/prctr/platform/serverApi/node/responseDecoding.js');
 	const etag = `"${'a'.repeat(64)}"`;
 	const bytes = Buffer.from('RIFF0000WEBP');
 	let count = 0;
-	const http = new DesktopAuthHttp(async (input, init) => {
+	const transport = new ServerHttpTransport(async (input, init) => {
 		count++;
 		assert.equal(String(input), `https://example.test/api/v1/users/${id}/profile-picture`);
 		assert.equal(init?.redirect, 'manual');
@@ -175,37 +178,26 @@ void test('profile photo transport binds image bytes and If-Match without follow
 			return new Response(bytes, { headers: { 'Content-Type': 'image/webp', ETag: etag } });
 		assert.equal(init?.method, 'PUT');
 		assert.equal(new Headers(init.headers).get('If-Match'), etag);
-		assert.deepEqual(init.body, Buffer.from([1, 2, 3]));
-		return new Response('{}', { headers: { 'Content-Type': 'application/json' } });
+		assert.deepEqual(init.body, new Uint8Array([1, 2, 3]));
+		return new Response(null, { status: 204 });
 	});
-	const read = await http.request(
-		'https://example.test',
-		`/api/v1/users/${id}/profile-picture`,
-		CancellationToken.None,
-		{ photo: { operation: 'GET' } }
-	);
-	assert.deepEqual(read.value, {
-		kind: 'photo',
-		dataUrl: `data:image/webp;base64,${bytes.toString('base64')}`,
-		etag
+	const read = encodeRequest('https://example.test', 'getUserProfilePicture', {
+		path: { user_id: id }
 	});
-	await http.request(
-		'https://example.test',
-		`/api/v1/users/${id}/profile-picture`,
-		CancellationToken.None,
-		{
-			photo: {
-				operation: 'PUT',
-				bytes: new Uint8Array([1, 2, 3]),
-				mediaType: 'image/png',
-				etag
-			}
-		}
-	);
+	const photo = decodeResponse(read.operation, await transport.send(read));
+	assert.deepEqual(Buffer.from(photo.value as Uint8Array), bytes);
+	assert.equal(photo.headers.etag, etag);
+	const upload = encodeRequest('https://example.test', 'uploadUserProfilePicture', {
+		path: { user_id: id },
+		header: { 'If-Match': etag },
+		mediaType: 'image/png',
+		body: new Uint8Array([1, 2, 3])
+	});
+	await transport.send(upload);
 	assert.equal(count, 2);
-	await assert.rejects(
-		http.request('https://example.test', '/api/v1/users/me', CancellationToken.None, {
-			photo: { operation: 'DELETE' }
+	assert.throws(() =>
+		encodeRequest('https://example.test', 'removeUserProfilePicture', {
+			path: { user_id: 'me' }
 		})
 	);
 });

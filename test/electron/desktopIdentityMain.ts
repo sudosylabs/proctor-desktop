@@ -18,7 +18,7 @@ import { loadNativeDesktopKeyCustody } from '../../src/prctr/platform/identity/e
 import { OsDesktopCredentialStore } from '../../src/prctr/platform/identity/electron-main/desktopCredentialStore.js';
 import { DesktopAuthorizationService } from '../../src/prctr/platform/identity/electron-main/desktopAuthorizationService.js';
 import { AdministrationService } from '../../src/prctr/platform/administration/electron-main/administrationService.js';
-import { DesktopAuthHttp } from '../../src/prctr/platform/identity/node/desktopAuthHttp.js';
+import { ServerHttpTransport } from '../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 import {
 	installationKeyScope,
 	createDPoPProof
@@ -113,7 +113,7 @@ if (probe) {
 						{ accept: () => {} }
 					);
 				};
-				const http = new DesktopAuthHttp(async (input, init) => {
+				const http = new ServerHttpTransport(async (input, init) => {
 					const path = new URL(String(input)).pathname;
 					const response = (value: unknown, status = 200): Response =>
 						new Response(JSON.stringify(value), {
@@ -145,7 +145,16 @@ if (probe) {
 								user_id: principalId,
 								desktop_registration_id: registrationId,
 								client_type: 'desktop',
-								mfa_recovery_required: false
+								mfa_recovery_required: false,
+								mfa_enrollment_required: false,
+								authentication_method: 'password',
+								authentication_strength: 'single_factor',
+								created_at: new Date().toISOString(),
+								updated_at: new Date().toISOString(),
+								authenticated_at: new Date().toISOString(),
+								last_activity_at: new Date().toISOString(),
+								idle_expires_at: new Date(Date.now() + 3600000).toISOString(),
+								expires_at: new Date(Date.now() + 3600000).toISOString()
 							},
 							tokens: {
 								token_type: 'DPoP',
@@ -162,6 +171,7 @@ if (probe) {
 								id: principalId,
 								username: 'identity-test',
 								profile_picture_reference: '',
+								profile_picture_kind: 'default',
 								display_name: 'Identity Test',
 								locale: 'en',
 								timezone: 'UTC'
@@ -259,7 +269,7 @@ if (probe) {
 						},
 						keys,
 						credentials,
-						http,
+						transport: http,
 						callbackPages: createDesktopAuthCallbackPages(
 							createLocalization({
 								requestedLocale: 'en',

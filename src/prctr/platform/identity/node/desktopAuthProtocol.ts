@@ -1,5 +1,10 @@
 import { DesktopAuthorizationError } from './desktopAuthorizationError.js';
-import type { DesktopHttpResult } from './desktopAuthHttp.js';
+/** One answered authentication exchange: its status, decoded body and current server nonce. */
+export interface DesktopExchangeResult {
+	readonly status: number;
+	readonly value: unknown;
+	readonly nonce?: string;
+}
 export interface DesktopTokens {
 	readonly principalId: string;
 	readonly sessionId: string;
@@ -44,7 +49,7 @@ export function expiry(value: unknown): number {
 		throw new DesktopAuthorizationError('rejected');
 	return time;
 }
-export function errorCode(result: DesktopHttpResult): string | undefined {
+export function errorCode(result: DesktopExchangeResult): string | undefined {
 	if (!result.value || typeof result.value !== 'object') return undefined;
 	const error = result.value as Record<string, unknown>;
 	return typeof error.code === 'string' ? error.code : undefined;
@@ -53,7 +58,7 @@ export function errorCode(result: DesktopHttpResult): string | undefined {
  * Reads issued tokens. The server may omit `DPoP-Nonce` on success; the nonce the request just
  * used was accepted, so it stays current until a challenge says otherwise.
  */
-export function parseTokens(result: DesktopHttpResult, requestNonce: string): DesktopTokens {
+export function parseTokens(result: DesktopExchangeResult, requestNonce: string): DesktopTokens {
 	if (result.status !== 200) {
 		const problem = result.value;
 		if (
