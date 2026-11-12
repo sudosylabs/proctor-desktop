@@ -95,6 +95,7 @@ export class PeriodsPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('periodsStatus'),
+							width: '120px',
 							cell: (period) => this.status(period)
 						}
 					],

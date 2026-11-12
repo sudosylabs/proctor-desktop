@@ -129,6 +129,7 @@ export class ClassPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('classStatusColumn'),
+							width: '150px',
 							cell: (member) =>
 								member.endAt !== undefined && member.endAt <= format.now()
 									? {

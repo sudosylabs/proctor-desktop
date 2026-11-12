@@ -185,6 +185,7 @@ export class RetentionPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('retentionStatus'),
+							width: '200px',
 							cell: (record) =>
 								record.retiredAt !== undefined
 									? {

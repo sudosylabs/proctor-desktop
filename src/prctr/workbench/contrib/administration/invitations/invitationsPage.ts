@@ -204,6 +204,7 @@ export class InvitationsPage extends Disposable implements PageView {
 						},
 						{
 							label: format.text('invitationsColumnStatus'),
+							width: '104px',
 							cell: (invitation) => this.status(invitation)
 						}
 					],
