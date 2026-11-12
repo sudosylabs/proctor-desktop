@@ -57,7 +57,6 @@ export class AccountConfirmation extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				icon: proctorIconFactory('action.close'),
 				label: this.format.text('cancel')
 			})
 		);
@@ -89,8 +88,7 @@ export class AccountConfirmation extends Disposable {
 		this.feedback.set();
 		this.cancel.setState({
 			label: this.format.text('cancel'),
-			disabled: true,
-			icon: proctorIconFactory('action.close')
+			disabled: true
 		});
 		const icon = proctorIconFactory(this.options.confirmIcon ?? 'action.end');
 		this.confirm.setState({ label: this.options.confirmLabel, busy: true, icon });
@@ -103,8 +101,7 @@ export class AccountConfirmation extends Disposable {
 			return;
 		}
 		this.cancel.setState({
-			label: this.format.text('cancel'),
-			icon: proctorIconFactory('action.close')
+			label: this.format.text('cancel')
 		});
 		this.confirm.setState({ label: this.options.confirmLabel, icon });
 		this.feedback.set(

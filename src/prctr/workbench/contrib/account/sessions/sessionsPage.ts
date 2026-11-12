@@ -276,7 +276,7 @@ export class SessionsPage extends Disposable implements PageView {
 					? {
 							status: {
 								text: this.format.text('desktopRemovedStatus'),
-								tone: 'quiet' as const
+								tone: 'neutral' as const
 							}
 						}
 					: {}),

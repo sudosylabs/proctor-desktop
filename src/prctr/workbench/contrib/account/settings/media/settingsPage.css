@@ -97,6 +97,12 @@
 		outline: none;
 	}
 
+	/* Placeholder text is the field's own text colour at 68 percent, legible in both themes. */
+	.prctr-account .prctr-settings-page__find-input::placeholder {
+		color: currentColor;
+		opacity: 0.68;
+	}
+
 	.prctr-account .prctr-settings-page__preview {
 		display: flex;
 		flex-direction: column;

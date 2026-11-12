@@ -139,7 +139,7 @@ export class ClassPage extends Disposable implements PageView {
 									: {
 											kind: 'status',
 											text: format.text('classEnrolled'),
-											tone: 'ok'
+											tone: 'neutral'
 										}
 						}
 					],

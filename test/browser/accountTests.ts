@@ -443,7 +443,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'security rows'
 		);
 		check(
-			row('Recovery codes').querySelector('[data-tone="warning"]'),
+			row('Recovery codes').querySelector('[data-tone="attention"]'),
 			'Few recovery codes read as attention'
 		);
 		check(

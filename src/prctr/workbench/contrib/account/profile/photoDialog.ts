@@ -28,10 +28,10 @@ type Photo = Extract<AccountResponse, { kind: 'photo' }>;
 const CIRCLE = 200;
 const SAVED_SIZE = 512;
 
+/** Every action has an icon except Cancel. */
 const photoActionIcons = Object.freeze({
 	chooseAnother: 'object.image',
 	photoRecheck: 'action.retry',
-	cancel: 'action.close',
 	savePhoto: 'action.confirm'
 } as const);
 
@@ -140,7 +140,7 @@ export class AccountPhotoDialog extends Disposable {
 			new ButtonControl(this.dialog.actions, {
 				variant,
 				label: this.format.text(key),
-				icon: proctorIconFactory(photoActionIcons[key])
+				...(key === 'cancel' ? {} : { icon: proctorIconFactory(photoActionIcons[key]) })
 			})
 		);
 	}
@@ -230,7 +230,6 @@ export class AccountPhotoDialog extends Disposable {
 		});
 		this.cancel.setState({
 			label: this.format.text('cancel'),
-			icon: proctorIconFactory(photoActionIcons.cancel),
 			disabled: this.busy
 		});
 		this.choose.setState({

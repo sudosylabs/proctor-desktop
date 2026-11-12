@@ -4,7 +4,7 @@
 	.prctr-page-dialog {
 		background: var(--prctr-color-background-card);
 		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
-		border-radius: 12px;
+		border-radius: var(--prctr-shape-radius-dialog);
 		box-shadow: var(--prctr-elevation-modal);
 		box-sizing: border-box;
 		color: var(--prctr-color-text-primary);
@@ -56,6 +56,7 @@
 		overflow-wrap: anywhere;
 	}
 	.prctr-page-dialog .prctr-page-dialog__description {
+		text-wrap: pretty;
 		color: var(--prctr-color-text-secondary);
 		font-size: 13.5px;
 		line-height: 20px;
@@ -94,6 +95,10 @@
 		overscroll-behavior: contain;
 		padding: 4px 24px 24px;
 		scrollbar-width: none;
+	}
+	/* No lone last word in a dialog's paragraphs. */
+	.prctr-page-dialog .prctr-page-dialog__body p {
+		text-wrap: pretty;
 	}
 	.prctr-page-dialog .prctr-page-dialog__body::-webkit-scrollbar {
 		display: none;

@@ -43,15 +43,15 @@ const WORKING_REFRESH_MS = 2_000;
 const ROW_STATUS: Readonly<
 	Record<RowState, { readonly text: AdministrationText; readonly tone: PageRowStatus['tone'] }>
 > = {
-	valid: { text: 'importRowValid', tone: 'quiet' },
+	valid: { text: 'importRowValid', tone: 'neutral' },
 	invalid: { text: 'importRowInvalid', tone: 'failure' },
-	duplicate: { text: 'importRowDuplicate', tone: 'warning' },
-	pending: { text: 'importRowValid', tone: 'quiet' },
-	succeeded: { text: 'importRowDone', tone: 'success' },
-	no_op: { text: 'importRowSkipped', tone: 'quiet' },
+	duplicate: { text: 'importRowDuplicate', tone: 'attention' },
+	pending: { text: 'importRowValid', tone: 'neutral' },
+	succeeded: { text: 'importRowDone', tone: 'neutral' },
+	no_op: { text: 'importRowSkipped', tone: 'neutral' },
 	failed: { text: 'importRowFailed', tone: 'failure' },
-	skipped: { text: 'importRowSkipped', tone: 'warning' },
-	canceled: { text: 'importRowSkipped', tone: 'quiet' }
+	skipped: { text: 'importRowSkipped', tone: 'neutral' },
+	canceled: { text: 'importRowSkipped', tone: 'neutral' }
 };
 
 /**
@@ -171,12 +171,10 @@ export class ImportPage extends Disposable implements PageView {
 				text: this.format.text(IMPORT_STATE_TEXT[data.state]),
 				tone:
 					data.state === 'failed' || data.state === 'completed_with_errors'
-						? 'fail'
-						: data.state === 'completed'
-							? 'ok'
-							: data.state === 'preview_ready'
-								? 'warn'
-								: 'neutral'
+						? 'failure'
+						: data.state === 'preview_ready'
+							? 'attention'
+							: 'neutral'
 			}
 		});
 		const done =

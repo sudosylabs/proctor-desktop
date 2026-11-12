@@ -24,10 +24,10 @@ export const JOB_STATE: Readonly<
 	Record<State, { readonly text: AdministrationText; readonly tone: AdminTone }>
 > = {
 	queued: { text: 'jobQueued', tone: 'neutral' },
-	running: { text: 'jobRunning', tone: 'busy' },
-	cancel_requested: { text: 'jobCancelRequested', tone: 'warn' },
-	succeeded: { text: 'jobSucceeded', tone: 'ok' },
-	failed: { text: 'jobFailed', tone: 'fail' },
+	running: { text: 'jobRunning', tone: 'neutral' },
+	cancel_requested: { text: 'jobCancelRequested', tone: 'neutral' },
+	succeeded: { text: 'jobSucceeded', tone: 'neutral' },
+	failed: { text: 'jobFailed', tone: 'failure' },
 	canceled: { text: 'jobCanceled', tone: 'neutral' }
 };
 const ANY = 'any';

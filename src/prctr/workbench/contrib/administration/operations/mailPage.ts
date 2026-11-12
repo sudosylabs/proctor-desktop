@@ -43,9 +43,9 @@ const STATE: Readonly<
 > = {
 	queued: { text: 'mailQueued', tone: 'neutral' },
 	sending: { text: 'mailSending', tone: 'neutral' },
-	accepted: { text: 'mailAccepted', tone: 'ok' },
-	failed: { text: 'mailFailedState', tone: 'fail' },
-	suppressed: { text: 'mailSuppressed', tone: 'warn' },
+	accepted: { text: 'mailAccepted', tone: 'neutral' },
+	failed: { text: 'mailFailedState', tone: 'failure' },
+	suppressed: { text: 'mailSuppressed', tone: 'attention' },
 	canceled: { text: 'mailCanceledState', tone: 'neutral' }
 };
 const ANY = 'any';
@@ -389,7 +389,7 @@ export class MailPage extends Disposable implements PageView {
 				? {
 						status: {
 							text: this.format.text('mailKeyPrimary'),
-							tone: 'success' as const
+							tone: 'neutral' as const
 						}
 					}
 				: {}),

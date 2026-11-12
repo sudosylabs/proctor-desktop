@@ -62,8 +62,7 @@ export class DeliveryDialog extends Disposable {
 		this.close = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				label: format.text('deliveryClose'),
-				icon: proctorIconFactory('action.close')
+				label: format.text('deliveryClose')
 			})
 		);
 		this.action = this._register(

@@ -1,6 +1,6 @@
 @layer controls {
 	.prctr-switch {
-		background: var(--prctr-color-border-control);
+		background: var(--prctr-color-border-outline);
 		block-size: 24px;
 		border: 0;
 		border-radius: 12px;
@@ -13,7 +13,7 @@
 	}
 
 	.prctr-switch[aria-checked='true'] {
-		background: var(--prctr-color-brand-accent);
+		background: var(--prctr-color-border-accentLine);
 	}
 
 	.prctr-switch .prctr-switch__knob {

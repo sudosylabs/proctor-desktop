@@ -25,14 +25,14 @@ export const PROGRESSION_STATE: Readonly<
 		}
 	>
 > = {
-	uploading: { text: 'stateChecking', tone: 'busy' },
-	parsing: { text: 'stateChecking', tone: 'busy' },
-	preview_ready: { text: 'stateReady', tone: 'warn' },
-	executing: { text: 'stateMoving', tone: 'busy' },
-	completed: { text: 'stateMoved', tone: 'ok' },
-	completed_with_errors: { text: 'stateMovedWithProblems', tone: 'fail' },
+	uploading: { text: 'stateChecking', tone: 'neutral' },
+	parsing: { text: 'stateChecking', tone: 'neutral' },
+	preview_ready: { text: 'stateReady', tone: 'attention' },
+	executing: { text: 'stateMoving', tone: 'neutral' },
+	completed: { text: 'stateMoved', tone: 'neutral' },
+	completed_with_errors: { text: 'stateMovedWithProblems', tone: 'failure' },
 	canceled: { text: 'stateCancelled', tone: 'neutral' },
-	failed: { text: 'stateFailed', tone: 'fail' }
+	failed: { text: 'stateFailed', tone: 'failure' }
 };
 
 /** "Programming 1 → Programming 2", from the names the server gives. */

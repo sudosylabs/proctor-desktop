@@ -4,14 +4,12 @@
 
 import { IAuthenticatedHoverService } from '../authenticatedHover.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
-import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import {
 	createStatusBadge,
 	type StatusBadgeTone
 } from '../../../../base/browser/ui/badge/statusBadge.js';
-import type { MenuEntry } from '../../../../base/browser/ui/menu/menuControl.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import { Disposable, DisposableStore } from '../../../../base/common/lifecycle.js';
 import {
@@ -23,6 +21,7 @@ import { IPageFormatService } from './pageFormat.js';
 import { PageFeedback } from './pageFeedback.js';
 import { IPagePaneContext } from './pagePaneContext.js';
 import type { PageReadState } from './pageRead.js';
+import { createRowMenuButton } from './rowMenuButton.js';
 import './media/pageSection.css';
 
 let sectionSequence = 0;
@@ -41,22 +40,15 @@ const VISIBLE_CHIPS = 3;
 /** Rows on one page of a section; a longer list gets a pager at the foot of its card. */
 export const PAGE_SECTION_SIZE = 10;
 
-/** A status word, shown as a badge: green when fine, yellow when it needs a look, red for a problem. */
+/** A status word, shown as a badge; its tone says what it means and the badge picks the colour. */
 export interface PageRowStatus {
 	readonly text: string;
-	readonly tone: 'quiet' | 'success' | 'warning' | 'failure';
+	readonly tone: StatusBadgeTone;
 }
-
-const badgeTones: Readonly<Record<PageRowStatus['tone'], StatusBadgeTone>> = {
-	quiet: 'neutral',
-	success: 'success',
-	warning: 'warning',
-	failure: 'danger'
-};
 
 /** A row status as a badge. */
 export function createRowBadge(document: Document, status: PageRowStatus): HTMLElement {
-	return createStatusBadge(document, { text: status.text, tone: badgeTones[status.tone] });
+	return createStatusBadge(document, status);
 }
 
 export interface PageRowModel {
@@ -474,15 +466,7 @@ export class PageSection extends Disposable {
 		);
 		if (row.titleBadge !== undefined) title.append(createRowBadge(document, row.titleBadge));
 		if (row.here !== undefined)
-			title.append(
-				createStatusBadge(document, {
-					icon: this.rowStore.add(
-						createProctorIcon(document, { id: 'status.here', size: 14 })
-					),
-					label: row.here,
-					tone: 'success'
-				})
-			);
+			title.append(createStatusBadge(document, { text: row.here, tone: 'neutral' }));
 		const text = $('span.prctr-page-row__text', {}, title);
 		if (row.chips !== undefined && row.chips.length > 0)
 			text.append(this.createChips($, row.chips));
@@ -541,56 +525,14 @@ export class PageSection extends Disposable {
 	}
 
 	private createMenuButton(
-		$: ReturnType<typeof createElementFactory>,
+		_$: ReturnType<typeof createElementFactory>,
 		name: string,
 		actions: readonly PageRowAction[]
 	): HTMLButtonElement {
-		const label = this.format.text('rowActions', { name });
-		const button = $('button.prctr-page-row__more', {
-			type: 'button',
-			title: label,
-			attrs: { 'aria-label': label, 'aria-haspopup': 'menu', 'aria-expanded': 'false' }
+		return createRowMenuButton(this.rowStore, this.pane.menu, this.element.ownerDocument, {
+			label: this.format.text('rowActions', { name }),
+			actions,
+			className: 'prctr-page-row__more'
 		});
-		button.append(
-			this.rowStore.add(
-				createProctorIcon(button.ownerDocument, { id: 'action.more', size: 18 })
-			).element
-		);
-		// Destructive entries come last, after a separator.
-		const ordered = [
-			...actions.filter((action) => action.destructive !== true),
-			...actions.filter((action) => action.destructive === true)
-		];
-		const firstDestructive = ordered.findIndex((action) => action.destructive === true);
-		const entries: MenuEntry[] = ordered.map((action, index) => ({
-			label: action.label,
-			icon: proctorIconFactory(action.icon, 16),
-			destructive: action.destructive === true,
-			separatorBefore: index > 0 && index === firstDestructive,
-			enabled: action.enabled !== false,
-			run: action.run
-		}));
-		const open = (): void => {
-			this.pane.menu.show(button, entries, label);
-			if (!this.pane.menu.visible) return;
-			button.setAttribute('aria-expanded', 'true');
-			const store = this.rowStore.add(new DisposableStore());
-			store.add(
-				this.pane.menu.onDidChangeVisibility((visible) => {
-					if (visible) return;
-					button.setAttribute('aria-expanded', 'false');
-					this.rowStore.delete(store);
-				})
-			);
-		};
-		this.rowStore.add(addDisposableListener(button, 'click', open));
-		this.rowStore.add(
-			addDisposableListener(button, 'keydown', (event) => {
-				if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
-				event.preventDefault();
-				open();
-			})
-		);
-		return button;
 	}
 }

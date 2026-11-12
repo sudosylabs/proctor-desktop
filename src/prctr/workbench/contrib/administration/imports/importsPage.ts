@@ -87,14 +87,10 @@ export class ImportsPage extends Disposable implements PageView {
 								tone:
 									item.state === 'failed' ||
 									item.state === 'completed_with_errors'
-										? 'fail'
-										: item.state === 'completed'
-											? 'ok'
-											: item.state === 'preview_ready'
-												? 'warn'
-												: item.state === 'canceled'
-													? 'neutral'
-													: 'busy'
+										? 'failure'
+										: item.state === 'preview_ready'
+											? 'attention'
+											: 'neutral'
 							})
 						}
 					],

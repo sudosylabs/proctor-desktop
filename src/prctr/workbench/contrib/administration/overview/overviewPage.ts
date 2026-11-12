@@ -97,11 +97,11 @@ export class OverviewPage extends Disposable implements PageView {
 					audit.status === 'success' || audit.status === 'succeeded'
 						? {
 								text: this.format.text('overviewSucceeded'),
-								tone: 'success'
+								tone: 'neutral'
 							}
 						: {
 								text: this.format.text('overviewRefused'),
-								tone: 'warning'
+								tone: 'failure'
 							}
 			}))
 		);

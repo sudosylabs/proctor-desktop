@@ -12,7 +12,6 @@ import { IPageFormatService } from './pageFormat.js';
 import { IPagePaneContext } from './pagePaneContext.js';
 import './media/confirmItsYouDialog.css';
 
-const CANCEL_ICON = proctorIconFactory('action.close');
 const CONTINUE_ICON = proctorIconFactory('action.openExternal');
 
 /** How a confirmation in the browser ended. */
@@ -78,8 +77,7 @@ export class ConfirmItsYouDialog extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				label: this.format.text('cancel'),
-				icon: CANCEL_ICON
+				label: this.format.text('cancel')
 			})
 		);
 		this.confirm = this._register(

@@ -3,6 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { status } from '../../../../base/browser/ui/aria/aria.js';
+import type { StatusBadgeTone } from '../../../../base/browser/ui/badge/statusBadge.js';
 import type { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
 import type { ToastHost } from '../../../../base/browser/ui/toast/toastHost.js';
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
@@ -18,7 +19,7 @@ export interface PageHeading {
 	/** The pages above this one, each opening its own list, as in Users › Daniel Mensah. */
 	readonly trail?: readonly { readonly label: string; open(): void }[];
 	/** A status word beside the title, coloured only when it needs attention. */
-	readonly status?: { readonly text: string; readonly tone: 'ok' | 'warn' | 'fail' | 'neutral' };
+	readonly status?: { readonly text: string; readonly tone: StatusBadgeTone };
 	/** Initials shown before the title, as for a person, until `photo` arrives. */
 	readonly initials?: string;
 	/** The person's picture as a data URL, shown in place of the initials. */

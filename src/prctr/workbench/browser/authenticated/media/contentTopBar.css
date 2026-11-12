@@ -104,8 +104,8 @@
 	}
 
 	.prctr-content-top-bar .prctr-content-top-bar__input::placeholder {
-		color: var(--prctr-color-text-tertiary);
-		opacity: 1;
+		color: currentColor;
+		opacity: 0.68;
 	}
 
 	.prctr-content-top-bar .prctr-content-top-bar__shortcut {

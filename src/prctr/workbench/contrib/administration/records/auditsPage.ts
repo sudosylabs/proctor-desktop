@@ -126,12 +126,12 @@ export class AuditsPage extends Disposable implements PageView {
 								? {
 										kind: 'status',
 										text: format.text('overviewSucceeded'),
-										tone: 'ok'
+										tone: 'neutral'
 									}
 								: {
 										kind: 'status',
 										text: format.text('overviewRefused'),
-										tone: 'warn'
+										tone: 'failure'
 									}
 					},
 					{

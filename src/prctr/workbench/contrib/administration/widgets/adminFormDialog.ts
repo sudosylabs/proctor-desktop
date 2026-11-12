@@ -150,8 +150,7 @@ export class AdminFormDialog extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				label: format.text('cancel'),
-				icon: proctorIconFactory('action.close')
+				label: format.text('cancel')
 			})
 		);
 		this.confirm = this._register(
@@ -386,7 +385,6 @@ export class AdminFormDialog extends Disposable {
 		this.dialog.setClosable(!working);
 		this.cancel.setState({
 			label: this.format.text('cancel'),
-			icon: proctorIconFactory('action.close'),
 			disabled: working
 		});
 		this.confirm.setState({

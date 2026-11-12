@@ -304,7 +304,7 @@ export class ProfilePage extends Disposable implements PageView {
 		emailNote.replaceChildren(
 			createStatusBadge(emailNote.ownerDocument, {
 				text: this.format.text(verified ? 'emailVerified' : 'emailUnverified'),
-				tone: verified ? 'success' : 'warning'
+				tone: verified ? 'safeguard' : 'attention'
 			})
 		);
 		this.unverified.hidden = profile.email === undefined || verified !== false;
@@ -347,9 +347,7 @@ export class ProfilePage extends Disposable implements PageView {
 				),
 				status: {
 					text: this.noticeWhen(presentation.when, presentation.date),
-					icon:
-						presentation.when === 'noticeDeletedAfter' ? 'status.time' : 'action.close',
-					tone: presentation.when === 'noticeDeletedAfter' ? 'warning' : 'quiet'
+					tone: 'neutral'
 				}
 			};
 		});

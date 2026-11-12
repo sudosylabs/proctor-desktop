@@ -571,7 +571,6 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 					id: 'cancel',
 					label: this.text('cancel'),
 					variant: 'secondary',
-					icon: proctorIconFactory('action.close'),
 					onRequest: () => {}
 				},
 				{

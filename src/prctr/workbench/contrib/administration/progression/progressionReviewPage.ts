@@ -156,7 +156,7 @@ export class ProgressionReviewPage extends Disposable implements PageView {
 			trail,
 			status: {
 				text: this.format.text(shown.text),
-				tone: shown.tone === 'busy' ? 'neutral' : shown.tone
+				tone: shown.tone
 			}
 		});
 		const done =
@@ -189,7 +189,7 @@ export class ProgressionReviewPage extends Disposable implements PageView {
 								? {
 										note: {
 											text: this.format.text('reviewLeftOut'),
-											tone: 'warn' as const
+											tone: 'neutral' as const
 										}
 									}
 								: {})
@@ -240,7 +240,7 @@ export class ProgressionReviewPage extends Disposable implements PageView {
 					detail: row.code === undefined ? '' : this.format.code('problem', row.code),
 					status: {
 						text: this.format.text(failed ? 'reviewLeftOut' : 'reviewSkipped'),
-						tone: failed ? 'failure' : 'warning'
+						tone: failed ? 'failure' : 'neutral'
 					}
 				};
 			})

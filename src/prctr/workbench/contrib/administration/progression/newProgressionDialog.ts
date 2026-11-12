@@ -89,8 +89,7 @@ export class NewProgressionDialog extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				label: format.text('cancel'),
-				icon: proctorIconFactory('action.close')
+				label: format.text('cancel')
 			})
 		);
 		this.check = this._register(
@@ -220,7 +219,6 @@ export class NewProgressionDialog extends Disposable {
 		this.feedback.set();
 		this.cancel.setState({
 			label: this.format.text('cancel'),
-			icon: proctorIconFactory('action.close'),
 			disabled: true
 		});
 		this.update();
@@ -243,8 +241,7 @@ export class NewProgressionDialog extends Disposable {
 		if (this._store.isDisposed) return;
 		this.working = false;
 		this.cancel.setState({
-			label: this.format.text('cancel'),
-			icon: proctorIconFactory('action.close')
+			label: this.format.text('cancel')
 		});
 		this.update();
 		if (result !== 'busy' && result.kind === 'created') {

@@ -11,7 +11,7 @@
 		background: var(--prctr-color-background-card);
 		block-size: 34px;
 		border-radius: 8px;
-		box-shadow: inset 0 0 0 1px var(--prctr-color-border-control);
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-field);
 		box-sizing: border-box;
 		color: var(--prctr-color-text-tertiary);
 		display: flex;
@@ -32,6 +32,12 @@
 		font-size: 13.5px;
 		min-inline-size: 0;
 		outline: none;
+	}
+
+	/* Placeholder text is the field's own text colour at 68 percent, legible in both themes. */
+	.prctr-admin-filters .prctr-admin-filters__input::placeholder {
+		color: currentColor;
+		opacity: 0.68;
 	}
 	.prctr-admin-filters .prctr-admin-filters__select {
 		display: flex;

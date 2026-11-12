@@ -76,6 +76,7 @@
 		outline-offset: 2px;
 	}
 	.prctr-page-pane .prctr-page-pane__description {
+		text-wrap: pretty;
 		color: var(--prctr-color-text-secondary);
 		font-size: 14px;
 		margin: 0;

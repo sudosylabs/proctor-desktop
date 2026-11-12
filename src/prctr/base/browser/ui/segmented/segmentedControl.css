@@ -29,7 +29,7 @@
 	.prctr-segmented .prctr-segmented__option[aria-checked='true'] {
 		background: var(--prctr-color-background-card);
 		box-shadow:
-			0 0 0 1px var(--prctr-color-border-default),
+			0 0 0 1px var(--prctr-color-border-outline),
 			0 1px 2px rgb(0 0 0 / 8%);
 		color: var(--prctr-color-text-primary);
 		font-weight: var(--prctr-typography-weight-medium);

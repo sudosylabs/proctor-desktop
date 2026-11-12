@@ -156,7 +156,7 @@ export class PeriodsPage extends Disposable implements PageView {
 			return { kind: 'status', text: this.format.text('periodsUpcoming'), tone: 'neutral' };
 		if (period.endAt < now)
 			return { kind: 'status', text: this.format.text('periodsPast'), tone: 'neutral' };
-		return { kind: 'status', text: this.format.text('periodsCurrent'), tone: 'ok' };
+		return { kind: 'status', text: this.format.text('periodsCurrent'), tone: 'neutral' };
 	}
 
 	private async edit(period: Period | undefined): Promise<void> {

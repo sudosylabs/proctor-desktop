@@ -12,7 +12,7 @@
 		appearance: none;
 		background: var(--prctr-theme-input-background);
 		block-size: 32px;
-		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-control);
+		border: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-field);
 		border-radius: 8px;
 		box-sizing: border-box;
 		color: inherit;

@@ -256,8 +256,7 @@ class BulkPlaceDialog extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				label: format.text('cancel'),
-				icon: proctorIconFactory('action.close')
+				label: format.text('cancel')
 			})
 		);
 		this.confirm = this._register(
@@ -439,7 +438,6 @@ class BulkPlaceDialog extends Disposable {
 		this.feedback.set();
 		this.cancel.setState({
 			label: this.format.text('cancel'),
-			icon: proctorIconFactory('action.close'),
 			disabled: true
 		});
 		this.update();
@@ -448,8 +446,7 @@ class BulkPlaceDialog extends Disposable {
 		this.working = false;
 		this.dialog.setClosable(true);
 		this.cancel.setState({
-			label: this.format.text('cancel'),
-			icon: proctorIconFactory('action.close')
+			label: this.format.text('cancel')
 		});
 		this.update();
 		if (result !== 'busy' && result.kind !== 'error') {

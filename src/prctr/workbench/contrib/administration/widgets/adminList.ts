@@ -4,12 +4,8 @@
 
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
 import { addDisposableListener } from '../../../../base/browser/dom.js';
-import {
-	createStatusBadge,
-	type StatusBadgeTone
-} from '../../../../base/browser/ui/badge/statusBadge.js';
+import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
-import type { MenuEntry } from '../../../../base/browser/ui/menu/menuControl.js';
 import { Emitter, type Event } from '../../../../base/common/event.js';
 import {
 	Disposable,
@@ -31,6 +27,7 @@ import {
 } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { PageRead } from '../../../browser/authenticated/pages/pageRead.js';
+import { createRowMenuButton } from '../../../browser/authenticated/pages/rowMenuButton.js';
 import {
 	PageSection,
 	type PageEmpty,
@@ -142,15 +139,6 @@ export interface AdminListOptions<K extends AdminListKind> {
 	readonly filtered?: (query: AdminListQuery<K>) => boolean;
 	readonly action?: { readonly label: string; readonly icon: ProctorIconId };
 }
-
-/** Badge colours by tone. */
-const badgeTones: Readonly<Record<AdminTone, StatusBadgeTone>> = {
-	ok: 'success',
-	warn: 'warning',
-	fail: 'danger',
-	neutral: 'neutral',
-	busy: 'accent'
-};
 
 /**
  * One server-paged list shown as a table without a card: hairline rows, ten at a time,
@@ -712,7 +700,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 			case 'status':
 				return createStatusBadge(this.body.ownerDocument, {
 					text: cell.text,
-					tone: badgeTones[cell.tone]
+					tone: cell.tone
 				});
 			case 'check': {
 				const element = $('span.prctr-admin-list__check', {
@@ -753,56 +741,15 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	}
 
 	private createMenuButton(
-		$: ReturnType<typeof createElementFactory>,
+		_$: ReturnType<typeof createElementFactory>,
 		name: string,
 		actions: readonly PageRowAction[]
 	): HTMLButtonElement {
-		const label = this.format.text('rowActions', { name });
-		const button = $('button.prctr-admin-list__more', {
-			type: 'button',
-			title: label,
-			attrs: { 'aria-label': label, 'aria-haspopup': 'menu', 'aria-expanded': 'false' }
+		return createRowMenuButton(this.rowStore, this.pane.menu, this.body.ownerDocument, {
+			label: this.format.text('rowActions', { name }),
+			actions,
+			className: 'prctr-admin-list__more'
 		});
-		button.append(
-			this.rowStore.add(
-				createProctorIcon(button.ownerDocument, { id: 'action.more', size: 18 })
-			).element
-		);
-		const ordered = [
-			...actions.filter((action) => action.destructive !== true),
-			...actions.filter((action) => action.destructive === true)
-		];
-		const firstDestructive = ordered.findIndex((action) => action.destructive === true);
-		const entries: MenuEntry[] = ordered.map((action, index) => ({
-			label: action.label,
-			icon: proctorIconFactory(action.icon, 16),
-			destructive: action.destructive === true,
-			separatorBefore: index > 0 && index === firstDestructive,
-			enabled: action.enabled !== false,
-			run: action.run
-		}));
-		const open = (): void => {
-			this.pane.menu.show(button, entries, label);
-			if (!this.pane.menu.visible) return;
-			button.setAttribute('aria-expanded', 'true');
-			const store = this.rowStore.add(new DisposableStore());
-			store.add(
-				this.pane.menu.onDidChangeVisibility((visible) => {
-					if (visible) return;
-					button.setAttribute('aria-expanded', 'false');
-					this.rowStore.delete(store);
-				})
-			);
-		};
-		this.rowStore.add(addDisposableListener(button, 'click', open));
-		this.rowStore.add(
-			addDisposableListener(button, 'keydown', (event) => {
-				if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
-				event.preventDefault();
-				open();
-			})
-		);
-		return button;
 	}
 }
 

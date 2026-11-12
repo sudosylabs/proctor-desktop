@@ -3,6 +3,7 @@ import { controlsFixture } from './sharedControlsFixture.ts';
 import { proctorControlsFixture } from './proctorControlsFixture.ts';
 import { brandLockupFixture } from './brandLockupFixture.ts';
 import { productWindowChromeFixture } from './productWindowChromeFixture.ts';
+import { statusAndRowsFixture } from './statusAndRowsFixture.ts';
 import { runLaunchWindowTests } from '../launchWindowTests.ts';
 import { launchStates } from '../../../src/prctr/platform/identity/common/launchIdentity.ts';
 
@@ -25,6 +26,11 @@ export const controlExplorerFixtures: readonly ControlFixture[] = Object.freeze(
 		id: 'proctor-controls',
 		title: 'Proctor controls',
 		mount: proctorControlsFixture
+	}),
+	Object.freeze({
+		id: 'status-and-rows',
+		title: 'Status words and row menus',
+		mount: statusAndRowsFixture
 	}),
 	Object.freeze({ id: 'brand-lockup', title: 'Brand lockup', mount: brandLockupFixture }),
 	Object.freeze({

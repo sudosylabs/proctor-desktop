@@ -2,7 +2,7 @@
 	.prctr-area-rail {
 		align-items: center;
 		box-sizing: border-box;
-		color: var(--prctr-color-text-secondary);
+		color: var(--prctr-color-frame-item);
 		display: flex;
 		flex-direction: column;
 		font-family: var(--prctr-typography-font-application);

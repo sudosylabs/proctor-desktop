@@ -2,7 +2,12 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-export type AdminTone = 'ok' | 'warn' | 'fail' | 'neutral' | 'busy';
+/**
+ * What an Administration status means, as the status badge shows it: red when something went
+ * wrong, amber when it waits on you or lapses soon, grey for everything else. Administration
+ * never shows green: a safeguard is green only on your own account.
+ */
+export type AdminTone = 'failure' | 'attention' | 'neutral';
 
 /** How one Administration table column behaves as the table narrows. */
 export interface AdminColumnLayout {

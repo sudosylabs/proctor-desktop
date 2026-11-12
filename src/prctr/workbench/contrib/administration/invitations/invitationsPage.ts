@@ -26,8 +26,7 @@ import {
 	AdminList,
 	type AdminListItem,
 	type AdminCell,
-	type AdminListQuery,
-	type AdminTone
+	type AdminListQuery
 } from '../widgets/adminList.js';
 import { readOnce } from '../widgets/adminReads.js';
 import { InviteDialog } from './inviteDialog.js';
@@ -241,15 +240,18 @@ export class InvitationsPage extends Disposable implements PageView {
 			(invitation.delivery?.state === 'failed' ||
 				invitation.delivery?.state === 'suppressed');
 		if (failed)
-			return { kind: 'status', text: this.format.text('invitationBounced'), tone: 'fail' };
+			return { kind: 'status', text: this.format.text('invitationBounced'), tone: 'failure' };
 		if (invitation.state === 'pending')
 			return {
 				kind: 'status',
 				text: this.format.text(STATE_TEXT.pending),
-				tone: 'warn'
+				tone: 'neutral'
 			};
-		const tone: AdminTone = invitation.state === 'accepted' ? 'ok' : 'neutral';
-		return { kind: 'status', text: this.format.text(STATE_TEXT[invitation.state]), tone };
+		return {
+			kind: 'status',
+			text: this.format.text(STATE_TEXT[invitation.state]),
+			tone: 'neutral'
+		};
 	}
 
 	private actions(invitation: Invitation): readonly PageRowAction[] {

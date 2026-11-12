@@ -243,14 +243,7 @@ export class PagePane extends Disposable {
 				: [
 						createStatusBadge(this.status.ownerDocument, {
 							text: status.text,
-							tone:
-								status.tone === 'ok'
-									? 'success'
-									: status.tone === 'warn'
-										? 'warning'
-										: status.tone === 'fail'
-											? 'danger'
-											: 'neutral'
+							tone: status.tone
 						})
 					])
 		);

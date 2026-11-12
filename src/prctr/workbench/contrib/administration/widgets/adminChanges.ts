@@ -134,7 +134,6 @@ export class AdminConfirmation extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				icon: proctorIconFactory('action.close'),
 				label: this.format.text('cancel')
 			})
 		);
@@ -161,8 +160,7 @@ export class AdminConfirmation extends Disposable {
 		const icon = proctorIconFactory(this.options.confirmIcon);
 		this.cancel.setState({
 			label: this.format.text('cancel'),
-			disabled: working,
-			icon: proctorIconFactory('action.close')
+			disabled: working
 		});
 		this.confirm.setState({ label: this.options.confirmLabel, busy: working, icon });
 	}

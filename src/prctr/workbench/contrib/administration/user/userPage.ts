@@ -254,7 +254,7 @@ export class UserPage extends Disposable implements PageView {
 			...(this.photo.data === undefined ? {} : { photo: this.photo.data.dataUrl }),
 			status:
 				user.disabledAt === undefined
-					? { text: this.format.text('userActive'), tone: 'ok' }
+					? { text: this.format.text('userActive'), tone: 'neutral' }
 					: { text: this.format.text('userDisabled'), tone: 'neutral' }
 		});
 		const none = this.format.text('userNone');
@@ -275,11 +275,11 @@ export class UserPage extends Disposable implements PageView {
 								user.emailVerified === true
 									? {
 											text: this.format.text('userEmailVerified'),
-											tone: 'ok' as const
+											tone: 'neutral' as const
 										}
 									: {
 											text: this.format.text('userEmailUnverified'),
-											tone: 'warn' as const
+											tone: 'attention' as const
 										}
 						})
 			},
@@ -487,9 +487,9 @@ export class UserPage extends Disposable implements PageView {
 	private periodStatus(start: number, end: number | undefined): PageRowModel['status'] {
 		const now = this.format.now();
 		if (end !== undefined && end <= now)
-			return { text: this.format.text('userEnded'), tone: 'quiet' };
-		if (start > now) return { text: this.format.text('userUpcoming'), tone: 'quiet' };
-		return { text: this.format.text('userCurrent'), tone: 'success' };
+			return { text: this.format.text('userEnded'), tone: 'neutral' };
+		if (start > now) return { text: this.format.text('userUpcoming'), tone: 'neutral' };
+		return { text: this.format.text('userCurrent'), tone: 'neutral' };
 	}
 
 	private scopeName(type: string, id: string): string {

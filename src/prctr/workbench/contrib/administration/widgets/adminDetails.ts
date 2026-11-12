@@ -3,7 +3,10 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
-import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge.js';
+import {
+	createStatusBadge,
+	type StatusBadgeTone
+} from '../../../../base/browser/ui/badge/statusBadge.js';
 import './media/adminDetails.css';
 
 export interface AdminDetail {
@@ -12,7 +15,7 @@ export interface AdminDetail {
 	/** The value is missing, shown in the quiet colour. */
 	readonly empty?: boolean;
 	/** A badge after the value, such as Verified. */
-	readonly note?: { readonly text: string; readonly tone: 'ok' | 'warn' | 'neutral' };
+	readonly note?: { readonly text: string; readonly tone: StatusBadgeTone };
 }
 
 /** Replaces `host`'s content with a list of labelled values, one per line. */
@@ -39,12 +42,7 @@ export function renderDetails(host: HTMLElement, details: readonly AdminDetail[]
 									{},
 									createStatusBadge(host.ownerDocument, {
 										text: detail.note.text,
-										tone:
-											detail.note.tone === 'ok'
-												? 'success'
-												: detail.note.tone === 'warn'
-													? 'warning'
-													: 'neutral'
+										tone: detail.note.tone
 									})
 								)
 							])

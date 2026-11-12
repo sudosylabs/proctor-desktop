@@ -39,12 +39,12 @@ const WORKING_REFRESH_MS = 3_000;
 const ATTEMPT_STATE: Readonly<
 	Record<AttemptState, { readonly text: AdministrationText; readonly tone: AdminTone }>
 > = {
-	running: { text: 'attemptRunning', tone: 'busy' },
-	succeeded: { text: 'attemptSucceeded', tone: 'ok' },
-	failed: { text: 'attemptFailed', tone: 'fail' },
+	running: { text: 'attemptRunning', tone: 'neutral' },
+	succeeded: { text: 'attemptSucceeded', tone: 'neutral' },
+	failed: { text: 'attemptFailed', tone: 'failure' },
 	canceled: { text: 'attemptCanceled', tone: 'neutral' },
-	lease_expired: { text: 'attemptLeaseExpired', tone: 'warn' },
-	incompatible: { text: 'attemptIncompatible', tone: 'warn' }
+	lease_expired: { text: 'attemptLeaseExpired', tone: 'attention' },
+	incompatible: { text: 'attemptIncompatible', tone: 'attention' }
 };
 
 /**
@@ -78,8 +78,7 @@ export class JobPage extends Disposable implements PageView {
 		this.cancel = this._register(
 			new ButtonControl(headerActions, {
 				variant: 'secondary',
-				label: format.text('jobsCancelShort'),
-				icon: proctorIconFactory('action.close')
+				label: format.text('jobsCancelShort')
 			})
 		);
 		this.retry = this._register(
@@ -236,7 +235,7 @@ export class JobPage extends Disposable implements PageView {
 			trail,
 			status: {
 				text: this.format.text(state.text),
-				tone: state.tone === 'busy' ? 'neutral' : state.tone
+				tone: state.tone
 			}
 		});
 		const none = this.format.text('jobNone');

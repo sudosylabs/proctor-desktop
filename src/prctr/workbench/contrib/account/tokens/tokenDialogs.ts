@@ -35,7 +35,6 @@ import { PageDialog } from '../../../browser/authenticated/pages/pageDialog.js';
 import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
 import './media/tokenDialogs.css';
 
-const CANCEL_ICON = proctorIconFactory('action.close');
 const SELECT_CARET = proctorIconFactory('action.expand', 14);
 const CREATE_ICON = proctorIconFactory('action.add');
 
@@ -177,8 +176,7 @@ export class NewTokenDialog extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				label: this.format.text('cancel'),
-				icon: CANCEL_ICON
+				label: this.format.text('cancel')
 			})
 		);
 		this.create = this._register(
@@ -417,7 +415,6 @@ export class NewTokenDialog extends Disposable {
 		this.expiry.disabled = working;
 		this.cancel.setState({
 			label: this.format.text('cancel'),
-			icon: CANCEL_ICON,
 			disabled: working
 		});
 		this.create.setState({

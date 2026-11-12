@@ -176,7 +176,11 @@ export class UsersPage extends Disposable implements PageView {
 						label: format.text('usersColumnStatus'),
 						cell: (user) =>
 							user.disabledAt === undefined
-								? { kind: 'status', text: format.text('userActive'), tone: 'ok' }
+								? {
+										kind: 'status',
+										text: format.text('userActive'),
+										tone: 'neutral'
+									}
 								: {
 										kind: 'status',
 										text: format.text('userDisabled'),

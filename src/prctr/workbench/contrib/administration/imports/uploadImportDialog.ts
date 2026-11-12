@@ -142,8 +142,7 @@ export class UploadImportDialog extends Disposable {
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
 				variant: 'secondary',
-				label: format.text('cancel'),
-				icon: proctorIconFactory('action.close')
+				label: format.text('cancel')
 			})
 		);
 		this._register(this.cancel.onDidRequest(() => this.close()));

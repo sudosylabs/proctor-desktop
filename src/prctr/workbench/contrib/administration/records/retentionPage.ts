@@ -197,7 +197,7 @@ export class RetentionPage extends Disposable implements PageView {
 										? {
 												kind: 'status',
 												text: format.text('retentionHeld'),
-												tone: 'warn'
+												tone: 'neutral'
 											}
 										: record.eligibleAt !== undefined
 											? {
