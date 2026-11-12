@@ -501,7 +501,12 @@ export class HistoryPage extends Disposable implements PageView {
 				textContent: client ?? entry.ipAddress ?? this.format.text('historyWhereUnknown')
 			})
 		);
-		if (client !== undefined && entry.ipAddress !== undefined)
+		// Only a sign-in shows the address it came from; other rows name the app.
+		if (
+			client !== undefined &&
+			entry.ipAddress !== undefined &&
+			entry.event.startsWith('sign_in')
+		)
 			where.append(
 				$('span.prctr-account-history__address', { textContent: entry.ipAddress })
 			);

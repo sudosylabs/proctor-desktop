@@ -832,9 +832,10 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	}
 
 	private updateFoot(): void {
-		this.hint.hidden = this.wrap.dataset.overflow !== 'true';
-		this.foot.hidden =
-			this.wrap.hidden || (this.range.hidden && this.steps.hidden && this.hint.hidden);
+		this.hint.hidden = this.wrap.hidden || this.wrap.dataset.overflow !== 'true';
+		// A page whose rows are all hidden, as reads under Changes only, still offers Next.
+		const rows = this.items.length > 0;
+		this.foot.hidden = !rows || (this.range.hidden && this.steps.hidden && this.hint.hidden);
 	}
 
 	private updatePageAll(): void {

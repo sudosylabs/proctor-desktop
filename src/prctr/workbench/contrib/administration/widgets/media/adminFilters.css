@@ -15,9 +15,9 @@
 		box-sizing: border-box;
 		color: var(--prctr-color-text-tertiary);
 		display: flex;
-		flex: 0 1 320px;
+		flex: 0 1 260px;
 		gap: 8px;
-		min-inline-size: 200px;
+		min-inline-size: 180px;
 		padding: 0 12px;
 	}
 	.prctr-admin-filters .prctr-admin-filters__find:focus-within {
