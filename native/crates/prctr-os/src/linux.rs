@@ -69,6 +69,68 @@ pub fn connected_displays_in(root: &Path) -> Result<RawTopology, OsError> {
     })
 }
 
+/// The current logind session from `/run/systemd/sessions`, without D-Bus. The lock state is not
+/// in these files, so it is unknown.
+#[must_use]
+pub fn session() -> crate::RawSession {
+    session_in(
+        Path::new("/proc/self/cgroup"),
+        Path::new("/run/systemd/sessions"),
+    )
+}
+
+fn session_fields(path: &Path) -> Option<std::collections::BTreeMap<String, String>> {
+    let text = fs::read_to_string(path).ok()?;
+    Some(
+        text.lines()
+            .filter_map(|line| line.split_once('='))
+            .map(|(key, value)| (key.to_owned(), value.to_owned()))
+            .collect(),
+    )
+}
+
+/// [`session`] against any cgroup file and sessions directory, for tests.
+#[must_use]
+pub fn session_in(cgroup: &Path, sessions: &Path) -> crate::RawSession {
+    let own = fs::read_to_string(cgroup).ok().and_then(|text| {
+        text.split('/').find_map(|part| {
+            part.trim()
+                .strip_prefix("session-")?
+                .strip_suffix(".scope")
+                .map(str::to_owned)
+        })
+    });
+    let Some(own) = own else {
+        return crate::RawSession::default();
+    };
+    let own_fields = session_fields(&sessions.join(&own));
+    let others = fs::read_dir(sessions).ok().map(|entries| {
+        let count = entries
+            .filter_map(Result::ok)
+            .filter(|entry| entry.file_name().to_string_lossy() != own)
+            .filter_map(|entry| session_fields(&entry.path()))
+            .filter(|fields| {
+                fields.get("CLASS").is_none_or(|class| class == "user")
+                    && fields
+                        .get("STATE")
+                        .is_some_and(|state| state == "active" || state == "online")
+            })
+            .take(1024)
+            .count();
+        u64::try_from(count).unwrap_or(u64::MAX)
+    });
+    crate::RawSession {
+        on_console: own_fields
+            .as_ref()
+            .map(|fields| fields.get("ACTIVE").is_some_and(|value| value == "1")),
+        locked: None,
+        remote: own_fields
+            .as_ref()
+            .map(|fields| fields.get("REMOTE").is_some_and(|value| value == "1")),
+        other_human_sessions: others,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

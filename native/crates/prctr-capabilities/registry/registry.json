@@ -264,6 +264,83 @@
         "title": "DisplaySummary",
         "type": "object"
       }
+    },
+    "interactive_session": {
+      "state": {
+        "$defs": {
+          "ConsoleOwner": {
+            "enum": [
+              "candidate",
+              "other_human",
+              "none",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "Coverage": {
+            "enum": [
+              "full_lifecycle",
+              "snapshot_only",
+              "unavailable"
+            ],
+            "type": "string"
+          },
+          "Lock": {
+            "enum": [
+              "unlocked",
+              "locked",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "RemoteAttachment": {
+            "enum": [
+              "absent",
+              "present",
+              "unknown"
+            ],
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "console_owner": {
+            "$ref": "#/$defs/ConsoleOwner"
+          },
+          "coverage": {
+            "$ref": "#/$defs/Coverage"
+          },
+          "lock": {
+            "$ref": "#/$defs/Lock"
+          },
+          "other_human_sessions": {
+            "description": "`None` when the platform cannot count other sessions.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "remote_attachment": {
+            "$ref": "#/$defs/RemoteAttachment"
+          }
+        },
+        "required": [
+          "coverage",
+          "console_owner",
+          "lock",
+          "remote_attachment"
+        ],
+        "title": "InteractiveSessionState",
+        "type": "object"
+      },
+      "summary": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      }
     }
   },
   "registry": {
@@ -328,6 +405,47 @@
           }
         },
         "rule_id": "baseline.window"
+      },
+      {
+        "capability": "interactive_session",
+        "mode": "enforce",
+        "phase": "both",
+        "reason": "interactive_session.single_session_required",
+        "requirement": {
+          "All": {
+            "conditions": [
+              {
+                "Compare": {
+                  "field": "interactive_session.console_owner",
+                  "op": "eq",
+                  "value": "candidate"
+                }
+              },
+              {
+                "Compare": {
+                  "field": "interactive_session.lock",
+                  "op": "eq",
+                  "value": "unlocked"
+                }
+              },
+              {
+                "Compare": {
+                  "field": "interactive_session.remote_attachment",
+                  "op": "eq",
+                  "value": "absent"
+                }
+              },
+              {
+                "Compare": {
+                  "field": "interactive_session.other_human_sessions",
+                  "op": "eq",
+                  "value": 0
+                }
+              }
+            ]
+          }
+        },
+        "rule_id": "baseline.session"
       }
     ],
     "capabilities": [
@@ -463,6 +581,52 @@
         ],
         "sensitive": false,
         "stability_ms": 1000
+      },
+      {
+        "app_conditions": false,
+        "categories": [],
+        "fields": [
+          {
+            "name": "interactive_session.console_owner",
+            "type": "symbol",
+            "values": [
+              "candidate",
+              "other_human",
+              "none",
+              "unknown"
+            ]
+          },
+          {
+            "name": "interactive_session.lock",
+            "type": "symbol",
+            "values": [
+              "unlocked",
+              "locked",
+              "unknown"
+            ]
+          },
+          {
+            "name": "interactive_session.remote_attachment",
+            "type": "symbol",
+            "values": [
+              "absent",
+              "present",
+              "unknown"
+            ]
+          },
+          {
+            "max": 1024,
+            "name": "interactive_session.other_human_sessions",
+            "type": "count"
+          }
+        ],
+        "id": "interactive_session",
+        "permission_prompt": false,
+        "reasons": [
+          "interactive_session.single_session_required"
+        ],
+        "sensitive": true,
+        "stability_ms": 2000
       }
     ]
   }

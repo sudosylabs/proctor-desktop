@@ -224,3 +224,130 @@ mod window {
 }
 
 pub use window::window;
+
+mod session {
+    use windows::Win32::System::RemoteDesktop::{
+        ProcessIdToSessionId, WTS_CONNECTSTATE_CLASS, WTS_CURRENT_SERVER_HANDLE, WTS_INFO_CLASS,
+        WTS_SESSION_INFOW, WTS_SESSIONSTATE_LOCK, WTS_SESSIONSTATE_UNLOCK, WTSActive,
+        WTSDisconnected, WTSEnumerateSessionsW, WTSFreeMemory, WTSGetActiveConsoleSessionId,
+        WTSINFOEXW, WTSQuerySessionInformationW, WTSSessionInfoEx, WTSUserName,
+    };
+    use windows::Win32::System::Threading::GetCurrentProcessId;
+    use windows::Win32::UI::WindowsAndMessaging::{GetSystemMetrics, SM_REMOTESESSION};
+    use windows::core::PWSTR;
+
+    use crate::RawSession;
+
+    /// `WTSGetActiveConsoleSessionId` when no session is attached to the console.
+    const NO_CONSOLE: u32 = 0xFFFF_FFFF;
+    const MAX_SESSIONS: u32 = 1024;
+
+    /// Queries one information class and hands the buffer to `read` before freeing it.
+    fn query<T>(
+        session: u32,
+        class: WTS_INFO_CLASS,
+        read: impl FnOnce(*const u8, u32) -> T,
+    ) -> Option<T> {
+        let mut buffer = PWSTR::null();
+        let mut bytes = 0_u32;
+        // SAFETY: `buffer` and `bytes` are valid out-parameters; on success WTS allocates the buffer.
+        unsafe {
+            WTSQuerySessionInformationW(
+                Some(WTS_CURRENT_SERVER_HANDLE),
+                session,
+                class,
+                &raw mut buffer,
+                &raw mut bytes,
+            )
+        }
+        .ok()?;
+        let result = read(buffer.0.cast::<u8>().cast_const(), bytes);
+        // SAFETY: `buffer` was allocated by WTS for this call and is freed exactly once.
+        unsafe { WTSFreeMemory(buffer.0.cast()) };
+        Some(result)
+    }
+
+    fn locked(session: u32) -> Option<bool> {
+        query(session, WTSSessionInfoEx, |buffer, bytes| {
+            if buffer.is_null() || (bytes as usize) < size_of::<WTSINFOEXW>() {
+                return None;
+            }
+            // SAFETY: WTS returned at least one `WTSINFOEXW`; level 1 is the only defined level.
+            let info = unsafe { buffer.cast::<WTSINFOEXW>().read_unaligned() };
+            if info.Level != 1 {
+                return None;
+            }
+            // SAFETY: level 1 selects the `WTSInfoExLevel1` member of the union.
+            let flags = unsafe { info.Data.WTSInfoExLevel1.SessionFlags };
+            match u32::try_from(flags).ok()? {
+                WTS_SESSIONSTATE_LOCK => Some(true),
+                WTS_SESSIONSTATE_UNLOCK => Some(false),
+                _ => None,
+            }
+        })
+        .flatten()
+    }
+
+    fn has_user(session: u32) -> bool {
+        query(session, WTSUserName, |buffer, bytes| {
+            !buffer.is_null() && bytes > 2
+        })
+        .unwrap_or(false)
+    }
+
+    fn other_human_sessions(own: u32) -> Option<u64> {
+        let mut sessions: *mut WTS_SESSION_INFOW = std::ptr::null_mut();
+        let mut count = 0_u32;
+        // SAFETY: `sessions` and `count` are valid out-parameters; on success WTS allocates the array.
+        unsafe {
+            WTSEnumerateSessionsW(
+                Some(WTS_CURRENT_SERVER_HANDLE),
+                0,
+                1,
+                &raw mut sessions,
+                &raw mut count,
+            )
+        }
+        .ok()?;
+        let mut others = 0_u64;
+        for index in 0..count.min(MAX_SESSIONS) as usize {
+            // SAFETY: `index` is below `count`, the number of entries WTS allocated.
+            let entry = unsafe { sessions.add(index) };
+            // SAFETY: `entry` points at an initialised element of the WTS array.
+            let info = unsafe { &*entry };
+            let state: WTS_CONNECTSTATE_CLASS = info.State;
+            let human = (state == WTSActive || state == WTSDisconnected) && info.SessionId != own;
+            if human && has_user(info.SessionId) {
+                others += 1;
+            }
+        }
+        // SAFETY: `sessions` was allocated by WTS for this call and is freed exactly once.
+        unsafe { WTSFreeMemory(sessions.cast()) };
+        Some(others)
+    }
+
+    /// The current session from WTS: console ownership, lock, remote use, and other human sessions.
+    #[must_use]
+    pub fn session() -> RawSession {
+        let mut own = 0_u32;
+        // SAFETY: `GetCurrentProcessId` has no preconditions.
+        let process = unsafe { GetCurrentProcessId() };
+        // SAFETY: `own` is a valid out-parameter.
+        let known = unsafe { ProcessIdToSessionId(process, &raw mut own) }.is_ok();
+        if !known {
+            return RawSession::default();
+        }
+        // SAFETY: no preconditions.
+        let console = unsafe { WTSGetActiveConsoleSessionId() };
+        // SAFETY: no preconditions.
+        let remote = unsafe { GetSystemMetrics(SM_REMOTESESSION) } != 0;
+        RawSession {
+            on_console: (console != NO_CONSOLE).then_some(console == own),
+            locked: locked(own),
+            remote: Some(remote),
+            other_human_sessions: other_human_sessions(own),
+        }
+    }
+}
+
+pub use session::session;

@@ -120,3 +120,16 @@ pub struct RawWindow {
     /// assistive overlays.
     pub covering: Vec<Rect>,
 }
+
+/// The candidate's interactive session as the OS reports it without privileged components.
+/// `None` means the platform cannot tell. No account name or session identity leaves here.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct RawSession {
+    /// `Some(true)` when this process's session owns the physical console.
+    pub on_console: Option<bool>,
+    pub locked: Option<bool>,
+    /// The session is being used or viewed remotely.
+    pub remote: Option<bool>,
+    /// Other human login sessions, active or disconnected.
+    pub other_human_sessions: Option<u64>,
+}

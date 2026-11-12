@@ -4,6 +4,7 @@
 
 pub mod candidate_window;
 pub mod display;
+pub mod interactive_session;
 
 use prctr_core::{Registry, Source};
 use serde_json::{Value, json};
@@ -14,6 +15,7 @@ pub fn sources() -> Vec<Box<dyn Source>> {
     vec![
         Box::new(display::DisplaySource::new()),
         Box::new(candidate_window::CandidateWindowSource::new()),
+        Box::new(interactive_session::InteractiveSessionSource::new()),
     ]
 }
 
@@ -21,8 +23,16 @@ pub fn sources() -> Vec<Box<dyn Source>> {
 #[must_use]
 pub fn registry() -> Registry {
     Registry {
-        capabilities: vec![display::descriptor(), candidate_window::descriptor()],
-        baseline_rules: vec![display::baseline_rule(), candidate_window::baseline_rule()],
+        capabilities: vec![
+            display::descriptor(),
+            candidate_window::descriptor(),
+            interactive_session::descriptor(),
+        ],
+        baseline_rules: vec![
+            display::baseline_rule(),
+            candidate_window::baseline_rule(),
+            interactive_session::baseline_rule(),
+        ],
     }
 }
 
@@ -40,6 +50,10 @@ pub fn registry_json() -> Value {
             },
             candidate_window::CAPABILITY: {
                 "state": schema(schemars::schema_for!(candidate_window::CandidateWindowState)),
+                "summary": { "type": "object", "additionalProperties": false, "properties": {} },
+            },
+            interactive_session::CAPABILITY: {
+                "state": schema(schemars::schema_for!(interactive_session::InteractiveSessionState)),
                 "summary": { "type": "object", "additionalProperties": false, "properties": {} },
             }
         }

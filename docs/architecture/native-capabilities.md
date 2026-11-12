@@ -31,10 +31,18 @@ tests prove each fact there.
 
 Implemented in source: the protocol, core, rule evaluator and conformance vectors; the agent and
 Electron main's connection and service, tested end to end against the real binary; and display
-topology and the candidate window on Windows, macOS and Linux. Their real-OS tests run on macOS
-(the candidate-window read-back is proved against another process's window). On macOS an
-external display is still reported unclassified (partial certainty) until the `IORegistry`
-transport classification is proved, so the baseline is unknown there whenever one is connected.
+topology, the candidate window and the unprivileged interactive session on Windows, macOS and
+Linux. Their real-OS tests run on macOS (the candidate-window read-back is proved against another
+process's window).
+
+Known limits:
+
+- On macOS an external display is still reported unclassified (partial certainty) until the
+  `IORegistry` transport classification is proved, so the display baseline is unknown there
+  whenever one is connected.
+- The interactive session reports `snapshot_only` coverage, so `baseline.session` stays unknown
+  until the privileged components exist.
+
 The other capabilities, the privileged components and the recorder are not implemented yet.
 
 ## Processes and ownership

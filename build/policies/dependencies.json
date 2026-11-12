@@ -513,15 +513,6 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
-          "manifest": "native/crates/removable-storage-state/Cargo.toml",
-          "alias": "libc",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"macos\")"
-        },
-        {
           "manifest": "native/crates/network-configuration-state/Cargo.toml",
           "alias": "libc",
           "kind": "production",
@@ -531,7 +522,25 @@
           "targetScope": "cfg(target_os=\"macos\")"
         },
         {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "libc",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        },
+        {
           "manifest": "native/crates/process-application-state/Cargo.toml",
+          "alias": "libc",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": "cfg(target_os=\"macos\")"
+        },
+        {
+          "manifest": "native/crates/removable-storage-state/Cargo.toml",
           "alias": "libc",
           "kind": "production",
           "features": [],
@@ -540,7 +549,7 @@
           "targetScope": "cfg(target_os=\"macos\")"
         }
       ],
-      "processes": ["exam-security-utility", "native-security-helper"],
+      "processes": ["exam-security-utility", "native-security-helper", "native-agent"],
       "networkBehavior": "None; the crate exposes platform C declarations only.",
       "nativeBehavior": "Links macOS system APIs already provided by the operating system and ships no helper or bundled native library.",
       "transitiveRisk": "No additional transitive runtime graph; the exact version is already locked by the native workspace.",
@@ -638,6 +647,7 @@
             "CGDisplayConfiguration",
             "CGError",
             "CGGeometry",
+            "CGSession",
             "CGWindow",
             "libc",
             "std"
@@ -676,6 +686,8 @@
             "Win32_Foundation",
             "Win32_Graphics_Dwm",
             "Win32_Graphics_Gdi",
+            "Win32_System_RemoteDesktop",
+            "Win32_System_Threading",
             "Win32_UI_WindowsAndMessaging",
             "std"
           ],

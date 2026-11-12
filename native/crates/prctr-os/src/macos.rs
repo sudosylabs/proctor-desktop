@@ -246,3 +246,98 @@ mod window {
 }
 
 pub use window::window;
+
+mod session {
+    use std::ffi::CStr;
+
+    use objc2_core_foundation::{CFBoolean, CFDictionary, CFString, CFType};
+    use objc2_core_graphics::CGSessionCopyCurrentDictionary;
+
+    use crate::RawSession;
+
+    /// `kCGSessionOnConsoleKey` and the screen-lock key, which CoreGraphics defines only as strings.
+    const ON_CONSOLE: &str = "kCGSSessionOnConsoleKey";
+    const SCREEN_LOCKED: &str = "CGSSessionScreenIsLocked";
+    /// `USER_PROCESS` in `utmpx`.
+    const USER_PROCESS: i16 = 7;
+
+    fn boolean(dictionary: &CFDictionary, key: &'static str) -> Option<bool> {
+        let key = CFString::from_static_str(key);
+        let key_pointer: *const std::ffi::c_void = std::ptr::from_ref::<CFString>(&key).cast();
+        // SAFETY: the session dictionary uses CFString keys; the value is owned by the dictionary
+        // and stays valid while it is borrowed.
+        let value = unsafe { dictionary.value(key_pointer) };
+        if value.is_null() {
+            return None;
+        }
+        // SAFETY: dictionary values are CoreFoundation objects.
+        let object = unsafe { &*value.cast::<CFType>() };
+        object.downcast_ref::<CFBoolean>().map(CFBoolean::as_bool)
+    }
+
+    /// Other users with a login session (`utmpx` user processes), not counting this user.
+    fn other_users() -> Option<u64> {
+        // SAFETY: `getuid` has no preconditions.
+        let uid = unsafe { libc::getuid() };
+        // SAFETY: `getpwuid` returns null or a pointer to a static record valid until the next call
+        // on this thread; it is read immediately.
+        let account = unsafe { libc::getpwuid(uid) };
+        if account.is_null() {
+            return None;
+        }
+        // SAFETY: a non-null record from `getpwuid` is valid to read.
+        let name = unsafe { (*account).pw_name };
+        // SAFETY: `pw_name` of a valid record is a NUL-terminated string.
+        let own = unsafe { CStr::from_ptr(name) }.to_bytes().to_vec();
+        let mut others = std::collections::BTreeSet::new();
+        // SAFETY: `setutxent` rewinds the process-wide utmpx cursor; no other code here uses it.
+        unsafe { libc::setutxent() };
+        loop {
+            // SAFETY: `getutxent` returns null at the end or a pointer valid until the next call.
+            let entry = unsafe { libc::getutxent() };
+            if entry.is_null() {
+                break;
+            }
+            // SAFETY: a non-null entry is a valid `utmpx` record.
+            let record = unsafe { &*entry };
+            if record.ut_type != USER_PROCESS {
+                continue;
+            }
+            let name: Vec<u8> = record
+                .ut_user
+                .iter()
+                .take_while(|byte| **byte != 0)
+                .map(|byte| byte.to_ne_bytes()[0])
+                .collect();
+            if !name.is_empty() && name != own {
+                others.insert(name);
+            }
+            if others.len() > 1024 {
+                break;
+            }
+        }
+        // SAFETY: closes the cursor opened above.
+        unsafe { libc::endutxent() };
+        u64::try_from(others.len()).ok()
+    }
+
+    /// The current session from the window server, plus other logged-in users from `utmpx`.
+    /// Remote viewing is not visible without the Endpoint Security extension.
+    #[must_use]
+    pub fn session() -> RawSession {
+        let Some(dictionary) = CGSessionCopyCurrentDictionary() else {
+            return RawSession {
+                on_console: Some(false),
+                ..RawSession::default()
+            };
+        };
+        RawSession {
+            on_console: boolean(&dictionary, ON_CONSOLE),
+            locked: Some(boolean(&dictionary, SCREEN_LOCKED).unwrap_or(false)),
+            remote: None,
+            other_human_sessions: other_users(),
+        }
+    }
+}
+
+pub use session::session;

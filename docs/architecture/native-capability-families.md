@@ -131,6 +131,18 @@ owners are never read.
 **Purpose.** The candidate's local session must be the only human session, unlocked, and not
 viewed or controlled remotely. It also holds the remote-viewing fact.
 
+**Unprivileged coverage.** Without the privileged components every platform reports
+`snapshot_only` coverage with partial certainty, so `baseline.session` (console owned by the
+candidate, unlocked, no remote attachment, no other human session) is unknown until they exist.
+What each platform reads without privilege:
+
+- **macOS:** console and lock from the window-server session; other users from `utmpx`; remote
+  attachment unknown.
+- **Windows:** console, lock and remote use from WTS; other active or disconnected human sessions.
+- **Linux:** logind session files; lock unknown.
+
+A count the platform cannot read is left out, never reported as zero.
+
 **State.** `coverage` (full_lifecycle, snapshot_only, unavailable), `certainty`, `console_owner`
 (candidate, other_human, none, unknown), `lock` (unlocked, locked, unknown), `remote_attachment`
 (absent, present, unknown: RDP into this session, screen sharing, remote management),
