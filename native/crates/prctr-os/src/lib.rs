@@ -266,3 +266,60 @@ pub fn fingerprint(bytes: &[u8]) -> u64 {
     bytes.hash(&mut hasher);
     hasher.finish()
 }
+
+/// What kind of removable storage a device is.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum RawStorageKind {
+    /// A block device the OS can mount: USB sticks, external disks, SD cards.
+    Block,
+    /// A phone or camera that exposes files over MTP/PTP rather than as a disk.
+    Portable,
+}
+
+/// How a removable device is attached, as far as the OS states it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum RawTransport {
+    Usb,
+    Thunderbolt,
+    Sd,
+    Other,
+    Unknown,
+}
+
+/// One removable or external storage device. `key` is a process-local hash of the OS device name,
+/// so a device keeps its identity between reads; names, labels, serials and contents are never
+/// read or kept.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct RawStorageDevice {
+    pub key: u64,
+    pub kind: RawStorageKind,
+    pub transport: RawTransport,
+    /// Whether a file system on the device is mounted; `None` when the OS does not say.
+    pub mounted: Option<bool>,
+    /// Whether the media accepts writes; `None` when the OS does not say.
+    pub writable: Option<bool>,
+}
+
+/// The whole-disk name of a BSD device path: `/dev/disk4s1` and `disk4` are both `disk4`.
+#[must_use]
+pub fn whole_disk(path: &str) -> Option<String> {
+    let name = path.strip_prefix("/dev/").unwrap_or(path);
+    let number = name.strip_prefix("disk")?;
+    let digits = number.bytes().take_while(u8::is_ascii_digit).count();
+    (digits > 0).then(|| format!("disk{}", &number[..digits]))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::whole_disk;
+
+    #[test]
+    fn a_partition_path_names_its_whole_disk() {
+        assert_eq!(whole_disk("/dev/disk4s1").as_deref(), Some("disk4"));
+        assert_eq!(whole_disk("/dev/disk12s2s1").as_deref(), Some("disk12"));
+        assert_eq!(whole_disk("disk3").as_deref(), Some("disk3"));
+        assert_eq!(whole_disk("/dev/disk"), None);
+        assert_eq!(whole_disk("map auto_home"), None);
+        assert_eq!(whole_disk("devfs"), None);
+    }
+}

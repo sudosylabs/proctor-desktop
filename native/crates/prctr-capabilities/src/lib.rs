@@ -8,6 +8,7 @@ pub mod display;
 pub mod interactive_session;
 pub mod network;
 mod poller;
+pub mod removable_storage;
 pub mod virtualization;
 
 use prctr_core::{Registry, Source};
@@ -23,6 +24,7 @@ pub fn sources() -> Vec<Box<dyn Source>> {
         Box::new(clipboard::ClipboardSource::new()),
         Box::new(virtualization::VirtualizationSource),
         Box::new(network::NetworkSource::new()),
+        Box::new(removable_storage::RemovableStorageSource::new()),
     ]
 }
 
@@ -37,6 +39,7 @@ pub fn registry() -> Registry {
             clipboard::descriptor(),
             virtualization::descriptor(),
             network::descriptor(),
+            removable_storage::descriptor(),
         ],
         baseline_rules: vec![
             display::baseline_rule(),
@@ -77,6 +80,10 @@ pub fn registry_json() -> Value {
             network::CAPABILITY: {
                 "state": schema(schemars::schema_for!(network::NetworkState)),
                 "summary": schema(schemars::schema_for!(network::NetworkSummary)),
+            },
+            removable_storage::CAPABILITY: {
+                "state": schema(schemars::schema_for!(removable_storage::StorageState)),
+                "summary": schema(schemars::schema_for!(removable_storage::StorageSummary)),
             }
         }
     })

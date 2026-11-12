@@ -521,3 +521,204 @@ mod network {
 }
 
 pub use network::{managed_vpn, route_fingerprint, system_proxy, tunnels};
+
+mod storage {
+    use std::collections::BTreeSet;
+    use std::ffi::c_void;
+
+    use windows::Win32::Devices::DeviceAndDriverInstallation::{
+        DIGCF_PRESENT, GUID_DEVCLASS_WPD, SP_DEVINFO_DATA, SetupDiDestroyDeviceInfoList,
+        SetupDiEnumDeviceInfo, SetupDiGetClassDevsW, SetupDiGetDeviceInstanceIdW,
+    };
+    use windows::Win32::Foundation::{
+        CloseHandle, ERROR_NO_MEDIA_IN_DRIVE, ERROR_NOT_READY, ERROR_WRITE_PROTECT, HANDLE,
+    };
+    use windows::Win32::Storage::FileSystem::{
+        BusTypeMmc, BusTypeSd, BusTypeUsb, CreateFileW, FILE_FLAGS_AND_ATTRIBUTES, FILE_SHARE_READ,
+        FILE_SHARE_WRITE, GetLogicalDrives, OPEN_EXISTING,
+    };
+    use windows::Win32::System::IO::DeviceIoControl;
+    use windows::Win32::System::Ioctl::{
+        IOCTL_DISK_IS_WRITABLE, IOCTL_STORAGE_CHECK_VERIFY2, IOCTL_STORAGE_GET_DEVICE_NUMBER,
+        IOCTL_STORAGE_QUERY_PROPERTY, PropertyStandardQuery, STORAGE_DEVICE_DESCRIPTOR,
+        STORAGE_DEVICE_NUMBER, STORAGE_PROPERTY_QUERY, StorageDeviceProperty,
+    };
+    use windows::core::{HSTRING, w};
+
+    use crate::{RawStorageDevice, RawStorageKind, RawTransport, fingerprint};
+
+    /// Physical drive numbers probed; Windows numbers attached disks densely from zero.
+    const MAX_DRIVES: u32 = 64;
+    const MAX_DEVICES: u32 = 256;
+
+    /// A device handle opened with no data access: enough for storage queries, never for reads.
+    struct Device(HANDLE);
+
+    impl Device {
+        fn open(path: &str) -> Option<Self> {
+            // SAFETY: the path is a valid wide string; zero access opens no data stream.
+            let handle = unsafe {
+                CreateFileW(
+                    &HSTRING::from(path),
+                    0,
+                    FILE_SHARE_READ | FILE_SHARE_WRITE,
+                    None,
+                    OPEN_EXISTING,
+                    FILE_FLAGS_AND_ATTRIBUTES(0),
+                    None,
+                )
+            };
+            handle.ok().map(Self)
+        }
+
+        fn control<T: Copy + Default>(
+            &self,
+            code: u32,
+            input: Option<&STORAGE_PROPERTY_QUERY>,
+        ) -> windows::core::Result<T> {
+            let mut output = T::default();
+            let mut returned = 0_u32;
+            let input_size = input.map_or(0, |_| size_of::<STORAGE_PROPERTY_QUERY>());
+            // SAFETY: the handle is open, the input (when present) and output point at live values
+            // of the stated sizes, and the call is synchronous.
+            unsafe {
+                DeviceIoControl(
+                    self.0,
+                    code,
+                    input.map(|query| std::ptr::from_ref(query).cast::<c_void>()),
+                    u32::try_from(input_size).unwrap_or(0),
+                    Some((&raw mut output).cast::<c_void>()),
+                    u32::try_from(size_of::<T>()).unwrap_or(0),
+                    Some(&raw mut returned),
+                    None,
+                )
+            }?;
+            Ok(output)
+        }
+
+        fn number(&self) -> Option<u32> {
+            self.control::<STORAGE_DEVICE_NUMBER>(IOCTL_STORAGE_GET_DEVICE_NUMBER, None)
+                .ok()
+                .map(|number| number.DeviceNumber)
+        }
+    }
+
+    impl Drop for Device {
+        fn drop(&mut self) {
+            // SAFETY: the handle was opened by `CreateFileW` and is closed exactly once.
+            let _ = unsafe { CloseHandle(self.0) };
+        }
+    }
+
+    /// The physical drive numbers that hold a mounted volume with a drive letter.
+    fn mounted_drives() -> BTreeSet<u32> {
+        // SAFETY: no arguments; returns a bit mask of drive letters.
+        let letters = unsafe { GetLogicalDrives() };
+        (0..26_u8)
+            .filter(|bit| letters & (1 << bit) != 0)
+            .filter_map(|bit| Device::open(&format!(r"\\.\{}:", char::from(b'A' + bit))))
+            .filter_map(|volume| volume.number())
+            .collect()
+    }
+
+    /// Removable or USB/SD-attached physical drives. A Thunderbolt disk reports its inner bus
+    /// (`NVMe`), so it is counted only when Windows marks its media removable.
+    #[must_use]
+    pub fn block_devices() -> Option<Vec<RawStorageDevice>> {
+        let mounted = mounted_drives();
+        let mut devices = Vec::new();
+        for drive in 0..MAX_DRIVES {
+            let Some(device) = Device::open(&format!(r"\\.\PhysicalDrive{drive}")) else {
+                continue;
+            };
+            let query = STORAGE_PROPERTY_QUERY {
+                PropertyId: StorageDeviceProperty,
+                QueryType: PropertyStandardQuery,
+                AdditionalParameters: [0],
+            };
+            let Ok(descriptor) = device
+                .control::<STORAGE_DEVICE_DESCRIPTOR>(IOCTL_STORAGE_QUERY_PROPERTY, Some(&query))
+            else {
+                continue;
+            };
+            let bus = descriptor.BusType;
+            let transport = if bus == BusTypeUsb {
+                RawTransport::Usb
+            } else if bus == BusTypeSd || bus == BusTypeMmc {
+                RawTransport::Sd
+            } else if descriptor.RemovableMedia {
+                RawTransport::Other
+            } else {
+                continue;
+            };
+            // An empty card reader is not a device until media is inserted.
+            if let Err(error) = device.control::<u32>(IOCTL_STORAGE_CHECK_VERIFY2, None) {
+                let code = error.code();
+                if code == ERROR_NOT_READY.to_hresult()
+                    || code == ERROR_NO_MEDIA_IN_DRIVE.to_hresult()
+                {
+                    continue;
+                }
+            }
+            let writable = match device.control::<u8>(IOCTL_DISK_IS_WRITABLE, None) {
+                Ok(_) => Some(true),
+                Err(error) if error.code() == ERROR_WRITE_PROTECT.to_hresult() => Some(false),
+                Err(_) => None,
+            };
+            devices.push(RawStorageDevice {
+                key: fingerprint(&drive.to_le_bytes()),
+                kind: RawStorageKind::Block,
+                transport,
+                mounted: Some(mounted.contains(&drive)),
+                writable,
+            });
+        }
+        devices.sort();
+        Some(devices)
+    }
+
+    /// Phones and cameras: Windows Portable Devices enumerated by the USB bus. A USB stick also
+    /// appears as a portable device, but through the software bus, so it is not counted twice.
+    #[must_use]
+    pub fn portable_devices() -> Option<Vec<RawStorageDevice>> {
+        // SAFETY: the class GUID is a constant and the enumerator a static wide string.
+        let set = unsafe {
+            SetupDiGetClassDevsW(Some(&GUID_DEVCLASS_WPD), w!("USB"), None, DIGCF_PRESENT)
+        }
+        .ok()?;
+        let mut devices = BTreeSet::new();
+        for index in 0..MAX_DEVICES {
+            let mut data = SP_DEVINFO_DATA {
+                cbSize: u32::try_from(size_of::<SP_DEVINFO_DATA>()).unwrap_or(0),
+                ..SP_DEVINFO_DATA::default()
+            };
+            // SAFETY: `set` is the live device set and `data` is sized for the call.
+            if unsafe { SetupDiEnumDeviceInfo(set, index, &raw mut data) }.is_err() {
+                break;
+            }
+            let mut id = [0_u16; 512];
+            // SAFETY: `data` was filled by the enumeration above and `id` is a writable buffer.
+            if unsafe { SetupDiGetDeviceInstanceIdW(set, &raw const data, Some(&mut id), None) }
+                .is_ok()
+            {
+                let length = id.iter().position(|unit| *unit == 0).unwrap_or(id.len());
+                let bytes: Vec<u8> = id[..length]
+                    .iter()
+                    .flat_map(|unit| unit.to_le_bytes())
+                    .collect();
+                devices.insert(RawStorageDevice {
+                    key: fingerprint(&bytes),
+                    kind: RawStorageKind::Portable,
+                    transport: RawTransport::Usb,
+                    mounted: None,
+                    writable: None,
+                });
+            }
+        }
+        // SAFETY: `set` was returned by `SetupDiGetClassDevsW` and is destroyed exactly once.
+        let _ = unsafe { SetupDiDestroyDeviceInfoList(set) };
+        Some(devices.into_iter().collect())
+    }
+}
+
+pub use storage::{block_devices, portable_devices};

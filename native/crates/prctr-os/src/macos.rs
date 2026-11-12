@@ -456,6 +456,223 @@ pub fn is_apple_hardware_model(model: &str) -> bool {
     })
 }
 
+mod storage {
+    use std::collections::BTreeMap;
+    use std::ffi::{CStr, c_char};
+
+    use objc2_core_foundation::{
+        CFBoolean, CFDictionary, CFNumber, CFNumberType, CFRetained, CFString, CFType,
+    };
+    use objc2_io_kit::{
+        IOIteratorNext, IOObjectConformsTo, IOObjectRelease, IORegistryEntryCreateCFProperty,
+        IORegistryEntryGetParentEntry, IORegistryEntrySearchCFProperty,
+        IOServiceGetMatchingServices, IOServiceMatching, io_object_t, kIOMainPortDefault,
+        kIORegistryIterateParents, kIORegistryIterateRecursively,
+    };
+
+    use crate::{RawStorageDevice, RawStorageKind, RawTransport, fingerprint};
+
+    const MAX_ENTRIES: usize = 512;
+    /// The USB interface class for still-image devices: phones and cameras (PTP, often with MTP).
+    const STILL_IMAGE_CLASS: f64 = 6.0;
+
+    /// An `IOKit` name buffer (`io_name_t`) holding `name`.
+    fn name_buffer(name: &CStr) -> [c_char; 128] {
+        let mut buffer = [0 as c_char; 128];
+        for (slot, byte) in buffer.iter_mut().zip(name.to_bytes().iter().take(127)) {
+            *slot = c_char::from_ne_bytes([*byte]);
+        }
+        buffer
+    }
+
+    /// Visits every registered service of `class`; each is released after `visit` returns.
+    fn each_service(class: &CStr, mut visit: impl FnMut(io_object_t)) -> Option<()> {
+        // SAFETY: `class` is a NUL-terminated IOKit class name.
+        let matching = unsafe { IOServiceMatching(class.as_ptr()) }?;
+        // The call consumes one reference: hand it a dictionary reference of its own.
+        let matching: CFRetained<CFDictionary> = CFRetained::from(&**matching);
+        let mut iterator: io_object_t = 0;
+        // SAFETY: the default main port is always valid, the call consumes the one `matching`
+        // reference it is given, and `iterator` is a valid out-parameter.
+        let status = unsafe {
+            IOServiceGetMatchingServices(kIOMainPortDefault, Some(matching), &raw mut iterator)
+        };
+        if status != 0 {
+            return None;
+        }
+        for _ in 0..MAX_ENTRIES {
+            let service = IOIteratorNext(iterator);
+            if service == 0 {
+                break;
+            }
+            visit(service);
+            IOObjectRelease(service);
+        }
+        IOObjectRelease(iterator);
+        Some(())
+    }
+
+    fn property(service: io_object_t, key: &str) -> Option<CFRetained<CFType>> {
+        let key = CFString::from_str(key);
+        // SAFETY: `service` is a live registry entry and `key` a valid CFString.
+        unsafe { IORegistryEntryCreateCFProperty(service, Some(&key), None, 0) }
+    }
+
+    /// Reads `key` from the entry or its nearest ancestor in the service plane.
+    fn inherited(service: io_object_t, key: &str) -> Option<CFRetained<CFType>> {
+        let key = CFString::from_str(key);
+        let mut plane = name_buffer(c"IOService");
+        // SAFETY: `service` is a live registry entry, `plane` names the service plane and stays
+        // alive for the call, and `key` is a valid CFString.
+        unsafe {
+            IORegistryEntrySearchCFProperty(
+                service,
+                (&raw mut plane).cast(),
+                Some(&key),
+                None,
+                kIORegistryIterateRecursively | kIORegistryIterateParents,
+            )
+        }
+    }
+
+    /// Whether the entry's provider is a block-storage driver: true for a physical disk, false for
+    /// a disk synthesized on top of another (an APFS container), which would count a device twice.
+    fn is_physical_disk(service: io_object_t) -> bool {
+        let mut plane = name_buffer(c"IOService");
+        let mut parent: io_object_t = 0;
+        // SAFETY: `service` is live, `plane` names the service plane, `parent` is a valid
+        // out-parameter.
+        let status = unsafe {
+            IORegistryEntryGetParentEntry(service, (&raw mut plane).cast(), &raw mut parent)
+        };
+        if status != 0 {
+            return false;
+        }
+        let mut class = name_buffer(c"IOBlockStorageDriver");
+        // SAFETY: `parent` is the live entry just returned and `class` is a NUL-terminated name.
+        let conforms = unsafe { IOObjectConformsTo(parent, (&raw mut class).cast()) };
+        IOObjectRelease(parent);
+        conforms
+    }
+
+    fn boolean(value: Option<CFRetained<CFType>>) -> Option<bool> {
+        value?.downcast_ref::<CFBoolean>().map(CFBoolean::as_bool)
+    }
+
+    fn text(value: Option<&CFType>) -> Option<String> {
+        value?.downcast_ref::<CFString>().map(ToString::to_string)
+    }
+
+    fn number(value: Option<CFRetained<CFType>>) -> Option<f64> {
+        let value = value?;
+        let number = value.downcast_ref::<CFNumber>()?;
+        let mut result = 0.0_f64;
+        // SAFETY: `result` is a valid `f64` for the double conversion CoreFoundation writes.
+        let converted = unsafe { number.value(CFNumberType::DoubleType, (&raw mut result).cast()) };
+        converted.then_some(result)
+    }
+
+    /// The whole-disk BSD names (`diskN`) that have a mounted file system.
+    fn mounted_disks() -> Vec<String> {
+        let mut table: *mut libc::statfs = std::ptr::null_mut();
+        // SAFETY: `table` is a valid out-parameter; the returned table belongs to libc.
+        let count = unsafe { libc::getmntinfo(&raw mut table, libc::MNT_NOWAIT) };
+        let count = usize::try_from(count).unwrap_or(0).min(MAX_ENTRIES);
+        if table.is_null() || count == 0 {
+            return Vec::new();
+        }
+        // SAFETY: `getmntinfo` returned `count` initialized entries starting at `table`.
+        let entries = unsafe { std::slice::from_raw_parts(table, count) };
+        entries
+            .iter()
+            .filter_map(|entry| {
+                // SAFETY: `f_mntfromname` is a NUL-terminated string within its array.
+                let source = unsafe { CStr::from_ptr(entry.f_mntfromname.as_ptr()) };
+                crate::whole_disk(&source.to_string_lossy())
+            })
+            .collect()
+    }
+
+    fn transport(interconnect: &str) -> RawTransport {
+        match interconnect {
+            "USB" => RawTransport::Usb,
+            "Thunderbolt" => RawTransport::Thunderbolt,
+            "Secure Digital" | "SD" | "SDXC" => RawTransport::Sd,
+            "" => RawTransport::Unknown,
+            _ => RawTransport::Other,
+        }
+    }
+
+    /// Whole removable or external disks, mounted or not. Disk images and disks synthesized on
+    /// another disk are not devices.
+    #[must_use]
+    pub fn block_devices() -> Option<Vec<RawStorageDevice>> {
+        let mounted = mounted_disks();
+        let mut devices = Vec::new();
+        each_service(c"IOMedia", |service| {
+            if boolean(property(service, "Whole")) != Some(true) || !is_physical_disk(service) {
+                return;
+            }
+            let characteristics = inherited(service, "Protocol Characteristics");
+            let characteristics = characteristics
+                .as_deref()
+                .and_then(|value| value.downcast_ref::<CFDictionary>());
+            let read = |key: &str| {
+                characteristics
+                    .and_then(|dictionary| {
+                        text(super::window::value(dictionary, &CFString::from_str(key)))
+                    })
+                    .unwrap_or_default()
+            };
+            let interconnect = read("Physical Interconnect");
+            if interconnect == "Virtual Interface" {
+                return;
+            }
+            let removable = boolean(property(service, "Removable")) == Some(true)
+                || boolean(property(service, "Ejectable")) == Some(true);
+            if !removable && read("Physical Interconnect Location") != "External" {
+                return;
+            }
+            let Some(name) = text(property(service, "BSD Name").as_deref()) else {
+                return;
+            };
+            devices.push(RawStorageDevice {
+                key: fingerprint(name.as_bytes()),
+                kind: RawStorageKind::Block,
+                transport: transport(&interconnect),
+                mounted: Some(mounted.contains(&name)),
+                writable: boolean(property(service, "Writable")),
+            });
+        })?;
+        devices.sort();
+        Some(devices)
+    }
+
+    /// Phones and cameras that expose a still-image USB interface. One device may expose several
+    /// interfaces; they share the device's location and count once.
+    #[must_use]
+    pub fn portable_devices() -> Option<Vec<RawStorageDevice>> {
+        let mut devices: BTreeMap<u64, RawStorageDevice> = BTreeMap::new();
+        each_service(c"IOUSBHostInterface", |service| {
+            if number(property(service, "bInterfaceClass")) != Some(STILL_IMAGE_CLASS) {
+                return;
+            }
+            let location = number(inherited(service, "locationID")).unwrap_or(0.0);
+            let key = fingerprint(&location.to_bits().to_le_bytes());
+            devices.entry(key).or_insert(RawStorageDevice {
+                key,
+                kind: RawStorageKind::Portable,
+                transport: RawTransport::Usb,
+                mounted: None,
+                writable: None,
+            });
+        })?;
+        Some(devices.into_values().collect())
+    }
+}
+
+pub use storage::{block_devices, portable_devices};
+
 #[cfg(test)]
 mod model_tests {
     use super::is_apple_hardware_model;

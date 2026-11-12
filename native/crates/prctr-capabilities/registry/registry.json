@@ -516,6 +516,131 @@
         "type": "object"
       }
     },
+    "removable_storage": {
+      "state": {
+        "$defs": {
+          "Coverage": {
+            "oneOf": [
+              {
+                "enum": [
+                  "unavailable"
+                ],
+                "type": "string"
+              },
+              {
+                "const": "block_and_portable",
+                "description": "Disks and portable devices are both read.",
+                "type": "string"
+              },
+              {
+                "const": "block_only",
+                "description": "Disks are read; this platform cannot read portable devices.",
+                "type": "string"
+              }
+            ]
+          },
+          "Device": {
+            "additionalProperties": false,
+            "description": "One attached device. `device_id` is opaque and stable within one agent session.",
+            "properties": {
+              "device_id": {
+                "type": "string"
+              },
+              "kind": {
+                "$ref": "#/$defs/Kind"
+              },
+              "mounted": {
+                "$ref": "#/$defs/Known",
+                "description": "Whether a file system on it is mounted. Unmounted storage still counts as attached."
+              },
+              "transport": {
+                "$ref": "#/$defs/Transport"
+              },
+              "writable": {
+                "$ref": "#/$defs/Known"
+              }
+            },
+            "required": [
+              "device_id",
+              "kind",
+              "transport",
+              "mounted",
+              "writable"
+            ],
+            "type": "object"
+          },
+          "Kind": {
+            "enum": [
+              "block_storage",
+              "portable_device"
+            ],
+            "type": "string"
+          },
+          "Known": {
+            "description": "A yes/no the OS may not state.",
+            "enum": [
+              "yes",
+              "no",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "Transport": {
+            "enum": [
+              "usb",
+              "thunderbolt",
+              "sd",
+              "other",
+              "unknown"
+            ],
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "coverage": {
+            "$ref": "#/$defs/Coverage"
+          },
+          "devices": {
+            "description": "At most [`MAX_DEVICES`], ordered by identity.",
+            "items": {
+              "$ref": "#/$defs/Device"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "coverage",
+          "devices"
+        ],
+        "title": "StorageState",
+        "type": "object"
+      },
+      "summary": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "description": "Device counts by kind, derived only from the read devices.",
+        "properties": {
+          "block_storage": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "portable_devices": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "block_storage",
+          "portable_devices"
+        ],
+        "title": "StorageSummary",
+        "type": "object"
+      }
+    },
     "virtualization": {
       "state": {
         "$defs": {
@@ -976,6 +1101,38 @@
         ],
         "sensitive": true,
         "stability_ms": 3000
+      },
+      {
+        "app_conditions": false,
+        "categories": [],
+        "fields": [
+          {
+            "name": "removable_storage.coverage",
+            "type": "symbol",
+            "values": [
+              "block_and_portable",
+              "block_only",
+              "unavailable"
+            ]
+          },
+          {
+            "max": 1024,
+            "name": "removable_storage.summary.block_storage",
+            "type": "count"
+          },
+          {
+            "max": 1024,
+            "name": "removable_storage.summary.portable_devices",
+            "type": "count"
+          }
+        ],
+        "id": "removable_storage",
+        "permission_prompt": false,
+        "reasons": [
+          "removable_storage.attached"
+        ],
+        "sensitive": true,
+        "stability_ms": 2000
       }
     ]
   }

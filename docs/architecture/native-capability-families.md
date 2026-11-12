@@ -250,25 +250,44 @@ the exam blocks the overview without creating an occurrence. Proctor never cance
 ## Removable and portable storage
 
 **Purpose.** Whether data-bearing storage is attached, mounted or not: USB drives, SD cards,
-external disks, and phones exposing file or photo transfer. Keyboards, mice, headsets, docks and
-hubs are not storage. Mounted disk images are not reported.
+external disks, and phones or cameras exposing file or photo transfer. Keyboards, mice, headsets,
+docks and hubs are not storage. Disk images and disks synthesized on another disk (APFS containers)
+are not reported. An empty card reader is not a device until media is inserted.
 
-**State.** `coverage` (block_and_portable, block_only, unavailable), `certainty`, `devices` (at most
-64), each with an Attempt-keyed pseudonym `device_id`, `kind` (block_storage, portable_device),
-`transport`, `mounted`, `writable`.
+**State.** `coverage` (block_and_portable, block_only, unavailable) and `devices` (at most 64,
+ordered by identity), each with an opaque per-session `device_id`, `kind` (block_storage,
+portable_device), `transport` (usb, thunderbolt, sd, other, unknown), `mounted` and `writable` (yes,
+no, unknown). A device that returns keeps its `device_id` for the rest of the agent session. The
+catalog asked for an Attempt-keyed pseudonym; the agent has no Attempt key yet, so identities are
+per agent session until main provides one.
 
-**Changes.** `storage_changed` with the complete new state.
+**Changes.** The new state on every change, reconciled every 2 seconds, with the change kinds
+`device_attached`, `device_removed` and `device_changed`.
 
-**Summary.** `block_storage`, `portable_devices`.
+**Summary.** `block_storage` and `portable_devices` count every device, including those beyond the
+listed 64. A kind the platform cannot read has no count, never zero: `block_only` coverage is partial
+certainty and leaves out the `portable_devices` field.
 
-**Platforms.** Windows: device-interface notifications for disks and portable devices, then bus type
-and removable flag. macOS: disk appeared/disappeared callbacks with the internal and protocol
-properties; phones through USB still-image (PTP/MTP) interface matching, to be proved with iPhone
-and Android devices. Linux: udev; partial where MTP rules are missing.
+**Platforms.**
 
-**Never leaves the agent.** Serials, vendor/model, volume names, mount paths, file contents. The
-pseudonym correlates one device within an Attempt and never across Attempts. Proctor never ejects
-storage.
+- **Windows:** each `PhysicalDriveN` opened with no data access: the storage bus type (USB, SD, MMC)
+  or the removable-media flag, media presence, and write protection; mounted means a drive-letter
+  volume on that disk. A Thunderbolt disk reports its inner bus (NVMe) and counts only when Windows
+  marks it removable. Phones and cameras: Windows Portable Devices enumerated by the USB bus, so a
+  USB drive that also appears as a portable device through the software bus counts once.
+- **macOS:** IOKit whole `IOMedia` whose provider is a block-storage driver, removable or ejectable or
+  at an external interconnect location; the internal property decides, never transport alone, so a
+  built-in disk on a Thunderbolt bus does not count. Mounted from `getmntinfo`. Phones and cameras:
+  USB interfaces of the still-image class (PTP, usually with MTP), counted once per device. Still to
+  be proved with an iPhone, Android phones and SD cards on certification rigs.
+- **Linux:** `/sys/block` (the removable flag, and USB, Thunderbolt or MMC topology), read-only flags,
+  `/proc/mounts`, and still-image interfaces in `/sys/bus/usb/devices`.
+
+The catalog proposed DiskArbitration and device-interface notifications; polling the same properties
+is simpler and loses nothing, because each read is the complete state.
+
+**Never leaves the agent.** Serials, vendor/model, volume names, mount paths, file contents. Proctor
+never ejects storage.
 
 ## Virtualization
 

@@ -232,6 +232,102 @@ pub fn route_fingerprint() -> Option<u64> {
     Some(crate::fingerprint(&[ipv4, ipv6].concat()))
 }
 
+const MAX_STORAGE: usize = 256;
+
+fn trimmed(path: &Path) -> Option<String> {
+    fs::read_to_string(path)
+        .ok()
+        .map(|text| text.trim().to_owned())
+}
+
+/// Whether a `/proc/mounts` source names `disk` or one of its partitions (`sdb1`, `mmcblk0p1`).
+fn mounts_disk(source: &str, disk: &str) -> bool {
+    let Some(rest) = source
+        .strip_prefix("/dev/")
+        .and_then(|name| name.strip_prefix(disk))
+    else {
+        return false;
+    };
+    let rest = rest.strip_prefix('p').unwrap_or(rest);
+    rest.bytes().all(|byte| byte.is_ascii_digit())
+}
+
+/// Removable, USB, SD and Thunderbolt-attached block devices.
+#[must_use]
+pub fn block_devices() -> Option<Vec<crate::RawStorageDevice>> {
+    let mounts = fs::read_to_string("/proc/mounts").unwrap_or_default();
+    block_devices_in(Path::new("/sys/block"), &mounts)
+}
+
+/// Reads block devices from a `/sys/block`-shaped tree; `mounts` is `/proc/mounts` content.
+#[must_use]
+pub fn block_devices_in(root: &Path, mounts: &str) -> Option<Vec<crate::RawStorageDevice>> {
+    use crate::{RawStorageDevice, RawStorageKind, RawTransport, fingerprint};
+    let sources: Vec<&str> = mounts
+        .lines()
+        .filter_map(|line| line.split_whitespace().next())
+        .collect();
+    let mut devices = Vec::new();
+    for entry in fs::read_dir(root).ok()?.flatten().take(MAX_STORAGE) {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        let path = entry.path();
+        let topology = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+        let topology = topology.to_string_lossy();
+        let removable = trimmed(&path.join("removable")).as_deref() == Some("1");
+        let transport = if topology.contains("/usb") {
+            RawTransport::Usb
+        } else if topology.contains("/thunderbolt") || topology.contains("/domain") {
+            RawTransport::Thunderbolt
+        } else if name.starts_with("mmcblk") {
+            RawTransport::Sd
+        } else if removable {
+            RawTransport::Other
+        } else {
+            continue;
+        };
+        let writable = trimmed(&path.join("ro")).map(|value| value == "0");
+        devices.push(RawStorageDevice {
+            key: fingerprint(name.as_bytes()),
+            kind: RawStorageKind::Block,
+            transport,
+            mounted: Some(sources.iter().any(|source| mounts_disk(source, &name))),
+            writable,
+        });
+    }
+    devices.sort();
+    Some(devices)
+}
+
+/// Phones and cameras exposing a still-image USB interface.
+#[must_use]
+pub fn portable_devices() -> Option<Vec<crate::RawStorageDevice>> {
+    portable_devices_in(Path::new("/sys/bus/usb/devices"))
+}
+
+/// Reads still-image interfaces from a `/sys/bus/usb/devices`-shaped tree. Interfaces are named
+/// `<device>:<config>.<interface>`; interfaces of one device count once.
+#[must_use]
+pub fn portable_devices_in(root: &Path) -> Option<Vec<crate::RawStorageDevice>> {
+    use crate::{RawStorageDevice, RawStorageKind, RawTransport, fingerprint};
+    let mut devices = std::collections::BTreeSet::new();
+    for entry in fs::read_dir(root).ok()?.flatten().take(MAX_STORAGE * 4) {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        let Some((device, _)) = name.split_once(':') else {
+            continue;
+        };
+        if trimmed(&entry.path().join("bInterfaceClass")).as_deref() == Some("06") {
+            devices.insert(RawStorageDevice {
+                key: fingerprint(device.as_bytes()),
+                kind: RawStorageKind::Portable,
+                transport: RawTransport::Usb,
+                mounted: None,
+                writable: None,
+            });
+        }
+    }
+    Some(devices.into_iter().collect())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -311,5 +407,105 @@ mod network_tests {
         let tunnels = tunnels_in(&root).expect("reads fixture");
         let _ = fs::remove_dir_all(&root);
         assert_eq!(tunnels.len(), 4, "eth0 and the down tun9 are not counted");
+    }
+}
+
+#[cfg(test)]
+mod storage_tests {
+    use super::*;
+    use crate::{RawStorageKind, RawTransport};
+
+    fn fixture(name: &str) -> std::path::PathBuf {
+        let root = std::env::temp_dir().join(format!("prctr-{name}-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&root);
+        fs::create_dir_all(&root).expect("fixture root");
+        root
+    }
+
+    fn disk(root: &Path, devices: &Path, name: &str, topology: &str, removable: &str, ro: &str) {
+        let target = devices.join(topology).join(name);
+        fs::create_dir_all(&target).expect("fixture device");
+        fs::write(target.join("removable"), format!("{removable}\n")).expect("removable");
+        fs::write(target.join("ro"), format!("{ro}\n")).expect("ro");
+        std::os::unix::fs::symlink(&target, root.join(name)).expect("fixture link");
+    }
+
+    #[test]
+    fn usb_sd_and_removable_disks_count_and_internal_ones_do_not() {
+        let base = fixture("block");
+        let (root, devices) = (base.join("block"), base.join("devices"));
+        fs::create_dir_all(&root).expect("block root");
+        disk(
+            &root,
+            &devices,
+            "nvme0n1",
+            "pci0000:00/0000:00:1d.0/nvme",
+            "0",
+            "0",
+        );
+        disk(
+            &root,
+            &devices,
+            "sdb",
+            "pci0000:00/0000:00:14.0/usb2/2-1",
+            "1",
+            "0",
+        );
+        disk(&root, &devices, "mmcblk0", "platform/mmc0", "0", "1");
+        disk(&root, &devices, "sr0", "pci0000:00/ata1", "1", "1");
+        disk(&root, &devices, "loop0", "virtual/block", "0", "0");
+        let mounts = "/dev/nvme0n1p2 / ext4 rw 0 0\n/dev/sdb1 /media/x vfat rw 0 0\n";
+        let found = block_devices_in(&root, mounts).expect("reads fixture");
+        let _ = fs::remove_dir_all(&base);
+        assert_eq!(
+            found.len(),
+            3,
+            "the NVMe system disk and the loop device are not removable"
+        );
+        let usb = found
+            .iter()
+            .find(|device| device.transport == RawTransport::Usb)
+            .expect("usb");
+        assert_eq!((usb.mounted, usb.writable), (Some(true), Some(true)));
+        let sd = found
+            .iter()
+            .find(|device| device.transport == RawTransport::Sd)
+            .expect("sd");
+        assert_eq!((sd.mounted, sd.writable), (Some(false), Some(false)));
+        assert!(
+            found
+                .iter()
+                .all(|device| device.kind == RawStorageKind::Block)
+        );
+    }
+
+    #[test]
+    fn a_partition_source_matches_only_its_own_disk() {
+        assert!(mounts_disk("/dev/sdb1", "sdb"));
+        assert!(mounts_disk("/dev/sdb", "sdb"));
+        assert!(mounts_disk("/dev/mmcblk0p1", "mmcblk0"));
+        assert!(!mounts_disk("/dev/sdba1", "sdb"));
+        assert!(!mounts_disk("tmpfs", "sdb"));
+    }
+
+    #[test]
+    fn interfaces_of_one_still_image_device_count_once() {
+        let root = fixture("usb");
+        let interface = |name: &str, class: &str| {
+            fs::create_dir_all(root.join(name)).expect("interface");
+            fs::write(
+                root.join(name).join("bInterfaceClass"),
+                format!("{class}\n"),
+            )
+            .expect("class");
+        };
+        interface("1-2:1.0", "06");
+        interface("1-2:1.1", "06");
+        interface("1-3:1.0", "08");
+        fs::create_dir_all(root.join("usb1")).expect("hub");
+        let found = portable_devices_in(&root).expect("reads fixture");
+        let _ = fs::remove_dir_all(&root);
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].kind, RawStorageKind::Portable);
     }
 }
