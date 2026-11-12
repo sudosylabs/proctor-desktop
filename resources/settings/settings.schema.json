@@ -1,6 +1,6 @@
 {
   "generatedBy": "settings.registry",
-  "registryFingerprint": "fnv1a64:a4866316160e9488",
+  "registryFingerprint": "fnv1a64:a709cb0f2d871cfb",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": true,
@@ -213,7 +213,7 @@
         "solid"
       ],
       "title": "Cursor blinking",
-      "description": "How the text cursor animates."
+      "description": "How the cursor blinks. Solid doesn’t blink."
     },
     "accessibility.reducedMotion": {
       "type": "boolean",
@@ -249,15 +249,15 @@
       "minimum": 4,
       "maximum": 20,
       "title": "Tree indentation",
-      "description": "How far nested files are indented."
+      "description": "How far each folder level steps in, in the exam’s file list."
     },
     "browser.presentation.zoom": {
       "type": "integer",
       "default": 100,
       "minimum": 80,
       "maximum": 200,
-      "title": "Page zoom",
-      "description": "Zoom for pages opened in the exam browser."
+      "title": "Exam browser zoom",
+      "description": "Zoom for the pages an exam lets you open in its browser."
     }
   },
   "patternProperties": {
@@ -340,7 +340,7 @@
             "solid"
           ],
           "title": "Cursor blinking",
-          "description": "How the text cursor animates."
+          "description": "How the cursor blinks. Solid doesn’t blink."
         }
       }
     }

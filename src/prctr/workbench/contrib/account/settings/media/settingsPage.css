@@ -12,10 +12,11 @@
 		font-size: 13px;
 		gap: 6px;
 		min-block-size: 30px;
+		white-space: nowrap;
 	}
+	/* Quiet: the row's badge and the toast say which setting it was. */
 	.prctr-account .prctr-settings-page__status[data-status='failed'] {
 		color: var(--prctr-color-feedback-error);
-		font-weight: var(--prctr-typography-weight-medium);
 	}
 
 	.prctr-account .prctr-settings-page__swatch {
@@ -28,18 +29,37 @@
 		inline-size: 14px;
 	}
 
+	/* Sticks one pixel above the top so that, while stuck, the page can tell and draw the edge. */
 	.prctr-account .prctr-settings-page__toolbar {
-		align-items: center;
+		align-items: flex-end;
+		background: var(--prctr-color-background-surface);
 		border-block-end: var(--prctr-shape-stroke-default) solid var(--prctr-color-border-default);
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px 12px;
+		inset-block-start: -1px;
+		padding-block-start: 1px;
+		position: sticky;
+		z-index: 1;
 	}
+	.prctr-account .prctr-settings-page__toolbar[data-stuck] {
+		box-shadow: 0 8px 10px -8px rgb(0 0 0 / 22%);
+	}
+	/* Too narrow for one row, the tools wrap onto their own line rather than collide. */
 	.prctr-account .prctr-settings-page__tabs {
 		display: flex;
-		flex: 1;
+		flex: 1 1 auto;
+		flex-wrap: wrap;
 		gap: 4px;
 		min-inline-size: 0;
+	}
+	.prctr-account .prctr-settings-page__tools {
+		align-items: center;
+		display: flex;
+		flex: 0 1 auto;
+		gap: 12px;
+		margin-block-end: 4px;
+		margin-inline-start: auto;
 	}
 	.prctr-account .prctr-settings-page__tab {
 		align-items: center;
@@ -54,15 +74,22 @@
 		gap: 7px;
 		margin-block-end: -1px;
 		padding: 0 12px;
+		position: relative;
 		white-space: nowrap;
 	}
 	.prctr-account .prctr-settings-page__tab:hover {
 		color: var(--prctr-color-text-primary);
 	}
+	/* Every tab keeps one weight, so choosing one never moves its neighbours. The line is a
+	   border, which forced colours keep, rather than a shadow, which they drop. */
 	.prctr-account .prctr-settings-page__tab[aria-selected='true'] {
-		box-shadow: inset 0 -2px 0 var(--prctr-color-brand-accent);
 		color: var(--prctr-color-text-primary);
-		font-weight: var(--prctr-typography-weight-semibold);
+	}
+	.prctr-account .prctr-settings-page__tab[aria-selected='true']::after {
+		border-block-end: 2px solid var(--prctr-color-border-accentLine);
+		content: '';
+		inset: auto 0 0;
+		position: absolute;
 	}
 	.prctr-account .prctr-settings-page__tab:focus-visible {
 		border-radius: 6px;
@@ -76,10 +103,11 @@
 		border-radius: 8px;
 		box-sizing: border-box;
 		color: var(--prctr-color-text-tertiary);
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-field);
 		display: flex;
 		gap: 6px;
 		inline-size: 200px;
-		margin-block-end: 4px;
+		max-inline-size: 100%;
 		padding: 0 8px;
 	}
 	.prctr-account .prctr-settings-page__find:focus-within {
@@ -141,7 +169,7 @@
 	.prctr-account .prctr-settings-page__number[data-current='true'] {
 		color: var(--prctr-preview-line-number-active, var(--prctr-preview-foreground, #e6edf3));
 	}
-	.prctr-account .prctr-settings-page__line > :first-child:not(.prctr-settings-page__number) {
+	.prctr-account .prctr-settings-page__number[hidden] + span {
 		padding-inline-start: 16px;
 	}
 	.prctr-account .prctr-settings-page__code [data-token='keyword'] {
@@ -154,6 +182,11 @@
 		color: var(--prctr-preview-number, #79c0ff);
 	}
 
+	.prctr-account .prctr-settings-page__panel {
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
 	.prctr-account .prctr-settings-page__groups {
 		display: flex;
 		flex-direction: column;
@@ -196,9 +229,25 @@
 		gap: 2px;
 		min-inline-size: 0;
 	}
+	.prctr-account .prctr-settings-page__title-line {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 8px;
+	}
 	.prctr-account .prctr-settings-page__title {
 		font-size: 14px;
 		font-weight: var(--prctr-typography-weight-medium);
+	}
+	/* “Tab · Group” above a row's title, only among search results. */
+	.prctr-account .prctr-settings-page__place {
+		display: none;
+	}
+	.prctr-account .prctr-settings-page__results-card .prctr-settings-page__place {
+		color: var(--prctr-color-text-tertiary);
+		display: block;
+		font-size: 12px;
+		line-height: 16px;
 	}
 	.prctr-account .prctr-settings-page__description {
 		color: var(--prctr-color-text-tertiary);
@@ -206,14 +255,26 @@
 		line-height: 18px;
 	}
 	.prctr-account .prctr-settings-page__empty {
-		color: var(--prctr-color-text-secondary);
+		align-items: flex-start;
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		padding: 20px;
+	}
+	.prctr-account .prctr-settings-page__empty-title {
+		font-size: 14px;
+		font-weight: var(--prctr-typography-weight-medium);
 		margin: 0;
-		padding: 16px;
+		overflow-wrap: anywhere;
+	}
+	.prctr-account .prctr-settings-page__empty-hint {
+		color: var(--prctr-color-text-secondary);
+		margin: 0 0 6px;
 	}
 
 	@media (forced-colors: active) {
-		.prctr-account .prctr-settings-page__tab[aria-selected='true'] {
-			box-shadow: inset 0 -2px 0 Highlight;
+		.prctr-account .prctr-settings-page__tab[aria-selected='true']::after {
+			border-color: Highlight;
 		}
 		.prctr-account .prctr-settings-page__card {
 			border-color: CanvasText;

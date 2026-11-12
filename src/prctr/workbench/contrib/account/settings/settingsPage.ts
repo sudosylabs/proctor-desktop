@@ -10,11 +10,7 @@ import { createElementFactory } from '../../../../base/browser/documentElements.
 import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { BannerControl } from '../../../../base/browser/ui/banner/bannerControl.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
-import { SegmentedControl } from '../../../../base/browser/ui/segmented/segmentedControl.js';
-import { SelectControl } from '../../../../base/browser/ui/select/selectControl.js';
-import { StepperControl } from '../../../../base/browser/ui/stepper/stepperControl.js';
-import { SwitchControl } from '../../../../base/browser/ui/switch/switchControl.js';
-import { Disposable, DisposableStore, toDisposable } from '../../../../base/common/lifecycle.js';
+import { Disposable, toDisposable } from '../../../../base/common/lifecycle.js';
 import { parseSettingsDocument } from '../../../../platform/settings/common/settingsDocument.js';
 import { SettingsDraft } from '../../../../platform/settings/common/settingsDraft.js';
 import type { EffectiveSettingId } from '../../../../platform/settings/common/settingsManifest.js';
@@ -28,62 +24,98 @@ import {
 } from '../../../../platform/theme/browser/proctorIcon.js';
 import { IUserSettingsService } from '../../../services/settings/common/settingsRendererClient.js';
 import {
+	choiceFor,
+	isSearching,
 	matchingRows,
 	SETTINGS_SAVE_DELAY_MS,
 	settingsLayout,
 	settingsTabIcons,
 	settingsTabs,
 	type SettingChoice,
-	type SettingGroup,
 	type SettingRow,
+	type SettingSearchText,
 	type SettingsSaveStatus,
 	type SettingsTab
 } from './common/settingsPresentation.js';
 import type { AccountMessage } from '../accountMessages.js';
 import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import './media/settingsPage.css';
-import { SCHEME_THEME_NAMES } from '../../../../platform/theme/common/bundledThemes.js';
-import { getTheme } from '../../../../platform/theme/common/themes.js';
-import type { ControlIconFactory } from '../../../../base/browser/ui/controlIcon.js';
+import { SettingRowView, type SettingRowChoice, type SettingValue } from './settingRow.js';
+import { EditorPreview, editorThemeName, type EditorPreviewState } from './settingsPreview.js';
 
 /** The scheme aliases are for the exam window's own choice; the page lists named themes. */
 const SCHEME_ALIASES = new Set(['light', 'dark', 'hcLight', 'hcDark']);
 
-type Value = string | number | boolean;
+const PANEL_ID = 'prctr-settings-panel';
+
+/** One parse of the settings document, read by every row and the preview. */
+interface SettingsSnapshot {
+	readonly authenticated: EffectiveSettings;
+	readonly candidate: EffectiveSettings;
+	readonly explicit: ReadonlySet<string>;
+}
+
+interface TabView {
+	readonly tab: SettingsTab;
+	readonly button: HTMLButtonElement;
+	/** The tab's groups, shown while it is selected and nothing is being found. */
+	readonly groups: HTMLElement;
+}
+
+/** A row and the card it belongs in when it is not a search result. */
+interface PlacedRow {
+	readonly view: SettingRowView;
+	readonly home: HTMLElement;
+}
 
 /**
- * Settings: Proctor's own page for the registered settings, in four tabs. Every change saves
+ * Settings: Proctor's own page for the registered settings, in three tabs. Every change saves
  * itself a moment later to the account's settings, so they follow the person to any computer.
  * Nobody edits settings.json; a conflicting save from elsewhere is merged by applying this
  * page's pending changes again on top of the newer settings.
+ *
+ * Every row is built once. A change, a save or news from elsewhere parses the document once and
+ * writes the result into the rows in place, so focus stays where the person left it.
  */
 export class SettingsPage extends Disposable implements PageView {
+	private readonly root: HTMLElement;
+	private readonly toolbar: HTMLElement;
 	private readonly status: HTMLElement;
 	private readonly statusIcon: ProctorIconControl;
 	private readonly statusText: HTMLElement;
-	private readonly tabs: readonly {
-		readonly tab: SettingsTab;
-		readonly button: HTMLButtonElement;
-	}[];
+	private readonly tabs: readonly TabView[];
 	private readonly find: HTMLInputElement;
-	private readonly banner: BannerControl;
-	private readonly preview: HTMLElement;
-	private readonly groups: HTMLElement;
-	private readonly rows = this._register(new DisposableStore());
+	private readonly unavailable: BannerControl;
+	private readonly panel: HTMLElement;
+	private readonly examNote: BannerControl;
+	private readonly accessibilityNote: BannerControl;
+	private readonly preview: EditorPreview;
+	private readonly results: HTMLElement;
+	private readonly resultsTitle: HTMLElement;
+	private readonly resultsCard: HTMLElement;
+	private readonly empty: HTMLElement;
+	private readonly emptyTitle: HTMLElement;
+	private readonly rows = new Map<EffectiveSettingId, PlacedRow>();
+	/** The defaults, for Reset's label: what an empty document resolves to on this computer. */
+	private readonly defaults: SettingsSnapshot = snapshotOf('{}');
 
 	private tab: SettingsTab = 'appearance';
 	private query = '';
+	private announcedResults = '';
 	private projection: UserSettingsProjection | undefined;
 	private draft: SettingsDraft | undefined;
 	/** Changes not yet acknowledged by the server, applied again after a conflict. */
-	private readonly pending = new Map<EffectiveSettingId, Value | undefined>();
+	private readonly pending = new Map<EffectiveSettingId, SettingValue | undefined>();
 	private saving = false;
+	private saveStatus: SettingsSaveStatus = 'idle';
+	/** “Saved” is said only once this visit has changed something. */
+	private changedThisVisit = false;
 	private timer: ReturnType<typeof setTimeout> | undefined;
 	private ambiguousRetried = false;
 
 	constructor(
 		body: HTMLElement,
-		headerActions: HTMLElement,
+		_headerActions: HTMLElement,
 		@IAccountFormatService private readonly format: IAccountFormatService,
 		@IPagePaneContext private readonly pane: IPagePaneContext,
 		@ILocalizationService private readonly localization: ILocalizationService,
@@ -92,45 +124,26 @@ export class SettingsPage extends Disposable implements PageView {
 		super();
 		const document = body.ownerDocument;
 		const $ = createElementFactory(document);
+		this.root = $('div.prctr-settings-page');
+		body.append(this.root);
+
+		// The banner states a condition of the whole page, so it comes before the tabs.
+		this.unavailable = this._register(new BannerControl(this.root));
+
 		this.statusIcon = this._register(
 			createProctorIcon(document, { id: 'status.saved', size: 16 })
 		);
 		this.statusText = $('span');
+		// Present from the start, even when silent, so the first save is announced.
 		this.status = $(
 			'span.prctr-settings-page__status',
-			{ attrs: { role: 'status' } },
+			{ data: { status: 'idle' }, attrs: { role: 'status' } },
 			this.statusIcon.element,
 			this.statusText
 		);
-		headerActions.append(this.status);
-
 		const tablist = $('div.prctr-settings-page__tabs', {
 			attrs: { role: 'tablist', 'aria-label': this.format.text('settingsTitle') }
 		});
-		this.tabs = settingsTabs.map((tab) => {
-			const button = $(
-				'button.prctr-settings-page__tab',
-				{ type: 'button', attrs: { role: 'tab', 'aria-controls': 'prctr-settings-panel' } },
-				this._register(createProctorIcon(document, { id: settingsTabIcons[tab], size: 16 }))
-					.element,
-				this.format.text(tabMessages[tab])
-			);
-			tablist.append(button);
-			this._register(addDisposableListener(button, 'click', () => this.selectTab(tab)));
-			return { tab, button };
-		});
-		this._register(
-			addDisposableListener(tablist, 'keydown', (event) => {
-				const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
-				if (step === 0) return;
-				event.preventDefault();
-				const index = settingsTabs.indexOf(this.tab);
-				const next =
-					settingsTabs[(index + step + settingsTabs.length) % settingsTabs.length]!;
-				this.selectTab(next);
-				this.tabs.find((entry) => entry.tab === next)?.button.focus();
-			})
-		);
 		this.find = $('input.prctr-settings-page__find-input', {
 			type: 'search',
 			placeholder: this.format.text('findSetting'),
@@ -142,36 +155,198 @@ export class SettingsPage extends Disposable implements PageView {
 			this._register(createProctorIcon(document, { id: 'action.search', size: 14 })).element,
 			this.find
 		);
-		const toolbar = $('div.prctr-settings-page__toolbar', {}, tablist, find);
-		const root = $('div.prctr-settings-page');
-		body.append(root);
-		// The banner states a condition of the whole page, so it comes before the tabs.
-		this.banner = this._register(new BannerControl(root));
-		root.append(toolbar);
-		this.preview = $('div.prctr-settings-page__preview', { hidden: true });
-		this.groups = $('div.prctr-settings-page__groups', {
-			id: 'prctr-settings-panel',
+		this.toolbar = $(
+			'div.prctr-settings-page__toolbar',
+			{},
+			tablist,
+			$('div.prctr-settings-page__tools', {}, this.status, find)
+		);
+		this.root.append(this.toolbar);
+
+		// The panel waits for the settings, so no control offers a value it has not read.
+		this.panel = $('div.prctr-settings-page__panel', {
+			id: PANEL_ID,
+			hidden: true,
 			attrs: { role: 'tabpanel' }
 		});
-		root.append(this.preview, this.groups);
-		this._register(
-			addDisposableListener(this.find, 'input', () => {
-				this.query = this.find.value;
-				this.render();
+		this.root.append(this.panel);
+		this.examNote = this.createNote('settingsExamOverride');
+		this.accessibilityNote = this.createNote('settingsAccessibilityNote');
+		const openAppearance = this._register(
+			new ButtonControl(this.accessibilityNote.actions, {
+				variant: 'secondary',
+				size: 'small',
+				label: this.format.text('openAppearance')
 			})
 		);
-		const unsubscribe = client.onDidChange((projection) => this.receive(projection));
-		this._register(toDisposable(unsubscribe));
-		this._register(toDisposable(() => clearTimeout(this.timer)));
-		this._register(toDisposable(() => this.draft?.dispose()));
+		this._register(openAppearance.onDidRequest(() => this.openTab('appearance')));
+		this.preview = this._register(
+			new EditorPreview(this.panel, this.format.text('editorPreview'))
+		);
+
+		this.tabs = settingsTabs.map((tab) => this.createTab($, tablist, tab));
+
+		this.resultsTitle = $('h2.prctr-settings-page__group-title');
+		this.resultsCard = $('div.prctr-settings-page__card.prctr-settings-page__results-card');
+		this.results = $(
+			'section.prctr-settings-page__group',
+			{ hidden: true },
+			this.resultsTitle,
+			this.resultsCard
+		);
+		this.emptyTitle = $('p.prctr-settings-page__empty-title');
+		this.empty = $(
+			'div.prctr-settings-page__card.prctr-settings-page__empty',
+			{ hidden: true },
+			this.emptyTitle,
+			$('p.prctr-settings-page__empty-hint', {
+				textContent: this.format.text('settingsNoMatchHint')
+			})
+		);
+		const clear = this._register(
+			new ButtonControl(this.empty, {
+				variant: 'secondary',
+				size: 'small',
+				label: this.format.text('clearSearch')
+			})
+		);
+		this._register(clear.onDidRequest(() => this.clearSearch()));
+		this.panel.append(this.results, this.empty);
+
+		this.registerListeners(tablist);
+		this.observeStuck();
 		void client.projection().then(
 			(projection) => this.receive(projection),
 			() => this.setStatus('failed')
 		);
-		this.render();
+		this.showView();
 	}
 
 	setVisible(): void {}
+
+	// #region Building
+
+	private createNote(text: AccountMessage): BannerControl {
+		const note = this._register(new BannerControl(this.panel));
+		// A note is read with the tab, not announced each time the tab opens.
+		note.element.removeAttribute('role');
+		note.show({
+			tone: 'info',
+			icon: proctorIconFactory('status.info', 18),
+			text: this.format.text(text)
+		});
+		return note;
+	}
+
+	private createTab(
+		$: ReturnType<typeof createElementFactory>,
+		tablist: HTMLElement,
+		tab: SettingsTab
+	): TabView {
+		const button = $(
+			'button.prctr-settings-page__tab',
+			{
+				id: `prctr-settings-tab-${tab}`,
+				type: 'button',
+				attrs: { role: 'tab', 'aria-controls': PANEL_ID }
+			},
+			this._register(
+				createProctorIcon(tablist.ownerDocument, { id: settingsTabIcons[tab], size: 16 })
+			).element,
+			$('span.prctr-settings-page__tab-label', {
+				textContent: this.format.text(tabMessages[tab])
+			})
+		);
+		tablist.append(button);
+		this._register(addDisposableListener(button, 'click', () => this.selectTab(tab)));
+		const groups = $('div.prctr-settings-page__groups');
+		for (const group of settingsLayout[tab]) {
+			const title = this.format.text(group.title as AccountMessage);
+			const card = $('div.prctr-settings-page__card');
+			for (const row of group.rows) this.createRow(card, tab, title, row);
+			groups.append(
+				$(
+					'section.prctr-settings-page__group',
+					{},
+					$('h2.prctr-settings-page__group-title', { textContent: title }),
+					card
+				)
+			);
+		}
+		this.panel.append(groups);
+		return { tab, button, groups };
+	}
+
+	private createRow(card: HTMLElement, tab: SettingsTab, group: string, row: SettingRow): void {
+		const { title, description } = this.describe(row.id);
+		const fallback = this.valueIn(this.defaults, row.id);
+		const fallbackLabel = this.valueLabel(row, fallback);
+		const view = this._register(
+			new SettingRowView(
+				card,
+				row,
+				{
+					title,
+					description,
+					place: this.format.text('settingsResultPlace', {
+						tab: this.format.text(tabMessages[tab]),
+						group
+					}),
+					reset: this.format.text('resetSetting', { value: fallbackLabel }),
+					resetAccessible: this.format.text('resetSettingNamed', {
+						name: title,
+						value: fallbackLabel
+					}),
+					notSaved: this.format.text('settingsNotSavedShort'),
+					choices: this.choicesOf(row),
+					smaller: this.format.text('smaller'),
+					larger: this.format.text('larger'),
+					pixels: (value) => this.format.text('pixels', { value })
+				},
+				fallback
+			)
+		);
+		this._register(view.onDidChange((value) => void this.change(row.id, value)));
+		this.rows.set(row.id, { view, home: card });
+	}
+
+	private registerListeners(tablist: HTMLElement): void {
+		this._register(addDisposableListener(tablist, 'keydown', (event) => this.onTabKey(event)));
+		this._register(
+			addDisposableListener(this.find, 'input', () => {
+				this.query = this.find.value;
+				this.showView();
+			})
+		);
+		const unsubscribe = this.client.onDidChange((projection) => this.receive(projection));
+		this._register(toDisposable(unsubscribe));
+		this._register(toDisposable(() => clearTimeout(this.timer)));
+		this._register(toDisposable(() => this.draft?.dispose()));
+	}
+
+	/**
+	 * The tab bar sticks to the top of the page and grows a soft edge once content scrolls under
+	 * it. Stuck one pixel above the top, it is clipped by that pixel exactly while it sticks.
+	 */
+	private observeStuck(): void {
+		const view = this.root.ownerDocument.defaultView;
+		if (view === null || !('IntersectionObserver' in view)) return;
+		const observer = new view.IntersectionObserver(
+			(entries) => {
+				for (const entry of entries)
+					this.toolbar.toggleAttribute(
+						'data-stuck',
+						entry.intersectionRatio < 1 &&
+							entry.intersectionRect.top > entry.boundingClientRect.top
+					);
+			},
+			{ threshold: [1] }
+		);
+		observer.observe(this.toolbar);
+		this._register(toDisposable(() => observer.disconnect()));
+	}
+
+	// #endregion
 
 	// #region Reading
 
@@ -183,8 +358,9 @@ export class SettingsPage extends Disposable implements PageView {
 			return;
 		}
 		this.adopt(projection);
-		this.setStatus(this.writable() ? 'saved' : 'readonly');
-		this.render();
+		this.panel.hidden = false;
+		this.setStatus(this.writable() ? (this.changedThisVisit ? 'saved' : 'idle') : 'readonly');
+		this.refresh();
 	}
 
 	private adopt(projection: UserSettingsProjection): void {
@@ -201,33 +377,19 @@ export class SettingsPage extends Disposable implements PageView {
 		);
 	}
 
-	private values(): {
-		readonly authenticated: EffectiveSettings;
-		readonly candidate: EffectiveSettings;
-		readonly explicit: ReadonlySet<string>;
-	} {
-		const document = parseSettingsDocument(this.draft?.source ?? '{}');
-		return {
-			authenticated: new EffectiveSettings(document, { window: 'authenticated' }),
-			candidate: new EffectiveSettings(document, { window: 'candidate' }),
-			explicit: new Set(document.values.keys())
-		};
-	}
-
-	private settingValue(id: EffectiveSettingId): Value {
-		const values = this.values();
+	private valueIn(snapshot: SettingsSnapshot, id: EffectiveSettingId): SettingValue {
 		const declaration = settingsRegistry.declaration(id)!;
 		const effective = declaration.windows.includes('authenticated')
-			? values.authenticated
-			: values.candidate;
-		return effective.get(id) as Value;
+			? snapshot.authenticated
+			: snapshot.candidate;
+		return effective.get(id) as SettingValue;
 	}
 
 	// #endregion
 
 	// #region Saving
 
-	private async change(id: EffectiveSettingId, value: Value | undefined): Promise<void> {
+	private async change(id: EffectiveSettingId, value: SettingValue | undefined): Promise<void> {
 		const draft = this.draft;
 		if (draft === undefined || !this.writable()) return;
 		this.pending.set(id, value);
@@ -235,16 +397,19 @@ export class SettingsPage extends Disposable implements PageView {
 			await draft.set(id, value);
 		} catch {
 			this.pending.delete(id);
-			this.pane.toast(this.format.text('settingsNotSaved'), {
+			this.pane.toast(this.format.text('settingNotSavedNamed', { name: this.titleOf(id) }), {
 				body: this.format.text('settingsInvalid')
 			});
-			this.render();
+			this.refresh();
 			return;
 		}
 		if (this._store.isDisposed) return;
+		this.changedThisVisit = true;
 		this.previewDraft();
 		this.setStatus('saving');
-		this.render();
+		this.refresh();
+		// Reset has just hidden itself; its control takes the focus, showing the default.
+		if (value === undefined) this.rows.get(id)?.view.focus();
 		this.scheduleSave();
 	}
 
@@ -286,8 +451,8 @@ export class SettingsPage extends Disposable implements PageView {
 			for (const [id, value] of saved)
 				if (this.pending.get(id) === value) this.pending.delete(id);
 			if (this.pending.size > 0) this.scheduleSave();
-			else this.setStatus('saved');
-			this.render();
+			else this.setStatus(this.writable() ? 'saved' : 'readonly');
+			this.refresh();
 			return;
 		}
 		if (response.kind === 'conflict') {
@@ -303,13 +468,35 @@ export class SettingsPage extends Disposable implements PageView {
 		}
 		this.ambiguousRetried = false;
 		this.setStatus('failed');
-		this.pane.toast(this.format.text('settingsNotSaved'), {
-			body: this.format.text('settingsKeptHere'),
-			retry: () => {
-				this.setStatus('saving');
-				void this.save();
-			}
+		this.refresh();
+		this.toastFailure();
+	}
+
+	/** Names the setting that was not saved, wherever its tab is, and offers to try again. */
+	private toastFailure(): void {
+		const unsaved = [...this.pending.keys()];
+		const one = unsaved.length === 1;
+		const institution = this.format.institution;
+		const body: AccountMessage = one
+			? institution === undefined
+				? 'settingsKeptHere'
+				: 'settingsKeptHereNamed'
+			: institution === undefined
+				? 'settingsKeptHereMany'
+				: 'settingsKeptHereManyNamed';
+		const title = one
+			? this.format.text('settingNotSavedNamed', { name: this.titleOf(unsaved[0]!) })
+			: this.format.text('settingsNotSaved');
+		this.pane.toast(title, {
+			body: this.format.text(body, institution === undefined ? {} : { institution }),
+			retry: () => this.retry()
 		});
+	}
+
+	private retry(): void {
+		this.setStatus('saving');
+		this.refresh();
+		void this.save();
 	}
 
 	private async reapply(projection: UserSettingsProjection): Promise<void> {
@@ -323,100 +510,144 @@ export class SettingsPage extends Disposable implements PageView {
 			}
 		}
 		this.previewDraft();
-		this.render();
+		this.refresh();
 	}
 
 	private setStatus(status: SettingsSaveStatus): void {
-		const presentation: Readonly<
-			Record<
-				SettingsSaveStatus,
-				{
-					readonly text: AccountMessage;
-					readonly icon:
-						'status.saved' | 'status.saving' | 'status.attention' | 'status.locked';
-				}
-			>
-		> = {
-			saved: { text: 'settingsSaved', icon: 'status.saved' },
-			saving: { text: 'settingsSaving', icon: 'status.saving' },
-			failed: { text: 'settingsNotSavedShort', icon: 'status.attention' },
-			readonly: { text: 'settingsReadOnly', icon: 'status.locked' }
-		};
-		const entry = presentation[status];
+		this.saveStatus = status;
+		const entry = statusPresentation[status];
 		this.status.dataset.status = status;
-		this.statusIcon.setState({ id: entry.icon, size: 16 });
-		this.statusText.textContent = this.format.text(entry.text);
+		this.statusIcon.element.hidden = entry === undefined;
+		if (entry !== undefined) this.statusIcon.setState({ id: entry.icon, size: 16 });
+		this.statusText.textContent = entry === undefined ? '' : this.format.text(entry.text);
 	}
 
 	// #endregion
 
 	// #region Presentation
 
-	private selectTab(tab: SettingsTab): void {
-		this.tab = tab;
-		this.query = '';
-		this.find.value = '';
-		this.render();
-	}
-
-	private render(): void {
-		for (const { tab, button } of this.tabs) {
-			const selected = tab === this.tab && this.query.trim() === '';
-			button.setAttribute('aria-selected', String(selected));
-			button.tabIndex = tab === this.tab ? 0 : -1;
-		}
-		this.rows.clear();
-		this.groups.replaceChildren();
-		if (this.projection === undefined) {
-			this.banner.hide();
-			this.preview.hidden = true;
-			return;
-		}
-		if (!this.writable())
-			this.banner.show({
+	/** Writes one parse of the document into every row, the preview and the page's state. */
+	private refresh(): void {
+		const writable = this.writable();
+		this.root.toggleAttribute('data-readonly', this.projection !== undefined && !writable);
+		if (this.projection !== undefined && !writable)
+			this.unavailable.show({
 				tone: 'neutral',
 				icon: proctorIconFactory('status.locked', 18),
 				text: this.format.text('settingsUnavailable')
 			});
-		else if (this.tab === 'editor' && this.query.trim() === '')
-			this.banner.show({
-				tone: 'info',
-				icon: proctorIconFactory('status.info', 18),
-				text: this.format.text('settingsExamOverride')
+		else this.unavailable.hide();
+		const snapshot = snapshotOf(this.draft?.source ?? '{}');
+		const failed = this.saveStatus === 'failed';
+		for (const [id, { view }] of this.rows)
+			view.update({
+				value: this.valueIn(snapshot, id),
+				changed: snapshot.explicit.has(id),
+				disabled: !writable,
+				failed: failed && this.pending.has(id)
 			});
-		else this.banner.hide();
-		const searching = this.query.trim() !== '';
-		this.preview.hidden = searching || this.tab !== 'editor';
-		if (!this.preview.hidden) this.renderPreview();
-		const groups: readonly SettingGroup[] = searching
-			? [
-					{
-						title: 'settingsSearchResults',
-						rows: matchingRows(this.query, (id) => this.describe(id))
-					}
-				]
-			: settingsLayout[this.tab];
-		const $ = createElementFactory(this.groups.ownerDocument);
-		for (const group of groups) {
-			const card = $('div.prctr-settings-page__card');
-			for (const row of group.rows) card.append(this.renderRow($, row));
-			if (group.rows.length === 0)
-				card.append(
-					$('p.prctr-settings-page__empty', {
-						textContent: this.format.text('settingsNoMatch')
-					})
-				);
-			this.groups.append(
-				$(
-					'section.prctr-settings-page__group',
-					{},
-					$('h2.prctr-settings-page__group-title', {
-						textContent: this.format.text(group.title as AccountMessage)
-					}),
-					card
-				)
-			);
+		this.preview.update(this.previewState(snapshot));
+	}
+
+	private openTab(tab: SettingsTab): void {
+		this.selectTab(tab);
+		this.tabs.find((entry) => entry.tab === tab)?.button.focus();
+	}
+
+	private selectTab(tab: SettingsTab): void {
+		this.tab = tab;
+		this.query = '';
+		this.find.value = '';
+		this.showView();
+	}
+
+	private clearSearch(): void {
+		this.query = '';
+		this.find.value = '';
+		this.showView();
+		this.find.focus();
+	}
+
+	private onTabKey(event: KeyboardEvent): void {
+		const index = settingsTabs.indexOf(this.tab);
+		const rtl =
+			this.root.ownerDocument.defaultView?.getComputedStyle(this.root).direction === 'rtl';
+		const count = settingsTabs.length;
+		const targets: Readonly<Record<string, number>> = {
+			ArrowRight: (index + (rtl ? -1 : 1) + count) % count,
+			ArrowLeft: (index + (rtl ? 1 : -1) + count) % count,
+			Home: 0,
+			End: count - 1
+		};
+		const target = targets[event.key];
+		if (target === undefined) return;
+		event.preventDefault();
+		this.openTab(settingsTabs[target]!);
+	}
+
+	/** Shows the selected tab, or the rows Find a setting matches across every tab. */
+	private showView(): void {
+		const searching = isSearching(this.query);
+		for (const { tab, button, groups } of this.tabs) {
+			button.setAttribute('aria-selected', String(!searching && tab === this.tab));
+			// While finding, the selected tab keeps the tab bar's one tab stop.
+			button.tabIndex = tab === this.tab ? 0 : -1;
+			groups.hidden = searching || tab !== this.tab;
 		}
+		this.examNote.element.hidden = searching || this.tab !== 'editor';
+		this.accessibilityNote.element.hidden = searching || this.tab !== 'accessibility';
+		this.preview.element.hidden = searching || this.tab !== 'editor';
+		this.returnRowsHome();
+		if (searching) this.showMatches();
+		else {
+			this.results.hidden = true;
+			this.empty.hidden = true;
+			this.announcedResults = '';
+			this.panel.removeAttribute('aria-label');
+			this.panel.setAttribute('aria-labelledby', `prctr-settings-tab-${this.tab}`);
+		}
+	}
+
+	private showMatches(): void {
+		const matches = matchingRows(this.query, (row) => this.searchText(row));
+		for (const match of matches) {
+			const placed = this.rows.get(match.row.id);
+			if (placed !== undefined) this.resultsCard.append(placed.view.element);
+		}
+		const heading = this.format.text('settingsSearchCount', {
+			count: this.format.count(matches.length)
+		});
+		this.resultsTitle.textContent = heading;
+		this.emptyTitle.textContent = this.format.text('settingsNoMatch', {
+			query: this.query.trim()
+		});
+		this.results.hidden = matches.length === 0;
+		this.empty.hidden = matches.length > 0;
+		this.panel.removeAttribute('aria-labelledby');
+		this.panel.setAttribute('aria-label', this.format.text('settingsSearchResults'));
+		const announcement = matches.length === 0 ? this.emptyTitle.textContent : heading;
+		if (announcement !== this.announcedResults) {
+			this.announcedResults = announcement;
+			this.pane.announce(announcement);
+		}
+	}
+
+	/** Puts every row back in its own group's card, in the tab's order. */
+	private returnRowsHome(): void {
+		for (const { view, home } of this.rows.values()) home.append(view.element);
+	}
+
+	private previewState(snapshot: SettingsSnapshot): EditorPreviewState {
+		const theme = editorThemeName(this.valueIn(snapshot, 'workbench.colorTheme'));
+		const fontSize = Number(this.valueIn(snapshot, 'editor.fontSize'));
+		return {
+			theme,
+			fontSize,
+			lineHeight: Number(this.valueIn(snapshot, 'editor.lineHeight')),
+			tabSize: Number(this.valueIn(snapshot, 'editor.tabSize')),
+			lineNumbers: String(this.valueIn(snapshot, 'editor.lineNumbers')),
+			label: this.format.text('editorPreviewLabel', { theme, size: fontSize })
+		};
 	}
 
 	private describe(id: EffectiveSettingId): {
@@ -430,6 +661,44 @@ export class SettingsPage extends Disposable implements PageView {
 		};
 	}
 
+	private titleOf(id: EffectiveSettingId): string {
+		return this.describe(id).title;
+	}
+
+	private searchText(row: SettingRow): SettingSearchText {
+		return {
+			...this.describe(row.id),
+			choices: this.choicesOf(row).map((choice) => choice.label),
+			keywords:
+				row.keywords === undefined ? '' : this.format.text(row.keywords as AccountMessage)
+		};
+	}
+
+	/** The row's choices in the page's language; the editor theme lists the named themes. */
+	private choicesOf(row: SettingRow): readonly SettingRowChoice[] {
+		if (row.id === 'workbench.colorTheme')
+			return (settingsRegistry.declaration(row.id)!.enum ?? [])
+				.filter((name) => typeof name === 'string' && !SCHEME_ALIASES.has(name))
+				.map((name) => ({ value: String(name), label: String(name) }));
+		const control = row.control;
+		if (control.kind !== 'segmented' && control.kind !== 'select') return [];
+		return control.choices.map((choice) => ({
+			value: choice.value,
+			label: this.choiceLabel(choice)
+		}));
+	}
+
+	/** How a value reads on its own, as Reset names the default: “14 px”, “On”, “System”. */
+	private valueLabel(row: SettingRow, value: SettingValue): string {
+		const control = row.control;
+		if (control.kind === 'switch')
+			return this.format.text(value === true ? 'choiceOn' : 'choiceOff');
+		if (control.kind === 'stepper') return this.format.text('pixels', { value: Number(value) });
+		if (row.id === 'workbench.colorTheme') return editorThemeName(value);
+		const choice = choiceFor(row, value);
+		return choice === undefined ? String(value) : this.choiceLabel(choice);
+	}
+
 	private choiceLabel(choice: SettingChoice): string {
 		if (choice.label === 'motionFollowSystem')
 			return this.format.text('motionFollowSystem', {
@@ -441,277 +710,39 @@ export class SettingsPage extends Disposable implements PageView {
 		return this.format.text(choice.label as AccountMessage);
 	}
 
-	private renderRow($: ReturnType<typeof createElementFactory>, row: SettingRow): HTMLElement {
-		const { title, description } = this.describe(row.id);
-		const value = this.settingValue(row.id);
-		const changed = this.values().explicit.has(row.id);
-		const disabled = !this.writable();
-		const element = $(
-			'div.prctr-settings-page__row',
-			{ data: { setting: row.id } },
-			$(
-				'div.prctr-settings-page__text',
-				{},
-				$('span.prctr-settings-page__title', { textContent: title }),
-				$('span.prctr-settings-page__description', { textContent: description })
-			)
-		);
-		if (changed) {
-			const reset = this.rows.add(
-				new ButtonControl(element, {
-					variant: 'ghost',
-					size: 'small',
-					label: this.format.text('resetSetting'),
-					accessibleLabel: this.format.text('resetSettingNamed', { name: title }),
-					icon: proctorIconFactory('action.reset', 14),
-					disabled
-				})
-			);
-			this.rows.add(reset.onDidRequest(() => void this.change(row.id, undefined)));
-		}
-		const control = row.control;
-		if (control.kind === 'switch') {
-			const toggle = this.rows.add(
-				new SwitchControl(element, { label: title, on: value === true, disabled })
-			);
-			this.rows.add(toggle.onDidChange((on) => void this.change(row.id, on)));
-		} else if (control.kind === 'stepper') {
-			const stepper = this.rows.add(
-				new StepperControl(element, {
-					label: title,
-					value: Number(value),
-					minimum: control.minimum,
-					maximum: control.maximum,
-					format: (current) => this.format.text('pixels', { value: current }),
-					decreaseLabel: this.format.text('smaller'),
-					increaseLabel: this.format.text('larger'),
-					decreaseIcon: proctorIconFactory('action.decrease', 12),
-					increaseIcon: proctorIconFactory('action.increase', 12),
-					disabled
-				})
-			);
-			this.rows.add(stepper.onDidChange((next) => void this.change(row.id, next)));
-		} else if (control.kind === 'segmented') {
-			// Word wrap's other enum values are a kind of On; automatic announcements read as Brief.
-			const selected =
-				row.id === 'editor.wordWrap' && value !== 'off'
-					? 'on'
-					: row.id === 'accessibility.announcementMode' && value === 'auto'
-						? 'minimal'
-						: String(value);
-			const segmented = this.rows.add(
-				new SegmentedControl(element, {
-					label: title,
-					value: selected,
-					disabled,
-					options: control.choices.map((choice) => ({
-						value: String(choice.value),
-						label: this.choiceLabel(choice),
-						...(choice.icon === undefined
-							? {}
-							: { icon: proctorIconFactory(choice.icon, 14) })
-					}))
-				})
-			);
-			this.rows.add(
-				segmented.onDidChange((next) => {
-					const choice = control.choices.find((entry) => String(entry.value) === next);
-					if (choice !== undefined) void this.change(row.id, choice.value);
-				})
-			);
-		} else {
-			const choices =
-				row.id === 'workbench.colorTheme'
-					? (settingsRegistry.declaration(row.id)!.enum ?? [])
-							.filter((name) => typeof name === 'string' && !SCHEME_ALIASES.has(name))
-							.map((name) => ({ value: String(name), label: String(name) }))
-					: control.choices.map((choice) => ({
-							value: String(choice.value),
-							label: this.choiceLabel(choice)
-						}));
-			const current =
-				row.id === 'workbench.colorTheme' ? editorThemeName(value) : String(value);
-			if (!choices.some((choice) => choice.value === current))
-				choices.unshift({ value: current, label: current });
-			const select = this.rows.add(
-				new SelectControl(element, {
-					label: title,
-					value: current,
-					choices,
-					caret: proctorIconFactory('action.expand', 14),
-					...(row.id === 'workbench.colorTheme' ? { icon: themeSwatch(current) } : {}),
-					disabled
-				})
-			);
-			this.rows.add(
-				select.onDidChange((next) => {
-					const choice = control.choices.find((entry) => String(entry.value) === next);
-					void this.change(row.id, choice?.value ?? next);
-				})
-			);
-		}
-		return element;
-	}
-
-	/** A few lines of code drawn with the editor settings as chosen. */
-	private renderPreview(): void {
-		const $ = createElementFactory(this.preview.ownerDocument);
-		const size = Number(this.settingValue('editor.fontSize'));
-		const height = Number(this.settingValue('editor.lineHeight'));
-		const lineNumbers = this.settingValue('editor.lineNumbers');
-		const numbers = lineNumbers !== 'off';
-		const tab = Number(this.settingValue('editor.tabSize'));
-		const theme = editorThemeName(this.settingValue('workbench.colorTheme'));
-		const indent = ' '.repeat(tab);
-		const lines: readonly (readonly [string, string][])[] = [
-			[
-				['keyword', 'def'],
-				['', ' '],
-				['function', 'mean'],
-				['', '(values):']
-			],
-			[
-				['', indent],
-				['keyword', 'if not'],
-				['', ' values:']
-			],
-			[
-				['', indent + indent],
-				['keyword', 'return'],
-				['', ' '],
-				['number', '0']
-			],
-			[
-				['', `${indent}total = `],
-				['function', 'sum'],
-				['', '(values)']
-			],
-			[
-				['', indent],
-				['keyword', 'return'],
-				['', ' total / '],
-				['function', 'len'],
-				['', '(values)']
-			]
-		];
-		const code = $('div.prctr-settings-page__code', {
-			attrs: { 'aria-label': this.format.text('editorPreview') }
-		});
-		code.style.fontSize = `${size}px`;
-		code.style.lineHeight = `${height}px`;
-		// The preview is drawn in the chosen editor theme, whatever the window theme is.
-		const palette = editorPalette(theme);
-		setColor(code, '--prctr-preview-background', palette.background);
-		setColor(code, '--prctr-preview-foreground', palette.foreground);
-		setColor(code, '--prctr-preview-border', palette.border);
-		setColor(code, '--prctr-preview-line-number', palette.lineNumber);
-		setColor(code, '--prctr-preview-line-number-active', palette.activeLineNumber);
-		setColor(code, '--prctr-preview-keyword', palette.keyword);
-		setColor(code, '--prctr-preview-function', palette.function);
-		setColor(code, '--prctr-preview-number', palette.number);
-		lines.forEach((tokens, index) => {
-			const line = $('div.prctr-settings-page__line');
-			if (numbers)
-				line.append(
-					$('span.prctr-settings-page__number', {
-						// Relative numbers count from the line holding the cursor, which keeps its own.
-						textContent: String(
-							lineNumbers === 'relative' && index !== PREVIEW_CURSOR_LINE
-								? Math.abs(index - PREVIEW_CURSOR_LINE)
-								: index + 1
-						),
-						data: { current: String(index === PREVIEW_CURSOR_LINE) },
-						attrs: { 'aria-hidden': 'true' }
-					})
-				);
-			for (const [kind, text] of tokens)
-				line.append(
-					$('span', { textContent: text, ...(kind ? { data: { token: kind } } : {}) })
-				);
-			code.append(line);
-		});
-		this.preview.replaceChildren(
-			$('span.prctr-settings-page__preview-label', {
-				textContent: this.format.text('editorPreviewLabel', { theme, size })
-			}),
-			code
-		);
-	}
-
 	// #endregion
 }
 
-/** A scheme alias such as `dark` is shown as the theme it stands for. */
-function editorThemeName(value: unknown): string {
-	const name = String(value);
-	return name in SCHEME_THEME_NAMES
-		? SCHEME_THEME_NAMES[name as keyof typeof SCHEME_THEME_NAMES]
-		: name;
-}
-
-/** A chip of the theme's editor background, edged with its function colour. */
-/** The preview line that holds the cursor, from 0; relative line numbers count from it. */
-const PREVIEW_CURSOR_LINE = 2;
-
-/** The colours of an editor theme that the preview and the theme chip need. */
-interface EditorPalette {
-	readonly background?: string;
-	readonly foreground?: string;
-	readonly border?: string;
-	readonly lineNumber?: string;
-	readonly activeLineNumber?: string;
-	readonly keyword?: string;
-	readonly function?: string;
-	readonly number?: string;
-}
-
-/** Reads a bundled editor theme's colours; an unknown theme gives none, and defaults apply. */
-function editorPalette(name: string): EditorPalette {
-	try {
-		const theme = getTheme(name);
-		const token = (wanted: string): string | undefined =>
-			theme.colorTheme.tokenColors.find((entry) =>
-				(Array.isArray(entry.scope) ? entry.scope : [entry.scope]).some(
-					(scope) => typeof scope === 'string' && scope.split(/[,\s]+/).includes(wanted)
-				)
-			)?.settings.foreground;
-		return {
-			background: theme.colors['editor.background'],
-			foreground: theme.colors['editor.foreground'],
-			border: theme.colors['editorGroup.border'] ?? theme.colors['panel.border'],
-			lineNumber: theme.colors['editorLineNumber.foreground'],
-			activeLineNumber: theme.colors['editorLineNumber.activeForeground'],
-			keyword: token('keyword'),
-			function: token('entity.name.function'),
-			number: token('constant.numeric') ?? token('constant')
-		};
-	} catch {
-		return {};
-	}
-}
-
-function setColor(element: HTMLElement, property: string, value: string | undefined): void {
-	if (value === undefined) element.style.removeProperty(property);
-	else element.style.setProperty(property, value);
-}
-
-/** A chip of the theme's editor background, edged with its function colour. */
-function themeSwatch(name: string): ControlIconFactory {
-	return (document) => {
-		const element = createElementFactory(document)('span.prctr-settings-page__swatch', {
-			attrs: { 'aria-hidden': 'true' }
-		});
-		const palette = editorPalette(name);
-		setColor(element, '--prctr-swatch-background', palette.background);
-		setColor(element, '--prctr-swatch-border', palette.border);
-		setColor(element, '--prctr-swatch-accent', palette.function);
-		return { element, dispose: () => element.remove() };
+function snapshotOf(source: string): SettingsSnapshot {
+	const document = parseSettingsDocument(source);
+	return {
+		authenticated: new EffectiveSettings(document, { window: 'authenticated' }),
+		candidate: new EffectiveSettings(document, { window: 'candidate' }),
+		explicit: new Set(document.values.keys())
 	};
 }
+
+/** The tab bar's word for each save status; `idle` shows nothing. */
+const statusPresentation: Readonly<
+	Record<
+		SettingsSaveStatus,
+		| {
+				readonly text: AccountMessage;
+				readonly icon:
+					'status.saved' | 'status.saving' | 'status.attention' | 'status.locked';
+		  }
+		| undefined
+	>
+> = Object.freeze({
+	idle: undefined,
+	saved: { text: 'settingsSaved', icon: 'status.saved' },
+	saving: { text: 'settingsSaving', icon: 'status.saving' },
+	failed: { text: 'settingsNotSavedShort', icon: 'status.attention' },
+	readonly: { text: 'settingsReadOnly', icon: 'status.locked' }
+});
 
 const tabMessages: Readonly<Record<SettingsTab, AccountMessage>> = Object.freeze({
 	appearance: 'settingsTabAppearance',
 	editor: 'settingsTabEditor',
-	accessibility: 'settingsTabAccessibility',
-	browser: 'settingsTabBrowser'
+	accessibility: 'settingsTabAccessibility'
 });

@@ -9,14 +9,13 @@ import type { ProctorIconId } from '../../../../../platform/theme/common/proctor
  * The Settings page: Proctor's own controls over the registered settings. People never edit
  * settings.json; each control writes one key and the page saves it for them.
  */
-export const settingsTabs = ['appearance', 'editor', 'accessibility', 'browser'] as const;
+export const settingsTabs = ['appearance', 'editor', 'accessibility'] as const;
 export type SettingsTab = (typeof settingsTabs)[number];
 
 export const settingsTabIcons: Readonly<Record<SettingsTab, ProctorIconId>> = Object.freeze({
 	appearance: 'settings.appearance',
 	editor: 'settings.editor',
-	accessibility: 'settings.accessibility',
-	browser: 'settings.browser'
+	accessibility: 'settings.accessibility'
 });
 
 /** A choice of fixed values. `label` names a page message; the value is what is stored. */
@@ -40,6 +39,8 @@ export type SettingControl =
 export interface SettingRow {
 	readonly id: EffectiveSettingId;
 	readonly control: SettingControl;
+	/** A page message of everyday words that should find this row, separated by spaces. */
+	readonly keywords?: string;
 }
 
 export interface SettingGroup {
@@ -59,6 +60,7 @@ export const settingsLayout: Readonly<Record<SettingsTab, readonly SettingGroup[
 				rows: [
 					{
 						id: 'window.theme',
+						keywords: 'settingsKeywordsWindowTheme',
 						control: {
 							kind: 'segmented',
 							choices: [
@@ -68,7 +70,11 @@ export const settingsLayout: Readonly<Record<SettingsTab, readonly SettingGroup[
 							]
 						}
 					},
-					{ id: 'workbench.preferHighContrast', control: { kind: 'switch' } }
+					{
+						id: 'workbench.preferHighContrast',
+						keywords: 'settingsKeywordsContrast',
+						control: { kind: 'switch' }
+					}
 				]
 			},
 			{
@@ -76,6 +82,15 @@ export const settingsLayout: Readonly<Record<SettingsTab, readonly SettingGroup[
 				rows: [
 					{
 						id: 'window.zoomLevel',
+						keywords: 'settingsKeywordsInterfaceSize',
+						control: {
+							kind: 'select',
+							choices: percent([80, 90, 100, 110, 125, 150, 175, 200])
+						}
+					},
+					{
+						id: 'browser.presentation.zoom',
+						keywords: 'settingsKeywordsBrowserZoom',
 						control: {
 							kind: 'select',
 							choices: percent([80, 90, 100, 110, 125, 150, 175, 200])
@@ -88,13 +103,19 @@ export const settingsLayout: Readonly<Record<SettingsTab, readonly SettingGroup[
 			{
 				title: 'settingsGroupLook',
 				rows: [
-					{ id: 'workbench.colorTheme', control: { kind: 'select', choices: [] } },
+					{
+						id: 'workbench.colorTheme',
+						keywords: 'settingsKeywordsEditorTheme',
+						control: { kind: 'select', choices: [] }
+					},
 					{
 						id: 'editor.fontSize',
+						keywords: 'settingsKeywordsFontSize',
 						control: { kind: 'stepper', minimum: 12, maximum: 24, unit: 'px' }
 					},
 					{
 						id: 'editor.lineHeight',
+						keywords: 'settingsKeywordsLineHeight',
 						control: { kind: 'stepper', minimum: 16, maximum: 40, unit: 'px' }
 					},
 					{
@@ -172,6 +193,7 @@ export const settingsLayout: Readonly<Record<SettingsTab, readonly SettingGroup[
 				rows: [
 					{
 						id: 'accessibility.reducedMotion',
+						keywords: 'settingsKeywordsMotion',
 						// The system's own request always applies; this can only add to it.
 						control: {
 							kind: 'select',
@@ -201,6 +223,7 @@ export const settingsLayout: Readonly<Record<SettingsTab, readonly SettingGroup[
 				rows: [
 					{
 						id: 'accessibility.screenReaderMode',
+						keywords: 'settingsKeywordsScreenReader',
 						control: {
 							kind: 'select',
 							choices: [
@@ -222,20 +245,6 @@ export const settingsLayout: Readonly<Record<SettingsTab, readonly SettingGroup[
 					}
 				]
 			}
-		],
-		browser: [
-			{
-				title: 'settingsGroupExamBrowser',
-				rows: [
-					{
-						id: 'browser.presentation.zoom',
-						control: {
-							kind: 'select',
-							choices: percent([80, 90, 100, 110, 125, 150, 175, 200])
-						}
-					}
-				]
-			}
 		]
 	} satisfies Record<SettingsTab, readonly SettingGroup[]>
 );
@@ -247,24 +256,92 @@ export function settingsPageIds(): readonly EffectiveSettingId[] {
 	);
 }
 
-/** Rows whose title or description contains `query`, across every tab. */
+/** The words of one row that Find a setting looks through, all in the page's language. */
+export interface SettingSearchText {
+	readonly title: string;
+	readonly description: string;
+	readonly choices: readonly string[];
+	readonly keywords: string;
+}
+
+/** A row found by Find a setting, with the tab and group it lives in. */
+export interface SettingMatch {
+	readonly tab: SettingsTab;
+	/** The page message naming the row's group. */
+	readonly group: string;
+	readonly row: SettingRow;
+}
+
+/**
+ * Rows, across every tab in page order, whose title, description, choice labels or
+ * everyday words contain every word of `query`.
+ */
 export function matchingRows(
 	query: string,
-	describe: (id: EffectiveSettingId) => { readonly title: string; readonly description: string }
-): readonly SettingRow[] {
-	const needle = query.trim().toLocaleLowerCase();
-	if (needle === '') return [];
+	text: (row: SettingRow) => SettingSearchText
+): readonly SettingMatch[] {
+	const words = searchWords(query);
+	if (words.length === 0) return [];
 	return settingsTabs.flatMap((tab) =>
 		settingsLayout[tab].flatMap((group) =>
-			group.rows.filter((row) => {
-				const text = describe(row.id);
-				return `${text.title} ${text.description}`.toLocaleLowerCase().includes(needle);
-			})
+			group.rows
+				.filter((row) => {
+					const found = text(row);
+					const haystack = normalize(
+						[found.title, found.description, ...found.choices, found.keywords].join(' ')
+					);
+					return words.every((word) => haystack.includes(word));
+				})
+				.map((row) => ({ tab, group: group.title, row }))
 		)
 	);
+}
+
+/** Whether `query` asks for anything; spaces alone do not. */
+export function isSearching(query: string): boolean {
+	return searchWords(query).length > 0;
+}
+
+function searchWords(query: string): readonly string[] {
+	return normalize(query)
+		.split(/\s+/u)
+		.filter((word) => word !== '');
+}
+
+/** Case and accents never stop a match, so “colour” and “Colour” find the same rows. */
+function normalize(text: string): string {
+	return text
+		.normalize('NFD')
+		.replace(/\p{Diacritic}/gu, '')
+		.toLocaleLowerCase();
+}
+
+/**
+ * The choice a control shows for a stored value. Word wrap's other values are kinds of On, and
+ * automatic announcements read as Brief.
+ */
+export function shownValue(id: EffectiveSettingId, value: string | number | boolean): string {
+	if (id === 'editor.wordWrap' && value !== 'off') return 'on';
+	if (id === 'accessibility.announcementMode' && value === 'auto') return 'minimal';
+	return String(value);
+}
+
+/** The choice of `row` that stands for `value`, if the row offers one. */
+export function choiceFor(
+	row: SettingRow,
+	value: string | number | boolean
+): SettingChoice | undefined {
+	const control = row.control;
+	if (control.kind !== 'segmented' && control.kind !== 'select') return undefined;
+	const shown = shownValue(row.id, value);
+	return control.choices.find((choice) => String(choice.value) === shown);
 }
 
 /** How long after the last change the page saves, so a run of steps is one save. */
 export const SETTINGS_SAVE_DELAY_MS = 400;
 
-export type SettingsSaveStatus = 'saved' | 'saving' | 'failed' | 'readonly';
+/**
+ * What the tab bar says about saving. `idle` says nothing: “Saved” appears only once a change
+ * made on this visit has been saved.
+ */
+export type SettingsSaveStatus = 'idle' | 'saved' | 'saving' | 'failed' | 'readonly';

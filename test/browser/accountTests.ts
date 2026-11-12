@@ -212,13 +212,16 @@ export async function runAccountTests(document: Document): Promise<void> {
 	let settingsSource = '{}';
 	let settingsRevision = 1;
 	let conflictNext = false;
+	let failNext = false;
+	let settingsWritable = true;
+	const settingsListeners = new Set<(projection: UserSettingsProjection) => void>();
 	const settingsCommits: string[] = [];
 	const settingsPreviews: string[] = [];
 	const settingsProjection = (): UserSettingsProjection => ({
 		source: settingsSource,
 		revision: `r${settingsRevision}`,
 		availability: 'available',
-		writable: true,
+		writable: settingsWritable,
 		presentation: {
 			windowTheme: 'system',
 			highContrast: false,
@@ -234,6 +237,10 @@ export async function runAccountTests(document: Document): Promise<void> {
 		cancelPreview: async () => {},
 		commit: async (intent) => {
 			settingsCommits.push(intent.source);
+			if (failNext) {
+				failNext = false;
+				return { kind: 'unavailable' };
+			}
 			if (conflictNext) {
 				conflictNext = false;
 				settingsSource = '{"editor.fontSize": 18}';
@@ -246,7 +253,10 @@ export async function runAccountTests(document: Document): Promise<void> {
 			settingsRevision++;
 			return { kind: 'success', projection: settingsProjection() };
 		},
-		onDidChange: () => () => {}
+		onDidChange: (listener) => {
+			settingsListeners.add(listener);
+			return () => settingsListeners.delete(listener);
+		}
 	};
 	const services = createAccountTestServices({
 		document,
@@ -1158,37 +1168,111 @@ export async function runAccountTests(document: Document): Promise<void> {
 
 		// #region Settings
 		assign('settings');
-		await wait(() => root.textContent!.includes('Window theme'), 'settings page');
-		check(
-			root.querySelector('[role="tab"][aria-selected="true"]')?.textContent === 'Appearance',
-			'Settings opens on Appearance'
-		);
-		check(root.textContent!.includes('Saved'), 'Settings say they are saved');
+		const settingsPanel = (): HTMLElement =>
+			root.querySelector<HTMLElement>('.prctr-settings-page__panel')!;
+		await wait(() => !settingsPanel().hidden, 'settings page');
 		const settingRow = (key: string): HTMLElement =>
 			root.querySelector<HTMLElement>(`[data-setting="${key}"]`)!;
-		[...settingRow('window.theme').querySelectorAll<HTMLButtonElement>('[role="radio"]')]
-			.find((radio) => radio.textContent === 'Dark')!
-			.click();
+		const shownRows = (): string[] =>
+			[...root.querySelectorAll<HTMLElement>('[data-setting]')]
+				.filter((row) => row.offsetParent !== null)
+				.map((row) => row.dataset.setting!);
+		const saveStatus = (): HTMLElement =>
+			root.querySelector<HTMLElement>('.prctr-settings-page__status')!;
+		const settingTabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+		check(
+			settingTabs.map((tab) => tab.textContent).join(',') ===
+				'Appearance,Exam editor,Accessibility',
+			'Settings has three tabs'
+		);
+		check(
+			settingTabs.every(
+				(tab) => tab.id !== '' && tab.getAttribute('aria-controls') === settingsPanel().id
+			),
+			'Each tab has an id and controls the panel'
+		);
+		check(
+			root.querySelector('[role="tab"][aria-selected="true"]')?.textContent ===
+				'Appearance' &&
+				settingsPanel().getAttribute('aria-labelledby') === settingTabs[0]!.id,
+			'Settings opens on Appearance, which labels the panel'
+		);
+		check(
+			saveStatus().getAttribute('role') === 'status' && saveStatus().textContent === '',
+			'The save status is present but silent before any change'
+		);
+		check(
+			!!settingRow('browser.presentation.zoom') &&
+				settingRow('browser.presentation.zoom').closest('[hidden]') === null &&
+				settingRow('browser.presentation.zoom').textContent!.includes('Exam browser zoom'),
+			'Exam browser zoom is on Appearance'
+		);
+		check(
+			buttonIn(settingRow('window.theme'), 'Reset to System')?.hidden === true,
+			'Reset waits until a setting is changed'
+		);
+		const themeRadios = [
+			...settingRow('window.theme').querySelectorAll<HTMLButtonElement>('[role="radio"]')
+		];
+		themeRadios[0]!.focus();
+		themeRadios[0]!.dispatchEvent(
+			new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+		);
 		await wait(() => settingsPreviews.length === 1, 'theme applied');
 		check(
-			settingsCommits.length === 0 && /"window\.theme":\s*"dark"/u.test(settingsPreviews[0]!),
+			settingsCommits.length === 0 &&
+				/"window\.theme":\s*"light"/u.test(settingsPreviews[0]!),
 			'A change applies at once, before it is saved'
+		);
+		check(
+			document.activeElement === themeRadios[1] && themeRadios[1]!.isConnected,
+			'A change keeps focus on the same control, updated in place'
 		);
 		await wait(() => settingsCommits.length === 1, 'theme saved');
 		check(
-			/"window\.theme":\s*"dark"/u.test(settingsCommits[0]!),
+			/"window\.theme":\s*"light"/u.test(settingsCommits[0]!),
 			'The choice is saved by itself'
 		);
-		await wait(() => !!buttonIn(settingRow('window.theme'), 'Reset'), 'reset offered');
-		buttonIn(settingRow('window.theme'), 'Reset')!.click();
+		await wait(() => saveStatus().textContent === 'Saved', 'saved after a change');
+		const themeReset = buttonIn(settingRow('window.theme'), 'Reset to System')!;
+		check(
+			!themeReset.hidden &&
+				themeReset.getAttribute('aria-label') === 'Reset Window theme to System',
+			'Reset names the default, in its accessible name too'
+		);
+		themeReset.click();
 		await wait(() => settingsCommits.length === 2, 'reset saved');
 		check(!settingsCommits[1]!.includes('window.theme'), 'Reset removes the key');
+		check(
+			document.activeElement === themeRadios[0] && themeReset.hidden,
+			'Reset moves focus to its control, now on the default'
+		);
+		check(
+			buttonIn(settingRow('editor.fontSize'), 'Reset to 14 px') !== undefined &&
+				buttonIn(settingRow('workbench.colorTheme'), 'Reset to GitHub Dark Default') !==
+					undefined,
+			'Reset labels name each default'
+		);
 		buttonIn(root, 'Exam editor')!.click();
 		check(
-			root.textContent!.includes('An exam can set its own editor settings'),
-			'The editor tab says exams can override it'
+			root.textContent!.includes(
+				'When you join an exam, these settings are copied into it and stay fixed until it ends.'
+			),
+			'The editor tab says how an exam uses these settings'
 		);
-		check(root.querySelector('.prctr-settings-page__code'), 'The editor tab previews code');
+		check(
+			root.querySelector<HTMLElement>('.prctr-settings-page__code')?.offsetParent !== null,
+			'The editor tab previews code'
+		);
+		check(
+			shownRows().includes('editor.cursorStyle') &&
+				shownRows().includes('editor.cursorBlinking') &&
+				shownRows().includes('workbench.tree.indent') &&
+				settingRow('editor.cursorBlinking').textContent!.includes(
+					'How the cursor blinks. Solid doesn’t blink.'
+				),
+			'The editor tab has Cursor style, Cursor blinking and Tree indentation'
+		);
 		[...settingRow('editor.lineNumbers').querySelectorAll<HTMLButtonElement>('[role="radio"]')]
 			.find((radio) => radio.textContent === 'Relative')!
 			.click();
@@ -1200,24 +1284,130 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'relative line numbers'
 		);
 		await wait(() => settingsCommits.length === 3, 'line numbers saved');
+		const lineHeight =
+			settingRow('editor.lineHeight').querySelector<HTMLElement>('[role="spinbutton"]')!;
+		check(
+			lineHeight.textContent === '22 px' &&
+				lineHeight.getAttribute('aria-valuemin') === '16' &&
+				lineHeight.getAttribute('aria-valuemax') === '40' &&
+				lineHeight.getAttribute('aria-describedby') !== null,
+			'Line height is a 16–40 px stepper at 22 px, described by its row'
+		);
+		lineHeight.focus();
+		lineHeight.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+		await wait(() => settingsCommits.length === 4, 'line height saved');
+		check(
+			document.activeElement === lineHeight && String(lineHeight.textContent) === '23 px',
+			'A stepper keeps focus through its change and save'
+		);
 		conflictNext = true;
 		settingRow('editor.fontSize')
 			.querySelector<HTMLButtonElement>('[aria-label="Larger"]')!
 			.click();
-		await wait(() => settingsCommits.length === 5, 'conflict reapplied');
+		await wait(() => settingsCommits.length === 6, 'conflict reapplied');
 		check(
-			/"editor\.fontSize":\s*15/u.test(settingsCommits[4]!),
+			/"editor\.fontSize":\s*15/u.test(settingsCommits[5]!),
 			'A conflicting save applies this page’s change again on the newer settings'
 		);
-		await wait(() => root.textContent!.includes('Saved'), 'saved after the conflict');
-		const find = root.querySelector<HTMLInputElement>('input[aria-label="Find a setting"]')!;
-		find.value = 'minimap';
-		find.dispatchEvent(new Event('input', { bubbles: true }));
+		await wait(() => saveStatus().textContent === 'Saved', 'saved after the conflict');
+		// #endregion
+
+		// #region Settings tabs and Find
+		const tablist = root.querySelector<HTMLElement>('[role="tablist"]')!;
+		settingTabs[1]!.focus();
+		tablist.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
 		check(
-			root.querySelectorAll('[data-setting]').length === 1 &&
-				!!settingRow('editor.minimap.enabled'),
-			'Find a setting narrows to matches across tabs'
+			document.activeElement === settingTabs[2] &&
+				settingTabs[2]!.getAttribute('aria-selected') === 'true',
+			'End selects and focuses the last tab'
 		);
+		check(
+			root.textContent!.includes('High contrast and Interface size are under Appearance.'),
+			'Accessibility points to Appearance'
+		);
+		buttonIn(root, 'Open Appearance')!.click();
+		check(
+			document.activeElement === settingTabs[0] &&
+				settingTabs[0]!.getAttribute('aria-selected') === 'true',
+			'Open Appearance selects and focuses the Appearance tab'
+		);
+		settingTabs[0]!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+		check(document.activeElement === settingTabs[0], 'Home stays on the first tab');
+		const find = root.querySelector<HTMLInputElement>('input[aria-label="Find a setting"]')!;
+		const findFor = (query: string): void => {
+			find.value = query;
+			find.dispatchEvent(new Event('input', { bubbles: true }));
+		};
+		findFor('minimap');
+		check(
+			shownRows().join(',') === 'editor.minimap.enabled' &&
+				root.textContent!.includes('Matching settings · 1') &&
+				settingRow('editor.minimap.enabled').textContent!.includes('Exam editor · Layout'),
+			'Find a setting narrows to matches across tabs, each saying where it lives'
+		);
+		check(
+			root.querySelector('[role="tab"][aria-selected="true"]') === null &&
+				settingTabs[0]!.tabIndex === 0 &&
+				settingsPanel().getAttribute('aria-label') === 'Matching settings',
+			'While finding no tab is selected, one keeps the tab stop and the panel is labelled'
+		);
+		findFor('dark');
+		check(
+			shownRows().includes('window.theme') && shownRows().includes('workbench.colorTheme'),
+			'Find a setting finds both themes by a choice'
+		);
+		findFor('zoom');
+		check(
+			shownRows().includes('window.zoomLevel') &&
+				shownRows().includes('browser.presentation.zoom'),
+			'Find a setting finds sizes by an everyday word'
+		);
+		findFor('qqq');
+		check(
+			shownRows().length === 0 &&
+				root.textContent!.includes('No setting matches “qqq”') &&
+				root.textContent!.includes('Every tab is searched.'),
+			'A search that finds nothing says so, with a hint'
+		);
+		buttonIn(root, 'Clear search')!.click();
+		check(
+			find.value === '' &&
+				document.activeElement === find &&
+				settingTabs[0]!.getAttribute('aria-selected') === 'true' &&
+				shownRows()[0] === 'window.theme',
+			'Clear search returns to the tab with focus in Find'
+		);
+		// #endregion
+
+		// #region Settings failures and read only
+		failNext = true;
+		const minimap = settingRow('editor.minimap.enabled');
+		buttonIn(root, 'Exam editor')!.click();
+		minimap.querySelector<HTMLButtonElement>('[role="switch"]')!.click();
+		await wait(() => saveStatus().textContent === 'Not saved', 'failed save');
+		const minimapBadge = minimap.querySelector<HTMLElement>('.prctr-status-badge')!;
+		check(
+			!minimapBadge.hidden && minimapBadge.textContent === 'Not saved',
+			'The row that was not saved carries a badge'
+		);
+		await wait(
+			() => host.textContent!.includes('Minimap wasn’t saved'),
+			'toast naming the setting'
+		);
+		buttonIn(host, 'Try again')!.click();
+		await wait(() => saveStatus().textContent === 'Saved', 'saved on trying again');
+		check(minimapBadge.hidden, 'The badge leaves once the setting is saved');
+		settingsWritable = false;
+		for (const listener of settingsListeners) listener(settingsProjection());
+		await wait(() => saveStatus().textContent === 'Read only', 'read only');
+		check(
+			root.textContent!.includes('Settings can’t be changed right now.') &&
+				minimap.querySelector<HTMLButtonElement>('[role="switch"]')!.disabled &&
+				buttonIn(minimap, 'Reset to On')!.hidden,
+			'Read only says so, dims every control and offers no Reset'
+		);
+		settingsWritable = true;
+		for (const listener of settingsListeners) listener(settingsProjection());
 		// #endregion
 
 		// #region Layout and lifecycle
