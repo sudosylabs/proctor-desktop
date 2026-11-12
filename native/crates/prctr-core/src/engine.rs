@@ -404,6 +404,12 @@ impl Engine {
             .min()
     }
 
+    /// Numbers a notification the agent itself originates (heartbeat, fatal), in the same sequence
+    /// as the engine's own. These are never withheld by flow control.
+    pub fn notify(&mut self, notification: Notification) -> Numbered {
+        self.number(notification)
+    }
+
     fn number(&mut self, notification: Notification) -> Numbered {
         self.last_message += 1;
         Numbered {

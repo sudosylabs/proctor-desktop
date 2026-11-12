@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.electron-main.json",
+  "include": [
+    "../src/prctr/base/browser/styleSheets.d.ts",
+    "../src/prctr/base/common/thenable.d.ts",
+    "../src/prctr/**/node/**/*.ts",
+    "../src/prctr/**/electron-main/**/*.ts",
+    "../test/native-agent/**/*.ts"
+  ]
+}

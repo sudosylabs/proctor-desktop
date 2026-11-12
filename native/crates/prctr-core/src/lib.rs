@@ -7,6 +7,7 @@ pub mod evaluate;
 pub mod observation;
 pub mod policy;
 pub mod registry;
+pub mod source;
 
 #[cfg(any(test, feature = "testing"))]
 pub mod testing;
@@ -17,3 +18,4 @@ pub use engine::{CoreError, Engine, InitialState, Input, MAX_UNACKNOWLEDGED, Num
 pub use observation::{AppMatches, FieldValue, Observation};
 pub use policy::{PolicyError, ValidPolicy};
 pub use registry::{CapabilityDescriptor, FieldKind, FieldSpec, Registry};
+pub use source::{Sink, Source, SourceError, SourceEvent};

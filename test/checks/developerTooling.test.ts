@@ -32,7 +32,8 @@ void test('test commands include every Node suite and close each Electron prereq
 		'base',
 		'platform',
 		'editor',
-		'security-utility'
+		'security-utility',
+		'native-agent'
 	]);
 	assert.deepEqual(selectSuites('electron'), [
 		'browser',

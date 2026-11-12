@@ -31,6 +31,12 @@ export const testSuites = {
 		output: '.build/security-utility-tests/**/*.test.js',
 		runtime: 'node'
 	},
+	'native-agent': {
+		patterns: ['test/native-agent/**/*.test.ts'],
+		build: 'build/buildNativeAgentTests.ts',
+		output: '.build/native-agent-tests/**/*.test.js',
+		runtime: 'node'
+	},
 	browser: {
 		patterns: ['test/electron/browserHarness.real.test.ts'],
 		build: 'build/buildBrowserHarness.ts',

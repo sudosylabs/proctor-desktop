@@ -56,6 +56,7 @@
     "test:editor": "node scripts/test.ts editor",
     "test:native": "node build/testNative.ts",
     "test:security-utility": "node scripts/test.ts security-utility",
+    "test:native-agent": "node scripts/test.ts native-agent",
     "test:window-skeleton": "node scripts/test.ts window-skeleton",
     "test:unit": "node scripts/test.ts unit",
     "check:all": "npm run check && npm run test:electron && npm run test:native",

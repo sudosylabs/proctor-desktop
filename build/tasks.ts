@@ -41,6 +41,10 @@ export const tasks: Readonly<Record<string, Task>> = {
 	'test:editor': { group: 'test', description: 'Editor suites' },
 	'test:native': { group: 'native', description: 'Rust native-package tests' },
 	'test:security-utility': { group: 'test', description: 'Security-utility suite' },
+	'test:native-agent': {
+		group: 'test',
+		description: 'Native agent process and Electron-main service suite'
+	},
 	'test:window-skeleton': { group: 'test', description: 'Window skeleton suite' },
 	'test:desktop-identity': { group: 'test', description: 'Desktop identity suite' },
 	'build:security-utility': { group: 'build', description: 'Bundle the security utility' },

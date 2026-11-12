@@ -190,6 +190,15 @@
           "targetScope": null
         },
         {
+          "manifest": "native/crates/prctr-agent/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
           "manifest": "native/crates/prctr-core/Cargo.toml",
           "alias": "serde_json",
           "kind": "production",

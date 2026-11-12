@@ -92,6 +92,18 @@
       "allowedDynamicImports": []
     },
     {
+      "id": "native-agent-main",
+      "kind": "main",
+      "entrypoint": "src/prctr/code/electron-main/nativeAgentComposition.ts",
+      "required": [
+        "src/prctr/platform/native/common",
+        "src/prctr/platform/native/node",
+        "src/prctr/platform/native/electron-main"
+      ],
+      "forbidden": ["src/prctr/platform/native/electron-utility"],
+      "allowedDynamicImports": []
+    },
+    {
       "id": "integrated-browser-main",
       "kind": "main",
       "entrypoint": "src/prctr/code/electron-main/integratedBrowserComposition.ts",

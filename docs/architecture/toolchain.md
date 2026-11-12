@@ -311,7 +311,11 @@ never coincide.
 
 The foundation currently exposes `check`, focused repository checks,
 `check:types`, `generate`, `inspect`, the checker test suite, and a typed
-`test:native` entrypoint. `build:security-utility` compiles the native Node-API
+`test:native` entrypoint. `test:native-agent` builds the native agent with its
+test-only scripted capability and drives the real binary through Electron main's
+connection and service: handshake, framing, readiness → participation, containment,
+gaps, crash, hang, the single restart, and orderly close. It is part of
+`test:unit`. `build:security-utility` compiles the superseded native Node-API
 addon and exact Electron-main/utility test bundles. `test:security-utility`
 proves the process-neutral private protocol, while `test:electron` runs the
 real Electron/Node-API lifecycle. `build:browser-harness` bundles a sandboxed
