@@ -88,6 +88,7 @@ const sessions = (): AccountResponse =>
 				client: 'desktop',
 				platform: 'darwin',
 				method: 'oidc',
+				authenticationStrength: 'multi_factor',
 				createdAt: NOW - 60 * 60 * 1000,
 				lastActivityAt: NOW,
 				expiresAt: NOW + DAY
@@ -99,6 +100,7 @@ const sessions = (): AccountResponse =>
 				client: 'desktop',
 				platform: 'windows',
 				method: 'password',
+				authenticationStrength: 'single_factor',
 				createdAt: NOW - 4 * DAY,
 				lastActivityAt: NOW - 4 * DAY,
 				expiresAt: NOW + DAY
@@ -748,6 +750,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 			failed: false,
 			relation: 'subject' as const,
 			actor: 'self' as const,
+			summary: 'You signed in.',
 			...extra
 		});
 		account.changes.set('readHistory', (intent) =>

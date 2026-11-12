@@ -252,6 +252,27 @@ export class AccountService {
 				if (intent.id === this.session.currentRegistration(binding))
 					await this.session.endRevokedDesktop();
 				return { kind: 'success' };
+			case 'renameSession':
+				try {
+					await api.request('renameCurrentUserSession', {
+						path: { session_id: intent.id },
+						body: { device_name: intent.name }
+					});
+				} catch (error) {
+					const registration = namingRegistration(error);
+					if (registration === undefined) throw error;
+					return validateAccountResponse({
+						kind: 'namedByDesktop',
+						desktopRegistrationId: registration
+					});
+				}
+				return { kind: 'success' };
+			case 'renameDesktop':
+				await api.request('renameDesktopRegistration', {
+					path: { desktop_registration_id: intent.id },
+					body: { display_name: intent.name }
+				});
+				return { kind: 'success' };
 			case 'createToken': {
 				const result = await api.request('createPersonalAccessToken', {
 					body: {
@@ -304,6 +325,18 @@ function readPhoto(value: unknown, etag: string | undefined): AccountResponse {
 		dataUrl: `data:image/webp;base64,${bytes.toString('base64')}`,
 		etag
 	});
+}
+
+/** The registration that names a Desktop Session, when a Session rename was refused for it. */
+function namingRegistration(error: unknown): string | undefined {
+	if (
+		!(error instanceof ServerApiError) ||
+		error.kind !== 'server' ||
+		error.status !== 409 ||
+		error.code !== 'session.desktop_named_by_registration'
+	)
+		return undefined;
+	return error.problem?.fields?.desktop_registration_id;
 }
 
 /** The closed Account reason for a failure. The Session signer already ended a refused Session. */

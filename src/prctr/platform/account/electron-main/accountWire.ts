@@ -79,17 +79,24 @@ export function readAccountSessions(raw: unknown, binding: SessionBinding): Acco
 			// The server marks the Session that asked; it must be the one this window is bound to.
 			if (s.current !== (s.id === binding.sessionId))
 				throw new TypeError('Account binding mismatch');
-			return {
+			const session: Record<string, unknown> = {
 				id: s.id,
 				current: s.current,
 				name: s.device_name ?? '',
 				client: s.client_type,
 				platform: s.desktop_platform ?? '',
 				method: s.authentication_method,
+				authenticationStrength: s.authentication_strength,
+				mfaCompletedAt: accountInstant(s.mfa_completed_at),
+				desktopRegistrationId: s.desktop_registration_id,
+				desktopRegistrationName: s.desktop_registration_display_name,
 				createdAt: accountInstant(s.created_at),
 				lastActivityAt: accountInstant(s.last_activity_at),
 				expiresAt: accountInstant(s.expires_at)
 			};
+			for (const key of Object.keys(session))
+				if (session[key] === undefined) delete session[key];
+			return session;
 		})
 	});
 }
@@ -229,6 +236,7 @@ export function readAccountHistory(raw: unknown): AccountData {
 				failed: e.status === 'fail',
 				relation: e.relation,
 				actor: record(e.actor).kind,
+				summary: e.summary,
 				client: e.client_type,
 				ipAddress: e.ip_address,
 				userAgent: e.user_agent
