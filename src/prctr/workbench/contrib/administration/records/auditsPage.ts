@@ -12,6 +12,18 @@ import { isReadAction, readableCode } from '../common/administrationPresentation
 import { AdminFilters } from '../widgets/adminFilters.js';
 import { AdminList, type AdminListItem, type AdminListQuery } from '../widgets/adminList.js';
 import { readOnce } from '../widgets/adminReads.js';
+import { AdminPersonFilter } from '../widgets/adminPersonFilter.js';
+import { auditEventActions, auditEventKinds, type AuditEventKind } from '../common/auditEvents.js';
+import type { AdministrationText } from '../administrationFormat.js';
+
+const EVENT_TEXT: Readonly<Record<AuditEventKind, AdministrationText>> = {
+	signIn: 'auditsEventSignIn',
+	people: 'auditsEventPeople',
+	access: 'auditsEventAccess',
+	structure: 'auditsEventStructure',
+	exams: 'auditsEventExams',
+	records: 'auditsEventRecords'
+};
 
 type Audit = AdminListItem<'audits'>;
 type Period = 'day' | 'week' | 'month' | 'any';
@@ -59,11 +71,9 @@ export class AuditsPage extends Disposable implements PageView {
 			],
 			'week',
 			(period) => {
-				const { status } = this.query;
-				this.query = {
-					...since(period, format.now()),
-					...(status === undefined ? {} : { status })
-				};
+				// Only the period changes; the other filters stay.
+				const { createdAfter: _after, ...rest } = this.query;
+				this.query = { ...rest, ...since(period, format.now()) };
 				this.list.setQuery(this.query);
 			}
 		);
@@ -80,6 +90,50 @@ export class AuditsPage extends Disposable implements PageView {
 				this.list.redraw();
 				this.updateNote();
 			}
+		);
+		// Event narrows to one kind of change, By to who did it, About to whom it happened.
+		this.filters.addSelect<AuditEventKind | 'any'>(
+			format.text('auditsEventFilter'),
+			'action.filter',
+			[
+				{ value: 'any', label: format.text('auditsEventAny') },
+				...auditEventKinds.map((kind) => ({
+					value: kind,
+					label: format.text(EVENT_TEXT[kind])
+				}))
+			],
+			'any',
+			(kind) => {
+				const { actions: _actions, ...rest } = this.query;
+				this.query =
+					kind === 'any' ? rest : { ...rest, actions: [...auditEventActions[kind]] };
+				this.list.setQuery(this.query);
+			}
+		);
+		this._register(
+			instantiationService.createInstance(AdminPersonFilter, this.filters.addSlot(), {
+				label: format.text('auditsBy'),
+				anyone: format.text('auditsAnyone'),
+				icon: 'admin.users',
+				onChange: (person) => {
+					const { actorId: _actorId, ...rest } = this.query;
+					this.query = person === undefined ? rest : { ...rest, actorId: person.id };
+					this.list.setQuery(this.query);
+				}
+			})
+		);
+		this._register(
+			instantiationService.createInstance(AdminPersonFilter, this.filters.addSlot(), {
+				label: format.text('auditsAbout'),
+				anyone: format.text('auditsAnyone'),
+				icon: 'object.student',
+				onChange: (person) => {
+					const { subjectUserId: _subject, ...rest } = this.query;
+					this.query =
+						person === undefined ? rest : { ...rest, subjectUserId: person.id };
+					this.list.setQuery(this.query);
+				}
+			})
 		);
 		this.filters.addSelect<'any' | 'success' | 'fail'>(
 			format.text('auditsOutcome'),

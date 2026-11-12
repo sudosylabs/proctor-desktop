@@ -93,6 +93,18 @@ export class AdminFilters extends Disposable {
 		this.linkRun = run;
 	}
 
+	/** A place in the bar for a filter another control draws, such as a person picker. */
+	addSlot(): HTMLElement {
+		const holder = createElementFactory(this.element.ownerDocument)(
+			'span.prctr-admin-filters__select'
+		);
+		this.element.insertBefore(
+			holder,
+			this.element.querySelector('.prctr-admin-filters__spacer')
+		);
+		return holder;
+	}
+
 	/** A search field; `onChange` hears the settled text, or undefined once it is cleared. */
 	addSearch(
 		label: string,

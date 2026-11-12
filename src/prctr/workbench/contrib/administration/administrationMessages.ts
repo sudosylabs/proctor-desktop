@@ -274,6 +274,46 @@ const sharedMessages = Object.freeze({
 		defaultMessage: 'Your access changed since this check. Nothing has changed; check again.',
 		description: "A change for everyone whose check no longer matches the viewer's access."
 	}),
+	personPickerTitle: defineMessage({
+		id: 'administration.person.picker.title',
+		defaultMessage: '{filter}: choose a person',
+		description: 'Title of finding one person for a filter, as in "About: choose a person".'
+	}),
+	personPickerBody: defineMessage({
+		id: 'administration.person.picker.body',
+		defaultMessage: 'Find them by name, email or username.',
+		description: 'Description of finding one person for a filter.'
+	}),
+	personPickerFind: defineMessage({
+		id: 'administration.person.picker.find',
+		defaultMessage: 'Find a person',
+		description: 'Label of the search field that finds one person.'
+	}),
+	personPickerResults: defineMessage({
+		id: 'administration.person.picker.results',
+		defaultMessage: 'People found',
+		description: 'Accessible name of the people a search found.'
+	}),
+	personPickerClear: defineMessage({
+		id: 'administration.person.picker.clear',
+		defaultMessage: 'Show {anyone}',
+		description: 'Clears the person filter, as in "Show anyone".'
+	}),
+	personPickerStart: defineMessage({
+		id: 'administration.person.picker.start',
+		defaultMessage: 'Type at least two letters of a name, email or username.',
+		description: 'Before anything is typed.'
+	}),
+	personPickerNone: defineMessage({
+		id: 'administration.person.picker.none',
+		defaultMessage: 'Nobody matches.',
+		description: 'When a search finds nobody.'
+	}),
+	personPickerMore: defineMessage({
+		id: 'administration.person.picker.more',
+		defaultMessage: 'More people match; type more of the name.',
+		description: 'When a search finds more than are listed.'
+	}),
 	pageUnavailable: defineMessage({
 		id: 'administration.page.unavailable',
 		defaultMessage: 'This Administration page could not be opened.',

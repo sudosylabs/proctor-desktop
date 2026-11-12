@@ -141,6 +141,16 @@ export const operationsMessages = Object.freeze({
 		defaultMessage: 'The job is cancelling',
 		description: 'Toast after cancelling a job.'
 	}),
+	mailRecipientFilter: defineMessage({
+		id: 'administration.operations.mail.filter.recipient',
+		defaultMessage: 'Recipient',
+		description: 'Mail filter: emails sent to one person.'
+	}),
+	mailAnyone: defineMessage({
+		id: 'administration.operations.mail.filter.anyone',
+		defaultMessage: 'Anyone',
+		description: 'The Recipient filter with nobody chosen.'
+	}),
 	mailHealth: defineMessage({
 		id: 'administration.operations.mail.health',
 		defaultMessage: 'All email, last 24 hours',

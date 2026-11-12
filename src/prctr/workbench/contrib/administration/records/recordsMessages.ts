@@ -41,6 +41,61 @@ export const recordsMessages = Object.freeze({
 		defaultMessage: 'By',
 		description: 'Audit column: who did it.'
 	}),
+	auditsEventFilter: defineMessage({
+		id: 'administration.records.audits.filter.event.label',
+		defaultMessage: 'Event',
+		description: 'Audits filter by kind of change.'
+	}),
+	auditsEventAny: defineMessage({
+		id: 'administration.records.audits.filter.event.any',
+		defaultMessage: 'Any event',
+		description: 'Audits filter choice: every kind of change.'
+	}),
+	auditsEventSignIn: defineMessage({
+		id: 'administration.records.audits.filter.event.signin',
+		defaultMessage: 'Sign-in and two-step',
+		description: 'Audits filter choice: sign-ins and two-step verification.'
+	}),
+	auditsEventPeople: defineMessage({
+		id: 'administration.records.audits.filter.event.people',
+		defaultMessage: 'People and accounts',
+		description: 'Audits filter choice: accounts, invitations, sessions and tokens.'
+	}),
+	auditsEventAccess: defineMessage({
+		id: 'administration.records.audits.filter.event.access',
+		defaultMessage: 'Roles and access',
+		description: 'Audits filter choice: roles, grants and the access policy.'
+	}),
+	auditsEventStructure: defineMessage({
+		id: 'administration.records.audits.filter.event.structure',
+		defaultMessage: 'Structure and classes',
+		description: 'Audits filter choice: units, programmes, classes and periods.'
+	}),
+	auditsEventExams: defineMessage({
+		id: 'administration.records.audits.filter.event.exams',
+		defaultMessage: 'Exams and results',
+		description: 'Audits filter choice: exams, sittings and results.'
+	}),
+	auditsEventRecords: defineMessage({
+		id: 'administration.records.audits.filter.event.records',
+		defaultMessage: 'Records and operations',
+		description: 'Audits filter choice: retention, jobs and mail.'
+	}),
+	auditsBy: defineMessage({
+		id: 'administration.records.audits.filter.by',
+		defaultMessage: 'By',
+		description: 'Audits filter: who did it.'
+	}),
+	auditsAbout: defineMessage({
+		id: 'administration.records.audits.filter.about',
+		defaultMessage: 'About',
+		description: 'Audits filter: to whom it happened.'
+	}),
+	auditsAnyone: defineMessage({
+		id: 'administration.records.audits.filter.anyone',
+		defaultMessage: 'Anyone',
+		description: 'The value of the By and About filters with nobody chosen.'
+	}),
 	auditsOutcomeAny: defineMessage({
 		id: 'administration.records.audits.outcome.any',
 		defaultMessage: 'Any outcome',

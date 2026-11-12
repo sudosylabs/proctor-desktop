@@ -6140,6 +6140,18 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.mail.filter.anyone": {
+      "message": "Anyone",
+      "description": "The Recipient filter with nobody chosen.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.mail.filter.recipient": {
+      "message": "Recipient",
+      "description": "Mail filter: emails sent to one person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.mail.filter.state": {
       "message": "Status",
       "description": "Filter over deliveries.",
@@ -6667,6 +6679,58 @@
       "message": "Users",
       "description": "Heading of the Administration Users page.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.person.picker.body": {
+      "message": "Find them by name, email or username.",
+      "description": "Description of finding one person for a filter.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.person.picker.clear": {
+      "message": "Show {anyone}",
+      "description": "Clears the person filter, as in \"Show anyone\".",
+      "placeholders": [
+        "anyone"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.person.picker.find": {
+      "message": "Find a person",
+      "description": "Label of the search field that finds one person.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.person.picker.more": {
+      "message": "More people match; type more of the name.",
+      "description": "When a search finds more than are listed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.person.picker.none": {
+      "message": "Nobody matches.",
+      "description": "When a search finds nobody.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.person.picker.results": {
+      "message": "People found",
+      "description": "Accessible name of the people a search found.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.person.picker.start": {
+      "message": "Type at least two letters of a name, email or username.",
+      "description": "Before anything is typed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.person.picker.title": {
+      "message": "{filter}: choose a person",
+      "description": "Title of finding one person for a filter, as in \"About: choose a person\".",
+      "placeholders": [
+        "filter"
+      ],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.policy.blocker.mfa": {
@@ -7213,6 +7277,72 @@
     "administration.records.audits.everything": {
       "message": "Every event",
       "description": "Filter choice: every event, including reads.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.about": {
+      "message": "About",
+      "description": "Audits filter: to whom it happened.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.anyone": {
+      "message": "Anyone",
+      "description": "The value of the By and About filters with nobody chosen.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.by": {
+      "message": "By",
+      "description": "Audits filter: who did it.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.event.access": {
+      "message": "Roles and access",
+      "description": "Audits filter choice: roles, grants and the access policy.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.event.any": {
+      "message": "Any event",
+      "description": "Audits filter choice: every kind of change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.event.exams": {
+      "message": "Exams and results",
+      "description": "Audits filter choice: exams, sittings and results.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.event.label": {
+      "message": "Event",
+      "description": "Audits filter by kind of change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.event.people": {
+      "message": "People and accounts",
+      "description": "Audits filter choice: accounts, invitations, sessions and tokens.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.event.records": {
+      "message": "Records and operations",
+      "description": "Audits filter choice: retention, jobs and mail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.event.signin": {
+      "message": "Sign-in and two-step",
+      "description": "Audits filter choice: sign-ins and two-step verification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.audits.filter.event.structure": {
+      "message": "Structure and classes",
+      "description": "Audits filter choice: units, programmes, classes and periods.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },

@@ -31,7 +31,13 @@ import { readableCode } from '../common/administrationPresentation.js';
 import { AdminChanges, AdminConfirmation } from '../widgets/adminChanges.js';
 import { AdminFilters } from '../widgets/adminFilters.js';
 import { DeliveryDialog } from './deliveryDialog.js';
-import { AdminList, type AdminListItem, type AdminTone } from '../widgets/adminList.js';
+import {
+	AdminList,
+	type AdminListItem,
+	type AdminListQuery,
+	type AdminTone
+} from '../widgets/adminList.js';
+import { AdminPersonFilter } from '../widgets/adminPersonFilter.js';
 import { adminRead, readOnce } from '../widgets/adminReads.js';
 
 type Delivery = AdminListItem<'mailDeliveries'>;
@@ -60,6 +66,7 @@ export class MailPage extends Disposable implements PageView {
 	private readonly banner: BannerControl;
 	private readonly health: PageSection;
 	private readonly list: AdminList<'mailDeliveries'>;
+	private query: AdminListQuery<'mailDeliveries'> = {};
 	private readonly keys: PageSection;
 	private readonly changes: AdminChanges;
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
@@ -101,7 +108,25 @@ export class MailPage extends Disposable implements PageView {
 				}))
 			],
 			ANY,
-			(state) => this.list.setQuery(state === ANY ? {} : { state: [state] })
+			(state) => {
+				const { state: _state, ...rest } = this.query;
+				this.query = state === ANY ? rest : { ...rest, state: [state] };
+				this.list.setQuery(this.query);
+			}
+		);
+		// Recipient is a person, never a typed address.
+		this._register(
+			instantiationService.createInstance(AdminPersonFilter, filters.addSlot(), {
+				label: format.text('mailRecipientFilter'),
+				anyone: format.text('mailAnyone'),
+				icon: 'admin.users',
+				onChange: (person) => {
+					const { recipientUserId: _recipient, ...rest } = this.query;
+					this.query =
+						person === undefined ? rest : { ...rest, recipientUserId: person.id };
+					this.list.setQuery(this.query);
+				}
+			})
 		);
 		this.list = this._register(
 			instantiationService.createInstance(
