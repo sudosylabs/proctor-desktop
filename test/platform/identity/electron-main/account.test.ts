@@ -16,9 +16,14 @@ import {
 	readAccountHistory,
 	readAccountSecurity,
 	readRevokedSessionCount,
-	accountHistoryPath
+	accountHistoryQuery
 } from '../../../../src/prctr/platform/account/electron-main/accountWire.js';
-import { desktopHttpMethod } from '../../../../src/prctr/platform/identity/node/desktopAuthHttp.js';
+import { encodeRequest } from '../../../../src/prctr/platform/serverApi/node/requestEncoding.js';
+import { operationContract } from '../../../../src/prctr/platform/serverApi/node/serverContract.js';
+const historyURL = (query: Parameters<typeof accountHistoryQuery>[0]) =>
+	encodeRequest('https://example.test', 'listCurrentUserAuditEvents', {
+		query: accountHistoryQuery(query)
+	}).url;
 const id = 'y'.repeat(26);
 void test('account boundary rejects URLs, foreign resources, excessive data and unexpected actions', () => {
 	for (const value of [
@@ -28,8 +33,12 @@ void test('account boundary rejects URLs, foreign resources, excessive data and 
 		{ kind: 'revokeAll' }
 	])
 		assert.throws(() => validateAccountIntent(value));
-	assert.throws(() => desktopHttpMethod('/api/v1/users/me/desktop-registrations/../sessions'));
-	assert.equal(desktopHttpMethod(`/api/v1/users/me/desktop-registrations/${id}`), 'DELETE');
+	assert.throws(() =>
+		encodeRequest('https://example.test', 'revokeDesktopRegistration', {
+			path: { desktop_registration_id: '../sessions' }
+		})
+	);
+	assert.equal(operationContract('revokeDesktopRegistration').method, 'DELETE');
 	assert.throws(() =>
 		readAccountProfile({ id: 'b'.repeat(26) }, { principalId: id, sessionId: id })
 	);
@@ -410,18 +419,24 @@ void test('token and notice wire parsers whitelist fields and bind the principal
 	);
 });
 
-void test('token and verification routes map to exact methods and reject bodies on reads', () => {
-	assert.equal(desktopHttpMethod('/api/v1/users/me/tokens'), 'GET');
-	assert.equal(desktopHttpMethod('/api/v1/users/me/tokens', undefined, undefined, true), 'POST');
-	assert.equal(desktopHttpMethod(`/api/v1/users/me/tokens/${id}`), 'DELETE');
-	assert.equal(desktopHttpMethod(`/api/v1/users/me/tokens/${id}/disable`), 'POST');
-	assert.equal(desktopHttpMethod(`/api/v1/users/me/tokens/${id}/enable`), 'POST');
-	assert.equal(desktopHttpMethod('/api/v1/auth/email-verification/request'), 'POST');
-	assert.equal(desktopHttpMethod('/api/v1/users/me/retention-notices?limit=200'), 'GET');
-	assert.throws(() => desktopHttpMethod(`/api/v1/users/me/tokens/${id}/rotate`));
-	assert.throws(() => desktopHttpMethod('/api/v1/users/me/tokens/../sessions'));
+void test('token and verification operations have exact methods and refuse bodies on reads', () => {
+	const method = (operation: Parameters<typeof operationContract>[0]) =>
+		operationContract(operation).method;
+	assert.equal(method('listPersonalAccessTokens'), 'GET');
+	assert.equal(method('createPersonalAccessToken'), 'POST');
+	assert.equal(method('revokePersonalAccessToken'), 'DELETE');
+	assert.equal(method('disablePersonalAccessToken'), 'POST');
+	assert.equal(method('enablePersonalAccessToken'), 'POST');
+	assert.equal(method('requestEmailVerification'), 'POST');
+	assert.equal(method('listRetentionNotices'), 'GET');
+	assert.equal(method('listGrantablePersonalAccessTokenScopes'), 'GET');
 	assert.throws(() =>
-		desktopHttpMethod(`/api/v1/users/me/tokens/${id}`, undefined, undefined, true)
+		encodeRequest('https://example.test', 'listPersonalAccessTokens', { body: {} } as never)
+	);
+	assert.throws(() =>
+		encodeRequest('https://example.test', 'revokePersonalAccessToken', {
+			path: { personal_access_token_id: '..' }
+		})
 	);
 });
 
@@ -456,7 +471,7 @@ void test('sessions trust the server current mark only when it is this window’
 	});
 	assert.throws(() => readRevokedSessionCount({ revoked_session_count: -1 }));
 	assert.throws(() => readRevokedSessionCount({ revoked_session_count: 1, extra: true }));
-	assert.equal(desktopHttpMethod('/api/v1/users/me/sessions/revoke-others'), 'POST');
+	assert.equal(operationContract('revokeOtherCurrentUserSessions').method, 'POST');
 });
 
 void test('two-step status maps method, dates and the issued recovery-code set', () => {
@@ -548,32 +563,26 @@ void test('grantable scopes are bounded and refer only to listed Academic Units'
 	assert.throws(() =>
 		readAccountGrantableScopes({ ...raw, scopes: [{ ...raw.scopes[0], name: 'Exam View' }] })
 	);
-	assert.equal(desktopHttpMethod('/api/v1/users/me/tokens/grantable-scopes'), 'GET');
 });
 
 void test('history queries use the server filter names and parse a minimized page', () => {
-	assert.equal(accountHistoryPath({}), '/api/v1/users/me/audits?limit=10');
-	const path = accountHistoryPath({
-		createdAfter: Date.parse('2026-01-01T00:00:00Z'),
-		createdBefore: Date.parse('2026-02-01T00:00:00Z'),
-		events: ['sign_in.failed', 'sign_out'],
-		status: 'fail',
-		relation: 'subject',
-		cursor: 'opaque/+='
-	});
+	assert.equal(historyURL({}), 'https://example.test/api/v1/users/me/audits?limit=10');
 	assert.equal(
-		path,
-		'/api/v1/users/me/audits?limit=10&created_after=2026-01-01T00%3A00%3A00.000Z&created_before=2026-02-01T00%3A00%3A00.000Z&event=sign_in.failed&event=sign_out&status=fail&relation=subject&cursor=opaque%2F%2B%3D'
+		historyURL({
+			createdAfter: Date.parse('2026-01-01T00:00:00Z'),
+			createdBefore: Date.parse('2026-02-01T00:00:00Z'),
+			events: ['sign_in.failed', 'sign_out'],
+			status: 'fail',
+			relation: 'subject',
+			cursor: 'opaque/+='
+		}),
+		'https://example.test/api/v1/users/me/audits?limit=10&cursor=opaque%2F%2B%3D&created_after=2026-01-01T00%3A00%3A00.000Z&created_before=2026-02-01T00%3A00%3A00.000Z&event=sign_in.failed&event=sign_out&status=fail&relation=subject'
 	);
-	assert.equal(desktopHttpMethod(path), 'GET');
-	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=10&actor=1'));
-	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=200' as never));
 	// The last page is read oldest first with exactly what is left over.
-	const last = accountHistoryPath({ order: 'asc', limit: 4 });
-	assert.equal(last, '/api/v1/users/me/audits?limit=4&order=asc');
-	assert.equal(desktopHttpMethod(last), 'GET');
-	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=0' as never));
-	assert.throws(() => desktopHttpMethod('/api/v1/users/me/audits?limit=11' as never));
+	assert.equal(
+		historyURL({ order: 'asc', limit: 4 }),
+		'https://example.test/api/v1/users/me/audits?limit=4&order=asc'
+	);
 	for (const intent of [
 		{ kind: 'readHistory', events: ['made.up'] },
 		{ kind: 'readHistory', events: [] },

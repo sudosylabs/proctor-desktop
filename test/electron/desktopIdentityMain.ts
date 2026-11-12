@@ -18,6 +18,7 @@ import { loadNativeDesktopKeyCustody } from '../../src/prctr/platform/identity/e
 import { OsDesktopCredentialStore } from '../../src/prctr/platform/identity/electron-main/desktopCredentialStore.js';
 import { DesktopAuthorizationService } from '../../src/prctr/platform/identity/electron-main/desktopAuthorizationService.js';
 import { AdministrationService } from '../../src/prctr/platform/administration/electron-main/administrationService.js';
+import { AccountService } from '../../src/prctr/platform/account/electron-main/accountService.js';
 import { ServerHttpTransport } from '../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 import {
 	installationKeyScope,
@@ -94,7 +95,7 @@ if (probe) {
 					return new ProductWindowCoordinator(
 						new ElectronProductWindowFactory({
 							production: false,
-							account: service,
+							account: new AccountService(service),
 							administration: new AdministrationService(service),
 							examActivity: service,
 							settings: service,

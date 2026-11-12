@@ -103,3 +103,19 @@ void test('multipart content keeps bytes and metadata encoding separate', async 
 	assert.deepEqual(photo.body, new Uint8Array([1, 2, 3]));
 	assert.equal(photo.headers?.['Content-Type'], 'image/png');
 });
+
+void test('a repeated query parameter is sent as every value it was given, in order', () => {
+	const url = new URL(
+		encodeRequest(origin, 'listCurrentUserAuditEvents', {
+			query: { limit: 10, event: ['session.revoked', 'sign_in.succeeded'] }
+		}).url
+	);
+	assert.deepEqual(url.searchParams.getAll('event'), ['session.revoked', 'sign_in.succeeded']);
+	assert.equal(url.searchParams.get('limit'), '10');
+	const single = new URL(
+		encodeRequest(origin, 'listCurrentUserAuditEvents', {
+			query: { event: ['session.revoked'] }
+		}).url
+	);
+	assert.deepEqual(single.searchParams.getAll('event'), ['session.revoked']);
+});

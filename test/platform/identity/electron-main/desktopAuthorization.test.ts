@@ -20,6 +20,7 @@ import {
 	CancellationToken
 } from '../../../../src/prctr/base/common/cancellation.js';
 import { LoopbackAuthServer } from '../../../../src/prctr/platform/identity/node/loopbackAuthServer.js';
+import { AccountService } from '../../../../src/prctr/platform/account/electron-main/accountService.js';
 import { ServerHttpTransport } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 import { encodeRequest } from '../../../../src/prctr/platform/serverApi/node/requestEncoding.js';
 import { decodeResponse } from '../../../../src/prctr/platform/serverApi/node/responseDecoding.js';
@@ -34,6 +35,13 @@ import {
 import { DesktopAuthorizationError } from '../../../../src/prctr/platform/identity/node/desktopAuthorizationError.js';
 import type { StoredDesktopSession } from '../../../../src/prctr/platform/identity/node/desktopCredentialStore.js';
 
+const accounts = new WeakMap<DesktopAuthorizationService, AccountService>();
+/** The Account capability lent the Session of `service`, one per service as in composition. */
+function accountOf(service: DesktopAuthorizationService): AccountService {
+	let account = accounts.get(service);
+	if (!account) accounts.set(service, (account = new AccountService(service)));
+	return account;
+}
 const callbackPages = createDesktopAuthCallbackPages(
 	createLocalization({ requestedLocale: 'en', messages: Object.values(callbackPageMessages) }),
 	resolve('resources/branding/source/lockup')
@@ -1183,14 +1191,17 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		await service.start(identity, CancellationToken.None);
 		const binding = { principalId: id, sessionId };
 		assert.deepEqual(
-			await service.account(
+			await accountOf(service).account(
 				{ ...binding, sessionId: 'foreign' },
 				{ kind: 'read', section: 'profile' }
 			),
 			{ kind: 'error', reason: 'sessionEnded' }
 		);
 		assert.equal(seen.length, 0);
-		const profile = await service.account(binding, { kind: 'read', section: 'profile' });
+		const profile = await accountOf(service).account(binding, {
+			kind: 'read',
+			section: 'profile'
+		});
 		assert.equal(profile.kind, 'data');
 		assert.ok(!JSON.stringify(profile).includes('never project'));
 		assert.equal(seen.length, 2);
@@ -1198,10 +1209,13 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		await service.apiForSession(binding).reads.invalidate();
 		profileMode = 'malformed';
 		const beforeMalformed = profileReads;
-		assert.deepEqual(await service.account(binding, { kind: 'read', section: 'profile' }), {
-			kind: 'error',
-			reason: 'unavailable'
-		});
+		assert.deepEqual(
+			await accountOf(service).account(binding, { kind: 'read', section: 'profile' }),
+			{
+				kind: 'error',
+				reason: 'unavailable'
+			}
+		);
 		assert.equal(
 			profileReads,
 			beforeMalformed + 1,
@@ -1209,7 +1223,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		);
 		profileMode = 'gateway';
 		const beforeGateway = profileReads;
-		const retrying = service.account(binding, { kind: 'read', section: 'profile' });
+		const retrying = accountOf(service).account(binding, { kind: 'read', section: 'profile' });
 		await new Promise((resolve) => setTimeout(resolve, 100));
 		assert.equal(profileReads, beforeGateway + 1, 'Retry-After prevents immediate retries');
 		assert.equal((await retrying).kind, 'data');
@@ -1239,15 +1253,21 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		settingsMode = 'ambiguous';
 		assert.deepEqual(await service.commitSettings(binding, write), { kind: 'ambiguous' });
 		assert.equal(settingsWrites, 3);
-		await service.account(binding, { kind: 'openSecurity' });
+		await accountOf(service).account(binding, { kind: 'openSecurity' });
 		assert.equal(opened, 'https://example.edu/account/security');
 		assert.deepEqual(
-			await service.account(binding, { kind: 'revokeSession', id: 'y'.repeat(26) }),
+			await accountOf(service).account(binding, {
+				kind: 'revokeSession',
+				id: 'y'.repeat(26)
+			}),
 			{ kind: 'error', reason: 'strongAuthenticationRequired' }
 		);
 		revokeMode = 'network';
 		assert.deepEqual(
-			await service.account(binding, { kind: 'revokeSession', id: 'y'.repeat(26) }),
+			await accountOf(service).account(binding, {
+				kind: 'revokeSession',
+				id: 'y'.repeat(26)
+			}),
 			{ kind: 'error', reason: 'unconfirmed' }
 		);
 		assert.equal(revokeCount, 2);
@@ -1256,7 +1276,10 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 			outcomes.push(`${outcome.authentication}:${outcome.remoteRevocation}`)
 		);
 		assert.deepEqual(
-			await service.account(binding, { kind: 'revokeDesktop', id: 'd'.repeat(26) }),
+			await accountOf(service).account(binding, {
+				kind: 'revokeDesktop',
+				id: 'd'.repeat(26)
+			}),
 			{ kind: 'success' }
 		);
 		subscription.dispose();
@@ -1265,10 +1288,13 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		const count = seen.length;
 		assert.equal(await service.readSettings(binding), undefined);
 		assert.deepEqual(await service.commitSettings(binding, write), { kind: 'unavailable' });
-		assert.deepEqual(await service.account(binding, { kind: 'read', section: 'profile' }), {
-			kind: 'error',
-			reason: 'sessionEnded'
-		});
+		assert.deepEqual(
+			await accountOf(service).account(binding, { kind: 'read', section: 'profile' }),
+			{
+				kind: 'error',
+				reason: 'sessionEnded'
+			}
+		);
 		assert.equal(seen.length, count);
 	} finally {
 		service.dispose();
@@ -1356,7 +1382,7 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 	try {
 		await service.start(identity, CancellationToken.None);
 		const binding = { principalId: id, sessionId };
-		assert.deepEqual(await service.account(binding, { kind: 'reauthenticate' }), {
+		assert.deepEqual(await accountOf(service).account(binding, { kind: 'reauthenticate' }), {
 			kind: 'success'
 		});
 		assert.equal(Object.keys(started).sort().join(), 'callback_url,code_challenge,state');
@@ -1372,18 +1398,21 @@ void test('Confirm it’s you refreshes the session in the browser, never issues
 		assert.equal(exchanges, 1, 'confirming never issues a new session');
 
 		browser = 'wait';
-		const waiting = service.account(binding, { kind: 'reauthenticate' });
+		const waiting = accountOf(service).account(binding, { kind: 'reauthenticate' });
 		await new Promise((resolve) => setTimeout(resolve, 30));
-		assert.deepEqual(await service.account(binding, { kind: 'cancelReauthentication' }), {
-			kind: 'success'
-		});
+		assert.deepEqual(
+			await accountOf(service).account(binding, { kind: 'cancelReauthentication' }),
+			{
+				kind: 'success'
+			}
+		);
 		assert.deepEqual(await waiting, { kind: 'error', reason: 'cancelled' });
 		assert.equal(completions.length, 1, 'a cancelled confirmation is never completed');
 
 		browser = 'answer';
 		pageOrigin = 'https://elsewhere.example';
 		const before = opened.length;
-		assert.deepEqual(await service.account(binding, { kind: 'reauthenticate' }), {
+		assert.deepEqual(await accountOf(service).account(binding, { kind: 'reauthenticate' }), {
 			kind: 'error',
 			reason: 'invalid'
 		});
@@ -1523,7 +1552,7 @@ void test('account tokens, email verification and retention notices are bound, s
 	try {
 		await service.start(identity, CancellationToken.None);
 		const binding = { principalId: id, sessionId };
-		const list = await service.account(binding, { kind: 'read', section: 'tokens' });
+		const list = await accountOf(service).account(binding, { kind: 'read', section: 'tokens' });
 		assert.deepEqual(list, {
 			kind: 'data',
 			data: {
@@ -1539,7 +1568,7 @@ void test('account tokens, email verification and retention notices are bound, s
 				]
 			}
 		});
-		await service.account(binding, { kind: 'read', section: 'tokens' });
+		await accountOf(service).account(binding, { kind: 'read', section: 'tokens' });
 		assert.equal(listReads, 1, 'token reads use the shared account cache');
 
 		const create = {
@@ -1550,12 +1579,15 @@ void test('account tokens, email verification and retention notices are bound, s
 			expiresAt: Date.parse('2027-01-01T00:00:00Z')
 		} as const;
 		createMode = 'hold';
-		const pending = service.account(binding, create);
+		const pending = accountOf(service).account(binding, create);
 		await new Promise((resolve) => setTimeout(resolve, 20));
-		assert.deepEqual(await service.account(binding, { kind: 'revokeToken', id: tokenId }), {
-			kind: 'error',
-			reason: 'unavailable'
-		});
+		assert.deepEqual(
+			await accountOf(service).account(binding, { kind: 'revokeToken', id: tokenId }),
+			{
+				kind: 'error',
+				reason: 'unavailable'
+			}
+		);
 		releaseCreate?.();
 		const created = await pending;
 		assert.equal(created.kind, 'tokenCreated');
@@ -1563,57 +1595,75 @@ void test('account tokens, email verification and retention notices are bound, s
 			assert.equal(created.credential, credential);
 			assert.equal(created.token.id, tokenId);
 		}
-		const after = await service.account(binding, { kind: 'read', section: 'tokens' });
+		const after = await accountOf(service).account(binding, {
+			kind: 'read',
+			section: 'tokens'
+		});
 		assert.equal(listReads, 2, 'a successful creation invalidates account reads');
 		assert.ok(!JSON.stringify(after).includes(credential), 'the credential is never cached');
 		assert.ok(!JSON.stringify(stored).includes(credential), 'the credential is never stored');
 
 		createMode = 'malformed';
-		assert.deepEqual(await service.account(binding, create), {
+		assert.deepEqual(await accountOf(service).account(binding, create), {
 			kind: 'error',
 			reason: 'unconfirmed'
 		});
 		createMode = 'foreign';
-		assert.deepEqual(await service.account(binding, create), {
+		assert.deepEqual(await accountOf(service).account(binding, create), {
 			kind: 'error',
 			reason: 'unconfirmed'
 		});
-		assert.deepEqual(await service.account(binding, { kind: 'enableToken', id: tokenId }), {
-			kind: 'error',
-			reason: 'reauthenticationRequired'
-		});
-		assert.deepEqual(await service.account(binding, { kind: 'disableToken', id: tokenId }), {
-			kind: 'success'
-		});
-		assert.deepEqual(await service.account(binding, { kind: 'revokeToken', id: tokenId }), {
-			kind: 'success'
-		});
-		assert.deepEqual(await service.account(binding, { kind: 'requestEmailVerification' }), {
-			kind: 'success'
-		});
-		assert.deepEqual(await service.account(binding, { kind: 'read', section: 'notices' }), {
-			kind: 'data',
-			data: {
-				section: 'notices',
-				notices: [
-					{
-						retirementId: tokenId,
-						examId: registration,
-						examTitle: 'Algorithms final',
-						examSittingId: registration,
-						sittingStartAt: Date.parse('2025-12-20T09:00:00Z'),
-						sittingEndAt: Date.parse('2025-12-20T12:00:00Z'),
-						submissionId: registration,
-						category: 'work',
-						state: 'grace',
-						createdAt: Date.parse('2026-01-01T00:00:00Z'),
-						retireAfter: Date.parse('2026-02-01T00:00:00Z'),
-						deliveryState: 'accepted'
-					}
-				],
-				more: true
+		assert.deepEqual(
+			await accountOf(service).account(binding, { kind: 'enableToken', id: tokenId }),
+			{
+				kind: 'error',
+				reason: 'reauthenticationRequired'
 			}
-		});
+		);
+		assert.deepEqual(
+			await accountOf(service).account(binding, { kind: 'disableToken', id: tokenId }),
+			{
+				kind: 'success'
+			}
+		);
+		assert.deepEqual(
+			await accountOf(service).account(binding, { kind: 'revokeToken', id: tokenId }),
+			{
+				kind: 'success'
+			}
+		);
+		assert.deepEqual(
+			await accountOf(service).account(binding, { kind: 'requestEmailVerification' }),
+			{
+				kind: 'success'
+			}
+		);
+		assert.deepEqual(
+			await accountOf(service).account(binding, { kind: 'read', section: 'notices' }),
+			{
+				kind: 'data',
+				data: {
+					section: 'notices',
+					notices: [
+						{
+							retirementId: tokenId,
+							examId: registration,
+							examTitle: 'Algorithms final',
+							examSittingId: registration,
+							sittingStartAt: Date.parse('2025-12-20T09:00:00Z'),
+							sittingEndAt: Date.parse('2025-12-20T12:00:00Z'),
+							submissionId: registration,
+							category: 'work',
+							state: 'grace',
+							createdAt: Date.parse('2026-01-01T00:00:00Z'),
+							retireAfter: Date.parse('2026-02-01T00:00:00Z'),
+							deliveryState: 'accepted'
+						}
+					],
+					more: true
+				}
+			}
+		);
 		assert.ok(seen.includes(`DELETE /api/v1/users/me/tokens/${tokenId}`));
 		assert.ok(seen.includes(`POST /api/v1/users/me/tokens/${tokenId}/disable`));
 		assert.ok(seen.includes('POST /api/v1/auth/email-verification/request'));

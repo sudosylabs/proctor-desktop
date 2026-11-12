@@ -21,7 +21,7 @@ import {
 	type IpcMainInvokeEvent,
 	type WebContents
 } from 'electron';
-import { AccountIpcBridge, type AccountService } from '../../account/electron-main/accountIpc.js';
+import { AccountIpcBridge, type AccountCapability } from '../../account/electron-main/accountIpc.js';
 import { AdministrationIpcBridge, type AdministrationIpcService } from '../../administration/electron-main/administrationIpc.js';
 import { release } from 'node:os';
 import process from 'node:process';
@@ -72,7 +72,7 @@ export interface ElectronProductWindowFactoryOptions extends ElectronProductWind
 	readonly runtimeIconPath?: string;
 	readonly ipc?: Pick<typeof ipcMain, 'handle' | 'removeHandler'>;
 	readonly launchIdentity?: DesktopIdentityCoordinator;
-	readonly account?: AccountService;
+	readonly account?: AccountCapability;
 	readonly administration?: AdministrationIpcService;
 	readonly examActivity?: ExamActivityService;
 	readonly settings?: UserSettingsSessionService;
@@ -330,7 +330,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		private readonly ipc: Pick<typeof ipcMain, 'handle' | 'removeHandler'>,
 		chromeEnvironment: ElectronWindowChromeEnvironment,
 		launchIdentity?: DesktopIdentityCoordinator,
-		account?: AccountService,
+		account?: AccountCapability,
 		settings?: UserSettingsSessionService,
 		examActivity?: ExamActivityService,
 		administration?: AdministrationIpcService,

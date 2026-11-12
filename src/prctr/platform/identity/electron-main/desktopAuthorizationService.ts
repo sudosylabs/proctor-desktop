@@ -51,27 +51,8 @@ import {
 	type DesktopSettingsRequest,
 	type DesktopHttpResult
 } from '../node/desktopAuthHttp.js';
-import {
-	validateAccountIntent,
-	validateAccountResponse,
-	type AccountFailure,
-	type AccountIntent,
-	type AccountResponse
-} from '../../account/common/accountProtocol.js';
-import {
-	readAccountProfile,
-	readAccountSecurity,
-	readAccountSessions,
-	readAccountDesktops,
-	readAccountNotices,
-	readAccountToken,
-	readAccountTokenCreation,
-	readAccountTokens,
-	readAccountGrantableScopes,
-	readAccountHistory,
-	accountHistoryPath,
-	readRevokedSessionCount
-} from '../../account/electron-main/accountWire.js';
+import type { AccountFailure } from '../../account/common/accountProtocol.js';
+import { accountFailure } from '../../account/electron-main/accountService.js';
 import {
 	installationKeyScope,
 	type DesktopSigningKey,
@@ -127,7 +108,6 @@ export class DesktopAuthorizationService extends Disposable {
 	#signingOut: Promise<void> | undefined;
 	#shutdown: Promise<void> | undefined;
 	#outcomeSequence = 0;
-	#accountMutation: object | undefined;
 	/** A confirmation waiting for the system browser; the renderer may stop it. */
 	#reauthentication: CancellationTokenSource | undefined;
 	/** The sign-in page a browser is completing, kept so it can be opened again until it expires. */
@@ -516,305 +496,29 @@ export class DesktopAuthorizationService extends Disposable {
 		});
 	}
 
-	/** Closed account capability: credentials, URLs, and arbitrary requests never cross IPC. */
-	async account(binding: SessionBinding, raw: AccountIntent): Promise<AccountResponse> {
-		const intent = validateAccountIntent(raw);
-		if (intent.kind !== 'read' && intent.kind !== 'readPhoto' && intent.kind !== 'readHistory')
-			// A change through the typed client already invalidates every cached read.
-			return this.accountUncached(binding, intent);
-		try {
-			return await this.apiForSession(binding).reads.read(['account', intent], (signal) =>
-				projectRead((capture) => this.accountUncached(binding, intent, signal, capture))
-			);
-		} catch (error) {
-			return error instanceof ProjectionFailure
-				? (error.response as AccountResponse)
-				: {
-						kind: 'error',
-						reason:
-							error instanceof ServerApiError && error.kind === 'sessionEnded'
-								? 'sessionEnded'
-								: 'unavailable'
-					};
-		}
-	}
-	observeAccount(
-		binding: SessionBinding,
-		raw: AccountIntent,
-		listener: (response: AccountResponse) => void
-	): ReadObservation {
-		const intent = validateAccountIntent(raw);
-		if (intent.kind !== 'read' && intent.kind !== 'readPhoto')
-			throw new ServerApiError('invalidRequest');
-		return this.apiForSession(binding).reads.observe(
-			['account', intent],
-			(signal) =>
-				projectRead((capture) => this.accountUncached(binding, intent, signal, capture)),
-			(state) => {
-				if (state.error)
-					listener(
-						state.error instanceof ProjectionFailure
-							? (state.error.response as AccountResponse)
-							: { kind: 'error', reason: 'unavailable' }
-					);
-				else if (state.value) listener(state.value);
-			},
-			{ pollIntervalMs: 60_000 }
-		);
-	}
 	setApiOnline(online: boolean): void {
 		this.#api?.setOnline(online);
 	}
 	setApiFocused(binding: SessionBinding, focused: boolean): void {
 		this.apiForSession(binding).setFocused(focused);
 	}
-	/** Confirm it's you for another capability of the same Session, as Account does. */
-	async reauthenticate(binding: SessionBinding): Promise<'success' | AccountFailure> {
-		const result = await this.account(binding, { kind: 'reauthenticate' });
-		return result.kind === 'success'
-			? 'success'
-			: result.kind === 'error'
-				? result.reason
-				: 'unavailable';
+	/** The Desktop registration the bound Session signed in with. */
+	currentRegistration(binding: SessionBinding): string {
+		this.apiForSession(binding);
+		return this.#session!.tokens.registrationId;
+	}
+	/** Ends this Session after the server confirmed its own Desktop registration is revoked. */
+	endRevokedDesktop(): Promise<void> {
+		return (this.#signingOut ??= this.#signOutCurrent(true).finally(() => {
+			this.#signingOut = undefined;
+		}));
+	}
+	openBrowser(url: string): Promise<void> {
+		return this.options.openBrowser(url);
 	}
 	cancelReauthentication(binding: SessionBinding): void {
-		void this.account(binding, { kind: 'cancelReauthentication' });
-	}
-	private async accountUncached(
-		binding: SessionBinding,
-		raw: AccountIntent,
-		signal?: AbortSignal,
-		captureFailure?: (failure: ServerApiError) => void
-	): Promise<AccountResponse> {
-		const intent = validateAccountIntent(raw);
-		const session = this.#session;
-		const generation = this.#generation;
-		if (
-			!session ||
-			this.#disposed ||
-			session.tokens.principalId !== binding.principalId ||
-			session.tokens.sessionId !== binding.sessionId
-		)
-			return { kind: 'error', reason: 'sessionEnded' };
-		const current = () => {
-			if (this.#disposed || this.#session !== session || this.#generation !== generation)
-				throw new DesktopAuthorizationError('cancelled');
-		};
-		// Stopping a confirmation is never blocked by the confirmation it stops.
-		if (intent.kind === 'cancelReauthentication') {
-			this.#reauthentication?.cancel();
-			return { kind: 'success' };
-		}
-		const mutation =
-			intent.kind === 'revokeSession' ||
-			intent.kind === 'revokeOtherSessions' ||
-			intent.kind === 'revokeDesktop' ||
-			intent.kind === 'uploadPhoto' ||
-			intent.kind === 'removePhoto' ||
-			intent.kind === 'createToken' ||
-			intent.kind === 'disableToken' ||
-			intent.kind === 'enableToken' ||
-			intent.kind === 'revokeToken' ||
-			intent.kind === 'requestEmailVerification' ||
-			intent.kind === 'reauthenticate';
-		if (mutation && this.#accountMutation) return { kind: 'error', reason: 'unavailable' };
-		const operation = {};
-		if (mutation) this.#accountMutation = operation;
-		try {
-			if (intent.kind === 'openSecurity') {
-				await this.options.openBrowser(
-					new URL('/account/security', session.identity.origin).href
-				);
-				current();
-				return { kind: 'success' };
-			}
-			if (this.#refresh || session.tokens.accessExpiresAt <= Date.now() + 5000)
-				await this.refresh();
-			current();
-			const request = async (
-				path: DesktopHttpPath,
-				body?: unknown,
-				photo?: DesktopPhotoRequest
-			): Promise<DesktopHttpResult> => {
-				const result = await this.protectedRequest(
-					session,
-					generation,
-					path,
-					body,
-					photo,
-					undefined,
-					signal
-				);
-				if (result.failure) captureFailure?.(result.failure);
-				return result;
-			};
-			const failed = async (result: DesktopHttpResult): Promise<AccountResponse> => {
-				const code = errorCode(result);
-				if (result.status === 409) return { kind: 'error', reason: 'conflict' };
-				if (result.status === 400) return { kind: 'error', reason: 'invalid' };
-				if (result.status === 401) {
-					await this.signOut();
-					return { kind: 'error', reason: 'sessionEnded' };
-				}
-				if (code === 'authentication.reauthentication_required')
-					return { kind: 'error', reason: 'reauthenticationRequired' };
-				if (code === 'authentication.desktop_reauthentication.denied')
-					return { kind: 'error', reason: 'denied' };
-				if (code === 'authentication.desktop_reauthentication.invalid')
-					return { kind: 'error', reason: 'invalid' };
-				if (code === 'authentication.strong_required')
-					return { kind: 'error', reason: 'strongAuthenticationRequired' };
-				return {
-					kind: 'error',
-					reason:
-						result.status === 403
-							? 'denied'
-							: result.status === 404
-								? 'notFound'
-								: mutation && result.status >= 500
-									? 'unconfirmed'
-									: 'unavailable'
-				};
-			};
-			if (
-				intent.kind === 'readPhoto' ||
-				intent.kind === 'uploadPhoto' ||
-				intent.kind === 'removePhoto'
-			) {
-				const photo: DesktopPhotoRequest =
-					intent.kind === 'readPhoto'
-						? { operation: 'GET' }
-						: intent.kind === 'removePhoto'
-							? { operation: 'DELETE', etag: intent.etag }
-							: {
-									operation: 'PUT',
-									etag: intent.etag,
-									bytes: intent.bytes,
-									mediaType: intent.mediaType
-								};
-				const result = await request(
-					`/api/v1/users/${binding.principalId}/profile-picture`,
-					undefined,
-					photo
-				);
-				if (result.status !== 200) return failed(result);
-				return intent.kind === 'readPhoto'
-					? validateAccountResponse(result.value)
-					: { kind: 'success' };
-			}
-			if (intent.kind === 'revokeSession') {
-				if (intent.id === binding.sessionId) {
-					await this.signOut();
-					return { kind: 'success' };
-				}
-				const response = await request('/api/v1/users/me/sessions/revoke', {
-					session_id: intent.id
-				});
-				return response.status === 204 ? { kind: 'success' } : failed(response);
-			}
-			if (intent.kind === 'revokeOtherSessions') {
-				const response = await request('/api/v1/users/me/sessions/revoke-others');
-				return response.status === 200
-					? readRevokedSessionCount(response.value)
-					: failed(response);
-			}
-			if (intent.kind === 'reauthenticate')
-				return await this.#reauthenticate(session, request, failed, current);
-			if (intent.kind === 'readHistory') {
-				const response = await request(accountHistoryPath(intent));
-				return response.status === 200
-					? { kind: 'data', data: readAccountHistory(response.value) }
-					: failed(response);
-			}
-			if (intent.kind === 'revokeDesktop') {
-				const response = await request(
-					`/api/v1/users/me/desktop-registrations/${intent.id}`
-				);
-				if (response.status !== 204) return failed(response);
-				if (intent.id === session.tokens.registrationId)
-					await (this.#signingOut ??= this.#signOutCurrent(true).finally(() => {
-						this.#signingOut = undefined;
-					}));
-				return { kind: 'success' };
-			}
-			if (intent.kind === 'createToken') {
-				const response = await request('/api/v1/users/me/tokens', {
-					description: intent.description,
-					scopes: intent.scopes,
-					...(intent.academicUnitId === undefined
-						? {}
-						: { academic_unit_id: intent.academicUnitId }),
-					expires_at: new Date(intent.expiresAt).toISOString()
-				});
-				if (response.status !== 201) return failed(response);
-				// The one-time credential is returned to the caller only; it is never cached.
-				return readAccountTokenCreation(response.value, binding);
-			}
-			if (intent.kind === 'disableToken' || intent.kind === 'enableToken') {
-				const response = await request(
-					`/api/v1/users/me/tokens/${intent.id}/${intent.kind === 'disableToken' ? 'disable' : 'enable'}`
-				);
-				if (response.status !== 200) return failed(response);
-				readAccountToken(response.value, binding, intent.id);
-				return { kind: 'success' };
-			}
-			if (intent.kind === 'revokeToken') {
-				const response = await request(`/api/v1/users/me/tokens/${intent.id}`);
-				return response.status === 204 ? { kind: 'success' } : failed(response);
-			}
-			if (intent.kind === 'requestEmailVerification') {
-				const response = await request('/api/v1/auth/email-verification/request');
-				return response.status === 202 ? { kind: 'success' } : failed(response);
-			}
-			const paths = {
-				profile: '/api/v1/users/me',
-				security: '/api/v1/authentication-methods',
-				sessions: '/api/v1/users/me/sessions',
-				desktops: '/api/v1/users/me/desktop-registrations',
-				tokens: '/api/v1/users/me/tokens',
-				grantableScopes: '/api/v1/users/me/tokens/grantable-scopes',
-				notices: '/api/v1/users/me/retention-notices?limit=200'
-			} as const;
-			const response = await request(paths[intent.section]);
-			if (response.status !== 200) return failed(response);
-			if (intent.section === 'tokens')
-				return { kind: 'data', data: readAccountTokens(response.value, binding) };
-			if (intent.section === 'grantableScopes')
-				return { kind: 'data', data: readAccountGrantableScopes(response.value) };
-			if (intent.section === 'notices')
-				return { kind: 'data', data: readAccountNotices(response.value) };
-			if (intent.section === 'profile')
-				return { kind: 'data', data: readAccountProfile(response.value, binding) };
-			if (intent.section === 'sessions')
-				return { kind: 'data', data: readAccountSessions(response.value, binding) };
-			if (intent.section === 'desktops')
-				return {
-					kind: 'data',
-					data: readAccountDesktops(response.value, session.tokens.registrationId)
-				};
-			const mfa = await request('/api/v1/users/me/mfa');
-			if (mfa.status === 401) return failed(mfa);
-			return {
-				kind: 'data',
-				data: readAccountSecurity(
-					response.value,
-					mfa.status === 200 ? mfa.value : undefined
-				)
-			};
-		} catch (error) {
-			if (error instanceof ServerApiError) captureFailure?.(error);
-			return {
-				kind: 'error',
-				reason:
-					this.#session !== session || this.#generation !== generation
-						? 'sessionEnded'
-						: mutation
-							? 'unconfirmed'
-							: 'unavailable'
-			};
-		} finally {
-			if (this.#accountMutation === operation) this.#accountMutation = undefined;
-		}
+		this.apiForSession(binding);
+		this.#reauthentication?.cancel();
 	}
 
 	/** Full typed client is available only to privileged, session-bound capability owners. */
@@ -831,16 +535,24 @@ export class DesktopAuthorizationService extends Disposable {
 		return this.#api;
 	}
 	/**
-	 * Confirms it is the person on the institution's own page in the system browser, as Desktop
+	 * Confirm it's you on the institution's own page in the system browser, as Desktop
 	 * Authorization does: an exact loopback callback, state and a PKCE S256 challenge. Success
-	 * refreshes the existing session's recent sign-in; no session is issued and nothing rotates.
+	 * refreshes the bound Session's recent sign-in; no Session is issued and nothing rotates.
+	 * A new confirmation replaces one still waiting for the browser.
 	 */
-	async #reauthenticate(
-		session: CurrentSession,
-		request: (path: DesktopHttpPath, body?: unknown) => Promise<DesktopHttpResult>,
-		failed: (result: DesktopHttpResult) => Promise<AccountResponse>,
-		current: () => void
-	): Promise<AccountResponse> {
+	async reauthenticate(binding: SessionBinding): Promise<'success' | AccountFailure> {
+		let api: SessionApi;
+		try {
+			api = this.apiForSession(binding);
+		} catch {
+			return 'sessionEnded';
+		}
+		const session = this.#session!;
+		const generation = this.#generation;
+		const current = (): void => {
+			if (this.#disposed || this.#session !== session || this.#generation !== generation)
+				throw new DesktopAuthorizationError('cancelled');
+		};
 		this.#reauthentication?.cancel();
 		const source = new CancellationTokenSource(this.#operations.token);
 		this.#reauthentication = source;
@@ -853,35 +565,40 @@ export class DesktopAuthorizationService extends Disposable {
 				this.options.confirmationPages,
 				source.token
 			);
-			const started = await request('/api/v1/auth/desktop/reauthentications', {
-				callback_url: listener.callbackURL,
-				state,
-				code_challenge: createHash('sha256').update(verifier).digest('base64url')
-			});
-			if (started.status !== 201) return await failed(started);
+			const started = await api.request('startDesktopReauthentication', {
+				body: {
+					callback_url: listener.callbackURL,
+					state,
+					code_challenge: createHash('sha256').update(verifier).digest('base64url')
+				}
+			} as never);
 			const value = record(started.value);
 			const page = new URL(boundedText(value.authorization_url, 4096));
 			// Only the institution's own page may be opened.
 			if (page.origin !== session.identity.origin || page.username || page.password)
-				return { kind: 'error', reason: 'invalid' };
+				return 'invalid';
 			listener.expireAt(expiry(value.expires_at));
 			current();
 			await this.options.openBrowser(page.href);
 			const code = await listener.waitForCode();
 			current();
-			const completed = await request('/api/v1/auth/desktop/reauthentications/complete', {
-				code,
-				code_verifier: verifier,
-				state
-			});
-			return completed.status === 200 ? { kind: 'success' } : await failed(completed);
+			await api.request('completeDesktopReauthentication', {
+				body: { code, code_verifier: verifier, state }
+			} as never);
+			return 'success';
 		} catch (error) {
 			if (error instanceof DesktopAuthorizationError) {
-				if (error.reason === 'cancelled') return { kind: 'error', reason: 'cancelled' };
-				if (error.reason === 'timedOut') return { kind: 'error', reason: 'expired' };
-				if (error.reason === 'callbackInvalid') return { kind: 'error', reason: 'invalid' };
+				if (error.reason === 'cancelled')
+					return this.#session === session ? 'cancelled' : 'sessionEnded';
+				if (error.reason === 'timedOut') return 'expired';
+				if (error.reason === 'callbackInvalid') return 'invalid';
 			}
-			return { kind: 'error', reason: 'unavailable' };
+			if (
+				error instanceof ServerApiError &&
+				(error.kind === 'server' || error.kind === 'sessionEnded')
+			)
+				return accountFailure(error, true);
+			return 'unavailable';
 		} finally {
 			await listener?.stop().catch(() => undefined);
 			if (this.#reauthentication === source) this.#reauthentication = undefined;

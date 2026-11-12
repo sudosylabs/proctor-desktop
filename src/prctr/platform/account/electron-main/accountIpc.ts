@@ -10,7 +10,7 @@ import {
 	type AccountResponse
 } from '../common/accountProtocol.js';
 
-export interface AccountService {
+export interface AccountCapability {
 	observeAccount?(
 		binding: SessionBinding,
 		intent: AccountIntent,
@@ -27,7 +27,7 @@ export class AccountIpcBridge {
 	constructor(
 		private readonly ipc: Pick<IpcMain, 'handle' | 'removeHandler'>,
 		binding: SessionBinding,
-		service: AccountService,
+		service: AccountCapability,
 		authorize: (event: IpcMainInvokeEvent) => void
 	) {
 		const bound = Object.freeze({

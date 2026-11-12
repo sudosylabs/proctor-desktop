@@ -1,3 +1,4 @@
+import type { ApiInput } from '../../serverApi/common/serverApi.js';
 import {
 	projectionRecord as record,
 	projectionId as accountId,
@@ -242,22 +243,27 @@ export function readAccountHistory(raw: unknown): AccountData {
 	});
 }
 /** The history path for one query: the server's own filter names, encoded. */
-export function accountHistoryPath(
+type AuditEventName = NonNullable<
+	NonNullable<ApiInput<'listCurrentUserAuditEvents'>['query']>['event']
+>[number];
+/** The `listCurrentUserAuditEvents` query for one history page, in the server's filter names. */
+export function accountHistoryQuery(
 	query: AccountHistoryQuery
-): `/api/v1/users/me/audits?limit=${number}${string}` {
-	const search = new URLSearchParams();
-	if (query.createdAfter !== undefined)
-		search.append('created_after', new Date(query.createdAfter).toISOString());
-	if (query.createdBefore !== undefined)
-		search.append('created_before', new Date(query.createdBefore).toISOString());
-	for (const event of query.events ?? []) search.append('event', event);
-	if (query.status !== undefined) search.append('status', query.status);
-	if (query.relation !== undefined) search.append('relation', query.relation);
-	if (query.order !== undefined) search.append('order', query.order);
-	if (query.cursor !== undefined) search.append('cursor', query.cursor);
-	const rest = search.toString();
-	const limit = query.limit ?? ACCOUNT_HISTORY_PAGE_SIZE;
-	return `/api/v1/users/me/audits?limit=${limit}${rest ? `&${rest}` : ''}`;
+): NonNullable<ApiInput<'listCurrentUserAuditEvents'>['query']> {
+	return {
+		limit: query.limit ?? ACCOUNT_HISTORY_PAGE_SIZE,
+		...(query.createdAfter === undefined
+			? {}
+			: { created_after: new Date(query.createdAfter).toISOString() }),
+		...(query.createdBefore === undefined
+			? {}
+			: { created_before: new Date(query.createdBefore).toISOString() }),
+		...(query.events?.length ? { event: query.events as readonly AuditEventName[] } : {}),
+		...(query.status === undefined ? {} : { status: query.status }),
+		...(query.relation === undefined ? {} : { relation: query.relation }),
+		...(query.order === undefined ? {} : { order: query.order }),
+		...(query.cursor === undefined ? {} : { cursor: query.cursor })
+	};
 }
 export function readRevokedSessionCount(raw: unknown): AccountResponse {
 	const r = record(raw);
