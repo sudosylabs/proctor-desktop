@@ -167,6 +167,7 @@ void test('sessions split into this computer and the rest', () => {
 		client: 'web',
 		platform: '',
 		method: 'password',
+		authenticationStrength: 'single_factor',
 		createdAt: 1,
 		lastActivityAt: 1,
 		expiresAt: 2
@@ -263,7 +264,8 @@ void test('history filters become the server query, and unknown events read gene
 		event: 'role.granted',
 		failed: false,
 		relation: 'subject' as const,
-		actor: 'administrator' as const
+		actor: 'administrator' as const,
+		summary: 'An administrator granted you a role.'
 	};
 	assert.strictEqual(historyActorMessage(entry), 'historyByAdministrator');
 	assert.strictEqual(historyActorMessage({ ...entry, actor: 'system' }), 'historyBySystem');

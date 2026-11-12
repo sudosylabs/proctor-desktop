@@ -496,6 +496,7 @@ void test('sessions trust the server current mark only when it is this window’
 		current,
 		client_type: 'web',
 		authentication_method: 'password',
+		authentication_strength: 'single_factor',
 		created_at: '2026-01-01T00:00:00Z',
 		last_activity_at: '2026-01-02T00:00:00Z',
 		expires_at: '2026-02-01T00:00:00Z'
@@ -517,6 +518,60 @@ void test('sessions trust the server current mark only when it is this window’
 		kind: 'sessionsEnded',
 		count: 2
 	});
+	// A Desktop Session carries the registration that names it and how it was verified.
+	const registration = 'r'.repeat(26);
+	const desktop = readAccountSessions(
+		{
+			items: [
+				{
+					...session(id, true),
+					client_type: 'desktop',
+					desktop_platform: 'darwin',
+					device_name: 'ignored for a Desktop',
+					authentication_strength: 'multi_factor',
+					mfa_completed_at: '2026-01-01T00:05:00Z',
+					desktop_registration_id: registration,
+					desktop_registration_display_name: 'Amara’s MacBook Pro',
+					device_id: 'secret-device',
+					desktop_build_id: 'build'
+				}
+			]
+		},
+		{ principalId: id, sessionId: id }
+	);
+	assert.deepEqual(desktop, {
+		section: 'sessions',
+		sessions: [
+			{
+				id,
+				current: true,
+				name: 'ignored for a Desktop',
+				client: 'desktop',
+				platform: 'darwin',
+				method: 'password',
+				authenticationStrength: 'multi_factor',
+				mfaCompletedAt: Date.parse('2026-01-01T00:05:00Z'),
+				desktopRegistrationId: registration,
+				desktopRegistrationName: 'Amara’s MacBook Pro',
+				createdAt: Date.parse('2026-01-01T00:00:00Z'),
+				lastActivityAt: Date.parse('2026-01-02T00:00:00Z'),
+				expiresAt: Date.parse('2026-02-01T00:00:00Z')
+			}
+		]
+	});
+	assert.ok(!JSON.stringify(desktop).includes('secret-device'));
+	assert.throws(() =>
+		readAccountSessions(
+			{ items: [{ ...session(id, true), desktop_registration_id: '../x' }] },
+			{ principalId: id, sessionId: id }
+		)
+	);
+	assert.throws(() =>
+		readAccountSessions(
+			{ items: [{ ...session(id, true), authentication_strength: undefined }] },
+			{ principalId: id, sessionId: id }
+		)
+	);
 	assert.throws(() => readRevokedSessionCount({ revoked_session_count: -1 }));
 	assert.throws(() => readRevokedSessionCount({ revoked_session_count: 1, extra: true }));
 	assert.equal(operationContract('revokeOtherCurrentUserSessions').method, 'POST');
@@ -653,6 +708,7 @@ void test('history queries use the server filter names and parse a minimized pag
 		actor: { kind: 'self' },
 		resource: { type: 'user', id },
 		error_code: 'authentication.invalid_credentials',
+		summary: 'Sign-in failed: wrong password.',
 		client_type: 'web',
 		ip_address: '81.2.69.160'
 	};
@@ -666,6 +722,7 @@ void test('history queries use the server filter names and parse a minimized pag
 				failed: true,
 				relation: 'subject',
 				actor: 'self',
+				summary: 'Sign-in failed: wrong password.',
 				client: 'web',
 				ipAddress: '81.2.69.160'
 			}
@@ -684,6 +741,7 @@ void test('history queries use the server filter names and parse a minimized pag
 					failed: true,
 					relation: 'subject',
 					actor: 'self',
+					summary: 'Sign-in failed: wrong password.',
 					client: 'web',
 					ipAddress: '81.2.69.160'
 				}
@@ -701,6 +759,147 @@ void test('history queries use the server filter names and parse a minimized pag
 	assert.throws(() => readAccountHistory({ items: [{ ...entry, status: 'partial' }] }));
 	assert.throws(() => readAccountHistory({ items: [{ ...entry, actor: { kind: 'person' } }] }));
 	assert.throws(() => readAccountHistory({ items: [entry, entry] }));
+	assert.throws(() => readAccountHistory({ items: [{ ...entry, summary: undefined }] }));
+	assert.throws(() => readAccountHistory({ items: [{ ...entry, summary: 'x'.repeat(2049) }] }));
+});
+
+void test('a Session or desktop rename is exact, and a Desktop Session names its registration', async () => {
+	const { AccountService } =
+		await import('../../../../src/prctr/platform/account/electron-main/accountService.js');
+	const { SessionApi } =
+		await import('../../../../src/prctr/platform/serverApi/node/sessionApi.js');
+	const registration = 'r'.repeat(26);
+	const other = 'b'.repeat(26);
+	for (const value of [
+		{ kind: 'renameSession', id: other },
+		{ kind: 'renameSession', id: other, name: '' },
+		{ kind: 'renameSession', id: other, name: '   ' },
+		{ kind: 'renameSession', id: other, name: 'x'.repeat(129) },
+		{ kind: 'renameSession', id: other, name: 'Lab\u0007PC' },
+		{ kind: 'renameDesktop', id: '../sessions', name: 'Lab PC' },
+		{ kind: 'renameDesktop', id: registration, name: 'Lab PC', url: 'https://x.test' }
+	])
+		assert.throws(() => validateAccountIntent(value), JSON.stringify(value));
+	assert.deepEqual(validateAccountIntent({ kind: 'renameDesktop', id, name: 'Lab PC' }), {
+		kind: 'renameDesktop',
+		id,
+		name: 'Lab PC'
+	});
+	const json = (value: unknown, status = 200) => ({
+		status,
+		headers: { 'content-type': 'application/json' },
+		bytes: new TextEncoder().encode(JSON.stringify(value))
+	});
+	const problem = (code: string, fields?: Record<string, string>) =>
+		json({ type: 'about:blank', title: 'Refused', status: 409, code, fields }, 409);
+	const at = '2026-01-01T00:00:00Z';
+	const renamedSession = json({
+		id: other,
+		user_id: id,
+		current: false,
+		client_type: 'web',
+		authentication_method: 'password',
+		authentication_strength: 'single_factor',
+		mfa_recovery_required: false,
+		mfa_enrollment_required: false,
+		device_name: 'Lab PC',
+		authenticated_at: at,
+		created_at: at,
+		updated_at: at,
+		last_activity_at: at,
+		idle_expires_at: at,
+		expires_at: at
+	});
+	const renamedDesktop = json({
+		id: registration,
+		display_name: 'Lab PC',
+		desktop_release: '1.0.0',
+		desktop_build_id: 'build',
+		platform: 'darwin',
+		architecture: 'arm64',
+		realtime_protocol: 1,
+		created_at: at,
+		last_used_at: at,
+		status: 'active',
+		current: true
+	});
+	const requests: { method: string; url: string; body: unknown }[] = [];
+	const answers: unknown[] = [];
+	const binding = { principalId: id, sessionId: id };
+	const api = new SessionApi({
+		binding,
+		origin: 'https://example.edu',
+		execute: async (request) => {
+			requests.push({
+				method: request.method,
+				url: new URL(request.url).pathname,
+				body: JSON.parse(String(request.body))
+			});
+			return answers.shift() as never;
+		}
+	});
+	const service = new AccountService({
+		apiForSession: () => api,
+		currentRegistration: () => registration
+	} as never);
+	try {
+		answers.push(renamedSession);
+		assert.deepEqual(
+			await service.account(binding, { kind: 'renameSession', id: other, name: 'Lab PC' }),
+			{ kind: 'success' }
+		);
+		answers.push(
+			problem('session.desktop_named_by_registration', {
+				desktop_registration_id: registration
+			})
+		);
+		assert.deepEqual(
+			await service.account(binding, { kind: 'renameSession', id, name: 'Lab PC' }),
+			{ kind: 'namedByDesktop', desktopRegistrationId: registration }
+		);
+		answers.push(problem('session.desktop_named_by_registration', {}));
+		assert.deepEqual(
+			await service.account(binding, { kind: 'renameSession', id, name: 'Lab PC' }),
+			{ kind: 'error', reason: 'conflict' }
+		);
+		answers.push(renamedDesktop);
+		assert.deepEqual(
+			await service.account(binding, {
+				kind: 'renameDesktop',
+				id: registration,
+				name: 'Lab PC'
+			}),
+			{ kind: 'success' }
+		);
+		answers.push(problem('desktop_registration.revoked'));
+		assert.deepEqual(
+			await service.account(binding, {
+				kind: 'renameDesktop',
+				id: registration,
+				name: 'Lab PC'
+			}),
+			{ kind: 'error', reason: 'conflict' }
+		);
+		assert.deepEqual(requests.slice(0, 2), [
+			{
+				method: 'PATCH',
+				url: `/api/v1/users/me/sessions/${other}`,
+				body: { device_name: 'Lab PC' }
+			},
+			{
+				method: 'PATCH',
+				url: `/api/v1/users/me/sessions/${id}`,
+				body: { device_name: 'Lab PC' }
+			}
+		]);
+		assert.deepEqual(requests[3], {
+			method: 'PATCH',
+			url: `/api/v1/users/me/desktop-registrations/${registration}`,
+			body: { display_name: 'Lab PC' }
+		});
+	} finally {
+		api.dispose();
+	}
 });
 
 void test('Sessions and registered desktops refresh on the server event that covers both', async () => {

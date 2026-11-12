@@ -56,6 +56,11 @@ export const administrationOperations: ReadonlySet<ApiOperationId> = new Set<Api
 	'uploadUserProfilePicture',
 	'removeUserProfilePicture',
 	'runAcademicAdministrationBatch',
+	'createAcademicAdministrationPreview',
+	'getAcademicAdministrationPreview',
+	'listAcademicAdministrationPreviewRows',
+	'commitAcademicAdministrationPreview',
+	'cancelAcademicAdministrationPreview',
 	'getAdministrationCounts',
 	'listOnboardingImports',
 	'listStudentProgressions',
@@ -212,7 +217,16 @@ function route<I extends RoutedKind, K extends ApiOperationId>(
 			const result = await api.request(operation, input(intent, idempotencyKey), {
 				signal
 			});
-			return project(result.value as Success<K>, intent, result.headers ?? {});
+			const response = project(result.value as Success<K>, intent, result.headers ?? {});
+			// A page never holds more than the person asked for.
+			if (
+				'limit' in intent &&
+				response.kind === 'data' &&
+				'items' in response.data.value &&
+				response.data.value.items.length > intent.limit
+			)
+				throw new ServerApiError('invalidResponse');
+			return response;
 		}
 	};
 }
@@ -231,6 +245,17 @@ const page = (intent: { readonly limit: number; readonly cursor?: string }) => (
 	cursor: intent.cursor
 });
 const key = (idempotencyKey: string) => ({ 'Idempotency-Key': idempotencyKey });
+/** The User directory's filters in the server's names, for the list and for a preview. */
+const directoryFilter = (filter: AdministrationIntentOf<'createAcademicPreview'>['filter']) => ({
+	q: filter.q,
+	affiliation: filter.affiliation && [...filter.affiliation],
+	academic_unit_id: filter.academicUnitId,
+	role_id: filter.roleIds && [...filter.roleIds],
+	state: filter.state,
+	never_signed_in: filter.neverSignedIn,
+	last_active_after: iso(filter.lastActiveAfter),
+	last_active_before: iso(filter.lastActiveBefore)
+});
 const period = (intent: { readonly startAt?: number; readonly endAt?: number }) => ({
 	start_at: iso(intent.startAt),
 	end_at: iso(intent.endAt)
@@ -266,10 +291,10 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		(i) => ({
 			query: {
 				...page(i),
-				q: i.q,
+				...directoryFilter(i),
 				include_disabled: i.includeDisabled,
-				affiliation: i.affiliation && [...i.affiliation],
-				academic_unit_id: i.academicUnitId
+				sort: i.sort,
+				dir: i.dir
 			}
 		}),
 		(v) => wire.projectPage('users', v, wire.userEntry)
@@ -315,6 +340,48 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 			}
 		}),
 		(v) => wire.academicBatch(v)
+	),
+	createAcademicPreview: route(
+		'createAcademicAdministrationPreview',
+		(i) => ({
+			body: body({
+				operation: i.operation,
+				scope_type: i.scopeType,
+				scope_id: i.scopeId,
+				filter: body(directoryFilter(i.filter)),
+				role_id: i.roleId,
+				affiliation_kind: i.affiliationKind,
+				...period(i)
+			})
+		}),
+		(v) => created(v.id)
+	),
+	academicPreview: route(
+		'getAcademicAdministrationPreview',
+		(i) => ({ path: { academic_administration_preview_id: i.id } }),
+		(v) => wire.projectData('academicPreview', wire.academicPreview(v))
+	),
+	academicPreviewRows: route(
+		'listAcademicAdministrationPreviewRows',
+		(i) => ({
+			path: { academic_administration_preview_id: i.id },
+			query: { ...page(i), group: i.group, reason: i.reason }
+		}),
+		(v) => wire.projectPage('academicPreviewRows', v, wire.academicPreviewRow)
+	),
+	commitAcademicPreview: route(
+		'commitAcademicAdministrationPreview',
+		(i, k) => ({
+			path: { academic_administration_preview_id: i.id },
+			header: key(k),
+			body: { expected_revision: i.expectedRevision, preview_digest: i.previewDigest }
+		}),
+		success
+	),
+	cancelAcademicPreview: route(
+		'cancelAcademicAdministrationPreview',
+		(i) => ({ path: { academic_administration_preview_id: i.id } }),
+		success
 	),
 	user: route(
 		'getUserProfile',
@@ -503,7 +570,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 	),
 	onboardingImports: route(
 		'listOnboardingImports',
-		(i) => ({ query: { ...page(i), state: i.state && [...i.state] } }),
+		(i) => ({ query: { ...page(i), state: i.state && [...i.state], order: i.order } }),
 		(v) => wire.projectPage('onboardingImports', v, wire.importSummary)
 	),
 	studentProgressions: route(
@@ -698,12 +765,15 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 	),
 	unitClasses: route(
 		'searchClasses',
-		(i) => ({ path: { academic_unit_id: i.unitId }, query: { ...page(i), q: i.q } }),
+		(i) => ({
+			path: { academic_unit_id: i.unitId },
+			query: { ...page(i), q: i.q, dir: i.dir }
+		}),
 		(v) => wire.projectPage('unitClasses', v, wire.classOf)
 	),
 	levelClasses: route(
 		'listClasses',
-		(i) => ({ path: { programme_level_id: i.levelId }, query: page(i) }),
+		(i) => ({ path: { programme_level_id: i.levelId }, query: { ...page(i), dir: i.dir } }),
 		(v) => wire.projectPage('levelClasses', v, wire.classOf)
 	),
 	class: route(
@@ -746,7 +816,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		'listAcademicUnitMembers',
 		(i) => ({
 			path: { academic_unit_id: i.unitId },
-			query: { ...page(i), history: i.history }
+			query: { ...page(i), history: i.history, sort: i.sort, dir: i.dir }
 		}),
 		(v) => wire.projectPage('unitMembers', v, wire.unitMember)
 	),
@@ -765,7 +835,10 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 	),
 	classMembers: route(
 		'listClassMembers',
-		(i) => ({ path: { class_id: i.classId }, query: { ...page(i), history: i.history } }),
+		(i) => ({
+			path: { class_id: i.classId },
+			query: { ...page(i), history: i.history, sort: i.sort, dir: i.dir }
+		}),
 		(v) => wire.projectPage('classMembers', v, wire.classMember)
 	),
 	enrollClassMember: route(
@@ -913,12 +986,15 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 			query: {
 				...page(i),
 				actor_id: i.actorId,
+				subject_user_id: i.subjectUserId,
 				// The contract's request validation refuses a name outside its catalogue.
-				action: i.action === undefined ? undefined : [i.action as AuditAction],
+				action: i.actions && (i.actions as readonly AuditAction[]),
+				status: i.status,
 				resource_type: i.resourceType as ResourceType | undefined,
 				resource_id: i.resourceId,
 				created_after: iso(i.createdAfter),
-				created_before: iso(i.createdBefore)
+				created_before: iso(i.createdBefore),
+				order: i.order
 			}
 		}),
 		(v) => wire.projectPage('audits', v, wire.audit)
@@ -983,7 +1059,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 	// Jobs
 	jobs: route(
 		'listJobs',
-		(i) => ({ query: { ...page(i), status: i.status && [...i.status] } }),
+		(i) => ({ query: { ...page(i), status: i.status && [...i.status], order: i.order } }),
 		(v) => wire.projectPage('jobs', v, wire.job)
 	),
 	job: route(
@@ -1001,7 +1077,17 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 	// Mail and MFA keys
 	mailDeliveries: route(
 		'listMailDeliveries',
-		(i) => ({ query: { ...page(i), state: i.state && [...i.state] } }),
+		(i) => ({
+			query: {
+				...page(i),
+				state: i.state && [...i.state],
+				recipient_user_id: i.recipientUserId,
+				created_after: iso(i.createdAfter),
+				created_before: iso(i.createdBefore),
+				sort: i.sort,
+				dir: i.dir
+			}
+		}),
 		(v) => wire.projectPage('mailDeliveries', v, wire.mailDelivery)
 	),
 	mailDelivery: route(
@@ -1099,6 +1185,11 @@ const collections = new Set<AdministrationIntent['kind']>([
 	'jobs',
 	'mailDeliveries'
 ]);
+/** Server codes with a reason of their own, ahead of their status. */
+const failureCodes: Readonly<Record<string, AdministrationFailure>> = {
+	'academic_administration_preview.expired': 'expired',
+	'academic_administration_preview.authorization_lost': 'accessChanged'
+};
 
 /** How often a page with no server event is re-read. */
 const POLL_MS = 60_000;
@@ -1310,6 +1401,8 @@ export class AdministrationService {
 		if (code === 'authentication.reauthentication_required')
 			return fail('reauthenticationRequired');
 		if (code === 'authentication.strong_required') return fail('strongRequired');
+		if (code !== undefined && Object.hasOwn(failureCodes, code))
+			return fail(failureCodes[code]!);
 		if (status === 403) return fail('noAccess');
 		if (status === 404)
 			return fail(!change && collections.has(intent.kind) ? 'noAccess' : 'notFound');

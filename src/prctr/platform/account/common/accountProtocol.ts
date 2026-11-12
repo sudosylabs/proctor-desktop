@@ -115,6 +115,9 @@ export type AccountIntent =
 	| { readonly kind: 'revokeSession'; readonly id: string }
 	| { readonly kind: 'revokeOtherSessions' }
 	| { readonly kind: 'revokeDesktop'; readonly id: string }
+	/** Names a browser or CLI Session; a Desktop Session is named by its registration. */
+	| { readonly kind: 'renameSession'; readonly id: string; readonly name: string }
+	| { readonly kind: 'renameDesktop'; readonly id: string; readonly name: string }
 	| {
 			readonly kind: 'createToken';
 			readonly description: string;
@@ -175,6 +178,13 @@ export interface AccountSession {
 	/** The Desktop's operating system, empty for other clients. */
 	readonly platform: string;
 	readonly method: string;
+	/** How strongly the Session was authenticated, as the server names it. */
+	readonly authenticationStrength: string;
+	/** When the Session completed two-step verification. */
+	readonly mfaCompletedAt?: number;
+	/** The Desktop registration a Desktop Session signed in with; it names the Session. */
+	readonly desktopRegistrationId?: string;
+	readonly desktopRegistrationName?: string;
 	readonly createdAt: number;
 	readonly lastActivityAt: number;
 	readonly expiresAt: number;
@@ -245,6 +255,8 @@ export interface AccountHistoryEntry {
 	readonly failed: boolean;
 	readonly relation: 'subject' | 'actor';
 	readonly actor: (typeof accountHistoryActors)[number];
+	/** One sentence the server wrote for display; it never names another person. */
+	readonly summary: string;
 	readonly client?: string;
 	readonly ipAddress?: string;
 	readonly userAgent?: string;
@@ -293,6 +305,8 @@ export type AccountResponse =
 	| { readonly kind: 'tokenCreated'; readonly token: AccountToken; readonly credential: string }
 	| { readonly kind: 'success' }
 	| { readonly kind: 'sessionsEnded'; readonly count: number }
+	/** A Desktop Session is named by its registration; rename that registration instead. */
+	| { readonly kind: 'namedByDesktop'; readonly desktopRegistrationId: string }
 	| { readonly kind: 'error'; readonly reason: AccountFailure };
 export interface AccountClient extends ObservableCapability<AccountIntent, AccountResponse> {
 	request(intent: AccountIntent): Promise<AccountResponse>;
@@ -327,6 +341,15 @@ export function validateAccountIntent(value: unknown): AccountIntent {
 	)
 		return Object.freeze({ kind: input.kind });
 	if (input.kind === 'createToken') return validateCreateToken(input);
+	if (
+		(input.kind === 'renameSession' || input.kind === 'renameDesktop') &&
+		Object.keys(input).sort().join() === 'id,kind,name'
+	)
+		return Object.freeze({
+			kind: input.kind,
+			id: projectionId(input.id),
+			name: accountDeviceName(input.name)
+		});
 	if (input.kind === 'readHistory') return validateHistoryQuery(input);
 	if (Object.keys(input).length !== 2) throw new TypeError('Invalid account action');
 	if (input.kind === 'read' && accountReadSections.includes(input.section as AccountReadSection))
@@ -340,6 +363,17 @@ export function validateAccountIntent(value: unknown): AccountIntent {
 	)
 		return Object.freeze({ kind: input.kind, id: projectionId(input.id) });
 	throw new TypeError('Invalid account action');
+}
+/** A name the person typed for a Session or desktop: 1 to 128 characters, no control characters. */
+function accountDeviceName(value: unknown): string {
+	if (
+		typeof value !== 'string' ||
+		value.length > 128 ||
+		value.trim().length === 0 ||
+		/[\u0000-\u001f\u007f]/u.test(value)
+	)
+		throw new TypeError('Invalid device name');
+	return value;
 }
 function historyEventName(value: unknown): string {
 	if (typeof value !== 'string' || !/^[a-z][a-z0-9_.]{0,127}$/u.test(value))
@@ -494,6 +528,11 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 	if (input.kind === 'success') return Object.freeze({ kind: 'success' });
 	if (input.kind === 'sessionsEnded' && Object.keys(input).length === 2)
 		return Object.freeze({ kind: 'sessionsEnded', count: projectionTime(input.count) });
+	if (input.kind === 'namedByDesktop' && Object.keys(input).length === 2)
+		return Object.freeze({
+			kind: 'namedByDesktop',
+			desktopRegistrationId: projectionId(input.desktopRegistrationId)
+		});
 	if (
 		input.kind === 'error' &&
 		[
@@ -583,6 +622,18 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 						client: projectionText(s.client, 64),
 						platform: projectionText(s.platform, 64),
 						method: projectionText(s.method, 64),
+						authenticationStrength: projectionText(s.authenticationStrength, 64),
+						...optionalTimes(s, ['mfaCompletedAt']),
+						...(s.desktopRegistrationId === undefined
+							? {}
+							: { desktopRegistrationId: projectionId(s.desktopRegistrationId) }),
+						...(s.desktopRegistrationName === undefined
+							? {}
+							: {
+									desktopRegistrationName: projectionText(
+										s.desktopRegistrationName
+									)
+								}),
 						createdAt: projectionTime(s.createdAt),
 						lastActivityAt: projectionTime(s.lastActivityAt),
 						expiresAt: projectionTime(s.expiresAt)
@@ -662,6 +713,7 @@ export function validateAccountResponse(value: unknown): AccountResponse {
 				failed: projectionFlag(e.failed),
 				relation: projectionMember(e.relation, ['subject', 'actor'] as const),
 				actor: projectionMember(e.actor, accountHistoryActors),
+				summary: projectionText(e.summary, 2048),
 				...optional('client', 32),
 				...optional('ipAddress', 64),
 				...optional('userAgent', 512)
