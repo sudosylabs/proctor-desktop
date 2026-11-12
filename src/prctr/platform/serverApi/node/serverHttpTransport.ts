@@ -1,4 +1,3 @@
-import { parseStrictContractJson } from './canonicalContract.js';
 import { ServerApiError } from '../common/serverApi.js';
 
 export interface HttpRequest {
@@ -109,22 +108,5 @@ export class ServerHttpTransport {
 			clearTimeout(deadline);
 			request.signal?.removeEventListener('abort', cancel);
 		}
-	}
-}
-
-export function decodeJson(response: HttpResponse, integerNumbersOnly = false): unknown {
-	if (
-		!/^application\/(?:json|problem\+json)(?:\s*;|$)/iu.test(
-			response.headers['content-type'] ?? ''
-		)
-	)
-		throw new ServerApiError('invalidResponse');
-	try {
-		return parseStrictContractJson(response.bytes, {
-			integerNumbersOnly,
-			maxBytes: Math.max(1, response.bytes.byteLength)
-		});
-	} catch {
-		throw new ServerApiError('invalidResponse');
 	}
 }

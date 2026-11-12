@@ -13,11 +13,12 @@ import {
 	type ApiResponse
 } from '../common/serverApi.js';
 import {
-	prepareApiRequest,
-	readApiResponse,
+	encodeRequest,
+	isCacheableRequest,
 	type ApiRequestInput,
-	type PreparedApiRequest
-} from './apiRequest.js';
+	type EncodedApiRequest
+} from './requestEncoding.js';
+import { decodeResponse } from './responseDecoding.js';
 import { ServerHttpTransport, type HttpResponse } from './serverHttpTransport.js';
 
 export interface ApiRealtimePolicy extends RealtimePolicy {
@@ -34,7 +35,7 @@ export interface ApiRequestOptions {
 	readonly maxResponseBytes?: number;
 	readonly timeoutMs?: number;
 }
-export type ApiExecutor = (request: PreparedApiRequest) => Promise<HttpResponse>;
+export type ApiExecutor = (request: EncodedApiRequest) => Promise<HttpResponse>;
 export interface ApiObservation {
 	dispose(): void;
 	refresh(): Promise<void>;
@@ -104,7 +105,7 @@ export class ServerApiClient {
 						}
 					: {}
 			};
-			const request = prepareApiRequest(this.origin, 'connectWebSocket', input);
+			const request = encodeRequest(this.origin, 'connectWebSocket', input);
 			return connectServerRealtime(request.url, authorize, signal, message, closed);
 		}, policy);
 		this.connections.add(client);
@@ -170,7 +171,7 @@ export class ServerApiClient {
 		options: ApiRequestOptions = {}
 	): Promise<ApiResponse<K>> {
 		this.assertCurrent();
-		const prepared = prepareApiRequest(this.origin, id, input as ApiRequestInput);
+		const prepared = encodeRequest(this.origin, id, input as ApiRequestInput);
 		if (id === 'connectWebSocket') throw new ServerApiError('invalidRequest');
 		const signal = AbortSignal.any([
 			this.lifetime.signal,
@@ -186,7 +187,7 @@ export class ServerApiClient {
 		}
 		this.assertCurrent();
 		if (signal.aborted) throw new ServerApiError('cancelled');
-		const response = readApiResponse(prepared.operation, result) as ApiResponse<K>;
+		const response = decodeResponse(prepared.operation, result) as ApiResponse<K>;
 		if (!['GET', 'HEAD', 'OPTIONS'].includes(prepared.method)) await this.invalidate();
 		this.assertCurrent();
 		if (signal.aborted) throw new ServerApiError('cancelled');
@@ -198,7 +199,7 @@ export class ServerApiClient {
 		policy: ApiQueryPolicy = {}
 	): Promise<ApiResponse<K>> {
 		if (
-			!cacheable(prepareApiRequest(this.origin, id, input as ApiRequestInput)) ||
+			!isCacheableRequest(encodeRequest(this.origin, id, input as ApiRequestInput)) ||
 			id === 'connectWebSocket'
 		)
 			throw new ServerApiError('invalidRequest');
@@ -215,7 +216,7 @@ export class ServerApiClient {
 		policy: ApiQueryPolicy = {}
 	): ApiObservation {
 		if (
-			!cacheable(prepareApiRequest(this.origin, id, input as ApiRequestInput)) ||
+			!isCacheableRequest(encodeRequest(this.origin, id, input as ApiRequestInput)) ||
 			id === 'connectWebSocket'
 		)
 			throw new ServerApiError('invalidRequest');
@@ -358,13 +359,4 @@ export class ServerApiClient {
 	private assertCurrent(): void {
 		if (this.disposed) throw new ServerApiError('sessionEnded');
 	}
-}
-
-function cacheable(request: PreparedApiRequest): boolean {
-	return (
-		request.method === 'GET' &&
-		!Object.keys(request.headers ?? {}).some((key) =>
-			/(?:credential|authorization|dpop|cookie|csrf)/iu.test(key)
-		)
-	);
 }

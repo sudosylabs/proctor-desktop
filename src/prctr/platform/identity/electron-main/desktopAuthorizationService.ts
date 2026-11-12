@@ -6,8 +6,9 @@ import {
 	projectRead,
 	type SessionBinding
 } from '../../serverApi/common/projection.js';
-import { decodeJson, type HttpResponse } from '../../serverApi/node/serverHttpTransport.js';
-import type { PreparedApiRequest } from '../../serverApi/node/apiRequest.js';
+import type { HttpResponse } from '../../serverApi/node/serverHttpTransport.js';
+import { decodeJsonBody } from '../../serverApi/node/responseDecoding.js';
+import type { EncodedApiRequest } from '../../serverApi/node/requestEncoding.js';
 import {
 	validateExamActivityIntent,
 	type ExamActivityIntent,
@@ -840,7 +841,7 @@ export class DesktopAuthorizationService extends Disposable {
 	private async executeApiRequest(
 		session: CurrentSession,
 		generation: number,
-		request: PreparedApiRequest
+		request: EncodedApiRequest
 	): Promise<HttpResponse> {
 		const current = () => {
 			if (this.#disposed || this.#session !== session || this.#generation !== generation)
@@ -880,7 +881,7 @@ export class DesktopAuthorizationService extends Disposable {
 		const code = (result: HttpResponse): string | undefined => {
 			if (result.status < 400) return undefined;
 			try {
-				const value = decodeJson(result);
+				const value = decodeJsonBody(result);
 				return value &&
 					typeof value === 'object' &&
 					'code' in value &&

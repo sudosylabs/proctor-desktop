@@ -154,11 +154,14 @@ void test('in-progress and unknown conflicts preserve uncertain outcome, includi
 	let requests = 0;
 	const api = new ServerApiClient('https://institution.test', async () => {
 		requests++;
-		throw new ServerApiError('server', 409, {
-			code: 'idempotency.in_progress',
+		throw new ServerApiError('server', {
 			status: 409,
-			title: 'In progress',
-			type: 'about:blank'
+			problem: {
+				code: 'idempotency.in_progress',
+				status: 409,
+				title: 'In progress',
+				type: 'about:blank'
+			}
 		});
 	});
 	const authority = new ServerWorkspaceAuthority({
@@ -322,7 +325,7 @@ void test('a committed mutation remains uncertain if refreshing its snapshot is 
 				{ workspace_id: id, workspace_cursor: 1, operation: 'create_file', entry: file },
 				201
 			);
-		throw new ServerApiError('server', 403);
+		throw new ServerApiError('server', { status: 403 });
 	});
 	const authority = new ServerWorkspaceAuthority({
 		api,

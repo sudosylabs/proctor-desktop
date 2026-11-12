@@ -1,4 +1,5 @@
-import { ServerHttpTransport, decodeJson } from '../../serverApi/node/serverHttpTransport.js';
+import { ServerHttpTransport } from '../../serverApi/node/serverHttpTransport.js';
+import { decodeJsonBody } from '../../serverApi/node/responseDecoding.js';
 import { ServerApiError } from '../../serverApi/common/serverApi.js';
 import type { CancellationToken } from '../../../base/common/cancellation.js';
 import { DesktopAuthorizationError } from './desktopAuthorizationError.js';
@@ -211,7 +212,7 @@ export class DesktopAuthHttp {
 					dataUrl: `data:image/webp;base64,${bytes.toString('base64')}`,
 					etag: response.headers.etag
 				};
-			} else if (response.status !== 204) value = decodeJson(response);
+			} else if (response.status !== 204) value = decodeJsonBody(response);
 			return { status: response.status, value, ...(nonce ? { nonce } : {}) };
 		} catch (error) {
 			if (token.isCancellationRequested) throw new DesktopAuthorizationError('cancelled');

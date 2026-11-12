@@ -74,9 +74,9 @@ export async function connectServerRealtime(
 								(code === 4001
 									? new ServerApiError('sessionEnded')
 									: code === 4003
-										? new ServerApiError('server', 403)
+										? new ServerApiError('server', { status: 403 })
 										: code === 4004
-											? new ServerApiError('server', 429)
+											? new ServerApiError('server', { status: 429 })
 											: code === 1000
 												? undefined
 												: new ServerApiError('network')))
@@ -157,7 +157,7 @@ export async function connectServerRealtime(
 					reject(
 						new ServerApiError(
 							status >= 300 && status < 400 ? 'redirectBlocked' : 'server',
-							status
+							{ status }
 						)
 					);
 				socket.terminate();
@@ -187,5 +187,5 @@ export async function connectServerRealtime(
 			}
 		};
 	}
-	throw new ServerApiError('server', 401);
+	throw new ServerApiError('server', { status: 401 });
 }

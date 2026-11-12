@@ -26,7 +26,7 @@ import {
 	type ApiOperationId
 } from '../../../../src/prctr/platform/serverApi/common/serverApi.js';
 import { operationContract } from '../../../../src/prctr/platform/serverApi/node/serverContract.js';
-import type { PreparedApiRequest } from '../../../../src/prctr/platform/serverApi/node/apiRequest.js';
+import type { EncodedApiRequest } from '../../../../src/prctr/platform/serverApi/node/requestEncoding.js';
 import { ServerApiClient } from '../../../../src/prctr/platform/serverApi/node/serverApiClient.js';
 import type { HttpResponse } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 
@@ -88,15 +88,15 @@ const retentionPolicyDto = {
 
 interface Harness {
 	readonly service: AdministrationService;
-	readonly requests: PreparedApiRequest[];
+	readonly requests: EncodedApiRequest[];
 	readonly signOuts: () => number;
 	readonly dispose: () => void;
 }
 function harness(
-	answer: (request: PreparedApiRequest, index: number) => HttpResponse | Promise<HttpResponse>,
+	answer: (request: EncodedApiRequest, index: number) => HttpResponse | Promise<HttpResponse>,
 	port: Partial<AdministrationSessionPort> = {}
 ): Harness {
-	const requests: PreparedApiRequest[] = [];
+	const requests: EncodedApiRequest[] = [];
 	let signOuts = 0;
 	const api = new ServerApiClient(origin, async (request) => {
 		requests.push(request);
@@ -127,7 +127,7 @@ function harness(
 		}
 	};
 }
-const path = (request: PreparedApiRequest) => {
+const path = (request: EncodedApiRequest) => {
 	const url = new URL(request.url);
 	return `${request.method} ${url.pathname}${url.search}`;
 };

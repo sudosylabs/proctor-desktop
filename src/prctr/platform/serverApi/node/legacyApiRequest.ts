@@ -1,7 +1,7 @@
 import type { ApiInput, ApiOperationId } from '../common/serverApi.js';
 import { ServerApiError } from '../common/serverApi.js';
 import { operationContracts, resolveSchema } from './serverContract.js';
-import type { ApiRequestInput } from './apiRequest.js';
+import type { ApiRequestInput } from './requestEncoding.js';
 
 /** Transitional domain adapters resolve only packaged routes; no arbitrary endpoint is admitted. */
 export function resolveApiRoute(

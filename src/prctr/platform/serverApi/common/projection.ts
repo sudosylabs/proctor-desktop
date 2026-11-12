@@ -65,12 +65,11 @@ export function projectionMember<T extends string>(value: unknown, members: read
 export class ProjectionFailure<R> extends ServerApiError {
 	readonly response: R;
 	constructor(response: R, failure?: ServerApiError, sessionEnded = false) {
-		super(
-			failure?.kind ?? (sessionEnded ? 'sessionEnded' : 'invalidResponse'),
-			failure?.status,
-			failure?.problem,
-			failure?.retryAfterMs
-		);
+		super(failure?.kind ?? (sessionEnded ? 'sessionEnded' : 'invalidResponse'), {
+			status: failure?.status,
+			problem: failure?.problem,
+			retryAfterMs: failure?.retryAfterMs
+		});
 		this.response = response;
 	}
 }

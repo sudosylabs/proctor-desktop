@@ -76,7 +76,7 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 			header: this.headers(binding),
 			query: { participation_id: binding.participationId }
 		});
-		if (result.status !== 200) throw new ServerApiError('server', result.status);
+		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		if (
 			result.value.participation_id !== binding.participationId ||
 			result.value.generation !== binding.participationGeneration
@@ -95,7 +95,7 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 			},
 			body: { family: 'browser', reason: 'local_loss_inventory_exhausted' }
 		});
-		if (result.status !== 200) throw new ServerApiError('server', result.status);
+		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		if (
 			result.value.budget.participation_id !== binding.participationId ||
 			result.value.budget.generation !== binding.participationGeneration
@@ -171,7 +171,7 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 			path: this.path(binding),
 			header: this.headers(binding)
 		});
-		if (result.status !== 200) throw new ServerApiError('server', result.status);
+		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		assertBrowserSourceStatus(binding, result.value);
 		return result.value;
 	}
@@ -194,7 +194,7 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 			header: { 'Idempotency-Key': canonicalBrowserDigest(body) },
 			body
 		});
-		if (result.status !== 200) throw new ServerApiError('server', result.status);
+		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		if (result.value.source_session_id !== binding.sourceInstanceId)
 			throw new ServerApiError('invalidResponse');
 		return result.value;
@@ -205,7 +205,7 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 			header: this.headers(binding),
 			query: { limit: 64, ...(cursor === undefined ? {} : { cursor }) }
 		});
-		if (result.status !== 200) throw new ServerApiError('server', result.status);
+		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		return result.value;
 	}
 	async gaps(binding: BrowserSourceBinding, body: components['schemas']['DeclareDeliveryGaps']) {
@@ -214,7 +214,7 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 			header: { ...this.headers(binding), 'Idempotency-Key': body.declaration_id },
 			body
 		});
-		if (result.status !== 200) throw new ServerApiError('server', result.status);
+		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		assertBrowserSourceStatus(binding, result.value.status);
 		return result.value;
 	}
@@ -227,7 +227,7 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 			header: { ...this.headers(binding), 'Idempotency-Key': body.declaration_id },
 			body
 		});
-		if (result.status !== 200) throw new ServerApiError('server', result.status);
+		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		assertBrowserSourceStatus(binding, result.value);
 		return result.value;
 	}
@@ -241,7 +241,7 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 			header: { ...this.headers(binding), 'Idempotency-Key': idempotencyKey },
 			body
 		});
-		if (result.status !== 200) throw new ServerApiError('server', result.status);
+		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 		assertBrowserSourceStatus(binding, result.value.status);
 		return result.value;
 	}

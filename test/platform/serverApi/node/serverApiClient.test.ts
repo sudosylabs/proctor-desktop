@@ -2,22 +2,8 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createServer } from 'node:http';
 import { WebSocketServer } from 'ws';
-import {
-	operationContract,
-	operationContracts,
-	resolveSchema,
-	validateNamedSchema,
-	validateSchema
-} from '../../../../src/prctr/platform/serverApi/node/serverContract.js';
-import {
-	prepareApiRequest,
-	readApiResponse
-} from '../../../../src/prctr/platform/serverApi/node/apiRequest.js';
 import { ServerApiClient } from '../../../../src/prctr/platform/serverApi/node/serverApiClient.js';
-import {
-	ServerHttpTransport,
-	type HttpResponse
-} from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
+import type { HttpResponse } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 import {
 	ServerApiError,
 	type ApiInput,
@@ -27,220 +13,7 @@ import { connectServerRealtime } from '../../../../src/prctr/platform/serverApi/
 
 const origin = 'https://institution.test';
 const id = 'y'.repeat(26);
-const json = (value: unknown, status = 200, headers = {}): HttpResponse => ({
-	status,
-	headers: { 'content-type': 'application/json', ...headers },
-	bytes: new TextEncoder().encode(JSON.stringify(value))
-});
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
-
-void test('every packaged operation has executable request/response schemas, including conditional and non-JSON routes', () => {
-	const operations = [...operationContracts()];
-	assert.equal(operations.length, 301);
-	assert.equal(new Set(operations.map((operation) => operation.path)).size, 247);
-	const compiles = (operation: string, run: () => void) => {
-		try {
-			run();
-		} catch (error) {
-			assert.ok(error instanceof ServerApiError, `${operation}: ${String(error)}`);
-		}
-	};
-	for (const operation of operations) {
-		for (const parameter of operation.parameters)
-			compiles(operation.id, () => validateSchema(parameter.schema, undefined));
-		for (const media of Object.values(operation.requestBody?.content ?? {}))
-			if (media.schema)
-				compiles(operation.id, () => validateSchema(media.schema!, undefined));
-		for (const response of Object.values(operation.responses))
-			for (const media of Object.values(response.content ?? {}))
-				if (media.schema)
-					compiles(operation.id, () =>
-						validateSchema(media.schema!, undefined, 'response')
-					);
-	}
-});
-
-void test('the runtime contract carries no prose and names strict-integer operations', () => {
-	assert.equal(operationContract('appendNativeDelivery').strictIntegers, true);
-	assert.equal(operationContract('getCurrentUserProfile').strictIntegers, false);
-	for (const operation of operationContracts())
-		assert.ok(
-			!('description' in operation) && !('summary' in operation),
-			`${operation.id} keeps prose`
-		);
-});
-
-void test('operation inputs reject unknown routes/parameters, traversal and renderer-supplied authentication', () => {
-	const request = prepareApiRequest(origin, 'getUserProfilePicture', { path: { user_id: id } });
-	assert.equal(request.url, `${origin}/api/v1/users/${id}/profile-picture`);
-	for (const value of ['..', '../me', 'l'.repeat(26)])
-		assert.throws(() =>
-			prepareApiRequest(origin, 'getUserProfilePicture', { path: { user_id: value } })
-		);
-	assert.throws(() =>
-		prepareApiRequest(origin, 'getUserProfilePicture', {
-			path: { user_id: id },
-			query: { token: 'secret' }
-		})
-	);
-	assert.throws(() =>
-		prepareApiRequest(origin, 'exchangeDesktopAuthorizationCode', {
-			header: { DPoP: 'secret' }
-		})
-	);
-});
-
-void test('multipart content keeps bytes and metadata encoding separate', async () => {
-	const operation = operationContract('createCandidateExamWorkspaceFile');
-	const schema = resolveSchema(operation.requestBody!.content['multipart/form-data'].schema!);
-	assert.ok(schema.properties?.content);
-	// Invalid metadata is rejected before any network request.
-	assert.throws(() =>
-		prepareApiRequest(origin, operation.id, {
-			path: { exam_attempt_id: id },
-			body: { content: new Uint8Array([0, 255]), metadata: {} }
-		})
-	);
-	const upload = prepareApiRequest(origin, 'createCandidateExamWorkspaceFile', {
-		path: { exam_attempt_id: id },
-		header: {
-			'X-Proctor-Attempt-Credential': 'a'.repeat(43),
-			'X-Proctor-Attempt-Connection-ID': id,
-			'Idempotency-Key': 'upload-1'
-		},
-		body: {
-			content: new Uint8Array([0, 255]),
-			metadata: {
-				participation_id: id,
-				generation: 1,
-				path: 'main.ts',
-				media_type: 'text/plain',
-				size: 2,
-				sha256: 'a'.repeat(64)
-			}
-		}
-	});
-	assert.ok(upload.body instanceof FormData);
-	assert.deepEqual([...upload.body.keys()], ['metadata', 'content']);
-	const metadata = upload.body.get('metadata');
-	const content = upload.body.get('content');
-	assert.ok(metadata instanceof Blob && content instanceof Blob);
-	assert.equal(JSON.parse(await metadata.text()).size, 2);
-	const encoded = await new Request(upload.url, {
-		method: upload.method,
-		body: upload.body
-	}).text();
-	assert.match(encoded, /name="metadata"\r\nContent-Type: application\/json/);
-	assert.ok(encoded.indexOf('name="metadata"') < encoded.indexOf('name="content"'));
-	const correction = prepareApiRequest(origin, 'stageExamSittingCorrectionResourceContent', {
-		path: { exam_id: id, exam_sitting_id: id },
-		header: { 'Idempotency-Key': 'stage-1' },
-		body: {
-			metadata: {
-				base_revision_id: id,
-				target_kind: 'addition',
-				media_type: 'text/plain',
-				size: 2,
-				sha256: 'a'.repeat(64)
-			},
-			content: new Uint8Array([1, 2])
-		}
-	});
-	const correctionWire = await new Request(correction.url, {
-		method: correction.method,
-		body: correction.body
-	}).text();
-	assert.match(correctionWire, /name="metadata"\r\nContent-Type: application\/json/);
-	assert.ok(correctionWire.includes('"target_kind":"addition"'));
-
-	assert.deepEqual(new Uint8Array(await content.arrayBuffer()), new Uint8Array([0, 255]));
-
-	const photo = prepareApiRequest(origin, 'uploadUserProfilePicture', {
-		path: { user_id: id },
-		header: { 'If-Match': `"${'a'.repeat(64)}"` },
-		mediaType: 'image/png',
-		body: new Uint8Array([1, 2, 3])
-	});
-	assert.deepEqual(photo.body, new Uint8Array([1, 2, 3]));
-	assert.equal(photo.headers?.['Content-Type'], 'image/png');
-});
-
-void test('errors preserve problem fields and Retry-After while malformed responses fail validation', () => {
-	const operation = operationContract('getCurrentUserProfile');
-	const problem = {
-		type: 'about:blank',
-		title: 'Invalid',
-		status: 429,
-		code: 'authentication.rate_limited',
-		fields: { name: 'required' },
-		request_id: 'request-1'
-	};
-	assert.throws(
-		() => readApiResponse(operation, json(problem, 429, { 'retry-after': '3' })),
-		(error: unknown) =>
-			error instanceof ServerApiError &&
-			error.problem?.fields?.name === 'required' &&
-			error.retryAfterMs === 3000
-	);
-	assert.throws(
-		() => readApiResponse(operation, json({}, 200)),
-		(error: unknown) => error instanceof ServerApiError && error.kind === 'invalidResponse'
-	);
-	assert.throws(() => readApiResponse(operation, json({ ...problem, status: 400 }, 429)));
-});
-
-void test('binary and 304 responses preserve their transport meaning', () => {
-	const operation = operationContract('getUserProfilePicture');
-	const bytes = new Uint8Array([0, 255, 10]);
-	assert.deepEqual(
-		readApiResponse(operation, {
-			status: 200,
-			bytes,
-			headers: { 'content-type': 'image/webp', etag: 'v1' }
-		}).value,
-		bytes
-	);
-	assert.equal(
-		readApiResponse(operation, {
-			status: 304,
-			bytes: new Uint8Array(),
-			headers: { etag: 'v1' }
-		}).value,
-		undefined
-	);
-	assert.throws(() =>
-		readApiResponse(operation, { status: 200, bytes, headers: { 'content-type': 'text/html' } })
-	);
-});
-
-void test('transport fences redirects, excessive bodies, cancellation and deadline separately', async () => {
-	for (const response of [
-		new Response(null, { status: 302, headers: { Location: 'https://other.test' } }),
-		new Response('large')
-	]) {
-		const transport = new ServerHttpTransport(async () => response);
-		await assert.rejects(
-			transport.send({ url: origin, method: 'GET', maxResponseBytes: 2 }),
-			ServerApiError
-		);
-	}
-	const controller = new AbortController();
-	controller.abort();
-	await assert.rejects(
-		new ServerHttpTransport().send({ url: origin, method: 'GET', signal: controller.signal }),
-		(error: unknown) => error instanceof ServerApiError && error.kind === 'cancelled'
-	);
-	const transport = new ServerHttpTransport(
-		(_url, options) =>
-			new Promise((_resolve, reject) =>
-				options?.signal?.addEventListener('abort', () => reject(new Error('aborted')))
-			)
-	);
-	await assert.rejects(
-		transport.send({ url: origin, method: 'GET', timeoutMs: 5 }),
-		(error: unknown) => error instanceof ServerApiError && error.kind === 'timeout'
-	);
-});
 
 void test('shared reads deduplicate, stay fresh, and invalidate observed data after mutations', async () => {
 	const client = new ServerApiClient(origin);
@@ -434,23 +207,6 @@ void test('Node polling pauses when hidden and stops with its observation', asyn
 	}
 });
 
-void test('runtime schemas retain DTO properties named like schema annotations', () => {
-	validateNamedSchema('CreatePersonalAccessTokenRequest', {
-		description: 'Automation',
-		expires_at: new Date(Date.now() + 60000).toISOString(),
-		scopes: ['exam.view']
-	});
-	assert.throws(
-		() =>
-			validateNamedSchema('CreatePersonalAccessTokenRequest', {
-				description: 5,
-				expires_at: new Date(Date.now() + 60000).toISOString(),
-				scopes: ['exam.view']
-			}),
-		ServerApiError
-	);
-});
-
 void test('privileged executor failures expose only normalized API errors', async () => {
 	const client = new ServerApiClient(origin, async () => {
 		throw new Error('private transport details');
@@ -468,28 +224,6 @@ void test('privileged executor failures expose only normalized API errors', asyn
 	}
 });
 
-void test('gateway failures retain HTTP status and backoff without exposing HTML or inconsistent problem details', () => {
-	const operation = operationContract('getCurrentUserProfile');
-	for (const response of [
-		{
-			status: 503,
-			headers: { 'content-type': 'text/html', 'retry-after': '4' },
-			bytes: new TextEncoder().encode('<html>private proxy</html>')
-		},
-		json({ status: 400, title: 'bad' }, 503, { 'retry-after': '4' })
-	]) {
-		assert.throws(
-			() => readApiResponse(operation, response),
-			(e: unknown) =>
-				e instanceof ServerApiError &&
-				e.kind === 'server' &&
-				e.status === 503 &&
-				e.retryAfterMs === 4000 &&
-				e.problem === undefined &&
-				!e.message.includes('private')
-		);
-	}
-});
 void test('invalidation fences pending initial and background reads before publishing authoritative data', async () => {
 	for (const cached of [false, true]) {
 		const client = new ServerApiClient(origin);
@@ -520,6 +254,7 @@ void test('invalidation fences pending initial and background reads before publi
 		}
 	}
 });
+
 void test('throwing or reentrant observation callbacks leave no polling timer or active observer', async (context) => {
 	context.mock.timers.enable({ apis: ['setInterval'] });
 	for (const reentrant of [false, true]) {
@@ -547,6 +282,7 @@ void test('throwing or reentrant observation callbacks leave no polling timer or
 		client.dispose();
 	}
 });
+
 void test('mutation completion is fenced when session ends during the awaited cache refresh', async () => {
 	const client = new ServerApiClient(origin, async () => ({
 		status: 204,

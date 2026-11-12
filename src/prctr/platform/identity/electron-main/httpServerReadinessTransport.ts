@@ -1,4 +1,5 @@
-import { ServerHttpTransport, decodeJson } from '../../serverApi/node/serverHttpTransport.js';
+import { ServerHttpTransport } from '../../serverApi/node/serverHttpTransport.js';
+import { decodeJsonBody } from '../../serverApi/node/responseDecoding.js';
 import { ServerApiError } from '../../serverApi/common/serverApi.js';
 import type { CancellationToken } from '../../../base/common/cancellation.js';
 import {
@@ -61,7 +62,7 @@ export class HttpServerReadinessTransport implements ServerReadinessTransport {
 				maxResponseBytes: MAX_RESPONSE_BYTES
 			});
 			if (response.status !== 200) return failure('unreachable');
-			return { ok: true, value: decodeJson(response) };
+			return { ok: true, value: decodeJsonBody(response) };
 		} catch (error) {
 			return failure(
 				error instanceof ServerApiError

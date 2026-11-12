@@ -44,24 +44,34 @@ export type ApiFailureKind =
 	| 'invalidResponse'
 	| 'redirectBlocked'
 	| 'sessionEnded';
-/** Never includes credentials, request bodies, URLs, or the raw underlying exception. */
+export interface ServerApiErrorDetails {
+	/** The HTTP status the server answered with, for `server` failures. */
+	readonly status?: number;
+	/** The server's Problem Details, when it sent a valid one for this status. */
+	readonly problem?: ApiProblem;
+	/** How long the server asked the client to wait before trying again. */
+	readonly retryAfterMs?: number;
+}
+/**
+ * A failed server operation. The message names only the kind and status: it never includes
+ * credentials, request bodies, URLs or the underlying exception.
+ */
 export class ServerApiError extends Error {
 	readonly kind: ApiFailureKind;
 	readonly status: number | undefined;
 	readonly problem: ApiProblem | undefined;
 	readonly retryAfterMs: number | undefined;
-	constructor(
-		kind: ApiFailureKind,
-		status?: number,
-		problem?: ApiProblem,
-		retryAfterMs?: number
-	) {
-		super(`Server API ${kind}${status === undefined ? '' : ` (${status})`}`);
+	constructor(kind: ApiFailureKind, details: ServerApiErrorDetails = {}) {
+		super(`Server API ${kind}${details.status === undefined ? '' : ` (${details.status})`}`);
 		this.name = 'ServerApiError';
 		this.kind = kind;
-		this.status = status;
-		this.problem = problem;
-		this.retryAfterMs = retryAfterMs;
+		this.status = details.status;
+		this.problem = details.problem;
+		this.retryAfterMs = details.retryAfterMs;
+	}
+	/** The server's stable error code, when it answered with Problem Details. */
+	get code(): string | undefined {
+		return this.problem?.code;
 	}
 }
 
