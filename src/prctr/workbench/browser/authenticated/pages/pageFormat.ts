@@ -141,15 +141,27 @@ export class PageFormatService implements IPageFormatService {
 		return this.text(day === 'today' ? today : yesterday, { time: clock });
 	}
 
+	/**
+	 * Numbers and dates follow the person's regional format: a window shown in plain "en" on a
+	 * British system writes "12 Nov 2026", not "Nov 12, 2026". Another language keeps its own.
+	 */
 	private get locale(): string {
-		return this.localization.locale === 'pseudo' ? 'en' : this.localization.locale;
+		const language = this.localization.locale === 'pseudo' ? 'en' : this.localization.locale;
+		if (language.includes('-')) return language;
+		const regional = new Intl.DateTimeFormat().resolvedOptions().locale;
+		return regional.split('-')[0] === language ? regional : language;
 	}
 }
 
-/** The text with its first letter in upper case, as each part of a detail line starts. */
+/**
+ * The text with its first letter in upper case, as each part of a detail line starts. A name
+ * that sets its own case inside its first word, such as "macOS", is left as it is.
+ */
 export function capitalize(text: string, locale?: string): string {
 	const first = text.codePointAt(0);
 	if (first === undefined) return text;
+	const word = text.split(/\s/u, 1)[0] ?? '';
+	if (/\p{Lu}/u.test(word.slice(String.fromCodePoint(first).length))) return text;
 	const letter = String.fromCodePoint(first);
 	return letter.toLocaleUpperCase(locale) + text.slice(letter.length);
 }

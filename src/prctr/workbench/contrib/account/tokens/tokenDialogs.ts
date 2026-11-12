@@ -4,6 +4,7 @@
 
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
+import type { AccountMessage } from '../accountMessages.js';
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IClipboardService } from '../../../../platform/clipboard/common/clipboardService.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
@@ -25,6 +26,10 @@ import { accountReauthentication } from '../widgets/accountReauthentication.js';
 import {
 	DEFAULT_TOKEN_EXPIRY,
 	scopeGrantable,
+	tokenActionColumns,
+	tokenAreaMessage,
+	tokenScopeAreas,
+	type TokenActionColumn,
 	tokenExpiry,
 	tokenExpiryPresets,
 	validateTokenDraft,
@@ -42,22 +47,39 @@ let scopeSequence = 0;
 
 const NO_LIMIT = '';
 
-/**
- * Asks for a new token's name, what it can do, where it applies and when it
- * expires, then creates it. The scopes and Academic Units offered are the ones
- * the server says this person may grant; the server checks them again on
- * creation. The one-time credential goes straight to the copy dialog.
- */
+const columnMessages: Readonly<Record<TokenActionColumn, AccountMessage>> = Object.freeze({
+	view: 'tokenColumnView',
+	create: 'tokenColumnCreate',
+	manage: 'tokenColumnManage',
+	review: 'tokenColumnReview',
+	publish: 'tokenColumnPublish'
+});
+
 /** How long a Copy button says Copied before it reads Copy again. */
 const COPIED_MS = 2000;
 
+/** One box of the grid: the scope it grants, and the row it belongs to. */
+interface ScopeBox {
+	readonly scope: AccountGrantableScope;
+	readonly input: HTMLInputElement;
+	readonly row: number;
+}
+
+/**
+ * Asks for a new token's name, what it can do, where it applies and when it
+ * expires, then creates it. What it can do is a grid: one row per area, such as
+ * Exams, one fixed column per action, with an empty cell where the action doesn't
+ * exist. The scopes and Academic Units offered are the ones the server says this
+ * person may grant; the server checks them again on creation. The one summary of
+ * the ticked boxes is shown in the footer, Confirm it's you and the copy step. The
+ * one-time credential goes straight to the copy dialog.
+ */
 export class NewTokenDialog extends Disposable {
 	private readonly dialog: PageDialog;
 	private readonly name: TextFieldControl;
-	private scopes: readonly {
-		readonly scope: AccountGrantableScope;
-		readonly input: HTMLInputElement;
-	}[] = [];
+	private scopes: readonly ScopeBox[] = [];
+	/** Each grid row's reason line, shown when none of its boxes can be ticked. */
+	private reasons: readonly HTMLElement[] = [];
 	private readonly scopeList: HTMLElement;
 	private readonly scopeStatus: HTMLElement;
 	private readonly scopeError: HTMLElement;
@@ -76,7 +98,11 @@ export class NewTokenDialog extends Disposable {
 	private readonly confirmation = this._register(new MutableDisposable<ConfirmItsYouDialog>());
 
 	constructor(
-		private readonly onDidCreate: (token: AccountToken, credential: string) => void,
+		private readonly onDidCreate: (
+			token: AccountToken,
+			credential: string,
+			summary: readonly string[]
+		) => void,
 		private readonly onDidClose: () => void,
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
@@ -114,11 +140,20 @@ export class NewTokenDialog extends Disposable {
 			id: `${scopeId}-status`,
 			textContent: this.format.text('tokenScopesLoading')
 		});
-		this.scopeList = $('div.prctr-account-token-form__scope-list', { hidden: true });
+		this.scopeList = $('div.prctr-account-token-form__grid', { hidden: true });
+		const scopeHint = $('p.prctr-account-token-form__hint', {
+			id: `${scopeId}-hint`,
+			textContent: this.format.text('tokenScopesHint')
+		});
 		const fieldset = $(
 			'fieldset.prctr-account-token-form__scopes',
-			{ attrs: { 'aria-describedby': `${this.scopeStatus.id} ${this.scopeError.id}` } },
+			{
+				attrs: {
+					'aria-describedby': `${scopeHint.id} ${this.scopeStatus.id} ${this.scopeError.id}`
+				}
+			},
 			legend,
+			scopeHint,
 			this.scopeStatus,
 			this.scopeList,
 			this.scopeError
@@ -209,39 +244,86 @@ export class NewTokenDialog extends Disposable {
 	private showGrantable(grantable: AccountGrantableScopes): void {
 		const $ = createElementFactory(this.pane.document);
 		this.grantable = grantable;
-		// One row per area, such as Exams, with that area's permissions side by side; each
-		// permission's own description is its tooltip, so the list stays short.
-		const areas = groupScopesByArea(grantable.scopes);
-		const scopes: {
-			readonly scope: AccountGrantableScope;
-			readonly input: HTMLInputElement;
-		}[] = [];
-		for (const area of areas) {
-			const choices = area.scopes.map(({ scope, verb }) => {
-				const input = $('input.prctr-account-token-form__checkbox', {
-					type: 'checkbox',
-					value: scope.name,
-					attrs: { 'aria-label': scope.title }
-				});
-				this._register(addDisposableListener(input, 'change', () => this.updateFootnote()));
-				scopes.push({ scope, input });
+		const header = $(
+			'div.prctr-account-token-form__grid-row.prctr-account-token-form__grid-head',
+			{ attrs: { 'aria-hidden': 'true' } },
+			$('span', { textContent: this.format.text('tokenAreaColumn') }),
+			...tokenActionColumns.map((column) =>
+				$('span.prctr-account-token-form__column', {
+					textContent: this.format.text(columnMessages[column])
+				})
+			)
+		);
+		this.scopeList.append(header);
+		const boxes: ScopeBox[] = [];
+		const reasons: HTMLElement[] = [];
+		const checkbox = (scope: AccountGrantableScope, row: number): HTMLInputElement => {
+			const input = $('input.prctr-account-token-form__checkbox', {
+				type: 'checkbox',
+				value: scope.name,
+				title: scope.description,
+				attrs: { 'aria-label': scope.title }
+			});
+			this._register(addDisposableListener(input, 'change', () => this.updateFootnote()));
+			boxes.push({ scope, input, row });
+			return input;
+		};
+		for (const [index, area] of tokenScopeAreas(grantable.scopes).entries()) {
+			const nameId = `${this.scopeList.id || 'prctr-token-grid'}-${++scopeSequence}`;
+			const named = tokenAreaMessage(area.area);
+			const label =
+				named === undefined
+					? [...Object.values(area.cells), ...area.other]
+							.map((scope) => scope.title)
+							.join(', ')
+					: this.format.text(named);
+			const reason = $('span.prctr-account-token-form__reason', { hidden: true });
+			reasons.push(reason);
+			const heading = $(
+				'span.prctr-account-token-form__area',
+				{},
+				$('span.prctr-account-token-form__area-name', {
+					id: nameId,
+					textContent: area.anyone
+						? this.format.text('tokenAreaAnyone', { area: label })
+						: label
+				})
+			);
+			if (named !== undefined)
+				heading.append(
+					$('span.prctr-account-token-form__area-description', {
+						textContent: this.format.text(`${named}Description` as AccountMessage)
+					})
+				);
+			heading.append(reason);
+			const cells = tokenActionColumns.map((column) => {
+				const scope = area.cells[column];
 				return $(
-					'label.prctr-account-token-form__scope',
-					{ title: scope.description },
-					input,
-					$('span.prctr-account-token-form__scope-title', { textContent: verb })
+					'span.prctr-account-token-form__cell',
+					{},
+					...(scope === undefined ? [] : [checkbox(scope, index)])
 				);
 			});
-			this.scopeList.append(
-				$(
-					'div.prctr-account-token-form__area',
-					{ attrs: { role: 'group', 'aria-label': area.label } },
-					$('span.prctr-account-token-form__area-name', { textContent: area.label }),
-					$('span.prctr-account-token-form__area-scopes', {}, ...choices)
-				)
+			const row = $(
+				'div.prctr-account-token-form__grid-row',
+				{ attrs: { role: 'group', 'aria-labelledby': nameId } },
+				heading,
+				...cells
 			);
+			// An action without a column, if the catalogue ever grows one, is offered by its title.
+			for (const scope of area.other)
+				heading.append(
+					$(
+						'label.prctr-account-token-form__other',
+						{},
+						checkbox(scope, index),
+						$('span', { textContent: scope.title })
+					)
+				);
+			this.scopeList.append(row);
 		}
-		this.scopes = scopes;
+		this.scopes = boxes;
+		this.reasons = reasons;
 		this.updateFootnote();
 		const empty = grantable.scopes.length === 0;
 		this.scopeStatus.hidden = !empty;
@@ -260,15 +342,53 @@ export class NewTokenDialog extends Disposable {
 		this.setWorking(false);
 	}
 
-	/** "3 permissions", beside the buttons. */
+	/**
+	 * The one summary of what is ticked: "View exams, Export submissions · Computer Science only ·
+	 * Expires 10 Feb 2027". The date never breaks across lines.
+	 */
+	private summary(): string {
+		const unit = this.academicUnitId();
+		const unitName = this.grantable?.academicUnits.find((entry) => entry.id === unit)?.name;
+		const days = Number(this.expiry.value) as TokenExpiryPreset;
+		return [
+			this.selectedScopeTitles().join(', '),
+			unit === undefined
+				? this.format.text('tokenWholeInstitution')
+				: unitName === undefined
+					? this.format.text('tokenUnitTag')
+					: this.format.text('tokenUnitNamedTag', { unit: unitName }),
+			this.format.text('tokenExpires', {
+				date: this.format
+					.date(tokenExpiry(days, this.format.now()))
+					.replace(/ /gu, '\u00a0')
+			})
+		]
+			.filter((part) => part !== '')
+			.reduce((first, second) => this.format.join(first, second));
+	}
+
+	/** "3 permissions · Computer Science only", beside the buttons. */
 	private updateFootnote(): void {
 		const count = this.selectedScopes().length;
+		if (count === 0) {
+			this.dialog.setFootnote(undefined);
+			return;
+		}
+		const unit = this.academicUnitId();
+		const unitName = this.grantable?.academicUnits.find((entry) => entry.id === unit)?.name;
+		const permissions =
+			count === 1
+				? this.format.text('tokenScopeCountOne')
+				: this.format.text('tokenScopeCount', { count });
 		this.dialog.setFootnote(
-			count === 0
-				? undefined
-				: count === 1
-					? this.format.text('tokenScopeCountOne')
-					: this.format.text('tokenScopeCount', { count })
+			unit === undefined
+				? permissions
+				: this.format.join(
+						permissions,
+						unitName === undefined
+							? this.format.text('tokenUnitTag')
+							: this.format.text('tokenUnitNamedTag', { unit: unitName })
+					)
 		);
 	}
 
@@ -276,26 +396,53 @@ export class NewTokenDialog extends Disposable {
 		return this.limit.value === NO_LIMIT ? undefined : this.limit.value;
 	}
 
-	/** Scopes that cannot apply where the token is limited are unticked and unavailable. */
+	/**
+	 * Scopes that cannot apply where the token is limited are unticked and greyed, and a row with
+	 * nothing left to tick says why under its name.
+	 */
 	private applyLimit(): void {
 		const unit = this.academicUnitId();
+		const unitName = this.grantable?.academicUnits.find((entry) => entry.id === unit)?.name;
+		const open = new Set<number>();
 		for (const entry of this.scopes) {
 			const grantable = scopeGrantable(entry.scope, unit);
 			if (!grantable) entry.input.checked = false;
+			else open.add(entry.row);
 			entry.input.disabled = this.working || !grantable;
 		}
+		for (const [row, reason] of this.reasons.entries()) {
+			reason.hidden = open.has(row);
+			reason.textContent = open.has(row)
+				? ''
+				: unit === undefined
+					? this.format.text('tokenAreaNeedsUnit')
+					: this.format.text('tokenAreaNotInUnit', {
+							unit: unitName ?? this.format.text('tokenUnitTag')
+						});
+		}
+		this.updateFootnote();
 	}
 
 	private registerListeners(): void {
 		this._register(
 			this.name.onDidChange((value) => {
+				const named = value.trim().length > 0;
+				const wasNamed = this.nameValue.trim().length > 0;
 				this.nameValue = value;
+				// Create token waits for a name; typing one is enough to offer it.
+				if (named !== wasNamed && !this.working)
+					this.create.setState({
+						label: this.format.text('createToken'),
+						icon: CREATE_ICON,
+						disabled: this.scopes.length === 0 || !named
+					});
 			})
 		);
 		this._register(this.cancel.onDidRequest(() => this.close()));
 		this._register(this.dialog.onDidRequestCancel(() => this.close()));
 		this._register(this.create.onDidRequest(() => void this.submit()));
 		this._register(addDisposableListener(this.limit, 'change', () => this.applyLimit()));
+		this._register(addDisposableListener(this.expiry, 'change', () => this.updateFootnote()));
 		this._register(
 			addDisposableListener(this.name.input, 'keydown', (event) => {
 				if (event.key !== 'Enter') return;
@@ -361,8 +508,9 @@ export class NewTokenDialog extends Disposable {
 		if (this._store.isDisposed) return;
 		this.setWorking(false);
 		if (result !== 'busy' && result.kind === 'tokenCreated') {
+			const summary = [intent.description, this.summary()];
 			this.dispose();
-			this.onDidCreate(result.token, result.credential);
+			this.onDidCreate(result.token, result.credential, summary);
 			return;
 		}
 		if (
@@ -388,12 +536,8 @@ export class NewTokenDialog extends Disposable {
 	private confirm(intent: Extract<AccountIntent, { kind: 'createToken' }>): void {
 		this.confirming = true;
 		this.feedback.set();
-		this.dialog.element.close();
-		const summary = [
-			intent.description,
-			this.selectedScopeTitles().join(', '),
-			this.expiry.selectedOptions[0]?.textContent ?? ''
-		].filter((line) => line !== '');
+		this.dialog.hide();
+		const summary = [intent.description, this.summary()];
 		this.confirmation.value = this.instantiationService.createInstance(
 			ConfirmItsYouDialog,
 			summary,
@@ -421,7 +565,7 @@ export class NewTokenDialog extends Disposable {
 			label: this.format.text('createToken'),
 			icon: CREATE_ICON,
 			busy: working,
-			disabled: !working && this.scopes.length === 0
+			disabled: !working && (this.scopes.length === 0 || this.nameValue.trim().length === 0)
 		});
 	}
 
@@ -449,6 +593,7 @@ export class TokenCreatedDialog extends Disposable {
 
 	constructor(
 		credential: string,
+		summary: readonly string[],
 		private readonly onDidClose: () => void,
 		@IAccountFormatService private readonly format: IAccountFormatService,
 		@IPagePaneContext private readonly pane: IPagePaneContext,
@@ -475,7 +620,21 @@ export class TokenCreatedDialog extends Disposable {
 			}
 		});
 		const row = $('div.prctr-account-token-credential', {}, this.value);
-		this.dialog.body.append(row);
+		this.dialog.body.append(
+			row,
+			$(
+				'div.prctr-account-token-summary',
+				{},
+				...summary.map((line, index) =>
+					$(
+						index === 0
+							? 'span.prctr-account-token-summary__name'
+							: 'span.prctr-account-token-summary__line',
+						{ textContent: line }
+					)
+				)
+			)
+		);
 		this.copy = this._register(
 			new ButtonControl(row, {
 				variant: 'secondary',
@@ -534,6 +693,8 @@ export class TokenCreatedDialog extends Disposable {
 			clearTimeout(timer);
 			if (this._store.isDisposed) return;
 			delete element.dataset.copied;
+			// The width was held only while it said Copied.
+			element.style.minInlineSize = '';
 			button.setState({
 				label: this.format.text('copy'),
 				icon: proctorIconFactory('action.copy', 14)
@@ -549,32 +710,4 @@ export class TokenCreatedDialog extends Disposable {
 		super.dispose();
 		this.onDidClose();
 	}
-}
-
-/**
- * Permissions such as `exam.view` and `exam.manage.override` grouped by what they act on: the
- * area is everything before the action, and an override reads as the action "for any".
- */
-export function groupScopesByArea(scopes: readonly AccountGrantableScope[]): readonly {
-	readonly label: string;
-	readonly scopes: readonly { readonly scope: AccountGrantableScope; readonly verb: string }[];
-}[] {
-	const areas = new Map<string, { scope: AccountGrantableScope; verb: string }[]>();
-	for (const scope of scopes) {
-		const parts = scope.name.split('.');
-		const override = parts.at(-1) === 'override' && parts.length > 2;
-		const verbPart = override ? parts.at(-2)! : (parts.at(-1) ?? scope.name);
-		const area = parts.slice(0, override ? -2 : -1).join('.') || scope.name;
-		const verb = words(verbPart) + (override ? ' (any)' : '');
-		const list = areas.get(area) ?? [];
-		list.push({ scope, verb });
-		areas.set(area, list);
-	}
-	return [...areas].map(([area, list]) => ({ label: words(area), scopes: list }));
-}
-
-/** `academic_unit.members` → "Academic unit members". */
-function words(code: string): string {
-	const text = code.replace(/[._]+/gu, ' ').trim();
-	return text === '' ? code : text[0]!.toLocaleUpperCase() + text.slice(1);
 }

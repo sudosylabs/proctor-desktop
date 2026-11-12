@@ -47,6 +47,13 @@ export interface PagerOptions {
 	readonly labels: PagerLabels;
 	readonly previousIcon: ControlIconFactory;
 	readonly nextIcon: ControlIconFactory;
+	/**
+	 * A list the server pages by cursor offers only Previous and Next beside its range, with no
+	 * page numbers. Numbered by default.
+	 */
+	readonly numbered?: boolean;
+	/** Controls that sit right after the range, such as "Go to a date". */
+	readonly tools?: HTMLElement;
 }
 
 /**
@@ -97,12 +104,18 @@ export class PagerControl extends Disposable {
 			'nav.prctr-pager',
 			{ attrs: { 'aria-label': options.labels.name } },
 			this.range,
+			...(options.tools === undefined ? [] : [options.tools]),
 			$('span.prctr-pager__space'),
 			this.previous,
 			this.pages,
 			this.compact,
 			this.next
 		);
+		if (options.numbered === false) {
+			this.pages.hidden = true;
+			this.compact.hidden = true;
+			this.element.dataset.numbered = 'false';
+		}
 		host.append(this.element);
 		this._register(
 			addDisposableListener(this.previous, 'click', () => this.request(this.state.page - 1))
@@ -136,6 +149,7 @@ export class PagerControl extends Disposable {
 		this.previous.disabled = state.page <= 1 || state.busy === true;
 		this.next.disabled = !state.hasNext || state.busy === true;
 		this.element.setAttribute('aria-busy', String(state.busy === true));
+		if (this.options.numbered === false) return;
 		const $ = createElementFactory(this.element.ownerDocument);
 		this.pages.replaceChildren(
 			...pageNumbers(state, pageCount).map((page) =>

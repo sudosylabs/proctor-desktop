@@ -106,6 +106,12 @@
 		}
 	}
 
+	/* A cursor-paged list has no numbers in any width. */
+	.prctr-pager[data-numbered='false'] .prctr-pager__pages,
+	.prctr-pager[data-numbered='false'] .prctr-pager__compact {
+		display: none;
+	}
+
 	@media (forced-colors: active) {
 		.prctr-pager .prctr-pager__page[aria-current='page'] {
 			border: 1px solid ButtonText;

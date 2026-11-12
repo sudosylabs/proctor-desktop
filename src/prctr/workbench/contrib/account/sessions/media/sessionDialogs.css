@@ -1,0 +1,26 @@
+@layer contributions {
+	/* Session details: label and value pairs between hairlines, as on Profile. */
+	.prctr-page-dialog .prctr-account-session-details {
+		margin: 0;
+	}
+	.prctr-page-dialog .prctr-account-session-details__row {
+		align-items: baseline;
+		column-gap: 12px;
+		display: grid;
+		grid-template-columns: minmax(96px, 168px) minmax(0, 1fr);
+		padding: 10px 0;
+	}
+	.prctr-page-dialog .prctr-account-session-details__row + .prctr-account-session-details__row {
+		border-block-start: var(--prctr-shape-stroke-default) solid
+			var(--prctr-color-border-default);
+	}
+	.prctr-page-dialog .prctr-account-session-details__label {
+		color: var(--prctr-color-text-secondary);
+		font-size: 13px;
+	}
+	.prctr-page-dialog .prctr-account-session-details__value {
+		font-size: 13.5px;
+		margin: 0;
+		overflow-wrap: anywhere;
+	}
+}

@@ -1,8 +1,6 @@
 @layer contributions {
-	.prctr-account .prctr-account-history {
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
+	.prctr-account .prctr-account-history .prctr-page-section__card {
+		overflow: hidden;
 	}
 	.prctr-account .prctr-account-history__filters {
 		align-items: center;
@@ -80,17 +78,41 @@
 		padding: 12px 16px 8px;
 		text-align: start;
 	}
-	.prctr-account .prctr-account-history__heading[data-column='event'] {
-		inline-size: 34%;
-	}
-	.prctr-account .prctr-account-history__heading[data-column='by'] {
-		inline-size: 14%;
-	}
+	/* What happened takes the room; Where and When keep fixed widths and are never clipped. */
 	.prctr-account .prctr-account-history__heading[data-column='where'] {
-		inline-size: 22%;
+		inline-size: 168px;
 	}
 	.prctr-account .prctr-account-history__heading[data-column='when'] {
+		inline-size: 140px;
+		padding-inline-end: 8px;
 		text-align: end;
+	}
+	.prctr-account .prctr-account-history__sort {
+		align-items: center;
+		background: transparent;
+		block-size: 24px;
+		border: 0;
+		border-radius: 6px;
+		color: var(--prctr-color-text-primary);
+		display: inline-flex;
+		font: inherit;
+		font-weight: var(--prctr-typography-weight-medium);
+		gap: 4px;
+		padding: 0 8px;
+	}
+	.prctr-account .prctr-account-history__sort:hover {
+		background: var(--prctr-color-interaction-hover);
+	}
+	.prctr-account .prctr-account-history__sort:focus-visible,
+	.prctr-account .prctr-account-history__toggle:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
+	}
+	/* Where folds away first when the window is narrow. */
+	@media (max-width: 1099px) {
+		.prctr-account .prctr-account-history [data-column='where'] {
+			display: none;
+		}
 	}
 	.prctr-account .prctr-account-history__row > td {
 		border-block-start: var(--prctr-shape-stroke-default) solid
@@ -118,9 +140,35 @@
 		color: var(--prctr-color-text-primary);
 		font-weight: var(--prctr-typography-weight-medium);
 	}
+	.prctr-account .prctr-account-history__note-line {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
 	.prctr-account .prctr-account-history__note {
 		color: var(--prctr-color-text-tertiary);
 		font-size: 13px;
+	}
+	.prctr-account .prctr-account-history__toggle {
+		align-items: center;
+		background: transparent;
+		block-size: 22px;
+		border: 0;
+		border-radius: 6px;
+		color: var(--prctr-color-text-link);
+		display: inline-flex;
+		font: inherit;
+		font-size: 13px;
+		font-weight: var(--prctr-typography-weight-medium);
+		padding: 0 6px;
+	}
+	.prctr-account .prctr-account-history__toggle:hover {
+		background: var(--prctr-color-interaction-hover);
+	}
+	.prctr-account .prctr-account-history__tools {
+		display: inline-flex;
+		margin-inline-start: 4px;
 	}
 	.prctr-account .prctr-account-history__address {
 		color: var(--prctr-color-text-tertiary);

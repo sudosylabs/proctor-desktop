@@ -34,18 +34,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
-    "account.desktops.remove.menu": {
-      "message": "Remove desktop",
-      "description": "Row menu entry that opens the confirmation to remove a registered desktop.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
-    },
-    "account.desktops.removed.status": {
-      "message": "Removed",
-      "description": "Status word: this registered desktop was removed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
-    },
     "account.failure.cancelled": {
       "message": "Stopped before it finished. Nothing changed.",
       "description": "The person cancelled a browser step, or it was cancelled in Proctor.",
@@ -112,445 +100,277 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
-    "account.history.about.elsewhere": {
-      "message": "Something you did outside your account",
-      "description": "The event is one the person performed on something else.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
-    },
-    "account.history.by.administrator": {
-      "message": "An administrator",
-      "description": "Someone with authority over the account did it; they are never named.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.by.self": {
-      "message": "You",
-      "description": "The person did it themself.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.by.system": {
-      "message": "Proctor",
-      "description": "No signed-in person did it, such as a background job or an emailed link.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.column.by": {
-      "message": "By",
-      "description": "Account history column heading.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
-    },
     "account.history.column.what": {
-      "message": "Event",
-      "description": "Account history column heading.",
+      "message": "What happened",
+      "description": "Header of the Account history column with one sentence per change.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.column.when": {
       "message": "When",
-      "description": "Account history column heading.",
+      "description": "Header of the Account history column with the time, and its sort button.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.column.where": {
       "message": "Where",
-      "description": "Account history column heading.",
+      "description": "Header of the Account history column: what it was done from.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.empty": {
       "message": "Nothing happened with your account in this period.",
-      "description": "No events match the filters.",
+      "description": "The history filters match nothing.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
-    },
-    "account.history.event.academic.unit.joined": {
-      "message": "Joined an academic unit",
-      "description": "Account history event academic_unit.joined.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.academic.unit.left": {
-      "message": "Left an academic unit",
-      "description": "Account history event academic_unit.left.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.account.disabled": {
-      "message": "Account turned off",
-      "description": "Account history event account.disabled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.account.enabled": {
-      "message": "Account turned back on",
-      "description": "Account history event account.enabled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.account.recovered.by.administrator": {
-      "message": "Account recovered by an administrator",
-      "description": "Account history event account.recovered_by_administrator.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.affiliation.ended": {
-      "message": "Affiliation ended",
-      "description": "Account history event affiliation.ended.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.affiliation.started": {
-      "message": "Affiliation started",
-      "description": "Account history event affiliation.started.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.class.enrolled": {
-      "message": "Enrolled in a class",
-      "description": "Account history event class.enrolled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.class.transferred.in": {
-      "message": "Moved into a class",
-      "description": "Account history event class.transferred_in.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.class.transferred.out": {
-      "message": "Moved out of a class",
-      "description": "Account history event class.transferred_out.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.class.unenrolled": {
-      "message": "Removed from a class",
-      "description": "Account history event class.unenrolled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.desktop.registration.revoked": {
-      "message": "Removed a registered desktop",
-      "description": "Account history event desktop.registration_revoked.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.desktop.signed.in": {
-      "message": "Signed in on Proctor Desktop",
-      "description": "Account history event desktop.signed_in.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.email.change.undone": {
-      "message": "Email change undone",
-      "description": "Account history event email.change_undone.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.email.changed": {
-      "message": "Changed email address",
-      "description": "Account history event email.changed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.email.verified": {
-      "message": "Verified email address",
-      "description": "Account history event email.verified.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.invitation.accepted": {
-      "message": "Accepted an invitation",
-      "description": "Account history event invitation.accepted.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.mfa.disabled": {
-      "message": "Turned off two-step verification",
-      "description": "Account history event mfa.disabled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.mfa.enabled": {
-      "message": "Turned on two-step verification",
-      "description": "Account history event mfa.enabled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.mfa.recovery.codes.regenerated": {
-      "message": "Got new recovery codes",
-      "description": "Account history event mfa.recovery_codes_regenerated.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.mfa.reset.by.administrator": {
-      "message": "Two-step verification reset",
-      "description": "Account history event mfa.reset_by_administrator.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.mfa.setup.started": {
-      "message": "Started setting up two-step verification",
-      "description": "Account history event mfa.setup_started.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.other": {
-      "message": "Other account activity",
-      "description": "An account history event this release has no label for.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.password.changed": {
-      "message": "Changed password",
-      "description": "Account history event password.changed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.password.enrolled": {
-      "message": "Set a password",
-      "description": "Account history event password.enrolled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.password.removed": {
-      "message": "Removed password",
-      "description": "Account history event password.removed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.password.reset": {
-      "message": "Reset password",
-      "description": "Account history event password.reset.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.personal.access.token.created": {
-      "message": "Created an access token",
-      "description": "Account history event personal_access_token.created.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.personal.access.token.disabled": {
-      "message": "Disabled an access token",
-      "description": "Account history event personal_access_token.disabled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.personal.access.token.enabled": {
-      "message": "Turned an access token back on",
-      "description": "Account history event personal_access_token.enabled.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.personal.access.token.revoked": {
-      "message": "Revoked an access token",
-      "description": "Account history event personal_access_token.revoked.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.profile.changed": {
-      "message": "Profile changed",
-      "description": "Account history event profile.changed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.profile.picture.changed": {
-      "message": "Changed profile photo",
-      "description": "Account history event profile_picture.changed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.profile.picture.removed": {
-      "message": "Removed profile photo",
-      "description": "Account history event profile_picture.removed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.provider.unlinked": {
-      "message": "Sign-in provider unlinked",
-      "description": "Account history event provider.unlinked.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.role.ended": {
-      "message": "Role ended",
-      "description": "Account history event role.ended.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.role.granted": {
-      "message": "Role granted",
-      "description": "Account history event role.granted.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.session.revoked": {
-      "message": "Ended a session",
-      "description": "Account history event session.revoked.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.sessions.revoked.all": {
-      "message": "Ended every session",
-      "description": "Account history event sessions.revoked_all.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.sessions.revoked.others": {
-      "message": "Ended all other sessions",
-      "description": "Account history event sessions.revoked_others.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.sign.in.failed": {
-      "message": "Sign-in failed",
-      "description": "Account history event sign_in.failed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.sign.in.succeeded": {
-      "message": "Signed in",
-      "description": "Account history event sign_in.succeeded.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.history.event.sign.out": {
-      "message": "Signed out",
-      "description": "Account history event sign_out.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.failed": {
       "message": "Did not succeed",
-      "description": "The event failed.",
+      "description": "Note under a change that was attempted and failed.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.group": {
-      "message": "Kind",
-      "description": "Accessible name of the event-kind filter.",
+    "account.history.filter.about": {
+      "message": "About",
+      "description": "Account history filter: changes to your account, or what you did elsewhere.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.group.all": {
-      "message": "Any event",
-      "description": "Event-kind filter option: every event.",
+    "account.history.filter.about.actor": {
+      "message": "What you did elsewhere",
+      "description": "About choice: changes you made to anything else.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.filter.about.all": {
+      "message": "Anything",
+      "description": "About choice: everything.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.filter.about.subject": {
+      "message": "Your account",
+      "description": "About choice: changes made to your own account.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.filter.group.membership": {
       "message": "Classes, units and roles",
-      "description": "Event-kind filter option.",
+      "description": "Kind choice: memberships and roles.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.filter.group.profile": {
       "message": "Profile",
-      "description": "Event-kind filter option.",
+      "description": "Kind choice: the profile and its photo.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.filter.group.security": {
       "message": "Password, two-step and email",
-      "description": "Event-kind filter option.",
+      "description": "Kind choice: what protects the account.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.filter.group.sign.in": {
       "message": "Sign-in and sessions",
-      "description": "Event-kind filter option.",
+      "description": "Kind choice: signing in and out, and sessions.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.filter.group.status": {
       "message": "Account on or off",
-      "description": "Event-kind filter option.",
+      "description": "Kind choice: the account turned off or back on.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.filter.group.tokens": {
       "message": "Access tokens",
-      "description": "Event-kind filter option.",
+      "description": "Kind choice: access tokens.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.outcome": {
-      "message": "Outcome",
-      "description": "Accessible name of the outcome filter.",
+    "account.history.filter.kind": {
+      "message": "Kind",
+      "description": "Account history filter: what kind of change.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.outcome.all": {
-      "message": "Any",
-      "description": "Outcome filter option: every event.",
+    "account.history.filter.kind.all": {
+      "message": "Any change",
+      "description": "Kind choice: every kind of change.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.outcome.fail": {
-      "message": "Failed",
-      "description": "Outcome filter option.",
+    "account.history.filter.kind.failed": {
+      "message": "Failed attempts",
+      "description": "Kind choice: only attempts that did not succeed, such as a wrong password.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
-    },
-    "account.history.filter.outcome.success": {
-      "message": "Succeeded",
-      "description": "Outcome filter option.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.filter.period": {
       "message": "Period",
-      "description": "Accessible name of the period filter.",
+      "description": "Account history filter: how far back to look.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.filter.period.all": {
       "message": "All time",
-      "description": "Period filter option: no time limit.",
+      "description": "Period choice: the whole history.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.period.days": {
-      "message": "Last {days} days",
-      "description": "Period filter option: the last number of days.",
+    "account.history.filter.period.half.year": {
+      "message": "Last 6 months",
+      "description": "Period choice: the last half year, the default.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.filter.period.month": {
+      "message": "Last 30 days",
+      "description": "Period choice: the last month.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.filter.period.week": {
+      "message": "Last 7 days",
+      "description": "Period choice: the last week.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.filter.period.year": {
+      "message": "Last 12 months",
+      "description": "Period choice: the last year.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.filters": {
+      "message": "Filter the history",
+      "description": "Accessible name of the row of Account history filters.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.folded.note": {
+      "message": "The same change {count} times in a row",
+      "description": "Under a row that stands for a run of the same change.",
       "placeholders": [
-        "days"
+        "count"
       ],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.relation": {
-      "message": "About",
-      "description": "Accessible name of the subject filter.",
+    "account.history.go.to.date": {
+      "message": "Go to a date",
+      "description": "Opens a dialog to show the history up to a chosen day.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.relation.actor": {
-      "message": "What you did elsewhere",
-      "description": "Subject filter option: events the person performed on something else.",
+    "account.history.go.to.date.action": {
+      "message": "Go to date",
+      "description": "Shows the history up to the chosen day.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.relation.all": {
-      "message": "Anything",
-      "description": "Subject filter option: every event.",
+    "account.history.go.to.date.description": {
+      "message": "Shows what happened on that day and before it, with the filters you chose.",
+      "description": "One line under the Go to a date title.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
-    "account.history.filter.relation.subject": {
-      "message": "Your account",
-      "description": "Subject filter option: events about the account.",
+    "account.history.go.to.date.field": {
+      "message": "Day",
+      "description": "Label of the date field in Go to a date.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.go.to.date.title": {
+      "message": "Go to a date",
+      "description": "Title of the Go to a date dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.go.to.date.until": {
+      "message": "Up to {date}",
+      "description": "The Go to a date button once a date is chosen.",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.go.to.latest": {
+      "message": "Show the latest",
+      "description": "Leaves the chosen day and shows the newest changes again.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.page.shown": {
+      "message": "Showing {first} to {last}",
+      "description": "Announced once after moving to another page of the history.",
+      "placeholders": [
+        "first",
+        "last"
+      ],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.range": {
+      "message": "Showing {first}–{last} of {total}",
+      "description": "The history pager: which changes the page shows, of how many.",
+      "placeholders": [
+        "first",
+        "last",
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.range.at.least": {
+      "message": "Showing {first}–{last} of {total}+",
+      "description": "The history pager when the count stopped at its ceiling.",
+      "placeholders": [
+        "first",
+        "last",
+        "total"
+      ],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.range.open": {
+      "message": "Showing {first}–{last}",
+      "description": "The history pager when the total is not known.",
+      "placeholders": [
+        "first",
+        "last"
+      ],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.show.all": {
+      "message": "Show all {count}",
+      "description": "Opens a folded run of the same change in place.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.show.fewer": {
+      "message": "Show fewer",
+      "description": "Folds an opened run of the same change again.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.sort.newest": {
+      "message": "When, newest first. Show oldest first",
+      "description": "Accessible name of the When sort button while newest is first.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.sort.oldest": {
+      "message": "When, oldest first. Show newest first",
+      "description": "Accessible name of the When sort button while oldest is first.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.history.where.unknown": {
-      "message": "Not recorded",
-      "description": "Where the event came from is unknown.",
+      "message": "—",
+      "description": "The Where cell when nothing is recorded about it.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/audits/auditsMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
     "account.notice.browser.activity": {
       "message": "Browser activity during an exam",
@@ -614,14 +434,14 @@
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.page.history.description": {
-      "message": "Everything done with your account, by you, an administrator or Proctor itself.",
-      "description": "Description under the Audits heading.",
+      "message": "Everything done with your account or by it: by you, an administrator or Proctor itself.",
+      "description": "Description under the Account history heading.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.page.history.title": {
-      "message": "Audits",
-      "description": "Heading of the Audits page: what was done with the account.",
+      "message": "Account history",
+      "description": "Heading of the Account history page: what was done with the account.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
@@ -819,6 +639,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
+    "account.profile.add.photo": {
+      "message": "Add photo",
+      "description": "Choose a profile photo when there is none yet, only initials.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
+    },
     "account.profile.change.photo": {
       "message": "Change photo",
       "description": "Choose a new profile photo.",
@@ -832,16 +658,36 @@
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
     "account.profile.details.managed": {
-      "message": "{institution} manages these. To change one, contact an administrator.",
+      "message": "{institution} manages these. To change one, ask an administrator.",
       "description": "Account details are read-only; institution is its name.",
       "placeholders": [
         "institution"
       ],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
+    "account.profile.details.managed.administrator": {
+      "message": "{institution} manages these. You can change them in Administration.",
+      "description": "Account details, for someone who can open Administration; institution is its name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
+    },
+    "account.profile.details.managed.administrator.generic": {
+      "message": "Your institution manages these. You can change them in Administration.",
+      "description": "Account details, for someone who can open Administration, institution unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
+    },
     "account.profile.details.managed.generic": {
-      "message": "Your institution manages these. To change one, contact an administrator.",
+      "message": "Your institution manages these. To change one, ask an administrator.",
       "description": "Account details are read-only and the institution name is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
+    },
+    "account.profile.edit.in.administration": {
+      "message": "Edit in Administration",
+      "description": "Opens your own person page in Administration, where the details can be changed.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
@@ -908,12 +754,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
-    "account.profile.no.affiliation": {
-      "message": "You have no current affiliation with this institution.",
-      "description": "The account has no current affiliation.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
-    },
     "account.profile.notices.description": {
       "message": "{institution} keeps exam records for a set time. These are about to reach it.",
       "description": "Explains retention notices; institution is its name.",
@@ -958,6 +798,14 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
+    "account.profile.photo.zoom.value": {
+      "message": "{value}%",
+      "description": "What the photo zoom slider reports to a screen reader, as in \"200%\".",
+      "placeholders": [
+        "value"
+      ],
+      "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
+    },
     "account.profile.remove.photo": {
       "message": "Remove photo",
       "description": "Remove the profile photo.",
@@ -1000,6 +848,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/profile/profileMessages.ts"
     },
+    "account.security.extra.protection": {
+      "message": "Extra protection",
+      "description": "Heading of the section with two-step verification and recovery codes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
+    },
     "account.security.footnote": {
       "message": "Passwords, two-step verification and recovery codes are changed on {institution}’s security page in your browser. Proctor never asks for your password.",
       "description": "Where security changes happen.",
@@ -1026,26 +880,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
-    "account.security.other.provider": {
-      "message": "Linked sign-in",
-      "description": "A linked sign-in provider of another kind.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
-    },
-    "account.security.password": {
-      "message": "Password",
-      "description": "Password sign-in method.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
-    },
-    "account.security.password.changed": {
-      "message": "Set · Changed {date}",
-      "description": "A password is set and was last changed at date.",
-      "placeholders": [
-        "date"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
     "account.security.password.changed.on": {
       "message": "Changed {date}",
       "description": "When the password was last changed.",
@@ -1060,9 +894,17 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
-    "account.security.password.set": {
-      "message": "Set",
-      "description": "A password is set.",
+    "account.security.password.without": {
+      "message": "For signing in without {provider}",
+      "description": "What the Proctor password is for when a provider is linked; provider is its name.",
+      "placeholders": [
+        "provider"
+      ],
+      "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
+    },
+    "account.security.proctor.password": {
+      "message": "Proctor password",
+      "description": "Title of the password row: the password kept by Proctor itself.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
@@ -1097,26 +939,15 @@
       ],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
-    "account.security.recovery.codes.low": {
-      "message": "{count} left · Get new ones before you run out",
-      "description": "Few recovery codes remain.",
-      "placeholders": [
-        "count"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.security.recovery.codes.low.of": {
-      "message": "{count} of {total} left · Get new ones before you run out",
-      "description": "Few of the issued recovery codes remain.",
-      "placeholders": [
-        "count",
-        "total"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
     "account.security.recovery.codes.once": {
       "message": "Each code works once",
       "description": "Recovery codes detail when the issue date is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
+    },
+    "account.security.recovery.codes.with.two.step": {
+      "message": "You get them when you turn on two-step verification",
+      "description": "Recovery codes row while two-step verification is off.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
@@ -1125,6 +956,14 @@
       "description": "A linked institution sign-in provider.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+    },
+    "account.security.single.sign.on.with": {
+      "message": "Single sign-on with {email}",
+      "description": "Detail of a linked institution sign-in; email is the account’s address.",
+      "placeholders": [
+        "email"
+      ],
+      "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
     "account.security.two.step": {
       "message": "Two-step verification",
@@ -1146,21 +985,21 @@
       ],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
-    "account.security.two.step.description": {
-      "message": "A second check after your password, such as a code from an authenticator app.",
-      "description": "Explains two-step verification.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
     "account.security.two.step.not.offered": {
       "message": "Not offered for your account",
       "description": "Two-step verification is not offered.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
-    "account.security.two.step.off": {
-      "message": "Off · Turn it on from the security page",
-      "description": "Two-step verification is off.",
+    "account.security.two.step.off.only": {
+      "message": "Only one step protects your account",
+      "description": "Two-step verification is off and the account has no Proctor password.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
+    },
+    "account.security.two.step.off.password": {
+      "message": "Only your Proctor password protects your account",
+      "description": "Two-step verification is off and the account has a Proctor password.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
@@ -1169,20 +1008,6 @@
       "description": "Two-step verification is on.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
-    },
-    "account.security.two.step.on.app": {
-      "message": "On · Authenticator app",
-      "description": "Two-step verification is on with an authenticator app.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.security.two.step.on.since": {
-      "message": "On · Authenticator app, since {date}",
-      "description": "Two-step verification is on with an authenticator app, turned on at date.",
-      "placeholders": [
-        "date"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.security.two.step.pending": {
       "message": "Setup isn’t finished · Finish it on the security page",
@@ -1202,100 +1027,148 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
+    "account.security.two.step.turn.on": {
+      "message": "Turn on",
+      "description": "Opens the security page in the browser to turn on two-step verification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
+    },
     "account.security.ways": {
       "message": "Ways to sign in",
       "description": "Heading of the sign-in methods.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/security/securityMessages.ts"
     },
-    "account.security.ways.description": {
-      "message": "{institution} lets you use these.",
-      "description": "Description of sign-in methods; institution is its name.",
-      "placeholders": [
-        "institution"
-      ],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.security.ways.description.generic": {
-      "message": "Your institution lets you use these.",
-      "description": "Description of sign-in methods when the institution name is unknown.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
     "account.sessions.active": {
-      "message": "active {when}",
-      "description": "Part of a session row's second line: when the session was last used.",
+      "message": "Active {when}",
+      "description": "When a session was last used, as in \"Active 2 hours ago\".",
       "placeholders": [
         "when"
       ],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
+    "account.sessions.current.badge": {
+      "message": "Current",
+      "description": "Grey badge after the title of the session and computer you are using.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
     "account.sessions.current.empty": {
       "message": "This window’s session isn’t listed. It may have just ended.",
-      "description": "The current session is missing from the list.",
+      "description": "The sessions list does not include the session this window uses.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.desktop.removed": {
-      "message": "Desktop removed.",
-      "description": "A registered desktop was removed.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
-    },
-    "account.sessions.desktop.removed.summary": {
-      "message": "{platform} · Removed · Registered {registered}",
-      "description": "Second line of a removed desktop row.",
+    "account.sessions.desktop.last.used": {
+      "message": "Last used {when}",
+      "description": "When a registered computer was last used.",
       "placeholders": [
-        "platform",
-        "registered"
+        "when"
       ],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.desktop.summary": {
-      "message": "{platform} · Proctor {release} · Registered {registered} · Last used {used}",
-      "description": "Second line of a registered desktop row.",
+    "account.sessions.desktop.registered": {
+      "message": "Registered {date}",
+      "description": "When a computer was registered for exams.",
       "placeholders": [
-        "platform",
-        "release",
-        "registered",
-        "used"
+        "date"
       ],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.desktops": {
-      "message": "Registered desktops",
-      "description": "Heading of registered desktops.",
+    "account.sessions.detail.expires": {
+      "message": "Signs out by",
+      "description": "Session details label: when the session ends on its own.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.desktops.description": {
-      "message": "Computers that hold a key for your exams.",
-      "description": "Describes registered desktops.",
+    "account.sessions.detail.how": {
+      "message": "How it signed in",
+      "description": "Session details label: the sign-in method and whether two-step was used.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.desktops.empty": {
-      "message": "No computers are registered.",
-      "description": "No registered desktops.",
+    "account.sessions.detail.kind": {
+      "message": "Kind",
+      "description": "Session details label: what signed in, such as Web browser.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.detail.last.active": {
+      "message": "Last active",
+      "description": "Session details label: when the session was last used.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.detail.last.used": {
+      "message": "Last used",
+      "description": "Session details label: when the registered computer was last used.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.detail.not.signed.in": {
+      "message": "Not signed in",
+      "description": "Session details value: a registered computer with no session now.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.detail.registered": {
+      "message": "Registered for exams",
+      "description": "Session details label: when the computer was registered.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.detail.release": {
+      "message": "Proctor version",
+      "description": "Session details label: the Proctor Desktop release the computer last used.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.detail.signed.in": {
+      "message": "Signed in",
+      "description": "Session details label: when the session signed in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.detail.system": {
+      "message": "System",
+      "description": "Session details label: the operating system.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.detail.two.step": {
+      "message": "Two-step verification",
+      "description": "Session details label: when the session completed two-step verification.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.details.close": {
+      "message": "Close",
+      "description": "Closes the Session details dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.details.menu": {
+      "message": "Session details",
+      "description": "Row menu entry that shows everything known about a session or computer.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.end": {
       "message": "End session",
-      "description": "End another session.",
+      "description": "Confirms ending a session.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.end.body": {
       "message": "{name} is signed out straight away and anything unsaved there is lost. Exam work the server already received is kept.",
-      "description": "Consequences of ending a session.",
+      "description": "Body of the confirmation to end one session.",
       "placeholders": [
         "name"
       ],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.end.menu": {
-      "message": "End session",
+      "message": "End session…",
       "description": "Row menu entry that opens the confirmation to end a session.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
@@ -1308,31 +1181,31 @@
     },
     "account.sessions.end.others.body": {
       "message": "Everywhere else you are signed in is signed out straight away, and anything unsaved there is lost. This computer stays signed in.",
-      "description": "Consequences of ending every other session.",
+      "description": "Body of the confirmation to end every other session.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.end.others.done": {
       "message": "Every other session was ended.",
-      "description": "Every other session was ended.",
+      "description": "Toast after ending every other session.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.end.others.none": {
       "message": "There were no other sessions to end.",
-      "description": "Ending other sessions found none.",
+      "description": "Toast when there was nothing else to end.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.end.others.title": {
       "message": "End all other sessions?",
-      "description": "Title of the confirmation before ending every other session.",
+      "description": "Title of the confirmation to end every other session.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.end.title": {
       "message": "End the session on {name}?",
-      "description": "Title of the end-session confirmation.",
+      "description": "Title of the confirmation to end one session; name is the session.",
       "placeholders": [
         "name"
       ],
@@ -1344,83 +1217,219 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
-    "account.sessions.other": {
-      "message": "Other sessions",
-      "description": "Heading of other sessions.",
+    "account.sessions.load.failed.timeout": {
+      "message": "{institution} didn’t answer in time. Nothing has changed.",
+      "description": "The sessions read went unanswered; institution is the server’s name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.load.failed.timeout.generic": {
+      "message": "The server didn’t answer in time. Nothing has changed.",
+      "description": "The sessions read went unanswered and the institution name is unknown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.other.description": {
-      "message": "Places you are signed in right now.",
-      "description": "Describes other sessions.",
+    "account.sessions.load.failed.title": {
+      "message": "Couldn’t load your sessions",
+      "description": "Title of the Signed in section when the sessions could not be read.",
       "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.other.empty": {
-      "message": "You aren’t signed in anywhere else.",
-      "description": "No other sessions.",
+    "account.sessions.not.identified": {
+      "message": "Not identified",
+      "description": "The kind of a session the server could not identify, in its detail line.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.registered.for.exams": {
+      "message": "Registered for exams",
+      "description": "In a session’s detail line: the computer is registered to take exams.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.registered.only": {
+      "message": "Registered, not signed in",
+      "description": "Heading of the computers registered for exams that have no session now.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.registered.only.description": {
+      "message": "Computers set up to take your exams. Removing one means it is set up again before your next exam there.",
+      "description": "Description under Registered, not signed in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.registration.removed": {
+      "message": "Registration removed.",
+      "description": "Toast after removing a computer’s registration.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.remove.body": {
-      "message": "{name} loses its key and can’t be used for your exams until you sign in there again. Exam work the server already received is kept.",
-      "description": "Consequences of removing a registered desktop.",
+      "message": "{name} is set up again before your next exam there. Exam work the server already received is kept.",
+      "description": "Body of the confirmation to remove a computer’s registration.",
       "placeholders": [
         "name"
       ],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.remove.desktop": {
-      "message": "Remove",
-      "description": "Remove a registered desktop.",
+    "account.sessions.remove.registration": {
+      "message": "Remove registration",
+      "description": "Confirms removing a computer’s registration for exams.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.remove.title": {
-      "message": "Remove {name}?",
-      "description": "Title of the remove-desktop confirmation.",
+    "account.sessions.remove.registration.menu": {
+      "message": "Remove registration…",
+      "description": "Row menu entry that opens the confirmation to remove a computer’s registration.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.remove.signed.in.body": {
+      "message": "{name} is signed out and set up again before your next exam there. Exam work the server already received is kept.",
+      "description": "Body of the confirmation to remove the registration of a signed-in computer.",
       "placeholders": [
         "name"
       ],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.remove.title": {
+      "message": "Remove the registration for {name}?",
+      "description": "Title of the confirmation to remove a computer’s registration.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.rename.action": {
+      "message": "Rename",
+      "description": "Saves the new name in the Rename dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.rename.description": {
+      "message": "A name you’ll recognise. Only you see it.",
+      "description": "One line under the Rename title.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.rename.desktop.description": {
+      "message": "A name you’ll recognise. It stays with this computer when you sign in again.",
+      "description": "One line under the Rename title for a computer registered for exams.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.rename.menu": {
+      "message": "Rename…",
+      "description": "Row menu entry that opens a dialog to rename a session or computer.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.rename.name": {
+      "message": "Name",
+      "description": "Label of the name field in the Rename dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.rename.name.invalid": {
+      "message": "Use up to 128 characters, without line breaks.",
+      "description": "The Rename name is too long or holds control characters.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.rename.name.required": {
+      "message": "Enter a name.",
+      "description": "The Rename name field is empty.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.rename.title": {
+      "message": "Rename {name}",
+      "description": "Title of the dialog that renames a session or computer.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.renamed": {
+      "message": "Renamed.",
+      "description": "Toast after a session or computer was renamed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.sign.in.other": {
+      "message": "Another way, no two-step",
+      "description": "How a session signed in, when the method has no name here.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.sign.in.other.two.step": {
+      "message": "Another way, with two-step verification",
+      "description": "How a session signed in with a second step, when the method has no name here.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.sign.in.password": {
+      "message": "Password, no two-step",
+      "description": "How a session signed in: a password alone.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.sign.in.password.two.step": {
+      "message": "Password with two-step verification",
+      "description": "How a session signed in: a password and a second step.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.sign.in.sso": {
+      "message": "Single sign-on",
+      "description": "How a session signed in: the institution’s single sign-on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.sign.in.sso.two.step": {
+      "message": "Single sign-on with two-step verification",
+      "description": "How a session signed in: single sign-on and a second step.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.sign.out": {
       "message": "Sign out",
-      "description": "End the current session by signing out.",
+      "description": "Signs this computer out; the window asks first.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.signed.in": {
-      "message": "signed in {when}",
-      "description": "Part of a session row's second line, after the device, as in \"macOS · signed in today, 08:41\".",
-      "placeholders": [
-        "when"
-      ],
-      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
-    },
-    "account.sessions.signed.in.first": {
       "message": "Signed in {when}",
-      "description": "Start of a session row's second line, as in \"Signed in yesterday, 17:20 · active today, 09:12\".",
+      "description": "When a session signed in, as in \"Signed in yesterday, 17:20\".",
       "placeholders": [
         "when"
       ],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.this.computer": {
-      "message": "This computer",
-      "description": "Heading of the current session, and a tag on the current desktop.",
+    "account.sessions.signed.in.section": {
+      "message": "Signed in",
+      "description": "Heading of the list of every place the account is signed in, each computer once.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
-    "account.sessions.this.session": {
-      "message": "This session",
-      "description": "Tag on the current session.",
+    "account.sessions.unidentified.badge": {
+      "message": "Unidentified",
+      "description": "Amber badge on a session the server could not say what it is.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
+    },
+    "account.sessions.unknown.device": {
+      "message": "Unknown device",
+      "description": "Title of a session that has no name and is not identified.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
     "account.sessions.unnamed.desktop": {
       "message": "Unnamed computer",
-      "description": "A registered desktop without a name.",
+      "description": "Title of a registered computer that has no name.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
@@ -1765,12 +1774,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
-    "account.state.recheck.first": {
-      "message": "Proctor is checking whether the last change worked. Try again after the list refreshes.",
-      "description": "An action is blocked until an unknown outcome is read again.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
     "account.status.attention": {
       "message": "Needs attention",
       "description": "Status word: something about two-step verification needs the person.",
@@ -1813,12 +1816,6 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
-    "account.tokens.active.description": {
-      "message": "Each token can do only what it lists, and stops working when it expires.",
-      "description": "Describes active tokens.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
-    },
     "account.tokens.active.empty": {
       "message": "No active tokens",
       "description": "Title of the empty Active section while disabled or expired tokens exist.",
@@ -1826,8 +1823,330 @@
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.active.empty.body": {
-      "message": "Your other tokens are disabled or expired, so no script can use your account right now. Enable one below, or create a new one.",
+      "message": "No script can use your account right now. Enable a disabled token below, or create a new one.",
       "description": "Body of the empty Active section while disabled or expired tokens exist.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.audit": {
+      "message": "Academic records",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.audit.description": {
+      "message": "Changes to programmes, classes and enrolment",
+      "description": "One line under the New token grid row named Academic records.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.period": {
+      "message": "Academic periods",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.period.description": {
+      "message": "Terms and years, and their dates",
+      "description": "One line under the New token grid row named Academic periods.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.progression": {
+      "message": "Progression",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.progression.description": {
+      "message": "Moving students on at the end of a year",
+      "description": "One line under the New token grid row named Progression.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.unit": {
+      "message": "Academic units",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.unit.description": {
+      "message": "Faculties and departments",
+      "description": "One line under the New token grid row named Academic units.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.unit.members": {
+      "message": "Unit members",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.academic.unit.members.description": {
+      "message": "Who belongs to an academic unit",
+      "description": "One line under the New token grid row named Unit members.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.anyone": {
+      "message": "{area}, anyone’s",
+      "description": "A grid row for the same area acting on anyone’s records, not only your own.",
+      "placeholders": [
+        "area"
+      ],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.audit": {
+      "message": "Audits",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.audit.description": {
+      "message": "What happened, and who did it",
+      "description": "One line under the New token grid row named Audits.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.browser.activity": {
+      "message": "Browser activity",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.browser.activity.description": {
+      "message": "Pages opened in an exam’s browser",
+      "description": "One line under the New token grid row named Browser activity.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.class": {
+      "message": "Classes",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.class.description": {
+      "message": "Classes and their settings",
+      "description": "One line under the New token grid row named Classes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.class.members": {
+      "message": "Class members",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.class.members.description": {
+      "message": "Who is in a class",
+      "description": "One line under the New token grid row named Class members.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.column": {
+      "message": "Area",
+      "description": "Header of the New token grid’s first column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.exam": {
+      "message": "Exams",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.exam.description": {
+      "message": "Exams and their settings",
+      "description": "One line under the New token grid row named Exams.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.institution": {
+      "message": "Institution",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.institution.description": {
+      "message": "Settings for the whole institution",
+      "description": "One line under the New token grid row named Institution.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.invitation": {
+      "message": "Invitations",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.invitation.description": {
+      "message": "Invitations to join",
+      "description": "One line under the New token grid row named Invitations.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.job": {
+      "message": "Jobs",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.job.description": {
+      "message": "Work Proctor runs in the background",
+      "description": "One line under the New token grid row named Jobs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.mail": {
+      "message": "Mail",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.mail.description": {
+      "message": "Email Proctor sends",
+      "description": "One line under the New token grid row named Mail.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.needs.unit": {
+      "message": "Only on a token limited to one of your academic units",
+      "description": "Why a grid row is greyed: these permissions can’t apply to the whole institution.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.not.in.unit": {
+      "message": "You can’t give this for {unit}",
+      "description": "Why a grid row is greyed: these permissions aren’t yours to give in that unit.",
+      "placeholders": [
+        "unit"
+      ],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.onboarding": {
+      "message": "Imports",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.onboarding.description": {
+      "message": "People added from a file",
+      "description": "One line under the New token grid row named Imports.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.profile.picture": {
+      "message": "Profile photos",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.profile.picture.description": {
+      "message": "People’s profile photos",
+      "description": "One line under the New token grid row named Profile photos.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.programme": {
+      "message": "Programmes",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.programme.description": {
+      "message": "Programmes of study",
+      "description": "One line under the New token grid row named Programmes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.programme.level": {
+      "message": "Levels",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.programme.level.description": {
+      "message": "The years or stages of a programme",
+      "description": "One line under the New token grid row named Levels.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.session": {
+      "message": "Sessions",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.session.description": {
+      "message": "Where people are signed in",
+      "description": "One line under the New token grid row named Sessions.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.sitting": {
+      "message": "Sittings",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.sitting.description": {
+      "message": "When and where an exam is sat",
+      "description": "One line under the New token grid row named Sittings.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.submission": {
+      "message": "Submissions",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.submission.description": {
+      "message": "Work candidates hand in",
+      "description": "One line under the New token grid row named Submissions.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.user": {
+      "message": "People",
+      "description": "A row of the New token grid: what its permissions act on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.area.user.description": {
+      "message": "Accounts and their affiliations",
+      "description": "One line under the New token grid row named People.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.column.create": {
+      "message": "Create",
+      "description": "Header of the New token grid column for creating.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.column.manage": {
+      "message": "Change",
+      "description": "Header of the New token grid column for changing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.column.publish": {
+      "message": "Publish",
+      "description": "Header of the New token grid column for publishing and releasing.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.column.review": {
+      "message": "Review",
+      "description": "Header of the New token grid column for reviewing and marking.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.column.view": {
+      "message": "View",
+      "description": "Header of the New token grid column for viewing.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
@@ -1868,13 +2187,13 @@
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.created.body": {
-      "message": "This is the only time Proctor shows it. Keep it somewhere safe, such as a password manager. Anyone with it can act as you within its limits.",
+      "message": "This is the only time Proctor shows it. If you lose it, revoke it and create another.",
       "description": "Explains the one-time credential.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.created.title": {
-      "message": "Copy your token now",
+      "message": "Copy your new token",
       "description": "Title of the one-time credential dialog.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
@@ -1892,7 +2211,7 @@
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.dialog.description": {
-      "message": "The script gets only what you tick, and never more than you can do yourself.",
+      "message": "A script using this token can do only what you tick, and never more than you can do yourself.",
       "description": "Explains token limits.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
@@ -1956,19 +2275,25 @@
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.expires": {
-      "message": "expires {date}",
+      "message": "Expires {date}",
       "description": "When a token expires, after another detail, as in \"Disabled 10 Oct · expires 30 Dec\".",
       "placeholders": [
         "date"
       ],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
-    "account.tokens.expires.first": {
-      "message": "Expires {date}",
-      "description": "When an active token expires, at the start of its details.",
+    "account.tokens.expires.soon": {
+      "message": "Expires in {days} days",
+      "description": "Amber badge on an active token that stops working within a week.",
       "placeholders": [
-        "date"
+        "days"
       ],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.expires.tomorrow": {
+      "message": "Expires tomorrow",
+      "description": "Amber badge on an active token that stops working within a day.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.expiry": {
@@ -1978,7 +2303,7 @@
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.expiry.option": {
-      "message": "In {days} days, {date}",
+      "message": "In {days} days · {date}",
       "description": "One expiry choice.",
       "placeholders": [
         "days",
@@ -1987,22 +2312,10 @@
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.inactive": {
-      "message": "Disabled or expired",
+      "message": "Not in use",
       "description": "Heading of disabled, expired and revoked tokens.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
-    },
-    "account.tokens.inactive.description": {
-      "message": "A disabled token can be turned back on until it expires. Expired and revoked tokens stay listed for your records.",
-      "description": "Describes inactive tokens.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
-    },
-    "account.tokens.inactive.empty": {
-      "message": "None.",
-      "description": "No inactive tokens.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.tokens.limit": {
       "message": "Limit to",
@@ -2053,7 +2366,7 @@
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
     "account.tokens.never.used": {
-      "message": "never used",
+      "message": "Never used",
       "description": "The token has not been used.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
@@ -2142,6 +2455,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
+    "account.tokens.scopes.hint": {
+      "message": "One row for each area, one column for each action. A greyed box says why it can’t be ticked.",
+      "description": "One line under What it can do in the New token dialog.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
     "account.tokens.scopes.loading": {
       "message": "Finding what you can give a token…",
       "description": "The grantable token scopes are being read.",
@@ -2157,18 +2476,6 @@
     "account.tokens.scopes.required": {
       "message": "Tick at least one thing the token can do.",
       "description": "No scope is selected.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
-    },
-    "account.tokens.section.all": {
-      "message": "Your tokens",
-      "description": "The one tokens section shown when the person has no tokens.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
-    },
-    "account.tokens.select.to.copy": {
-      "message": "Select the token and copy it.",
-      "description": "How to copy when no clipboard is available.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/accountMessages.ts"
     },
@@ -2200,16 +2507,22 @@
     },
     "account.tokens.unit.tag": {
       "message": "One academic unit only",
-      "description": "The token is limited to one Academic Unit whose name is unknown.",
+      "description": "The token is limited to an Academic Unit whose name is not known here.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.used": {
-      "message": "used {when}",
+      "message": "Used {when}",
       "description": "When a token was last used.",
       "placeholders": [
         "when"
       ],
+      "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
+    },
+    "account.tokens.whole.institution": {
+      "message": "Whole institution",
+      "description": "In a token’s summary: it is not limited to one academic unit.",
+      "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.value.not.provided": {
@@ -8971,7 +9284,7 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "authenticated.account.nav.history": {
-      "message": "Audits",
+      "message": "Account history",
       "description": "Account page listing what was done with the account.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/authenticatedMessages.ts"
@@ -11040,20 +11353,17 @@
       ],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
-    "page.row.chips.more": {
-      "message": "+{count}",
-      "description": "A chip standing for the labels not shown, such as \"+7\".",
-      "placeholders": [
-        "count"
-      ],
+    "page.row.chips.fewer": {
+      "message": "Show fewer",
+      "description": "Folds the labels a row opened in place back behind \"N more\".",
+      "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
-    "page.row.chips.more.label": {
-      "message": "{count} more: {names}",
-      "description": "Accessible name of the \"+N\" chip; {names} lists what it stands for.",
+    "page.row.chips.more": {
+      "message": "{count} more",
+      "description": "Opens the labels not shown in the row, such as \"7 more\".",
       "placeholders": [
-        "count",
-        "names"
+        "count"
       ],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },

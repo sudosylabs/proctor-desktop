@@ -7,7 +7,7 @@ import type { PageView } from '../../browser/authenticated/pages/pagePane.js';
 import type { AccountPage } from '../../services/authenticatedNavigation/common/authenticatedNavigationModel.js';
 import type { IAccountFormatService } from './accountFormat.js';
 import type { AccountMessage } from './accountMessages.js';
-import { AuditsPage } from './audits/auditsPage.js';
+import { HistoryPage } from './history/historyPage.js';
 import { ProfilePage } from './profile/profilePage.js';
 import { SecurityPage } from './security/securityPage.js';
 import { SessionsPage } from './sessions/sessionsPage.js';
@@ -58,7 +58,7 @@ export const accountPageRegistry: Readonly<Record<AccountPage, AccountPageDescri
 			title: 'historyTitle',
 			description: (format) => format.text('historyDescription'),
 			create: (instantiationService, body, headerActions) =>
-				instantiationService.createInstance(AuditsPage, body, headerActions)
+				instantiationService.createInstance(HistoryPage, body, headerActions)
 		},
 		settings: {
 			title: 'settingsTitle',

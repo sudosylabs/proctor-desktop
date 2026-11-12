@@ -165,15 +165,15 @@ export const pageMessages = Object.freeze({
 		defaultMessage: 'Breadcrumb',
 		description: 'Accessible name of the trail of pages above a record’s page.'
 	}),
+	fewerChips: defineMessage({
+		id: 'page.row.chips.fewer',
+		defaultMessage: 'Show fewer',
+		description: 'Folds the labels a row opened in place back behind "N more".'
+	}),
 	moreChips: defineMessage({
 		id: 'page.row.chips.more',
-		defaultMessage: '+{count}',
-		description: 'A chip standing for the labels not shown, such as "+7".'
-	}),
-	moreChipsLabel: defineMessage({
-		id: 'page.row.chips.more.label',
-		defaultMessage: '{count} more: {names}',
-		description: 'Accessible name of the "+N" chip; {names} lists what it stands for.'
+		defaultMessage: '{count} more',
+		description: 'Opens the labels not shown in the row, such as "7 more".'
 	}),
 	confirmItsYouTitle: defineMessage({
 		id: 'page.confirm.title',

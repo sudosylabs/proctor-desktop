@@ -61,6 +61,8 @@ export class PageDialog extends Disposable {
 	readonly onDidRequestCancel: Event<void> = this.cancelEmitter.event;
 
 	private readonly returnFocus: HTMLElement | undefined;
+	/** The dialog is closing on purpose, so its close event is not a request to cancel. */
+	private hiding = false;
 	private readonly fallbackFocus: () => void;
 
 	constructor(host: PageDialogHost, options: PageDialogOptions) {
@@ -123,6 +125,28 @@ export class PageDialog extends Disposable {
 			})
 		);
 		this._register(addDisposableListener(this.close, 'click', () => this.cancelEmitter.fire()));
+		// A browser may close a modal dialog on a repeated Escape without a cancel event the page
+		// can refuse. That close is a request like any other: the owner decides, and a dialog it
+		// keeps opens again rather than staying shut but alive.
+		this._register(
+			addDisposableListener(this.element, 'close', () => {
+				if (this._store.isDisposed) return;
+				if (this.hiding) {
+					// The close event arrives after the close it reports.
+					this.hiding = false;
+					return;
+				}
+				if (!this.close.hidden) this.cancelEmitter.fire();
+				if (!this._store.isDisposed && !this.element.open) this.element.showModal();
+			})
+		);
+	}
+
+	/** Steps aside for another dialog, such as Confirm it's you; {@link show} brings it back. */
+	hide(): void {
+		if (!this.element.open) return;
+		this.hiding = true;
+		this.element.close();
 	}
 
 	show(initialFocus: HTMLElement): void {
@@ -162,7 +186,7 @@ export class PageDialog extends Disposable {
 	override dispose(): void {
 		if (this._store.isDisposed) return;
 		const hadFocus = this.element.contains(this.element.ownerDocument.activeElement);
-		if (this.element.open) this.element.close();
+		this.hide();
 		this.element.remove();
 		super.dispose();
 		if (!hadFocus) return;

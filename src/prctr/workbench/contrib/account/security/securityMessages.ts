@@ -76,25 +76,51 @@ export const securityMessages = Object.freeze({
 		defaultMessage: 'Ways to sign in',
 		description: 'Heading of the sign-in methods.'
 	}),
-	password: defineMessage({
-		id: 'account.security.password',
-		defaultMessage: 'Password',
-		description: 'Password sign-in method.'
-	}),
-	passwordSet: defineMessage({
-		id: 'account.security.password.set',
-		defaultMessage: 'Set',
-		description: 'A password is set.'
-	}),
 	passwordNotSet: defineMessage({
 		id: 'account.security.password.not.set',
 		defaultMessage: 'Not set',
 		description: 'No password is set.'
 	}),
-	otherProvider: defineMessage({
-		id: 'account.security.other.provider',
-		defaultMessage: 'Linked sign-in',
-		description: 'A linked sign-in provider of another kind.'
+	extraProtection: defineMessage({
+		id: 'account.security.extra.protection',
+		defaultMessage: 'Extra protection',
+		description: 'Heading of the section with two-step verification and recovery codes.'
+	}),
+	singleSignOnWith: defineMessage({
+		id: 'account.security.single.sign.on.with',
+		defaultMessage: 'Single sign-on with {email}',
+		description: 'Detail of a linked institution sign-in; email is the account’s address.'
+	}),
+	proctorPassword: defineMessage({
+		id: 'account.security.proctor.password',
+		defaultMessage: 'Proctor password',
+		description: 'Title of the password row: the password kept by Proctor itself.'
+	}),
+	passwordWithout: defineMessage({
+		id: 'account.security.password.without',
+		defaultMessage: 'For signing in without {provider}',
+		description:
+			'What the Proctor password is for when a provider is linked; provider is its name.'
+	}),
+	twoStepOffPassword: defineMessage({
+		id: 'account.security.two.step.off.password',
+		defaultMessage: 'Only your Proctor password protects your account',
+		description: 'Two-step verification is off and the account has a Proctor password.'
+	}),
+	twoStepOffOnly: defineMessage({
+		id: 'account.security.two.step.off.only',
+		defaultMessage: 'Only one step protects your account',
+		description: 'Two-step verification is off and the account has no Proctor password.'
+	}),
+	turnOnTwoStep: defineMessage({
+		id: 'account.security.two.step.turn.on',
+		defaultMessage: 'Turn on',
+		description: 'Opens the security page in the browser to turn on two-step verification.'
+	}),
+	recoveryCodesWithTwoStep: defineMessage({
+		id: 'account.security.recovery.codes.with.two.step',
+		defaultMessage: 'You get them when you turn on two-step verification',
+		description: 'Recovery codes row while two-step verification is off.'
 	}),
 	twoStep: defineMessage({
 		id: 'account.security.two.step',
@@ -105,11 +131,6 @@ export const securityMessages = Object.freeze({
 		id: 'account.security.two.step.on',
 		defaultMessage: 'On',
 		description: 'Two-step verification is on.'
-	}),
-	twoStepOff: defineMessage({
-		id: 'account.security.two.step.off',
-		defaultMessage: 'Off · Turn it on from the security page',
-		description: 'Two-step verification is off.'
 	}),
 	twoStepPending: defineMessage({
 		id: 'account.security.two.step.pending',

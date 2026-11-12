@@ -2,8 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { IAuthenticatedHoverService } from '../authenticatedHover.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
+import { addDisposableListener } from '../../../../base/browser/dom.js';
 import { PagerControl } from '../../../../base/browser/ui/pager/pagerControl.js';
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
 import {
@@ -118,6 +118,7 @@ export class PageSection extends Disposable {
 	private readonly stateIcon;
 	private readonly stateGlyph: HTMLElement;
 	private readonly plain: boolean;
+	private readonly failure: ((reason: string) => PageEmpty | undefined) | undefined;
 	private readonly stateActions: HTMLElement;
 	private readonly note: HTMLElement;
 	private readonly noteText: HTMLElement;
@@ -142,13 +143,23 @@ export class PageSection extends Disposable {
 			readonly action?: PageSectionAction;
 			/** Content that draws its own edges, such as a table of hairline rows, needs no card. */
 			readonly plain?: boolean;
+			/**
+			 * The shape the section takes while it loads: rows with a glyph, or label and value
+			 * pairs, as many as the details it will show.
+			 */
+			readonly skeleton?: { readonly kind: 'rows' | 'details'; readonly count: number };
+			/**
+			 * The section's own words for a failed read, such as "Couldn’t load your sessions";
+			 * a reason it leaves to the page reads "This couldn’t be loaded" with the reason.
+			 */
+			readonly failure?: (reason: string) => PageEmpty | undefined;
 		},
 		@IPageFormatService private readonly format: IPageFormatService,
-		@IPagePaneContext private readonly pane: IPagePaneContext,
-		@IAuthenticatedHoverService private readonly hover: IAuthenticatedHoverService
+		@IPagePaneContext private readonly pane: IPagePaneContext
 	) {
 		super();
 		this.plain = options.plain === true;
+		this.failure = options.failure;
 		const document = host.ownerDocument;
 		const $ = createElementFactory(document);
 		const id = `prctr-page-section-${++sectionSequence}`;
@@ -198,19 +209,32 @@ export class PageSection extends Disposable {
 		this.skeleton = $('div.prctr-page-section__skeleton', {
 			attrs: { 'aria-hidden': 'true' }
 		});
-		for (let index = 0; index < SKELETON_ROWS; index++)
+		const skeleton = options.skeleton ?? { kind: 'rows', count: SKELETON_ROWS };
+		this.skeleton.dataset.kind = skeleton.kind;
+		for (let index = 0; index < skeleton.count; index++)
 			this.skeleton.append(
-				$(
-					'div.prctr-page-section__skeleton-row',
-					{},
-					$('span.prctr-page-section__skeleton-glyph'),
-					$(
-						'span.prctr-page-section__skeleton-text',
-						{},
-						$('span.prctr-page-section__skeleton-bar'),
-						$('span.prctr-page-section__skeleton-bar')
-					)
-				)
+				skeleton.kind === 'details'
+					? $(
+							'div.prctr-page-section__skeleton-row',
+							{},
+							$(
+								'span.prctr-page-section__skeleton-bar.prctr-page-section__skeleton-label'
+							),
+							$('span.prctr-page-section__skeleton-bar', {
+								data: { width: String(index % 7) }
+							})
+						)
+					: $(
+							'div.prctr-page-section__skeleton-row',
+							{},
+							$('span.prctr-page-section__skeleton-glyph'),
+							$(
+								'span.prctr-page-section__skeleton-text',
+								{},
+								$('span.prctr-page-section__skeleton-bar'),
+								$('span.prctr-page-section__skeleton-bar')
+							)
+						)
 			);
 		this.stateIcon = this._register(
 			createProctorIcon(document, { id: 'status.attention', size: this.plain ? 22 : 18 })
@@ -330,6 +354,7 @@ export class PageSection extends Disposable {
 	 */
 	setState(state: PageReadState, empty: string | PageEmpty | false, retry?: () => void): void {
 		this.retryHandler = retry;
+		const wasFailed = this.element.dataset.state === 'failed';
 		this.element.setAttribute('aria-busy', String(state.kind === 'loading'));
 		this.element.dataset.state = state.kind;
 		this.note.hidden = true;
@@ -346,11 +371,14 @@ export class PageSection extends Disposable {
 		}
 		if (state.kind === 'failed') {
 			this.clearRows();
-			this.showState(state.reason === 'denied' ? 'denied' : 'failure', {
+			const content = this.failure?.(state.reason) ?? {
 				text: this.format.text('loadFailed', {
 					reason: this.pane.describeFailure(state.reason)
 				})
-			});
+			};
+			this.showState(state.reason === 'denied' ? 'denied' : 'failure', content);
+			// A section that has just failed says so once, for those who can't see it.
+			if (!wasFailed) this.pane.announce(content.title ?? content.text);
 			return;
 		}
 		if (state.kind === 'stale') {
@@ -529,36 +557,42 @@ export class PageSection extends Disposable {
 		return item;
 	}
 
-	/** The first chips, then "+N" whose tooltip and accessible name list the rest. */
+	/**
+	 * The first chips, then an "N more" button that opens the rest in place, in the row, and
+	 * "Show fewer" that folds them again. Nothing covers the detail line under them.
+	 */
 	private createChips(
 		$: ReturnType<typeof createElementFactory>,
 		labels: readonly string[]
 	): HTMLElement {
-		const hidden = labels.slice(VISIBLE_CHIPS);
-		const chips = $(
-			'span.prctr-page-row__chips',
-			{},
-			...labels
-				.slice(0, VISIBLE_CHIPS)
-				.map((label) => $('span.prctr-page-row__chip', { textContent: label }))
-		);
-		if (hidden.length > 0) {
-			const names = hidden.join(', ');
-			const more = $('button.prctr-page-row__chip-more', {
-				type: 'button',
-				textContent: this.format.text('moreChips', { count: hidden.length }),
-				attrs: {
-					'aria-label': this.format.text('moreChipsLabel', {
-						count: hidden.length,
-						names
-					})
-				}
-			});
-			// The tooltip lists one per line; the accessible name above reads them as a sentence.
-			const list = hidden.join('\n');
-			this.rowStore.add(this.hover.setupHover(more, list));
-			chips.append(more);
+		const hidden = labels.length - VISIBLE_CHIPS;
+		const chips = $('span.prctr-page-row__chips');
+		const chip = (label: string): HTMLElement =>
+			$('span.prctr-page-row__chip', { textContent: label });
+		if (hidden <= 0) {
+			chips.append(...labels.map(chip));
+			return chips;
 		}
+		const extra = labels.slice(VISIBLE_CHIPS).map(chip);
+		const more = $('button.prctr-page-row__chip-more', {
+			type: 'button',
+			attrs: { 'aria-expanded': 'false' }
+		});
+		const show = (expanded: boolean): void => {
+			for (const element of extra) element.hidden = !expanded;
+			more.setAttribute('aria-expanded', String(expanded));
+			// The visible words are the accessible name; aria-expanded says whether it is open.
+			more.textContent = expanded
+				? this.format.text('fewerChips')
+				: this.format.text('moreChips', { count: hidden });
+		};
+		show(false);
+		this.rowStore.add(
+			addDisposableListener(more, 'click', () =>
+				show(more.getAttribute('aria-expanded') !== 'true')
+			)
+		);
+		chips.append(...labels.slice(0, VISIBLE_CHIPS).map(chip), ...extra, more);
 		return chips;
 	}
 

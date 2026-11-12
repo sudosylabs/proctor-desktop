@@ -111,7 +111,7 @@ const icons = {
 	'object.image': 'image',
 	'object.institution': 'buildings',
 	'object.key': 'key',
-	'object.password': 'password',
+	'object.password': 'lock-key',
 	'object.role': 'chalkboard-teacher',
 	'object.zoom': 'magnifying-glass-plus',
 

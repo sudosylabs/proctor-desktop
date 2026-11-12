@@ -27,7 +27,9 @@ import {
 	type AccountPage
 } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { accountMessages as messages, accountText } from './accountMessages.js';
+import { IAccountFormatService } from './accountFormat.js';
 import { accountPageRegistry } from './accountPages.js';
+import { tokenState } from './common/accountPresentation.js';
 import { AccountPane, type AccountModel } from './accountPane.js';
 
 const ACCOUNT_ITEM_TYPE = 'prctr.authenticated.account';
@@ -45,6 +47,7 @@ class AccountContribution extends Disposable {
 		@IWorkbenchPaneHostService private readonly host: IWorkbenchPaneHostService,
 		@IWorkbenchItemResolverService registry: IWorkbenchItemResolverService,
 		@ILocalizationService private readonly localization: ILocalizationService,
+		@IAccountFormatService private readonly format: IAccountFormatService,
 		@IWorkbenchWindowService windowService: IWorkbenchWindowService,
 		@IInstantiationService instantiationService: IInstantiationService
 	) {
@@ -107,20 +110,14 @@ class AccountContribution extends Disposable {
 		}
 	}
 
+	/** Access tokens counts the tokens a script can use now; at none the count is hidden. */
 	private watchCounts(): void {
-		this.watchCount({ kind: 'read', section: 'sessions' }, (data) => {
-			if (data.section === 'sessions') {
-				this.navigation.setAccountCount(
-					'sessions',
-					data.sessions.filter((session) => !session.current).length
-				);
-			}
-		});
 		this.watchCount({ kind: 'read', section: 'tokens' }, (data) => {
 			if (data.section === 'tokens') {
+				const now = this.format.now();
 				this.navigation.setAccountCount(
 					'tokens',
-					data.tokens.filter((token) => token.revokedAt === undefined).length
+					data.tokens.filter((token) => tokenState(token, now) === 'active').length
 				);
 			}
 		});

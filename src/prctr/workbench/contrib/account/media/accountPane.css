@@ -95,10 +95,6 @@
 	.prctr-account .prctr-account-details__value[data-empty='true'] {
 		color: var(--prctr-color-text-tertiary);
 	}
-	.prctr-account .prctr-account-details__mono {
-		font-family: var(--prctr-typography-font-monospace);
-		font-size: 13px;
-	}
 	.prctr-account .prctr-account-details__note {
 		align-items: center;
 		display: inline-flex;

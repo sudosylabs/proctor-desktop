@@ -84,11 +84,13 @@ const sessions = (): AccountResponse =>
 			{
 				id: id('b'),
 				current: true,
-				name: 'Proctor Desktop on Amara’s MacBook Pro',
+				name: 'Proctor Desktop',
 				client: 'desktop',
 				platform: 'darwin',
 				method: 'oidc',
 				authenticationStrength: 'multi_factor',
+				desktopRegistrationId: id('d'),
+				desktopRegistrationName: 'Amara’s MacBook Pro',
 				createdAt: NOW - 60 * 60 * 1000,
 				lastActivityAt: NOW,
 				expiresAt: NOW + DAY
@@ -96,13 +98,27 @@ const sessions = (): AccountResponse =>
 			{
 				id: id('c'),
 				current: false,
-				name: 'Lab PC 14',
+				name: 'Proctor Desktop',
 				client: 'desktop',
 				platform: 'windows',
 				method: 'password',
 				authenticationStrength: 'single_factor',
+				desktopRegistrationId: id('e'),
+				desktopRegistrationName: 'Lab PC 14',
 				createdAt: NOW - 4 * DAY,
 				lastActivityAt: NOW - 4 * DAY,
+				expiresAt: NOW + DAY
+			},
+			{
+				id: id('i'),
+				current: false,
+				name: '',
+				client: 'unknown',
+				platform: '',
+				method: 'password',
+				authenticationStrength: 'single_factor',
+				createdAt: NOW - 6 * DAY,
+				lastActivityAt: NOW - 5 * DAY,
 				expiresAt: NOW + DAY
 			}
 		]
@@ -131,6 +147,16 @@ const desktops = (): AccountResponse =>
 				createdAt: NOW - 10 * DAY,
 				lastUsedAt: NOW - 4 * DAY,
 				revoked: false
+			},
+			{
+				id: id('j'),
+				current: false,
+				name: 'Library PC 2',
+				platform: 'win32',
+				release: '0.1.0',
+				createdAt: NOW - 40 * DAY,
+				lastUsedAt: NOW - 20 * DAY,
+				revoked: false
 			}
 		]
 	});
@@ -142,7 +168,13 @@ const tokens = (): AccountResponse =>
 			{
 				id: id('f'),
 				description: 'Grade export script',
-				scopes: ['exam.view'],
+				scopes: [
+					'exam.view',
+					'class.view',
+					'submission.view',
+					'exam.publish',
+					'audit.view'
+				],
 				academicUnitId: id('u'),
 				expiresAt: NOW + 100 * DAY,
 				lastUsedAt: NOW - 2 * DAY,
@@ -337,6 +369,12 @@ export async function runAccountTests(document: Document): Promise<void> {
 			) && !root.querySelector('.prctr-account [data-spin]'),
 			'Loading shows grey rows shaped like the content, not a spinner'
 		);
+		check(
+			section('Account details').querySelectorAll(
+				'.prctr-page-section__skeleton[data-kind="details"] .prctr-page-section__skeleton-row'
+			).length === 7,
+			'The details load as seven label and value rows'
+		);
 		resolveProfile?.(profile(false));
 		await wait(
 			() => root.textContent!.includes('amara.okafor@northfield.example'),
@@ -362,6 +400,23 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'Retention notices are absent when there are none'
 		);
 		check(!root.querySelector('input:not([type="file"])'), 'Account details are read-only');
+		check(
+			buttonIn(root, 'Add photo') && buttonIn(root, 'Remove photo')?.hidden !== false,
+			'Initials offer only Add photo'
+		);
+		check(
+			!root.querySelector('.prctr-account-details__mono') &&
+				getComputedStyle(root.querySelector('.prctr-account-profile__username')!)
+					.fontFamily !==
+					getComputedStyle(root.querySelector('.prctr-account-details__value')!)
+						.fontFamily,
+			'Only the username is monospace'
+		);
+		check(
+			section('Account details').textContent!.includes('ask an administrator') &&
+				!buttonIn(section('Account details'), 'Edit in Administration')?.checkVisibility(),
+			'Someone without Administration is told to ask an administrator'
+		);
 		const send = buttonIn(root, 'Send verification email');
 		check(send, 'Unverified email offers verification');
 		send.click();
@@ -390,6 +445,20 @@ export async function runAccountTests(document: Document): Promise<void> {
 						createdAt: NOW - 3 * DAY,
 						retireAfter: NOW + 30 * DAY,
 						deliveryState: 'accepted'
+					},
+					{
+						retirementId: id('q'),
+						examId: id('x'),
+						examTitle: 'Databases midterm',
+						examSittingId: id('s'),
+						sittingStartAt: NOW - 9 * DAY,
+						sittingEndAt: NOW - 9 * DAY + 3 * 3600_000,
+						submissionId: id('t'),
+						category: 'browser_activity',
+						state: 'grace',
+						createdAt: NOW - 3 * DAY,
+						retireAfter: NOW + 10 * DAY,
+						deliveryState: 'accepted'
 					}
 				]
 			})
@@ -397,6 +466,12 @@ export async function runAccountTests(document: Document): Promise<void> {
 		assign('profile');
 		await wait(() => !section('Exam records due for deletion').hidden, 'notices section');
 		check(row('Algorithms final'), 'A notice names its exam');
+		check(
+			[...section('Exam records due for deletion').querySelectorAll('.prctr-page-row__title')]
+				.map((title) => title.textContent)
+				.join() === 'Databases midterm,Algorithms final',
+			'Records due for deletion are listed soonest first'
+		);
 		check(
 			row('Algorithms final').textContent!.includes(
 				'Your submitted work from the sitting on'
@@ -456,7 +531,19 @@ export async function runAccountTests(document: Document): Promise<void> {
 			row('Two-step verification').textContent!.includes('Authenticator app · On since'),
 			'Two-step verification names its method and date'
 		);
-		check(row('Password').textContent!.includes('Changed'), 'The password change is dated');
+		check(
+			row('Proctor password').textContent!.includes(
+				'For signing in without Northfield University account · Changed'
+			),
+			'The password reads as its own way to sign in, dated'
+		);
+		check(
+			row('Northfield University account').textContent!.includes(
+				'Single sign-on with amara.okafor@northfield.example'
+			),
+			'Single sign-on names the address it uses'
+		);
+		check(section('Extra protection'), 'Two-step sits under Extra protection');
 		check(!root.querySelector('input'), 'Security credentials stay on the hosted page');
 		check(
 			root.textContent!.includes('never asks for your password'),
@@ -465,6 +552,40 @@ export async function runAccountTests(document: Document): Promise<void> {
 		check(!root.querySelector('.prctr-page-row__more'), 'Security rows have no actions');
 		buttonIn(root, 'Open security page')!.click();
 		await wait(() => account.count('openSecurity') === 1, 'open security');
+		account.reads.set('security', () =>
+			data({
+				section: 'security',
+				security: {
+					password: true,
+					providers: [],
+					mfa: {
+						available: true,
+						enabled: false,
+						pending: false,
+						recoveryRequired: false,
+						recoveryCodesRemaining: 0,
+						recoveryCodesTotal: 0
+					}
+				}
+			})
+		);
+		assign('security');
+		await wait(
+			() => root.textContent!.includes('Only your Proctor password protects your account'),
+			'two-step off'
+		);
+		check(
+			row('Two-step verification').querySelector('[data-tone="failure"]')?.textContent ===
+				'Off',
+			'Two-step Off is red'
+		);
+		check(
+			row('Recovery codes').textContent!.includes('You get them when you turn on') &&
+				!row('Recovery codes').querySelector('[data-tone]'),
+			'Recovery codes say when they come, with no badge'
+		);
+		buttonIn(row('Two-step verification'), 'Turn on')!.click();
+		await wait(() => account.count('openSecurity') === 2, 'turn on opens the security page');
 		// #endregion
 
 		// #region Sessions and devices
@@ -472,48 +593,129 @@ export async function runAccountTests(document: Document): Promise<void> {
 		assign('sessions');
 		await wait(() => root.textContent!.includes('Lab PC 14'), 'sessions');
 		check(
-			section('Registered desktops').dataset.state === 'failed' &&
-				buttonIn(section('Registered desktops'), 'Try again'),
+			section('Registered, not signed in').dataset.state === 'failed' &&
+				buttonIn(section('Registered, not signed in'), 'Try again'),
 			'A failed section offers a retry'
 		);
-		check(section('Other sessions').dataset.state === 'ready', 'Sections fail independently');
+		check(section('Signed in').dataset.state === 'ready', 'Sections fail independently');
 		check(
 			[...root.querySelectorAll('.prctr-page-row button')].every(
 				(button) =>
 					button.classList.contains('prctr-page-row__more') ||
-					button.closest('.prctr-page-row')?.querySelector('.prctr-page-row__title')
-						?.textContent === 'Proctor Desktop on Amara’s MacBook Pro'
+					button.textContent === 'Sign out'
 			),
 			'Row actions are a menu, except this session’s one obvious action'
 		);
 		account.reads.set('desktops', desktops);
-		buttonIn(section('Registered desktops'), 'Try again')!.click();
+		buttonIn(section('Registered, not signed in'), 'Try again')!.click();
 		await wait(
-			() => section('Registered desktops').dataset.state === 'ready',
+			() => section('Registered, not signed in').dataset.state === 'ready',
 			'desktops retry'
 		);
 		check(
-			!row('Amara’s MacBook Pro').querySelector('.prctr-page-row__more'),
-			'This computer’s desktop has no Remove'
+			root.querySelectorAll('.prctr-page-row__title').length === 4 &&
+				[...root.querySelectorAll('.prctr-page-row__title')].filter(
+					(title) => title.textContent === 'Lab PC 14'
+				).length === 1,
+			'Each computer appears once'
 		);
-
-		let menu: HTMLElement;
 		check(
-			!row('Proctor Desktop on Amara’s MacBook Pro').querySelector('.prctr-page-row__more'),
-			'This session’s one action is a button, not a menu'
+			row('Amara’s MacBook Pro').textContent!.includes(
+				'Proctor Desktop · macOS · Registered for exams · Signed in'
+			),
+			'A signed-in computer says it is registered, by its registered name'
 		);
-		buttonIn(row('Proctor Desktop on Amara’s MacBook Pro'), 'Sign out')!.click();
+		check(
+			row('Amara’s MacBook Pro').querySelector('[data-tone="neutral"]')?.textContent ===
+				'Current',
+			'The session you are using says Current in grey'
+		);
+		check(
+			row('Unknown device').querySelector('[data-tone="attention"]')?.textContent ===
+				'Unidentified' &&
+				row('Unknown device').textContent!.includes(
+					'Not identified · Password, no two-step'
+				),
+			'An unidentified session is amber and says how it signed in'
+		);
+		check(
+			section('Registered, not signed in').contains(row('Library PC 2')) &&
+				row('Library PC 2').textContent!.includes('Proctor Desktop · Windows · Registered'),
+			'Only computers without a session are listed as not signed in'
+		);
+		let menu = openMenu('Amara’s MacBook Pro');
+		check(
+			[...menu.querySelectorAll('button')].map((item) => item.textContent).join() ===
+				'Session details,Rename…',
+			'This computer can be described and renamed, not ended or removed'
+		);
+		menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+		buttonIn(row('Amara’s MacBook Pro'), 'Sign out')!.click();
 		await wait(() => signOuts.length === 1, 'current session signs out');
 		check(account.count('revokeSession') === 0, 'Signing out is not a remote revocation here');
 
 		menu = openMenu('Lab PC 14');
-		const end = menuItem(menu, 'End session');
+		check(
+			[...menu.querySelectorAll('button')].map((item) => item.textContent).join() ===
+				'Session details,Rename…,End session…,Remove registration…',
+			'Another computer’s menu has every action, the destructive ones last'
+		);
+		const end = menuItem(menu, 'End session…');
 		check(end.dataset.destructive === 'true', 'Ending a session is destructive');
 		end.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 		check(!root.querySelector('.prctr-menu'), 'Escape closes the menu');
 		const more = row('Lab PC 14').querySelector<HTMLButtonElement>('.prctr-page-row__more')!;
 		check(document.activeElement === more, 'Closing the menu returns focus to its button');
-		menuItem(openMenu('Lab PC 14'), 'End session').click();
+
+		menuItem(openMenu('Lab PC 14'), 'Session details').click();
+		await wait(() => dialog() !== null, 'session details');
+		check(
+			dialog()!.textContent!.includes('How it signed in') &&
+				dialog()!.textContent!.includes('Password, no two-step') &&
+				dialog()!.textContent!.includes('Proctor version'),
+			'Session details say how it signed in and what registered it'
+		);
+		check(!buttonIn(dialog()!, 'Close')!.querySelector('.prctr-icon'), 'Close carries no icon');
+		buttonIn(dialog()!, 'Close')!.click();
+		check(!dialog(), 'Close closes the details');
+
+		// A desktop session is renamed through its registration.
+		menuItem(openMenu('Lab PC 14'), 'Rename…').click();
+		await wait(() => dialog() !== null, 'rename dialog');
+		const renameField = dialog()!.querySelector<HTMLInputElement>('input[type="text"]')!;
+		check(renameField.value === 'Lab PC 14', 'Rename starts from the current name');
+		renameField.value = 'Lab PC 14 (window seat)';
+		renameField.dispatchEvent(new Event('input', { bubbles: true }));
+		buttonIn(dialog()!, 'Rename')!.click();
+		await wait(() => !dialog(), 'renamed');
+		const renamed = account.requests.findLast((intent) => intent.kind === 'renameDesktop');
+		check(
+			renamed?.kind === 'renameDesktop' &&
+				renamed.id === id('e') &&
+				renamed.name === 'Lab PC 14 (window seat)',
+			'A computer is renamed through its registration'
+		);
+		// A browser session the server says belongs to a desktop is renamed there instead.
+		account.changes.set('renameSession', () => ({
+			kind: 'namedByDesktop',
+			desktopRegistrationId: id('j')
+		}));
+		menuItem(openMenu('Unknown device'), 'Rename…').click();
+		await wait(() => dialog() !== null, 'rename session dialog');
+		const sessionField = dialog()!.querySelector<HTMLInputElement>('input[type="text"]')!;
+		sessionField.value = 'Spare laptop';
+		sessionField.dispatchEvent(new Event('input', { bubbles: true }));
+		buttonIn(dialog()!, 'Rename')!.click();
+		await wait(() => !dialog(), 'renamed through the desktop');
+		const forwarded = account.requests.findLast((intent) => intent.kind === 'renameDesktop');
+		check(
+			account.count('renameSession') === 1 &&
+				forwarded?.kind === 'renameDesktop' &&
+				forwarded.id === id('j'),
+			'A name the registration owns goes to the registration'
+		);
+
+		menuItem(openMenu('Lab PC 14'), 'End session…').click();
 		await wait(() => dialog() !== null, 'confirmation');
 		check(
 			dialog()!.getAttribute('role') === 'alertdialog',
@@ -525,12 +727,19 @@ export async function runAccountTests(document: Document): Promise<void> {
 		);
 		check(document.activeElement === buttonIn(dialog()!, 'Cancel'), 'Cancel has initial focus');
 		check(overlays.visible, 'The dialog gates the window');
+		check(!buttonIn(dialog()!, 'Cancel')!.querySelector('.prctr-icon'), 'Cancel has no icon');
+		// A second Escape the browser turns into a close still asks the owner, which closes it.
+		dialog()!.close();
+		await wait(() => !dialog() && !overlays.visible, 'a browser close closes the dialog');
+		check(account.count('revokeSession') === 0, 'Closing changes nothing');
+		menuItem(openMenu('Lab PC 14'), 'End session…').click();
+		await wait(() => dialog() !== null, 'confirmation again');
 		buttonIn(dialog()!, 'Cancel')!.click();
 		check(!dialog() && account.count('revokeSession') === 0, 'Cancel changes nothing');
 		check(document.activeElement === more, 'Cancel returns focus to the row');
 
 		account.changes.set('revokeSession', () => failure('strongAuthenticationRequired'));
-		menuItem(openMenu('Lab PC 14'), 'End session').click();
+		menuItem(openMenu('Lab PC 14'), 'End session…').click();
 		await wait(() => dialog() !== null, 'confirmation again');
 		buttonIn(dialog()!, 'End session')!.click();
 		await wait(
@@ -543,29 +752,39 @@ export async function runAccountTests(document: Document): Promise<void> {
 		account.changes.set('revokeSession', () => failure('unconfirmed'));
 		let resolveSessions: ((value: AccountResponse) => void) | undefined;
 		account.reads.set('sessions', () => new Promise((resolve) => (resolveSessions = resolve)));
-		menuItem(openMenu('Lab PC 14'), 'End session').click();
+		menuItem(openMenu('Lab PC 14'), 'End session…').click();
 		await wait(() => dialog() !== null, 'confirmation for unknown outcome');
 		buttonIn(dialog()!, 'End session')!.click();
 		await wait(() => !dialog(), 'unknown outcome closes the dialog');
 		check(
-			section('Other sessions').textContent!.includes('couldn’t confirm'),
+			section('Signed in').textContent!.includes('couldn’t confirm'),
 			'The unknown outcome is reported'
 		);
 		menu = openMenu('Lab PC 14');
 		check(
-			menuItem(menu, 'End session').getAttribute('aria-disabled') === 'true',
+			menuItem(menu, 'End session…').getAttribute('aria-disabled') === 'true',
 			'An unknown outcome locks the row until the list is read again'
 		);
 		menu.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 		resolveSessions?.(sessions());
 		await wait(() => {
-			const item = buttonIn(openMenu('Lab PC 14'), 'End session');
+			const item = buttonIn(openMenu('Lab PC 14'), 'End session…');
 			root.querySelector('.prctr-menu')?.dispatchEvent(
 				new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
 			);
 			return item?.getAttribute('aria-disabled') === 'false';
 		}, 'fresh read unlocks the row');
-		const endOthers = buttonIn(section('Other sessions'), 'End all other sessions')!;
+
+		menuItem(openMenu('Library PC 2'), 'Remove registration…').click();
+		await wait(() => dialog() !== null, 'remove registration confirmation');
+		check(
+			dialog()!.textContent!.includes('Remove the registration for Library PC 2?'),
+			'Removing a registration names the computer'
+		);
+		buttonIn(dialog()!, 'Remove registration')!.click();
+		await wait(() => account.count('revokeDesktop') === 1, 'registration removed');
+
+		const endOthers = buttonIn(section('Signed in'), 'End all other sessions')!;
 		check(endOthers && !endOthers.hidden, 'Other sessions can all be ended at once');
 		account.changes.set('revokeOtherSessions', () => ({ kind: 'sessionsEnded', count: 1 }));
 		endOthers.click();
@@ -580,6 +799,18 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'others ended'
 		);
 		check(account.count('revokeOtherSessions') === 1, 'Other sessions end in one request');
+
+		account.reads.set('sessions', () => failure('unavailable'));
+		assign('sessions');
+		await wait(() => section('Signed in').dataset.state === 'failed', 'sessions fail');
+		check(
+			section('Signed in').textContent!.includes('Couldn’t load your sessions') &&
+				section('Signed in').textContent!.includes(
+					'Northfield University didn’t answer in time. Nothing has changed.'
+				),
+			'A failed sessions read says the institution didn’t answer'
+		);
+		account.reads.set('sessions', sessions);
 		// #endregion
 
 		// #region Access tokens
@@ -613,7 +844,7 @@ export async function runAccountTests(document: Document): Promise<void> {
 		await wait(() => root.textContent!.includes('Grade export script'), 'tokens');
 		check(section('Active').contains(row('Grade export script')), 'Working tokens are active');
 		check(
-			section('Disabled or expired').contains(row('Marking spreadsheet')),
+			section('Not in use').contains(row('Marking spreadsheet')),
 			'Disabled tokens are inactive'
 		);
 		check(
@@ -623,6 +854,29 @@ export async function runAccountTests(document: Document): Promise<void> {
 		check(
 			row('Grade export script').textContent!.includes('View exams'),
 			'Scopes are titled from the server catalogue'
+		);
+		const moreScopes = row('Grade export script').querySelector<HTMLButtonElement>(
+			'.prctr-page-row__chip-more'
+		)!;
+		check(
+			moreScopes.textContent === '2 more' &&
+				moreScopes.getAttribute('aria-expanded') === 'false' &&
+				!moreScopes.hasAttribute('aria-label'),
+			'More than three permissions fold behind "N more", named by its own words'
+		);
+		moreScopes.click();
+		check(
+			moreScopes.getAttribute('aria-expanded') === 'true' &&
+				String(moreScopes.textContent) === 'Show fewer' &&
+				[...row('Grade export script').querySelectorAll('.prctr-page-row__chip')].every(
+					(chip) => !(chip as HTMLElement).hidden
+				),
+			'"N more" opens the rest in place'
+		);
+		check(
+			row('Marking spreadsheet').querySelector('[data-tone="neutral"]')?.textContent ===
+				'Disabled',
+			'A disabled token is grey'
 		);
 		check(
 			row('Old roster import').textContent!.includes('people:read'),
@@ -661,8 +915,18 @@ export async function runAccountTests(document: Document): Promise<void> {
 			form.querySelector<HTMLInputElement>(`input[type="checkbox"][aria-label="${title}"]`);
 		await wait(() => scopeBox('View exams') !== null, 'grantable scopes');
 		check(
-			scopeBox('View exams')!.closest('label')?.title === 'See exams and their details.',
+			scopeBox('View exams')!.title === 'See exams and their details.',
 			'Scopes are described'
+		);
+		check(
+			[...form.querySelectorAll('.prctr-account-token-form__column')]
+				.map((column) => column.textContent)
+				.join() === 'View,Create,Change,Review,Publish',
+			'The grid has fixed action columns'
+		);
+		check(
+			form.textContent!.includes('Exams and their settings'),
+			'Each area has a visible one-line description'
 		);
 		const boxes = [...form.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];
 		const limit = [...form.querySelectorAll<HTMLSelectElement>('select')].find(
@@ -673,13 +937,16 @@ export async function runAccountTests(document: Document): Promise<void> {
 			boxes[1]!.disabled && !boxes[0]!.disabled,
 			'A unit-only scope waits for a unit to be chosen'
 		);
+		check(
+			form.textContent!.includes('Only on a token limited to one of your academic units'),
+			'A greyed row says why'
+		);
 		limit.value = id('u');
 		limit.dispatchEvent(new Event('change'));
 		check(!boxes[1]!.disabled, 'Choosing a unit makes its scopes available');
 		limit.value = '';
 		limit.dispatchEvent(new Event('change'));
-		buttonIn(form, 'Create token')!.click();
-		check(form.textContent!.includes('Enter a name.'), 'A token needs a name');
+		check(buttonIn(form, 'Create token')!.disabled, 'Create token waits for a name');
 		check(account.count('createToken') === 0, 'An invalid draft is never sent');
 		const name = form.querySelector<HTMLInputElement>('input[type="text"]')!;
 		name.value = '  Grade export script 2  ';
@@ -687,6 +954,10 @@ export async function runAccountTests(document: Document): Promise<void> {
 		buttonIn(form, 'Create token')!.click();
 		check(form.textContent!.includes('Tick at least one'), 'A token needs a scope');
 		boxes[0]!.click();
+		check(
+			form.querySelector('.prctr-page-dialog__footnote')?.textContent === '1 permission',
+			'The footer counts the ticked permissions'
+		);
 		let refusedOnce = false;
 		account.changes.set('createToken', (intent) => {
 			check(intent.kind === 'createToken', 'createToken intent');
@@ -713,13 +984,18 @@ export async function runAccountTests(document: Document): Promise<void> {
 			'confirm it is you'
 		);
 		check(
-			dialog()!.textContent!.includes('Grade export script 2'),
-			'Confirming says what will be created'
+			dialog()!.textContent!.includes('Grade export script 2') &&
+				dialog()!.textContent!.includes('View exams · Whole institution · Expires'),
+			'Confirming says what will be created, in the one summary'
 		);
 		buttonIn(dialog()!, 'Continue in browser')!.click();
 		await wait(
-			() => !!dialog()?.textContent?.includes('Copy your token now'),
+			() => !!dialog()?.textContent?.includes('Copy your new token'),
 			'credential dialog'
+		);
+		check(
+			dialog()!.textContent!.includes('View exams · Whole institution · Expires'),
+			'The copy step repeats the same summary'
 		);
 		check(account.count('reauthenticate') === 1, 'Confirming runs the browser step once');
 		check(account.count('createToken') === 2, 'The refused request is sent again');
@@ -750,73 +1026,134 @@ export async function runAccountTests(document: Document): Promise<void> {
 			failed: false,
 			relation: 'subject' as const,
 			actor: 'self' as const,
-			summary: 'You signed in.',
+			summary: 'You signed in on Amara’s MacBook Pro',
 			...extra
 		});
 		account.changes.set('readHistory', (intent) =>
 			intent.kind === 'readHistory' && intent.cursor === 'next'
-				? data({ section: 'history', entries: [historyEntry('m', 'sign_out')] })
+				? data({
+						section: 'history',
+						entries: [historyEntry('m', 'sign_out', { summary: 'You signed out' })]
+					})
 				: data({
 						section: 'history',
 						cursor: 'next',
+						total: 7,
 						entries: [
 							historyEntry('j', 'sign_in.succeeded', {
 								client: 'desktop',
 								ipAddress: '81.2.69.160'
 							}),
-							historyEntry('k', 'role.granted', { actor: 'administrator' }),
-							historyEntry('l', 'future.event', { failed: true, actor: 'system' })
+							historyEntry('k', 'role.granted', {
+								actor: 'administrator',
+								summary: 'An administrator made you a teacher in Mathematics'
+							}),
+							historyEntry('l', 'future.event', {
+								failed: true,
+								actor: 'system',
+								summary: 'Someone tried to sign in as you'
+							}),
+							...['n', 'o', 'p'].map((letter) =>
+								historyEntry(letter, 'profile_picture.changed', {
+									relation: 'actor',
+									summary: 'You changed a profile photo'
+								})
+							)
 						]
 					})
 		);
 		assign('history');
-		await wait(() => root.textContent!.includes('Signed in'), 'history');
-		const table = root.querySelector('table')!;
-		check(table.textContent!.includes('An administrator'), 'Administrators are never named');
-		check(table.textContent!.includes('81.2.69.160'), 'Own actions show where they came from');
+		await wait(() => root.textContent!.includes('Amara’s MacBook Pro'), 'history');
 		check(
-			table.textContent!.includes('Other account activity'),
-			'An unknown event reads generically'
+			root.querySelector('h1')?.textContent === 'Account history',
+			'The page is Account history'
 		);
+		const table = root.querySelector('table')!;
+		check(
+			table.closest('.prctr-page-section') !== null,
+			'History sits on the shared page section'
+		);
+		check(
+			table.textContent!.includes('An administrator made you a teacher in Mathematics'),
+			'Each row is the server’s sentence, and administrators are never named'
+		);
+		check(table.textContent!.includes('81.2.69.160'), 'Own actions show where they came from');
 		check(table.textContent!.includes('Did not succeed'), 'A failed event says so');
+		check(
+			table.querySelectorAll('tbody tr').length === 4,
+			'A run of the same change folds into one row'
+		);
+		const showAll = buttonIn(table, 'Show all 3')!;
+		check(showAll.getAttribute('aria-expanded') === 'false', 'A folded run says it is closed');
+		showAll.click();
+		check(
+			table.querySelectorAll('tbody tr').length === 6 &&
+				buttonIn(table, 'Show fewer')?.getAttribute('aria-expanded') === 'true',
+			'A folded run opens in place'
+		);
 		const first = account.requests.findLast((intent) => intent.kind === 'readHistory')!;
 		check(
 			first.kind === 'readHistory' && first.createdAfter !== undefined,
-			'History starts with the last 30 days'
+			'History starts with the last 6 months'
 		);
-		const pager = root.querySelector<HTMLElement>('nav.prctr-pager')!;
+		const pager = root.querySelector<HTMLElement>(
+			'.prctr-page-section__footer nav.prctr-pager'
+		)!;
 		check(!pager.hidden, 'A history with more pages offers a pager');
 		check(
-			pager.querySelector('[aria-current="page"]')?.textContent === '1',
-			'The first page is current'
+			pager.textContent!.includes('Showing 1–6 of 7') &&
+				!pager.querySelector('[aria-current="page"]:not([hidden] *)')?.checkVisibility(),
+			'The pager counts without page numbers'
 		);
+		check(buttonIn(pager, 'Go to a date'), 'The pager offers Go to a date');
 		pager.querySelector<HTMLButtonElement>('[aria-label="Next"]')!.click();
-		await wait(() => table.textContent!.includes('Signed out'), 'next history page');
+		await wait(() => table.textContent!.includes('You signed out'), 'next history page');
 		check(table.querySelectorAll('tbody tr').length === 1, 'A page replaces the rows');
 		check(
 			pager.querySelector<HTMLButtonElement>('[aria-label="Next"]')!.disabled,
 			'The last page offers no Next'
 		);
-		check(
-			pager.querySelector('[aria-current="page"]')?.textContent === '2',
-			'The second page is current'
-		);
+		check(pager.textContent!.includes('Showing 11–11'), 'The second page says where it is');
 		pager.querySelector<HTMLButtonElement>('[aria-label="Previous"]')!.click();
-		await wait(() => table.textContent!.includes('Signed in'), 'previous history page');
+		await wait(
+			() => table.textContent!.includes('Amara’s MacBook Pro'),
+			'previous history page'
+		);
 		const back = account.requests.findLast((intent) => intent.kind === 'readHistory')!;
 		check(
 			back.kind === 'readHistory' && back.cursor === undefined,
 			'Previous reads the first page again'
 		);
-		const outcome = root.querySelector<HTMLSelectElement>('select[aria-label="Outcome"]')!;
-		outcome.value = 'fail';
-		outcome.dispatchEvent(new Event('change'));
+		const kind = root.querySelector<HTMLSelectElement>('select[aria-label="Kind"]')!;
+		kind.focus();
+		kind.value = 'failed';
+		kind.dispatchEvent(new Event('change'));
 		await wait(() => {
 			const last = account.requests.findLast((intent) => intent.kind === 'readHistory');
 			return (
 				last?.kind === 'readHistory' && last.status === 'fail' && last.cursor === undefined
 			);
 		}, 'filtered history');
+		check(document.activeElement === kind, 'A filter change keeps focus on the filter');
+		root.querySelector<HTMLButtonElement>('.prctr-account-history__sort')!.click();
+		await wait(() => {
+			const last = account.requests.findLast((intent) => intent.kind === 'readHistory');
+			return last?.kind === 'readHistory' && last.order === 'asc';
+		}, 'oldest first');
+		check(
+			root.querySelector('th[aria-sort]')?.getAttribute('aria-sort') === 'ascending',
+			'The When header says how it is sorted'
+		);
+		account.changes.set('readHistory', () => failure('unavailable'));
+		kind.value = 'all';
+		kind.dispatchEvent(new Event('change'));
+		await wait(
+			() =>
+				root.querySelector('.prctr-account-history')?.getAttribute('data-state') ===
+				'failed',
+			'history failure'
+		);
+		check(table.hidden, 'A failure keeps no stale rows');
 		// #endregion
 
 		// #region Settings

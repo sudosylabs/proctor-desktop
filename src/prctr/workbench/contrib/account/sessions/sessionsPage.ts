@@ -18,8 +18,10 @@ import {
 	clientKind,
 	failureNeedsRead,
 	groupSessions,
-	orderDesktops,
-	platformKind
+	platformKind,
+	sessionUnidentified,
+	signInMessage,
+	type SignedInEntry
 } from '../common/accountPresentation.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import { AccountConfirmation } from '../widgets/accountConfirmation.js';
@@ -28,26 +30,28 @@ import type { PageView } from '../../../browser/authenticated/pages/pagePane.js'
 import { AccountRead } from '../widgets/accountRead.js';
 import {
 	PageSection,
+	type PageRowAction,
 	type PageRowModel
 } from '../../../browser/authenticated/pages/pageSection.js';
+import { RenameDialog, SessionDetailsDialog, type RenameTarget } from './sessionDialogs.js';
 
 /** Lock key for ending every other session; it settles with the next sessions read. */
 const OTHERS = 'session:*';
 
 /**
- * Sessions and devices: this computer's session, the other places the account
- * is signed in, and the computers registered for exams. Ending this computer's
- * session is signing out; ending another session or removing another desktop is
- * confirmed first. After an unknown outcome a row stays locked until its list is
+ * Sessions and devices: every place the account is signed in, each computer once, and the
+ * computers registered for exams that are not signed in. A Desktop Session is joined to the
+ * registration it signed in with, so its row says it is registered and its menu can remove
+ * that registration. Ending this computer's session is signing out; every other ending or
+ * removal is confirmed first. After an unknown outcome a row stays locked until its list is
  * read again.
  */
 export class SessionsPage extends Disposable implements PageView {
 	private readonly sessions: AccountRead<'sessions'>;
 	private readonly desktops: AccountRead<'desktops'>;
-	private readonly current: PageSection;
-	private readonly others: PageSection;
+	private readonly signedIn: PageSection;
 	private readonly registered: PageSection;
-	private readonly confirmation = this._register(new MutableDisposable());
+	private readonly dialog = this._register(new MutableDisposable());
 	/** Items whose last change has an unknown outcome; they wait for a fresh read. */
 	private readonly unconfirmed = new Set<string>();
 
@@ -68,34 +72,38 @@ export class SessionsPage extends Disposable implements PageView {
 		this.desktops = this._register(
 			this.instantiationService.createInstance(AccountRead<'desktops'>, 'desktops')
 		);
-		this.current = this._register(
+		this.signedIn = this._register(
 			this.instantiationService.createInstance(PageSection, body, {
-				title: this.format.text('thisComputer')
-			})
-		);
-		this.others = this._register(
-			this.instantiationService.createInstance(PageSection, body, {
-				title: this.format.text('otherSessions'),
+				title: this.format.text('signedInSection'),
 				action: {
 					label: this.format.text('endOtherSessions'),
 					icon: 'action.end',
 					destructive: true
-				}
+				},
+				failure: (reason) =>
+					reason === 'unavailable'
+						? {
+								title: this.format.text('sessionsLoadFailedTitle'),
+								text: this.format.institutionText(
+									'sessionsLoadFailedTimeout',
+									'sessionsLoadFailedTimeoutGeneric'
+								)
+							}
+						: undefined
 			})
 		);
 		this.registered = this._register(
 			this.instantiationService.createInstance(PageSection, body, {
-				title: this.format.text('registeredDesktops'),
-				description: this.format.text('registeredDesktopsDescription')
+				title: this.format.text('registeredOnlySection'),
+				description: this.format.text('registeredOnlyDescription')
 			})
 		);
-		this._register(this.others.onDidRequestAction(() => this.confirmEndOthers()));
-		this._register(this.sessions.onDidChange(() => this.renderSessions()));
-		this._register(this.desktops.onDidChange(() => this.renderDesktops()));
+		this._register(this.signedIn.onDidRequestAction(() => this.confirmEndOthers()));
+		this._register(this.sessions.onDidChange(() => this.render()));
+		this._register(this.desktops.onDidChange(() => this.render()));
 		this._register(this.sessions.onDidRead(() => this.onRead('session:')));
 		this._register(this.desktops.onDidRead(() => this.onRead('desktop:')));
-		this.renderSessions();
-		this.renderDesktops();
+		this.render();
 	}
 
 	setVisible(visible: boolean): void {
@@ -108,40 +116,30 @@ export class SessionsPage extends Disposable implements PageView {
 		const settled = [...this.unconfirmed].filter((key) => key.startsWith(prefix));
 		if (settled.length === 0) return;
 		for (const key of settled) this.unconfirmed.delete(key);
-		if (prefix === 'session:') this.renderSessions();
-		else this.renderDesktops();
+		this.render();
 	}
 
-	private renderSessions(): void {
-		const state = this.sessions.state;
-		const retry = (): void => void this.sessions.refresh();
-		const groups = groupSessions(this.sessions.data?.sessions ?? []);
+	private render(): void {
+		const groups = groupSessions(
+			this.sessions.data?.sessions ?? [],
+			this.desktops.data?.desktops ?? []
+		);
 		const ready = this.sessions.data !== undefined;
-		this.current.setState(
-			state,
-			ready && groups.current === undefined ? this.format.text('noCurrentSession') : false,
-			retry
+		this.signedIn.setState(
+			this.sessions.state,
+			ready && groups.signedIn.length === 0 ? this.format.text('noCurrentSession') : false,
+			() => void this.sessions.refresh()
 		);
-		this.others.setState(
-			state,
-			ready && groups.others.length === 0 ? this.format.text('noOtherSessions') : false,
-			retry
-		);
-		this.others.setAction(groups.others.length > 0, !this.unconfirmed.has(OTHERS));
-		this.current.setRows(groups.current === undefined ? [] : [this.currentRow(groups.current)]);
-		this.others.setRows(groups.others.map((session) => this.sessionRow(session)));
-	}
-
-	private renderDesktops(): void {
-		const desktops = orderDesktops(this.desktops.data?.desktops ?? []);
-		this.registered.setState(
-			this.desktops.state,
-			this.desktops.data !== undefined && desktops.length === 0
-				? this.format.text('noDesktops')
-				: false,
-			() => void this.desktops.refresh()
-		);
-		this.registered.setRows(desktops.map((desktop) => this.desktopRow(desktop)));
+		const others = groups.signedIn.filter((entry) => !entry.session.current).length;
+		this.signedIn.setAction(others > 0, !this.unconfirmed.has(OTHERS));
+		this.signedIn.setRows(groups.signedIn.map((entry) => this.sessionRow(entry)));
+		// Only computers that are registered and not signed in; with none the section is left out.
+		const desktopsReady = this.desktops.data !== undefined;
+		this.registered.hidden =
+			this.desktops.state.kind !== 'failed' &&
+			(!desktopsReady || groups.registeredOnly.length === 0);
+		this.registered.setState(this.desktops.state, false, () => void this.desktops.refresh());
+		this.registered.setRows(groups.registeredOnly.map((desktop) => this.desktopRow(desktop)));
 	}
 
 	private confirmEndOthers(): void {
@@ -151,38 +149,41 @@ export class SessionsPage extends Disposable implements PageView {
 			confirmLabel: this.format.text('endOtherSessions'),
 			intent: { kind: 'revokeOtherSessions' },
 			key: OTHERS,
-			section: this.others,
-			read: this.sessions,
+			id: undefined,
 			success: 'otherSessionsEnded'
 		});
 	}
 
-	private clientName(session: AccountSession): string {
-		return this.format.text(clientKind(session.client));
+	/** A computer by its registered name, a browser or tool by the name the server gave it. */
+	private sessionName(entry: SignedInEntry): string {
+		const { session, desktop } = entry;
+		const name = session.desktopRegistrationName || desktop?.name || session.name;
+		if (name) return name;
+		return sessionUnidentified(session)
+			? this.format.text('unknownDevice')
+			: this.format.text(clientKind(session.client));
 	}
 
-	private sessionName(session: AccountSession): string {
-		return session.name || this.clientName(session);
+	private kind(session: AccountSession): string {
+		return sessionUnidentified(session)
+			? this.format.text('notIdentified')
+			: this.format.text(clientKind(session.client));
 	}
 
 	/**
-	 * "macOS · signed in today, 08:41" for this computer; for another session, what the title
-	 * does not already say, then when it was last used: "Proctor Desktop · Windows · active 5 Nov",
-	 * or "Signed in yesterday, 17:20 · active today, 09:12" when nothing else is known.
+	 * One pattern for every row: kind · system · registered · how it signed in, when the row is
+	 * one to judge · signed in · active. "Proctor Desktop · macOS · Registered for exams · Signed
+	 * in today, 08:41", "Not identified · Password, no two-step · Signed in 1 Nov · Active 3 Nov".
 	 */
-	private sessionDetail(session: AccountSession): string {
-		const parts: string[] = [];
-		if (!session.current && session.name && session.name !== this.clientName(session))
-			parts.push(this.clientName(session));
+	private sessionDetail(entry: SignedInEntry): string {
+		const { session, desktop } = entry;
+		const parts = [this.kind(session)];
 		if (session.platform) parts.push(this.format.text(platformKind(session.platform)));
-		const signedIn = { when: this.format.relative(session.createdAt) };
-		if (session.current || parts.length === 0)
-			parts.push(
-				this.format.text(
-					parts.length === 0 ? 'sessionSignedInFirst' : 'sessionSignedIn',
-					signedIn
-				)
-			);
+		if (desktop !== undefined) parts.push(this.format.text('registeredForExams'));
+		if (sessionUnidentified(session)) parts.push(this.format.text(signInMessage(session)));
+		parts.push(
+			this.format.text('sessionSignedIn', { when: this.format.relative(session.createdAt) })
+		);
 		if (!session.current)
 			parts.push(
 				this.format.text('sessionActive', {
@@ -190,6 +191,153 @@ export class SessionsPage extends Disposable implements PageView {
 				})
 			);
 		return parts.reduce((detail, part) => this.format.join(detail, part));
+	}
+
+	private sessionRow(entry: SignedInEntry): PageRowModel {
+		const { session, desktop } = entry;
+		const name = this.sessionName(entry);
+		const key = `session:${session.id}`;
+		const locked = this.unconfirmed.has(key);
+		const actions: PageRowAction[] = [
+			{
+				label: this.format.text('sessionDetailsMenu'),
+				icon: 'status.info',
+				run: () => this.showSessionDetails(entry, name)
+			},
+			{
+				label: this.format.text('renameMenu'),
+				icon: 'action.edit',
+				enabled: !locked,
+				run: () =>
+					this.rename(
+						desktop === undefined && session.desktopRegistrationId === undefined
+							? { kind: 'session', id: session.id, name }
+							: {
+									kind: 'desktop',
+									id: desktop?.id ?? session.desktopRegistrationId!,
+									name
+								},
+						session.id
+					)
+			}
+		];
+		if (!session.current)
+			actions.push({
+				label: this.format.text('endSessionMenu'),
+				icon: 'action.end',
+				destructive: true,
+				enabled: !locked,
+				run: () =>
+					this.confirm({
+						title: this.format.text('confirmEndSessionTitle', { name }),
+						message: this.format.text('confirmEndSessionBody', { name }),
+						confirmLabel: this.format.text('endSession'),
+						confirmIcon: 'action.end',
+						intent: { kind: 'revokeSession', id: session.id },
+						key,
+						id: session.id,
+						success: 'sessionEnded'
+					})
+			});
+		if (desktop !== undefined && !desktop.current)
+			actions.push(this.removeAction(desktop, name, session.id, true));
+		return {
+			id: session.id,
+			glyph: this.sessionGlyph(session),
+			title: name,
+			detail: this.sessionDetail(entry),
+			...(session.current ? { here: this.format.text('currentBadge') } : {}),
+			...(sessionUnidentified(session)
+				? {
+						titleBadge: {
+							text: this.format.text('unidentifiedBadge'),
+							tone: 'attention' as const
+						}
+					}
+				: {}),
+			// Signing out asks first, in the window's own confirmation.
+			...(session.current
+				? {
+						button: {
+							label: this.format.text('signOut'),
+							icon: 'action.signOut' as const,
+							run: () => this.navigation.signOut()
+						}
+					}
+				: {}),
+			actions
+		};
+	}
+
+	private desktopName(desktop: AccountDesktop): string {
+		return desktop.name || this.format.text('unnamedDesktop');
+	}
+
+	/** "Proctor Desktop · Windows · Registered 1 Oct · Last used 20 Oct". */
+	private desktopRow(desktop: AccountDesktop): PageRowModel {
+		const name = this.desktopName(desktop);
+		const detail = [
+			this.format.text('clientDesktop'),
+			this.format.text(platformKind(desktop.platform)),
+			this.format.text('desktopRegistered', { date: this.format.date(desktop.createdAt) }),
+			this.format.text('desktopLastUsed', {
+				when: this.format.relative(desktop.lastUsedAt)
+			})
+		].reduce((first, second) => this.format.join(first, second));
+		const locked = this.unconfirmed.has(`desktop:${desktop.id}`);
+		const actions: PageRowAction[] = [
+			{
+				label: this.format.text('sessionDetailsMenu'),
+				icon: 'status.info',
+				run: () => this.showDesktopDetails(desktop, name)
+			},
+			{
+				label: this.format.text('renameMenu'),
+				icon: 'action.edit',
+				enabled: !locked,
+				run: () => this.rename({ kind: 'desktop', id: desktop.id, name }, desktop.id)
+			}
+		];
+		if (!desktop.current) actions.push(this.removeAction(desktop, name, desktop.id, false));
+		return {
+			id: desktop.id,
+			glyph: platformGlyph(desktop.platform),
+			title: name,
+			detail,
+			...(desktop.current ? { here: this.format.text('currentBadge') } : {}),
+			actions
+		};
+	}
+
+	private removeAction(
+		desktop: AccountDesktop,
+		name: string,
+		rowId: string,
+		signedIn: boolean
+	): PageRowAction {
+		const key = `desktop:${desktop.id}`;
+		return {
+			label: this.format.text('removeRegistrationMenu'),
+			icon: 'action.delete',
+			destructive: true,
+			enabled: !this.unconfirmed.has(key),
+			run: () =>
+				this.confirm({
+					title: this.format.text('confirmRemoveRegistrationTitle', { name }),
+					message: this.format.text(
+						signedIn
+							? 'confirmRemoveRegistrationSignedInBody'
+							: 'confirmRemoveRegistrationBody',
+						{ name }
+					),
+					confirmLabel: this.format.text('removeRegistration'),
+					confirmIcon: 'action.delete',
+					intent: { kind: 'revokeDesktop', id: desktop.id },
+					key,
+					id: rowId,
+					success: 'registrationRemoved'
+				})
+		};
 	}
 
 	/** A browser's globe, the command line's terminal, or the Desktop's operating system logo. */
@@ -202,111 +350,102 @@ export class SessionsPage extends Disposable implements PageView {
 				: platformGlyph(session.platform);
 	}
 
-	private currentRow(session: AccountSession): PageRowModel {
-		return {
-			id: session.id,
-			glyph: this.sessionGlyph(session),
-			title: this.sessionName(session),
-			detail: this.sessionDetail(session),
-			here: this.format.text('thisSession'),
-			// Signing out asks first, in the window's own confirmation.
-			button: {
-				label: this.format.text('signOut'),
-				icon: 'action.signOut',
-				run: () => this.navigation.signOut()
+	// #region Dialogs
+
+	private showSessionDetails(entry: SignedInEntry, name: string): void {
+		const { session, desktop } = entry;
+		const details: { label: string; value: string }[] = [
+			{ label: this.format.text('detailKind'), value: this.kind(session) }
+		];
+		if (session.platform)
+			details.push({
+				label: this.format.text('detailSystem'),
+				value: this.format.text(platformKind(session.platform))
+			});
+		details.push(
+			{
+				label: this.format.text('detailHow'),
+				value: this.format.text(signInMessage(session))
+			},
+			{
+				label: this.format.text('detailSignedIn'),
+				value: this.format.dateTime(session.createdAt)
 			}
-		};
+		);
+		if (session.mfaCompletedAt !== undefined)
+			details.push({
+				label: this.format.text('detailTwoStep'),
+				value: this.format.dateTime(session.mfaCompletedAt)
+			});
+		details.push(
+			{
+				label: this.format.text('detailLastActive'),
+				value: this.format.dateTime(session.lastActivityAt)
+			},
+			{
+				label: this.format.text('detailExpires'),
+				value: this.format.dateTime(session.expiresAt)
+			}
+		);
+		if (desktop !== undefined) details.push(...this.registrationDetails(desktop));
+		this.dialog.value = this.instantiationService.createInstance(
+			SessionDetailsDialog,
+			name,
+			details
+		);
 	}
 
-	private sessionRow(session: AccountSession): PageRowModel {
-		const name = this.sessionName(session);
-		const key = `session:${session.id}`;
-		return {
-			id: session.id,
-			glyph: this.sessionGlyph(session),
-			title: name,
-			detail: this.sessionDetail(session),
-			actions: [
-				{
-					label: this.format.text('endSessionEllipsis'),
-					icon: 'action.end',
-					destructive: true,
-					enabled: !this.unconfirmed.has(key),
-					run: () =>
-						this.confirm({
-							title: this.format.text('confirmEndSessionTitle', { name }),
-							message: this.format.text('confirmEndSessionBody', { name }),
-							confirmLabel: this.format.text('endSession'),
-							confirmIcon: 'action.end',
-							intent: { kind: 'revokeSession', id: session.id },
-							key,
-							section: this.others,
-							read: this.sessions,
-							success: 'sessionEnded'
-						})
-				}
-			]
-		};
+	private showDesktopDetails(desktop: AccountDesktop, name: string): void {
+		this.dialog.value = this.instantiationService.createInstance(SessionDetailsDialog, name, [
+			{ label: this.format.text('detailKind'), value: this.format.text('clientDesktop') },
+			{
+				label: this.format.text('detailSystem'),
+				value: this.format.text(platformKind(desktop.platform))
+			},
+			{
+				label: this.format.text('detailSignedIn'),
+				value: this.format.text('detailNotSignedIn')
+			},
+			...this.registrationDetails(desktop),
+			{
+				label: this.format.text('detailLastUsed'),
+				value: this.format.dateTime(desktop.lastUsedAt)
+			}
+		]);
 	}
 
-	private desktopRow(desktop: AccountDesktop): PageRowModel {
-		const name = desktop.name || this.format.text('unnamedDesktop');
-		const platform = this.format.text(platformKind(desktop.platform));
-		const key = `desktop:${desktop.id}`;
-		const detail = desktop.revoked
-			? this.format.text('desktopRemovedSummary', {
-					platform,
-					registered: this.format.date(desktop.createdAt)
-				})
-			: this.format.text('desktopSummary', {
-					platform,
-					release: desktop.release,
-					registered: this.format.date(desktop.createdAt),
-					used: this.format.relative(desktop.lastUsedAt)
-				});
-		const removable = !desktop.current && !desktop.revoked;
-		return {
-			id: desktop.id,
-			glyph: platformGlyph(desktop.platform),
-			title: name,
-			detail,
-			...(desktop.current
-				? { here: this.format.text('thisComputer') }
-				: desktop.revoked
-					? {
-							status: {
-								text: this.format.text('desktopRemovedStatus'),
-								tone: 'neutral' as const
-							}
-						}
-					: {}),
-			actions: removable
-				? [
-						{
-							label: this.format.text('removeDesktopEllipsis'),
-							icon: 'action.delete',
-							destructive: true,
-							enabled: !this.unconfirmed.has(key),
-							run: () =>
-								this.confirm({
-									title: this.format.text('confirmRemoveDesktopTitle', {
-										name
-									}),
-									message: this.format.text('confirmRemoveDesktopBody', {
-										name
-									}),
-									confirmLabel: this.format.text('removeDesktop'),
-									confirmIcon: 'action.delete',
-									intent: { kind: 'revokeDesktop', id: desktop.id },
-									key,
-									section: this.registered,
-									read: this.desktops,
-									success: 'desktopRemoved'
-								})
-						}
-					]
-				: []
-		};
+	private registrationDetails(desktop: AccountDesktop): { label: string; value: string }[] {
+		const details = [
+			{
+				label: this.format.text('detailRegistered'),
+				value: this.format.date(desktop.createdAt)
+			}
+		];
+		// A development build's placeholder version means nothing to the person.
+		if (desktop.release && !/^0\.0\.0(?:$|-)/u.test(desktop.release))
+			details.push({ label: this.format.text('detailRelease'), value: desktop.release });
+		return details;
+	}
+
+	private rename(target: RenameTarget, rowId: string): void {
+		this.dialog.value = this.instantiationService.createInstance(
+			RenameDialog,
+			target,
+			(result) => {
+				if (this._store.isDisposed) return;
+				if (result.kind === 'error') {
+					this.unconfirmed.add(
+						target.kind === 'desktop' ? `desktop:${target.id}` : `session:${target.id}`
+					);
+					this.render();
+					this.signedIn.feedback.set(this.format.failure(result.reason), 'error');
+				} else this.pane.toast(this.format.text('renamed'));
+				void this.sessions.refresh();
+				void this.desktops.refresh();
+				if (!this.signedIn.focusRow(rowId) && !this.registered.focusRow(rowId))
+					this.signedIn.focusHeading();
+			}
+		);
 	}
 
 	private confirm(options: {
@@ -316,11 +455,11 @@ export class SessionsPage extends Disposable implements PageView {
 		readonly confirmIcon?: ProctorIconId;
 		readonly intent: AccountIntent;
 		readonly key: string;
-		readonly section: PageSection;
-		readonly read: AccountRead<'sessions'> | AccountRead<'desktops'>;
+		/** The row the change is about, which takes focus back if it is still there. */
+		readonly id: string | undefined;
 		readonly success: AccountMessage;
 	}): void {
-		this.confirmation.value = this.instantiationService.createInstance(
+		this.dialog.value = this.instantiationService.createInstance(
 			AccountConfirmation,
 			{
 				title: options.title,
@@ -336,19 +475,18 @@ export class SessionsPage extends Disposable implements PageView {
 
 	private onChangeComplete(
 		result: AccountResponse,
-		options: {
-			readonly key: string;
-			readonly section: PageSection;
-			readonly read: AccountRead<'sessions'> | AccountRead<'desktops'>;
-			readonly success: AccountMessage;
-		}
+		options: { readonly key: string; readonly success: AccountMessage }
 	): void {
+		// A computer that is signed in is listed under Signed in, so its failure is told there.
+		const section =
+			options.key.startsWith('desktop:') && !this.registered.element.hidden
+				? this.registered
+				: this.signedIn;
 		if (result.kind === 'error' && failureNeedsRead(result.reason)) {
 			this.unconfirmed.add(options.key);
 			// Redraw so the row's action is locked while the list is read again.
-			if (options.key.startsWith('session:')) this.renderSessions();
-			else this.renderDesktops();
-			options.section.feedback.set(this.format.failure(result.reason), 'error');
+			this.render();
+			section.feedback.set(this.format.failure(result.reason), 'error');
 		} else
 			this.pane.toast(
 				this.format.text(
@@ -357,18 +495,22 @@ export class SessionsPage extends Disposable implements PageView {
 						: options.success
 				)
 			);
-		options.section.focusHeading();
-		void options.read.refresh();
+		this.signedIn.focusHeading();
+		void this.sessions.refresh();
+		void this.desktops.refresh();
 	}
+
+	// #endregion
 }
 
 /** The operating system's logo, or a plain desktop when it is not known. */
 function platformGlyph(platform: string): ProctorIconId {
-	return platform === 'darwin'
+	const kind = platformKind(platform);
+	return kind === 'platformMac'
 		? 'device.apple'
-		: platform === 'win32'
+		: kind === 'platformWindows'
 			? 'device.windows'
-			: platform === 'linux'
+			: kind === 'platformLinux'
 				? 'device.linux'
 				: 'device.desktop';
 }

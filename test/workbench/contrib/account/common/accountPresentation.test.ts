@@ -3,11 +3,12 @@ import { test } from 'node:test';
 
 import type {
 	AccountDesktop,
+	AccountHistoryEntry,
 	AccountRetentionNotice,
+	AccountSession,
 	AccountToken
 } from '../../../../../src/prctr/platform/account/common/accountProtocol.ts';
 import {
-	desktopShape,
 	failureMessage,
 	failureNeedsRead,
 	failureWithdrawsData,
@@ -18,15 +19,18 @@ import {
 	orderDesktops,
 	platformKind,
 	providerKind,
-	historyActorMessage,
+	foldHistory,
 	historyEventGroups,
-	historyEventMessage,
 	historyQuery,
 	scopeGrantable,
 	scopeTitle,
+	sessionUnidentified,
+	signInMessage,
 	tokenActions,
+	tokenAreaMessage,
+	tokenExpiresSoon,
 	tokenExpiry,
-	tokenShape,
+	tokenScopeAreas,
 	tokenState,
 	twoStepPresentation,
 	validateTokenDraft
@@ -133,7 +137,6 @@ void test('two-step verification reads its state, and few recovery codes need at
 	};
 	assert.deepStrictEqual(twoStepPresentation(mfa), {
 		status: 'on',
-		shape: 'active',
 		recovery: { remaining: 3, total: 10, low: true }
 	});
 	assert.strictEqual(
@@ -141,7 +144,10 @@ void test('two-step verification reads its state, and few recovery codes need at
 		false
 	);
 	assert.strictEqual(twoStepPresentation(undefined).status, 'notOffered');
-	assert.strictEqual(twoStepPresentation({ ...mfa, available: false }).shape, 'attention');
+	assert.strictEqual(
+		twoStepPresentation({ ...mfa, available: false }).status,
+		'serviceUnavailable'
+	);
 	assert.strictEqual(
 		twoStepPresentation({ ...mfa, recoveryRequired: true }).status,
 		'recoveryRequired'
@@ -159,11 +165,11 @@ void test('institution providers read as single sign-on', () => {
 	assert.strictEqual(providerKind('passkey'), 'other');
 });
 
-void test('sessions split into this computer and the rest', () => {
-	const session = {
+void test('each computer appears once: sessions join their registration, the rest stay apart', () => {
+	const session: AccountSession = {
 		id: 'b'.repeat(26),
 		current: false,
-		name: '',
+		name: 'Firefox on Windows',
 		client: 'web',
 		platform: '',
 		method: 'password',
@@ -172,20 +178,47 @@ void test('sessions split into this computer and the rest', () => {
 		lastActivityAt: 1,
 		expiresAt: 2
 	};
-	const groups = groupSessions([session, { ...session, id: 'c'.repeat(26), current: true }]);
+	const lab = desktop({});
+	const library = desktop({ id: 'e'.repeat(26), name: 'Library PC 2' });
+	const removed = desktop({ id: 'g'.repeat(26), revoked: true });
+	const groups = groupSessions(
+		[
+			session,
+			{
+				...session,
+				id: 'c'.repeat(26),
+				current: true,
+				client: 'desktop',
+				desktopRegistrationId: lab.id
+			}
+		],
+		[lab, library, removed]
+	);
 	assert.strictEqual(groups.current?.id, 'c'.repeat(26));
 	assert.deepStrictEqual(
-		groups.others.map((item) => item.id),
-		['b'.repeat(26)]
+		groups.signedIn.map((entry) => [entry.session.id, entry.desktop?.id]),
+		[
+			['c'.repeat(26), lab.id],
+			['b'.repeat(26), undefined]
+		]
+	);
+	// The removed registration is a record, not a computer to list.
+	assert.deepStrictEqual(
+		groups.registeredOnly.map((entry) => entry.id),
+		[library.id]
+	);
+	assert.strictEqual(sessionUnidentified(session), false);
+	assert.strictEqual(sessionUnidentified({ ...session, client: 'unknown' }), true);
+	assert.strictEqual(signInMessage(session), 'signInPassword');
+	assert.strictEqual(
+		signInMessage({ ...session, method: 'oidc', authenticationStrength: 'multi_factor' }),
+		'signInSingleSignOnTwoStep'
 	);
 });
 
-void test('desktops list this computer first and read their state by shape', () => {
+void test('desktops list this computer first', () => {
 	const ordered = orderDesktops([desktop({}), desktop({ id: 'e'.repeat(26), current: true })]);
 	assert.strictEqual(ordered[0]?.current, true);
-	assert.strictEqual(desktopShape(desktop({ current: true })), 'active');
-	assert.strictEqual(desktopShape(desktop({})), 'idle');
-	assert.strictEqual(desktopShape(desktop({ revoked: true })), 'off');
 	assert.strictEqual(platformKind('darwin'), 'platformMac');
 	assert.strictEqual(platformKind('beos'), 'platformOther');
 });
@@ -211,8 +244,45 @@ void test('only working and disabled tokens offer actions, and only disabled one
 	assert.deepStrictEqual(tokenActions('disabled'), ['enable', 'revoke']);
 	assert.deepStrictEqual(tokenActions('expired'), []);
 	assert.deepStrictEqual(tokenActions('revoked'), []);
-	assert.strictEqual(tokenShape('disabled'), 'idle');
-	assert.strictEqual(tokenShape('revoked'), 'off');
+});
+
+void test('only an active token about to expire is called out', () => {
+	assert.strictEqual(tokenExpiresSoon(token({ expiresAt: NOW + 6 * DAY }), NOW), 6);
+	assert.strictEqual(tokenExpiresSoon(token({ expiresAt: NOW + 2 * 60 * 60 * 1000 }), NOW), 1);
+	assert.strictEqual(tokenExpiresSoon(token({ expiresAt: NOW + 30 * DAY }), NOW), undefined);
+	assert.strictEqual(
+		tokenExpiresSoon(token({ expiresAt: NOW + DAY, disabledAt: NOW - 1 }), NOW),
+		undefined
+	);
+});
+
+void test('grantable scopes become grid rows with fixed action columns', () => {
+	const scope = (name: string) => ({
+		name,
+		title: name,
+		description: '',
+		institutionWide: true,
+		academicUnitIds: []
+	});
+	const rows = tokenScopeAreas([
+		scope('exam.view'),
+		scope('exam.publish'),
+		scope('exam.manage.override'),
+		scope('submission.release'),
+		scope('exam.sitting.view'),
+		scope('exam.archive')
+	]);
+	assert.deepStrictEqual(
+		rows.map((row) => [row.area, row.anyone, Object.keys(row.cells), row.other.length]),
+		[
+			['exam', false, ['view', 'publish'], 1],
+			['exam', true, ['manage'], 0],
+			['submission', false, ['publish'], 0],
+			['exam.sitting', false, ['view'], 0]
+		]
+	);
+	assert.strictEqual(tokenAreaMessage('exam.sitting'), 'tokenAreaSitting');
+	assert.strictEqual(tokenAreaMessage('toString'), undefined);
 });
 
 void test('a scope is grantable where the server says, and is titled from its catalogue', () => {
@@ -241,34 +311,52 @@ void test('a scope is grantable where the server says, and is titled from its ca
 	assert.strictEqual(scopeTitle('exam.view', undefined), 'exam.view');
 });
 
-void test('history filters become the server query, and unknown events read generically', () => {
+void test('history filters become the server query', () => {
 	assert.deepStrictEqual(
-		historyQuery({ period: 'all', group: 'all', relation: 'all', outcome: 'all' }, NOW),
+		historyQuery({ period: 'all', kind: 'all', about: 'all', order: 'desc' }, NOW),
 		{}
 	);
 	const query = historyQuery(
-		{ period: 30, group: 'tokens', relation: 'subject', outcome: 'fail' },
+		{ period: 30, kind: 'tokens', about: 'subject', order: 'asc' },
 		NOW + 1234
 	);
 	assert.strictEqual(query.createdAfter! % 60_000, 0);
 	assert.ok(query.createdAfter! <= NOW + 1234 - 30 * DAY);
 	assert.deepStrictEqual(query.events, historyEventGroups.find((g) => g.id === 'tokens')!.events);
-	assert.strictEqual(query.status, 'fail');
 	assert.strictEqual(query.relation, 'subject');
-	assert.strictEqual(historyEventMessage('sign_in.failed'), 'historyEventSignInFailed');
-	assert.strictEqual(historyEventMessage('future.event'), 'historyEventOther');
-	assert.strictEqual(historyEventMessage('toString'), 'historyEventOther');
-	const entry = {
-		id: 'e'.repeat(26),
+	assert.strictEqual(query.order, 'asc');
+	const failed = historyQuery(
+		{ period: 7, kind: 'failed', about: 'all', order: 'desc', before: NOW },
+		NOW + 99 * DAY
+	);
+	assert.strictEqual(failed.status, 'fail');
+	assert.strictEqual(failed.events, undefined);
+	// Go to a date ends the period at that day instead of now.
+	assert.strictEqual(failed.createdBefore, NOW);
+	assert.ok(failed.createdAfter! <= NOW - 7 * DAY && failed.createdAfter! > NOW - 8 * DAY);
+});
+
+void test('runs of the same change fold into one row, shorter runs stay apart', () => {
+	const entry = (id: string, event: string): AccountHistoryEntry => ({
+		id: id.repeat(26),
 		createdAt: NOW,
-		event: 'role.granted',
+		event,
 		failed: false,
-		relation: 'subject' as const,
-		actor: 'administrator' as const,
-		summary: 'An administrator granted you a role.'
-	};
-	assert.strictEqual(historyActorMessage(entry), 'historyByAdministrator');
-	assert.strictEqual(historyActorMessage({ ...entry, actor: 'system' }), 'historyBySystem');
+		relation: 'actor',
+		actor: 'self',
+		summary: event
+	});
+	const runs = foldHistory([
+		entry('a', 'profile_picture.changed'),
+		entry('b', 'profile_picture.changed'),
+		entry('c', 'profile_picture.changed'),
+		entry('d', 'sign_in.succeeded'),
+		entry('e', 'sign_in.succeeded')
+	]);
+	assert.deepStrictEqual(
+		runs.map((run) => run.entries.length),
+		[3, 1, 1]
+	);
 });
 
 void test('a token draft needs a usable name and at least one scope', () => {

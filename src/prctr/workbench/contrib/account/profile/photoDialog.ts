@@ -320,7 +320,13 @@ export class AccountPhotoDialog extends Disposable {
 			bitmap.width * scale,
 			bitmap.height * scale
 		);
-		this.zoom.setAttribute('aria-valuetext', `${Math.round(this.crop.zoom * 100)}%`);
+		// The number and the place of the percent sign follow the window's language.
+		this.zoom.setAttribute(
+			'aria-valuetext',
+			this.format.text('photoZoomValue', {
+				value: this.format.count(Math.round(this.crop.zoom * 100))
+			})
+		);
 		this.lowResolution.hidden = rect.size >= SAVED_SIZE;
 	}
 

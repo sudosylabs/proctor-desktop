@@ -20,6 +20,7 @@ import {
 	groupTokens,
 	scopeTitle,
 	tokenActions,
+	tokenExpiresSoon,
 	tokenState,
 	type TokenAction,
 	type TokenState
@@ -91,14 +92,12 @@ export class TokensPage extends Disposable implements PageView {
 		);
 		this.active = this._register(
 			this.instantiationService.createInstance(PageSection, body, {
-				title: this.format.text('activeTokens'),
-				description: this.format.text('activeTokensDescription')
+				title: this.format.text('activeTokens')
 			})
 		);
 		this.inactive = this._register(
 			this.instantiationService.createInstance(PageSection, body, {
-				title: this.format.text('inactiveTokens'),
-				description: this.format.text('inactiveTokensDescription')
+				title: this.format.text('inactiveTokens')
 			})
 		);
 		this._register(this.tokens.onDidChange(() => this.render()));
@@ -128,12 +127,6 @@ export class TokensPage extends Disposable implements PageView {
 		const none = data !== undefined && groups.active.length + groups.inactive.length === 0;
 		// When the empty Active section offers the first or next token, the header does not repeat it.
 		this.create.element.hidden = none || (data !== undefined && groups.active.length === 0);
-		if (none) this.active.setHeading(this.format.text('yourTokens'));
-		else
-			this.active.setHeading(
-				this.format.text('activeTokens'),
-				this.format.text('activeTokensDescription')
-			);
 		this.active.setState(
 			state,
 			none
@@ -177,27 +170,24 @@ export class TokensPage extends Disposable implements PageView {
 			enabled: !this.unconfirmed.has(token.id),
 			run: () => this.runAction(action, token, section)
 		}));
+		// A token that no longer works is a plain fact, so its badge is grey. Amber is kept for one
+		// that is about to stop working while a script may still rely on it.
+		const soon = tokenExpiresSoon(token, this.format.now());
 		const status: PageRowModel['status'] =
 			state === 'disabled'
-				? {
-						text: this.format.text('tokenDisabledStatus'),
-						tone: 'neutral'
-					}
+				? { text: this.format.text('tokenDisabledStatus'), tone: 'neutral' }
 				: state === 'expired'
-					? {
-							text: this.format.text('tokenExpiredStatus'),
-							tone: 'neutral'
-						}
+					? { text: this.format.text('tokenExpiredStatus'), tone: 'neutral' }
 					: state === 'revoked'
-						? {
-								text: this.format.text('tokenRevokedStatus'),
-								tone: 'neutral'
-							}
-						: token.academicUnitId === undefined
+						? { text: this.format.text('tokenRevokedStatus'), tone: 'neutral' }
+						: soon === undefined
 							? undefined
 							: {
-									text: this.unitTag(token.academicUnitId),
-									tone: 'neutral'
+									text:
+										soon === 1
+											? this.format.text('tokenExpiresTomorrow')
+											: this.format.text('tokenExpiresSoon', { days: soon }),
+									tone: 'attention'
 								};
 		return {
 			id: token.id,
@@ -206,7 +196,9 @@ export class TokensPage extends Disposable implements PageView {
 					? 'action.disable'
 					: state === 'active'
 						? 'object.key'
-						: 'status.time',
+						: state === 'revoked'
+							? 'status.prohibited'
+							: 'status.time',
 			title: token.description,
 			chips: token.scopes.map((scope) => scopeTitle(scope, this.grantable.data?.grantable)),
 			detail: this.detail(token, state),
@@ -222,30 +214,36 @@ export class TokensPage extends Disposable implements PageView {
 			: this.format.text('tokenUnitNamedTag', { unit: unit.name });
 	}
 
+	/**
+	 * "Expires 6 Feb 2027 · Used 2 days ago · Computer Science only" while it works; a disabled
+	 * one says when it was disabled and when it expires; an expired or revoked one only when.
+	 */
 	private detail(token: AccountToken, state: TokenState): string {
 		const date = (time: number): string => this.format.date(time);
-		let lifetime: string;
 		if (state === 'revoked')
-			lifetime = this.format.text('tokenRevokedOn', {
+			return this.format.text('tokenRevokedOn', {
 				date: date(token.revokedAt ?? token.expiresAt)
 			});
-		else if (state === 'expired')
-			lifetime = this.format.text('tokenExpired', { date: date(token.expiresAt) });
-		else if (state === 'disabled')
-			lifetime = this.format.join(
+		if (state === 'expired')
+			return this.format.text('tokenExpired', { date: date(token.expiresAt) });
+		const parts: string[] = [];
+		if (state === 'disabled')
+			parts.push(
 				this.format.text('tokenDisabledOn', {
 					date: date(token.disabledAt ?? token.createdAt)
-				}),
-				this.format.text('tokenExpires', { date: date(token.expiresAt) })
+				})
 			);
-		else lifetime = this.format.text('tokenExpiresFirst', { date: date(token.expiresAt) });
-		const used =
-			token.lastUsedAt === undefined
-				? this.format.text('tokenNeverUsed')
-				: this.format.text('tokenUsed', {
-						when: this.format.relative(token.lastUsedAt)
-					});
-		return this.format.join(lifetime, used);
+		parts.push(this.format.text('tokenExpires', { date: date(token.expiresAt) }));
+		if (state === 'active')
+			parts.push(
+				token.lastUsedAt === undefined
+					? this.format.text('tokenNeverUsed')
+					: this.format.text('tokenUsed', {
+							when: this.format.relative(token.lastUsedAt)
+						})
+			);
+		if (token.academicUnitId !== undefined) parts.push(this.unitTag(token.academicUnitId));
+		return parts.reduce((first, second) => this.format.join(first, second));
 	}
 
 	private runAction(action: TokenAction, token: AccountToken, section: PageSection): void {
@@ -336,16 +334,22 @@ export class TokensPage extends Disposable implements PageView {
 	private openNewToken(): void {
 		this.dialog.value = this.instantiationService.createInstance(
 			NewTokenDialog,
-			(token, credential) => this.showCredential(token, credential),
+			(token: AccountToken, credential: string, summary: readonly string[]) =>
+				this.showCredential(token, credential, summary),
 			() => undefined
 		);
 	}
 
 	/** The credential passes straight into its dialog; this page never keeps it. */
-	private showCredential(token: AccountToken, credential: string): void {
+	private showCredential(
+		token: AccountToken,
+		credential: string,
+		summary: readonly string[]
+	): void {
 		this.dialog.value = this.instantiationService.createInstance(
 			TokenCreatedDialog,
 			credential,
+			summary,
 			() => {
 				if (this._store.isDisposed) return;
 				this.pane.toast(this.format.text('tokenCreated'));

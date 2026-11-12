@@ -16,6 +16,16 @@ export const profileMessages = Object.freeze({
 		defaultMessage: 'Change photo',
 		description: 'Choose a new profile photo.'
 	}),
+	photoZoomValue: defineMessage({
+		id: 'account.profile.photo.zoom.value',
+		defaultMessage: '{value}%',
+		description: 'What the photo zoom slider reports to a screen reader, as in "200%".'
+	}),
+	addPhoto: defineMessage({
+		id: 'account.profile.add.photo',
+		defaultMessage: 'Add photo',
+		description: 'Choose a profile photo when there is none yet, only initials.'
+	}),
 	removePhoto: defineMessage({
 		id: 'account.profile.remove.photo',
 		defaultMessage: 'Remove photo',
@@ -53,13 +63,31 @@ export const profileMessages = Object.freeze({
 	}),
 	detailsManaged: defineMessage({
 		id: 'account.profile.details.managed',
-		defaultMessage: '{institution} manages these. To change one, contact an administrator.',
+		defaultMessage: '{institution} manages these. To change one, ask an administrator.',
 		description: 'Account details are read-only; institution is its name.'
 	}),
 	detailsManagedGeneric: defineMessage({
 		id: 'account.profile.details.managed.generic',
-		defaultMessage: 'Your institution manages these. To change one, contact an administrator.',
+		defaultMessage: 'Your institution manages these. To change one, ask an administrator.',
 		description: 'Account details are read-only and the institution name is unknown.'
+	}),
+	detailsManagedAdministrator: defineMessage({
+		id: 'account.profile.details.managed.administrator',
+		defaultMessage: '{institution} manages these. You can change them in Administration.',
+		description:
+			'Account details, for someone who can open Administration; institution is its name.'
+	}),
+	detailsManagedAdministratorGeneric: defineMessage({
+		id: 'account.profile.details.managed.administrator.generic',
+		defaultMessage: 'Your institution manages these. You can change them in Administration.',
+		description:
+			'Account details, for someone who can open Administration, institution unknown.'
+	}),
+	editInAdministration: defineMessage({
+		id: 'account.profile.edit.in.administration',
+		defaultMessage: 'Edit in Administration',
+		description:
+			'Opens your own person page in Administration, where the details can be changed.'
 	}),
 	firstName: defineMessage({
 		id: 'account.profile.first.name',
@@ -121,11 +149,6 @@ export const profileMessages = Object.freeze({
 		id: 'account.profile.verification.sent',
 		defaultMessage: 'If this address can receive email, a verification link is on its way.',
 		description: 'Confirms a verification request without revealing delivery.'
-	}),
-	noAffiliation: defineMessage({
-		id: 'account.profile.no.affiliation',
-		defaultMessage: 'You have no current affiliation with this institution.',
-		description: 'The account has no current affiliation.'
 	}),
 	noAccess: defineMessage({
 		id: 'account.profile.no.access',

@@ -49,7 +49,8 @@ export class AccountPane extends Disposable implements WorkbenchPane {
 			id: page,
 			title: this.format.text(descriptor.title),
 			description: descriptor.description(this.format),
-			width: page === 'history' ? 'wide' : 'narrow',
+			// Every Account page keeps the same 760 column and left edge.
+			width: 'narrow',
 			create: descriptor.create
 		});
 	}

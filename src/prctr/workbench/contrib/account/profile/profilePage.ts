@@ -6,6 +6,7 @@ import { createStatusBadge } from '../../../../base/browser/ui/badge/statusBadge
 import { IAccountService } from '../../../services/account/common/account.js';
 import { IAccountFormatService } from '../accountFormat.js';
 import { IWorkbenchWindowService } from '../../../browser/workbenchServices.js';
+import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import type { AuthenticatedWindowDescriptor } from '../../../../platform/windows/common/windowProtocol.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { createElementFactory } from '../../../../base/browser/documentElements.js';
@@ -14,7 +15,8 @@ import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
 import type {
 	AccountProfile,
-	AccountResponse
+	AccountResponse,
+	AccountRetentionNotice
 } from '../../../../platform/account/common/accountProtocol.js';
 import {
 	createProctorIcon,
@@ -88,6 +90,8 @@ export class ProfilePage extends Disposable implements PageView {
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
 		@IWorkbenchWindowService windowService: IWorkbenchWindowService,
+		@IAuthenticatedNavigationService
+		private readonly navigation: IAuthenticatedNavigationService,
 		@IInstantiationService private readonly instantiationService: IInstantiationService
 	) {
 		super();
@@ -133,7 +137,7 @@ export class ProfilePage extends Disposable implements PageView {
 		this.changePhoto = this._register(
 			new ButtonControl(photoActions, {
 				variant: 'secondary',
-				label: this.format.text('changePhoto'),
+				label: this.format.text('addPhoto'),
 				icon: CHANGE_PHOTO_ICON,
 				disabled: true
 			})
@@ -148,12 +152,39 @@ export class ProfilePage extends Disposable implements PageView {
 		body.append(identityBlock);
 		this.photoFeedback = this._register(new PageFeedback(identityBlock));
 
+		// An administrator isn't told to ask one: they can change the details themselves.
+		const administrator =
+			this.identity?.availableProductAreas.includes('administration') === true;
 		this.details = this._register(
 			this.instantiationService.createInstance(PageSection, body, {
 				title: this.format.text('accountDetails'),
-				description: this.format.institutionText('detailsManaged', 'detailsManagedGeneric')
+				description: administrator
+					? this.format.institutionText(
+							'detailsManagedAdministrator',
+							'detailsManagedAdministratorGeneric'
+						)
+					: this.format.institutionText('detailsManaged', 'detailsManagedGeneric'),
+				...(administrator
+					? {
+							action: {
+								label: this.format.text('editInAdministration'),
+								icon: 'action.edit' as const
+							}
+						}
+					: {}),
+				// Seven label and value pairs, as the details it loads.
+				skeleton: { kind: 'details', count: 7 }
 			})
 		);
+		const principalId = this.identity?.principalId;
+		if (administrator && principalId !== undefined) {
+			this.details.setAction(true);
+			this._register(
+				this.details.onDidRequestAction(() =>
+					this.navigation.selectAdministrationPage('user', principalId)
+				)
+			);
+		}
 		const list = $('dl.prctr-account-details');
 		this.detailRows = {
 			firstName: this.detailRow($, list, 'firstName'),
@@ -164,8 +195,6 @@ export class ProfilePage extends Disposable implements PageView {
 			memberSince: this.detailRow($, list, 'memberSince'),
 			lastSignIn: this.detailRow($, list, 'lastSignIn')
 		};
-		this.detailRows.email.value.classList.add('prctr-account-details__mono');
-		this.detailRows.timeZone.value.classList.add('prctr-account-details__mono');
 		this.details.content.append(list);
 
 		const noticeIcon = this._register(
@@ -194,8 +223,7 @@ export class ProfilePage extends Disposable implements PageView {
 		this.unverified.after(this.verificationFeedback.element);
 
 		const identityContext = this.identity;
-		if (identityContext?.noCurrentAffiliation)
-			this.details.element.before(this.plainNotice($, this.format.text('noAffiliation')));
+		// Having no current affiliation is told once, by the rail's notice.
 		if (identityContext?.noAssignedAccess)
 			this.details.element.before(this.plainNotice($, this.format.text('noAccess')));
 
@@ -329,7 +357,11 @@ export class ProfilePage extends Disposable implements PageView {
 		this.noticeSection.hidden = !hasNotices && state.kind !== 'failed';
 		this.noticeSection.setState(state, false, () => void this.notices.refresh());
 		this.noticesMore.hidden = !(data?.more ?? false);
-		const rows: PageRowModel[] = (data?.notices ?? []).map((notice) => {
+		// Records still waiting to be deleted come first, the soonest at the top.
+		const order = (notice: AccountRetentionNotice): number =>
+			notice.state === 'grace' ? notice.retireAfter : Number.MAX_SAFE_INTEGER;
+		const notices = [...(data?.notices ?? [])].sort((a, b) => order(a) - order(b));
+		const rows: PageRowModel[] = notices.map((notice) => {
 			const presentation = noticePresentation(notice);
 			return {
 				id: notice.retirementId,
@@ -374,7 +406,7 @@ export class ProfilePage extends Disposable implements PageView {
 			return;
 		}
 		this.changePhoto.setState({
-			label: this.format.text('changePhoto'),
+			label: this.photoLabel(),
 			icon: CHANGE_PHOTO_ICON,
 			disabled: true
 		});
@@ -389,17 +421,27 @@ export class ProfilePage extends Disposable implements PageView {
 		});
 		this.avatar.replaceChildren(image);
 		this.account.setPhoto(photo.dataUrl);
-		this.changePhoto.setState({
-			label: this.format.text('changePhoto'),
-			icon: CHANGE_PHOTO_ICON
-		});
 		this.renderRemovePhoto();
 	}
 
-	/** Remove is offered only for the person's own upload, as the account itself reports it. */
+	/**
+	 * Initials offer only "Add photo"; the person's own upload offers Change and Remove, as the
+	 * account itself reports which it is.
+	 */
 	private renderRemovePhoto(): void {
-		this.removePhoto.element.hidden =
-			this.photo === undefined || this.profile.data?.profile.photoKind !== 'custom';
+		const custom = this.profile.data?.profile.photoKind === 'custom';
+		this.removePhoto.element.hidden = this.photo === undefined || !custom;
+		this.changePhoto.setState({
+			label: this.photoLabel(),
+			icon: CHANGE_PHOTO_ICON,
+			disabled: this.photo === undefined
+		});
+	}
+
+	private photoLabel(): string {
+		return this.format.text(
+			this.profile.data?.profile.photoKind === 'custom' ? 'changePhoto' : 'addPhoto'
+		);
 	}
 
 	private onFileChosen(): void {
