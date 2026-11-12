@@ -131,6 +131,53 @@ pub fn session_in(cgroup: &Path, sessions: &Path) -> crate::RawSession {
     }
 }
 
+/// Virtualization evidence: the DMI system vendor and product, then CPUID on x86-64. Linux evidence
+/// recognises guests but never proves physical hardware.
+#[must_use]
+pub fn virtualization() -> crate::RawVirtualization {
+    let read = |name: &str| {
+        fs::read_to_string(Path::new("/sys/class/dmi/id").join(name))
+            .unwrap_or_default()
+            .trim()
+            .to_owned()
+    };
+    let from_dmi = dmi_guest(&read("sys_vendor"), &read("product_name"));
+    if from_dmi != crate::RawHypervisor::None {
+        return crate::RawVirtualization {
+            probed: true,
+            guest_of: from_dmi,
+            physical_or_root: false,
+        };
+    }
+    #[cfg(target_arch = "x86_64")]
+    {
+        let mut cpuid = crate::cpuid_virtualization();
+        cpuid.physical_or_root = false;
+        cpuid
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    crate::RawVirtualization {
+        probed: true,
+        guest_of: crate::RawHypervisor::None,
+        physical_or_root: false,
+    }
+}
+
+/// The hypervisor a DMI vendor and product name identify.
+#[must_use]
+pub fn dmi_guest(vendor: &str, product: &str) -> crate::RawHypervisor {
+    use crate::RawHypervisor;
+    match (vendor, product) {
+        ("QEMU", _) | (_, "KVM") => RawHypervisor::QemuKvm,
+        ("VMware, Inc.", _) => RawHypervisor::Vmware,
+        ("innotek GmbH", _) | (_, "VirtualBox") => RawHypervisor::VirtualBox,
+        ("Xen", _) => RawHypervisor::Xen,
+        (_, product) if product.starts_with("Parallels") => RawHypervisor::Parallels,
+        ("Microsoft Corporation", "Virtual Machine") => RawHypervisor::HyperV,
+        _ => RawHypervisor::None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

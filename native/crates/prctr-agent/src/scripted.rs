@@ -57,7 +57,11 @@ impl Source for Scripted {
         }
     }
 
-    fn start(&mut self, sink: Sink) -> Result<Observation, SourceError> {
+    fn start(
+        &mut self,
+        _categories: &[Identifier],
+        sink: Sink,
+    ) -> Result<Observation, SourceError> {
         self.sink = Some(sink);
         Ok(self.current())
     }

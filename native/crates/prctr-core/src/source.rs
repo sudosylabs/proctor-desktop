@@ -5,6 +5,8 @@ use std::fmt;
 
 use prctr_protocol::facts::Permission;
 
+use prctr_protocol::scalars::Identifier;
+
 use crate::observation::Observation;
 use crate::registry::CapabilityDescriptor;
 
@@ -39,12 +41,13 @@ impl std::error::Error for SourceError {}
 pub trait Source: Send {
     fn descriptor(&self) -> CapabilityDescriptor;
 
-    /// Starts observing, then returns the first complete state. Observation is registered before the
+    /// Starts observing the activation's selected `categories` (empty for capabilities without
+    /// sub-categories; an unselected category is never queried), then returns the first complete state. Observation is registered before the
     /// state is read, so no change can fall between them.
     ///
     /// # Errors
     /// When the OS observation cannot be set up.
-    fn start(&mut self, sink: Sink) -> Result<Observation, SourceError>;
+    fn start(&mut self, categories: &[Identifier], sink: Sink) -> Result<Observation, SourceError>;
 
     /// The complete state now. Valid whether or not the source is started.
     fn current(&mut self) -> Observation;

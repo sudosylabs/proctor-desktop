@@ -280,7 +280,11 @@ impl Source for InteractiveSessionSource {
         descriptor()
     }
 
-    fn start(&mut self, sink: Sink) -> Result<Observation, SourceError> {
+    fn start(
+        &mut self,
+        _categories: &[Identifier],
+        sink: Sink,
+    ) -> Result<Observation, SourceError> {
         self.stop();
         let stop = Arc::new(AtomicBool::new(false));
         let thread_stop = Arc::clone(&stop);

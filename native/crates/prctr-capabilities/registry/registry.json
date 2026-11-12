@@ -99,6 +99,43 @@
         "type": "object"
       }
     },
+    "clipboard": {
+      "state": {
+        "$defs": {
+          "Coverage": {
+            "enum": [
+              "counter_polling",
+              "unavailable"
+            ],
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "changes": {
+            "description": "Host clipboard changes since this capability was activated.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "coverage": {
+            "$ref": "#/$defs/Coverage"
+          }
+        },
+        "required": [
+          "coverage",
+          "changes"
+        ],
+        "title": "ClipboardState",
+        "type": "object"
+      },
+      "summary": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      }
+    },
     "display": {
       "state": {
         "$defs": {
@@ -334,6 +371,55 @@
           "remote_attachment"
         ],
         "title": "InteractiveSessionState",
+        "type": "object"
+      },
+      "summary": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    "virtualization": {
+      "state": {
+        "$defs": {
+          "Classification": {
+            "enum": [
+              "recognized_guest",
+              "recognized_physical_or_root",
+              "unknown"
+            ],
+            "type": "string"
+          },
+          "Hypervisor": {
+            "enum": [
+              "hyperv",
+              "vmware",
+              "virtualbox",
+              "parallels",
+              "qemu_kvm",
+              "apple_virtualization",
+              "xen",
+              "other",
+              "none_detected"
+            ],
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "classification": {
+            "$ref": "#/$defs/Classification"
+          },
+          "hypervisor": {
+            "$ref": "#/$defs/Hypervisor"
+          }
+        },
+        "required": [
+          "classification",
+          "hypervisor"
+        ],
+        "title": "VirtualizationState",
         "type": "object"
       },
       "summary": {
@@ -627,6 +713,62 @@
         ],
         "sensitive": true,
         "stability_ms": 2000
+      },
+      {
+        "app_conditions": false,
+        "categories": [],
+        "fields": [
+          {
+            "max": 1000000000,
+            "name": "clipboard.changes",
+            "type": "count"
+          }
+        ],
+        "id": "clipboard",
+        "permission_prompt": false,
+        "reasons": [
+          "clipboard.changed"
+        ],
+        "sensitive": false,
+        "stability_ms": 0
+      },
+      {
+        "app_conditions": false,
+        "categories": [],
+        "fields": [
+          {
+            "name": "virtualization.classification",
+            "type": "symbol",
+            "values": [
+              "recognized_guest",
+              "recognized_physical_or_root",
+              "unknown"
+            ]
+          },
+          {
+            "name": "virtualization.hypervisor",
+            "type": "symbol",
+            "values": [
+              "hyperv",
+              "vmware",
+              "virtualbox",
+              "parallels",
+              "qemu_kvm",
+              "apple_virtualization",
+              "xen",
+              "other",
+              "none_detected"
+            ]
+          }
+        ],
+        "id": "virtualization",
+        "permission_prompt": false,
+        "reasons": [
+          "virtualization.guest_detected",
+          "virtualization.physical_required"
+        ],
+        "sensitive": false,
+        "stability_ms": 0
       }
     ]
   }

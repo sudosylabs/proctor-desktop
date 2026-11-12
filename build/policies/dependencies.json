@@ -599,6 +599,66 @@
     },
     {
       "ecosystem": "cargo",
+      "package": "objc2-app-kit",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "AppKit bindings for the native agent on macOS: the general pasteboard change count only. Content, types and owner are never read.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-app-kit/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-app-kit",
+          "kind": "production",
+          "features": ["NSPasteboard", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent"],
+      "networkBehavior": "None; process-local Objective-C calls.",
+      "nativeBehavior": "Links the Objective-C runtime and the named system framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Adds objc2-foundation and block2 on macOS only; exact versions are locked and license checked.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written objc_msgSend declarations, as in the superseded crates, are untyped and easy to get wrong.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2",
+      "version": "0.6.5",
+      "kind": "production",
+      "purpose": "The Objective-C runtime bindings for the native agent on macOS: autorelease pools around framework calls made from polling threads.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2/0.6.5",
+      "license": "MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2",
+          "kind": "production",
+          "features": ["std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent"],
+      "networkBehavior": "None; process-local Objective-C calls.",
+      "nativeBehavior": "Links the Objective-C runtime and the named system framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Already present transitively through the objc2 framework crates; declaring it directly adds no new crate.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written objc_msgSend declarations, as in the superseded crates, are untyped and easy to get wrong.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
       "package": "objc2-core-foundation",
       "version": "0.3.2",
       "kind": "production",
@@ -686,6 +746,7 @@
             "Win32_Foundation",
             "Win32_Graphics_Dwm",
             "Win32_Graphics_Gdi",
+            "Win32_System_DataExchange",
             "Win32_System_RemoteDesktop",
             "Win32_System_Threading",
             "Win32_UI_WindowsAndMessaging",

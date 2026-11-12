@@ -351,3 +351,21 @@ mod session {
 }
 
 pub use session::session;
+
+/// The clipboard sequence number, which rises on every change. Content, formats and owner are never
+/// read. `None` when this session has no clipboard access.
+#[must_use]
+pub fn clipboard_change_count() -> Option<u64> {
+    // SAFETY: no preconditions; zero means the sequence number is not available.
+    let sequence = unsafe { windows::Win32::System::DataExchange::GetClipboardSequenceNumber() };
+    (sequence != 0).then_some(u64::from(sequence))
+}
+
+/// Virtualization evidence from CPUID. On ARM64 Windows there is no CPUID, so it is unprobed.
+#[must_use]
+pub fn virtualization() -> crate::RawVirtualization {
+    #[cfg(target_arch = "x86_64")]
+    return crate::cpuid_virtualization();
+    #[cfg(not(target_arch = "x86_64"))]
+    crate::RawVirtualization::unprobed()
+}

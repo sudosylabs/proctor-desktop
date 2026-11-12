@@ -341,3 +341,147 @@ mod session {
 }
 
 pub use session::session;
+
+/// The general pasteboard's change count. Content, types and owner are never read.
+#[must_use]
+pub fn clipboard_change_count() -> Option<u64> {
+    objc2::rc::autoreleasepool(|_| {
+        let pasteboard = objc2_app_kit::NSPasteboard::generalPasteboard();
+        u64::try_from(pasteboard.changeCount()).ok()
+    })
+}
+
+fn sysctl_text(name: &std::ffi::CStr) -> Option<String> {
+    let mut length = 0_usize;
+    // SAFETY: querying the length with a null buffer is the documented first step.
+    let sized = unsafe {
+        libc::sysctlbyname(
+            name.as_ptr(),
+            std::ptr::null_mut(),
+            &raw mut length,
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+    if sized != 0 || length == 0 || length > 256 {
+        return None;
+    }
+    let mut buffer = vec![0_u8; length];
+    // SAFETY: `buffer` holds `length` writable bytes, as the size query reported.
+    let read = unsafe {
+        libc::sysctlbyname(
+            name.as_ptr(),
+            buffer.as_mut_ptr().cast(),
+            &raw mut length,
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+    if read != 0 {
+        return None;
+    }
+    buffer.truncate(length);
+    let text = buffer.split(|byte| *byte == 0).next().unwrap_or_default();
+    String::from_utf8(text.to_vec()).ok()
+}
+
+fn sysctl_int(name: &std::ffi::CStr) -> Option<i32> {
+    let mut value = 0_i32;
+    let mut length = size_of::<i32>();
+    // SAFETY: `value` is a writable `i32` of exactly `length` bytes.
+    let read = unsafe {
+        libc::sysctlbyname(
+            name.as_ptr(),
+            (&raw mut value).cast(),
+            &raw mut length,
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+    (read == 0 && length == size_of::<i32>()).then_some(value)
+}
+
+/// Virtualization evidence: the kernel's VMM-present flag and the hardware model. A real
+/// Apple-silicon model (`Mac<major>,<minor>`) with no VMM flag is positive physical evidence.
+#[must_use]
+pub fn virtualization() -> crate::RawVirtualization {
+    use crate::{RawHypervisor, RawVirtualization};
+    let Some(vmm) = sysctl_int(c"kern.hv_vmm_present") else {
+        return RawVirtualization::unprobed();
+    };
+    let model = sysctl_text(c"hw.model").unwrap_or_default();
+    if vmm == 1 {
+        let family = if model.starts_with("VirtualMac") {
+            RawHypervisor::AppleVirtualization
+        } else if model.starts_with("VMware") {
+            RawHypervisor::Vmware
+        } else if model.starts_with("Parallels") {
+            RawHypervisor::Parallels
+        } else {
+            RawHypervisor::Other
+        };
+        return RawVirtualization {
+            probed: true,
+            guest_of: family,
+            physical_or_root: false,
+        };
+    }
+    let apple_silicon_model = cfg!(target_arch = "aarch64") && is_apple_hardware_model(&model);
+    RawVirtualization {
+        probed: true,
+        guest_of: RawHypervisor::None,
+        physical_or_root: apple_silicon_model,
+    }
+}
+
+/// Whether `model` is an Apple hardware model identifier: a family (`Mac`, `MacBookPro`,
+/// `MacBookAir`, `Macmini`, `iMac`, `MacPro`) followed by `<major>,<minor>`. Apple's virtualization
+/// framework reports `VirtualMac…`, which does not match.
+#[must_use]
+pub fn is_apple_hardware_model(model: &str) -> bool {
+    const FAMILIES: [&str; 6] = [
+        "MacBookPro",
+        "MacBookAir",
+        "Macmini",
+        "MacPro",
+        "iMac",
+        "Mac",
+    ];
+    let digits = |text: &str| !text.is_empty() && text.bytes().all(|byte| byte.is_ascii_digit());
+    FAMILIES.iter().any(|family| {
+        model
+            .strip_prefix(family)
+            .and_then(|rest| rest.split_once(','))
+            .is_some_and(|(major, minor)| digits(major) && digits(minor))
+    })
+}
+
+#[cfg(test)]
+mod model_tests {
+    use super::is_apple_hardware_model;
+
+    #[test]
+    fn apple_hardware_models_are_recognized_and_virtual_ones_are_not() {
+        for model in [
+            "Macmini9,1",
+            "MacBookPro18,3",
+            "MacBookAir10,1",
+            "iMac21,1",
+            "Mac14,2",
+            "MacPro7,1",
+        ] {
+            assert!(is_apple_hardware_model(model), "{model}");
+        }
+        for model in [
+            "VirtualMac2,1",
+            "VMware7,1",
+            "Parallels-ARM",
+            "Mac",
+            "Macmini9",
+            "MacBookPro,1",
+            "",
+        ] {
+            assert!(!is_apple_hardware_model(model), "{model}");
+        }
+    }
+}

@@ -3,8 +3,11 @@
 #![forbid(unsafe_code)]
 
 pub mod candidate_window;
+pub mod clipboard;
 pub mod display;
 pub mod interactive_session;
+mod poller;
+pub mod virtualization;
 
 use prctr_core::{Registry, Source};
 use serde_json::{Value, json};
@@ -16,6 +19,8 @@ pub fn sources() -> Vec<Box<dyn Source>> {
         Box::new(display::DisplaySource::new()),
         Box::new(candidate_window::CandidateWindowSource::new()),
         Box::new(interactive_session::InteractiveSessionSource::new()),
+        Box::new(clipboard::ClipboardSource::new()),
+        Box::new(virtualization::VirtualizationSource),
     ]
 }
 
@@ -27,6 +32,8 @@ pub fn registry() -> Registry {
             display::descriptor(),
             candidate_window::descriptor(),
             interactive_session::descriptor(),
+            clipboard::descriptor(),
+            virtualization::descriptor(),
         ],
         baseline_rules: vec![
             display::baseline_rule(),
@@ -54,6 +61,14 @@ pub fn registry_json() -> Value {
             },
             interactive_session::CAPABILITY: {
                 "state": schema(schemars::schema_for!(interactive_session::InteractiveSessionState)),
+                "summary": { "type": "object", "additionalProperties": false, "properties": {} },
+            },
+            clipboard::CAPABILITY: {
+                "state": schema(schemars::schema_for!(clipboard::ClipboardState)),
+                "summary": { "type": "object", "additionalProperties": false, "properties": {} },
+            },
+            virtualization::CAPABILITY: {
+                "state": schema(schemars::schema_for!(virtualization::VirtualizationState)),
                 "summary": { "type": "object", "additionalProperties": false, "properties": {} },
             }
         }

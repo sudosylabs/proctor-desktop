@@ -212,15 +212,23 @@ reconciled, or becomes an explicit gap. Proctor never kills an application.
 candidate did. The CandidateWindow's private clipboard is an effect, not a fact: it never reads or
 writes the host clipboard and is erased at departure.
 
-**State.** `coverage` (notifications, counter_polling, unavailable), `certainty`, `change_counter`.
-There is no list of entries; content, formats and owner are never read.
+**State.** `coverage` (counter_polling, unavailable) and `changes`: host clipboard changes since
+activation. There is no list of entries; content, formats and owner are never read. When the counter
+is unavailable the `clipboard.changes` field is left out, never reported as zero.
 
-**Changes.** `clipboard_changed` with the new state and the number of changes since the previous
-one.
+**Changes.** The new state on every change; the difference between two facts is the number of changes
+between them.
 
-**Platforms.** Windows: clipboard format listener plus sequence number (complete). macOS: the
-pasteboard change count, polled; this is complete for the capability because macOS has no change
-notification. Linux: X11 selection notifications; Wayland unavailable.
+**Platforms.** Both certified targets keep a counter that rises on every change, polled every 250 ms,
+so no change is missed:
+
+- **Windows:** the clipboard sequence number (complete).
+- **macOS:** the pasteboard change count (complete; macOS has no change notification).
+- **Linux:** unavailable for now (X11 selection notifications are not implemented; Wayland has no
+  generic API).
+
+**Rules.** Observe-only: there is no baseline rule, and an exam rule on `clipboard.changes` never
+contains.
 
 ## Printing
 
@@ -275,11 +283,20 @@ none_detected).
 **Rules.** `block_recognized_guest` blocks only a recognized guest; `require_certified_physical_environment`
 admits only `recognized_physical_or_root`, so unknown blocks.
 
-**Platforms.** Windows: CPUID hypervisor bit and vendor, the Hyper-V privilege leaf (a physical host
-with Hyper-V or VBS is the root partition, not a guest), SMBIOS manufacturer/product. macOS: the
-kernel's VMM-present flag, the hardware model (Apple's virtualization framework reports a virtual
-model) and the platform vendor; to be proved across Parallels, VMware Fusion and UTM. Linux: DMI and
-CPUID; never proves physical.
+**Certainty.** A probe that ran is complete certainty; the classification itself says how much the
+evidence proves. That is why a clean machine meets `block_recognized_guest` while
+`require_certified_physical_environment` still needs positive physical evidence.
+
+**Platforms.**
+
+- **Windows:** CPUID: the hypervisor bit, the vendor leaf, and the Hyper-V privilege leaf. A physical
+  host with Hyper-V or VBS is the root partition, not a guest. Without a hypervisor bit the result is
+  unknown, never physical. SMBIOS manufacturer and product are not read yet.
+- **macOS:** the kernel's VMM-present flag and the hardware model. Positive physical evidence is an
+  Apple hardware model (`Mac`, `MacBookPro`, `MacBookAir`, `Macmini`, `iMac`, `MacPro` followed by
+  `<major>,<minor>`) on Apple silicon with no VMM flag; Apple's virtualization framework reports
+  `VirtualMac…`. Still to be proved across Parallels, VMware Fusion and UTM.
+- **Linux:** DMI vendor and product, then CPUID; it recognises guests but never proves physical.
 
 ## Network configuration
 

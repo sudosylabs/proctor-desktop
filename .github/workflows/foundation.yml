@@ -94,6 +94,9 @@ jobs:
         run: npm ci
       - name: Verify native target
         run: npm run test:native
+        env:
+          # The runner's clipboard is disposable, so the real clipboard write test runs here.
+          PRCTR_ALLOW_CLIPBOARD_WRITE: '1'
       - name: Prepare pinned Electron runtime
         if: matrix.electron
         run: npm run setup
