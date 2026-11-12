@@ -88,6 +88,7 @@ const icons = {
 	'status.locked': 'lock-simple',
 	'status.offline': 'cloud-slash',
 	'status.saved': 'cloud-check',
+	'status.skipped': 'minus-circle',
 	'status.saving': 'cloud-arrow-up',
 	'status.success': 'check-circle',
 	'status.time': 'clock',

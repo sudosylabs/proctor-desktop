@@ -65,6 +65,7 @@ const regular = [
 	'magnifying-glass-plus',
 	'map-pin',
 	'minus',
+	'minus-circle',
 	'monitor',
 	'moon',
 	'palette',

@@ -441,6 +441,11 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		);
 	}
 
+	/** How many the list holds, from its first page, when the server counts it. */
+	get totalCount(): { readonly count: number; readonly atLeast: boolean } | undefined {
+		return this.total;
+	}
+
 	/** Focuses the checkbox that chooses the whole page. */
 	focusPageAll(): void {
 		this.pageAll?.focus();

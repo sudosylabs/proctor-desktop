@@ -4491,6 +4491,12 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.failure.accesschanged": {
+      "message": "Your access changed since this check. Nothing has changed; check again.",
+      "description": "A change for everyone whose check no longer matches the viewer's access.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.failure.cancelled": {
       "message": "Cancelled.",
       "description": "The person cancelled a confirmation.",
@@ -9216,6 +9222,94 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
+    "administration.users.everyone.checkwho": {
+      "message": "Check who changes",
+      "description": "Asks the server to check everyone matching before anything changes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.disableeveryone": {
+      "message": "Disable everyone matching?",
+      "description": "Title of the check for disabling everyone matching.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.enableeveryone": {
+      "message": "Enable everyone matching?",
+      "description": "Title of the check for enabling everyone matching.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.enroleveryonein": {
+      "message": "Enrol everyone matching in {where}?",
+      "description": "Title of the check for enrolling everyone matching in a class.",
+      "placeholders": [
+        "where"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.enroleveryonetitle": {
+      "message": "Enrol everyone matching in a class",
+      "description": "Title of choosing the class for everyone the filters match.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.enrolin": {
+      "message": "Enrol in {where}",
+      "description": "The change a check is for: an enrolment in a class.",
+      "placeholders": [
+        "where"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.granteveryone": {
+      "message": "Grant {where} to everyone matching?",
+      "description": "Title of the check for granting a role to everyone matching.",
+      "placeholders": [
+        "where"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.granteveryonetitle": {
+      "message": "Grant a role to everyone matching",
+      "description": "Title of choosing the role for everyone the filters match.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.grantrole": {
+      "message": "Grant {where}",
+      "description": "The change a check is for: a role.",
+      "placeholders": [
+        "where"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.nofilter": {
+      "message": "Everyone",
+      "description": "The filters of a change for everyone when none is set.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.signoutconfirm": {
+      "message": "Sign {count} people out",
+      "description": "Confirms signing everyone matching out everywhere.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.signoutconfirmone": {
+      "message": "Sign 1 person out",
+      "description": "Confirms signing one person out everywhere.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.everyone.signouteveryone": {
+      "message": "Sign everyone matching out everywhere?",
+      "description": "Title of the check for signing everyone matching out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
     "administration.users.filter.active.any": {
       "message": "Any time",
       "description": "Users filter choice: no filter on when people were last active.",
@@ -9312,6 +9406,221 @@
     "administration.users.no.role": {
       "message": "—",
       "description": "A person who holds no role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.allmatching": {
+      "message": "All {count} matching",
+      "description": "The selection bar once everyone matching is chosen.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.body": {
+      "message": "{count} people match your filters. Proctor checks each of them before anything changes.",
+      "description": "Description of a change for everyone matching.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.change": {
+      "message": "Change",
+      "description": "Label of what a check would do.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.checkagain": {
+      "message": "Check again",
+      "description": "Runs the check again with the same filters.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.checked": {
+      "message": "Checked",
+      "description": "Label of when a check was made.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.checkedvalue": {
+      "message": "{when} · {count} people",
+      "description": "When a check was made and how many it matched.",
+      "placeholders": [
+        "when",
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.checking": {
+      "message": "Checking…",
+      "description": "The confirming button while the server checks everyone.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.checkingbody": {
+      "message": "Checking {count} people…",
+      "description": "While the server checks everyone the filter matches.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.expiredbody": {
+      "message": "Proctor checks who would change and holds the result for 15 minutes, so that what you approve is what happens. Nothing has changed.",
+      "description": "Why a check expires.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.expirednote": {
+      "message": "Checking again uses the same filters. The numbers may differ.",
+      "description": "Footnote of an expired check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.expiredtitle": {
+      "message": "This check has expired",
+      "description": "Title once a check is older than 15 minutes.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.filters": {
+      "message": "Filters",
+      "description": "Label of the filters a check used.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.holds": {
+      "message": "This check holds for 15 minutes. The change runs as a job; Jobs shows its progress.",
+      "description": "Footnote of a ready check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.leftasis": {
+      "message": "Left as they are",
+      "description": "Second line of people who are left unchanged.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.lostbody": {
+      "message": "These filters now reach people you can no longer change, so this check can’t be used. Nothing has changed.",
+      "description": "Why a check can no longer be used.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.lostnote": {
+      "message": "Checking again shows only the people your access covers now.",
+      "description": "Footnote of a check whose access changed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.losttitle": {
+      "message": "Your access changed since this check",
+      "description": "Title once the viewer’s access no longer covers the filter.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.morewho": {
+      "message": "And more",
+      "description": "After the first names of a group.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.noop": {
+      "message": "{count} are already so",
+      "description": "People the change would leave unchanged.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.running": {
+      "message": "The change is running as a job. Jobs shows its progress.",
+      "description": "Toast once a change for everyone was sent.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.selectallmatching": {
+      "message": "Select all {count} matching these filters",
+      "description": "Link in the selection bar once a whole page is chosen.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.showwho": {
+      "message": "Show who",
+      "description": "Lists the people in one group of a check.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.skipambiguous": {
+      "message": "{count} couldn’t be decided",
+      "description": "People the server couldn’t classify.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.skipambiguousdetail": {
+      "message": "Left out; change them one by one",
+      "description": "What to do about undecided people.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.skipconflict": {
+      "message": "{count} are already enrolled or can’t be",
+      "description": "People an enrolment conflicts with.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.skipnotstudents": {
+      "message": "{count} aren’t students here",
+      "description": "People who need a student affiliation first.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.skipnotstudentsdetail": {
+      "message": "Only students can be enrolled",
+      "description": "Why people without a student affiliation are left out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.skipself": {
+      "message": "Your own account",
+      "description": "A change for everyone never includes the viewer.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.skipsystem": {
+      "message": "{count} system administrators",
+      "description": "System administrators are never changed for everyone.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.skipsystemdetail": {
+      "message": "Never changed by a change for everyone",
+      "description": "Why system administrators are left out.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.willchange": {
+      "message": "{count} people change",
+      "description": "How many people the change applies to.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.preview.willchangedetail": {
+      "message": "Each on their own, as a job",
+      "description": "Second line of the people who change.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },

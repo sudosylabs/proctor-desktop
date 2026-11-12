@@ -330,6 +330,235 @@ export const usersMessages = Object.freeze({
 		defaultMessage: 'Leave out {name}',
 		description: 'Accessible name of the × on a person chip in a change for several people.'
 	}),
+	previewChecking: defineMessage({
+		id: 'administration.users.preview.checking',
+		defaultMessage: 'Checking…',
+		description: 'The confirming button while the server checks everyone.'
+	}),
+	previewRunning: defineMessage({
+		id: 'administration.users.preview.running',
+		defaultMessage: 'The change is running as a job. Jobs shows its progress.',
+		description: 'Toast once a change for everyone was sent.'
+	}),
+	previewBody: defineMessage({
+		id: 'administration.users.preview.body',
+		defaultMessage:
+			'{count} people match your filters. Proctor checks each of them before anything changes.',
+		description: 'Description of a change for everyone matching.'
+	}),
+	previewCheckingBody: defineMessage({
+		id: 'administration.users.preview.checkingbody',
+		defaultMessage: 'Checking {count} people…',
+		description: 'While the server checks everyone the filter matches.'
+	}),
+	previewWillChange: defineMessage({
+		id: 'administration.users.preview.willchange',
+		defaultMessage: '{count} people change',
+		description: 'How many people the change applies to.'
+	}),
+	previewWillChangeDetail: defineMessage({
+		id: 'administration.users.preview.willchangedetail',
+		defaultMessage: 'Each on their own, as a job',
+		description: 'Second line of the people who change.'
+	}),
+	previewNoOp: defineMessage({
+		id: 'administration.users.preview.noop',
+		defaultMessage: '{count} are already so',
+		description: 'People the change would leave unchanged.'
+	}),
+	previewLeftAsIs: defineMessage({
+		id: 'administration.users.preview.leftasis',
+		defaultMessage: 'Left as they are',
+		description: 'Second line of people who are left unchanged.'
+	}),
+	previewSkipSelf: defineMessage({
+		id: 'administration.users.preview.skipself',
+		defaultMessage: 'Your own account',
+		description: 'A change for everyone never includes the viewer.'
+	}),
+	previewSkipConflict: defineMessage({
+		id: 'administration.users.preview.skipconflict',
+		defaultMessage: '{count} are already enrolled or can’t be',
+		description: 'People an enrolment conflicts with.'
+	}),
+	previewSkipNotStudents: defineMessage({
+		id: 'administration.users.preview.skipnotstudents',
+		defaultMessage: '{count} aren’t students here',
+		description: 'People who need a student affiliation first.'
+	}),
+	previewSkipNotStudentsDetail: defineMessage({
+		id: 'administration.users.preview.skipnotstudentsdetail',
+		defaultMessage: 'Only students can be enrolled',
+		description: 'Why people without a student affiliation are left out.'
+	}),
+	previewSkipSystem: defineMessage({
+		id: 'administration.users.preview.skipsystem',
+		defaultMessage: '{count} system administrators',
+		description: 'System administrators are never changed for everyone.'
+	}),
+	previewSkipSystemDetail: defineMessage({
+		id: 'administration.users.preview.skipsystemdetail',
+		defaultMessage: 'Never changed by a change for everyone',
+		description: 'Why system administrators are left out.'
+	}),
+	previewSkipAmbiguous: defineMessage({
+		id: 'administration.users.preview.skipambiguous',
+		defaultMessage: '{count} couldn’t be decided',
+		description: 'People the server couldn’t classify.'
+	}),
+	previewSkipAmbiguousDetail: defineMessage({
+		id: 'administration.users.preview.skipambiguousdetail',
+		defaultMessage: 'Left out; change them one by one',
+		description: 'What to do about undecided people.'
+	}),
+	previewShowWho: defineMessage({
+		id: 'administration.users.preview.showwho',
+		defaultMessage: 'Show who',
+		description: 'Lists the people in one group of a check.'
+	}),
+	previewMoreWho: defineMessage({
+		id: 'administration.users.preview.morewho',
+		defaultMessage: 'And more',
+		description: 'After the first names of a group.'
+	}),
+	previewHolds: defineMessage({
+		id: 'administration.users.preview.holds',
+		defaultMessage:
+			'This check holds for 15 minutes. The change runs as a job; Jobs shows its progress.',
+		description: 'Footnote of a ready check.'
+	}),
+	previewCheckAgain: defineMessage({
+		id: 'administration.users.preview.checkagain',
+		defaultMessage: 'Check again',
+		description: 'Runs the check again with the same filters.'
+	}),
+	previewExpiredTitle: defineMessage({
+		id: 'administration.users.preview.expiredtitle',
+		defaultMessage: 'This check has expired',
+		description: 'Title once a check is older than 15 minutes.'
+	}),
+	previewExpiredBody: defineMessage({
+		id: 'administration.users.preview.expiredbody',
+		defaultMessage:
+			'Proctor checks who would change and holds the result for 15 minutes, so that what you approve is what happens. Nothing has changed.',
+		description: 'Why a check expires.'
+	}),
+	previewExpiredNote: defineMessage({
+		id: 'administration.users.preview.expirednote',
+		defaultMessage: 'Checking again uses the same filters. The numbers may differ.',
+		description: 'Footnote of an expired check.'
+	}),
+	previewLostTitle: defineMessage({
+		id: 'administration.users.preview.losttitle',
+		defaultMessage: 'Your access changed since this check',
+		description: 'Title once the viewer’s access no longer covers the filter.'
+	}),
+	previewLostBody: defineMessage({
+		id: 'administration.users.preview.lostbody',
+		defaultMessage:
+			'These filters now reach people you can no longer change, so this check can’t be used. Nothing has changed.',
+		description: 'Why a check can no longer be used.'
+	}),
+	previewLostNote: defineMessage({
+		id: 'administration.users.preview.lostnote',
+		defaultMessage: 'Checking again shows only the people your access covers now.',
+		description: 'Footnote of a check whose access changed.'
+	}),
+	previewChange: defineMessage({
+		id: 'administration.users.preview.change',
+		defaultMessage: 'Change',
+		description: 'Label of what a check would do.'
+	}),
+	previewFilters: defineMessage({
+		id: 'administration.users.preview.filters',
+		defaultMessage: 'Filters',
+		description: 'Label of the filters a check used.'
+	}),
+	previewChecked: defineMessage({
+		id: 'administration.users.preview.checked',
+		defaultMessage: 'Checked',
+		description: 'Label of when a check was made.'
+	}),
+	previewCheckedValue: defineMessage({
+		id: 'administration.users.preview.checkedvalue',
+		defaultMessage: '{when} · {count} people',
+		description: 'When a check was made and how many it matched.'
+	}),
+	usersSelectAllMatching: defineMessage({
+		id: 'administration.users.preview.selectallmatching',
+		defaultMessage: 'Select all {count} matching these filters',
+		description: 'Link in the selection bar once a whole page is chosen.'
+	}),
+	usersAllMatching: defineMessage({
+		id: 'administration.users.preview.allmatching',
+		defaultMessage: 'All {count} matching',
+		description: 'The selection bar once everyone matching is chosen.'
+	}),
+	bulkSignOutConfirm: defineMessage({
+		id: 'administration.users.everyone.signoutconfirm',
+		defaultMessage: 'Sign {count} people out',
+		description: 'Confirms signing everyone matching out everywhere.'
+	}),
+	bulkSignOutConfirmOne: defineMessage({
+		id: 'administration.users.everyone.signoutconfirmone',
+		defaultMessage: 'Sign 1 person out',
+		description: 'Confirms signing one person out everywhere.'
+	}),
+	bulkEnrolEveryoneTitle: defineMessage({
+		id: 'administration.users.everyone.enroleveryonetitle',
+		defaultMessage: 'Enrol everyone matching in a class',
+		description: 'Title of choosing the class for everyone the filters match.'
+	}),
+	bulkGrantEveryoneTitle: defineMessage({
+		id: 'administration.users.everyone.granteveryonetitle',
+		defaultMessage: 'Grant a role to everyone matching',
+		description: 'Title of choosing the role for everyone the filters match.'
+	}),
+	bulkCheckWho: defineMessage({
+		id: 'administration.users.everyone.checkwho',
+		defaultMessage: 'Check who changes',
+		description: 'Asks the server to check everyone matching before anything changes.'
+	}),
+	bulkEnrolEveryoneIn: defineMessage({
+		id: 'administration.users.everyone.enroleveryonein',
+		defaultMessage: 'Enrol everyone matching in {where}?',
+		description: 'Title of the check for enrolling everyone matching in a class.'
+	}),
+	bulkEnrolIn: defineMessage({
+		id: 'administration.users.everyone.enrolin',
+		defaultMessage: 'Enrol in {where}',
+		description: 'The change a check is for: an enrolment in a class.'
+	}),
+	bulkGrantEveryone: defineMessage({
+		id: 'administration.users.everyone.granteveryone',
+		defaultMessage: 'Grant {where} to everyone matching?',
+		description: 'Title of the check for granting a role to everyone matching.'
+	}),
+	bulkGrantRole: defineMessage({
+		id: 'administration.users.everyone.grantrole',
+		defaultMessage: 'Grant {where}',
+		description: 'The change a check is for: a role.'
+	}),
+	bulkSignOutEveryone: defineMessage({
+		id: 'administration.users.everyone.signouteveryone',
+		defaultMessage: 'Sign everyone matching out everywhere?',
+		description: 'Title of the check for signing everyone matching out.'
+	}),
+	bulkDisableEveryone: defineMessage({
+		id: 'administration.users.everyone.disableeveryone',
+		defaultMessage: 'Disable everyone matching?',
+		description: 'Title of the check for disabling everyone matching.'
+	}),
+	bulkEnableEveryone: defineMessage({
+		id: 'administration.users.everyone.enableeveryone',
+		defaultMessage: 'Enable everyone matching?',
+		description: 'Title of the check for enabling everyone matching.'
+	}),
+	usersEveryone: defineMessage({
+		id: 'administration.users.everyone.nofilter',
+		defaultMessage: 'Everyone',
+		description: 'The filters of a change for everyone when none is set.'
+	}),
 	bulkPeople: defineMessage({
 		id: 'administration.bulk.people',
 		defaultMessage: 'People',

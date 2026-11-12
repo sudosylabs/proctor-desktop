@@ -269,6 +269,11 @@ const sharedMessages = Object.freeze({
 		defaultMessage: '{count} emails not delivered',
 		description: 'Spoken name of the sidebar count beside Mail.'
 	}),
+	failureAccessChanged: defineMessage({
+		id: 'administration.failure.accesschanged',
+		defaultMessage: 'Your access changed since this check. Nothing has changed; check again.',
+		description: "A change for everyone whose check no longer matches the viewer's access."
+	}),
 	pageUnavailable: defineMessage({
 		id: 'administration.page.unavailable',
 		defaultMessage: 'This Administration page could not be opened.',

@@ -71,7 +71,12 @@ class FakeAdministration implements AdministrationClient {
 					start + intent.limit < matching.length
 						? `page-${start + intent.limit}`
 						: undefined;
-				return data('users', { items, ...(next === undefined ? {} : { cursor: next }) });
+				return data('users', {
+					items,
+					...(next === undefined ? {} : { cursor: next }),
+					// The server counts the first page only.
+					...(start === 0 ? { total: matching.length } : {})
+				});
 			}
 			case 'user': {
 				const found = this.people.find((person) => person.id === intent.id);
@@ -227,6 +232,25 @@ export async function runAdministrationTests(document: Document): Promise<void> 
 			rows()[0]?.textContent?.includes('Person 11'),
 			'The second page starts after the first'
 		);
+
+		// A whole page chosen from a longer list offers everyone matching; nothing is sent.
+		root.querySelector<HTMLInputElement>('thead .prctr-admin-list__select')!.click();
+		const link = (): HTMLButtonElement | null =>
+			root.querySelector<HTMLButtonElement>('.prctr-admin-filters__link:not([hidden])');
+		await wait(() => link() !== null, 'select all matching link');
+		check(
+			link()!.textContent === 'Select all 14 matching these filters',
+			'The link names everyone the filters match'
+		);
+		const before = administration.intents.length;
+		link()!.click();
+		await wait(
+			() => visibleText('.prctr-admin-filters__count').join() === 'All 14 matching',
+			'everyone chosen'
+		);
+		check(administration.intents.length === before, 'Choosing everyone sends nothing');
+		button('Clear selection')!.click();
+		await wait(() => link() === null, 'selection cleared');
 
 		// Search reads from the first page with the query.
 		const search = root.querySelector<HTMLInputElement>('input[type="search"]')!;

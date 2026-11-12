@@ -50,6 +50,7 @@ const failureMessages: Readonly<Record<string, AdministrationText>> = Object.fre
 	noAccess: 'failureNoAccess',
 	denied: 'failureNoAccess',
 	notFound: 'failureNotFound',
+	accessChanged: 'failureAccessChanged',
 	reauthenticationRequired: 'failureReauthentication',
 	strongRequired: 'failureStrong',
 	strongAuthenticationRequired: 'failureStrong',

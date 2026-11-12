@@ -6,7 +6,11 @@ import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.
 import type { SelectControl } from '../../../../base/browser/ui/select/selectControl.js';
 import { Disposable, MutableDisposable } from '../../../../base/common/lifecycle.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
-import { affiliationKinds } from '../../../../platform/administration/common/administrationProtocol.js';
+import {
+	ADMINISTRATION_PAGE_SIZE,
+	affiliationKinds,
+	type AdministrationIntentOf
+} from '../../../../platform/administration/common/administrationProtocol.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
 import type { ProctorIconId } from '../../../../platform/theme/common/proctorIcons.js';
 import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
@@ -23,7 +27,6 @@ import {
 	type AdminListQuery
 } from '../widgets/adminList.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
-import { ADMINISTRATION_PAGE_SIZE } from '../../../../platform/administration/common/administrationProtocol.js';
 import { BulkUserChanges } from './bulkUserChanges.js';
 import { AdminMenuButton } from '../widgets/adminMenuButton.js';
 import { UserActions, type AdminUser } from './userActions.js';
@@ -52,6 +55,11 @@ export class UsersPage extends Disposable implements PageView {
 	private readonly unit: SelectControl<string>;
 	private readonly status: SelectControl<Status>;
 	private readonly role: SelectControl<string>;
+	private readonly search: HTMLInputElement;
+	private readonly affiliation: SelectControl<AffiliationKind | typeof ANY>;
+	private readonly lastActive: SelectControl<LastActive>;
+	/** Everyone the filters match is chosen, not only the page shown. */
+	private everyoneChosen = false;
 	private readonly bulk: BulkUserChanges;
 	private enableButton: ButtonControl | undefined;
 	private disableButton: ButtonControl | undefined;
@@ -91,7 +99,7 @@ export class UsersPage extends Disposable implements PageView {
 
 		this.filters = this._register(new AdminFilters(body));
 		const filters = this.filters;
-		filters.addSearch(format.text('usersFind'), (q) => this.setQuery({ q }));
+		this.search = filters.addSearch(format.text('usersFind'), (q) => this.setQuery({ q }));
 		this.status = filters.addSelect<Status>(
 			format.text('usersStatus'),
 			'status.success',
@@ -105,7 +113,7 @@ export class UsersPage extends Disposable implements PageView {
 						: { state: undefined, includeDisabled: status === 'any' ? true : undefined }
 				)
 		);
-		filters.addSelect<AffiliationKind | typeof ANY>(
+		this.affiliation = filters.addSelect<AffiliationKind | typeof ANY>(
 			format.text('usersAffiliation'),
 			'admin.roles',
 			[
@@ -133,7 +141,7 @@ export class UsersPage extends Disposable implements PageView {
 			(role) => this.setQuery({ roleIds: role === ANY ? undefined : [role] }),
 			true
 		);
-		filters.addSelect<LastActive>(
+		this.lastActive = filters.addSelect<LastActive>(
 			format.text('usersColumnLastActive'),
 			'status.time',
 			[
@@ -307,7 +315,8 @@ export class UsersPage extends Disposable implements PageView {
 			label: string,
 			icon: ProctorIconId,
 			run: (users: readonly AdminUser[]) => void,
-			variant: 'secondary' | 'dangerGhost' = 'secondary'
+			variant: 'secondary' | 'dangerGhost' = 'secondary',
+			everyone?: 'enrol' | 'grant' | 'signOut' | 'disable' | 'enable'
 		): ButtonControl => {
 			const control = this._register(
 				new ButtonControl(host, {
@@ -317,11 +326,29 @@ export class UsersPage extends Disposable implements PageView {
 					icon: proctorIconFactory(icon, 14)
 				})
 			);
-			this._register(control.onDidRequest(() => run(this.list.selection)));
+			this._register(
+				control.onDidRequest(() =>
+					this.everyoneChosen && everyone !== undefined
+						? this.changeEveryone(everyone)
+						: run(this.list.selection)
+				)
+			);
 			return control;
 		};
-		button(format.text('usersBulkEnrol'), 'object.student', (users) => this.bulk.enrol(users));
-		button(format.text('usersBulkGrant'), 'admin.roles', (users) => this.bulk.grant(users));
+		button(
+			format.text('usersBulkEnrol'),
+			'object.student',
+			(users) => this.bulk.enrol(users),
+			'secondary',
+			'enrol'
+		);
+		button(
+			format.text('usersBulkGrant'),
+			'admin.roles',
+			(users) => this.bulk.grant(users),
+			'secondary',
+			'grant'
+		);
 		// The less used changes give way to ⋯ when the bar is narrow, so it never wraps.
 		const signOut = (users: readonly AdminUser[]): void => this.bulk.signOut(users);
 		const enable = (users: readonly AdminUser[]): void =>
@@ -331,15 +358,24 @@ export class UsersPage extends Disposable implements PageView {
 		button(
 			format.text('usersBulkSignOut'),
 			'action.signOut',
-			signOut
+			signOut,
+			'secondary',
+			'signOut'
 		).element.dataset.secondary = 'true';
-		this.enableButton = button(format.text('usersBulkEnable'), 'action.enable', enable);
+		this.enableButton = button(
+			format.text('usersBulkEnable'),
+			'action.enable',
+			enable,
+			'secondary',
+			'enable'
+		);
 		this.enableButton.element.dataset.secondary = 'true';
 		this.disableButton = button(
 			format.text('usersBulkDisable'),
 			'action.end',
 			disable,
-			'dangerGhost'
+			'dangerGhost',
+			'disable'
 		);
 		this.disableButton.element.dataset.secondary = 'true';
 		const more = this._register(
@@ -415,9 +451,37 @@ export class UsersPage extends Disposable implements PageView {
 
 	private showSelection(users: readonly AdminUser[]): void {
 		if (users.length === 0) {
+			this.everyoneChosen = false;
 			this.filters.setSelection(undefined);
+			this.filters.setSelectionLink(undefined);
 			return;
 		}
+		const total = this.list.totalCount;
+		if (this.everyoneChosen && total !== undefined) {
+			// Every change applies to everyone matching; the server checks each person first.
+			const all = this.format.count(total.count) + (total.atLeast ? '+' : '');
+			this.filters.setSelection(
+				this.format.text('usersAllMatching', { count: all }),
+				this.format.text('usersAllMatching', { count: all })
+			);
+			this.filters.setSelectionLink(undefined);
+			this.enableButton!.element.hidden = false;
+			this.disableButton!.element.hidden = false;
+			return;
+		}
+		// A whole page chosen from a longer list offers everyone the filters match.
+		const wholePage = users.length === this.list.rows.length;
+		this.filters.setSelectionLink(
+			wholePage && total !== undefined && total.count > users.length
+				? this.format.text('usersSelectAllMatching', {
+						count: this.format.count(total.count) + (total.atLeast ? '+' : '')
+					})
+				: undefined,
+			() => {
+				this.everyoneChosen = true;
+				this.showSelection(this.list.selection);
+			}
+		);
 		const count = this.format.count(users.length);
 		this.filters.setSelection(
 			users.length === 1
@@ -429,6 +493,53 @@ export class UsersPage extends Disposable implements PageView {
 		);
 		this.enableButton!.element.hidden = !users.some((user) => user.disabledAt !== undefined);
 		this.disableButton!.element.hidden = !users.some((user) => user.disabledAt === undefined);
+	}
+
+	/** Everyone the filters match, as the server's directory filter. */
+	private directoryFilter(): AdministrationIntentOf<'createAcademicPreview'>['filter'] {
+		const query = this.query;
+		return {
+			...(query.q === undefined ? {} : { q: query.q }),
+			...(query.affiliation === undefined ? {} : { affiliation: query.affiliation }),
+			...(query.academicUnitId === undefined ? {} : { academicUnitId: query.academicUnitId }),
+			...(query.roleIds === undefined ? {} : { roleIds: query.roleIds }),
+			// The list shows active accounts unless it was asked for every status.
+			...(query.state !== undefined
+				? { state: query.state }
+				: query.includeDisabled === true
+					? {}
+					: { state: 'active' as const }),
+			...(query.neverSignedIn === undefined ? {} : { neverSignedIn: query.neverSignedIn }),
+			...(query.lastActiveAfter === undefined
+				? {}
+				: { lastActiveAfter: query.lastActiveAfter }),
+			...(query.lastActiveBefore === undefined
+				? {}
+				: { lastActiveBefore: query.lastActiveBefore })
+		};
+	}
+
+	/** The filters in words, as the check of a change for everyone shows them. */
+	private filterWords(): string {
+		const chosen = <T extends string>(select: SelectControl<T>, none: T | ''): string[] =>
+			select.value === none || select.element.closest('[hidden]') !== null
+				? []
+				: [select.select.options[select.select.selectedIndex]?.textContent ?? ''];
+		const words = [
+			...(this.search.value.trim() === '' ? [] : [`“${this.search.value.trim()}”`]),
+			...chosen(this.status, ''),
+			...chosen(this.affiliation, ANY),
+			...chosen(this.unit, ANY),
+			...chosen(this.role, ANY),
+			...chosen(this.lastActive, 'any')
+		].filter((word) => word !== '');
+		return words.length === 0 ? this.format.text('usersEveryone') : words.join(' · ');
+	}
+
+	private changeEveryone(kind: 'enrol' | 'grant' | 'signOut' | 'disable' | 'enable'): void {
+		const total = this.list.totalCount;
+		if (total === undefined) return;
+		this.bulk.everyone(kind, this.directoryFilter(), total.count, this.filterWords());
 	}
 
 	private affiliationCell(user: AdminListItem<'users'>): AdminCell {

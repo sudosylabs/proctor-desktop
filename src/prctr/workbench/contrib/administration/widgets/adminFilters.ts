@@ -33,6 +33,8 @@ export class AdminFilters extends Disposable {
 	private readonly note: HTMLElement;
 	private readonly selection: HTMLElement;
 	private readonly selectionCount: HTMLElement;
+	private readonly selectionLink: HTMLButtonElement;
+	private linkRun: (() => void) | undefined;
 	private readonly more: {
 		readonly label: string;
 		readonly holder: HTMLElement;
@@ -49,10 +51,16 @@ export class AdminFilters extends Disposable {
 			attrs: { 'aria-live': 'polite' }
 		});
 		this.selectionActions = $('div.prctr-admin-filters__actions');
+		this.selectionLink = $('button.prctr-admin-filters__link', {
+			type: 'button',
+			hidden: true
+		});
+		this._register(addDisposableListener(this.selectionLink, 'click', () => this.linkRun?.()));
 		this.selection = $(
 			'div.prctr-admin-filters__selection',
 			{ attrs: { role: 'toolbar' } },
 			this.selectionCount,
+			this.selectionLink,
 			this.selectionActions
 		);
 		this.selection.hidden = true;
@@ -76,6 +84,13 @@ export class AdminFilters extends Disposable {
 		this.selection.hidden = !selecting;
 		this.selectionCount.textContent = count ?? '';
 		if (label !== undefined) this.selection.setAttribute('aria-label', label);
+	}
+
+	/** A link after the count, such as "Select all 1,284 matching these filters". */
+	setSelectionLink(text: string | undefined, run?: () => void): void {
+		this.selectionLink.textContent = text ?? '';
+		this.selectionLink.hidden = text === undefined;
+		this.linkRun = run;
 	}
 
 	/** A search field; `onChange` hears the settled text, or undefined once it is cleared. */

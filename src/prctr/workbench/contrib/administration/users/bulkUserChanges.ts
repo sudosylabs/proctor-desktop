@@ -38,12 +38,25 @@ import {
 import { AdminChips } from '../widgets/adminChips.js';
 import { adminField } from '../widgets/adminForm.js';
 import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
+import { FilterPreviewDialog } from './filterPreviewDialog.js';
 import './media/bulkUserChanges.css';
 
 type User = AdministrationValue<'user'>;
 type Batch = AdministrationIntentOf<'runAcademicBatch'>;
 
 const NONE = '';
+
+/** Everyone a filter matches, in place of chosen people: the dialog picks only the place. */
+interface EveryoneChoice {
+	readonly count: number;
+	choose(
+		place: Pick<
+			AdministrationIntentOf<'createAcademicPreview'>,
+			'operation' | 'scopeType' | 'scopeId' | 'roleId'
+		>,
+		where: string
+	): void;
+}
 const INSTITUTION = 'institution';
 
 /**
@@ -73,7 +86,8 @@ export class BulkUserChanges extends Disposable {
 			BulkPlaceDialog,
 			'enrol',
 			users,
-			(batch, people) => this.run(batch, people)
+			(batch, people) => this.run(batch, people),
+			undefined
 		);
 	}
 
@@ -82,7 +96,8 @@ export class BulkUserChanges extends Disposable {
 			BulkPlaceDialog,
 			'grant',
 			users,
-			(batch, people) => this.run(batch, people)
+			(batch, people) => this.run(batch, people),
+			undefined
 		);
 	}
 
@@ -119,6 +134,112 @@ export class BulkUserChanges extends Disposable {
 			confirmLabel: this.many(users.length, 'bulkEnableConfirm'),
 			confirmIcon: 'action.enable',
 			destructive: false
+		});
+	}
+
+	/**
+	 * A change for everyone the filters match, not only the people on the page. The server
+	 * checks each person first; the dialog says what would happen before anything changes.
+	 */
+	everyone(
+		kind: 'enrol' | 'grant' | 'signOut' | 'disable' | 'enable',
+		filter: AdministrationIntentOf<'createAcademicPreview'>['filter'],
+		count: number,
+		filters: string
+	): void {
+		const preview = (
+			place: Pick<
+				AdministrationIntentOf<'createAcademicPreview'>,
+				'operation' | 'scopeType' | 'scopeId' | 'roleId'
+			>,
+			title: string,
+			change: string,
+			confirm: AdministrationText,
+			icon:
+				'action.invite' | 'admin.roles' | 'action.signOut' | 'action.end' | 'action.enable',
+			destructive: boolean
+		): void => {
+			this.dialog.value = this.instantiationService.createInstance(FilterPreviewDialog, {
+				create: { kind: 'createAcademicPreview', ...place, filter },
+				matching: count,
+				title,
+				change,
+				filters,
+				confirmLabel: (people) => this.many(people, confirm),
+				confirmIcon: icon,
+				destructive,
+				onDidCommit: () => this.onDidChange()
+			});
+		};
+		if (kind === 'enrol' || kind === 'grant') {
+			this.dialog.value = this.instantiationService.createInstance(
+				BulkPlaceDialog,
+				kind,
+				[],
+				() => Promise.resolve({ kind: 'error', reason: 'invalid' } as const),
+				{
+					count,
+					choose: (place, where) =>
+						kind === 'enrol'
+							? preview(
+									place,
+									this.format.text('bulkEnrolEveryoneIn', { where }),
+									this.format.text('bulkEnrolIn', { where }),
+									'bulkEnrolConfirm',
+									'action.invite',
+									false
+								)
+							: preview(
+									place,
+									this.format.text('bulkGrantEveryone', { where }),
+									this.format.text('bulkGrantRole', { where }),
+									'bulkGrantConfirm',
+									'admin.roles',
+									false
+								)
+				}
+			);
+			return;
+		}
+		void readOnce(this.administration, {
+			kind: 'institution'
+		} as AdministrationIntentOf<'institution'>).then((institution) => {
+			if (this._store.isDisposed) return;
+			if (institution.kind === 'failure') {
+				this.pane.toast(this.format.failure(institution.reason));
+				return;
+			}
+			const place = {
+				scopeType: 'institution' as const,
+				scopeId: institution.value.id
+			};
+			if (kind === 'signOut')
+				preview(
+					{ ...place, operation: 'user_sessions.revoke' },
+					this.format.text('bulkSignOutEveryone'),
+					this.format.text('usersBulkSignOut'),
+					'bulkSignOutConfirm',
+					'action.signOut',
+					true
+				);
+			else if (kind === 'disable')
+				preview(
+					{ ...place, operation: 'user.disable' },
+					this.format.text('bulkDisableEveryone'),
+					this.format.text('usersBulkDisable'),
+					'bulkDisableConfirm',
+					'action.end',
+					true
+				);
+			else
+				preview(
+					{ ...place, operation: 'user.enable' },
+					this.format.text('bulkEnableEveryone'),
+					this.format.text('usersBulkEnable'),
+					'bulkEnableConfirm',
+					'action.enable',
+					false
+				);
 		});
 	}
 
@@ -239,6 +360,7 @@ class BulkPlaceDialog extends Disposable {
 		private readonly kind: 'enrol' | 'grant',
 		private users: readonly User[],
 		private readonly run: (batch: Batch, users: readonly User[]) => Promise<AdminChangeResult>,
+		private readonly everyone: EveryoneChoice | undefined,
 		@IAdministrationService private readonly administration: IAdministrationService,
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
 		@IPagePaneContext pane: IPagePaneContext
@@ -261,6 +383,8 @@ class BulkPlaceDialog extends Disposable {
 			})
 		);
 		this.people.set(users.map((user) => ({ id: user.id, label: user.displayName })));
+		// For everyone matching, the server checks the people; this dialog only picks the place.
+		peopleField.element.hidden = this.everyone !== undefined;
 		this._register(
 			this.people.onDidChange((chips) => {
 				const kept = new Set(chips.map((chip) => chip.id));
@@ -299,6 +423,10 @@ class BulkPlaceDialog extends Disposable {
 	}
 
 	private titleText(): string {
+		if (this.everyone !== undefined)
+			return this.format.text(
+				this.kind === 'enrol' ? 'bulkEnrolEveryoneTitle' : 'bulkGrantEveryoneTitle'
+			);
 		const count = this.users.length;
 		const key = this.kind === 'enrol' ? 'bulkEnrolTitle' : 'bulkGrantTitle';
 		return count === 1
@@ -307,6 +435,7 @@ class BulkPlaceDialog extends Disposable {
 	}
 
 	private confirmText(): string {
+		if (this.everyone !== undefined) return this.format.text('bulkCheckWho');
 		const count = this.users.length;
 		const key = this.kind === 'enrol' ? 'bulkEnrolConfirm' : 'bulkGrantConfirm';
 		return count === 1
@@ -413,7 +542,8 @@ class BulkPlaceDialog extends Disposable {
 	private batch(): Batch | undefined {
 		const target = this.target.select.value;
 		const where = this.unit.select.value;
-		if (this.users.length === 0 || target === NONE) return undefined;
+		if ((this.users.length === 0 && this.everyone === undefined) || target === NONE)
+			return undefined;
 		const items = this.users.map((user, index) => ({
 			key: `person-${index + 1}`,
 			userId: user.id
@@ -439,11 +569,13 @@ class BulkPlaceDialog extends Disposable {
 
 	private update(): void {
 		this.dialog.setFootnote(
-			this.users.length === 1
-				? this.format.text('bulkPeopleCountOne')
-				: this.format.text('bulkPeopleCount', {
-						count: this.format.count(this.users.length)
-					})
+			this.everyone !== undefined
+				? this.format.text('previewBody', { count: this.format.count(this.everyone.count) })
+				: this.users.length === 1
+					? this.format.text('bulkPeopleCountOne')
+					: this.format.text('bulkPeopleCount', {
+							count: this.format.count(this.users.length)
+						})
 		);
 		this.confirm.setState({
 			label: this.confirmText(),
@@ -456,6 +588,25 @@ class BulkPlaceDialog extends Disposable {
 	private async submit(): Promise<void> {
 		const batch = this.batch();
 		if (batch === undefined || this.working) return;
+		if (this.everyone !== undefined) {
+			const target = this.target.select;
+			const where = target.options[target.selectedIndex]?.textContent ?? '';
+			const everyone = this.everyone;
+			const roleId =
+				batch.items[0]?.roleId ?? (this.kind === 'grant' ? target.value : undefined);
+			this.dispose();
+			everyone.choose(
+				{
+					operation:
+						batch.operation as AdministrationIntentOf<'createAcademicPreview'>['operation'],
+					scopeType: batch.scopeType,
+					scopeId: batch.scopeId,
+					...(roleId === undefined ? {} : { roleId })
+				},
+				where
+			);
+			return;
+		}
 		this.working = true;
 		this.dialog.setClosable(false);
 		this.feedback.set();

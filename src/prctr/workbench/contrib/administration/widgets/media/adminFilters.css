@@ -69,12 +69,32 @@
 	}
 	.prctr-admin-filters .prctr-admin-filters__count {
 		color: var(--prctr-color-text-primary);
-		flex: 1;
+		flex: none;
 		font-size: 13.5px;
 		font-weight: var(--prctr-typography-weight-medium);
 	}
+	.prctr-admin-filters .prctr-admin-filters__link {
+		background: transparent;
+		border: 0;
+		color: var(--prctr-color-brand-link);
+		cursor: pointer;
+		flex: none;
+		font: inherit;
+		font-size: 13px;
+		padding: 0;
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
+	.prctr-admin-filters .prctr-admin-filters__link[hidden] {
+		display: none;
+	}
+	.prctr-admin-filters .prctr-admin-filters__link:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 2px;
+	}
 	.prctr-admin-filters .prctr-admin-filters__actions {
 		display: flex;
+		margin-inline-start: auto;
 		flex-wrap: nowrap;
 		gap: 6px;
 		justify-content: flex-end;
