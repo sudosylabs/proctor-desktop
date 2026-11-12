@@ -11,6 +11,7 @@ import {
 	nativeHelperProtocolGenerator
 } from './nativeProtocol.ts';
 import { nativeCapabilityRegistryGenerator } from './nativeCapabilityRegistry.ts';
+import { nativeAgentProtocolGenerator } from './nativeAgentProtocol.ts';
 import { localizationCatalogGenerator } from './localizationCatalog.ts';
 import { settingsRegistryGenerator } from './settingsRegistry.ts';
 import { createFormatOwnershipGenerator } from './formatOwnership.ts';
@@ -35,7 +36,8 @@ const productGenerators: readonly Generator[] = [
 	nativeProtocolGenerator,
 	...nativeCapabilityProtocolGenerators,
 	nativeHelperProtocolGenerator,
-	nativeCapabilityRegistryGenerator
+	nativeCapabilityRegistryGenerator,
+	nativeAgentProtocolGenerator
 ];
 
 export const generators: readonly Generator[] = [

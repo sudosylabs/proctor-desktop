@@ -83,17 +83,22 @@ Conditions use three-valued (Kleene) logic:
 
 `Not` swaps met and not met and keeps unknown.
 
-- A `Compare` is unknown when its field is unavailable, or its capability is unhealthy, has
-  permission not granted, or has certainty other than complete. The cause is the first that applies,
-  in that order: `unavailable`, `unhealthy`, `permission`, `partial`. Partial certainty therefore
-  makes the baseline **unknown (partial)**, never not met.
-- `AppsAbsent` and `AppsOnly` are unknown while process coverage is incomplete (`partial`) or any
-  new process is still being identified (`checking`). With no match reported for the rule yet, they
-  are unknown (`unavailable`).
+- Every leaf reports the **first** cause that applies, in this order:
+  1. `unavailable`: no state yet, the compared field is missing, or (for `AppsAbsent` / `AppsOnly`)
+     no match has been reported for the rule;
+  2. `gap`: events were lost, or an interruption happened, and no fresh complete state has arrived
+     since;
+  3. `unhealthy`: the capability is `unsupported`, `failed` or `stopped` (`degraded` still runs;
+     its certainty decides);
+  4. `permission`: its permission is not granted;
+  5. `partial`: its certainty is not complete;
+  6. `checking` (application conditions only): a new process is still being identified.
+
+  Partial certainty therefore makes the baseline **unknown (partial)**, never not met.
+
 - When unknowns combine in `All` or `Any`, the reported cause is that of the **first** unknown
   operand in order.
-- A rule is evaluated against the **latest complete state** of its capability. After a gap it is
-  unknown (`gap`) until a fresh complete state arrives.
+- A rule is evaluated against the **latest complete state** of its capability.
 - The **first evaluation** at activation sets the status directly, with no stability wait.
 - **Recovery is slower than violation.** After that, not met or unknown → met happens only after the
   facts stay met for the capability's stability time, a fixed per-capability release constant.
@@ -114,8 +119,9 @@ The server can neither remove nor weaken them.
 ## Reporting
 
 For each rule, every status change is reported with the rule, the new status, the unknown cause
-when unknown, the fact (capability, source instance, sequence) that caused it, and the local effect
-(contained, released or none). The server re-evaluates the same rules on the same facts. If
+when unknown, the fact (capability, source instance, sequence) that caused it, and the local effect.
+The local effect is `contained` or `released` on every status reported in the batch that flipped
+containment, and `none` otherwise; containment exists only during participation. The server re-evaluates the same rules on the same facts. If
 Desktop's status differs, the server's evaluation wins and the difference is recorded.
 
 ## Conformance

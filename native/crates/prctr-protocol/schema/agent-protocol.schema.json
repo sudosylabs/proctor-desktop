@@ -1,0 +1,1261 @@
+{
+  "$defs": {
+    "Activation": {
+      "additionalProperties": false,
+      "description": "Which capabilities run, with the sub-categories they may query.",
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "categories": {
+          "items": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "capability",
+        "categories"
+      ],
+      "type": "object"
+    },
+    "AgentMessage": {
+      "description": "What the native agent sends.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "The answer to `hello`, exactly once.",
+          "properties": {
+            "build_identity": {
+              "$ref": "#/$defs/BuildIdentity"
+            },
+            "kind": {
+              "const": "hello_ack",
+              "type": "string"
+            },
+            "protocol_digest": {
+              "$ref": "#/$defs/Digest"
+            },
+            "secret": {
+              "$ref": "#/$defs/Secret"
+            }
+          },
+          "required": [
+            "kind",
+            "secret",
+            "build_identity",
+            "protocol_digest"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "response",
+              "type": "string"
+            },
+            "request_id": {
+              "$ref": "#/$defs/Count"
+            },
+            "response": {
+              "$ref": "#/$defs/Response"
+            }
+          },
+          "required": [
+            "kind",
+            "request_id",
+            "response"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "notification",
+              "type": "string"
+            },
+            "message_number": {
+              "$ref": "#/$defs/Count"
+            },
+            "notification": {
+              "$ref": "#/$defs/Notification"
+            }
+          },
+          "required": [
+            "kind",
+            "message_number",
+            "notification"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "BuildIdentity": {
+      "pattern": "^[!-~]{1,128}$",
+      "type": "string"
+    },
+    "Certainty": {
+      "description": "How completely the state reflects the machine.",
+      "enum": [
+        "complete",
+        "partial",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "Compare": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "op": {
+          "$ref": "#/$defs/CompareOp"
+        },
+        "value": {
+          "$ref": "#/$defs/RuleValue"
+        }
+      },
+      "required": [
+        "field",
+        "op",
+        "value"
+      ],
+      "type": "object"
+    },
+    "CompareOp": {
+      "enum": [
+        "eq",
+        "ne",
+        "lt",
+        "le",
+        "gt",
+        "ge",
+        "in",
+        "not_in"
+      ],
+      "type": "string"
+    },
+    "Condition": {
+      "description": "A requirement. Serialized externally tagged: `{ \"Compare\": { … } }`, `{ \"All\": { \"conditions\": [ … ] } }`.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "Compare": {
+              "$ref": "#/$defs/Compare"
+            }
+          },
+          "required": [
+            "Compare"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "All": {
+              "additionalProperties": false,
+              "properties": {
+                "conditions": {
+                  "items": {
+                    "$ref": "#/$defs/Condition"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "conditions"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "All"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "Any": {
+              "additionalProperties": false,
+              "properties": {
+                "conditions": {
+                  "items": {
+                    "$ref": "#/$defs/Condition"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "conditions"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "Any"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "Not": {
+              "additionalProperties": false,
+              "properties": {
+                "condition": {
+                  "$ref": "#/$defs/Condition"
+                }
+              },
+              "required": [
+                "condition"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "Not"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Blocklist: none of these catalog applications running.",
+          "properties": {
+            "AppsAbsent": {
+              "additionalProperties": false,
+              "properties": {
+                "catalog_app_ids": {
+                  "items": {
+                    "$ref": "#/$defs/Identifier"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "catalog_app_ids"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "AppsAbsent"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Allowlist: nothing outside these catalog applications and the OS-essential set.",
+          "properties": {
+            "AppsOnly": {
+              "additionalProperties": false,
+              "properties": {
+                "catalog_app_ids": {
+                  "items": {
+                    "$ref": "#/$defs/Identifier"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "catalog_app_ids"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "AppsOnly"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Count": {
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "Digest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "type": "string"
+    },
+    "Envelope": {
+      "additionalProperties": false,
+      "description": "The fields every fact carries, whatever the capability.",
+      "properties": {
+        "certainty": {
+          "$ref": "#/$defs/Certainty"
+        },
+        "health": {
+          "$ref": "#/$defs/Health"
+        },
+        "permission": {
+          "$ref": "#/$defs/Permission"
+        }
+      },
+      "required": [
+        "permission",
+        "health",
+        "certainty"
+      ],
+      "type": "object"
+    },
+    "Fact": {
+      "additionalProperties": false,
+      "description": "One capability's complete state at a sequence number.",
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "captured_at_ms": {
+          "$ref": "#/$defs/Count",
+          "description": "Monotonic milliseconds of the agent's clock when the state was captured."
+        },
+        "changes": {
+          "description": "The kinds of change since the previous fact; empty for an activation or fresh state.",
+          "items": {
+            "$ref": "#/$defs/Identifier"
+          },
+          "type": "array"
+        },
+        "envelope": {
+          "$ref": "#/$defs/Envelope"
+        },
+        "sequence": {
+          "$ref": "#/$defs/Count"
+        },
+        "source_instance_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "state": {
+          "description": "The capability's state, valid against its published schema."
+        },
+        "summary": {
+          "description": "Fields derived only from `state`, valid against the capability's summary schema."
+        }
+      },
+      "required": [
+        "capability",
+        "source_instance_id",
+        "sequence",
+        "captured_at_ms",
+        "envelope",
+        "state",
+        "summary",
+        "changes"
+      ],
+      "type": "object"
+    },
+    "FactRef": {
+      "additionalProperties": false,
+      "description": "Points at the fact that caused a rule status.",
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "sequence": {
+          "$ref": "#/$defs/Count"
+        },
+        "source_instance_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "required": [
+        "capability",
+        "source_instance_id",
+        "sequence"
+      ],
+      "type": "object"
+    },
+    "FatalCode": {
+      "enum": [
+        "protocol",
+        "capability_failed",
+        "internal"
+      ],
+      "type": "string"
+    },
+    "Gap": {
+      "additionalProperties": false,
+      "description": "A range of sequence numbers whose facts were never delivered.",
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "first_sequence": {
+          "$ref": "#/$defs/Count"
+        },
+        "last_sequence": {
+          "$ref": "#/$defs/Count"
+        },
+        "reason": {
+          "$ref": "#/$defs/GapReason"
+        },
+        "source_instance_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "required": [
+        "capability",
+        "source_instance_id",
+        "first_sequence",
+        "last_sequence",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "GapReason": {
+      "description": "Why sequence numbers are missing.",
+      "oneOf": [
+        {
+          "const": "source_loss",
+          "description": "The adapter lost events.",
+          "type": "string"
+        },
+        {
+          "const": "flow_control",
+          "description": "Electron main fell behind and older states were dropped in favour of the newest.",
+          "type": "string"
+        }
+      ]
+    },
+    "Health": {
+      "description": "Whether the capability is running. `degraded` still runs; its certainty says how far it can be\ntrusted. `unsupported`, `failed` and `stopped` mean no usable facts.",
+      "enum": [
+        "unsupported",
+        "healthy",
+        "degraded",
+        "failed",
+        "stopped"
+      ],
+      "type": "string"
+    },
+    "Identifier": {
+      "pattern": "^[a-z][a-z0-9_.]{0,63}$",
+      "type": "string"
+    },
+    "InterruptionKind": {
+      "description": "An OS event that ends every capability's stream until a fresh complete state arrives.",
+      "enum": [
+        "sleep",
+        "screen_lock",
+        "user_switch"
+      ],
+      "type": "string"
+    },
+    "LocalEffect": {
+      "description": "What Electron main did to the candidate window as a result of this change.",
+      "enum": [
+        "contained",
+        "released",
+        "none"
+      ],
+      "type": "string"
+    },
+    "MainMessage": {
+      "description": "What Electron main sends.",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "The first message, exactly once.",
+          "properties": {
+            "build_identity": {
+              "$ref": "#/$defs/BuildIdentity"
+            },
+            "kind": {
+              "const": "hello",
+              "type": "string"
+            },
+            "protocol_digest": {
+              "$ref": "#/$defs/Digest"
+            },
+            "secret": {
+              "$ref": "#/$defs/Secret"
+            }
+          },
+          "required": [
+            "kind",
+            "secret",
+            "build_identity",
+            "protocol_digest"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "request",
+              "type": "string"
+            },
+            "request": {
+              "$ref": "#/$defs/Request"
+            },
+            "request_id": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "kind",
+            "request_id",
+            "request"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "A fact only Electron main can see, for a capability that accepts host events.",
+          "properties": {
+            "capability": {
+              "$ref": "#/$defs/Identifier"
+            },
+            "event": true,
+            "kind": {
+              "const": "host_event",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "capability",
+            "event"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Electron main lost this many host events before sending them.",
+          "properties": {
+            "capability": {
+              "$ref": "#/$defs/Identifier"
+            },
+            "count": {
+              "$ref": "#/$defs/Count"
+            },
+            "kind": {
+              "const": "host_events_lost",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "capability",
+            "count"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Every notification up to and including this message number was received.",
+          "properties": {
+            "kind": {
+              "const": "acknowledge",
+              "type": "string"
+            },
+            "up_to": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "kind",
+            "up_to"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Mode": {
+      "enum": [
+        "enforce",
+        "observe"
+      ],
+      "type": "string"
+    },
+    "Notification": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "fact": {
+              "$ref": "#/$defs/Fact"
+            },
+            "kind": {
+              "const": "fact",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "fact"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "rules",
+              "type": "string"
+            },
+            "statuses": {
+              "items": {
+                "$ref": "#/$defs/RuleStatus"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "statuses"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "gap": {
+              "$ref": "#/$defs/Gap"
+            },
+            "kind": {
+              "const": "gap",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "gap"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "reset",
+              "type": "string"
+            },
+            "reset": {
+              "$ref": "#/$defs/Reset"
+            }
+          },
+          "required": [
+            "kind",
+            "reset"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "interruption": {
+              "$ref": "#/$defs/InterruptionKind"
+            },
+            "kind": {
+              "const": "interruption",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "interruption"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "heartbeat",
+              "type": "string"
+            },
+            "monotonic_ms": {
+              "$ref": "#/$defs/Count"
+            }
+          },
+          "required": [
+            "kind",
+            "monotonic_ms"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The agent failed and is about to exit.",
+          "properties": {
+            "code": {
+              "$ref": "#/$defs/FatalCode"
+            },
+            "kind": {
+              "const": "fatal",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "code"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "OpaqueId": {
+      "pattern": "^[A-Za-z0-9_-]{8,64}$",
+      "type": "string"
+    },
+    "Permission": {
+      "description": "The OS permission a capability needs. Capabilities that need none report `granted`.",
+      "enum": [
+        "not_determined",
+        "granted",
+        "denied",
+        "restricted",
+        "unavailable"
+      ],
+      "type": "string"
+    },
+    "Policy": {
+      "additionalProperties": false,
+      "description": "What the server sends at activation.",
+      "properties": {
+        "activations": {
+          "items": {
+            "$ref": "#/$defs/Activation"
+          },
+          "type": "array"
+        },
+        "rules": {
+          "items": {
+            "$ref": "#/$defs/Rule"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "activations",
+        "rules"
+      ],
+      "type": "object"
+    },
+    "RefusalCode": {
+      "description": "Why a request was refused. The session and connection stay usable.",
+      "oneOf": [
+        {
+          "const": "wrong_phase",
+          "description": "The request is not valid in the current session phase.",
+          "type": "string"
+        },
+        {
+          "const": "invalid_policy",
+          "description": "The policy names an unregistered capability, field, value or reason, or exceeds a bound.",
+          "type": "string"
+        },
+        {
+          "const": "unknown_capability",
+          "description": "The capability is not registered, or is sensitive and cannot be queried outside a session.",
+          "type": "string"
+        },
+        {
+          "const": "not_ready",
+          "description": "A capability has not delivered a fresh complete state yet.",
+          "type": "string"
+        },
+        {
+          "const": "no_permission_prompt",
+          "description": "The capability needs no permission, or the OS has no prompt for it.",
+          "type": "string"
+        }
+      ]
+    },
+    "Request": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "description": "The current state of a non-sensitive capability, outside any session.",
+          "properties": {
+            "capability": {
+              "$ref": "#/$defs/Identifier"
+            },
+            "kind": {
+              "const": "query",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "capability"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Start the readiness session for one sitting's compiled policy.",
+          "properties": {
+            "collection_session_id": {
+              "$ref": "#/$defs/OpaqueId"
+            },
+            "kind": {
+              "const": "open_readiness",
+              "type": "string"
+            },
+            "policy": {
+              "$ref": "#/$defs/Policy"
+            }
+          },
+          "required": [
+            "kind",
+            "collection_session_id",
+            "policy"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The binding check at Start: fresh complete states and readiness rule statuses.",
+          "properties": {
+            "kind": {
+              "const": "begin_participation",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "The server admitted the candidate: the session continues without a gap.",
+          "properties": {
+            "kind": {
+              "const": "confirm_participation",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Admission was refused or timed out: back to readiness.",
+          "properties": {
+            "kind": {
+              "const": "abandon_participation",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "Show the OS permission prompt, after explicit candidate action on the overview.",
+          "properties": {
+            "capability": {
+              "$ref": "#/$defs/Identifier"
+            },
+            "kind": {
+              "const": "request_permission",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "capability"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "description": "End the session in reverse order and return the final states.",
+          "properties": {
+            "kind": {
+              "const": "close",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Reset": {
+      "additionalProperties": false,
+      "description": "A capability restarted under a new instance; its sequence starts again at zero.",
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "previous_sequence": {
+          "$ref": "#/$defs/Count"
+        },
+        "previous_source_instance_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "source_instance_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "required": [
+        "capability",
+        "previous_source_instance_id",
+        "previous_sequence",
+        "source_instance_id"
+      ],
+      "type": "object"
+    },
+    "Response": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "fact": {
+              "$ref": "#/$defs/Fact"
+            },
+            "kind": {
+              "const": "queried",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "fact"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/Fact"
+              },
+              "type": "array"
+            },
+            "kind": {
+              "const": "readiness_opened",
+              "type": "string"
+            },
+            "rules": {
+              "items": {
+                "$ref": "#/$defs/RuleStatus"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "facts",
+            "rules"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/Fact"
+              },
+              "type": "array"
+            },
+            "kind": {
+              "const": "participation_begun",
+              "type": "string"
+            },
+            "rules": {
+              "items": {
+                "$ref": "#/$defs/RuleStatus"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "facts",
+            "rules"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "participation_confirmed",
+              "type": "string"
+            },
+            "rules": {
+              "items": {
+                "$ref": "#/$defs/RuleStatus"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "rules"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "participation_abandoned",
+              "type": "string"
+            },
+            "rules": {
+              "items": {
+                "$ref": "#/$defs/RuleStatus"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "rules"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "capability": {
+              "$ref": "#/$defs/Identifier"
+            },
+            "kind": {
+              "const": "permission_requested",
+              "type": "string"
+            },
+            "permission": {
+              "$ref": "#/$defs/Permission"
+            }
+          },
+          "required": [
+            "kind",
+            "capability",
+            "permission"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/Fact"
+              },
+              "type": "array"
+            },
+            "kind": {
+              "const": "closed",
+              "type": "string"
+            },
+            "rules": {
+              "items": {
+                "$ref": "#/$defs/RuleStatus"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "kind",
+            "facts",
+            "rules"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "code": {
+              "$ref": "#/$defs/RefusalCode"
+            },
+            "kind": {
+              "const": "refused",
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind",
+            "code"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Rule": {
+      "additionalProperties": false,
+      "properties": {
+        "capability": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "mode": {
+          "$ref": "#/$defs/Mode"
+        },
+        "phase": {
+          "$ref": "#/$defs/RulePhase"
+        },
+        "reason": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "requirement": {
+          "$ref": "#/$defs/Condition"
+        },
+        "rule_id": {
+          "$ref": "#/$defs/Identifier"
+        }
+      },
+      "required": [
+        "rule_id",
+        "capability",
+        "mode",
+        "phase",
+        "reason",
+        "requirement"
+      ],
+      "type": "object"
+    },
+    "RulePhase": {
+      "enum": [
+        "readiness",
+        "participation",
+        "both"
+      ],
+      "type": "string"
+    },
+    "RuleStatus": {
+      "additionalProperties": false,
+      "properties": {
+        "cause": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FactRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "local_effect": {
+          "$ref": "#/$defs/LocalEffect"
+        },
+        "rule_id": {
+          "$ref": "#/$defs/Identifier"
+        },
+        "status": {
+          "$ref": "#/$defs/Status"
+        },
+        "unknown_cause": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/UnknownCause"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "rule_id",
+        "status",
+        "local_effect"
+      ],
+      "type": "object"
+    },
+    "RuleValue": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Scalar"
+        },
+        {
+          "items": {
+            "$ref": "#/$defs/Scalar"
+          },
+          "type": "array"
+        }
+      ],
+      "description": "The right-hand side of a comparison: one scalar, or a set for `in` / `not_in`."
+    },
+    "Scalar": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Count"
+        },
+        {
+          "$ref": "#/$defs/Identifier"
+        }
+      ],
+      "description": "One value a field can hold: a count or one of the field's enum values."
+    },
+    "Secret": {
+      "pattern": "^[A-Za-z0-9_-]{43}$",
+      "type": "string"
+    },
+    "Status": {
+      "enum": [
+        "met",
+        "not_met",
+        "unknown"
+      ],
+      "type": "string"
+    },
+    "UnknownCause": {
+      "description": "Why a rule is unknown. When several apply, the first in this order is reported.",
+      "oneOf": [
+        {
+          "const": "unavailable",
+          "description": "No state yet, the field is missing, or no application match was reported for the rule.",
+          "type": "string"
+        },
+        {
+          "const": "gap",
+          "description": "Events were lost and no fresh complete state has arrived since.",
+          "type": "string"
+        },
+        {
+          "const": "unhealthy",
+          "description": "The capability is unsupported, failed or stopped.",
+          "type": "string"
+        },
+        {
+          "const": "permission",
+          "description": "The capability's permission is not granted.",
+          "type": "string"
+        },
+        {
+          "const": "partial",
+          "description": "The capability's certainty is not complete.",
+          "type": "string"
+        },
+        {
+          "const": "checking",
+          "description": "A new process is still being identified.",
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$id": "prctr-agent-protocol.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/MainMessage"
+    },
+    {
+      "$ref": "#/$defs/AgentMessage"
+    }
+  ],
+  "title": "Proctor native agent protocol"
+}

@@ -18,6 +18,9 @@ members = [
   "crates/media-device-state",
   "crates/native-source-supervisor",
   "crates/native-node-bridge",
+  "crates/prctr-protocol",
+  "crates/prctr-core",
+  "crates/prctr-xtask",
 ]
 resolver = "2"
 

@@ -135,9 +135,32 @@
           "defaultFeatures": true,
           "optional": false,
           "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-core/Cargo.toml",
+          "alias": "serde",
+          "kind": "production",
+          "features": ["derive"],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-protocol/Cargo.toml",
+          "alias": "serde",
+          "kind": "production",
+          "features": ["derive"],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility", "native-build", "native-security-helper"],
+      "processes": [
+        "exam-security-utility",
+        "native-build",
+        "native-security-helper",
+        "native-agent"
+      ],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust serialization traits and derive macros; no native library or helper process.",
       "transitiveRisk": "Adds the exact locked serde core and derive macro graph; generated DTO validation still runs independently after conversion.",
@@ -165,9 +188,36 @@
           "defaultFeatures": true,
           "optional": false,
           "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-core/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-protocol/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-xtask/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
         }
       ],
-      "processes": ["native-security-helper"],
+      "processes": ["native-security-helper", "native-agent", "build"],
       "networkBehavior": "None; all frames use private inherited process handles and are validated before nested allocation.",
       "nativeBehavior": "Pure Rust JSON encoding and decoding; ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Uses the exact locked itoa, memchr, serde_core, and zmij graph; fixed frame limits and generated protocol validation remain independent controls.",
@@ -218,6 +268,15 @@
       "lifecycleScripts": "none",
       "declarations": [
         {
+          "manifest": "native/crates/prctr-xtask/Cargo.toml",
+          "alias": "sha2",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        },
+        {
           "manifest": "native/crates/removable-storage-state/Cargo.toml",
           "alias": "sha2",
           "kind": "production",
@@ -227,7 +286,7 @@
           "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility"],
+      "processes": ["exam-security-utility", "build"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust SHA-256 primitives; it ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Adds the exact locked digest, block-buffer, crypto-common, generic-array and typenum graph; the use is local HMAC derivation over bounded inputs.",
@@ -459,6 +518,36 @@
       "transitiveRisk": "No additional transitive runtime graph; the exact version is already locked by the native workspace.",
       "bundleTreatment": "external-platform",
       "localAlternative": "Maintaining local statfs, ifaddrs, flags, and target-ABI declarations would duplicate platform headers and increase unsafe layout risk.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "schemars",
+      "version": "1.2.3",
+      "kind": "production",
+      "purpose": "Derive the JSON Schema of the native agent protocol from its Rust types, so the committed schema, the protocol digest and the generated TypeScript come from one authority.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/schemars/1.2.3",
+      "license": "MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-protocol/Cargo.toml",
+          "alias": "schemars",
+          "kind": "production",
+          "features": ["derive", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        }
+      ],
+      "processes": ["native-agent", "build"],
+      "networkBehavior": "None; schema generation is in-process and deterministic.",
+      "nativeBehavior": "Pure Rust derive and schema construction; no FFI and no build script beyond its derive macro crate.",
+      "transitiveRisk": "Adds schemars_derive, serde_derive_internals, dyn-clone and ref-cast; exact versions are locked and license checked. Default features (including its preserve_order map) are disabled.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "A hand-written schema would duplicate every protocol type and drift; the previous design generated Rust from hand-written schemas through a 1,825-line generator.",
       "updateOwner": "native-capabilities",
       "removalOwner": "native-capabilities"
     },

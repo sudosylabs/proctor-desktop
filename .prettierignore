@@ -15,6 +15,8 @@ package-lock.json
 native/Cargo.lock
 resources/server-api/openapi.json
 resources/server-api/asyncapi.json
+/native/crates/prctr-protocol/schema/
+/native/crates/prctr-core/conformance/
 /.prettierignore
 /build/generators/localizationCatalog.ts
 /native/crates/native-protocol/src/candidate_window.generated.rs
@@ -753,6 +755,7 @@ resources/server-api/asyncapi.json
 /src/prctr/platform/markdown/browser/markdownRenderer.ts
 /src/prctr/platform/markers/common/markers.ts
 /src/prctr/platform/native/common/native.ts
+/src/prctr/platform/native/common/nativeAgentProtocol.generated.ts
 /src/prctr/platform/native/common/nativeCapabilityRegistry.generated.js
 /src/prctr/platform/native/common/nativeCapabilityRegistry.generated.ts
 /src/prctr/platform/native/common/nativeObservation.generated.ts

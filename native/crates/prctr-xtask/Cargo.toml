@@ -1,0 +1,16 @@
+[package]
+name = "prctr-xtask"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+prctr-core = { path = "../prctr-core", features = ["vectors"] }
+prctr-protocol = { path = "../prctr-protocol" }
+serde_json = { version = "=1.0.151" }
+sha2 = { version = "=0.10.9", default-features = false }
+
+[lints]
+workspace = true

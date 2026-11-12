@@ -40,6 +40,9 @@ export function formattingIgnore(
 		// Preserve the imported contract byte-for-byte against its source digest.
 		'resources/server-api/openapi.json',
 		'resources/server-api/asyncapi.json',
+		// Written byte-for-byte by prctr-xtask; the protocol digest hashes these bytes.
+		'/native/crates/prctr-protocol/schema/',
+		'/native/crates/prctr-core/conformance/',
 		...paths.map((path) => `/${path}`),
 		''
 	].join('\n');
