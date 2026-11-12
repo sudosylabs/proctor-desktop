@@ -8,6 +8,8 @@ import {
 	SelectControl,
 	type SelectChoice
 } from '../../../../base/browser/ui/select/selectControl.js';
+import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
+import type { MenuControl } from '../../../../base/browser/ui/menu/menuControl.js';
 import { Disposable, toDisposable } from '../../../../base/common/lifecycle.js';
 import {
 	createProctorIcon,
@@ -31,6 +33,13 @@ export class AdminFilters extends Disposable {
 	private readonly note: HTMLElement;
 	private readonly selection: HTMLElement;
 	private readonly selectionCount: HTMLElement;
+	private readonly more: {
+		readonly label: string;
+		readonly holder: HTMLElement;
+		readonly select: SelectControl<string>;
+	}[] = [];
+	private moreButton: ButtonControl | undefined;
+	private moreAvailable = true;
 
 	constructor(host: HTMLElement) {
 		super();
@@ -115,17 +124,22 @@ export class AdminFilters extends Disposable {
 		return input;
 	}
 
-	/** A filter chosen from a short list. */
+	/**
+	 * A filter chosen from a short list. A `more` filter starts out of the bar and is added from
+	 * More filters; it leaves again once set back to `value`, its no-filter choice.
+	 */
 	addSelect<T extends string>(
 		label: string,
 		icon: ProctorIconId,
 		choices: readonly SelectChoice<T>[],
 		value: T,
-		onChange: (value: T) => void
+		onChange: (value: T) => void,
+		more = false
 	): SelectControl<T> {
 		const holder = createElementFactory(this.element.ownerDocument)(
 			'span.prctr-admin-filters__select'
 		);
+		holder.hidden = more;
 		this.element.insertBefore(
 			holder,
 			this.element.querySelector('.prctr-admin-filters__spacer')
@@ -140,8 +154,72 @@ export class AdminFilters extends Disposable {
 				fit: 'content'
 			})
 		);
-		this._register(select.onDidChange(onChange));
+		this._register(
+			select.onDidChange((next) => {
+				if (more && next === value) {
+					holder.hidden = true;
+					this.moreButton?.element.focus();
+				}
+				this.updateMore();
+				onChange(next);
+			})
+		);
+		if (more)
+			this.more.push({ label, holder, select: select as unknown as SelectControl<string> });
 		return select;
+	}
+
+	/**
+	 * Adds More filters at the end of the filters: a menu of the filters not in the bar, each
+	 * added as its own pill when chosen. The menu is gone while every filter is shown.
+	 */
+	addMoreFilters(label: string, menu: MenuControl): void {
+		const holder = createElementFactory(this.element.ownerDocument)(
+			'span.prctr-admin-filters__more'
+		);
+		this.element.insertBefore(
+			holder,
+			this.element.querySelector('.prctr-admin-filters__spacer')
+		);
+		const button = this._register(
+			new ButtonControl(holder, {
+				variant: 'ghost',
+				label,
+				icon: proctorIconFactory('action.filter', 16)
+			})
+		);
+		this.moreButton = button;
+		this._register(
+			button.onDidRequest(() =>
+				menu.show(
+					button.element,
+					this.more
+						.filter((filter) => filter.holder.hidden)
+						.map((filter) => ({
+							label: filter.label,
+							run: () => {
+								filter.holder.hidden = false;
+								this.updateMore();
+								filter.select.focus();
+							}
+						})),
+					label
+				)
+			)
+		);
+		this.updateMore();
+	}
+
+	/** Hides or shows More filters for viewers who can't use them, as a scoped administrator. */
+	setMoreFiltersAvailable(available: boolean): void {
+		this.moreAvailable = available;
+		this.updateMore();
+	}
+
+	private updateMore(): void {
+		if (this.moreButton === undefined) return;
+		this.moreButton.element.parentElement!.hidden =
+			!this.moreAvailable || this.more.every((filter) => !filter.holder.hidden);
 	}
 
 	setNote(text: string): void {

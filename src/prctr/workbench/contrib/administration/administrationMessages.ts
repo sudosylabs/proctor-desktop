@@ -27,6 +27,31 @@ const sharedMessages = Object.freeze({
 		defaultMessage: 'Showing {range}',
 		description: 'Under a table: which rows it shows, as in "Showing 1–10 of 1,284".'
 	}),
+	listPageSize: defineMessage({
+		id: 'administration.list.page.size',
+		defaultMessage: '{count} a page',
+		description: 'Under a table: how many rows each page shows; opens a choice of 10, 25 or 50.'
+	}),
+	listPageSizeChoice: defineMessage({
+		id: 'administration.list.page.choice',
+		defaultMessage: 'Rows on each page',
+		description: 'Accessible name of the menu that chooses how many rows a page shows.'
+	}),
+	listGoToDate: defineMessage({
+		id: 'administration.list.jump',
+		defaultMessage: 'Go to a date',
+		description: 'Under a dated table: starts the list at the end of the chosen day.'
+	}),
+	listSortedAscending: defineMessage({
+		id: 'administration.list.sorted.ascending',
+		defaultMessage: '{column}, sorted from first to last',
+		description: 'Accessible name of a column header sorted in ascending order.'
+	}),
+	listSortedDescending: defineMessage({
+		id: 'administration.list.sorted.descending',
+		defaultMessage: '{column}, sorted from last to first',
+		description: 'Accessible name of a column header sorted in descending order.'
+	}),
 	listScrollHint: defineMessage({
 		id: 'administration.list.scroll.hint',
 		defaultMessage: 'Scroll sideways for more columns',

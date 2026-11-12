@@ -22,15 +22,22 @@ import {
 	type AdminListItem,
 	type AdminListQuery
 } from '../widgets/adminList.js';
-import { readOnce, readUnitTree, unitLabel } from '../widgets/adminReads.js';
+import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminReads.js';
+import { ADMINISTRATION_PAGE_SIZE } from '../../../../platform/administration/common/administrationProtocol.js';
 import { BulkUserChanges } from './bulkUserChanges.js';
 import { AdminMenuButton } from '../widgets/adminMenuButton.js';
 import { UserActions, type AdminUser } from './userActions.js';
 
-type Status = 'active' | 'any';
+type Status = 'active' | 'disabled' | 'any';
+type LastActive = 'any' | 'never' | 'recent' | 'idle';
+const DAY = 86_400_000;
 type AffiliationKind = (typeof affiliationKinds)[number];
 
 const ANY = 'any';
+/** Pictures kept for people already shown. */
+const PHOTO_CACHE = 200;
+/** Below this width the selection bar keeps only its count, one menu and Clear selection. */
+const COMPACT_BAR = 560;
 export const AFFILIATION_TEXT: Readonly<Record<AffiliationKind, AdministrationText>> = {
 	student: 'affiliationStudent',
 	teacher: 'affiliationTeacher',
@@ -43,12 +50,14 @@ export class UsersPage extends Disposable implements PageView {
 	private readonly list: AdminList<'users'>;
 	private readonly filters: AdminFilters;
 	private readonly unit: SelectControl<string>;
+	private readonly status: SelectControl<Status>;
+	private readonly role: SelectControl<string>;
 	private readonly bulk: BulkUserChanges;
 	private enableButton: ButtonControl | undefined;
 	private disableButton: ButtonControl | undefined;
 	private readonly invite = this._register(new MutableDisposable<InviteDialog>());
 	private query: AdminListQuery<'users'> = {};
-	/** Each person's picture, read once: their own or the default the server draws. */
+	/** Each person's picture, read once: their own or the default the server draws. Bounded. */
 	private readonly photos = new Map<string, string>();
 
 	constructor(
@@ -83,15 +92,18 @@ export class UsersPage extends Disposable implements PageView {
 		this.filters = this._register(new AdminFilters(body));
 		const filters = this.filters;
 		filters.addSearch(format.text('usersFind'), (q) => this.setQuery({ q }));
-		filters.addSelect<Status>(
+		this.status = filters.addSelect<Status>(
 			format.text('usersStatus'),
 			'status.success',
-			[
-				{ value: 'active', label: format.text('usersStatusActive') },
-				{ value: 'any', label: format.text('usersStatusAny') }
-			],
+			this.statusChoices(false),
 			'active',
-			(status) => this.setQuery({ includeDisabled: status === 'any' ? true : undefined })
+			(status) =>
+				// Only an Institution-wide viewer may ask for disabled accounts alone.
+				this.setQuery(
+					status === 'disabled'
+						? { state: 'disabled', includeDisabled: undefined }
+						: { state: undefined, includeDisabled: status === 'any' ? true : undefined }
+				)
 		);
 		filters.addSelect<AffiliationKind | typeof ANY>(
 			format.text('usersAffiliation'),
@@ -113,6 +125,29 @@ export class UsersPage extends Disposable implements PageView {
 			ANY,
 			(unit) => this.setQuery({ academicUnitId: unit === ANY ? undefined : unit })
 		);
+		this.role = filters.addSelect<string>(
+			format.text('usersRole'),
+			'admin.roles',
+			[{ value: ANY, label: format.text('usersRoleAny') }],
+			ANY,
+			(role) => this.setQuery({ roleIds: role === ANY ? undefined : [role] }),
+			true
+		);
+		filters.addSelect<LastActive>(
+			format.text('usersColumnLastActive'),
+			'status.time',
+			[
+				{ value: 'any', label: format.text('usersLastActiveAny') },
+				{ value: 'never', label: format.text('usersLastActiveNever') },
+				{ value: 'recent', label: format.text('usersLastActiveRecent') },
+				{ value: 'idle', label: format.text('usersLastActiveIdle') }
+			],
+			'any',
+			(choice) => this.setLastActive(choice),
+			true
+		);
+		filters.addMoreFilters(format.text('usersMoreFilters'), this.pane.menu);
+		filters.setMoreFiltersAvailable(false);
 		const actions = this._register(
 			instantiationService.createInstance(
 				UserActions,
@@ -134,7 +169,8 @@ export class UsersPage extends Disposable implements PageView {
 				columns: [
 					{
 						label: format.text('usersColumnPerson'),
-						width: '34%',
+						width: '30%',
+						sort: { key: 'name', first: 'asc' },
 						cell: (user) => {
 							const photo = this.photos.get(user.id);
 							return {
@@ -147,20 +183,21 @@ export class UsersPage extends Disposable implements PageView {
 					},
 					{
 						label: format.text('usersAffiliation'),
-						width: '22%',
+						width: '21%',
 						cell: (user) => this.affiliationCell(user)
 					},
 					{
 						label: format.text('usersColumnRoles'),
-						width: '18%',
-						priority: 3,
+						width: '17%',
+						priority: 4,
 						cell: (user) => ({ kind: 'text', primary: this.roles(user), quiet: true })
 					},
 					{
 						label: format.text('usersColumnLastActive'),
-						width: '168px',
+						width: '13%',
 						align: 'end',
 						priority: 2,
+						sort: { key: 'last_active', first: 'desc', gated: true },
 						foldLabel: true,
 						cell: (user) => ({
 							kind: 'text',
@@ -174,6 +211,7 @@ export class UsersPage extends Disposable implements PageView {
 					},
 					{
 						label: format.text('usersColumnStatus'),
+						width: '104px',
 						cell: (user) =>
 							user.disabledAt === undefined
 								? {
@@ -190,6 +228,13 @@ export class UsersPage extends Disposable implements PageView {
 				],
 				rowId: (user) => user.id,
 				rowName: (user) => user.displayName,
+				sorting: {
+					initial: { key: 'name', dir: 'asc' },
+					params: (sort) => ({
+						sort: sort.key as 'name' | 'last_active',
+						dir: sort.dir
+					})
+				},
 				open: (user) => navigation.selectAdministrationPage('user', user.id),
 				actions: (user) => actions.for(user, true),
 				icon: 'admin.users',
@@ -208,6 +253,51 @@ export class UsersPage extends Disposable implements PageView {
 		this._register(this.list.onDidChangeSelection((users) => this.showSelection(users)));
 		this._register(this.list.onDidLoad((users) => void this.loadPhotos(users)));
 		void this.loadUnits();
+		void this.loadReach();
+	}
+
+	private statusChoices(wide: boolean) {
+		return [
+			{ value: 'active' as const, label: this.format.text('usersStatusActive') },
+			...(wide
+				? [{ value: 'disabled' as const, label: this.format.text('usersStatusDisabled') }]
+				: []),
+			{ value: 'any' as const, label: this.format.text('usersStatusAny') }
+		];
+	}
+
+	/**
+	 * Some filters and the Last active order are for viewers who see the whole Institution; the
+	 * server refuses them to a scoped administrator, so they are offered only once it accepts one.
+	 */
+	private async loadReach(): Promise<void> {
+		const probe = await readOnce(this.administration, {
+			kind: 'users',
+			limit: ADMINISTRATION_PAGE_SIZE,
+			neverSignedIn: true
+		});
+		if (this._store.isDisposed || probe.kind !== 'data') return;
+		this.status.setChoices(this.statusChoices(true), this.status.value);
+		this.filters.setMoreFiltersAvailable(true);
+		this.list.enableSort('last_active');
+		const roles = await readPages(this.administration, 'roles', {});
+		if (this._store.isDisposed || roles.kind !== 'data') return;
+		this.role.setChoices(
+			[
+				{ value: ANY, label: this.format.text('usersRoleAny') },
+				...roles.value.items.map((role) => ({ value: role.id, label: role.displayName }))
+			],
+			this.role.value
+		);
+	}
+
+	private setLastActive(choice: LastActive): void {
+		const now = this.format.now();
+		this.setQuery({
+			neverSignedIn: choice === 'never' ? true : undefined,
+			lastActiveAfter: choice === 'recent' ? now - 30 * DAY : undefined,
+			lastActiveBefore: choice === 'idle' ? now - 90 * DAY : undefined
+		});
 	}
 
 	private createSelectionBar(format: IAdministrationFormatService): void {
@@ -215,11 +305,12 @@ export class UsersPage extends Disposable implements PageView {
 		const button = (
 			label: string,
 			icon: ProctorIconId,
-			run: (users: readonly AdminUser[]) => void
+			run: (users: readonly AdminUser[]) => void,
+			variant: 'secondary' | 'dangerGhost' = 'secondary'
 		): ButtonControl => {
 			const control = this._register(
 				new ButtonControl(host, {
-					variant: 'secondary',
+					variant,
 					size: 'small',
 					label,
 					icon: proctorIconFactory(icon, 14)
@@ -243,7 +334,12 @@ export class UsersPage extends Disposable implements PageView {
 		).element.dataset.secondary = 'true';
 		this.enableButton = button(format.text('usersBulkEnable'), 'action.enable', enable);
 		this.enableButton.element.dataset.secondary = 'true';
-		this.disableButton = button(format.text('usersBulkDisable'), 'action.end', disable);
+		this.disableButton = button(
+			format.text('usersBulkDisable'),
+			'action.end',
+			disable,
+			'dangerGhost'
+		);
 		this.disableButton.element.dataset.secondary = 'true';
 		const more = this._register(
 			new AdminMenuButton(
@@ -251,7 +347,23 @@ export class UsersPage extends Disposable implements PageView {
 				format.text('usersBulkMore'),
 				() => {
 					const users = this.list.selection;
+					// Very narrow, as at 200% zoom, every change is in this menu.
+					const compact = this.filters.element.clientWidth < COMPACT_BAR;
 					return [
+						...(compact
+							? [
+									{
+										label: format.text('usersBulkEnrol'),
+										icon: 'object.student' as const,
+										run: () => this.bulk.enrol(users)
+									},
+									{
+										label: format.text('usersBulkGrant'),
+										icon: 'admin.roles' as const,
+										run: () => this.bulk.grant(users)
+									}
+								]
+							: []),
 						{
 							label: format.text('usersBulkSignOut'),
 							icon: 'action.signOut' as const,
@@ -290,7 +402,14 @@ export class UsersPage extends Disposable implements PageView {
 				icon: proctorIconFactory('action.close', 14)
 			})
 		);
-		this._register(clear.onDidRequest(() => this.list.clearSelection()));
+		// The bar leaves with the selection, so focus goes to the checkbox that chooses a page.
+		clear.element.dataset.keep = 'true';
+		this._register(
+			clear.onDidRequest(() => {
+				this.list.clearSelection();
+				this.list.focusPageAll();
+			})
+		);
 	}
 
 	private showSelection(users: readonly AdminUser[]): void {
@@ -366,6 +485,11 @@ export class UsersPage extends Disposable implements PageView {
 			this.photos.set(user.id, photo.value.dataUrl);
 			changed = true;
 		});
+		// Keep the pictures of the last few pages only; each is a decoded image.
+		for (const id of this.photos.keys()) {
+			if (this.photos.size <= PHOTO_CACHE) break;
+			this.photos.delete(id);
+		}
 		if (changed) this.list.redraw();
 	}
 

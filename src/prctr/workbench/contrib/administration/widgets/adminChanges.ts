@@ -19,6 +19,7 @@ import { PageDialog } from '../../../browser/authenticated/pages/pageDialog.js';
 import { PageFeedback } from '../../../browser/authenticated/pages/pageFeedback.js';
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
+import { AdminChips, type AdminChip } from './adminChips.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { administrationFailureNeedsRead } from '../common/administrationPresentation.js';
 
@@ -96,8 +97,18 @@ export interface AdminConfirmationOptions {
 	readonly confirmIcon: ProctorIconId;
 	/** A change that ends or removes something is red; others use the brand colour. */
 	readonly destructive: boolean;
-	/** Makes the change once the person confirms. */
-	readonly run: () => Promise<AdminChangeResult>;
+	/**
+	 * The people the change is for, as chips the person can remove before confirming; there is no
+	 * field to add one. The button counts who is left.
+	 */
+	readonly people?: {
+		readonly label: string;
+		readonly chips: readonly AdminChip[];
+		removeLabel(chip: AdminChip): string;
+		confirmLabel(count: number): string;
+	};
+	/** Makes the change once the person confirms, for the people left when there are chips. */
+	readonly run: (people: readonly string[]) => Promise<AdminChangeResult>;
 	/**
 	 * Receives the result once the dialog has closed: on success, or on a failure that needs
 	 * the list read again. Other failures stay in the dialog.
@@ -114,6 +125,7 @@ export class AdminConfirmation extends Disposable {
 	private readonly cancel: ButtonControl;
 	private readonly confirm: ButtonControl;
 	private readonly feedback: PageFeedback;
+	private readonly chips: AdminChips | undefined;
 	private working = false;
 
 	constructor(
@@ -130,6 +142,18 @@ export class AdminConfirmation extends Disposable {
 				role: 'alertdialog'
 			})
 		);
+		const people = options.people;
+		if (people !== undefined) {
+			const chips = this._register(
+				new AdminChips(this.dialog.body, {
+					label: people.label,
+					removeLabel: (chip) => people.removeLabel(chip)
+				})
+			);
+			chips.set(people.chips);
+			this.chips = chips;
+			this._register(chips.onDidChange(() => this.setWorking(false)));
+		}
 		this.feedback = this._register(new PageFeedback(this.dialog.body));
 		this.cancel = this._register(
 			new ButtonControl(this.dialog.actions, {
@@ -162,14 +186,23 @@ export class AdminConfirmation extends Disposable {
 			label: this.format.text('cancel'),
 			disabled: working
 		});
-		this.confirm.setState({ label: this.options.confirmLabel, busy: working, icon });
+		const left = this.chips?.chips.length;
+		this.confirm.setState({
+			label:
+				left === undefined
+					? this.options.confirmLabel
+					: this.options.people!.confirmLabel(left),
+			busy: working,
+			disabled: left === 0,
+			icon
+		});
 	}
 
 	private async run(): Promise<void> {
 		if (this.working) return;
 		this.feedback.set();
 		this.setWorking(true);
-		const result = await this.options.run();
+		const result = await this.options.run(this.chips?.chips.map((chip) => chip.id) ?? []);
 		if (this._store.isDisposed) return;
 		this.setWorking(false);
 		if (

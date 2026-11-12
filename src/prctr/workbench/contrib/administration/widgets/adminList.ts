@@ -15,6 +15,8 @@ import {
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import {
 	ADMINISTRATION_PAGE_SIZE,
+	ADMINISTRATION_PAGE_SIZES,
+	type AdministrationPageSize,
 	type AdministrationFailure,
 	type AdministrationIntentOf,
 	type AdministrationReadKind,
@@ -107,6 +109,22 @@ export type AdminCell =
 
 export interface AdminColumn<T> extends AdminColumnLayout {
 	cell(item: T): AdminCell;
+	/**
+	 * The server order this column's header asks for, and the direction it takes when first
+	 * chosen: dates start newest first, names A to Z.
+	 */
+	readonly sort?: {
+		readonly key: string;
+		readonly first: AdminSortDirection;
+		/** Offered only once the page knows the viewer may use it, by {@link AdminList.enableSort}. */
+		readonly gated?: boolean;
+	};
+}
+
+export type AdminSortDirection = 'asc' | 'desc';
+export interface AdminSort {
+	readonly key: string;
+	readonly dir: AdminSortDirection;
 }
 
 export interface AdminListOptions<K extends AdminListKind> {
@@ -138,6 +156,14 @@ export interface AdminListOptions<K extends AdminListKind> {
 	 */
 	readonly filtered?: (query: AdminListQuery<K>) => boolean;
 	readonly action?: { readonly label: string; readonly icon: ProctorIconId };
+	/** How the server can order the list; each sortable column names its key. */
+	readonly sorting?: {
+		readonly initial: AdminSort;
+		/** The query fields that ask the server for this order. */
+		params(sort: AdminSort): Partial<AdminListQuery<K>>;
+	};
+	/** The list can start from a day: the query fields for "up to the end of this day". */
+	readonly dateJump?: (endOfDay: number) => Partial<AdminListQuery<K>>;
 }
 
 /**
@@ -161,6 +187,8 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	private readonly range: HTMLElement;
 	private readonly hint: HTMLElement;
 	private readonly steps: HTMLElement;
+	private readonly pageSizeButton: ButtonControl;
+	private readonly jump: HTMLInputElement | undefined;
 	private readonly previous: ButtonControl;
 	private readonly next: ButtonControl;
 	private readonly pageAll: HTMLInputElement | undefined;
@@ -189,6 +217,11 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	/** The first page's count, kept while the person moves through later pages. */
 	private total: { readonly count: number; readonly atLeast: boolean } | undefined;
 	private readonly chosen = new Set<string>();
+	private sort: AdminSort | undefined;
+	private readonly enabledSorts = new Set<string>();
+	private pageSize: AdministrationPageSize = ADMINISTRATION_PAGE_SIZE;
+	/** The day the list starts from, as the end of that day; unset shows the newest. */
+	private jumpTo: number | undefined;
 	private width = 0;
 	private folded = '';
 
@@ -204,6 +237,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	) {
 		super();
 		this.query = query;
+		this.sort = options.sorting?.initial;
 		this.section = this._register(
 			instantiationService.createInstance(PageSection, host, {
 				title: options.title ?? '',
@@ -225,6 +259,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 			$('thead', {}, this.headRow),
 			this.body
 		);
+		this.table.dataset.selectable = String(options.selectable === true);
 		if (options.selectable === true) {
 			this.pageAll = $('input.prctr-admin-list__select', {
 				type: 'checkbox',
@@ -265,12 +300,51 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 				icon: proctorIconFactory('action.forward', 14)
 			})
 		);
+		this.pageSizeButton = this._register(
+			new ButtonControl($('div.prctr-admin-list__size'), {
+				variant: 'ghost',
+				size: 'small',
+				label: format.text('listPageSize', { count: format.count(this.pageSize) }),
+				icon: proctorIconFactory('action.expand', 14)
+			})
+		);
+		this._register(this.pageSizeButton.onDidRequest(() => this.choosePageSize()));
+		if (options.dateJump !== undefined) {
+			const input = $('input.prctr-admin-list__jump-input', { type: 'date' });
+			this.jump = input;
+			this._register(
+				addDisposableListener(input, 'change', () => {
+					const day = input.valueAsNumber;
+					// The end of the chosen day in local time, so that day's rows are included.
+					this.jumpTo = Number.isNaN(day)
+						? undefined
+						: new Date(
+								new Date(day).getUTCFullYear(),
+								new Date(day).getUTCMonth(),
+								new Date(day).getUTCDate() + 1
+							).getTime();
+					this.restart();
+				})
+			);
+		}
 		this._register(this.previous.onDidRequest(() => this.showPage(this.page - 1, true)));
 		this._register(this.next.onDidRequest(() => this.showPage(this.page + 1, true)));
+		const tools = $('div.prctr-admin-list__tools');
+		if (this.jump !== undefined)
+			tools.append(
+				$(
+					'label.prctr-admin-list__jump',
+					{},
+					$('span', { textContent: format.text('listGoToDate') }),
+					this.jump
+				)
+			);
+		tools.append(this.pageSizeButton.element);
 		this.foot = $(
 			'div.prctr-admin-list__foot',
 			{},
 			$('div.prctr-admin-list__notes', {}, this.range, this.hint),
+			tools,
 			this.steps
 		);
 		this.wrap = $(
@@ -317,9 +391,56 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	/** Reads from the first page with new filters. */
 	setQuery(query: AdminListQuery<K>): void {
 		this.query = query;
+		this.restart();
+	}
+
+	/** A new order, page size, filter or start day: a cursor belongs to the old one. */
+	private restart(): void {
 		this.cursors = [undefined];
 		this.total = undefined;
 		this.showPage(1, false);
+	}
+
+	/** Offers a gated order, as Last active for a viewer who sees the whole Institution. */
+	enableSort(key: string): void {
+		if (this.enabledSorts.has(key)) return;
+		this.enabledSorts.add(key);
+		this.renderRows();
+	}
+
+	private setSort(key: string, first: AdminSortDirection): void {
+		const dir: AdminSortDirection =
+			this.sort?.key === key ? (this.sort.dir === 'asc' ? 'desc' : 'asc') : first;
+		this.sort = { key, dir };
+		this.restart();
+	}
+
+	private choosePageSize(): void {
+		const button = this.pageSizeButton.element;
+		this.pane.menu.show(
+			button,
+			ADMINISTRATION_PAGE_SIZES.map((size) => ({
+				label: this.format.text('listPageSize', { count: this.format.count(size) }),
+				...(size === this.pageSize
+					? { icon: proctorIconFactory('action.confirm', 16) }
+					: {}),
+				run: () => {
+					if (size === this.pageSize) return;
+					this.pageSize = size;
+					this.pageSizeButton.setState({
+						label: this.format.text('listPageSize', { count: this.format.count(size) }),
+						icon: proctorIconFactory('action.expand', 14)
+					});
+					this.restart();
+				}
+			})),
+			this.format.text('listPageSizeChoice')
+		);
+	}
+
+	/** Focuses the checkbox that chooses the whole page. */
+	focusPageAll(): void {
+		this.pageAll?.focus();
 	}
 
 	clearSelection(): void {
@@ -358,8 +479,10 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		const cursor = this.cursors[page - 1];
 		const intent = {
 			...this.query,
+			...(this.sort === undefined ? {} : this.options.sorting!.params(this.sort)),
+			...(this.jumpTo === undefined ? {} : this.options.dateJump!(this.jumpTo)),
 			kind: this.kind,
-			limit: ADMINISTRATION_PAGE_SIZE,
+			limit: this.pageSize,
 			...(cursor === undefined ? {} : { cursor })
 		} as unknown as AdministrationIntentOf<K>;
 		const read = new PageRead<
@@ -431,7 +554,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		if (data.cursor !== undefined) this.cursors[this.page] = data.cursor;
 		else this.cursors.length = this.page;
 		this.renderRows();
-		const first = (this.page - 1) * ADMINISTRATION_PAGE_SIZE + 1;
+		const first = (this.page - 1) * this.pageSize + 1;
 		const last = first + data.items.length - 1;
 		const hasNext = data.cursor !== undefined;
 		const paged = this.page > 1 || hasNext;
@@ -447,7 +570,8 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 							this.total?.atLeast === true
 						)
 					});
-		this.range.hidden = !paged;
+		// Every counted list says how many it holds; an uncounted one only once it has pages.
+		this.range.hidden = data.items.length === 0 || (!paged && this.total === undefined);
 		this.steps.hidden = !paged;
 		this.previous.setState({
 			label: this.format.text('pagerPrevious'),
@@ -507,6 +631,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	}
 
 	private renderRows(): void {
+		const focus = this.focusedPlace();
 		this.rowStore.clear();
 		const $ = createElementFactory(this.body.ownerDocument);
 		const shown = this.shownItems();
@@ -529,13 +654,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 			const width = plan.widths[index];
 			if (width !== undefined) col.style.width = width;
 			cols.push(col);
-			headers.push(
-				$('th', {
-					textContent: column.label,
-					attrs: { scope: 'col' },
-					data: { align: column.align ?? 'start' }
-				})
-			);
+			headers.push(this.renderHeader($, column));
 		});
 		if (this.options.actions !== undefined) {
 			cols.push($('col', { data: { kind: 'more' } }));
@@ -611,6 +730,80 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		this.wrap.hidden = shown.length === 0;
 		this.updatePageAll();
 		this.applyOverflow(plan.minimum);
+		this.restoreFocus(focus);
+	}
+
+	private renderHeader(
+		$: ReturnType<typeof createElementFactory>,
+		column: AdminColumn<AdminListItem<K>>
+	): HTMLTableCellElement {
+		const sort = column.sort;
+		const th = $('th', {
+			attrs: { scope: 'col' },
+			data: { align: column.align ?? 'start' }
+		});
+		if (
+			sort === undefined ||
+			this.options.sorting === undefined ||
+			(sort.gated === true && !this.enabledSorts.has(sort.key))
+		) {
+			th.textContent = column.label;
+			return th;
+		}
+		const sorted = this.sort?.key === sort.key ? this.sort.dir : undefined;
+		th.setAttribute(
+			'aria-sort',
+			sorted === undefined ? 'none' : sorted === 'asc' ? 'ascending' : 'descending'
+		);
+		const button = $(
+			'button.prctr-admin-list__sort',
+			{
+				type: 'button',
+				data: { sortKey: sort.key, sorted: String(sorted !== undefined) }
+			},
+			$('span', { textContent: column.label })
+		);
+		if (sorted !== undefined)
+			button.append(
+				this.rowStore.add(
+					createProctorIcon(button.ownerDocument, {
+						id: sorted === 'asc' ? 'action.sortAscending' : 'action.sortDescending',
+						size: 14
+					})
+				).element
+			);
+		this.rowStore.add(
+			addDisposableListener(button, 'click', () => this.setSort(sort.key, sort.first))
+		);
+		th.append(button);
+		return th;
+	}
+
+	/** Where keyboard focus is in the table, so a redraw can put it back. */
+	private focusedPlace(): { readonly row?: string; readonly selector: string } | undefined {
+		const active = this.root.ownerDocument.activeElement;
+		if (!(active instanceof HTMLElement) || !this.table.contains(active)) return undefined;
+		const sortKey = active.closest<HTMLElement>('.prctr-admin-list__sort')?.dataset.sortKey;
+		if (sortKey !== undefined)
+			return { selector: `.prctr-admin-list__sort[data-sort-key="${CSS.escape(sortKey)}"]` };
+		if (active === this.pageAll) return { selector: 'thead .prctr-admin-list__select' };
+		const row = active.closest<HTMLElement>('tr[data-row-id]')?.dataset.rowId;
+		const kind = [
+			'prctr-admin-list__open',
+			'prctr-admin-list__more',
+			'prctr-admin-list__select'
+		].find((name) => active.classList.contains(name));
+		if (row === undefined || kind === undefined) return undefined;
+		return { row, selector: `.${kind}` };
+	}
+
+	private restoreFocus(place: ReturnType<AdminList<K>['focusedPlace']>): void {
+		if (place === undefined) return;
+		const scope =
+			place.row === undefined
+				? this.table
+				: this.body.querySelector<HTMLElement>(`[data-row-id="${CSS.escape(place.row)}"]`);
+		scope?.querySelector<HTMLElement>(place.selector)?.focus();
 	}
 
 	private applyOverflow(minimum: number): void {

@@ -3,7 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
-	ADMINISTRATION_PAGE_SIZE,
+	ADMINISTRATION_MAX_PAGE_SIZE,
 	type AdministrationFailure,
 	type AdministrationIntentOf,
 	type AdministrationReadKind,
@@ -49,7 +49,8 @@ export async function readPages<K extends AdminListKind>(
 		const intent = {
 			...query,
 			kind,
-			limit: ADMINISTRATION_PAGE_SIZE,
+			// A picker reads the largest pages, so a long list takes few requests.
+			limit: ADMINISTRATION_MAX_PAGE_SIZE,
 			...(cursor === undefined ? {} : { cursor })
 		} as unknown as AdministrationIntentOf<K>;
 		const result = await readOnce(administration, intent);

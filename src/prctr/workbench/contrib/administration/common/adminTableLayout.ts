@@ -16,10 +16,10 @@ export interface AdminColumnLayout {
 	readonly width?: string;
 	readonly align?: 'start' | 'end' | 'center';
 	/**
-	 * 1 never folds; 2 folds into the first column's second line below 680 pixels; 3 below
-	 * 820 pixels.
+	 * 1 never folds; 2 folds into the first column's second line below 680 pixels, 3 below
+	 * 820 pixels and 4 below 960 pixels.
 	 */
-	readonly priority?: 1 | 2 | 3;
+	readonly priority?: 1 | 2 | 3 | 4;
 	/** The narrowest the column may be before the table scrolls sideways. */
 	readonly min?: number;
 	/** Long text wraps instead of ending in "…". */
@@ -29,7 +29,12 @@ export interface AdminColumnLayout {
 }
 
 /** Below these widths a column of that priority folds. */
-export const ADMIN_FOLD_BELOW: Readonly<Record<1 | 2 | 3, number>> = { 1: 0, 2: 680, 3: 820 };
+export const ADMIN_FOLD_BELOW: Readonly<Record<1 | 2 | 3 | 4, number>> = {
+	1: 0,
+	2: 680,
+	3: 820,
+	4: 960
+};
 /** The narrowest a column of each kind may be when it names no minimum. */
 export const ADMIN_CELL_MIN: Readonly<Record<string, number>> = {
 	person: 240,

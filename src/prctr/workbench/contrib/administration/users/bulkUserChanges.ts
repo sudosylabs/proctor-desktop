@@ -96,14 +96,20 @@ export class BulkUserChanges extends Disposable {
 		});
 	}
 
+	/** Disabling is listed person by person, so one can still be taken out before it runs. */
 	disable(users: readonly User[]): void {
-		this.confirm(users, 'user.disable', {
-			title: this.many(users.length, 'bulkDisableTitle'),
-			message: this.format.text('bulkDisableBody'),
-			confirmLabel: this.many(users.length, 'bulkDisableConfirm'),
-			confirmIcon: 'action.end',
-			destructive: true
-		});
+		this.confirm(
+			users,
+			'user.disable',
+			{
+				title: this.many(users.length, 'bulkDisableTitle'),
+				message: this.format.text('bulkDisableBody'),
+				confirmLabel: this.many(users.length, 'bulkDisableConfirm'),
+				confirmIcon: 'action.end',
+				destructive: true
+			},
+			true
+		);
 	}
 
 	enable(users: readonly User[]): void {
@@ -132,14 +138,31 @@ export class BulkUserChanges extends Disposable {
 			readonly confirmLabel: string;
 			readonly confirmIcon: 'action.signOut' | 'action.end' | 'action.enable';
 			readonly destructive: boolean;
-		}
+		},
+		listed = false
 	): void {
 		let outcome: AdminChangeResult | undefined;
 		this.dialog.value = this.instantiationService.createInstance(
 			AdminConfirmation,
 			{
 				...text,
-				run: async () => {
+				...(listed
+					? {
+							people: {
+								label: this.format.text('bulkPeople'),
+								chips: users.map((user) => ({
+									id: user.id,
+									label: user.displayName
+								})),
+								removeLabel: (chip: { readonly label: string }) =>
+									this.format.text('bulkRemovePerson', { name: chip.label }),
+								confirmLabel: (count: number) =>
+									this.many(count, 'bulkDisableConfirm')
+							}
+						}
+					: {}),
+				run: async (ids) => {
+					const chosen = listed ? users.filter((user) => ids.includes(user.id)) : users;
 					const institution = await readOnce(this.administration, {
 						kind: 'institution'
 					} as AdministrationIntentOf<'institution'>);
@@ -151,7 +174,7 @@ export class BulkUserChanges extends Disposable {
 							operation,
 							scopeType: 'institution',
 							scopeId: institution.value.id,
-							items: users.map((user, index) => ({
+							items: chosen.map((user, index) => ({
 								key: `person-${index + 1}`,
 								userId: user.id
 							}))

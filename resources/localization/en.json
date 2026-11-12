@@ -4983,6 +4983,26 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
+    "administration.list.jump": {
+      "message": "Go to a date",
+      "description": "Under a dated table: starts the list at the end of the chosen day.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.list.page.choice": {
+      "message": "Rows on each page",
+      "description": "Accessible name of the menu that chooses how many rows a page shows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.list.page.size": {
+      "message": "{count} a page",
+      "description": "Under a table: how many rows each page shows; opens a choice of 10, 25 or 50.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.list.scroll.hint": {
       "message": "Scroll sideways for more columns",
       "description": "Under a table that is wider than the window and scrolls sideways.",
@@ -5008,6 +5028,22 @@
       "description": "Under a table: which rows it shows, as in \"Showing 1–10 of 1,284\".",
       "placeholders": [
         "range"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.list.sorted.ascending": {
+      "message": "{column}, sorted from first to last",
+      "description": "Accessible name of a column header sorted in ascending order.",
+      "placeholders": [
+        "column"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.list.sorted.descending": {
+      "message": "{column}, sorted from last to first",
+      "description": "Accessible name of a column header sorted in descending order.",
+      "placeholders": [
+        "column"
       ],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
@@ -8503,6 +8539,14 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
+    "administration.users.bulk.leaveout": {
+      "message": "Leave out {name}",
+      "description": "Accessible name of the × on a person chip in a change for several people.",
+      "placeholders": [
+        "name"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
     "administration.users.bulk.more": {
       "message": "More changes for the selected people",
       "description": "Accessible name of the ⋯ menu in the selection bar.",
@@ -8599,6 +8643,48 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
+    "administration.users.filter.active.any": {
+      "message": "Any time",
+      "description": "Users filter choice: no filter on when people were last active.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.active.idle": {
+      "message": "Not for 90 days",
+      "description": "Users filter choice: people not active for 90 days or more.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.active.never": {
+      "message": "Never signed in",
+      "description": "Users filter choice: people who have never signed in.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.active.recent": {
+      "message": "In the last 30 days",
+      "description": "Users filter choice: people active in the last 30 days.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.more": {
+      "message": "More filters",
+      "description": "Opens the filters not shown in the bar: Role and Last active.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.role.any": {
+      "message": "Any role",
+      "description": "Users filter choice: no role filter.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.role.label": {
+      "message": "Role",
+      "description": "Users filter: people who hold a role.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
     "administration.users.filter.status": {
       "message": "Status",
       "description": "Filter over the list of users by whether accounts are disabled.",
@@ -8614,6 +8700,12 @@
     "administration.users.filter.status.any": {
       "message": "Any status",
       "description": "Users filter choice: active and disabled accounts.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.filter.status.disabled": {
+      "message": "Disabled",
+      "description": "Users filter choice: only accounts that are turned off.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },

@@ -125,6 +125,57 @@
 			var(--prctr-color-background-surface);
 	}
 
+	/* A selectable table pins the checkbox and the name beside it, so a row is never anonymous. */
+	.prctr-admin-list
+		.prctr-admin-list__wrap[data-overflow='true']
+		table[data-selectable='true']
+		tr
+		> :first-child {
+		box-shadow: inset 0 -1px 0 var(--prctr-color-border-default);
+	}
+	.prctr-admin-list
+		.prctr-admin-list__wrap[data-overflow='true']
+		table[data-selectable='true']
+		tr
+		> :nth-child(2) {
+		background: var(--prctr-color-background-surface);
+		box-shadow:
+			inset -1px 0 0 var(--prctr-color-border-default),
+			inset 0 -1px 0 var(--prctr-color-border-default);
+		inset-inline-start: 44px;
+		position: sticky;
+		z-index: 1;
+	}
+
+	/* A sortable column's header is a button: its label, and an arrow once it orders the list. */
+	.prctr-admin-list .prctr-admin-list__sort {
+		align-items: center;
+		background: transparent;
+		border: 0;
+		border-radius: var(--prctr-shape-radius-compact);
+		color: inherit;
+		cursor: pointer;
+		display: inline-flex;
+		font: inherit;
+		gap: 4px;
+		margin-inline: -6px;
+		padding: 4px 6px;
+	}
+	.prctr-admin-list .prctr-admin-list__sort:hover {
+		background: var(--prctr-color-interaction-hover);
+		color: var(--prctr-color-text-primary);
+	}
+	.prctr-admin-list .prctr-admin-list__sort[data-sorted='true'] {
+		color: var(--prctr-color-text-primary);
+	}
+	.prctr-admin-list .prctr-admin-list__sort:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 0;
+	}
+	.prctr-admin-list th[data-align='end'] .prctr-admin-list__sort {
+		flex-direction: row-reverse;
+	}
+
 	.prctr-admin-list .prctr-admin-list__person {
 		align-items: center;
 		display: flex;
@@ -246,11 +297,38 @@
 		gap: 4px 16px;
 		min-inline-size: 0;
 	}
+	.prctr-admin-list .prctr-admin-list__tools {
+		align-items: center;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin-inline-start: auto;
+	}
+	.prctr-admin-list .prctr-admin-list__jump {
+		align-items: center;
+		color: var(--prctr-color-text-secondary);
+		display: inline-flex;
+		font-size: 13px;
+		gap: 8px;
+	}
+	.prctr-admin-list .prctr-admin-list__jump-input {
+		background: var(--prctr-color-background-card);
+		block-size: 28px;
+		border: 0;
+		border-radius: var(--prctr-shape-radius-compact);
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-field);
+		color: var(--prctr-color-text-primary);
+		font: inherit;
+		padding: 0 8px;
+	}
+	.prctr-admin-list .prctr-admin-list__jump-input:focus-visible {
+		outline: 2px solid var(--prctr-color-border-focus);
+		outline-offset: 1px;
+	}
 	.prctr-admin-list .prctr-admin-list__steps {
 		display: flex;
 		flex: none;
 		gap: 8px;
-		margin-inline-start: auto;
 	}
 	.prctr-admin-list .prctr-admin-list__foot [hidden] {
 		display: none;

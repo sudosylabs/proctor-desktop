@@ -31,6 +31,46 @@ export const usersMessages = Object.freeze({
 		defaultMessage: 'Active',
 		description: 'Users filter choice: only accounts that can sign in.'
 	}),
+	usersStatusDisabled: defineMessage({
+		id: 'administration.users.filter.status.disabled',
+		defaultMessage: 'Disabled',
+		description: 'Users filter choice: only accounts that are turned off.'
+	}),
+	usersRole: defineMessage({
+		id: 'administration.users.filter.role.label',
+		defaultMessage: 'Role',
+		description: 'Users filter: people who hold a role.'
+	}),
+	usersRoleAny: defineMessage({
+		id: 'administration.users.filter.role.any',
+		defaultMessage: 'Any role',
+		description: 'Users filter choice: no role filter.'
+	}),
+	usersLastActiveAny: defineMessage({
+		id: 'administration.users.filter.active.any',
+		defaultMessage: 'Any time',
+		description: 'Users filter choice: no filter on when people were last active.'
+	}),
+	usersLastActiveNever: defineMessage({
+		id: 'administration.users.filter.active.never',
+		defaultMessage: 'Never signed in',
+		description: 'Users filter choice: people who have never signed in.'
+	}),
+	usersLastActiveRecent: defineMessage({
+		id: 'administration.users.filter.active.recent',
+		defaultMessage: 'In the last 30 days',
+		description: 'Users filter choice: people active in the last 30 days.'
+	}),
+	usersLastActiveIdle: defineMessage({
+		id: 'administration.users.filter.active.idle',
+		defaultMessage: 'Not for 90 days',
+		description: 'Users filter choice: people not active for 90 days or more.'
+	}),
+	usersMoreFilters: defineMessage({
+		id: 'administration.users.filter.more',
+		defaultMessage: 'More filters',
+		description: 'Opens the filters not shown in the bar: Role and Last active.'
+	}),
 	usersStatusAny: defineMessage({
 		id: 'administration.users.filter.status.any',
 		defaultMessage: 'Any status',
@@ -284,6 +324,11 @@ export const usersMessages = Object.freeze({
 		defaultMessage:
 			'They join the class from the date you choose. Each person is handled on their own, so one who can’t be enrolled doesn’t stop the others.',
 		description: 'Explains enrolling several people.'
+	}),
+	bulkRemovePerson: defineMessage({
+		id: 'administration.users.bulk.leaveout',
+		defaultMessage: 'Leave out {name}',
+		description: 'Accessible name of the × on a person chip in a change for several people.'
 	}),
 	bulkPeople: defineMessage({
 		id: 'administration.bulk.people',

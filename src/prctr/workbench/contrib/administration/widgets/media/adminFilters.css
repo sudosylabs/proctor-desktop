@@ -95,6 +95,17 @@
 		}
 	}
 
+	@container (max-width: 560px) {
+		.prctr-admin-filters
+			.prctr-admin-filters__actions
+			> :not([data-overflow='true']):not([data-keep='true']) {
+			display: none;
+		}
+	}
+	.prctr-admin-filters .prctr-admin-filters__more[hidden] {
+		display: none;
+	}
+
 	@media (forced-colors: active) {
 		.prctr-admin-filters .prctr-admin-filters__find {
 			border: 1px solid CanvasText;
