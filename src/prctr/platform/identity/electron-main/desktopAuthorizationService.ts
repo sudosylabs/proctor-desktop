@@ -1,27 +1,16 @@
 import { SessionApi } from '../../serverApi/node/sessionApi.js';
-import type { ReadObservation } from '../../serverApi/node/sessionReads.js';
 import { resolveApiRoute } from '../../serverApi/node/legacyApiRequest.js';
 import {
 	ServerApiError,
 	type ApiInput,
 	type ApiOperationId
 } from '../../serverApi/common/serverApi.js';
-import {
-	ProjectionFailure,
-	projectRead,
-	type SessionBinding
-} from '../../serverApi/common/projection.js';
+import type { SessionBinding } from '../../serverApi/common/projection.js';
 import type { ServerHttpTransport } from '../../serverApi/node/serverHttpTransport.js';
 import { decodeResponse } from '../../serverApi/node/responseDecoding.js';
 import { encodeRequest, type ApiRequestInput } from '../../serverApi/node/requestEncoding.js';
 import { problemCode, sendWithDPoP, type DPoPBinding } from '../node/dpopExchange.js';
 import { SessionRequestSigner } from './sessionRequestSigner.js';
-import {
-	validateExamActivityIntent,
-	type ExamActivityIntent,
-	type ExamActivityResponse
-} from '../../examActivity/common/examActivityProtocol.js';
-import { readExamActivityWire } from '../../examActivity/electron-main/examActivityWire.js';
 import { validateUserSettingsCommitIntent } from '../../settings/common/settingsRendererProtocol.js';
 import {
 	readUserSettingsWire,
@@ -657,113 +646,6 @@ export class DesktopAuthorizationService extends Disposable {
 			if (error instanceof ServerApiError && error.kind === 'server')
 				return { status: error.status!, value: error.problem, failure: error };
 			throw error;
-		}
-	}
-	async examActivity(
-		binding: SessionBinding,
-		raw: ExamActivityIntent
-	): Promise<ExamActivityResponse> {
-		const intent = validateExamActivityIntent(raw);
-		try {
-			return await this.apiForSession(binding).reads.read(
-				['examActivity', intent],
-				(signal) =>
-					projectRead((capture) =>
-						this.examActivityUncached(binding, intent, signal, capture)
-					),
-				{ staleTime: intent.kind === 'context' ? 0 : 30_000 }
-			);
-		} catch (error) {
-			return error instanceof ProjectionFailure
-				? (error.response as ExamActivityResponse)
-				: {
-						kind: 'error',
-						reason:
-							error instanceof ServerApiError && error.kind === 'sessionEnded'
-								? 'sessionEnded'
-								: 'unavailable'
-					};
-		}
-	}
-	observeExamActivity(
-		binding: SessionBinding,
-		raw: ExamActivityIntent,
-		listener: (response: ExamActivityResponse) => void
-	): ReadObservation {
-		const intent = validateExamActivityIntent(raw);
-		return this.apiForSession(binding).reads.observe(
-			['examActivity', intent],
-			(signal) =>
-				projectRead((capture) =>
-					this.examActivityUncached(binding, intent, signal, capture)
-				),
-			(state) => {
-				if (state.error)
-					listener(
-						state.error instanceof ProjectionFailure
-							? (state.error.response as ExamActivityResponse)
-							: { kind: 'error', reason: 'unavailable' }
-					);
-				else if (state.value) listener(state.value);
-			},
-			{ staleTime: intent.kind === 'context' ? 0 : 30_000, pollIntervalMs: 30_000 }
-		);
-	}
-	/** Read-only product capability bound to the same authenticated session as account/settings. */
-	private async examActivityUncached(
-		binding: SessionBinding,
-		raw: ExamActivityIntent,
-		signal?: AbortSignal,
-		captureFailure?: (failure: ServerApiError) => void
-	): Promise<ExamActivityResponse> {
-		const intent = validateExamActivityIntent(raw);
-		const session = this.#session,
-			generation = this.#generation;
-		const current = () =>
-			!this.#disposed && this.#session === session && this.#generation === generation;
-		if (
-			!session ||
-			!current() ||
-			session.tokens.principalId !== binding.principalId ||
-			session.tokens.sessionId !== binding.sessionId
-		)
-			return { kind: 'error', reason: 'sessionEnded' };
-		const path: DesktopHttpPath =
-			intent.kind === 'context'
-				? '/api/v1/users/me/context'
-				: intent.kind === 'result'
-					? `/api/v1/exam-attempts/${intent.attemptId}/result`
-					: `/api/v1/users/me/exam-activity?limit=20${intent.cursor ? `&cursor=${encodeURIComponent(intent.cursor)}` : ''}`;
-		try {
-			const result = await this.protectedRequest(
-				session,
-				generation,
-				path,
-				undefined,
-				undefined,
-				undefined,
-				signal
-			);
-			if (result.failure) captureFailure?.(result.failure);
-			if (result.status === 401) {
-				await this.signOut();
-				return { kind: 'error', reason: 'sessionEnded' };
-			}
-			if (result.status === 403) return { kind: 'error', reason: 'restricted' };
-			if (result.status === 404 && intent.kind === 'result')
-				return { kind: 'error', reason: 'notFound' };
-			if (result.status === 400 && intent.kind === 'activity' && intent.cursor)
-				return { kind: 'error', reason: 'invalidCursor' };
-			if (result.status !== 200) return { kind: 'error', reason: 'unavailable' };
-			return readExamActivityWire(
-				intent,
-				result.value,
-				session.tokens.principalId,
-				session.tokens.registrationId
-			);
-		} catch (error) {
-			if (error instanceof ServerApiError) captureFailure?.(error);
-			return { kind: 'error', reason: current() ? 'unavailable' : 'sessionEnded' };
 		}
 	}
 	async readSettings(

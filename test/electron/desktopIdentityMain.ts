@@ -18,6 +18,7 @@ import { loadNativeDesktopKeyCustody } from '../../src/prctr/platform/identity/e
 import { OsDesktopCredentialStore } from '../../src/prctr/platform/identity/electron-main/desktopCredentialStore.js';
 import { DesktopAuthorizationService } from '../../src/prctr/platform/identity/electron-main/desktopAuthorizationService.js';
 import { AdministrationService } from '../../src/prctr/platform/administration/electron-main/administrationService.js';
+import { ExamActivityService } from '../../src/prctr/platform/examActivity/electron-main/examActivityService.js';
 import { AccountService } from '../../src/prctr/platform/account/electron-main/accountService.js';
 import { ServerHttpTransport } from '../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 import {
@@ -97,7 +98,7 @@ if (probe) {
 							production: false,
 							account: new AccountService(service),
 							administration: new AdministrationService(service),
-							examActivity: service,
+							examActivity: new ExamActivityService(service),
 							settings: service,
 							launchIdentity: launch,
 							rendererByKind: {
@@ -386,7 +387,7 @@ if (probe) {
 				);
 				assert.equal(
 					(
-						await service.examActivity(
+						await new ExamActivityService(service).examActivity(
 							{ principalId: 'b'.repeat(26), sessionId },
 							{ kind: 'context' }
 						)
@@ -423,7 +424,10 @@ if (probe) {
 				await service.refresh();
 				await service.signOut();
 				assert.deepEqual(
-					await service.examActivity({ principalId, sessionId }, { kind: 'activity' }),
+					await new ExamActivityService(service).examActivity(
+						{ principalId, sessionId },
+						{ kind: 'activity' }
+					),
 					{ kind: 'error', reason: 'sessionEnded' }
 				);
 				assert.equal(await credentials.read(scope), undefined);

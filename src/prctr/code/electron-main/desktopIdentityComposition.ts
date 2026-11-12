@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { DisposableStore } from '../../base/common/lifecycle.js';
 import { DesktopIdentityCoordinator } from '../../platform/identity/electron-main/desktopIdentityCoordinator.js';
 import { AccountService } from '../../platform/account/electron-main/accountService.js';
+import { ExamActivityService } from '../../platform/examActivity/electron-main/examActivityService.js';
 import { AdministrationService } from '../../platform/administration/electron-main/administrationService.js';
 import { DesktopAuthorizationService } from '../../platform/identity/electron-main/desktopAuthorizationService.js';
 import { HttpServerReadinessTransport } from '../../platform/identity/electron-main/httpServerReadinessTransport.js';
@@ -99,6 +100,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 			})
 		);
 		const account = new AccountService(authorization);
+		const examActivity = new ExamActivityService(authorization);
 		const administration = owned.add(new AdministrationService(authorization));
 		const connectivity = () => authorization.setApiOnline(net.isOnline());
 		const connectivityTimer = setInterval(connectivity, 5000);
@@ -132,7 +134,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				launchIdentity: identity,
 				account,
 				administration,
-				examActivity: authorization,
+				examActivity,
 				settings: authorization
 			}),
 			{

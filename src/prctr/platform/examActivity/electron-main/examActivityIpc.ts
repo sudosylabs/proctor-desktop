@@ -10,7 +10,7 @@ import {
 	type ExamActivityResponse
 } from '../common/examActivityProtocol.js';
 
-export interface ExamActivityService {
+export interface ExamActivityCapability {
 	observeExamActivity?(
 		binding: SessionBinding,
 		intent: ExamActivityIntent,
@@ -29,7 +29,7 @@ export class ExamActivityIpcBridge {
 	constructor(
 		private readonly ipc: Pick<IpcMain, 'handle' | 'removeHandler'>,
 		binding: SessionBinding,
-		service: ExamActivityService,
+		service: ExamActivityCapability,
 		authorize: (event: IpcMainInvokeEvent) => void
 	) {
 		const bound = Object.freeze({

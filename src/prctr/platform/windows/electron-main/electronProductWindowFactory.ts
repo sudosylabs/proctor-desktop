@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 // @proctor-vscode-port electron-window-skeleton
 import type { WindowAppearanceStore } from '../node/windowAppearanceStore.js';
-import { ExamActivityIpcBridge, type ExamActivityService } from '../../examActivity/electron-main/examActivityIpc.js';
+import { ExamActivityIpcBridge, type ExamActivityCapability } from '../../examActivity/electron-main/examActivityIpc.js';
 
 import { bindWindowUserSettings } from '../../settings/electron-main/userSettingsWindow.js';
 import type { UserSettingsSessionService } from '../../settings/common/userSettingsSession.js';
@@ -74,7 +74,7 @@ export interface ElectronProductWindowFactoryOptions extends ElectronProductWind
 	readonly launchIdentity?: DesktopIdentityCoordinator;
 	readonly account?: AccountCapability;
 	readonly administration?: AdministrationIpcService;
-	readonly examActivity?: ExamActivityService;
+	readonly examActivity?: ExamActivityCapability;
 	readonly settings?: UserSettingsSessionService;
 	readonly windowChromeEnvironment?: ElectronWindowChromeEnvironment;
 	/** Where the build staged @vnilink/elg; without it, macOS 26 falls back to vibrancy. */
@@ -332,7 +332,7 @@ class ElectronManagedProductWindow implements ManagedProductWindow {
 		launchIdentity?: DesktopIdentityCoordinator,
 		account?: AccountCapability,
 		settings?: UserSettingsSessionService,
-		examActivity?: ExamActivityService,
+		examActivity?: ExamActivityCapability,
 		administration?: AdministrationIpcService,
 		material?: WindowMaterial,
 		appearance?: WindowAppearanceStore

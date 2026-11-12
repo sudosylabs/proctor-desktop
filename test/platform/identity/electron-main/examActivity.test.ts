@@ -7,7 +7,7 @@ import {
 } from '../../../../src/prctr/platform/examActivity/common/examActivityProtocol.js';
 import { readExamActivityWire } from '../../../../src/prctr/platform/examActivity/electron-main/examActivityWire.js';
 import { ExamActivityIpcBridge } from '../../../../src/prctr/platform/examActivity/electron-main/examActivityIpc.js';
-import { desktopHttpMethod } from '../../../../src/prctr/platform/identity/node/desktopAuthHttp.js';
+import { encodeRequest } from '../../../../src/prctr/platform/serverApi/node/requestEncoding.js';
 import { ProductAccess } from '../../../../src/prctr/workbench/contrib/examActivity/common/productAccess.js';
 const id = 'y'.repeat(26);
 const date = '2026-09-11T08:00:00Z';
@@ -20,18 +20,27 @@ void test('exam capability rejects arbitrary paths, binding injection, unsupport
 		{ kind: 'context', url: 'https://attacker.test' }
 	])
 		assert.throws(() => validateExamActivityIntent(value));
-	assert.equal(desktopHttpMethod(`/api/v1/exam-attempts/${id}/result`), 'GET');
+	const origin = 'https://example.test';
+	const result = encodeRequest(origin, 'getStudentExamResult', { path: { exam_attempt_id: id } });
+	assert.equal(result.method, 'GET');
+	assert.equal(result.url, `${origin}/api/v1/exam-attempts/${id}/result`);
 	assert.equal(
-		desktopHttpMethod('/api/v1/users/me/exam-activity?limit=20&cursor=a%2Fb%3D'),
-		'GET'
+		encodeRequest(origin, 'listCandidateExamActivity', { query: { limit: 20, cursor: 'a/b=' } })
+			.url,
+		`${origin}/api/v1/users/me/exam-activity?limit=20&cursor=a%2Fb%3D`
 	);
-	for (const path of [
-		'/api/v1/users/me/exam-activity?limit=200',
-		'/api/v1/users/me/exam-activity?limit=20&user_id=other',
-		`/api/v1/exam-attempts/${id}/result?private=true`,
-		'/api/v1/users/me/exam-activity?limit=20#fragment'
+	for (const input of [
+		{ query: { limit: 201 } },
+		{ query: { limit: 20, user_id: 'other' } },
+		{ path: { exam_attempt_id: id } }
 	])
-		assert.throws(() => desktopHttpMethod(path as Parameters<typeof desktopHttpMethod>[0]));
+		assert.throws(() => encodeRequest(origin, 'listCandidateExamActivity', input as never));
+	assert.throws(() =>
+		encodeRequest(origin, 'getStudentExamResult', {
+			path: { exam_attempt_id: id },
+			query: { private: true }
+		} as never)
+	);
 });
 void test('context and released result whitelist fields and verify immutable session/resource bindings', () => {
 	const context = {
