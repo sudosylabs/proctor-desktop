@@ -1,4 +1,5 @@
-import { ServerApiClient, type ApiObservation } from '../../serverApi/node/serverApiClient.js';
+import { SessionApi } from '../../serverApi/node/sessionApi.js';
+import type { ReadObservation } from '../../serverApi/node/sessionReads.js';
 import { resolveApiRoute } from '../../serverApi/node/legacyApiRequest.js';
 import {
 	ServerApiError,
@@ -131,7 +132,7 @@ export class DesktopAuthorizationService extends Disposable {
 	#reauthentication: CancellationTokenSource | undefined;
 	/** The sign-in page a browser is completing, kept so it can be opened again until it expires. */
 	#pendingSignInPage: { readonly url: string; readonly expiresAt: number } | undefined;
-	#api: ServerApiClient | undefined;
+	#api: SessionApi | undefined;
 	constructor(private readonly options: DesktopAuthorizationOptions) {
 		super();
 	}
@@ -261,11 +262,15 @@ export class DesktopAuthorizationService extends Disposable {
 					if (this.#session === activeSession) void this.signOut();
 				}
 			});
-			this.#api = new ServerApiClient(
-				identity.origin,
-				(request) => signer.execute(request),
-				(url, challenge) => signer.authorizeUpgrade(url, challenge)
-			);
+			this.#api = new SessionApi({
+				binding: {
+					principalId: session.tokens.principalId,
+					sessionId: session.tokens.sessionId
+				},
+				origin: identity.origin,
+				execute: (request) => signer.execute(request),
+				authorizeUpgrade: (url, challenge) => signer.authorizeUpgrade(url, challenge)
+			});
 			await this.options.onAuthenticated(projection);
 			current();
 			this.#scheduleRefresh();
@@ -518,7 +523,7 @@ export class DesktopAuthorizationService extends Disposable {
 			// A change through the typed client already invalidates every cached read.
 			return this.accountUncached(binding, intent);
 		try {
-			return await this.apiForSession(binding).fetchTask(['account', intent], (signal) =>
+			return await this.apiForSession(binding).reads.read(['account', intent], (signal) =>
 				projectRead((capture) => this.accountUncached(binding, intent, signal, capture))
 			);
 		} catch (error) {
@@ -537,11 +542,11 @@ export class DesktopAuthorizationService extends Disposable {
 		binding: SessionBinding,
 		raw: AccountIntent,
 		listener: (response: AccountResponse) => void
-	): ApiObservation {
+	): ReadObservation {
 		const intent = validateAccountIntent(raw);
 		if (intent.kind !== 'read' && intent.kind !== 'readPhoto')
 			throw new ServerApiError('invalidRequest');
-		return this.apiForSession(binding).observeTask(
+		return this.apiForSession(binding).reads.observe(
 			['account', intent],
 			(signal) =>
 				projectRead((capture) => this.accountUncached(binding, intent, signal, capture)),
@@ -552,7 +557,7 @@ export class DesktopAuthorizationService extends Disposable {
 							? (state.error.response as AccountResponse)
 							: { kind: 'error', reason: 'unavailable' }
 					);
-				else if (state.data) listener(state.data);
+				else if (state.value) listener(state.value);
 			},
 			{ pollIntervalMs: 60_000 }
 		);
@@ -813,7 +818,7 @@ export class DesktopAuthorizationService extends Disposable {
 	}
 
 	/** Full typed client is available only to privileged, session-bound capability owners. */
-	apiForSession(binding: SessionBinding): ServerApiClient {
+	apiForSession(binding: SessionBinding): SessionApi {
 		const session = this.#session;
 		if (
 			!session ||
@@ -943,7 +948,7 @@ export class DesktopAuthorizationService extends Disposable {
 	): Promise<ExamActivityResponse> {
 		const intent = validateExamActivityIntent(raw);
 		try {
-			return await this.apiForSession(binding).fetchTask(
+			return await this.apiForSession(binding).reads.read(
 				['examActivity', intent],
 				(signal) =>
 					projectRead((capture) =>
@@ -967,9 +972,9 @@ export class DesktopAuthorizationService extends Disposable {
 		binding: SessionBinding,
 		raw: ExamActivityIntent,
 		listener: (response: ExamActivityResponse) => void
-	): ApiObservation {
+	): ReadObservation {
 		const intent = validateExamActivityIntent(raw);
-		return this.apiForSession(binding).observeTask(
+		return this.apiForSession(binding).reads.observe(
 			['examActivity', intent],
 			(signal) =>
 				projectRead((capture) =>
@@ -982,7 +987,7 @@ export class DesktopAuthorizationService extends Disposable {
 							? (state.error.response as ExamActivityResponse)
 							: { kind: 'error', reason: 'unavailable' }
 					);
-				else if (state.data) listener(state.data);
+				else if (state.value) listener(state.value);
 			},
 			{ staleTime: intent.kind === 'context' ? 0 : 30_000, pollIntervalMs: 30_000 }
 		);

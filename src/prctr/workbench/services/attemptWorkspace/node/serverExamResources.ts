@@ -1,4 +1,4 @@
-import type { ServerApiClient } from '../../../../platform/serverApi/node/serverApiClient.js';
+import type { SessionApi } from '../../../../platform/serverApi/node/sessionApi.js';
 import { ServerApiError } from '../../../../platform/serverApi/common/serverApi.js';
 import type { components } from '../../../../platform/serverApi/common/serverApi.generated.js';
 import type { ExamResourceEntry } from '../common/attemptWorkspace.js';
@@ -11,7 +11,7 @@ export class ServerExamResources implements ExamResourcePort {
 	readonly #entries: readonly ExamResourceEntry[];
 	readonly #lifetime = new AbortController();
 	constructor(
-		private readonly api: Pick<ServerApiClient, 'request'>,
+		private readonly api: Pick<SessionApi, 'request'>,
 		private readonly current: () => WorkspaceServerBinding,
 		private readonly presentation: Presentation,
 		private readonly revisionIsCurrent: () => boolean

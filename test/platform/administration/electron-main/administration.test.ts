@@ -27,7 +27,7 @@ import {
 } from '../../../../src/prctr/platform/serverApi/common/serverApi.js';
 import { operationContract } from '../../../../src/prctr/platform/serverApi/node/serverContract.js';
 import type { EncodedApiRequest } from '../../../../src/prctr/platform/serverApi/node/requestEncoding.js';
-import { ServerApiClient } from '../../../../src/prctr/platform/serverApi/node/serverApiClient.js';
+import { SessionApi } from '../../../../src/prctr/platform/serverApi/node/sessionApi.js';
 import type { HttpResponse } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 
 const id = 'y'.repeat(26);
@@ -89,7 +89,6 @@ const retentionPolicyDto = {
 interface Harness {
 	readonly service: AdministrationService;
 	readonly requests: EncodedApiRequest[];
-	readonly signOuts: () => number;
 	readonly dispose: () => void;
 }
 function harness(
@@ -97,19 +96,19 @@ function harness(
 	port: Partial<AdministrationSessionPort> = {}
 ): Harness {
 	const requests: EncodedApiRequest[] = [];
-	let signOuts = 0;
-	const api = new ServerApiClient(origin, async (request) => {
-		requests.push(request);
-		return answer(request, requests.length - 1);
+	const api = new SessionApi({
+		binding,
+		origin: origin,
+		execute: async (request) => {
+			requests.push(request);
+			return answer(request, requests.length - 1);
+		}
 	});
 	const service = new AdministrationService({
 		apiForSession(value) {
 			if (value.principalId !== binding.principalId || value.sessionId !== binding.sessionId)
 				throw new ServerApiError('sessionEnded');
 			return api;
-		},
-		async signOut() {
-			signOuts++;
 		},
 		async reauthenticate() {
 			return 'success';
@@ -120,7 +119,6 @@ function harness(
 	return {
 		service,
 		requests,
-		signOuts: () => signOuts,
 		dispose: () => {
 			service.dispose();
 			api.dispose();
@@ -221,7 +219,7 @@ void test('only allow-listed operations can be sent, and every route is on the l
 		request: (async () => {
 			calls++;
 			throw new Error('reached');
-		}) as ServerApiClient['request']
+		}) as SessionApi['request']
 	});
 	for (const operation of [
 		'replaceCurrentUserSettings',
@@ -610,9 +608,7 @@ void test('server refusals become closed reasons, and a rejected credential ends
 		);
 		await expect({ kind: 'retryJob', id }, { kind: 'error', reason: 'unconfirmed' });
 		await expect({ kind: 'institution' }, { kind: 'error', reason: 'unavailable' });
-		assert.equal(h.signOuts(), 0);
 		await expect({ kind: 'enableUser', id }, { kind: 'error', reason: 'sessionEnded' });
-		assert.equal(h.signOuts(), 1);
 	} finally {
 		h.dispose();
 	}

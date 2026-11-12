@@ -1195,7 +1195,7 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		assert.ok(!JSON.stringify(profile).includes('never project'));
 		assert.equal(seen.length, 2);
 		assert.notEqual(seen[0]!.proof.jti, seen[1]!.proof.jti);
-		await service.apiForSession(binding).invalidate();
+		await service.apiForSession(binding).reads.invalidate();
 		profileMode = 'malformed';
 		const beforeMalformed = profileReads;
 		assert.deepEqual(await service.account(binding, { kind: 'read', section: 'profile' }), {

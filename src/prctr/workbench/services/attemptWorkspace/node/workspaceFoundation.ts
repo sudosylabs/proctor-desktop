@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { DisposableStore } from '../../../../base/common/lifecycle.js';
 import type { Event } from '../../../../base/common/event.js';
 import type { ProtectedRecordStore } from '../../../../platform/protectedStorage/node/protectedRecordStore.js';
-import type { ServerApiClient } from '../../../../platform/serverApi/node/serverApiClient.js';
+import type { SessionApi } from '../../../../platform/serverApi/node/sessionApi.js';
 import type { components } from '../../../../platform/serverApi/common/serverApi.generated.js';
 import { validateNamedSchema } from '../../../../platform/serverApi/node/serverContract.js';
 import type { WorkspaceAccess, WorkspaceEntryReference } from '../common/attemptWorkspace.js';
@@ -17,7 +17,7 @@ import {
 import { ServerExamResources } from './serverExamResources.js';
 
 export interface WorkspaceFoundationOptions {
-	readonly api: Pick<ServerApiClient, 'request'>;
+	readonly api: Pick<SessionApi, 'request'>;
 	/** Store is already bound to this account, server, Attempt and Workspace. Borrowed. */
 	readonly recovery: ProtectedRecordStore;
 	readonly current: () => WorkspaceServerBinding;

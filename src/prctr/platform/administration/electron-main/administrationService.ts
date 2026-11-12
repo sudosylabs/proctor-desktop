@@ -12,13 +12,9 @@ import {
 } from '../../serverApi/common/serverApi.js';
 import type { components } from '../../serverApi/common/serverApi.generated.js';
 import type { ApiSubscription } from '../../serverApi/common/apiObservation.js';
-import {
-	ProjectionFailure,
-	projectRead,
-	type SessionBinding
-} from '../../serverApi/common/projection.js';
+import type { SessionBinding } from '../../serverApi/common/projection.js';
 import { operationContract } from '../../serverApi/node/serverContract.js';
-import type { ServerApiClient } from '../../serverApi/node/serverApiClient.js';
+import type { SessionApi } from '../../serverApi/node/sessionApi.js';
 import {
 	isAdministrationRead,
 	validateAdministrationIntent,
@@ -35,13 +31,12 @@ import * as wire from './administrationWire.js';
 type AuditAction = components['schemas']['AuditAction'];
 type ResourceType = components['schemas']['ResourceType'];
 
-export type AdministrationApi = Pick<ServerApiClient, 'request' | 'fetchTask' | 'observeTask'>;
+export type AdministrationApi = Pick<SessionApi, 'request' | 'reads'>;
 
 /** What the Session owner lends Administration; credentials and refresh never leave it. */
 export interface AdministrationSessionPort {
 	/** The typed client of the bound Session; throws `sessionEnded` once it is not current. */
 	apiForSession(binding: SessionBinding): AdministrationApi;
-	signOut(): Promise<void>;
 	/** Confirm it's you in the system browser; ends when the browser step completes or fails. */
 	reauthenticate(binding: SessionBinding): Promise<'success' | AccountFailure>;
 	cancelReauthentication(binding: SessionBinding): void;
@@ -164,8 +159,8 @@ export const administrationOperations: ReadonlySet<ApiOperationId> = new Set<Api
 
 /** Refuses any operation outside {@link administrationOperations} before it is sent. */
 export function guardAdministrationApi(
-	api: Pick<ServerApiClient, 'request'>
-): Pick<ServerApiClient, 'request'> {
+	api: Pick<SessionApi, 'request'>
+): Pick<SessionApi, 'request'> {
 	return {
 		request: (operation, input, options) => {
 			if (!administrationOperations.has(operation))
@@ -193,7 +188,7 @@ type Success<K extends ApiOperationId> = Extract<
 interface Route<I extends RoutedKind> {
 	readonly operation: ApiOperationId;
 	call(
-		api: Pick<ServerApiClient, 'request'>,
+		api: Pick<SessionApi, 'request'>,
 		intent: AdministrationIntentOf<I>,
 		idempotencyKey: string,
 		signal?: AbortSignal
@@ -1119,13 +1114,11 @@ export class AdministrationService {
 		const intent = validateAdministrationIntent(raw);
 		if (!isAdministrationRead(intent)) return this.#change(binding, intent);
 		try {
-			return await this.#api(binding).fetchTask(['administration', intent], (signal) =>
-				projectRead((capture) => this.#read(binding, intent, signal, capture))
+			return await this.#api(binding).reads.read(['administration', intent], (signal) =>
+				this.#read(binding, intent, signal)
 			);
 		} catch (error) {
-			return error instanceof ProjectionFailure
-				? (error.response as AdministrationResponse)
-				: this.#failure(error, intent);
+			return this.#failure(error, intent);
 		}
 	}
 
@@ -1136,17 +1129,12 @@ export class AdministrationService {
 	): ApiSubscription {
 		const intent = validateAdministrationIntent(raw);
 		if (!isAdministrationRead(intent)) throw new ServerApiError('invalidRequest');
-		return this.#api(binding).observeTask(
+		return this.#api(binding).reads.observe(
 			['administration', intent],
-			(signal) => projectRead((capture) => this.#read(binding, intent, signal, capture)),
+			(signal) => this.#read(binding, intent, signal),
 			(state) => {
-				if (state.error)
-					listener(
-						state.error instanceof ProjectionFailure
-							? (state.error.response as AdministrationResponse)
-							: { kind: 'error', reason: 'unavailable' }
-					);
-				else if (state.data) listener(state.data);
+				if (state.error) listener(this.#failure(state.error, intent));
+				else if (state.value) listener(state.value);
 			},
 			{ pollIntervalMs: 60_000 }
 		);
@@ -1161,24 +1149,19 @@ export class AdministrationService {
 		return this.session.apiForSession(binding);
 	}
 
-	async #read(
+	/** One read. It throws on failure, so the cache retries only what is transient. */
+	#read(
 		binding: SessionBinding,
 		intent: AdministrationReadIntent,
-		signal: AbortSignal,
-		capture: (failure: ServerApiError) => void
+		signal: AbortSignal
 	): Promise<AdministrationResponse> {
-		try {
-			const api = guardAdministrationApi(this.#api(binding));
-			return await (routes[intent.kind] as Route<RoutedKind>).call(
-				api,
-				intent as AdministrationIntentOf<RoutedKind>,
-				'',
-				signal
-			);
-		} catch (error) {
-			if (error instanceof ServerApiError) capture(error);
-			return this.#failure(error, intent);
-		}
+		const api = guardAdministrationApi(this.#api(binding));
+		return (routes[intent.kind] as Route<RoutedKind>).call(
+			api,
+			intent as AdministrationIntentOf<RoutedKind>,
+			'',
+			signal
+		);
 	}
 
 	async #change(
@@ -1229,7 +1212,8 @@ export class AdministrationService {
 		}
 	}
 
-	async #failure(error: unknown, intent: AdministrationIntent): Promise<AdministrationResponse> {
+	/** The closed failure reply for an error; the Session signer already ended a refused Session. */
+	#failure(error: unknown, intent: AdministrationIntent): AdministrationResponse {
 		const change = !isAdministrationRead(intent);
 		const fail = (reason: AdministrationFailure): AdministrationResponse => ({
 			kind: 'error',
@@ -1242,10 +1226,7 @@ export class AdministrationService {
 		if (error.kind !== 'server') return fail(change ? 'unconfirmed' : 'unavailable');
 		const status = error.status ?? 0;
 		const code = error.problem?.code;
-		if (status === 401) {
-			await this.session.signOut().catch(() => undefined);
-			return fail('sessionEnded');
-		}
+		if (status === 401) return fail('sessionEnded');
 		if (code === 'authentication.reauthentication_required')
 			return fail('reauthenticationRequired');
 		if (code === 'authentication.strong_required') return fail('strongRequired');

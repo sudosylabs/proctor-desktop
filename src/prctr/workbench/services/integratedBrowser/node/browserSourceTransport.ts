@@ -4,7 +4,7 @@
 
 import type { components } from '../../../../platform/serverApi/common/serverApi.generated.js';
 import { ServerApiError } from '../../../../platform/serverApi/common/serverApi.js';
-import type { ServerApiClient } from '../../../../platform/serverApi/node/serverApiClient.js';
+import type { SessionApi } from '../../../../platform/serverApi/node/sessionApi.js';
 import {
 	RealtimeCommandError,
 	type ServerRealtimeClient
@@ -66,7 +66,7 @@ export interface BrowserSourceTransport {
 
 export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 	constructor(
-		private readonly api: Pick<ServerApiClient, 'request'>,
+		private readonly api: Pick<SessionApi, 'request'>,
 		private readonly realtime: Pick<ServerRealtimeClient, 'request'>,
 		private readonly currentAccess: () => BrowserCurrentAccess | undefined
 	) {}

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { CancellationToken } from '../../../../base/common/cancellation.js';
 import { ServerApiError } from '../../../../platform/serverApi/common/serverApi.js';
 import type { components } from '../../../../platform/serverApi/common/serverApi.generated.js';
-import type { ServerApiClient } from '../../../../platform/serverApi/node/serverApiClient.js';
+import type { SessionApi } from '../../../../platform/serverApi/node/sessionApi.js';
 import {
 	WORKSPACE_V1_HARD_LIMITS,
 	type WorkspaceAccess,
@@ -36,7 +36,7 @@ export interface WorkspaceServerBinding {
 	readonly access: WorkspaceAccess;
 }
 export interface WorkspaceServerAuthorityOptions {
-	readonly api: Pick<ServerApiClient, 'request'>;
+	readonly api: Pick<SessionApi, 'request'>;
 	readonly current: () => WorkspaceServerBinding;
 	readonly limits: WorkspaceLimits;
 }

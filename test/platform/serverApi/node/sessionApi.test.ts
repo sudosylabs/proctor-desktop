@@ -2,40 +2,42 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createServer } from 'node:http';
 import { WebSocketServer } from 'ws';
-import { ServerApiClient } from '../../../../src/prctr/platform/serverApi/node/serverApiClient.js';
+import { SessionApi } from '../../../../src/prctr/platform/serverApi/node/sessionApi.js';
+import type { ReadState } from '../../../../src/prctr/platform/serverApi/node/sessionReads.js';
 import type { HttpResponse } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 import {
 	ServerApiError,
-	type ApiInput,
-	type ApiQueryState
+	type ApiInput
 } from '../../../../src/prctr/platform/serverApi/common/serverApi.js';
 import { connectServerRealtime } from '../../../../src/prctr/platform/serverApi/node/serverRealtime.js';
 
 const origin = 'https://institution.test';
 const id = 'y'.repeat(26);
+const testBinding = { principalId: 'p'.repeat(26), sessionId: 's'.repeat(26) };
+const unanswered = (): Promise<never> => Promise.reject(new ServerApiError('network'));
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
 
 void test('shared reads deduplicate, stay fresh, and invalidate observed data after mutations', async () => {
-	const client = new ServerApiClient(origin);
+	const client = new SessionApi({ binding: testBinding, origin: origin, execute: unanswered });
 	let calls = 0;
 	const read = async () => ({ value: ++calls });
 	try {
 		const values = await Promise.all([
-			client.fetchTask(['profile'], read),
-			client.fetchTask(['profile'], read)
+			client.reads.read(['profile'], read),
+			client.reads.read(['profile'], read)
 		]);
 		assert.equal(calls, 1);
 		assert.deepEqual(values, [{ value: 1 }, { value: 1 }]);
-		await client.fetchTask(['profile'], read);
+		await client.reads.read(['profile'], read);
 		assert.equal(calls, 1);
-		const states: ApiQueryState<{ value: number }>[] = [];
-		const observation = client.observeTask(['profile'], read, (state) => states.push(state));
-		await client.invalidate(['profile']);
+		const states: ReadState<{ value: number }>[] = [];
+		const observation = client.reads.observe(['profile'], read, (state) => states.push(state));
+		await client.reads.invalidate(['profile']);
 		assert.equal(calls, 2);
-		assert.equal(states.at(-1)?.data?.value, 2);
-		assert.ok(states.some((state) => state.fetching && state.data?.value === 1));
+		assert.equal(states.at(-1)?.value?.value, 2);
+		assert.ok(states.some((state) => state.fetching && state.value?.value === 1));
 		observation.dispose();
-		await client.invalidate();
+		await client.reads.invalidate();
 		assert.equal(calls, 2);
 	} finally {
 		client.dispose();
@@ -43,9 +45,9 @@ void test('shared reads deduplicate, stay fresh, and invalidate observed data af
 });
 
 void test('stale focus/reconnection refetches active queries and disposal fences late completions', async () => {
-	const client = new ServerApiClient(origin);
+	const client = new SessionApi({ binding: testBinding, origin: origin, execute: unanswered });
 	let calls = 0;
-	const observation = client.observeTask(
+	const observation = client.reads.observe(
 		['list'],
 		async () => ++calls,
 		() => {},
@@ -63,15 +65,16 @@ void test('stale focus/reconnection refetches active queries and disposal fences
 	assert.equal(calls, 3);
 	observation.dispose();
 	client.dispose();
-	assert.throws(() => client.fetchTask(['list'], async () => 1), ServerApiError);
+	assert.throws(() => client.reads.read(['list'], async () => 1), ServerApiError);
 	let finish!: (response: HttpResponse) => void;
-	const pendingClient = new ServerApiClient(
-		origin,
-		() =>
+	const pendingClient = new SessionApi({
+		binding: testBinding,
+		origin: origin,
+		execute: () =>
 			new Promise((resolve) => {
 				finish = resolve;
 			})
-	);
+	});
 	const request = pendingClient.request('getUserProfilePicture', { path: { user_id: id } });
 	pendingClient.dispose();
 	finish({ status: 200, bytes: new Uint8Array(), headers: { 'content-type': 'image/webp' } });
@@ -139,9 +142,13 @@ void missingPath;
 
 void test('Attempt credentials never enter query keys or the shared cache; mutations are never retried', async () => {
 	let calls = 0;
-	const client = new ServerApiClient(origin, async () => {
-		calls++;
-		throw new ServerApiError('network');
+	const client = new SessionApi({
+		binding: testBinding,
+		origin: origin,
+		execute: async () => {
+			calls++;
+			throw new ServerApiError('network');
+		}
 	});
 	const input: ApiInput<'getCandidateExamWorkspaceContent'> = {
 		path: { exam_attempt_id: id, attempt_workspace_entry_id: id },
@@ -151,11 +158,6 @@ void test('Attempt credentials never enter query keys or the shared cache; mutat
 		}
 	};
 	try {
-		assert.throws(
-			() => client.fetch('getCandidateExamWorkspaceContent', input),
-			ServerApiError
-		);
-		assert.equal(calls, 0);
 		await assert.rejects(
 			client.request('getCandidateExamWorkspaceContent', input),
 			ServerApiError
@@ -178,9 +180,9 @@ void test('Attempt credentials never enter query keys or the shared cache; mutat
 
 void test('Node polling pauses when hidden and stops with its observation', async (context) => {
 	context.mock.timers.enable({ apis: ['setInterval'] });
-	const client = new ServerApiClient(origin);
+	const client = new SessionApi({ binding: testBinding, origin: origin, execute: unanswered });
 	let calls = 0;
-	const observer = client.observeTask(
+	const observer = client.reads.observe(
 		['poll'],
 		async () => ++calls,
 		() => {},
@@ -208,8 +210,12 @@ void test('Node polling pauses when hidden and stops with its observation', asyn
 });
 
 void test('privileged executor failures expose only normalized API errors', async () => {
-	const client = new ServerApiClient(origin, async () => {
-		throw new Error('private transport details');
+	const client = new SessionApi({
+		binding: testBinding,
+		origin: origin,
+		execute: async () => {
+			throw new Error('private transport details');
+		}
 	});
 	try {
 		await assert.rejects(
@@ -226,12 +232,16 @@ void test('privileged executor failures expose only normalized API errors', asyn
 
 void test('invalidation fences pending initial and background reads before publishing authoritative data', async () => {
 	for (const cached of [false, true]) {
-		const client = new ServerApiClient(origin);
-		const states: ApiQueryState<number>[] = [];
+		const client = new SessionApi({
+			binding: testBinding,
+			origin: origin,
+			execute: unanswered
+		});
+		const states: ReadState<number>[] = [];
 		const pending: ((value: number) => void)[] = [];
 		try {
-			if (cached) await client.fetchTask(['race'], async () => 0);
-			const observer = client.observeTask(
+			if (cached) await client.reads.read(['race'], async () => 0);
+			const observer = client.reads.observe(
 				['race'],
 				() => new Promise<number>((resolve) => pending.push(resolve)),
 				(state) => states.push(state),
@@ -239,15 +249,15 @@ void test('invalidation fences pending initial and background reads before publi
 			);
 			await tick();
 			assert.equal(pending.length, 1);
-			const invalidated = client.invalidate(['race']);
+			const invalidated = client.reads.invalidate(['race']);
 			await tick();
 			assert.equal(pending.length, 2);
 			pending[0]!(1);
 			await tick();
-			assert.ok(!states.some((s) => s.data === 1));
+			assert.ok(!states.some((s) => s.value === 1));
 			pending[1]!(2);
 			await invalidated;
-			assert.equal(states.at(-1)?.data, 2);
+			assert.equal(states.at(-1)?.value, 2);
 			observer.dispose();
 		} finally {
 			client.dispose();
@@ -258,10 +268,14 @@ void test('invalidation fences pending initial and background reads before publi
 void test('throwing or reentrant observation callbacks leave no polling timer or active observer', async (context) => {
 	context.mock.timers.enable({ apis: ['setInterval'] });
 	for (const reentrant of [false, true]) {
-		const client = new ServerApiClient(origin);
+		const client = new SessionApi({
+			binding: testBinding,
+			origin: origin,
+			execute: unanswered
+		});
 		let calls = 0;
 		let publications = 0;
-		const observer = client.observeTask(
+		const observer = client.reads.observe(
 			['ownership'],
 			async () => ++calls,
 			() => {
@@ -284,14 +298,18 @@ void test('throwing or reentrant observation callbacks leave no polling timer or
 });
 
 void test('mutation completion is fenced when session ends during the awaited cache refresh', async () => {
-	const client = new ServerApiClient(origin, async () => ({
-		status: 204,
-		headers: {},
-		bytes: new Uint8Array()
-	}));
+	const client = new SessionApi({
+		binding: testBinding,
+		origin: origin,
+		execute: async () => ({
+			status: 204,
+			headers: {},
+			bytes: new Uint8Array()
+		})
+	});
 	let finish!: () => void;
 	let reads = 0;
-	const observer = client.observeTask(
+	const observer = client.reads.observe(
 		['late'],
 		async () => {
 			if (++reads > 1)
@@ -333,20 +351,21 @@ void test('realtime bursts refresh only affected queries and allow slow reads to
 	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
 	const address = server.address();
 	assert.ok(address && typeof address !== 'string');
-	const client = new ServerApiClient(
-		`http://127.0.0.1:${address.port}`,
-		undefined,
-		async () => ({})
-	);
+	const client = new SessionApi({
+		binding: testBinding,
+		origin: `http://127.0.0.1:${address.port}`,
+		execute: unanswered,
+		authorizeUpgrade: async () => ({})
+	});
 	const reads: { signal: AbortSignal; finish: (value: number) => void }[] = [];
-	const states: ApiQueryState<number>[] = [];
+	const states: ReadState<number>[] = [];
 	let unrelated = 0;
-	const changed = client.observeTask(
+	const changed = client.reads.observe(
 		['affected'],
 		(signal) => new Promise<number>((finish) => reads.push({ signal, finish })),
 		(state) => states.push(state)
 	);
-	const other = client.observeTask(
+	const other = client.reads.observe(
 		['unrelated'],
 		async () => ++unrelated,
 		() => {}
@@ -386,11 +405,11 @@ void test('realtime bursts refresh only affected queries and allow slow reads to
 		assert.equal(reads[1]!.signal.aborted, false);
 		reads[1]!.finish(1);
 		await tick();
-		assert.equal(states.at(-1)?.data, 1);
+		assert.equal(states.at(-1)?.value, 1);
 		assert.equal(reads.length, 3);
 		reads[2]!.finish(2);
 		await tick();
-		assert.equal(states.at(-1)?.data, 2);
+		assert.equal(states.at(-1)?.value, 2);
 		assert.equal(unrelated, 1);
 	} finally {
 		changed.dispose();

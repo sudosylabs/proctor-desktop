@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { CancellationToken } from '../../../../../src/prctr/base/common/cancellation.js';
-import { ServerApiClient } from '../../../../../src/prctr/platform/serverApi/node/serverApiClient.js';
+import { SessionApi } from '../../../../../src/prctr/platform/serverApi/node/sessionApi.js';
+
 import type { HttpResponse } from '../../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 import {
 	ServerWorkspaceAuthority,
@@ -13,6 +14,8 @@ import {
 	type WorkspaceEntryReference
 } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/attemptWorkspace.js';
 import { workspacePath } from '../../../../../src/prctr/workbench/services/attemptWorkspace/common/path.js';
+
+const testBinding = { principalId: 'p'.repeat(26), sessionId: 's'.repeat(26) };
 const id = 'y'.repeat(26);
 const entryId = 'z'.repeat(26);
 const access = {
@@ -68,18 +71,21 @@ void test('server workspace validates frozen limits and verified current file re
 		})
 	);
 	let corrupt = false;
-	const api = new ServerApiClient('https://institution.test', async (request) =>
-		request.url.endsWith('/content')
-			? {
-					status: 200,
-					headers: {
-						'content-type': 'application/octet-stream',
-						etag: `"${'a'.repeat(26)}"`
-					},
-					bytes: corrupt ? new Uint8Array(content.length) : content
-				}
-			: json(manifest)
-	);
+	const api = new SessionApi({
+		binding: testBinding,
+		origin: 'https://institution.test',
+		execute: async (request) =>
+			request.url.endsWith('/content')
+				? {
+						status: 200,
+						headers: {
+							'content-type': 'application/octet-stream',
+							etag: `"${'a'.repeat(26)}"`
+						},
+						bytes: corrupt ? new Uint8Array(content.length) : content
+					}
+				: json(manifest)
+	});
 	const authority = new ServerWorkspaceAuthority({ api, current: () => binding, limits });
 	try {
 		await authority.getSnapshot();
@@ -96,22 +102,31 @@ void test('server workspace validates frozen limits and verified current file re
 });
 void test('mutation uses exact metadata and retains acknowledgement independent of newer snapshot', async () => {
 	let metadata: unknown;
-	const api = new ServerApiClient('https://institution.test', async (request) => {
-		if (request.method === 'POST') {
-			assert.ok(request.body instanceof FormData);
-			const part = request.body.get('metadata');
-			assert.ok(part instanceof Blob);
-			metadata = JSON.parse(await part.text());
-			return json(
-				{ workspace_id: id, workspace_cursor: 1, operation: 'create_file', entry: file },
-				201
-			);
+	const api = new SessionApi({
+		binding: testBinding,
+		origin: 'https://institution.test',
+		execute: async (request) => {
+			if (request.method === 'POST') {
+				assert.ok(request.body instanceof FormData);
+				const part = request.body.get('metadata');
+				assert.ok(part instanceof Blob);
+				metadata = JSON.parse(await part.text());
+				return json(
+					{
+						workspace_id: id,
+						workspace_cursor: 1,
+						operation: 'create_file',
+						entry: file
+					},
+					201
+				);
+			}
+			return json({
+				...manifest,
+				workspace_cursor: 2,
+				items: [{ ...file, content_version: 'b'.repeat(26) }]
+			});
 		}
-		return json({
-			...manifest,
-			workspace_cursor: 2,
-			items: [{ ...file, content_version: 'b'.repeat(26) }]
-		});
 	});
 	const authority = new ServerWorkspaceAuthority({
 		api,
@@ -152,17 +167,21 @@ void test('in-progress and unknown conflicts preserve uncertain outcome, includi
 	const { ServerApiError } =
 		await import('../../../../../src/prctr/platform/serverApi/common/serverApi.js');
 	let requests = 0;
-	const api = new ServerApiClient('https://institution.test', async () => {
-		requests++;
-		throw new ServerApiError('server', {
-			status: 409,
-			problem: {
-				code: 'idempotency.in_progress',
+	const api = new SessionApi({
+		binding: testBinding,
+		origin: 'https://institution.test',
+		execute: async () => {
+			requests++;
+			throw new ServerApiError('server', {
 				status: 409,
-				title: 'In progress',
-				type: 'about:blank'
-			}
-		});
+				problem: {
+					code: 'idempotency.in_progress',
+					status: 409,
+					title: 'In progress',
+					type: 'about:blank'
+				}
+			});
+		}
 	});
 	const authority = new ServerWorkspaceAuthority({
 		api,
@@ -239,18 +258,21 @@ void test('workspace foundation composes real server reads and recovery behind a
 		list: async () => [...records.keys()],
 		dispose: () => {}
 	};
-	const api = new ServerApiClient('https://institution.test', async (request) =>
-		request.url.endsWith('/content')
-			? {
-					status: 200,
-					headers: {
-						'content-type': 'application/octet-stream',
-						etag: `"${'a'.repeat(26)}"`
-					},
-					bytes: content
-				}
-			: json(manifest)
-	);
+	const api = new SessionApi({
+		binding: testBinding,
+		origin: 'https://institution.test',
+		execute: async (request) =>
+			request.url.endsWith('/content')
+				? {
+						status: 200,
+						headers: {
+							'content-type': 'application/octet-stream',
+							etag: `"${'a'.repeat(26)}"`
+						},
+						bytes: content
+					}
+				: json(manifest)
+	});
 	const foundation = await createWorkspaceFoundation({
 		api,
 		recovery,
@@ -319,13 +341,22 @@ void test('workspace foundation composes real server reads and recovery behind a
 void test('a committed mutation remains uncertain if refreshing its snapshot is denied', async () => {
 	const { ServerApiError } =
 		await import('../../../../../src/prctr/platform/serverApi/common/serverApi.js');
-	const api = new ServerApiClient('https://institution.test', async (request) => {
-		if (request.method === 'POST')
-			return json(
-				{ workspace_id: id, workspace_cursor: 1, operation: 'create_file', entry: file },
-				201
-			);
-		throw new ServerApiError('server', { status: 403 });
+	const api = new SessionApi({
+		binding: testBinding,
+		origin: 'https://institution.test',
+		execute: async (request) => {
+			if (request.method === 'POST')
+				return json(
+					{
+						workspace_id: id,
+						workspace_cursor: 1,
+						operation: 'create_file',
+						entry: file
+					},
+					201
+				);
+			throw new ServerApiError('server', { status: 403 });
+		}
 	});
 	const authority = new ServerWorkspaceAuthority({
 		api,
