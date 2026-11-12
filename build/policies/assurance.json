@@ -607,6 +607,79 @@
       ]
     },
     {
+      "id": "native-agent-core-conformance",
+      "kind": "test",
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": [
+        "native.passive-sources",
+        "native.race-free-session",
+        "native.fail-closed",
+        "toolchain.native-schema-authority"
+      ],
+      "evidence": [
+        "native/crates/prctr-protocol/src/lib.rs",
+        "native/crates/prctr-protocol/schema/agent-protocol.schema.json",
+        "native/crates/prctr-protocol/schema/agent-protocol.digest",
+        "native/crates/prctr-core/src/engine.rs",
+        "native/crates/prctr-core/src/engine_tests.rs",
+        "native/crates/prctr-core/src/evaluate.rs",
+        "native/crates/prctr-core/src/testing.rs",
+        "native/crates/prctr-core/src/vectors.rs",
+        "native/crates/prctr-core/conformance/rules.json",
+        "native/crates/prctr-xtask/src/lib.rs",
+        "build/generators/nativeAgentProtocol.ts",
+        "src/prctr/platform/native/common/nativeAgentProtocol.generated.ts",
+        "test/platform/native/node/nativeAgentProtocol.test.ts"
+      ]
+    },
+    {
+      "id": "native-agent-process-supervision",
+      "kind": "test",
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": [
+        "native.process-boundaries",
+        "native.fail-closed",
+        "native.abnormal-loss-contained"
+      ],
+      "evidence": [
+        "native/crates/prctr-agent/src/main.rs",
+        "native/crates/prctr-agent/src/agent.rs",
+        "native/crates/prctr-agent/src/transport.rs",
+        "src/prctr/platform/native/node/nativeAgentConnection.ts",
+        "src/prctr/platform/native/node/nativeAgentFrames.ts",
+        "src/prctr/platform/native/electron-main/nativeAgentService.ts",
+        "src/prctr/code/electron-main/nativeAgentComposition.ts",
+        "build/buildNativeAgentTests.ts",
+        "test/native-agent/nativeAgent.test.ts"
+      ]
+    },
+    {
+      "id": "native-baseline-capabilities",
+      "kind": "test",
+      "status": "active",
+      "owner": "native-capabilities",
+      "invariants": [
+        "native.passive-sources",
+        "native.single-display-window",
+        "native.packaged-conformance"
+      ],
+      "evidence": [
+        "native/crates/prctr-os/src/lib.rs",
+        "native/crates/prctr-os/src/macos.rs",
+        "native/crates/prctr-os/src/windows.rs",
+        "native/crates/prctr-os/src/linux.rs",
+        "native/crates/prctr-capabilities/src/lib.rs",
+        "native/crates/prctr-capabilities/src/display.rs",
+        "native/crates/prctr-capabilities/src/display_tests.rs",
+        "native/crates/prctr-capabilities/src/candidate_window.rs",
+        "native/crates/prctr-capabilities/src/candidate_window_tests.rs",
+        "native/crates/prctr-capabilities/src/interactive_session.rs",
+        "native/crates/prctr-capabilities/registry/registry.json"
+      ]
+    },
+    {
       "id": "native-display-source-contract-tests",
       "kind": "test",
       "status": "active",

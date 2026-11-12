@@ -66,7 +66,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, windows-latest]
+        include:
+          # macOS arm64 and x64, and Windows x64, are the initial certification targets. Linux runs
+          # the native gate only; its Electron tests need the virtual display of the foundation job.
+          - os: macos-14
+            electron: true
+          - os: macos-15-intel
+            electron: true
+          - os: windows-latest
+            electron: true
+          - os: ubuntu-latest
+            electron: false
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
@@ -85,6 +95,8 @@ jobs:
       - name: Verify native target
         run: npm run test:native
       - name: Prepare pinned Electron runtime
+        if: matrix.electron
         run: npm run setup
       - name: Verify Electron security utility
+        if: matrix.electron
         run: npm run test:electron
