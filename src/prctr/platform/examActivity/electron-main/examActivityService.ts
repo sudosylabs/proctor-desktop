@@ -2,7 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import type { IDisposable } from '../../../base/common/lifecycle.js';
+import { combinedDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import { ServerApiError } from '../../serverApi/common/serverApi.js';
 import type { SessionBinding } from '../../serverApi/common/projection.js';
 import type { SessionApi } from '../../serverApi/node/sessionApi.js';
@@ -14,7 +14,7 @@ import {
 } from '../common/examActivityProtocol.js';
 import { readExamActivityWire } from './examActivityWire.js';
 
-export type ExamActivityApi = Pick<SessionApi, 'request' | 'reads' | 'setFocused'>;
+export type ExamActivityApi = Pick<SessionApi, 'request' | 'reads' | 'events' | 'setFocused'>;
 
 /** What the Session owner lends Exam Activity. Credentials and refresh never leave it. */
 export interface ExamActivitySessionPort {
@@ -57,15 +57,26 @@ export class ExamActivityService {
 		listener: (response: ExamActivityResponse) => void
 	): IDisposable {
 		const intent = validateExamActivityIntent(raw);
-		return this.session.apiForSession(binding).reads.observe(
-			['examActivity', intent],
+		const api = this.session.apiForSession(binding);
+		const key = ['examActivity', intent] as const;
+		const observation = api.reads.observe(
+			key,
 			(signal) => this.#read(binding, intent, signal),
 			(state) => {
 				if (state.error) listener(failure(state.error, intent));
 				else if (state.value) listener(state.value);
 			},
-			{ ...policy(intent), pollIntervalMs: 30_000 }
+			// Events are best-effort after commit, so a live read is still re-read now and then.
+			{ ...policy(intent), pollIntervalMs: 300_000 }
 		);
+		const changes = api.events.on(
+			intent.kind === 'context'
+				? 'current_user.context.changed'
+				: 'candidate.exam_activity.changed',
+			undefined,
+			() => api.reads.refresh(key)
+		);
+		return combinedDisposable(observation, changes);
 	}
 
 	setApiFocused(binding: SessionBinding, focused: boolean): void {

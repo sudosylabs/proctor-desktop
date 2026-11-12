@@ -11,7 +11,7 @@ import {
 	type ApiResponse
 } from '../../serverApi/common/serverApi.js';
 import type { components } from '../../serverApi/common/serverApi.generated.js';
-import type { IDisposable } from '../../../base/common/lifecycle.js';
+import { combinedDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import type { SessionBinding } from '../../serverApi/common/projection.js';
 import { operationContract } from '../../serverApi/node/serverContract.js';
 import type { SessionApi } from '../../serverApi/node/sessionApi.js';
@@ -31,12 +31,14 @@ import * as wire from './administrationWire.js';
 type AuditAction = components['schemas']['AuditAction'];
 type ResourceType = components['schemas']['ResourceType'];
 
-export type AdministrationApi = Pick<SessionApi, 'request' | 'reads'>;
+export type AdministrationApi = Pick<SessionApi, 'request' | 'reads' | 'events'>;
 
 /** What the Session owner lends Administration; credentials and refresh never leave it. */
 export interface AdministrationSessionPort {
 	/** The typed client of the bound Session; throws `sessionEnded` once it is not current. */
 	apiForSession(binding: SessionBinding): AdministrationApi;
+	/** The Institution the bound Session belongs to. */
+	institutionId(binding: SessionBinding): string;
 	/** Confirm it's you in the system browser; ends when the browser step completes or fails. */
 	reauthenticate(binding: SessionBinding): Promise<'success' | AccountFailure>;
 	cancelReauthentication(binding: SessionBinding): void;
@@ -1129,15 +1131,27 @@ export class AdministrationService {
 	): IDisposable {
 		const intent = validateAdministrationIntent(raw);
 		if (!isAdministrationRead(intent)) throw new ServerApiError('invalidRequest');
-		return this.#api(binding).reads.observe(
-			['administration', intent],
+		const api = this.#api(binding);
+		const key = ['administration', intent] as const;
+		// The Access Policy changes live; the other pages have no server event and are polled.
+		const live = intent.kind === 'accessPolicy';
+		const observation = api.reads.observe(
+			key,
 			(signal) => this.#read(binding, intent, signal),
 			(state) => {
 				if (state.error) listener(this.#failure(state.error, intent));
 				else if (state.value) listener(state.value);
 			},
-			{ pollIntervalMs: 60_000 }
+			// Events are best-effort after commit, so a live page is still re-read now and then.
+			{ pollIntervalMs: live ? 300_000 : 60_000 }
 		);
+		if (!live) return observation;
+		const changes = api.events.on(
+			'access_policy_changed',
+			{ resourceId: this.session.institutionId(binding) },
+			() => api.reads.refresh(key)
+		);
+		return combinedDisposable(observation, changes);
 	}
 
 	dispose(): void {

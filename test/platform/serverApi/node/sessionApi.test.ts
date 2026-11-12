@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { createServer } from 'node:http';
+import { WebSocketServer } from 'ws';
 import { SessionApi } from '../../../../src/prctr/platform/serverApi/node/sessionApi.js';
 import type { ReadState } from '../../../../src/prctr/platform/serverApi/node/sessionReads.js';
 import type { HttpResponse } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
@@ -327,5 +329,73 @@ void test('event hints refresh only the hinted reads and let slow reads finish b
 		changed.dispose();
 		other.dispose();
 		client.dispose();
+	}
+});
+
+void test('a server event refreshes the read it names; a fresh reconnect refreshes every observed read', async () => {
+	const http = createServer();
+	const sockets = new WebSocketServer({ server: http });
+	let connections = 0;
+	sockets.on('connection', (socket) => {
+		const connectionId = String(++connections).repeat(26);
+		socket.send(
+			JSON.stringify({
+				event: 'hello',
+				sequence: 1,
+				data: { connection_id: connectionId, node_id: 'node-a', resumed: false }
+			})
+		);
+	});
+	await new Promise<void>((resolve) => http.listen(0, '127.0.0.1', resolve));
+	const address = http.address();
+	assert.ok(address && typeof address !== 'string');
+	const client = new SessionApi({
+		binding: testBinding,
+		origin: `http://127.0.0.1:${address.port}`,
+		execute: unanswered,
+		authorizeUpgrade: async () => ({ Authorization: 'DPoP test' })
+	});
+	let photos = 0;
+	let others = 0;
+	const photo = client.reads.observe(
+		['account', 'photo'],
+		async () => ++photos,
+		() => {}
+	);
+	const other = client.reads.observe(
+		['account', 'other'],
+		async () => ++others,
+		() => {}
+	);
+	const changes = client.events.on('user_profile_picture_changed', undefined, () =>
+		client.reads.refresh(['account', 'photo'])
+	);
+	const until = async (condition: () => boolean) => {
+		for (let attempt = 0; attempt < 500 && !condition(); attempt++)
+			await new Promise((resolve) => setTimeout(resolve, 5));
+		assert.ok(condition());
+	};
+	try {
+		await until(() => client.events.state === 'live' && photos === 1 && others === 1);
+		for (const socket of sockets.clients)
+			socket.send(
+				JSON.stringify({
+					event: 'user_profile_picture_changed',
+					sequence: 2,
+					data: { revision: 2 }
+				})
+			);
+		await until(() => photos === 2);
+		assert.equal(others, 1, 'an event refreshes only the read it names');
+		// Authorization changed: the server drops the connection and the client cannot resume.
+		for (const socket of sockets.clients) socket.close(4003);
+		await until(() => connections === 2 && photos === 3 && others === 2);
+	} finally {
+		changes.dispose();
+		photo.dispose();
+		other.dispose();
+		client.dispose();
+		for (const socket of sockets.clients) socket.terminate();
+		await new Promise<void>((resolve) => sockets.close(() => http.close(() => resolve())));
 	}
 });

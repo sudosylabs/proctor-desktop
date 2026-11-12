@@ -2,7 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import type { IDisposable } from '../../../base/common/lifecycle.js';
+import { combinedDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import { ServerApiError } from '../../serverApi/common/serverApi.js';
 import type { SessionBinding } from '../../serverApi/common/projection.js';
 import type { SessionApi } from '../../serverApi/node/sessionApi.js';
@@ -29,7 +29,7 @@ import {
 } from './accountWire.js';
 
 type AccountRead = Extract<AccountIntent, { kind: 'read' | 'readPhoto' | 'readHistory' }>;
-export type AccountApi = Pick<SessionApi, 'origin' | 'request' | 'reads' | 'setFocused'>;
+export type AccountApi = Pick<SessionApi, 'origin' | 'request' | 'reads' | 'events' | 'setFocused'>;
 
 /** What the Session owner lends Account. Credentials and refresh never leave it. */
 export interface AccountSessionPort {
@@ -56,6 +56,9 @@ const sections = {
 	notices: 'listRetentionNotices'
 } as const;
 const MAX_NOTICES = 200;
+const POLL_MS = 60_000;
+/** Events are best-effort after commit, so a live read is still re-read now and then. */
+const SAFETY_POLL_MS = 300_000;
 
 /**
  * The privileged Account capability: each intent becomes one operation on the bound Session's
@@ -86,15 +89,25 @@ export class AccountService {
 		const intent = validateAccountIntent(raw);
 		if (intent.kind !== 'read' && intent.kind !== 'readPhoto')
 			throw new ServerApiError('invalidRequest');
-		return this.session.apiForSession(binding).reads.observe(
-			['account', intent],
+		const api = this.session.apiForSession(binding);
+		const key = ['account', intent] as const;
+		// The profile and its picture change live; other sections have no event and are polled.
+		const live =
+			intent.kind === 'readPhoto' || (intent.kind === 'read' && intent.section === 'profile');
+		const observation = api.reads.observe(
+			key,
 			(signal) => this.#read(binding, intent, signal),
 			(state) => {
 				if (state.error) listener(failure(state.error, false));
 				else if (state.value) listener(state.value);
 			},
-			{ pollIntervalMs: 60_000 }
+			{ pollIntervalMs: live ? SAFETY_POLL_MS : POLL_MS }
 		);
+		if (!live) return observation;
+		const changes = api.events.on('user_profile_picture_changed', undefined, () =>
+			api.reads.refresh(key)
+		);
+		return combinedDisposable(observation, changes);
 	}
 
 	setApiFocused(binding: SessionBinding, focused: boolean): void {

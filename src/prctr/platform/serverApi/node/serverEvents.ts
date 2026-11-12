@@ -63,6 +63,8 @@ const MAX_EARLY_BYTES = 8 * 1024 * 1024;
 const MAX_TIMER_MS = 2147483647;
 const idPattern = /^[a-z0-9]{26}$/u;
 const nodePattern = /^[A-Za-z0-9._-]{1,128}$/u;
+/** A resource identity as the server spells it; the server authorizes the subscription. */
+const resourcePattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
 
 interface Listener {
 	readonly resourceId: string | undefined;
@@ -161,7 +163,7 @@ export class ServerEvents extends Disposable implements IServerEvents {
 		let key: string | undefined;
 		if (entry.target === 'resource') {
 			const resourceId = (scope as { readonly resourceId?: unknown } | undefined)?.resourceId;
-			if (typeof resourceId !== 'string' || !idPattern.test(resourceId))
+			if (typeof resourceId !== 'string' || !resourcePattern.test(resourceId))
 				throw new ServerApiError('invalidRequest');
 			key = `${entry.action}\u0000${entry.resourceType}\u0000${resourceId}`;
 			subscription = this.subscriptions.get(key);

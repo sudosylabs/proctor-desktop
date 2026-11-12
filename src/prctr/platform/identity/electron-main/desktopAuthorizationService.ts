@@ -472,6 +472,11 @@ export class DesktopAuthorizationService extends Disposable {
 	setApiFocused(binding: SessionBinding, focused: boolean): void {
 		this.apiForSession(binding).setFocused(focused);
 	}
+	/** The Institution the bound Session belongs to. */
+	institutionId(binding: SessionBinding): string {
+		this.apiForSession(binding);
+		return this.#session!.identity.institutionId;
+	}
 	/** The Desktop registration the bound Session signed in with. */
 	currentRegistration(binding: SessionBinding): string {
 		this.apiForSession(binding);

@@ -110,6 +110,7 @@ function harness(
 				throw new ServerApiError('sessionEnded');
 			return api;
 		},
+		institutionId: () => id,
 		async reauthenticate() {
 			return 'success';
 		},
