@@ -31,6 +31,11 @@ export const JOB_STATE: Readonly<
 	canceled: { text: 'jobCanceled', tone: 'neutral' }
 };
 const ANY = 'any';
+const NOT_DONE = 'notDone';
+const DONE = 'done';
+/** Work still to happen, or that failed and may need a retry. */
+const NOT_DONE_STATES: readonly State[] = ['queued', 'running', 'cancel_requested', 'failed'];
+const DONE_STATES: readonly State[] = ['succeeded', 'canceled'];
 
 /** A short duration, as in "48 s", "4 min" or "2 h". */
 export function duration(format: IAdministrationFormatService, ms: number): string {
@@ -58,25 +63,37 @@ export class JobsPage extends Disposable implements PageView {
 		super();
 		this.changes = this._register(instantiationService.createInstance(AdminChanges));
 		const filters = this._register(new AdminFilters(body));
-		filters.addSelect<State | typeof ANY>(
+		// Finished and routine runs are under Done, so the page opens on what may need you.
+		filters.addSelect<State | typeof ANY | typeof NOT_DONE | typeof DONE>(
 			format.text('jobsStatus'),
 			'status.success',
 			[
+				{ value: NOT_DONE, label: format.text('jobsNotDone') },
+				{ value: DONE, label: format.text('jobsDone') },
 				{ value: ANY, label: format.text('jobsAny') },
 				...jobStates.map((state) => ({
 					value: state,
 					label: format.text(JOB_STATE[state].text)
 				}))
 			],
-			ANY,
-			(state) => this.list.setQuery(state === ANY ? {} : { status: [state] })
+			NOT_DONE,
+			(state) =>
+				this.list.setQuery(
+					state === ANY
+						? {}
+						: state === NOT_DONE
+							? { status: [...NOT_DONE_STATES] }
+							: state === DONE
+								? { status: [...DONE_STATES] }
+								: { status: [state] }
+				)
 		);
 		this.list = this._register(
 			instantiationService.createInstance(
 				AdminList<'jobs'>,
 				body,
 				'jobs',
-				{},
+				{ status: [...NOT_DONE_STATES] },
 				{
 					label: format.text('jobsTable'),
 					columns: [
@@ -101,6 +118,7 @@ export class JobsPage extends Disposable implements PageView {
 							width: '140px',
 							align: 'end',
 							priority: 2,
+							sort: { key: 'started', first: 'desc' },
 							cell: (job) => ({
 								kind: 'text',
 								primary:
@@ -165,7 +183,6 @@ export class JobsPage extends Disposable implements PageView {
 										? {
 												kind: 'button',
 												label: format.text('jobsCancelShort'),
-												icon: 'action.close',
 												run: () => this.cancel(job)
 											}
 										: { kind: 'empty' }
@@ -173,6 +190,10 @@ export class JobsPage extends Disposable implements PageView {
 					],
 					open: (job) => navigation.selectAdministrationPage('job', job.id),
 					rowId: (job) => job.id,
+					sorting: {
+						initial: { key: 'started', dir: 'desc' },
+						params: (sort) => ({ order: sort.dir })
+					},
 					rowName: (job) => format.code('jobType', job.type),
 					icon: 'admin.jobs',
 					empty: {

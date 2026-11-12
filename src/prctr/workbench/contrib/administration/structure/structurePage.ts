@@ -276,7 +276,8 @@ export class StructurePage extends Disposable implements PageView {
 				columns: [
 					{
 						label: this.format.text('structureClassColumn'),
-						width: '40%',
+						width: '36%',
+						sort: { key: 'name', first: 'asc' },
 						cell: (klass) => ({
 							kind: 'text',
 							primary: klass.displayName,
@@ -294,10 +295,33 @@ export class StructurePage extends Disposable implements PageView {
 							kind: 'text',
 							primary: this.periodNames.get(klass.academicPeriodId) ?? ''
 						})
+					},
+					{
+						label: this.format.text('structureStudentsColumn'),
+						width: '104px',
+						align: 'end',
+						priority: 2,
+						foldLabel: true,
+						// Shown only to a viewer who can see the class's members.
+						cell: (klass) =>
+							klass.studentCount === undefined
+								? { kind: 'empty' }
+								: {
+										kind: 'text',
+										primary:
+											this.format.count(klass.studentCount) +
+											(klass.studentCountAtLeast === true ? '+' : ''),
+										mono: true,
+										quiet: true
+									}
 					}
 				],
 				rowId: (klass) => klass.id,
 				rowName: (klass) => klass.displayName,
+				sorting: {
+					initial: { key: 'name', dir: 'asc' },
+					params: (sort) => ({ dir: sort.dir })
+				},
 				open: (klass) => this.navigation.selectAdministrationPage('class', klass.id),
 				actions: (klass) => [
 					{
@@ -356,6 +380,7 @@ export class StructurePage extends Disposable implements PageView {
 					{
 						label: this.format.text('unitMemberColumn'),
 						min: 240,
+						sort: { key: 'name', first: 'asc' },
 						cell: (member) => ({
 							kind: 'person',
 							name: member.user.displayName,
@@ -387,6 +412,7 @@ export class StructurePage extends Disposable implements PageView {
 						width: '120px',
 						align: 'end',
 						priority: 2,
+						sort: { key: 'since', first: 'asc' },
 						cell: (member) => ({
 							kind: 'text',
 							primary: this.format.date(member.startAt),
@@ -397,6 +423,10 @@ export class StructurePage extends Disposable implements PageView {
 				],
 				rowId: (member) => member.id,
 				rowName: (member) => member.user.displayName,
+				sorting: {
+					initial: { key: 'since', dir: 'asc' },
+					params: (sort) => ({ sort: sort.key as 'since' | 'name', dir: sort.dir })
+				},
 				open: (member) => this.navigation.selectAdministrationPage('user', member.userId),
 				actions: (member) => [
 					{

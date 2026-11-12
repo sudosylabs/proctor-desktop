@@ -237,6 +237,9 @@
 	.prctr-admin-list .prctr-admin-list__secondary[data-tone='fail'] {
 		color: var(--prctr-color-feedback-error);
 	}
+	.prctr-admin-list .prctr-admin-list__secondary[data-tone='attention'] {
+		color: var(--prctr-color-status-attention);
+	}
 	.prctr-admin-list .prctr-admin-list__open {
 		background: transparent;
 		border: 0;

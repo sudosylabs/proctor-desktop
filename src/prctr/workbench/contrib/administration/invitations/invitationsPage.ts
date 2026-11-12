@@ -49,6 +49,7 @@ const PURPOSE_TEXT: Readonly<Record<Purpose, AdministrationText>> = {
 	institution_role: 'invitationKindInstitutionRole'
 };
 const ANY = 'any';
+const DAY = 86_400_000;
 const EMAIL = /^[^\s@]{1,64}@[^\s@]+\.[^\s@]+$/u;
 
 /** Who was invited to what, whether their email arrived, and resending or revoking it. */
@@ -97,7 +98,7 @@ export class InvitationsPage extends Disposable implements PageView {
 		filters.addSearch(format.text('invitationsFind'), (text) =>
 			this.setQuery({ email: text !== undefined && EMAIL.test(text) ? text : undefined })
 		);
-		filters.addSelect<State | typeof ANY>(
+		const status = filters.addSelect<State | typeof ANY>(
 			format.text('invitationsStatus'),
 			'status.success',
 			[
@@ -176,12 +177,29 @@ export class InvitationsPage extends Disposable implements PageView {
 							width: '120px',
 							align: 'end',
 							priority: 2,
-							cell: (invitation) => ({
-								kind: 'text',
-								primary: format.date(invitation.expiresAt),
-								mono: true,
-								quiet: true
-							})
+							// A pending invitation that lapses within a week says so in amber.
+							cell: (invitation) => {
+								const left = Math.ceil((invitation.expiresAt - format.now()) / DAY);
+								const soon =
+									invitation.state === 'pending' && left > 0 && left <= 7;
+								return {
+									kind: 'text',
+									primary: format.date(invitation.expiresAt),
+									mono: true,
+									quiet: true,
+									...(soon
+										? {
+												secondary:
+													left === 1
+														? format.text('invitationsExpiresTomorrow')
+														: format.text('invitationsExpiresIn', {
+																count: format.count(left)
+															}),
+												secondaryTone: 'attention' as const
+											}
+										: {})
+								};
+							}
 						},
 						{
 							label: format.text('invitationsColumnStatus'),
@@ -199,6 +217,14 @@ export class InvitationsPage extends Disposable implements PageView {
 							label: format.text('usersInvite'),
 							icon: 'action.invite',
 							run: openInvite
+						},
+						secondary: {
+							label: format.text('invitationsShowAll'),
+							icon: 'action.filter',
+							run: () => {
+								status.setValue(ANY);
+								this.setQuery({ state: undefined });
+							}
 						}
 					},
 					filteredEmpty: format.text('invitationsNoMatch'),
@@ -210,7 +236,13 @@ export class InvitationsPage extends Disposable implements PageView {
 				}
 			)
 		);
-		this._register(this.list.onDidLoad((invitations) => void this.loadNames(invitations)));
+		this._register(
+			this.list.onDidLoad((invitations) => {
+				// An empty list offers Invite itself, so the heading doesn't repeat it.
+				invite.element.hidden = invitations.length === 0;
+				void this.loadNames(invitations);
+			})
+		);
 	}
 
 	private async loadNames(invitations: readonly Invitation[]): Promise<void> {

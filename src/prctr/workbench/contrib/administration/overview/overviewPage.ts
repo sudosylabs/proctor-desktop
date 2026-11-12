@@ -12,7 +12,7 @@ import {
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
 import { IAuthenticatedNavigationService } from '../../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
-import { isReadAction, readableCode } from '../common/administrationPresentation.js';
+import { isReadAction } from '../common/administrationPresentation.js';
 import { readOnce, readPages } from '../widgets/adminReads.js';
 
 const RECENT_CHANGES = 5;
@@ -88,11 +88,8 @@ export class OverviewPage extends Disposable implements PageView {
 			changes.map((audit): PageRowModel => ({
 				id: audit.id,
 				glyph: 'admin.audits',
-				title: readableCode(audit.action),
-				detail: this.format.join(
-					readableCode(audit.resourceType),
-					this.format.relative(audit.createdAt)
-				),
+				title: audit.summary,
+				detail: this.format.relative(audit.createdAt),
 				status:
 					audit.status === 'success' || audit.status === 'succeeded'
 						? {

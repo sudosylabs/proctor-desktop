@@ -41,6 +41,11 @@ export const recordsMessages = Object.freeze({
 		defaultMessage: 'By',
 		description: 'Audit column: who did it.'
 	}),
+	auditsOutcomeAny: defineMessage({
+		id: 'administration.records.audits.outcome.any',
+		defaultMessage: 'Any outcome',
+		description: 'Audits filter choice: allowed and refused events.'
+	}),
 	auditsOutcome: defineMessage({
 		id: 'administration.records.audits.column.outcome',
 		defaultMessage: 'Outcome',

@@ -246,6 +246,21 @@ export const invitationsMessages = Object.freeze({
 			'Everyone you invited has answered. Invite more people, or show accepted and expired invitations.',
 		description: 'Explains the empty list of pending invitations.'
 	}),
+	invitationsShowAll: defineMessage({
+		id: 'administration.invitations.empty.showall',
+		defaultMessage: 'Show all invitations',
+		description: 'Second button on the empty pending list: shows invitations in every state.'
+	}),
+	invitationsExpiresIn: defineMessage({
+		id: 'administration.invitations.expires.soon',
+		defaultMessage: 'In {count} days',
+		description: "Under a pending invitation's expiry date when it lapses within a week."
+	}),
+	invitationsExpiresTomorrow: defineMessage({
+		id: 'administration.invitations.expires.tomorrow',
+		defaultMessage: 'Tomorrow',
+		description: "Under a pending invitation's expiry date when it lapses tomorrow."
+	}),
 	invitationsNoMatch: defineMessage({
 		id: 'administration.invitations.empty.filtered',
 		defaultMessage: 'No invitations match these filters.',

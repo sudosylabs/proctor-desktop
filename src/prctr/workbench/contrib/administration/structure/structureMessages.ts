@@ -141,6 +141,11 @@ export const structureMessages = Object.freeze({
 		defaultMessage: 'Programme level',
 		description: 'Classes table column.'
 	}),
+	structureStudentsColumn: defineMessage({
+		id: 'administration.structure.column.students',
+		defaultMessage: 'Students',
+		description: "Column of a unit's classes: how many students each has."
+	}),
 	structurePeriodColumn: defineMessage({
 		id: 'administration.structure.column.period',
 		defaultMessage: 'Period',

@@ -88,8 +88,8 @@ export type AdminCell =
 			readonly mono?: boolean;
 			/** Ordinary text reads in the primary colour; the rest of a row is quieter. */
 			readonly quiet?: boolean;
-			/** The second line names a problem. */
-			readonly secondaryTone?: 'fail';
+			/** The second line names a problem, or something that lapses soon. */
+			readonly secondaryTone?: 'fail' | 'attention';
 	  }
 	/** A status word, shown as a badge without an icon. */
 	| {
@@ -102,7 +102,8 @@ export type AdminCell =
 	| {
 			readonly kind: 'button';
 			readonly label: string;
-			readonly icon: ProctorIconId;
+			/** Every button has an icon, except Cancel. */
+			readonly icon?: ProctorIconId;
 			readonly run: () => void;
 	  }
 	| { readonly kind: 'empty' };
@@ -922,7 +923,9 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 						variant: 'secondary',
 						size: 'small',
 						label: cell.label,
-						icon: proctorIconFactory(cell.icon, 14)
+						...(cell.icon === undefined
+							? {}
+							: { icon: proctorIconFactory(cell.icon, 14) })
 					})
 				);
 				this.rowStore.add(button.onDidRequest(cell.run));

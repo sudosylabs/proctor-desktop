@@ -11,6 +11,16 @@ export const operationsMessages = Object.freeze({
 		defaultMessage: 'Status',
 		description: 'Filter over the jobs.'
 	}),
+	jobsNotDone: defineMessage({
+		id: 'administration.operations.jobs.notdone',
+		defaultMessage: 'Not done',
+		description: 'Jobs filter choice, the default: waiting, running or failed jobs.'
+	}),
+	jobsDone: defineMessage({
+		id: 'administration.operations.jobs.done',
+		defaultMessage: 'Done',
+		description: 'Jobs filter choice: jobs that finished or were cancelled.'
+	}),
 	jobsAny: defineMessage({
 		id: 'administration.operations.jobs.any',
 		defaultMessage: 'Any status',
@@ -133,8 +143,8 @@ export const operationsMessages = Object.freeze({
 	}),
 	mailHealth: defineMessage({
 		id: 'administration.operations.mail.health',
-		defaultMessage: 'Delivery',
-		description: 'Section with mail health.'
+		defaultMessage: 'All email, last 24 hours',
+		description: 'Section of mail delivery figures over the last day.'
 	}),
 	mailHealthy: defineMessage({
 		id: 'administration.operations.mail.healthy',

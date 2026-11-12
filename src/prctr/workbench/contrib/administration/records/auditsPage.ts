@@ -34,7 +34,8 @@ export class AuditsPage extends Disposable implements PageView {
 	private readonly names = new Map<string, string>();
 	private readonly filters: AdminFilters;
 	private query: AdminListQuery<'audits'>;
-	private everything = true;
+	/** Reads are recorded too; the page starts with changes only, as Overview does. */
+	private everything = false;
 
 	constructor(
 		body: HTMLElement,
@@ -58,7 +59,11 @@ export class AuditsPage extends Disposable implements PageView {
 			],
 			'week',
 			(period) => {
-				this.query = since(period, format.now());
+				const { status } = this.query;
+				this.query = {
+					...since(period, format.now()),
+					...(status === undefined ? {} : { status })
+				};
 				this.list.setQuery(this.query);
 			}
 		);
@@ -66,14 +71,29 @@ export class AuditsPage extends Disposable implements PageView {
 			format.text('auditsShow'),
 			'action.filter',
 			[
-				{ value: 'everything', label: format.text('auditsEverything') },
-				{ value: 'changes', label: format.text('auditsChanges') }
+				{ value: 'changes', label: format.text('auditsChanges') },
+				{ value: 'everything', label: format.text('auditsEverything') }
 			],
-			'everything',
+			'changes',
 			(choice) => {
 				this.everything = choice === 'everything';
 				this.list.redraw();
 				this.updateNote();
+			}
+		);
+		this.filters.addSelect<'any' | 'success' | 'fail'>(
+			format.text('auditsOutcome'),
+			'status.success',
+			[
+				{ value: 'any', label: format.text('auditsOutcomeAny') },
+				{ value: 'success', label: format.text('overviewSucceeded') },
+				{ value: 'fail', label: format.text('overviewRefused') }
+			],
+			'any',
+			(outcome) => {
+				const { status: _status, ...rest } = this.query;
+				this.query = outcome === 'any' ? rest : { ...rest, status: outcome };
+				this.list.setQuery(this.query);
 			}
 		);
 		this.list = this._register(
@@ -83,12 +103,13 @@ export class AuditsPage extends Disposable implements PageView {
 					{
 						label: format.text('auditsEvent'),
 						min: 240,
+						// The server writes each event as a sentence that names its target.
 						cell: (audit) => ({
 							kind: 'text',
-							primary: readableCode(audit.action),
+							primary: audit.summary,
 							secondary:
 								audit.reason === undefined
-									? readableCode(audit.resourceType)
+									? ''
 									: format.text('auditsReason', { reason: audit.reason }),
 							strong: true
 						})
@@ -138,6 +159,7 @@ export class AuditsPage extends Disposable implements PageView {
 						label: format.text('auditsWhen'),
 						width: '140px',
 						align: 'end',
+						sort: { key: 'when', first: 'desc' },
 						cell: (audit) => ({
 							kind: 'text',
 							primary: format.relativeStandalone(audit.createdAt),
@@ -146,7 +168,12 @@ export class AuditsPage extends Disposable implements PageView {
 					}
 				],
 				rowId: (audit) => audit.id,
-				rowName: (audit) => readableCode(audit.action),
+				rowName: (audit) => audit.summary,
+				sorting: {
+					initial: { key: 'when', dir: 'desc' },
+					params: (sort) => ({ order: sort.dir })
+				},
+				dateJump: (endOfDay) => ({ createdBefore: endOfDay }),
 				hidden: (audit) => !this.everything && isReadAction(audit.action),
 				actions: (audit) =>
 					audit.actorId === undefined

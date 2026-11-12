@@ -84,6 +84,8 @@ export interface PageEmpty {
 	readonly title?: string;
 	readonly text: string;
 	readonly action?: { readonly label: string; readonly icon: ProctorIconId; run(): void };
+	/** A quieter second way on, such as showing the list without its filter. */
+	readonly secondary?: { readonly label: string; readonly icon: ProctorIconId; run(): void };
 }
 
 const SKELETON_ROWS = 3;
@@ -105,6 +107,8 @@ export class PageSection extends Disposable {
 	private readonly description: HTMLElement;
 	private readonly stateTitle: HTMLElement;
 	private readonly emptyAction: ButtonControl;
+	private readonly emptySecondary: ButtonControl;
+	private emptySecondaryRun: (() => void) | undefined;
 	private emptyRun: (() => void) | undefined;
 	private readonly card: HTMLElement;
 	private readonly list: HTMLUListElement;
@@ -240,6 +244,16 @@ export class PageSection extends Disposable {
 		);
 		this.emptyAction.element.hidden = true;
 		this._register(this.emptyAction.onDidRequest(() => this.emptyRun?.()));
+		this.emptySecondary = this._register(
+			new ButtonControl(this.stateActions, {
+				variant: 'secondary',
+				size: 'small',
+				label: '',
+				icon: proctorIconFactory('action.filter', 14)
+			})
+		);
+		this.emptySecondary.element.hidden = true;
+		this._register(this.emptySecondary.onDidRequest(() => this.emptySecondaryRun?.()));
 		this.list = $('ul.prctr-page-section__rows', { attrs: { 'aria-labelledby': id } });
 		this.content = $('div.prctr-page-section__content');
 		this.card = $(
@@ -449,6 +463,13 @@ export class PageSection extends Disposable {
 			this.emptyAction.setState({
 				label: content.action.label,
 				icon: proctorIconFactory(content.action.icon, 14)
+			});
+		this.emptySecondaryRun = content.secondary?.run;
+		this.emptySecondary.element.hidden = content.secondary === undefined;
+		if (content.secondary !== undefined)
+			this.emptySecondary.setState({
+				label: content.secondary.label,
+				icon: proctorIconFactory(content.secondary.icon, 14)
 			});
 	}
 

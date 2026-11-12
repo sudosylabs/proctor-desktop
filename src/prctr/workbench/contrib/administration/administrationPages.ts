@@ -111,7 +111,7 @@ export const administrationPageRegistry: Readonly<
 	imports: list(
 		'importsTitle',
 		(f) => f.text('importsDescription'),
-		'narrow',
+		'wide',
 		(i, body, actions) => i.createInstance(ImportsPage, body, actions)
 	),
 	import: record('importTitle', 'narrow', (i, body, actions, id) =>

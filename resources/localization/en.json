@@ -4614,9 +4614,29 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
+    "administration.invitations.empty.showall": {
+      "message": "Show all invitations",
+      "description": "Second button on the empty pending list: shows invitations in every state.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
     "administration.invitations.empty.text": {
       "message": "Everyone you invited has answered. Invite more people, or show accepted and expired invitations.",
       "description": "Explains the empty list of pending invitations.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.expires.soon": {
+      "message": "In {count} days",
+      "description": "Under a pending invitation's expiry date when it lapses within a week.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.expires.tomorrow": {
+      "message": "Tomorrow",
+      "description": "Under a pending invitation's expiry date when it lapses tomorrow.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
@@ -5485,6 +5505,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
+    "administration.operations.jobs.done": {
+      "message": "Done",
+      "description": "Jobs filter choice: jobs that finished or were cancelled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
     "administration.operations.jobs.empty": {
       "message": "No jobs yet",
       "description": "Title of the empty Jobs list.",
@@ -5506,6 +5532,12 @@
     "administration.operations.jobs.not.started": {
       "message": "Not yet",
       "description": "In the Started column: the job is waiting to run.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.operations.jobs.notdone": {
+      "message": "Not done",
+      "description": "Jobs filter choice, the default: waiting, running or failed jobs.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -5660,8 +5692,8 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.mail.health": {
-      "message": "Delivery",
-      "description": "Section with mail health.",
+      "message": "All email, last 24 hours",
+      "description": "Section of mail delivery figures over the last day.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -6727,6 +6759,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
+    "administration.records.audits.outcome.any": {
+      "message": "Any outcome",
+      "description": "Audits filter choice: allowed and refused events.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
     "administration.records.audits.page.reads": {
       "message": "Reads on this page are hidden.",
       "description": "Note when a page holds only reads.",
@@ -7298,6 +7336,12 @@
     "administration.structure.column.period": {
       "message": "Period",
       "description": "Classes table column.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.structure.column.students": {
+      "message": "Students",
+      "description": "Column of a unit's classes: how many students each has.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },

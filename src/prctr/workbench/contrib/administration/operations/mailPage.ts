@@ -151,6 +151,7 @@ export class MailPage extends Disposable implements PageView {
 							label: format.text('mailUpdated'),
 							width: '130px',
 							align: 'end',
+							sort: { key: 'updated', first: 'desc' },
 							cell: (delivery) => ({
 								kind: 'text',
 								primary: format.relativeStandalone(delivery.updatedAt),
@@ -162,6 +163,11 @@ export class MailPage extends Disposable implements PageView {
 					open: (delivery) => this.openDelivery(delivery),
 					rowId: (delivery) => delivery.id,
 					rowName: (delivery) => delivery.recipient,
+					sorting: {
+						initial: { key: 'updated', dir: 'desc' },
+						params: (sort) => ({ sort: 'updated' as const, dir: sort.dir })
+					},
+					dateJump: (endOfDay) => ({ createdBefore: endOfDay }),
 					actions: (delivery) => this.actions(delivery),
 					icon: 'admin.mail',
 					empty: {

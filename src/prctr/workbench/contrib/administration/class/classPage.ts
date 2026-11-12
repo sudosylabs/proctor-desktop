@@ -111,6 +111,7 @@ export class ClassPage extends Disposable implements PageView {
 						{
 							label: format.text('classStudentColumn'),
 							width: '46%',
+							sort: { key: 'name', first: 'asc' },
 							cell: (member) => ({
 								kind: 'person',
 								name: this.names.get(member.userId) ?? format.text('inviteLoading')
@@ -119,6 +120,7 @@ export class ClassPage extends Disposable implements PageView {
 						{
 							label: format.text('classEnrolledColumn'),
 							width: '22%',
+							sort: { key: 'enrolled', first: 'asc' },
 							cell: (member) => ({
 								kind: 'text',
 								primary: format.date(member.startAt),
@@ -145,6 +147,10 @@ export class ClassPage extends Disposable implements PageView {
 					],
 					rowId: (member) => member.id,
 					rowName: (member) => this.names.get(member.userId) ?? '',
+					sorting: {
+						initial: { key: 'enrolled', dir: 'asc' },
+						params: (sort) => ({ sort: sort.key as 'enrolled' | 'name', dir: sort.dir })
+					},
 					open: (member) => navigation.selectAdministrationPage('user', member.userId),
 					actions: (member) => this.memberActions(member),
 					empty: format.text('classStudentsEmpty')

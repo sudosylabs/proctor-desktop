@@ -71,6 +71,7 @@ export class ImportsPage extends Disposable implements PageView {
 							width: '130px',
 							align: 'end',
 							priority: 2,
+							sort: { key: 'uploaded', first: 'desc' },
 							cell: (item) => ({
 								kind: 'text',
 								primary: format.relativeStandalone(item.createdAt),
@@ -95,6 +96,10 @@ export class ImportsPage extends Disposable implements PageView {
 						}
 					],
 					rowId: (item) => item.id,
+					sorting: {
+						initial: { key: 'uploaded', dir: 'desc' },
+						params: (sort) => ({ order: sort.dir })
+					},
 					rowName: (item) => item.fileName ?? format.text('importsUnnamed'),
 					open: (item) => navigation.selectAdministrationPage('import', item.id),
 					icon: 'object.csv',
@@ -109,6 +114,12 @@ export class ImportsPage extends Disposable implements PageView {
 					}
 				}
 			)
+		);
+		// An empty list offers Upload itself, so the heading doesn't repeat it.
+		this._register(
+			this.recent.onDidLoad((items) => {
+				start.element.hidden = items.length === 0;
+			})
 		);
 	}
 
