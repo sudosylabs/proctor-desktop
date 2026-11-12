@@ -17,6 +17,8 @@ import {
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import {
 	ACCOUNT_HISTORY_PAGE_SIZE,
+	ACCOUNT_HISTORY_PAGE_SIZES,
+	type AccountHistoryPageSize,
 	type AccountFailure,
 	type AccountHistoryEntry,
 	type AccountResponse
@@ -42,7 +44,11 @@ import type { AccountMessage } from '../accountMessages.js';
 import type { PageView } from '../../../browser/authenticated/pages/pagePane.js';
 import { PageDialog } from '../../../browser/authenticated/pages/pageDialog.js';
 import { PageSection } from '../../../browser/authenticated/pages/pageSection.js';
+import { IAdministrationListsService } from '../../../services/administration/common/administrationLists.js';
 import './media/historyPage.css';
+
+/** The name its page size is remembered by, beside Administration's lists. */
+const HISTORY_LIST = 'accountHistory';
 import './media/goToDateDialog.css';
 
 const groupMessages: Readonly<Record<HistoryEventGroup, AccountMessage>> = Object.freeze({
@@ -87,6 +93,8 @@ export class HistoryPage extends Disposable implements PageView {
 	private readonly sortIcon;
 	private readonly pager: PagerControl;
 	private readonly goToDate: ButtonControl;
+	private readonly pageSizeButton: ButtonControl;
+	private pageSize: AccountHistoryPageSize = ACCOUNT_HISTORY_PAGE_SIZE;
 	private readonly rowStore = this._register(new DisposableStore());
 	private readonly dialog = this._register(new MutableDisposable());
 	private readonly slow = this._register(new MutableDisposable());
@@ -110,7 +118,8 @@ export class HistoryPage extends Disposable implements PageView {
 		@IAccountService private readonly account: IAccountService,
 		@IAccountFormatService private readonly format: IAccountFormatService,
 		@IPagePaneContext private readonly pane: IPagePaneContext,
-		@IInstantiationService instantiationService: IInstantiationService
+		@IInstantiationService instantiationService: IInstantiationService,
+		@IAdministrationListsService private readonly lists: IAdministrationListsService
 	) {
 		super();
 		const document = body.ownerDocument;
@@ -213,6 +222,16 @@ export class HistoryPage extends Disposable implements PageView {
 				icon: proctorIconFactory('action.goToDate', 14)
 			})
 		);
+		this.pageSize = lists.pageSize(HISTORY_LIST) ?? ACCOUNT_HISTORY_PAGE_SIZE;
+		this.pageSizeButton = this._register(
+			new ButtonControl(tools, {
+				variant: 'ghost',
+				size: 'small',
+				label: this.pageSizeLabel(this.pageSize),
+				icon: proctorIconFactory('action.expand', 14)
+			})
+		);
+		this.pageSizeButton.element.setAttribute('aria-haspopup', 'menu');
 		this.pager = this._register(
 			new PagerControl(this.section.footer, {
 				labels: {
@@ -237,6 +256,15 @@ export class HistoryPage extends Disposable implements PageView {
 			this._register(addDisposableListener(control, 'change', () => this.onFilterChange()));
 		this._register(addDisposableListener(this.sort, 'click', () => this.toggleOrder()));
 		this._register(this.goToDate.onDidRequest(() => this.openGoToDate()));
+		this._register(this.pageSizeButton.onDidRequest(() => this.choosePageSize()));
+		// A size chosen on another computer, or read after the page opened, applies here too.
+		this._register(
+			lists.onDidChange(() => {
+				const remembered = lists.pageSize(HISTORY_LIST);
+				if (remembered !== undefined && remembered !== this.pageSize)
+					this.applyPageSize(remembered);
+			})
+		);
 		this._register(this.pager.onDidRequestPage((page) => void this.load(page)));
 		this.render();
 	}
@@ -296,6 +324,37 @@ export class HistoryPage extends Disposable implements PageView {
 		this.restart();
 	}
 
+	private pageSizeLabel(size: number): string {
+		return this.format.text('historyPageSize', { count: this.format.count(size) });
+	}
+
+	private applyPageSize(size: AccountHistoryPageSize): void {
+		this.pageSize = size;
+		this.pageSizeButton.setState({
+			label: this.pageSizeLabel(size),
+			icon: proctorIconFactory('action.expand', 14)
+		});
+		if (this.loaded) this.restart();
+	}
+
+	private choosePageSize(): void {
+		this.pane.menu.show(
+			this.pageSizeButton.element,
+			ACCOUNT_HISTORY_PAGE_SIZES.map((size) => ({
+				label: this.pageSizeLabel(size),
+				...(size === this.pageSize
+					? { icon: proctorIconFactory('action.confirm', 16) }
+					: {}),
+				run: () => {
+					if (size === this.pageSize) return;
+					this.applyPageSize(size);
+					void this.lists.setPageSize(HISTORY_LIST, size);
+				}
+			})),
+			this.format.text('historyPageSizeChoice')
+		);
+	}
+
 	private restart(): void {
 		this.cursors = [undefined];
 		this.total = undefined;
@@ -328,6 +387,7 @@ export class HistoryPage extends Disposable implements PageView {
 		const response = await this.read({
 			kind: 'readHistory',
 			...historyQuery(this.filters, this.format.now()),
+			limit: this.pageSize,
 			...(cursor === undefined ? {} : { cursor })
 		});
 		if (this._store.isDisposed || sequence !== this.sequence) return;
@@ -378,7 +438,7 @@ export class HistoryPage extends Disposable implements PageView {
 	/** After a page change focus moves to the table and "Showing 11 to 20" is said once. */
 	private announcePage(): void {
 		this.table.focus();
-		const first = (this.page - 1) * ACCOUNT_HISTORY_PAGE_SIZE + 1;
+		const first = (this.page - 1) * this.pageSize + 1;
 		this.pane.announce(
 			this.format.text('historyPageShown', { first, last: first + this.entries.length - 1 })
 		);
@@ -398,13 +458,17 @@ export class HistoryPage extends Disposable implements PageView {
 		this.table.setAttribute('aria-busy', String(this.loadingPage));
 		this.table.hidden = this.entries.length === 0;
 		this.renderRows();
-		// Ten or fewer, with no date chosen, need no pager at all.
-		const paged = this.page > 1 || this.hasNext || this.filters.before !== undefined;
+		// One page, with no date chosen and the smallest size, needs no pager at all.
+		const paged =
+			this.page > 1 ||
+			this.hasNext ||
+			this.filters.before !== undefined ||
+			this.pageSize !== ACCOUNT_HISTORY_PAGE_SIZE;
 		this.pager.element.hidden = !paged || !this.loaded;
-		const first = (this.page - 1) * ACCOUNT_HISTORY_PAGE_SIZE + 1;
+		const first = (this.page - 1) * this.pageSize + 1;
 		this.pager.setState({
 			page: this.page,
-			pageSize: ACCOUNT_HISTORY_PAGE_SIZE,
+			pageSize: this.pageSize,
 			first: this.entries.length === 0 ? 0 : first,
 			last: this.entries.length === 0 ? 0 : first + this.entries.length - 1,
 			...(this.total === undefined

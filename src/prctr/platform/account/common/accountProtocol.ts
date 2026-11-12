@@ -83,8 +83,11 @@ export const accountHistoryEvents = [
 export type AccountHistoryEvent = (typeof accountHistoryEvents)[number];
 export const accountHistoryActors = ['self', 'administrator', 'system'] as const;
 /** One history query: every filter is optional and the cursor continues the same query. */
-/** Events on one page of account history. */
+/** Events on one page of account history, unless the person chose another of the sizes. */
 export const ACCOUNT_HISTORY_PAGE_SIZE = 10;
+export const ACCOUNT_HISTORY_PAGE_SIZES = [10, 25, 50] as const;
+export type AccountHistoryPageSize = (typeof ACCOUNT_HISTORY_PAGE_SIZES)[number];
+const ACCOUNT_HISTORY_MAX_PAGE_SIZE = 50;
 
 export interface AccountHistoryQuery {
 	/** Inclusive lower bound, epoch milliseconds. */
@@ -96,7 +99,7 @@ export interface AccountHistoryQuery {
 	readonly relation?: 'subject' | 'actor';
 	/** Newest first unless asked otherwise; a cursor continues only the order that made it. */
 	readonly order?: 'asc' | 'desc';
-	/** Events on the page, 1 to 10; 10 when absent. A short last page is read oldest first. */
+	/** Events on the page, 1 to 50; 10 when absent. A short last page is read oldest first. */
 	readonly limit?: number;
 	readonly cursor?: string;
 }
@@ -425,7 +428,7 @@ function validateHistoryQuery(input: Record<string, unknown>): AccountIntent {
 			typeof input.limit !== 'number' ||
 			!Number.isInteger(input.limit) ||
 			input.limit < 1 ||
-			input.limit > ACCOUNT_HISTORY_PAGE_SIZE
+			input.limit > ACCOUNT_HISTORY_MAX_PAGE_SIZE
 		)
 			throw new TypeError('Invalid history page size');
 		query.limit = input.limit;

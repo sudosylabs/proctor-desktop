@@ -302,12 +302,26 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },
+    "account.history.page.choice": {
+      "message": "Events on each page",
+      "description": "Accessible name of the menu that chooses how many events a page shows.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
     "account.history.page.shown": {
       "message": "Showing {first} to {last}",
       "description": "Announced once after moving to another page of the history.",
       "placeholders": [
         "first",
         "last"
+      ],
+      "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
+    },
+    "account.history.page.size": {
+      "message": "{count} a page",
+      "description": "Under the history: how many events each page shows; opens a choice of 10, 25 or 50.",
+      "placeholders": [
+        "count"
       ],
       "source": "src/prctr/workbench/contrib/account/history/historyMessages.ts"
     },

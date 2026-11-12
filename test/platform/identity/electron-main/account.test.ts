@@ -694,7 +694,7 @@ void test('history queries use the server filter names and parse a minimized pag
 		{ kind: 'readHistory', cursor: 'has space' },
 		{ kind: 'readHistory', order: 'sideways' },
 		{ kind: 'readHistory', limit: 0 },
-		{ kind: 'readHistory', limit: 11 },
+		{ kind: 'readHistory', limit: 51 },
 		{ kind: 'readHistory', limit: 2.5 },
 		{ kind: 'readHistory', url: 'https://attacker.test' }
 	])

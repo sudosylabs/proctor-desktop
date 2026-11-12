@@ -181,6 +181,17 @@ export const historyMessages = Object.freeze({
 		defaultMessage: 'Showing {first} to {last}',
 		description: 'Announced once after moving to another page of the history.'
 	}),
+	historyPageSize: defineMessage({
+		id: 'account.history.page.size',
+		defaultMessage: '{count} a page',
+		description:
+			'Under the history: how many events each page shows; opens a choice of 10, 25 or 50.'
+	}),
+	historyPageSizeChoice: defineMessage({
+		id: 'account.history.page.choice',
+		defaultMessage: 'Events on each page',
+		description: 'Accessible name of the menu that chooses how many events a page shows.'
+	}),
 	historyGoToDate: defineMessage({
 		id: 'account.history.go.to.date',
 		defaultMessage: 'Go to a date',
