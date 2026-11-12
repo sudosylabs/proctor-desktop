@@ -63,17 +63,31 @@ preview is not the visual acceptance surface.
 - A record's page (one user, one class) opens with a trail back to its list,
   then the record's name with initials for a person and a status word beside
   it.
-- A table in a card puts column labels in the quiet text colour, hairlines
+- A table has no card: column labels in the quiet text colour, hairlines
   between rows, people as initials with a name and one detail line, status as a
-  coloured dot and word, and one "⋯" menu per row. A bar of search and select
-  filters sits above it.
+  word on a tinted pill, and one "⋯" menu per row, always visible in muted grey.
+  A bar of search and select filters sits above it, with More filters for the
+  rarer ones. A sortable column's header is a button with an arrow and
+  `aria-sort`; the pager says "Showing 1–10 of 1,284" on a counted list and
+  offers 10, 25 or 50 rows a page, remembered per list in the person's settings.
+- Status colour answers "do I need to act?". `StatusBadgeTone` names the meaning
+  and the badge picks the colour: red `failure` when something went wrong, amber
+  `attention` when it waits on you or lapses soon, green `safeguard` only for a
+  protection on the viewer's own account (Verified, Linked, Set, On), and grey
+  `neutral` for everything else, work still running included. Purple is for
+  actions and selection, never a status. A status is a word, never an icon.
 - Sections are grouped lists on `color.background.card`: 10px radius, a
   hairline boundary and no shadow. A row is a small glyph, its title and one
   detail line, then either a status word or one "⋯" actions menu. The current
   session's Sign out is the one inline row button.
 - A dialog is a card near the top of the window. Its title is a question, its
-  body one sentence on what happens, and its actions Cancel and the verb, both
-  with icons. Signing out always asks first.
+  body one sentence on what happens, and its actions Cancel and the verb. Every
+  button has an icon except Cancel and Close. Signing out always asks first.
+- Fields use `color.border.field` and controls that must be seen to be used use
+  `color.border.outline`, both at least 3:1 against cards; the accent stroke of
+  a switch that is on and of the selected tab is `color.border.accentLine`.
+  Placeholders are the field's text colour at 68%. Descriptions and dialog
+  paragraphs use `text-wrap: pretty`, so no line ends on a lone word.
 - Decorative flourishes are excluded: no gradient or blob backgrounds, tinted
   icon tiles, pill chips, illustrated empty states, or shadows on static cards.
 

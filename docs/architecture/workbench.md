@@ -56,7 +56,7 @@ titlebar account trigger or account popup menu.
 
 Each Account page is one registered WorkbenchItem resolved into one cancellable
 pane: a heading, a one-line description, any page action, then titled sections,
-in one centred column (760px, 880px for history). Sections read independently
+in one centred column of 760px on every page. The sidebar counts only what may need the person: active access tokens, hidden at zero; Sessions has no count. Sections read independently
 through the bound account capability and follow the design system's
 [states pattern](./design-system.md#states); every read ends with an answer, a
 failure or a deadline. Account data is window-session state and is never

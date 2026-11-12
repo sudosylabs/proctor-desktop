@@ -103,12 +103,23 @@ CandidateWindow closes the entire AuthenticatedWindow, so the editing surface
 cannot coexist with active candidate participation.
 
 Settings is an Account page (`settings` in `accountPages`), opened from the
-Account sidebar or Ctrl/Cmd+, (`prctr.authenticated.openSettings`). Its tabs —
-Appearance, Exam editor, Accessibility and Browser — are built from
+Account sidebar or Ctrl/Cmd+, (`prctr.authenticated.openSettings`). Its three
+tabs — Appearance, Exam editor and Accessibility — are built from
 `SETTINGS_MANIFEST` by
-`src/prctr/workbench/contrib/account/settings/common/settingsPresentation.ts`. Find a
-setting searches every tab. Object settings such as color and token
-customizations stay in the manifest and remain effective but have no control.
+`src/prctr/workbench/contrib/account/settings/common/settingsPresentation.ts`. The exam
+browser's zoom lives in Appearance › Size beside Interface size. Rows are built
+once and updated in place, so focus stays on the control that changed. A sticky
+tab bar carries Find and the save status; "Saved" appears only after a change on
+that visit. Find searches titles, descriptions, choice labels and a few everyday
+words of every tab. Object settings such as color and token customizations stay
+in the manifest and remain effective but have no control.
+
+`administration.lists` is an object setting with no control on this page:
+Administration keeps each list's page size and up to eight saved views of Users
+there, so they follow the person to any computer. It is AuthenticatedWindow-only
+and `nonCandidateOnly`, and its normalizer keeps only known filters.
+`IAdministrationListsService` reads it from the settings projection and saves it
+through the same draft, revision and conflict path as the page.
 
 Each control writes one key through one in-memory `SettingsDraft` and previews
 the draft at once, so every window applies the change before it is saved. The

@@ -83,7 +83,6 @@ const icons = {
 	'status.review': 'eye',
 	'status.waiting': 'hourglass',
 	'status.failed': 'x-circle',
-	'status.here': 'map-pin',
 	'status.info': 'info',
 	'status.locked': 'lock-simple',
 	'status.offline': 'cloud-slash',
@@ -118,7 +117,6 @@ const icons = {
 
 	'settings.accessibility': 'person-simple-circle',
 	'settings.appearance': 'palette',
-	'settings.browser': 'browser',
 	'settings.editor': 'code',
 	'theme.dark': 'moon',
 	'theme.light': 'sun',
