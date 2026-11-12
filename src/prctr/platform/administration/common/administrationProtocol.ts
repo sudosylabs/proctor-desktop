@@ -19,8 +19,13 @@ import {
  * operation: a refusal is an answer, never a hint that something exists.
  */
 export const ADMINISTRATION_CHANNEL = 'prctr:authenticated:administration';
-/** Items on one page of an administration list. */
+/** The page sizes an administration list offers. */
+export const ADMINISTRATION_PAGE_SIZES = [10, 25, 50] as const;
+export type AdministrationPageSize = (typeof ADMINISTRATION_PAGE_SIZES)[number];
+/** Items on one page of an administration list unless the person chose more. */
 export const ADMINISTRATION_PAGE_SIZE = 10;
+/** The most items one page of an administration list may hold. */
+export const ADMINISTRATION_MAX_PAGE_SIZE = 50;
 
 // #region Field language
 
@@ -33,8 +38,8 @@ interface ScalarValues {
 	readonly id: string;
 	/** An opaque continuation the server issued for the same query. */
 	readonly cursor: string;
-	/** 1 to {@link ADMINISTRATION_PAGE_SIZE}. */
-	readonly pageLimit: number;
+	/** One of {@link ADMINISTRATION_PAGE_SIZES}. */
+	readonly pageLimit: AdministrationPageSize;
 	/** A non-negative safe integer: a count or a revision. */
 	readonly count: number;
 	/** Epoch milliseconds. */
@@ -150,7 +155,9 @@ function readScalar(kind: ScalarField, value: unknown): unknown {
 		case 'id':
 			return projectionId(value);
 		case 'pageLimit':
-			return integer(value, 1, ADMINISTRATION_PAGE_SIZE);
+			if (!ADMINISTRATION_PAGE_SIZES.includes(value as AdministrationPageSize))
+				throw new TypeError('Invalid administration page size');
+			return value;
 		case 'count':
 		case 'instant':
 			return projectionTime(value);
@@ -393,6 +400,46 @@ export const jobAttemptStates = [
 	'lease_expired',
 	'incompatible'
 ] as const;
+/** The existing-user operations a filter preview may apply; a transfer names exact memberships. */
+export const academicPreviewOperations = academicBatchOperations.filter(
+	(operation): operation is Exclude<(typeof academicBatchOperations)[number], 'class.transfer'> =>
+		operation !== 'class.transfer'
+);
+export const academicPreviewStates = [
+	'parsing',
+	'preview_ready',
+	'executing',
+	'completed',
+	'completed_with_errors',
+	'canceled',
+	'failed'
+] as const;
+export const academicPreviewGroups = ['will_change', 'no_op', 'skipped'] as const;
+export const academicPreviewSkipReasons = [
+	'academic_administration_preview.ambiguous',
+	'academic_administration_preview.enrollment_conflict',
+	'academic_administration_preview.self',
+	'academic_administration_preview.student_affiliation_required',
+	'academic_administration_preview.system_administrator'
+] as const;
+export const academicPreviewRowStates = [
+	'valid',
+	'invalid',
+	'pending',
+	'succeeded',
+	'no_op',
+	'failed',
+	'skipped',
+	'canceled'
+] as const;
+export const userStates = ['active', 'disabled'] as const;
+export const auditStatuses = ['attempt', 'success', 'fail'] as const;
+/** The list orders the server offers, by list. */
+export const sortDirections = ['asc', 'desc'] as const;
+export const userSorts = ['username', 'name', 'created', 'last_active'] as const;
+export const classMemberSorts = ['enrolled', 'name'] as const;
+export const unitMemberSorts = ['since', 'name'] as const;
+export const mailDeliverySorts = ['updated', 'created'] as const;
 export const photoMediaTypes = ['image/png', 'image/jpeg', 'image/webp'] as const;
 /** The counts the sidebar badges show; each is left out when the person can't list it. */
 export const administrationCounts = [
@@ -407,6 +454,19 @@ export const administrationCounts = [
 // #region Intents
 
 const page = { cursor: { optional: 'cursor' }, limit: 'pageLimit' } as const;
+const dir = { dir: { optional: sortDirections } } as const;
+const order = { order: { optional: sortDirections } } as const;
+/** The User directory's filters, shared by the Users list and a filter preview. */
+const directoryFilter = {
+	q: { optional: 'search' },
+	affiliation: { optional: { list: affiliationKinds, max: affiliationKinds.length } },
+	academicUnitId: { optional: 'id' },
+	roleIds: { optional: { list: 'id', max: 16 } },
+	state: { optional: userStates },
+	neverSignedIn: { optional: 'flag' },
+	lastActiveAfter: { optional: 'instant' },
+	lastActiveBefore: { optional: 'instant' }
+} as const;
 const byId = { id: 'id' } as const;
 const revised = { id: 'id', expectedRevision: 'count' } as const;
 const period = { startAt: { optional: 'instant' }, endAt: { optional: 'instant' } } as const;
@@ -444,10 +504,10 @@ const accessSettings = {
 export const administrationReads = {
 	users: {
 		...page,
-		q: { optional: 'search' },
+		...directoryFilter,
 		includeDisabled: { optional: 'flag' },
-		affiliation: { optional: { list: affiliationKinds, max: affiliationKinds.length } },
-		academicUnitId: { optional: 'id' }
+		sort: { optional: userSorts },
+		...dir
 	},
 	user: byId,
 	userPhoto: { userId: 'id' },
@@ -463,7 +523,8 @@ export const administrationReads = {
 	invitation: byId,
 	onboardingImports: {
 		...page,
-		state: { optional: { list: importStates, max: importStates.length } }
+		state: { optional: { list: importStates, max: importStates.length } },
+		...order
 	},
 	onboardingImport: byId,
 	studentProgressions: {
@@ -476,13 +537,25 @@ export const administrationReads = {
 	institution: {},
 	academicUnits: { ...page, q: { optional: 'search' } },
 	unitChildren: { ...page, unitId: 'id' },
-	unitMembers: { ...page, unitId: 'id', history: { optional: 'flag' } },
-	unitClasses: { ...page, unitId: 'id', q: { optional: 'search' } },
+	unitMembers: {
+		...page,
+		unitId: 'id',
+		history: { optional: 'flag' },
+		sort: { optional: unitMemberSorts },
+		...dir
+	},
+	unitClasses: { ...page, unitId: 'id', q: { optional: 'search' }, ...dir },
 	unitProgrammes: { ...page, unitId: 'id', q: { optional: 'search' } },
 	programmeLevels: { ...page, programmeId: 'id', q: { optional: 'search' } },
-	levelClasses: { ...page, levelId: 'id' },
+	levelClasses: { ...page, levelId: 'id', ...dir },
 	class: byId,
-	classMembers: { ...page, classId: 'id', history: { optional: 'flag' } },
+	classMembers: {
+		...page,
+		classId: 'id',
+		history: { optional: 'flag' },
+		sort: { optional: classMemberSorts },
+		...dir
+	},
 	academicPeriods: { ...page, q: { optional: 'search' } },
 	roles: page,
 	roleBindings: {
@@ -496,22 +569,35 @@ export const administrationReads = {
 	audits: {
 		...page,
 		actorId: { optional: 'id' },
-		action: { optional: 'code' },
+		/** Whom the events were about, as actor or resource. */
+		subjectUserId: { optional: 'id' },
+		actions: { optional: { list: 'code', max: 32 } },
+		status: { optional: auditStatuses },
 		resourceType: { optional: 'code' },
 		resourceId: { optional: 'id' },
 		createdAfter: { optional: 'instant' },
-		createdBefore: { optional: 'instant' }
+		createdBefore: { optional: 'instant' },
+		...order
 	},
 	retentionPolicy: {},
 	retentionControl: {},
 	retentionPreview: byId,
 	retentionRecords: page,
-	jobs: { ...page, status: { optional: { list: jobStates, max: jobStates.length } } },
+	jobs: {
+		...page,
+		status: { optional: { list: jobStates, max: jobStates.length } },
+		...order
+	},
 	job: byId,
 	jobAttempts: { ...page, jobId: 'id' },
 	mailDeliveries: {
 		...page,
-		state: { optional: { list: mailDeliveryStates, max: mailDeliveryStates.length } }
+		state: { optional: { list: mailDeliveryStates, max: mailDeliveryStates.length } },
+		recipientUserId: { optional: 'id' },
+		createdAfter: { optional: 'instant' },
+		createdBefore: { optional: 'instant' },
+		sort: { optional: mailDeliverySorts },
+		...dir
 	},
 	mailDelivery: byId,
 	mailMetrics: {},
@@ -519,7 +605,15 @@ export const administrationReads = {
 	mfaKeys: {},
 	mailKeys: {},
 	mfaRekey: { jobId: 'id' },
-	mailRekey: { jobId: 'id' }
+	mailRekey: { jobId: 'id' },
+	academicPreview: byId,
+	/** One class of a ready preview's rows; `reason` narrows only the skipped rows. */
+	academicPreviewRows: {
+		...page,
+		id: 'id',
+		group: academicPreviewGroups,
+		reason: { optional: academicPreviewSkipReasons }
+	}
 } as const satisfies Record<string, Shape>;
 
 /** One change per action, with its exact fields. */
@@ -573,6 +667,21 @@ export const administrationChanges = {
 			max: 200
 		}
 	},
+	/**
+	 * Proposes one operation for every User the directory filter matches now. Nothing changes until
+	 * the ready preview is committed with its revision and digest.
+	 */
+	createAcademicPreview: {
+		operation: academicPreviewOperations,
+		scopeType: invitationScopeTypes,
+		scopeId: 'id',
+		filter: { shape: directoryFilter },
+		roleId: { optional: 'id' },
+		affiliationKind: { optional: affiliationKinds },
+		...period
+	},
+	commitAcademicPreview: { ...revised, previewDigest: 'digest' },
+	cancelAcademicPreview: byId,
 	// Invitations and onboarding imports
 	inviteToInstitution: {
 		institutionId: 'id',
@@ -746,6 +855,13 @@ export function isAdministrationRead(
 	return Object.hasOwn(administrationReads, intent.kind);
 }
 
+/** Pairs of instants where the second must come after the first. */
+const instantRanges = [
+	['startAt', 'endAt'],
+	['createdAfter', 'createdBefore'],
+	['lastActiveAfter', 'lastActiveBefore']
+] as const;
+
 export function validateAdministrationIntent(value: unknown): AdministrationIntent {
 	const input = projectionRecord(value);
 	const kind = input.kind;
@@ -759,12 +875,17 @@ export function validateAdministrationIntent(value: unknown): AdministrationInte
 					: undefined;
 	if (!shape) throw new TypeError('Invalid administration action');
 	const fields = readShape(shape, input, 'kind');
-	if (
-		typeof fields.startAt === 'number' &&
-		typeof fields.endAt === 'number' &&
-		fields.endAt <= fields.startAt
-	)
-		throw new TypeError('Invalid administration period');
+	const ranges = [fields, fields.filter as Record<string, unknown> | undefined];
+	for (const range of ranges)
+		for (const [from, to] of instantRanges)
+			if (
+				typeof range?.[from] === 'number' &&
+				typeof range[to] === 'number' &&
+				range[to] <= range[from]
+			)
+				throw new TypeError('Invalid administration period');
+	if (kind === 'academicPreviewRows' && fields.reason !== undefined && fields.group !== 'skipped')
+		throw new TypeError('Invalid administration preview reason');
 	return Object.freeze({ kind, ...fields }) as AdministrationIntent;
 }
 
@@ -774,7 +895,7 @@ export function validateAdministrationIntent(value: unknown): AdministrationInte
 
 function pageOf<S extends Shape>(item: S) {
 	return {
-		items: { list: { shape: item }, max: ADMINISTRATION_PAGE_SIZE },
+		items: { list: { shape: item }, max: ADMINISTRATION_MAX_PAGE_SIZE },
 		cursor: { optional: 'cursor' },
 		/** On a first page only: how many items the whole list holds, at most 10,000. */
 		total: { optional: 'count' },
@@ -940,7 +1061,15 @@ const structured = {
 const unitShape = { ...structured, parentId: { optional: 'id' } } as const;
 const programmeShape = { ...structured, unitId: 'id' } as const;
 const levelShape = { ...structured, programmeId: 'id' } as const;
-const classShape = { ...structured, levelId: 'id', academicPeriodId: 'id' } as const;
+const classShape = {
+	...structured,
+	levelId: 'id',
+	academicPeriodId: 'id',
+	/** On a list row, for a viewer who may see members: current members, stopped at 10,000. */
+	studentCount: { optional: 'count' },
+	/** The count reached its bound, so there are at least `studentCount`. */
+	studentCountAtLeast: { optional: 'flag' }
+} as const;
 const classMemberShape = {
 	id: 'id',
 	userId: 'id',
@@ -993,6 +1122,8 @@ const auditShape = {
 	id: 'id',
 	action: 'text',
 	status: 'text',
+	/** One sentence the server wrote for display, naming only what the viewer may see. */
+	summary: 'longText',
 	createdAt: 'instant',
 	resourceType: 'text',
 	resourceId: 'text',
@@ -1061,6 +1192,70 @@ const mailDeliveryDetailShape = {
 	/** Present instead of the user for an email to an invitee. */
 	targetInvitationId: { optional: 'id' },
 	messageId: 'longText'
+} as const;
+/** A User directory filter as a preview froze it. */
+const directoryFilterShape = {
+	q: { optional: 'text' },
+	affiliation: { optional: { list: affiliationKinds, max: affiliationKinds.length } },
+	academicUnitId: { optional: 'id' },
+	roleIds: { optional: { list: 'id', max: 16 } },
+	state: { optional: userStates },
+	neverSignedIn: { optional: 'flag' },
+	lastActiveAfter: { optional: 'instant' },
+	lastActiveBefore: { optional: 'instant' }
+} as const;
+const academicPreviewShape = {
+	id: 'id',
+	operation: academicPreviewOperations,
+	state: academicPreviewStates,
+	scopeType: invitationScopeTypes,
+	scopeId: 'id',
+	filter: { shape: directoryFilterShape },
+	roleId: { optional: 'id' },
+	affiliationKind: { optional: affiliationKinds },
+	startAt: { optional: 'instant' },
+	endAt: { optional: 'instant' },
+	revision: 'count',
+	/** Present once ready; the commit must name it. */
+	previewDigest: { optional: 'digest' },
+	totalRows: 'count',
+	succeededRows: 'count',
+	failedRows: 'count',
+	skippedRows: 'count',
+	noOpRows: 'count',
+	/** Once ready: the rows by class, with skipped rows counted by reason. */
+	summary: {
+		optional: {
+			shape: {
+				willChange: 'count',
+				noOp: 'count',
+				skipped: 'count',
+				skipReasons: { list: { shape: { reason: 'code', rows: 'count' } }, max: 32 }
+			}
+		}
+	},
+	failureCode: { optional: 'code' },
+	previewJobId: 'id',
+	executionJobId: { optional: 'id' },
+	createdAt: 'instant',
+	updatedAt: 'instant',
+	expiresAt: 'instant',
+	/** When a ready preview can no longer be committed. */
+	commitBy: { optional: 'instant' }
+} as const;
+const academicPreviewRowShape = {
+	row: 'count',
+	userId: 'id',
+	username: 'text',
+	displayName: 'text',
+	group: academicPreviewGroups,
+	status: academicPreviewRowStates,
+	/** Why a skipped row is skipped; the catalogue may grow. */
+	reason: { optional: 'code' },
+	/** The outcome code of a row after commit. */
+	code: { optional: 'code' },
+	/** What the row created or ended. */
+	resourceId: { optional: 'id' }
 } as const;
 const countShape = { optional: { shape: { count: 'count', atLeast: 'flag' } } } as const;
 const rekeyShape = {
@@ -1249,7 +1444,9 @@ export const administrationResources = {
 		keys: { list: { shape: { keyId: 'keyId', references: 'count' } }, max: 9 }
 	},
 	mfaRekey: rekeyShape,
-	mailRekey: rekeyShape
+	mailRekey: rekeyShape,
+	academicPreview: academicPreviewShape,
+	academicPreviewRows: pageOf(academicPreviewRowShape)
 } as const satisfies Record<AdministrationReadKind | 'accessPolicyPreflight', Shape>;
 
 export type AdministrationResource = keyof typeof administrationResources;
@@ -1304,7 +1501,10 @@ export const administrationFailures = [
 	'conflict',
 	'invalid',
 	'cancelled',
-	'expired'
+	/** The preview is past its commit deadline; a new preview is needed. */
+	'expired',
+	/** The person can no longer see what the preview's filter selects, so it can't be used. */
+	'accessChanged'
 ] as const;
 export type AdministrationFailure = (typeof administrationFailures)[number];
 

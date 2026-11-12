@@ -825,3 +825,520 @@ void test('pages a server event keeps current subscribe on the Institution and p
 		service.dispose();
 	}
 });
+
+void test('list orders, page sizes and filters are closed sets from the contract', () => {
+	for (const value of [
+		{ kind: 'users', limit: 20 },
+		{ kind: 'users', limit: 100 },
+		{ kind: 'users', limit: 10, sort: 'email' },
+		{ kind: 'users', limit: 10, dir: 'up' },
+		{ kind: 'users', limit: 10, state: 'archived' },
+		{ kind: 'users', limit: 10, roleIds: Array(17).fill(id) },
+		{ kind: 'users', limit: 10, lastActiveAfter: 20, lastActiveBefore: 10 },
+		{ kind: 'classMembers', classId: id, limit: 10, sort: 'since' },
+		{ kind: 'unitMembers', unitId: id, limit: 10, sort: 'enrolled' },
+		{ kind: 'unitProgrammes', unitId: id, limit: 10, dir: 'asc' },
+		{ kind: 'mailDeliveries', limit: 10, sort: 'name' },
+		{ kind: 'audits', limit: 10, dir: 'asc' },
+		{ kind: 'audits', limit: 10, order: 'newest' },
+		{ kind: 'audits', limit: 10, status: 'failed' },
+		{ kind: 'audits', limit: 10, actions: Array(33).fill('user.disable') },
+		{ kind: 'audits', limit: 10, createdAfter: 10, createdBefore: 10 },
+		{ kind: 'jobs', limit: 10, sort: 'created' }
+	])
+		assert.throws(
+			() => validateAdministrationIntent(value),
+			JSON.stringify(value).slice(0, 90)
+		);
+	for (const limit of [10, 25, 50])
+		assert.equal(
+			(validateAdministrationIntent({ kind: 'users', limit }) as { limit: number }).limit,
+			limit
+		);
+	assert.deepEqual(
+		validateAdministrationIntent({
+			kind: 'users',
+			limit: 25,
+			sort: 'last_active',
+			dir: 'desc',
+			roleIds: [id, other],
+			state: 'active',
+			neverSignedIn: true
+		}),
+		{
+			kind: 'users',
+			limit: 25,
+			roleIds: [id, other],
+			state: 'active',
+			neverSignedIn: true,
+			sort: 'last_active',
+			dir: 'desc'
+		}
+	);
+});
+
+void test('lists send their order and filters in the server names', async () => {
+	const h = harness(() => json({ items: [] }));
+	try {
+		const sent = async (intent: AdministrationIntent) => {
+			await h.service.administration(binding, intent);
+			return path(h.requests.at(-1)!);
+		};
+		const after = Date.parse('2026-01-01T00:00:00Z');
+		const before = Date.parse('2026-02-01T00:00:00Z');
+		const iso = (value: number) => encodeURIComponent(new Date(value).toISOString());
+		assert.equal(
+			await sent({
+				kind: 'users',
+				limit: 50,
+				roleIds: [id, other],
+				state: 'disabled',
+				neverSignedIn: true,
+				lastActiveAfter: after,
+				lastActiveBefore: before,
+				sort: 'last_active',
+				dir: 'desc'
+			}),
+			`GET /api/v1/users?role_id=${id}&role_id=${other}&state=disabled&never_signed_in=true` +
+				`&last_active_after=${iso(after)}&last_active_before=${iso(before)}` +
+				'&sort=last_active&dir=desc&limit=50'
+		);
+		assert.equal(
+			await sent({
+				kind: 'audits',
+				limit: 25,
+				subjectUserId: id,
+				actions: ['user.manage', 'user.mfa.reset'],
+				status: 'fail',
+				createdBefore: before,
+				order: 'asc'
+			}),
+			`GET /api/v1/audits?limit=25&subject_user_id=${id}&action=user.manage&action=user.mfa.reset` +
+				`&status=fail&created_before=${iso(before)}&order=asc`
+		);
+		assert.equal(
+			await sent({
+				kind: 'mailDeliveries',
+				limit: 10,
+				recipientUserId: id,
+				createdBefore: before,
+				sort: 'created',
+				dir: 'asc'
+			}),
+			`GET /api/v1/mail/deliveries?limit=10&recipient_user_id=${id}` +
+				`&created_before=${iso(before)}&sort=created&dir=asc`
+		);
+		assert.equal(
+			await sent({ kind: 'classMembers', classId: id, limit: 10, sort: 'name', dir: 'desc' }),
+			`GET /api/v1/classes/${id}/members?sort=name&dir=desc&limit=10`
+		);
+		assert.equal(
+			await sent({ kind: 'unitMembers', unitId: id, limit: 10, sort: 'since', dir: 'asc' }),
+			`GET /api/v1/academic-units/${id}/members?sort=since&dir=asc&limit=10`
+		);
+		assert.equal(
+			await sent({ kind: 'unitClasses', unitId: id, limit: 10, dir: 'desc' }),
+			`GET /api/v1/academic-units/${id}/classes?dir=desc&limit=10`
+		);
+		assert.equal(
+			await sent({ kind: 'levelClasses', levelId: id, limit: 10, dir: 'desc' }),
+			`GET /api/v1/programme-levels/${id}/classes?dir=desc&limit=10`
+		);
+		assert.equal(
+			await sent({ kind: 'jobs', limit: 10, order: 'asc' }),
+			'GET /api/v1/jobs?limit=10&order=asc'
+		);
+		assert.equal(
+			await sent({ kind: 'onboardingImports', limit: 10, order: 'asc' }),
+			'GET /api/v1/onboarding-imports?limit=10&order=asc'
+		);
+	} finally {
+		h.dispose();
+	}
+});
+
+void test('audits carry their summary, classes their student count, and first pages their total', async () => {
+	const unit = 'u'.repeat(26);
+	const classDto = (n: number) => ({
+		id: `${String.fromCharCode(97 + n)}`.repeat(26),
+		name: `c${n}`,
+		display_name: `Class ${n}`,
+		description: '',
+		revision: 1,
+		programme_level_id: unit,
+		academic_period_id: unit,
+		created_at: at,
+		updated_at: at
+	});
+	const h = harness((request) => {
+		const route = path(request);
+		if (route.startsWith('GET /api/v1/audits'))
+			return json({
+				items: [
+					{
+						id,
+						action: 'user.disable',
+						status: 'success',
+						summary: 'Ada Lovelace disabled Grace Hopper\u0007.',
+						created_at: at,
+						updated_at: at,
+						resource: { type: 'user', id: other },
+						request_id: 'internal'
+					}
+				]
+			});
+		if (route.startsWith(`GET /api/v1/academic-units/${unit}/classes`))
+			return json({
+				items: [
+					{ ...classDto(0), student_count: 10000, student_count_is_lower_bound: true },
+					{ ...classDto(1), student_count: 3, student_count_is_lower_bound: false },
+					classDto(2)
+				],
+				total: 3,
+				total_is_lower_bound: false
+			});
+		if (route.startsWith(`GET /api/v1/classes/${unit}/members`))
+			return json({
+				items: Array.from({ length: 11 }, (_, n) => ({
+					id: `${String.fromCharCode(97 + n)}`.repeat(26),
+					user_id: id,
+					class_id: unit,
+					academic_period_id: unit,
+					start_at: at,
+					created_at: at,
+					updated_at: at
+				})),
+				total: 11
+			});
+		if (route.startsWith('GET /api/v1/role-bindings'))
+			return json({ items: [], total: 0, total_is_lower_bound: false });
+		throw new Error(`Unexpected ${route}`);
+	});
+	try {
+		const audits = await h.service.administration(binding, { kind: 'audits', limit: 10 });
+		assert.ok(audits.kind === 'data' && audits.data.resource === 'audits');
+		assert.equal(audits.data.value.items[0]!.summary, 'Ada Lovelace disabled Grace Hopper .');
+		assert.ok(!JSON.stringify(audits).includes('internal'));
+
+		const classes = await h.service.administration(binding, {
+			kind: 'unitClasses',
+			unitId: unit,
+			limit: 10
+		});
+		assert.ok(classes.kind === 'data' && classes.data.resource === 'unitClasses');
+		assert.deepEqual(
+			classes.data.value.items.map((item) => [item.studentCount, item.studentCountAtLeast]),
+			[
+				[10000, true],
+				[3, false],
+				[undefined, undefined]
+			]
+		);
+		assert.equal(classes.data.value.total, 3);
+		assert.equal(classes.data.value.totalAtLeast, false);
+
+		// A page longer than the one asked for is refused, and the same page fits a larger size.
+		assert.deepEqual(
+			await h.service.administration(binding, {
+				kind: 'classMembers',
+				classId: unit,
+				limit: 10
+			}),
+			{ kind: 'error', reason: 'unavailable' }
+		);
+		const members = await h.service.administration(binding, {
+			kind: 'classMembers',
+			classId: unit,
+			limit: 25
+		});
+		assert.ok(members.kind === 'data' && members.data.resource === 'classMembers');
+		assert.equal(members.data.value.items.length, 11);
+		assert.equal(members.data.value.total, 11);
+
+		const bindings = await h.service.administration(binding, {
+			kind: 'roleBindings',
+			limit: 10
+		});
+		assert.ok(bindings.kind === 'data' && bindings.data.resource === 'roleBindings');
+		assert.equal(bindings.data.value.total, 0);
+	} finally {
+		h.dispose();
+	}
+});
+
+void test('a filter preview is created, read, listed by group, committed once and cancelled', async () => {
+	const preview = 'p'.repeat(26);
+	const job = 'j'.repeat(26);
+	const digest = 'a'.repeat(64);
+	const role = 'r'.repeat(26);
+	const previewDto = {
+		id: preview,
+		operation: 'role_binding.create',
+		state: 'preview_ready',
+		scope_type: 'institution',
+		scope_id: id,
+		role_id: role,
+		filter: { affiliation: ['teacher'], never_signed_in: true, last_active_before: at },
+		revision: 2,
+		preview_digest: digest,
+		total_rows: 3,
+		succeeded_rows: 0,
+		failed_rows: 0,
+		skipped_rows: 1,
+		no_op_rows: 1,
+		summary: {
+			will_change: 1,
+			no_op: 1,
+			skipped: 1,
+			skip_reasons: [{ reason: 'academic_administration_preview.self', rows: 1 }]
+		},
+		preview_job_id: job,
+		created_at: at,
+		updated_at: at,
+		expires_at: at,
+		preview_expires_at: at
+	};
+	const answers: HttpResponse[] = [];
+	const h = harness(() => answers.shift()!);
+	try {
+		for (const value of [
+			{
+				kind: 'createAcademicPreview',
+				operation: 'class.transfer',
+				scopeType: 'class',
+				scopeId: id,
+				filter: {}
+			},
+			{
+				kind: 'createAcademicPreview',
+				operation: 'user.disable',
+				scopeType: 'institution',
+				scopeId: id,
+				filter: { roleIds: Array(17).fill(id) }
+			},
+			{
+				kind: 'createAcademicPreview',
+				operation: 'user.disable',
+				scopeType: 'institution',
+				scopeId: id,
+				filter: { lastActiveAfter: 5, lastActiveBefore: 5 }
+			},
+			{
+				kind: 'academicPreviewRows',
+				id: preview,
+				group: 'no_op',
+				reason: 'academic_administration_preview.self',
+				limit: 10
+			},
+			{ kind: 'academicPreviewRows', id: preview, group: 'all', limit: 10 },
+			{ kind: 'commitAcademicPreview', id: preview, expectedRevision: 2 }
+		])
+			assert.throws(() => validateAdministrationIntent(value), JSON.stringify(value));
+
+		answers.push(json(previewDto, 202));
+		assert.deepEqual(
+			await h.service.administration(binding, {
+				kind: 'createAcademicPreview',
+				operation: 'role_binding.create',
+				scopeType: 'institution',
+				scopeId: id,
+				roleId: role,
+				filter: {
+					affiliation: ['teacher'],
+					neverSignedIn: true,
+					lastActiveBefore: Date.parse(at)
+				}
+			}),
+			{ kind: 'created', id: preview }
+		);
+		assert.equal(path(h.requests[0]!), 'POST /api/v1/academic-administration-previews');
+		assert.deepEqual(JSON.parse(String(h.requests[0]!.body)), {
+			operation: 'role_binding.create',
+			scope_type: 'institution',
+			scope_id: id,
+			filter: {
+				affiliation: ['teacher'],
+				never_signed_in: true,
+				last_active_before: '2026-01-01T00:00:00.000Z'
+			},
+			role_id: role
+		});
+
+		answers.push(json(previewDto));
+		assert.deepEqual(
+			await h.service.administration(binding, { kind: 'academicPreview', id: preview }),
+			{
+				kind: 'data',
+				data: {
+					resource: 'academicPreview',
+					value: {
+						id: preview,
+						operation: 'role_binding.create',
+						state: 'preview_ready',
+						scopeType: 'institution',
+						scopeId: id,
+						filter: {
+							affiliation: ['teacher'],
+							neverSignedIn: true,
+							lastActiveBefore: Date.parse(at)
+						},
+						roleId: role,
+						revision: 2,
+						previewDigest: digest,
+						totalRows: 3,
+						succeededRows: 0,
+						failedRows: 0,
+						skippedRows: 1,
+						noOpRows: 1,
+						summary: {
+							willChange: 1,
+							noOp: 1,
+							skipped: 1,
+							skipReasons: [
+								{ reason: 'academic_administration_preview.self', rows: 1 }
+							]
+						},
+						previewJobId: job,
+						createdAt: Date.parse(at),
+						updatedAt: Date.parse(at),
+						expiresAt: Date.parse(at),
+						commitBy: Date.parse(at)
+					}
+				}
+			}
+		);
+
+		answers.push(
+			json({
+				items: [
+					{
+						row: 3,
+						user_id: id,
+						username: 'ada',
+						display_name: 'Ada Lovelace',
+						group: 'skipped',
+						status: 'skipped',
+						reason: 'academic_administration_preview.self'
+					}
+				],
+				next_cursor: 'more'
+			})
+		);
+		const rows = await h.service.administration(binding, {
+			kind: 'academicPreviewRows',
+			id: preview,
+			group: 'skipped',
+			reason: 'academic_administration_preview.self',
+			limit: 25
+		});
+		assert.equal(
+			path(h.requests[2]!),
+			`GET /api/v1/academic-administration-previews/${preview}/rows` +
+				'?group=skipped&reason=academic_administration_preview.self&limit=25'
+		);
+		assert.deepEqual(rows, {
+			kind: 'data',
+			data: {
+				resource: 'academicPreviewRows',
+				value: {
+					items: [
+						{
+							row: 3,
+							userId: id,
+							username: 'ada',
+							displayName: 'Ada Lovelace',
+							group: 'skipped',
+							status: 'skipped',
+							reason: 'academic_administration_preview.self'
+						}
+					],
+					cursor: 'more'
+				}
+			}
+		});
+
+		assert.ok(requiresIdempotencyKey('commitAcademicAdministrationPreview'));
+		answers.push(json({ ...previewDto, state: 'executing' }, 202));
+		assert.deepEqual(
+			await h.service.administration(binding, {
+				kind: 'commitAcademicPreview',
+				id: preview,
+				expectedRevision: 2,
+				previewDigest: digest
+			}),
+			{ kind: 'success' }
+		);
+		const commit = h.requests[3]!;
+		assert.equal(
+			path(commit),
+			`POST /api/v1/academic-administration-previews/${preview}/commit`
+		);
+		assert.match(commit.headers?.['Idempotency-Key'] ?? '', /^[A-Za-z0-9_-]{43}$/u);
+		assert.deepEqual(JSON.parse(String(commit.body)), {
+			expected_revision: 2,
+			preview_digest: digest
+		});
+
+		answers.push(json({ ...previewDto, state: 'canceled' }));
+		assert.deepEqual(
+			await h.service.administration(binding, {
+				kind: 'cancelAcademicPreview',
+				id: preview
+			}),
+			{ kind: 'success' }
+		);
+		assert.equal(
+			path(h.requests[4]!),
+			`POST /api/v1/academic-administration-previews/${preview}/cancel`
+		);
+	} finally {
+		h.dispose();
+	}
+});
+
+void test('an expired preview and lost access to its filter have reasons of their own', async () => {
+	const preview = 'p'.repeat(26);
+	const answers: HttpResponse[] = [];
+	const h = harness(() => answers.shift()!);
+	try {
+		const commit: AdministrationIntent = {
+			kind: 'commitAcademicPreview',
+			id: preview,
+			expectedRevision: 2,
+			previewDigest: 'a'.repeat(64)
+		};
+		answers.push(problem(410, 'academic_administration_preview.expired'));
+		assert.deepEqual(await h.service.administration(binding, commit), {
+			kind: 'error',
+			reason: 'expired'
+		});
+		answers.push(problem(409, 'academic_administration_preview.authorization_lost'));
+		assert.deepEqual(await h.service.administration(binding, commit), {
+			kind: 'error',
+			reason: 'accessChanged'
+		});
+		answers.push(problem(409, 'academic_administration_preview.authorization_lost'));
+		assert.deepEqual(
+			await h.service.administration(binding, { kind: 'academicPreview', id: preview }),
+			{ kind: 'error', reason: 'accessChanged' }
+		);
+		answers.push(problem(409, 'academic_administration_preview.revision_mismatch'));
+		assert.deepEqual(await h.service.administration(binding, commit), {
+			kind: 'error',
+			reason: 'conflict'
+		});
+		answers.push(problem(404, 'resource.not_found'));
+		assert.deepEqual(
+			await h.service.administration(binding, {
+				kind: 'academicPreviewRows',
+				id: preview,
+				group: 'will_change',
+				limit: 10
+			}),
+			{ kind: 'error', reason: 'notFound' }
+		);
+		assert.ok(validateAdministrationResponse({ kind: 'error', reason: 'accessChanged' }));
+	} finally {
+		h.dispose();
+	}
+});

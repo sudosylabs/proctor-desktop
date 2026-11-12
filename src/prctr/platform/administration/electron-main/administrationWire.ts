@@ -5,7 +5,7 @@
 import type { components } from '../../serverApi/common/serverApi.generated.js';
 import { projectionInstant } from '../../serverApi/common/projection.js';
 import {
-	ADMINISTRATION_PAGE_SIZE,
+	ADMINISTRATION_MAX_PAGE_SIZE,
 	validateAdministrationResponse,
 	type AdministrationBatchResult,
 	type AdministrationResource,
@@ -35,7 +35,10 @@ export function projectData<R extends AdministrationResource>(
 ): AdministrationResponse {
 	return validateAdministrationResponse({ kind: 'data', data: { resource, value } });
 }
-/** One page; the server is asked for at most a page, and a longer answer is refused. */
+/**
+ * One page; the server is asked for at most a page, and a longer answer is refused. The route
+ * also refuses a page longer than the one asked for.
+ */
 export function projectPage<R extends AdministrationResource, T>(
 	resource: R,
 	page: {
@@ -50,7 +53,7 @@ export function projectPage<R extends AdministrationResource, T>(
 		'items' | 'cursor'
 	>
 ): AdministrationResponse {
-	if (page.items.length > ADMINISTRATION_PAGE_SIZE) throw new TypeError('Oversized page');
+	if (page.items.length > ADMINISTRATION_MAX_PAGE_SIZE) throw new TypeError('Oversized page');
 	return projectData(resource, {
 		...extra,
 		items: page.items.map(item),
@@ -243,11 +246,22 @@ export function programme(p: Schema<'ProgrammeResponse'>): Item<'unitProgrammes'
 export function programmeLevel(l: Schema<'ProgrammeLevelResponse'>): Item<'programmeLevels'> {
 	return { ...structured(l), programmeId: l.programme_id };
 }
-export function classOf(c: Schema<'ClassResponse'>): AdministrationValue<'class'> {
+export function classOf(
+	c: Schema<'ClassResponse'> | Schema<'ClassListItemResponse'>
+): AdministrationValue<'class'> {
+	const count = 'student_count' in c ? c.student_count : undefined;
 	return {
 		...structured(c),
 		levelId: c.programme_level_id,
-		academicPeriodId: c.academic_period_id
+		academicPeriodId: c.academic_period_id,
+		...(count === undefined
+			? {}
+			: {
+					studentCount: count,
+					studentCountAtLeast:
+						'student_count_is_lower_bound' in c &&
+						c.student_count_is_lower_bound === true
+				})
 	};
 }
 export function classMember(m: Schema<'ClassMemberResponse'>): Item<'classMembers'> {
@@ -378,6 +392,7 @@ export function audit(a: Schema<'AuditEventResponse'>): Item<'audits'> {
 		id: a.id,
 		action: a.action,
 		status: a.status,
+		summary: a.summary,
 		createdAt: at(a.created_at),
 		resourceType: a.resource.type,
 		resourceId: a.resource.id,
@@ -594,6 +609,72 @@ export function rekey(
 		createdAt: at(s.created_at),
 		updatedAt: at(s.updated_at),
 		completedAt: optionalAt(s.completed_at)
+	};
+}
+function directoryFilter(f: Schema<'AcademicAdministrationPreviewFilter'>) {
+	return {
+		q: f.q,
+		affiliation: f.affiliation,
+		academicUnitId: f.academic_unit_id,
+		roleIds: f.role_id,
+		state: f.state,
+		neverSignedIn: f.never_signed_in,
+		lastActiveAfter: optionalAt(f.last_active_after),
+		lastActiveBefore: optionalAt(f.last_active_before)
+	};
+}
+export function academicPreview(
+	p: Schema<'AcademicAdministrationPreviewResponse'>
+): AdministrationValue<'academicPreview'> {
+	return {
+		id: p.id,
+		operation: p.operation,
+		state: p.state,
+		scopeType: p.scope_type,
+		scopeId: p.scope_id,
+		filter: directoryFilter(p.filter),
+		roleId: p.role_id,
+		affiliationKind: p.affiliation_kind,
+		startAt: optionalAt(p.start_at),
+		endAt: optionalAt(p.end_at),
+		revision: p.revision,
+		previewDigest: p.preview_digest,
+		totalRows: p.total_rows,
+		succeededRows: p.succeeded_rows,
+		failedRows: p.failed_rows,
+		skippedRows: p.skipped_rows,
+		noOpRows: p.no_op_rows,
+		summary: p.summary && {
+			willChange: p.summary.will_change,
+			noOp: p.summary.no_op,
+			skipped: p.summary.skipped,
+			skipReasons: p.summary.skip_reasons.map((reason) => ({
+				reason: reason.reason,
+				rows: reason.rows
+			}))
+		},
+		failureCode: p.failure_code,
+		previewJobId: p.preview_job_id,
+		executionJobId: p.execution_job_id,
+		createdAt: at(p.created_at),
+		updatedAt: at(p.updated_at),
+		expiresAt: at(p.expires_at),
+		commitBy: optionalAt(p.preview_expires_at)
+	};
+}
+export function academicPreviewRow(
+	r: Schema<'AcademicAdministrationPreviewRowResponse'>
+): Item<'academicPreviewRows'> {
+	return {
+		row: r.row,
+		userId: r.user_id,
+		username: r.username,
+		displayName: r.display_name,
+		group: r.group,
+		status: r.status,
+		reason: r.reason,
+		code: r.public_code,
+		resourceId: r.resource_id
 	};
 }
 export function invitationBatch(b: Schema<'InvitationBatchResponse'>): AdministrationResponse {
