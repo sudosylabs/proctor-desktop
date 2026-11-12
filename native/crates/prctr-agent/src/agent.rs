@@ -57,19 +57,18 @@ pub struct Agent<W: Write> {
 }
 
 impl<W: Write> Agent<W> {
+    /// `registry` lists exactly the capabilities `sources` provide, plus the release-owned baseline.
+    ///
     /// # Panics
     /// Panics when the compiled build identity or protocol digest is malformed (a build error).
     pub fn new(
+        registry: Registry,
         sources: Vec<Box<dyn Source>>,
         events: Sender<Event>,
         output: W,
         build_identity: &str,
         protocol_digest: &str,
     ) -> Self {
-        let registry = Registry {
-            capabilities: sources.iter().map(|source| source.descriptor()).collect(),
-            baseline_rules: Vec::new(),
-        };
         let mut by_id = BTreeMap::new();
         let mut pending = BTreeMap::new();
         for source in sources {

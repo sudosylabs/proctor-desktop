@@ -29,6 +29,13 @@ only by tests and harnesses, until the native agent below replaces it; nothing n
 into production yet. A capability counts as implemented on a platform only when its real-OS
 tests prove each fact there.
 
+Implemented in source: the protocol, core, rule evaluator and conformance vectors; the agent and
+Electron main's connection and service, tested end to end against the real binary; and display
+topology on Windows, macOS and Linux. Display topology's real-OS test runs on macOS. On macOS an
+external display is still reported unclassified (partial certainty) until the `IORegistry`
+transport classification is proved, so the baseline is unknown there whenever one is connected.
+The other capabilities, the privileged components and the recorder are not implemented yet.
+
 ## Processes and ownership
 
 ```text

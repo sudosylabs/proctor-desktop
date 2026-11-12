@@ -1,0 +1,20 @@
+[package]
+name = "prctr-capabilities"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+prctr-core = { path = "../prctr-core" }
+prctr-os = { path = "../prctr-os" }
+prctr-protocol = { path = "../prctr-protocol" }
+schemars = { version = "=1.2.3", default-features = false, features = ["derive", "std"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = { version = "=1.0.151" }
+
+[dev-dependencies]
+prctr-core = { path = "../prctr-core", features = ["testing"] }
+
+[lints]
+workspace = true

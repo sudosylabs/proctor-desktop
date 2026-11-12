@@ -12,6 +12,7 @@ publish = false
 scripted-capabilities = []
 
 [dependencies]
+prctr-capabilities = { path = "../prctr-capabilities" }
 prctr-core = { path = "../prctr-core" }
 prctr-protocol = { path = "../prctr-protocol" }
 serde_json = { version = "=1.0.151" }

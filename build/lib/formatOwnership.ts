@@ -43,6 +43,7 @@ export function formattingIgnore(
 		// Written byte-for-byte by prctr-xtask; the protocol digest hashes these bytes.
 		'/native/crates/prctr-protocol/schema/',
 		'/native/crates/prctr-core/conformance/',
+		'/native/crates/prctr-capabilities/registry/',
 		...paths.map((path) => `/${path}`),
 		''
 	].join('\n');

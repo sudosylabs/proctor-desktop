@@ -22,6 +22,8 @@ members = [
   "crates/prctr-core",
   "crates/prctr-xtask",
   "crates/prctr-agent",
+  "crates/prctr-os",
+  "crates/prctr-capabilities",
 ]
 resolver = "2"
 

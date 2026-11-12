@@ -17,7 +17,8 @@
     "MPL-2.0",
     "OFL-1.1",
     "Python-2.0",
-    "Unlicense OR MIT"
+    "Unlicense OR MIT",
+    "Zlib OR Apache-2.0 OR MIT"
   ],
   "dependencies": [
     {
@@ -137,6 +138,15 @@
           "targetScope": null
         },
         {
+          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
+          "alias": "serde",
+          "kind": "production",
+          "features": ["derive"],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
           "manifest": "native/crates/prctr-core/Cargo.toml",
           "alias": "serde",
           "kind": "production",
@@ -191,6 +201,15 @@
         },
         {
           "manifest": "native/crates/prctr-agent/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
           "alias": "serde_json",
           "kind": "production",
           "features": [],
@@ -542,6 +561,15 @@
       "lifecycleScripts": "allowed",
       "declarations": [
         {
+          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
+          "alias": "schemars",
+          "kind": "production",
+          "features": ["derive", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        },
+        {
           "manifest": "native/crates/prctr-protocol/Cargo.toml",
           "alias": "schemars",
           "kind": "production",
@@ -557,6 +585,66 @@
       "transitiveRisk": "Adds schemars_derive, serde_derive_internals, dyn-clone and ref-cast; exact versions are locked and license checked. Default features (including its preserve_order map) are disabled.",
       "bundleTreatment": "external-native",
       "localAlternative": "A hand-written schema would duplicate every protocol type and drift; the previous design generated Rust from hand-written schemas through a 1,825-line generator.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-core-graphics",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "Maintained CoreGraphics bindings for the native agent on macOS: the online display list and the built-in, active, main, asleep and mirror queries. Replaces hand-written CoreGraphics and objc_msgSend declarations.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-core-graphics/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-core-graphics",
+          "kind": "production",
+          "features": ["CGDirectDisplay", "CGDisplayConfiguration", "CGError", "libc", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent"],
+      "networkBehavior": "None; CoreGraphics queries are process-local.",
+      "nativeBehavior": "Links the system CoreGraphics framework. Most selected functions are safe wrappers; the remaining unsafe calls are confined to prctr-os with documented safety.",
+      "transitiveRisk": "Adds objc2, objc2-core-foundation, objc2-encode, bitflags and libc on macOS only; exact versions are locked and license checked. Used under MIT.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written framework declarations, as in the superseded crates, duplicate ABI details the bindings already generate from Apple headers and are easy to get wrong.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "windows",
+      "version": "0.62.2",
+      "kind": "production",
+      "purpose": "Microsoft's Windows API bindings for the native agent: the display configuration API over every path, with output technology for built-in, wireless, virtual and indirect targets.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/windows/0.62.2",
+      "license": "MIT OR Apache-2.0",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "windows",
+          "kind": "production",
+          "features": ["Win32_Devices_Display", "Win32_Foundation", "Win32_Graphics_Gdi", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"windows\")"
+        }
+      ],
+      "processes": ["native-agent"],
+      "networkBehavior": "None; display configuration queries are process-local.",
+      "nativeBehavior": "Links user32 for the display configuration API; unsafe calls are confined to prctr-os with documented safety.",
+      "transitiveRisk": "Adds windows-core, windows-link, windows-result, windows-strings and their companions on Windows only; exact versions are locked and license checked.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "windows-sys gives raw declarations only; the windows crate adds typed results and safe defaults for the structures the agent reads.",
       "updateOwner": "native-capabilities",
       "removalOwner": "native-capabilities"
     },

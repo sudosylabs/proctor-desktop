@@ -29,6 +29,10 @@ pub fn artifacts() -> Vec<Artifact> {
             contents: format!("{digest}\n"),
         },
         Artifact {
+            path: "crates/prctr-capabilities/registry/registry.json",
+            contents: pretty(&prctr_capabilities::registry_json()),
+        },
+        Artifact {
             path: "crates/prctr-core/conformance/rules.json",
             contents: pretty(&prctr_core::vectors::rule_vectors_json()),
         },

@@ -12,7 +12,7 @@ mod transport;
 use std::process::ExitCode;
 use std::sync::mpsc;
 
-use prctr_core::Source;
+use prctr_core::{Registry, Source};
 
 use crate::agent::{Agent, Exit};
 use crate::diagnostic::{Diagnostic, emit};
@@ -23,11 +23,24 @@ const BUILD_IDENTITY: &str = match option_env!("PRCTR_BUILD_IDENTITY") {
 };
 const PROTOCOL_DIGEST: &str = include_str!("../../prctr-protocol/schema/agent-protocol.digest");
 
-fn sources() -> Vec<Box<dyn Source>> {
-    vec![
-        #[cfg(feature = "scripted-capabilities")]
-        Box::new(scripted::Scripted::new()),
-    ]
+/// Release and development builds run the real capabilities and the shared registry.
+#[cfg(not(feature = "scripted-capabilities"))]
+fn capabilities() -> (Registry, Vec<Box<dyn Source>>) {
+    (
+        prctr_capabilities::registry(),
+        prctr_capabilities::sources(),
+    )
+}
+
+/// Test builds run only the scripted capability, with no baseline, so tests control every fact.
+#[cfg(feature = "scripted-capabilities")]
+fn capabilities() -> (Registry, Vec<Box<dyn Source>>) {
+    let scripted: Box<dyn Source> = Box::new(scripted::Scripted::new());
+    let registry = Registry {
+        capabilities: vec![scripted.descriptor()],
+        baseline_rules: Vec::new(),
+    };
+    (registry, vec![scripted])
 }
 
 fn main() -> ExitCode {
@@ -39,8 +52,10 @@ fn main() -> ExitCode {
     }));
     let (sender, receiver) = mpsc::channel();
     transport::spawn_reader(std::io::stdin(), sender.clone());
+    let (registry, sources) = capabilities();
     let mut agent = Agent::new(
-        sources(),
+        registry,
+        sources,
         sender,
         std::io::stdout(),
         BUILD_IDENTITY,
