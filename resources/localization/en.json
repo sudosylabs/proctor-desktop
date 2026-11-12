@@ -6927,6 +6927,22 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
+    "administration.records.retention.enable.final": {
+      "message": "This can’t be undone.",
+      "description": "Last line of the cleanup confirmation.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.enable.list": {
+      "message": "{category}: {eligible} records, {held} held",
+      "description": "One line of the cleanup confirmation: a kind of record, how many go and how many are held.",
+      "placeholders": [
+        "category",
+        "eligible",
+        "held"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
     "administration.records.retention.enable.title": {
       "message": "Turn on automatic cleanup?",
       "description": "Confirmation title before turning cleanup on.",
@@ -7006,7 +7022,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.preview": {
-      "message": "Preview cleanup",
+      "message": "Review cleanup",
       "description": "Asks the server what cleanup would delete.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"

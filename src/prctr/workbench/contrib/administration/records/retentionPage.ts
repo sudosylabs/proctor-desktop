@@ -147,8 +147,9 @@ export class RetentionPage extends Disposable implements PageView {
 		);
 		this.previewSection.footer.append(enable);
 		this.enableButton = this._register(
+			// Neutral here: the confirmation that follows is the red step.
 			new ButtonControl(enable, {
-				variant: 'danger',
+				variant: 'secondary',
 				size: 'small',
 				label: format.text('retentionEnable'),
 				icon: proctorIconFactory('action.enable', 14)
@@ -414,7 +415,19 @@ export class RetentionPage extends Disposable implements PageView {
 			AdminConfirmation,
 			{
 				title: this.format.text('retentionEnableTitle'),
-				message: this.format.text('retentionEnableBody'),
+				// What goes, kind by kind, what is held back, and that it is final.
+				message: [
+					this.format.text('retentionEnableBody'),
+					...PREVIEW_CATEGORIES.filter(({ key }) => preview[key].eligible > 0).map(
+						({ key, label }) =>
+							this.format.text('retentionEnableList', {
+								category: this.format.text(label),
+								eligible: this.format.count(preview[key].eligible),
+								held: this.format.count(preview[key].held)
+							})
+					),
+					this.format.text('retentionCannotUndo')
+				].join('\n'),
 				confirmLabel: this.format.text('retentionEnableConfirm'),
 				confirmIcon: 'action.enable',
 				destructive: true,

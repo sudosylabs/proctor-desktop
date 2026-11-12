@@ -57,6 +57,8 @@
 	}
 	.prctr-page-dialog .prctr-page-dialog__description {
 		text-wrap: pretty;
+		/* A description may list lines, as a confirmation of what goes does. */
+		white-space: pre-line;
 		color: var(--prctr-color-text-secondary);
 		font-size: 13.5px;
 		line-height: 20px;

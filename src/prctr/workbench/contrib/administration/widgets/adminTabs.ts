@@ -23,6 +23,8 @@ export class AdminTabs<T extends string> extends Disposable {
 	private readonly tabs: readonly { readonly id: T; readonly button: HTMLButtonElement }[];
 	private readonly counts = new Map<T, HTMLElement>();
 	private current: T;
+	private static next = 0;
+	private readonly prefix = `prctr-admin-tabs-${AdminTabs.next++}`;
 	private readonly changeEmitter = this._register(new Emitter<T>());
 	readonly onDidChange: Event<T> = this.changeEmitter.event;
 
@@ -35,7 +37,7 @@ export class AdminTabs<T extends string> extends Disposable {
 			this.counts.set(tab.id, count);
 			const button = $(
 				'button.prctr-admin-tabs__tab',
-				{ type: 'button', attrs: { role: 'tab' } },
+				{ type: 'button', id: `${this.prefix}-${tab.id}`, attrs: { role: 'tab' } },
 				$('span', { textContent: tab.label }),
 				count
 			);
@@ -86,6 +88,16 @@ export class AdminTabs<T extends string> extends Disposable {
 		if (count === undefined) return;
 		count.textContent = text ?? '';
 		count.hidden = text === undefined;
+	}
+
+	/** Names the element a tab shows, so assistive technology can tie the two together. */
+	setPanel(id: T, panel: HTMLElement): void {
+		const tab = this.tabs.find((candidate) => candidate.id === id);
+		if (tab === undefined) return;
+		panel.id ||= `${this.prefix}-${id}-panel`;
+		panel.setAttribute('role', 'tabpanel');
+		panel.setAttribute('aria-labelledby', tab.button.id);
+		tab.button.setAttribute('aria-controls', panel.id);
 	}
 
 	choose(id: T, focus: boolean): void {

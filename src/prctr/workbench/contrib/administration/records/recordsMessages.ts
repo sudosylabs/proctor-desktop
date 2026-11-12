@@ -203,7 +203,7 @@ export const recordsMessages = Object.freeze({
 	}),
 	retentionPreview: defineMessage({
 		id: 'administration.records.retention.preview',
-		defaultMessage: 'Preview cleanup',
+		defaultMessage: 'Review cleanup',
 		description: 'Asks the server what cleanup would delete.'
 	}),
 	retentionPreviewTitle: defineMessage({
@@ -235,6 +235,17 @@ export const recordsMessages = Object.freeze({
 		id: 'administration.records.retention.enable',
 		defaultMessage: 'Turn on cleanup',
 		description: 'Turns automatic cleanup on after confirming.'
+	}),
+	retentionEnableList: defineMessage({
+		id: 'administration.records.retention.enable.list',
+		defaultMessage: '{category}: {eligible} records, {held} held',
+		description:
+			'One line of the cleanup confirmation: a kind of record, how many go and how many are held.'
+	}),
+	retentionCannotUndo: defineMessage({
+		id: 'administration.records.retention.enable.final',
+		defaultMessage: 'This can’t be undone.',
+		description: 'Last line of the cleanup confirmation.'
 	}),
 	retentionEnableTitle: defineMessage({
 		id: 'administration.records.retention.enable.title',

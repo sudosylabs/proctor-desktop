@@ -190,6 +190,8 @@ export class StructurePage extends Disposable implements PageView {
 		this.classesHost = $('div');
 		this.membersHost = $('div');
 		main.append(this.classesHost, this.membersHost);
+		this.views.setPanel('contents', this.classesHost);
+		this.views.setPanel('members', this.membersHost);
 		this._register(this.tree.onDidSelect((unit) => void this.showUnit(unit)));
 		void this.showUnit(undefined);
 	}

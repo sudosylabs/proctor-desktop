@@ -127,6 +127,10 @@ export class UploadImportDialog extends Disposable {
 		);
 		const fileRow = choose.element.parentElement!;
 		fileRow.append(this.fileName);
+		// The visible button is what people reach; it carries the file name and the hint.
+		this.fileName.id = `${fileField.id}-name`;
+		choose.element.setAttribute('aria-describedby', `${this.fileName.id} ${fileField.hint.id}`);
+		this.chooseButton = choose.element;
 		fileField.element.append(this.fileInput, fileRow, fileField.hint);
 		this.fileHint = fileField.hint;
 		this._register(choose.onDidRequest(() => this.fileInput.click()));
@@ -276,10 +280,21 @@ export class UploadImportDialog extends Disposable {
 		});
 	}
 
+	/** An error replaces the hint in red, is announced, and marks Choose file invalid. */
 	private setFileError(error: string | undefined): void {
 		this.fileHint.textContent = error ?? this.format.text('importsFileHint');
 		this.fileHint.dataset.error = String(error !== undefined);
+		if (error === undefined) {
+			this.fileHint.removeAttribute('role');
+			this.chooseButton?.removeAttribute('aria-invalid');
+			return;
+		}
+		this.fileHint.setAttribute('role', 'alert');
+		this.chooseButton?.setAttribute('aria-invalid', 'true');
+		this.chooseButton?.focus();
 	}
+
+	private chooseButton: HTMLElement | undefined;
 
 	private async send(): Promise<void> {
 		const file = this.fileInput.files?.[0];
