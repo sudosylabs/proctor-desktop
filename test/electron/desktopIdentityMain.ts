@@ -18,6 +18,7 @@ import { loadNativeDesktopKeyCustody } from '../../src/prctr/platform/identity/e
 import { OsDesktopCredentialStore } from '../../src/prctr/platform/identity/electron-main/desktopCredentialStore.js';
 import { DesktopAuthorizationService } from '../../src/prctr/platform/identity/electron-main/desktopAuthorizationService.js';
 import { AdministrationService } from '../../src/prctr/platform/administration/electron-main/administrationService.js';
+import { UserSettingsServer } from '../../src/prctr/platform/settings/electron-main/userSettingsServer.js';
 import { ExamActivityService } from '../../src/prctr/platform/examActivity/electron-main/examActivityService.js';
 import { AccountService } from '../../src/prctr/platform/account/electron-main/accountService.js';
 import { ServerHttpTransport } from '../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
@@ -99,7 +100,7 @@ if (probe) {
 							account: new AccountService(service),
 							administration: new AdministrationService(service),
 							examActivity: new ExamActivityService(service),
-							settings: service,
+							settings: new UserSettingsServer(service),
 							launchIdentity: launch,
 							rendererByKind: {
 								launch: join(root, 'launch.html'),

@@ -1,5 +1,4 @@
 import { SessionApi } from '../../serverApi/node/sessionApi.js';
-import { resolveApiRoute } from '../../serverApi/node/legacyApiRequest.js';
 import {
 	ServerApiError,
 	type ApiInput,
@@ -11,16 +10,6 @@ import { decodeResponse } from '../../serverApi/node/responseDecoding.js';
 import { encodeRequest, type ApiRequestInput } from '../../serverApi/node/requestEncoding.js';
 import { problemCode, sendWithDPoP, type DPoPBinding } from '../node/dpopExchange.js';
 import { SessionRequestSigner } from './sessionRequestSigner.js';
-import { validateUserSettingsCommitIntent } from '../../settings/common/settingsRendererProtocol.js';
-import {
-	readUserSettingsWire,
-	readUserSettingsRevision,
-	type UserSettingsSessionService
-} from '../../settings/common/userSettingsSession.js';
-import type {
-	SettingsCommitRequest,
-	SettingsCommitResult
-} from '../../settings/common/userSettingsService.js';
 import type { DesktopSessionOutcome } from '../common/desktopSessionOutcome.js';
 import { createHash, randomBytes } from 'node:crypto';
 import { CancellationToken, CancellationTokenSource } from '../../../base/common/cancellation.js';
@@ -33,13 +22,6 @@ import {
 import type { DesktopReleaseTarget, VerifiedServerIdentity } from './serverReadiness.js';
 import { LoopbackAuthServer, type LoopbackCallbackPages } from '../node/loopbackAuthServer.js';
 import { DesktopAuthorizationError } from '../node/desktopAuthorizationError.js';
-import {
-	desktopHttpMethod,
-	type DesktopHttpPath,
-	type DesktopPhotoRequest,
-	type DesktopSettingsRequest,
-	type DesktopHttpResult
-} from '../node/desktopAuthHttp.js';
 import type { AccountFailure } from '../../account/common/accountProtocol.js';
 import { accountFailure } from '../../account/electron-main/accountService.js';
 import {
@@ -57,7 +39,6 @@ import {
 	credential,
 	expiry,
 	parseTokens,
-	errorCode,
 	type DesktopExchangeResult,
 	type DesktopTokens
 } from '../node/desktopAuthProtocol.js';
@@ -592,149 +573,6 @@ export class DesktopAuthorizationService extends Disposable {
 			await listener?.stop().catch(() => undefined);
 			if (this.#reauthentication === source) this.#reauthentication = undefined;
 			source.dispose();
-		}
-	}
-
-	private async protectedRequest(
-		session: CurrentSession,
-		generation: number,
-		path: DesktopHttpPath,
-		body?: unknown,
-		photo?: DesktopPhotoRequest,
-		settings?: DesktopSettingsRequest,
-		signal?: AbortSignal
-	): Promise<DesktopHttpResult> {
-		if (this.#generation !== generation || this.#session !== session)
-			throw new ServerApiError('sessionEnded');
-		const headers = {
-			...(photo?.etag ? { 'If-Match': photo.etag } : {}),
-			...(settings?.idempotencyKey ? { 'Idempotency-Key': settings.idempotencyKey } : {})
-		};
-		const { id, input } = resolveApiRoute(
-			session.identity.origin,
-			path,
-			desktopHttpMethod(path, photo, settings, body !== undefined),
-			photo?.bytes ?? body,
-			headers,
-			photo?.mediaType
-		);
-		try {
-			const result = await this.apiForSession({
-				principalId: session.tokens.principalId,
-				sessionId: session.tokens.sessionId
-			}).request(id, input, { signal });
-			if (photo?.operation === 'GET' && result.status === 200) {
-				if (!(result.value instanceof Uint8Array))
-					throw new ServerApiError('invalidResponse');
-				const bytes = Buffer.from(result.value);
-				if (
-					bytes.toString('ascii', 0, 4) !== 'RIFF' ||
-					bytes.toString('ascii', 8, 12) !== 'WEBP'
-				)
-					throw new ServerApiError('invalidResponse');
-				return {
-					status: 200,
-					value: {
-						kind: 'photo',
-						dataUrl: `data:image/webp;base64,${bytes.toString('base64')}`,
-						etag: result.headers.etag
-					}
-				};
-			}
-			return { status: Number(result.status), value: result.value };
-		} catch (error) {
-			if (error instanceof ServerApiError && error.kind === 'server')
-				return { status: error.status!, value: error.problem, failure: error };
-			throw error;
-		}
-	}
-	async readSettings(
-		binding: SessionBinding
-	): ReturnType<UserSettingsSessionService['readSettings']> {
-		const session = this.#session,
-			generation = this.#generation;
-		if (
-			!session ||
-			this.#disposed ||
-			session.tokens.principalId !== binding.principalId ||
-			session.tokens.sessionId !== binding.sessionId
-		)
-			return undefined;
-		try {
-			const result = await this.protectedRequest(
-				session,
-				generation,
-				'/api/v1/users/me/settings',
-				undefined,
-				undefined,
-				{ operation: 'GET' }
-			);
-			if (result.status === 401) {
-				await this.signOut();
-				return undefined;
-			}
-			return result.status === 200 ? readUserSettingsWire(result.value) : undefined;
-		} catch {
-			return undefined;
-		}
-	}
-	async commitSettings(
-		binding: SessionBinding,
-		raw: SettingsCommitRequest
-	): Promise<SettingsCommitResult> {
-		const request = validateUserSettingsCommitIntent(raw);
-		const session = this.#session,
-			generation = this.#generation;
-		if (
-			!session ||
-			this.#disposed ||
-			session.tokens.principalId !== binding.principalId ||
-			session.tokens.sessionId !== binding.sessionId
-		)
-			return { kind: 'unavailable' };
-		try {
-			const result = await this.protectedRequest(
-				session,
-				generation,
-				'/api/v1/users/me/settings',
-				{
-					source: request.source,
-					format_version: 1,
-					expected_revision: request.expectedRevision
-				},
-				undefined,
-				{
-					operation: 'PUT',
-					idempotencyKey: createHash('sha256')
-						.update(request.idempotencyKey)
-						.digest('hex')
-				}
-			);
-			if (result.status === 200)
-				return { kind: 'success', revision: readUserSettingsRevision(result.value) };
-			if (result.status === 401) {
-				await this.signOut();
-				return { kind: 'unavailable' };
-			}
-			if (result.status === 409 && errorCode(result) === 'user_settings.revision_conflict') {
-				const latest = await this.readSettings(binding);
-				return latest
-					? { kind: 'conflict', latest: latest.acknowledged }
-					: { kind: 'unavailable' };
-			}
-			return {
-				kind:
-					result.status >= 500 || errorCode(result) === 'idempotency.in_progress'
-						? 'ambiguous'
-						: 'unavailable'
-			};
-		} catch {
-			return {
-				kind:
-					this.#session === session && this.#generation === generation
-						? 'ambiguous'
-						: 'unavailable'
-			};
 		}
 	}
 

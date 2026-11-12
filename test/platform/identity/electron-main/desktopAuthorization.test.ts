@@ -20,6 +20,7 @@ import {
 	CancellationToken
 } from '../../../../src/prctr/base/common/cancellation.js';
 import { LoopbackAuthServer } from '../../../../src/prctr/platform/identity/node/loopbackAuthServer.js';
+import { UserSettingsServer } from '../../../../src/prctr/platform/settings/electron-main/userSettingsServer.js';
 import { AccountService } from '../../../../src/prctr/platform/account/electron-main/accountService.js';
 import { ServerHttpTransport } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
 import { encodeRequest } from '../../../../src/prctr/platform/serverApi/node/requestEncoding.js';
@@ -1233,25 +1234,33 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 			'gateway failures remain classified as transient'
 		);
 
-		assert.equal(await service.readSettings({ ...binding, sessionId: 'foreign' }), undefined);
-		const settings = await service.readSettings(binding);
+		assert.equal(
+			await new UserSettingsServer(service).readSettings({
+				...binding,
+				sessionId: 'foreign'
+			}),
+			undefined
+		);
+		const settings = await new UserSettingsServer(service).readSettings(binding);
 		assert.equal(settings?.acknowledged.source, settingsSource);
 		const write = {
 			source: settingsSource,
 			expectedRevision: 'r'.repeat(26),
 			idempotencyKey: 'settings:proof-test'
 		};
-		assert.deepEqual(await service.commitSettings(binding, write), {
+		assert.deepEqual(await new UserSettingsServer(service).commitSettings(binding, write), {
 			kind: 'success',
 			revision: 't'.repeat(26)
 		});
 		settingsMode = 'conflict';
-		assert.deepEqual(await service.commitSettings(binding, write), {
+		assert.deepEqual(await new UserSettingsServer(service).commitSettings(binding, write), {
 			kind: 'conflict',
 			latest: settings!.acknowledged
 		});
 		settingsMode = 'ambiguous';
-		assert.deepEqual(await service.commitSettings(binding, write), { kind: 'ambiguous' });
+		assert.deepEqual(await new UserSettingsServer(service).commitSettings(binding, write), {
+			kind: 'ambiguous'
+		});
 		assert.equal(settingsWrites, 3);
 		await accountOf(service).account(binding, { kind: 'openSecurity' });
 		assert.equal(opened, 'https://example.edu/account/security');
@@ -1286,8 +1295,10 @@ void test('account reads and actions are bound, DPoP signed, nonce retried once,
 		assert.deepEqual(outcomes, ['ending:pending', 'signedOut:confirmed']);
 		assert.equal(stored, undefined);
 		const count = seen.length;
-		assert.equal(await service.readSettings(binding), undefined);
-		assert.deepEqual(await service.commitSettings(binding, write), { kind: 'unavailable' });
+		assert.equal(await new UserSettingsServer(service).readSettings(binding), undefined);
+		assert.deepEqual(await new UserSettingsServer(service).commitSettings(binding, write), {
+			kind: 'unavailable'
+		});
 		assert.deepEqual(
 			await accountOf(service).account(binding, { kind: 'read', section: 'profile' }),
 			{

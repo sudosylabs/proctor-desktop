@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto';
 import { DisposableStore } from '../../base/common/lifecycle.js';
 import { DesktopIdentityCoordinator } from '../../platform/identity/electron-main/desktopIdentityCoordinator.js';
 import { AccountService } from '../../platform/account/electron-main/accountService.js';
+import { UserSettingsServer } from '../../platform/settings/electron-main/userSettingsServer.js';
 import { ExamActivityService } from '../../platform/examActivity/electron-main/examActivityService.js';
 import { AdministrationService } from '../../platform/administration/electron-main/administrationService.js';
 import { DesktopAuthorizationService } from '../../platform/identity/electron-main/desktopAuthorizationService.js';
@@ -135,7 +136,7 @@ export function createDesktopIdentityComposition(options: DesktopIdentityComposi
 				account,
 				administration,
 				examActivity,
-				settings: authorization
+				settings: new UserSettingsServer(authorization)
 			}),
 			{
 				accept: (_descriptor, intent) => {
