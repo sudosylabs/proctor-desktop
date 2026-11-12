@@ -20,7 +20,7 @@ import {
 } from '../../services/authenticatedNavigation/common/authenticatedNavigation.js';
 import { ILocalizationService } from '../../services/localization/common/localization.js';
 import type { AdministrationResponse } from '../../../platform/administration/common/administrationProtocol.js';
-import type { ApiSubscription } from '../../../platform/serverApi/common/apiObservation.js';
+import type { IDisposable } from '../../../base/common/lifecycle.js';
 import { IAdministrationService } from '../../services/administration/common/administration.js';
 import { administrationMessages as messages } from './administrationMessages.js';
 import { administrationPageRegistry } from './administrationPages.js';
@@ -93,7 +93,7 @@ class AdministrationContribution extends Disposable {
 	 * refusal of every count stops following them.
 	 */
 	private watchCounts(): void {
-		let subscription: ApiSubscription | undefined;
+		let subscription: IDisposable | undefined;
 		let stopped = false;
 		const deliver = (response: AdministrationResponse): void => {
 			if (this.disposed || stopped) return;

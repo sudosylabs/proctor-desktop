@@ -2,8 +2,6 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { ServerApiError } from './serverApi.js';
-
 /** The authenticated Session a privileged capability is bound to for its whole life. */
 export interface SessionBinding {
 	readonly principalId: string;
@@ -55,37 +53,4 @@ export function projectionInstant(value: unknown): number | undefined {
 export function projectionMember<T extends string>(value: unknown, members: readonly T[]): T {
 	if (!members.includes(value as T)) throw new TypeError('Invalid projected state');
 	return value as T;
-}
-
-/**
- * A projected read that answered with a failure. The query cache keeps the server failure it
- * came from, so its retry policy sees a transport failure, while the caller still receives the
- * closed failure reply.
- */
-export class ProjectionFailure<R> extends ServerApiError {
-	readonly response: R;
-	constructor(response: R, failure?: ServerApiError, sessionEnded = false) {
-		super(failure?.kind ?? (sessionEnded ? 'sessionEnded' : 'invalidResponse'), {
-			status: failure?.status,
-			problem: failure?.problem,
-			retryAfterMs: failure?.retryAfterMs
-		});
-		this.response = response;
-	}
-}
-/** Runs one projected read, turning a failure reply into a {@link ProjectionFailure}. */
-export async function projectRead<T extends { readonly kind: string }>(
-	read: (capture: (failure: ServerApiError) => void) => Promise<T>
-): Promise<T> {
-	let failure: ServerApiError | undefined;
-	const result = await read((value) => {
-		failure = value;
-	});
-	if (result.kind === 'error')
-		throw new ProjectionFailure(
-			result,
-			failure,
-			(result as { readonly reason?: unknown }).reason === 'sessionEnded'
-		);
-	return result;
 }

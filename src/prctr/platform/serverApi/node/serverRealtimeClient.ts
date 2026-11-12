@@ -1,5 +1,5 @@
 import { ServerApiError } from '../common/serverApi.js';
-import type { ApiSubscription } from '../common/apiObservation.js';
+import type { IDisposable } from '../../../base/common/lifecycle.js';
 import type { ApiRealtimeConnection, RealtimeMessage } from './serverRealtime.js';
 
 export type RealtimeEvent = Extract<RealtimeMessage, { event: string }>;
@@ -92,12 +92,12 @@ export class ServerRealtimeClient {
 	get state(): RealtimeState {
 		return this.current;
 	}
-	onEvent(listener: (event: RealtimeEvent) => void): ApiSubscription {
+	onEvent(listener: (event: RealtimeEvent) => void): IDisposable {
 		if (this.disposed) throw new ServerApiError('sessionEnded');
 		this.events.add(listener);
 		return { dispose: () => this.events.delete(listener) };
 	}
-	onState(listener: (state: RealtimeState) => void): ApiSubscription {
+	onState(listener: (state: RealtimeState) => void): IDisposable {
 		if (this.disposed) throw new ServerApiError('sessionEnded');
 		this.states.add(listener);
 		return { dispose: () => this.states.delete(listener) };

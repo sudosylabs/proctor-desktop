@@ -10,7 +10,7 @@ import {
 	type AdministrationResponse
 } from '../../../../platform/administration/common/administrationProtocol.js';
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
-import type { ApiSubscription } from '../../../../platform/serverApi/common/apiObservation.js';
+import type { IDisposable } from '../../../../base/common/lifecycle.js';
 
 /** A read that has not answered by then fails, so no page waits forever. */
 export const ADMINISTRATION_READ_DEADLINE_MS = 15_000;
@@ -41,7 +41,7 @@ export interface IAdministrationService {
 	observe(
 		intent: AdministrationIntent,
 		listener: (response: AdministrationResponse) => void
-	): ApiSubscription | undefined;
+	): IDisposable | undefined;
 }
 
 export class AdministrationService extends Disposable implements IAdministrationService {
@@ -90,7 +90,7 @@ export class AdministrationService extends Disposable implements IAdministration
 	observe(
 		intent: AdministrationIntent,
 		listener: (response: AdministrationResponse) => void
-	): ApiSubscription | undefined {
+	): IDisposable | undefined {
 		return this.client.observe?.(intent, listener);
 	}
 

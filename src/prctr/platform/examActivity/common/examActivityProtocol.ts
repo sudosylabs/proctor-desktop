@@ -1,4 +1,4 @@
-import type { ObservableApiCapability } from '../../serverApi/common/apiObservation.js';
+import type { ObservableCapability } from '../../capabilityObservation/common/capabilityObservation.js';
 import { productAreas, type ProductArea } from '../../identity/common/authenticatedIdentity.js';
 /** Session-bound read capability. Routing context is never action authorization. */
 export const EXAM_ACTIVITY_CHANNEL = 'prctr:authenticated:exam-activity';
@@ -68,7 +68,7 @@ export type ExamActivityResponse =
 			readonly reason:
 				'unavailable' | 'restricted' | 'sessionEnded' | 'notFound' | 'invalidCursor';
 	  };
-export interface ExamActivityClient extends ObservableApiCapability<
+export interface ExamActivityClient extends ObservableCapability<
 	ExamActivityIntent,
 	ExamActivityResponse
 > {

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import type { IpcMainInvokeEvent } from 'electron/main';
-import { ApiObservationIpc } from '../../../../src/prctr/platform/serverApi/electron-main/apiObservationIpc.js';
+import { CapabilityObservationChannel } from '../../../../src/prctr/platform/capabilityObservation/electron-main/capabilityObservationChannel.js';
 
 void test('observations reauthorize every publication and fence stopped or synchronously rejected subscriptions', () => {
 	let handler!: (event: IpcMainInvokeEvent, ...args: unknown[]) => unknown;
@@ -14,7 +14,7 @@ void test('observations reauthorize every publication and fence stopped or synch
 	const event = {
 		senderFrame: { send: (_channel: string, value: unknown) => messages.push(value) }
 	} as unknown as IpcMainInvokeEvent;
-	const bridge = new ApiObservationIpc(
+	const bridge = new CapabilityObservationChannel(
 		{
 			handle: (_channel, listener) => {
 				handler = listener;
@@ -23,29 +23,31 @@ void test('observations reauthorize every publication and fence stopped or synch
 				removed = true;
 			}
 		},
-		'closed-capability:observe',
-		(value) => {
-			if (value !== 'read') throw new TypeError('Invalid intent');
-			return value;
-		},
-		(value) => {
-			if (typeof value !== 'number') throw new TypeError('Invalid response');
-			return value;
-		},
-		() => {
-			if (!allowed) throw new Error('Unauthorized');
-		},
-		(_intent, listener) => {
-			publish = listener;
-			if (revokeDuringStart) {
-				allowed = false;
-				publish(0);
-			}
-			return {
-				dispose: () => {
-					disposals++;
+		{
+			channel: 'closed-capability:observe',
+			validateIntent: (value) => {
+				if (value !== 'read') throw new TypeError('Invalid intent');
+				return value;
+			},
+			validateResponse: (value) => {
+				if (typeof value !== 'number') throw new TypeError('Invalid response');
+				return value;
+			},
+			authorize: () => {
+				if (!allowed) throw new Error('Unauthorized');
+			},
+			observe: (_intent, listener) => {
+				publish = listener;
+				if (revokeDuringStart) {
+					allowed = false;
+					publish(0);
 				}
-			};
+				return {
+					dispose: () => {
+						disposals++;
+					}
+				};
+			}
 		}
 	);
 	try {
@@ -88,22 +90,24 @@ void test('observations deliver to the frame that started them and turn undelive
 		}
 	} as unknown as IpcMainInvokeEvent;
 	const authorized: unknown[] = [];
-	const bridge = new ApiObservationIpc(
+	const bridge = new CapabilityObservationChannel(
 		{ handle: (_channel, listener) => void (handler = listener), removeHandler: () => {} },
-		'closed-capability:observe',
-		(value) => value,
-		(value) => {
-			if (typeof value !== 'number') throw new TypeError('Invalid response');
-			return value;
-		},
-		(candidate) => {
-			authorized.push(candidate.senderFrame);
-		},
-		(_intent, listener) => {
-			publish = listener as (value: unknown) => void;
-			return { dispose: () => {} };
-		},
-		-1
+		{
+			channel: 'closed-capability:observe',
+			validateIntent: (value) => value,
+			validateResponse: (value) => {
+				if (typeof value !== 'number') throw new TypeError('Invalid response');
+				return value;
+			},
+			authorize: (candidate) => {
+				authorized.push(candidate.senderFrame);
+			},
+			observe: (_intent, listener) => {
+				publish = listener as (value: unknown) => void;
+				return { dispose: () => {} };
+			},
+			failure: -1
+		}
 	);
 	try {
 		handler(event, { kind: 'start', id: 1, intent: 'read' });
@@ -117,4 +121,38 @@ void test('observations deliver to the frame that started them and turn undelive
 	} finally {
 		bridge.dispose();
 	}
+});
+
+void test('a destroyed window ends every observation it started', () => {
+	let handler!: (event: IpcMainInvokeEvent, ...args: unknown[]) => unknown;
+	let destroyed!: () => void;
+	let disposals = 0;
+	const event = {
+		sender: {
+			once: (name: string, listener: () => void) => {
+				assert.equal(name, 'destroyed');
+				destroyed = listener;
+			}
+		},
+		senderFrame: { send: () => {} }
+	} as unknown as IpcMainInvokeEvent;
+	const channel = new CapabilityObservationChannel(
+		{ handle: (_channel, listener) => void (handler = listener), removeHandler: () => {} },
+		{
+			channel: 'closed-capability:observe',
+			validateIntent: (value) => value,
+			validateResponse: (value) => value,
+			authorize: () => {},
+			observe: () => ({ dispose: () => void disposals++ })
+		}
+	);
+	try {
+		handler(event, { kind: 'start', id: 1, intent: 'a' });
+		handler(event, { kind: 'start', id: 2, intent: 'b' });
+		destroyed();
+		assert.equal(disposals, 2);
+	} finally {
+		channel.dispose();
+	}
+	assert.equal(disposals, 2);
 });

@@ -1,5 +1,5 @@
-import { ApiObservationIpc } from '../../serverApi/electron-main/apiObservationIpc.js';
-import type { ApiSubscription } from '../../serverApi/common/apiObservation.js';
+import { CapabilityObservationChannel } from '../../capabilityObservation/electron-main/capabilityObservationChannel.js';
+import type { IDisposable } from '../../../base/common/lifecycle.js';
 import type { SessionBinding } from '../../serverApi/common/projection.js';
 import type { IpcMain, IpcMainInvokeEvent } from 'electron/main';
 import {
@@ -15,7 +15,7 @@ export interface AccountCapability {
 		binding: SessionBinding,
 		intent: AccountIntent,
 		listener: (response: AccountResponse) => void
-	): ApiSubscription;
+	): IDisposable;
 	setApiFocused?(binding: SessionBinding, focused: boolean): void;
 	account(binding: SessionBinding, intent: AccountIntent): Promise<AccountResponse>;
 }
@@ -23,7 +23,8 @@ export interface AccountCapability {
 /** One capability owned by one authenticated main frame and immutable Session Binding. */
 export class AccountIpcBridge {
 	#disposed = false;
-	private readonly observation: ApiObservationIpc<AccountIntent, AccountResponse> | undefined;
+	private readonly observation:
+		CapabilityObservationChannel<AccountIntent, AccountResponse> | undefined;
 	constructor(
 		private readonly ipc: Pick<IpcMain, 'handle' | 'removeHandler'>,
 		binding: SessionBinding,
@@ -35,15 +36,14 @@ export class AccountIpcBridge {
 			sessionId: binding.sessionId
 		});
 		if (service.observeAccount)
-			this.observation = new ApiObservationIpc(
-				ipc,
-				`${ACCOUNT_CHANNEL}:observe`,
-				validateAccountIntent,
-				validateAccountResponse,
+			this.observation = new CapabilityObservationChannel(ipc, {
+				channel: `${ACCOUNT_CHANNEL}:observe`,
+				validateIntent: validateAccountIntent,
+				validateResponse: validateAccountResponse,
 				authorize,
-				(intent, listener) => service.observeAccount!(bound, intent, listener),
-				{ kind: 'error', reason: 'unavailable' }
-			);
+				observe: (intent, listener) => service.observeAccount!(bound, intent, listener),
+				failure: { kind: 'error', reason: 'unavailable' }
+			});
 		ipc.handle(ACCOUNT_CHANNEL, async (event, ...args: unknown[]) => {
 			if (this.#disposed) throw new Error('Account capability is closed');
 			authorize(event);

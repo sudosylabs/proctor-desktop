@@ -2,8 +2,8 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import { ApiObservationIpc } from '../../serverApi/electron-main/apiObservationIpc.js';
-import type { ApiSubscription } from '../../serverApi/common/apiObservation.js';
+import { CapabilityObservationChannel } from '../../capabilityObservation/electron-main/capabilityObservationChannel.js';
+import type { IDisposable } from '../../../base/common/lifecycle.js';
 import type { SessionBinding } from '../../serverApi/common/projection.js';
 import type { IpcMain, IpcMainInvokeEvent } from 'electron/main';
 import {
@@ -19,7 +19,7 @@ export interface AdministrationIpcService {
 		binding: SessionBinding,
 		intent: AdministrationIntent,
 		listener: (response: AdministrationResponse) => void
-	): ApiSubscription;
+	): IDisposable;
 	administration(
 		binding: SessionBinding,
 		intent: AdministrationIntent
@@ -30,7 +30,7 @@ export interface AdministrationIpcService {
 export class AdministrationIpcBridge {
 	#disposed = false;
 	private readonly observation:
-		ApiObservationIpc<AdministrationIntent, AdministrationResponse> | undefined;
+		CapabilityObservationChannel<AdministrationIntent, AdministrationResponse> | undefined;
 	constructor(
 		private readonly ipc: Pick<IpcMain, 'handle' | 'removeHandler'>,
 		binding: SessionBinding,
@@ -42,15 +42,15 @@ export class AdministrationIpcBridge {
 			sessionId: binding.sessionId
 		});
 		if (service.observeAdministration)
-			this.observation = new ApiObservationIpc(
-				ipc,
-				`${ADMINISTRATION_CHANNEL}:observe`,
-				validateAdministrationIntent,
-				validateAdministrationResponse,
+			this.observation = new CapabilityObservationChannel(ipc, {
+				channel: `${ADMINISTRATION_CHANNEL}:observe`,
+				validateIntent: validateAdministrationIntent,
+				validateResponse: validateAdministrationResponse,
 				authorize,
-				(intent, listener) => service.observeAdministration!(bound, intent, listener),
-				{ kind: 'error', reason: 'unavailable' }
-			);
+				observe: (intent, listener) =>
+					service.observeAdministration!(bound, intent, listener),
+				failure: { kind: 'error', reason: 'unavailable' }
+			});
 		ipc.handle(ADMINISTRATION_CHANNEL, async (event, ...args: unknown[]) => {
 			if (this.#disposed) throw new Error('Administration capability is closed');
 			authorize(event);

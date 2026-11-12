@@ -2,7 +2,7 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
-import type { ObservableApiCapability } from '../../serverApi/common/apiObservation.js';
+import type { ObservableCapability } from '../../capabilityObservation/common/capabilityObservation.js';
 import {
 	projectionFlag,
 	projectionId,
@@ -1321,7 +1321,7 @@ export type AdministrationResponse =
 			readonly fields?: readonly string[];
 	  };
 
-export interface AdministrationClient extends ObservableApiCapability<
+export interface AdministrationClient extends ObservableCapability<
 	AdministrationIntent,
 	AdministrationResponse
 > {

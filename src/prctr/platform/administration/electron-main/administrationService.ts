@@ -11,7 +11,7 @@ import {
 	type ApiResponse
 } from '../../serverApi/common/serverApi.js';
 import type { components } from '../../serverApi/common/serverApi.generated.js';
-import type { ApiSubscription } from '../../serverApi/common/apiObservation.js';
+import type { IDisposable } from '../../../base/common/lifecycle.js';
 import type { SessionBinding } from '../../serverApi/common/projection.js';
 import { operationContract } from '../../serverApi/node/serverContract.js';
 import type { SessionApi } from '../../serverApi/node/sessionApi.js';
@@ -1126,7 +1126,7 @@ export class AdministrationService {
 		binding: SessionBinding,
 		raw: AdministrationIntent,
 		listener: (response: AdministrationResponse) => void
-	): ApiSubscription {
+	): IDisposable {
 		const intent = validateAdministrationIntent(raw);
 		if (!isAdministrationRead(intent)) throw new ServerApiError('invalidRequest');
 		return this.#api(binding).reads.observe(

@@ -8,7 +8,7 @@ import type {
 	ExamActivityResponse
 } from '../../../../platform/examActivity/common/examActivityProtocol.js';
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
-import type { ApiSubscription } from '../../../../platform/serverApi/common/apiObservation.js';
+import type { IDisposable } from '../../../../base/common/lifecycle.js';
 
 export const IExamActivityService = createDecorator<IExamActivityService>('examActivityService');
 
@@ -25,7 +25,7 @@ export class ExamActivityService implements IExamActivityService {
 	readonly observe?: (
 		intent: ExamActivityIntent,
 		listener: (response: ExamActivityResponse) => void
-	) => ApiSubscription;
+	) => IDisposable;
 
 	constructor(private readonly client: ExamActivityClient) {
 		const observe = client.observe;

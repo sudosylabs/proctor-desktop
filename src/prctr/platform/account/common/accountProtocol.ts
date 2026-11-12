@@ -1,4 +1,4 @@
-import type { ObservableApiCapability } from '../../serverApi/common/apiObservation.js';
+import type { ObservableCapability } from '../../capabilityObservation/common/capabilityObservation.js';
 import {
 	projectionFlag,
 	projectionId,
@@ -294,7 +294,7 @@ export type AccountResponse =
 	| { readonly kind: 'success' }
 	| { readonly kind: 'sessionsEnded'; readonly count: number }
 	| { readonly kind: 'error'; readonly reason: AccountFailure };
-export interface AccountClient extends ObservableApiCapability<AccountIntent, AccountResponse> {
+export interface AccountClient extends ObservableCapability<AccountIntent, AccountResponse> {
 	request(intent: AccountIntent): Promise<AccountResponse>;
 }
 export function validateAccountIntent(value: unknown): AccountIntent {

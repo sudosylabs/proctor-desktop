@@ -1,5 +1,5 @@
-import { ApiObservationIpc } from '../../serverApi/electron-main/apiObservationIpc.js';
-import type { ApiSubscription } from '../../serverApi/common/apiObservation.js';
+import { CapabilityObservationChannel } from '../../capabilityObservation/electron-main/capabilityObservationChannel.js';
+import type { IDisposable } from '../../../base/common/lifecycle.js';
 import type { IpcMain, IpcMainInvokeEvent } from 'electron/main';
 import type { SessionBinding } from '../../serverApi/common/projection.js';
 import {
@@ -15,7 +15,7 @@ export interface ExamActivityCapability {
 		binding: SessionBinding,
 		intent: ExamActivityIntent,
 		listener: (response: ExamActivityResponse) => void
-	): ApiSubscription;
+	): IDisposable;
 	setApiFocused?(binding: SessionBinding, focused: boolean): void;
 	examActivity(
 		binding: SessionBinding,
@@ -25,7 +25,7 @@ export interface ExamActivityCapability {
 export class ExamActivityIpcBridge {
 	#disposed = false;
 	private readonly observation:
-		ApiObservationIpc<ExamActivityIntent, ExamActivityResponse> | undefined;
+		CapabilityObservationChannel<ExamActivityIntent, ExamActivityResponse> | undefined;
 	constructor(
 		private readonly ipc: Pick<IpcMain, 'handle' | 'removeHandler'>,
 		binding: SessionBinding,
@@ -37,15 +37,15 @@ export class ExamActivityIpcBridge {
 			sessionId: binding.sessionId
 		});
 		if (service.observeExamActivity)
-			this.observation = new ApiObservationIpc(
-				ipc,
-				`${EXAM_ACTIVITY_CHANNEL}:observe`,
-				validateExamActivityIntent,
-				validateExamActivityResponse,
+			this.observation = new CapabilityObservationChannel(ipc, {
+				channel: `${EXAM_ACTIVITY_CHANNEL}:observe`,
+				validateIntent: validateExamActivityIntent,
+				validateResponse: validateExamActivityResponse,
 				authorize,
-				(intent, listener) => service.observeExamActivity!(bound, intent, listener),
-				{ kind: 'error', reason: 'unavailable' }
-			);
+				observe: (intent, listener) =>
+					service.observeExamActivity!(bound, intent, listener),
+				failure: { kind: 'error', reason: 'unavailable' }
+			});
 		ipc.handle(EXAM_ACTIVITY_CHANNEL, async (event, ...args: unknown[]) => {
 			if (this.#disposed) throw new Error('Exam activity capability is closed');
 			authorize(event);

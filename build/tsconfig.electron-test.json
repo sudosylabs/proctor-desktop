@@ -28,6 +28,7 @@
     "../test/electron/desktopIdentity.real.test.ts",
     "../test/platform/settings/electron-main/**/*.ts",
     "../test/platform/serverApi/**/*.ts",
+    "../test/platform/capabilityObservation/electron-main/**/*.ts",
     "../test/platform/protectedStorage/node/**/*.ts",
     "../test/platform/windows/node/**/*.ts",
     "../test/workbench/services/attemptWorkspace/node/**/*.ts",

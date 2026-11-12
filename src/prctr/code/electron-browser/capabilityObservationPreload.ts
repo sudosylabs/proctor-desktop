@@ -1,14 +1,14 @@
 import { ipcRenderer, type IpcRendererEvent } from 'electron';
-import type { ApiSubscription } from '../../platform/serverApi/common/apiObservation.js';
+import type { IDisposable } from '../../base/common/lifecycle.js';
 
 let sequence = 0;
 /** Constructed only for literal, capability-specific channels by the owning preload. */
-export function createApiObserver<I, R>(
+export function createCapabilityObserver<I, R>(
 	channel: string,
 	validateIntent: (value: unknown) => I,
 	validateResponse: (value: unknown) => R,
 	failure: R
-): (intent: I, listener: (response: R) => void) => ApiSubscription {
+): (intent: I, listener: (response: R) => void) => IDisposable {
 	return (intent, listener) => {
 		const request = validateIntent(intent);
 		const id = ++sequence;

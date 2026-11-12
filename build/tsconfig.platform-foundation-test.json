@@ -10,6 +10,7 @@
     "../test/platform/identity/node/**",
     "../test/platform/settings/electron-main/**",
     "../test/platform/serverApi/**",
+    "../test/platform/capabilityObservation/electron-main/**",
     "../test/platform/protectedStorage/node/**",
     "../test/platform/windows/node/**",
     "../test/workbench/services/examSecurity/node/**",

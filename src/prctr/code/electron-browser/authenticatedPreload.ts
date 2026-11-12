@@ -1,4 +1,4 @@
-import { createApiObserver } from './apiObservationPreload.js';
+import { createCapabilityObserver } from './capabilityObservationPreload.js';
 import {
 	EXAM_ACTIVITY_CHANNEL,
 	validateExamActivityIntent,
@@ -59,7 +59,7 @@ contextBridge.exposeInMainWorld(
 				kind: 'authenticated.close'
 			}),
 		examActivity: Object.freeze({
-			observe: createApiObserver(
+			observe: createCapabilityObserver(
 				`${EXAM_ACTIVITY_CHANNEL}:observe`,
 				validateExamActivityIntent,
 				validateExamActivityResponse,
@@ -74,7 +74,7 @@ contextBridge.exposeInMainWorld(
 				)
 		}),
 		account: Object.freeze({
-			observe: createApiObserver(
+			observe: createCapabilityObserver(
 				`${ACCOUNT_CHANNEL}:observe`,
 				validateAccountIntent,
 				validateAccountResponse,
@@ -86,7 +86,7 @@ contextBridge.exposeInMainWorld(
 				)
 		}),
 		administration: Object.freeze({
-			observe: createApiObserver(
+			observe: createCapabilityObserver(
 				`${ADMINISTRATION_CHANNEL}:observe`,
 				validateAdministrationIntent,
 				validateAdministrationResponse,

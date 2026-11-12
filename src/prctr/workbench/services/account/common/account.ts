@@ -10,7 +10,7 @@ import type {
 	AccountResponse
 } from '../../../../platform/account/common/accountProtocol.js';
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
-import type { ApiSubscription } from '../../../../platform/serverApi/common/apiObservation.js';
+import type { IDisposable } from '../../../../base/common/lifecycle.js';
 
 /** A read that has not answered by then fails, so no page waits forever. */
 export const ACCOUNT_READ_DEADLINE_MS = 15_000;
@@ -43,7 +43,7 @@ export interface IAccountService {
 	observe(
 		intent: AccountIntent,
 		listener: (response: AccountResponse) => void
-	): ApiSubscription | undefined;
+	): IDisposable | undefined;
 	/** The current profile photo as a data URL, when the account has one. */
 	readPhoto(): Promise<string | undefined>;
 	/** Shows a photo the account now uses, everywhere the window shows it. */
@@ -99,7 +99,7 @@ export class AccountService extends Disposable implements IAccountService {
 	observe(
 		intent: AccountIntent,
 		listener: (response: AccountResponse) => void
-	): ApiSubscription | undefined {
+	): IDisposable | undefined {
 		return this.client.observe?.(intent, listener);
 	}
 
