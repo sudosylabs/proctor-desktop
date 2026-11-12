@@ -67,7 +67,7 @@ export class ProgressionPage extends Disposable implements PageView {
 			new ButtonControl(headerActions, {
 				variant: 'brand',
 				label: format.text('progressionNew'),
-				icon: proctorIconFactory('action.continue')
+				icon: proctorIconFactory('action.add')
 			})
 		);
 		this._register(start.onDidRequest(() => this.openNew()));

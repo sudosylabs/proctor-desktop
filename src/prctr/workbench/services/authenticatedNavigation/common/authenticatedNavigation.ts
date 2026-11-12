@@ -44,6 +44,8 @@ export interface AdministrationCount {
 	readonly count: number;
 	readonly atLeast: boolean;
 	readonly attention?: boolean;
+	/** What the count is, as a screen reader says it: "2 failed jobs". */
+	readonly label?: string;
 }
 
 /**

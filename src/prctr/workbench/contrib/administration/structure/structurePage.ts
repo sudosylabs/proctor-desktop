@@ -9,9 +9,11 @@ import {
 	MutableDisposable,
 	type IDisposable
 } from '../../../../base/common/lifecycle.js';
-import type {
-	AdministrationChangeIntent,
-	AdministrationValue
+import {
+	ADMINISTRATION_PAGE_SIZE,
+	type AdministrationChangeIntent,
+	type AdministrationValue,
+	type AdministrationIntentOf
 } from '../../../../platform/administration/common/administrationProtocol.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { proctorIconFactory } from '../../../../platform/theme/browser/proctorIcon.js';
@@ -232,6 +234,49 @@ export class StructurePage extends Disposable implements PageView {
 
 	// #region The chosen unit
 
+	/** Each tab counts what it holds, from the first page's totals. */
+	private async loadCounts(unit: AdminUnit, serial: number): Promise<void> {
+		this.views.setCount('contents', undefined);
+		this.views.setCount('members', undefined);
+		const total = async (
+			intent:
+				| AdministrationIntentOf<'unitMembers'>
+				| AdministrationIntentOf<'unitClasses'>
+				| AdministrationIntentOf<'unitProgrammes'>
+		) => {
+			const result = await readOnce(this.administration, intent);
+			if (result.kind !== 'data') return undefined;
+			const page = result.value as {
+				readonly total?: number;
+				readonly totalAtLeast?: boolean;
+			};
+			return page.total === undefined
+				? undefined
+				: { count: page.total, atLeast: page.totalAtLeast === true };
+		};
+		const limit = ADMINISTRATION_PAGE_SIZE;
+		const [members, classes, programmes] = await Promise.all([
+			total({ kind: 'unitMembers', unitId: unit.id, limit }),
+			total({ kind: 'unitClasses', unitId: unit.id, limit }),
+			total({ kind: 'unitProgrammes', unitId: unit.id, limit })
+		]);
+		if (this._store.isDisposed || serial !== this.sequence) return;
+		const text = (count: { count: number; atLeast: boolean } | undefined) =>
+			count === undefined
+				? undefined
+				: this.format.count(count.count) + (count.atLeast ? '+' : '');
+		this.views.setCount('members', text(members));
+		this.views.setCount(
+			'contents',
+			classes === undefined || programmes === undefined
+				? undefined
+				: text({
+						count: classes.count + programmes.count,
+						atLeast: classes.atLeast || programmes.atLeast
+					})
+		);
+	}
+
 	private async showUnit(unit: AdminUnit | undefined): Promise<void> {
 		const serial = ++this.sequence;
 		this.unit = unit;
@@ -252,6 +297,7 @@ export class StructurePage extends Disposable implements PageView {
 			return;
 		}
 		this.showMembers(unit);
+		void this.loadCounts(unit, serial);
 		this.details.setHeading(unit.displayName, unit.description || undefined);
 		renderDetails(this.details.content, [
 			{

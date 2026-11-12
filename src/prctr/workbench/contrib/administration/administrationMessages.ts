@@ -229,6 +229,46 @@ const sharedMessages = Object.freeze({
 		defaultMessage: 'Import',
 		description: 'Heading of one onboarding import before its details load.'
 	}),
+	countInvitationsOne: defineMessage({
+		id: 'administration.sidebar.count.invitations.one',
+		defaultMessage: '1 pending invitation',
+		description: 'Spoken name of the sidebar count beside Invitations when it is one.'
+	}),
+	countInvitations: defineMessage({
+		id: 'administration.sidebar.count.invitations.many',
+		defaultMessage: '{count} pending invitations',
+		description: 'Spoken name of the sidebar count beside Invitations.'
+	}),
+	countImportsOne: defineMessage({
+		id: 'administration.sidebar.count.imports.one',
+		defaultMessage: '1 open import',
+		description: 'Spoken name of the sidebar count beside Imports when it is one.'
+	}),
+	countImports: defineMessage({
+		id: 'administration.sidebar.count.imports.many',
+		defaultMessage: '{count} open imports',
+		description: 'Spoken name of the sidebar count beside Imports.'
+	}),
+	countJobsOne: defineMessage({
+		id: 'administration.sidebar.count.jobs.one',
+		defaultMessage: '1 failed job',
+		description: 'Spoken name of the sidebar count beside Jobs when it is one.'
+	}),
+	countJobs: defineMessage({
+		id: 'administration.sidebar.count.jobs.many',
+		defaultMessage: '{count} failed jobs',
+		description: 'Spoken name of the sidebar count beside Jobs.'
+	}),
+	countMailOne: defineMessage({
+		id: 'administration.sidebar.count.mail.one',
+		defaultMessage: '1 email not delivered',
+		description: 'Spoken name of the sidebar count beside Mail when it is one.'
+	}),
+	countMail: defineMessage({
+		id: 'administration.sidebar.count.mail.many',
+		defaultMessage: '{count} emails not delivered',
+		description: 'Spoken name of the sidebar count beside Mail.'
+	}),
 	pageUnavailable: defineMessage({
 		id: 'administration.page.unavailable',
 		defaultMessage: 'This Administration page could not be opened.',

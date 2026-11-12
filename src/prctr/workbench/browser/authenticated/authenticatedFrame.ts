@@ -319,7 +319,13 @@ export class AuthenticatedFrame extends Disposable implements IAuthenticatedNavi
 				: new Intl.NumberFormat(
 						this.localization.locale === 'pseudo' ? 'en' : this.localization.locale
 					).format(count.count) + (count.atLeast ? '+' : '');
-		this.sidebar.setBadge('administration', page, text, count?.attention === true);
+		this.sidebar.setBadge(
+			'administration',
+			page,
+			text,
+			count?.attention === true,
+			count?.label
+		);
 	}
 
 	// #endregion

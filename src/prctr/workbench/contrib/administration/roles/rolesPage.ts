@@ -160,9 +160,22 @@ export class RolesPage extends Disposable implements PageView {
 						attrs: { role: 'option', 'aria-selected': String(role.id === this.chosen) }
 					},
 					$('span.prctr-admin-roles__item-name', { textContent: role.displayName }),
-					$('span.prctr-admin-roles__item-meta', {
-						textContent: String(role.permissions.length)
-					})
+					// A built-in role can't be changed; the lock says so where it is chosen.
+					...(role.builtIn
+						? [
+								$(
+									'span.prctr-admin-roles__item-meta',
+									{},
+									this.listStore.add(
+										createProctorIcon(this.list.ownerDocument, {
+											id: 'status.locked',
+											size: 14
+										})
+									).element,
+									$('span', { textContent: this.format.text('rolesBuiltIn') })
+								)
+							]
+						: [])
 				);
 				this.listStore.add(
 					addDisposableListener(item, 'click', () => this.choose(role.id))

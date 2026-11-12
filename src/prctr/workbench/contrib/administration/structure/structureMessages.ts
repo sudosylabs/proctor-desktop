@@ -319,12 +319,12 @@ export const structureMessages = Object.freeze({
 	}),
 	classEnroll: defineMessage({
 		id: 'administration.structure.class.enroll',
-		defaultMessage: 'Enroll existing…',
+		defaultMessage: 'Enrol existing…',
 		description: 'Opens the dialog that enrols an existing account.'
 	}),
 	classEnrollTitle: defineMessage({
 		id: 'administration.structure.class.enroll.title',
-		defaultMessage: 'Enroll someone in {name}',
+		defaultMessage: 'Enrol someone in {name}',
 		description: 'Title of the enrol dialog.'
 	}),
 	classEnrollBody: defineMessage({
@@ -345,7 +345,7 @@ export const structureMessages = Object.freeze({
 	}),
 	classEnrollConfirm: defineMessage({
 		id: 'administration.structure.class.enroll.confirm',
-		defaultMessage: 'Enroll',
+		defaultMessage: 'Enrol',
 		description: 'Confirms enrolling.'
 	}),
 	classEnrolledToast: defineMessage({

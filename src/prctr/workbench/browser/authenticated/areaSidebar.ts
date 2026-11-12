@@ -231,11 +231,20 @@ export class AreaSidebar extends Disposable {
 		destination: AuthenticatedDestination,
 		entry: string,
 		text: string | undefined,
-		attention = false
+		attention = false,
+		label?: string
 	): void {
 		const badge = this.areas.get(destination)?.entries.get(entry)?.badge;
 		if (badge === undefined) return;
 		badge.textContent = text ?? '';
+		// A bare number means little when read aloud; the label says what it counts.
+		if (label !== undefined && text !== undefined) {
+			badge.setAttribute('role', 'img');
+			badge.setAttribute('aria-label', label);
+		} else {
+			badge.removeAttribute('role');
+			badge.removeAttribute('aria-label');
+		}
 		badge.dataset.attention = String(attention);
 		badge.hidden = text === undefined;
 	}

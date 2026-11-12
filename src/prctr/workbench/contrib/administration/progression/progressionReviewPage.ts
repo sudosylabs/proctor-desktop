@@ -252,10 +252,18 @@ export class ProgressionReviewPage extends Disposable implements PageView {
 
 	private setButtons(data: Progression | undefined): void {
 		const ready = data?.state === 'preview_ready' && data.validRows > 0;
+		// A move that takes effect later is scheduled, not made now; the button says when.
+		const later =
+			data?.effectiveAt !== undefined && data.effectiveAt > this.format.now()
+				? data.effectiveAt
+				: undefined;
 		this.commit.setState({
-			label: this.format.text('reviewCommit', {
-				count: this.format.count(data?.validRows ?? 0)
-			}),
+			label:
+				later === undefined
+					? this.format.text('reviewCommit', {
+							count: this.format.count(data?.validRows ?? 0)
+						})
+					: this.format.text('reviewSchedule', { date: this.format.date(later) }),
 			icon: proctorIconFactory('action.continue'),
 			disabled: !ready
 		});

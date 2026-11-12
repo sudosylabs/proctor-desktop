@@ -28,7 +28,7 @@ export const rolesMessages = Object.freeze({
 	}),
 	rolesKind: defineMessage({
 		id: 'administration.access.kind',
-		defaultMessage: 'Kind',
+		defaultMessage: 'Type',
 		description: 'Role detail.'
 	}),
 	rolesBuiltIn: defineMessage({

@@ -284,7 +284,7 @@ export const recordsMessages = Object.freeze({
 	}),
 	retentionCategory: defineMessage({
 		id: 'administration.records.retention.column.category',
-		defaultMessage: 'Kind',
+		defaultMessage: 'Type',
 		description: 'Records column.'
 	}),
 	retentionStatus: defineMessage({

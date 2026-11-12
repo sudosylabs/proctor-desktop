@@ -59,9 +59,12 @@
 		white-space: nowrap;
 	}
 	.prctr-admin-roles .prctr-admin-roles__item-meta {
+		align-items: center;
 		color: var(--prctr-color-text-tertiary);
+		display: inline-flex;
+		flex: none;
 		font-size: 12px;
-		font-variant-numeric: tabular-nums;
+		gap: 4px;
 	}
 	.prctr-admin-roles .prctr-admin-roles__note {
 		color: var(--prctr-color-text-tertiary);

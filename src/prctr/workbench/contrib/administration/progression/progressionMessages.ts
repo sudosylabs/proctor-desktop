@@ -246,6 +246,11 @@ export const progressionMessages = Object.freeze({
 		defaultMessage: 'Move {count} students',
 		description: 'Confirms a reviewed progression.'
 	}),
+	reviewSchedule: defineMessage({
+		id: 'administration.progression.review.schedule',
+		defaultMessage: 'Schedule move for {date}',
+		description: 'Confirms a reviewed progression that takes effect on a later date.'
+	}),
 	reviewCommitTitle: defineMessage({
 		id: 'administration.progression.review.commit.title',
 		defaultMessage: 'Move these students?',

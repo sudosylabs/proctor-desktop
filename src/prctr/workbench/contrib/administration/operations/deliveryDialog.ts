@@ -101,6 +101,14 @@ export class DeliveryDialog extends Disposable {
 				? undefined
 				: await readOnce(this.administration, { kind: 'user', id: delivery.targetUserId });
 		if (this._store.isDisposed) return;
+		// Named by the person once known, as in "Invitation for Rafael Silva".
+		if (user?.kind === 'data')
+			this.dialog.setHeading(
+				this.format.text('deliveryTitleFor', { kind, name: user.value.displayName }),
+				delivery.failureCode === undefined
+					? this.format.text('deliveryNoProblem')
+					: this.format.code('problem', delivery.failureCode)
+			);
 		const state = this.format.text(this.stateText(delivery.state));
 		renderDetails(this.details, [
 			...(user?.kind === 'data'

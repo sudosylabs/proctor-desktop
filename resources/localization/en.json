@@ -2482,7 +2482,7 @@
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
     "administration.access.kind": {
-      "message": "Kind",
+      "message": "Type",
       "description": "Role detail.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
@@ -4647,13 +4647,13 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.filter.any.kind": {
-      "message": "Any kind",
+      "message": "Any invitation",
       "description": "Kind filter choice that shows every invitation.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.filter.kind": {
-      "message": "Kind",
+      "message": "Invited as",
       "description": "Invitations filter by what people are invited to.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
@@ -5068,7 +5068,7 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.mail.column.kind": {
-      "message": "Kind",
+      "message": "Email",
       "description": "Column of what kind of email it is.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
@@ -5116,7 +5116,7 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.mail.delivery.kind": {
-      "message": "Kind",
+      "message": "Email",
       "description": "Label of what kind of email it is.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
@@ -5186,6 +5186,15 @@
       "placeholders": [
         "kind",
         "recipient"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
+    },
+    "administration.mail.delivery.titlefor": {
+      "message": "{kind} for {name}",
+      "description": "Title of one delivery’s details once the person is known, as in \"Invitation for Rafael Silva\".",
+      "placeholders": [
+        "kind",
+        "name"
       ],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -5368,7 +5377,7 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.operations.job.kind": {
-      "message": "Kind",
+      "message": "Job",
       "description": "Label of a job’s kind.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
@@ -6574,6 +6583,14 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
     },
+    "administration.progression.review.schedule": {
+      "message": "Schedule move for {date}",
+      "description": "Confirms a reviewed progression that takes effect on a later date.",
+      "placeholders": [
+        "date"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/progression/progressionMessages.ts"
+    },
     "administration.progression.review.skipped": {
       "message": "Skipped",
       "description": "A student the progression leaves out without a problem.",
@@ -6816,7 +6833,7 @@
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.column.category": {
-      "message": "Kind",
+      "message": "Type",
       "description": "Records column.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
@@ -7073,6 +7090,62 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
+    "administration.sidebar.count.imports.many": {
+      "message": "{count} open imports",
+      "description": "Spoken name of the sidebar count beside Imports.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.sidebar.count.imports.one": {
+      "message": "1 open import",
+      "description": "Spoken name of the sidebar count beside Imports when it is one.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.sidebar.count.invitations.many": {
+      "message": "{count} pending invitations",
+      "description": "Spoken name of the sidebar count beside Invitations.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.sidebar.count.invitations.one": {
+      "message": "1 pending invitation",
+      "description": "Spoken name of the sidebar count beside Invitations when it is one.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.sidebar.count.jobs.many": {
+      "message": "{count} failed jobs",
+      "description": "Spoken name of the sidebar count beside Jobs.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.sidebar.count.jobs.one": {
+      "message": "1 failed job",
+      "description": "Spoken name of the sidebar count beside Jobs when it is one.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.sidebar.count.mail.many": {
+      "message": "{count} emails not delivered",
+      "description": "Spoken name of the sidebar count beside Mail.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
+    "administration.sidebar.count.mail.one": {
+      "message": "1 email not delivered",
+      "description": "Spoken name of the sidebar count beside Mail when it is one.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
+    },
     "administration.structure.archive": {
       "message": "Archive",
       "description": "Archives a programme, level or class after confirming.",
@@ -7188,7 +7261,7 @@
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.class.enroll": {
-      "message": "Enroll existing…",
+      "message": "Enrol existing…",
       "description": "Opens the dialog that enrols an existing account.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
@@ -7200,13 +7273,13 @@
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.class.enroll.confirm": {
-      "message": "Enroll",
+      "message": "Enrol",
       "description": "Confirms enrolling.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
     },
     "administration.structure.class.enroll.title": {
-      "message": "Enroll someone in {name}",
+      "message": "Enrol someone in {name}",
       "description": "Title of the enrol dialog.",
       "placeholders": [
         "name"

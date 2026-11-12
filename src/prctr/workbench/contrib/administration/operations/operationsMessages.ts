@@ -437,7 +437,7 @@ export const operationsMessages = Object.freeze({
 	}),
 	jobKind: defineMessage({
 		id: 'administration.operations.job.kind',
-		defaultMessage: 'Kind',
+		defaultMessage: 'Job',
 		description: 'Label of a job’s kind.'
 	}),
 	jobAbout: defineMessage({
@@ -548,13 +548,19 @@ export const operationsMessages = Object.freeze({
 	}),
 	mailColumnKind: defineMessage({
 		id: 'administration.mail.column.kind',
-		defaultMessage: 'Kind',
+		defaultMessage: 'Email',
 		description: 'Column of what kind of email it is.'
 	}),
 	mailOpen: defineMessage({
 		id: 'administration.mail.open',
 		defaultMessage: 'Details',
 		description: 'Opens one delivery’s details.'
+	}),
+	deliveryTitleFor: defineMessage({
+		id: 'administration.mail.delivery.titlefor',
+		defaultMessage: '{kind} for {name}',
+		description:
+			'Title of one delivery’s details once the person is known, as in "Invitation for Rafael Silva".'
 	}),
 	deliveryTitle: defineMessage({
 		id: 'administration.mail.delivery.title',
@@ -573,7 +579,7 @@ export const operationsMessages = Object.freeze({
 	}),
 	deliveryKind: defineMessage({
 		id: 'administration.mail.delivery.kind',
-		defaultMessage: 'Kind',
+		defaultMessage: 'Email',
 		description: 'Label of what kind of email it is.'
 	}),
 	deliveryStatus: defineMessage({

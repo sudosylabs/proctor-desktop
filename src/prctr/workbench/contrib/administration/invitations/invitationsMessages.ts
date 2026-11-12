@@ -147,7 +147,7 @@ export const invitationsMessages = Object.freeze({
 	}),
 	invitationsKind: defineMessage({
 		id: 'administration.invitations.filter.kind',
-		defaultMessage: 'Kind',
+		defaultMessage: 'Invited as',
 		description: 'Invitations filter by what people are invited to.'
 	}),
 	invitationsAny: defineMessage({
@@ -157,7 +157,7 @@ export const invitationsMessages = Object.freeze({
 	}),
 	invitationsAnyKind: defineMessage({
 		id: 'administration.invitations.filter.any.kind',
-		defaultMessage: 'Any kind',
+		defaultMessage: 'Any invitation',
 		description: 'Kind filter choice that shows every invitation.'
 	}),
 	invitationStatePending: defineMessage({

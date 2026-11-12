@@ -106,15 +106,37 @@ class AdministrationContribution extends Disposable {
 			}
 			if (response.kind !== 'data' || response.data.resource !== 'counts') return;
 			const counts = response.data.value;
-			this.navigation.setAdministrationCount('invitations', counts.pendingInvitations);
-			this.navigation.setAdministrationCount('imports', counts.openImports);
+			const labelled = (
+				count: { readonly count: number; readonly atLeast: boolean } | undefined,
+				one: keyof typeof messages,
+				many: keyof typeof messages,
+				attention = false
+			) =>
+				count && {
+					...count,
+					attention,
+					label:
+						count.count === 1 && !count.atLeast
+							? this.localization.format(messages[one])
+							: this.localization.format(messages[many], {
+									count: `${count.count}${count.atLeast ? '+' : ''}`
+								})
+				};
+			this.navigation.setAdministrationCount(
+				'invitations',
+				labelled(counts.pendingInvitations, 'countInvitationsOne', 'countInvitations')
+			);
+			this.navigation.setAdministrationCount(
+				'imports',
+				labelled(counts.openImports, 'countImportsOne', 'countImports')
+			);
 			this.navigation.setAdministrationCount(
 				'jobs',
-				counts.failedJobs && { ...counts.failedJobs, attention: true }
+				labelled(counts.failedJobs, 'countJobsOne', 'countJobs', true)
 			);
 			this.navigation.setAdministrationCount(
 				'mail',
-				counts.failedMailDeliveries && { ...counts.failedMailDeliveries, attention: true }
+				labelled(counts.failedMailDeliveries, 'countMailOne', 'countMail', true)
 			);
 		};
 		subscription = this.administration.observe({ kind: 'counts' }, deliver);
