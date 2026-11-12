@@ -111,7 +111,7 @@ The release owns rules that every policy carries unchanged:
 | rule                      | requirement                                                                                            |
 | ------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `baseline.single_display` | one connected display, which is physical and active (unknown unless certainty is complete)             |
-| `baseline.window`         | the CandidateWindow is maximized and its content protection is verified where the platform supports it |
+| `baseline.window`         | during participation: the CandidateWindow is present, maximized and its content protection is verified |
 | `baseline.session`        | the candidate owns the console, the session is unlocked, no remote attachment, no other human session  |
 
 The server can neither remove nor weaken them.

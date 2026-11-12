@@ -590,10 +590,40 @@
     },
     {
       "ecosystem": "cargo",
+      "package": "objc2-core-foundation",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "CoreFoundation types for reading the CoreGraphics window list on macOS: arrays, dictionaries, numbers and strings, each type-checked before use.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-core-foundation/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-core-foundation",
+          "kind": "production",
+          "features": ["CFArray", "CFDictionary", "CFNumber", "CFString", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent"],
+      "networkBehavior": "None; CoreFoundation objects are process-local.",
+      "nativeBehavior": "Links the system CoreFoundation framework; unsafe element access is confined to prctr-os with documented safety and checked downcasts.",
+      "transitiveRisk": "Already present transitively through objc2-core-graphics; declaring it directly adds no new crate. Used under MIT.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written CoreFoundation declarations would duplicate ABI details and lose the checked type downcasts.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
       "package": "objc2-core-graphics",
       "version": "0.3.2",
       "kind": "production",
-      "purpose": "Maintained CoreGraphics bindings for the native agent on macOS: the online display list and the built-in, active, main, asleep and mirror queries. Replaces hand-written CoreGraphics and objc_msgSend declarations.",
+      "purpose": "Maintained CoreGraphics bindings for the native agent on macOS: the online display list and display queries, and the window list that reads the candidate window sharing state and the bounds of windows above it. Replaces hand-written CoreGraphics and objc_msgSend declarations.",
       "owner": "native-capabilities",
       "source": "https://crates.io/crates/objc2-core-graphics/0.3.2",
       "license": "Zlib OR Apache-2.0 OR MIT",
@@ -603,7 +633,15 @@
           "manifest": "native/crates/prctr-os/Cargo.toml",
           "alias": "objc2-core-graphics",
           "kind": "production",
-          "features": ["CGDirectDisplay", "CGDisplayConfiguration", "CGError", "libc", "std"],
+          "features": [
+            "CGDirectDisplay",
+            "CGDisplayConfiguration",
+            "CGError",
+            "CGGeometry",
+            "CGWindow",
+            "libc",
+            "std"
+          ],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": "cfg(target_os = \"macos\")"
@@ -623,7 +661,7 @@
       "package": "windows",
       "version": "0.62.2",
       "kind": "production",
-      "purpose": "Microsoft's Windows API bindings for the native agent: the display configuration API over every path, with output technology for built-in, wireless, virtual and indirect targets.",
+      "purpose": "Microsoft's Windows API bindings for the native agent: the display configuration API, and the candidate window's display affinity and the visible, uncloaked windows above it.",
       "owner": "native-capabilities",
       "source": "https://crates.io/crates/windows/0.62.2",
       "license": "MIT OR Apache-2.0",
@@ -633,7 +671,14 @@
           "manifest": "native/crates/prctr-os/Cargo.toml",
           "alias": "windows",
           "kind": "production",
-          "features": ["Win32_Devices_Display", "Win32_Foundation", "Win32_Graphics_Gdi", "std"],
+          "features": [
+            "Win32_Devices_Display",
+            "Win32_Foundation",
+            "Win32_Graphics_Dwm",
+            "Win32_Graphics_Gdi",
+            "Win32_UI_WindowsAndMessaging",
+            "std"
+          ],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": "cfg(target_os = \"windows\")"

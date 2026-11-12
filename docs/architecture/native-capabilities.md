@@ -31,7 +31,8 @@ tests prove each fact there.
 
 Implemented in source: the protocol, core, rule evaluator and conformance vectors; the agent and
 Electron main's connection and service, tested end to end against the real binary; and display
-topology on Windows, macOS and Linux. Display topology's real-OS test runs on macOS. On macOS an
+topology and the candidate window on Windows, macOS and Linux. Their real-OS tests run on macOS
+(the candidate-window read-back is proved against another process's window). On macOS an
 external display is still reported unclassified (partial certainty) until the `IORegistry`
 transport classification is proved, so the baseline is unknown there whenever one is connected.
 The other capabilities, the privileged components and the recorder are not implemented yet.

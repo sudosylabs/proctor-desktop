@@ -130,3 +130,97 @@ pub fn display_targets() -> Result<RawTopology, OsError> {
         mirroring_known: true,
     })
 }
+
+mod window {
+    use std::ffi::c_void;
+
+    use windows::Win32::Foundation::{HWND, RECT};
+    use windows::Win32::Graphics::Dwm::{DWMWA_CLOAKED, DwmGetWindowAttribute};
+    use windows::Win32::UI::WindowsAndMessaging::{
+        GW_HWNDPREV, GetWindow, GetWindowDisplayAffinity, GetWindowRect, GetWindowThreadProcessId,
+        IsWindow, IsWindowVisible, WDA_EXCLUDEFROMCAPTURE, WDA_MONITOR,
+    };
+
+    use crate::{RawWindow, Rect};
+
+    /// Bounds the z-order walk; a desktop never has more top-level windows above one window.
+    const MAX_WINDOWS_ABOVE: usize = 1024;
+
+    fn rect(window: HWND) -> Option<Rect> {
+        let mut bounds = RECT::default();
+        // SAFETY: `bounds` is a valid `RECT` to write into; an invalid handle only fails the call.
+        unsafe { GetWindowRect(window, &raw mut bounds) }.ok()?;
+        Some(Rect {
+            x: f64::from(bounds.left),
+            y: f64::from(bounds.top),
+            width: f64::from(bounds.right - bounds.left),
+            height: f64::from(bounds.bottom - bounds.top),
+        })
+    }
+
+    fn owner(window: HWND) -> u32 {
+        let mut process = 0_u32;
+        // SAFETY: `process` is a valid `u32` to write into; an invalid handle leaves it zero.
+        unsafe { GetWindowThreadProcessId(window, Some(&raw mut process)) };
+        process
+    }
+
+    fn cloaked(window: HWND) -> bool {
+        let mut value = 0_u32;
+        // SAFETY: `value` is a valid `u32` of exactly the size passed; DWM writes at most that.
+        let read = unsafe {
+            DwmGetWindowAttribute(
+                window,
+                DWMWA_CLOAKED,
+                (&raw mut value).cast::<c_void>(),
+                u32::try_from(size_of::<u32>()).unwrap_or(4),
+            )
+        };
+        read.is_ok() && value != 0
+    }
+
+    /// Reads the window with this handle and the visible windows of other processes above it.
+    #[must_use]
+    pub fn window(handle: isize) -> RawWindow {
+        let own = HWND(handle as *mut c_void);
+        // SAFETY: `IsWindow` accepts any value and only reports whether it names a window.
+        if !unsafe { IsWindow(Some(own)) }.as_bool() {
+            return RawWindow::default();
+        }
+        let mut affinity = 0_u32;
+        // SAFETY: `affinity` is a valid `u32` to write into.
+        let protection = unsafe { GetWindowDisplayAffinity(own, &raw mut affinity) }
+            .ok()
+            .map(|()| affinity == WDA_EXCLUDEFROMCAPTURE.0 || affinity == WDA_MONITOR.0);
+        let own_process = owner(own);
+        let mut covering = Vec::new();
+        let mut current = own;
+        for _ in 0..MAX_WINDOWS_ABOVE {
+            // SAFETY: `current` is a window handle from the previous step; an invalid one fails.
+            let Ok(above) = (unsafe { GetWindow(current, GW_HWNDPREV) }) else {
+                break;
+            };
+            if above.is_invalid() {
+                break;
+            }
+            current = above;
+            // SAFETY: `IsWindowVisible` accepts any handle.
+            let visible = unsafe { IsWindowVisible(above) }.as_bool();
+            if visible
+                && !cloaked(above)
+                && owner(above) != own_process
+                && let Some(bounds) = rect(above)
+            {
+                covering.push(bounds);
+            }
+        }
+        RawWindow {
+            found: true,
+            capture_excluded: protection,
+            bounds: rect(own),
+            covering,
+        }
+    }
+}
+
+pub use window::window;

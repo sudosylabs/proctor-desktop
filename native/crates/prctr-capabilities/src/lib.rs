@@ -2,6 +2,7 @@
 //! entry in [`sources`] and [`registry`].
 #![forbid(unsafe_code)]
 
+pub mod candidate_window;
 pub mod display;
 
 use prctr_core::{Registry, Source};
@@ -10,15 +11,18 @@ use serde_json::{Value, json};
 /// A fresh source for every registered capability.
 #[must_use]
 pub fn sources() -> Vec<Box<dyn Source>> {
-    vec![Box::new(display::DisplaySource::new())]
+    vec![
+        Box::new(display::DisplaySource::new()),
+        Box::new(candidate_window::CandidateWindowSource::new()),
+    ]
 }
 
 /// The registry the agent and the server share: descriptors and the release-owned baseline rules.
 #[must_use]
 pub fn registry() -> Registry {
     Registry {
-        capabilities: vec![display::descriptor()],
-        baseline_rules: vec![display::baseline_rule()],
+        capabilities: vec![display::descriptor(), candidate_window::descriptor()],
+        baseline_rules: vec![display::baseline_rule(), candidate_window::baseline_rule()],
     }
 }
 
@@ -33,6 +37,10 @@ pub fn registry_json() -> Value {
             display::CAPABILITY: {
                 "state": schema(schemars::schema_for!(display::DisplayState)),
                 "summary": schema(schemars::schema_for!(display::DisplaySummary)),
+            },
+            candidate_window::CAPABILITY: {
+                "state": schema(schemars::schema_for!(candidate_window::CandidateWindowState)),
+                "summary": { "type": "object", "additionalProperties": false, "properties": {} },
             }
         }
     })

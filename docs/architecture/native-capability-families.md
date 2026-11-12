@@ -98,10 +98,17 @@ evaluation.
 
 **State.** `certainty`, `presence`, `focus`, `visibility`, `placement` (maximized, normal,
 minimized, fullscreen), `display_target_id`, `content_protection` (verified, failed, unknown, read
-back from the OS), `occlusion` (none, covered, unknown).
+back from the OS), `occlusion` (none, covered, unknown), `close_attempts` (a count).
+`display_target_id` is not implemented yet: it needs the display capability's target identities.
 
-**Changes.** `window_changed` with the complete new state and kinds of change; `close_attempted`
-with a count.
+**Host events.** Electron main sends `attach` (the window's native identity: the CoreGraphics
+window number on macOS, the window handle on Windows), `state` (presence, focus, visibility,
+placement), `close_attempted` and `detach`. Any other shape is a protocol error.
+
+**Changes.** The complete new state on every change; a close attempt raises `close_attempts`.
+
+**Baseline.** `baseline.window` applies to participation only (the window does not exist during
+readiness): present, maximized, and content protection verified.
 
 **Occlusion.** `covered` when other windows cover at least **5% of the exam window for at least 1
 second**. Accessibility tools and Proctor's own overlay never count. The other windows' names or

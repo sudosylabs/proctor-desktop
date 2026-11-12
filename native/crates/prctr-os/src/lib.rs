@@ -76,3 +76,47 @@ pub struct RawTopology {
 
 /// At most this many displays are read; more is reported as an error, never truncated.
 pub const MAX_DISPLAYS: usize = 32;
+
+/// A rectangle in global screen coordinates (points on macOS, pixels on Windows).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Rect {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+}
+
+impl Rect {
+    #[must_use]
+    pub fn area(self) -> f64 {
+        self.width.max(0.0) * self.height.max(0.0)
+    }
+
+    #[must_use]
+    pub fn intersection(self, other: Self) -> Option<Self> {
+        let left = self.x.max(other.x);
+        let top = self.y.max(other.y);
+        let right = (self.x + self.width).min(other.x + other.width);
+        let bottom = (self.y + self.height).min(other.y + other.height);
+        (right > left && bottom > top).then_some(Self {
+            x: left,
+            y: top,
+            width: right - left,
+            height: bottom - top,
+        })
+    }
+}
+
+/// What the OS says about the candidate window and the windows above it. No other window's name,
+/// owner or content is read.
+#[derive(Clone, Debug, PartialEq, Default)]
+pub struct RawWindow {
+    /// The OS knows a window with this identity.
+    pub found: bool,
+    /// `Some(true)` when the OS confirms the window is excluded from capture.
+    pub capture_excluded: Option<bool>,
+    pub bounds: Option<Rect>,
+    /// Bounds of visible windows of other processes above it, excluding the dock, the cursor and
+    /// assistive overlays.
+    pub covering: Vec<Rect>,
+}
