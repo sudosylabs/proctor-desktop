@@ -163,6 +163,8 @@ export interface AdminListOptions<K extends AdminListKind> {
 		/** The query fields that ask the server for this order. */
 		params(sort: AdminSort): Partial<AdminListQuery<K>>;
 	};
+	/** The filters above the list; a refusal hides them, since nothing can be narrowed. */
+	readonly filters?: { readonly element: HTMLElement };
 	/** The list can start from a day: the query fields for "up to the end of this day". */
 	readonly dateJump?: (endOfDay: number) => Partial<AdminListQuery<K>>;
 }
@@ -543,6 +545,10 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 						...(typeof shown === 'string' ? { text: shown } : shown)
 					};
 		this.section.setState(state, empty, retry);
+		if (this.options.filters !== undefined)
+			this.options.filters.element.hidden =
+				state.kind === 'failed' &&
+				(state.reason === 'noAccess' || state.reason === 'denied');
 		if (data === undefined) {
 			this.items = [];
 			this.wrap.hidden = true;

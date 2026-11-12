@@ -133,6 +133,7 @@ export class InvitationsPage extends Disposable implements PageView {
 				this.query,
 				{
 					label: format.text('invitationsTable'),
+					filters,
 					columns: [
 						{
 							label: format.text('invitationsColumnInvitee'),

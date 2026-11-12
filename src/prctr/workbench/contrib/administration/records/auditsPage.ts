@@ -99,6 +99,7 @@ export class AuditsPage extends Disposable implements PageView {
 		this.list = this._register(
 			instantiationService.createInstance(AdminList<'audits'>, body, 'audits', this.query, {
 				label: format.text('auditsTable'),
+				filters: this.filters,
 				columns: [
 					{
 						label: format.text('auditsEvent'),

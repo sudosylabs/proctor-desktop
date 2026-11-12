@@ -11075,6 +11075,23 @@
       ],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },
+    "page.state.stale.since": {
+      "message": "Showing what Proctor last read {when}. It refreshes when the server answers again.",
+      "description": "Note above a list the server couldn't refresh; when is a time such as \"today, 09:12\".",
+      "placeholders": [
+        "when"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.state.stale.since.named": {
+      "message": "Showing what Proctor last read {when}. It refreshes when {institution} answers again.",
+      "description": "Note above a list the server couldn't refresh, naming the institution.",
+      "placeholders": [
+        "when",
+        "institution"
+      ],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
     "page.state.still.waiting": {
       "message": "Still waiting for {institution}…",
       "description": "A read is slow; institution is the server’s name.",

@@ -26,6 +26,19 @@ export const pageMessages = Object.freeze({
 		defaultMessage: 'This couldn’t be loaded. {reason}',
 		description: 'A section read failed and nothing is shown; reason explains why.'
 	}),
+	staleSince: defineMessage({
+		id: 'page.state.stale.since',
+		defaultMessage:
+			'Showing what Proctor last read {when}. It refreshes when the server answers again.',
+		description:
+			'Note above a list the server couldn\'t refresh; when is a time such as "today, 09:12".'
+	}),
+	staleSinceNamed: defineMessage({
+		id: 'page.state.stale.since.named',
+		defaultMessage:
+			'Showing what Proctor last read {when}. It refreshes when {institution} answers again.',
+		description: "Note above a list the server couldn't refresh, naming the institution."
+	}),
 	staleData: defineMessage({
 		id: 'page.state.stale',
 		defaultMessage: 'This couldn’t be refreshed, so it may be out of date. {reason}',

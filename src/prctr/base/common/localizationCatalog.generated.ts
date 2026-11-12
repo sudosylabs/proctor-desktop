@@ -1766,6 +1766,8 @@ export const englishCatalog: LocalizationCatalog = Object.freeze({
     "page.state.loading": "Loading…",
     "page.state.retry": "Try again",
     "page.state.stale": "This couldn’t be refreshed, so it may be out of date. {reason}",
+    "page.state.stale.since": "Showing what Proctor last read {when}. It refreshes when the server answers again.",
+    "page.state.stale.since.named": "Showing what Proctor last read {when}. It refreshes when {institution} answers again.",
     "page.state.still.waiting": "Still waiting for {institution}…",
     "page.state.still.waiting.generic": "Still waiting for the server…",
     "page.time.today": "today, {time}",

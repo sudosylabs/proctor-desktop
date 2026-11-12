@@ -165,6 +165,7 @@ export class UsersPage extends Disposable implements PageView {
 		this.list = this._register(
 			instantiationService.createInstance(AdminList<'users'>, body, 'users', this.query, {
 				label: format.text('usersTable'),
+				filters: this.filters,
 				selectable: true,
 				columns: [
 					{

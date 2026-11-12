@@ -96,6 +96,7 @@ export class JobsPage extends Disposable implements PageView {
 				{ status: [...NOT_DONE_STATES] },
 				{
 					label: format.text('jobsTable'),
+					filters,
 					columns: [
 						{
 							label: format.text('jobsJob'),

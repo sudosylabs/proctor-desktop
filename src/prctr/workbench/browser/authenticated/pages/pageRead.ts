@@ -21,7 +21,8 @@ export type PageReadState<F extends string = string> =
 	/** Nothing could be read. */
 	| { readonly kind: 'failed'; readonly reason: F }
 	/** A refresh failed; the earlier data stays shown. */
-	| { readonly kind: 'stale'; readonly reason: F };
+	/** The data shown is from the last good read, at `since`, and a newer read failed. */
+	| { readonly kind: 'stale'; readonly reason: F; readonly since?: number };
 
 /** What one read answered: the data it is for, or why there is none. */
 export type PageReadResult<D, F extends string> =
@@ -125,6 +126,7 @@ export class PageRead<D, F extends string, R = unknown> extends Disposable {
 		if (result.kind === 'data') {
 			const changed = JSON.stringify(result.data) !== JSON.stringify(this.currentData);
 			this.currentData = result.data;
+			this.readAt = Date.now();
 			if (changed || this.currentState.kind !== 'ready') {
 				this.currentState = { kind: 'ready' };
 				this.changeEmitter.fire();
@@ -136,10 +138,16 @@ export class PageRead<D, F extends string, R = unknown> extends Disposable {
 		this.setState(
 			this.currentData === undefined
 				? { kind: 'failed', reason: result.reason }
-				: { kind: 'stale', reason: result.reason }
+				: {
+						kind: 'stale',
+						reason: result.reason,
+						...(this.readAt === undefined ? {} : { since: this.readAt })
+					}
 		);
 		return false;
 	}
+
+	private readAt: number | undefined;
 
 	private setState(state: PageReadState<F>): void {
 		this.currentState = state;

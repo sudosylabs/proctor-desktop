@@ -354,9 +354,26 @@ export class PageSection extends Disposable {
 			return;
 		}
 		if (state.kind === 'stale') {
+			// A server that didn't answer leaves what was last read, and says when that was.
+			const unreachable =
+				state.reason === 'unavailable' ||
+				state.reason === 'offline' ||
+				state.reason === 'timeout';
 			this.showNote(
 				'status.offline',
-				this.format.text('staleData', { reason: this.pane.describeFailure(state.reason) })
+				unreachable && state.since !== undefined
+					? this.format.text(
+							this.format.institution === undefined
+								? 'staleSince'
+								: 'staleSinceNamed',
+							{
+								when: this.format.relative(state.since),
+								institution: this.format.institution ?? ''
+							}
+						)
+					: this.format.text('staleData', {
+							reason: this.pane.describeFailure(state.reason)
+						})
 			);
 			return;
 		}

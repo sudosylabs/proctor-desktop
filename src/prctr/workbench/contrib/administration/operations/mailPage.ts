@@ -111,6 +111,7 @@ export class MailPage extends Disposable implements PageView {
 				{},
 				{
 					label: format.text('mailDeliveries'),
+					filters,
 					columns: [
 						{
 							label: format.text('mailColumnTo'),
