@@ -187,16 +187,17 @@ export class RolesPage extends Disposable implements PageView {
 					// A built-in role can't be changed; the lock says so where it is chosen.
 					...(role.builtIn
 						? [
+								// The lock alone, so the name keeps its room beside the count; the
+								// option's name and the Type row say "Built-in role" in words.
 								$(
 									'span.prctr-admin-roles__item-meta',
-									{},
+									{ title: this.format.text('rolesBuiltIn') },
 									this.listStore.add(
 										createProctorIcon(this.list.ownerDocument, {
 											id: 'status.locked',
 											size: 14
 										})
-									).element,
-									$('span', { textContent: this.format.text('rolesBuiltIn') })
+									).element
 								)
 							]
 						: [])
