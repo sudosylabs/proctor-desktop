@@ -17,7 +17,7 @@ import {
 	projectRead,
 	type SessionBinding
 } from '../../serverApi/common/projection.js';
-import { apiOperations } from '../../serverApi/node/apiContract.js';
+import { operationContract } from '../../serverApi/node/serverContract.js';
 import type { ServerApiClient } from '../../serverApi/node/serverApiClient.js';
 import {
 	isAdministrationRead,
@@ -177,7 +177,7 @@ export function guardAdministrationApi(
 
 /** Whether the contract has the server deduplicate the operation by an `Idempotency-Key`. */
 export function requiresIdempotencyKey(operation: ApiOperationId): boolean {
-	return apiOperations.get(operation)?.['x-proctor-idempotency'] === 'required';
+	return operationContract(operation).idempotency === 'required';
 }
 
 // #region Routes

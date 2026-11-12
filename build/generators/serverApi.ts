@@ -50,16 +50,14 @@ export const serverApiGenerator: Generator = {
 				return undefined;
 			}
 		});
-		// Keep the full schema tree: annotation names can also be legitimate DTO property names.
-		const runtime = document;
 		const outputs = new Map([
 			[types, header + astToString(generated)],
 			[
 				contract,
 				header +
-					"import type { ApiDocument } from './apiContract.js';\nexport const serverContract = " +
-					JSON.stringify(runtime) +
-					' as unknown as ApiDocument;\n'
+					"import type { ApiRuntimeContract } from './serverContract.js';\nexport const serverContract = " +
+					JSON.stringify(runtimeContract(document)) +
+					' as unknown as ApiRuntimeContract;\n'
 			],
 			[
 				inventory,
@@ -121,4 +119,164 @@ export function refineSecurityPolicyTypes(document: OpenAPI3): OpenAPI3 {
 		return matches[0];
 	});
 	return copy;
+}
+
+const operationMethods = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'];
+/** The base URI every runtime schema reference is resolved against. */
+const schemaBase = 'urn:proctor:api';
+/** Prose a validator never reads. Removed only at schema-keyword positions, never from `properties`. */
+const schemaAnnotations = new Set(['description', 'title', 'example', 'examples', '$comment']);
+const schemaMaps = ['properties', 'patternProperties', '$defs', 'dependentSchemas'];
+const schemaLists = ['allOf', 'anyOf', 'oneOf', 'prefixItems'];
+const schemaValues = [
+	'items',
+	'additionalProperties',
+	'not',
+	'if',
+	'then',
+	'else',
+	'contains',
+	'propertyNames',
+	'unevaluatedItems',
+	'unevaluatedProperties',
+	'contentSchema'
+];
+
+type JsonObject = Record<string, unknown>;
+const isObject = (value: unknown): value is JsonObject =>
+	typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/**
+ * The part of the server contract Desktop executes: each operation's route, authentication,
+ * idempotency, parameters, request media and success responses, plus the named schemas they
+ * reference. Parameter, body and response references are resolved here, prose is removed, and
+ * every schema reference names {@link schemaBase} so it can be compiled without rewriting.
+ */
+export function runtimeContract(document: OpenAPI3): JsonObject {
+	const components = (document.components ?? {}) as Record<string, Record<string, unknown>>;
+	const component = <T>(value: T): T => {
+		if (!isObject(value) || typeof value.$ref !== 'string') return value;
+		const match = /^#\/components\/(parameters|requestBodies|responses)\/([^/]+)$/u.exec(
+			value.$ref
+		);
+		const resolved = match ? components[match[1]!]?.[match[2]!] : undefined;
+		if (!resolved) throw new Error(`Unsupported server API reference ${value.$ref}`);
+		return component(resolved as T);
+	};
+	const schema = (value: unknown): unknown => {
+		if (!isObject(value)) return value;
+		const result: JsonObject = {};
+		for (const [key, entry] of Object.entries(value)) {
+			if (schemaAnnotations.has(key)) continue;
+			if (key === '$ref') {
+				if (typeof entry !== 'string' || !entry.startsWith('#/components/schemas/'))
+					throw new Error(`Unsupported schema reference ${String(entry)}`);
+				result.$ref = schemaBase + entry;
+			} else if (schemaMaps.includes(key) && isObject(entry))
+				result[key] = Object.fromEntries(
+					Object.entries(entry).map(([name, item]) => [name, schema(item)])
+				);
+			else if (schemaLists.includes(key) && Array.isArray(entry))
+				result[key] = entry.map(schema);
+			else if (schemaValues.includes(key)) result[key] = schema(entry);
+			else result[key] = entry;
+		}
+		return result;
+	};
+	const media = (content: unknown): JsonObject | undefined => {
+		if (!isObject(content)) return undefined;
+		return Object.fromEntries(
+			Object.entries(content).map(([type, value]) => {
+				const entry = value as JsonObject;
+				return [
+					type,
+					{
+						...(entry.schema === undefined ? {} : { schema: schema(entry.schema) }),
+						...(isObject(entry.encoding)
+							? {
+									encoding: Object.fromEntries(
+										Object.entries(entry.encoding).map(([field, encoding]) => [
+											field,
+											isObject(encoding) &&
+											typeof encoding.contentType === 'string'
+												? { contentType: encoding.contentType }
+												: {}
+										])
+									)
+								}
+							: {})
+					}
+				];
+			})
+		);
+	};
+	const operations: Record<string, JsonObject> = {};
+	for (const [path, item] of Object.entries(document.paths ?? {})) {
+		const shared = ((item as JsonObject).parameters ?? []) as unknown[];
+		for (const [method, raw] of Object.entries(item as JsonObject)) {
+			if (!operationMethods.includes(method)) continue;
+			const operation = raw as JsonObject;
+			const parameters = new Map<string, JsonObject>();
+			for (const parameter of [...shared, ...((operation.parameters ?? []) as unknown[])]) {
+				const resolved = component(parameter) as JsonObject;
+				if (resolved.in === 'cookie') continue; // Desktop never authenticates with cookies.
+				if (!['path', 'query', 'header'].includes(String(resolved.in)))
+					throw new Error(`Unsupported parameter location ${String(resolved.in)}`);
+				parameters.set(`${String(resolved.in)}:${String(resolved.name)}`, {
+					name: resolved.name,
+					in: resolved.in,
+					required: resolved.required === true,
+					schema: schema(resolved.schema),
+					...(resolved.style === undefined ? {} : { style: resolved.style }),
+					...(resolved.explode === undefined ? {} : { explode: resolved.explode })
+				});
+			}
+			const body =
+				operation.requestBody === undefined
+					? undefined
+					: (component(operation.requestBody) as JsonObject);
+			const responses = Object.entries(operation.responses as JsonObject).map(
+				([status, response]) => [status, component(response) as JsonObject] as const
+			);
+			operations[String(operation.operationId)] = {
+				method: method.toUpperCase(),
+				path,
+				auth: operation['x-proctor-auth'],
+				idempotency: operation['x-proctor-idempotency'],
+				parameters: [...parameters.values()],
+				...(body
+					? {
+							requestBody: {
+								required: body.required === true,
+								content: media(body.content)
+							}
+						}
+					: {}),
+				// Failures are always Problem Details; only success bodies need their own schema.
+				responses: Object.fromEntries(
+					responses
+						.filter(([status]) => Number(status) < 400)
+						.map(([status, response]) => [
+							status,
+							response.content === undefined
+								? {}
+								: { content: media(response.content) }
+						])
+				),
+				accept: [
+					...new Set(
+						responses.flatMap(([, response]) =>
+							isObject(response.content) ? Object.keys(response.content) : []
+						)
+					)
+				]
+			};
+		}
+	}
+	return {
+		operations,
+		schemas: Object.fromEntries(
+			Object.entries(components.schemas ?? {}).map(([name, value]) => [name, schema(value)])
+		)
+	};
 }

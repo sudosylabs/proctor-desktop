@@ -1,6 +1,6 @@
 import type { ApiInput, ApiOperationId } from '../common/serverApi.js';
 import { ServerApiError } from '../common/serverApi.js';
-import { apiOperations, resolveContract } from './apiContract.js';
+import { operationContracts, resolveSchema } from './serverContract.js';
 import type { ApiRequestInput } from './apiRequest.js';
 
 /** Transitional domain adapters resolve only packaged routes; no arbitrary endpoint is admitted. */
@@ -14,7 +14,7 @@ export function resolveApiRoute(
 ): { id: ApiOperationId; input: ApiInput<ApiOperationId> } {
 	const url = new URL(path, origin);
 	if (url.origin !== origin || url.hash) throw new ServerApiError('invalidRequest');
-	for (const operation of apiOperations.values()) {
+	for (const operation of operationContracts()) {
 		if (operation.method !== method) continue;
 		const template = operation.path.split('/');
 		const actual = url.pathname.split('/');
@@ -32,14 +32,11 @@ export function resolveApiRoute(
 		if (!matched) continue;
 		const query: Record<string, unknown> = {};
 		for (const [name, value] of url.searchParams) {
-			const param = operation.parameters
-				?.map(resolveContract)
-				.find((p) => p.in === 'query' && p.name === name);
-			const schema = param && resolveContract(param.schema);
+			const param = operation.parameters.find((p) => p.in === 'query' && p.name === name);
+			const schema = param && resolveSchema(param.schema);
 			// A repeated parameter keeps every value it was given, in order.
 			if (schema?.type === 'array') {
-				const items =
-					schema.items === undefined ? undefined : resolveContract(schema.items);
+				const items = schema.items === undefined ? undefined : resolveSchema(schema.items);
 				const previous = query[name];
 				query[name] = [...(Array.isArray(previous) ? previous : []), scalar(items, value)];
 			} else query[name] = scalar(schema, value);
@@ -51,7 +48,7 @@ export function resolveApiRoute(
 			...(body === undefined ? {} : { body }),
 			...(mediaType ? { mediaType } : {})
 		};
-		return { id: operation.operationId, input: input as ApiInput<ApiOperationId> };
+		return { id: operation.id, input: input as ApiInput<ApiOperationId> };
 	}
 	throw new ServerApiError('invalidRequest');
 }

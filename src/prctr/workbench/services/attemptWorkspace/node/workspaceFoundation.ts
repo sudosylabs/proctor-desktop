@@ -4,7 +4,7 @@ import type { Event } from '../../../../base/common/event.js';
 import type { ProtectedRecordStore } from '../../../../platform/protectedStorage/node/protectedRecordStore.js';
 import type { ServerApiClient } from '../../../../platform/serverApi/node/serverApiClient.js';
 import type { components } from '../../../../platform/serverApi/common/serverApi.generated.js';
-import { validateApiValue } from '../../../../platform/serverApi/node/apiContract.js';
+import { validateNamedSchema } from '../../../../platform/serverApi/node/serverContract.js';
 import type { WorkspaceAccess, WorkspaceEntryReference } from '../common/attemptWorkspace.js';
 import { createAttemptWorkspaceSession } from '../common/attemptWorkspaceSession.js';
 import { createExamResourceCatalog } from '../common/examResourceCatalog.js';
@@ -35,10 +35,7 @@ const denied: WorkspaceAccess = Object.freeze({
 });
 /** A privileged reusable foundation. Its caller owns admission, API credentials and storage lifetime. */
 export async function createWorkspaceFoundation(options: WorkspaceFoundationOptions) {
-	validateApiValue(
-		{ $ref: '#/components/schemas/CandidateExamPresentationResponse' },
-		options.presentation
-	);
+	validateNamedSchema('CandidateExamPresentationResponse', options.presentation);
 	const lifetime = new DisposableStore();
 	const initial = { ...options.current() };
 	const sameBinding = () => {

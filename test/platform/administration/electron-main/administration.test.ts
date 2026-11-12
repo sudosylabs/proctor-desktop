@@ -25,7 +25,7 @@ import {
 	ServerApiError,
 	type ApiOperationId
 } from '../../../../src/prctr/platform/serverApi/common/serverApi.js';
-import { apiOperations } from '../../../../src/prctr/platform/serverApi/node/apiContract.js';
+import { operationContract } from '../../../../src/prctr/platform/serverApi/node/serverContract.js';
 import type { PreparedApiRequest } from '../../../../src/prctr/platform/serverApi/node/apiRequest.js';
 import { ServerApiClient } from '../../../../src/prctr/platform/serverApi/node/serverApiClient.js';
 import type { HttpResponse } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
@@ -243,9 +243,8 @@ void test('only allow-listed operations can be sent, and every route is on the l
 		assert.ok(administrationOperations.has(operation), `${kind} → ${operation}`);
 	}
 	for (const operation of administrationOperations) {
-		const declared = apiOperations.get(operation);
-		assert.ok(declared, operation);
-		assert.notEqual(declared['x-proctor-auth'], 'public', operation);
+		const declared = operationContract(operation);
+		assert.notEqual(declared.auth, 'public', operation);
 		assert.ok(!declared.path.startsWith('/api/v1/users/me'), operation);
 	}
 });

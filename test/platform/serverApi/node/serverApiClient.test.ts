@@ -3,10 +3,12 @@ import { test } from 'node:test';
 import { createServer } from 'node:http';
 import { WebSocketServer } from 'ws';
 import {
-	apiOperations,
-	resolveContract,
-	validateApiValue
-} from '../../../../src/prctr/platform/serverApi/node/apiContract.js';
+	operationContract,
+	operationContracts,
+	resolveSchema,
+	validateNamedSchema,
+	validateSchema
+} from '../../../../src/prctr/platform/serverApi/node/serverContract.js';
 import {
 	prepareApiRequest,
 	readApiResponse
@@ -33,45 +35,39 @@ const json = (value: unknown, status = 200, headers = {}): HttpResponse => ({
 const tick = () => new Promise<void>((resolve) => setImmediate(resolve));
 
 void test('every packaged operation has executable request/response schemas, including conditional and non-JSON routes', () => {
-	assert.equal(apiOperations.size, 301);
-	assert.equal(new Set([...apiOperations.values()].map((operation) => operation.path)).size, 247);
-	for (const operation of apiOperations.values()) {
-		for (const parameter of operation.parameters ?? []) {
-			try {
-				validateApiValue(resolveContract(parameter).schema, undefined);
-			} catch (error) {
-				assert.ok(
-					error instanceof ServerApiError,
-					`${operation.operationId}: ${String(error)}`
-				);
-			}
+	const operations = [...operationContracts()];
+	assert.equal(operations.length, 301);
+	assert.equal(new Set(operations.map((operation) => operation.path)).size, 247);
+	const compiles = (operation: string, run: () => void) => {
+		try {
+			run();
+		} catch (error) {
+			assert.ok(error instanceof ServerApiError, `${operation}: ${String(error)}`);
 		}
-		for (const media of Object.values(
-			resolveContract(operation.requestBody ?? {}).content ?? {}
-		)) {
+	};
+	for (const operation of operations) {
+		for (const parameter of operation.parameters)
+			compiles(operation.id, () => validateSchema(parameter.schema, undefined));
+		for (const media of Object.values(operation.requestBody?.content ?? {}))
 			if (media.schema)
-				try {
-					validateApiValue(media.schema, undefined);
-				} catch (error) {
-					assert.ok(
-						error instanceof ServerApiError,
-						`${operation.operationId}: ${String(error)}`
-					);
-				}
-		}
+				compiles(operation.id, () => validateSchema(media.schema!, undefined));
 		for (const response of Object.values(operation.responses))
-			for (const media of Object.values(resolveContract(response).content ?? {})) {
+			for (const media of Object.values(response.content ?? {}))
 				if (media.schema)
-					try {
-						validateApiValue(media.schema, undefined, true);
-					} catch (error) {
-						assert.ok(
-							error instanceof ServerApiError,
-							`${operation.operationId}: ${String(error)}`
-						);
-					}
-			}
+					compiles(operation.id, () =>
+						validateSchema(media.schema!, undefined, 'response')
+					);
 	}
+});
+
+void test('the runtime contract carries no prose and names strict-integer operations', () => {
+	assert.equal(operationContract('appendNativeDelivery').strictIntegers, true);
+	assert.equal(operationContract('getCurrentUserProfile').strictIntegers, false);
+	for (const operation of operationContracts())
+		assert.ok(
+			!('description' in operation) && !('summary' in operation),
+			`${operation.id} keeps prose`
+		);
 });
 
 void test('operation inputs reject unknown routes/parameters, traversal and renderer-supplied authentication', () => {
@@ -95,14 +91,12 @@ void test('operation inputs reject unknown routes/parameters, traversal and rend
 });
 
 void test('multipart content keeps bytes and metadata encoding separate', async () => {
-	const operation = apiOperations.get('createCandidateExamWorkspaceFile')!;
-	const schema = resolveContract(
-		resolveContract(operation.requestBody!).content!['multipart/form-data'].schema!
-	);
+	const operation = operationContract('createCandidateExamWorkspaceFile');
+	const schema = resolveSchema(operation.requestBody!.content['multipart/form-data'].schema!);
 	assert.ok(schema.properties?.content);
 	// Invalid metadata is rejected before any network request.
 	assert.throws(() =>
-		prepareApiRequest(origin, operation.operationId, {
+		prepareApiRequest(origin, operation.id, {
 			path: { exam_attempt_id: id },
 			body: { content: new Uint8Array([0, 255]), metadata: {} }
 		})
@@ -172,7 +166,7 @@ void test('multipart content keeps bytes and metadata encoding separate', async 
 });
 
 void test('errors preserve problem fields and Retry-After while malformed responses fail validation', () => {
-	const operation = apiOperations.get('getCurrentUserProfile')!;
+	const operation = operationContract('getCurrentUserProfile');
 	const problem = {
 		type: 'about:blank',
 		title: 'Invalid',
@@ -196,7 +190,7 @@ void test('errors preserve problem fields and Retry-After while malformed respon
 });
 
 void test('binary and 304 responses preserve their transport meaning', () => {
-	const operation = apiOperations.get('getUserProfilePicture')!;
+	const operation = operationContract('getUserProfilePicture');
 	const bytes = new Uint8Array([0, 255, 10]);
 	assert.deepEqual(
 		readApiResponse(operation, {
@@ -441,24 +435,18 @@ void test('Node polling pauses when hidden and stops with its observation', asyn
 });
 
 void test('runtime schemas retain DTO properties named like schema annotations', () => {
-	validateApiValue(
-		{ $ref: '#/components/schemas/CreatePersonalAccessTokenRequest' },
-		{
-			description: 'Automation',
-			expires_at: new Date(Date.now() + 60000).toISOString(),
-			scopes: ['exam.view']
-		}
-	);
+	validateNamedSchema('CreatePersonalAccessTokenRequest', {
+		description: 'Automation',
+		expires_at: new Date(Date.now() + 60000).toISOString(),
+		scopes: ['exam.view']
+	});
 	assert.throws(
 		() =>
-			validateApiValue(
-				{ $ref: '#/components/schemas/CreatePersonalAccessTokenRequest' },
-				{
-					description: 5,
-					expires_at: new Date(Date.now() + 60000).toISOString(),
-					scopes: ['exam.view']
-				}
-			),
+			validateNamedSchema('CreatePersonalAccessTokenRequest', {
+				description: 5,
+				expires_at: new Date(Date.now() + 60000).toISOString(),
+				scopes: ['exam.view']
+			}),
 		ServerApiError
 	);
 });
@@ -481,7 +469,7 @@ void test('privileged executor failures expose only normalized API errors', asyn
 });
 
 void test('gateway failures retain HTTP status and backoff without exposing HTML or inconsistent problem details', () => {
-	const operation = apiOperations.get('getCurrentUserProfile')!;
+	const operation = operationContract('getCurrentUserProfile');
 	for (const response of [
 		{
 			status: 503,

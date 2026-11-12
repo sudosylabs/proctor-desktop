@@ -848,9 +848,8 @@ export class DesktopAuthorizationService extends Disposable {
 			if (request.signal?.aborted) throw new ServerApiError('cancelled');
 		};
 		current();
-		if (request.operation['x-proctor-auth'] === 'public')
-			return this.options.http.transport.send(request);
-		if (request.operation['x-proctor-auth'] === 'refresh_credential_required')
+		if (request.operation.auth === 'public') return this.options.http.transport.send(request);
+		if (request.operation.auth === 'refresh_credential_required')
 			throw new ServerApiError('invalidRequest');
 		if (this.#refresh || session.tokens.accessExpiresAt <= Date.now() + 5000)
 			await this.refresh();

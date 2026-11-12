@@ -4,10 +4,11 @@
 
 import type { components } from '../../../../platform/serverApi/common/serverApi.generated.js';
 import {
-	resolveContract,
-	validateApiValue,
-	type ApiSchema
-} from '../../../../platform/serverApi/node/apiContract.js';
+	namedSchema,
+	resolveSchema,
+	validateNamedSchema,
+	validateSchema
+} from '../../../../platform/serverApi/node/serverContract.js';
 import {
 	canonicalContractDigest,
 	parseStrictContractJson
@@ -65,16 +66,15 @@ export function decodeServerSecurityPolicy(
 		maxBytes: 128 * 1024,
 		integerNumbersOnly: true
 	});
-	validateApiValue({ $ref: '#/components/schemas/SecurityPolicyResponse' }, value);
+	validateNamedSchema('SecurityPolicyResponse', value);
 	const wire = value as ResponseWire;
 	// The server's current prefixItems constrain order only. Apply the full
 	// family schema too; JSON Schema items does not intersect prefixItems.
-	const capabilitySchema = resolveContract<ApiSchema>({
-		$ref: '#/components/schemas/EffectiveExamSecurityPolicy'
-	}).properties?.capabilities?.items;
+	const capabilitySchema = resolveSchema(namedSchema('EffectiveExamSecurityPolicy')).properties
+		?.capabilities?.items;
 	if (capabilitySchema === undefined)
 		throw new TypeError('Packaged native policy schema is unavailable');
-	for (const family of wire.policy.capabilities) validateApiValue(capabilitySchema, family);
+	for (const family of wire.policy.capabilities) validateSchema(capabilitySchema, family);
 	const { digest, ...unsigned } = wire.policy;
 	if (canonicalContractDigest(unsigned, 64 * 1024) !== digest) invalid('policy digest');
 	const { scope: _scope, issued_at: _issued, active_from: _active, ...content } = unsigned;

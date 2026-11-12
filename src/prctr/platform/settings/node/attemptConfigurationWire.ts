@@ -1,4 +1,4 @@
-import { validateApiValue } from '../../serverApi/node/apiContract.js';
+import { validateNamedSchema } from '../../serverApi/node/serverContract.js';
 import {
 	canonicalContractDigest,
 	parseStrictContractJson
@@ -36,7 +36,7 @@ export function encodeAttemptConfiguration(
 		approved_commands: candidate.approvedCommands,
 		approved_keybindings: candidate.approvedKeybindings
 	};
-	validateApiValue({ $ref: '#/components/schemas/AttemptConfigurationCandidate' }, value);
+	validateNamedSchema('AttemptConfigurationCandidate', value);
 	canonicalContractDigest(value, 16384);
 	// Also validate the packaged command catalog and presentation without requiring server output.
 	validateFrozenAttemptConfiguration({
@@ -48,7 +48,7 @@ export function encodeAttemptConfiguration(
 }
 export function decodeFrozenAttemptConfiguration(bytes: Uint8Array): FrozenAttemptConfiguration {
 	const value = parseStrictContractJson(bytes, { maxBytes: 16384, integerNumbersOnly: true });
-	validateApiValue({ $ref: '#/components/schemas/FrozenAttemptConfiguration' }, value);
+	validateNamedSchema('FrozenAttemptConfiguration', value);
 	const wire = value as FrozenWire;
 	const { attempt_configuration_revision: revision, digest, ...candidate } = wire;
 	if (canonicalContractDigest(candidate, 16384) !== digest)

@@ -1,10 +1,11 @@
 import { ServerApiError, type ApiOperationId, type ApiProblem } from '../common/serverApi.js';
 import {
-	apiOperations,
-	resolveContract,
-	validateApiValue,
-	type ApiOperation
-} from './apiContract.js';
+	operationContract,
+	resolveSchema,
+	validateNamedSchema,
+	validateSchema,
+	type ApiOperationContract
+} from './serverContract.js';
 import { decodeJson, type HttpRequest, type HttpResponse } from './serverHttpTransport.js';
 
 export interface ApiRequestInput {
@@ -16,7 +17,7 @@ export interface ApiRequestInput {
 	readonly mediaType?: string;
 }
 export interface PreparedApiRequest extends HttpRequest {
-	readonly operation: ApiOperation;
+	readonly operation: ApiOperationContract;
 }
 
 export function prepareApiRequest(
@@ -24,18 +25,13 @@ export function prepareApiRequest(
 	id: ApiOperationId,
 	input: ApiRequestInput = {}
 ): PreparedApiRequest {
-	const operation = apiOperations.get(id);
-	if (!operation) throw new ServerApiError('invalidRequest');
+	const operation = operationContract(id);
 	let path = operation.path;
 	const query = new URLSearchParams();
 	const headers: Record<string, string> = {};
 	const known = { path: new Set<string>(), query: new Set<string>(), header: new Set<string>() };
-	for (const raw of operation.parameters ?? []) {
-		const parameter = resolveContract(raw);
-		if (parameter.in === 'cookie') continue; // Desktop never uses cookie authentication.
-		if (!['path', 'query', 'header'].includes(parameter.in))
-			throw new ServerApiError('invalidRequest');
-		const location = parameter.in as keyof typeof known;
+	for (const parameter of operation.parameters) {
+		const location = parameter.in;
 		known[location].add(parameter.name);
 		const value = input[location]?.[parameter.name];
 		// Credentials/proofs are supplied only by the privileged authentication owner.
@@ -50,7 +46,7 @@ export function prepareApiRequest(
 			if (parameter.required) throw new ServerApiError('invalidRequest');
 			continue;
 		}
-		validateApiValue(parameter.schema, value);
+		validateSchema(parameter.schema, value);
 		if (location === 'path') {
 			if (value === '.' || value === '..') throw new ServerApiError('invalidRequest');
 			path = path.replace(`{${parameter.name}}`, encodeURIComponent(String(value)));
@@ -82,7 +78,7 @@ export function prepareApiRequest(
 	if (url.origin !== origin) throw new ServerApiError('invalidRequest');
 	url.search = query.toString();
 	let body: HttpRequest['body'];
-	const declared = operation.requestBody && resolveContract(operation.requestBody);
+	const declared = operation.requestBody;
 	if (declared?.required && input.body === undefined) throw new ServerApiError('invalidRequest');
 	if (input.body !== undefined) {
 		const content = declared?.content ?? {};
@@ -90,11 +86,11 @@ export function prepareApiRequest(
 		const media = content[mediaType];
 		if (!media) throw new ServerApiError('invalidRequest');
 		if (mediaType === 'application/json') {
-			if (media.schema) validateApiValue(media.schema, input.body);
+			if (media.schema) validateSchema(media.schema, input.body);
 			body = JSON.stringify(input.body);
 			headers['Content-Type'] = mediaType;
 		} else if (mediaType === 'multipart/form-data') {
-			const schema = media.schema && resolveContract(media.schema);
+			const schema = media.schema && resolveSchema(media.schema);
 			if (!schema || !input.body || typeof input.body !== 'object')
 				throw new ServerApiError('invalidRequest');
 			const values = input.body as Record<string, unknown>;
@@ -105,7 +101,7 @@ export function prepareApiRequest(
 			)) {
 				const field = schema.properties?.[key];
 				if (!field) throw new ServerApiError('invalidRequest');
-				const resolved = resolveContract(field);
+				const resolved = resolveSchema(field);
 				const mediaType =
 					media.encoding?.[key]?.contentType ??
 					(resolved.type === 'object' || resolved.type === 'array'
@@ -119,7 +115,7 @@ export function prepareApiRequest(
 					form.append(key, new Blob([new Uint8Array(value)], { type: mediaType }), key);
 					validation[key] = '';
 				} else {
-					validateApiValue(field, value);
+					validateSchema(field, value);
 					validation[key] = value;
 					if (mediaType === 'application/json') {
 						const json = JSON.stringify(value);
@@ -129,10 +125,10 @@ export function prepareApiRequest(
 					} else form.append(key, String(value));
 				}
 			}
-			validateApiValue(schema, validation);
+			validateSchema(schema, validation);
 			body = form;
 		} else {
-			const schema = media.schema && resolveContract(media.schema);
+			const schema = media.schema && resolveSchema(media.schema);
 			if (schema?.format === 'binary') {
 				if (!(input.body instanceof Uint8Array)) throw new ServerApiError('invalidRequest');
 				const maximum =
@@ -145,28 +141,19 @@ export function prepareApiRequest(
 				body = new Uint8Array(input.body);
 			} else {
 				if (typeof input.body !== 'string') throw new ServerApiError('invalidRequest');
-				if (schema) validateApiValue(schema, input.body);
+				if (schema) validateSchema(schema, input.body);
 				body = input.body;
 			}
 			headers['Content-Type'] = mediaType;
 		}
 	}
-	headers.Accept =
-		[
-			...new Set(
-				Object.values(operation.responses).flatMap((response) =>
-					Object.keys(resolveContract(response).content ?? {})
-				)
-			)
-		].join(', ') || 'application/json';
+	headers.Accept = operation.accept.join(', ') || 'application/json';
 	return {
 		operation,
 		url: url.href,
 		method: operation.method,
-		maxResponseBytes: Object.values(operation.responses).some((response) =>
-			Object.keys(resolveContract(response).content ?? {}).some((type) =>
-				['*/*', 'application/zip', 'text/csv'].includes(type)
-			)
+		maxResponseBytes: operation.accept.some((type) =>
+			['*/*', 'application/zip', 'text/csv'].includes(type)
 		)
 			? 100 * 1024 * 1024
 			: 2 * 1024 * 1024,
@@ -176,14 +163,14 @@ export function prepareApiRequest(
 }
 
 export function readApiResponse(
-	operation: ApiOperation,
+	operation: ApiOperationContract,
 	response: HttpResponse
 ): { status: number; value: unknown; headers: Readonly<Record<string, string>> } {
 	if (response.status >= 400) {
 		let problem: ApiProblem | undefined;
 		try {
 			const candidate = decodeJson(response);
-			validateApiValue({ $ref: '#/components/schemas/ProblemDetails' }, candidate, true);
+			validateNamedSchema('ProblemDetails', candidate, 'response');
 			if ((candidate as ApiProblem).status === response.status)
 				problem = candidate as ApiProblem;
 		} catch {
@@ -202,9 +189,9 @@ export function readApiResponse(
 			Number.isFinite(retryAfterMs) ? retryAfterMs : undefined
 		);
 	}
-	const declared = operation.responses[String(response.status)] ?? operation.responses.default;
+	const declared = operation.responses[String(response.status)];
 	if (!declared) throw new ServerApiError('invalidResponse');
-	const content = resolveContract(declared).content;
+	const content = declared.content;
 	let value: unknown;
 	if (content) {
 		const mediaType = (response.headers['content-type'] ?? '')
@@ -214,13 +201,8 @@ export function readApiResponse(
 		const media = content[mediaType] ?? content['*/*'];
 		if (!media || !mediaType) throw new ServerApiError('invalidResponse');
 		if (mediaType === 'application/json' && !content['*/*']) {
-			value = decodeJson(
-				response,
-				/(?:security-preflights|security-policy|security-batches|security-streams|browser-sources|browser-activity|delivery-limits)/u.test(
-					operation.path
-				)
-			);
-			if (media.schema) validateApiValue(media.schema, value, true);
+			value = decodeJson(response, operation.strictIntegers);
+			if (media.schema) validateSchema(media.schema, value, 'response');
 		} else value = response.bytes;
 	} else if (response.bytes.byteLength) throw new ServerApiError('invalidResponse');
 	return { status: response.status, value, headers: response.headers };

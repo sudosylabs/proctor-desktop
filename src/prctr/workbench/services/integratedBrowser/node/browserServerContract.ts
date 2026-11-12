@@ -7,7 +7,7 @@ import {
 	canonicalContractDigest
 } from '../../../../platform/serverApi/node/canonicalContract.js';
 import type { components } from '../../../../platform/serverApi/common/serverApi.generated.js';
-import { validateApiValue } from '../../../../platform/serverApi/node/apiContract.js';
+import { validateNamedSchema } from '../../../../platform/serverApi/node/serverContract.js';
 import {
 	validateBrowserPolicy,
 	type BrowserPolicy
@@ -40,7 +40,7 @@ export function readBrowserSchema<K extends keyof components['schemas']>(
 	name: K,
 	value: unknown
 ): components['schemas'][K] {
-	validateApiValue({ $ref: `#/components/schemas/${name}` }, value, true);
+	validateNamedSchema(name, value, 'response');
 	return value as components['schemas'][K];
 }
 
