@@ -106,12 +106,34 @@
 	.prctr-page-dialog .prctr-account-token-form__row > [hidden] {
 		display: none;
 	}
+	/* Drawn here so its border is the field colour; forced colours get the native box back. */
 	.prctr-page-dialog .prctr-account-token-form__checkbox {
-		accent-color: var(--prctr-color-brand-accent);
+		appearance: none;
+		background: var(--prctr-color-background-card);
 		block-size: 18px;
+		border-radius: 4px;
+		box-shadow: inset 0 0 0 1px var(--prctr-color-border-field);
+		display: grid;
 		flex: none;
 		inline-size: 18px;
 		margin: 0;
+		place-content: center;
+	}
+	.prctr-page-dialog .prctr-account-token-form__checkbox::before {
+		background: var(--prctr-color-brand-onAccent);
+		block-size: 12px;
+		content: '';
+		inline-size: 12px;
+		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3.2 3L13 4.5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+			center / contain no-repeat;
+		visibility: hidden;
+	}
+	.prctr-page-dialog .prctr-account-token-form__checkbox:checked {
+		background: var(--prctr-color-brand-accent);
+		box-shadow: none;
+	}
+	.prctr-page-dialog .prctr-account-token-form__checkbox:checked::before {
+		visibility: visible;
 	}
 	.prctr-page-dialog .prctr-account-token-form__checkbox:focus-visible {
 		outline: var(--prctr-shape-stroke-strong) solid var(--prctr-color-border-focus);
@@ -155,6 +177,12 @@
 	}
 
 	@media (forced-colors: active) {
+		.prctr-page-dialog .prctr-account-token-form__checkbox {
+			appearance: auto;
+		}
+		.prctr-page-dialog .prctr-account-token-form__checkbox::before {
+			content: none;
+		}
 		.prctr-page-dialog .prctr-account-token-credential {
 			border: var(--prctr-shape-stroke-default) solid CanvasText;
 		}
