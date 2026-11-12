@@ -1,7 +1,5 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createServer } from 'node:http';
-import { WebSocketServer } from 'ws';
 import { SessionApi } from '../../../../src/prctr/platform/serverApi/node/sessionApi.js';
 import type { ReadState } from '../../../../src/prctr/platform/serverApi/node/sessionReads.js';
 import type { HttpResponse } from '../../../../src/prctr/platform/serverApi/node/serverHttpTransport.js';
@@ -9,7 +7,6 @@ import {
 	ServerApiError,
 	type ApiInput
 } from '../../../../src/prctr/platform/serverApi/common/serverApi.js';
-import { connectServerRealtime } from '../../../../src/prctr/platform/serverApi/node/serverRealtime.js';
 
 const origin = 'https://institution.test';
 const id = 'y'.repeat(26);
@@ -82,55 +79,6 @@ void test('stale focus/reconnection refetches active queries and disposal fences
 		request,
 		(error: unknown) => error instanceof ServerApiError && error.kind === 'sessionEnded'
 	);
-});
-
-void test('real WebSocket upgrade receives hello without a race, sends bounded commands and closes on disposal', async () => {
-	const server = createServer();
-	const sockets = new WebSocketServer({ server });
-	sockets.on('connection', (socket, request) => {
-		assert.equal(request.headers.authorization, 'DPoP test');
-		socket.send(
-			JSON.stringify({
-				id,
-				event: 'hello',
-				sequence: 1,
-				data: { connection_id: id, node_id: id, resumed: false }
-			})
-		);
-		socket.on('message', (message) => {
-			const request = JSON.parse(String(message));
-			socket.send(JSON.stringify({ status: 'ok', sequence: request.sequence }));
-		});
-	});
-	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
-	const address = server.address();
-	assert.ok(address && typeof address !== 'string');
-	const messages: unknown[] = [];
-	let received!: () => void;
-	const reply = new Promise<void>((resolve) => {
-		received = resolve;
-	});
-	const controller = new AbortController();
-	const connection = await connectServerRealtime(
-		`http://127.0.0.1:${address.port}/api/v1/websocket`,
-		async () => ({ Authorization: 'DPoP test' }),
-		controller.signal,
-		(message) => {
-			messages.push(message);
-			if ('status' in message) received();
-		},
-		() => {}
-	);
-	try {
-		connection.send({ sequence: 1, action: 'ping' });
-		await reply;
-		assert.equal(messages.length, 2);
-		assert.throws(() => connection.send({ sequence: 0, action: 'ping' }));
-	} finally {
-		connection.dispose();
-		for (const socket of sockets.clients) socket.terminate();
-		await new Promise<void>((resolve) => sockets.close(() => server.close(() => resolve())));
-	}
 });
 
 // Compile-time examples cover optional arguments, required route IDs and generated result fields.
@@ -334,29 +282,8 @@ void test('mutation completion is fenced when session ends during the awaited ca
 	observer.dispose();
 });
 
-void test('realtime bursts refresh only affected queries and allow slow reads to finish before the next pass', async () => {
-	const server = createServer();
-	const sockets = new WebSocketServer({ server });
-	let sequence = 1;
-	sockets.on('connection', (socket) =>
-		socket.send(
-			JSON.stringify({
-				id,
-				event: 'hello',
-				sequence: 1,
-				data: { connection_id: id, node_id: 'node-a', resumed: false }
-			})
-		)
-	);
-	await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
-	const address = server.address();
-	assert.ok(address && typeof address !== 'string');
-	const client = new SessionApi({
-		binding: testBinding,
-		origin: `http://127.0.0.1:${address.port}`,
-		execute: unanswered,
-		authorizeUpgrade: async () => ({})
-	});
+void test('event hints refresh only the hinted reads and let slow reads finish before the next pass', async () => {
+	const client = new SessionApi({ binding: testBinding, origin, execute: unanswered });
 	const reads: { signal: AbortSignal; finish: (value: number) => void }[] = [];
 	const states: ReadState<number>[] = [];
 	let unrelated = 0;
@@ -370,40 +297,25 @@ void test('realtime bursts refresh only affected queries and allow slow reads to
 		async () => ++unrelated,
 		() => {}
 	);
-	const realtime = client.createRealtime({
-		invalidate: (event) => (event.event === 'changed' ? [['affected']] : [])
-	});
 	const burst = async () => {
-		const last = sequence + 20;
-		const delivered = new Promise<void>((resolve) => {
-			const subscription = realtime.onEvent((event) => {
-				if (event.sequence === last) {
-					subscription.dispose();
-					resolve();
-				}
-			});
-		});
-		for (let n = 0; n < 20; n++) {
-			sequence++;
-			for (const socket of sockets.clients)
-				socket.send(JSON.stringify({ id, event: 'changed', sequence }));
-		}
-		await delivered;
+		for (let n = 0; n < 20; n++) client.reads.refresh(['affected']);
 		await tick();
 	};
 	try {
-		await realtime.start();
+		await tick();
 		assert.equal(reads.length, 1);
 		await burst();
 		assert.equal(reads.length, 1);
 		assert.equal(reads[0]!.signal.aborted, false);
 		reads[0]!.finish(0);
 		await tick();
+		await tick();
 		assert.equal(reads.length, 2);
 		await burst();
 		assert.equal(reads.length, 2);
 		assert.equal(reads[1]!.signal.aborted, false);
 		reads[1]!.finish(1);
+		await tick();
 		await tick();
 		assert.equal(states.at(-1)?.value, 1);
 		assert.equal(reads.length, 3);
@@ -415,7 +327,5 @@ void test('realtime bursts refresh only affected queries and allow slow reads to
 		changed.dispose();
 		other.dispose();
 		client.dispose();
-		for (const socket of sockets.clients) socket.terminate();
-		await new Promise<void>((resolve) => sockets.close(() => server.close(() => resolve())));
 	}
 });

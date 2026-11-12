@@ -6,9 +6,9 @@ import type { components } from '../../../../platform/serverApi/common/serverApi
 import { ServerApiError } from '../../../../platform/serverApi/common/serverApi.js';
 import type { SessionApi } from '../../../../platform/serverApi/node/sessionApi.js';
 import {
-	RealtimeCommandError,
-	type ServerRealtimeClient
-} from '../../../../platform/serverApi/node/serverRealtimeClient.js';
+	ServerCommandError,
+	type ServerCommandChannel
+} from '../../../../platform/serverApi/common/serverEvents.js';
 import {
 	canonicalBrowserDigest,
 	readBrowserSchema,
@@ -67,7 +67,7 @@ export interface BrowserSourceTransport {
 export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 	constructor(
 		private readonly api: Pick<SessionApi, 'request'>,
-		private readonly realtime: Pick<ServerRealtimeClient, 'request'>,
+		private readonly commands: Pick<ServerCommandChannel, 'send'>,
 		private readonly currentAccess: () => BrowserCurrentAccess | undefined
 	) {}
 	async budget(binding: BrowserSourceBinding) {
@@ -135,22 +135,22 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 	): Promise<BrowserSourceStatus> {
 		const access = this.access(binding, true)!;
 		try {
-			const reply = await this.realtime.request('exam_attempt.browser_activity.start', {
+			const reply = await this.commands.send('exam_attempt.browser_activity.start', {
 				...batchIdentity(binding),
 				continuity_credential: access.continuityCredential,
 				transition
 			});
-			const status = readBrowserSchema('BrowserSourceStatus', reply.data);
+			const status = readBrowserSchema('BrowserSourceStatus', reply);
 			assertBrowserSourceStatus(binding, status);
 			return status;
 		} catch (error) {
 			if (
-				error instanceof RealtimeCommandError &&
-				error.reply?.error?.browser_source_status !== undefined
+				error instanceof ServerCommandError &&
+				error.problem?.browser_source_status !== undefined
 			) {
 				const predecessor = readBrowserSchema(
 					'BrowserSourceStatus',
-					error.reply.error.browser_source_status
+					error.problem.browser_source_status
 				);
 				if (
 					transition.kind === 'initial' ||
@@ -180,11 +180,11 @@ export class ServerBrowserSourceTransport implements BrowserSourceTransport {
 		readBrowserSchema('BrowserActivityBatch', body);
 		const access = this.access(binding);
 		if (access) {
-			const reply = await this.realtime.request('exam_attempt.browser_activity.append', {
+			const reply = await this.commands.send('exam_attempt.browser_activity.append', {
 				...body,
 				continuity_credential: access.continuityCredential
 			});
-			const result = readBrowserSchema('BrowserActivityAcknowledgement', reply.data);
+			const result = readBrowserSchema('BrowserActivityAcknowledgement', reply);
 			if (result.source_session_id !== binding.sourceInstanceId)
 				throw new ServerApiError('invalidResponse');
 			return result;

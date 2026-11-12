@@ -14,13 +14,8 @@ import { encodeRequest, type ApiRequestInput, type EncodedApiRequest } from './r
 import { decodeResponse } from './responseDecoding.js';
 import { SessionReads } from './sessionReads.js';
 import type { HttpResponse } from './serverHttpTransport.js';
-import {
-	ServerRealtimeClient,
-	type RealtimeEvent,
-	type RealtimePolicy
-} from './serverRealtimeClient.js';
-import { connectServerRealtime, type ConnectionAuthorizer } from './serverRealtime.js';
-import type { ReadKey } from './sessionReads.js';
+import { ServerEvents } from './serverEvents.js';
+import { openRealtimeConnection, type UpgradeAuthorizer } from './serverRealtimeConnection.js';
 
 export interface ApiRequestOptions {
 	readonly signal?: AbortSignal;
@@ -33,12 +28,8 @@ export interface SessionApiOptions {
 	readonly origin: string;
 	/** Signs and sends one request. The credential never leaves this function. */
 	readonly execute: (request: EncodedApiRequest) => Promise<HttpResponse>;
-	/** Headers for the authenticated realtime upgrade. */
-	readonly authorizeUpgrade?: ConnectionAuthorizer;
-}
-export interface ApiRealtimePolicy extends RealtimePolicy {
-	/** Domain-owned mapping from an event to the reads it may have changed. */
-	readonly invalidate?: (event: RealtimeEvent) => readonly ReadKey[];
+	/** Headers for the authenticated realtime upgrade; without it the Session has no events. */
+	readonly authorizeUpgrade?: UpgradeAuthorizer;
 }
 const readMethods = new Set(['GET', 'HEAD', 'OPTIONS']);
 
@@ -51,10 +42,10 @@ export class SessionApi extends Disposable {
 	readonly binding: SessionBinding;
 	readonly origin: string;
 	readonly reads: SessionReads;
+	/** Live server events. Lost continuity refreshes every observed read once. */
+	readonly events: ServerEvents;
 	private readonly lifetime = new AbortController();
-	private readonly connections = new Set<ServerRealtimeClient>();
 	private ended = false;
-	private online = true;
 
 	constructor(private readonly options: SessionApiOptions) {
 		super();
@@ -72,10 +63,27 @@ export class SessionApi extends Disposable {
 			toDisposable(() => {
 				this.ended = true;
 				this.lifetime.abort();
-				for (const connection of [...this.connections]) connection.dispose();
 			})
 		);
 		this.reads = this._register(new SessionReads());
+		const authorize = options.authorizeUpgrade;
+		this.events = this._register(
+			new ServerEvents({
+				dial: (checkpoint, sink, signal) => {
+					if (!authorize) return Promise.reject(new ServerApiError('sessionEnded'));
+					const request = encodeRequest(this.origin, 'connectWebSocket', {
+						query: checkpoint
+							? {
+									connection_id: checkpoint.connectionId,
+									sequence_number: checkpoint.sequence
+								}
+							: {}
+					});
+					return openRealtimeConnection(request.url, authorize, sink, signal);
+				}
+			})
+		);
+		this._register(this.events.onDidLoseContinuity(() => this.reads.refresh()));
 	}
 
 	/**
@@ -111,42 +119,11 @@ export class SessionApi extends Disposable {
 		return decoded;
 	}
 
-	createRealtime(options: ApiRealtimePolicy = {}): ServerRealtimeClient {
-		const { invalidate: affected, ...policy } = options;
-		this.assertCurrent();
-		const authorize = this.options.authorizeUpgrade;
-		if (!authorize || this.connections.size >= 4) throw new ServerApiError('invalidRequest');
-		const client = new ServerRealtimeClient((checkpoint, signal, message, closed) => {
-			const request = encodeRequest(this.origin, 'connectWebSocket', {
-				query: checkpoint
-					? {
-							connection_id: checkpoint.connectionId,
-							sequence_number: checkpoint.sequence
-						}
-					: {}
-			});
-			return connectServerRealtime(request.url, authorize, signal, message, closed);
-		}, policy);
-		this.connections.add(client);
-		client.onEvent((event) => {
-			for (const prefix of affected?.(event) ?? []) this.reads.refresh(prefix);
-		});
-		let needsResync = false;
-		client.onState((state) => {
-			if (state.needsResync && !needsResync) this.reads.refresh();
-			needsResync = state.needsResync;
-			if (state.error?.kind === 'sessionEnded') this.connections.delete(client);
-		});
-		client.setOnline(this.online);
-		return client;
-	}
-
 	setFocused(value: boolean): void {
 		this.reads.setFocused(value);
 	}
 	setOnline(value: boolean): void {
-		this.online = value;
-		for (const connection of this.connections) connection.setOnline(value);
+		this.events.setOnline(value);
 		this.reads.setOnline(value);
 	}
 
