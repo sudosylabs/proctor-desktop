@@ -702,3 +702,50 @@ void test('history queries use the server filter names and parse a minimized pag
 	assert.throws(() => readAccountHistory({ items: [{ ...entry, actor: { kind: 'person' } }] }));
 	assert.throws(() => readAccountHistory({ items: [entry, entry] }));
 });
+
+void test('Sessions and registered desktops refresh on the server event that covers both', async () => {
+	const { AccountService } =
+		await import('../../../../src/prctr/platform/account/electron-main/accountService.js');
+	const subscriptions: string[] = [];
+	const polls: number[] = [];
+	const refreshed: unknown[] = [];
+	const api = {
+		reads: {
+			observe: (
+				_k: unknown,
+				_r: unknown,
+				_l: unknown,
+				options: { pollIntervalMs: number }
+			) => {
+				polls.push(options.pollIntervalMs);
+				return { dispose() {} };
+			},
+			refresh: (key: unknown) => void refreshed.push(key)
+		},
+		events: {
+			on: (name: string, _scope: undefined, listener: () => void) => {
+				subscriptions.push(name);
+				listener();
+				return { accepted: Promise.resolve(true), dispose() {} };
+			}
+		}
+	};
+	const service = new AccountService({
+		apiForSession: () => api as never,
+		currentRegistration: () => id,
+		signOut: async () => {},
+		endRevokedDesktop: async () => {},
+		reauthenticate: async () => 'success',
+		cancelReauthentication: () => {}
+	} as never);
+	const binding = { principalId: id, sessionId: id };
+	for (const section of ['sessions', 'desktops', 'profile', 'security'] as const)
+		service.observeAccount(binding, { kind: 'read', section }, () => {}).dispose();
+	assert.deepEqual(subscriptions, [
+		'current_user.sessions.changed',
+		'current_user.sessions.changed',
+		'user_profile_picture_changed'
+	]);
+	assert.deepEqual(polls, [300_000, 300_000, 300_000, 60_000]);
+	assert.equal(refreshed.length, 3);
+});

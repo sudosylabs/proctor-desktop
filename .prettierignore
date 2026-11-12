@@ -14,6 +14,7 @@ artifacts/
 package-lock.json
 native/Cargo.lock
 resources/server-api/openapi.json
+resources/server-api/asyncapi.json
 /.prettierignore
 /build/generators/localizationCatalog.ts
 /native/crates/native-protocol/src/candidate_window.generated.rs
@@ -792,7 +793,9 @@ resources/server-api/openapi.json
 /src/prctr/platform/remote/common/remoteSocketFactoryService.ts
 /src/prctr/platform/request/common/request.ts
 /src/prctr/platform/serverApi/common/serverApi.generated.ts
+/src/prctr/platform/serverApi/common/serverEvents.generated.ts
 /src/prctr/platform/serverApi/node/serverContract.generated.ts
+/src/prctr/platform/serverApi/node/serverRealtimeContract.generated.ts
 /src/prctr/platform/sign/common/sign.ts
 /src/prctr/platform/storage/common/storage.ts
 /src/prctr/platform/telemetry/common/commonProperties.ts

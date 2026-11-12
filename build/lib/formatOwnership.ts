@@ -39,6 +39,7 @@ export function formattingIgnore(
 		'native/Cargo.lock',
 		// Preserve the imported contract byte-for-byte against its source digest.
 		'resources/server-api/openapi.json',
+		'resources/server-api/asyncapi.json',
 		...paths.map((path) => `/${path}`),
 		''
 	].join('\n');

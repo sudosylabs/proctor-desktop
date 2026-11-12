@@ -382,7 +382,13 @@ void test('a server event refreshes the read it names; a fresh reconnect refresh
 				JSON.stringify({
 					event: 'user_profile_picture_changed',
 					sequence: 2,
-					data: { revision: 2 }
+					user_id: 'ybndrfg8ejkmcpqxot1uwisza3',
+					resource: { type: '', id: '' },
+					data: {
+						active_file_entry_id: 'ybndrfg8ejkmcpqxot1uwisza3',
+						revision: 2,
+						changed_at: '2026-11-12T09:30:00Z'
+					}
 				})
 			);
 		await until(() => photos === 2);

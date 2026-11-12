@@ -14,6 +14,7 @@ import type { components } from '../../serverApi/common/serverApi.generated.js';
 import { combinedDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import type { SessionBinding } from '../../serverApi/common/projection.js';
 import { operationContract } from '../../serverApi/node/serverContract.js';
+import type { ServerEventSubscription } from '../../serverApi/common/serverEvents.js';
 import type { SessionApi } from '../../serverApi/node/sessionApi.js';
 import {
 	isAdministrationRead,
@@ -913,7 +914,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 				...page(i),
 				actor_id: i.actorId,
 				// The contract's request validation refuses a name outside its catalogue.
-				action: i.action as AuditAction | undefined,
+				action: i.action === undefined ? undefined : [i.action as AuditAction],
 				resource_type: i.resourceType as ResourceType | undefined,
 				resource_id: i.resourceId,
 				created_after: iso(i.createdAfter),
@@ -1099,6 +1100,11 @@ const collections = new Set<AdministrationIntent['kind']>([
 	'mailDeliveries'
 ]);
 
+/** How often a page with no server event is re-read. */
+const POLL_MS = 60_000;
+/** How often a page its server event keeps current is re-read anyway. */
+const SAFETY_POLL_MS = 300_000;
+
 /**
  * The privileged Administration capability. Every intent becomes one allow-listed operation on
  * the bound Session's typed client; replies are whitelist projections, and failures are closed
@@ -1133,8 +1139,10 @@ export class AdministrationService {
 		if (!isAdministrationRead(intent)) throw new ServerApiError('invalidRequest');
 		const api = this.#api(binding);
 		const key = ['administration', intent] as const;
-		// The Access Policy changes live; the other pages have no server event and are polled.
-		const live = intent.kind === 'accessPolicy';
+		const refresh = () => api.reads.refresh(key);
+		const changes = this.#subscribeChanges(binding, intent.kind, refresh);
+		// Events are best-effort after commit, so a page they cover is still re-read now and then;
+		// a page with no event, or whose subscription the server refuses, is polled.
 		const observation = api.reads.observe(
 			key,
 			(signal) => this.#read(binding, intent, signal),
@@ -1142,16 +1150,74 @@ export class AdministrationService {
 				if (state.error) listener(this.#failure(state.error, intent));
 				else if (state.value) listener(state.value);
 			},
-			// Events are best-effort after commit, so a live page is still re-read now and then.
-			{ pollIntervalMs: live ? 300_000 : 60_000 }
+			{ pollIntervalMs: changes ? SAFETY_POLL_MS : POLL_MS }
 		);
-		if (!live) return observation;
-		const changes = api.events.on(
-			'access_policy_changed',
-			{ resourceId: this.session.institutionId(binding) },
-			() => api.reads.refresh(key)
-		);
-		return combinedDisposable(observation, changes);
+		if (!changes) {
+			// Invitations announce only the ones you issued, so the page is still polled.
+			if (intent.kind !== 'invitations' && intent.kind !== 'invitation') return observation;
+			return combinedDisposable(
+				observation,
+				api.events.on('invitation.changed', undefined, refresh)
+			);
+		}
+		let fallback: ReturnType<typeof setInterval> | undefined;
+		let disposed = false;
+		void changes.accepted.then((accepted) => {
+			if (!accepted && !disposed) fallback = setInterval(refresh, POLL_MS);
+		});
+		return combinedDisposable(observation, changes, {
+			dispose: () => {
+				disposed = true;
+				clearInterval(fallback);
+			}
+		});
+	}
+
+	/**
+	 * Subscribes to the server event that reports changes to a page, when there is one. Jobs,
+	 * imports and the Access Policy are subscribed to on the Institution; a viewer the server
+	 * doesn't let see them there is refused, and the page falls back to polling.
+	 */
+	#subscribeChanges(
+		binding: SessionBinding,
+		kind: AdministrationReadIntent['kind'],
+		refresh: () => void
+	): ServerEventSubscription | undefined {
+		const events = this.#api(binding).events;
+		const institution = <A extends string>(action: A) =>
+			({
+				action,
+				resourceType: 'institution',
+				resourceId: this.session.institutionId(binding)
+			}) as const;
+		switch (kind) {
+			case 'accessPolicy':
+				return events.on(
+					'access_policy_changed',
+					institution('access_policy.view'),
+					refresh
+				);
+			case 'jobs':
+			case 'job':
+			case 'jobAttempts':
+				return events.on('job.changed', institution('job.view'), refresh);
+			case 'onboardingImports':
+			case 'onboardingImport': {
+				const subscribed = events.on(
+					'onboarding_import.changed',
+					institution('onboarding_batch.view'),
+					refresh
+				);
+				// An import only its creator may read is announced to the creator alone.
+				const mine = events.on('onboarding_import.changed', undefined, refresh);
+				return {
+					accepted: subscribed.accepted,
+					dispose: () => combinedDisposable(subscribed, mine).dispose()
+				};
+			}
+			default:
+				return undefined;
+		}
 	}
 
 	dispose(): void {

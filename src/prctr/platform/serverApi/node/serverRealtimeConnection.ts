@@ -19,6 +19,8 @@ export interface RealtimeEventFrame {
 	readonly kind: 'event';
 	readonly sequence: number;
 	readonly name: string;
+	/** The subscription action that delivered it; absent on a copy addressed to one User. */
+	readonly action?: string;
 	readonly userId?: string;
 	readonly resource?: { readonly type: string; readonly id: string };
 	readonly data: unknown;
@@ -213,6 +215,11 @@ function readFrame(raw: WebSocket.RawData): RealtimeFrame | undefined {
 			if (value.id !== undefined && (typeof value.id !== 'string' || value.id.length > 64))
 				return undefined;
 			if (value.user_id !== undefined && typeof value.user_id !== 'string') return undefined;
+			if (
+				value.action !== undefined &&
+				(typeof value.action !== 'string' || !namePattern.test(value.action))
+			)
+				return undefined;
 			let resource: RealtimeEventFrame['resource'];
 			if (value.resource !== undefined) {
 				const candidate = value.resource;
@@ -230,6 +237,7 @@ function readFrame(raw: WebSocket.RawData): RealtimeFrame | undefined {
 				kind: 'event',
 				sequence,
 				name: value.event,
+				...(typeof value.action === 'string' ? { action: value.action } : {}),
 				...(typeof value.user_id === 'string' ? { userId: value.user_id } : {}),
 				...(resource ? { resource } : {}),
 				data: value.data

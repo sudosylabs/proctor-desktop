@@ -1,12 +1,42 @@
 {
   "schemaVersion": 1,
-  "sha256": "19418d1ab1d03ab6e17e47eb7f7f1d8cdc58188f3dcd9619096c3ffa2c195d39",
-  "paths": 247,
+  "sha256": "b8cedb29239c3f3612bbf71820575d66607b077d5c3dfeabe7a5693b742c905a",
+  "paths": 253,
   "operations": [
     {
       "operationId": "runAcademicAdministrationBatch",
       "method": "POST",
       "path": "/api/v1/academic-administration-batches",
+      "transport": "http"
+    },
+    {
+      "operationId": "createAcademicAdministrationPreview",
+      "method": "POST",
+      "path": "/api/v1/academic-administration-previews",
+      "transport": "http"
+    },
+    {
+      "operationId": "getAcademicAdministrationPreview",
+      "method": "GET",
+      "path": "/api/v1/academic-administration-previews/{academic_administration_preview_id}",
+      "transport": "http"
+    },
+    {
+      "operationId": "cancelAcademicAdministrationPreview",
+      "method": "POST",
+      "path": "/api/v1/academic-administration-previews/{academic_administration_preview_id}/cancel",
+      "transport": "http"
+    },
+    {
+      "operationId": "commitAcademicAdministrationPreview",
+      "method": "POST",
+      "path": "/api/v1/academic-administration-previews/{academic_administration_preview_id}/commit",
+      "transport": "http"
+    },
+    {
+      "operationId": "listAcademicAdministrationPreviewRows",
+      "method": "GET",
+      "path": "/api/v1/academic-administration-previews/{academic_administration_preview_id}/rows",
       "transport": "http"
     },
     {
@@ -1582,6 +1612,12 @@
       "transport": "http"
     },
     {
+      "operationId": "renameDesktopRegistration",
+      "method": "PATCH",
+      "path": "/api/v1/users/me/desktop-registrations/{desktop_registration_id}",
+      "transport": "http"
+    },
+    {
       "operationId": "listCandidateExamActivity",
       "method": "GET",
       "path": "/api/v1/users/me/exam-activity",
@@ -1651,6 +1687,12 @@
       "operationId": "revokeOtherCurrentUserSessions",
       "method": "POST",
       "path": "/api/v1/users/me/sessions/revoke-others",
+      "transport": "http"
+    },
+    {
+      "operationId": "renameCurrentUserSession",
+      "method": "PATCH",
+      "path": "/api/v1/users/me/sessions/{session_id}",
       "transport": "http"
     },
     {

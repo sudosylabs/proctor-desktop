@@ -19,8 +19,18 @@ validator once, on first use. Requests are held to the exact schema; responses
 tolerate additive fields. Operations whose JSON is canonical or signed are named
 in `strictIntegerOperations`, never matched by path.
 
-Use `npm run api:sync -- <server-openapi.json> [server-revision]` to import a new
-contract without modifying the server checkout. Review the snapshot, generated
+`resources/server-api/asyncapi.json` is the pinned realtime contract, imported
+with the HTTP one from the same server revision. The `server.realtime` generator
+produces `serverEvents.generated.ts`: the payload types and a catalog of every
+event by delivery. A copy delivered through a subscription is keyed by its
+action; a copy addressed to one User is keyed `@user`. One name can have
+several copies, each with its own payload. It also produces the payload schemas
+that `serverRealtimeContract.ts` compiles on first use. Like responses, payloads
+tolerate additive fields.
+
+Use `npm run api:sync -- <server/openapi.json> [server-revision]` to import both
+contracts, with `asyncapi.json` read from beside the OpenAPI file, without
+modifying the server checkout. Review the snapshot, generated
 inventory, type errors and contract tests together. `npm run check:generated`
 detects stale generated outputs. The installed application uses only packaged
 artifacts and never reads a server checkout or downloads schemas.
@@ -74,19 +84,31 @@ refuses the upgrade. Every inbound frame is parsed strictly and checked as an
 envelope; frames, pending commands, subscriptions and the pre-hello buffer are
 bounded.
 
-A consumer subscribes to a typed event from `serverEventCatalog.ts`. A user
-event needs no scope; a resource event names its resource, and the server
-authorizes it. Subscriptions are reference-counted and restored after a fresh
-reconnect. The client resumes from its checkpoint when the server can replay.
-Otherwise, after a gap, `resync_required` or an unreadable event, it reports lost
-continuity once, after subscriptions are back. `SessionApi` then refreshes every
-observed read. A listener's error never affects another listener or the
-connection. Events only hint: they never grant access or complete a transition.
+A consumer subscribes to a typed event by name. The copy addressed to the
+signed-in User needs no scope. A subscribed copy names its action, resource type
+and resource; the server authorizes the subscription and may refuse it. A
+consumer whose subscription is refused falls back to polling. An event name,
+action or copy the contract doesn't list is refused when subscribing and
+ignored when it arrives. Subscriptions are reference-counted and restored after
+a fresh reconnect. The client resumes from its checkpoint when the server can
+replay. Otherwise, after a gap, `resync_required`, close code 4003 or an event
+whose payload fails its schema, it reports lost continuity once, after
+subscriptions are back. `SessionApi` then refreshes every observed read. A
+listener's error never affects another listener or the connection. Events only
+hint: they never grant access or complete a transition.
 
-The catalog is provisional and hand-written from the server's event
-constructors. Its validators read only the fields Desktop uses and ignore the
-rest. It is to be replaced by types generated from the server's realtime
-schemas.
+These events keep pages current, each still re-read every five minutes:
+
+- **Administration:** Access Policy (`access_policy_changed`); jobs
+  (`job.changed`); imports (`onboarding_import.changed`, both the Institution
+  copy and the creator's own). Each is subscribed on the Institution.
+- **Account:** Sessions and registered desktops (`current_user.sessions.changed`);
+  the profile picture.
+- **Exam Activity:** its context and activity.
+- **Settings:** `user_settings_changed`.
+
+Invitations announce only the ones you issued, so that page is also polled
+every minute.
 
 The Attempt owner sends commands through its `ServerCommandChannel`. A command
 is sent once and never replayed: a lost reply settles `unconfirmed`. After lost

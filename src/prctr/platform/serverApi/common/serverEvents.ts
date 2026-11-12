@@ -5,31 +5,70 @@
 import type { CancellationToken } from '../../../base/common/cancellation.js';
 import type { Event } from '../../../base/common/event.js';
 import type { IDisposable } from '../../../base/common/lifecycle.js';
-import type {
-	ServerEventCatalog,
-	ServerEventData,
-	ServerEventName,
-	ServerResourceEventName,
-	ServerUserEventName
-} from './serverEventCatalog.js';
+import {
+	serverEventCatalog,
+	USER_DELIVERY,
+	type ServerEventVariants
+} from './serverEvents.generated.js';
 
-export type { ServerEventData, ServerEventName, ServerResourceEventName, ServerUserEventName };
+export { USER_DELIVERY };
+
+/** Every event the server documents in its realtime contract. */
+export type ServerEventName = keyof ServerEventVariants;
+/** How a copy of event `N` is delivered: a subscription action, or {@link USER_DELIVERY}. */
+export type ServerEventDelivery<N extends ServerEventName> = keyof ServerEventVariants[N] & string;
+/** The subscription actions that deliver event `N`. */
+export type ServerEventAction<N extends ServerEventName> = Exclude<
+	ServerEventDelivery<N>,
+	typeof USER_DELIVERY
+>;
 
 /**
- * Where an event is delivered. A user event reaches every connection of the signed-in User and
- * needs no scope. A resource event names its resource; the action and resource type come from
- * the catalog, and the server authorizes the subscription when it is made.
+ * A subscription: the action the server checks, on the exact resource it is checked against.
+ * The server authorizes it when it is made and may refuse it.
  */
-export type ServerEventScope<N extends ServerEventName> = N extends ServerResourceEventName
-	? { readonly resourceId: string }
-	: undefined;
+export interface ServerResourceScope<A extends string = string> {
+	readonly action: A;
+	readonly resourceType: string;
+	readonly resourceId: string;
+}
 
-export interface ServerEvent<N extends ServerEventName> {
+/**
+ * Where an event is delivered. A copy addressed to the signed-in User reaches every connection
+ * and needs no scope (`undefined`). Any other copy needs a subscription naming its action and
+ * resource. One event can have both, with a payload of its own for each.
+ */
+export type ServerEventScope<N extends ServerEventName> =
+	| ([ServerEventAction<N>] extends [never] ? never : ServerResourceScope<ServerEventAction<N>>)
+	| (typeof USER_DELIVERY extends ServerEventDelivery<N> ? undefined : never);
+
+/** The delivery a scope selects. */
+export type ServerScopeDelivery<S> = S extends { readonly action: infer A }
+	? A
+	: typeof USER_DELIVERY;
+
+export interface ServerEvent<
+	N extends ServerEventName,
+	D extends ServerEventDelivery<N> = ServerEventDelivery<N>
+> {
 	readonly name: N;
-	/** The fields Desktop reads, validated. Unknown fields are ignored. */
-	readonly data: ServerEventData<N>;
-	/** The resource a resource event is about. */
+	/** The payload, validated against the server's realtime contract. Unknown fields are kept. */
+	readonly data: ServerEventVariants[N][D];
+	/** The resource a subscribed copy is about. */
 	readonly resourceId?: string;
+}
+
+export function isServerEventName(name: string): name is ServerEventName {
+	return Object.hasOwn(serverEventCatalog, name);
+}
+
+/** The payload schema of one copy of an event, `null` without data, `undefined` when unknown. */
+export function serverEventPayloadSchema(
+	name: ServerEventName,
+	delivery: string
+): string | null | undefined {
+	const variants = serverEventCatalog[name] as Readonly<Record<string, string | null>>;
+	return Object.hasOwn(variants, delivery) ? variants[delivery] : undefined;
 }
 
 /**
@@ -58,10 +97,10 @@ export interface ServerEventSubscription extends IDisposable {
  */
 export interface IServerEvents {
 	/** Listens for one event. The listener runs once per accepted event, in server order. */
-	on<N extends ServerEventName>(
+	on<N extends ServerEventName, S extends ServerEventScope<N>>(
 		name: N,
-		scope: ServerEventScope<N>,
-		listener: (event: ServerEvent<N>) => void
+		scope: S,
+		listener: (event: ServerEvent<N, ServerScopeDelivery<S> & ServerEventDelivery<N>>) => void
 	): ServerEventSubscription;
 	/**
 	 * Fires once whenever events may have been missed: a lost connection replaced by a new one,
@@ -133,5 +172,3 @@ export class ServerCommandError extends Error {
 		this.problem = problem;
 	}
 }
-
-export type { ServerEventCatalog };

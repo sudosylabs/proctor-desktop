@@ -8,17 +8,18 @@ import { Disposable, toDisposable } from '../../../base/common/lifecycle.js';
 import { ServerApiError } from '../common/serverApi.js';
 import {
 	isServerEventName,
-	serverEventCatalog,
-	type ServerEventName
-} from '../common/serverEventCatalog.js';
-import {
+	serverEventPayloadSchema,
 	ServerCommandError,
+	USER_DELIVERY,
 	type IServerEvents,
 	type ServerCommandAction,
 	type ServerCommandChannel,
 	type ServerCommandOptions,
 	type ServerEvent,
+	type ServerEventDelivery,
+	type ServerEventName,
 	type ServerEventScope,
+	type ServerScopeDelivery,
 	type ServerEventSubscription,
 	type ServerEventsState
 } from '../common/serverEvents.js';
@@ -29,6 +30,7 @@ import type {
 	RealtimeSink,
 	RealtimeSocket
 } from './serverRealtimeConnection.js';
+import { isValidServerEventPayload } from './serverRealtimeContract.js';
 
 /** The position a reconnect offers so the server can replay what was missed. */
 export interface RealtimeCheckpoint {
@@ -65,10 +67,18 @@ const idPattern = /^[a-z0-9]{26}$/u;
 const nodePattern = /^[A-Za-z0-9._-]{1,128}$/u;
 /** A resource identity as the server spells it; the server authorizes the subscription. */
 const resourcePattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
+const resourceTypePattern = /^[a-z][a-z0-9_]{0,63}$/u;
 
+/** An event as the dispatcher handles it, before a listener's own type narrows it. */
+interface AnyServerEvent {
+	readonly name: ServerEventName;
+	readonly data: unknown;
+	readonly resourceId?: string;
+}
 interface Listener {
-	readonly resourceId: string | undefined;
-	readonly receive: (event: ServerEvent<ServerEventName>) => void;
+	/** The subscription it listens through; absent for the copy addressed to the User. */
+	readonly subscription: ResourceSubscription | undefined;
+	readonly receive: (event: AnyServerEvent) => void;
 }
 interface ResourceSubscription {
 	readonly action: string;
@@ -152,27 +162,37 @@ export class ServerEvents extends Disposable implements IServerEvents {
 		return this.current;
 	}
 
-	on<N extends ServerEventName>(
+	on<N extends ServerEventName, S extends ServerEventScope<N>>(
 		name: N,
-		scope: ServerEventScope<N>,
-		receive: (event: ServerEvent<N>) => void
+		scope: S,
+		receive: (event: ServerEvent<N, ServerScopeDelivery<S> & ServerEventDelivery<N>>) => void
 	): ServerEventSubscription {
-		const entry = serverEventCatalog[name];
+		if (!isServerEventName(name)) throw new ServerApiError('invalidRequest');
+		const requested = scope as
+			{ action?: unknown; resourceType?: unknown; resourceId?: unknown } | undefined;
+		const delivery = requested === undefined ? USER_DELIVERY : requested.action;
+		if (typeof delivery !== 'string' || serverEventPayloadSchema(name, delivery) === undefined)
+			throw new ServerApiError('invalidRequest');
 		if (this.ended) return { accepted: Promise.resolve(false), dispose: () => {} };
 		let subscription: ResourceSubscription | undefined;
 		let key: string | undefined;
-		if (entry.target === 'resource') {
-			const resourceId = (scope as { readonly resourceId?: unknown } | undefined)?.resourceId;
-			if (typeof resourceId !== 'string' || !resourcePattern.test(resourceId))
+		if (requested !== undefined) {
+			const { resourceType, resourceId } = requested;
+			if (
+				typeof resourceType !== 'string' ||
+				!resourceTypePattern.test(resourceType) ||
+				typeof resourceId !== 'string' ||
+				!resourcePattern.test(resourceId)
+			)
 				throw new ServerApiError('invalidRequest');
-			key = `${entry.action}\u0000${entry.resourceType}\u0000${resourceId}`;
+			key = `${delivery}\u0000${resourceType}\u0000${resourceId}`;
 			subscription = this.subscriptions.get(key);
 			if (!subscription) {
 				if (this.subscriptions.size >= MAX_SUBSCRIPTIONS)
 					return { accepted: Promise.resolve(false), dispose: () => {} };
 				subscription = this.forgotten.get(key) ?? {
-					action: entry.action,
-					type: entry.resourceType,
+					action: delivery,
+					type: resourceType,
 					id: resourceId,
 					refs: 0,
 					status: 'pending',
@@ -185,8 +205,8 @@ export class ServerEvents extends Disposable implements IServerEvents {
 			subscription.refs++;
 		}
 		const listener: Listener = {
-			resourceId: subscription?.id,
-			receive: receive as (event: ServerEvent<ServerEventName>) => void
+			subscription,
+			receive: receive as unknown as (event: AnyServerEvent) => void
 		};
 		let set = this.listeners.get(name);
 		if (!set) this.listeners.set(name, (set = new Set()));
@@ -503,35 +523,31 @@ export class ServerEvents extends Disposable implements IServerEvents {
 	}
 
 	private deliver(frame: RealtimeEventFrame): void {
+		// The server may add events; one Desktop doesn't know is ignored.
 		if (!isServerEventName(frame.name)) return;
 		const name = frame.name;
-		const entry = serverEventCatalog[name];
-		const resourceId =
-			entry.target === 'resource'
-				? frame.resource?.type === entry.resourceType
-					? frame.resource.id
-					: undefined
-				: undefined;
-		if (entry.target === 'resource' && resourceId === undefined) return;
-		const listeners = [...(this.listeners.get(name) ?? [])].filter(
-			(listener) => entry.target === 'user' || listener.resourceId === resourceId
+		const delivery = frame.action ?? USER_DELIVERY;
+		const schema = serverEventPayloadSchema(name, delivery);
+		if (schema === undefined) return;
+		const resource = frame.action === undefined ? undefined : frame.resource;
+		if (frame.action !== undefined && resource === undefined) return;
+		const listeners = [...(this.listeners.get(name) ?? [])].filter(({ subscription }) =>
+			subscription === undefined
+				? frame.action === undefined
+				: subscription.action === frame.action &&
+					subscription.type === resource?.type &&
+					subscription.id === resource.id
 		);
 		if (!listeners.length) return;
-		let data: ServerEvent<typeof name>['data'];
-		try {
-			const fields = frame.data ?? {};
-			if (typeof fields !== 'object' || fields === null || Array.isArray(fields))
-				throw new TypeError('Invalid event data');
-			data = entry.read(fields as Readonly<Record<string, unknown>>) as typeof data;
-		} catch {
-			// The server changed something Desktop cannot read: treat it as missed.
+		if (!isValidServerEventPayload(schema, frame.data)) {
+			// The server sent something this build can't read: treat it as missed.
 			this.loseContinuity();
 			return;
 		}
-		const event: ServerEvent<ServerEventName> = Object.freeze({
+		const event: AnyServerEvent = Object.freeze({
 			name,
-			data,
-			...(resourceId === undefined ? {} : { resourceId })
+			data: frame.data,
+			...(resource === undefined ? {} : { resourceId: resource.id })
 		});
 		for (const listener of listeners) {
 			try {

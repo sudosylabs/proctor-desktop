@@ -1,5 +1,6 @@
 import { tokenCustomizationsGenerator } from './tokenCustomizations.ts';
 import { serverApiGenerator } from './serverApi.ts';
+import { serverRealtimeGenerator } from './serverRealtime.ts';
 import { productMetadataGenerator } from './productMetadata.ts';
 import { bundledThemesGenerator } from './bundledThemes.ts';
 import { phosphorIconsGenerator } from './phosphorIcons.ts';
@@ -24,6 +25,7 @@ export interface Generator {
 
 const productGenerators: readonly Generator[] = [
 	serverApiGenerator,
+	serverRealtimeGenerator,
 	tokenCustomizationsGenerator,
 	productMetadataGenerator,
 	bundledThemesGenerator,

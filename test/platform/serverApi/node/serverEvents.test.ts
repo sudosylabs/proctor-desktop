@@ -42,9 +42,26 @@ const hello = (sequence: number, connectionId: string, resumed = false): Realtim
 const event = (
 	sequence: number,
 	name: string,
-	data: unknown = {},
-	resource?: { type: string; id: string }
-): RealtimeFrame => ({ kind: 'event', sequence, name, data, ...(resource ? { resource } : {}) });
+	data: unknown = undefined,
+	resource?: { type: string; id: string },
+	action?: string
+): RealtimeFrame => ({
+	kind: 'event',
+	sequence,
+	name,
+	data,
+	...(action ? { action } : {}),
+	...(resource ? { resource } : {})
+});
+/** A profile picture change as the server's realtime contract spells it. */
+const picture = (revision: unknown, extra: object = {}) => ({
+	active_file_entry_id: 'ybndrfg8ejkmcpqxot1uwisza3',
+	revision,
+	changed_at: '2026-11-12T09:30:00Z',
+	...extra
+});
+const policyScope = (resourceId: string) =>
+	({ action: 'access_policy.view', resourceType: 'institution', resourceId }) as const;
 const reply = (sequence: number, data?: unknown): RealtimeFrame => ({
 	kind: 'reply',
 	sequence,
@@ -126,9 +143,9 @@ void test('typed user events arrive in order; unknown events advance the sequenc
 		assert.equal(await subscription.accepted, true);
 		const dial = await f.open();
 		assert.equal(f.events.state, 'live');
-		dial.sink.frame(event(2, 'user_profile_picture_changed', { revision: 1, extra: true }));
+		dial.sink.frame(event(2, 'user_profile_picture_changed', picture(1, { extra: true })));
 		dial.sink.frame(event(3, 'something_new', { anything: 1 }));
-		dial.sink.frame(event(4, 'user_profile_picture_changed', { revision: 2 }));
+		dial.sink.frame(event(4, 'user_profile_picture_changed', picture(2)));
 		assert.deepEqual(received, [1, 2]);
 		assert.equal(f.dials.length, 1);
 		assert.equal(f.losses, 0);
@@ -141,12 +158,8 @@ void test('typed user events arrive in order; unknown events advance the sequenc
 void test('resource subscriptions are shared, authorized once and released with their last listener', async () => {
 	const f = fixture();
 	const seen: string[] = [];
-	const a = f.events.on('access_policy_changed', { resourceId: institution }, () =>
-		seen.push('a')
-	);
-	const b = f.events.on('access_policy_changed', { resourceId: institution }, () =>
-		seen.push('b')
-	);
+	const a = f.events.on('access_policy_changed', policyScope(institution), () => seen.push('a'));
+	const b = f.events.on('access_policy_changed', policyScope(institution), () => seen.push('b'));
 	try {
 		const dial = await f.open();
 		const subscribes = dial.sent.filter((request) => request.action === 'subscribe');
@@ -163,7 +176,8 @@ void test('resource subscriptions are shared, authorized once and released with 
 				2,
 				'access_policy_changed',
 				{ revision: 7 },
-				{ type: 'institution', id: institution }
+				{ type: 'institution', id: institution },
+				'access_policy.view'
 			)
 		);
 		dial.sink.frame(
@@ -171,7 +185,8 @@ void test('resource subscriptions are shared, authorized once and released with 
 				3,
 				'access_policy_changed',
 				{ revision: 8 },
-				{ type: 'institution', id: 'x'.repeat(26) }
+				{ type: 'institution', id: 'x'.repeat(26) },
+				'access_policy.view'
 			)
 		);
 		assert.deepEqual(seen, ['a', 'b']);
@@ -179,12 +194,12 @@ void test('resource subscriptions are shared, authorized once and released with 
 		assert.equal(dial.sent.filter((request) => request.action === 'unsubscribe').length, 0);
 		b.dispose();
 		assert.deepEqual(lastRequest(dial, 'unsubscribe').data, subscribes[0]!.data);
-		const denied = f.events.on('access_policy_changed', { resourceId: forbidden }, () => {});
+		const denied = f.events.on('access_policy_changed', policyScope(forbidden), () => {});
 		dial.sink.frame(refused(lastRequest(dial, 'subscribe').sequence));
 		assert.equal(await denied.accepted, false);
 		denied.dispose();
 		assert.throws(
-			() => f.events.on('access_policy_changed', { resourceId: '../other' }, () => {}),
+			() => f.events.on('access_policy_changed', policyScope('../other'), () => {}),
 			ServerApiError
 		);
 	} finally {
@@ -194,11 +209,7 @@ void test('resource subscriptions are shared, authorized once and released with 
 
 void test('a fresh reconnect restores subscriptions before it reports lost continuity', async () => {
 	const f = fixture();
-	const subscription = f.events.on(
-		'access_policy_changed',
-		{ resourceId: institution },
-		() => {}
-	);
+	const subscription = f.events.on('access_policy_changed', policyScope(institution), () => {});
 	const channel = f.events.openCommandChannel();
 	let resynchronizations = 0;
 	channel.onDidNeedResynchronization(() => resynchronizations++);
@@ -231,16 +242,16 @@ void test('a resumed connection replays what was missed and keeps continuity', a
 	);
 	try {
 		const dial = await f.open();
-		dial.sink.frame(event(2, 'user_profile_picture_changed', { revision: 1 }));
+		dial.sink.frame(event(2, 'user_profile_picture_changed', picture(1)));
 		dial.sink.closed('resume');
 		await until(() => f.dials.length === 2);
 		const next = f.dials[1]!;
 		assert.deepEqual(next.checkpoint, { connectionId: first, sequence: 2 });
 		// Replay arrives before the resumed hello.
-		next.sink.frame(event(3, 'user_profile_picture_changed', { revision: 2 }));
+		next.sink.frame(event(3, 'user_profile_picture_changed', picture(2)));
 		next.sink.frame(hello(4, first, true));
 		await tick();
-		next.sink.frame(event(5, 'user_profile_picture_changed', { revision: 3 }));
+		next.sink.frame(event(5, 'user_profile_picture_changed', picture(3)));
 		assert.deepEqual(received, [1, 2, 3]);
 		assert.equal(f.losses, 0);
 	} finally {
@@ -256,14 +267,79 @@ void test('a sequence gap reconnects fresh; resync_required and unreadable event
 		const dial = await f.open();
 		dial.sink.frame(event(2, 'resync_required'));
 		assert.equal(f.losses, 1);
-		dial.sink.frame(event(3, 'user_profile_picture_changed', { revision: 'not a number' }));
+		dial.sink.frame(event(3, 'user_profile_picture_changed', picture('not a number')));
 		assert.equal(f.losses, 2, 'an event Desktop cannot read counts as missed');
-		dial.sink.frame(event(9, 'user_profile_picture_changed', { revision: 1 }));
+		dial.sink.frame(event(9, 'user_profile_picture_changed', picture(1)));
 		const next = await f.open(second);
 		assert.equal(next.checkpoint, undefined, 'a gap never resumes');
 		await until(() => f.losses === 3);
 	} finally {
 		subscription.dispose();
+		f.events.dispose();
+	}
+});
+
+void test('one event name reaches subscribers and the addressed User separately, each with its own copy', async () => {
+	const f = fixture();
+	const unit = 'ybndrfg8ejkmcpqxot1uwisza3';
+	const changed = (state: string) => ({ schema_version: 1, import_id: unit, state });
+	const scoped: string[] = [];
+	const mine: string[] = [];
+	const subscribed = f.events.on(
+		'onboarding_import.changed',
+		{ action: 'onboarding_batch.view', resourceType: 'academic_unit', resourceId: unit },
+		(value) => scoped.push(value.data.state)
+	);
+	const addressed = f.events.on('onboarding_import.changed', undefined, (value) =>
+		mine.push(value.data.state)
+	);
+	try {
+		const dial = await f.open();
+		const subscribe = lastRequest(dial, 'subscribe');
+		assert.deepEqual(subscribe.data, {
+			action: 'onboarding_batch.view',
+			resource: { type: 'academic_unit', id: unit }
+		});
+		dial.sink.frame(reply(subscribe.sequence));
+		assert.equal(await subscribed.accepted, true);
+		dial.sink.frame(
+			event(
+				2,
+				'onboarding_import.changed',
+				changed('parsing'),
+				{ type: 'academic_unit', id: unit },
+				'onboarding_batch.view'
+			)
+		);
+		// The same import seen through the institution: not this subscription.
+		dial.sink.frame(
+			event(
+				3,
+				'onboarding_import.changed',
+				changed('parsing'),
+				{ type: 'institution', id: unit },
+				'onboarding_batch.view'
+			)
+		);
+		dial.sink.frame(
+			event(4, 'onboarding_import.changed', changed('preview_ready'), { type: '', id: '' })
+		);
+		assert.deepEqual(scoped, ['parsing']);
+		assert.deepEqual(mine, ['preview_ready']);
+		assert.equal(f.losses, 0);
+		assert.throws(
+			() =>
+				f.events.on(
+					'onboarding_import.changed',
+					{ action: 'job.view', resourceType: 'institution', resourceId: unit } as never,
+					() => {}
+				),
+			ServerApiError,
+			'an action that never delivers the event is refused'
+		);
+	} finally {
+		subscribed.dispose();
+		addressed.dispose();
 		f.events.dispose();
 	}
 });

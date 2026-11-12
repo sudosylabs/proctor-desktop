@@ -744,3 +744,84 @@ void test('administration IPC binds identity, rejects extra arguments, rechecks 
 	await assert.rejects(invoke({ kind: 'disableUser', id }), /closed/);
 	bridge.dispose();
 });
+
+void test('pages a server event keeps current subscribe on the Institution and poll less; others poll', async () => {
+	const subscriptions: { name: string; scope: unknown }[] = [];
+	const polls: number[] = [];
+	const refreshed: unknown[] = [];
+	const listeners: (() => void)[] = [];
+	let accept = true;
+	const api = {
+		reads: {
+			observe: (
+				_key: unknown,
+				_read: unknown,
+				_listener: unknown,
+				options: { pollIntervalMs: number }
+			) => {
+				polls.push(options.pollIntervalMs);
+				return { dispose() {} };
+			},
+			refresh: (key: unknown) => void refreshed.push(key)
+		},
+		events: {
+			on: (name: string, scope: unknown, listener: () => void) => {
+				subscriptions.push({ name, scope });
+				listeners.push(listener);
+				return { accepted: Promise.resolve(scope === undefined || accept), dispose() {} };
+			}
+		}
+	};
+	const service = new AdministrationService({
+		apiForSession: () => api as never,
+		institutionId: () => id,
+		async reauthenticate() {
+			return 'success';
+		},
+		cancelReauthentication() {}
+	});
+	try {
+		const institution = (action: string) => ({
+			action,
+			resourceType: 'institution',
+			resourceId: id
+		});
+		const jobs = service.observeAdministration(binding, { kind: 'jobs', limit: 10 }, () => {});
+		assert.deepEqual(subscriptions, [{ name: 'job.changed', scope: institution('job.view') }]);
+		assert.deepEqual(polls, [300_000]);
+		listeners[0]!();
+		assert.equal(refreshed.length, 1);
+		jobs.dispose();
+
+		subscriptions.length = 0;
+		polls.length = 0;
+		service
+			.observeAdministration(binding, { kind: 'onboardingImports', limit: 10 }, () => {})
+			.dispose();
+		assert.deepEqual(subscriptions, [
+			{ name: 'onboarding_import.changed', scope: institution('onboarding_batch.view') },
+			{ name: 'onboarding_import.changed', scope: undefined }
+		]);
+		assert.deepEqual(polls, [300_000]);
+
+		subscriptions.length = 0;
+		polls.length = 0;
+		service
+			.observeAdministration(binding, { kind: 'invitations', limit: 10 }, () => {})
+			.dispose();
+		assert.deepEqual(subscriptions, [{ name: 'invitation.changed', scope: undefined }]);
+		assert.deepEqual(
+			polls,
+			[60_000],
+			'invitations announce only your own, so the page is still polled'
+		);
+
+		subscriptions.length = 0;
+		polls.length = 0;
+		service.observeAdministration(binding, { kind: 'users', limit: 10 }, () => {}).dispose();
+		assert.deepEqual(subscriptions, []);
+		assert.deepEqual(polls, [60_000]);
+	} finally {
+		service.dispose();
+	}
+});

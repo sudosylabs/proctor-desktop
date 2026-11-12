@@ -91,9 +91,16 @@ export class AccountService {
 			throw new ServerApiError('invalidRequest');
 		const api = this.session.apiForSession(binding);
 		const key = ['account', intent] as const;
-		// The profile and its picture change live; other sections have no event and are polled.
-		const live =
-			intent.kind === 'readPhoto' || (intent.kind === 'read' && intent.section === 'profile');
+		// The profile picture, Sessions and registered desktops change live; the rest is polled.
+		// A Session renamed or ended and a desktop renamed or removed share one event, so both
+		// sections refresh on it. The profile has no event for its other fields.
+		const event =
+			intent.kind === 'readPhoto' || (intent.kind === 'read' && intent.section === 'profile')
+				? 'user_profile_picture_changed'
+				: intent.kind === 'read' &&
+					  (intent.section === 'sessions' || intent.section === 'desktops')
+					? 'current_user.sessions.changed'
+					: undefined;
 		const observation = api.reads.observe(
 			key,
 			(signal) => this.#read(binding, intent, signal),
@@ -101,12 +108,10 @@ export class AccountService {
 				if (state.error) listener(failure(state.error, false));
 				else if (state.value) listener(state.value);
 			},
-			{ pollIntervalMs: live ? SAFETY_POLL_MS : POLL_MS }
+			{ pollIntervalMs: event ? SAFETY_POLL_MS : POLL_MS }
 		);
-		if (!live) return observation;
-		const changes = api.events.on('user_profile_picture_changed', undefined, () =>
-			api.reads.refresh(key)
-		);
+		if (!event) return observation;
+		const changes = api.events.on(event, undefined, () => api.reads.refresh(key));
 		return combinedDisposable(observation, changes);
 	}
 
