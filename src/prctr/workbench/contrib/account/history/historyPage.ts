@@ -21,6 +21,7 @@ import {
 	type AccountHistoryPageSize,
 	type AccountFailure,
 	type AccountHistoryEntry,
+	type AccountHistoryRun,
 	type AccountResponse
 } from '../../../../platform/account/common/accountProtocol.js';
 import {
@@ -101,6 +102,7 @@ export class HistoryPage extends Disposable implements PageView {
 
 	private filters: HistoryFilters = defaultHistoryFilters;
 	private entries: readonly AccountHistoryEntry[] = [];
+	private runs: readonly AccountHistoryRun[] = [];
 	/** Runs of the same change the person opened, by their first entry. */
 	private readonly opened = new Set<string>();
 	/** The cursor that reads each page reached in this query; page 1 needs none. */
@@ -376,6 +378,8 @@ export class HistoryPage extends Disposable implements PageView {
 		this.loadingPage = changingPage;
 		if (!changingPage) {
 			this.entries = [];
+			this.runs = [];
+			this.runs = [];
 			this.section.setState({ kind: 'loading' }, false);
 		}
 		this.render();
@@ -396,6 +400,7 @@ export class HistoryPage extends Disposable implements PageView {
 		if (response.kind === 'data' && response.data.section === 'history') {
 			const data = response.data;
 			this.entries = data.entries;
+			this.runs = data.runs;
 			this.page = page;
 			this.cursors = this.cursors.slice(0, page);
 			if (data.cursor !== undefined) this.cursors.push(data.cursor);
@@ -499,7 +504,7 @@ export class HistoryPage extends Disposable implements PageView {
 		this.rowStore.clear();
 		const $ = createElementFactory(document);
 		const rows: HTMLTableRowElement[] = [];
-		for (const run of foldHistory(this.entries)) rows.push(...this.runRows($, run));
+		for (const run of foldHistory(this.entries, this.runs)) rows.push(...this.runRows($, run));
 		this.rows.replaceChildren(...rows);
 		if (focusedRun !== undefined)
 			this.rows
@@ -530,10 +535,8 @@ export class HistoryPage extends Disposable implements PageView {
 				this.renderRows();
 			})
 		);
-		const head = this.row($, first, {
-			note: this.format.text('historyFoldedNote', { count: run.entries.length }),
-			toggle
-		});
+		// The server's sentence counts the run; a failed run says so itself.
+		const head = this.row($, first, { summary: run.summary ?? first.summary, toggle });
 		head.dataset.run = first.id;
 		return open ? [head, ...rest.map((entry) => this.row($, entry, undefined))] : [head];
 	}
@@ -541,14 +544,15 @@ export class HistoryPage extends Disposable implements PageView {
 	private row(
 		$: ReturnType<typeof createElementFactory>,
 		entry: AccountHistoryEntry,
-		fold: { readonly note: string; readonly toggle: HTMLButtonElement } | undefined
+		fold: { readonly summary: string; readonly toggle: HTMLButtonElement } | undefined
 	): HTMLTableRowElement {
 		const what = $(
 			'span.prctr-account-history__what',
 			{},
-			$('span.prctr-account-history__event', { textContent: entry.summary })
+			$('span.prctr-account-history__event', { textContent: fold?.summary ?? entry.summary })
 		);
-		const note = fold?.note ?? (entry.failed ? this.format.text('historyFailed') : undefined);
+		const note =
+			fold === undefined && entry.failed ? this.format.text('historyFailed') : undefined;
 		if (note !== undefined || fold !== undefined) {
 			const line = $('span.prctr-account-history__note-line');
 			if (note !== undefined)

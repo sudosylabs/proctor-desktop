@@ -139,8 +139,6 @@ export interface AdminListOptions<K extends AdminListKind> {
 	rowId(item: AdminListItem<K>): string;
 	/** The row's name, for its actions button and its checkbox. */
 	rowName(item: AdminListItem<K>): string;
-	/** Rows the page leaves out of the shown page, such as the audit log's reads. */
-	hidden?(item: AdminListItem<K>): boolean;
 	/** Opens the row's own page from its first cell. */
 	open?(item: AdminListItem<K>): void;
 	/** The row's actions; the destructive ones come last after a separator. */
@@ -623,8 +621,7 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 	}
 
 	private shownItems(): readonly AdminListItem<K>[] {
-		const hidden = this.options.hidden;
-		return hidden === undefined ? this.items : this.items.filter((item) => !hidden(item));
+		return this.items;
 	}
 
 	/** Folds columns again when the table's width crosses a threshold. */

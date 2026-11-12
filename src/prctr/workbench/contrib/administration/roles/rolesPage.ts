@@ -152,14 +152,38 @@ export class RolesPage extends Disposable implements PageView {
 		const $ = createElementFactory(this.list.ownerDocument);
 		this.list.replaceChildren(
 			...this.roles.map((role) => {
+				const holders = role.holders;
+				const label = [
+					role.displayName,
+					...(holders === undefined
+						? []
+						: [this.people(holders.users, holders.usersIsLowerBound)]),
+					...(role.builtIn ? [this.format.text('rolesBuiltIn')] : [])
+				].join(', ');
 				const item = $(
 					'div.prctr-admin-roles__item',
 					{
 						tabIndex: role.id === this.chosen ? 0 : -1,
 						data: { roleId: role.id },
-						attrs: { role: 'option', 'aria-selected': String(role.id === this.chosen) }
+						attrs: {
+							role: 'option',
+							'aria-selected': String(role.id === this.chosen),
+							'aria-label': label
+						}
 					},
 					$('span.prctr-admin-roles__item-name', { textContent: role.displayName }),
+					// How many people hold it, when the viewer may see who does.
+					...(holders === undefined
+						? []
+						: [
+								$('span.prctr-admin-roles__item-count', {
+									textContent: this.amount(
+										holders.users,
+										holders.usersIsLowerBound
+									),
+									attrs: { 'aria-hidden': 'true' }
+								})
+							]),
 					// A built-in role can't be changed; the lock says so where it is chosen.
 					...(role.builtIn
 						? [
@@ -229,6 +253,26 @@ export class RolesPage extends Disposable implements PageView {
 				value: this.format.text(role.builtIn ? 'rolesBuiltIn' : 'rolesCustom')
 			},
 			{ label: this.format.text('rolesName'), value: role.name },
+			...(role.holders === undefined
+				? []
+				: [
+						{
+							label: this.format.text('rolesGivenTo'),
+							value:
+								role.holders.users === 0
+									? this.format.text('rolesGivenToNobody')
+									: this.format.text('rolesGivenToPeople', {
+											people: this.people(
+												role.holders.users,
+												role.holders.usersIsLowerBound
+											),
+											places: this.places(
+												role.holders.scopes,
+												role.holders.scopesIsLowerBound
+											)
+										})
+						}
+					]),
 			{
 				label: this.format.text('rolesPermissionCount'),
 				value: this.format.text('rolesPermissionTotal', {
@@ -237,6 +281,27 @@ export class RolesPage extends Disposable implements PageView {
 			}
 		]);
 		this.renderGrid(role);
+	}
+
+	/** A count as shown, "10,000+" when the server stopped counting. */
+	private amount(count: number, atLeast: boolean): string {
+		return atLeast
+			? this.format.text('rolesAtLeast', { count: this.format.count(count) })
+			: this.format.count(count);
+	}
+
+	/** "23 people", "1 person", "10,000+ people". */
+	private people(count: number, atLeast: boolean): string {
+		return atLeast
+			? this.format.text('rolesPeople', { count: this.amount(count, true) })
+			: this.format.counted('rolesPeople', count);
+	}
+
+	/** "6 places", "1 place": the institution, units and classes it is given in. */
+	private places(count: number, atLeast: boolean): string {
+		return atLeast
+			? this.format.text('rolesPlaces', { count: this.amount(count, true) })
+			: this.format.counted('rolesPlaces', count);
 	}
 
 	/** The role's permissions as areas by verbs, a tick where it allows the pair. */

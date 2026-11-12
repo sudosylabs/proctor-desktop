@@ -945,12 +945,105 @@ void test('lists send their order and filters in the server names', async () => 
 			`GET /api/v1/programme-levels/${id}/classes?dir=desc&limit=10`
 		);
 		assert.equal(
+			await sent({ kind: 'audits', limit: 10, auditKind: 'change' }),
+			'GET /api/v1/audits?limit=10&kind=change'
+		);
+		assert.equal(
+			await sent({ kind: 'roleBindings', limit: 10, roleIds: [id, other] }),
+			`GET /api/v1/role-bindings?role_id=${id}&role_id=${other}&limit=10`
+		);
+		assert.equal(
 			await sent({ kind: 'jobs', limit: 10, order: 'asc' }),
 			'GET /api/v1/jobs?limit=10&order=asc'
 		);
 		assert.equal(
 			await sent({ kind: 'onboardingImports', limit: 10, order: 'asc' }),
 			'GET /api/v1/onboarding-imports?limit=10&order=asc'
+		);
+	} finally {
+		h.dispose();
+	}
+});
+
+void test('roles count who holds them, and mail names its recipient when the viewer may see them', async () => {
+	const role = {
+		id,
+		name: 'teacher',
+		display_name: 'Teacher',
+		description: '',
+		built_in: true,
+		permissions: ['class.view'],
+		created_at: at,
+		updated_at: at
+	};
+	const delivery = {
+		id,
+		occurrence_id: other,
+		state: 'failed',
+		masked_recipient: 'a***@example.test',
+		template_key: 'identity.verify_email',
+		template_digest: 'd'.repeat(64),
+		attempt_count: 2,
+		message_id: '<m@example.test>',
+		message_date: at,
+		created_at: at,
+		updated_at: at,
+		deadline: at
+	};
+	const h = harness((request) => {
+		const route = path(request);
+		if (route.startsWith('GET /api/v1/roles'))
+			return json({
+				items: [
+					{
+						...role,
+						holders: {
+							bindings: 30,
+							bindings_is_lower_bound: false,
+							users: 23,
+							users_is_lower_bound: false,
+							scopes: 6,
+							scopes_is_lower_bound: false
+						}
+					},
+					{ ...role, id: other, name: 'auditor', display_name: 'Auditor' }
+				]
+			});
+		if (route.startsWith('GET /api/v1/mail/deliveries'))
+			return json({
+				items: [
+					{ ...delivery, target_user_id: other, recipient_display_name: 'Ada Lovelace' },
+					{ ...delivery, id: other, target_invitation_id: id }
+				]
+			});
+		throw new Error(`Unexpected ${route}`);
+	});
+	try {
+		const roles = await h.service.administration(binding, { kind: 'roles', limit: 10 });
+		assert.ok(roles.kind === 'data' && roles.data.resource === 'roles');
+		assert.deepEqual(roles.data.value.items[0]!.holders, {
+			bindings: 30,
+			bindingsIsLowerBound: false,
+			users: 23,
+			usersIsLowerBound: false,
+			scopes: 6,
+			scopesIsLowerBound: false
+		});
+		// A viewer who may see no bindings gets no counts, not zero.
+		assert.equal(roles.data.value.items[1]!.holders, undefined);
+
+		const mail = await h.service.administration(binding, { kind: 'mailDeliveries', limit: 10 });
+		assert.ok(mail.kind === 'data' && mail.data.resource === 'mailDeliveries');
+		assert.deepEqual(
+			mail.data.value.items.map((item) => [
+				item.recipientName,
+				item.targetUserId,
+				item.recipient
+			]),
+			[
+				['Ada Lovelace', other, 'a***@example.test'],
+				[undefined, undefined, 'a***@example.test']
+			]
 		);
 	} finally {
 		h.dispose();

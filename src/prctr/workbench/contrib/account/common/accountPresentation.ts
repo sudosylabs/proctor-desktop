@@ -5,6 +5,7 @@
 import type {
 	AccountDesktop,
 	AccountHistoryEntry,
+	AccountHistoryRun,
 	AccountHistoryEvent,
 	AccountHistoryQuery,
 	AccountGrantableScope,
@@ -582,41 +583,33 @@ export function historyQuery(filters: HistoryFilters, now: number): AccountHisto
 	};
 }
 
-/** Adjacent rows of the same change fold into one once there are this many. */
-export const HISTORY_FOLD_MIN = 3;
-
 /** One row of the history table: one event, or a run of the same change folded together. */
 export interface HistoryRun {
 	readonly entries: readonly AccountHistoryEntry[];
+	/** The server's one sentence for a folded run, as in "You changed 5 profile pictures". */
+	readonly summary?: string;
 }
 
 /**
- * Folds runs of the same change done the same way, such as five profile photos changed in a
- * row, into one row within the page. Shorter runs stay as they are.
+ * The page's rows: each run the server found (two or more neighbouring entries of the same
+ * change) folds into one, and every other entry stands alone. Runs never cross a page.
  */
-export function foldHistory(entries: readonly AccountHistoryEntry[]): readonly HistoryRun[] {
-	const runs: AccountHistoryEntry[][] = [];
-	for (const entry of entries) {
-		const last = runs.at(-1);
-		const previous = last?.[0];
-		if (
-			last !== undefined &&
-			previous !== undefined &&
-			previous.event === entry.event &&
-			previous.actor === entry.actor &&
-			previous.relation === entry.relation &&
-			previous.failed === entry.failed &&
-			previous.client === entry.client &&
-			previous.ipAddress === entry.ipAddress
-		)
-			last.push(entry);
-		else runs.push([entry]);
+export function foldHistory(
+	entries: readonly AccountHistoryEntry[],
+	runs: readonly AccountHistoryRun[]
+): readonly HistoryRun[] {
+	const rows: HistoryRun[] = [];
+	let index = 0;
+	for (const run of runs) {
+		for (; index < run.start; index++) rows.push({ entries: [entries[index]!] });
+		rows.push({
+			entries: entries.slice(run.start, run.start + run.length),
+			summary: run.summary
+		});
+		index = run.start + run.length;
 	}
-	return runs.flatMap((run) =>
-		run.length >= HISTORY_FOLD_MIN
-			? [{ entries: run }]
-			: run.map((entry) => ({ entries: [entry] }))
-	);
+	for (; index < entries.length; index++) rows.push({ entries: [entries[index]!] });
+	return rows;
 }
 
 // #endregion

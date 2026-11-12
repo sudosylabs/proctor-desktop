@@ -146,11 +146,6 @@ export const historyMessages = Object.freeze({
 		defaultMessage: 'Nothing happened with your account in this period.',
 		description: 'The history filters match nothing.'
 	}),
-	historyFoldedNote: defineMessage({
-		id: 'account.history.folded.note',
-		defaultMessage: 'The same change {count} times in a row',
-		description: 'Under a row that stands for a run of the same change.'
-	}),
 	historyShowAll: defineMessage({
 		id: 'account.history.show.all',
 		defaultMessage: 'Show all {count}',

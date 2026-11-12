@@ -31,6 +31,47 @@ export const rolesMessages = Object.freeze({
 		defaultMessage: 'Type',
 		description: 'Role detail.'
 	}),
+	rolesGivenTo: defineMessage({
+		id: 'administration.access.given.to',
+		defaultMessage: 'Given to',
+		description: 'Label of who holds a role now.'
+	}),
+	rolesGivenToPeople: defineMessage({
+		id: 'administration.access.given.to.people',
+		defaultMessage: '{people} in {places}',
+		description: 'Who holds a role, as in "23 people in 6 places".'
+	}),
+	rolesGivenToNobody: defineMessage({
+		id: 'administration.access.given.to.nobody',
+		defaultMessage: 'Nobody yet',
+		description: 'No one you can see holds the role now.'
+	}),
+	rolesPeopleOne: defineMessage({
+		id: 'administration.access.people.one',
+		defaultMessage: '{count} person',
+		description: 'How many people hold a role, for one.'
+	}),
+	rolesPeople: defineMessage({
+		id: 'administration.access.people',
+		defaultMessage: '{count} people',
+		description: 'How many people hold a role.'
+	}),
+	rolesPlacesOne: defineMessage({
+		id: 'administration.access.places.one',
+		defaultMessage: '{count} place',
+		description:
+			'In how many places (the institution, a unit or a class) a role is given, for one.'
+	}),
+	rolesPlaces: defineMessage({
+		id: 'administration.access.places',
+		defaultMessage: '{count} places',
+		description: 'In how many places (the institution, units or classes) a role is given.'
+	}),
+	rolesAtLeast: defineMessage({
+		id: 'administration.access.at.least',
+		defaultMessage: '{count}+',
+		description: 'A count the server stopped at, as in "10,000+".'
+	}),
 	rolesBuiltIn: defineMessage({
 		id: 'administration.access.built.in',
 		defaultMessage: 'Built-in role',

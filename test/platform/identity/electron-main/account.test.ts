@@ -25,6 +25,7 @@ const historyURL = (query: Parameters<typeof accountHistoryQuery>[0]) =>
 		query: accountHistoryQuery(query)
 	}).url;
 const id = 'y'.repeat(26);
+const id2 = 'z'.repeat(26);
 void test('account boundary rejects URLs, foreign resources, excessive data and unexpected actions', () => {
 	for (const value of [
 		{ kind: 'openSecurity', url: 'https://attacker.test' },
@@ -727,6 +728,7 @@ void test('history queries use the server filter names and parse a minimized pag
 				ipAddress: '81.2.69.160'
 			}
 		],
+		runs: [],
 		cursor: 'next'
 	});
 	assert.deepEqual(
@@ -746,11 +748,18 @@ void test('history queries use the server filter names and parse a minimized pag
 					ipAddress: '81.2.69.160'
 				}
 			],
+			runs: [],
 			total: 10000,
 			totalIsLowerBound: true
 		}
 	);
 	assert.throws(() => readAccountHistory({ items: [entry], total: -1 }));
+	const run = { start: 0, length: 2, summary: 'You failed to sign in 2 times' };
+	const twice = readAccountHistory({ items: [entry, { ...entry, id: id2 }], runs: [run] });
+	assert.ok(twice.section === 'history' && twice.runs[0]?.summary === run.summary);
+	// A run must cover two or more entries on the page and never overlap another.
+	for (const runs of [[{ ...run, length: 1 }], [{ ...run, length: 3 }], [run, run]])
+		assert.throws(() => readAccountHistory({ items: [entry, { ...entry, id: id2 }], runs }));
 	for (const intent of [{ kind: 'reauthenticate' }, { kind: 'cancelReauthentication' }])
 		assert.deepEqual(validateAccountIntent(intent), intent);
 	assert.throws(() => validateAccountIntent({ kind: 'reauthenticate', url: 'https://x.test' }));

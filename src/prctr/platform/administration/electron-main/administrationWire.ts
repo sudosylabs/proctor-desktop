@@ -310,7 +310,15 @@ export function role(r: Schema<'RoleResponse'>): Item<'roles'> {
 		description: r.description,
 		builtIn: r.built_in,
 		permissions: r.permissions,
-		archivedAt: optionalAt(r.archived_at)
+		archivedAt: optionalAt(r.archived_at),
+		holders: r.holders && {
+			bindings: r.holders.bindings,
+			bindingsIsLowerBound: r.holders.bindings_is_lower_bound,
+			users: r.holders.users,
+			usersIsLowerBound: r.holders.users_is_lower_bound,
+			scopes: r.holders.scopes,
+			scopesIsLowerBound: r.holders.scopes_is_lower_bound
+		}
 	};
 }
 export function roleBinding(b: Schema<'RoleBindingResponse'>): Item<'roleBindings'> {
@@ -523,6 +531,8 @@ export function mailDelivery(d: Schema<'MailDeliveryResponse'>): Item<'mailDeliv
 		id: d.id,
 		state: d.state,
 		recipient: d.masked_recipient,
+		recipientName: d.recipient_display_name,
+		targetUserId: d.target_user_id,
 		template: d.template_key,
 		attempts: d.attempt_count,
 		createdAt: at(d.created_at),
@@ -538,7 +548,6 @@ export function mailDeliveryDetail(
 ): AdministrationValue<'mailDelivery'> {
 	return {
 		...mailDelivery(d),
-		targetUserId: d.target_user_id,
 		targetInvitationId: d.target_invitation_id,
 		messageId: d.message_id
 	};

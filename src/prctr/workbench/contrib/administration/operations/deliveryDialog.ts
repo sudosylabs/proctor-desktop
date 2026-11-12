@@ -91,7 +91,9 @@ export class DeliveryDialog extends Disposable {
 		this.delivery = delivery;
 		const kind = this.format.code('mailKind', delivery.template);
 		this.dialog.setHeading(
-			this.format.text('deliveryTitle', { kind, recipient: delivery.recipient }),
+			delivery.recipientName === undefined
+				? this.format.text('deliveryTitle', { kind, recipient: delivery.recipient })
+				: this.format.text('deliveryTitleFor', { kind, name: delivery.recipientName }),
 			delivery.failureCode === undefined
 				? this.format.text('deliveryNoProblem')
 				: this.format.code('problem', delivery.failureCode)

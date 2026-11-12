@@ -143,10 +143,13 @@ export class MailPage extends Disposable implements PageView {
 							min: 220,
 							cell: (delivery) => ({
 								kind: 'text',
-								primary: delivery.recipient,
+								// The person's name above the masked address; an invitee has only the address.
+								primary: delivery.recipientName ?? delivery.recipient,
 								secondary:
 									delivery.failureCode === undefined
-										? ''
+										? delivery.recipientName === undefined
+											? ''
+											: delivery.recipient
 										: format.code('problem', delivery.failureCode),
 								...(delivery.failureCode === undefined
 									? {}
@@ -188,7 +191,7 @@ export class MailPage extends Disposable implements PageView {
 					],
 					open: (delivery) => this.openDelivery(delivery),
 					rowId: (delivery) => delivery.id,
-					rowName: (delivery) => delivery.recipient,
+					rowName: (delivery) => delivery.recipientName ?? delivery.recipient,
 					sorting: {
 						initial: { key: 'updated', dir: 'desc' },
 						params: (sort) => ({ sort: 'updated' as const, dir: sort.dir })

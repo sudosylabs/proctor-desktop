@@ -922,6 +922,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 		(i) => ({
 			query: {
 				...page(i),
+				role_id: i.roleIds && [...i.roleIds],
 				user_id: i.userId,
 				scope_type: i.scopeType,
 				scope_id: i.scopeId
@@ -987,6 +988,7 @@ const routes: { readonly [I in RoutedKind]: Route<I> } = {
 				...page(i),
 				actor_id: i.actorId,
 				subject_user_id: i.subjectUserId,
+				kind: i.auditKind,
 				// The contract's request validation refuses a name outside its catalogue.
 				action: i.actions && (i.actions as readonly AuditAction[]),
 				status: i.status,

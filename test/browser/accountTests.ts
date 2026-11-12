@@ -1043,12 +1043,14 @@ export async function runAccountTests(document: Document): Promise<void> {
 			intent.kind === 'readHistory' && intent.cursor === 'next'
 				? data({
 						section: 'history',
+						runs: [],
 						entries: [historyEntry('m', 'sign_out', { summary: 'You signed out' })]
 					})
 				: data({
 						section: 'history',
 						cursor: 'next',
 						total: 7,
+						runs: [{ start: 3, length: 3, summary: 'You changed 3 profile pictures' }],
 						entries: [
 							historyEntry('j', 'sign_in.succeeded', {
 								client: 'desktop',
@@ -1092,6 +1094,10 @@ export async function runAccountTests(document: Document): Promise<void> {
 		check(
 			table.querySelectorAll('tbody tr').length === 4,
 			'A run of the same change folds into one row'
+		);
+		check(
+			table.textContent!.includes('You changed 3 profile pictures'),
+			'A folded run reads as the server’s sentence for it'
 		);
 		const showAll = buttonIn(table, 'Show all 3')!;
 		check(showAll.getAttribute('aria-expanded') === 'false', 'A folded run says it is closed');
