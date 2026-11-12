@@ -178,6 +178,60 @@ pub fn dmi_guest(vendor: &str, product: &str) -> crate::RawHypervisor {
     }
 }
 
+/// Tunnel and point-to-point interfaces that are up, from `/sys/class/net`.
+#[must_use]
+pub fn tunnels() -> Option<Vec<crate::RawTunnel>> {
+    tunnels_in(Path::new("/sys/class/net"))
+}
+
+/// [`tunnels`] against any directory laid out like `/sys/class/net`, for tests.
+#[must_use]
+pub fn tunnels_in(root: &Path) -> Option<Vec<crate::RawTunnel>> {
+    use crate::{RawTunnel, RawTunnelClass, fingerprint};
+    /// `IFF_TAP` in `tun_flags`.
+    const TAP: u32 = 0x0002;
+    let mut tunnels = Vec::new();
+    for entry in fs::read_dir(root).ok()?.filter_map(Result::ok).take(256) {
+        let path = entry.path();
+        let read = |file: &str| fs::read_to_string(path.join(file)).unwrap_or_default();
+        let state = read("operstate");
+        if !matches!(state.trim(), "up" | "unknown") || entry.file_name() == "lo" {
+            continue;
+        }
+        let class = if let Some(flags) = read("tun_flags").trim().strip_prefix("0x") {
+            let flags = u32::from_str_radix(flags, 16).unwrap_or(0);
+            if flags & TAP != 0 {
+                RawTunnelClass::VirtualEthernet
+            } else {
+                RawTunnelClass::PacketTunnel
+            }
+        } else if read("uevent")
+            .lines()
+            .any(|line| line == "DEVTYPE=wireguard")
+        {
+            RawTunnelClass::PacketTunnel
+        } else if read("type").trim() == "512" {
+            RawTunnelClass::PointToPoint
+        } else {
+            continue;
+        };
+        tunnels.push(RawTunnel {
+            key: fingerprint(entry.file_name().as_encoded_bytes()),
+            class,
+        });
+    }
+    tunnels.sort();
+    Some(tunnels)
+}
+
+/// A fingerprint of the IPv4 and IPv6 routing tables.
+#[must_use]
+pub fn route_fingerprint() -> Option<u64> {
+    let ipv4 = fs::read("/proc/net/route").ok()?;
+    let ipv6 = fs::read("/proc/net/ipv6_route").unwrap_or_default();
+    Some(crate::fingerprint(&[ipv4, ipv6].concat()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -218,5 +272,44 @@ mod tests {
                 .iter()
                 .any(|display| display.kind == RawKind::Virtual)
         );
+    }
+}
+
+#[cfg(test)]
+mod network_tests {
+    use super::*;
+
+    #[test]
+    fn tun_tap_wireguard_and_ppp_are_tunnels_and_ethernet_is_not() {
+        let root = std::env::temp_dir().join(format!("prctr-net-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&root);
+        let interface = |name: &str, files: &[(&str, &str)]| {
+            let path = root.join(name);
+            fs::create_dir_all(&path).expect("fixture interface");
+            for (file, content) in files {
+                fs::write(path.join(file), content).expect("fixture file");
+            }
+        };
+        interface(
+            "tun0",
+            &[("operstate", "unknown\n"), ("tun_flags", "0x1001\n")],
+        );
+        interface("tap0", &[("operstate", "up\n"), ("tun_flags", "0x1002\n")]);
+        interface(
+            "wg0",
+            &[
+                ("operstate", "unknown\n"),
+                ("uevent", "DEVTYPE=wireguard\n"),
+            ],
+        );
+        interface("ppp0", &[("operstate", "up\n"), ("type", "512\n")]);
+        interface("eth0", &[("operstate", "up\n"), ("type", "1\n")]);
+        interface(
+            "tun9",
+            &[("operstate", "down\n"), ("tun_flags", "0x1001\n")],
+        );
+        let tunnels = tunnels_in(&root).expect("reads fixture");
+        let _ = fs::remove_dir_all(&root);
+        assert_eq!(tunnels.len(), 4, "eth0 and the down tun9 are not counted");
     }
 }

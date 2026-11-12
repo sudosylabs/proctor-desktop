@@ -308,12 +308,27 @@ unknown), `managed_vpn` (inactive, active, unknown), `tunnels` (at most 32, opaq
 and class: point_to_point, packet_tunnel, virtual_ethernet, managed_vpn, other), `route_generation`.
 A proxy auto-config script is reported as `automatic_config` and never read or run.
 
-**Changes.** `network_changed`. A route change alone is never a violation; it triggers a fresh check.
+**Categories.** The capability is `network`, with sub-categories `system_proxy`, `managed_vpn`,
+`tunnel_interfaces` and `route_change`. An activation selects at least one, and only selected ones
+are read. An unselected category is absent from the state; a selected one the platform cannot read is
+`unknown`, which makes certainty partial.
 
-**Platforms.** Windows: adapter enumeration by interface type, interface and route change
-notifications, RAS connections, WinHTTP proxy settings. macOS: the SystemConfiguration dynamic store
-(proxies, interfaces, VPN service status) and a routing socket; system tunnels such as iCloud Private
-Relay and Continuity must be classified, not counted. Linux: rtnetlink and NetworkManager; partial.
+**Summary.** Tunnel counts by class: `tunnels_total`, `point_to_point`, `packet_tunnel`,
+`virtual_ethernet`, `managed_vpn_tunnels`.
+
+**Changes.** The new state on every change, reconciled every second. A route change alone is never a
+violation; it only raises `route_generation`.
+
+**Platforms.**
+
+- **Windows:** the WinHTTP user proxy settings, RAS connections for OS-managed VPNs, adapters that
+  are up by interface type (tunnel, PPP, virtual), and a fingerprint of the routing table.
+- **macOS:** the SystemConfiguration proxy settings, interfaces from `getifaddrs`, and a fingerprint
+  of the routing table. A `utun` interface counts only with a routable address, because iCloud
+  Private Relay and Continuity create `utun` interfaces with link-local addresses only; this
+  heuristic still needs certification. OS-managed VPN state is unknown for now.
+- **Linux:** `/sys/class/net` (TUN/TAP flags, WireGuard, PPP) and the `/proc` routing tables; proxy
+  and managed VPN are unknown.
 
 **Never leaves the agent.** Addresses, interface names, SSIDs, DNS servers, proxy URLs, VPN server
 names. Only selected categories are queried.

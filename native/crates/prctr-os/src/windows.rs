@@ -369,3 +369,155 @@ pub fn virtualization() -> crate::RawVirtualization {
     #[cfg(not(target_arch = "x86_64"))]
     crate::RawVirtualization::unprobed()
 }
+
+mod network {
+    use windows::Win32::Foundation::{ERROR_BUFFER_OVERFLOW, ERROR_SUCCESS, GlobalFree, HGLOBAL};
+    use windows::Win32::NetworkManagement::IpHelper::{
+        FreeMibTable, GAA_FLAG_SKIP_ANYCAST, GAA_FLAG_SKIP_DNS_SERVER, GAA_FLAG_SKIP_MULTICAST,
+        GetAdaptersAddresses, GetIpForwardTable2, IF_TYPE_PPP, IF_TYPE_PROP_VIRTUAL,
+        IF_TYPE_TUNNEL, IP_ADAPTER_ADDRESSES_LH, MIB_IPFORWARD_ROW2, MIB_IPFORWARD_TABLE2,
+    };
+    use windows::Win32::NetworkManagement::Ndis::IfOperStatusUp;
+    use windows::Win32::NetworkManagement::Rras::RasEnumConnectionsW;
+    use windows::Win32::Networking::WinHttp::{
+        WINHTTP_CURRENT_USER_IE_PROXY_CONFIG, WinHttpGetIEProxyConfigForCurrentUser,
+    };
+    use windows::Win32::Networking::WinSock::AF_UNSPEC;
+    use windows::core::PWSTR;
+
+    use crate::{RawProxy, RawTunnel, RawTunnelClass, fingerprint};
+
+    const MAX_ADAPTERS: usize = 256;
+    const MAX_ROUTES: usize = 65_536;
+    /// `ERROR_BUFFER_TOO_SMALL` from RAS.
+    const RAS_BUFFER_TOO_SMALL: u32 = 603;
+
+    fn release(text: PWSTR) {
+        if !text.is_null() {
+            // SAFETY: WinHTTP allocates these strings with `GlobalAlloc` and the caller frees them.
+            let _ = unsafe { GlobalFree(Some(HGLOBAL(text.0.cast()))) };
+        }
+    }
+
+    /// Whether a system proxy is configured for this user, and of which kind. Hosts, ports and the
+    /// configuration script are never read; the strings are freed unread.
+    #[must_use]
+    pub fn system_proxy() -> Option<RawProxy> {
+        let mut config = WINHTTP_CURRENT_USER_IE_PROXY_CONFIG::default();
+        // SAFETY: `config` is a valid out-parameter.
+        unsafe { WinHttpGetIEProxyConfigForCurrentUser(&raw mut config) }.ok()?;
+        let kind = if !config.lpszProxy.is_null() {
+            RawProxy::Manual
+        } else if !config.lpszAutoConfigUrl.is_null() {
+            RawProxy::AutomaticConfig
+        } else if config.fAutoDetect.as_bool() {
+            RawProxy::AutoDetect
+        } else {
+            RawProxy::None
+        };
+        release(config.lpszProxy);
+        release(config.lpszAutoConfigUrl);
+        release(config.lpszProxyBypass);
+        Some(kind)
+    }
+
+    /// Whether an OS-managed (RAS) VPN connection is active.
+    #[must_use]
+    pub fn managed_vpn() -> Option<bool> {
+        let mut bytes = 0_u32;
+        let mut connections = 0_u32;
+        // SAFETY: a null buffer with zero size asks only for the required size and the count.
+        let status = unsafe { RasEnumConnectionsW(None, &raw mut bytes, &raw mut connections) };
+        match status {
+            0 => Some(connections > 0),
+            RAS_BUFFER_TOO_SMALL => Some(true),
+            _ => None,
+        }
+    }
+
+    fn class_of(adapter: &IP_ADAPTER_ADDRESSES_LH) -> Option<RawTunnelClass> {
+        match adapter.IfType {
+            IF_TYPE_TUNNEL => Some(RawTunnelClass::PacketTunnel),
+            IF_TYPE_PPP => Some(RawTunnelClass::PointToPoint),
+            IF_TYPE_PROP_VIRTUAL => Some(RawTunnelClass::VirtualEthernet),
+            _ => None,
+        }
+    }
+
+    /// Tunnel, point-to-point and virtual adapters that are up.
+    #[must_use]
+    pub fn tunnels() -> Option<Vec<RawTunnel>> {
+        let flags = GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER;
+        let mut size = 16 * 1024_u32;
+        for _ in 0..3 {
+            // A `u64` buffer keeps the adapter structures aligned.
+            let mut buffer = vec![0_u64; (size as usize).div_ceil(8)];
+            let first = buffer.as_mut_ptr().cast::<IP_ADAPTER_ADDRESSES_LH>();
+            // SAFETY: `buffer` holds at least `size` writable, 8-byte-aligned bytes.
+            let status = unsafe {
+                GetAdaptersAddresses(
+                    u32::from(AF_UNSPEC.0),
+                    flags,
+                    None,
+                    Some(first),
+                    &raw mut size,
+                )
+            };
+            if status == ERROR_BUFFER_OVERFLOW.0 {
+                continue;
+            }
+            if status != ERROR_SUCCESS.0 {
+                return None;
+            }
+            let mut tunnels = Vec::new();
+            let mut cursor = first.cast_const();
+            let mut visited = 0_usize;
+            while !cursor.is_null() && visited < MAX_ADAPTERS {
+                visited += 1;
+                // SAFETY: `cursor` is a node of the list the call wrote into `buffer`.
+                let adapter = unsafe { &*cursor };
+                cursor = adapter.Next.cast_const();
+                if adapter.OperStatus != IfOperStatusUp {
+                    continue;
+                }
+                if let Some(class) = class_of(adapter) {
+                    // SAFETY: `Value` is the 64-bit view of the interface LUID union.
+                    let luid = unsafe { adapter.Luid.Value };
+                    tunnels.push(RawTunnel {
+                        key: fingerprint(&luid.to_le_bytes()),
+                        class,
+                    });
+                }
+            }
+            return Some(tunnels);
+        }
+        None
+    }
+
+    /// A fingerprint of the IPv4 and IPv6 routing table.
+    #[must_use]
+    pub fn route_fingerprint() -> Option<u64> {
+        let mut table: *mut MIB_IPFORWARD_TABLE2 = std::ptr::null_mut();
+        // SAFETY: `table` is a valid out-parameter; on success the OS allocates the table.
+        if unsafe { GetIpForwardTable2(AF_UNSPEC, &raw mut table) } != ERROR_SUCCESS
+            || table.is_null()
+        {
+            return None;
+        }
+        // SAFETY: the table header is valid until it is freed below.
+        let entries = unsafe { (*table).NumEntries } as usize;
+        let rows = entries.min(MAX_ROUTES);
+        // SAFETY: the table holds `NumEntries` rows starting at `Table`.
+        let first = unsafe { (&raw const (*table).Table).cast::<MIB_IPFORWARD_ROW2>() };
+        // SAFETY: `rows` rows starting at `first` are initialised; they are read as bytes.
+        let bytes = unsafe {
+            std::slice::from_raw_parts(first.cast::<u8>(), rows * size_of::<MIB_IPFORWARD_ROW2>())
+        };
+        let result = fingerprint(bytes);
+        // SAFETY: frees the table returned above exactly once.
+        unsafe { FreeMibTable(table.cast_const().cast()) };
+        Some(result)
+    }
+}
+
+pub use network::{managed_vpn, route_fingerprint, system_proxy, tunnels};

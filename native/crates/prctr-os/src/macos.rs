@@ -99,7 +99,7 @@ mod window {
             .collect()
     }
 
-    fn value<'a>(dictionary: &'a CFDictionary, key: &CFString) -> Option<&'a CFType> {
+    pub(super) fn value<'a>(dictionary: &'a CFDictionary, key: &CFString) -> Option<&'a CFType> {
         let key: *const c_void = std::ptr::from_ref::<CFString>(key).cast();
         // SAFETY: the window-info dictionary uses CFString keys; the value it returns is owned by
         // the dictionary and stays valid while the dictionary is borrowed.
@@ -111,7 +111,7 @@ mod window {
         Some(unsafe { &*value.cast::<CFType>() })
     }
 
-    fn number(dictionary: &CFDictionary, key: &CFString) -> Option<f64> {
+    pub(super) fn number(dictionary: &CFDictionary, key: &CFString) -> Option<f64> {
         let number = value(dictionary, key)?.downcast_ref::<CFNumber>()?;
         let mut result = 0.0_f64;
         // SAFETY: `result` is a valid `f64` for the double conversion CoreFoundation writes.
@@ -485,3 +485,169 @@ mod model_tests {
         }
     }
 }
+
+mod network {
+    use std::ffi::CStr;
+
+    use objc2_core_foundation::CFString;
+    use objc2_system_configuration::{
+        SCDynamicStore, kSCPropNetProxiesFTPEnable, kSCPropNetProxiesHTTPEnable,
+        kSCPropNetProxiesHTTPSEnable, kSCPropNetProxiesProxyAutoConfigEnable,
+        kSCPropNetProxiesProxyAutoDiscoveryEnable, kSCPropNetProxiesSOCKSEnable,
+    };
+
+    use crate::{RawProxy, RawTunnel, RawTunnelClass, fingerprint};
+
+    const MAX_INTERFACES: usize = 256;
+
+    fn enabled(dictionary: &objc2_core_foundation::CFDictionary, key: &CFString) -> bool {
+        super::window::number(dictionary, key).is_some_and(|value| value >= 1.0)
+    }
+
+    /// Whether a system proxy is configured, and of which kind. Hosts, ports and the PAC script are
+    /// never read.
+    #[must_use]
+    pub fn system_proxy() -> Option<RawProxy> {
+        let proxies = SCDynamicStore::proxies(None)?;
+        // SAFETY: these are immutable SystemConfiguration constants.
+        let manual = unsafe {
+            [
+                kSCPropNetProxiesHTTPEnable,
+                kSCPropNetProxiesHTTPSEnable,
+                kSCPropNetProxiesSOCKSEnable,
+                kSCPropNetProxiesFTPEnable,
+            ]
+        };
+        // SAFETY: immutable SystemConfiguration constants.
+        let (pac, discovery) = unsafe {
+            (
+                kSCPropNetProxiesProxyAutoConfigEnable,
+                kSCPropNetProxiesProxyAutoDiscoveryEnable,
+            )
+        };
+        Some(if manual.iter().any(|key| enabled(&proxies, key)) {
+            RawProxy::Manual
+        } else if enabled(&proxies, pac) {
+            RawProxy::AutomaticConfig
+        } else if enabled(&proxies, discovery) {
+            RawProxy::AutoDetect
+        } else {
+            RawProxy::None
+        })
+    }
+
+    /// Up tunnel interfaces. A `utun` counts only with a routable address: macOS creates `utun`
+    /// interfaces with link-local addresses only for iCloud Private Relay and Continuity.
+    #[must_use]
+    pub fn tunnels() -> Option<Vec<RawTunnel>> {
+        let mut list: *mut libc::ifaddrs = std::ptr::null_mut();
+        // SAFETY: `list` is a valid out-parameter; on success the OS allocates the list.
+        if unsafe { libc::getifaddrs(&raw mut list) } != 0 {
+            return None;
+        }
+        let mut seen: std::collections::BTreeMap<Vec<u8>, (RawTunnelClass, bool)> =
+            std::collections::BTreeMap::new();
+        let mut cursor = list;
+        let mut visited = 0_usize;
+        while !cursor.is_null() && visited < MAX_INTERFACES * 8 {
+            visited += 1;
+            // SAFETY: `cursor` is a non-null node of the list the OS returned.
+            let entry = unsafe { &*cursor };
+            cursor = entry.ifa_next;
+            if entry.ifa_name.is_null() {
+                continue;
+            }
+            // SAFETY: interface names are NUL-terminated strings owned by the list.
+            let name = unsafe { CStr::from_ptr(entry.ifa_name) }
+                .to_bytes()
+                .to_vec();
+            let flags = entry.ifa_flags;
+            let up = flags & (libc::IFF_UP as u32) != 0 && flags & (libc::IFF_RUNNING as u32) != 0;
+            let class = if name.starts_with(b"utun") {
+                RawTunnelClass::PacketTunnel
+            } else if name.starts_with(b"ipsec") {
+                RawTunnelClass::ManagedVpn
+            } else if name.starts_with(b"ppp") {
+                RawTunnelClass::PointToPoint
+            } else if name.starts_with(b"tap") {
+                RawTunnelClass::VirtualEthernet
+            } else if name.starts_with(b"tun") {
+                RawTunnelClass::PacketTunnel
+            } else {
+                continue;
+            };
+            let routable = !entry.ifa_addr.is_null() && routable_address(entry.ifa_addr);
+            let slot = seen.entry(name).or_insert((class, false));
+            if up && (class != RawTunnelClass::PacketTunnel || routable) {
+                slot.1 = true;
+            }
+            if seen.len() > MAX_INTERFACES {
+                break;
+            }
+        }
+        // SAFETY: frees the list returned by `getifaddrs` exactly once.
+        unsafe { libc::freeifaddrs(list) };
+        Some(
+            seen.into_iter()
+                .filter(|(_, (_, active))| *active)
+                .map(|(name, (class, _))| RawTunnel {
+                    key: fingerprint(&name),
+                    class,
+                })
+                .collect(),
+        )
+    }
+
+    fn routable_address(address: *const libc::sockaddr) -> bool {
+        // SAFETY: `address` is a non-null address owned by the interface list.
+        let family = i32::from(unsafe { (*address).sa_family });
+        if family == libc::AF_INET {
+            return true;
+        }
+        if family == libc::AF_INET6 {
+            // SAFETY: an AF_INET6 address is a `sockaddr_in6`; it is copied out unaligned.
+            let ipv6 = unsafe { address.cast::<libc::sockaddr_in6>().read_unaligned() };
+            let bytes = ipv6.sin6_addr.s6_addr;
+            // fe80::/10 is link-local.
+            return !(bytes[0] == 0xfe && bytes[1] & 0xc0 == 0x80);
+        }
+        false
+    }
+
+    /// A fingerprint of the routing table; it changes whenever a route changes.
+    #[must_use]
+    pub fn route_fingerprint() -> Option<u64> {
+        let mut mib = [libc::CTL_NET, libc::PF_ROUTE, 0, 0, libc::NET_RT_DUMP, 0];
+        let mut length = 0_usize;
+        let count = u32::try_from(mib.len()).unwrap_or(6);
+        // SAFETY: querying the length with a null buffer is the documented first step.
+        let sized = unsafe {
+            libc::sysctl(
+                mib.as_mut_ptr(),
+                count,
+                std::ptr::null_mut(),
+                &raw mut length,
+                std::ptr::null_mut(),
+                0,
+            )
+        };
+        if sized != 0 || length > 16 * 1024 * 1024 {
+            return None;
+        }
+        let mut buffer = vec![0_u8; length];
+        // SAFETY: `buffer` holds `length` writable bytes.
+        let read = unsafe {
+            libc::sysctl(
+                mib.as_mut_ptr(),
+                count,
+                buffer.as_mut_ptr().cast(),
+                &raw mut length,
+                std::ptr::null_mut(),
+                0,
+            )
+        };
+        (read == 0).then(|| fingerprint(&buffer[..length.min(buffer.len())]))
+    }
+}
+
+pub use network::{route_fingerprint, system_proxy, tunnels};

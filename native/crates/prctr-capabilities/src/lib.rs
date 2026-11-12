@@ -6,6 +6,7 @@ pub mod candidate_window;
 pub mod clipboard;
 pub mod display;
 pub mod interactive_session;
+pub mod network;
 mod poller;
 pub mod virtualization;
 
@@ -21,6 +22,7 @@ pub fn sources() -> Vec<Box<dyn Source>> {
         Box::new(interactive_session::InteractiveSessionSource::new()),
         Box::new(clipboard::ClipboardSource::new()),
         Box::new(virtualization::VirtualizationSource),
+        Box::new(network::NetworkSource::new()),
     ]
 }
 
@@ -34,6 +36,7 @@ pub fn registry() -> Registry {
             interactive_session::descriptor(),
             clipboard::descriptor(),
             virtualization::descriptor(),
+            network::descriptor(),
         ],
         baseline_rules: vec![
             display::baseline_rule(),
@@ -70,6 +73,10 @@ pub fn registry_json() -> Value {
             virtualization::CAPABILITY: {
                 "state": schema(schemars::schema_for!(virtualization::VirtualizationState)),
                 "summary": { "type": "object", "additionalProperties": false, "properties": {} },
+            },
+            network::CAPABILITY: {
+                "state": schema(schemars::schema_for!(network::NetworkState)),
+                "summary": schema(schemars::schema_for!(network::NetworkSummary)),
             }
         }
     })

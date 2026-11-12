@@ -219,3 +219,50 @@ pub fn cpuid_virtualization() -> RawVirtualization {
         physical_or_root: false,
     }
 }
+
+/// The system proxy configuration, as a kind only: hosts, ports and scripts are never read.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RawProxy {
+    None,
+    Manual,
+    AutomaticConfig,
+    AutoDetect,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RawTunnelClass {
+    PointToPoint,
+    PacketTunnel,
+    VirtualEthernet,
+    ManagedVpn,
+    Other,
+}
+
+/// One active tunnel interface. `key` is a process-local hash of the interface name, so a tunnel
+/// keeps its identity between reads; the name itself never leaves `prctr-os`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct RawTunnel {
+    pub key: u64,
+    pub class: RawTunnelClass,
+}
+
+impl PartialOrd for RawTunnelClass {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for RawTunnelClass {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        (*self as u8).cmp(&(*other as u8))
+    }
+}
+
+/// A stable, process-local hash: tunnel keys and route fingerprints are compared, never sent.
+#[must_use]
+pub fn fingerprint(bytes: &[u8]) -> u64 {
+    use std::hash::{Hash, Hasher};
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    bytes.hash(&mut hasher);
+    hasher.finish()
+}

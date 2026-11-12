@@ -728,6 +728,41 @@
     },
     {
       "ecosystem": "cargo",
+      "package": "objc2-system-configuration",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "SystemConfiguration bindings for the native agent on macOS: whether a manual, automatic-configuration or auto-discovery system proxy is enabled. Hosts, ports and scripts are never read.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-system-configuration/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-system-configuration",
+          "kind": "production",
+          "features": [
+            "SCDynamicStore",
+            "SCDynamicStoreCopySpecific",
+            "SCSchemaDefinitions",
+            "std"
+          ],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-agent"],
+      "networkBehavior": "None; reads the local SystemConfiguration store only.",
+      "nativeBehavior": "Links the system SystemConfiguration framework; calls are confined to prctr-os.",
+      "transitiveRisk": "Builds on objc2-core-foundation, already admitted; used under MIT.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Hand-written SystemConfiguration declarations would duplicate the framework ABI and its CFString keys.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
       "package": "windows",
       "version": "0.62.2",
       "kind": "production",
@@ -746,6 +781,11 @@
             "Win32_Foundation",
             "Win32_Graphics_Dwm",
             "Win32_Graphics_Gdi",
+            "Win32_NetworkManagement_IpHelper",
+            "Win32_NetworkManagement_Ndis",
+            "Win32_NetworkManagement_Rras",
+            "Win32_Networking_WinHttp",
+            "Win32_Networking_WinSock",
             "Win32_System_DataExchange",
             "Win32_System_RemoteDesktop",
             "Win32_System_Threading",
