@@ -62,6 +62,22 @@ const tokenDefinitions = [
 	{ id: 'color.border.strong', kind: 'color', description: 'Emphasized component boundary.' },
 	{ id: 'color.border.control', kind: 'color', description: 'Boundary of a button or field.' },
 	{ id: 'color.border.focus', kind: 'color', description: 'Keyboard focus indicator.' },
+	{
+		id: 'color.border.field',
+		kind: 'color',
+		description: 'Edge of a field you type or choose in: input, select, text area, chip box.'
+	},
+	{
+		id: 'color.border.outline',
+		kind: 'color',
+		description:
+			'Outline of a control that must be seen to be used: a switch off, a stepper, a selected segment.'
+	},
+	{
+		id: 'color.border.accentLine',
+		kind: 'color',
+		description: 'Accent stroke on a control: a switch on, the selected tab line.'
+	},
 	{ id: 'color.interaction.accent', kind: 'color', description: 'Primary action surface.' },
 	{
 		id: 'color.interaction.accentHover',
@@ -76,6 +92,11 @@ const tokenDefinitions = [
 	{ id: 'color.interaction.hover', kind: 'color', description: 'Hover feedback surface.' },
 	{ id: 'color.interaction.active', kind: 'color', description: 'Pressed feedback surface.' },
 	{ id: 'color.interaction.selected', kind: 'color', description: 'Selected item surface.' },
+	{
+		id: 'color.interaction.selectedRow',
+		kind: 'color',
+		description: 'Surface of a selected row in a list or table.'
+	},
 	{
 		id: 'color.interaction.disabled',
 		kind: 'color',
@@ -109,6 +130,16 @@ const tokenDefinitions = [
 		description: 'Error foreground paired with text.'
 	},
 	{ id: 'color.feedback.errorBackground', kind: 'color', description: 'Error message surface.' },
+	{
+		id: 'color.status.safeguard',
+		kind: 'color',
+		description: 'Status word for a safeguard in place on your own account, on its 12% tint.'
+	},
+	{
+		id: 'color.status.attention',
+		kind: 'color',
+		description: 'Status word for something that waits on you or lapses soon, on its 12% tint.'
+	},
 	{
 		id: 'color.feedback.pending',
 		kind: 'color',
@@ -153,6 +184,16 @@ const tokenDefinitions = [
 		description: 'Window frame behind the area rail and sidebar when no material shows.'
 	},
 	{ id: 'color.frame.divider', kind: 'color', description: 'Hairline between frame regions.' },
+	{
+		id: 'color.frame.label',
+		kind: 'color',
+		description: 'Group labels on the frame, legible on the window material.'
+	},
+	{
+		id: 'color.frame.item',
+		kind: 'color',
+		description: 'Rail and sidebar entries on the frame, legible on the window material.'
+	},
 	{
 		id: 'color.navigation.selected',
 		kind: 'color',
@@ -233,6 +274,44 @@ const tokenDefinitions = [
 		kind: 'dimension',
 		description: 'Large heading line height.'
 	},
+	{ id: 'typography.title.page.size', kind: 'dimension', description: 'Page title font size.' },
+	{
+		id: 'typography.title.page.lineHeight',
+		kind: 'dimension',
+		description: 'Page title line height.'
+	},
+	{
+		id: 'typography.title.dialog.size',
+		kind: 'dimension',
+		description: 'Dialog title font size.'
+	},
+	{
+		id: 'typography.title.dialog.lineHeight',
+		kind: 'dimension',
+		description: 'Dialog title line height.'
+	},
+	{
+		id: 'typography.title.section.size',
+		kind: 'dimension',
+		description: 'Section title font size.'
+	},
+	{
+		id: 'typography.title.section.lineHeight',
+		kind: 'dimension',
+		description: 'Section title line height.'
+	},
+	{
+		id: 'typography.detail.size',
+		kind: 'dimension',
+		description: 'Second line of a row, hints and footnotes.'
+	},
+	{ id: 'typography.detail.lineHeight', kind: 'dimension', description: 'Detail line height.' },
+	{
+		id: 'typography.caption.size',
+		kind: 'dimension',
+		description: 'Group labels and column headers.'
+	},
+	{ id: 'typography.caption.lineHeight', kind: 'dimension', description: 'Caption line height.' },
 	{ id: 'typography.weight.regular', kind: 'font-weight', description: 'Regular text weight.' },
 	{
 		id: 'typography.weight.medium',
@@ -253,6 +332,15 @@ const tokenDefinitions = [
 	{ id: 'shape.radius.small', kind: 'dimension', description: 'Small corner radius.' },
 	{ id: 'shape.radius.medium', kind: 'dimension', description: 'Medium corner radius.' },
 	{ id: 'shape.radius.large', kind: 'dimension', description: 'Large corner radius.' },
+	{
+		id: 'shape.radius.compact',
+		kind: 'dimension',
+		description: 'Badges, chips and small buttons.'
+	},
+	{ id: 'shape.radius.control', kind: 'dimension', description: 'Buttons, fields and rows.' },
+	{ id: 'shape.radius.card', kind: 'dimension', description: 'Cards, menus and popovers.' },
+	{ id: 'shape.radius.dialog', kind: 'dimension', description: 'Dialogs.' },
+	{ id: 'shape.radius.window', kind: 'dimension', description: 'Window and floating panels.' },
 	{ id: 'shape.radius.circle', kind: 'dimension', description: 'Circular radius.' },
 	{ id: 'shape.stroke.default', kind: 'dimension', description: 'Default boundary stroke.' },
 	{ id: 'shape.stroke.strong', kind: 'dimension', description: 'Strong boundary stroke.' },

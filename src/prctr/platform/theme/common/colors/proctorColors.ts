@@ -165,3 +165,105 @@ export const cardBackground = registerColor(
 	},
 	localize('proctor.cardBackground', 'Grouped lists and fields that sit on the window canvas.')
 );
+
+/*
+ * Contrast roles from the 2026-11 design review: field and control edges reach 3:1 against
+ * cards and panels, status words 4.5:1 on their tint, frame text 4.5:1 on the window material.
+ */
+
+export const fieldBorder = registerColor(
+	'proctor.fieldBorder',
+	{
+		light: Color.fromHex('#8E9196'),
+		dark: Color.fromHex('#6B6F76'),
+		hcLight: Color.fromHex('#0F4A85'),
+		hcDark: Color.fromHex('#6FC3DF')
+	},
+	localize('proctor.fieldBorder', 'Edge of a field you type or choose in.')
+);
+
+export const controlOutline = registerColor(
+	'proctor.controlOutline',
+	{
+		light: Color.fromHex('#7D8086'),
+		dark: Color.fromHex('#767A81'),
+		hcLight: Color.fromHex('#0F4A85'),
+		hcDark: Color.fromHex('#6FC3DF')
+	},
+	localize(
+		'proctor.controlOutline',
+		'Outline of a switch that is off, a stepper or a selected segment.'
+	)
+);
+
+export const accentLine = registerColor(
+	'proctor.accentLine',
+	{
+		light: Color.fromHex('#5C00AA'),
+		dark: Color.fromHex('#9B5DE5'),
+		hcLight: Color.fromHex('#0F4A85'),
+		hcDark: Color.fromHex('#6FC3DF')
+	},
+	localize('proctor.accentLine', 'Accent stroke of a switch that is on and of the selected tab.')
+);
+
+export const selectedRowBackground = registerColor(
+	'proctor.selectedRowBackground',
+	{
+		light: Color.fromHex('#F6F0FC'),
+		dark: Color.fromHex('#2A2338'),
+		hcLight: Color.fromHex('#0F4A851A'),
+		hcDark: Color.fromHex('#6FC3DF33')
+	},
+	localize('proctor.selectedRowBackground', 'Surface of a selected row in a list or table.')
+);
+
+export const statusSafeguardForeground = registerColor(
+	'proctor.statusSafeguardForeground',
+	{
+		light: Color.fromHex('#17693A'),
+		dark: Color.fromHex('#62C98C'),
+		hcLight: Color.fromHex('#292929'),
+		hcDark: Color.white
+	},
+	localize(
+		'proctor.statusSafeguardForeground',
+		'Status word for a safeguard in place on your own account.'
+	)
+);
+
+export const statusAttentionForeground = registerColor(
+	'proctor.statusAttentionForeground',
+	{
+		light: Color.fromHex('#7D4D00'),
+		dark: Color.fromHex('#E8B44E'),
+		hcLight: Color.fromHex('#292929'),
+		hcDark: Color.white
+	},
+	localize(
+		'proctor.statusAttentionForeground',
+		'Status word for something that waits on you or lapses soon.'
+	)
+);
+
+export const frameLabelForeground = registerColor(
+	'proctor.frameLabelForeground',
+	{
+		light: Color.fromHex('#686C72'),
+		dark: Color.fromHex('#C9CCD1'),
+		hcLight: Color.fromHex('#292929'),
+		hcDark: Color.white
+	},
+	localize('proctor.frameLabelForeground', 'Group labels on the window frame.')
+);
+
+export const frameItemForeground = registerColor(
+	'proctor.frameItemForeground',
+	{
+		light: Color.fromHex('#55585D'),
+		dark: Color.fromHex('#D0D3D8'),
+		hcLight: Color.fromHex('#292929'),
+		hcDark: Color.white
+	},
+	localize('proctor.frameItemForeground', 'Rail and sidebar entries on the window frame.')
+);
