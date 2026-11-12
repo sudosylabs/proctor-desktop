@@ -334,7 +334,7 @@ export const userMessages = Object.freeze({
 	}),
 	userSessionsEmpty: defineMessage({
 		id: 'administration.user.sessions.empty',
-		defaultMessage: 'They aren’t signed in anywhere.',
+		defaultMessage: 'No open sessions',
 		description: 'A user with no open sessions.'
 	}),
 	userSessionDetail: defineMessage({

@@ -337,10 +337,16 @@ export const invitationsMessages = Object.freeze({
 		defaultMessage: '{count} addresses',
 		description: 'Footnote: how many addresses the dialog sends to. Two or more.'
 	}),
-	inviteFootnoteFix: defineMessage({
-		id: 'administration.invitations.invite.footnote.fix',
-		defaultMessage: '{addresses} · {fix} to fix',
-		description: 'Footnote when some addresses need fixing, as in "3 addresses · 1 to fix".'
+	inviteFootnoteFixOne: defineMessage({
+		id: 'administration.invitations.invite.footnote.fixone',
+		defaultMessage: '{address} needs fixing. It stays here; the other {count} are sent.',
+		description:
+			"Invite footer when one address can't be used: it stays to fix and the rest are sent."
+	}),
+	inviteFootnoteFixMany: defineMessage({
+		id: 'administration.invitations.invite.footnote.fixmany',
+		defaultMessage: '{fix} addresses need fixing. They stay here; the other {count} are sent.',
+		description: "Invite footer when several addresses can't be used."
 	}),
 	inviteExpires: defineMessage({
 		id: 'administration.invitations.invite.expires',

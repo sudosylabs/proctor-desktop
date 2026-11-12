@@ -51,6 +51,11 @@ export const pageMessages = Object.freeze({
 		defaultMessage: 'Cancel',
 		description: 'Close a dialog without changing anything.'
 	}),
+	undo: defineMessage({
+		id: 'page.action.undo',
+		defaultMessage: 'Undo',
+		description: 'Takes back the change a toast reports, such as disabling an account.'
+	}),
 	dismiss: defineMessage({
 		id: 'page.dismiss',
 		defaultMessage: 'Dismiss',

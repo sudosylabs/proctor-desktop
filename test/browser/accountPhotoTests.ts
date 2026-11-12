@@ -163,6 +163,7 @@ export async function runAccountPhotoTests(document: Document): Promise<void> {
 					dismissIcon: proctorIconFactory('action.close', 14)
 				}),
 				'Try again',
+				'Undo',
 				'Close',
 				() => undefined,
 				(reason: string) => reason,

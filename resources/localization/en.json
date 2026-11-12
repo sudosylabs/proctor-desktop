@@ -4769,12 +4769,21 @@
       ],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
-    "administration.invitations.invite.footnote.fix": {
-      "message": "{addresses} · {fix} to fix",
-      "description": "Footnote when some addresses need fixing, as in \"3 addresses · 1 to fix\".",
+    "administration.invitations.invite.footnote.fixmany": {
+      "message": "{fix} addresses need fixing. They stay here; the other {count} are sent.",
+      "description": "Invite footer when several addresses can't be used.",
       "placeholders": [
-        "addresses",
-        "fix"
+        "fix",
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
+    },
+    "administration.invitations.invite.footnote.fixone": {
+      "message": "{address} needs fixing. It stays here; the other {count} are sent.",
+      "description": "Invite footer when one address can't be used: it stays to fix and the rest are sent.",
+      "placeholders": [
+        "address",
+        "count"
       ],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
@@ -8461,7 +8470,7 @@
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
     },
     "administration.user.sessions.empty": {
-      "message": "They aren’t signed in anywhere.",
+      "message": "No open sessions",
       "description": "A user with no open sessions.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/user/userMessages.ts"
@@ -10844,6 +10853,12 @@
     "page.action.cancel": {
       "message": "Cancel",
       "description": "Close a dialog without changing anything.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
+    },
+    "page.action.undo": {
+      "message": "Undo",
+      "description": "Takes back the change a toast reports, such as disabling an account.",
       "placeholders": [],
       "source": "src/prctr/workbench/browser/authenticated/pages/pageMessages.ts"
     },

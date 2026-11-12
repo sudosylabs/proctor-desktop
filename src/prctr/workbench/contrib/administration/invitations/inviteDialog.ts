@@ -3,7 +3,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ButtonControl } from '../../../../base/browser/ui/button/buttonControl.js';
-import { SegmentedControl } from '../../../../base/browser/ui/segmented/segmentedControl.js';
 import {
 	SelectControl,
 	type SelectChoice
@@ -76,15 +75,17 @@ export class InviteDialog extends Disposable {
 		);
 		const body = this.dialog.body;
 		const kindField = adminField(body, format.text('inviteKind'));
+		// One control for one choice, as in Upload.
 		const kinds = this._register(
-			new SegmentedControl<InviteKind>(kindField.element, {
+			new SelectControl<InviteKind>(kindField.element, {
 				label: format.text('inviteKind'),
 				value: 'students',
-				options: [
+				choices: [
 					{ value: 'students', label: format.text('inviteStudents') },
 					{ value: 'teachers', label: format.text('inviteTeachers') },
 					{ value: 'role', label: format.text('inviteRole') }
-				]
+				],
+				caret: proctorIconFactory('action.expand', 14)
 			})
 		);
 		this._register(kinds.onDidChange((kind) => this.setKind(kind)));
@@ -279,9 +280,9 @@ export class InviteDialog extends Disposable {
 		const valid = chips.filter((chip) => chip.problem === undefined).map((chip) => chip.label);
 		const invalid = chips.length - valid.length;
 		const parsed = { valid };
+		// An address that can't be used stays in the box to fix; the others are still sent.
 		let error: string | undefined;
-		if (invalid > 0) error = this.format.text('inviteAddressesFix');
-		else if (valid.length > MAXIMUM_ADDRESSES)
+		if (valid.length > MAXIMUM_ADDRESSES)
 			error = this.format.text('inviteEmailsTooMany', { count: valid.length });
 		this.emailHint.textContent = error ?? this.format.text('inviteChipsHint');
 		this.emailHint.dataset.error = String(error !== undefined);
@@ -290,15 +291,21 @@ export class InviteDialog extends Disposable {
 			chips.length === 1
 				? this.format.text('inviteFootnoteOne')
 				: this.format.text('inviteFootnote', { count: this.format.count(chips.length) });
+		const unusable = chips.filter((chip) => chip.problem !== undefined);
 		this.dialog.setFootnote(
 			chips.length === 0
 				? undefined
-				: invalid > 0
-					? this.format.text('inviteFootnoteFix', {
-							addresses,
-							fix: this.format.count(invalid)
-						})
-					: addresses
+				: invalid === 0
+					? addresses
+					: invalid === 1
+						? this.format.text('inviteFootnoteFixOne', {
+								address: unusable[0]!.label,
+								count: this.format.count(valid.length)
+							})
+						: this.format.text('inviteFootnoteFixMany', {
+								fix: this.format.count(invalid),
+								count: this.format.count(valid.length)
+							})
 		);
 		const target =
 			this.kind === 'students'
@@ -407,17 +414,27 @@ export class InviteDialog extends Disposable {
 						.map((item) => addresses[item.index] ?? '')
 				: [];
 		const sent = addresses.length - failed.length;
+		const toFix = this.emails.chips.filter((chip) => chip.problem !== undefined);
 		if (failed.length === 0) {
 			this.pane.toast(
 				sent === 1
 					? this.format.text('inviteSentOne')
 					: this.format.text('inviteSentMany', { count: sent })
 			);
-			this.dispose();
+			// Addresses still to fix keep the dialog open with only them.
+			if (toFix.length === 0) {
+				this.dispose();
+				return;
+			}
+			this.emails.set(toFix);
+			this.update();
 			return;
 		}
-		// Keep only the addresses that still need sending.
-		this.emails.set(failed.map((email) => ({ id: email.toLowerCase(), label: email })));
+		// Keep only the addresses that still need sending, and the ones still to fix.
+		this.emails.set([
+			...failed.map((email) => ({ id: email.toLowerCase(), label: email })),
+			...toFix
+		]);
 		this.update();
 		this.feedback.set(
 			this.format.text('invitePartly', { sent, addresses: failed.join(', ') }),

@@ -110,11 +110,13 @@ export class UserActions extends Disposable {
 			},
 			summary: () => [this.format.text('userDisableConfirm'), name],
 			onDidComplete: (result) => {
-				this.pane.toast(
-					result.kind === 'error'
-						? this.format.failure(result.reason)
-						: this.format.text('userDisabledToast', { name })
-				);
+				if (result.kind === 'error') this.pane.toast(this.format.failure(result.reason));
+				// Disabling is easily undone, so the toast offers it until dismissed.
+				else
+					this.pane.toastUndo(
+						this.format.text('userDisabledToast', { name }),
+						() => void this.enable(user)
+					);
 				this.onDidChange(user.id, result);
 			}
 		});

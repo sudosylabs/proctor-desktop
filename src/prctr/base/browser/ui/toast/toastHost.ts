@@ -28,6 +28,8 @@ export interface Toast {
 	readonly title: string;
 	readonly body?: string;
 	readonly action?: ToastAction;
+	/** A success that offers Undo stays until it is dismissed, so the chance isn't missed. */
+	readonly persistent?: boolean;
 }
 
 export interface ToastHostOptions {
@@ -102,7 +104,7 @@ export class ToastHost extends Disposable {
 		element.append(close);
 		this.element.replaceChildren(element);
 		store.add(toDisposable(() => element.remove()));
-		if (toast.tone === 'success') {
+		if (toast.tone === 'success' && toast.persistent !== true) {
 			const timer = setTimeout(() => {
 				if (this.current.value === store) this.dismiss();
 			}, TOAST_SUCCESS_MS);

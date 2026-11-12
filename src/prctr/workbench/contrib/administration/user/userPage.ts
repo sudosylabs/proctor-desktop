@@ -65,6 +65,8 @@ export class UserPage extends Disposable implements PageView {
 	private readonly changes: AdminChanges;
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
 	private readonly resetButton: ButtonControl;
+	/** A disabled account's page leads with the way back. */
+	private readonly enableButton: ButtonControl;
 	private roleNames = new Map<string, string>();
 	private roleChoices: readonly { readonly value: string; readonly label: string }[] = [];
 	private unitNames = new Map<string, string>();
@@ -89,6 +91,20 @@ export class UserPage extends Disposable implements PageView {
 				() => void this.refreshAll(),
 				() => this.pane.focusPage()
 			)
+		);
+		this.enableButton = this._register(
+			new ButtonControl(headerActions, {
+				variant: 'brand',
+				label: format.text('userEnable'),
+				icon: proctorIconFactory('action.enable')
+			})
+		);
+		this.enableButton.element.hidden = true;
+		this._register(
+			this.enableButton.onDidRequest(() => {
+				const user = this.user.data;
+				if (user !== undefined) void this.actions.enable(user);
+			})
 		);
 		this.resetButton = this._register(
 			new ButtonControl(headerActions, {
@@ -227,6 +243,7 @@ export class UserPage extends Disposable implements PageView {
 		for (const section of [this.profileSection, this.affiliationSection, this.roleSection])
 			section.setAction(ready);
 		this.sessionSection.setAction(ready && user.disabledAt === undefined);
+		this.enableButton.element.hidden = user?.disabledAt === undefined;
 		if (user === undefined) {
 			this.pane.setHeading({
 				title: this.format.text('userTitle'),

@@ -55,6 +55,8 @@ export interface IPagePaneContext {
 	 * failure stays until dismissed and can offer to try again.
 	 */
 	toast(title: string, failure?: PageToastFailure): void;
+	/** A change that can be taken back: the toast offers Undo and stays until dismissed. */
+	toastUndo(title: string, undo: () => void): void;
 }
 
 export class PagePaneContext implements IPagePaneContext {
@@ -66,6 +68,7 @@ export class PagePaneContext implements IPagePaneContext {
 		readonly menu: MenuControl,
 		private readonly toasts: ToastHost,
 		private readonly retryLabel: string,
+		private readonly undoLabel: string,
 		readonly closeLabel: string,
 		private readonly focus: () => void,
 		private readonly failureText: (reason: string) => string,
@@ -86,6 +89,20 @@ export class PagePaneContext implements IPagePaneContext {
 
 	setHeading(heading: PageHeading): void {
 		this.heading(heading);
+	}
+
+	toastUndo(title: string, undo: () => void): void {
+		this.toasts.show({
+			tone: 'success',
+			icon: proctorIconFactory('status.success', 18),
+			title,
+			persistent: true,
+			action: {
+				label: this.undoLabel,
+				icon: proctorIconFactory('action.reset', 14),
+				run: undo
+			}
+		});
 	}
 
 	toast(title: string, failure?: PageToastFailure): void {

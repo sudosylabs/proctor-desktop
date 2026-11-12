@@ -150,6 +150,7 @@ export class PagePane extends Disposable {
 			this.menu,
 			toasts,
 			format.text('retry'),
+			format.text('undo'),
 			format.text('closeDialog'),
 			() => this.focus(),
 			(reason) => options.describeFailure(reason),
