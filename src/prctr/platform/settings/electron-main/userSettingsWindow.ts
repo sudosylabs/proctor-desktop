@@ -1,4 +1,5 @@
 import type { IpcMain, WebContents } from 'electron/main';
+import type { IDisposable } from '../../../base/common/lifecycle.js';
 import type {
 	UserSettingsSessionService,
 	SettingsSessionBinding
@@ -14,12 +15,16 @@ export function bindWindowUserSettings(
 	service: UserSettingsSessionService
 ): { dispose(): void } {
 	let disposed = false;
+	let changes: IDisposable | undefined;
 	const ready = (async () => {
 		const snapshot = await service.readSettings(binding).catch(() => undefined);
 		const coordinator = await UserSettingsCoordinator.create({
 			binding,
 			context: { window: 'authenticated' },
-			authority: { commit: (owner, request) => service.commitSettings(owner, request) },
+			authority: {
+				read: (owner) => service.readSettings(owner),
+				commit: (owner, request) => service.commitSettings(owner, request)
+			},
 			// No unprotected disk cache. Acknowledged source lives only in this bound coordinator.
 			cache: {
 				async load() {
@@ -30,7 +35,14 @@ export function bindWindowUserSettings(
 			...(snapshot ? { acknowledged: snapshot.acknowledged } : {}),
 			writable: snapshot?.writable ?? false
 		});
-		if (disposed) await coordinator.dispose();
+		if (disposed) {
+			await coordinator.dispose();
+			return coordinator;
+		}
+		// Settings changed on another computer or in another Session reach this window live.
+		changes = service.onDidChangeSettings(binding, (revision) => {
+			void coordinator.reconcile(revision).catch(() => undefined);
+		});
 		return coordinator;
 	})();
 	let bridge: UserSettingsIpcBridge;
@@ -45,6 +57,7 @@ export function bindWindowUserSettings(
 		dispose() {
 			if (disposed) return;
 			disposed = true;
+			changes?.dispose();
 			try {
 				bridge.dispose();
 			} finally {

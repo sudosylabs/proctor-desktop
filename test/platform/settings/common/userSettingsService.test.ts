@@ -15,6 +15,7 @@ import {
 	type UserSettingsAuthorityPort,
 	type UserSettingsBinding
 } from '../../../../src/prctr/platform/settings/electron-main/userSettingsCoordinator.ts';
+import type { UserSettingsSnapshot } from '../../../../src/prctr/platform/settings/common/userSettingsSession.ts';
 
 const binding: UserSettingsBinding = Object.freeze({
 	principalId: 'principal:one',
@@ -45,6 +46,13 @@ class Cache implements ProtectedUserSettingsCachePort {
 	}
 }
 class Authority implements UserSettingsAuthorityPort {
+	reads = 0;
+	latest: UserSettingsSnapshot | undefined;
+	async read(requested: UserSettingsBinding) {
+		assert.strictEqual(requested.principalId, binding.principalId);
+		this.reads++;
+		return this.latest;
+	}
 	readonly requests: SettingsCommitRequest[] = [];
 	readonly bindings: UserSettingsBinding[] = [];
 	results: SettingsCommitResult[] = [];
@@ -458,5 +466,55 @@ suite('UserSettingsCoordinator', () => {
 		]);
 		assert.strictEqual(replacement.projection().revision, 'r3');
 		await replacement.dispose();
+	});
+	test('a change made elsewhere replaces the acknowledged settings', async () => {
+		const { authority, coordinator } = await create();
+		authority.latest = {
+			acknowledged: { source: '{"editor.fontSize":18}', revision: 'r2' },
+			writable: true
+		};
+		const seen: string[] = [];
+		coordinator.onDidChange((projection) => seen.push(projection.revision));
+		await coordinator.reconcile('r2');
+		assert.strictEqual(coordinator.projection().revision, 'r2');
+		assert.strictEqual(coordinator.effective.get('editor.fontSize'), 18);
+		assert.deepStrictEqual(seen, ['r2']);
+		await coordinator.dispose();
+	});
+	test('an announced revision already acknowledged is not read again', async () => {
+		const { authority, coordinator } = await create();
+		await coordinator.reconcile('r1');
+		assert.strictEqual(authority.reads, 0);
+		await coordinator.dispose();
+	});
+	test('missed events re-read the server and follow its writability', async () => {
+		const { authority, coordinator } = await create();
+		authority.latest = { acknowledged: { source: '{}', revision: 'r1' }, writable: false };
+		await coordinator.reconcile(undefined);
+		assert.strictEqual(authority.reads, 1);
+		assert.strictEqual(coordinator.projection().writable, false);
+		await coordinator.dispose();
+	});
+	test("a window's own commit is not read back as someone else's change", async () => {
+		const { authority, coordinator } = await create();
+		authority.results.push({ kind: 'success', revision: 'r2' });
+		const committed = coordinator.commit({
+			source: '{"editor.fontSize":16}',
+			expectedRevision: 'r1',
+			idempotencyKey: 'save-key-own-change'
+		});
+		const reconciled = coordinator.reconcile('r2');
+		await Promise.all([committed, reconciled]);
+		assert.strictEqual(authority.reads, 0);
+		assert.strictEqual(coordinator.effective.get('editor.fontSize'), 16);
+		await coordinator.dispose();
+	});
+	test('an unreadable server leaves the acknowledged settings as they are', async () => {
+		const { authority, coordinator } = await create();
+		await coordinator.reconcile('r9');
+		assert.strictEqual(authority.reads, 1);
+		assert.strictEqual(coordinator.projection().revision, 'r1');
+		assert.strictEqual(coordinator.projection().writable, true);
+		await coordinator.dispose();
 	});
 });

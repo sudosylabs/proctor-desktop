@@ -91,6 +91,9 @@ async function run(): Promise<void> {
 				if (request.expectedRevision !== 'r'.repeat(26))
 					throw new Error('Settings revision lost');
 				return { kind: 'success', revision: 't'.repeat(26) };
+			},
+			onDidChangeSettings() {
+				return { dispose() {} };
 			}
 		},
 		production: true,
@@ -455,7 +458,10 @@ async function verifyTransactionalRollback(
 		await createUserSettingsComposition(settingsIpc.ipc, authenticatedContents, {
 			binding: { principalId: 'principal-rollback', sessionId: 'session-rollback' },
 			context: { window: 'authenticated' },
-			authority: { commit: async () => ({ kind: 'unavailable' }) },
+			authority: {
+				read: async () => undefined,
+				commit: async () => ({ kind: 'unavailable' })
+			},
 			cache: { load: async () => undefined, store: async () => {} },
 			acknowledged: { source: '{}', revision: 'settings-1' },
 			writable: true

@@ -44,6 +44,8 @@ export const serverEventCatalog = {
 	'candidate.exam_activity.changed': userEvent(() => ({})),
 	/** The User's profile picture changed at profile `revision`. */
 	user_profile_picture_changed: userEvent((data) => ({ revision: eventCount(data.revision) })),
+	/** The User's settings were replaced at `revision`, by this or another Session. */
+	user_settings_changed: userEvent((data) => ({ revision: eventRevision(data.revision) })),
 	/** The Institution's Access Policy reached `revision`. */
 	access_policy_changed: resourceEvent('access_policy.view', 'institution', (data) => ({
 		revision: eventCount(data.revision)
@@ -66,4 +68,10 @@ function eventCount(value: unknown): number {
 	if (!Number.isSafeInteger(value) || Number(value) < 0)
 		throw new TypeError('Invalid event count');
 	return Number(value);
+}
+
+function eventRevision(value: unknown): string {
+	if (typeof value !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(value))
+		throw new TypeError('Invalid event revision');
+	return value;
 }

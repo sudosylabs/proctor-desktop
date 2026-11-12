@@ -249,7 +249,8 @@ void test('closing an authenticated window fences settings requests waiting for 
 			commitSettings: async () => {
 				commits++;
 				return { kind: 'success', revision: 'revision' };
-			}
+			},
+			onDidChangeSettings: () => ({ dispose() {} })
 		}
 	);
 	const pending = Promise.resolve(
@@ -268,6 +269,53 @@ void test('closing an authenticated window fences settings requests waiting for 
 	await rejected;
 	assert.equal(commits, 0);
 	assert.equal(handlers.size, 0);
+});
+
+void test('settings changed elsewhere reach an open authenticated window until it closes', async () => {
+	const { bindWindowUserSettings } =
+		await import('../../../../src/prctr/platform/settings/electron-main/userSettingsWindow.js');
+	type Snapshot =
+		import('../../../../src/prctr/platform/settings/common/userSettingsSession.js').UserSettingsSnapshot;
+	let latest: Snapshot = { acknowledged: { source: '{}', revision: 'before' }, writable: true };
+	let announce: ((revision: string | undefined) => void) | undefined;
+	let subscriptions = 0;
+	const sent: { revision: string; source: string }[] = [];
+	const contents = {
+		id: 33,
+		mainFrame: {},
+		isDestroyed: () => false,
+		send: (_channel: string, projection: { revision: string; source: string }) =>
+			sent.push({ revision: projection.revision, source: projection.source })
+	} as unknown as import('electron/main').WebContents;
+	const binding = bindWindowUserSettings(
+		{ handle: () => {}, removeHandler: () => {} },
+		contents,
+		{ principalId: id, sessionId: id },
+		{
+			readSettings: async () => latest,
+			commitSettings: async () => ({ kind: 'unavailable' }),
+			onDidChangeSettings: (_binding, listener) => {
+				subscriptions++;
+				announce = listener;
+				return {
+					dispose() {
+						announce = undefined;
+					}
+				};
+			}
+		}
+	);
+	while (!announce) await new Promise((resolve) => setImmediate(resolve));
+	assert.equal(subscriptions, 1);
+	latest = {
+		acknowledged: { source: '{"editor.fontSize":18}', revision: 'after' },
+		writable: true
+	};
+	announce('after');
+	while (sent.length === 0) await new Promise((resolve) => setImmediate(resolve));
+	assert.deepEqual(sent, [{ revision: 'after', source: '{"editor.fontSize":18}' }]);
+	binding.dispose();
+	assert.equal(announce, undefined);
 });
 
 void test('token, verification and notice intents are exact and bounded', () => {

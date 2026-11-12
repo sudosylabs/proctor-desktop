@@ -266,6 +266,15 @@ A revision conflict refetches the authoritative source; an uncertain write
 retains the existing retry identity. Closing the window disposes the binding,
 and sign-out fences all pending transport responses.
 
+While the window is open, the binding listens for the server's
+`user_settings_changed` event and for lost realtime continuity. Either one
+reconciles the coordinator after any save in flight. An announced revision that
+is already acknowledged needs no read, so a window's own save is never read back
+as a change. Otherwise the coordinator re-reads the settings, adopts a newer
+revision and follows the server's writability. While an uncertain write is
+unresolved, it waits for that write's retry instead. A failed read leaves the
+acknowledged settings as they were.
+
 The production adapter currently refetches on each authenticated window and
 keeps acknowledged source only in bound memory. It does not introduce an
 unencrypted host settings file or an offline mutation queue. Responses outside

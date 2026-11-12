@@ -3,6 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { createHash } from 'node:crypto';
+import { combinedDisposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import { ServerApiError } from '../../serverApi/common/serverApi.js';
 import type { SessionApi } from '../../serverApi/node/sessionApi.js';
 import { validateUserSettingsCommitIntent } from '../common/settingsRendererProtocol.js';
@@ -18,7 +19,7 @@ import type { SettingsCommitRequest, SettingsCommitResult } from '../common/user
 /** What the Session owner lends the settings transport. Credentials never leave it. */
 export interface UserSettingsSessionPort {
 	/** The typed client of the bound Session; throws `sessionEnded` once it is not current. */
-	apiForSession(binding: SettingsSessionBinding): Pick<SessionApi, 'request'>;
+	apiForSession(binding: SettingsSessionBinding): Pick<SessionApi, 'request' | 'events'>;
 }
 
 /**
@@ -38,6 +39,23 @@ export class UserSettingsServer implements UserSettingsSessionService {
 		} catch {
 			return undefined;
 		}
+	}
+
+	onDidChangeSettings(
+		binding: SettingsSessionBinding,
+		listener: (revision: string | undefined) => void
+	): IDisposable {
+		let events: SessionApi['events'];
+		try {
+			events = this.session.apiForSession(binding).events;
+		} catch {
+			// The Session already ended; the window bound to it is closing.
+			return { dispose() {} };
+		}
+		return combinedDisposable(
+			events.on('user_settings_changed', undefined, (event) => listener(event.data.revision)),
+			events.onDidLoseContinuity(() => listener(undefined))
+		);
 	}
 
 	async commitSettings(

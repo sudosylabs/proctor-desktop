@@ -15,12 +15,15 @@ import {
 	type SettingsCommitResult
 } from '../common/userSettingsService.js';
 import type { SettingsResolutionContext } from '../common/settingsResolution.js';
+import type { UserSettingsSnapshot } from '../common/userSettingsSession.js';
 
 export interface UserSettingsBinding {
 	readonly principalId: string;
 	readonly sessionId: string;
 }
 export interface UserSettingsAuthorityPort {
+	/** The server's current settings, or `undefined` when it can't be read now. */
+	read(binding: UserSettingsBinding): Promise<UserSettingsSnapshot | undefined>;
 	commit(
 		binding: UserSettingsBinding,
 		request: SettingsCommitRequest
@@ -197,6 +200,26 @@ export class UserSettingsCoordinator {
 		}
 		this.#ambiguousRequest = request;
 		return Object.freeze({ kind: 'ambiguous' });
+	}
+	/**
+	 * Takes in a change made outside this window, by another computer or Session. `revision` is
+	 * the one the server announced, or `undefined` when changes may have been missed. Runs after
+	 * any commit in flight, so a window's own change is never read back as someone else's.
+	 */
+	reconcile(revision: string | undefined): Promise<void> {
+		this.#assertLive();
+		return this.#enqueueCommit(async () => {
+			if (revision !== undefined && revision === this.#acknowledged.revision) return;
+			// An unresolved commit is retried with the same request, and its answer settles the
+			// revision; reading now could not tell whether that commit landed.
+			if (this.#ambiguousRequest !== undefined) return;
+			const latest = await this.#authority.read(this.#binding);
+			this.#assertLive();
+			if (latest === undefined) return;
+			if (latest.acknowledged.revision !== this.#acknowledged.revision)
+				await this.#accept(latest.acknowledged);
+			this.setWritable(latest.writable);
+		});
 	}
 	#enqueueCommit<T>(operation: () => Promise<T>): Promise<T> {
 		const queued = this.#commitSerial.then(() => {

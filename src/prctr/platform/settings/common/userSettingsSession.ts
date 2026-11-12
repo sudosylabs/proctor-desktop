@@ -1,3 +1,4 @@
+import type { IDisposable } from '../../../base/common/lifecycle.js';
 import { parseSettingsDocument } from './settingsDocument.js';
 import type {
 	AcknowledgedUserSettings,
@@ -20,6 +21,14 @@ export interface UserSettingsSessionService {
 		binding: SettingsSessionBinding,
 		request: SettingsCommitRequest
 	): Promise<SettingsCommitResult>;
+	/**
+	 * Reports that the acknowledged settings may have changed on the server: with the new
+	 * revision when the server announced one, or `undefined` when events may have been missed.
+	 */
+	onDidChangeSettings(
+		binding: SettingsSessionBinding,
+		listener: (revision: string | undefined) => void
+	): IDisposable;
 }
 
 export function readUserSettingsWire(value: unknown): UserSettingsSnapshot {
