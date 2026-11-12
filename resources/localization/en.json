@@ -3441,6 +3441,84 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
+    "administration.class.page.column.expires": {
+      "message": "Expires",
+      "description": "Column of when an invitation expires.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.column.invitee": {
+      "message": "Invitee",
+      "description": "Column of an invited address.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.column.role": {
+      "message": "Role",
+      "description": "Column of a teacher’s role in the class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.column.since": {
+      "message": "Since",
+      "description": "Column of when a role in the class started.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.column.teacher": {
+      "message": "Teacher",
+      "description": "Column of a class teacher.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.invitations": {
+      "message": "Invitations to this class",
+      "description": "Accessible name of the class invitations table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.invitations.empty": {
+      "message": "No invitations to this class are waiting.",
+      "description": "Empty invitations tab.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.tab.invitations": {
+      "message": "Invitations",
+      "description": "Class tab: pending invitations to the class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.tab.students": {
+      "message": "Students",
+      "description": "Class tab: the students enrolled.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.tab.teachers": {
+      "message": "Teachers",
+      "description": "Class tab: people with a role in the class.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.teachers": {
+      "message": "Teachers",
+      "description": "Accessible name of the class teachers table.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.teachers.empty": {
+      "message": "No one has a role in this class yet.",
+      "description": "Empty teachers tab.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
+    "administration.class.page.views": {
+      "message": "Views of the class",
+      "description": "Accessible name of the class tabs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/structure/structureMessages.ts"
+    },
     "administration.client.browser": {
       "message": "Web browser",
       "description": "An event that came from a web browser.",

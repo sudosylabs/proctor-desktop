@@ -28,6 +28,10 @@ import { AdminFilters } from '../widgets/adminFilters.js';
 import { AdminFormDialog } from '../widgets/adminFormDialog.js';
 import { AdminList, type AdminListItem } from '../widgets/adminList.js';
 import { AdminMenuButton } from '../widgets/adminMenuButton.js';
+import { AdminTabs } from '../widgets/adminTabs.js';
+import { createElementFactory } from '../../../../base/browser/documentElements.js';
+
+type ClassTab = 'students' | 'teachers' | 'invitations';
 import { adminRead, readOnce, readPages } from '../widgets/adminReads.js';
 
 type Member = AdminListItem<'classMembers'>;
@@ -40,6 +44,13 @@ type Klass = AdministrationValue<'class'>;
 export class ClassPage extends Disposable implements PageView {
 	private readonly klass: PageRead<Klass, AdministrationFailure, AdministrationResponse>;
 	private readonly members: AdminList<'classMembers'>;
+	private readonly teachers: AdminList<'roleBindings'>;
+	private readonly invitations: AdminList<'invitations'>;
+	private readonly tabs: AdminTabs<ClassTab>;
+	private readonly hosts: Readonly<Record<ClassTab, HTMLElement>>;
+	private readonly roleNames = new Map<string, string>();
+	private rolesLoaded = false;
+	private visible = false;
 	private readonly changes: AdminChanges;
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
 	private readonly names = new Map<string, string>();
@@ -82,7 +93,33 @@ export class ClassPage extends Disposable implements PageView {
 			new AdminMenuButton(headerActions, format.text('classMore'), () => this.menu(), pane)
 		);
 
-		const filters = this._register(new AdminFilters(body));
+		// Students, Teachers and Invitations are tabs, each its own list with its count.
+		const $ = createElementFactory(body.ownerDocument);
+		this.tabs = this._register(
+			new AdminTabs<ClassTab>(
+				body,
+				format.text('classViews'),
+				[
+					{ id: 'students', label: format.text('classTabStudents') },
+					{ id: 'teachers', label: format.text('classTabTeachers') },
+					{ id: 'invitations', label: format.text('classTabInvitations') }
+				],
+				'students'
+			)
+		);
+		const studentsHost = $('div');
+		const teachersHost = $('div');
+		const invitationsHost = $('div');
+		body.append(studentsHost, teachersHost, invitationsHost);
+		this.hosts = {
+			students: studentsHost,
+			teachers: teachersHost,
+			invitations: invitationsHost
+		};
+		for (const [id, host] of Object.entries(this.hosts))
+			this.tabs.setPanel(id as ClassTab, host);
+		this._register(this.tabs.onDidChange(() => this.showTab()));
+		const filters = this._register(new AdminFilters(studentsHost));
 		filters.addSelect<'current' | 'history'>(
 			format.text('classEnrollment'),
 			'status.success',
@@ -102,7 +139,7 @@ export class ClassPage extends Disposable implements PageView {
 		this.members = this._register(
 			instantiationService.createInstance(
 				AdminList<'classMembers'>,
-				body,
+				studentsHost,
 				'classMembers',
 				{ classId },
 				{
@@ -158,13 +195,141 @@ export class ClassPage extends Disposable implements PageView {
 				}
 			)
 		);
-		this._register(this.members.onDidLoad((members) => void this.loadNames(members)));
+		this._register(
+			this.members.onDidLoad((members) => {
+				this.count('students', this.members);
+				void this.loadNames(members);
+			})
+		);
+		this.teachers = this._register(
+			instantiationService.createInstance(
+				AdminList<'roleBindings'>,
+				teachersHost,
+				'roleBindings',
+				{ scopeType: 'class', scopeId: classId },
+				{
+					label: format.text('classTeachers'),
+					columns: [
+						{
+							label: format.text('classTeacherColumn'),
+							width: '46%',
+							cell: (binding) => ({
+								kind: 'person',
+								name: this.names.get(binding.userId) ?? format.text('inviteLoading')
+							})
+						},
+						{
+							label: format.text('classRoleColumn'),
+							width: '30%',
+							cell: (binding) => ({
+								kind: 'text',
+								primary: this.roleNames.get(binding.roleId) ?? '',
+								quiet: true
+							})
+						},
+						{
+							label: format.text('classSinceColumn'),
+							align: 'end',
+							cell: (binding) => ({
+								kind: 'text',
+								primary: format.date(binding.startAt),
+								mono: true,
+								quiet: true
+							})
+						}
+					],
+					rowId: (binding) => binding.id,
+					rowName: (binding) => this.names.get(binding.userId) ?? '',
+					open: (binding) => navigation.selectAdministrationPage('user', binding.userId),
+					empty: format.text('classTeachersEmpty')
+				}
+			)
+		);
+		this._register(
+			this.teachers.onDidLoad((bindings) => {
+				this.count('teachers', this.teachers);
+				void this.loadNames(bindings);
+				void this.loadRoles();
+			})
+		);
+		this.invitations = this._register(
+			instantiationService.createInstance(
+				AdminList<'invitations'>,
+				invitationsHost,
+				'invitations',
+				{ targetId: classId, state: 'pending' },
+				{
+					label: format.text('classInvitations'),
+					columns: [
+						{
+							label: format.text('classInviteeColumn'),
+							width: '56%',
+							cell: (invitation) => ({
+								kind: 'text',
+								primary: invitation.email,
+								strong: true
+							})
+						},
+						{
+							label: format.text('classExpiresColumn'),
+							align: 'end',
+							cell: (invitation) => ({
+								kind: 'text',
+								primary: format.date(invitation.expiresAt),
+								mono: true,
+								quiet: true
+							})
+						}
+					],
+					rowId: (invitation) => invitation.id,
+					rowName: (invitation) => invitation.email,
+					empty: format.text('classInvitationsEmpty')
+				}
+			)
+		);
+		this._register(
+			this.invitations.onDidLoad(() => this.count('invitations', this.invitations))
+		);
+		this.showTab();
 		this.renderHeading();
 	}
 
 	setVisible(visible: boolean): void {
+		this.visible = visible;
 		this.klass.setActive(visible);
-		this.members.setActive(visible);
+		this.showTab();
+	}
+
+	private showTab(): void {
+		const tab = this.tabs.value;
+		for (const [id, host] of Object.entries(this.hosts)) host.hidden = id !== tab;
+		this.members.setActive(this.visible && tab === 'students');
+		this.teachers.setActive(this.visible && tab === 'teachers');
+		this.invitations.setActive(this.visible && tab === 'invitations');
+	}
+
+	private count(
+		tab: ClassTab,
+		list: {
+			readonly totalCount: { readonly count: number; readonly atLeast: boolean } | undefined;
+		}
+	): void {
+		const total = list.totalCount;
+		this.tabs.setCount(
+			tab,
+			total === undefined
+				? undefined
+				: this.format.count(total.count) + (total.atLeast ? '+' : '')
+		);
+	}
+
+	private async loadRoles(): Promise<void> {
+		if (this.rolesLoaded) return;
+		this.rolesLoaded = true;
+		const roles = await readPages(this.administration, 'roles', {});
+		if (this._store.isDisposed || roles.kind !== 'data') return;
+		for (const role of roles.value.items) this.roleNames.set(role.id, role.displayName);
+		this.teachers.redraw();
 	}
 
 	private renderHeading(): void {
@@ -195,7 +360,7 @@ export class ClassPage extends Disposable implements PageView {
 		if (this.periodName !== '') this.renderHeading();
 	}
 
-	private async loadNames(members: readonly Member[]): Promise<void> {
+	private async loadNames(members: readonly { readonly userId: string }[]): Promise<void> {
 		const missing = [...new Set(members.map((member) => member.userId))].filter(
 			(id) => !this.names.has(id)
 		);
@@ -214,6 +379,7 @@ export class ClassPage extends Disposable implements PageView {
 			);
 		});
 		this.members.redraw();
+		this.teachers.redraw();
 	}
 
 	private memberActions(member: Member): readonly PageRowAction[] {

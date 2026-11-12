@@ -297,6 +297,71 @@ export const structureMessages = Object.freeze({
 		defaultMessage: 'Student',
 		description: 'Class members column.'
 	}),
+	classViews: defineMessage({
+		id: 'administration.class.page.views',
+		defaultMessage: 'Views of the class',
+		description: 'Accessible name of the class tabs.'
+	}),
+	classTabStudents: defineMessage({
+		id: 'administration.class.page.tab.students',
+		defaultMessage: 'Students',
+		description: 'Class tab: the students enrolled.'
+	}),
+	classTabTeachers: defineMessage({
+		id: 'administration.class.page.tab.teachers',
+		defaultMessage: 'Teachers',
+		description: 'Class tab: people with a role in the class.'
+	}),
+	classTabInvitations: defineMessage({
+		id: 'administration.class.page.tab.invitations',
+		defaultMessage: 'Invitations',
+		description: 'Class tab: pending invitations to the class.'
+	}),
+	classTeachers: defineMessage({
+		id: 'administration.class.page.teachers',
+		defaultMessage: 'Teachers',
+		description: 'Accessible name of the class teachers table.'
+	}),
+	classTeacherColumn: defineMessage({
+		id: 'administration.class.page.column.teacher',
+		defaultMessage: 'Teacher',
+		description: 'Column of a class teacher.'
+	}),
+	classRoleColumn: defineMessage({
+		id: 'administration.class.page.column.role',
+		defaultMessage: 'Role',
+		description: 'Column of a teacher’s role in the class.'
+	}),
+	classSinceColumn: defineMessage({
+		id: 'administration.class.page.column.since',
+		defaultMessage: 'Since',
+		description: 'Column of when a role in the class started.'
+	}),
+	classTeachersEmpty: defineMessage({
+		id: 'administration.class.page.teachers.empty',
+		defaultMessage: 'No one has a role in this class yet.',
+		description: 'Empty teachers tab.'
+	}),
+	classInvitations: defineMessage({
+		id: 'administration.class.page.invitations',
+		defaultMessage: 'Invitations to this class',
+		description: 'Accessible name of the class invitations table.'
+	}),
+	classInviteeColumn: defineMessage({
+		id: 'administration.class.page.column.invitee',
+		defaultMessage: 'Invitee',
+		description: 'Column of an invited address.'
+	}),
+	classExpiresColumn: defineMessage({
+		id: 'administration.class.page.column.expires',
+		defaultMessage: 'Expires',
+		description: 'Column of when an invitation expires.'
+	}),
+	classInvitationsEmpty: defineMessage({
+		id: 'administration.class.page.invitations.empty',
+		defaultMessage: 'No invitations to this class are waiting.',
+		description: 'Empty invitations tab.'
+	}),
 	classEnrolledColumn: defineMessage({
 		id: 'administration.structure.class.column.enrolled',
 		defaultMessage: 'Enrolled',
