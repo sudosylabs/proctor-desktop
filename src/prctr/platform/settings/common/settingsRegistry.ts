@@ -3,6 +3,7 @@ import {
 	normalizeSemanticTokenColorCustomizations
 } from '../../theme/common/tokenCustomizations.js';
 import { normalizeColorCustomizations } from '../../theme/common/colorCustomizations.js';
+import { normalizeAdministrationLists } from './administrationLists.js';
 import {
 	SETTINGS_MANIFEST,
 	type EffectiveSettingId,
@@ -53,6 +54,8 @@ export const settingsRegistry: SettingsRegistry = Object.freeze({
 		if (id === 'editor.semanticTokenColorCustomizations')
 			return normalizeSemanticTokenColorCustomizations(value) as
 				SettingValueMap[K] | undefined;
+		if (id === 'administration.lists')
+			return normalizeAdministrationLists(value) as SettingValueMap[K] | undefined;
 		if (id === 'workbench.colorCustomizations')
 			return normalizeColorCustomizations(value) as SettingValueMap[K] | undefined;
 		if (declaration.type === 'boolean' && typeof value !== 'boolean') return undefined;

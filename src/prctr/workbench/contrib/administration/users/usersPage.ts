@@ -30,6 +30,15 @@ import { readOnce, readPages, readUnitTree, unitLabel } from '../widgets/adminRe
 import { BulkUserChanges } from './bulkUserChanges.js';
 import { AdminMenuButton } from '../widgets/adminMenuButton.js';
 import { UserActions, type AdminUser } from './userActions.js';
+import { SaveViewDialog } from './saveViewDialog.js';
+import { AdminTabs } from '../widgets/adminTabs.js';
+import { createElementFactory } from '../../../../base/browser/documentElements.js';
+import {
+	MAX_SAVED_USER_VIEWS,
+	type SavedUserFilter
+} from '../../../../platform/settings/common/administrationLists.js';
+import { IAdministrationListsService } from '../../../services/administration/common/administrationLists.js';
+import './media/usersPage.css';
 
 type Status = 'active' | 'disabled' | 'any';
 type LastActive = 'any' | 'never' | 'recent' | 'idle';
@@ -37,6 +46,7 @@ const DAY = 86_400_000;
 type AffiliationKind = (typeof affiliationKinds)[number];
 
 const ANY = 'any';
+const EVERYONE = 'everyone';
 /** Pictures kept for people already shown. */
 const PHOTO_CACHE = 200;
 /** Below this width the selection bar keeps only its count, one menu and Clear selection. */
@@ -60,6 +70,17 @@ export class UsersPage extends Disposable implements PageView {
 	private readonly lastActive: SelectControl<LastActive>;
 	/** Everyone the filters match is chosen, not only the page shown. */
 	private everyoneChosen = false;
+	private readonly viewsHost: HTMLElement;
+	private readonly tabsHolder: HTMLElement;
+	private readonly viewTools: HTMLElement;
+	private readonly saveView: ButtonControl;
+	private readonly removeView: ButtonControl;
+	private readonly viewTabs = this._register(new MutableDisposable<AdminTabs<string>>());
+	private readonly viewDialog = this._register(new MutableDisposable<SaveViewDialog>());
+	/** The tab shown: Everyone, or a saved view by its place. */
+	private currentView = EVERYONE;
+	/** Each saved view's count, by its name, read once it is shown. */
+	private readonly viewCounts = new Map<string, string>();
 	private readonly bulk: BulkUserChanges;
 	private enableButton: ButtonControl | undefined;
 	private disableButton: ButtonControl | undefined;
@@ -75,7 +96,8 @@ export class UsersPage extends Disposable implements PageView {
 		@IAdministrationService private readonly administration: IAdministrationService,
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
 		@IAuthenticatedNavigationService navigation: IAuthenticatedNavigationService,
-		@IPagePaneContext private readonly pane: IPagePaneContext
+		@IPagePaneContext private readonly pane: IPagePaneContext,
+		@IAdministrationListsService private readonly lists: IAdministrationListsService
 	) {
 		super();
 		const importButton = this._register(
@@ -97,6 +119,31 @@ export class UsersPage extends Disposable implements PageView {
 		);
 		this._register(inviteButton.onDidRequest(() => this.openInvite()));
 
+		// Saved views are tabs above the filters, each a set of filters with its own count.
+		const $ = createElementFactory(body.ownerDocument);
+		this.tabsHolder = $('div.prctr-admin-users-views__tabs');
+		this.viewTools = $('div.prctr-admin-users-views__tools');
+		this.viewsHost = $('div.prctr-admin-users-views', {}, this.tabsHolder, this.viewTools);
+		body.append(this.viewsHost);
+		this.saveView = this._register(
+			new ButtonControl(this.viewTools, {
+				variant: 'ghost',
+				size: 'small',
+				label: format.text('viewsSaveAs'),
+				icon: proctorIconFactory('action.add', 14)
+			})
+		);
+		this.removeView = this._register(
+			new ButtonControl(this.viewTools, {
+				variant: 'ghost',
+				size: 'small',
+				label: format.text('viewsRemove'),
+				icon: proctorIconFactory('action.delete', 14)
+			})
+		);
+		this._register(this.saveView.onDidRequest(() => this.openSaveView()));
+		this._register(this.removeView.onDidRequest(() => void this.removeCurrentView()));
+		this._register(this.lists.onDidChange(() => this.renderViews()));
 		this.filters = this._register(new AdminFilters(body));
 		const filters = this.filters;
 		this.search = filters.addSearch(format.text('usersFind'), (q) => this.setQuery({ q }));
@@ -263,7 +310,153 @@ export class UsersPage extends Disposable implements PageView {
 		this._register(this.list.onDidLoad((users) => void this.loadPhotos(users)));
 		void this.loadUnits();
 		void this.loadReach();
+		this._register(this.list.onDidLoad(() => this.updateViewTools()));
+		void this.lists.ready.then(() => this.renderViews());
 	}
+
+	// #region Saved views
+
+	private renderViews(): void {
+		if (this._store.isDisposed) return;
+		const views = this.lists.userViews;
+		if (this.currentView !== EVERYONE && Number(this.currentView) >= views.length)
+			this.currentView = EVERYONE;
+		const tabs = new AdminTabs<string>(
+			this.tabsHolder,
+			this.format.text('viewsLabel'),
+			[
+				{ id: EVERYONE, label: this.format.text('viewsEveryone') },
+				...views.map((view, index) => ({ id: String(index), label: view.name }))
+			],
+			this.currentView
+		);
+		this.tabsHolder.replaceChildren(tabs.element);
+		tabs.onDidChange((id) => this.applyView(id));
+		this.viewTabs.value = tabs;
+		const total = this.list.totalCount;
+		if (total !== undefined)
+			tabs.setCount(EVERYONE, this.format.count(total.count) + (total.atLeast ? '+' : ''));
+		views.forEach((view, index) => {
+			const known = this.viewCounts.get(view.name);
+			if (known !== undefined) tabs.setCount(String(index), known);
+			else void this.countView(view.filter, view.name, String(index));
+		});
+		this.updateViewTools();
+	}
+
+	private async countView(filter: SavedUserFilter, name: string, id: string): Promise<void> {
+		const read = await readOnce(this.administration, {
+			...this.queryFor(filter),
+			kind: 'users',
+			limit: ADMINISTRATION_PAGE_SIZE
+		} as Parameters<typeof readOnce<'users'>>[1]);
+		if (this._store.isDisposed || read.kind !== 'data' || read.value.total === undefined)
+			return;
+		const text =
+			this.format.count(read.value.total) + (read.value.totalAtLeast === true ? '+' : '');
+		this.viewCounts.set(name, text);
+		this.viewTabs.value?.setCount(id, text);
+	}
+
+	/** Save as view while filters are set; Remove view on a saved view's own tab. */
+	private updateViewTools(): void {
+		const views = this.lists.userViews;
+		const filtered = Object.keys(this.savedFilter()).length > 0;
+		const onView = this.currentView !== EVERYONE;
+		this.saveView.element.hidden = !filtered || onView || views.length >= MAX_SAVED_USER_VIEWS;
+		this.removeView.element.hidden = !onView;
+		this.viewsHost.hidden = views.length === 0 && this.saveView.element.hidden;
+		if (this.currentView === EVERYONE) {
+			const total = this.list.totalCount;
+			if (total !== undefined)
+				this.viewTabs.value?.setCount(
+					EVERYONE,
+					this.format.count(total.count) + (total.atLeast ? '+' : '')
+				);
+		}
+	}
+
+	/** The Users filters now set, as a saved view keeps them. */
+	private savedFilter(): SavedUserFilter {
+		const q = this.search.value.trim();
+		const status = this.status.value;
+		return {
+			...(q === '' ? {} : { q }),
+			...(this.affiliation.value === ANY ? {} : { affiliation: [this.affiliation.value] }),
+			...(this.unit.value === ANY ? {} : { academicUnitId: this.unit.value }),
+			...(this.role.value === ANY ? {} : { roleIds: [this.role.value] }),
+			...(status === 'active' ? {} : { status }),
+			...(this.lastActive.value === 'any' ? {} : { lastActive: this.lastActive.value })
+		};
+	}
+
+	private queryFor(filter: SavedUserFilter): AdminListQuery<'users'> {
+		const now = this.format.now();
+		return {
+			...(filter.q === undefined ? {} : { q: filter.q }),
+			...(filter.affiliation === undefined ? {} : { affiliation: filter.affiliation }),
+			...(filter.academicUnitId === undefined
+				? {}
+				: { academicUnitId: filter.academicUnitId }),
+			...(filter.roleIds === undefined ? {} : { roleIds: filter.roleIds }),
+			...(filter.status === 'disabled'
+				? { state: 'disabled' as const }
+				: filter.status === 'any'
+					? { includeDisabled: true }
+					: {}),
+			...(filter.lastActive === 'never' ? { neverSignedIn: true } : {}),
+			...(filter.lastActive === 'recent' ? { lastActiveAfter: now - 30 * DAY } : {}),
+			...(filter.lastActive === 'idle' ? { lastActiveBefore: now - 90 * DAY } : {})
+		};
+	}
+
+	/** Shows a tab: its filters fill the bar and the list reads from its first page. */
+	private applyView(id: string): void {
+		this.currentView = id;
+		const filter = id === EVERYONE ? {} : (this.lists.userViews[Number(id)]?.filter ?? {});
+		this.search.value = filter.q ?? '';
+		this.status.setValue(filter.status ?? 'active');
+		this.affiliation.setValue(filter.affiliation?.[0] ?? ANY);
+		this.unit.setValue(filter.academicUnitId ?? ANY);
+		this.role.setValue(filter.roleIds?.[0] ?? ANY);
+		this.lastActive.setValue(filter.lastActive ?? 'any');
+		this.query = this.queryFor(filter);
+		this.list.setQuery(this.query);
+		this.updateViewTools();
+	}
+
+	private openSaveView(): void {
+		const filter = this.savedFilter();
+		this.viewDialog.value = this.instantiationService.createInstance(
+			SaveViewDialog,
+			this.filterWords(),
+			async (name) => {
+				const views = [...this.lists.userViews, { name, filter }];
+				const saved = await this.lists.setUserViews(views);
+				if (saved && !this._store.isDisposed) {
+					this.currentView = String(views.length - 1);
+					this.renderViews();
+				}
+				return saved;
+			}
+		);
+	}
+
+	private async removeCurrentView(): Promise<void> {
+		if (this.currentView === EVERYONE) return;
+		const index = Number(this.currentView);
+		const views = this.lists.userViews.filter((_, place) => place !== index);
+		const removed = await this.lists.setUserViews(views);
+		if (this._store.isDisposed) return;
+		if (!removed) {
+			this.pane.toast(this.format.text('viewsNotSaved'));
+			return;
+		}
+		this.applyView(EVERYONE);
+		this.renderViews();
+	}
+
+	// #endregion
 
 	private statusChoices(wide: boolean) {
 		return [

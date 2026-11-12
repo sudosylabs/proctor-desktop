@@ -9710,6 +9710,62 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
+    "administration.users.views.everyone": {
+      "message": "Everyone",
+      "description": "The tab of Users without a saved view.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.views.label": {
+      "message": "Views of Users",
+      "description": "Accessible name of the saved views tabs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.views.name": {
+      "message": "Name",
+      "description": "Label of a saved view’s name.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.views.notsaved": {
+      "message": "The view couldn’t be saved. Try again in a moment.",
+      "description": "A saved view that couldn’t be kept in the settings.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.views.remove": {
+      "message": "Remove view",
+      "description": "Removes the saved view shown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.views.save": {
+      "message": "Save view",
+      "description": "Saves the named view.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.views.saveas": {
+      "message": "Save as view",
+      "description": "Keeps the current Users filters as a tab.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.views.savebody": {
+      "message": "A tab under Users shows them again on any computer: {filters}.",
+      "description": "Description of naming a saved view, with the filters in words.",
+      "placeholders": [
+        "filters"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.users.views.savetitle": {
+      "message": "Save these filters as a view",
+      "description": "Title of naming a saved view.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
     "authenticated.account.nav.history": {
       "message": "Account history",
       "description": "Account page listing what was done with the account.",
@@ -11930,6 +11986,18 @@
     "settings.accessibility.screenreader.title": {
       "message": "Screen reader mode",
       "description": "Title for the screen reader mode setting.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.administration.lists.description": {
+      "message": "How many rows each Administration list shows, and your saved views of Users.",
+      "description": "Description of the remembered Administration list choices.",
+      "placeholders": [],
+      "source": "src/prctr/platform/settings/common/settingsManifest.ts"
+    },
+    "settings.administration.lists.title": {
+      "message": "Administration lists",
+      "description": "Title of the remembered page sizes and saved views of Administration lists.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },

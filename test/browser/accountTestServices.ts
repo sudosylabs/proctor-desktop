@@ -1,3 +1,8 @@
+import { SyncDescriptor } from '../../src/prctr/platform/instantiation/common/descriptors.ts';
+import {
+	AdministrationListsService,
+	IAdministrationListsService
+} from '../../src/prctr/workbench/services/administration/common/administrationLists.ts';
 import type { IDisposable } from '../../src/prctr/base/common/lifecycle.ts';
 import type { LocalizationContext } from '../../src/prctr/base/common/localization.ts';
 import type { AccountClient } from '../../src/prctr/platform/account/common/accountProtocol.ts';
@@ -94,7 +99,8 @@ export function createAccountTestServices(options: AccountTestServicesOptions): 
 			navigation(options.signOut ?? (() => undefined), options.openAdministration)
 		],
 		[IAdministrationFormatService, new AdministrationFormatService(localization, pageFormat)],
-		[IAdministrationService, administration]
+		[IAdministrationService, administration],
+		[IAdministrationListsService, new SyncDescriptor(AdministrationListsService)]
 	);
 	const instantiationService = new InstantiationService(services, true);
 	return {

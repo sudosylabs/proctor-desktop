@@ -2,6 +2,10 @@
  *  Copyright (c) Proctor contributors. All rights reserved.
  *--------------------------------------------------------------------------------------------*/
 
+import {
+	AdministrationListsService,
+	IAdministrationListsService
+} from '../../workbench/services/administration/common/administrationLists.js';
 import type { AccountClient } from '../../platform/account/common/accountProtocol.js';
 import type { AdministrationClient } from '../../platform/administration/common/administrationProtocol.js';
 import { IClipboardService } from '../../platform/clipboard/common/clipboardService.js';
@@ -83,6 +87,7 @@ export function authenticatedWindowServices(
 			services.set(IExamActivityService, new ExamActivityService(preload.examActivity));
 		}
 		services.set(IUserSettingsService, new UserSettingsService(preload.settings));
+		services.set(IAdministrationListsService, new SyncDescriptor(AdministrationListsService));
 		services.set(IClipboardService, new NativeClipboardService(preload.clipboard));
 		services.set(IAuthenticatedNavigationService, new SyncDescriptor(AuthenticatedFrame));
 	};

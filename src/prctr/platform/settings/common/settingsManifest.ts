@@ -3,6 +3,7 @@ import type {
 	ISemanticTokenColorCustomizations
 } from '../../theme/common/tokenCustomizationTypes.js';
 import type { IColorCustomizations } from '../../theme/common/colorCustomizations.js';
+import type { AdministrationLists } from './administrationLists.js';
 export interface SettingMessageDescriptor {
 	readonly id: string;
 	readonly defaultMessage: string;
@@ -192,6 +193,29 @@ export const SETTINGS_MANIFEST = [
 			id: 'settings.theme.description',
 			defaultMessage: 'Colours for code in the exam editor.',
 			description: 'Description of the packaged color theme setting.'
+		})
+	},
+	{
+		id: 'administration.lists',
+		type: 'object',
+		default: {},
+		storage: 'portableUser',
+		domain: 'navigation',
+		windows: ['authenticated'],
+		languageOverride: false,
+		activation: 'immediate',
+		candidate: 'nonCandidateOnly',
+		title: defineMessage({
+			id: 'settings.administration.lists.title',
+			defaultMessage: 'Administration lists',
+			description:
+				'Title of the remembered page sizes and saved views of Administration lists.'
+		}),
+		description: defineMessage({
+			id: 'settings.administration.lists.description',
+			defaultMessage:
+				'How many rows each Administration list shows, and your saved views of Users.',
+			description: 'Description of the remembered Administration list choices.'
 		})
 	},
 	{
@@ -668,6 +692,7 @@ export interface SettingValueMap {
 	readonly 'window.theme': 'system' | 'light' | 'dark';
 	readonly 'workbench.colorTheme': string;
 	readonly 'workbench.colorCustomizations': IColorCustomizations;
+	readonly 'administration.lists': AdministrationLists;
 	readonly 'workbench.preferHighContrast': boolean;
 	readonly 'window.zoomLevel': number;
 	readonly 'editor.fontSize': number;

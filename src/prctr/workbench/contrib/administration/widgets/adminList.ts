@@ -37,6 +37,7 @@ import {
 } from '../../../browser/authenticated/pages/pageSection.js';
 import { IPagePaneContext } from '../../../browser/authenticated/pages/pagePaneContext.js';
 import { IAdministrationService } from '../../../services/administration/common/administration.js';
+import { IAdministrationListsService } from '../../../services/administration/common/administrationLists.js';
 import { IAdministrationFormatService } from '../administrationFormat.js';
 import { administrationFailureWithdraws } from '../common/administrationPresentation.js';
 import {
@@ -236,10 +237,19 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		@IAdministrationService private readonly administration: IAdministrationService,
 		@IAdministrationFormatService private readonly format: IAdministrationFormatService,
 		@IPagePaneContext private readonly pane: IPagePaneContext,
-		@IInstantiationService instantiationService: IInstantiationService
+		@IInstantiationService instantiationService: IInstantiationService,
+		@IAdministrationListsService private readonly lists: IAdministrationListsService
 	) {
 		super();
 		this.query = query;
+		// Each list remembers its page size in the person's settings, by the list's name.
+		this.pageSize = lists.pageSize(kind) ?? ADMINISTRATION_PAGE_SIZE;
+		void lists.ready.then(() => {
+			const remembered = lists.pageSize(kind);
+			if (this._store.isDisposed || remembered === undefined || remembered === this.pageSize)
+				return;
+			this.applyPageSize(remembered);
+		});
 		this.sort = options.sorting?.initial;
 		this.section = this._register(
 			instantiationService.createInstance(PageSection, host, {
@@ -418,6 +428,15 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 		this.restart();
 	}
 
+	private applyPageSize(size: AdministrationPageSize): void {
+		this.pageSize = size;
+		this.pageSizeButton.setState({
+			label: this.format.text('listPageSize', { count: this.format.count(size) }),
+			icon: proctorIconFactory('action.expand', 14)
+		});
+		this.restart();
+	}
+
 	private choosePageSize(): void {
 		const button = this.pageSizeButton.element;
 		this.pane.menu.show(
@@ -429,12 +448,8 @@ export class AdminList<K extends AdminListKind> extends Disposable {
 					: {}),
 				run: () => {
 					if (size === this.pageSize) return;
-					this.pageSize = size;
-					this.pageSizeButton.setState({
-						label: this.format.text('listPageSize', { count: this.format.count(size) }),
-						icon: proctorIconFactory('action.expand', 14)
-					});
-					this.restart();
+					this.applyPageSize(size);
+					void this.lists.setPageSize(this.kind, size);
 				}
 			})),
 			this.format.text('listPageSizeChoice')

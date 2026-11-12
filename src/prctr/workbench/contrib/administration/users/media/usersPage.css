@@ -1,0 +1,26 @@
+/* Users' saved views: tabs with their counts, and Save as view or Remove view at the end. */
+@layer contributions {
+	.prctr-admin-users-views {
+		align-items: flex-end;
+		display: flex;
+		gap: 12px;
+		justify-content: space-between;
+		margin-block-end: 4px;
+	}
+	.prctr-admin-users-views[hidden] {
+		display: none;
+	}
+	.prctr-admin-users-views .prctr-admin-users-views__tabs {
+		flex: 1;
+		min-inline-size: 0;
+	}
+	.prctr-admin-users-views .prctr-admin-users-views__tools {
+		display: flex;
+		flex: none;
+		gap: 8px;
+		padding-block-end: 6px;
+	}
+	.prctr-admin-users-views .prctr-admin-users-views__tools [hidden] {
+		display: none;
+	}
+}

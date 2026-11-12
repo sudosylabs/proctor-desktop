@@ -559,6 +559,51 @@ export const usersMessages = Object.freeze({
 		defaultMessage: 'Everyone',
 		description: 'The filters of a change for everyone when none is set.'
 	}),
+	viewsEveryone: defineMessage({
+		id: 'administration.users.views.everyone',
+		defaultMessage: 'Everyone',
+		description: 'The tab of Users without a saved view.'
+	}),
+	viewsLabel: defineMessage({
+		id: 'administration.users.views.label',
+		defaultMessage: 'Views of Users',
+		description: 'Accessible name of the saved views tabs.'
+	}),
+	viewsSaveAs: defineMessage({
+		id: 'administration.users.views.saveas',
+		defaultMessage: 'Save as view',
+		description: 'Keeps the current Users filters as a tab.'
+	}),
+	viewsRemove: defineMessage({
+		id: 'administration.users.views.remove',
+		defaultMessage: 'Remove view',
+		description: 'Removes the saved view shown.'
+	}),
+	viewsSaveTitle: defineMessage({
+		id: 'administration.users.views.savetitle',
+		defaultMessage: 'Save these filters as a view',
+		description: 'Title of naming a saved view.'
+	}),
+	viewsSaveBody: defineMessage({
+		id: 'administration.users.views.savebody',
+		defaultMessage: 'A tab under Users shows them again on any computer: {filters}.',
+		description: 'Description of naming a saved view, with the filters in words.'
+	}),
+	viewsName: defineMessage({
+		id: 'administration.users.views.name',
+		defaultMessage: 'Name',
+		description: 'Label of a saved view’s name.'
+	}),
+	viewsSave: defineMessage({
+		id: 'administration.users.views.save',
+		defaultMessage: 'Save view',
+		description: 'Saves the named view.'
+	}),
+	viewsNotSaved: defineMessage({
+		id: 'administration.users.views.notsaved',
+		defaultMessage: 'The view couldn’t be saved. Try again in a moment.',
+		description: 'A saved view that couldn’t be kept in the settings.'
+	}),
 	bulkPeople: defineMessage({
 		id: 'administration.bulk.people',
 		defaultMessage: 'People',

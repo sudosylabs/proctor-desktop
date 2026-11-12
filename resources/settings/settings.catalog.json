@@ -1,6 +1,6 @@
 {
   "generatedBy": "settings.registry",
-  "registryFingerprint": "fnv1a64:a709cb0f2d871cfb",
+  "registryFingerprint": "fnv1a64:5bc454d7cdb1a13a",
   "settings": [
     {
       "id": "workbench.hover.delay",
@@ -100,6 +100,22 @@
       "languageOverride": false,
       "activation": "immediate",
       "candidate": "eligible"
+    },
+    {
+      "id": "administration.lists",
+      "title": "Administration lists",
+      "titleMessageId": "settings.administration.lists.title",
+      "description": "How many rows each Administration list shows, and your saved views of Users.",
+      "descriptionMessageId": "settings.administration.lists.description",
+      "default": {},
+      "storage": "portableUser",
+      "domain": "navigation",
+      "windows": [
+        "authenticated"
+      ],
+      "languageOverride": false,
+      "activation": "immediate",
+      "candidate": "nonCandidateOnly"
     },
     {
       "id": "workbench.colorCustomizations",
