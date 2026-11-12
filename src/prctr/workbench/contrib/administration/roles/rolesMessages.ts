@@ -421,24 +421,24 @@ export const rolesMessages = Object.freeze({
 		defaultMessage: '{count} minutes',
 		description: 'A session length in minutes.'
 	}),
-	policyHours: defineMessage({
+	policyHour: defineMessage({
 		id: 'administration.policy.hours',
 		defaultMessage: '{count} hours',
 		description: 'A session length in hours.'
 	}),
 	policyHourOne: defineMessage({
 		id: 'administration.policy.hour.one',
-		defaultMessage: '1 hour',
+		defaultMessage: '{count} hour',
 		description: 'A session length of one hour.'
 	}),
-	policyDays: defineMessage({
+	policyDay: defineMessage({
 		id: 'administration.policy.days',
 		defaultMessage: '{count} days',
 		description: 'A session length in days.'
 	}),
 	policyDayOne: defineMessage({
 		id: 'administration.policy.day.one',
-		defaultMessage: '1 day',
+		defaultMessage: '{count} day',
 		description: 'A session length of one day.'
 	}),
 	policyBlockerMfa: defineMessage({

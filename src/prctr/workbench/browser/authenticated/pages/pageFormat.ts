@@ -21,6 +21,8 @@ export interface PageFormat {
 	join(first: string, second: string): string;
 	/** A whole number with the locale's grouping, as in "10,000". */
 	count(value: number): string;
+	/** The locale's plural category for a count, as in "one" for 1 in English. */
+	plural(count: number): Intl.LDMLPluralRule;
 	date(time: number): string;
 	dateTime(time: number): string;
 	/** "today, 08:41", "yesterday, 17:20", or a date, for use inside a sentence. */
@@ -76,6 +78,10 @@ export class PageFormatService implements IPageFormatService {
 
 	count(value: number): string {
 		return new Intl.NumberFormat(this.locale).format(value);
+	}
+
+	plural(count: number): Intl.LDMLPluralRule {
+		return new Intl.PluralRules(this.locale).select(count);
 	}
 
 	date(time: number): string {

@@ -106,6 +106,9 @@ class AdministrationContribution extends Disposable {
 			}
 			if (response.kind !== 'data' || response.data.resource !== 'counts') return;
 			const counts = response.data.value;
+			const plural = new Intl.PluralRules(
+				this.localization.locale === 'pseudo' ? 'en' : this.localization.locale
+			);
 			const labelled = (
 				count: { readonly count: number; readonly atLeast: boolean } | undefined,
 				one: keyof typeof messages,
@@ -115,12 +118,12 @@ class AdministrationContribution extends Disposable {
 				count && {
 					...count,
 					attention,
-					label:
-						count.count === 1 && !count.atLeast
-							? this.localization.format(messages[one])
-							: this.localization.format(messages[many], {
-									count: `${count.count}${count.atLeast ? '+' : ''}`
-								})
+					label: this.localization.format(
+						!count.atLeast && plural.select(count.count) === 'one'
+							? messages[one]
+							: messages[many],
+						{ count: `${count.count}${count.atLeast ? '+' : ''}` }
+					)
 				};
 			this.navigation.setAdministrationCount(
 				'invitations',

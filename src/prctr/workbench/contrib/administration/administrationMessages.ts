@@ -231,7 +231,7 @@ const sharedMessages = Object.freeze({
 	}),
 	countInvitationsOne: defineMessage({
 		id: 'administration.sidebar.count.invitations.one',
-		defaultMessage: '1 pending invitation',
+		defaultMessage: '{count} pending invitation',
 		description: 'Spoken name of the sidebar count beside Invitations when it is one.'
 	}),
 	countInvitations: defineMessage({
@@ -241,7 +241,7 @@ const sharedMessages = Object.freeze({
 	}),
 	countImportsOne: defineMessage({
 		id: 'administration.sidebar.count.imports.one',
-		defaultMessage: '1 open import',
+		defaultMessage: '{count} open import',
 		description: 'Spoken name of the sidebar count beside Imports when it is one.'
 	}),
 	countImports: defineMessage({
@@ -251,7 +251,7 @@ const sharedMessages = Object.freeze({
 	}),
 	countJobsOne: defineMessage({
 		id: 'administration.sidebar.count.jobs.one',
-		defaultMessage: '1 failed job',
+		defaultMessage: '{count} failed job',
 		description: 'Spoken name of the sidebar count beside Jobs when it is one.'
 	}),
 	countJobs: defineMessage({
@@ -261,7 +261,7 @@ const sharedMessages = Object.freeze({
 	}),
 	countMailOne: defineMessage({
 		id: 'administration.sidebar.count.mail.one',
-		defaultMessage: '1 email not delivered',
+		defaultMessage: '{count} email not delivered',
 		description: 'Spoken name of the sidebar count beside Mail when it is one.'
 	}),
 	countMail: defineMessage({

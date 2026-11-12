@@ -675,14 +675,9 @@ export class UsersPage extends Disposable implements PageView {
 				this.showSelection(this.list.selection);
 			}
 		);
-		const count = this.format.count(users.length);
 		this.filters.setSelection(
-			users.length === 1
-				? this.format.text('usersSelectedOne')
-				: this.format.text('usersSelected', { count }),
-			users.length === 1
-				? this.format.text('usersSelectionLabelOne')
-				: this.format.text('usersSelectionLabel', { count })
+			this.format.counted('usersSelected', users.length),
+			this.format.counted('usersSelectionLabel', users.length)
 		);
 		this.enableButton!.element.hidden = !users.some((user) => user.disabledAt !== undefined);
 		this.disableButton!.element.hidden = !users.some((user) => user.disabledAt === undefined);

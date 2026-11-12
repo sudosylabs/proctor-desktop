@@ -27,6 +27,15 @@ export const IAdministrationFormatService = createDecorator<IAdministrationForma
 export interface IAdministrationFormatService extends PageFormat {
 	readonly _serviceBrand: undefined;
 	text(key: AdministrationText, values?: Readonly<Record<string, LocalizationValue>>): string;
+	/**
+	 * `key` for a count, or its one-form `<key>One` where the locale's plural rules call the
+	 * count "one". The count is passed as `{count}` to whichever form shows it.
+	 */
+	counted(
+		key: AdministrationText,
+		count: number,
+		values?: Readonly<Record<string, LocalizationValue>>
+	): string;
 	/** Uses the institution-named message when the institution is known, else its generic form. */
 	institutionText(named: AdministrationText, generic: AdministrationText): string;
 	/** The sentence for an Administration failure reason. */
@@ -81,6 +90,25 @@ export class AdministrationFormatService implements IAdministrationFormatService
 		return this.localization.format(administrationText[key], values);
 	}
 
+	counted(
+		key: AdministrationText,
+		count: number,
+		values: Readonly<Record<string, LocalizationValue>> = {}
+	): string {
+		const one = `${key}One`;
+		const chosen =
+			this.page.plural(count) === 'one' && Object.hasOwn(administrationText, one)
+				? (one as AdministrationText)
+				: key;
+		const descriptor = administrationText[chosen];
+		return this.localization.format(
+			descriptor,
+			descriptor.placeholders.includes('count')
+				? { ...values, count: this.count(count) }
+				: values
+		);
+	}
+
 	institutionText(named: AdministrationText, generic: AdministrationText): string {
 		const institution = this.institution;
 		return institution === undefined ? this.text(generic) : this.text(named, { institution });
@@ -104,6 +132,10 @@ export class AdministrationFormatService implements IAdministrationFormatService
 
 	count(value: number): string {
 		return this.page.count(value);
+	}
+
+	plural(count: number): Intl.LDMLPluralRule {
+		return this.page.plural(count);
 	}
 
 	date(time: number): string {

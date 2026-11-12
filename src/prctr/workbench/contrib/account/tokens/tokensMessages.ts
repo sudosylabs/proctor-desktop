@@ -557,7 +557,7 @@ export const tokensMessages = Object.freeze({
 	}),
 	tokenScopeCountOne: defineMessage({
 		id: 'account.tokens.scope.count.one',
-		defaultMessage: '1 permission',
+		defaultMessage: '{count} permission',
 		description: 'Beside the new-token buttons: how many permissions are ticked. One.'
 	}),
 	tokenScopeCount: defineMessage({

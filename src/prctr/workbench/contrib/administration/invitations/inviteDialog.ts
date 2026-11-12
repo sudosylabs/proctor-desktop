@@ -287,10 +287,7 @@ export class InviteDialog extends Disposable {
 		this.emailHint.textContent = error ?? this.format.text('inviteChipsHint');
 		this.emailHint.dataset.error = String(error !== undefined);
 		this.emails.setInvalid(error !== undefined);
-		const addresses =
-			chips.length === 1
-				? this.format.text('inviteFootnoteOne')
-				: this.format.text('inviteFootnote', { count: this.format.count(chips.length) });
+		const addresses = this.format.counted('inviteFootnote', chips.length);
 		const unusable = chips.filter((chip) => chip.problem !== undefined);
 		this.dialog.setFootnote(
 			chips.length === 0
@@ -324,9 +321,7 @@ export class InviteDialog extends Disposable {
 			label:
 				count === 0 || error !== undefined
 					? this.format.text('inviteSendNone')
-					: count === 1
-						? this.format.text('inviteSendOne')
-						: this.format.text('inviteSendMany', { count }),
+					: this.format.counted('inviteSend', count),
 			icon: proctorIconFactory('admin.mail'),
 			disabled: !ready,
 			busy: this.working
@@ -416,11 +411,7 @@ export class InviteDialog extends Disposable {
 		const sent = addresses.length - failed.length;
 		const toFix = this.emails.chips.filter((chip) => chip.problem !== undefined);
 		if (failed.length === 0) {
-			this.pane.toast(
-				sent === 1
-					? this.format.text('inviteSentOne')
-					: this.format.text('inviteSentMany', { count: sent })
-			);
+			this.pane.toast(this.format.counted('inviteSent', sent));
 			// Addresses still to fix keep the dialog open with only them.
 			if (toFix.length === 0) {
 				this.dispose();

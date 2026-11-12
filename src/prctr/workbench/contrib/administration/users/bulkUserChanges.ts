@@ -245,9 +245,7 @@ export class BulkUserChanges extends Disposable {
 
 	/** A message with a one-person form, `<key>One`. */
 	private many(count: number, key: AdministrationText): string {
-		return count === 1
-			? this.format.text(`${key}One` as AdministrationText)
-			: this.format.text(key, { count: this.format.count(count) });
+		return this.format.counted(key, count);
 	}
 
 	private confirm(
@@ -314,7 +312,7 @@ export class BulkUserChanges extends Disposable {
 	private async run(batch: Batch, users: readonly User[]): Promise<AdminChangeResult> {
 		const result = await this.send(batch, [this.many(users.length, 'bulkPeopleCount')]);
 		if (result !== 'busy' && result.kind !== 'error')
-			queueMicrotask(() => this.report(result, users));
+			queueMicrotask(() => this.report(result, users, batch));
 		return result;
 	}
 
@@ -322,7 +320,7 @@ export class BulkUserChanges extends Disposable {
 		return this.changes.send(batch, summary);
 	}
 
-	private report(result: AdministrationResponse, users: readonly User[]): void {
+	private report(result: AdministrationResponse, users: readonly User[], batch?: Batch): void {
 		if (this._store.isDisposed) return;
 		this.onDidChange();
 		if (result.kind === 'error') {
@@ -336,8 +334,39 @@ export class BulkUserChanges extends Disposable {
 		this.dialog.value = this.instantiationService.createInstance(
 			BulkResultDialog,
 			result.result,
-			users
+			users,
+			batch?.operation === 'class.enroll'
+				? (user: User) => this.enrolAsStudent(batch, user)
+				: undefined
 		);
+	}
+
+	/**
+	 * Fixes one person a class enrolment refused for want of a student affiliation: gives them
+	 * one from today, then enrols them again. Settles with why it failed, or `undefined`.
+	 */
+	private async enrolAsStudent(batch: Batch, user: User): Promise<string | undefined> {
+		const affiliated = await this.changes.send(
+			{ kind: 'createAffiliation', userId: user.id, affiliation: 'student' },
+			[user.displayName]
+		);
+		if (affiliated === 'busy') return this.format.failure('unavailable');
+		if (affiliated.kind === 'error')
+			return this.changes.describe(affiliated) || this.format.failure(affiliated.reason);
+		const enrolled = await this.changes.send(
+			{ ...batch, items: [{ key: 'person-1', userId: user.id }] },
+			[user.displayName]
+		);
+		this.onDidChange();
+		if (enrolled === 'busy') return this.format.failure('unavailable');
+		if (enrolled.kind === 'error')
+			return this.changes.describe(enrolled) || this.format.failure(enrolled.reason);
+		const item = enrolled.kind === 'batchResult' ? enrolled.result.items[0] : undefined;
+		if (item?.status === 'failed')
+			return item.errorCode === undefined
+				? this.format.failure('unavailable')
+				: this.format.code('problem', item.errorCode);
+		return undefined;
 	}
 }
 
@@ -429,18 +458,14 @@ class BulkPlaceDialog extends Disposable {
 			);
 		const count = this.users.length;
 		const key = this.kind === 'enrol' ? 'bulkEnrolTitle' : 'bulkGrantTitle';
-		return count === 1
-			? this.format.text(`${key}One`)
-			: this.format.text(key, { count: this.format.count(count) });
+		return this.format.counted(key, count);
 	}
 
 	private confirmText(): string {
 		if (this.everyone !== undefined) return this.format.text('bulkCheckWho');
 		const count = this.users.length;
 		const key = this.kind === 'enrol' ? 'bulkEnrolConfirm' : 'bulkGrantConfirm';
-		return count === 1
-			? this.format.text(`${key}One`)
-			: this.format.text(key, { count: this.format.count(count) });
+		return this.format.counted(key, count);
 	}
 
 	private select(field: ReturnType<typeof adminField>, label: string): SelectControl<string> {
@@ -571,11 +596,7 @@ class BulkPlaceDialog extends Disposable {
 		this.dialog.setFootnote(
 			this.everyone !== undefined
 				? this.format.text('previewBody', { count: this.format.count(this.everyone.count) })
-				: this.users.length === 1
-					? this.format.text('bulkPeopleCountOne')
-					: this.format.text('bulkPeopleCount', {
-							count: this.format.count(this.users.length)
-						})
+				: this.format.counted('bulkPeopleCount', this.users.length)
 		);
 		this.confirm.setState({
 			label: this.confirmText(),
@@ -641,6 +662,9 @@ class BulkPlaceDialog extends Disposable {
 }
 
 /** Who a change for several people applied to, and why it didn't apply to the others. */
+/** The refusal a class enrolment gives a person with no student affiliation. */
+const STUDENT_REQUIRED = 'class_member.student_affiliation_required';
+
 class BulkResultDialog extends Disposable {
 	private readonly dialog: PageDialog;
 	private readonly icons = this._register(new DisposableStore());
@@ -648,6 +672,8 @@ class BulkResultDialog extends Disposable {
 	constructor(
 		result: AdministrationBatchResult,
 		users: readonly User[],
+		/** Fixes a person a class enrolment refused for want of a student affiliation. */
+		enrolAsStudent: ((user: User) => Promise<string | undefined>) | undefined,
 		@IAdministrationFormatService format: IAdministrationFormatService,
 		@IPagePaneContext pane: IPagePaneContext
 	) {
@@ -692,23 +718,70 @@ class BulkResultDialog extends Disposable {
 						: format.text(
 								item?.status === 'no_op' ? 'bulkResultSame' : 'bulkResultDone'
 							);
-					return $(
+					const glyph = $(
+						'span.prctr-admin-bulk-results__glyph',
+						{ attrs: { 'aria-hidden': 'true' } },
+						icon.element
+					);
+					const detailElement = $('span.prctr-admin-bulk-results__detail', {
+						textContent: detail
+					});
+					const row = $(
 						'li.prctr-admin-bulk-results__row',
 						{ data: { failed: String(failed) } },
-						$(
-							'span.prctr-admin-bulk-results__glyph',
-							{ attrs: { 'aria-hidden': 'true' } },
-							icon.element
-						),
+						glyph,
 						$(
 							'span.prctr-admin-bulk-results__text',
 							{},
 							$('span.prctr-admin-bulk-results__name', {
 								textContent: user.displayName
 							}),
-							$('span.prctr-admin-bulk-results__detail', { textContent: detail })
+							detailElement
 						)
 					);
+					if (
+						failed &&
+						enrolAsStudent !== undefined &&
+						item?.errorCode === STUDENT_REQUIRED
+					) {
+						const fixLabel = format.text('bulkResultEnrolStudent');
+						const fix = this.icons.add(
+							new ButtonControl(row, {
+								variant: 'secondary',
+								size: 'small',
+								label: fixLabel
+							})
+						);
+						fix.element.setAttribute(
+							'aria-label',
+							format.text('bulkResultEnrolStudentFor', { name: user.displayName })
+						);
+						this.icons.add(
+							fix.onDidRequest(async () => {
+								fix.setState({ label: fixLabel, busy: true });
+								const problem = await enrolAsStudent(user);
+								if (this._store.isDisposed) return;
+								if (problem !== undefined) {
+									fix.setState({ label: fixLabel });
+									detailElement.textContent = problem;
+									return;
+								}
+								fix.dispose();
+								row.dataset.failed = 'false';
+								detailElement.textContent = format.text('bulkResultDone');
+								glyph.replaceChildren(
+									this.icons.add(
+										createProctorIcon(document, {
+											id: 'status.success',
+											size: 18
+										})
+									).element
+								);
+								close.focus();
+							})
+						);
+					}
+					return row;
 				})
 			)
 		);

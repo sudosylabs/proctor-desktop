@@ -597,7 +597,7 @@ export const operationsMessages = Object.freeze({
 		defaultMessage: 'Status',
 		description: 'Label of where a delivery stands.'
 	}),
-	deliveryStatusAttempts: defineMessage({
+	deliveryStatusAttempt: defineMessage({
 		id: 'administration.mail.delivery.status.attempts',
 		defaultMessage: '{state} after {count} attempts',
 		description:
@@ -655,7 +655,7 @@ export const operationsMessages = Object.freeze({
 	}),
 	deliveryStatusAttemptOne: defineMessage({
 		id: 'administration.mail.delivery.status.attempt.one',
-		defaultMessage: '{state} after 1 attempt',
+		defaultMessage: '{state} after {count} attempt',
 		description: 'A delivery’s state after a single try, as in "Delivered after 1 attempt".'
 	})
 });

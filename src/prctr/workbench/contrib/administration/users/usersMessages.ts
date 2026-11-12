@@ -261,7 +261,7 @@ export const usersMessages = Object.freeze({
 	}),
 	usersSelectedOne: defineMessage({
 		id: 'administration.users.selected.one',
-		defaultMessage: '1 selected',
+		defaultMessage: '{count} selected',
 		description: 'How many people are chosen in the Users table. One person.'
 	}),
 	usersSelected: defineMessage({
@@ -271,7 +271,7 @@ export const usersMessages = Object.freeze({
 	}),
 	usersSelectionLabelOne: defineMessage({
 		id: 'administration.users.selection.label.one',
-		defaultMessage: 'Changes for 1 selected person',
+		defaultMessage: 'Changes for {count} selected person',
 		description: 'Accessible name of the toolbar for chosen people. One person.'
 	}),
 	usersSelectionLabel: defineMessage({
@@ -311,7 +311,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkEnrolTitleOne: defineMessage({
 		id: 'administration.bulk.enrol.title.one',
-		defaultMessage: 'Enrol 1 person in a class',
+		defaultMessage: 'Enrol {count} person in a class',
 		description: 'Title of the dialog that enrols chosen people. One person.'
 	}),
 	bulkEnrolTitle: defineMessage({
@@ -501,7 +501,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkSignOutConfirmOne: defineMessage({
 		id: 'administration.users.everyone.signoutconfirmone',
-		defaultMessage: 'Sign 1 person out',
+		defaultMessage: 'Sign {count} person out',
 		description: 'Confirms signing one person out everywhere.'
 	}),
 	bulkEnrolEveryoneTitle: defineMessage({
@@ -631,7 +631,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkEnrolConfirmOne: defineMessage({
 		id: 'administration.bulk.enrol.confirm.one',
-		defaultMessage: 'Enrol 1 person',
+		defaultMessage: 'Enrol {count} person',
 		description: 'Confirms enrolling the chosen people. One person.'
 	}),
 	bulkEnrolConfirm: defineMessage({
@@ -641,7 +641,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkGrantTitleOne: defineMessage({
 		id: 'administration.bulk.grant.title.one',
-		defaultMessage: 'Grant 1 person a role',
+		defaultMessage: 'Grant {count} person a role',
 		description: 'Title of the dialog that grants chosen people a role. One person.'
 	}),
 	bulkGrantTitle: defineMessage({
@@ -672,7 +672,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkGrantConfirmOne: defineMessage({
 		id: 'administration.bulk.grant.confirm.one',
-		defaultMessage: 'Grant to 1 person',
+		defaultMessage: 'Grant to {count} person',
 		description: 'Confirms granting the role. One person.'
 	}),
 	bulkGrantConfirm: defineMessage({
@@ -682,7 +682,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkSignOutTitleOne: defineMessage({
 		id: 'administration.bulk.sign.out.title.one',
-		defaultMessage: 'Sign 1 person out everywhere?',
+		defaultMessage: 'Sign {count} person out everywhere?',
 		description: 'Confirms ending every session of the chosen people. One person.'
 	}),
 	bulkSignOutTitle: defineMessage({
@@ -698,7 +698,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkDisableTitleOne: defineMessage({
 		id: 'administration.bulk.disable.title.one',
-		defaultMessage: 'Disable 1 account?',
+		defaultMessage: 'Disable {count} account?',
 		description: 'Confirms disabling the chosen people’s accounts. One person.'
 	}),
 	bulkDisableTitle: defineMessage({
@@ -714,7 +714,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkDisableConfirmOne: defineMessage({
 		id: 'administration.bulk.disable.confirm.one',
-		defaultMessage: 'Disable 1 account',
+		defaultMessage: 'Disable {count} account',
 		description: 'Confirms disabling the chosen accounts. One person.'
 	}),
 	bulkDisableConfirm: defineMessage({
@@ -724,7 +724,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkEnableTitleOne: defineMessage({
 		id: 'administration.bulk.enable.title.one',
-		defaultMessage: 'Enable 1 account?',
+		defaultMessage: 'Enable {count} account?',
 		description: 'Confirms enabling the chosen people’s accounts. One person.'
 	}),
 	bulkEnableTitle: defineMessage({
@@ -739,7 +739,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkEnableConfirmOne: defineMessage({
 		id: 'administration.bulk.enable.confirm.one',
-		defaultMessage: 'Enable 1 account',
+		defaultMessage: 'Enable {count} account',
 		description: 'Confirms enabling the chosen accounts. One person.'
 	}),
 	bulkEnableConfirm: defineMessage({
@@ -749,7 +749,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkResultAllOne: defineMessage({
 		id: 'administration.bulk.result.all.one',
-		defaultMessage: 'Done for 1 person',
+		defaultMessage: 'Done for {count} person',
 		description: 'Toast when a change applied to everyone chosen. One person.'
 	}),
 	bulkResultAll: defineMessage({
@@ -778,6 +778,16 @@ export const usersMessages = Object.freeze({
 		defaultMessage: 'Already as asked, nothing changed',
 		description: 'A person the change didn’t need to change.'
 	}),
+	bulkResultEnrolStudent: defineMessage({
+		id: 'administration.bulk.result.enrol.student',
+		defaultMessage: 'Add student and enrol',
+		description: 'Gives a refused person a student affiliation from today, then enrols them.'
+	}),
+	bulkResultEnrolStudentFor: defineMessage({
+		id: 'administration.bulk.result.enrol.student.for',
+		defaultMessage: 'Add {name} as a student and enrol them',
+		description: 'Accessible name of the fix on one person in the bulk result.'
+	}),
 	bulkResultClose: defineMessage({
 		id: 'administration.bulk.result.close',
 		defaultMessage: 'Done',
@@ -785,7 +795,7 @@ export const usersMessages = Object.freeze({
 	}),
 	bulkPeopleCountOne: defineMessage({
 		id: 'administration.bulk.people.count.one',
-		defaultMessage: '1 person',
+		defaultMessage: '{count} person',
 		description: 'Footnote of a bulk dialog: how many people it changes. One person.'
 	}),
 	bulkPeopleCount: defineMessage({

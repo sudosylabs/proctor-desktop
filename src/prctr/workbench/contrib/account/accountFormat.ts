@@ -62,6 +62,10 @@ export class AccountFormatService implements IAccountFormatService {
 		return this.page.count(value);
 	}
 
+	plural(count: number): Intl.LDMLPluralRule {
+		return this.page.plural(count);
+	}
+
 	date(time: number): string {
 		return this.page.date(time);
 	}

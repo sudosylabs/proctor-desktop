@@ -117,13 +117,7 @@ export class DeliveryDialog extends Disposable {
 			{ label: this.format.text('deliveryKind'), value: kind },
 			{
 				label: this.format.text('deliveryStatus'),
-				value:
-					delivery.attempts === 1
-						? this.format.text('deliveryStatusAttemptOne', { state })
-						: this.format.text('deliveryStatusAttempts', {
-								state,
-								count: this.format.count(delivery.attempts)
-							})
+				value: this.format.counted('deliveryStatusAttempt', delivery.attempts, { state })
 			},
 			{
 				label: this.format.text('deliveryQueued'),

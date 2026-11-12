@@ -376,10 +376,10 @@ export class NewTokenDialog extends Disposable {
 		}
 		const unit = this.academicUnitId();
 		const unitName = this.grantable?.academicUnits.find((entry) => entry.id === unit)?.name;
-		const permissions =
-			count === 1
-				? this.format.text('tokenScopeCountOne')
-				: this.format.text('tokenScopeCount', { count });
+		const permissions = this.format.text(
+			this.format.plural(count) === 'one' ? 'tokenScopeCountOne' : 'tokenScopeCount',
+			{ count: this.format.count(count) }
+		);
 		this.dialog.setFootnote(
 			unit === undefined
 				? permissions

@@ -124,11 +124,9 @@ export class OverviewPage extends Disposable implements PageView {
 				id: 'jobs',
 				glyph: 'status.failed',
 				title:
-					count === 1 && jobs.value.cursor === undefined
-						? this.format.text('overviewJobsFailedOne')
-						: this.format.text('overviewJobsFailed', {
-								count: jobs.value.cursor === undefined ? String(count) : many
-							}),
+					jobs.value.cursor === undefined
+						? this.format.counted('overviewJobsFailed', count)
+						: this.format.text('overviewJobsFailed', { count: many }),
 				detail: this.format.text('overviewJobsDetail', {
 					when: this.format.relative(latest)
 				}),
@@ -145,11 +143,9 @@ export class OverviewPage extends Disposable implements PageView {
 				id: 'mail',
 				glyph: 'action.sendEmail',
 				title:
-					count === 1 && mail.value.cursor === undefined
-						? this.format.text('overviewMailFailedOne')
-						: this.format.text('overviewMailFailed', {
-								count: mail.value.cursor === undefined ? String(count) : many
-							}),
+					mail.value.cursor === undefined
+						? this.format.counted('overviewMailFailed', count)
+						: this.format.text('overviewMailFailed', { count: many }),
 				detail: this.format.text('overviewMailDetail', {
 					recipient: mail.value.items[0]!.recipient
 				}),
@@ -169,11 +165,9 @@ export class OverviewPage extends Disposable implements PageView {
 				id: 'invitations',
 				glyph: 'admin.invitations',
 				title:
-					count === 1 && invitations.value.cursor === undefined
-						? this.format.text('overviewInvitationsOne')
-						: this.format.text('overviewInvitations', {
-								count: invitations.value.cursor === undefined ? String(count) : many
-							}),
+					invitations.value.cursor === undefined
+						? this.format.counted('overviewInvitations', count)
+						: this.format.text('overviewInvitations', { count: many }),
 				detail: this.format.text('overviewInvitationsDetail', {
 					when: this.format.relative(next)
 				}),

@@ -101,10 +101,10 @@ export const invitationsMessages = Object.freeze({
 	}),
 	inviteSendOne: defineMessage({
 		id: 'administration.invitations.invite.send.one',
-		defaultMessage: 'Send 1 invitation',
+		defaultMessage: 'Send {count} invitation',
 		description: 'Send button for one address.'
 	}),
-	inviteSendMany: defineMessage({
+	inviteSend: defineMessage({
 		id: 'administration.invitations.invite.send.many',
 		defaultMessage: 'Send {count} invitations',
 		description: 'Send button; count is how many addresses.'
@@ -119,7 +119,7 @@ export const invitationsMessages = Object.freeze({
 		defaultMessage: 'Invitation sent',
 		description: 'Toast after one invitation is sent.'
 	}),
-	inviteSentMany: defineMessage({
+	inviteSent: defineMessage({
 		id: 'administration.invitations.invite.sent.many',
 		defaultMessage: '{count} invitations sent',
 		description: 'Toast after invitations are sent; count is how many.'
@@ -329,7 +329,7 @@ export const invitationsMessages = Object.freeze({
 	}),
 	inviteFootnoteOne: defineMessage({
 		id: 'administration.invitations.invite.footnote.one',
-		defaultMessage: '1 address',
+		defaultMessage: '{count} address',
 		description: 'Footnote: how many addresses the dialog sends to. One.'
 	}),
 	inviteFootnote: defineMessage({

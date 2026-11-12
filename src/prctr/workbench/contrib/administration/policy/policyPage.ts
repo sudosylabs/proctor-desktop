@@ -442,14 +442,8 @@ export class PolicyPage extends Disposable implements PageView {
 
 	/** "30 minutes", "12 hours", "7 days". */
 	private length(minutes: number): string {
-		if (minutes % 1440 === 0)
-			return minutes === 1440
-				? this.format.text('policyDayOne')
-				: this.format.text('policyDays', { count: this.format.count(minutes / 1440) });
-		if (minutes % 60 === 0)
-			return minutes === 60
-				? this.format.text('policyHourOne')
-				: this.format.text('policyHours', { count: this.format.count(minutes / 60) });
+		if (minutes % 1440 === 0) return this.format.counted('policyDay', minutes / 1440);
+		if (minutes % 60 === 0) return this.format.counted('policyHour', minutes / 60);
 		return this.format.text('policyMinutes', { count: this.format.count(minutes) });
 	}
 
