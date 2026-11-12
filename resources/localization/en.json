@@ -1424,6 +1424,12 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/sessions/sessionsMessages.ts"
     },
+    "account.settings.accessibility.note": {
+      "message": "High contrast and Interface size are under Appearance.",
+      "description": "Note at the top of the Accessibility tab.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
     "account.settings.announce.brief": {
       "message": "Brief",
       "description": "Announcement detail choice.",
@@ -1475,6 +1481,12 @@
     "account.settings.choice.on": {
       "message": "On",
       "description": "A setting choice.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.clear.search": {
+      "message": "Clear search",
+      "description": "Empties Find a setting and shows the tabs again.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
@@ -1542,20 +1554,14 @@
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.exam.override": {
-      "message": "An exam can set its own editor settings. When it does, they apply only while you take that exam.",
-      "description": "Banner on the Exam editor tab.",
+      "message": "When you join an exam, these settings are copied into it and stay fixed until it ends. An exam can only make text larger or contrast stronger, never less.",
+      "description": "Note at the top of the Exam editor tab.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.find": {
       "message": "Find a setting",
       "description": "Accessible name and placeholder of the settings filter.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
-    },
-    "account.settings.group.exam.browser": {
-      "message": "Exam browser",
-      "description": "Settings group.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
@@ -1602,8 +1608,84 @@
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.kept.here": {
-      "message": "Your change is kept on this page; try again when the server answers.",
-      "description": "Toast body when a save fails.",
+      "message": "It still applies on this computer. Proctor saves it to your account when the server answers.",
+      "description": "Toast body when a save of one setting fails and the institution is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.kept.here.many": {
+      "message": "They still apply on this computer. Proctor saves them to your account when the server answers.",
+      "description": "Toast body when a save of several settings fails and the institution is unknown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.kept.here.many.named": {
+      "message": "They still apply on this computer. Proctor saves them to your account when {institution} answers.",
+      "description": "Toast body when a save of several settings fails; {institution} is its name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.kept.here.named": {
+      "message": "It still applies on this computer. Proctor saves it to your account when {institution} answers.",
+      "description": "Toast body when a save of one setting fails; {institution} is its name.",
+      "placeholders": [
+        "institution"
+      ],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.keywords.browser.zoom": {
+      "message": "zoom scale bigger smaller larger pages web",
+      "description": "Everyday words, separated by spaces, that find exam browser zoom in Find a setting. Translate freely; they are never shown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.keywords.contrast": {
+      "message": "colour color borders visibility",
+      "description": "Everyday words, separated by spaces, that find high contrast in Find a setting. Translate freely; they are never shown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.keywords.editor.theme": {
+      "message": "colour color scheme syntax dark light",
+      "description": "Everyday words, separated by spaces, that find the editor theme in Find a setting. Translate freely; they are never shown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.keywords.font.size": {
+      "message": "text zoom bigger smaller larger",
+      "description": "Everyday words, separated by spaces, that find editor font size in Find a setting. Translate freely; they are never shown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.keywords.interface.size": {
+      "message": "zoom scale bigger smaller larger",
+      "description": "Everyday words, separated by spaces, that find interface size in Find a setting. Translate freely; they are never shown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.keywords.line.height": {
+      "message": "spacing text",
+      "description": "Everyday words, separated by spaces, that find editor line height in Find a setting. Translate freely; they are never shown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.keywords.motion": {
+      "message": "animation movement",
+      "description": "Everyday words, separated by spaces, that find reduced motion in Find a setting. Translate freely; they are never shown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.keywords.screen.reader": {
+      "message": "voiceover narrator nvda jaws",
+      "description": "Everyday words, separated by spaces, that find screen reader mode in Find a setting. Translate freely; they are never shown.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.keywords.window.theme": {
+      "message": "colour color scheme appearance dark light mode",
+      "description": "Everyday words, separated by spaces, that find the window theme in Find a setting. Translate freely; they are never shown.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
@@ -1634,20 +1716,42 @@
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.no.match": {
-      "message": "No setting matches that.",
-      "description": "Find a setting found nothing.",
+      "message": "No setting matches “{query}”",
+      "description": "Find a setting found nothing; {query} is what the person typed.",
+      "placeholders": [
+        "query"
+      ],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.no.match.hint": {
+      "message": "Try another word, such as “dark”, “text” or “zoom”. Every tab is searched.",
+      "description": "Hint under a search that found nothing.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.not.saved": {
-      "message": "Couldn’t save your settings",
-      "description": "Toast title when a save fails.",
+      "message": "Your changes weren’t saved",
+      "description": "Toast title when a save of several settings fails.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.not.saved.named": {
+      "message": "{name} wasn’t saved",
+      "description": "Toast title when a save of one setting fails; {name} is the setting.",
+      "placeholders": [
+        "name"
+      ],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.not.saved.short": {
       "message": "Not saved",
       "description": "The last change could not be saved.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.open.appearance": {
+      "message": "Open Appearance",
+      "description": "Opens the Appearance tab from the Accessibility note.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
@@ -1674,16 +1778,28 @@
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.reset": {
-      "message": "Reset",
-      "description": "Puts one setting back to its default.",
-      "placeholders": [],
+      "message": "Reset to {value}",
+      "description": "Puts one setting back to its default; {value} is the default, as in Reset to 14 px.",
+      "placeholders": [
+        "value"
+      ],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.reset.named": {
-      "message": "Reset {name}",
-      "description": "Accessible name of a setting’s Reset button.",
+      "message": "Reset {name} to {value}",
+      "description": "Accessible name of a setting’s Reset button, as in Reset Font size to 14 px.",
       "placeholders": [
-        "name"
+        "name",
+        "value"
+      ],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.result.place": {
+      "message": "{tab} · {group}",
+      "description": "Where a found setting lives, above its title, as in Appearance · Size.",
+      "placeholders": [
+        "tab",
+        "group"
       ],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
@@ -1703,6 +1819,14 @@
       "message": "Detect automatically",
       "description": "Screen reader mode choice.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
+    },
+    "account.settings.search.count": {
+      "message": "Matching settings · {count}",
+      "description": "Heading of the search results, also announced; {count} is how many settings match.",
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
     "account.settings.search.results": {
@@ -1726,12 +1850,6 @@
     "account.settings.tab.appearance": {
       "message": "Appearance",
       "description": "Settings tab.",
-      "placeholders": [],
-      "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
-    },
-    "account.settings.tab.browser": {
-      "message": "Browser",
-      "description": "Settings tab for the exam browser.",
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/account/settings/settingsMessages.ts"
     },
@@ -11197,13 +11315,13 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.browser.zoom.description": {
-      "message": "Zoom for pages opened in the exam browser.",
+      "message": "Zoom for the pages an exam lets you open in its browser.",
       "description": "Description of the integrated browser zoom setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.browser.zoom.title": {
-      "message": "Page zoom",
+      "message": "Exam browser zoom",
       "description": "Title for the integrated browser zoom setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -11239,7 +11357,7 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.editor.cursorblinking.description": {
-      "message": "How the text cursor animates.",
+      "message": "How the cursor blinks. Solid doesn’t blink.",
       "description": "Description of the editor cursor blinking setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
@@ -11359,7 +11477,7 @@
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"
     },
     "settings.navigation.indent.description": {
-      "message": "How far nested files are indented.",
+      "message": "How far each folder level steps in, in the exam’s file list.",
       "description": "Description of the tree indentation setting.",
       "placeholders": [],
       "source": "src/prctr/platform/settings/common/settingsManifest.ts"

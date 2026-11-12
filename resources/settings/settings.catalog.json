@@ -1,6 +1,6 @@
 {
   "generatedBy": "settings.registry",
-  "registryFingerprint": "fnv1a64:a4866316160e9488",
+  "registryFingerprint": "fnv1a64:a709cb0f2d871cfb",
   "settings": [
     {
       "id": "workbench.hover.delay",
@@ -270,7 +270,7 @@
       "id": "editor.cursorBlinking",
       "title": "Cursor blinking",
       "titleMessageId": "settings.editor.cursorblinking.title",
-      "description": "How the text cursor animates.",
+      "description": "How the cursor blinks. Solid doesn’t blink.",
       "descriptionMessageId": "settings.editor.cursorblinking.description",
       "default": "blink",
       "storage": "portableUser",
@@ -338,7 +338,7 @@
       "id": "workbench.tree.indent",
       "title": "Tree indentation",
       "titleMessageId": "settings.navigation.indent.title",
-      "description": "How far nested files are indented.",
+      "description": "How far each folder level steps in, in the exam’s file list.",
       "descriptionMessageId": "settings.navigation.indent.description",
       "default": 8,
       "storage": "portableUser",
@@ -352,9 +352,9 @@
     },
     {
       "id": "browser.presentation.zoom",
-      "title": "Page zoom",
+      "title": "Exam browser zoom",
       "titleMessageId": "settings.browser.zoom.title",
-      "description": "Zoom for pages opened in the exam browser.",
+      "description": "Zoom for the pages an exam lets you open in its browser.",
       "descriptionMessageId": "settings.browser.zoom.description",
       "default": 100,
       "storage": "device",

@@ -21,11 +21,6 @@ export const settingsMessages = Object.freeze({
 		defaultMessage: 'Accessibility',
 		description: 'Settings tab.'
 	}),
-	settingsTabBrowser: defineMessage({
-		id: 'account.settings.tab.browser',
-		defaultMessage: 'Browser',
-		description: 'Settings tab for the exam browser.'
-	}),
 	settingsGroupTheme: defineMessage({
 		id: 'account.settings.group.theme',
 		defaultMessage: 'Theme',
@@ -56,11 +51,6 @@ export const settingsMessages = Object.freeze({
 		defaultMessage: 'Screen readers',
 		description: 'Settings group.'
 	}),
-	settingsGroupExamBrowser: defineMessage({
-		id: 'account.settings.group.exam.browser',
-		defaultMessage: 'Exam browser',
-		description: 'Settings group.'
-	}),
 	settingsSearchResults: defineMessage({
 		id: 'account.settings.search.results',
 		defaultMessage: 'Matching settings',
@@ -68,8 +58,30 @@ export const settingsMessages = Object.freeze({
 	}),
 	settingsNoMatch: defineMessage({
 		id: 'account.settings.no.match',
-		defaultMessage: 'No setting matches that.',
-		description: 'Find a setting found nothing.'
+		defaultMessage: 'No setting matches “{query}”',
+		description: 'Find a setting found nothing; {query} is what the person typed.'
+	}),
+	settingsNoMatchHint: defineMessage({
+		id: 'account.settings.no.match.hint',
+		defaultMessage:
+			'Try another word, such as “dark”, “text” or “zoom”. Every tab is searched.',
+		description: 'Hint under a search that found nothing.'
+	}),
+	clearSearch: defineMessage({
+		id: 'account.settings.clear.search',
+		defaultMessage: 'Clear search',
+		description: 'Empties Find a setting and shows the tabs again.'
+	}),
+	settingsSearchCount: defineMessage({
+		id: 'account.settings.search.count',
+		defaultMessage: 'Matching settings · {count}',
+		description:
+			'Heading of the search results, also announced; {count} is how many settings match.'
+	}),
+	settingsResultPlace: defineMessage({
+		id: 'account.settings.result.place',
+		defaultMessage: '{tab} · {group}',
+		description: 'Where a found setting lives, above its title, as in Appearance · Size.'
 	}),
 	findSetting: defineMessage({
 		id: 'account.settings.find',
@@ -98,13 +110,38 @@ export const settingsMessages = Object.freeze({
 	}),
 	settingsNotSaved: defineMessage({
 		id: 'account.settings.not.saved',
-		defaultMessage: 'Couldn’t save your settings',
-		description: 'Toast title when a save fails.'
+		defaultMessage: 'Your changes weren’t saved',
+		description: 'Toast title when a save of several settings fails.'
+	}),
+	settingNotSavedNamed: defineMessage({
+		id: 'account.settings.not.saved.named',
+		defaultMessage: '{name} wasn’t saved',
+		description: 'Toast title when a save of one setting fails; {name} is the setting.'
 	}),
 	settingsKeptHere: defineMessage({
 		id: 'account.settings.kept.here',
-		defaultMessage: 'Your change is kept on this page; try again when the server answers.',
-		description: 'Toast body when a save fails.'
+		defaultMessage:
+			'It still applies on this computer. Proctor saves it to your account when the server answers.',
+		description: 'Toast body when a save of one setting fails and the institution is unknown.'
+	}),
+	settingsKeptHereNamed: defineMessage({
+		id: 'account.settings.kept.here.named',
+		defaultMessage:
+			'It still applies on this computer. Proctor saves it to your account when {institution} answers.',
+		description: 'Toast body when a save of one setting fails; {institution} is its name.'
+	}),
+	settingsKeptHereMany: defineMessage({
+		id: 'account.settings.kept.here.many',
+		defaultMessage:
+			'They still apply on this computer. Proctor saves them to your account when the server answers.',
+		description:
+			'Toast body when a save of several settings fails and the institution is unknown.'
+	}),
+	settingsKeptHereManyNamed: defineMessage({
+		id: 'account.settings.kept.here.many.named',
+		defaultMessage:
+			'They still apply on this computer. Proctor saves them to your account when {institution} answers.',
+		description: 'Toast body when a save of several settings fails; {institution} is its name.'
 	}),
 	settingsInvalid: defineMessage({
 		id: 'account.settings.invalid',
@@ -119,18 +156,29 @@ export const settingsMessages = Object.freeze({
 	settingsExamOverride: defineMessage({
 		id: 'account.settings.exam.override',
 		defaultMessage:
-			'An exam can set its own editor settings. When it does, they apply only while you take that exam.',
-		description: 'Banner on the Exam editor tab.'
+			'When you join an exam, these settings are copied into it and stay fixed until it ends. An exam can only make text larger or contrast stronger, never less.',
+		description: 'Note at the top of the Exam editor tab.'
+	}),
+	settingsAccessibilityNote: defineMessage({
+		id: 'account.settings.accessibility.note',
+		defaultMessage: 'High contrast and Interface size are under Appearance.',
+		description: 'Note at the top of the Accessibility tab.'
+	}),
+	openAppearance: defineMessage({
+		id: 'account.settings.open.appearance',
+		defaultMessage: 'Open Appearance',
+		description: 'Opens the Appearance tab from the Accessibility note.'
 	}),
 	resetSetting: defineMessage({
 		id: 'account.settings.reset',
-		defaultMessage: 'Reset',
-		description: 'Puts one setting back to its default.'
+		defaultMessage: 'Reset to {value}',
+		description:
+			'Puts one setting back to its default; {value} is the default, as in Reset to 14 px.'
 	}),
 	resetSettingNamed: defineMessage({
 		id: 'account.settings.reset.named',
-		defaultMessage: 'Reset {name}',
-		description: 'Accessible name of a setting’s Reset button.'
+		defaultMessage: 'Reset {name} to {value}',
+		description: 'Accessible name of a setting’s Reset button, as in Reset Font size to 14 px.'
 	}),
 	themeSystem: defineMessage({
 		id: 'account.settings.theme.system',
@@ -277,5 +325,59 @@ export const settingsMessages = Object.freeze({
 		id: 'account.settings.editor.preview.label',
 		defaultMessage: 'Preview · {theme}, {size} px',
 		description: 'Label above the code preview.'
+	}),
+	settingsKeywordsWindowTheme: defineMessage({
+		id: 'account.settings.keywords.window.theme',
+		defaultMessage: 'colour color scheme appearance dark light mode',
+		description:
+			'Everyday words, separated by spaces, that find the window theme in Find a setting. Translate freely; they are never shown.'
+	}),
+	settingsKeywordsEditorTheme: defineMessage({
+		id: 'account.settings.keywords.editor.theme',
+		defaultMessage: 'colour color scheme syntax dark light',
+		description:
+			'Everyday words, separated by spaces, that find the editor theme in Find a setting. Translate freely; they are never shown.'
+	}),
+	settingsKeywordsContrast: defineMessage({
+		id: 'account.settings.keywords.contrast',
+		defaultMessage: 'colour color borders visibility',
+		description:
+			'Everyday words, separated by spaces, that find high contrast in Find a setting. Translate freely; they are never shown.'
+	}),
+	settingsKeywordsInterfaceSize: defineMessage({
+		id: 'account.settings.keywords.interface.size',
+		defaultMessage: 'zoom scale bigger smaller larger',
+		description:
+			'Everyday words, separated by spaces, that find interface size in Find a setting. Translate freely; they are never shown.'
+	}),
+	settingsKeywordsBrowserZoom: defineMessage({
+		id: 'account.settings.keywords.browser.zoom',
+		defaultMessage: 'zoom scale bigger smaller larger pages web',
+		description:
+			'Everyday words, separated by spaces, that find exam browser zoom in Find a setting. Translate freely; they are never shown.'
+	}),
+	settingsKeywordsFontSize: defineMessage({
+		id: 'account.settings.keywords.font.size',
+		defaultMessage: 'text zoom bigger smaller larger',
+		description:
+			'Everyday words, separated by spaces, that find editor font size in Find a setting. Translate freely; they are never shown.'
+	}),
+	settingsKeywordsLineHeight: defineMessage({
+		id: 'account.settings.keywords.line.height',
+		defaultMessage: 'spacing text',
+		description:
+			'Everyday words, separated by spaces, that find editor line height in Find a setting. Translate freely; they are never shown.'
+	}),
+	settingsKeywordsMotion: defineMessage({
+		id: 'account.settings.keywords.motion',
+		defaultMessage: 'animation movement',
+		description:
+			'Everyday words, separated by spaces, that find reduced motion in Find a setting. Translate freely; they are never shown.'
+	}),
+	settingsKeywordsScreenReader: defineMessage({
+		id: 'account.settings.keywords.screen.reader',
+		defaultMessage: 'voiceover narrator nvda jaws',
+		description:
+			'Everyday words, separated by spaces, that find screen reader mode in Find a setting. Translate freely; they are never shown.'
 	})
 });

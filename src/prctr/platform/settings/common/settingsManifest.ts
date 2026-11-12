@@ -434,7 +434,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.editor.cursorblinking.description',
-			defaultMessage: 'How the text cursor animates.',
+			defaultMessage: 'How the cursor blinks. Solid doesn’t blink.',
 			description: 'Description of the editor cursor blinking setting.'
 		})
 	},
@@ -522,7 +522,7 @@ export const SETTINGS_MANIFEST = [
 		}),
 		description: defineMessage({
 			id: 'settings.navigation.indent.description',
-			defaultMessage: 'How far nested files are indented.',
+			defaultMessage: 'How far each folder level steps in, in the exam’s file list.',
 			description: 'Description of the tree indentation setting.'
 		})
 	},
@@ -540,12 +540,12 @@ export const SETTINGS_MANIFEST = [
 		candidate: 'nonCandidateOnly',
 		title: defineMessage({
 			id: 'settings.browser.zoom.title',
-			defaultMessage: 'Page zoom',
+			defaultMessage: 'Exam browser zoom',
 			description: 'Title for the integrated browser zoom setting.'
 		}),
 		description: defineMessage({
 			id: 'settings.browser.zoom.description',
-			defaultMessage: 'Zoom for pages opened in the exam browser.',
+			defaultMessage: 'Zoom for the pages an exam lets you open in its browser.',
 			description: 'Description of the integrated browser zoom setting.'
 		})
 	},
