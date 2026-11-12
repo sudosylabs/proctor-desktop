@@ -50,14 +50,15 @@
   environments are too costly, so Desktop removed its remote terminal. A Run
   action with an output panel and no interactive terminal is planned before the
   first release; its backend is undecided. The AI agent is deferred.
-- Native architecture uses passive sources, a dedicated exam-security utility
-  process, main-process enforcement, one physical display, constrained
-  CandidateWindow, and packaged Windows/macOS conformance. Its accepted first-
-  release families also cover bounded process/application and interactive-
-  session state, clipboard, printing, removable storage, virtualization,
-  network configuration, and camera/microphone endpoint state. Each sub-
-  capability declares enforce, observe, or unavailable; global external screen-
-  capture detection is unavailable on the initial targets.
+- Native capabilities are being rewritten around one on-demand native agent:
+  passive adapters, server-compiled rules evaluated in the agent, Electron main
+  containment, a readiness overview before the exam, matches-only application
+  privacy, and a screen evidence recorder. Windows and macOS are implemented to
+  full OS coverage with an Endpoint Security extension and a Windows service;
+  Linux may report unsupported. The superseded utility-process implementation
+  stays in the tree for its tests until the agent replaces it. The native parts
+  of `docs/contracts/` describe the superseded design and are updated from the
+  server's published API.
 - One Proctor design system, selective VS Code source admission, one pinned npm/
   NodeNext/esbuild/Forge graph, and invariant-to-assurance mapping govern future
   implementation.

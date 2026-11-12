@@ -166,37 +166,42 @@ change.
 60. `security.fenced-participation` One fenced Attempt Participation generation is current. Stale generations
     never operate, and relaunch follows normal authenticated navigation before
     any ready join.
-61. `security.integrity-vocabulary` Native Observation, Security Signal, Detector Finding, Integrity Evidence,
+61. `security.integrity-vocabulary` Native Observation, Rule Status, Native Occurrence, Integrity Evidence,
     Integrity Flag, Review Outcome, and Consequence remain distinct. Renderers
     receive no raw observation or evidence stream.
 
 ## Native capabilities
 
-62. `native.passive-sources` Native packages are passive mechanical fact sources. They receive no exam
-    policy or generic control command; the coordinator interprets facts and
-    separate closed adapters own effects.
-63. `native.initial-scope` The accepted first-release native scope includes source/permission health,
-    CandidateWindow and display topology, remote interactive-session facts,
-    process/application and OS-session state, private clipboard and clipboard-
-    change observation, printing, removable storage, bounded virtualization and
-    network configuration, camera/microphone endpoint state, content protection,
-    and continuity. Each sub-capability declares enforce, observe, or unavailable
-    coverage without implying global external-capture detection.
-64. `native.process-boundaries` The Attempt-scoped coordinator runs in a dedicated utility process behind a
-    private authenticated protocol. Electron main owns supervision, permissions,
-    CandidateWindow enforcement, and fail-closed renderer projection.
+62. `native.passive-sources` Capability adapters are passive mechanical fact sources. They receive no exam
+    identity, policy, rule or control command. The native agent evaluates
+    server-compiled rules on their facts, Electron main applies closed effects,
+    and the server decides occurrences, flags and consequences. Application
+    identity is matched on the device; only rule matches leave the agent.
+63. `native.initial-scope` The accepted first-release native scope covers display topology, the
+    CandidateWindow (including content protection and occlusion), interactive
+    sessions (including remote attachment), process/application, clipboard-
+    change observation with the private clipboard effect, printing, removable
+    storage, virtualization, network configuration, camera, microphone, and the
+    screen evidence recorder. Each capability declares enforce, observe or
+    unavailable coverage per target, without implying external-capture detection.
+64. `native.process-boundaries` One unprivileged native agent, spawned on demand by Electron main over an
+    inherited private pipe, runs the capabilities and rules. Only the agent reaches
+    the privileged components; only Electron main holds the installation credential
+    and talks to the server; renderers receive projections only.
 65. `native.single-display-window` Candidate admission requires one verified maximized constrained
     CandidateWindow and exactly one physical usable display with no mirrored,
-    virtual, remote, or specialized secondary target.
-66. `native.race-free-session` Every source opens with one race-free snapshot/sequence boundary and reports
-    bounded events, health, permission, gaps, and resets.
-67. `native.fail-closed` Required source, process, permission, topology, protocol, or enforcement loss
-    blocks interaction; restart repeats complete checks and never restores
-    readiness alone.
-68. `native.abnormal-loss-contained` Abnormal privileged-process loss preserves CandidateWindow containment,
+    virtual, wireless, remote, or specialized secondary target.
+66. `native.race-free-session` Every capability activates with one complete state and its first sequence in
+    one step, then reports bounded changes, health, permission, gaps and resets;
+    the readiness session continues into participation without a gap.
+67. `native.fail-closed` An enforce rule that is not met or unknown blocks interaction. Agent, component,
+    protocol or enforcement loss contains; the one automatic restart repeats
+    complete states and never restores readiness alone.
+68. `native.abnormal-loss-contained` Abnormal agent or component loss preserves CandidateWindow containment,
     fences participation, and follows authoritative suspension/re-entry.
-69. `native.packaged-conformance` A native platform claim requires packaged conformance on each declared OS/
-    architecture tuple; mocks and generic Electron behavior prove no OS claim.
+69. `native.packaged-conformance` A native platform claim requires real-OS tests proving each fact and
+    packaged conformance on each declared OS/architecture tuple; mocks and generic
+    Electron behavior prove no OS claim.
 
 ## User settings and Attempt Configuration
 
@@ -242,8 +247,9 @@ change.
     emitter/bundler. Source layers are not packages.
 82. `toolchain.closed-packages` Production processes and windows enter through closed Proctor-owned manifests;
     inventory, fuses, ASAR integrity, signing, and tests prove the artifact.
-83. `toolchain.native-schema-authority` Native protocols have one language-neutral schema authority, generated
-    TypeScript/Rust views, runtime validation, bounds, and target-bound artifacts.
+83. `toolchain.native-schema-authority` Native protocols have one authority, the Rust protocol types. JSON Schema,
+    TypeScript types and validators, the capability registry and the rule
+    conformance vectors are generated from them and checked for parity.
 84. `toolchain.signed-capability-matrix` Secure-candidate support exists only for tuples proven on packaged target-
     native artifacts and named in the signed capability matrix.
 85. `toolchain.central-distribution` Central Proctor distribution owns signed installers/update feeds;

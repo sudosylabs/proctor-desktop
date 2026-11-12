@@ -72,8 +72,10 @@ gates are identified and pass.
 Derive schemas, catalogs, fingerprints, validators, localization indexes, and
 package metadata deterministically from their handwritten authority. Commit
 only stable reviewed or externally consumed artifacts and fail clean
-regeneration on drift. Produce TypeScript and Rust native-protocol views from
-the same language-neutral schema and retain runtime validation.
+regeneration on drift. Native protocols start from the Rust types in
+`prctr-protocol`: `prctr-xtask` exports JSON Schema, the capability registry and
+the rule conformance vectors, Rust tests catch drift, and the registered
+generator turns the committed schema into TypeScript with runtime validation.
 
 The step is complete when source, committed artifacts, runtime output, and
 package inventory agree and no generated file has a second editor.

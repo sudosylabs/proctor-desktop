@@ -117,24 +117,27 @@ admitted behavior with smaller implementations.
 
 ## Native and private protocol artifacts
 
-Language-neutral JSON Schema files are authoritative for native observation and
-enforcement DTOs, including the fixed privileged-helper handshake, source
-configuration, and normalized event envelope. One generator registry produces
-TypeScript and Rust types plus runtime validators. Generated types improve
-callers but never replace validation. Generated Rust deserializers reject
-unknown object fields rather than accepting an extension at a security
-boundary.
+Rust protocol types in `prctr-protocol` are authoritative for every native wire
+shape: Electron main ↔ native agent messages, agent ↔ privileged-component
+messages, capability facts, rules and rule statuses. `prctr-xtask` exports their
+JSON Schema, the capability registry (capabilities, typed rule fields, reasons,
+baseline rules) and the rule conformance vectors as committed files; Rust tests
+fail when those files drift from the types. A registered generator turns the
+committed schema into TypeScript types and runtime validators, and
+`generated.parity` checks that step. Generated types improve callers but never
+replace validation. Rust deserializers reject unknown fields rather than
+accepting an extension at a security boundary.
 
-Electron MessagePorts carry only schema-valid JSON-compatible structured-clone
-values. Node-API bindings expose the same bounded DTO shapes. A separately
-signed helper uses size-prefixed UTF-8 JSON frames on a private inherited
-channel and rejects excessive frames before parsing. Each capability manifest
-declares bounds, compatibility fixtures, target tuple, build toolchain, source
-revision, artifact hash, and signature.
+Electron main and the native agent exchange length-prefixed UTF-8 JSON frames
+on a private inherited pipe and reject excessive frames before parsing. The
+agent and the privileged components use the same framing and protocol crate.
+Each capability's release entry declares bounds, fixtures, target tuple, build
+toolchain, source revision, artifact hash, and signature.
 
-Observation Node-API modules belong only to passive sources in the security
-utility process. The separate identity key-custody adapter is the narrow
-Electron-main exception defined by the
+The native agent is a standalone binary, not a Node-API module; no observation
+code loads into an Electron process. The superseded utility-process bridge
+remains in the tree only for its tests until the agent replaces it. The separate
+identity key-custody adapter is the one Electron-main Node-API module, defined by the
 [identity architecture](./identity-and-exam-security.md#desktop-authorization-and-installation-proof):
 it exposes a public key, bounded digest signing and deletion, with no private-key
 export or observation/policy behavior. Required privilege, entitlement, native stability, or a

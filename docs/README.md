@@ -38,12 +38,14 @@ work stays under ignored `.scratch/` until it has been grilled and approved.
 - [Integrated browser](./architecture/integrated-browser.md) — frozen browser
   policy, privileged navigation, minimized activity, protected delivery, and
   privacy
-- [Native capabilities](./architecture/native-capabilities.md) — passive native
-  observation, candidate-window enforcement, process, privacy, failure, and
-  platform-verification boundaries
-- [Native capability families](./architecture/native-capability-families.md) —
-  accepted process/session, clipboard, printing, storage, virtualization,
-  network, media, platform-coverage, correction, and evidence contracts
+- [Native capabilities](./architecture/native-capabilities.md) — the on-demand
+  native agent, its protocol with Electron main, readiness and containment,
+  privileged components, the screen evidence recorder, crates, and verification
+- [Native capability contracts](./architecture/native-capability-families.md) —
+  what each capability reports, its platform coverage, permission, and privacy
+  limits
+- [Native rules](./architecture/native-rules.md) — server-compiled requirement
+  rules, three-valued evaluation, baseline rules, and conformance vectors
 - [User settings](./architecture/user-settings.md) — authoritative JSONC,
   static registry, effective configuration, Account/Settings persistence, and
   Attempt Configuration
@@ -108,8 +110,9 @@ spooling, privacy, access, and Candidate presentation.
 
 Use
 [`develop-native-capabilities`](../.agents/skills/develop-native-capabilities/SKILL.md)
-for native observation sources, OS adapters, permissions, candidate-window
-enforcement, security-utility supervision, native IPC, and platform verification.
+for native capabilities and OS adapters, native rules, the native agent and its
+protocol, permissions, candidate-window enforcement, privileged components, the
+screen evidence recorder, and platform verification.
 
 Use
 [`develop-user-settings`](../.agents/skills/develop-user-settings/SKILL.md) for

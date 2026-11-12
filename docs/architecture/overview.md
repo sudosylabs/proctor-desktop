@@ -56,8 +56,9 @@ Proctor Server
 - Electron main owns identity/key custody, window lifecycle, protected storage,
   system-browser/loopback coordination, updater, permissions, and closed
   CandidateWindow effects.
-- A dedicated utility process owns Attempt-scoped security coordination and
-  consumes passive bounded native sources through private protocols.
+- Electron main owns Attempt-scoped security coordination and supervises one
+  on-demand native agent, which runs passive capability adapters and evaluates
+  server-compiled rules behind a private pipe.
 - Server adapters own wire representation while domain modules expose
   purpose-specific projections and operations.
 

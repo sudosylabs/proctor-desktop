@@ -260,20 +260,23 @@ security evaluation rather than a conclusion about candidate conduct.
 
 _Avoid_: Integrity Flag, cheating event
 
-**Security Signal**
+**Rule Status**
 
-A normalized policy input derived from one or more observations, source-health
-facts, connectivity facts, or other trusted state.
+Whether one requirement of the exam's security policy is met, not met, or
+unknown at a moment, evaluated on Native Observations. Desktop evaluates it to
+drive readiness and reversible containment; the server evaluates the same rule
+on the same observations and its result is authoritative. Unknown is an
+operational state, never misconduct.
 
-_Avoid_: Raw native event, guilt
+_Avoid_: Cheating verdict, detector score
 
-**Detector Finding**
+**Native Occurrence**
 
-A versioned rule result derived from identified signals with its uncertainty
-and gaps preserved. It may support containment or server review but is not an
-Integrity Flag or consequence by itself.
+A server-recorded stretch during which an enforce or observe rule was not met,
+with its rule, capability, start and end, and the observations behind it. It may
+raise an Integrity Flag but is not a finding of guilt.
 
-_Avoid_: Cheating verdict
+_Avoid_: Violation, cheating event
 
 **Integrity Evidence**
 
@@ -315,6 +318,6 @@ _Avoid_: Cheating verdict, automatic violation
   states.
 - A Participation Interruption never establishes guilt or submission; confirmed
   continuity loss is represented by authoritative Attempt suspension.
-- Native Observations may become Security Signals and Detector Findings before
-  minimized material becomes Integrity Evidence.
+- Native Observations determine Rule Statuses; the server records Native
+  Occurrences from them before minimized material becomes Integrity Evidence.
 - An Integrity Flag records evidence and never determines guilt by itself.
