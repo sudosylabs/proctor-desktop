@@ -31,7 +31,11 @@ import { renderDetails } from '../widgets/adminDetails.js';
 import { AdminFormDialog, type AdminFormValues } from '../widgets/adminFormDialog.js';
 import { AdminList } from '../widgets/adminList.js';
 import { adminRead, readOnce } from '../widgets/adminReads.js';
+import { BannerControl } from '../../../../base/browser/ui/banner/bannerControl.js';
+import type { AdministrationIntentOf } from '../../../../platform/administration/common/administrationProtocol.js';
 import './media/retentionPage.css';
+
+type Replace = AdministrationIntentOf<'replaceRetentionPolicy'>;
 
 type Policy = AdministrationValue<'retentionPolicy'>;
 type Control = AdministrationValue<'retentionControl'>;
@@ -91,6 +95,13 @@ export class RetentionPage extends Disposable implements PageView {
 	private readonly changes: AdminChanges;
 	private readonly dialog = this._register(new MutableDisposable<IDisposable>());
 	private preview: Preview | undefined;
+	private readonly banner: BannerControl;
+	private readonly discard: ButtonControl;
+	private readonly apply: ButtonControl;
+	private readonly effectSection: PageSection;
+	/** A policy change being previewed, not saved yet. */
+	private draft: Replace | undefined;
+	private applying = false;
 
 	constructor(
 		body: HTMLElement,
@@ -102,6 +113,26 @@ export class RetentionPage extends Disposable implements PageView {
 	) {
 		super();
 		this.changes = this._register(instantiationService.createInstance(AdminChanges));
+		// A changed policy is previewed first: nothing is saved until Apply.
+		this.banner = this._register(new BannerControl(body));
+		this.discard = this._register(
+			new ButtonControl(this.banner.actions, {
+				variant: 'secondary',
+				size: 'small',
+				label: format.text('retentionDiscard'),
+				icon: proctorIconFactory('action.reset', 14)
+			})
+		);
+		this.apply = this._register(
+			new ButtonControl(this.banner.actions, {
+				variant: 'brand',
+				size: 'small',
+				label: format.text('retentionApply'),
+				icon: proctorIconFactory('action.confirm', 14)
+			})
+		);
+		this._register(this.discard.onDidRequest(() => this.setDraft(undefined)));
+		this._register(this.apply.onDidRequest(() => void this.applyDraft()));
 		this.policySection = this._register(
 			instantiationService.createInstance(PageSection, body, {
 				title: format.text('retentionPolicy'),
@@ -109,6 +140,12 @@ export class RetentionPage extends Disposable implements PageView {
 			})
 		);
 		this._register(this.policySection.onDidRequestAction(() => this.edit()));
+		this.effectSection = this._register(
+			instantiationService.createInstance(PageSection, body, {
+				title: format.text('retentionEffect')
+			})
+		);
+		this.effectSection.hidden = true;
 		this.cleanupSection = this._register(
 			instantiationService.createInstance(PageSection, body, {
 				title: format.text('retentionCleanup')
@@ -251,16 +288,127 @@ export class RetentionPage extends Disposable implements PageView {
 		this.policySection.setState(this.policy.state, false, () => void this.policy.refresh());
 		this.policySection.setAction(policy !== undefined);
 		if (policy === undefined) return;
+		const draft = this.draft;
+		const changedFrom = (text: string) => ({
+			note: {
+				text: this.format.text('retentionChangedFrom', { value: text }),
+				tone: 'attention' as const
+			}
+		});
 		renderDetails(this.policySection.content, [
-			...PERIODS.map(({ field, label }) => ({
-				label: this.format.text(label),
-				value: this.days(policy[field])
-			})),
+			...PERIODS.map(({ field, label }) => {
+				const value = draft?.[field] ?? policy[field];
+				return {
+					label: this.format.text(label),
+					value: this.days(value),
+					...(value === policy[field] ? {} : changedFrom(this.days(policy[field])))
+				};
+			}),
 			{
 				label: this.format.text('retentionNotices'),
-				value: this.format.text(policy.candidateNotices ? 'retentionOn' : 'retentionOff')
+				value: this.notices(draft?.candidateNotices ?? policy.candidateNotices),
+				...((draft?.candidateNotices ?? policy.candidateNotices) === policy.candidateNotices
+					? {}
+					: changedFrom(this.notices(policy.candidateNotices)))
 			}
 		]);
+		this.renderEffect(policy);
+	}
+
+	private notices(on: boolean): string {
+		return this.format.text(on ? 'retentionOn' : 'retentionOff');
+	}
+
+	/** What the previewed change would do, one line for each setting it changes. */
+	private renderEffect(policy: Policy): void {
+		const draft = this.draft;
+		this.effectSection.hidden = draft === undefined;
+		if (draft === undefined) return;
+		const rows: PageRowModel[] = [];
+		for (const { field, label } of PERIODS) {
+			const before = policy[field];
+			const after = draft[field];
+			if (before === after) continue;
+			const sooner = after !== 0 && (before === 0 || after < before);
+			rows.push({
+				id: field,
+				glyph: 'admin.retention',
+				title: this.format.text(label),
+				detail:
+					after === 0
+						? this.format.text('retentionEffectForever')
+						: before === 0
+							? this.format.text('retentionEffectNowDeleted', {
+									count: this.format.count(after)
+								})
+							: this.format.text(
+									sooner ? 'retentionEffectSooner' : 'retentionEffectLonger',
+									{
+										count: this.format.count(Math.abs(after - before))
+									}
+								)
+			});
+		}
+		if (draft.candidateNotices !== policy.candidateNotices)
+			rows.push({
+				id: 'notices',
+				glyph: 'admin.retention',
+				title: this.format.text('retentionNotices'),
+				detail: this.format.text(
+					draft.candidateNotices
+						? 'retentionEffectNoticesOn'
+						: 'retentionEffectNoticesOff'
+				)
+			});
+		this.effectSection.setState(
+			{ kind: 'ready' },
+			rows.length === 0 ? this.format.text('retentionEffectNone') : false
+		);
+		this.effectSection.setRows(rows);
+	}
+
+	private setDraft(draft: Replace | undefined): void {
+		this.draft = draft;
+		if (draft === undefined) this.banner.hide();
+		else
+			this.banner.show({
+				tone: 'info',
+				icon: proctorIconFactory('status.info', 18),
+				text: this.format.text('retentionPreviewing')
+			});
+		this.renderPolicy();
+		if (draft === undefined) this.policySection.focusHeading();
+	}
+
+	private async applyDraft(): Promise<void> {
+		const draft = this.draft;
+		if (draft === undefined || this.applying) return;
+		this.applying = true;
+		this.apply.setState({
+			label: this.format.text('retentionApply'),
+			icon: proctorIconFactory('action.confirm', 14),
+			busy: true
+		});
+		const result = await this.changes.send(draft, [this.format.text('retentionEditTitle')]);
+		if (this._store.isDisposed) return;
+		this.applying = false;
+		this.apply.setState({
+			label: this.format.text('retentionApply'),
+			icon: proctorIconFactory('action.confirm', 14)
+		});
+		if (result !== 'busy' && result.kind !== 'error') {
+			this.pane.toast(this.format.text('retentionSaved'));
+			this.setDraft(undefined);
+			void this.policy.refresh();
+			void this.control.refresh();
+			return;
+		}
+		if (result !== 'busy' && result.reason === 'cancelled') return;
+		this.pane.toast(this.changes.describe(result) || this.format.failure('unavailable'));
+		if (result !== 'busy' && result.reason === 'conflict') {
+			this.setDraft(undefined);
+			void this.policy.refresh();
+		}
 	}
 
 	private renderControl(): void {
@@ -298,7 +446,7 @@ export class RetentionPage extends Disposable implements PageView {
 					kind: 'text' as const,
 					id: field,
 					label: this.format.text(label),
-					value: String(policy[field]),
+					value: String(this.draft?.[field] ?? policy[field]),
 					hint: this.format.text('retentionDaysHint'),
 					inputMode: 'numeric' as const,
 					required: true
@@ -307,7 +455,7 @@ export class RetentionPage extends Disposable implements PageView {
 					kind: 'check',
 					id: 'candidateNotices',
 					label: this.format.text('retentionNotices'),
-					value: policy.candidateNotices
+					value: this.draft?.candidateNotices ?? policy.candidateNotices
 				}
 			],
 			submit: (values) => {
@@ -332,6 +480,7 @@ export class RetentionPage extends Disposable implements PageView {
 				};
 			},
 			summary: () => [this.format.text('retentionEditTitle')],
+			preview: (intent) => this.setDraft(intent as Replace),
 			onDidComplete: (result) => {
 				this.pane.toast(
 					result.kind === 'error'

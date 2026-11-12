@@ -231,6 +231,67 @@ export const recordsMessages = Object.freeze({
 		defaultMessage: 'The retention policy is saved',
 		description: 'Toast after saving the policy.'
 	}),
+	retentionPreviewing: defineMessage({
+		id: 'administration.records.retention.draft.banner',
+		defaultMessage:
+			'Previewing a change to how long records are kept. Nothing is saved until you apply it.',
+		description: 'Banner while a retention policy change is previewed.'
+	}),
+	retentionDiscard: defineMessage({
+		id: 'administration.records.retention.draft.discard',
+		defaultMessage: 'Discard',
+		description: 'Drops the previewed retention change.'
+	}),
+	retentionApply: defineMessage({
+		id: 'administration.records.retention.draft.apply',
+		defaultMessage: 'Apply',
+		description: 'Saves the previewed retention change.'
+	}),
+	retentionChangedFrom: defineMessage({
+		id: 'administration.records.retention.draft.changed',
+		defaultMessage: 'Changed from {value}',
+		description: 'Note on a previewed setting with its current value.'
+	}),
+	retentionEffect: defineMessage({
+		id: 'administration.records.retention.effect',
+		defaultMessage: 'Effect of this change',
+		description: 'Section listing what a previewed retention change would do.'
+	}),
+	retentionEffectSooner: defineMessage({
+		id: 'administration.records.retention.effect.sooner',
+		defaultMessage: 'Due for deletion {count} days sooner',
+		description: 'A period made shorter.'
+	}),
+	retentionEffectLonger: defineMessage({
+		id: 'administration.records.retention.effect.longer',
+		defaultMessage: 'Kept {count} days longer',
+		description: 'A period made longer.'
+	}),
+	retentionEffectForever: defineMessage({
+		id: 'administration.records.retention.effect.forever',
+		defaultMessage: 'Kept until deleted by hand; nothing is deleted automatically',
+		description: 'A period set to zero.'
+	}),
+	retentionEffectNowDeleted: defineMessage({
+		id: 'administration.records.retention.effect.now',
+		defaultMessage: 'Deleted automatically after {count} days; until now they were kept',
+		description: 'A period set from zero to some days.'
+	}),
+	retentionEffectNoticesOn: defineMessage({
+		id: 'administration.records.retention.effect.notices.on',
+		defaultMessage: 'Candidates are told before their records are deleted',
+		description: 'Candidate notices turned on.'
+	}),
+	retentionEffectNoticesOff: defineMessage({
+		id: 'administration.records.retention.effect.notices.off',
+		defaultMessage: 'Candidates are no longer told before their records are deleted',
+		description: 'Candidate notices turned off.'
+	}),
+	retentionEffectNone: defineMessage({
+		id: 'administration.records.retention.effect.none',
+		defaultMessage: 'This change keeps every setting as it is.',
+		description: 'No setting differs.'
+	}),
 	retentionCleanup: defineMessage({
 		id: 'administration.records.retention.cleanup',
 		defaultMessage: 'Automatic cleanup',

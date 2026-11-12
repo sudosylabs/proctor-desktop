@@ -2562,9 +2562,11 @@
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.scope.count.one": {
-      "message": "1 permission",
+      "message": "{count} permission",
       "description": "Beside the new-token buttons: how many permissions are ticked. One.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/account/tokens/tokensMessages.ts"
     },
     "account.tokens.scopes": {
@@ -3197,9 +3199,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.disable.confirm.one": {
-      "message": "Disable 1 account",
+      "message": "Disable {count} account",
       "description": "Confirms disabling the chosen accounts. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.disable.title": {
@@ -3211,9 +3215,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.disable.title.one": {
-      "message": "Disable 1 account?",
+      "message": "Disable {count} account?",
       "description": "Confirms disabling the chosen people’s accounts. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.enable.body": {
@@ -3231,9 +3237,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.enable.confirm.one": {
-      "message": "Enable 1 account",
+      "message": "Enable {count} account",
       "description": "Confirms enabling the chosen accounts. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.enable.title": {
@@ -3245,9 +3253,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.enable.title.one": {
-      "message": "Enable 1 account?",
+      "message": "Enable {count} account?",
       "description": "Confirms enabling the chosen people’s accounts. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.enrol.body": {
@@ -3265,9 +3275,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.enrol.confirm.one": {
-      "message": "Enrol 1 person",
+      "message": "Enrol {count} person",
       "description": "Confirms enrolling the chosen people. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.enrol.title": {
@@ -3279,9 +3291,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.enrol.title.one": {
-      "message": "Enrol 1 person in a class",
+      "message": "Enrol {count} person in a class",
       "description": "Title of the dialog that enrols chosen people. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.from": {
@@ -3311,9 +3325,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.grant.confirm.one": {
-      "message": "Grant to 1 person",
+      "message": "Grant to {count} person",
       "description": "Confirms granting the role. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.grant.title": {
@@ -3325,9 +3341,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.grant.title.one": {
-      "message": "Grant 1 person a role",
+      "message": "Grant {count} person a role",
       "description": "Title of the dialog that grants chosen people a role. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.people": {
@@ -3345,9 +3363,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.people.count.one": {
-      "message": "1 person",
+      "message": "{count} person",
       "description": "Footnote of a bulk dialog: how many people it changes. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.result.all": {
@@ -3359,9 +3379,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.result.all.one": {
-      "message": "Done for 1 person",
+      "message": "Done for {count} person",
       "description": "Toast when a change applied to everyone chosen. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.result.body": {
@@ -3380,6 +3402,20 @@
       "message": "Done",
       "description": "A person the change applied to.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.result.enrol.student": {
+      "message": "Add student and enrol",
+      "description": "Gives a refused person a student affiliation from today, then enrols them.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
+    },
+    "administration.bulk.result.enrol.student.for": {
+      "message": "Add {name} as a student and enrol them",
+      "description": "Accessible name of the fix on one person in the bulk result.",
+      "placeholders": [
+        "name"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.result.same": {
@@ -3418,9 +3454,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.sign.out.title.one": {
-      "message": "Sign 1 person out everywhere?",
+      "message": "Sign {count} person out everywhere?",
       "description": "Confirms ending every session of the chosen people. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.bulk.unit": {
@@ -5303,9 +5341,11 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.invite.footnote.one": {
-      "message": "1 address",
+      "message": "{count} address",
       "description": "Footnote: how many addresses the dialog sends to. One.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.invite.kind": {
@@ -5388,9 +5428,11 @@
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.invite.send.one": {
-      "message": "Send 1 invitation",
+      "message": "Send {count} invitation",
       "description": "Send button for one address.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/invitations/invitationsMessages.ts"
     },
     "administration.invitations.invite.sent.body": {
@@ -5688,10 +5730,11 @@
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
     "administration.mail.delivery.status.attempt.one": {
-      "message": "{state} after 1 attempt",
+      "message": "{state} after {count} attempt",
       "description": "A delivery’s state after a single try, as in \"Delivered after 1 attempt\".",
       "placeholders": [
-        "state"
+        "state",
+        "count"
       ],
       "source": "src/prctr/workbench/contrib/administration/operations/operationsMessages.ts"
     },
@@ -6826,9 +6869,11 @@
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
     "administration.policy.day.one": {
-      "message": "1 day",
+      "message": "{count} day",
       "description": "A session length of one day.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
     "administration.policy.days": {
@@ -6874,9 +6919,11 @@
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
     "administration.policy.hour.one": {
-      "message": "1 hour",
+      "message": "{count} hour",
       "description": "A session length of one hour.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/roles/rolesMessages.ts"
     },
     "administration.policy.hours": {
@@ -7524,6 +7571,32 @@
       "placeholders": [],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
+    "administration.records.retention.draft.apply": {
+      "message": "Apply",
+      "description": "Saves the previewed retention change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.draft.banner": {
+      "message": "Previewing a change to how long records are kept. Nothing is saved until you apply it.",
+      "description": "Banner while a retention policy change is previewed.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.draft.changed": {
+      "message": "Changed from {value}",
+      "description": "Note on a previewed setting with its current value.",
+      "placeholders": [
+        "value"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.draft.discard": {
+      "message": "Discard",
+      "description": "Drops the previewed retention change.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
     "administration.records.retention.edit": {
       "message": "Edit",
       "description": "Edits the retention policy.",
@@ -7534,6 +7607,60 @@
       "message": "How long records are kept",
       "description": "Title of the retention policy dialog.",
       "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.effect": {
+      "message": "Effect of this change",
+      "description": "Section listing what a previewed retention change would do.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.effect.forever": {
+      "message": "Kept until deleted by hand; nothing is deleted automatically",
+      "description": "A period set to zero.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.effect.longer": {
+      "message": "Kept {count} days longer",
+      "description": "A period made longer.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.effect.none": {
+      "message": "This change keeps every setting as it is.",
+      "description": "No setting differs.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.effect.notices.off": {
+      "message": "Candidates are no longer told before their records are deleted",
+      "description": "Candidate notices turned off.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.effect.notices.on": {
+      "message": "Candidates are told before their records are deleted",
+      "description": "Candidate notices turned on.",
+      "placeholders": [],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.effect.now": {
+      "message": "Deleted automatically after {count} days; until now they were kept",
+      "description": "A period set from zero to some days.",
+      "placeholders": [
+        "count"
+      ],
+      "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
+    },
+    "administration.records.retention.effect.sooner": {
+      "message": "Due for deletion {count} days sooner",
+      "description": "A period made shorter.",
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/records/recordsMessages.ts"
     },
     "administration.records.retention.eligible": {
@@ -7769,9 +7896,11 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.sidebar.count.imports.one": {
-      "message": "1 open import",
+      "message": "{count} open import",
       "description": "Spoken name of the sidebar count beside Imports when it is one.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.sidebar.count.invitations.many": {
@@ -7783,9 +7912,11 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.sidebar.count.invitations.one": {
-      "message": "1 pending invitation",
+      "message": "{count} pending invitation",
       "description": "Spoken name of the sidebar count beside Invitations when it is one.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.sidebar.count.jobs.many": {
@@ -7797,9 +7928,11 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.sidebar.count.jobs.one": {
-      "message": "1 failed job",
+      "message": "{count} failed job",
       "description": "Spoken name of the sidebar count beside Jobs when it is one.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.sidebar.count.mail.many": {
@@ -7811,9 +7944,11 @@
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.sidebar.count.mail.one": {
-      "message": "1 email not delivered",
+      "message": "{count} email not delivered",
       "description": "Spoken name of the sidebar count beside Mail when it is one.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/administrationMessages.ts"
     },
     "administration.structure.archive": {
@@ -9507,9 +9642,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.everyone.signoutconfirmone": {
-      "message": "Sign 1 person out",
+      "message": "Sign {count} person out",
       "description": "Confirms signing one person out everywhere.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.everyone.signouteveryone": {
@@ -9841,9 +9978,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.selected.one": {
-      "message": "1 selected",
+      "message": "{count} selected",
       "description": "How many people are chosen in the Users table. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.selection.label": {
@@ -9855,9 +9994,11 @@
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.selection.label.one": {
-      "message": "Changes for 1 selected person",
+      "message": "Changes for {count} selected person",
       "description": "Accessible name of the toolbar for chosen people. One person.",
-      "placeholders": [],
+      "placeholders": [
+        "count"
+      ],
       "source": "src/prctr/workbench/contrib/administration/users/usersMessages.ts"
     },
     "administration.users.sign.out.body": {

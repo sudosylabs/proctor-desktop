@@ -107,6 +107,11 @@ export interface AdminFormOptions {
 	summary(values: AdminFormValues): readonly string[];
 	/** Called once the change succeeded, or failed in a way that needs a fresh read. */
 	onDidComplete(result: AdministrationResponse): void;
+	/**
+	 * Previews instead of changing: the dialog closes with the change it built, and the page
+	 * shows its effect until the person applies or discards it.
+	 */
+	readonly preview?: (intent: AdministrationChangeIntent) => void;
 }
 
 interface FieldView {
@@ -350,6 +355,12 @@ export class AdminFormDialog extends Disposable {
 			const field = this.fields.find((candidate) => candidate.spec.id === intent.field);
 			field?.setError(intent.error);
 			field?.focus();
+			return;
+		}
+		if (this.options.preview !== undefined) {
+			const preview = this.options.preview;
+			this.dispose();
+			preview(intent);
 			return;
 		}
 		const result = await this.changes.send(intent, this.options.summary(values));
