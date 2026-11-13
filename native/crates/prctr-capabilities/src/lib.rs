@@ -95,3 +95,13 @@ pub fn registry_json() -> Value {
         }
     })
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn no_registered_rule_field_is_an_envelope_member() {
+        for descriptor in super::registry().capabilities {
+            prctr_core::testing::assert_rule_fields_are_not_envelope(&descriptor);
+        }
+    }
+}

@@ -120,15 +120,6 @@ pub fn descriptor() -> CapabilityDescriptor {
         stability_ms: STABILITY_MS,
         categories: Vec::new(),
         fields: vec![
-            FieldSpec {
-                name: id("removable_storage.coverage"),
-                kind: FieldKind::Symbol {
-                    values: ["block_and_portable", "block_only", "unavailable"]
-                        .into_iter()
-                        .map(id)
-                        .collect(),
-                },
-            },
             count("removable_storage.summary.block_storage"),
             count("removable_storage.summary.portable_devices"),
         ],
@@ -276,10 +267,7 @@ impl Tracking {
             coverage,
             devices: all.into_values().take(MAX_DEVICES).collect(),
         };
-        let mut fields = BTreeMap::from([(
-            id("removable_storage.coverage"),
-            FieldValue::Symbol(id(coverage_text(coverage))),
-        )]);
+        let mut fields = BTreeMap::new();
         if raw.block.is_some() {
             fields.insert(
                 id("removable_storage.summary.block_storage"),
@@ -304,14 +292,6 @@ impl Tracking {
             apps: None,
             changes,
         }
-    }
-}
-
-const fn coverage_text(coverage: Coverage) -> &'static str {
-    match coverage {
-        Coverage::BlockAndPortable => "block_and_portable",
-        Coverage::BlockOnly => "block_only",
-        Coverage::Unavailable => "unavailable",
     }
 }
 

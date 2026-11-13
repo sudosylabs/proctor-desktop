@@ -57,6 +57,24 @@ fn facts(numbered: &[Numbered]) -> Vec<&prctr_protocol::facts::Fact> {
         .collect()
 }
 
+/// The envelope decides whether a comparison is known, so it is never a rule field; every field is
+/// named under its capability (`docs/architecture/native-rules.md`).
+///
+/// # Panics
+/// When a field is named after an envelope member or outside its capability.
+pub fn assert_rule_fields_are_not_envelope(descriptor: &CapabilityDescriptor) {
+    let prefix = format!("{}.", descriptor.id.as_str());
+    for field in &descriptor.fields {
+        let name = field.name.as_str();
+        assert!(name.starts_with(&prefix), "{name} is outside {prefix}");
+        let last = name.rsplit('.').next().unwrap_or(name);
+        assert!(
+            !["certainty", "coverage", "health", "permission"].contains(&last),
+            "{name} is an envelope member, never a rule field"
+        );
+    }
+}
+
 /// Asserts the lifecycle guarantees for one capability, given two different valid states of it
 /// (as its fake would produce them).
 ///
@@ -71,6 +89,7 @@ pub fn assert_capability_conformance(
         !first.same_state(second),
         "conformance needs two different states"
     );
+    assert_rule_fields_are_not_envelope(descriptor);
     let capability = descriptor.id.clone();
     let observed = |observation: &Observation, at_ms| Input::Observed {
         capability: capability.clone(),

@@ -80,15 +80,7 @@ const COUNT_FIELDS: [&str; 6] = [
 
 #[must_use]
 pub fn descriptor() -> CapabilityDescriptor {
-    let mut fields = vec![FieldSpec {
-        name: id("printing.coverage"),
-        kind: FieldKind::Symbol {
-            values: ["monitored_scheduler", "snapshot_only", "unavailable"]
-                .into_iter()
-                .map(id)
-                .collect(),
-        },
-    }];
+    let mut fields = Vec::new();
     fields.extend(COUNT_FIELDS.iter().map(|name| FieldSpec {
         name: id(name),
         kind: FieldKind::Count { max: MAX_COUNT },
@@ -192,16 +184,10 @@ impl Tracking {
             candidate_jobs: state.candidate_jobs,
             unknown_jobs: state.unknown_jobs,
         };
-        let mut fields = std::collections::BTreeMap::from([
-            (
-                id("printing.coverage"),
-                FieldValue::Symbol(id(coverage_text(coverage))),
-            ),
-            (
-                id("printing.blocked_print_commands"),
-                FieldValue::Number(state.blocked_print_commands),
-            ),
-        ]);
+        let mut fields = std::collections::BTreeMap::from([(
+            id("printing.blocked_print_commands"),
+            FieldValue::Number(state.blocked_print_commands),
+        )]);
         if raw.jobs.is_some() {
             for (name, value) in [
                 ("printing.summary.candidate_jobs", summary.candidate_jobs),
@@ -230,14 +216,6 @@ impl Tracking {
             apps: None,
             changes,
         }
-    }
-}
-
-const fn coverage_text(coverage: Coverage) -> &'static str {
-    match coverage {
-        Coverage::MonitoredScheduler => "monitored_scheduler",
-        Coverage::SnapshotOnly => "snapshot_only",
-        Coverage::Unavailable => "unavailable",
     }
 }
 

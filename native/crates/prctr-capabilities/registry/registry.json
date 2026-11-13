@@ -1201,15 +1201,6 @@
         "categories": [],
         "fields": [
           {
-            "name": "removable_storage.coverage",
-            "type": "symbol",
-            "values": [
-              "block_and_portable",
-              "block_only",
-              "unavailable"
-            ]
-          },
-          {
             "max": 1024,
             "name": "removable_storage.summary.block_storage",
             "type": "count"
@@ -1232,15 +1223,6 @@
         "app_conditions": false,
         "categories": [],
         "fields": [
-          {
-            "name": "printing.coverage",
-            "type": "symbol",
-            "values": [
-              "monitored_scheduler",
-              "snapshot_only",
-              "unavailable"
-            ]
-          },
           {
             "max": 1000000,
             "name": "printing.summary.candidate_jobs",
