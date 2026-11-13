@@ -3196,7 +3196,7 @@ export interface paths {
         };
         /**
          * Play a ready screen clip
-         * @description Streams a ready clip to one of the Sitting's Exam Managers, whole or by one byte range so a player can seek. Each playback, a request from the clip's first byte, is audited. Multiple ranges, or a range past the clip's end, are refused.
+         * @description Streams a ready clip to one of the Sitting's Exam Managers, or once the Attempt is submitted to someone allowed to review its Submission, whole or by one byte range so a player can seek. Each playback, a request from the clip's first byte, is audited. Multiple ranges, or a range past the clip's end, are refused.
          */
         readonly get: operations["playExamAttemptScreenClip"];
         readonly put?: never;
@@ -8230,7 +8230,7 @@ export interface components {
             readonly ordinal: number;
             readonly policy_id: string;
             /** @constant */
-            readonly registry_digest: "sha256:b8da9b04779e2fa14d7e6d63393c80b9499749291c7132cf41745bddbf0e5313";
+            readonly registry_digest: "sha256:be7d0c62fe770b76cad13e36874d1acde3ca81bd53655d3abd263b6bc74e17fa";
             readonly resolved_exception_refs: readonly string[];
             /** @constant */
             readonly retention_class_id: "native_minimized";
@@ -10130,7 +10130,7 @@ export interface components {
             readonly items: readonly components["schemas"]["NativeConditionEvidence"][];
             readonly next_cursor?: string;
         };
-        /** @description Where the exam begins on the stream: Desktop sends it once, when the candidate window mounts after admission. Before it the server applies the policy's readiness rules; from it, the participation rules. */
+        /** @description Where the exam begins on the stream: Desktop sends it once, when the candidate window mounts after admission. Before it the server applies the policy's readiness rules; from it, the participation rules, on the latest facts. Send the mounted candidate window's fact before it, in the same or an earlier batch; otherwise the window rule is evaluated on the window Desktop reported at Start and fails. */
         readonly NativeParticipationConfirmed: {
             /**
              * @description discriminator enum property added by openapi-typescript
@@ -10284,7 +10284,7 @@ export interface components {
                 }
             ];
             /** @constant */
-            readonly registry_digest: "sha256:b8da9b04779e2fa14d7e6d63393c80b9499749291c7132cf41745bddbf0e5313";
+            readonly registry_digest: "sha256:be7d0c62fe770b76cad13e36874d1acde3ca81bd53655d3abd263b6bc74e17fa";
             readonly screen_recording: components["schemas"]["NativeScreenRecordingPolicy"];
         };
         readonly NativeSecurityStreamStatus: {
@@ -11393,7 +11393,7 @@ export interface components {
             readonly catalog_id: string;
             readonly digest: string;
             /** @enum {string} */
-            readonly kind: "application" | "storage_function" | "managed_network_profile" | "network_adapter_class" | "tunnel_class" | "detector";
+            readonly kind: "application";
             readonly revision: string;
         };
         /** @description How the server processed Desktop's latest security control: the lease renewal and its delivery watermarks. A renewal never changes whether the candidate may interact; only closing native delivery does. */
@@ -15701,7 +15701,7 @@ export interface components {
                  *             "outcome": "flag"
                  *           }
                  *         ],
-                 *         "registry_digest": "sha256:b8da9b04779e2fa14d7e6d63393c80b9499749291c7132cf41745bddbf0e5313",
+                 *         "registry_digest": "sha256:be7d0c62fe770b76cad13e36874d1acde3ca81bd53655d3abd263b6bc74e17fa",
                  *         "screen_recording": {
                  *           "enabled": true
                  *         }
@@ -16358,7 +16358,7 @@ export interface components {
                 /**
                  * @example {
                  *       "configuration_manifest_fingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                 *       "native_registry_digest": "sha256:b8da9b04779e2fa14d7e6d63393c80b9499749291c7132cf41745bddbf0e5313"
+                 *       "native_registry_digest": "sha256:be7d0c62fe770b76cad13e36874d1acde3ca81bd53655d3abd263b6bc74e17fa"
                  *     }
                  */
                 readonly "application/json": components["schemas"]["PrepareSecurityPreflightRequest"];

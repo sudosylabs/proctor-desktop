@@ -1029,7 +1029,7 @@
                     "outcome": "flag"
                   }
                 ],
-                "registry_digest": "sha256:b8da9b04779e2fa14d7e6d63393c80b9499749291c7132cf41745bddbf0e5313",
+                "registry_digest": "sha256:be7d0c62fe770b76cad13e36874d1acde3ca81bd53655d3abd263b6bc74e17fa",
                 "screen_recording": {
                   "enabled": true
                 }
@@ -1832,7 +1832,7 @@
           "application/json": {
             "example": {
               "configuration_manifest_fingerprint": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-              "native_registry_digest": "sha256:b8da9b04779e2fa14d7e6d63393c80b9499749291c7132cf41745bddbf0e5313"
+              "native_registry_digest": "sha256:be7d0c62fe770b76cad13e36874d1acde3ca81bd53655d3abd263b6bc74e17fa"
             },
             "schema": {
               "$ref": "#/components/schemas/PrepareSecurityPreflightRequest"
@@ -14618,7 +14618,7 @@
             "type": "string"
           },
           "registry_digest": {
-            "const": "sha256:b8da9b04779e2fa14d7e6d63393c80b9499749291c7132cf41745bddbf0e5313",
+            "const": "sha256:be7d0c62fe770b76cad13e36874d1acde3ca81bd53655d3abd263b6bc74e17fa",
             "type": "string"
           },
           "resolved_exception_refs": {
@@ -21073,7 +21073,7 @@
       },
       "NativeParticipationConfirmed": {
         "additionalProperties": false,
-        "description": "Where the exam begins on the stream: Desktop sends it once, when the candidate window mounts after admission. Before it the server applies the policy's readiness rules; from it, the participation rules.",
+        "description": "Where the exam begins on the stream: Desktop sends it once, when the candidate window mounts after admission. Before it the server applies the policy's readiness rules; from it, the participation rules, on the latest facts. Send the mounted candidate window's fact before it, in the same or an earlier batch; otherwise the window rule is evaluated on the window Desktop reported at Start and fails.",
         "properties": {
           "kind": {
             "enum": [
@@ -22338,7 +22338,7 @@
             "type": "array"
           },
           "registry_digest": {
-            "const": "sha256:b8da9b04779e2fa14d7e6d63393c80b9499749291c7132cf41745bddbf0e5313",
+            "const": "sha256:be7d0c62fe770b76cad13e36874d1acde3ca81bd53655d3abd263b6bc74e17fa",
             "type": "string"
           },
           "screen_recording": {
@@ -25901,12 +25901,7 @@
           },
           "kind": {
             "enum": [
-              "application",
-              "storage_function",
-              "managed_network_profile",
-              "network_adapter_class",
-              "tunnel_class",
-              "detector"
+              "application"
             ],
             "type": "string"
           },
@@ -42088,7 +42083,7 @@
     },
     "/api/v1/exams/{exam_id}/sittings/{exam_sitting_id}/attempts/{exam_attempt_id}/screen-clips/{screen_clip_id}/content": {
       "get": {
-        "description": "Streams a ready clip to one of the Sitting's Exam Managers, whole or by one byte range so a player can seek. Each playback, a request from the clip's first byte, is audited. Multiple ranges, or a range past the clip's end, are refused.",
+        "description": "Streams a ready clip to one of the Sitting's Exam Managers, or once the Attempt is submitted to someone allowed to review its Submission, whole or by one byte range so a player can seek. Each playback, a request from the clip's first byte, is audited. Multiple ranges, or a range past the clip's end, are refused.",
         "operationId": "playExamAttemptScreenClip",
         "parameters": [
           {

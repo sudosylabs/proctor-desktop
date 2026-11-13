@@ -50,6 +50,23 @@ export interface components {
             readonly sequence: number;
         };
         /**
+         * Connect security
+         * @description Which admission the connect consumes: a fresh preflight for first admission and Ready rejoin, or the current Participation for a same-generation reconnect.
+         */
+        readonly connect_security: {
+            /** @constant */
+            readonly kind: "preflight";
+            readonly preflight_id: string;
+            /** @description The digest the report receipt returned; the report must be at most 30 seconds old. */
+            readonly report_digest: string;
+        } | {
+            readonly generation: number;
+            /** @constant */
+            readonly kind: "resume";
+            readonly participation_id: components["schemas"]["id"];
+            readonly policy_digest: string;
+        };
+        /**
          * Event frame
          * @description The envelope of every server-to-client event. sequence is assigned by the connection, increases by one per event, and is what a reconnecting client offers as sequence_number.
          */
@@ -88,6 +105,43 @@ export interface components {
             readonly state: "suspended" | "active";
         };
         /**
+         * Exam Attempt connect
+         * @description Binds this WebSocket to the candidate's Attempt in the Sitting: admits a new Attempt, rejoins a Ready one, or resumes the current Participation.
+         */
+        readonly exam_attempt_connect: {
+            readonly configuration_manifest_fingerprint: string;
+            /** @description The Attempt Connection's continuity credential, chosen by Desktop at connect. */
+            readonly continuity_credential: string;
+            readonly exam_sitting_id: components["schemas"]["id"];
+            /** @description Repeating the same connect with the same key replays its result. */
+            readonly idempotency_key: string;
+            /** @description Exactly the OpenAPI component AttemptConfigurationCandidate. Sent on first admission; omitted when rejoining or resuming. */
+            readonly initial_configuration?: Record<string, never>;
+            readonly security: components["schemas"]["connect_security"];
+        };
+        /** Exam Attempt connect reply */
+        readonly exam_attempt_connect_reply: {
+            readonly attempt_connection_id: components["schemas"]["id"];
+            readonly attempt_id: components["schemas"]["id"];
+            /** @description Exactly the OpenAPI component CandidateBrowserPolicy, or null when the Exam has no Browser policy. */
+            readonly browser_policy: Record<string, never> | null;
+            /** @description Exactly the OpenAPI component CandidateRuntimeCapabilities. */
+            readonly candidate_runtime_capabilities: Record<string, never>;
+            readonly first_admission: boolean;
+            readonly generation: number;
+            readonly lease_expires_at: components["schemas"]["instant"];
+            readonly live_corrections: readonly Record<string, never>[];
+            readonly participation_id: components["schemas"]["id"];
+            /** @description How often to send exam_attempt.renew. */
+            readonly renewal_interval_seconds: number;
+            /** @description The connect repeated an earlier one with the same idempotency key. */
+            readonly replayed: boolean;
+            /** @description Exactly the OpenAPI component AdmittedSecurity. The immutable admitted binding receipt, including the effective native policy. */
+            readonly security: Record<string, never>;
+            readonly started_at: components["schemas"]["instant"];
+            readonly workspace_id: components["schemas"]["id"];
+        };
+        /**
          * Attempt Connection changed
          * @description An Attempt Connection opened or closed. close_reason is present only when it closed.
          */
@@ -101,6 +155,42 @@ export interface components {
             readonly exam_sitting_id: components["schemas"]["id"];
             /** @enum {string} */
             readonly state: "open" | "closed";
+        };
+        /**
+         * Exam Attempt Focus Loss
+         * @description Reports one completed loss of focus of the candidate window. Sequences are per generation and increase by one; a skipped sequence is recorded as a gap.
+         */
+        readonly exam_attempt_focus_loss: {
+            /** @description The Attempt Connection's continuity credential, chosen by Desktop at connect. */
+            readonly continuity_credential: string;
+            readonly duration_milliseconds: number;
+            readonly generation: number;
+            /** @constant */
+            readonly schema_version: 1;
+            readonly sequence: number;
+            /**
+             * @description Optional classification of what lost focus.
+             * @enum {string}
+             */
+            readonly source?: "window_blur" | "document_hidden" | "application_backgrounded" | "fullscreen_exited";
+        };
+        /**
+         * Exam Attempt Focus Loss reply
+         * @description Acknowledges the signal. It tells the candidate's Desktop only what it must act on: never the threshold, outcome or Flag.
+         */
+        readonly exam_attempt_focus_loss_reply: {
+            readonly accepted_sequence: number;
+            readonly discrepancy_recorded: boolean;
+            readonly duplicate: boolean;
+            readonly gap_detected: boolean;
+            readonly generation: number;
+            /** @description The Exam does not collect Focus Loss; the signal was only acknowledged. */
+            readonly policy_disabled: boolean;
+            readonly received_at: components["schemas"]["instant"];
+            /** @description The Attempt was suspended and this Connection closed. */
+            readonly suspension_created: boolean;
+            /** @description Show the candidate the Focus Loss warning. */
+            readonly warning_created: boolean;
         };
         /**
          * Focus Loss warning

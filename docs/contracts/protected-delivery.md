@@ -84,7 +84,10 @@ Desktop sends a capability fact whenever a capability's state or envelope
 changes; it carries the full minimized state, never a delta. A fact no newer
 than the latest of its source instance changes nothing. Desktop sends
 `participation_confirmed` exactly once, when the CandidateWindow mounts after
-admission. Desktop sends a `rule_status` record when its own status or
+admission, and sends the mounted window's `candidate_window` fact before it, in
+the same batch or an earlier one. Participation rules start on the latest facts,
+so a later window fact would leave `baseline.window` evaluated on the absent
+window reported at Start. Desktop sends a `rule_status` record when its own status or
 containment for a participation rule changes. Source resets and gaps have no
 separate receipts; the batch receipt covers them.
 
@@ -147,8 +150,11 @@ authoritative. A `rule_status` record is compared with the server's status for
 the same rule; a disagreement is counted, never applied.
 
 An occurrence opens when a rule becomes not met and closes when it becomes met
-again. An enforce occurrence that opens raises its capability's native Flag; for
-a `flag_and_suspend` family it also suspends the Attempt
+again. An enforce occurrence that opens raises that rule's native Flag: one Flag per
+rule per Participation generation, of kind `native.<capability>`, carrying
+`native_rule_id`, so two rules on one capability are two Flags with their own
+evidence and incident clips. For a `flag_and_suspend` family it also suspends
+the Attempt
 ([native outcomes](security-policy.md#native-outcomes)). When the policy's
 screen recorder is on, an enforce occurrence that raises a native Flag also
 creates an incident [screen clip](#screen-clips) request. Observe rules are
@@ -842,13 +848,14 @@ Manager routes, under
 - `GET` (`listExamAttemptScreenClips`) lists, newest first, every clip for the
   Attempt, manager and incident alike, with its state.
 - `GET …/screen-clips/{screen_clip_id}/content` (`playExamAttemptScreenClip`)
-  streams a ready clip to one of the Sitting's Exam Managers, whole or by one
-  byte range (`Range`, 206). Multiple ranges or a range past the end are refused.
+  streams a ready clip to one of the Sitting's Exam Managers, or, once the
+  Attempt is submitted, to someone allowed to review its Submission, whole or by
+  one byte range (`Range`, 206). Multiple ranges or a range past the end are refused.
   Each playback from the first byte is audited.
 
-When the recorder is on, an enforce occurrence that raises a native Flag creates
-an incident request for the range from 60 seconds before to 60 seconds after the
-occurrence. The realtime event `exam_attempt_screen_clips_requested`, on
+When the recorder is on, an enforce occurrence that raises a native Flag, or a
+Focus Loss Flag, creates an incident request for the range from 60 seconds
+before to 60 seconds after the occurrence. The realtime event `exam_attempt_screen_clips_requested`, on
 `exam.sitting.participate` for the addressed candidate, carries
 `{ exam_sitting_id, exam_attempt_id, changed_at }` and none of the requests;
 Desktop then lists its pending requests. Clip bytes are integrity evidence and

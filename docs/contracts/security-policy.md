@@ -163,7 +163,8 @@ again on the facts Desktop delivers, and its evaluation is authoritative.
 ## Native outcomes
 
 An enforce rule that is not met opens an occurrence on the server, and an
-enforce occurrence that opens raises its capability's native Flag. When the
+enforce occurrence that opens raises that rule's native Flag (one per rule per
+Participation generation, kind `native.<capability>`, with `native_rule_id`). When the
 family's outcome is `flag_and_suspend`, that enforce occurrence also suspends
 the Attempt exactly as a Focus Loss suspension does, with candidate reason
 `native_policy_review_required`. Observe rules are recorded only. A rule that is
@@ -231,13 +232,7 @@ interface SecurityPolicyResponse {
 }
 
 interface CatalogBinding {
-  kind:
-    | 'application'
-    | 'storage_function'
-    | 'managed_network_profile'
-    | 'network_adapter_class'
-    | 'tunnel_class'
-    | 'detector';
+  kind: 'application'; // The bundled application catalog is the only catalog.
   catalog_id: OpaqueID;
   revision: Revision;
   digest: SHA256;
