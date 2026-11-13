@@ -286,6 +286,16 @@ bounded_string!(
     |value| (1..=128).contains(&value.len()) && value.bytes().all(|byte| (b'!'..=b'~').contains(&byte))
 );
 
+bounded_string!(
+    /// Code-signing text from the OS (a publisher, file name, signing ID or Team ID): 1 to 256
+    /// bytes of UTF-8 without control characters.
+    CodeText,
+    "code text",
+    "CodeText",
+    "^[^\\u0000-\\u001f\\u007f]{1,256}$",
+    |value| (1..=256).contains(&value.len()) && !value.chars().any(char::is_control)
+);
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -338,6 +348,15 @@ mod tests {
             Secret::from_bytes(&[0xFF; 32]).as_str(),
             format!("{}8", "_".repeat(42))
         );
+    }
+
+    #[test]
+    fn code_text_is_bounded_and_has_no_control_characters() {
+        assert!(CodeText::new("Microsoft Windows").is_ok());
+        assert!(CodeText::new("").is_err());
+        assert!(CodeText::new("a\nb").is_err());
+        assert!(CodeText::new("é".repeat(128)).is_ok());
+        assert!(CodeText::new("a".repeat(257)).is_err());
     }
 
     #[test]

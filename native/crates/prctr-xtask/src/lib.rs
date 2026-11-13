@@ -19,6 +19,8 @@ pub struct Artifact {
 pub fn artifacts() -> Vec<Artifact> {
     let schema = pretty(&prctr_protocol::agent_protocol_schema());
     let digest = sha256_hex(schema.as_bytes());
+    let helper_schema = pretty(&prctr_protocol::helper_protocol_schema());
+    let helper_digest = sha256_hex(helper_schema.as_bytes());
     vec![
         Artifact {
             path: "crates/prctr-protocol/schema/agent-protocol.schema.json",
@@ -27,6 +29,14 @@ pub fn artifacts() -> Vec<Artifact> {
         Artifact {
             path: "crates/prctr-protocol/schema/agent-protocol.digest",
             contents: format!("{digest}\n"),
+        },
+        Artifact {
+            path: "crates/prctr-protocol/schema/helper-protocol.schema.json",
+            contents: helper_schema,
+        },
+        Artifact {
+            path: "crates/prctr-protocol/schema/helper-protocol.digest",
+            contents: format!("{helper_digest}\n"),
         },
         Artifact {
             path: "crates/prctr-capabilities/registry/registry.json",
