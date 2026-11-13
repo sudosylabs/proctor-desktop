@@ -122,6 +122,7 @@
     "../src/prctr/platform/profiling/common/profiling.ts",
     "../src/prctr/platform/request/common/request.ts",
     "../src/prctr/platform/native/common/native.ts",
+    "../src/prctr/platform/native/common/nativeAgentProtocol.generated.ts",
     "../src/prctr/platform/remote/common/remoteAgentEnvironment.ts",
     "../src/prctr/platform/sign/common/sign.ts",
     "../src/prctr/platform/remote/common/remoteAgentConnection.ts",
