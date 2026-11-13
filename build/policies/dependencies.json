@@ -138,6 +138,15 @@
           "targetScope": null
         },
         {
+          "manifest": "native/crates/prctr-recorder/Cargo.toml",
+          "alias": "serde",
+          "kind": "production",
+          "features": ["derive"],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
           "manifest": "native/crates/prctr-capabilities/Cargo.toml",
           "alias": "serde",
           "kind": "production",
@@ -201,6 +210,15 @@
         },
         {
           "manifest": "native/crates/prctr-agent/Cargo.toml",
+          "alias": "serde_json",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": null
+        },
+        {
+          "manifest": "native/crates/prctr-recorder/Cargo.toml",
           "alias": "serde_json",
           "kind": "production",
           "features": [],
@@ -295,6 +313,15 @@
       "license": "MIT OR Apache-2.0",
       "lifecycleScripts": "none",
       "declarations": [
+        {
+          "manifest": "native/crates/prctr-recorder/Cargo.toml",
+          "alias": "sha2",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        },
         {
           "manifest": "native/crates/prctr-xtask/Cargo.toml",
           "alias": "sha2",
@@ -827,6 +854,36 @@
     },
     {
       "ecosystem": "cargo",
+      "package": "chacha20poly1305",
+      "version": "0.11.0",
+      "kind": "production",
+      "purpose": "Authenticated encryption for the screen evidence recorder: every local segment and the index are sealed with XChaCha20-Poly1305 under the recording key, and every clip chunk with ChaCha20-Poly1305 under a fresh clip key, which Electron main opens with node:crypto.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/chacha20poly1305/0.11.0",
+      "license": "Apache-2.0 OR MIT",
+      "lifecycleScripts": "allowed",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-recorder/Cargo.toml",
+          "alias": "chacha20poly1305",
+          "kind": "production",
+          "features": ["alloc", "zeroize"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": null
+        }
+      ],
+      "processes": ["native-agent"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Pure Rust; no OS calls. Nonces come from prctr-os, never from a userspace generator.",
+      "transitiveRisk": "Adds the RustCrypto aead, chacha20, poly1305, cipher, inout, hybrid-array, crypto-common, universal-hash, ctutils and cmov crates, all Apache-2.0 OR MIT; getrandom and rand_core are disabled.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "No OS offers ChaCha20-Poly1305 across macOS, Windows and Linux, and a hand-written AEAD would be unaudited cryptography.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
       "package": "objc2-io-kit",
       "version": "0.3.2",
       "kind": "production",
@@ -950,6 +1007,7 @@
             "Win32_Networking_WinHttp",
             "Win32_Networking_WinSock",
             "Win32_Security",
+            "Win32_Security_Cryptography",
             "Win32_Storage_FileSystem",
             "Win32_System_Com",
             "Win32_System_Com_StructuredStorage",

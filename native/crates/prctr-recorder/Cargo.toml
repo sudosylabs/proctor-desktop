@@ -1,0 +1,16 @@
+[package]
+name = "prctr-recorder"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+chacha20poly1305 = { version = "=0.11.0", default-features = false, features = ["alloc", "zeroize"] }
+prctr-os = { path = "../prctr-os" }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = { version = "=1.0.151" }
+sha2 = { version = "=0.10.9", default-features = false }
+
+[lints]
+workspace = true

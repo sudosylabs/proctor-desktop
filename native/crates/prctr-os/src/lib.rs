@@ -421,3 +421,56 @@ pub struct RawProcess {
     pub pid: u32,
     pub parent: u32,
 }
+
+/// Fills `buffer` from the OS's cryptographic random source. Returns `false` if it is unavailable;
+/// callers must not fall back to anything weaker.
+#[must_use]
+pub fn random_bytes(buffer: &mut [u8]) -> bool {
+    #[cfg(target_os = "macos")]
+    {
+        // SAFETY: `buffer` is writable for its length; `arc4random_buf` cannot fail.
+        unsafe { libc::arc4random_buf(buffer.as_mut_ptr().cast(), buffer.len()) };
+        true
+    }
+    #[cfg(target_os = "linux")]
+    {
+        let mut filled = 0;
+        while filled < buffer.len() {
+            let rest = &mut buffer[filled..];
+            // SAFETY: `rest` is writable for its length.
+            let read = unsafe { libc::getrandom(rest.as_mut_ptr().cast(), rest.len(), 0) };
+            match usize::try_from(read) {
+                Ok(read) if read > 0 => filled += read,
+                _ if std::io::Error::last_os_error().kind() == std::io::ErrorKind::Interrupted => {}
+                _ => return false,
+            }
+        }
+        true
+    }
+    #[cfg(target_os = "windows")]
+    {
+        use ::windows::Win32::Security::Cryptography::{
+            BCRYPT_USE_SYSTEM_PREFERRED_RNG, BCryptGenRandom,
+        };
+        // SAFETY: `buffer` is writable for its length; no algorithm handle is needed with the
+        // system-preferred generator.
+        unsafe { BCryptGenRandom(None, buffer, BCRYPT_USE_SYSTEM_PREFERRED_RNG) }.is_ok()
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
+    {
+        let _ = buffer;
+        false
+    }
+}
+
+#[cfg(test)]
+mod random_tests {
+    #[test]
+    fn two_draws_differ_and_are_not_zero() {
+        let (mut first, mut second) = ([0_u8; 32], [0_u8; 32]);
+        assert!(super::random_bytes(&mut first));
+        assert!(super::random_bytes(&mut second));
+        assert_ne!(first, second);
+        assert_ne!(first, [0; 32]);
+    }
+}
