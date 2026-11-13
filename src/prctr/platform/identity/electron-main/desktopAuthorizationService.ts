@@ -496,6 +496,21 @@ export class DesktopAuthorizationService extends Disposable {
 		this.#reauthentication?.cancel();
 	}
 
+	/**
+	 * Signs a screen clip's content digest with the bound Session's installation key: ES256 over
+	 * the digest's 64 lowercase hexadecimal ASCII bytes, returned as raw r‖s in unpadded
+	 * base64url, as the clip completion route verifies it. Only a digest is accepted, so the key
+	 * cannot be used to sign anything else through this method.
+	 */
+	async signScreenClipDigest(binding: SessionBinding, contentDigestHex: string): Promise<string> {
+		this.apiForSession(binding);
+		if (!/^[0-9a-f]{64}$/.test(contentDigestHex)) throw new ServerApiError('invalidRequest');
+		const session = this.#session!;
+		const signature = await session.key.sign(new TextEncoder().encode(contentDigestHex));
+		if (signature.byteLength !== 64) throw new ServerApiError('invalidRequest');
+		return Buffer.from(signature).toString('base64url');
+	}
+
 	/** Full typed client is available only to privileged, session-bound capability owners. */
 	apiForSession(binding: SessionBinding): SessionApi {
 		const session = this.#session;
