@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 pub mod candidate_window;
+pub mod catalog;
 pub mod clipboard;
 pub mod display;
 pub mod interactive_session;
@@ -10,6 +11,7 @@ pub mod media;
 pub mod network;
 mod poller;
 pub mod printing;
+pub mod process_application;
 pub mod removable_storage;
 pub mod virtualization;
 
@@ -30,6 +32,7 @@ pub fn sources() -> Vec<Box<dyn Source>> {
         Box::new(printing::PrintingSource::new()),
         Box::new(media::MediaSource::new(media::Kind::Camera)),
         Box::new(media::MediaSource::new(media::Kind::Microphone)),
+        Box::new(process_application::ProcessSource::new()),
     ]
 }
 
@@ -48,12 +51,14 @@ pub fn registry() -> Registry {
             printing::descriptor(),
             media::descriptor(media::Kind::Camera),
             media::descriptor(media::Kind::Microphone),
+            process_application::descriptor(),
         ],
         baseline_rules: vec![
             display::baseline_rule(),
             candidate_window::baseline_rule(),
             interactive_session::baseline_rule(),
         ],
+        applications: catalog::registered(),
     }
 }
 
@@ -104,6 +109,10 @@ pub fn registry_json() -> Value {
             "microphone": {
                 "state": schema(schemars::schema_for!(media::MicrophoneState)),
                 "summary": schema(schemars::schema_for!(media::MicrophoneSummary)),
+            },
+            process_application::CAPABILITY: {
+                "state": schema(schemars::schema_for!(process_application::ProcessState)),
+                "summary": schema(schemars::schema_for!(process_application::ProcessSummary)),
             }
         }
     })

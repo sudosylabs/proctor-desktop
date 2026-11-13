@@ -418,6 +418,71 @@ pub fn microphones_in(root: &Path) -> crate::RawMedia {
     }
 }
 
+/// Every process of the account the agent runs as, from `/proc`.
+#[must_use]
+pub fn processes() -> Option<Vec<crate::RawProcess>> {
+    processes_in(Path::new("/proc"), current_uid()?)
+}
+
+fn current_uid() -> Option<u32> {
+    let status = fs::read_to_string("/proc/self/status").ok()?;
+    status_field(&status, "Uid:")
+}
+
+fn status_field(status: &str, name: &str) -> Option<u32> {
+    status
+        .lines()
+        .find_map(|line| line.strip_prefix(name))?
+        .split_whitespace()
+        .next()?
+        .parse()
+        .ok()
+}
+
+#[must_use]
+pub fn processes_in(root: &Path, uid: u32) -> Option<Vec<crate::RawProcess>> {
+    let mut processes = Vec::new();
+    for entry in fs::read_dir(root).ok()?.flatten().take(32_768) {
+        let Ok(pid) = entry.file_name().to_string_lossy().parse::<u32>() else {
+            continue;
+        };
+        let Ok(status) = fs::read_to_string(entry.path().join("status")) else {
+            continue;
+        };
+        if status_field(&status, "Uid:") != Some(uid) {
+            continue;
+        }
+        // The 22nd field of `stat` is the start time; the command name before it may hold spaces.
+        let start = fs::read_to_string(entry.path().join("stat"))
+            .ok()
+            .and_then(|stat| stat.rsplit_once(')').map(|(_, rest)| rest.to_owned()))
+            .and_then(|rest| rest.split_whitespace().nth(19).map(str::to_owned))
+            .unwrap_or_default();
+        processes.push(crate::RawProcess {
+            instance: crate::fingerprint(format!("{pid}:{start}").as_bytes()),
+            pid,
+            parent: status_field(&status, "PPid:").unwrap_or(0),
+        });
+    }
+    Some(processes)
+}
+
+/// The executable's file name: Linux has no code identity.
+#[must_use]
+pub fn identity(pid: u32) -> crate::RawIdentity {
+    fs::read_link(format!("/proc/{pid}/exe"))
+        .ok()
+        .and_then(|path| {
+            path.file_name()
+                .map(|name| name.to_string_lossy().into_owned())
+        })
+        .map_or(crate::RawIdentity::Unavailable, |executable| {
+            crate::RawIdentity::Linux {
+                executable: executable.trim_end_matches(" (deleted)").to_owned(),
+            }
+        })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -647,5 +712,37 @@ mod media_tests {
             "playback is not capture"
         );
         assert_eq!(media.in_use_by_other, Some(true));
+    }
+}
+
+#[cfg(test)]
+mod process_tests {
+    use super::*;
+
+    #[test]
+    fn only_the_accounts_processes_are_listed_and_start_times_make_instances() {
+        let root = std::env::temp_dir().join(format!("prctr-proc-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&root);
+        for (pid, uid, start) in [(10, 1000, 500), (11, 0, 600), (12, 1000, 700)] {
+            let path = root.join(pid.to_string());
+            fs::create_dir_all(&path).expect("pid");
+            fs::write(
+                path.join("status"),
+                format!("Name:\tx\nPPid:\t1\nUid:\t{uid}\t{uid}\t{uid}\t{uid}\n"),
+            )
+            .expect("status");
+            let fields = (0..19).map(|_| "0").collect::<Vec<_>>().join(" ");
+            fs::write(
+                path.join("stat"),
+                format!("{pid} (a b) S {fields} {start} 0\n"),
+            )
+            .expect("stat");
+        }
+        fs::create_dir_all(root.join("self")).expect("self");
+        let listed = processes_in(&root, 1000).expect("reads fixture");
+        let _ = fs::remove_dir_all(&root);
+        assert_eq!(listed.len(), 2);
+        assert!(listed.iter().all(|process| process.parent == 1));
+        assert_ne!(listed[0].instance, listed[1].instance);
     }
 }

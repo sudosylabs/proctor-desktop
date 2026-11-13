@@ -5,6 +5,7 @@ use std::fmt;
 
 use prctr_protocol::facts::Permission;
 
+use prctr_protocol::rules::Rule;
 use prctr_protocol::scalars::Identifier;
 
 use crate::observation::Observation;
@@ -40,6 +41,10 @@ impl std::error::Error for SourceError {}
 /// One capability on one platform.
 pub trait Source: Send {
     fn descriptor(&self) -> CapabilityDescriptor;
+
+    /// Receives the policy's rules on this capability before [`Source::start`], for a source that
+    /// matches application conditions on the device. The policy may still be refused afterwards.
+    fn configure_rules(&mut self, _rules: &[Rule]) {}
 
     /// Starts observing the activation's selected `categories` (empty for capabilities without
     /// sub-categories; an unselected category is never queried), then returns the first complete state. Observation is registered before the

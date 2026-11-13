@@ -389,3 +389,35 @@ impl RawMedia {
         }
     }
 }
+
+/// A process's code identity. Paths and process names are never identity.
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub enum RawIdentity {
+    /// macOS code signature. `team_id` is `None` for Apple's own code; `apple` is true when the
+    /// signature satisfies `anchor apple`.
+    MacOs {
+        signing_identifier: String,
+        team_id: Option<String>,
+        apple: bool,
+    },
+    /// Windows Authenticode signer and the version resource's original file name.
+    Windows {
+        publisher: String,
+        original_file_name: String,
+    },
+    /// Linux has no code identity; the executable's file name is a weak stand-in.
+    Linux { executable: String },
+    /// The code has no valid signature.
+    Unsigned,
+    /// The identity could not be read.
+    Unavailable,
+}
+
+/// One process in the candidate's session. `instance` hashes the process number with its start
+/// time, so a reused number is a new instance.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RawProcess {
+    pub instance: u64,
+    pub pid: u32,
+    pub parent: u32,
+}

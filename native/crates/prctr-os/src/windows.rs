@@ -1340,3 +1340,69 @@ mod media {
 }
 
 pub use media::{cameras, microphones};
+
+mod processes {
+    use windows::Win32::Foundation::CloseHandle;
+    use windows::Win32::System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, PROCESSENTRY32W, Process32FirstW, Process32NextW,
+        TH32CS_SNAPPROCESS,
+    };
+    use windows::Win32::System::RemoteDesktop::ProcessIdToSessionId;
+
+    use crate::{RawIdentity, RawProcess, fingerprint};
+
+    const MAX_PROCESSES: usize = 32_768;
+
+    fn session(pid: u32) -> Option<u32> {
+        let mut session = 0_u32;
+        // SAFETY: `session` is a valid out-parameter.
+        unsafe { ProcessIdToSessionId(pid, &raw mut session) }.ok()?;
+        Some(session)
+    }
+
+    /// Every process in the agent's interactive session. A process number and parent are not an
+    /// instance by themselves: the snapshot's thread count stands in for a start time until the
+    /// privileged service supplies creation times.
+    #[must_use]
+    pub fn processes() -> Option<Vec<RawProcess>> {
+        let own = session(std::process::id())?;
+        // SAFETY: a process snapshot takes no process argument.
+        let snapshot = unsafe { CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0) }.ok()?;
+        let mut entry = PROCESSENTRY32W {
+            dwSize: u32::try_from(size_of::<PROCESSENTRY32W>()).unwrap_or(0),
+            ..PROCESSENTRY32W::default()
+        };
+        let mut processes = Vec::new();
+        // SAFETY: `snapshot` is open and `entry` is sized for the call.
+        let mut more = unsafe { Process32FirstW(snapshot, &raw mut entry) }.is_ok();
+        while more && processes.len() < MAX_PROCESSES {
+            if entry.th32ProcessID != 0 && session(entry.th32ProcessID) == Some(own) {
+                processes.push(RawProcess {
+                    instance: fingerprint(
+                        &[
+                            entry.th32ProcessID.to_le_bytes(),
+                            entry.th32ParentProcessID.to_le_bytes(),
+                        ]
+                        .concat(),
+                    ),
+                    pid: entry.th32ProcessID,
+                    parent: entry.th32ParentProcessID,
+                });
+            }
+            // SAFETY: as above.
+            more = unsafe { Process32NextW(snapshot, &raw mut entry) }.is_ok();
+        }
+        // SAFETY: the snapshot handle is closed once.
+        let _ = unsafe { CloseHandle(snapshot) };
+        Some(processes)
+    }
+
+    /// Code identity needs the privileged service, which opens each image itself; the unprivileged
+    /// agent cannot verify catalog-signed system files, so it reports none.
+    #[must_use]
+    pub const fn identity(_pid: u32) -> RawIdentity {
+        RawIdentity::Unavailable
+    }
+}
+
+pub use processes::{identity, processes};

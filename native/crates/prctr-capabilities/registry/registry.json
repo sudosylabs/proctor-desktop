@@ -787,6 +787,99 @@
         "type": "object"
       }
     },
+    "process_application": {
+      "state": {
+        "$defs": {
+          "Coverage": {
+            "oneOf": [
+              {
+                "enum": [
+                  "unavailable"
+                ],
+                "type": "string"
+              },
+              {
+                "const": "full_lifecycle",
+                "description": "Every process start and exit is seen (the privileged components).",
+                "type": "string"
+              },
+              {
+                "const": "snapshot_only",
+                "description": "Periodic snapshots: a short-lived process can come and go unseen.",
+                "type": "string"
+              }
+            ]
+          },
+          "RuleMatch": {
+            "additionalProperties": false,
+            "description": "One application rule's match. `matched` means the condition is violated.",
+            "properties": {
+              "catalog_app_ids": {
+                "description": "Blocklist rules: the catalog applications found. Always empty for allowlist rules.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "matched": {
+                "type": "boolean"
+              },
+              "rule_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rule_id",
+              "matched",
+              "catalog_app_ids"
+            ],
+            "type": "object"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "checking": {
+            "description": "New processes whose identity is still being verified.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "coverage": {
+            "$ref": "#/$defs/Coverage"
+          },
+          "rule_matches": {
+            "items": {
+              "$ref": "#/$defs/RuleMatch"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "coverage",
+          "checking",
+          "rule_matches"
+        ],
+        "title": "ProcessState",
+        "type": "object"
+      },
+      "summary": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "checking": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "checking"
+        ],
+        "title": "ProcessSummary",
+        "type": "object"
+      }
+    },
     "removable_storage": {
       "state": {
         "$defs": {
@@ -963,6 +1056,56 @@
     }
   },
   "registry": {
+    "applications": [
+      {
+        "allowable": false,
+        "id": "terminal"
+      },
+      {
+        "allowable": false,
+        "id": "script_editor"
+      },
+      {
+        "allowable": false,
+        "id": "screen_sharing"
+      },
+      {
+        "allowable": false,
+        "id": "quicktime_player"
+      },
+      {
+        "allowable": false,
+        "id": "teamviewer"
+      },
+      {
+        "allowable": false,
+        "id": "zoom"
+      },
+      {
+        "allowable": true,
+        "id": "discord"
+      },
+      {
+        "allowable": true,
+        "id": "slack"
+      },
+      {
+        "allowable": true,
+        "id": "visual_studio_code"
+      },
+      {
+        "allowable": true,
+        "id": "google_chrome"
+      },
+      {
+        "allowable": true,
+        "id": "firefox"
+      },
+      {
+        "allowable": true,
+        "id": "safari"
+      }
+    ],
     "baseline_rules": [
       {
         "capability": "display",
@@ -1514,6 +1657,19 @@
           "microphone.virtual_device"
         ],
         "sensitive": false,
+        "stability_ms": 2000
+      },
+      {
+        "app_conditions": true,
+        "categories": [],
+        "fields": [],
+        "id": "process_application",
+        "permission_prompt": false,
+        "reasons": [
+          "process_application.blocked_application",
+          "process_application.unlisted_application"
+        ],
+        "sensitive": true,
         "stability_ms": 2000
       }
     ]

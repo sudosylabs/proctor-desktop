@@ -18,6 +18,7 @@ fn open(descriptor: &CapabilityDescriptor, first: &Observation) -> Engine {
     let registry = Registry {
         capabilities: vec![descriptor.clone()],
         baseline_rules: Vec::new(),
+        applications: Vec::new(),
     };
     let mut engine = Engine::new(registry);
     let policy = Policy {

@@ -174,37 +174,48 @@ outside this capability.
 
 **Purpose.** Whether an application the exam's rules name is running in the candidate's session.
 
-**Two layers.** The inventory (instance by PID plus creation time, session scope, verified
-identity, catalog match, display name) exists **only inside the agent**. The fact that leaves it is
-the match state: `coverage`, `certainty`, `checking` (new processes whose identity is still being
-verified), and per application rule: `rule_id`, `matched`, and for blocklist rules the
-`catalog_app_ids` found. Allowlist matches carry no IDs, names or counts.
+**Two layers.** The inventory (instance by process number plus start time, verified identity,
+catalog match) exists **only inside the agent**. The fact that leaves it is the match state:
+`coverage` (full_lifecycle, snapshot_only, unavailable), `checking` (new processes whose identity is
+still being verified), and per application rule its `rule_id`, `matched` (the condition is violated)
+and, for blocklist rules, the `catalog_app_ids` found. Allowlist matches carry no IDs, names or
+counts. The capability has no rule fields: rules on it are application conditions.
 
 **Changes.** `matches_changed` with the complete match state. A process start or exit that changes
 no rule produces no fact.
 
-**Identity.** Windows: signer chain, publisher/product metadata, version bounds, optional digest.
-macOS: signing identifier, Team ID, designated requirement, bundle identity, version. Paths and
-process names are never authoritative. The application catalog is release-owned and signed with
-the release agreement; it classifies OS-essential processes and assigns execution classes. Shells,
-interpreters, automation hosts, remote-control and capture tools, and local servers cannot be made
-allowed. A child never inherits its parent's allowance.
+**Catalog.** Release-owned and compiled into the agent, so the release's code signature covers it.
+The registry publishes each application's ID and whether an allowlist may name it. Each entry lists
+its identities: a macOS signing identifier with its Team ID (or Apple's anchor for Apple's own code),
+a Windows publisher with the original file name, and a Linux executable name. Code Apple signs, and
+code Microsoft signs as Windows, is part of the OS unless the catalog lists it, so the catalog must
+list every such application a candidate could use (Terminal, Script Editor, Screen Sharing,
+QuickTime, the Windows shells). The catalog in the source is a seed: every identity must be certified
+on real installations before release, and a catalog change is a release change.
 
-**Platforms.**
+**Matching.** A blocklist is violated by any listed application. An allowlist is violated by any
+process that is not Proctor, not part of the OS and not listed, including one whose identity cannot
+be read; an unidentifiable process never matches a blocklist. Proctor is the agent's parent
+(Electron main) and everything it started. A process started by another application is matched on
+its own identity, so an allowed editor that launches a shell is matched on the shell. Paths and
+process names are never identity.
 
-- Windows: the privileged service subscribes to the ETW kernel-process provider, then snapshots, so
-  nothing falls between; identity is read from a handle the service opens. Without it, snapshot
-  polling is `snapshot_only`.
-- macOS: the Endpoint Security extension's exec/exit events carry the code identity; it subscribes,
-  then inventories by audit token. Without it, `snapshot_only`.
-- Linux: `/proc` polling for the same account; `snapshot_only`.
+**Platforms.** Without the privileged components every read is a one-second snapshot: coverage is
+`snapshot_only`, certainty is partial, and application rules are unknown until the privileged
+components provide the full lifecycle.
 
-**Never leaves the agent.** Names, paths, command lines, arguments, PIDs, signers of unmatched
-applications, display names. The candidate sees an offending application's name on their own
-screen only.
+- **macOS:** `proc_listallpids` for the agent's account; identity from the running code's signature
+  (signing identifier, Team ID, and whether it satisfies `anchor apple`), verified once per
+  instance. The Endpoint Security extension will add exec and exit events.
+- **Windows:** a Toolhelp snapshot of the agent's session. The unprivileged agent cannot verify
+  catalog-signed system files, so identity is unavailable until the privileged service, which opens
+  each image itself, provides it; allowlists are violated and blocklists match nothing until then.
+- **Linux:** `/proc` for the agent's account; identity is the executable's file name, a weak stand-in
+  because Linux has no code identity.
 
-**Decided cases.** A process that exits before its identity is verified keeps `checking` until
-reconciled, or becomes an explicit gap. Proctor never kills an application.
+**Never leaves the agent.** Names, paths, command lines, arguments, process numbers, signers of
+unmatched applications, display names. The candidate sees an offending application's name on their
+own screen only. Proctor never ends an application.
 
 ## Clipboard
 

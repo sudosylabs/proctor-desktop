@@ -362,6 +362,7 @@ mod tests {
         let mut engine = Engine::new(Registry {
             capabilities: vec![descriptor()],
             baseline_rules: vec![baseline_rule()],
+            applications: Vec::new(),
         });
         let (_, statuses) = engine
             .open_readiness(
@@ -420,6 +421,7 @@ mod tests {
         let registry = Registry {
             capabilities: vec![descriptor()],
             baseline_rules: vec![baseline_rule()],
+            applications: Vec::new(),
         };
         assert!(ValidPolicy::new(policy(), &registry).is_ok());
     }

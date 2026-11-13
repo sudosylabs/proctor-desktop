@@ -47,6 +47,7 @@ fn baseline_status(raw: &Result<RawTopology, prctr_os::OsError>) -> (Status, Opt
     let mut engine = Engine::new(Registry {
         capabilities: vec![descriptor()],
         baseline_rules: vec![baseline_rule()],
+        applications: Vec::new(),
     });
     let policy = Policy {
         activations: vec![Activation {
@@ -267,6 +268,7 @@ fn the_baseline_rule_only_uses_registered_fields() {
     let registry = Registry {
         capabilities: vec![descriptor()],
         baseline_rules: vec![baseline_rule()],
+        applications: Vec::new(),
     };
     let policy = Policy {
         activations: vec![Activation {

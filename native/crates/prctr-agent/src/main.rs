@@ -39,6 +39,7 @@ fn capabilities() -> (Registry, Vec<Box<dyn Source>>) {
     let registry = Registry {
         capabilities: vec![scripted.descriptor()],
         baseline_rules: Vec::new(),
+        applications: Vec::new(),
     };
     (registry, vec![scripted])
 }

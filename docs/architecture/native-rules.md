@@ -65,11 +65,14 @@ Condition =
   `matched = true` means the condition is violated (for `AppsAbsent`, a listed application is
   running; for `AppsOnly`, an application outside the list is running), so the condition is not
   met; `matched = false` means it is met.
+- Every catalog ID must be in the registry's `applications`, and an `AppsOnly` list may name only
+  applications marked `allowable`. Shells, interpreters, automation hosts, remote-control and
+  capture tools, and local servers are never allowable.
 
 **Bounds:** at most 64 rules, 16 comparisons per rule, nesting depth 3 (a leaf is depth 1 and each
 `All`, `Any` or `Not` adds one, so `All { Any { Compare } }` is the deepest allowed) and 256
-catalog IDs per application condition. A policy outside these bounds, or naming an unregistered capability, field,
-value or reason, is refused before any permission prompt or capability start.
+catalog IDs per application condition. A policy outside these bounds, or naming an unregistered
+capability, field, value, reason or catalog application, is refused before any permission prompt or capability start.
 
 ## Evaluation
 

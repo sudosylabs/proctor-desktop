@@ -113,10 +113,13 @@ are read only inside a session for a specific sitting, and only as the facts the
 allows.
 
 **Application identity stays on the device.** The process inventory exists only inside the agent.
-It is matched against the release-owned application catalog delivered with the policy, and only
+It is matched against the release-owned application catalog, which is compiled into the agent
+and so covered by the release's code signature, and only
 **rule matches** leave the agent: the rule, whether it matched, and for blocklist rules the catalog
 application IDs found. An application that matches no rule produces nothing on the wire. Its name
-is shown only to the candidate, on their own screen, so they know what to close.
+is shown only to the candidate, on their own screen, so they know what to close. The registry
+publishes each catalog application's ID and whether an allowlist may name it, so the server can
+validate rules; identities never leave the agent.
 
 ## Rules, readiness and containment
 

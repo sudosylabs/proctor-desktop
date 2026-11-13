@@ -178,6 +178,7 @@ fn the_baseline_rule_only_uses_registered_fields_and_values() {
     let registry = Registry {
         capabilities: vec![descriptor()],
         baseline_rules: vec![baseline_rule()],
+        applications: Vec::new(),
     };
     let policy = Policy {
         activations: vec![Activation {

@@ -107,6 +107,7 @@ fn a_rule_may_only_name_registered_categories() {
     let registry = Registry {
         capabilities: vec![descriptor()],
         baseline_rules: Vec::new(),
+        applications: Vec::new(),
     };
     let policy = |category: &str| Policy {
         activations: vec![Activation {

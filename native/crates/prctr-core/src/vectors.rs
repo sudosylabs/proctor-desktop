@@ -12,7 +12,9 @@ use prctr_protocol::scalars::{Identifier, OpaqueId};
 
 use crate::engine::{Engine, InitialState, Input};
 use crate::observation::{AppMatches, FieldValue, Observation};
-use crate::registry::{CapabilityDescriptor, FieldKind, FieldSpec, Registry};
+use crate::registry::{
+    CapabilityDescriptor, FieldKind, FieldSpec, RegisteredApplication, Registry,
+};
 
 /// Stability time of the example capabilities.
 pub const STABILITY_MS: u64 = 1_000;
@@ -60,6 +62,18 @@ pub fn example_registry() -> Registry {
             },
         ],
         baseline_rules: Vec::new(),
+        applications: [
+            ("teamviewer", false),
+            ("editor", true),
+            ("a", true),
+            ("b", true),
+        ]
+        .into_iter()
+        .map(|(name, allowable)| RegisteredApplication {
+            id: id(name),
+            allowable,
+        })
+        .collect(),
     }
 }
 
@@ -685,35 +699,6 @@ pub fn refusals() -> Vec<Refusal> {
             ),
         },
         Refusal {
-            name: "two_app_conditions_in_one_rule_are_refused",
-            policy: policy(
-                &["apps"],
-                &[rule(
-                    "r",
-                    "apps",
-                    "enforce",
-                    "both",
-                    &json!({ "All": { "conditions": [
-                        { "AppsAbsent": { "catalog_app_ids": ["a"] } },
-                        { "AppsOnly": { "catalog_app_ids": ["b"] } }
-                    ] } }),
-                )],
-            ),
-        },
-        Refusal {
-            name: "an_app_condition_on_a_capability_without_them_is_refused",
-            policy: policy(
-                &["example"],
-                &[rule(
-                    "r",
-                    "example",
-                    "enforce",
-                    "both",
-                    &json!({ "AppsAbsent": { "catalog_app_ids": ["a"] } }),
-                )],
-            ),
-        },
-        Refusal {
             name: "a_value_outside_the_field_type_is_refused",
             policy: policy(
                 &["example"],
@@ -753,6 +738,70 @@ pub fn refusals() -> Vec<Refusal> {
                     "enforce",
                     "both",
                     &json!({ "All": { "conditions": [] } }),
+                )],
+            ),
+        },
+    ]
+    .into_iter()
+    .chain(app_refusals())
+    .collect()
+}
+
+/// Refusals of malformed application conditions.
+fn app_refusals() -> Vec<Refusal> {
+    vec![
+        Refusal {
+            name: "two_app_conditions_in_one_rule_are_refused",
+            policy: policy(
+                &["apps"],
+                &[rule(
+                    "r",
+                    "apps",
+                    "enforce",
+                    "both",
+                    &json!({ "All": { "conditions": [
+                        { "AppsAbsent": { "catalog_app_ids": ["a"] } },
+                        { "AppsOnly": { "catalog_app_ids": ["b"] } }
+                    ] } }),
+                )],
+            ),
+        },
+        Refusal {
+            name: "an_unregistered_catalog_application_is_refused",
+            policy: policy(
+                &["apps"],
+                &[rule(
+                    "r",
+                    "apps",
+                    "enforce",
+                    "both",
+                    &json!({ "AppsAbsent": { "catalog_app_ids": ["not_in_catalog"] } }),
+                )],
+            ),
+        },
+        Refusal {
+            name: "an_allowlist_naming_a_never_allowable_application_is_refused",
+            policy: policy(
+                &["apps"],
+                &[rule(
+                    "r",
+                    "apps",
+                    "enforce",
+                    "both",
+                    &json!({ "AppsOnly": { "catalog_app_ids": ["editor", "teamviewer"] } }),
+                )],
+            ),
+        },
+        Refusal {
+            name: "an_app_condition_on_a_capability_without_them_is_refused",
+            policy: policy(
+                &["example"],
+                &[rule(
+                    "r",
+                    "example",
+                    "enforce",
+                    "both",
+                    &json!({ "AppsAbsent": { "catalog_app_ids": ["a"] } }),
                 )],
             ),
         },

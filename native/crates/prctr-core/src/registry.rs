@@ -47,14 +47,32 @@ impl CapabilityDescriptor {
     }
 }
 
-/// Every registered capability, plus the release-owned baseline rules.
+/// One application of the release-owned catalog, as rules may name it. Identities stay in the
+/// agent's catalog; the registry publishes what the server needs to validate a rule.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct RegisteredApplication {
+    pub id: Identifier,
+    /// Whether an allowlist may name it. Shells, interpreters, automation hosts, remote-control and
+    /// capture tools, and local servers never may.
+    pub allowable: bool,
+}
+
+/// Every registered capability, the release-owned baseline rules, and the catalog applications.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
 pub struct Registry {
     pub capabilities: Vec<CapabilityDescriptor>,
     pub baseline_rules: Vec<Rule>,
+    pub applications: Vec<RegisteredApplication>,
 }
 
 impl Registry {
+    #[must_use]
+    pub fn application(&self, id: &Identifier) -> Option<&RegisteredApplication> {
+        self.applications
+            .iter()
+            .find(|application| &application.id == id)
+    }
+
     #[must_use]
     pub fn capability(&self, id: &Identifier) -> Option<&CapabilityDescriptor> {
         self.capabilities

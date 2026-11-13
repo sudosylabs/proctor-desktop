@@ -1123,3 +1123,179 @@ mod media {
 }
 
 pub use media::{Kind as MediaKind, cameras, microphones, request_access};
+
+mod processes {
+    use objc2_core_foundation::{CFDictionary, CFNumber, CFRetained, CFString, CFType};
+    use objc2_security::{
+        SecCSFlags, SecCode, SecRequirement, SecStaticCode, kSecCodeInfoIdentifier,
+        kSecCodeInfoTeamIdentifier, kSecGuestAttributePid,
+    };
+
+    use crate::{RawIdentity, RawProcess, fingerprint};
+
+    const MAX_PROCESSES: usize = 8_192;
+    /// `kSecCSSigningInformation`: include the team identifier.
+    const SIGNING_INFORMATION: u32 = 1 << 1;
+
+    fn bsd_info(pid: i32) -> Option<libc::proc_bsdinfo> {
+        let mut info = std::mem::MaybeUninit::<libc::proc_bsdinfo>::zeroed();
+        let size = i32::try_from(size_of::<libc::proc_bsdinfo>()).ok()?;
+        // SAFETY: `info` is writable for `size` bytes.
+        let written = unsafe {
+            libc::proc_pidinfo(
+                pid,
+                libc::PROC_PIDTBSDINFO,
+                0,
+                info.as_mut_ptr().cast(),
+                size,
+            )
+        };
+        // SAFETY: a full-size write initialized `info`; the struct is plain data.
+        (written == size).then(|| unsafe { info.assume_init() })
+    }
+
+    /// Every process of the account the agent runs as.
+    #[must_use]
+    pub fn processes() -> Option<Vec<RawProcess>> {
+        let mut pids = vec![0_i32; MAX_PROCESSES];
+        let size = i32::try_from(pids.len() * size_of::<i32>()).ok()?;
+        // SAFETY: `pids` is writable for `size` bytes.
+        let count = unsafe { libc::proc_listallpids(pids.as_mut_ptr().cast(), size) };
+        let count = usize::try_from(count).ok()?.min(pids.len());
+        // SAFETY: `getuid` has no preconditions.
+        let uid = unsafe { libc::getuid() };
+        Some(
+            pids[..count]
+                .iter()
+                .filter(|pid| **pid > 0)
+                .filter_map(|pid| {
+                    let info = bsd_info(*pid)?;
+                    (info.pbi_uid == uid).then(|| RawProcess {
+                        instance: fingerprint(
+                            &[
+                                info.pbi_pid.to_le_bytes(),
+                                u32::try_from(info.pbi_start_tvsec)
+                                    .unwrap_or(0)
+                                    .to_le_bytes(),
+                                u32::try_from(info.pbi_start_tvusec)
+                                    .unwrap_or(0)
+                                    .to_le_bytes(),
+                            ]
+                            .concat(),
+                        ),
+                        pid: info.pbi_pid,
+                        parent: info.pbi_ppid,
+                    })
+                })
+                .collect(),
+        )
+    }
+
+    fn text(dictionary: &CFDictionary, key: &CFString) -> Option<String> {
+        super::window::value(dictionary, key)?
+            .downcast_ref::<CFString>()
+            .map(ToString::to_string)
+    }
+
+    /// The code identity of a running process, from its signature. Nothing is read from the
+    /// executable's path or name.
+    #[must_use]
+    pub fn identity(pid: u32) -> RawIdentity {
+        let Ok(pid) = i32::try_from(pid) else {
+            return RawIdentity::Unavailable;
+        };
+        let number = CFNumber::new_i32(pid);
+        // SAFETY: the guest attribute key is an immutable framework constant.
+        let key: &CFString = unsafe { kSecGuestAttributePid };
+        let attributes = CFDictionary::<CFString, CFType>::from_slices(&[key], &[number.as_ref()]);
+        let mut code: *mut SecCode = std::ptr::null_mut();
+        // SAFETY: `attributes` is a valid dictionary and `code` a valid out-parameter.
+        let status = unsafe {
+            SecCode::copy_guest_with_attributes(
+                None,
+                Some(attributes.as_opaque()),
+                SecCSFlags::empty(),
+                std::ptr::NonNull::from(&mut code),
+            )
+        };
+        let Some(code) = std::ptr::NonNull::new(code).filter(|_| status == 0) else {
+            return RawIdentity::Unavailable;
+        };
+        // SAFETY: the call returned a +1 reference that this wrapper now owns.
+        let code = unsafe { CFRetained::from_raw(code) };
+        // SAFETY: `code` is a live code object; no requirement checks the signature itself.
+        if unsafe { code.check_validity(SecCSFlags::empty(), None) } != 0 {
+            return RawIdentity::Unsigned;
+        }
+        let apple = SecRequirement::anchor_apple().is_some_and(|requirement| {
+            // SAFETY: `code` and `requirement` are live.
+            unsafe { code.check_validity(SecCSFlags::empty(), Some(&requirement)) == 0 }
+        });
+        let mut static_code: *const SecStaticCode = std::ptr::null();
+        // SAFETY: `code` is live and `static_code` a valid out-parameter.
+        let status = unsafe {
+            code.copy_static_code(
+                SecCSFlags::empty(),
+                std::ptr::NonNull::from(&mut static_code),
+            )
+        };
+        let Some(static_code) =
+            std::ptr::NonNull::new(static_code.cast_mut()).filter(|_| status == 0)
+        else {
+            return RawIdentity::Unavailable;
+        };
+        // SAFETY: the call returned a +1 reference that this wrapper now owns.
+        let static_code = unsafe { CFRetained::from_raw(static_code) };
+        let mut information: *const CFDictionary = std::ptr::null();
+        // SAFETY: `static_code` is live and `information` a valid out-parameter.
+        let status = unsafe {
+            SecCode::copy_signing_information(
+                &static_code,
+                SecCSFlags(SIGNING_INFORMATION),
+                std::ptr::NonNull::from(&mut information),
+            )
+        };
+        let Some(information) =
+            std::ptr::NonNull::new(information.cast_mut()).filter(|_| status == 0)
+        else {
+            return RawIdentity::Unavailable;
+        };
+        // SAFETY: the call returned a +1 reference that this wrapper now owns.
+        let information = unsafe { CFRetained::from_raw(information) };
+        // SAFETY: the information keys are immutable framework constants.
+        let (identifier_key, team_key) =
+            unsafe { (kSecCodeInfoIdentifier, kSecCodeInfoTeamIdentifier) };
+        match text(&information, identifier_key) {
+            Some(signing_identifier) => RawIdentity::MacOs {
+                signing_identifier,
+                team_id: text(&information, team_key),
+                apple,
+            },
+            None => RawIdentity::Unsigned,
+        }
+    }
+
+    trait AnchorApple {
+        fn anchor_apple() -> Option<CFRetained<SecRequirement>>;
+    }
+
+    impl AnchorApple for SecRequirement {
+        fn anchor_apple() -> Option<CFRetained<SecRequirement>> {
+            let text = CFString::from_static_str("anchor apple");
+            let mut requirement: *mut SecRequirement = std::ptr::null_mut();
+            // SAFETY: `text` is a valid requirement string and `requirement` a valid out-parameter.
+            let status = unsafe {
+                SecRequirement::create_with_string(
+                    &text,
+                    SecCSFlags::empty(),
+                    std::ptr::NonNull::from(&mut requirement),
+                )
+            };
+            let requirement = std::ptr::NonNull::new(requirement).filter(|_| status == 0)?;
+            // SAFETY: the call returned a +1 reference that this wrapper now owns.
+            Some(unsafe { CFRetained::from_raw(requirement) })
+        }
+    }
+}
+
+pub use processes::{identity, processes};

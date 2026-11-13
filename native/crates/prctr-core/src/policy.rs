@@ -130,7 +130,7 @@ fn check_rules(policy: &Policy, registry: &Registry) -> Result<(), PolicyError> 
             return Err(PolicyError::UnknownReason(id.clone()));
         }
         let mut shape = Shape::default();
-        check_condition(&rule.requirement, 1, descriptor, id, &mut shape)?;
+        check_condition(&rule.requirement, 1, descriptor, id, &mut shape, registry)?;
         if shape.comparisons > MAX_COMPARISONS_PER_RULE {
             return Err(PolicyError::TooManyComparisons(id.clone()));
         }
@@ -153,6 +153,7 @@ fn check_condition(
     descriptor: &CapabilityDescriptor,
     rule: &Identifier,
     shape: &mut Shape,
+    registry: &Registry,
 ) -> Result<(), PolicyError> {
     if depth > MAX_DEPTH {
         return Err(PolicyError::TooDeep(rule.clone()));
@@ -172,12 +173,12 @@ fn check_condition(
             if conditions.is_empty() {
                 return Err(PolicyError::EmptyGroup(rule.clone()));
             }
-            conditions
-                .iter()
-                .try_for_each(|inner| check_condition(inner, depth + 1, descriptor, rule, shape))
+            conditions.iter().try_for_each(|inner| {
+                check_condition(inner, depth + 1, descriptor, rule, shape, registry)
+            })
         }
         Condition::Not { condition } => {
-            check_condition(condition, depth + 1, descriptor, rule, shape)
+            check_condition(condition, depth + 1, descriptor, rule, shape, registry)
         }
         Condition::AppsAbsent { catalog_app_ids } | Condition::AppsOnly { catalog_app_ids } => {
             shape.comparisons += 1;
@@ -186,7 +187,12 @@ fn check_condition(
             let valid = descriptor.app_conditions
                 && unique.len() == catalog_app_ids.len()
                 && catalog_app_ids.len() <= MAX_CATALOG_APP_IDS
-                && (matches!(condition, Condition::AppsOnly { .. }) || !catalog_app_ids.is_empty());
+                && (matches!(condition, Condition::AppsOnly { .. }) || !catalog_app_ids.is_empty())
+                && catalog_app_ids.iter().all(|app| {
+                    registry.application(app).is_some_and(|application| {
+                        application.allowable || matches!(condition, Condition::AppsAbsent { .. })
+                    })
+                });
             if valid {
                 Ok(())
             } else {

@@ -17,5 +17,5 @@ pub mod vectors;
 pub use engine::{CoreError, Engine, InitialState, Input, MAX_UNACKNOWLEDGED, Numbered};
 pub use observation::{AppMatches, FieldValue, Observation};
 pub use policy::{PolicyError, ValidPolicy};
-pub use registry::{CapabilityDescriptor, FieldKind, FieldSpec, Registry};
+pub use registry::{CapabilityDescriptor, FieldKind, FieldSpec, RegisteredApplication, Registry};
 pub use source::{Sink, Source, SourceError, SourceEvent};

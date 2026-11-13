@@ -339,6 +339,13 @@ impl<W: Write> Agent<W> {
                 self.stop_all();
                 return Err(RefusalCode::InvalidPolicy);
             };
+            let rules: Vec<_> = policy
+                .rules
+                .iter()
+                .filter(|rule| rule.capability == activation.capability)
+                .cloned()
+                .collect();
+            source.configure_rules(&rules);
             let Ok(observation) = source.start(&activation.categories, sink) else {
                 emit(Diagnostic::SourceStartFailed);
                 self.stop_all();
