@@ -386,6 +386,26 @@ violation; it only raises `route_generation`.
 **Never leaves the agent.** Addresses, interface names, SSIDs, DNS servers, proxy URLs, VPN server
 names. Only selected categories are queried.
 
+## Screen recording
+
+**Purpose.** Whether the screen evidence recorder could record, so the overview can show it before
+Start when an exam enables recording. The recorder itself is not a capability: it collects content,
+not facts (see the architecture's "Screen evidence recorder").
+
+**State.** `free_space_mib`, the space available to the account on the volume that holds the app's
+data, in MiB; absent when unreadable, which is partial certainty. The permission is the envelope's:
+macOS Screen Recording; granted elsewhere.
+
+**Rules.** `screen_recording.summary.free_space_mib` is a rule field. An exam that enables
+recording compiles a free-space rule; the permission blocks through the envelope. Reasons:
+`screen_recording.not_permitted` and `screen_recording.low_disk_space`.
+
+**Changes.** Reconciled every 5 seconds; a change of permission or of a whole MiB is a new state.
+
+**Permission.** On macOS the request shows the Screen Recording prompt once. macOS applies the
+answer after a relaunch, so the permission reads as denied until then if it was not granted.
+Windows has no prompt and needs none; Linux is unsupported.
+
 ## Camera
 
 **Purpose.** Whether a physical camera is present, permitted and ready, and whether another

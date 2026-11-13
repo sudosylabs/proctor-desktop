@@ -29,21 +29,31 @@ only by tests and harnesses, until the native agent below replaces it; nothing n
 into production yet. A capability counts as implemented on a platform only when its real-OS
 tests prove each fact there.
 
-Implemented in source: the protocol, core, rule evaluator and conformance vectors; the agent and
-Electron main's connection and service, tested end to end against the real binary; and display
-topology, the candidate window and the unprivileged interactive session on Windows, macOS and
-Linux. Their real-OS tests run on macOS (the candidate-window read-back is proved against another
-process's window).
+Implemented in source:
+
+- the protocol, core, rule evaluator and conformance vectors;
+- the agent and Electron main's connection and service, tested end to end against the real binary;
+- every capability in the registry on Windows, macOS and Linux: display topology, the candidate
+  window, the unprivileged interactive session, clipboard, virtualization, network configuration,
+  removable storage, printing, camera, microphone, process and application (matched against the
+  bundled catalog) and screen recording readiness;
+- OS interruptions;
+- the screen evidence recorder.
+
+The new crates' tests pass on macOS (Apple silicon), on a Windows laptop and in a Linux container;
+real-OS tests prove each fact on the first two.
 
 Known limits:
 
-- On macOS an external display is still reported unclassified (partial certainty) until the
-  `IORegistry` transport classification is proved, so the display baseline is unknown there
-  whenever one is connected.
-- The interactive session reports `snapshot_only` coverage, so `baseline.session` stays unknown
-  until the privileged components exist.
+- Intel Macs report external displays unclassified (partial certainty); Apple silicon classifies
+  them by framebuffer transport.
+- Without the privileged components, the interactive session and process and application report
+  `snapshot_only` coverage, so `baseline.session` and application rules stay unknown.
+- On Windows, process identity is unavailable until the privileged service verifies images.
+- Reads still to be proved on certification rigs: Sidecar, AirPlay and DisplayLink displays; the
+  macOS `utun` heuristic; Windows camera use from the ConsentStore; phones over PTP/MTP.
 
-The other capabilities, the privileged components and the recorder are not implemented yet.
+The privileged components are not implemented yet.
 
 ## Processes and ownership
 
@@ -212,19 +222,50 @@ participation contains while a fresh state is taken.
 
 The recorder collects content, not facts, and is **off by default, enabled per exam**. When
 enabled, it is disclosed on the readiness overview, shown by an indicator during the exam, and
-records the display from the moment the CandidateWindow mounts, with Proctor's own protected
-window composited in from Electron main's frames. There is no audio and no camera.
+records the display from confirmation (the CandidateWindow mount) to the end of the Participation.
+There is no audio and no camera. Proctor's own window is protected from capture, so the recorder
+paints its bounds with a flat neutral placeholder: the recording never shows what was beneath it,
+and everything else on screen (other applications, overlays, notifications) is recorded.
 
-- The recording stays on the device, encrypted, with its key sealed in the OS keystore for that
-  Attempt so it survives a crash or re-entry with an explicit gap.
-- The server requests saves: a manager's request for any range (including from session start), or a
-  window around an incident. The agent cuts the range without re-encoding into an encrypted clip;
-  Electron main uploads it and deletes it after acknowledgement.
-- Requests are accepted only during participation and queued by the server while suspended. The
-  whole recording is deleted at submission once pending saves finish within their deadline.
+- **Capture and encoding.**
+  - macOS uses ScreenCaptureKit and VideoToolbox; Windows uses Windows.Graphics.Capture and the
+    Media Foundation H.264 encoder. Linux does not record.
+  - Video is 5 fps, at most 1920 px wide, about 1 Mbit/s: roughly 1.4 GB for three hours.
+  - When the screen is still, the last frame repeats so segments keep closing.
+- **Storage.** The recording is fragmented MP4 (H.264, `avc3`, parameter sets in-band) in 2-second
+  keyframe segments.
+  - Every segment and the index are sealed with XChaCha20-Poly1305 under the recording key, with
+    the recording ID and the file's role as associated data. A file cannot be swapped, reordered or
+    moved into another recording.
+  - The recording is never trimmed, so "from session start" stays available. Below the free-space
+    reserve the recorder stops and reports `failed` with a gap.
+- **Keys.** Electron main generates the per-Attempt key, seals it with the OS keystore (Keychain or
+  DPAPI) beside the recording, and passes it at `confirm_participation`. A relaunch into the same
+  Attempt continues the recording with a restart gap. The agent never stores the key.
+- **Gaps.** Sleep, lock, user switch, restart, re-entry, capture or encoder failure and a full disk
+  are explicit gaps. A clip reports its gaps and any unrecorded hole, and is never stitched over.
+- **Clips.**
+  - The server requests saves: a manager's range (including from session start), or a window
+    around an incident.
+  - `recorder_save` cuts the range without re-encoding, rounded out to segment boundaries, and
+    completes once a future end has been recorded.
+  - The clip file is one ChaCha20-Poly1305 record per 8 MiB upload chunk under a fresh key, with
+    the chunk hashes and the server's `content_digest`.
+  - Electron main's uploader takes the request, uploads only missing chunks (resumable), checks
+    each decrypted chunk, completes with the digest signed by the installation key, then
+    `recorder_release` deletes the clip.
+- **Lifetime.**
+  - Requests are accepted only during participation; the server queues them while suspended.
+  - At submission the uploader gives pending clips a deadline. Then `close { delete }` deletes the
+    recording, and Electron main removes the key and the directory itself whatever the agent
+    managed. Saves not yet cut when the recorder stops fail, so closing stays quick.
+  - Suspension uses `close { seal }`.
+- **Readiness.** The `screen_recording` capability reports the macOS Screen Recording permission in
+  the envelope (with the OS prompt) and free disk space as a rule field, so the overview shows both
+  through the usual rules.
 
-The recorder is accepted and not yet implemented. Its server contract follows the server's
-published API.
+Not yet: compositing Proctor's own window instead of the placeholder, Linux capture, and the server
+transport for the uploader (it waits for the contract import that carries the clip routes).
 
 ## Privacy and diagnostics
 

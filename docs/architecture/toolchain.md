@@ -135,7 +135,10 @@ Each capability's release entry declares bounds, fixtures, target tuple, build
 toolchain, source revision, artifact hash, and signature.
 
 The native agent is a standalone binary, not a Node-API module; no observation
-code loads into an Electron process. The superseded utility-process bridge
+code loads into an Electron process. Its screen recorder uses the OS H.264
+encoders (VideoToolbox, Media Foundation), never ffmpeg, and RustCrypto's
+`chacha20poly1305`; every key and nonce comes from the OS random source through
+`prctr-os`, so no userspace random-number crate is admitted. The superseded utility-process bridge
 remains in the tree only for its tests until the agent replaces it. The separate
 identity key-custody adapter is the one Electron-main Node-API module, defined by the
 [identity architecture](./identity-and-exam-security.md#desktop-authorization-and-installation-proof):

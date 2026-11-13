@@ -53,9 +53,11 @@
 - Native capabilities are being rewritten around one on-demand native agent:
   passive adapters, server-compiled rules evaluated in the agent, Electron main
   containment, a readiness overview before the exam, matches-only application
-  privacy, and a screen evidence recorder. Windows and macOS are implemented to
-  full OS coverage with an Endpoint Security extension and a Windows service;
-  Linux may report unsupported. The superseded utility-process implementation
+  privacy, and a screen evidence recorder. Every capability and the recorder
+  are implemented unprivileged on Windows and macOS and tested on both, with
+  Linux reporting unsupported where it must; the Endpoint Security extension and
+  the Windows service, which full coverage needs, are not built yet, and nothing
+  native is composed into the app yet. The superseded utility-process implementation
   stays in the tree for its tests until the agent replaces it. The native parts
   of `docs/contracts/` describe the superseded design and are updated from the
   server's published API.

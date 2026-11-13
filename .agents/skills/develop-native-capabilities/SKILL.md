@@ -66,7 +66,9 @@ thing.
 
 Use the strongest public API each OS offers, plus the privileged components where the contract
 requires them. Use the maintained `objc2` framework crates on macOS and the `windows` crate on
-Windows; no hand-written message sends or C shims unless no binding can express the API. Subscribe
+Windows; no hand-written message sends or C shims unless no binding can express the API. The
+accepted exceptions are two Core Audio property calls and the Mach clocks (`prctr-os`), where a
+binding would add a large crate for two functions. Subscribe
 before the first query so nothing falls between them. APIs that need the macOS main run loop run on
 the run-loop owner in `prctr-os`.
 
