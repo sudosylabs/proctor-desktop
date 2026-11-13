@@ -6,6 +6,7 @@
 #![forbid(unsafe_code)]
 
 pub mod clip;
+pub mod convert;
 pub mod media;
 pub mod mp4;
 pub mod platform;

@@ -295,12 +295,11 @@ impl Worker {
         if let Some(area) = (self.config.placeholder)() {
             frame.fill_placeholder(area);
         }
+        // A segment is due after `segment_ms`: the encoder is asked for a keyframe, and the segment
+        // closes when the keyframe arrives (an encoder may deliver it a frame late).
         let due = self.current.as_ref().is_none_or(|current| {
             frame.captured_ms.saturating_sub(current.start_ms) >= self.config.segment_ms
         });
-        if due {
-            self.close_segment(frame.captured_ms);
-        }
         let Ok(samples) = self.encoder.encode(&frame, due) else {
             return self.fail();
         };
@@ -313,6 +312,9 @@ impl Worker {
             self.has_init = true;
         }
         for sample in samples {
+            if sample.keyframe && self.current.is_some() {
+                self.close_segment(frame.captured_ms);
+            }
             match self.current.as_mut() {
                 Some(current) => {
                     current.samples.push(sample);

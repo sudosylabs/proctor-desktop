@@ -294,6 +294,11 @@ mod classification_tests {
     }
 }
 
+#[path = "macos_capture.rs"]
+mod capture;
+
+pub use capture::{EncodedFrame, H264Encoder, RawFrame, ScreenStream};
+
 mod window {
     use std::ffi::c_void;
 

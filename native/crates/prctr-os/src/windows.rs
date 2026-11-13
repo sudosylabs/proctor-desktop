@@ -131,6 +131,11 @@ pub fn display_targets() -> Result<RawTopology, OsError> {
     })
 }
 
+#[path = "windows_capture.rs"]
+mod capture;
+
+pub use capture::{H264Mft, RawFrame, ScreenCapture};
+
 mod window {
     use std::ffi::c_void;
 
