@@ -306,7 +306,7 @@ allocating an entry for each missing position.
 ## Closure, successor creation, and counters
 
 At most one source per Participation has live navigation authority. Start is
-atomic with checking current native posture, browser policy, Sitting state,
+atomic with checking current native rule status, browser policy, Sitting state,
 Session/Connection/generation, source counters, and [live corrections](live-corrections.md)'s browser gate.
 
 - Initial start is allowed once, only when no earlier source exists for the

@@ -63,7 +63,7 @@ and acknowledgement_state=pending and C is in affected_capabilities`.
 Compute this in the same authorization/transaction boundary as the operation's
 existing Session/Participation/Sitting checks. Querying the boolean in a separate
 transaction before a mutation is insufficient because a correction can publish
-between check and effect. Keep every other suspension, deadline, posture, and
+between check and effect. Keep every other suspension, deadline, native-rule, and
 continuity gate intact.
 
 | Capability | Operations affected by its pending gate                                                            |
@@ -92,7 +92,7 @@ Acknowledgement marks only that applicable correction for that candidate. It
 cannot acknowledge a future revision or all pending revisions implicitly. Exact
 replay is idempotent. Two pending browser corrections require both
 acknowledgements before browser resumes. Removing one pending item cannot open
-a capability still gated by another item, suspension, posture, or expiry.
+a capability still gated by another item, suspension, native rule, or expiry.
 
 A concurrent correction and candidate operation serialize at the existing
 aggregate boundary: an operation committed before correction activation is

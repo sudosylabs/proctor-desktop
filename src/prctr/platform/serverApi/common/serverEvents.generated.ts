@@ -83,7 +83,7 @@ export interface components {
             readonly exam_attempt_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             /** @enum {string} */
-            readonly reason_code?: "secure_connectivity_lost" | "focus_policy_review_required" | "manager_suspended";
+            readonly reason_code?: "secure_connectivity_lost" | "focus_policy_review_required" | "native_policy_review_required" | "manager_suspended";
             /** @enum {string} */
             readonly state: "suspended" | "active";
         };
@@ -115,7 +115,7 @@ export interface components {
         };
         /**
          * Attempt Integrity Flag raised
-         * @description A Focus Loss Integrity Flag, its policy outcome and how many evidence episodes were kept or overflowed. The evidence itself is never included.
+         * @description An Integrity Flag a policy raised or added evidence to (Focus Loss, or native.<capability> when an enforce rule's occurrence opens), its policy outcome and how many evidence episodes were kept or overflowed. The evidence itself is never included.
          */
         readonly exam_attempt_integrity_flagged: {
             readonly candidate_user_id: components["schemas"]["id"];
@@ -128,8 +128,7 @@ export interface components {
             readonly integrity_flag_id: components["schemas"]["id"];
             /** @enum {string} */
             readonly outcome: "flag" | "flag_and_warn" | "flag_and_suspend";
-            /** @constant */
-            readonly policy_kind: "focus_loss";
+            readonly policy_kind: string;
             readonly retained_evidence_count: number;
         };
         /**
@@ -143,6 +142,15 @@ export interface components {
             readonly exam_attempt_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
             readonly suspension_id: components["schemas"]["id"];
+        };
+        /**
+         * Screen clips requested
+         * @description Tells the candidate's Desktop that its Attempt has screen clip requests it has not taken, so it reads them now instead of at its next poll. Neither the requests nor who made them are included.
+         */
+        readonly exam_attempt_screen_clips_requested: {
+            readonly changed_at: components["schemas"]["instant"];
+            readonly exam_attempt_id: components["schemas"]["id"];
+            readonly exam_sitting_id: components["schemas"]["id"];
         };
         /**
          * Attempt submitted
@@ -408,6 +416,14 @@ export interface components {
             readonly state: "uploading" | "parsing" | "preview_ready" | "executing" | "completed" | "completed_with_errors" | "canceled" | "failed";
         };
         /**
+         * Plugin settings changed
+         * @description The plugin whose settings an administrator changed, and their revision after the committed change. No setting values are included.
+         */
+        readonly plugin_settings_changed: {
+            readonly plugin_id: string;
+            readonly revision: number;
+        };
+        /**
          * Pong
          * @description The reply to ping.
          */
@@ -504,6 +520,7 @@ export const serverEventCatalog = {
 	"exam_attempt_focus_warning": { "exam.sitting.participate": "exam_attempt_focus_warning" },
 	"exam_attempt_integrity_flagged": { "exam.sitting.view": "exam_attempt_integrity_flagged" },
 	"exam_attempt_reallowed": { "exam.sitting.view": "exam_attempt_reallowed" },
+	"exam_attempt_screen_clips_requested": { "exam.sitting.participate": "exam_attempt_screen_clips_requested" },
 	"exam_attempt_submitted": { "exam.sitting.participate": "exam_attempt_submitted_for_candidate", "exam.sitting.view": "exam_attempt_submitted" },
 	"exam_attempt_suspended": { "exam.sitting.view": "exam_attempt_suspended" },
 	"exam_attempt_workspace_changed": { "exam.sitting.participate": "exam_attempt_workspace_changed" },
@@ -526,6 +543,7 @@ export const serverEventCatalog = {
 	"job.changed": { "job.view": "job_changed" },
 	"manager.sitting_board.changed": { "exam.sitting.view": "sitting_board_invalidation" },
 	"onboarding_import.changed": { "@user": "onboarding_import_changed", "onboarding_batch.view": "onboarding_import_changed" },
+	"plugin_settings_changed": { "plugin.manage": "plugin_settings_changed" },
 	"user_profile_picture_changed": { "@user": "user_profile_picture_changed" },
 	"user_settings_changed": { "@user": "user_settings_changed" },
 } as const;
@@ -547,6 +565,7 @@ export interface ServerEventVariants {
 	"exam_attempt_focus_warning": { "exam.sitting.participate": components['schemas']["exam_attempt_focus_warning"] };
 	"exam_attempt_integrity_flagged": { "exam.sitting.view": components['schemas']["exam_attempt_integrity_flagged"] };
 	"exam_attempt_reallowed": { "exam.sitting.view": components['schemas']["exam_attempt_reallowed"] };
+	"exam_attempt_screen_clips_requested": { "exam.sitting.participate": components['schemas']["exam_attempt_screen_clips_requested"] };
 	"exam_attempt_submitted": { "exam.sitting.participate": components['schemas']["exam_attempt_submitted_for_candidate"]; "exam.sitting.view": components['schemas']["exam_attempt_submitted"] };
 	"exam_attempt_suspended": { "exam.sitting.view": components['schemas']["exam_attempt_suspended"] };
 	"exam_attempt_workspace_changed": { "exam.sitting.participate": components['schemas']["exam_attempt_workspace_changed"] };
@@ -569,6 +588,7 @@ export interface ServerEventVariants {
 	"job.changed": { "job.view": components['schemas']["job_changed"] };
 	"manager.sitting_board.changed": { "exam.sitting.view": components['schemas']["sitting_board_invalidation"] };
 	"onboarding_import.changed": { "@user": components['schemas']["onboarding_import_changed"]; "onboarding_batch.view": components['schemas']["onboarding_import_changed"] };
+	"plugin_settings_changed": { "plugin.manage": components['schemas']["plugin_settings_changed"] };
 	"user_profile_picture_changed": { "@user": components['schemas']["user_profile_picture_changed"] };
 	"user_settings_changed": { "@user": components['schemas']["user_settings_changed"] };
 }

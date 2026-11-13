@@ -59,6 +59,9 @@
         "exam_attempt_reallowed": {
           "$ref": "#/components/messages/exam_attempt_reallowed"
         },
+        "exam_attempt_screen_clips_requested": {
+          "$ref": "#/components/messages/exam_attempt_screen_clips_requested"
+        },
         "exam_attempt_submitted": {
           "$ref": "#/components/messages/exam_attempt_submitted"
         },
@@ -145,6 +148,9 @@
         },
         "ping": {
           "$ref": "#/components/messages/ping"
+        },
+        "plugin_settings_changed": {
+          "$ref": "#/components/messages/plugin_settings_changed"
         },
         "pong": {
           "$ref": "#/components/messages/pong"
@@ -1053,7 +1059,7 @@
         "title": "Focus Loss warning"
       },
       "exam_attempt_integrity_flagged": {
-        "description": "A Focus Loss Integrity Flag was raised on an Attempt. Delivered to connections that subscribe to exam.sitting.view on the exam sitting.",
+        "description": "An Integrity Flag was raised on an Attempt by the policy policy_kind names, a core policy or a capability's \"\u003cplugin-id\u003e.\u003ckind\u003e\". Delivered to connections that subscribe to exam.sitting.view on the exam sitting.",
         "examples": [
           {
             "name": "example",
@@ -1110,7 +1116,7 @@
             }
           ]
         },
-        "summary": "A Focus Loss Integrity Flag was raised on an Attempt.",
+        "summary": "An Integrity Flag was raised on an Attempt.",
         "tags": [
           {
             "name": "event"
@@ -1185,6 +1191,70 @@
           }
         ],
         "title": "Attempt re-allowed"
+      },
+      "exam_attempt_screen_clips_requested": {
+        "description": "Tells the candidate's Desktop that its Attempt has screen clip requests it has not taken, after a manager asked for a clip or a Flag asked for an incident clip. Desktop then lists its pending requests; the event carries none of them. Delivered to the addressed User's connections that subscribe to exam.sitting.participate on the exam sitting.",
+        "examples": [
+          {
+            "name": "example",
+            "payload": {
+              "action": "exam.sitting.participate",
+              "data": {
+                "changed_at": "2026-08-01T09:31:00Z",
+                "exam_attempt_id": "dgjcx1ia56br8kpous3h9nfemq",
+                "exam_sitting_id": "h9nfemqtwz47ydgjcx1ia56br8"
+              },
+              "event": "exam_attempt_screen_clips_requested",
+              "id": "8kpous3h9nfemqtwz47ydgjcx1",
+              "resource": {
+                "id": "h9nfemqtwz47ydgjcx1ia56br8",
+                "type": "exam_sitting"
+              },
+              "sequence": 48,
+              "user_id": "qtwz47ydgjcx1ia56br8kpous3"
+            }
+          }
+        ],
+        "name": "exam_attempt_screen_clips_requested",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/event_frame"
+            },
+            {
+              "properties": {
+                "action": {
+                  "const": "exam.sitting.participate",
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/components/schemas/exam_attempt_screen_clips_requested"
+                },
+                "event": {
+                  "const": "exam_attempt_screen_clips_requested",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "event",
+                "user_id",
+                "action",
+                "data"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "summary": "Tells the candidate's Desktop that its Attempt has screen clip requests to take.",
+        "tags": [
+          {
+            "name": "event"
+          },
+          {
+            "name": "Attempts"
+          }
+        ],
+        "title": "Screen clips requested"
       },
       "exam_attempt_submitted": {
         "description": "An Attempt was submitted. Sent to Sitting viewers. Delivered to connections that subscribe to exam.sitting.view on the exam sitting.",
@@ -3036,6 +3106,67 @@
         ],
         "title": "Ping"
       },
+      "plugin_settings_changed": {
+        "description": "Refetch the plugins; the event names the plugin and its new settings revision, never setting values. Delivered to connections that subscribe to plugin.manage on the institution.",
+        "examples": [
+          {
+            "name": "example",
+            "payload": {
+              "action": "plugin.manage",
+              "data": {
+                "plugin_id": "display-topology",
+                "revision": 3
+              },
+              "event": "plugin_settings_changed",
+              "id": "8kpous3h9nfemqtwz47ydgjcx1",
+              "resource": {
+                "id": "ous3h9nfemqtwz47ydgjcx1ia5",
+                "type": "institution"
+              },
+              "sequence": 41
+            }
+          }
+        ],
+        "name": "plugin_settings_changed",
+        "payload": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/event_frame"
+            },
+            {
+              "properties": {
+                "action": {
+                  "const": "plugin.manage",
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/components/schemas/plugin_settings_changed"
+                },
+                "event": {
+                  "const": "plugin_settings_changed",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "event",
+                "action",
+                "data"
+              ],
+              "type": "object"
+            }
+          ]
+        },
+        "summary": "Refetch the plugins; the event names the plugin and its new settings revision.",
+        "tags": [
+          {
+            "name": "event"
+          },
+          {
+            "name": "Institution"
+          }
+        ],
+        "title": "Plugin settings changed"
+      },
       "pong": {
         "examples": [
           {
@@ -3577,6 +3708,7 @@
             "enum": [
               "secure_connectivity_lost",
               "focus_policy_review_required",
+              "native_policy_review_required",
               "manager_suspended"
             ],
             "type": "string"
@@ -3678,7 +3810,7 @@
       },
       "exam_attempt_integrity_flagged": {
         "additionalProperties": false,
-        "description": "A Focus Loss Integrity Flag, its policy outcome and how many evidence episodes were kept or overflowed. The evidence itself is never included.",
+        "description": "An Integrity Flag a policy raised or added evidence to (Focus Loss, or native.\u003ccapability\u003e when an enforce rule's occurrence opens), its policy outcome and how many evidence episodes were kept or overflowed. The evidence itself is never included.",
         "properties": {
           "candidate_user_id": {
             "$ref": "#/components/schemas/id"
@@ -3712,7 +3844,8 @@
             "type": "string"
           },
           "policy_kind": {
-            "const": "focus_loss",
+            "maxLength": 97,
+            "pattern": "^(connection_loss|focus_loss|browser_navigation|[a-z][a-z0-9.-]{0,63}\\.[a-z][a-z0-9_]{0,31})$",
             "type": "string"
           },
           "retained_evidence_count": {
@@ -3768,6 +3901,28 @@
           "changed_at"
         ],
         "title": "Attempt re-allowed",
+        "type": "object"
+      },
+      "exam_attempt_screen_clips_requested": {
+        "additionalProperties": false,
+        "description": "Tells the candidate's Desktop that its Attempt has screen clip requests it has not taken, so it reads them now instead of at its next poll. Neither the requests nor who made them are included.",
+        "properties": {
+          "changed_at": {
+            "$ref": "#/components/schemas/instant"
+          },
+          "exam_attempt_id": {
+            "$ref": "#/components/schemas/id"
+          },
+          "exam_sitting_id": {
+            "$ref": "#/components/schemas/id"
+          }
+        },
+        "required": [
+          "exam_sitting_id",
+          "exam_attempt_id",
+          "changed_at"
+        ],
+        "title": "Screen clips requested",
         "type": "object"
       },
       "exam_attempt_submitted": {
@@ -4535,6 +4690,26 @@
         "title": "Onboarding import changed",
         "type": "object"
       },
+      "plugin_settings_changed": {
+        "additionalProperties": false,
+        "description": "The plugin whose settings an administrator changed, and their revision after the committed change. No setting values are included.",
+        "properties": {
+          "plugin_id": {
+            "pattern": "^[a-z][a-z0-9.-]{0,63}$",
+            "type": "string"
+          },
+          "revision": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "plugin_id",
+          "revision"
+        ],
+        "title": "Plugin settings changed",
+        "type": "object"
+      },
       "pong": {
         "additionalProperties": false,
         "description": "The reply to ping.",
@@ -4817,6 +4992,9 @@
           "$ref": "#/channels/websocket/messages/access_policy_changed"
         },
         {
+          "$ref": "#/channels/websocket/messages/plugin_settings_changed"
+        },
+        {
           "$ref": "#/channels/websocket/messages/job.changed"
         },
         {
@@ -4908,6 +5086,9 @@
         },
         {
           "$ref": "#/channels/websocket/messages/exam_attempt_focus_warning"
+        },
+        {
+          "$ref": "#/channels/websocket/messages/exam_attempt_screen_clips_requested"
         },
         {
           "$ref": "#/channels/websocket/messages/exam_attempt_integrity_flagged"
