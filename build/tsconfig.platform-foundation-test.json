@@ -14,6 +14,7 @@
     "../test/platform/protectedStorage/node/**",
     "../test/platform/windows/node/**",
     "../test/workbench/services/examSecurity/node/**",
+    "../test/workbench/services/screenClips/node/**",
     "../test/platform/settings/node/**",
     "../test/platform/native/node/**"
   ],
