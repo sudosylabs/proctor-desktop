@@ -1,0 +1,18 @@
+[package]
+name = "prctr-helper"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+prctr-protocol = { path = "../prctr-protocol" }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+ferrisetw = { version = "=1.2.0", default-features = false }
+interprocess = { version = "=2.4.8", default-features = false }
+windows-service = { version = "=0.8.1" }
+
+[lints]
+workspace = true
