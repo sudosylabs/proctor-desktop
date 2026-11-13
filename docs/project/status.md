@@ -54,10 +54,16 @@
   passive adapters, server-compiled rules evaluated in the agent, Electron main
   containment, a readiness overview before the exam, matches-only application
   privacy, and a screen evidence recorder. Every capability and the recorder
-  are implemented unprivileged on Windows and macOS and tested on both, with
-  Linux reporting unsupported where it must; the Endpoint Security extension and
-  the Windows service, which full coverage needs, are not built yet, and nothing
-  native is composed into the app yet. The superseded utility-process
+  are implemented on Windows and macOS and tested on both, with Linux reporting
+  unsupported where it must. The privileged helper that full process and session
+  coverage needs (the Windows `ProctorNative` service and the macOS Endpoint
+  Security LaunchDaemon) is implemented; on Windows its privileged tests pass as
+  SYSTEM, while its MSI, the macOS packaging and a run on a SIP-off Mac are
+  still to come. Electron main's exam participation (readiness, preflight,
+  Connect, renewal with security control, native delivery, the CandidateWindow
+  seam, suspension, Focus Loss and submission) is implemented and tested against
+  fakes, with a composition factory; the readiness overview, the CandidateWindow
+  page and the production entry that would call it are not built yet. The superseded utility-process
   implementation has been removed. The native parts of `docs/contracts/` follow
   the server's published API.
 - One Proctor design system, selective VS Code source admission, one pinned npm/
@@ -184,9 +190,11 @@ Exam security now includes effective-policy and native-selection validation,
 reconciliation, minimized evidence, authoritative projection derivation, action
 gates, correction acknowledgement, and a fail-closed Candidate contribution.
 The renderer subscribes before its initial projection and revision-fences that
-snapshot. Electron IPC and composition seams exist, but authoritative server
-participation, enforcement adapters, protected evidence delivery, and complete
-CandidateWindow startup composition are not yet wired into a production entrypoint.
+snapshot. Electron main's `ExamParticipationService` now owns server
+participation (preflight, Connect, renewal, suspension, submission) and protected
+native delivery, and implements the projection the CandidateWindow bridge serves;
+its composition, the CandidateWindow startup and the readiness overview UI are
+not yet wired into a production entrypoint.
 
 The native Rust/Node-API/Electron utility foundation remains substantial: the
 generated eleven-source manifest, bounded schemas, source-session supervision,

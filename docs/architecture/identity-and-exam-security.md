@@ -263,6 +263,16 @@ main, used by the CandidateWindow composition root. It owns:
 - Browser Activity/integrity delivery reconciliation;
 - coordination with Attempt Workspace protection and recovery.
 
+The coordinator is implemented as `ExamParticipationService`
+(`workbench/services/examSecurity/electron-main/`), composed per Session by
+`code/electron-main/examParticipationComposition.ts`. It holds the Session's
+realtime command channel and the native agent, runs Start as prepare →
+bind → report → recheck → Connect within 30 seconds, renews every
+`renewal_interval_seconds` with a `security_control` that carries the native
+delivery watermark, and delivers native records through the encrypted
+`NativeDeliveryService` spool. When the CandidateWindow mounts it delivers the
+mounted window's fact before `participation_confirmed`.
+
 Its renderer interface exposes only an immutable
 `CandidateSecurityProjection` and closed intents such as retry checks, begin a
 permitted join, acknowledge an explicit correction, or contact approved

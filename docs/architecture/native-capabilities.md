@@ -24,8 +24,10 @@ unsupported. Untested combinations fail preflight; there is no silently weakened
 version ranges belong to the signed release capability matrix.
 
 **Implementation status.** This architecture replaced an earlier design built on an Electron
-utility process, a Node-API bridge and schema-generated Rust; that code has been removed. Nothing
-native is composed into the app yet: the agent is wired into secure participation in a later step. A capability counts as implemented on a platform only when its real-OS
+utility process, a Node-API bridge and schema-generated Rust; that code has been removed. Electron
+main's exam participation service supervises the agent, delivers its records and passes it host
+events (`platform/native/electron-main/candidateHostEvents.ts`); its production entry is not
+composed yet. A capability counts as implemented on a platform only when its real-OS
 tests prove each fact there.
 
 Implemented in source:
