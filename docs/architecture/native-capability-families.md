@@ -156,8 +156,8 @@ A count the platform cannot read is left out, never reported as zero.
 (absent, present, unknown: RDP into this session, screen sharing, remote management),
 `other_human_sessions` (count, active or disconnected).
 
-**Changes.** `session_changed` with the complete new state. Lock, user switch and remote attachment
-are also interruptions.
+**Changes.** `session_changed` with the complete new state. A lock and a user switch are also
+interruptions of every capability; remote attachment is a fact of this capability only.
 
 **Platforms.**
 

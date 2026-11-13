@@ -1543,3 +1543,34 @@ mod processes {
 }
 
 pub use processes::{identity, processes};
+
+#[repr(C)]
+struct Timebase {
+    numer: u32,
+    denom: u32,
+}
+
+#[link(name = "System")]
+unsafe extern "C" {
+    fn mach_absolute_time() -> u64;
+    fn mach_continuous_time() -> u64;
+    fn mach_timebase_info(info: *mut Timebase) -> i32;
+}
+
+/// Nanoseconds this machine has spent asleep since boot: the continuous clock counts sleep, the
+/// absolute clock does not. Wall-clock changes cannot move it.
+#[must_use]
+pub fn suspended_ns() -> Option<u64> {
+    let mut timebase = Timebase { numer: 0, denom: 0 };
+    // SAFETY: `timebase` is a valid out-parameter.
+    if unsafe { mach_timebase_info(&raw mut timebase) } != 0 || timebase.denom == 0 {
+        return None;
+    }
+    // SAFETY: both clocks take no arguments; the absolute clock is read first, so the difference
+    // is never negative.
+    let awake = unsafe { mach_absolute_time() };
+    // SAFETY: as above.
+    let total = unsafe { mach_continuous_time() };
+    let ticks = u128::from(total.saturating_sub(awake));
+    u64::try_from(ticks * u128::from(timebase.numer) / u128::from(timebase.denom)).ok()
+}

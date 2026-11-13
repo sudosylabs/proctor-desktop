@@ -7,6 +7,7 @@ pub mod catalog;
 pub mod clipboard;
 pub mod display;
 pub mod interactive_session;
+pub mod interruptions;
 pub mod media;
 pub mod network;
 mod poller;

@@ -108,6 +108,10 @@ impl Source for Scripted {
                 self.notify(SourceEvent::Changed);
             }
             "lose" => self.notify(SourceEvent::Lost(value.as_u64().ok_or(invalid)?)),
+            "interrupt" => {
+                let kind = serde_json::from_value(value.clone()).map_err(|_| invalid)?;
+                self.notify(SourceEvent::Interrupted(kind));
+            }
             "fail" => {
                 self.health = Health::Failed;
                 self.notify(SourceEvent::Changed);

@@ -159,6 +159,48 @@ void test('readiness continues into participation without a gap and contains on 
 	}
 });
 
+void test('an interruption ends every stream, contains, and a fresh state recovers', async () => {
+	const service = new NativeAgentService({ launch: LAUNCH });
+	try {
+		await service.openReadiness(COLLECTION, POLICY);
+		await service.beginParticipation();
+		await service.confirmParticipation();
+
+		const interruption = next<Notification>(
+			service.onDidNotify,
+			(notification) => notification.kind === 'interruption'
+		);
+		const unknown = next<Notification>(
+			service.onDidNotify,
+			(notification) =>
+				notification.kind === 'rules' &&
+				notification.statuses.some(
+					(status) => status.status === 'unknown' && status.unknown_cause === 'gap'
+				)
+		);
+		const fresh = next<Notification>(
+			service.onDidNotify,
+			(notification) => notification.kind === 'fact'
+		);
+		const contained = next(service.onDidChangeContainment, (value) => value);
+		service.sendHostEvent('scripted', { interrupt: 'screen_lock' });
+		const reported = await interruption;
+		assert.ok(reported.kind === 'interruption' && reported.interruption === 'screen_lock');
+		await unknown;
+		assert.equal(await contained, true, 'an unknown enforce rule contains');
+		const refreshed = await fresh;
+		assert.ok(
+			refreshed.kind === 'fact' && refreshed.fact.sequence === 1,
+			'the unchanged state is delivered again after the gap'
+		);
+
+		const released = next(service.onDidChangeContainment, (value) => !value);
+		assert.equal(await released, false, 'the fresh state recovers after the stability time');
+	} finally {
+		service.dispose();
+	}
+});
+
 void test('a crash during participation contains, restarts once with fresh instances, then fails', async () => {
 	const service = new NativeAgentService({ launch: LAUNCH });
 	try {

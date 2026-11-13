@@ -3,7 +3,7 @@
 
 use std::fmt;
 
-use prctr_protocol::facts::Permission;
+use prctr_protocol::facts::{InterruptionKind, Permission};
 
 use prctr_protocol::rules::Rule;
 use prctr_protocol::scalars::Identifier;
@@ -19,6 +19,9 @@ pub enum SourceEvent {
     Changed,
     /// The source lost this many OS events.
     Lost(u64),
+    /// The OS interrupted every capability (sleep, screen lock, user switch). The agent ends every
+    /// stream and re-reads every source.
+    Interrupted(InterruptionKind),
 }
 
 /// Receives a source's events. Cheap to clone; safe to call from any thread.

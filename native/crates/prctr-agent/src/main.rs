@@ -44,6 +44,30 @@ fn capabilities() -> (Registry, Vec<Box<dyn Source>>) {
     (registry, vec![scripted])
 }
 
+/// Reports sleep, screen lock and user switch to the agent. Test builds inject interruptions
+/// through the scripted capability instead.
+#[cfg(not(feature = "scripted-capabilities"))]
+fn watch_interruptions(
+    events: &mpsc::Sender<agent::Event>,
+) -> Option<prctr_capabilities::interruptions::Watcher> {
+    let events = events.clone();
+    let watcher = prctr_capabilities::interruptions::Watcher::start(
+        prctr_capabilities::interruptions::sample,
+        move |kind| {
+            let _ = events.send(agent::Event::Interrupted(kind));
+        },
+    );
+    if watcher.is_err() {
+        emit(Diagnostic::SourceStartFailed);
+    }
+    watcher.ok()
+}
+
+#[cfg(feature = "scripted-capabilities")]
+const fn watch_interruptions(_events: &mpsc::Sender<agent::Event>) -> Option<()> {
+    None
+}
+
 fn main() -> ExitCode {
     // A bug must never leave the agent running in an unknown state: Electron main sees the exit
     // and contains.
@@ -54,6 +78,7 @@ fn main() -> ExitCode {
     let (sender, receiver) = mpsc::channel();
     transport::spawn_reader(std::io::stdin(), sender.clone());
     let (registry, sources) = capabilities();
+    let _interruptions = watch_interruptions(&sender);
     let mut agent = Agent::new(
         registry,
         sources,

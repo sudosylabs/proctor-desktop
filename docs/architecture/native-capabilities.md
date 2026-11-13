@@ -96,8 +96,15 @@ capability:
 - **identical consecutive states** produce no event;
 - **per-capability sequence numbers**, explicit **gaps** when events are lost, and **resets** with a
   fresh instance identity after a restart;
-- **interruptions** (sleep and resume, screen lock, user switch) end the stream and force a fresh
-  complete state;
+- **interruptions** (sleep and resume, screen lock, user switch) end every stream and force a fresh
+  complete state. A watcher in the agent samples the OS every second. Sleep is suspended time that
+  grows by at least two seconds, read from a clock that counts sleep minus one that does not
+  (`mach_continuous_time` and `mach_absolute_time`, `CLOCK_BOOTTIME` and `CLOCK_MONOTONIC`, the
+  interrupt time and its unbiased form), so wall-clock changes cannot fake or hide one. A lock is
+  the session going from unlocked to locked, and a user switch is the session losing the console.
+  Resuming, unlocking and switching back are not interruptions: the agent re-reads every activated
+  source at once, and those fresh states say what is true. Until each arrives, every rule is
+  unknown with cause `gap`, so enforce rules contain;
 - **notifications are wake-ups**: the adapter re-queries the whole state and reports what it found,
   never what a notification claimed.
 

@@ -145,6 +145,19 @@ impl Engine {
         self.session.is_some()
     }
 
+    /// The capabilities the open session activated; empty when no session is open.
+    #[must_use]
+    pub fn activated(&self) -> Vec<Identifier> {
+        self.session.as_ref().map_or_else(Vec::new, |session| {
+            session
+                .policy
+                .activations()
+                .iter()
+                .map(|activation| activation.capability.clone())
+                .collect()
+        })
+    }
+
     /// The rules with application conditions, for the process capability's on-device matcher.
     #[must_use]
     pub fn app_rules(&self) -> Vec<Rule> {

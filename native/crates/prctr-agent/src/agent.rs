@@ -13,7 +13,7 @@ use std::time::{Duration, Instant};
 use prctr_core::{
     CoreError, Engine, InitialState, Input, Numbered, Registry, Sink, Source, SourceEvent,
 };
-use prctr_protocol::facts::Fact;
+use prctr_protocol::facts::{Fact, InterruptionKind};
 use prctr_protocol::messages::{
     AgentMessage, FatalCode, MainMessage, Notification, RefusalCode, Request, Response,
 };
@@ -29,6 +29,10 @@ pub const HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(5);
 /// Everything the core thread reacts to.
 pub enum Event {
     Main(Box<MainMessage>),
+    /// The OS interruption watcher saw sleep, a screen lock or a user switch. Test builds inject
+    /// interruptions through the scripted capability instead.
+    #[cfg_attr(feature = "scripted-capabilities", allow(dead_code))]
+    Interrupted(InterruptionKind),
     MainClosed,
     MainInvalid,
     Source(Identifier, SourceEvent),
@@ -128,6 +132,7 @@ impl<W: Write> Agent<W> {
                     return Exit::Closed;
                 }
                 Ok(Event::MainInvalid) => return self.fatal(Diagnostic::ProtocolError),
+                Ok(Event::Interrupted(kind)) => self.interrupt(kind),
                 Err(RecvTimeoutError::Timeout) => {
                     if self
                         .engine
@@ -390,8 +395,36 @@ impl<W: Write> Agent<W> {
                 count: *count,
                 at_ms,
             },
+            SourceEvent::Interrupted(kind) => {
+                self.interrupt(*kind);
+                return;
+            }
         };
         self.apply(input);
+    }
+
+    /// Ends every stream, then re-reads every activated source so each delivers a fresh complete
+    /// state. Outside a session there is nothing to interrupt.
+    fn interrupt(&mut self, kind: InterruptionKind) {
+        if !self.engine.is_open() {
+            return;
+        }
+        self.apply(Input::Interrupted {
+            kind,
+            at_ms: self.now_ms(),
+        });
+        for capability in self.engine.activated() {
+            let Some(source) = self.sources.get_mut(&capability) else {
+                continue;
+            };
+            let observation = source.current();
+            let input = Input::Observed {
+                capability,
+                observation,
+                at_ms: self.now_ms(),
+            };
+            self.apply(input);
+        }
     }
 
     fn apply(&mut self, input: Input) {

@@ -1406,3 +1406,20 @@ mod processes {
 }
 
 pub use processes::{identity, processes};
+
+/// Nanoseconds this machine has spent asleep or hibernating since boot: the interrupt time counts
+/// sleep, the unbiased interrupt time does not.
+#[must_use]
+pub fn suspended_ns() -> Option<u64> {
+    use windows::Win32::System::WindowsProgramming::{
+        QueryInterruptTime, QueryUnbiasedInterruptTime,
+    };
+    let mut awake = 0_u64;
+    // SAFETY: `awake` is a valid out-parameter.
+    if !unsafe { QueryUnbiasedInterruptTime(&raw mut awake) }.as_bool() {
+        return None;
+    }
+    // SAFETY: no arguments.
+    let total = unsafe { QueryInterruptTime() };
+    total.saturating_sub(awake).checked_mul(100)
+}

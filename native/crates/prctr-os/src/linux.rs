@@ -746,3 +746,23 @@ mod process_tests {
         assert_ne!(listed[0].instance, listed[1].instance);
     }
 }
+
+/// Nanoseconds this machine has spent suspended since boot: the boot clock counts suspend, the
+/// monotonic clock does not.
+#[must_use]
+pub fn suspended_ns() -> Option<u64> {
+    let read = |clock| {
+        let mut time = libc::timespec {
+            tv_sec: 0,
+            tv_nsec: 0,
+        };
+        // SAFETY: `time` is a valid out-parameter for a supported clock.
+        (unsafe { libc::clock_gettime(clock, &raw mut time) } == 0).then(|| {
+            u64::try_from(time.tv_sec).unwrap_or(0) * 1_000_000_000
+                + u64::try_from(time.tv_nsec).unwrap_or(0)
+        })
+    };
+    let awake = read(libc::CLOCK_MONOTONIC)?;
+    let total = read(libc::CLOCK_BOOTTIME)?;
+    Some(total.saturating_sub(awake))
+}
