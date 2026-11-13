@@ -213,6 +213,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 
 [[package]]
+name = "endpoint-sec-sys"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1479a27ba4be9093ff1de20b3aa0a0bc5165b375aa2e0e73b83bba903bd64bd5"
+dependencies = [
+ "block2",
+ "libc",
+ "mach2",
+ "objc2",
+]
+
+[[package]]
 name = "ferrisetw"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -398,6 +410,12 @@ name = "log"
 version = "0.4.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d15f86d12da44cd8d4ec3c73984537eb7f4cadcb9776a575a0a8a05ca11005c"
+
+[[package]]
+name = "mach2"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0d28e293f2b8c9d2b2d1c0193bd3c1cbdc0d2cf396888dc01162f7cf9d6c3f3"
 
 [[package]]
 name = "memchr"
@@ -724,7 +742,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "709fe137109bd1e8b5a99390f77a7d8b2961dafc1a1c5db8f2e60329ad6d895a"
 dependencies = [
  "bitflags 2.13.1",
+ "objc2",
  "objc2-core-foundation",
+]
+
+[[package]]
+name = "objc2-service-management"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b213642d6959cc6023ceb1217aa595eaaf09b8094ce95127c103cab611fe65e8"
+dependencies = [
+ "objc2",
+ "objc2-core-foundation",
+ "objc2-foundation",
+ "objc2-security",
 ]
 
 [[package]]
@@ -797,12 +828,14 @@ dependencies = [
 name = "prctr-capabilities"
 version = "0.1.0"
 dependencies = [
+ "interprocess",
  "prctr-core",
  "prctr-os",
  "prctr-protocol",
  "schemars",
  "serde",
  "serde_json",
+ "windows-service",
 ]
 
 [[package]]
@@ -820,7 +853,9 @@ version = "0.1.0"
 dependencies = [
  "ferrisetw",
  "interprocess",
+ "prctr-os",
  "prctr-protocol",
+ "widestring",
  "windows-service",
 ]
 
@@ -830,6 +865,8 @@ version = "0.1.0"
 dependencies = [
  "block2",
  "dispatch2",
+ "endpoint-sec-sys",
+ "interprocess",
  "libc",
  "objc2",
  "objc2-app-kit",
@@ -842,6 +879,7 @@ dependencies = [
  "objc2-io-kit",
  "objc2-screen-capture-kit",
  "objc2-security",
+ "objc2-service-management",
  "objc2-system-configuration",
  "objc2-video-toolbox",
  "windows 0.62.2",

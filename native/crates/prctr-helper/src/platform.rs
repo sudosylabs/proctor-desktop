@@ -1,7 +1,7 @@
 //! The seams the OS layer implements: where process events, sessions, identities and agent
 //! connections come from. The core (`hub`) depends only on these traits, so it is tested with
 //! fakes; the Windows service and the macOS daemon supply the real implementations.
-//! `.scratch/native-rewrite/os-layer-spec.md` describes what each implementation must do.
+//! Platform composition supplies authenticated local connections and subscription-owned watches.
 
 use std::io::{self, Read, Write};
 
@@ -11,15 +11,22 @@ use crate::processes::RawStart;
 use crate::sessions::RawSessionInfo;
 
 /// One raw process event from the OS.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ProcessEvent {
     Started(RawStart),
+    /// Identity copied from the same OS event, without querying a possibly reused PID.
+    Observed {
+        start: RawStart,
+        identity: HelperIdentity,
+    },
     Stopped {
         pid: u32,
         created: u64,
     },
     /// The OS source dropped events; the core takes a fresh snapshot.
     Lost,
+    /// The live source ended; snapshots alone cannot establish lifecycle coverage.
+    Unavailable,
 }
 
 pub type ProcessSink = Box<dyn Fn(ProcessEvent) + Send + Sync>;
@@ -38,7 +45,17 @@ pub trait ProcessSource: Send + Sync {
     fn snapshot(&self) -> Option<Vec<RawStart>>;
 }
 
+pub trait SessionWatch: Send {}
+
 pub trait SessionSource: Send + Sync {
+    /// Subscribe before the initial read. Dropping the guard stops notifications.
+    ///
+    /// # Errors
+    /// Returns a bounded source-start failure.
+    fn start(&self) -> Result<Option<Box<dyn SessionWatch>>, String> {
+        Ok(None)
+    }
+
     /// The console session and every session's state.
     fn read(&self) -> Option<(Option<u32>, Vec<RawSessionInfo>)>;
 }
@@ -61,6 +78,8 @@ impl IdentitySource for NoIdentity {
 pub struct Peer {
     /// The connecting process.
     pub pid: u32,
+    /// Connection-bound macOS audit token; absent on other transports.
+    pub audit_token: Option<[u32; 8]>,
     /// The connecting process's interactive session.
     pub session: u32,
     pub reader: Box<dyn Read + Send>,
@@ -79,7 +98,7 @@ pub trait Listener: Send + Sync {
 
 pub trait PeerCheck: Send + Sync {
     /// Whether `pid` is this release's agent.
-    fn authorize(&self, pid: u32) -> bool;
+    fn authorize(&self, peer: &Peer) -> bool;
 }
 
 /// A control from the service manager or launchd.

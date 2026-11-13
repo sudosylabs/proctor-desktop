@@ -46,13 +46,18 @@ Known limits:
 
 - Intel Macs report external displays unclassified (partial certainty); Apple silicon classifies
   them by framebuffer transport.
-- Without the privileged components, the interactive session and process and application report
-  `snapshot_only` coverage, so `baseline.session` and application rules stay unknown.
-- On Windows, process identity is unavailable until the privileged service verifies images.
+- A missing or unavailable configured helper makes its dependent capabilities unavailable, so
+  `baseline.session` and application rules stay unknown. Explicit unprivileged sources retain
+  `snapshot_only` coverage; they cannot establish the stronger claim.
+- On Windows, process identity requires the privileged service to verify images; failed trust or
+  resource reads remain unavailable.
 - Reads still to be proved on certification rigs: Sidecar, AirPlay and DisplayLink displays; the
   macOS `utun` heuristic; Windows camera use from the ConsentStore; phones over PTP/MTP.
 
-The privileged components are not implemented yet.
+The privileged helper core, Windows service/ETW/WTS adapters, macOS root launchd/Endpoint Security
+adapters and authenticated agent links are implemented in source. Privileged target-machine and
+packaged conformance remain unverified; this source status does not establish full coverage.
+Setup layout and executable checks live in the [helper guide](../../native/crates/prctr-helper/README.md).
 
 ## Processes and ownership
 
@@ -66,7 +71,7 @@ Electron main ──────────────── server: signed fa
 native agent (unprivileged Rust process inside the app bundle)
         │  helper messages
         ▼
-privileged components: macOS Endpoint Security system extension,
+privileged components: macOS root Endpoint Security launchd daemon,
                        Windows service (ETW/WTS)
 ```
 
@@ -79,8 +84,9 @@ privileged components: macOS Endpoint Security system extension,
   content protection), adds wall-clock time, signs records with the installation credential and
   delivers them to the server. It never evaluates rules itself.
 - **Privileged components** give full process and interactive-session coverage: a signed Windows
-  service using ETW and WTS, and an approved macOS Endpoint Security system extension with Full
-  Disk Access. They are installed and approved during setup, never during an exam, stay dormant
+  service using ETW and WTS, and an approved root macOS Endpoint Security launchd daemon registered
+  through `SMAppService`, with the Endpoint Security entitlement and Full Disk Access. They are
+  installed and approved during setup, never during an exam, stay dormant
   outside a session, and are reached only by the agent. A missing service, approval, entitlement,
   signature or compatible version makes the dependent coverage unavailable; there is no
   unprivileged substitute for the stronger claim.

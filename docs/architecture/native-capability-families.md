@@ -139,10 +139,11 @@ owners are never read.
 **Purpose.** The candidate's local session must be the only human session, unlocked, and not
 viewed or controlled remotely. It also holds the remote-viewing fact.
 
-**Unprivileged coverage.** Without the privileged components every platform reports
-`snapshot_only` coverage with partial certainty, so `baseline.session` (console owned by the
-candidate, unlocked, no remote attachment, no other human session) is unknown until they exist.
-What each platform reads without privilege:
+**Unprivileged coverage.** Explicit unprivileged sources report `snapshot_only` coverage with
+partial certainty. A configured helper that is missing or unavailable makes the capability
+unavailable. Neither case can establish `baseline.session` (console owned by the candidate,
+unlocked, no remote attachment, no other human session).
+What each platform can read without privilege:
 
 - **macOS:** console and lock from the window-server session; other users from `utmpx`; remote
   attachment unknown.
@@ -164,10 +165,11 @@ interruptions of every capability; remote attachment is a fact of this capabilit
 - Windows: the privileged service enumerates every session and receives logon, lock, remote and
   console changes; only `WTSActive` is console ownership. Without it, the current session's
   notifications and remote-session flag give `snapshot_only`.
-- macOS: the Endpoint Security extension gives login-window login/logout/lock/unlock,
-  screen-sharing attach/detach and SSH login events; `utmpx` and the current session dictionary give
-  the starting state. Screen sharing that began before the exam must be proved detectable before
-  macOS is complete.
+- macOS: the root Endpoint Security launchd daemon observes login-window login/logout/lock/unlock
+  and screen-sharing attach/detach. `IOConsoleUsers` and `IOConsoleLocked` give initial console
+  state; established TCP on local ports 5900/3283 supplies the initial screen-sharing signal.
+  An unassignable remote attachment or unreadable initial state remains unavailable. SSH-session
+  expansion and privileged target-machine certification remain outstanding.
 - Linux: logind sessions; partial.
 
 **Permission.** The privileged components' approval.
@@ -208,13 +210,14 @@ be read; an unidentifiable process never matches a blocklist. Proctor is the age
 its own identity, so an allowed editor that launches a shell is matched on the shell. Paths and
 process names are never identity.
 
-**Platforms.** Without the privileged components every read is a one-second snapshot: coverage is
-`snapshot_only`, certainty is partial, and application rules are unknown until the privileged
-components provide the full lifecycle.
+**Platforms.** Explicit unprivileged reads use one-second snapshots with `snapshot_only` coverage
+and partial certainty. A missing or unavailable configured helper makes the capability unavailable.
+Application rules remain unknown until the privileged components provide the full lifecycle.
 
 - **macOS:** `proc_listallpids` for the agent's account; identity from the running code's signature
   (signing identifier, Team ID, and whether it satisfies `anchor apple`), verified once per
-  instance. The Endpoint Security extension will add exec and exit events.
+  instance. The privileged daemon implements ES exec, fork and exit notifications; full coverage
+  still requires privileged target-machine proof.
 - **Windows:** a Toolhelp snapshot of the agent's session. The unprivileged agent cannot verify
   catalog-signed system files, so identity is unavailable until the privileged service, which opens
   each image itself, provides it; allowlists are violated and blocklists match nothing until then.

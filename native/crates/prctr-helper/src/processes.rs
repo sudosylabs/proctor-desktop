@@ -18,6 +18,9 @@ pub struct RawStart {
     pub created: u64,
 }
 
+/// A snapshot process whose creation time could not be read.
+pub const UNKNOWN_CREATED: u64 = 0;
+
 /// The session that holds system and service processes (Windows session 0).
 pub const SYSTEM_SESSION: u32 = 0;
 
@@ -69,16 +72,19 @@ impl ProcessTable {
         self.live.insert(start.pid, Entry::new(start, identity));
     }
 
-    /// Records a stop and returns the stopped process's session, or `None` when the stop is for a
-    /// process this table does not hold (already replaced or never seen).
-    pub fn stop(&mut self, pid: u32, created: u64) -> Option<u32> {
+    /// Records a stop and returns the stopped process's session and the creation time its
+    /// instance was built from, or `None` when the stop is for a process this table does not hold
+    /// (already replaced or never seen). A snapshot entry whose creation time could not be read
+    /// (`0`) matches the stop of the same process ID: a reused ID would have replaced it with a
+    /// start first.
+    pub fn stop(&mut self, pid: u32, created: u64) -> Option<(u32, u64)> {
         let entry = self.live.get(&pid)?;
-        if entry.created != created {
+        if entry.created != created && entry.created != UNKNOWN_CREATED {
             return None;
         }
-        let session = entry.session;
+        let stopped = (entry.session, entry.created);
         self.live.remove(&pid);
-        Some(session)
+        Some(stopped)
     }
 
     fn describe(&self, pid: u32, entry: &Entry, own: u32) -> Option<HelperProcess> {
@@ -100,6 +106,20 @@ impl ProcessTable {
     #[must_use]
     pub fn visible(&self, pid: u32, own: u32) -> Option<HelperProcess> {
         self.describe(pid, self.live.get(&pid)?, own)
+    }
+
+    /// Sets a pending process's identity. Returns `false` when the process exited, its ID was
+    /// reused, or its identity is already known.
+    pub fn identify(&mut self, pid: u32, created: u64, identity: HelperIdentity) -> bool {
+        match self.live.get_mut(&pid) {
+            Some(entry)
+                if entry.created == created && entry.identity == HelperIdentity::Pending =>
+            {
+                entry.identity = identity;
+                true
+            }
+            _ => false,
+        }
     }
 
     pub fn clear(&mut self) {
@@ -166,7 +186,7 @@ mod tests {
         let second = table.visible(100, 1).expect("visible").instance;
         assert_ne!(first, second);
         assert_eq!(table.stop(100, 10), None, "stop for the earlier process");
-        assert_eq!(table.stop(100, 20), Some(1));
+        assert_eq!(table.stop(100, 20), Some((1, 20)));
         assert!(table.visible(100, 1).is_none());
     }
 
@@ -186,5 +206,15 @@ mod tests {
         for pid in [0, 1, u32::MAX] {
             assert!(instance(pid, u64::MAX).get() <= MAX_SAFE_INTEGER);
         }
+    }
+
+    #[test]
+    fn a_snapshot_process_with_an_unknown_creation_time_still_exits() {
+        let mut table = ProcessTable::default();
+        table.reset([raw(4, 0, 0, UNKNOWN_CREATED)].map(unknown));
+        let instance_before = table.visible(4, 1).expect("visible").instance;
+        assert_eq!(table.stop(4, 12_345), Some((0, UNKNOWN_CREATED)));
+        assert_eq!(instance(4, UNKNOWN_CREATED), instance_before);
+        assert!(table.visible(4, 1).is_none());
     }
 }

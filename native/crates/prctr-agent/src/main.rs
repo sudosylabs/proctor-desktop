@@ -79,7 +79,42 @@ const fn watch_interruptions(_events: &mpsc::Sender<agent::Event>) -> Option<()>
     None
 }
 
+/// The one-shot setup commands for the macOS helper daemon's registration.
+#[cfg(target_os = "macos")]
+fn helper_command(argument: &std::ffi::OsStr) -> Option<ExitCode> {
+    use prctr_capabilities::helper::macos::{Registration, registration};
+    let register = argument == "--register-native-helper";
+    if !register && argument != "--native-helper-status" {
+        return None;
+    }
+    Some(match registration(register) {
+        Ok(status) => {
+            println!(
+                "{}",
+                match status {
+                    Registration::NotRegistered => "not_registered",
+                    Registration::RequiresApproval => "requires_approval",
+                    Registration::Enabled => "enabled",
+                }
+            );
+            ExitCode::SUCCESS
+        }
+        Err(_) => ExitCode::FAILURE,
+    })
+}
+
 fn main() -> ExitCode {
+    // Electron main starts the agent with no arguments. The only arguments are the one-shot macOS
+    // setup commands; anything else is a usage error on every platform.
+    if let Some(argument) = std::env::args_os().nth(1) {
+        #[cfg(target_os = "macos")]
+        if let Some(code) = helper_command(&argument) {
+            return code;
+        }
+        let _ = argument;
+        return ExitCode::from(64);
+    }
+
     // A bug must never leave the agent running in an unknown state: Electron main sees the exit
     // and contains.
     std::panic::set_hook(Box::new(|_| {

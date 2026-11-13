@@ -501,7 +501,7 @@ void test('dependency admission compares normalized Cargo features, defaults, op
 	const windows = 'windows = { version = "=0.62.2", default-features = false, ';
 	for (const mutation of [
 		(manifest: string): string =>
-			manifest.replace('"Win32_Graphics_Gdi"', '"Win32_System_Pipes"'),
+			manifest.replace('"Win32_Graphics_Gdi"', '"Win32_System_JobObjects"'),
 		(manifest: string): string =>
 			manifest.replace(windows, 'windows = { version = "=0.62.2", '),
 		(manifest: string): string => manifest.replace(windows, `${windows}optional = true, `),
@@ -644,7 +644,10 @@ void test('dependency admission rejects workspace-inherited registry declaration
 void test('dependency admission rejects package features that forward unadmitted Cargo features', async () => {
 	const check = checkMap().get('dependencies.admission');
 	assert.ok(check);
-	for (const forwarded of ['windows/Win32_System_Pipes', 'windows?/Win32_System_Pipes']) {
+	for (const forwarded of [
+		'windows/Win32_System_JobObjects',
+		'windows?/Win32_System_JobObjects'
+	]) {
 		const diagnostics = await run(
 			check,
 			snapshot((files) => {

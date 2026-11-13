@@ -8,12 +8,13 @@
 use std::collections::BTreeMap;
 use std::io::{Read, Write};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::{self, Receiver, RecvTimeoutError, Sender, SyncSender, TrySendError};
 use std::time::Duration;
 
 use prctr_protocol::frame::{Decoder, encode};
 use prctr_protocol::helper::{
-    AgentToHelper, HelperLoss, HelperRefusal, HelperSessions, HelperToAgent,
+    AgentToHelper, HelperIdentity, HelperLoss, HelperRefusal, HelperSessions, HelperToAgent,
 };
 
 use crate::connection::{Connection, Step, Subscription};
@@ -36,6 +37,13 @@ pub enum Output {
     Send(PeerId, HelperToAgent),
     /// Send nothing more and close the connection.
     Close(PeerId),
+    /// Verify this process's identity off the hub thread, then report it through
+    /// [`Hub::identified`].
+    Identify {
+        generation: u64,
+        pid: u32,
+        created: u64,
+    },
 }
 
 /// The platform sources the hub reads.
@@ -56,11 +64,17 @@ type RawSessions = (Option<u32>, Vec<RawSessionInfo>);
 pub struct Hub {
     sources: Sources,
     digest: String,
-    sink: Arc<dyn Fn(ProcessEvent) + Send + Sync>,
+    sink: Arc<dyn Fn(u64, ProcessEvent) + Send + Sync>,
     peers: BTreeMap<PeerId, PeerState>,
     watch: Option<Box<dyn ProcessWatch>>,
+    snapshot_ready: bool,
+    source_generation: u64,
+    session_started: bool,
     table: ProcessTable,
     sessions: Option<RawSessions>,
+    session_watch: Option<Box<dyn crate::platform::SessionWatch>>,
+    /// Processes awaiting identity, handed to the driver with the next outputs.
+    to_identify: Vec<(u32, u64)>,
 }
 
 impl Hub {
@@ -70,7 +84,7 @@ impl Hub {
     pub fn new(
         sources: Sources,
         digest: &str,
-        sink: Arc<dyn Fn(ProcessEvent) + Send + Sync>,
+        sink: Arc<dyn Fn(u64, ProcessEvent) + Send + Sync>,
     ) -> Self {
         Self {
             sources,
@@ -78,9 +92,60 @@ impl Hub {
             sink,
             peers: BTreeMap::new(),
             watch: None,
+            snapshot_ready: false,
+            source_generation: 0,
+            session_started: false,
             table: ProcessTable::default(),
             sessions: None,
+            session_watch: None,
+            to_identify: Vec::new(),
         }
+    }
+
+    /// Appends the identity requests queued while producing `out`.
+    fn with_identify(&mut self, mut out: Vec<Output>) -> Vec<Output> {
+        let generation = self.source_generation;
+        out.extend(
+            self.to_identify
+                .drain(..)
+                .map(|(pid, created)| Output::Identify {
+                    generation,
+                    pid,
+                    created,
+                }),
+        );
+        out
+    }
+
+    /// A verified identity for a process the hub asked about. Ignored when the source restarted,
+    /// the process exited or its ID was reused since.
+    pub fn identified(
+        &mut self,
+        generation: u64,
+        pid: u32,
+        created: u64,
+        identity: HelperIdentity,
+    ) -> Vec<Output> {
+        if generation != self.source_generation
+            || self.watch.is_none()
+            || !self.table.identify(pid, created, identity)
+        {
+            return Vec::new();
+        }
+        let targets: Vec<(PeerId, u32)> = self.subscribers(true).collect();
+        targets
+            .into_iter()
+            .filter_map(|(peer, own)| {
+                let process = self.table.visible(pid, own)?;
+                Some(Output::Send(
+                    peer,
+                    HelperToAgent::ProcessIdentified {
+                        instance: process.instance,
+                        identity: process.identity,
+                    },
+                ))
+            })
+            .collect()
     }
 
     /// Whether the process source is running.
@@ -119,7 +184,10 @@ impl Hub {
                 let own = state.session;
                 let mut out = Vec::new();
                 if newly.processes {
-                    if self.watch.is_none() && !self.start_watch() {
+                    if self.watch.is_none() {
+                        self.start_watch();
+                    }
+                    if !self.snapshot_ready {
                         out.push(Output::Send(
                             peer,
                             HelperToAgent::Lost {
@@ -127,28 +195,35 @@ impl Hub {
                             },
                         ));
                     }
-                    out.push(Output::Send(
-                        peer,
-                        HelperToAgent::ProcessSnapshot {
-                            processes: self.table.snapshot(own),
-                        },
-                    ));
+                    if self.snapshot_ready {
+                        out.push(Output::Send(
+                            peer,
+                            HelperToAgent::ProcessSnapshot {
+                                processes: self.table.snapshot(own),
+                            },
+                        ));
+                    }
                 }
                 if newly.sessions {
-                    if self.sessions.is_none() {
-                        self.sessions = self.sources.sessions.read();
-                    }
+                    self.start_sessions();
+                    self.sessions = if self.session_started {
+                        self.sources.sessions.read()
+                    } else {
+                        None
+                    };
                     out.push(Output::Send(peer, self.session_report(own)));
                 }
                 self.settle();
-                out
+                self.with_identify(out)
             }
         }
     }
 
     fn start_watch(&mut self) -> bool {
+        self.source_generation += 1;
+        let generation = self.source_generation;
         let sink = Arc::clone(&self.sink);
-        let forward: ProcessSink = Box::new(move |event| sink(event));
+        let forward: ProcessSink = Box::new(move |event| sink(generation, event));
         match self.sources.processes.start(forward) {
             Ok(watch) => {
                 self.watch = Some(watch);
@@ -160,13 +235,21 @@ impl Hub {
     }
 
     fn resnapshot(&mut self) {
-        let identity = &self.sources.identity;
-        let snapshot = self.sources.processes.snapshot().unwrap_or_default();
+        self.snapshot_ready = false;
+        self.table.clear();
+        let Some(snapshot) = self.sources.processes.snapshot() else {
+            return;
+        };
+        self.to_identify = snapshot
+            .iter()
+            .map(|start| (start.pid, start.created))
+            .collect();
         self.table.reset(
             snapshot
                 .into_iter()
-                .map(|start| (start, identity.identify(start.pid))),
+                .map(|start| (start, HelperIdentity::Pending)),
         );
+        self.snapshot_ready = true;
     }
 
     /// Stops the process source when no agent subscribes to processes, and forgets sessions when
@@ -176,9 +259,12 @@ impl Hub {
         if !wanted.processes && self.watch.is_some() {
             self.watch = None;
             self.table.clear();
+            self.snapshot_ready = false;
         }
         if !wanted.sessions {
             self.sessions = None;
+            self.session_watch = None;
+            self.session_started = false;
         }
     }
 
@@ -211,15 +297,33 @@ impl Hub {
         HelperToAgent::Sessions(report(console, own, &sessions))
     }
 
+    fn process_generation(&mut self, generation: u64, event: ProcessEvent) -> Vec<Output> {
+        if generation != self.source_generation {
+            return Vec::new();
+        }
+        self.process(event)
+    }
+
     /// One event from the process source.
     pub fn process(&mut self, event: ProcessEvent) -> Vec<Output> {
+        let out = self.apply_process(event);
+        self.with_identify(out)
+    }
+
+    fn apply_process(&mut self, event: ProcessEvent) -> Vec<Output> {
         if self.watch.is_none() {
             return Vec::new();
         }
         let targets: Vec<(PeerId, u32)> = self.subscribers(true).collect();
         match event {
             ProcessEvent::Started(start) => {
-                let identity = self.sources.identity.identify(start.pid);
+                self.to_identify.push((start.pid, start.created));
+                self.apply_process(ProcessEvent::Observed {
+                    start,
+                    identity: HelperIdentity::Pending,
+                })
+            }
+            ProcessEvent::Observed { start, identity } => {
                 self.table.start(start, identity);
                 targets
                     .into_iter()
@@ -233,14 +337,30 @@ impl Hub {
                     .collect()
             }
             ProcessEvent::Stopped { pid, created } => {
-                let Some(session) = self.table.stop(pid, created) else {
+                let Some((session, known)) = self.table.stop(pid, created) else {
                     return Vec::new();
                 };
-                let instance = crate::processes::instance(pid, created);
+                let instance = crate::processes::instance(pid, known);
                 targets
                     .into_iter()
                     .filter(|(_, own)| scope(session, *own).is_some())
                     .map(|(peer, _)| Output::Send(peer, HelperToAgent::ProcessExited { instance }))
+                    .collect()
+            }
+            ProcessEvent::Unavailable => {
+                self.watch = None;
+                self.snapshot_ready = false;
+                self.table.clear();
+                targets
+                    .into_iter()
+                    .map(|(peer, _)| {
+                        Output::Send(
+                            peer,
+                            HelperToAgent::Lost {
+                                reason: HelperLoss::SourceRestarted,
+                            },
+                        )
+                    })
                     .collect()
             }
             ProcessEvent::Lost => {
@@ -248,23 +368,40 @@ impl Hub {
                 targets
                     .into_iter()
                     .flat_map(|(peer, own)| {
-                        [
-                            Output::Send(
-                                peer,
-                                HelperToAgent::Lost {
-                                    reason: HelperLoss::EventsDropped,
-                                },
-                            ),
-                            Output::Send(
+                        let mut out = vec![Output::Send(
+                            peer,
+                            HelperToAgent::Lost {
+                                reason: HelperLoss::EventsDropped,
+                            },
+                        )];
+                        if self.snapshot_ready {
+                            out.push(Output::Send(
                                 peer,
                                 HelperToAgent::ProcessSnapshot {
                                     processes: self.table.snapshot(own),
                                 },
-                            ),
-                        ]
+                            ));
+                        }
+                        if self
+                            .peers
+                            .get(&peer)
+                            .is_some_and(|state| state.connection.subscription().sessions)
+                        {
+                            out.push(Output::Send(peer, self.session_report(own)));
+                        }
+                        out
                     })
                     .collect()
             }
+        }
+    }
+
+    fn start_sessions(&mut self) {
+        if !self.session_started
+            && let Ok(watch) = self.sources.sessions.start()
+        {
+            self.session_watch = watch;
+            self.session_started = true;
         }
     }
 
@@ -273,7 +410,12 @@ impl Hub {
         if !self.wanted().sessions {
             return Vec::new();
         }
-        let now = self.sources.sessions.read();
+        self.start_sessions();
+        let now = if self.session_started {
+            self.sources.sessions.read()
+        } else {
+            None
+        };
         if now == self.sessions {
             return Vec::new();
         }
@@ -288,13 +430,30 @@ impl Hub {
     /// The once-a-second tick: a session re-read and a heartbeat to every subscriber.
     pub fn tick(&mut self) -> Vec<Output> {
         let mut out = self.sessions_changed();
+        if self.wanted().processes && !self.snapshot_ready {
+            if self.watch.is_none() {
+                self.start_watch();
+            } else {
+                self.resnapshot();
+            }
+            if self.snapshot_ready {
+                out.extend(self.subscribers(true).map(|(peer, own)| {
+                    Output::Send(
+                        peer,
+                        HelperToAgent::ProcessSnapshot {
+                            processes: self.table.snapshot(own),
+                        },
+                    )
+                }));
+            }
+        }
         out.extend(self.peers.iter().filter_map(|(id, peer)| {
             peer.connection
                 .subscription()
                 .any()
                 .then_some(Output::Send(*id, HelperToAgent::Heartbeat))
         }));
-        out
+        self.with_identify(out)
     }
 
     /// The report this hub would send an agent in session `own`, for tests and diagnostics.
@@ -307,15 +466,34 @@ impl Hub {
     }
 }
 
+/// Events queued for the hub thread before the process source's overflow turns into a loss.
+pub const EVENT_QUEUE: usize = 16_384;
+/// Identity checks queued before new ones are reported as unavailable.
+pub const IDENTIFY_QUEUE: usize = 8_192;
+/// Consecutive listener failures, each followed by a back-off, before the helper stops so the
+/// service manager can restart it.
+const MAX_ACCEPT_FAILURES: u32 = 32;
+const ACCEPT_BACKOFF: Duration = Duration::from_millis(50);
+const MAX_ACCEPT_BACKOFF: Duration = Duration::from_secs(1);
+
 enum Event {
     Connected(PeerId, u32, SyncSender<HelperToAgent>),
     Message(PeerId, AgentToHelper),
     Disconnected(PeerId),
-    Process(ProcessEvent),
-    Control(Control),
+    Process(u64, ProcessEvent),
+    Identified {
+        generation: u64,
+        pid: u32,
+        created: u64,
+        identity: HelperIdentity,
+    },
 }
 
-fn read_messages(peer: PeerId, mut reader: Box<dyn Read + Send>, events: &Sender<Event>) {
+/// The longest the hub waits before checking service controls, so a session change or a stop
+/// is acted on promptly.
+const CONTROL_POLL: Duration = Duration::from_millis(100);
+
+fn read_messages(peer: PeerId, mut reader: Box<dyn Read + Send>, events: &SyncSender<Event>) {
     let mut decoder = Decoder::new();
     let mut buffer = [0_u8; 16 * 1024];
     loop {
@@ -356,6 +534,152 @@ fn write_messages(mut writer: Box<dyn Write + Send>, queue: &Receiver<HelperToAg
     }
 }
 
+fn spawn(name: &str, work: impl FnOnce() + Send + 'static) -> bool {
+    std::thread::Builder::new()
+        .name(name.to_owned())
+        .spawn(work)
+        .is_ok()
+}
+
+/// The back-off after the `failures`-th consecutive listener failure.
+fn accept_backoff(failures: u32) -> Duration {
+    ACCEPT_BACKOFF
+        .saturating_mul(1_u32 << failures.min(5))
+        .min(MAX_ACCEPT_BACKOFF)
+}
+
+/// Accepts agents until shutdown. A failed accept is one connection's failure: the listener backs
+/// off and keeps serving, and only a listener that keeps failing stops the helper.
+fn accept_agents(
+    listener: &Arc<dyn Listener>,
+    peers: &Arc<dyn PeerCheck>,
+    events: &SyncSender<Event>,
+    stop: &Sender<Control>,
+    stopping: &AtomicBool,
+) {
+    let mut next: PeerId = 0;
+    let mut failures = 0_u32;
+    loop {
+        let peer = match listener.accept() {
+            Ok(peer) => {
+                failures = 0;
+                peer
+            }
+            Err(_) if stopping.load(Ordering::Acquire) => break,
+            Err(error)
+                if matches!(
+                    error.kind(),
+                    std::io::ErrorKind::PermissionDenied | std::io::ErrorKind::InvalidData
+                ) =>
+            {
+                continue;
+            }
+            Err(_) => {
+                failures += 1;
+                if failures >= MAX_ACCEPT_FAILURES {
+                    let _ = stop.send(Control::Stop);
+                    break;
+                }
+                std::thread::sleep(accept_backoff(failures));
+                continue;
+            }
+        };
+        next += 1;
+        let id = next;
+        let authorized = peers.authorize(&peer);
+        let (queue, outbox) = mpsc::sync_channel::<HelperToAgent>(PEER_QUEUE);
+        let writer = peer.writer;
+        if !spawn("prctr-helper-writer", move || {
+            write_messages(writer, &outbox);
+        }) {
+            continue;
+        }
+        if !authorized {
+            let _ = queue.send(HelperToAgent::Refused {
+                code: HelperRefusal::UnauthorizedPeer,
+            });
+            continue;
+        }
+        if events
+            .send(Event::Connected(id, peer.session, queue))
+            .is_err()
+        {
+            break;
+        }
+        let reader = peer.reader;
+        let reader_events = events.clone();
+        if !spawn("prctr-helper-reader", move || {
+            read_messages(id, reader, &reader_events);
+        }) {
+            let _ = events.send(Event::Disconnected(id));
+        }
+    }
+}
+
+/// Verifies identities one at a time, off the hub thread.
+fn identify_processes(
+    identity: &Arc<dyn IdentitySource>,
+    jobs: &Receiver<(u64, u32, u64)>,
+    events: &SyncSender<Event>,
+) {
+    for (generation, pid, created) in jobs {
+        let identity = identity.identify(pid);
+        let event = Event::Identified {
+            generation,
+            pid,
+            created,
+            identity,
+        };
+        if events.send(event).is_err() {
+            return;
+        }
+    }
+}
+
+/// The hub's driver: delivers outputs to agent queues and identity jobs to the worker.
+struct Driver {
+    hub: Hub,
+    queues: BTreeMap<PeerId, SyncSender<HelperToAgent>>,
+    jobs: SyncSender<(u64, u32, u64)>,
+}
+
+impl Driver {
+    fn deliver(&mut self, outputs: Vec<Output>) {
+        let mut pending: std::collections::VecDeque<Output> = outputs.into();
+        while let Some(output) = pending.pop_front() {
+            match output {
+                Output::Send(peer, message) => {
+                    let stalled = self
+                        .queues
+                        .get(&peer)
+                        .is_some_and(|queue| queue.try_send(message).is_err());
+                    if stalled {
+                        self.queues.remove(&peer);
+                        self.hub.disconnected(peer);
+                    }
+                }
+                Output::Close(peer) => {
+                    self.queues.remove(&peer);
+                }
+                Output::Identify {
+                    generation,
+                    pid,
+                    created,
+                } => {
+                    if self.jobs.try_send((generation, pid, created)).is_err() {
+                        pending.extend(self.hub.identified(
+                            generation,
+                            pid,
+                            created,
+                            HelperIdentity::Unavailable,
+                        ));
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// Runs the helper until `Control::Stop`: accepts agents, authorizes each one, and drives the hub.
 pub fn serve(
     sources: Sources,
@@ -364,85 +688,123 @@ pub fn serve(
     controls: &Receiver<Control>,
     digest: &str,
 ) {
-    let (events, inbox) = mpsc::channel::<Event>();
+    let (events, inbox) = mpsc::sync_channel::<Event>(EVENT_QUEUE);
+    let (stop, stopped) = mpsc::channel::<Control>();
+    let stopping = Arc::new(AtomicBool::new(false));
     let accepting = {
-        let listener = Arc::clone(listener);
-        let peers = Arc::clone(peers);
-        let events = events.clone();
-        std::thread::spawn(move || {
-            let mut next: PeerId = 0;
-            while let Ok(peer) = listener.accept() {
-                next += 1;
-                let id = next;
-                let (queue, outbox) = mpsc::sync_channel::<HelperToAgent>(PEER_QUEUE);
-                let writer = peer.writer;
-                std::thread::spawn(move || write_messages(writer, &outbox));
-                if !peers.authorize(peer.pid) {
-                    let _ = queue.send(HelperToAgent::Refused {
-                        code: HelperRefusal::UnauthorizedPeer,
-                    });
-                    continue;
-                }
-                if events
-                    .send(Event::Connected(id, peer.session, queue))
-                    .is_err()
-                {
-                    break;
-                }
-                let reader = peer.reader;
-                let events = events.clone();
-                std::thread::spawn(move || read_messages(id, reader, &events));
-            }
-        })
+        let (listener, peers, events, stopping) = (
+            Arc::clone(listener),
+            Arc::clone(peers),
+            events.clone(),
+            Arc::clone(&stopping),
+        );
+        std::thread::Builder::new()
+            .name("prctr-helper-accept".into())
+            .spawn(move || accept_agents(&listener, &peers, &events, &stop, &stopping))
     };
-    let sink_events = events.clone();
-    let sink: Arc<dyn Fn(ProcessEvent) + Send + Sync> = Arc::new(move |event| {
-        let _ = sink_events.send(Event::Process(event));
-    });
-    let mut hub = Hub::new(sources, digest, sink);
-    let mut queues: BTreeMap<PeerId, SyncSender<HelperToAgent>> = BTreeMap::new();
-    loop {
-        while let Ok(control) = controls.try_recv() {
-            let _ = events.send(Event::Control(control));
-        }
-        let outputs = match inbox.recv_timeout(TICK) {
-            Ok(Event::Connected(peer, session, queue)) => {
-                queues.insert(peer, queue);
-                hub.connected(peer, session);
-                Vec::new()
-            }
-            Ok(Event::Message(peer, message)) => hub.message(peer, message),
-            Ok(Event::Disconnected(peer)) => {
-                queues.remove(&peer);
-                hub.disconnected(peer);
-                Vec::new()
-            }
-            Ok(Event::Process(event)) => hub.process(event),
-            Ok(Event::Control(Control::SessionChanged)) => hub.sessions_changed(),
-            Ok(Event::Control(Control::Stop)) | Err(RecvTimeoutError::Disconnected) => break,
-            Err(RecvTimeoutError::Timeout) => hub.tick(),
-        };
-        for output in outputs {
-            match output {
-                Output::Send(peer, message) => {
-                    let stalled = queues.get(&peer).is_some_and(|queue| {
-                        matches!(queue.try_send(message), Err(TrySendError::Full(_)))
-                    });
-                    if stalled {
-                        queues.remove(&peer);
-                        hub.disconnected(peer);
-                    }
-                }
-                Output::Close(peer) => {
-                    queues.remove(&peer);
-                }
-            }
-        }
-    }
-    drop(queues);
-    drop(hub);
+    let Ok(accepting) = accepting else {
+        return;
+    };
+    let (jobs, job_inbox) = mpsc::sync_channel::<(u64, u32, u64)>(IDENTIFY_QUEUE);
+    let identity = Arc::clone(&sources.identity);
+    let identify_events = events.clone();
+    let identifying = std::thread::Builder::new()
+        .name("prctr-helper-identity".into())
+        .spawn(move || identify_processes(&identity, &job_inbox, &identify_events))
+        .ok();
+    drive(
+        sources,
+        digest,
+        events,
+        &inbox,
+        &[controls, &stopped],
+        &stopping,
+        jobs,
+    );
+    // Closing the queue first fails any thread blocked on a full queue, so every join returns.
+    drop(inbox);
     listener.wake();
     let _ = accepting.join();
+    if let Some(identifying) = identifying {
+        let _ = identifying.join();
+    }
+}
+
+/// The hub thread's loop, until a stop control or every event sender is gone.
+fn drive(
+    sources: Sources,
+    digest: &str,
+    events: SyncSender<Event>,
+    inbox: &Receiver<Event>,
+    controls: &[&Receiver<Control>],
+    stopping: &AtomicBool,
+    jobs: SyncSender<(u64, u32, u64)>,
+) {
+    let overflowed = Arc::new(AtomicBool::new(false));
+    let sink_overflow = Arc::clone(&overflowed);
+    let sink_events = events.clone();
+    let sink: Arc<dyn Fn(u64, ProcessEvent) + Send + Sync> = Arc::new(move |generation, event| {
+        if let Err(TrySendError::Full(_)) = sink_events.try_send(Event::Process(generation, event))
+        {
+            sink_overflow.store(true, Ordering::Release);
+        }
+    });
+    drop(events);
+    let mut driver = Driver {
+        hub: Hub::new(sources, digest, sink),
+        queues: BTreeMap::new(),
+        jobs,
+    };
+    let mut next_tick = std::time::Instant::now() + TICK;
+    'serving: loop {
+        if std::time::Instant::now() >= next_tick {
+            let outputs = driver.hub.tick();
+            driver.deliver(outputs);
+            next_tick = std::time::Instant::now() + TICK;
+        }
+        for control in controls.iter().flat_map(|controls| controls.try_iter()) {
+            match control {
+                Control::Stop => break 'serving,
+                Control::SessionChanged => {
+                    let outputs = driver.hub.sessions_changed();
+                    driver.deliver(outputs);
+                }
+            }
+        }
+        if overflowed.swap(false, Ordering::AcqRel) {
+            let outputs = driver.hub.process(ProcessEvent::Lost);
+            driver.deliver(outputs);
+        }
+        let wait = next_tick
+            .saturating_duration_since(std::time::Instant::now())
+            .min(CONTROL_POLL);
+        let outputs = match inbox.recv_timeout(wait) {
+            Ok(Event::Connected(peer, session, queue)) => {
+                driver.queues.insert(peer, queue);
+                driver.hub.connected(peer, session);
+                Vec::new()
+            }
+            Ok(Event::Message(peer, message)) => driver.hub.message(peer, message),
+            Ok(Event::Disconnected(peer)) => {
+                driver.queues.remove(&peer);
+                driver.hub.disconnected(peer);
+                Vec::new()
+            }
+            Ok(Event::Process(generation, event)) => {
+                driver.hub.process_generation(generation, event)
+            }
+            Ok(Event::Identified {
+                generation,
+                pid,
+                created,
+                identity,
+            }) => driver.hub.identified(generation, pid, created, identity),
+            Err(RecvTimeoutError::Disconnected) => break,
+            Err(RecvTimeoutError::Timeout) => Vec::new(),
+        };
+        driver.deliver(outputs);
+    }
+    stopping.store(true, Ordering::Release);
 }
 
 #[cfg(test)]

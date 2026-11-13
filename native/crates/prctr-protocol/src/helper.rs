@@ -30,23 +30,35 @@ pub enum AgentToHelper {
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum HelperToAgent {
     /// The handshake succeeded.
-    Welcome { helper_version: CodeText },
+    Welcome {
+        helper_version: CodeText,
+    },
     /// The helper will not serve this connection; it closes it after this message.
-    Refused { code: HelperRefusal },
+    Refused {
+        code: HelperRefusal,
+    },
     /// Every process the agent may see, observed after the event stream started, so no process
     /// falls between the snapshot and the events that follow it.
-    ProcessSnapshot { processes: Vec<HelperProcess> },
-    ProcessStarted { process: HelperProcess },
+    ProcessSnapshot {
+        processes: Vec<HelperProcess>,
+    },
+    ProcessStarted {
+        process: HelperProcess,
+    },
     /// A process reported with a `pending` identity has been verified.
     ProcessIdentified {
         instance: Count,
         identity: HelperIdentity,
     },
-    ProcessExited { instance: Count },
+    ProcessExited {
+        instance: Count,
+    },
     /// The complete current session state, sent first and on every change.
     Sessions(HelperSessions),
     /// Events were lost: the helper follows with fresh snapshots of the affected streams.
-    Lost { reason: HelperLoss },
+    Lost {
+        reason: HelperLoss,
+    },
     /// Sent every second while subscribed, so a stalled helper is detected.
     Heartbeat,
 }

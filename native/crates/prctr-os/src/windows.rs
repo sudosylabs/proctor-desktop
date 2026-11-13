@@ -248,7 +248,7 @@ mod session {
     const MAX_SESSIONS: u32 = 1024;
 
     /// Queries one information class and hands the buffer to `read` before freeing it.
-    fn query<T>(
+    pub(super) fn query<T>(
         session: u32,
         class: WTS_INFO_CLASS,
         read: impl FnOnce(*const u8, u32) -> T,
@@ -272,7 +272,7 @@ mod session {
         Some(result)
     }
 
-    fn locked(session: u32) -> Option<bool> {
+    pub(super) fn locked(session: u32) -> Option<bool> {
         query(session, WTSSessionInfoEx, |buffer, bytes| {
             if buffer.is_null() || (bytes as usize) < size_of::<WTSINFOEXW>() {
                 return None;
@@ -1428,3 +1428,6 @@ pub fn suspended_ns() -> Option<u64> {
     let total = unsafe { QueryInterruptTime() };
     total.saturating_sub(awake).checked_mul(100)
 }
+
+pub mod helper;
+pub mod helper_pipe;

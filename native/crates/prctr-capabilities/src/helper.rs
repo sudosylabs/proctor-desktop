@@ -1,8 +1,8 @@
 //! The agent's side of the privileged helper: one connection shared by the process and session
 //! capabilities. It keeps a live view (processes, sessions) from the helper's messages and wakes
 //! each listening capability on every change. The connection itself comes from a platform
-//! [`HelperLink`] (named pipe on Windows, Unix socket on macOS), written separately; see
-//! `.scratch/native-rewrite/os-layer-spec.md`.
+//! [`HelperLink`] supplied by the platform modules: authenticated named pipes on Windows and
+//! a root-owned Unix socket on macOS.
 
 use std::collections::BTreeMap;
 use std::io::{self, Read, Write};
@@ -377,3 +377,8 @@ pub fn raw_identity(identity: &HelperIdentity) -> Option<prctr_os::RawIdentity> 
 #[cfg(test)]
 #[path = "helper_tests.rs"]
 mod tests;
+
+#[cfg(target_os = "macos")]
+pub mod macos;
+#[cfg(target_os = "windows")]
+pub mod windows;

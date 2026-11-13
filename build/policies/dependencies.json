@@ -11,6 +11,7 @@
     "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
     "BSD-2-Clause",
     "BSD-2-Clause OR Apache-2.0 OR MIT",
+    "BSD-2-Clause OR MIT OR Apache-2.0",
     "BSD-3-Clause",
     "BlueOak-1.0.0",
     "CC-BY-3.0",
@@ -135,7 +136,7 @@
           "targetScope": null
         }
       ],
-      "processes": ["native-build", "native-agent"],
+      "processes": ["native-build", "native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust serialization traits and derive macros; no native library or helper process.",
       "transitiveRisk": "Adds the exact locked serde core and derive macro graph; generated DTO validation still runs independently after conversion.",
@@ -210,7 +211,7 @@
           "targetScope": null
         }
       ],
-      "processes": ["native-agent", "build"],
+      "processes": ["native-agent", "build", "native-helper"],
       "networkBehavior": "None; all frames use private inherited process handles and are validated before nested allocation.",
       "nativeBehavior": "Pure Rust JSON encoding and decoding; ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Uses the exact locked itoa, memchr, serde_core, and zmij graph; fixed frame limits and generated protocol validation remain independent controls.",
@@ -288,7 +289,7 @@
           "targetScope": "cfg(target_os = \"linux\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None; the crate exposes platform C declarations only.",
       "nativeBehavior": "Links macOS system APIs already provided by the operating system and ships no helper or bundled native library.",
       "transitiveRisk": "No additional transitive runtime graph; the exact version is already locked by the native workspace.",
@@ -327,7 +328,7 @@
           "targetScope": null
         }
       ],
-      "processes": ["native-agent", "build"],
+      "processes": ["native-agent", "build", "native-helper"],
       "networkBehavior": "None; schema generation is in-process and deterministic.",
       "nativeBehavior": "Pure Rust derive and schema construction; no FFI and no build script beyond its derive macro crate.",
       "transitiveRisk": "Adds schemars_derive, serde_derive_internals, dyn-clone and ref-cast; exact versions are locked and license checked. Default features (including its preserve_order map) are disabled.",
@@ -357,7 +358,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None; process-local Objective-C calls.",
       "nativeBehavior": "Links the Objective-C runtime and the named system framework; calls are confined to prctr-os.",
       "transitiveRisk": "Adds objc2-foundation and block2 on macOS only; exact versions are locked and license checked.",
@@ -387,7 +388,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None; process-local Objective-C calls.",
       "nativeBehavior": "Links the Objective-C runtime and the named system framework; calls are confined to prctr-os.",
       "transitiveRisk": "Already present transitively through the objc2 framework crates; declaring it directly adds no new crate.",
@@ -411,13 +412,13 @@
           "manifest": "native/crates/prctr-os/Cargo.toml",
           "alias": "objc2-core-foundation",
           "kind": "production",
-          "features": ["CFArray", "CFDictionary", "CFNumber", "CFString", "std"],
+          "features": ["CFArray", "CFData", "CFURL", "CFDictionary", "CFNumber", "CFString", "std"],
           "defaultFeatures": false,
           "optional": false,
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None; CoreFoundation objects are process-local.",
       "nativeBehavior": "Links the system CoreFoundation framework; unsafe element access is confined to prctr-os with documented safety and checked downcasts.",
       "transitiveRisk": "Already present transitively through objc2-core-graphics; declaring it directly adds no new crate. Used under MIT.",
@@ -456,7 +457,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None; CoreGraphics queries are process-local.",
       "nativeBehavior": "Links the system CoreGraphics framework. Most selected functions are safe wrappers; the remaining unsafe calls are confined to prctr-os with documented safety.",
       "transitiveRisk": "Adds objc2, objc2-core-foundation, objc2-encode, bitflags and libc on macOS only; exact versions are locked and license checked. Used under MIT.",
@@ -486,7 +487,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Links the system AVFoundation framework; calls are confined to prctr-os.",
       "transitiveRisk": "Builds on objc2, objc2-foundation and block2; used under MIT.",
@@ -516,7 +517,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Links the system Foundation framework; calls are confined to prctr-os.",
       "transitiveRisk": "Already in the graph through objc2-app-kit; now declared directly.",
@@ -546,7 +547,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Creates blocks the system frameworks call; confined to prctr-os.",
       "transitiveRisk": "Already in the graph through the objc2 framework crates; now declared directly.",
@@ -606,7 +607,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Links libdispatch from the system; calls are confined to prctr-os.",
       "transitiveRisk": "Builds on objc2, already admitted.",
@@ -644,7 +645,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Links the system CoreMedia framework; calls are confined to prctr-os.",
       "transitiveRisk": "Builds on objc2-core-foundation and objc2-core-video.",
@@ -683,7 +684,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Links the system CoreVideo framework; calls are confined to prctr-os.",
       "transitiveRisk": "Builds on objc2-core-foundation.",
@@ -721,7 +722,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Links the system ScreenCaptureKit framework; needs the Screen Recording permission; calls are confined to prctr-os.",
       "transitiveRisk": "Builds on objc2, objc2-foundation, objc2-core-media, objc2-core-graphics, block2 and dispatch2.",
@@ -761,7 +762,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Links the system VideoToolbox framework; calls are confined to prctr-os.",
       "transitiveRisk": "Builds on objc2-core-foundation, objc2-core-media, objc2-core-video and block2.",
@@ -791,7 +792,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None; reads the local IORegistry only.",
       "nativeBehavior": "Links the system IOKit framework; calls are confined to prctr-os.",
       "transitiveRisk": "Builds on objc2-core-foundation and libc, already admitted; used under MIT.",
@@ -821,7 +822,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None.",
       "nativeBehavior": "Links the system Security framework; calls are confined to prctr-os.",
       "transitiveRisk": "Builds on objc2-core-foundation, already admitted; used under MIT.",
@@ -856,7 +857,7 @@
           "targetScope": "cfg(target_os = \"macos\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None; reads the local SystemConfiguration store only.",
       "nativeBehavior": "Links the system SystemConfiguration framework; calls are confined to prctr-os.",
       "transitiveRisk": "Builds on objc2-core-foundation, already admitted; used under MIT.",
@@ -889,6 +890,11 @@
             "Win32_Devices_DeviceAndDriverInstallation",
             "Win32_Devices_Display",
             "Win32_Foundation",
+            "Win32_Globalization",
+            "Win32_Security_WinTrust",
+            "Win32_Security_Cryptography_Catalog",
+            "Win32_Security_Cryptography_Sip",
+            "Win32_System_Diagnostics_Etw",
             "Win32_Graphics_Direct3D",
             "Win32_Graphics_Direct3D11",
             "Win32_Graphics_Dwm",
@@ -907,6 +913,8 @@
             "Win32_Security_Cryptography",
             "Win32_Storage_FileSystem",
             "Win32_System_Com",
+            "Win32_System_Console",
+            "Win32_System_Pipes",
             "Win32_System_Com_StructuredStorage",
             "Win32_System_DataExchange",
             "Win32_System_Diagnostics_ToolHelp",
@@ -930,9 +938,9 @@
           "targetScope": "cfg(target_os = \"windows\")"
         }
       ],
-      "processes": ["native-agent"],
+      "processes": ["native-agent", "native-helper"],
       "networkBehavior": "None; display configuration queries are process-local.",
-      "nativeBehavior": "Links user32, setupapi, kernel32, advapi32, winspool, d3d11, dxgi and mfplat for display, device, storage, print-job, media and screen-capture queries; storage devices are opened with no data access; unsafe calls are confined to prctr-os with documented safety.",
+      "nativeBehavior": "Links user32, setupapi, kernel32, advapi32, winspool, d3d11, dxgi and mfplat for display, device, storage, print-job, media and screen-capture queries; storage devices are opened with no data access; unsafe calls are confined to prctr-os with documented safety. In the privileged helper: Authenticode and catalog signature verification (WinTrust, CryptCATAdmin), the ETW session's loss counters, every session's WTS state, and named-pipe client and server process IDs for peer checks.",
       "transitiveRisk": "Adds windows-core, windows-link, windows-result, windows-strings and their companions on Windows only; exact versions are locked and license checked.",
       "bundleTreatment": "external-native",
       "localAlternative": "windows-sys gives raw declarations only; the windows crate adds typed results and safe defaults for the structures the agent reads.",
@@ -988,9 +996,27 @@
           "defaultFeatures": false,
           "optional": false,
           "targetScope": "cfg(target_os = \"windows\")"
+        },
+        {
+          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
+          "alias": "interprocess",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"windows\")"
+        },
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "interprocess",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"windows\")"
         }
       ],
-      "processes": ["native-helper"],
+      "processes": ["native-helper", "native-agent"],
       "networkBehavior": "None; a local named pipe only.",
       "nativeBehavior": "Creates and connects local named pipes; remote clients are refused.",
       "transitiveRisk": "Adds windows-sys, widestring, recvmsg and doctest-file; all permissively licensed.",
@@ -1018,9 +1044,18 @@
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os = \"windows\")"
+        },
+        {
+          "manifest": "native/crates/prctr-capabilities/Cargo.toml",
+          "alias": "windows-service",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"windows\")"
         }
       ],
-      "processes": ["native-helper"],
+      "processes": ["native-helper", "native-agent"],
       "networkBehavior": "None.",
       "nativeBehavior": "Registers the service control handler and reports status to the Service Control Manager.",
       "transitiveRisk": "Adds windows-sys, bitflags and widestring; all MIT or Apache-2.0.",
@@ -1728,6 +1763,96 @@
       "source": "https://www.npmjs.com/package/@electron-forge/cli",
       "license": "MIT",
       "lifecycleScripts": "none"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "endpoint-sec-sys",
+      "version": "0.6.2",
+      "kind": "production",
+      "purpose": "Public Endpoint Security NOTIFY event bindings inside the root helper.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/endpoint-sec-sys/0.6.2",
+      "license": "MIT OR Apache-2.0",
+      "lifecycleScripts": "none",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "endpoint-sec-sys",
+          "kind": "production",
+          "features": ["macos_13_0_0", "objc2"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-helper", "native-agent"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links EndpointSecurity; entitlement and Full Disk Access are required. Only passive NOTIFY subscriptions. Linked into the agent as well, through prctr-os, but only the helper daemon creates an Endpoint Security client; the agent has no entitlement and never calls it.",
+      "transitiveRisk": "Reuses block2/libc/objc2 and adds mach2 0.7.0 (BSD-2-Clause OR MIT OR Apache-2.0); no build script, network calls or runtime downloads.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Maintained versioned ES ABI bindings avoid hand-written unions and callback layouts.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "objc2-service-management",
+      "version": "0.3.2",
+      "kind": "production",
+      "purpose": "Setup-only launchd daemon registration and approval status through SMAppService.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/objc2-service-management/0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "lifecycleScripts": "none",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "objc2-service-management",
+          "kind": "production",
+          "features": ["SMAppService", "objc2", "objc2-foundation", "std"],
+          "defaultFeatures": false,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"macos\")"
+        }
+      ],
+      "processes": ["native-helper", "native-agent"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "Links ServiceManagement; registration occurs only on an explicit one-shot setup command.",
+      "transitiveRisk": "Reuses existing objc2/Foundation graph; no build script or network calls.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Public typed framework bindings avoid hand-written Objective-C messaging.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
+    },
+    {
+      "ecosystem": "cargo",
+      "package": "widestring",
+      "version": "1.2.1",
+      "kind": "production",
+      "purpose": "Create the fixed pipe security descriptor string for interprocess.",
+      "owner": "native-capabilities",
+      "source": "https://crates.io/crates/widestring/1.2.1",
+      "license": "MIT OR Apache-2.0",
+      "lifecycleScripts": "none",
+      "declarations": [
+        {
+          "manifest": "native/crates/prctr-helper/Cargo.toml",
+          "alias": "widestring",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"windows\")"
+        }
+      ],
+      "processes": ["native-helper"],
+      "networkBehavior": "None.",
+      "nativeBehavior": "UTF-16 allocation and validation only.",
+      "transitiveRisk": "Already locked transitively; no network, native code or build scripts.",
+      "bundleTreatment": "external-native",
+      "localAlternative": "Required string type for the admitted interprocess descriptor API.",
+      "updateOwner": "native-capabilities",
+      "removalOwner": "native-capabilities"
     }
   ]
 }

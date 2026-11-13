@@ -37,11 +37,18 @@ pub fn sources_and_window() -> (Vec<Box<dyn Source>>, candidate_window::WindowBo
     (all_sources(window), bounds)
 }
 
-/// The privileged helper this platform connects to, shared by the process and session
-/// capabilities. `None` until the platform's OS link exists (see
-/// `.scratch/native-rewrite/os-layer-spec.md`); the two capabilities then fall back to their
-/// unprivileged snapshot reads.
+/// One authenticated helper link shared by the process and session capabilities.
+#[allow(clippy::unnecessary_wraps)] // Linux has no privileged helper.
 fn platform_helper() -> Option<std::sync::Arc<helper::HelperClient>> {
+    #[cfg(target_os = "windows")]
+    return Some(helper::HelperClient::new(std::sync::Arc::new(
+        helper::windows::Link,
+    )));
+    #[cfg(target_os = "macos")]
+    return Some(helper::HelperClient::new(std::sync::Arc::new(
+        helper::macos::Link,
+    )));
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     None
 }
 
