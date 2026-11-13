@@ -307,3 +307,13 @@ fn macos_reports_the_same_number_of_displays_as_system_profiler() {
     });
     assert_eq!(summary_of(&first).connected_total, oracle);
 }
+
+/// Real OS: on Apple silicon every display is classified, so with mirroring known the topology is
+/// complete certainty.
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+#[test]
+fn apple_silicon_topology_is_complete() {
+    let observation = DisplaySource::new().current();
+    assert_eq!(observation.envelope.certainty, Certainty::Complete);
+    assert_eq!(summary_of(&observation).unknown_kind, 0);
+}

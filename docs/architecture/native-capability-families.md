@@ -73,9 +73,17 @@ or removed, activity, mirroring, kind, power, primary, certainty).
   specialization marks headsets. Wake-ups from display change, monitor arrival/removal and console
   display state.
 - macOS: the online display list (which includes mirrored and sleeping displays), built-in, mirror
-  and asleep queries, the reconfiguration callback, and IORegistry transport for wireless and
-  virtual targets. Wireless/virtual classification on Apple silicon must be proved before the
-  capability is called complete.
+  and asleep queries, and the reconfiguration callback.
+  - **Apple silicon:** every physical screen is driven through an `AppleCLCD2` framebuffer that
+    reports a hardware transport. Each display is paired with an unused framebuffer by EDID vendor,
+    product and serial (serial matches first). A paired display is physical and direct. An unpaired
+    one is virtual, which covers Sidecar, AirPlay and software displays; on macOS wireless targets
+    are reported as virtual. A display copying a real monitor's identity cannot pass as a second
+    screen, because each framebuffer pairs once. Checked on an M1 with one HDMI monitor (physical,
+    complete certainty). Sidecar, AirPlay and DisplayLink still need certification rigs.
+  - **Intel:** there are no such framebuffers, so external displays stay unclassified and certainty
+    is partial.
+  - EDID identities are compared in the agent and never sent.
 - Linux: DRM connectors in sysfs; partial where mirroring or virtual drivers cannot be confirmed.
 
 **Permission.** None.

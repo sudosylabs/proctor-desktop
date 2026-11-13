@@ -2,7 +2,8 @@
 
 use objc2_core_graphics::{
     CGDirectDisplayID, CGDisplayIsActive, CGDisplayIsAsleep, CGDisplayIsBuiltin, CGDisplayIsMain,
-    CGDisplayMirrorsDisplay, CGError, CGGetOnlineDisplayList,
+    CGDisplayMirrorsDisplay, CGDisplayModelNumber, CGDisplaySerialNumber, CGDisplayVendorNumber,
+    CGError, CGGetOnlineDisplayList,
 };
 
 use crate::{MAX_DISPLAYS, OsError, RawDisplay, RawKind, RawTopology};
@@ -12,9 +13,11 @@ const NULL_DISPLAY: CGDirectDisplayID = 0;
 
 /// Every online display, including mirrored and sleeping ones that the active list hides.
 ///
-/// CoreGraphics proves that a built-in panel is physical. It cannot reliably tell an external
-/// monitor from a virtual or wireless (`AirPlay`, `Sidecar`) target, so external displays are left
-/// unclassified until the `IORegistry` transport classification is proved.
+/// CoreGraphics proves that a built-in panel is physical. Other displays are classified by
+/// [`classify_external`] against the `IORegistry` framebuffers: on Apple silicon every physical
+/// screen is driven through a framebuffer with a hardware transport, so a display with none is a
+/// software or wireless target (`Sidecar`, `AirPlay`, a virtual display). Intel Macs have no such
+/// framebuffers, and their external displays stay unclassified.
 ///
 /// # Errors
 /// When CoreGraphics fails, or reports more than [`MAX_DISPLAYS`] displays.
@@ -38,7 +41,19 @@ pub fn online_displays() -> Result<RawTopology, OsError> {
             status: -1,
         });
     }
-    let displays = ids[..count]
+    let ids = &ids[..count];
+    let identities: Vec<EdidIdentity> = ids
+        .iter()
+        .filter(|&&id| !CGDisplayIsBuiltin(id))
+        .map(|&id| EdidIdentity {
+            vendor: CGDisplayVendorNumber(id),
+            product: CGDisplayModelNumber(id),
+            serial: CGDisplaySerialNumber(id),
+        })
+        .collect();
+    let mut external =
+        classify_external(&identities, framebuffers::framebuffers().as_deref()).into_iter();
+    let displays = ids
         .iter()
         .map(|&id| {
             let mirrored = CGDisplayMirrorsDisplay(id);
@@ -47,7 +62,7 @@ pub fn online_displays() -> Result<RawTopology, OsError> {
                 kind: if CGDisplayIsBuiltin(id) {
                     RawKind::BuiltIn
                 } else {
-                    RawKind::Unclassified
+                    external.next().unwrap_or(RawKind::Unclassified)
                 },
                 active: CGDisplayIsActive(id),
                 main: CGDisplayIsMain(id),
@@ -60,6 +75,223 @@ pub fn online_displays() -> Result<RawTopology, OsError> {
         displays,
         mirroring_known: true,
     })
+}
+
+/// A display's EDID identity: compared inside the agent to pair a CoreGraphics display with its
+/// framebuffer, and never sent. A serial of 0 is unknown.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct EdidIdentity {
+    pub vendor: u32,
+    pub product: u32,
+    pub serial: u32,
+}
+
+/// A framebuffer driving a screen, as the `IORegistry` describes it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Framebuffer {
+    pub identity: EdidIdentity,
+    /// The framebuffer reports a hardware transport (`DisplayPort`, HDMI, Thunderbolt).
+    pub transport: bool,
+}
+
+/// Classifies each non-built-in display, in order. A display paired with an unused framebuffer
+/// that has a hardware transport is external; one with no such framebuffer is virtual (software or
+/// wireless). Serial matches pair first, then vendor and product where a serial is unknown. Without
+/// any framebuffer information (`None`, Intel Macs) every display is unclassified.
+#[must_use]
+pub fn classify_external(
+    displays: &[EdidIdentity],
+    framebuffers: Option<&[Framebuffer]>,
+) -> Vec<RawKind> {
+    let Some(framebuffers) = framebuffers else {
+        return vec![RawKind::Unclassified; displays.len()];
+    };
+    let mut used = vec![false; framebuffers.len()];
+    let mut kinds = vec![RawKind::Virtual; displays.len()];
+    let same_screen = |display: &EdidIdentity, framebuffer: &Framebuffer| {
+        framebuffer.transport
+            && framebuffer.identity.vendor == display.vendor
+            && framebuffer.identity.product == display.product
+    };
+    for exact in [true, false] {
+        for (display, kind) in displays.iter().zip(kinds.iter_mut()) {
+            if *kind == RawKind::External {
+                continue;
+            }
+            let found = framebuffers
+                .iter()
+                .zip(used.iter_mut())
+                .find(|(framebuffer, used)| {
+                    !**used
+                        && same_screen(display, framebuffer)
+                        && if exact {
+                            display.serial != 0 && framebuffer.identity.serial == display.serial
+                        } else {
+                            display.serial == 0 || framebuffer.identity.serial == 0
+                        }
+                });
+            if let Some((_, used)) = found {
+                *used = true;
+                *kind = RawKind::External;
+            }
+        }
+    }
+    kinds
+}
+
+mod framebuffers {
+    use objc2_core_foundation::{CFDictionary, CFNumber, CFNumberType, CFString};
+
+    use super::iokit::{each_service, property};
+    use super::{EdidIdentity, Framebuffer};
+
+    fn dictionary<'a>(dictionary: &'a CFDictionary, key: &str) -> Option<&'a CFDictionary> {
+        super::window::value(dictionary, &CFString::from_str(key))?.downcast_ref::<CFDictionary>()
+    }
+
+    fn word(dictionary: &CFDictionary, key: &str) -> u32 {
+        let Some(number) = super::window::value(dictionary, &CFString::from_str(key))
+            .and_then(|value| value.downcast_ref::<CFNumber>())
+        else {
+            return 0;
+        };
+        let mut result = 0_i64;
+        // SAFETY: `result` is a valid `i64` for the 64-bit integer conversion CoreFoundation writes.
+        let converted = unsafe { number.value(CFNumberType::SInt64Type, (&raw mut result).cast()) };
+        if converted {
+            u32::try_from(result).unwrap_or(0)
+        } else {
+            0
+        }
+    }
+
+    /// The Apple silicon framebuffers that drive a screen; `None` when there are none at all (an
+    /// Intel Mac), so classification is impossible rather than "everything virtual".
+    pub(super) fn framebuffers() -> Option<Vec<Framebuffer>> {
+        let mut found = Vec::new();
+        let mut any = false;
+        each_service(c"AppleCLCD2", |service| {
+            any = true;
+            let attributes = property(service, "DisplayAttributes");
+            let Some(product) = attributes
+                .as_deref()
+                .and_then(|value| value.downcast_ref::<CFDictionary>())
+                .and_then(|attributes| dictionary(attributes, "ProductAttributes"))
+            else {
+                return;
+            };
+            let transport = property(service, "Transport").is_some_and(|value| {
+                value
+                    .downcast_ref::<CFDictionary>()
+                    .is_some_and(|transport| {
+                        super::window::value(transport, &CFString::from_str("Upstream")).is_some()
+                    })
+            });
+            found.push(Framebuffer {
+                identity: EdidIdentity {
+                    vendor: word(product, "LegacyManufacturerID"),
+                    product: word(product, "ProductID"),
+                    serial: word(product, "SerialNumber"),
+                },
+                transport,
+            });
+        })?;
+        any.then_some(found)
+    }
+}
+
+#[cfg(test)]
+mod classification_tests {
+    use super::*;
+
+    const DELL: EdidIdentity = EdidIdentity {
+        vendor: 4268,
+        product: 17028,
+        serial: 77,
+    };
+
+    fn wired(identity: EdidIdentity) -> Framebuffer {
+        Framebuffer {
+            identity,
+            transport: true,
+        }
+    }
+
+    #[test]
+    fn a_display_with_a_wired_framebuffer_is_external_and_one_without_is_virtual() {
+        let sidecar = EdidIdentity {
+            vendor: 1552,
+            product: 1,
+            serial: 0,
+        };
+        assert_eq!(
+            classify_external(&[DELL, sidecar], Some(&[wired(DELL)])),
+            vec![RawKind::External, RawKind::Virtual]
+        );
+    }
+
+    #[test]
+    fn two_identical_monitors_need_two_framebuffers() {
+        let twin = EdidIdentity { serial: 0, ..DELL };
+        assert_eq!(
+            classify_external(&[twin, twin], Some(&[wired(twin)])),
+            vec![RawKind::External, RawKind::Virtual],
+            "a virtual display copying a real monitor's identity does not pass as a second one"
+        );
+        assert_eq!(
+            classify_external(&[twin, twin], Some(&[wired(twin), wired(twin)])),
+            vec![RawKind::External, RawKind::External]
+        );
+    }
+
+    #[test]
+    fn serials_pair_first_so_an_unknown_serial_cannot_take_another_screen() {
+        let other = EdidIdentity { serial: 88, ..DELL };
+        let unknown = EdidIdentity { serial: 0, ..DELL };
+        assert_eq!(
+            classify_external(&[unknown, other], Some(&[wired(other), wired(DELL)])),
+            vec![RawKind::External, RawKind::External]
+        );
+    }
+
+    #[test]
+    fn a_framebuffer_without_a_transport_proves_nothing() {
+        let unwired = Framebuffer {
+            identity: DELL,
+            transport: false,
+        };
+        assert_eq!(
+            classify_external(&[DELL], Some(&[unwired])),
+            vec![RawKind::Virtual]
+        );
+    }
+
+    #[test]
+    fn without_framebuffer_information_displays_stay_unclassified() {
+        assert_eq!(
+            classify_external(&[DELL], None),
+            vec![RawKind::Unclassified]
+        );
+    }
+
+    /// Real OS: every online display on this Apple silicon Mac is classified.
+    #[cfg(target_arch = "aarch64")]
+    #[test]
+    fn this_macs_displays_are_all_classified() {
+        let topology = online_displays().expect("reads displays");
+        assert!(
+            topology
+                .displays
+                .iter()
+                .all(|display| display.kind != RawKind::Unclassified),
+            "{:?}",
+            topology
+                .displays
+                .iter()
+                .map(|display| display.kind)
+                .collect::<Vec<_>>()
+        );
+    }
 }
 
 mod window {
@@ -456,28 +688,22 @@ pub fn is_apple_hardware_model(model: &str) -> bool {
     })
 }
 
-mod storage {
-    use std::collections::BTreeMap;
+mod iokit {
     use std::ffi::{CStr, c_char};
 
-    use objc2_core_foundation::{
-        CFBoolean, CFDictionary, CFNumber, CFNumberType, CFRetained, CFString, CFType,
-    };
+    use objc2_core_foundation::{CFBoolean, CFNumber, CFNumberType, CFRetained, CFString, CFType};
     use objc2_io_kit::{
-        IOIteratorNext, IOObjectConformsTo, IOObjectRelease, IORegistryEntryCreateCFProperty,
-        IORegistryEntryGetParentEntry, IORegistryEntrySearchCFProperty,
-        IOServiceGetMatchingServices, IOServiceMatching, io_object_t, kIOMainPortDefault,
-        kIORegistryIterateParents, kIORegistryIterateRecursively,
+        IOIteratorNext, IOObjectRelease, IORegistryEntryCreateCFProperty,
+        IORegistryEntrySearchCFProperty, IOServiceGetMatchingServices, IOServiceMatching,
+        io_object_t, kIOMainPortDefault, kIORegistryIterateParents, kIORegistryIterateRecursively,
     };
 
-    use crate::{RawStorageDevice, RawStorageKind, RawTransport, fingerprint};
+    use objc2_core_foundation::CFDictionary;
 
-    const MAX_ENTRIES: usize = 512;
-    /// The USB interface class for still-image devices: phones and cameras (PTP, often with MTP).
-    const STILL_IMAGE_CLASS: f64 = 6.0;
+    pub(super) const MAX_ENTRIES: usize = 512;
 
     /// An `IOKit` name buffer (`io_name_t`) holding `name`.
-    fn name_buffer(name: &CStr) -> [c_char; 128] {
+    pub(super) fn name_buffer(name: &CStr) -> [c_char; 128] {
         let mut buffer = [0 as c_char; 128];
         for (slot, byte) in buffer.iter_mut().zip(name.to_bytes().iter().take(127)) {
             *slot = c_char::from_ne_bytes([*byte]);
@@ -486,7 +712,7 @@ mod storage {
     }
 
     /// Visits every registered service of `class`; each is released after `visit` returns.
-    fn each_service(class: &CStr, mut visit: impl FnMut(io_object_t)) -> Option<()> {
+    pub(super) fn each_service(class: &CStr, mut visit: impl FnMut(io_object_t)) -> Option<()> {
         // SAFETY: `class` is a NUL-terminated IOKit class name.
         let matching = unsafe { IOServiceMatching(class.as_ptr()) }?;
         // The call consumes one reference: hand it a dictionary reference of its own.
@@ -512,14 +738,14 @@ mod storage {
         Some(())
     }
 
-    fn property(service: io_object_t, key: &str) -> Option<CFRetained<CFType>> {
+    pub(super) fn property(service: io_object_t, key: &str) -> Option<CFRetained<CFType>> {
         let key = CFString::from_str(key);
         // SAFETY: `service` is a live registry entry and `key` a valid CFString.
         unsafe { IORegistryEntryCreateCFProperty(service, Some(&key), None, 0) }
     }
 
     /// Reads `key` from the entry or its nearest ancestor in the service plane.
-    fn inherited(service: io_object_t, key: &str) -> Option<CFRetained<CFType>> {
+    pub(super) fn inherited(service: io_object_t, key: &str) -> Option<CFRetained<CFType>> {
         let key = CFString::from_str(key);
         let mut plane = name_buffer(c"IOService");
         // SAFETY: `service` is a live registry entry, `plane` names the service plane and stays
@@ -534,6 +760,41 @@ mod storage {
             )
         }
     }
+
+    pub(super) fn boolean(value: Option<CFRetained<CFType>>) -> Option<bool> {
+        value?.downcast_ref::<CFBoolean>().map(CFBoolean::as_bool)
+    }
+
+    pub(super) fn text(value: Option<&CFType>) -> Option<String> {
+        value?.downcast_ref::<CFString>().map(ToString::to_string)
+    }
+
+    pub(super) fn number(value: Option<CFRetained<CFType>>) -> Option<f64> {
+        let value = value?;
+        let number = value.downcast_ref::<CFNumber>()?;
+        let mut result = 0.0_f64;
+        // SAFETY: `result` is a valid `f64` for the double conversion CoreFoundation writes.
+        let converted = unsafe { number.value(CFNumberType::DoubleType, (&raw mut result).cast()) };
+        converted.then_some(result)
+    }
+}
+
+mod storage {
+    use std::collections::BTreeMap;
+    use std::ffi::CStr;
+
+    use objc2_core_foundation::{CFDictionary, CFString};
+    use objc2_io_kit::{
+        IOObjectConformsTo, IOObjectRelease, IORegistryEntryGetParentEntry, io_object_t,
+    };
+
+    use super::iokit::{
+        MAX_ENTRIES, boolean, each_service, inherited, name_buffer, number, property, text,
+    };
+    use crate::{RawStorageDevice, RawStorageKind, RawTransport, fingerprint};
+
+    /// The USB interface class for still-image devices: phones and cameras (PTP, often with MTP).
+    const STILL_IMAGE_CLASS: f64 = 6.0;
 
     /// Whether the entry's provider is a block-storage driver: true for a physical disk, false for
     /// a disk synthesized on top of another (an APFS container), which would count a device twice.
@@ -553,23 +814,6 @@ mod storage {
         let conforms = unsafe { IOObjectConformsTo(parent, (&raw mut class).cast()) };
         IOObjectRelease(parent);
         conforms
-    }
-
-    fn boolean(value: Option<CFRetained<CFType>>) -> Option<bool> {
-        value?.downcast_ref::<CFBoolean>().map(CFBoolean::as_bool)
-    }
-
-    fn text(value: Option<&CFType>) -> Option<String> {
-        value?.downcast_ref::<CFString>().map(ToString::to_string)
-    }
-
-    fn number(value: Option<CFRetained<CFType>>) -> Option<f64> {
-        let value = value?;
-        let number = value.downcast_ref::<CFNumber>()?;
-        let mut result = 0.0_f64;
-        // SAFETY: `result` is a valid `f64` for the double conversion CoreFoundation writes.
-        let converted = unsafe { number.value(CFNumberType::DoubleType, (&raw mut result).cast()) };
-        converted.then_some(result)
     }
 
     /// The whole-disk BSD names (`diskN`) that have a mounted file system.
