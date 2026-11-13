@@ -6541,6 +6541,7 @@ export interface components {
             readonly pending_invitations_is_lower_bound?: boolean;
         };
         readonly AdmittedSecurity: {
+            /** @description The native delivery stream this admission opened. Desktop sends it as the security control's stream_id and as the native delivery watermark's source_id. */
             readonly delivery_stream_id: string;
             /** Format: int64 */
             readonly generation: number;
@@ -19420,7 +19421,12 @@ export interface operations {
             };
             readonly cookie?: never;
         };
-        readonly requestBody?: never;
+        /** @description The chunk's raw bytes, exactly the size the declared upload gives that chunk: 8 MiB (8388608 bytes) for every chunk but the last. */
+        readonly requestBody: {
+            readonly content: {
+                readonly "application/octet-stream": Uint8Array;
+            };
+        };
         readonly responses: {
             readonly 200: components["responses"]["ScreenClipChunkOK"];
             readonly 400: components["responses"]["BadRequest"];

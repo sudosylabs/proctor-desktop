@@ -132,8 +132,11 @@ export interface components {
             readonly lease_expires_at: components["schemas"]["instant"];
             readonly live_corrections: readonly Record<string, never>[];
             readonly participation_id: components["schemas"]["id"];
-            /** @description How often to send exam_attempt.renew. */
-            readonly renewal_interval_seconds: number;
+            /**
+             * @description How often to send exam_attempt.renew, in seconds. The same value as AdmittedSecurity.renewal_interval_seconds.
+             * @constant
+             */
+            readonly renewal_interval_seconds: 5;
             /** @description The connect repeated an earlier one with the same idempotency key. */
             readonly replayed: boolean;
             /** @description Exactly the OpenAPI component AdmittedSecurity. The immutable admitted binding receipt, including the effective native policy. */
@@ -587,10 +590,12 @@ export interface components {
                 readonly allocated_through_sequence: number;
                 /** @enum {string} */
                 readonly family: "native" | "browser";
+                /** @description For the native family, the admitted delivery_stream_id; for a Browser source, that source's ID. */
                 readonly source_id: string;
             }[];
             readonly policy_digest: string;
             readonly security_session_id: string;
+            /** @description The admitted native delivery stream: exactly AdmittedSecurity.delivery_stream_id from the connect reply. A control naming another stream is refused. */
             readonly stream_id: string;
         };
         /**

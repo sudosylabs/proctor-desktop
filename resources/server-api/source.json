@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "Proctor Server",
-  "revision": "9fa5b153",
-  "sha256": "983ca4e92dba5ed8ef28fdb159f986a5335d6ed3581891b52b502e7338e5be1a",
-  "asyncapiSha256": "2c1fb251f792fedd13255817d40c0e6cdcdf1380d6f461d8290cccff966dc1b2"
+  "revision": "7eaed332",
+  "sha256": "0b9b735f917b5cec362864da6258220cf60f652cedda78f15cbb7cac07df7aee",
+  "asyncapiSha256": "6b376fd29e9a34f227a733096a8e9422dd414a2ee9630edd594556a3414c0df2"
 }

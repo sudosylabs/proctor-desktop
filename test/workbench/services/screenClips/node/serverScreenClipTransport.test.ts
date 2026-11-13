@@ -5,6 +5,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
+import { encodeRequest } from '../../../../../src/prctr/platform/serverApi/node/requestEncoding.ts';
 import type { SessionApi } from '../../../../../src/prctr/platform/serverApi/node/sessionApi.ts';
 import {
 	ServerScreenClipTransport,
@@ -102,4 +103,14 @@ void test('a chunk is sent as the raw request body with its index from 1', async
 	});
 	assert.equal(seen[0]?.input['mediaType'], 'application/octet-stream');
 	assert.equal(seen[0]?.input['body'], bytes);
+});
+
+void test('the packaged contract accepts a chunk as a raw octet-stream body', () => {
+	const request = encodeRequest('https://example.edu', 'uploadCandidateScreenClipChunk', {
+		path: { exam_attempt_id: ATTEMPT, screen_clip_id: 'ybndrfg8ejkmcpqxot1uwisza4', chunk: 1 },
+		mediaType: 'application/octet-stream',
+		body: new Uint8Array([1, 2, 3])
+	});
+	assert.equal(request.method, 'PUT');
+	assert.equal(request.headers?.['Content-Type'], 'application/octet-stream');
 });

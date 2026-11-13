@@ -81,14 +81,12 @@ export class ServerScreenClipTransport implements ScreenClipTransport {
 	}
 
 	public async putChunk(clipId: string, index: number, bytes: Uint8Array): Promise<void> {
-		// The route takes the chunk as the raw request body. The imported OpenAPI does not declare
-		// that body yet, so the typed client refuses it until the server's contract does.
 		const result = await this.api.request('uploadCandidateScreenClipChunk', {
 			path: { exam_attempt_id: this.attemptId, screen_clip_id: clipId, chunk: index },
 			header: this.optional(),
 			mediaType: 'application/octet-stream',
 			body: bytes
-		} as Parameters<SessionApi['request']>[1]);
+		});
 		if (result.status !== 200) throw new ServerApiError('server', { status: result.status });
 	}
 
