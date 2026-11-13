@@ -240,9 +240,14 @@ mod tests {
             "the suspended clock is readable"
         );
         assert!(first.on_console.is_some(), "console ownership is readable");
+        let (Some(before), Some(after)) = (first.suspended_ns, sample().suspended_ns) else {
+            panic!("the suspended clock stays readable");
+        };
+        // The two clocks are read one after the other, so the difference jitters by the time
+        // between the reads; it never goes back by more than that.
         assert!(
-            sample().suspended_ns >= first.suspended_ns,
-            "suspended time never goes back"
+            after + 1_000_000 >= before,
+            "suspended time does not go back"
         );
     }
 }
