@@ -21,16 +21,17 @@ use windows::Win32::Graphics::Gdi::{
     GetMonitorInfoW, MONITOR_DEFAULTTOPRIMARY, MONITORINFO, MonitorFromPoint,
 };
 use windows::Win32::Media::MediaFoundation::{
-    CODECAPI_AVEncMPVDefaultBPictureCount, CODECAPI_AVEncVideoForceKeyFrame,
-    CODECAPI_AVLowLatencyMode, ICodecAPI, IMFActivate, IMFMediaType, IMFSample, IMFTransform,
-    MF_E_TRANSFORM_NEED_MORE_INPUT, MF_E_TRANSFORM_STREAM_CHANGE, MF_MT_AVG_BITRATE,
-    MF_MT_FRAME_RATE, MF_MT_FRAME_SIZE, MF_MT_INTERLACE_MODE, MF_MT_MAJOR_TYPE,
-    MF_MT_MPEG2_PROFILE, MF_MT_PIXEL_ASPECT_RATIO, MF_MT_SUBTYPE, MF_VERSION, MFCreateMediaType,
-    MFCreateMemoryBuffer, MFCreateSample, MFMediaType_Video, MFSTARTUP_FULL, MFStartup,
-    MFT_CATEGORY_VIDEO_ENCODER, MFT_ENUM_FLAG_SORTANDFILTER, MFT_ENUM_FLAG_SYNCMFT,
-    MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, MFT_MESSAGE_NOTIFY_START_OF_STREAM, MFT_OUTPUT_DATA_BUFFER,
-    MFT_OUTPUT_STREAM_PROVIDES_SAMPLES, MFT_REGISTER_TYPE_INFO, MFTEnumEx, MFVideoFormat_H264,
-    MFVideoFormat_NV12, MFVideoInterlace_Progressive, eAVEncH264VProfile_Main,
+    CODECAPI_AVEncMPVDefaultBPictureCount, CODECAPI_AVEncMPVGOPSize,
+    CODECAPI_AVEncVideoForceKeyFrame, CODECAPI_AVLowLatencyMode, ICodecAPI, IMFActivate,
+    IMFMediaType, IMFSample, IMFTransform, MF_E_TRANSFORM_NEED_MORE_INPUT,
+    MF_E_TRANSFORM_STREAM_CHANGE, MF_MT_AVG_BITRATE, MF_MT_FRAME_RATE, MF_MT_FRAME_SIZE,
+    MF_MT_INTERLACE_MODE, MF_MT_MAJOR_TYPE, MF_MT_MPEG2_PROFILE, MF_MT_PIXEL_ASPECT_RATIO,
+    MF_MT_SUBTYPE, MF_VERSION, MFCreateMediaType, MFCreateMemoryBuffer, MFCreateSample,
+    MFMediaType_Video, MFSTARTUP_FULL, MFStartup, MFT_CATEGORY_VIDEO_ENCODER,
+    MFT_ENUM_FLAG_SORTANDFILTER, MFT_ENUM_FLAG_SYNCMFT, MFT_MESSAGE_NOTIFY_BEGIN_STREAMING,
+    MFT_MESSAGE_NOTIFY_START_OF_STREAM, MFT_OUTPUT_DATA_BUFFER, MFT_OUTPUT_STREAM_PROVIDES_SAMPLES,
+    MFT_REGISTER_TYPE_INFO, MFTEnumEx, MFVideoFormat_H264, MFVideoFormat_NV12,
+    MFVideoInterlace_Progressive, eAVEncH264VProfile_Main,
 };
 use windows::Win32::System::Com::CoTaskMemFree;
 use windows::Win32::System::Variant::VARIANT;
@@ -334,6 +335,27 @@ impl H264Mft {
             unsafe { CoTaskMemFree(Some(activates.cast())) };
         }
         let transform = transform?;
+        // The encoder reads these when its media types are set, so they come first. Low latency
+        // and no B-frames make output follow input frame by frame; the GOP is long because the
+        // recorder forces a keyframe at each segment.
+        let codec: Option<ICodecAPI> = transform.cast().ok();
+        if let Some(codec) = &codec {
+            let low_latency = VARIANT::from(true);
+            let no_b_frames = VARIANT::from(0_u32);
+            let gop = VARIANT::from(fps.max(1) * 4);
+            // SAFETY: the values are plain variants for documented codec properties; an encoder
+            // that ignores one still works.
+            let _ = unsafe { codec.SetValue(&CODECAPI_AVLowLatencyMode, &raw const low_latency) };
+            // SAFETY: as above.
+            let _ = unsafe {
+                codec.SetValue(
+                    &CODECAPI_AVEncMPVDefaultBPictureCount,
+                    &raw const no_b_frames,
+                )
+            };
+            // SAFETY: as above.
+            let _ = unsafe { codec.SetValue(&CODECAPI_AVEncMPVGOPSize, &raw const gop) };
+        }
         let output_type = media_type(MFVideoFormat_H264, width, height, fps).ok()?;
         // SAFETY: plain attribute setters on the new type.
         unsafe { output_type.SetUINT32(&MF_MT_AVG_BITRATE, bit_rate) }.ok()?;
@@ -350,20 +372,6 @@ impl H264Mft {
         let input_type = media_type(MFVideoFormat_NV12, width, height, fps).ok()?;
         // SAFETY: as above.
         unsafe { transform.SetInputType(0, &input_type, 0) }.ok()?;
-        let codec: Option<ICodecAPI> = transform.cast().ok();
-        if let Some(codec) = &codec {
-            let (low_latency, no_b_frames) = (VARIANT::from(true), VARIANT::from(0_u32));
-            // SAFETY: the values are plain variants for documented codec properties; an encoder
-            // that ignores one still works.
-            let _ = unsafe { codec.SetValue(&CODECAPI_AVLowLatencyMode, &raw const low_latency) };
-            // SAFETY: as above.
-            let _ = unsafe {
-                codec.SetValue(
-                    &CODECAPI_AVEncMPVDefaultBPictureCount,
-                    &raw const no_b_frames,
-                )
-            };
-        }
         // SAFETY: streaming messages take no data.
         unsafe { transform.ProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, 0) }.ok()?;
         // SAFETY: as above.

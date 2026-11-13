@@ -342,7 +342,7 @@ mod real_os {
     use crate::recorder::{Disposition, Recorder, RecorderConfig, RecorderEvent};
 
     #[test]
-    fn this_mac_records_a_clip_with_keyframe_segments_and_the_placeholder() {
+    fn this_machine_records_a_clip_with_keyframe_segments_and_the_placeholder() {
         if std::env::var_os("PRCTR_ALLOW_SCREEN_CAPTURE").is_none() {
             return;
         }
