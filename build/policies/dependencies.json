@@ -13,7 +13,9 @@
     "BSD-2-Clause OR Apache-2.0 OR MIT",
     "BSD-3-Clause",
     "BlueOak-1.0.0",
+    "CC-BY-3.0",
     "CC-BY-4.0",
+    "CC0-1.0",
     "ISC",
     "MIT",
     "MIT OR Apache-2.0",
@@ -1716,6 +1718,16 @@
       "localAlternative": "Electron offers vibrancy but no Liquid Glass API; writing the AppKit bridge again would duplicate this package.",
       "updateOwner": "design-system",
       "removalOwner": "design-system"
+    },
+    {
+      "package": "@electron-forge/cli",
+      "version": "7.11.2",
+      "kind": "development",
+      "purpose": "Package the Electron app for release: ASAR assembly with the signed native helpers unpacked, platform packaging, and signing and notarization hooks. Proctor's own esbuild output is the input; Forge has no bundler plugin.",
+      "owner": "toolchain",
+      "source": "https://www.npmjs.com/package/@electron-forge/cli",
+      "license": "MIT",
+      "lifecycleScripts": "none"
     }
   ]
 }
