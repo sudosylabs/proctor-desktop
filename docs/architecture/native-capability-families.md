@@ -233,19 +233,34 @@ contains.
 ## Printing
 
 **Purpose.** Whether a job attributed to the candidate appears in the OS print scheduler, and
-whether the CandidateWindow blocked a print command. "No physical printing" is never claimed.
+whether the CandidateWindow blocked a print command. "No physical printing" is never claimed:
+printing that bypasses the local scheduler is not seen.
 
-**State.** `coverage`, `certainty`, `candidate_jobs`, `other_jobs`, `unknown_jobs`.
+**State.** `coverage` (monitored_scheduler, snapshot_only, unavailable); the active jobs by owner,
+`candidate_jobs`, `other_jobs` and `unknown_jobs`; `candidate_jobs_since_start`, the candidate jobs
+the scheduler accepted since observation started, finished ones included, so a job that printed
+between two reads is still seen; and `blocked_print_commands`. A query outside an observation is a
+snapshot: partial certainty and no since-start count. An unanswered scheduler is unavailable and has
+no job counts, never zero.
 
-**Changes.** `jobs_changed`; `candidate_print_blocked` (count, from Electron main's closed
-print-command denial).
+**Changes.** `jobs_changed` when the active counts change; `candidate_print_blocked` when Electron
+main reports a refused print command with the host event `{ "print_blocked": {} }`.
 
-**Platforms.** Windows: spooler notifications for owner and status only, the owner reduced to
-candidate/other at once and its buffer cleared. macOS and Linux: a bounded IPP query of not-completed
-jobs with owner and state only, plus an IPP notification subscription.
+**Summary.** `candidate_jobs` and `unknown_jobs`. A job queued before the exam is active but not new:
+it blocks the overview without counting in `candidate_jobs_since_start`.
 
-**Never leaves the agent.** Printer names, document names, job IDs, usernames. A job queued before
-the exam blocks the overview without creating an occurrence. Proctor never cancels a job.
+**Platforms.**
+
+- **Windows:** spooler change notifications on the local print server for job owner and status
+  only. Each owner is compared with the candidate's account as it arrives and never kept. Discarded
+  notifications are re-read in full and reported as a gap.
+- **macOS and Linux:** one IPP `Get-Jobs` request a second over the local CUPS socket, for job
+  number, state and owner only. Proctor does not link libcups. CUPS keeps finished jobs in its
+  history, so the complete job list is a monitored scheduler; a list cut at 1,000 jobs is partial.
+  Owners hidden by the CUPS privacy policy are `unknown`.
+
+**Never leaves the agent.** Printer names, document names, job numbers, user names. Proctor never
+cancels a job.
 
 ## Removable and portable storage
 

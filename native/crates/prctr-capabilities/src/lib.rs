@@ -8,6 +8,7 @@ pub mod display;
 pub mod interactive_session;
 pub mod network;
 mod poller;
+pub mod printing;
 pub mod removable_storage;
 pub mod virtualization;
 
@@ -25,6 +26,7 @@ pub fn sources() -> Vec<Box<dyn Source>> {
         Box::new(virtualization::VirtualizationSource),
         Box::new(network::NetworkSource::new()),
         Box::new(removable_storage::RemovableStorageSource::new()),
+        Box::new(printing::PrintingSource::new()),
     ]
 }
 
@@ -40,6 +42,7 @@ pub fn registry() -> Registry {
             virtualization::descriptor(),
             network::descriptor(),
             removable_storage::descriptor(),
+            printing::descriptor(),
         ],
         baseline_rules: vec![
             display::baseline_rule(),
@@ -84,6 +87,10 @@ pub fn registry_json() -> Value {
             removable_storage::CAPABILITY: {
                 "state": schema(schemars::schema_for!(removable_storage::StorageState)),
                 "summary": schema(schemars::schema_for!(removable_storage::StorageSummary)),
+            },
+            printing::CAPABILITY: {
+                "state": schema(schemars::schema_for!(printing::PrintState)),
+                "summary": schema(schemars::schema_for!(printing::PrintSummary)),
             }
         }
     })

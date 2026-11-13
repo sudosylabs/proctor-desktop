@@ -9,6 +9,8 @@
 
 use std::fmt;
 
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+pub mod cups;
 #[cfg(target_os = "linux")]
 pub mod linux;
 #[cfg(target_os = "macos")]
@@ -298,6 +300,26 @@ pub struct RawStorageDevice {
     pub mounted: Option<bool>,
     /// Whether the media accepts writes; `None` when the OS does not say.
     pub writable: Option<bool>,
+}
+
+/// Who owns a print job, reduced at once from the scheduler's user name, which is never kept.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum RawJobOwner {
+    /// The account the agent runs as: the candidate.
+    Candidate,
+    Other,
+    /// The scheduler did not state an owner.
+    Unknown,
+}
+
+/// One job the print scheduler knows, active or finished. `id` is the scheduler's job number,
+/// compared inside the agent to tell new jobs from old ones and never sent.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct RawPrintJob {
+    pub id: u32,
+    pub owner: RawJobOwner,
+    /// Pending, held, processing or stopped; false once completed, cancelled or aborted.
+    pub active: bool,
 }
 
 /// The whole-disk name of a BSD device path: `/dev/disk4s1` and `disk4` are both `disk4`.

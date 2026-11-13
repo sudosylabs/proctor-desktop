@@ -722,3 +722,298 @@ mod storage {
 }
 
 pub use storage::{block_devices, portable_devices};
+
+mod printing {
+    use std::collections::BTreeMap;
+    use std::time::Duration;
+
+    use windows::Win32::Foundation::{HANDLE, INVALID_HANDLE_VALUE, WAIT_OBJECT_0};
+    use windows::Win32::Graphics::Printing::{
+        ClosePrinter, FindClosePrinterChangeNotification, FindFirstPrinterChangeNotification,
+        FindNextPrinterChangeNotification, FreePrinterNotifyInfo, JOB_NOTIFY_FIELD_STATUS,
+        JOB_NOTIFY_FIELD_USER_NAME, JOB_NOTIFY_TYPE, JOB_STATUS_COMPLETE, JOB_STATUS_DELETED,
+        JOB_STATUS_DELETING, JOB_STATUS_PRINTED, OpenPrinterW, PRINTER_CHANGE_JOB, PRINTER_HANDLE,
+        PRINTER_NOTIFY_INFO, PRINTER_NOTIFY_INFO_DATA, PRINTER_NOTIFY_INFO_DISCARDED,
+        PRINTER_NOTIFY_OPTIONS, PRINTER_NOTIFY_OPTIONS_REFRESH, PRINTER_NOTIFY_OPTIONS_TYPE,
+    };
+    use windows::Win32::System::Threading::WaitForSingleObject;
+    use windows::Win32::System::WindowsProgramming::GetUserNameW;
+    use windows::core::{PCWSTR, PWSTR};
+
+    use crate::{RawJobOwner, RawPrintJob};
+
+    /// The most jobs remembered, finished ones included; the oldest finished jobs go first.
+    pub const MAX_JOBS: usize = 1_000;
+    const FINISHED: u32 =
+        JOB_STATUS_COMPLETE | JOB_STATUS_DELETED | JOB_STATUS_DELETING | JOB_STATUS_PRINTED;
+
+    /// What one wait observed.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub enum Watched {
+        Changed,
+        Quiet,
+        /// The spooler discarded notifications; the jobs were re-read in full.
+        Lost,
+        Failed,
+    }
+
+    #[derive(Clone, Copy, Default)]
+    struct Job {
+        owner: Option<bool>,
+        status: Option<u32>,
+    }
+
+    /// The local spooler's job notifications, carrying only each job's owner and status. The owner
+    /// is compared with the candidate's account as it arrives and never kept.
+    pub struct JobWatch {
+        server: PRINTER_HANDLE,
+        change: HANDLE,
+        fields: [u16; 2],
+        user: Vec<u16>,
+        jobs: BTreeMap<u32, Job>,
+    }
+
+    // SAFETY: the spooler handles may be used from any thread; the watch is moved to its own
+    // thread and used only there.
+    unsafe impl Send for JobWatch {}
+
+    fn current_user() -> Option<Vec<u16>> {
+        let mut buffer = [0_u16; 257];
+        let mut length = u32::try_from(buffer.len()).unwrap_or(0);
+        // SAFETY: `buffer` is writable for `length` characters.
+        unsafe { GetUserNameW(Some(PWSTR(buffer.as_mut_ptr())), &raw mut length) }.ok()?;
+        let length = usize::try_from(length).ok()?.saturating_sub(1);
+        Some(buffer.get(..length)?.to_vec())
+    }
+
+    impl JobWatch {
+        /// Opens the local spooler and reads every current job. `None` when the spooler is not
+        /// running.
+        #[must_use]
+        pub fn open() -> Option<Self> {
+            let user = current_user()?;
+            let mut server = PRINTER_HANDLE::default();
+            // SAFETY: a null name opens the local print server; `server` is a valid out-parameter.
+            unsafe { OpenPrinterW(PCWSTR::null(), &raw mut server, None) }.ok()?;
+            let mut watch = Self {
+                server,
+                change: INVALID_HANDLE_VALUE,
+                fields: [
+                    u16::try_from(JOB_NOTIFY_FIELD_USER_NAME).unwrap_or(0),
+                    u16::try_from(JOB_NOTIFY_FIELD_STATUS).unwrap_or(0),
+                ],
+                user,
+                jobs: BTreeMap::new(),
+            };
+            let mut kinds = watch.kinds();
+            let options = Self::options(&mut kinds, 0);
+            // SAFETY: `server` is open and `options` points at live option structures.
+            let change = unsafe {
+                FindFirstPrinterChangeNotification(
+                    server,
+                    PRINTER_CHANGE_JOB,
+                    0,
+                    Some(std::ptr::from_ref(&options).cast()),
+                )
+            };
+            if change.is_invalid() {
+                return None;
+            }
+            watch.change = change;
+            watch.refresh().then_some(watch)
+        }
+
+        fn kinds(&mut self) -> [PRINTER_NOTIFY_OPTIONS_TYPE; 1] {
+            [PRINTER_NOTIFY_OPTIONS_TYPE {
+                Type: u16::try_from(JOB_NOTIFY_TYPE).unwrap_or(0),
+                Count: u32::try_from(self.fields.len()).unwrap_or(0),
+                pFields: self.fields.as_mut_ptr(),
+                ..PRINTER_NOTIFY_OPTIONS_TYPE::default()
+            }]
+        }
+
+        fn options(
+            kinds: &mut [PRINTER_NOTIFY_OPTIONS_TYPE; 1],
+            flags: u32,
+        ) -> PRINTER_NOTIFY_OPTIONS {
+            PRINTER_NOTIFY_OPTIONS {
+                Version: 2,
+                Flags: flags,
+                Count: 1,
+                pTypes: kinds.as_mut_ptr(),
+            }
+        }
+
+        /// Reads the pending notification data, or all jobs when `flags` asks for a refresh.
+        /// Returns whether the spooler discarded data, or `None` when the read failed.
+        fn next(&mut self, flags: u32) -> Option<bool> {
+            let mut kinds = self.kinds();
+            let options = Self::options(&mut kinds, flags);
+            let mut changed = 0_u32;
+            let mut info: *mut core::ffi::c_void = std::ptr::null_mut();
+            // SAFETY: `change` is the open notification, `options` is live, and `info` is a valid
+            // out-parameter the spooler fills.
+            let read = unsafe {
+                FindNextPrinterChangeNotification(
+                    self.change,
+                    Some(&raw mut changed),
+                    Some(std::ptr::from_ref(&options).cast()),
+                    Some(&raw mut info),
+                )
+            };
+            if !read.as_bool() {
+                return None;
+            }
+            if info.is_null() {
+                return Some(false);
+            }
+            let info = info.cast::<PRINTER_NOTIFY_INFO>();
+            // SAFETY: the spooler returned a valid `PRINTER_NOTIFY_INFO` that lives until freed.
+            let header = unsafe { info.read_unaligned() };
+            let discarded = header.Flags & PRINTER_NOTIFY_INFO_DISCARDED != 0;
+            #[allow(clippy::cast_ptr_alignment)] // Every entry is read with `read_unaligned`.
+            let data = info
+                .cast::<u8>()
+                .wrapping_add(std::mem::offset_of!(PRINTER_NOTIFY_INFO, aData))
+                .cast::<PRINTER_NOTIFY_INFO_DATA>();
+            for index in 0..usize::try_from(header.Count).unwrap_or(0).min(MAX_JOBS * 2) {
+                let entry = data.wrapping_add(index);
+                // SAFETY: `aData` holds `Count` entries laid out after the header, and `index` is
+                // below `Count`.
+                let entry = unsafe { entry.read_unaligned() };
+                self.apply(&entry);
+            }
+            // SAFETY: `info` was returned by `FindNextPrinterChangeNotification` and is freed once.
+            let _ = unsafe { FreePrinterNotifyInfo(info) };
+            Some(discarded)
+        }
+
+        fn apply(&mut self, entry: &PRINTER_NOTIFY_INFO_DATA) {
+            if u32::from(entry.Type) != JOB_NOTIFY_TYPE {
+                return;
+            }
+            let field = u32::from(entry.Field);
+            let job = self.jobs.entry(entry.Id).or_default();
+            if field == JOB_NOTIFY_FIELD_STATUS {
+                // SAFETY: the status field is carried in `adwData`.
+                job.status = Some(unsafe { entry.NotifyData.adwData[0] });
+            } else if field == JOB_NOTIFY_FIELD_USER_NAME {
+                // SAFETY: the user name field is carried as a buffer of `cbBuf` bytes.
+                let buffer = unsafe { entry.NotifyData.Data };
+                let units = usize::try_from(buffer.cbBuf).unwrap_or(0) / 2;
+                job.owner = (!buffer.pBuf.is_null()).then(|| {
+                    // SAFETY: `pBuf` holds `cbBuf` bytes of UTF-16 until the info is freed.
+                    let name =
+                        unsafe { std::slice::from_raw_parts(buffer.pBuf.cast::<u16>(), units) };
+                    let length = name
+                        .iter()
+                        .position(|unit| *unit == 0)
+                        .unwrap_or(name.len());
+                    name[..length].eq_ignore_ascii_case_wide(&self.user)
+                });
+            }
+            self.evict();
+        }
+
+        fn evict(&mut self) {
+            while self.jobs.len() > MAX_JOBS {
+                let oldest = self
+                    .jobs
+                    .iter()
+                    .find(|(_, job)| job.status.is_some_and(|status| status & FINISHED != 0))
+                    .or_else(|| self.jobs.iter().next())
+                    .map(|(id, _)| *id);
+                if let Some(id) = oldest {
+                    self.jobs.remove(&id);
+                }
+            }
+        }
+
+        /// Re-reads every current job; jobs no longer reported are finished.
+        fn refresh(&mut self) -> bool {
+            let before: Vec<u32> = self.jobs.keys().copied().collect();
+            for job in self.jobs.values_mut() {
+                job.status = Some(JOB_STATUS_DELETED);
+            }
+            let refreshed = self.next(PRINTER_NOTIFY_OPTIONS_REFRESH).is_some();
+            if !refreshed {
+                for id in before {
+                    self.jobs.remove(&id);
+                }
+            }
+            refreshed
+        }
+
+        /// Waits up to `timeout` for job changes and applies them.
+        pub fn wait(&mut self, timeout: Duration) -> Watched {
+            let milliseconds = u32::try_from(timeout.as_millis()).unwrap_or(u32::MAX);
+            // SAFETY: `change` is an open waitable notification handle.
+            if unsafe { WaitForSingleObject(self.change, milliseconds) } != WAIT_OBJECT_0 {
+                return Watched::Quiet;
+            }
+            match self.next(0) {
+                Some(false) => Watched::Changed,
+                Some(true) if self.refresh() => Watched::Lost,
+                _ => Watched::Failed,
+            }
+        }
+
+        /// Every job seen since the watch opened, active and finished.
+        #[must_use]
+        pub fn jobs(&self) -> Vec<RawPrintJob> {
+            self.jobs
+                .iter()
+                .map(|(id, job)| RawPrintJob {
+                    id: *id,
+                    owner: match job.owner {
+                        Some(true) => RawJobOwner::Candidate,
+                        Some(false) => RawJobOwner::Other,
+                        None => RawJobOwner::Unknown,
+                    },
+                    active: job.status.is_none_or(|status| status & FINISHED == 0),
+                })
+                .collect()
+        }
+    }
+
+    impl Drop for JobWatch {
+        fn drop(&mut self) {
+            if !self.change.is_invalid() {
+                // SAFETY: the notification was opened by `FindFirstPrinterChangeNotification`.
+                let _ = unsafe { FindClosePrinterChangeNotification(self.change) };
+            }
+            // SAFETY: the server handle was opened by `OpenPrinterW` and is closed once.
+            let _ = unsafe { ClosePrinter(self.server) };
+        }
+    }
+
+    trait WideEq {
+        fn eq_ignore_ascii_case_wide(&self, other: &[u16]) -> bool;
+    }
+
+    impl WideEq for [u16] {
+        /// Windows account names compare without regard to case.
+        fn eq_ignore_ascii_case_wide(&self, other: &[u16]) -> bool {
+            let fold = |unit: u16| {
+                if (u16::from(b'A')..=u16::from(b'Z')).contains(&unit) {
+                    unit + 32
+                } else {
+                    unit
+                }
+            };
+            self.len() == other.len()
+                && self
+                    .iter()
+                    .zip(other)
+                    .all(|(left, right)| fold(*left) == fold(*right))
+        }
+    }
+
+    /// A one-off read of the current jobs.
+    #[must_use]
+    pub fn print_jobs() -> Option<Vec<RawPrintJob>> {
+        JobWatch::open().map(|watch| watch.jobs())
+    }
+}
+
+pub use printing::{JobWatch, Watched, print_jobs};

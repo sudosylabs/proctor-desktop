@@ -516,6 +516,100 @@
         "type": "object"
       }
     },
+    "printing": {
+      "state": {
+        "$defs": {
+          "Coverage": {
+            "oneOf": [
+              {
+                "enum": [
+                  "unavailable"
+                ],
+                "type": "string"
+              },
+              {
+                "const": "monitored_scheduler",
+                "description": "Every job the scheduler accepts is seen, including jobs that finish between reads.",
+                "type": "string"
+              },
+              {
+                "const": "snapshot_only",
+                "description": "One read of the jobs present now; a job that came and went is not seen.",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "blocked_print_commands": {
+            "description": "Print commands the `CandidateWindow` refused since observation started.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "candidate_jobs": {
+            "description": "Active jobs owned by the candidate's account.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "candidate_jobs_since_start": {
+            "description": "Candidate jobs the scheduler accepted since observation started, finished ones included.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "coverage": {
+            "$ref": "#/$defs/Coverage"
+          },
+          "other_jobs": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "unknown_jobs": {
+            "description": "Active jobs whose owner the scheduler did not state.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "coverage",
+          "candidate_jobs",
+          "other_jobs",
+          "unknown_jobs",
+          "candidate_jobs_since_start",
+          "blocked_print_commands"
+        ],
+        "title": "PrintState",
+        "type": "object"
+      },
+      "summary": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false,
+        "properties": {
+          "candidate_jobs": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "unknown_jobs": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "candidate_jobs",
+          "unknown_jobs"
+        ],
+        "title": "PrintSummary",
+        "type": "object"
+      }
+    },
     "removable_storage": {
       "state": {
         "$defs": {
@@ -1133,6 +1227,58 @@
         ],
         "sensitive": true,
         "stability_ms": 2000
+      },
+      {
+        "app_conditions": false,
+        "categories": [],
+        "fields": [
+          {
+            "name": "printing.coverage",
+            "type": "symbol",
+            "values": [
+              "monitored_scheduler",
+              "snapshot_only",
+              "unavailable"
+            ]
+          },
+          {
+            "max": 1000000,
+            "name": "printing.summary.candidate_jobs",
+            "type": "count"
+          },
+          {
+            "max": 1000000,
+            "name": "printing.summary.unknown_jobs",
+            "type": "count"
+          },
+          {
+            "max": 1000000,
+            "name": "printing.other_jobs",
+            "type": "count"
+          },
+          {
+            "max": 1000000,
+            "name": "printing.candidate_jobs",
+            "type": "count"
+          },
+          {
+            "max": 1000000,
+            "name": "printing.candidate_jobs_since_start",
+            "type": "count"
+          },
+          {
+            "max": 1000000,
+            "name": "printing.blocked_print_commands",
+            "type": "count"
+          }
+        ],
+        "id": "printing",
+        "permission_prompt": false,
+        "reasons": [
+          "printing.candidate_job"
+        ],
+        "sensitive": false,
+        "stability_ms": 0
       }
     ]
   }

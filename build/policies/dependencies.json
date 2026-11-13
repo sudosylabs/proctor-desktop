@@ -506,7 +506,7 @@
       "package": "libc",
       "version": "0.2.189",
       "kind": "production",
-      "purpose": "Expose bounded macOS mount, network-interface and root-only process/audit inventory APIs to passive native adapters.",
+      "purpose": "Expose bounded macOS mount, network-interface and root-only process/audit inventory APIs to passive native adapters, and the account name the agent runs as on macOS and Linux for print-job attribution.",
       "owner": "native-capabilities",
       "source": "https://crates.io/crates/libc/0.2.189",
       "license": "MIT OR Apache-2.0",
@@ -529,6 +529,15 @@
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os = \"macos\")"
+        },
+        {
+          "manifest": "native/crates/prctr-os/Cargo.toml",
+          "alias": "libc",
+          "kind": "production",
+          "features": [],
+          "defaultFeatures": true,
+          "optional": false,
+          "targetScope": "cfg(target_os = \"linux\")"
         },
         {
           "manifest": "native/crates/process-application-state/Cargo.toml",
@@ -812,6 +821,7 @@
             "Win32_Foundation",
             "Win32_Graphics_Dwm",
             "Win32_Graphics_Gdi",
+            "Win32_Graphics_Printing",
             "Win32_NetworkManagement_IpHelper",
             "Win32_NetworkManagement_Ndis",
             "Win32_NetworkManagement_Rras",
@@ -824,6 +834,7 @@
             "Win32_System_Ioctl",
             "Win32_System_RemoteDesktop",
             "Win32_System_Threading",
+            "Win32_System_WindowsProgramming",
             "Win32_UI_WindowsAndMessaging",
             "std"
           ],
@@ -834,7 +845,7 @@
       ],
       "processes": ["native-agent"],
       "networkBehavior": "None; display configuration queries are process-local.",
-      "nativeBehavior": "Links user32, setupapi and kernel32 for display, device and storage queries; storage devices are opened with no data access; unsafe calls are confined to prctr-os with documented safety.",
+      "nativeBehavior": "Links user32, setupapi, kernel32, advapi32 and winspool for display, device, storage and print-job queries; storage devices are opened with no data access; unsafe calls are confined to prctr-os with documented safety.",
       "transitiveRisk": "Adds windows-core, windows-link, windows-result, windows-strings and their companions on Windows only; exact versions are locked and license checked.",
       "bundleTreatment": "external-native",
       "localAlternative": "windows-sys gives raw declarations only; the windows crate adds typed results and safe defaults for the structures the agent reads.",
