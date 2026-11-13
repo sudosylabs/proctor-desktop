@@ -6,6 +6,9 @@ pub mod candidate_window;
 pub mod catalog;
 pub mod clipboard;
 pub mod display;
+pub mod helper;
+#[cfg(test)]
+mod helper_testing;
 pub mod interactive_session;
 pub mod interruptions;
 pub mod media;
@@ -34,11 +37,22 @@ pub fn sources_and_window() -> (Vec<Box<dyn Source>>, candidate_window::WindowBo
     (all_sources(window), bounds)
 }
 
+/// The privileged helper this platform connects to, shared by the process and session
+/// capabilities. `None` until the platform's OS link exists (see
+/// `.scratch/native-rewrite/os-layer-spec.md`); the two capabilities then fall back to their
+/// unprivileged snapshot reads.
+fn platform_helper() -> Option<std::sync::Arc<helper::HelperClient>> {
+    None
+}
+
 fn all_sources(window: candidate_window::CandidateWindowSource) -> Vec<Box<dyn Source>> {
+    let helper = platform_helper();
     vec![
         Box::new(display::DisplaySource::new()),
         Box::new(window),
-        Box::new(interactive_session::InteractiveSessionSource::new()),
+        Box::new(interactive_session::InteractiveSessionSource::with_helper(
+            helper.clone(),
+        )),
         Box::new(clipboard::ClipboardSource::new()),
         Box::new(virtualization::VirtualizationSource),
         Box::new(network::NetworkSource::new()),
@@ -46,7 +60,7 @@ fn all_sources(window: candidate_window::CandidateWindowSource) -> Vec<Box<dyn S
         Box::new(printing::PrintingSource::new()),
         Box::new(media::MediaSource::new(media::Kind::Camera)),
         Box::new(media::MediaSource::new(media::Kind::Microphone)),
-        Box::new(process_application::ProcessSource::new()),
+        Box::new(process_application::ProcessSource::with_helper(helper)),
         Box::new(screen_recording::ScreenRecordingSource::new()),
     ]
 }
