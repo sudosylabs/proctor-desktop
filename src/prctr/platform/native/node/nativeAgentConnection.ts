@@ -10,6 +10,7 @@ import {
 	NATIVE_AGENT_PROTOCOL_DIGEST,
 	isAgentMessage,
 	type AgentMessage,
+	type CloseDisposition,
 	type MainMessage,
 	type Notification,
 	type Request,
@@ -124,12 +125,15 @@ export class NativeAgentConnection extends Disposable {
 		this.send({ kind: 'host_event', capability, event });
 	}
 
-	/** Ends the session in order, then waits for the process to exit; kills it at the deadline. */
-	public async close(): Promise<Response | undefined> {
+	/**
+	 * Ends the session in order, then waits for the process to exit; kills it at the deadline.
+	 * `delete` removes the recording (submission, expiry, departure); `seal` keeps it for re-entry.
+	 */
+	public async close(disposition: CloseDisposition): Promise<Response | undefined> {
 		let response: Response | undefined;
 		this.closing = true;
 		try {
-			response = await this.request({ kind: 'close' });
+			response = await this.request({ kind: 'close', disposition });
 		} catch {
 			response = undefined;
 		}

@@ -8,6 +8,7 @@
 pub mod clip;
 pub mod media;
 pub mod mp4;
+pub mod platform;
 pub mod recorder;
 pub mod store;
 
@@ -15,5 +16,7 @@ pub use clip::{
     CHUNK_BYTES, ClipError, ClipManifest, ClipRange, MAX_CHUNKS, MAX_CLIP_BYTES, MEDIA_TYPE,
 };
 pub use media::{EncodedSample, Encoder, Frame, FrameSource, Rect, StreamFormat};
-pub use recorder::{Recorder, RecorderConfig, RecorderEvent, RecorderState, SaveRefusal};
+pub use recorder::{
+    ClipFailure, Disposition, Recorder, RecorderConfig, RecorderEvent, RecorderState, SaveRefusal,
+};
 pub use store::{Gap, GapReason, Store, StoreError};

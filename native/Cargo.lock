@@ -658,6 +658,7 @@ dependencies = [
  "prctr-capabilities",
  "prctr-core",
  "prctr-protocol",
+ "prctr-recorder",
  "serde_json",
 ]
 

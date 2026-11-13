@@ -15,6 +15,7 @@ scripted-capabilities = []
 prctr-capabilities = { path = "../prctr-capabilities" }
 prctr-core = { path = "../prctr-core" }
 prctr-protocol = { path = "../prctr-protocol" }
+prctr-recorder = { path = "../prctr-recorder" }
 serde_json = { version = "=1.0.151" }
 
 [lints]

@@ -10,6 +10,7 @@ pub enum Diagnostic {
     ProtocolError,
     MainClosed,
     SourceStartFailed,
+    RecorderFailed,
     Panicked,
 }
 
@@ -22,6 +23,7 @@ impl Diagnostic {
             Self::ProtocolError => "protocol_error",
             Self::MainClosed => "main_closed",
             Self::SourceStartFailed => "source_start_failed",
+            Self::RecorderFailed => "recorder_failed",
             Self::Panicked => "panicked",
         }
     }

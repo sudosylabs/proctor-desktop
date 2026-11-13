@@ -6,6 +6,7 @@
 pub mod facts;
 pub mod frame;
 pub mod messages;
+pub mod recording;
 pub mod rules;
 pub mod scalars;
 

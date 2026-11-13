@@ -195,8 +195,7 @@ impl Recorder {
         let _ = self.commands.send(Command::Interrupted);
     }
 
-    /// Stops recording, completes pending saves with what was recorded, then deletes or keeps the
-    /// recording.
+    /// Stops recording, fails saves not yet cut, then deletes or keeps the recording.
     pub fn stop(mut self, disposition: Disposition) {
         let (done, wait) = mpsc::channel();
         if self
@@ -439,9 +438,13 @@ impl Worker {
         if self.state == RecorderState::Recording {
             self.state = RecorderState::Stopped;
         }
-        let pending = std::mem::take(&mut self.pending);
-        for (request_id, range) in pending {
-            self.cut(request_id, &range);
+        // Stopping must be quick: a save not yet cut fails rather than holding up the close. At
+        // deletion it would be removed anyway; on re-entry the server delivers it again.
+        for (request_id, _) in std::mem::take(&mut self.pending) {
+            (self.report)(RecorderEvent::Clip {
+                request_id,
+                result: Err(ClipFailure::Failed),
+            });
         }
         self.emit_state();
         if disposition == Disposition::Delete {

@@ -196,6 +196,74 @@ bounded_string!(
 );
 
 bounded_string!(
+    /// An absolute local path chosen by Electron main: at most 1024 bytes, no NUL.
+    LocalPath,
+    "local path",
+    "LocalPath",
+    "^(/|[A-Za-z]:\\\\)[^\\u0000]{0,1020}$",
+    |value| {
+        let bytes = value.as_bytes();
+        let absolute = bytes.first() == Some(&b'/')
+            || (bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' && bytes[2] == b'\\');
+        absolute && bytes.len() <= 1024 && !bytes.contains(&0)
+    }
+);
+
+impl Secret {
+    /// The 32 bytes a secret encodes (base64url without padding).
+    #[must_use]
+    pub fn bytes(&self) -> [u8; 32] {
+        let value = |byte: u8| match byte {
+            b'A'..=b'Z' => byte - b'A',
+            b'a'..=b'z' => byte - b'a' + 26,
+            b'0'..=b'9' => byte - b'0' + 52,
+            b'-' => 62,
+            _ => 63,
+        };
+        let mut out = [0_u8; 32];
+        let mut bits = 0_u32;
+        let mut count = 0;
+        let mut index = 0;
+        for byte in self.0.bytes() {
+            bits = (bits << 6) | u32::from(value(byte));
+            count += 6;
+            if count >= 8 && index < out.len() {
+                count -= 8;
+                out[index] = u8::try_from((bits >> count) & 0xFF).unwrap_or(0);
+                index += 1;
+            }
+        }
+        out
+    }
+
+    /// Encodes 32 bytes as a secret.
+    #[must_use]
+    pub fn from_bytes(bytes: &[u8; 32]) -> Self {
+        const ALPHABET: &[u8; 64] =
+            b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+        let mut out = String::with_capacity(43);
+        let mut bits = 0_u32;
+        let mut count = 0;
+        for byte in bytes {
+            bits = (bits << 8) | u32::from(*byte);
+            count += 8;
+            while count >= 6 {
+                count -= 6;
+                out.push(char::from(
+                    ALPHABET[usize::try_from((bits >> count) & 0x3F).unwrap_or(0)],
+                ));
+            }
+        }
+        if count > 0 {
+            out.push(char::from(
+                ALPHABET[usize::try_from((bits << (6 - count)) & 0x3F).unwrap_or(0)],
+            ));
+        }
+        Self(out)
+    }
+}
+
+bounded_string!(
     /// A lowercase hexadecimal SHA-256 digest.
     Digest,
     "digest",
@@ -258,5 +326,26 @@ mod tests {
         assert!(serde_json::from_str::<OpaqueId>("\"short\"").is_err());
         assert!(serde_json::from_str::<Digest>("\"ABC\"").is_err());
         assert!(serde_json::from_str::<Secret>(&format!("\"{}\"", "a".repeat(43))).is_ok());
+    }
+
+    #[test]
+    fn a_secret_round_trips_its_bytes() {
+        let bytes: [u8; 32] = std::array::from_fn(|index| u8::try_from(index * 7 + 3).unwrap_or(0));
+        let secret = Secret::from_bytes(&bytes);
+        assert!(Secret::new(secret.as_str()).is_ok(), "a valid secret");
+        assert_eq!(secret.bytes(), bytes);
+        assert_eq!(
+            Secret::from_bytes(&[0xFF; 32]).as_str(),
+            format!("{}8", "_".repeat(42))
+        );
+    }
+
+    #[test]
+    fn local_paths_are_absolute_and_bounded() {
+        assert!(LocalPath::new("/var/lib/proctor/recording").is_ok());
+        assert!(LocalPath::new("D:\\Data\\recording").is_ok());
+        assert!(LocalPath::new("relative/x").is_err());
+        assert!(LocalPath::new(format!("/{}", "a".repeat(1024))).is_err());
+        assert!(LocalPath::new("/a\0b").is_err());
     }
 }

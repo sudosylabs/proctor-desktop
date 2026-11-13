@@ -125,3 +125,77 @@ impl Source for Scripted {
         Ok(())
     }
 }
+
+/// Synthetic frames at the recording rate in real time, so tests drive the real recorder.
+struct SyntheticFrames {
+    next: std::time::Instant,
+}
+
+impl prctr_recorder::FrameSource for SyntheticFrames {
+    fn next_frame(
+        &mut self,
+        timeout: std::time::Duration,
+    ) -> Result<Option<prctr_recorder::Frame>, String> {
+        let now = std::time::Instant::now();
+        let wait = self.next.saturating_duration_since(now);
+        if wait > timeout {
+            std::thread::sleep(timeout);
+            return Ok(None);
+        }
+        std::thread::sleep(wait);
+        self.next +=
+            std::time::Duration::from_millis(1_000 / u64::from(prctr_recorder::platform::FPS));
+        Ok(Some(prctr_recorder::Frame {
+            width: 2,
+            height: 2,
+            stride: 8,
+            bgra: vec![0x22; 16],
+            captured_ms: crate::recording::now_ms(),
+            display: prctr_recorder::Rect {
+                x: 0.0,
+                y: 0.0,
+                width: 2.0,
+                height: 2.0,
+            },
+        }))
+    }
+}
+
+/// Passes frames through as tiny H.264-shaped samples.
+struct PassThrough;
+
+impl prctr_recorder::Encoder for PassThrough {
+    fn encode(
+        &mut self,
+        frame: &prctr_recorder::Frame,
+        keyframe: bool,
+    ) -> Result<Vec<prctr_recorder::EncodedSample>, String> {
+        let nal = if keyframe { 0x65 } else { 0x41 };
+        Ok(vec![prctr_recorder::EncodedSample {
+            data: vec![0, 0, 0, 2, nal, frame.bgra[0]],
+            keyframe,
+        }])
+    }
+
+    fn format(&self) -> Option<prctr_recorder::StreamFormat> {
+        Some(prctr_recorder::StreamFormat {
+            width: 2,
+            height: 2,
+            sps: vec![0x67, 0x42, 0, 0x0A],
+            pps: vec![0x68, 0xCE],
+        })
+    }
+}
+
+pub fn recorder_setup() -> crate::recording::RecorderSetup {
+    crate::recording::RecorderSetup {
+        backend: Box::new(|| {
+            let source: Box<dyn prctr_recorder::FrameSource> = Box::new(SyntheticFrames {
+                next: std::time::Instant::now(),
+            });
+            let encoder: Box<dyn prctr_recorder::Encoder> = Box::new(PassThrough);
+            Some((source, encoder))
+        }),
+        placeholder: std::sync::Arc::new(|| None),
+    }
+}

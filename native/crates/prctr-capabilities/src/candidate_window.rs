@@ -409,6 +409,28 @@ impl CandidateWindowSource {
     }
 }
 
+/// The attached candidate window's last known bounds, in global points, for the recorder's
+/// placeholder. Cheap to clone; `None` while no window is attached or read.
+#[derive(Clone)]
+pub struct WindowBounds(Arc<Mutex<Tracked>>);
+
+impl WindowBounds {
+    #[must_use]
+    pub fn bounds(&self) -> Option<prctr_os::Rect> {
+        let tracked = self.0.lock().unwrap_or_else(PoisonError::into_inner);
+        tracked.attached?;
+        tracked.raw.bounds
+    }
+}
+
+impl CandidateWindowSource {
+    /// A handle on this source's window bounds.
+    #[must_use]
+    pub fn bounds(&self) -> WindowBounds {
+        WindowBounds(Arc::clone(&self.tracked))
+    }
+}
+
 impl Default for CandidateWindowSource {
     fn default() -> Self {
         Self::new()

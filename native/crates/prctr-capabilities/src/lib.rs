@@ -14,6 +14,7 @@ mod poller;
 pub mod printing;
 pub mod process_application;
 pub mod removable_storage;
+pub mod screen_recording;
 pub mod virtualization;
 
 use prctr_core::{Registry, Source};
@@ -22,9 +23,21 @@ use serde_json::{Value, json};
 /// A fresh source for every registered capability.
 #[must_use]
 pub fn sources() -> Vec<Box<dyn Source>> {
+    sources_and_window().0
+}
+
+/// Every source, and a handle on the candidate window's bounds for the recorder's placeholder.
+#[must_use]
+pub fn sources_and_window() -> (Vec<Box<dyn Source>>, candidate_window::WindowBounds) {
+    let window = candidate_window::CandidateWindowSource::new();
+    let bounds = window.bounds();
+    (all_sources(window), bounds)
+}
+
+fn all_sources(window: candidate_window::CandidateWindowSource) -> Vec<Box<dyn Source>> {
     vec![
         Box::new(display::DisplaySource::new()),
-        Box::new(candidate_window::CandidateWindowSource::new()),
+        Box::new(window),
         Box::new(interactive_session::InteractiveSessionSource::new()),
         Box::new(clipboard::ClipboardSource::new()),
         Box::new(virtualization::VirtualizationSource),
@@ -34,6 +47,7 @@ pub fn sources() -> Vec<Box<dyn Source>> {
         Box::new(media::MediaSource::new(media::Kind::Camera)),
         Box::new(media::MediaSource::new(media::Kind::Microphone)),
         Box::new(process_application::ProcessSource::new()),
+        Box::new(screen_recording::ScreenRecordingSource::new()),
     ]
 }
 
@@ -53,6 +67,7 @@ pub fn registry() -> Registry {
             media::descriptor(media::Kind::Camera),
             media::descriptor(media::Kind::Microphone),
             process_application::descriptor(),
+            screen_recording::descriptor(),
         ],
         baseline_rules: vec![
             display::baseline_rule(),
@@ -114,6 +129,10 @@ pub fn registry_json() -> Value {
             process_application::CAPABILITY: {
                 "state": schema(schemars::schema_for!(process_application::ProcessState)),
                 "summary": schema(schemars::schema_for!(process_application::ProcessSummary)),
+            },
+            screen_recording::CAPABILITY: {
+                "state": schema(schemars::schema_for!(screen_recording::ScreenRecordingState)),
+                "summary": schema(schemars::schema_for!(screen_recording::ScreenRecordingSummary)),
             }
         }
     })

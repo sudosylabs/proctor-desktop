@@ -474,3 +474,56 @@ mod random_tests {
         assert_ne!(first, [0; 32]);
     }
 }
+
+/// Bytes available to this account on the volume holding `path`.
+#[must_use]
+pub fn free_space(path: &std::path::Path) -> Option<u64> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::ffi::OsStrExt;
+        let path = std::ffi::CString::new(path.as_os_str().as_bytes()).ok()?;
+        let mut stats = std::mem::MaybeUninit::<libc::statvfs>::zeroed();
+        // SAFETY: `path` is NUL-terminated and `stats` is a valid out-parameter.
+        if unsafe { libc::statvfs(path.as_ptr(), stats.as_mut_ptr()) } != 0 {
+            return None;
+        }
+        // SAFETY: `statvfs` succeeded and filled `stats`.
+        let stats = unsafe { stats.assume_init() };
+        #[allow(clippy::useless_conversion)] // The field widths differ between platforms.
+        let (blocks, size) = (u64::from(stats.f_bavail), u64::from(stats.f_frsize));
+        blocks.checked_mul(size)
+    }
+    #[cfg(windows)]
+    {
+        use ::windows::Win32::Storage::FileSystem::GetDiskFreeSpaceExW;
+        let mut available = 0_u64;
+        let path = ::windows::core::HSTRING::from(path.as_os_str());
+        // SAFETY: `path` is a valid wide string and `available` a valid out-parameter.
+        unsafe { GetDiskFreeSpaceExW(&path, Some(&raw mut available), None, None) }.ok()?;
+        Some(available)
+    }
+    #[cfg(not(any(unix, windows)))]
+    {
+        let _ = path;
+        None
+    }
+}
+
+/// Whether this process may capture the screen: macOS Screen Recording; always on elsewhere.
+#[must_use]
+pub fn screen_capture_allowed() -> bool {
+    #[cfg(target_os = "macos")]
+    return objc2_core_graphics::CGPreflightScreenCaptureAccess();
+    #[cfg(not(target_os = "macos"))]
+    true
+}
+
+/// Shows the macOS Screen Recording prompt once; later calls only say whether it is allowed. The
+/// answer usually needs a relaunch to take effect.
+#[must_use]
+pub fn request_screen_capture() -> bool {
+    #[cfg(target_os = "macos")]
+    return objc2_core_graphics::CGRequestScreenCaptureAccess();
+    #[cfg(not(target_os = "macos"))]
+    true
+}

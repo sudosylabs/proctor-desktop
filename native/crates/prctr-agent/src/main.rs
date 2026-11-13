@@ -5,6 +5,7 @@
 
 mod agent;
 mod diagnostic;
+mod recording;
 #[cfg(feature = "scripted-capabilities")]
 mod scripted;
 mod transport;
@@ -23,25 +24,35 @@ const BUILD_IDENTITY: &str = match option_env!("PRCTR_BUILD_IDENTITY") {
 };
 const PROTOCOL_DIGEST: &str = include_str!("../../prctr-protocol/schema/agent-protocol.digest");
 
-/// Release and development builds run the real capabilities and the shared registry.
+/// Release and development builds run the real capabilities, the shared registry and this
+/// platform's recorder, which blanks the candidate window.
 #[cfg(not(feature = "scripted-capabilities"))]
-fn capabilities() -> (Registry, Vec<Box<dyn Source>>) {
-    (
-        prctr_capabilities::registry(),
-        prctr_capabilities::sources(),
-    )
+fn capabilities() -> (Registry, Vec<Box<dyn Source>>, recording::RecorderSetup) {
+    let (sources, window) = prctr_capabilities::sources_and_window();
+    let setup = recording::RecorderSetup {
+        backend: Box::new(prctr_recorder::platform::backend),
+        placeholder: std::sync::Arc::new(move || {
+            window.bounds().map(|bounds| prctr_recorder::Rect {
+                x: bounds.x,
+                y: bounds.y,
+                width: bounds.width,
+                height: bounds.height,
+            })
+        }),
+    };
+    (prctr_capabilities::registry(), sources, setup)
 }
 
 /// Test builds run only the scripted capability, with no baseline, so tests control every fact.
 #[cfg(feature = "scripted-capabilities")]
-fn capabilities() -> (Registry, Vec<Box<dyn Source>>) {
+fn capabilities() -> (Registry, Vec<Box<dyn Source>>, recording::RecorderSetup) {
     let scripted: Box<dyn Source> = Box::new(scripted::Scripted::new());
     let registry = Registry {
         capabilities: vec![scripted.descriptor()],
         baseline_rules: Vec::new(),
         applications: Vec::new(),
     };
-    (registry, vec![scripted])
+    (registry, vec![scripted], scripted::recorder_setup())
 }
 
 /// Reports sleep, screen lock and user switch to the agent. Test builds inject interruptions
@@ -77,7 +88,7 @@ fn main() -> ExitCode {
     }));
     let (sender, receiver) = mpsc::channel();
     transport::spawn_reader(std::io::stdin(), sender.clone());
-    let (registry, sources) = capabilities();
+    let (registry, sources, recorder_setup) = capabilities();
     let _interruptions = watch_interruptions(&sender);
     let mut agent = Agent::new(
         registry,
@@ -86,6 +97,7 @@ fn main() -> ExitCode {
         std::io::stdout(),
         BUILD_IDENTITY,
         PROTOCOL_DIGEST,
+        recorder_setup,
     );
     match agent.run(&receiver) {
         Exit::Closed => ExitCode::SUCCESS,

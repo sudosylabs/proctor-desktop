@@ -113,18 +113,17 @@ impl Store {
         if resumed {
             let bytes = store.unseal(INDEX, "index")?;
             store.index = serde_json::from_slice(&bytes).map_err(|_| StoreError::Corrupt)?;
+            // Every resume is a gap, even one faster than the last segment's rounded end.
             let since = store
                 .index
                 .segments
                 .last()
                 .map_or(store.index.origin_ms, |segment| segment.end_ms);
-            if now_ms > since {
-                store.index.gaps.push(Gap {
-                    start_ms: since,
-                    end_ms: now_ms,
-                    reason: GapReason::Restart,
-                });
-            }
+            store.index.gaps.push(Gap {
+                start_ms: since,
+                end_ms: now_ms.max(since + 1),
+                reason: GapReason::Restart,
+            });
         }
         store.write_index()?;
         Ok((store, resumed))

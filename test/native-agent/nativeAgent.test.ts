@@ -1,11 +1,16 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
+import { createDecipheriv, createHash, randomBytes } from 'node:crypto';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import process from 'node:process';
 import { test } from 'node:test';
 import type {
+	ClipOutcome,
 	Notification,
-	Policy
+	Policy,
+	RecordingStart
 } from '../../src/prctr/platform/native/common/nativeAgentProtocol.generated.ts';
 import {
 	NativeAgentConnection,
@@ -71,7 +76,7 @@ void test('the handshake binds the build identity and the protocol digest', asyn
 			assert.deepEqual(response.fact.state, { count: 1 });
 		}
 	} finally {
-		await connection.close();
+		await connection.close('delete');
 		connection.dispose();
 	}
 	await assert.rejects(
@@ -87,7 +92,7 @@ void test('an unregistered or sensitive capability cannot be queried', async () 
 		const response = await connection.request({ kind: 'query', capability: 'display' });
 		assert.deepEqual(response, { kind: 'refused', code: 'unknown_capability' });
 	} finally {
-		await connection.close();
+		await connection.close('delete');
 		connection.dispose();
 	}
 });
@@ -152,7 +157,7 @@ void test('readiness continues into participation without a gap and contains on 
 				reported.gap.last_sequence - reported.gap.first_sequence === 2
 		);
 
-		const closed = await service.close();
+		const closed = await service.close('delete');
 		assert.equal(closed?.facts.length, 1);
 	} finally {
 		service.dispose();
@@ -198,6 +203,114 @@ void test('an interruption ends every stream, contains, and a fresh state recove
 		assert.equal(await released, false, 'the fresh state recovers after the stability time');
 	} finally {
 		service.dispose();
+	}
+});
+
+type ClipReady = Extract<ClipOutcome, { kind: 'ready' }>;
+
+/** Opens a clip file the way the uploader does: one ChaCha20-Poly1305 record per upload chunk. */
+function openClip(clip: ClipReady): Buffer[] {
+	const sealed = readFileSync(clip.path);
+	const key = Buffer.from(clip.key, 'base64url');
+	const chunks: Buffer[] = [];
+	for (let offset = 0, index = 0; offset < sealed.length; index += 1) {
+		const length = Math.min(clip.chunk_bytes + 16, sealed.length - offset);
+		const record = sealed.subarray(offset, offset + length);
+		offset += length;
+		const nonce = Buffer.alloc(12);
+		nonce.writeBigUInt64BE(BigInt(index), 4);
+		const decipher = createDecipheriv('chacha20-poly1305', key, nonce, { authTagLength: 16 });
+		decipher.setAAD(Buffer.from('proctor-screen-clip-v1'), {
+			plaintextLength: record.length - 16
+		});
+		decipher.setAuthTag(record.subarray(record.length - 16));
+		chunks.push(
+			Buffer.concat([
+				decipher.update(record.subarray(0, record.length - 16)),
+				decipher.final()
+			])
+		);
+	}
+	return chunks;
+}
+
+void test('the recorder records from confirmation, cuts a requested clip, and deletes at submission', async () => {
+	const directory = join(mkdtempSync(join(tmpdir(), 'prctr-recording-')), 'attempt');
+	const recording: RecordingStart = {
+		recording_id: 'recording-0001',
+		key: randomBytes(32).toString('base64url'),
+		directory
+	};
+	const service = new NativeAgentService({ launch: LAUNCH });
+	try {
+		await service.openReadiness(COLLECTION, POLICY);
+		await service.beginParticipation();
+		const recordingState = next<Notification>(
+			service.onDidNotify,
+			(notification) => notification.kind === 'recorder' && notification.state === 'recording'
+		);
+		await service.confirmParticipation(recording);
+		await recordingState;
+
+		const clip = next(
+			service.onDidClip,
+			(value) => value.clipRequestId === 'clip-request-0001',
+			10_000
+		);
+		await service.recorderSave('clip-request-0001', {
+			from_session_start: true,
+			end_ms: Date.now() + 2_500
+		});
+		const delivered = await clip;
+		assert.equal(delivered.outcome.kind, 'ready');
+		if (delivered.outcome.kind !== 'ready') return;
+		const ready = delivered.outcome;
+		const chunks = openClip(ready);
+		const mp4 = Buffer.concat(chunks);
+		assert.equal(mp4.length, ready.size_bytes);
+		assert.equal(mp4.subarray(4, 8).toString('latin1'), 'ftyp', 'an MP4 file');
+		assert.deepEqual(
+			chunks.map((chunk) => createHash('sha256').update(chunk).digest('hex')),
+			ready.chunk_sha256
+		);
+		const digest = createHash('sha256');
+		digest.update(
+			`proctor-screen-clip-v1\nvideo/mp4\n${ready.size_bytes}\n${ready.chunk_bytes}\n`
+		);
+		for (const chunk of ready.chunk_sha256) digest.update(`${chunk}\n`);
+		assert.equal(digest.digest('hex'), ready.content_digest, 'the server formula');
+		assert.ok(ready.end_ms - ready.start_ms >= 2_000, 'it waited for the future part');
+
+		await service.recorderRelease('clip-request-0001');
+		await assert.rejects(
+			service.recorderSave('clip-request-0002', { from_session_start: false, end_ms: 5 }),
+			(error: unknown) => error instanceof Error && /invalid_range/.test(error.message)
+		);
+
+		await service.close('seal');
+		assert.ok(existsSync(join(directory, 'index.seal')), 'kept for re-entry');
+		assert.ok(!existsSync(ready.path), 'the released clip is gone');
+
+		const resumed = new NativeAgentService({ launch: LAUNCH });
+		try {
+			await resumed.openReadiness(COLLECTION, POLICY);
+			await resumed.beginParticipation();
+			const restarted = next<Notification>(
+				resumed.onDidNotify,
+				(notification) =>
+					notification.kind === 'recorder' &&
+					notification.gaps.some((gap) => gap.reason === 'restart')
+			);
+			await resumed.confirmParticipation(recording);
+			await restarted;
+			await resumed.close('delete');
+			assert.ok(!existsSync(directory), 'deleted at submission');
+		} finally {
+			resumed.dispose();
+		}
+	} finally {
+		service.dispose();
+		rmSync(directory, { recursive: true, force: true });
 	}
 });
 
@@ -252,7 +365,7 @@ void test('an orderly close returns final states and the process exits', async (
 		collection_session_id: COLLECTION,
 		policy: POLICY
 	});
-	const response = await connection.close();
+	const response = await connection.close('delete');
 	assert.equal(response?.kind, 'closed');
 	connection.dispose();
 	assert.ok(pid !== undefined);

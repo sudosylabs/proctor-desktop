@@ -6,9 +6,13 @@ import { Emitter, type Event } from '../../../base/common/event.js';
 import { Disposable, type IDisposable } from '../../../base/common/lifecycle.js';
 import { createDecorator } from '../../instantiation/common/instantiation.js';
 import type {
+	ClipOutcome,
+	ClipRange,
+	CloseDisposition,
 	Fact,
 	Notification,
 	Policy,
+	RecordingStart,
 	RefusalCode,
 	Request,
 	Response,
@@ -41,6 +45,12 @@ export class NativeAgentStateError extends Error {
 	}
 }
 
+/** A requested clip, ready to upload or failed. */
+export interface NativeAgentClip {
+	readonly clipRequestId: string;
+	readonly outcome: ClipOutcome;
+}
+
 export const INativeAgentService = createDecorator<INativeAgentService>('nativeAgentService');
 
 /**
@@ -58,13 +68,20 @@ export interface INativeAgentService extends IDisposable {
 	readonly onDidRestart: Event<NativeAgentSnapshot>;
 	/** The agent failed and no automatic restart remains. */
 	readonly onDidFail: Event<NativeAgentFailure>;
+	/** A clip asked for with `recorderSave` is ready or has failed. */
+	readonly onDidClip: Event<NativeAgentClip>;
 	query(capability: string): Promise<Fact>;
 	openReadiness(collectionSessionId: string, policy: Policy): Promise<NativeAgentSnapshot>;
 	beginParticipation(): Promise<NativeAgentSnapshot>;
-	confirmParticipation(): Promise<readonly RuleStatus[]>;
+	/** Admission succeeded; `recording` starts the screen recorder when the policy enables it. */
+	confirmParticipation(recording?: RecordingStart): Promise<readonly RuleStatus[]>;
+	/** Asks the recorder for a clip; it arrives on `onDidClip` once recorded. */
+	recorderSave(clipRequestId: string, range: ClipRange): Promise<void>;
+	/** The server acknowledged the uploaded clip: its file is deleted. */
+	recorderRelease(clipRequestId: string): Promise<void>;
 	abandonParticipation(): Promise<readonly RuleStatus[]>;
 	sendHostEvent(capability: string, event: unknown): void;
-	close(): Promise<NativeAgentSnapshot | undefined>;
+	close(disposition: CloseDisposition): Promise<NativeAgentSnapshot | undefined>;
 }
 
 export interface NativeAgentServiceOptions {
@@ -82,10 +99,14 @@ export class NativeAgentService extends Disposable implements INativeAgentServic
 	public readonly onDidRestart = this._onDidRestart.event;
 	private readonly _onDidFail = this._register(new Emitter<NativeAgentFailure>());
 	public readonly onDidFail = this._onDidFail.event;
+	private readonly _onDidClip = this._register(new Emitter<NativeAgentClip>());
+	public readonly onDidClip = this._onDidClip.event;
 
 	private connection: NativeAgentConnection | undefined;
 	private connectionListeners: IDisposable[] = [];
 	private session: { readonly collectionSessionId: string; readonly policy: Policy } | undefined;
+	/** Kept for the automatic restart, which resumes the same recording with a gap. */
+	private recording: RecordingStart | undefined;
 	private restarts = 0;
 	private _phase: NativeAgentPhase = 'idle';
 	private _contained = false;
@@ -129,9 +150,14 @@ export class NativeAgentService extends Disposable implements INativeAgentServic
 		return { facts: response.facts, rules: response.rules };
 	}
 
-	public async confirmParticipation(): Promise<readonly RuleStatus[]> {
+	public async confirmParticipation(recording?: RecordingStart): Promise<readonly RuleStatus[]> {
 		this.requirePhase('binding');
-		const response = await this.request({ kind: 'confirm_participation' });
+		this.recording = recording;
+		const response = await this.request(
+			recording === undefined
+				? { kind: 'confirm_participation' }
+				: { kind: 'confirm_participation', recording }
+		);
 		if (response.kind !== 'participation_confirmed') throw unexpected(response);
 		this._phase = 'participation';
 		this.applyStatuses(response.rules, true);
@@ -146,18 +172,37 @@ export class NativeAgentService extends Disposable implements INativeAgentServic
 		return response.rules;
 	}
 
+	public async recorderSave(clipRequestId: string, range: ClipRange): Promise<void> {
+		this.requirePhase('participation');
+		const response = await this.request({
+			kind: 'recorder_save',
+			clip_request_id: clipRequestId,
+			range
+		});
+		if (response.kind !== 'recorder_save_accepted') throw unexpected(response);
+	}
+
+	public async recorderRelease(clipRequestId: string): Promise<void> {
+		const response = await this.request({
+			kind: 'recorder_release',
+			clip_request_id: clipRequestId
+		});
+		if (response.kind !== 'recorder_released') throw unexpected(response);
+	}
+
 	public sendHostEvent(capability: string, event: unknown): void {
 		this.connection?.sendHostEvent(capability, event);
 	}
 
-	public async close(): Promise<NativeAgentSnapshot | undefined> {
+	public async close(disposition: CloseDisposition): Promise<NativeAgentSnapshot | undefined> {
 		const connection = this.connection;
 		this.detach();
 		this.session = undefined;
+		this.recording = undefined;
 		this._phase = 'idle';
 		this.setContained(false);
 		if (connection === undefined) return undefined;
-		const response = await connection.close();
+		const response = await connection.close(disposition);
 		connection.dispose();
 		return response?.kind === 'closed'
 			? { facts: response.facts, rules: response.rules }
@@ -203,6 +248,11 @@ export class NativeAgentService extends Disposable implements INativeAgentServic
 
 	private receive(notification: Notification): void {
 		if (notification.kind === 'rules') this.applyStatuses(notification.statuses, false);
+		if (notification.kind === 'clip')
+			this._onDidClip.fire({
+				clipRequestId: notification.clip_request_id,
+				outcome: notification.outcome
+			});
 		this._onDidNotify.fire(notification);
 	}
 
@@ -246,7 +296,7 @@ export class NativeAgentService extends Disposable implements INativeAgentServic
 			if (phase === 'participation') {
 				this._phase = 'readiness';
 				snapshot = await this.beginParticipation();
-				const rules = await this.confirmParticipation();
+				const rules = await this.confirmParticipation(this.recording);
 				snapshot = { facts: snapshot.facts, rules };
 			} else {
 				this._phase = 'readiness';

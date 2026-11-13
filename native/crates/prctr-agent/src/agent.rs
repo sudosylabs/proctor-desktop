@@ -17,10 +17,12 @@ use prctr_protocol::facts::{Fact, InterruptionKind};
 use prctr_protocol::messages::{
     AgentMessage, FatalCode, MainMessage, Notification, RefusalCode, Request, Response,
 };
+use prctr_protocol::recording::{ClipRange, CloseDisposition, RecorderState, RecordingStart};
 use prctr_protocol::rules::Policy;
 use prctr_protocol::scalars::{BuildIdentity, Count, Digest, Identifier, OpaqueId};
 
 use crate::diagnostic::{Diagnostic, emit};
+use crate::recording::{self, RecorderSetup};
 use crate::transport::Writer;
 
 pub const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(1);
@@ -29,6 +31,8 @@ pub const HANDSHAKE_TIMEOUT: Duration = Duration::from_secs(5);
 /// Everything the core thread reacts to.
 pub enum Event {
     Main(Box<MainMessage>),
+    /// The recorder's state changed or a clip finished.
+    Recorder(prctr_recorder::RecorderEvent),
     /// The OS interruption watcher saw sleep, a screen lock or a user switch. Test builds inject
     /// interruptions through the scripted capability instead.
     #[cfg_attr(feature = "scripted-capabilities", allow(dead_code))]
@@ -58,6 +62,8 @@ pub struct Agent<W: Write> {
     protocol_digest: Digest,
     random: RandomState,
     instances: u64,
+    recorder_setup: RecorderSetup,
+    recorder: Option<prctr_recorder::Recorder>,
 }
 
 impl<W: Write> Agent<W> {
@@ -72,6 +78,7 @@ impl<W: Write> Agent<W> {
         output: W,
         build_identity: &str,
         protocol_digest: &str,
+        recorder_setup: RecorderSetup,
     ) -> Self {
         let mut by_id = BTreeMap::new();
         let mut pending = BTreeMap::new();
@@ -93,6 +100,8 @@ impl<W: Write> Agent<W> {
                 .expect("compiled protocol digest is valid"),
             random: RandomState::new(),
             instances: 0,
+            recorder_setup,
+            recorder: None,
         }
     }
 
@@ -133,6 +142,12 @@ impl<W: Write> Agent<W> {
                 }
                 Ok(Event::MainInvalid) => return self.fatal(Diagnostic::ProtocolError),
                 Ok(Event::Interrupted(kind)) => self.interrupt(kind),
+                Ok(Event::Recorder(event)) => {
+                    if let Some(notification) = recording::notification(event) {
+                        let numbered = self.engine.notify(notification);
+                        let _ = self.send_numbered(vec![numbered]);
+                    }
+                }
                 Err(RecvTimeoutError::Timeout) => {
                     if self
                         .engine
@@ -258,10 +273,27 @@ impl<W: Write> Agent<W> {
                     Err(error) => refused(refusal(&error)),
                 }
             }
-            Request::ConfirmParticipation => match self.engine.confirm_participation(self.now_ms())
-            {
-                Ok(rules) => Response::ParticipationConfirmed { rules },
-                Err(error) => refused(refusal(&error)),
+            Request::ConfirmParticipation { recording } => {
+                match self.engine.confirm_participation(self.now_ms()) {
+                    Ok(rules) => {
+                        if let Some(start) = recording {
+                            self.start_recorder(&start);
+                        }
+                        Response::ParticipationConfirmed { rules }
+                    }
+                    Err(error) => refused(refusal(&error)),
+                }
+            }
+            Request::RecorderSave {
+                clip_request_id,
+                range,
+            } => self.recorder_save(clip_request_id, range),
+            Request::RecorderRelease { clip_request_id } => match &self.recorder {
+                Some(recorder) => {
+                    recorder.release(clip_request_id.as_str());
+                    Response::RecorderReleased { clip_request_id }
+                }
+                None => refused(RefusalCode::RecorderOff),
             },
             Request::AbandonParticipation => match self.engine.abandon_participation() {
                 Ok(rules) => Response::ParticipationAbandoned { rules },
@@ -280,8 +312,12 @@ impl<W: Write> Agent<W> {
                     capability,
                     permission,
                 }),
-            Request::Close => match self.engine.close() {
+            Request::Close { disposition } => match self.engine.close() {
                 Ok((facts, rules)) => {
+                    self.stop_recorder(match disposition {
+                        CloseDisposition::Delete => prctr_recorder::Disposition::Delete,
+                        CloseDisposition::Seal => prctr_recorder::Disposition::Seal,
+                    });
                     self.stop_all();
                     Response::Closed { facts, rules }
                 }
@@ -409,6 +445,9 @@ impl<W: Write> Agent<W> {
         if !self.engine.is_open() {
             return;
         }
+        if let Some(recorder) = &self.recorder {
+            recorder.interrupted();
+        }
         self.apply(Input::Interrupted {
             kind,
             at_ms: self.now_ms(),
@@ -453,7 +492,52 @@ impl<W: Write> Agent<W> {
         Exit::Protocol
     }
 
+    fn start_recorder(&mut self, start: &RecordingStart) {
+        self.stop_recorder(prctr_recorder::Disposition::Seal);
+        if let Some(recorder) = recording::start(&self.recorder_setup, start, self.events.clone()) {
+            self.recorder = Some(recorder);
+        } else {
+            emit(Diagnostic::RecorderFailed);
+            let numbered = self.engine.notify(Notification::Recorder {
+                state: RecorderState::Failed,
+                gaps: Vec::new(),
+            });
+            let _ = self.send_numbered(vec![numbered]);
+        }
+    }
+
+    fn recorder_save(&mut self, clip_request_id: OpaqueId, range: ClipRange) -> Response {
+        let Some(recorder) = &self.recorder else {
+            return Response::Refused {
+                code: RefusalCode::RecorderOff,
+            };
+        };
+        let range = prctr_recorder::ClipRange {
+            from_session_start: range.from_session_start,
+            start_ms: range.start_ms.map(Count::get),
+            end_ms: range.end_ms.get(),
+        };
+        match recorder.save(clip_request_id.as_str(), range) {
+            Ok(()) => Response::RecorderSaveAccepted { clip_request_id },
+            Err(prctr_recorder::SaveRefusal::InvalidRange) => Response::Refused {
+                code: RefusalCode::InvalidRange,
+            },
+            Err(prctr_recorder::SaveRefusal::Stopped) => Response::Refused {
+                code: RefusalCode::RecorderOff,
+            },
+        }
+    }
+
+    /// Stops the recorder first in the shutdown order; anything but an orderly close keeps the
+    /// recording sealed for re-entry.
+    fn stop_recorder(&mut self, disposition: prctr_recorder::Disposition) {
+        if let Some(recorder) = self.recorder.take() {
+            recorder.stop(disposition);
+        }
+    }
+
     fn stop_all(&mut self) {
+        self.stop_recorder(prctr_recorder::Disposition::Seal);
         for source in self.sources.values_mut().rev() {
             source.stop();
         }
