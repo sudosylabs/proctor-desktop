@@ -868,3 +868,258 @@ mod network {
 }
 
 pub use network::{route_fingerprint, system_proxy, tunnels};
+
+mod media {
+    use std::ffi::c_void;
+
+    use block2::RcBlock;
+    use objc2::rc::autoreleasepool;
+    use objc2::runtime::Bool;
+    use objc2_av_foundation::{
+        AVAuthorizationStatus, AVCaptureDevice, AVMediaType, AVMediaTypeAudio, AVMediaTypeVideo,
+    };
+
+    use crate::{RawMedia, RawMediaDevice, RawMediaPermission, fingerprint};
+
+    const MAX_DEVICES: usize = 64;
+    const MAX_PROCESSES: usize = 4_096;
+
+    /// Transport types (`kIOAudioDeviceTransportType…`) that name hardware.
+    const PHYSICAL_TRANSPORTS: [&[u8; 4]; 9] = [
+        b"bltn", b"usb ", b"thun", b"pci ", b"fwir", b"blue", b"blea", b"wrls", b"cntc",
+    ];
+
+    fn is_physical(transport: u32) -> bool {
+        PHYSICAL_TRANSPORTS
+            .iter()
+            .any(|code| u32::from_be_bytes(**code) == transport)
+    }
+
+    #[derive(Clone, Copy)]
+    pub enum Kind {
+        Camera,
+        Microphone,
+    }
+
+    fn media_type(kind: Kind) -> Option<&'static AVMediaType> {
+        // SAFETY: the media type constants are immutable statics AVFoundation exports.
+        unsafe {
+            match kind {
+                Kind::Camera => AVMediaTypeVideo,
+                Kind::Microphone => AVMediaTypeAudio,
+            }
+        }
+    }
+
+    fn permission(kind: Kind) -> RawMediaPermission {
+        let Some(media) = media_type(kind) else {
+            return RawMediaPermission::Unavailable;
+        };
+        // SAFETY: `media` is the video or audio type, the only ones this method accepts.
+        match unsafe { AVCaptureDevice::authorizationStatusForMediaType(media) } {
+            AVAuthorizationStatus::NotDetermined => RawMediaPermission::NotDetermined,
+            AVAuthorizationStatus::Authorized => RawMediaPermission::Granted,
+            AVAuthorizationStatus::Denied => RawMediaPermission::Denied,
+            AVAuthorizationStatus::Restricted => RawMediaPermission::Restricted,
+            _ => RawMediaPermission::Unavailable,
+        }
+    }
+
+    /// Shows the OS prompt when the permission is not determined. Returns at once; `answered`
+    /// runs on an OS queue when the candidate answers.
+    pub fn request_access(kind: Kind, answered: impl Fn() + Send + Sync + 'static) {
+        let Some(media) = media_type(kind) else {
+            return;
+        };
+        let block = RcBlock::new(move |_granted: Bool| answered());
+        // SAFETY: `media` is the video or audio type and the block lives as long as AVFoundation
+        // retains it.
+        unsafe { AVCaptureDevice::requestAccessForMediaType_completionHandler(media, &block) };
+    }
+
+    /// Every camera, by `AVFoundation`'s transport type; no device is opened.
+    #[must_use]
+    pub fn cameras() -> RawMedia {
+        let Some(media) = media_type(Kind::Camera) else {
+            return RawMedia::unavailable();
+        };
+        autoreleasepool(|_| {
+            // SAFETY: `media` is the video type. The deprecated listing is used because the
+            // discovery session's macOS 14 device types would not load on older systems.
+            #[allow(deprecated)]
+            let devices = unsafe { AVCaptureDevice::devicesWithMediaType(media) };
+            let mut in_use = false;
+            let devices = devices
+                .iter()
+                .take(MAX_DEVICES)
+                .map(|device| {
+                    // SAFETY: `device` is a live capture device and these are read-only properties.
+                    let identifier = unsafe { device.uniqueID() }.to_string();
+                    // SAFETY: as above.
+                    let transport = unsafe { device.transportType() };
+                    // SAFETY: as above.
+                    let connected = unsafe { device.isConnected() };
+                    // SAFETY: as above.
+                    let suspended = unsafe { device.isSuspended() };
+                    // SAFETY: as above.
+                    let used = unsafe { device.isInUseByAnotherApplication() };
+                    in_use |= used;
+                    RawMediaDevice {
+                        key: fingerprint(identifier.as_bytes()),
+                        physical: is_physical(u32::from_ne_bytes(transport.to_ne_bytes())),
+                        available: Some(connected && !suspended),
+                    }
+                })
+                .collect();
+            RawMedia {
+                permission: permission(Kind::Camera),
+                devices: Some(devices),
+                in_use_by_other: Some(in_use),
+            }
+        })
+    }
+
+    #[repr(C)]
+    struct Address {
+        selector: u32,
+        scope: u32,
+        element: u32,
+    }
+
+    #[link(name = "CoreAudio", kind = "framework")]
+    unsafe extern "C" {
+        fn AudioObjectGetPropertyDataSize(
+            object: u32,
+            address: *const Address,
+            qualifier_size: u32,
+            qualifier: *const c_void,
+            size: *mut u32,
+        ) -> i32;
+        fn AudioObjectGetPropertyData(
+            object: u32,
+            address: *const Address,
+            qualifier_size: u32,
+            qualifier: *const c_void,
+            size: *mut u32,
+            data: *mut c_void,
+        ) -> i32;
+    }
+
+    const SYSTEM_OBJECT: u32 = 1;
+    const fn code(text: [u8; 4]) -> u32 {
+        u32::from_be_bytes(text)
+    }
+    const SCOPE_GLOBAL: u32 = code(*b"glob");
+    const SCOPE_INPUT: u32 = code(*b"inpt");
+
+    fn address(selector: [u8; 4], scope: u32) -> Address {
+        Address {
+            selector: code(selector),
+            scope,
+            element: 0,
+        }
+    }
+
+    /// A property that is an array of `u32`, at most `limit` long.
+    fn words(object: u32, address: &Address, limit: usize) -> Option<Vec<u32>> {
+        let mut size = 0_u32;
+        // SAFETY: `address` is a valid property address and `size` a valid out-parameter.
+        let status = unsafe {
+            AudioObjectGetPropertyDataSize(object, address, 0, std::ptr::null(), &raw mut size)
+        };
+        if status != 0 {
+            return None;
+        }
+        let count = (usize::try_from(size).ok()? / 4).min(limit);
+        let mut values = vec![0_u32; count];
+        let mut size = u32::try_from(count * 4).ok()?;
+        // SAFETY: `values` holds `size` writable bytes.
+        let status = unsafe {
+            AudioObjectGetPropertyData(
+                object,
+                address,
+                0,
+                std::ptr::null(),
+                &raw mut size,
+                values.as_mut_ptr().cast(),
+            )
+        };
+        if status != 0 {
+            return None;
+        }
+        values.truncate(usize::try_from(size).ok()? / 4);
+        Some(values)
+    }
+
+    fn word(object: u32, address: &Address) -> Option<u32> {
+        words(object, address, 1)?.first().copied()
+    }
+
+    /// Whether any process other than this one is capturing audio input. Process objects exist
+    /// from macOS 14; earlier systems answer `None`.
+    fn input_running_elsewhere() -> Option<bool> {
+        let processes = words(
+            SYSTEM_OBJECT,
+            &address(*b"prs#", SCOPE_GLOBAL),
+            MAX_PROCESSES,
+        )?;
+        let own = std::process::id();
+        let mut running = false;
+        for process in processes {
+            let pid = word(process, &address(*b"ppid", SCOPE_GLOBAL));
+            if pid == Some(own) {
+                continue;
+            }
+            running |= word(process, &address(*b"piri", SCOPE_GLOBAL))? != 0;
+        }
+        Some(running)
+    }
+
+    /// Every Core Audio device with input streams; no device is opened.
+    #[must_use]
+    pub fn microphones() -> RawMedia {
+        let devices = words(
+            SYSTEM_OBJECT,
+            &address(*b"dev#", SCOPE_GLOBAL),
+            MAX_DEVICES * 4,
+        )
+        .map(|devices| {
+            devices
+                .into_iter()
+                .filter(|device| {
+                    words(*device, &address(*b"stm#", SCOPE_INPUT), MAX_DEVICES)
+                        .is_some_and(|streams| !streams.is_empty())
+                })
+                .take(MAX_DEVICES)
+                .map(|device| RawMediaDevice {
+                    key: fingerprint(&device.to_le_bytes()),
+                    physical: word(device, &address(*b"tran", SCOPE_GLOBAL))
+                        .is_some_and(is_physical),
+                    available: word(device, &address(*b"livn", SCOPE_GLOBAL))
+                        .map(|alive| alive != 0),
+                })
+                .collect()
+        });
+        RawMedia {
+            permission: permission(Kind::Microphone),
+            devices,
+            in_use_by_other: input_running_elsewhere(),
+        }
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn hardware_transports_are_physical_and_virtual_or_aggregate_are_not() {
+            assert!(is_physical(code(*b"bltn")));
+            assert!(is_physical(code(*b"usb ")));
+            assert!(!is_physical(code(*b"virt")));
+            assert!(!is_physical(code(*b"grup")));
+            assert!(!is_physical(0));
+        }
+    }
+}
+
+pub use media::{Kind as MediaKind, cameras, microphones, request_access};

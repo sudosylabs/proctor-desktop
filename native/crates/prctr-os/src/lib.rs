@@ -345,3 +345,47 @@ mod tests {
         assert_eq!(whole_disk("devfs"), None);
     }
 }
+
+/// The OS permission for a camera or microphone, for the agent's responsible application.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RawMediaPermission {
+    NotDetermined,
+    Granted,
+    Denied,
+    Restricted,
+    /// The platform has no such permission or it cannot be read.
+    Unavailable,
+}
+
+/// One camera or microphone. Names, models and identifiers never leave `prctr-os`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct RawMediaDevice {
+    /// A process-local hash of the OS device identifier.
+    pub key: u64,
+    /// The OS states a hardware transport (built-in, USB, Thunderbolt, PCI, wireless). A device
+    /// that cannot be classified is not physical.
+    pub physical: bool,
+    /// Connected and not suspended (for example, a closed laptop lid); `None` when unknown.
+    pub available: Option<bool>,
+}
+
+/// One read of a media kind.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RawMedia {
+    pub permission: RawMediaPermission,
+    /// `None` when the devices cannot be listed.
+    pub devices: Option<Vec<RawMediaDevice>>,
+    /// Whether another application is capturing from a device of this kind.
+    pub in_use_by_other: Option<bool>,
+}
+
+impl RawMedia {
+    #[must_use]
+    pub const fn unavailable() -> Self {
+        Self {
+            permission: RawMediaPermission::Unavailable,
+            devices: None,
+            in_use_by_other: None,
+        }
+    }
+}

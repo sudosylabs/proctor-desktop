@@ -370,33 +370,62 @@ names. Only selected categories are queried.
 ## Camera
 
 **Purpose.** Whether a physical camera is present, permitted and ready, and whether another
-application is using it. No frame is ever captured.
+application is using it. No frame is ever captured and no device is opened.
 
-**State.** `coverage`, `certainty`, `permission`, `physical_devices`, `virtual_devices` (software
-cameras), `ready` (a physical device can be opened without capturing), `in_use_by_other_app`.
+**State.** `coverage` (readiness_and_use, readiness_only, unavailable), `physical_devices`,
+`virtual_devices` (software cameras, and any camera that cannot be classified), `ready` (ready,
+not_ready, unknown: a physical camera is connected and not suspended, and the permission is granted)
+and `in_use_by_other_app` (yes, no, unknown). The permission is the envelope's, never a state or rule
+field.
 
-**Rules.** "Camera ready" needs `physical_devices >= 1`, permission granted and `ready`; a virtual
-camera never satisfies it. A camera that cannot be classified counts as virtual.
+**Changes.** The new state, reconciled every second, with `device_added`, `device_removed`,
+`permission_changed`, `readiness_changed` and `use_changed`.
 
-**Platforms.** Windows: video-capture device watcher, the OS privacy setting, a capture source
-activated without streaming; other-application use from the OS consent store only if certification
-proves it, otherwise unknown. macOS: AVFoundation discovery (built-in, external, Continuity),
-authorization status, a device input created without a session, CoreMediaIO "running somewhere".
-Linux: V4L2 capture devices; partial.
+**Rules.** "Camera ready" is `camera.ready = ready` with a granted permission; a virtual camera never
+satisfies it. `camera.summary.virtual_devices = 0` forbids virtual cameras, and
+`camera.in_use_by_other_app = no` forbids concurrent use. An unknown `ready` or use has no field, so
+a rule on it is unknown, never not met.
 
-**Permission.** Requested on the readiness overview only when a rule requires it.
+**Platforms.**
+
+- **macOS:** AVFoundation's device list with each device's transport type (built-in, USB,
+  Thunderbolt, PCI, FireWire, Bluetooth, wireless and Continuity are physical; virtual and
+  unclassified are not), connected and suspended (a closed lid), `isInUseByAnotherApplication`, and
+  the authorization status. The device-type discovery session is not used, because its macOS 14
+  constants would not load on older systems.
+- **Windows:** Media Foundation's video-capture sources, without activating any. A root- or
+  software-enumerated source is virtual. The permission comes from the camera ConsentStore: the
+  machine, user and desktop-app switches. Other-application use comes from the ConsentStore usage
+  times (a use that started and has not stopped). That store is undocumented, so certification must
+  prove it.
+- **Linux:** V4L2 devices in sysfs, one per device; v4l2loopback devices are virtual. There is no OS
+  consent, so the permission is granted; use is unknown, which makes coverage readiness_only.
+
+**Permission.** Requested on the readiness overview only when a rule requires it. On macOS the
+request shows the OS prompt and returns at once; the answer arrives as `permission_changed`. Windows
+and Linux have no prompt: the request is refused and the overview points to the OS settings. The
+packaged app must declare `NSCameraUsageDescription` and `NSMicrophoneUsageDescription`, or macOS
+terminates the process that asks.
 
 ## Microphone
 
 **Purpose.** Like the camera: present, permitted, ready, and whether another application records.
-No audio is ever captured.
+No audio is ever captured and no device is opened.
 
-**State.** `coverage`, `certainty`, `permission`, `devices`, `ready`, `in_use_by_other_app`.
+**State.** `coverage`, `devices`, `ready` (a microphone is available and the permission is granted)
+and `in_use_by_other_app`. Changes, rules and the permission work as for the camera; a virtual
+microphone counts as a microphone.
 
-**Platforms.** Windows: Core Audio capture endpoints and their change notifications; active audio
-sessions on each endpoint for other-application use. macOS: Core Audio input devices and "running
-somewhere" (the agent never opens the microphone), AVFoundation authorization. Linux: PipeWire or
-PulseAudio sources; partial.
+**Platforms.**
+
+- **macOS:** Core Audio devices with input streams and whether they are alive. Recording elsewhere is
+  read from Core Audio's process objects, where any process other than the agent that is running
+  input is recording. Process objects exist from macOS 14; earlier systems report use as unknown.
+  The device-wide "running somewhere" flag is not used, because playback through a headset sets it.
+- **Windows:** Core Audio's active capture endpoints, and an active audio session from another
+  process on any of them. The permission comes from the microphone ConsentStore.
+- **Linux:** ALSA capture PCMs in `/proc/asound`; a running capture substream is recording, whatever
+  sound server or direct access opened it.
 
 ## External screen capture
 

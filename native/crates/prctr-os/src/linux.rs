@@ -328,6 +328,96 @@ pub fn portable_devices_in(root: &Path) -> Option<Vec<crate::RawStorageDevice>> 
     Some(devices.into_iter().collect())
 }
 
+/// Video capture devices: the first V4L2 node of each device (`index` 0). A device under
+/// `/devices/virtual` (v4l2loopback) is not physical. Linux has no OS media consent (device-file
+/// access decides), so the permission is granted; other-application use is not readable.
+#[must_use]
+pub fn cameras() -> crate::RawMedia {
+    cameras_in(Path::new("/sys/class/video4linux"))
+}
+
+#[must_use]
+pub fn cameras_in(root: &Path) -> crate::RawMedia {
+    use crate::{RawMedia, RawMediaDevice, RawMediaPermission, fingerprint};
+    let devices = fs::read_dir(root).ok().map(|entries| {
+        entries
+            .flatten()
+            .take(MAX_STORAGE)
+            .filter(|entry| trimmed(&entry.path().join("index")).is_none_or(|index| index == "0"))
+            .map(|entry| {
+                let path = entry.path();
+                let topology = fs::canonicalize(&path).unwrap_or_else(|_| path.clone());
+                let topology = topology.to_string_lossy().into_owned();
+                RawMediaDevice {
+                    key: fingerprint(entry.file_name().as_encoded_bytes()),
+                    physical: !topology.contains("/devices/virtual/"),
+                    available: Some(true),
+                }
+            })
+            .collect::<Vec<_>>()
+    });
+    let mut devices = devices;
+    if let Some(devices) = devices.as_mut() {
+        devices.sort();
+    }
+    RawMedia {
+        permission: RawMediaPermission::Granted,
+        devices,
+        in_use_by_other: None,
+    }
+}
+
+/// ALSA capture devices, and whether any capture substream is running. Sound servers and
+/// direct device access both go through ALSA, so a running substream is a recording process.
+#[must_use]
+pub fn microphones() -> crate::RawMedia {
+    microphones_in(Path::new("/proc/asound"))
+}
+
+#[must_use]
+pub fn microphones_in(root: &Path) -> crate::RawMedia {
+    use crate::{RawMedia, RawMediaDevice, RawMediaPermission, fingerprint};
+    let Ok(cards) = fs::read_dir(root) else {
+        return RawMedia::unavailable();
+    };
+    let mut devices = Vec::new();
+    let mut running = false;
+    for card in cards.flatten().take(64) {
+        let card_name = card.file_name().to_string_lossy().into_owned();
+        if !card_name.starts_with("card") {
+            continue;
+        }
+        let Ok(pcms) = fs::read_dir(card.path()) else {
+            continue;
+        };
+        for pcm in pcms.flatten().take(64) {
+            let name = pcm.file_name().to_string_lossy().into_owned();
+            if !(name.starts_with("pcm") && name.ends_with('c')) {
+                continue;
+            }
+            devices.push(RawMediaDevice {
+                key: fingerprint(format!("{card_name}/{name}").as_bytes()),
+                physical: true,
+                available: Some(true),
+            });
+            let Ok(substreams) = fs::read_dir(pcm.path()) else {
+                continue;
+            };
+            for substream in substreams.flatten().take(64) {
+                running |= fs::read_to_string(substream.path().join("status"))
+                    .is_ok_and(|status| status.contains("state: RUNNING"));
+            }
+        }
+    }
+    devices.sort();
+    devices.truncate(64);
+    RawMedia {
+        permission: RawMediaPermission::Granted,
+        devices: Some(devices),
+        in_use_by_other: Some(running),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -507,5 +597,55 @@ mod storage_tests {
         let _ = fs::remove_dir_all(&root);
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].kind, RawStorageKind::Portable);
+    }
+}
+
+#[cfg(test)]
+mod media_tests {
+    use super::*;
+
+    #[test]
+    fn one_camera_per_device_and_loopback_is_virtual() {
+        let base = std::env::temp_dir().join(format!("prctr-v4l-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&base);
+        let (root, devices) = (base.join("class"), base.join("devices"));
+        fs::create_dir_all(&root).expect("root");
+        for (name, topology, index) in [
+            ("video0", "pci0000:00/usb1/1-1/video4linux", "0"),
+            ("video1", "pci0000:00/usb1/1-1/video4linux", "1"),
+            ("video2", "devices/virtual/video4linux", "0"),
+        ] {
+            let target = devices.join(topology).join(name);
+            fs::create_dir_all(&target).expect("device");
+            fs::write(target.join("index"), format!("{index}\n")).expect("index");
+            std::os::unix::fs::symlink(&target, root.join(name)).expect("link");
+        }
+        let media = cameras_in(&root);
+        let _ = fs::remove_dir_all(&base);
+        let devices = media.devices.expect("listed");
+        assert_eq!(devices.len(), 2, "the metadata node is not a second camera");
+        assert_eq!(devices.iter().filter(|device| device.physical).count(), 1);
+    }
+
+    #[test]
+    fn capture_pcms_are_microphones_and_a_running_substream_is_in_use() {
+        let root = std::env::temp_dir().join(format!("prctr-asound-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&root);
+        for (pcm, state) in [
+            ("card0/pcm0c/sub0", "closed"),
+            ("card0/pcm0p/sub0", "RUNNING"),
+            ("card1/pcm0c/sub0", "RUNNING"),
+        ] {
+            fs::create_dir_all(root.join(pcm)).expect("pcm");
+            fs::write(root.join(pcm).join("status"), format!("state: {state}\n")).expect("status");
+        }
+        let media = microphones_in(&root);
+        let _ = fs::remove_dir_all(&root);
+        assert_eq!(
+            media.devices.map(|devices| devices.len()),
+            Some(2),
+            "playback is not capture"
+        );
+        assert_eq!(media.in_use_by_other, Some(true));
     }
 }

@@ -6,6 +6,7 @@ pub mod candidate_window;
 pub mod clipboard;
 pub mod display;
 pub mod interactive_session;
+pub mod media;
 pub mod network;
 mod poller;
 pub mod printing;
@@ -27,6 +28,8 @@ pub fn sources() -> Vec<Box<dyn Source>> {
         Box::new(network::NetworkSource::new()),
         Box::new(removable_storage::RemovableStorageSource::new()),
         Box::new(printing::PrintingSource::new()),
+        Box::new(media::MediaSource::new(media::Kind::Camera)),
+        Box::new(media::MediaSource::new(media::Kind::Microphone)),
     ]
 }
 
@@ -43,6 +46,8 @@ pub fn registry() -> Registry {
             network::descriptor(),
             removable_storage::descriptor(),
             printing::descriptor(),
+            media::descriptor(media::Kind::Camera),
+            media::descriptor(media::Kind::Microphone),
         ],
         baseline_rules: vec![
             display::baseline_rule(),
@@ -91,6 +96,14 @@ pub fn registry_json() -> Value {
             printing::CAPABILITY: {
                 "state": schema(schemars::schema_for!(printing::PrintState)),
                 "summary": schema(schemars::schema_for!(printing::PrintSummary)),
+            },
+            "camera": {
+                "state": schema(schemars::schema_for!(media::CameraState)),
+                "summary": schema(schemars::schema_for!(media::CameraSummary)),
+            },
+            "microphone": {
+                "state": schema(schemars::schema_for!(media::MicrophoneState)),
+                "summary": schema(schemars::schema_for!(media::MicrophoneSummary)),
             }
         }
     })

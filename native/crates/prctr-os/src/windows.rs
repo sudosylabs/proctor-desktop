@@ -1017,3 +1017,326 @@ mod printing {
 }
 
 pub use printing::{JobWatch, Watched, print_jobs};
+
+mod media {
+    use windows::Win32::Foundation::ERROR_SUCCESS;
+    use windows::Win32::Media::Audio::{
+        AudioSessionStateActive, DEVICE_STATE_ACTIVE, IAudioSessionControl2, IAudioSessionManager2,
+        IMMDeviceEnumerator, MMDeviceEnumerator, eCapture,
+    };
+    use windows::Win32::Media::MediaFoundation::{
+        IMFActivate, IMFAttributes, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
+        MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID,
+        MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, MFCreateAttributes,
+        MFEnumDeviceSources,
+    };
+    use windows::Win32::System::Com::{
+        CLSCTX_ALL, COINIT_MULTITHREADED, CoCreateInstance, CoInitializeEx, CoTaskMemFree,
+        CoUninitialize,
+    };
+    use windows::Win32::System::Registry::{
+        HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, KEY_READ, RRF_RT_REG_QWORD, RRF_RT_REG_SZ,
+        RegCloseKey, RegEnumKeyExW, RegGetValueW, RegOpenKeyExW,
+    };
+    use windows::core::{HSTRING, Interface, PWSTR};
+
+    use crate::{RawMedia, RawMediaDevice, RawMediaPermission, fingerprint};
+
+    const MAX_DEVICES: usize = 64;
+    const MAX_APPS: u32 = 1_024;
+    const CONSENT: &str =
+        r"Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore";
+
+    /// COM for the calling thread, released when dropped.
+    struct Com(bool);
+
+    impl Com {
+        fn enter() -> Self {
+            // SAFETY: no reserved argument; a thread may initialize COM more than once.
+            Self(unsafe { CoInitializeEx(None, COINIT_MULTITHREADED) }.is_ok())
+        }
+    }
+
+    impl Drop for Com {
+        fn drop(&mut self) {
+            if self.0 {
+                // SAFETY: balances the successful `CoInitializeEx` above on the same thread.
+                unsafe { CoUninitialize() };
+            }
+        }
+    }
+
+    fn wide(text: &str) -> HSTRING {
+        HSTRING::from(text)
+    }
+
+    fn text_value(root: HKEY, path: &str, name: &str) -> Option<String> {
+        let mut buffer = [0_u16; 64];
+        let mut size = u32::try_from(size_of_val(&buffer)).unwrap_or(0);
+        // SAFETY: `buffer` is writable for `size` bytes.
+        let status = unsafe {
+            RegGetValueW(
+                root,
+                &wide(path),
+                &wide(name),
+                RRF_RT_REG_SZ,
+                None,
+                Some(buffer.as_mut_ptr().cast()),
+                Some(&raw mut size),
+            )
+        };
+        (status == ERROR_SUCCESS).then(|| {
+            let units = usize::try_from(size).unwrap_or(0) / 2;
+            String::from_utf16_lossy(&buffer[..units.min(buffer.len())])
+                .trim_end_matches('\0')
+                .to_owned()
+        })
+    }
+
+    fn quad_value(root: HKEY, path: &str, name: &str) -> Option<u64> {
+        let mut value = 0_u64;
+        let mut size = u32::try_from(size_of::<u64>()).unwrap_or(0);
+        // SAFETY: `value` is writable for `size` bytes.
+        let status = unsafe {
+            RegGetValueW(
+                root,
+                &wide(path),
+                &wide(name),
+                RRF_RT_REG_QWORD,
+                None,
+                Some((&raw mut value).cast()),
+                Some(&raw mut size),
+            )
+        };
+        (status == ERROR_SUCCESS).then_some(value)
+    }
+
+    /// The desktop-app permission for a `ConsentStore` capability (`webcam`, `microphone`): denied
+    /// when the machine, the user, or the user's desktop-app switch denies it.
+    fn permission(capability: &str) -> RawMediaPermission {
+        let base = format!(r"{CONSENT}\{capability}");
+        let values = [
+            text_value(HKEY_LOCAL_MACHINE, &base, "Value"),
+            text_value(HKEY_CURRENT_USER, &base, "Value"),
+            text_value(HKEY_CURRENT_USER, &format!(r"{base}\NonPackaged"), "Value"),
+        ];
+        if values
+            .iter()
+            .flatten()
+            .any(|value| value.eq_ignore_ascii_case("Deny"))
+        {
+            RawMediaPermission::Denied
+        } else {
+            RawMediaPermission::Granted
+        }
+    }
+
+    /// The subkey names under `path`. Each name is an application identity and is dropped as soon
+    /// as its values are read.
+    fn subkeys(path: &str) -> Vec<String> {
+        let mut key = HKEY::default();
+        // SAFETY: `key` is a valid out-parameter for the opened key.
+        if unsafe { RegOpenKeyExW(HKEY_CURRENT_USER, &wide(path), None, KEY_READ, &raw mut key) }
+            != ERROR_SUCCESS
+        {
+            return Vec::new();
+        }
+        let mut names = Vec::new();
+        for index in 0..MAX_APPS {
+            let mut name = [0_u16; 512];
+            let mut length = u32::try_from(name.len()).unwrap_or(0);
+            // SAFETY: `key` is open and `name` is writable for `length` characters.
+            let status = unsafe {
+                RegEnumKeyExW(
+                    key,
+                    index,
+                    Some(PWSTR(name.as_mut_ptr())),
+                    &raw mut length,
+                    None,
+                    None,
+                    None,
+                    None,
+                )
+            };
+            if status != ERROR_SUCCESS {
+                break;
+            }
+            names.push(String::from_utf16_lossy(
+                &name[..usize::try_from(length).unwrap_or(0).min(name.len())],
+            ));
+        }
+        // SAFETY: `key` was opened above and is closed once.
+        let _ = unsafe { RegCloseKey(key) };
+        names
+    }
+
+    /// Whether an application currently uses the capability, from the `ConsentStore` usage times: a
+    /// use that started and has not stopped. Undocumented; certification must prove it.
+    fn in_use(capability: &str) -> bool {
+        let base = format!(r"{CONSENT}\{capability}");
+        let packaged = subkeys(&base)
+            .into_iter()
+            .filter(|name| name != "NonPackaged")
+            .map(|name| format!(r"{base}\{name}"));
+        let desktop = subkeys(&format!(r"{base}\NonPackaged"))
+            .into_iter()
+            .map(|name| format!(r"{base}\NonPackaged\{name}"));
+        packaged.chain(desktop).any(|path| {
+            quad_value(HKEY_CURRENT_USER, &path, "LastUsedTimeStart")
+                .is_some_and(|start| start != 0)
+                && quad_value(HKEY_CURRENT_USER, &path, "LastUsedTimeStop") == Some(0)
+        })
+    }
+
+    /// A camera is physical unless it is root- or software-enumerated (virtual cameras).
+    fn physical_camera(link: &str) -> bool {
+        let link = link.to_ascii_lowercase();
+        !(link.starts_with(r"\\?\root#") || link.starts_with(r"\\?\swd#"))
+    }
+
+    fn camera_links() -> Option<Vec<String>> {
+        let mut attributes: Option<IMFAttributes> = None;
+        // SAFETY: `attributes` is a valid out-parameter.
+        unsafe { MFCreateAttributes(&raw mut attributes, 1) }.ok()?;
+        let attributes = attributes?;
+        // SAFETY: both GUIDs are constants.
+        unsafe {
+            attributes.SetGUID(
+                &MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE,
+                &MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID,
+            )
+        }
+        .ok()?;
+        let mut sources: *mut Option<IMFActivate> = std::ptr::null_mut();
+        let mut count = 0_u32;
+        // SAFETY: the out-parameters are valid; the returned array is freed below.
+        unsafe { MFEnumDeviceSources(&attributes, &raw mut sources, &raw mut count) }.ok()?;
+        let mut links = Vec::new();
+        for index in 0..usize::try_from(count).unwrap_or(0) {
+            let slot = sources.wrapping_add(index);
+            // SAFETY: `sources` holds `count` entries and `index` is below it; taking each entry
+            // releases it when dropped.
+            let source = unsafe { slot.replace(None) };
+            let Some(source) = source else { continue };
+            let mut link = PWSTR::null();
+            let mut length = 0_u32;
+            // SAFETY: the attribute is a string; the OS allocates it and it is freed below.
+            if unsafe {
+                source.GetAllocatedString(
+                    &MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK,
+                    &raw mut link,
+                    &raw mut length,
+                )
+            }
+            .is_ok()
+            {
+                // SAFETY: `link` is a NUL-terminated string the OS allocated.
+                if let Ok(text) = unsafe { link.to_string() }
+                    && links.len() < MAX_DEVICES
+                {
+                    links.push(text);
+                }
+                // SAFETY: `link` was allocated with the COM allocator and is freed once.
+                unsafe { CoTaskMemFree(Some(link.0.cast())) };
+            }
+        }
+        // SAFETY: the array was allocated with the COM allocator and its entries were released.
+        unsafe { CoTaskMemFree(Some(sources.cast())) };
+        Some(links)
+    }
+
+    /// Every video-capture device from Media Foundation; no device is activated.
+    #[must_use]
+    pub fn cameras() -> RawMedia {
+        let _com = Com::enter();
+        RawMedia {
+            permission: permission("webcam"),
+            devices: camera_links().map(|links| {
+                links
+                    .iter()
+                    .map(|link| RawMediaDevice {
+                        key: fingerprint(link.as_bytes()),
+                        physical: physical_camera(link),
+                        available: Some(true),
+                    })
+                    .collect()
+            }),
+            in_use_by_other: Some(in_use("webcam")),
+        }
+    }
+
+    /// Active capture endpoints, and whether any has an active session from another process.
+    fn capture_endpoints() -> Option<(Vec<RawMediaDevice>, bool)> {
+        // SAFETY: the class ID is a constant and no aggregation is used.
+        let enumerator: IMMDeviceEnumerator =
+            unsafe { CoCreateInstance(&MMDeviceEnumerator, None, CLSCTX_ALL) }.ok()?;
+        // SAFETY: valid flow and state constants.
+        let collection =
+            unsafe { enumerator.EnumAudioEndpoints(eCapture, DEVICE_STATE_ACTIVE) }.ok()?;
+        // SAFETY: `collection` is a live endpoint collection.
+        let count = unsafe { collection.GetCount() }.ok()?;
+        let own = std::process::id();
+        let mut devices = Vec::new();
+        let mut recording = false;
+        for index in 0..count.min(u32::try_from(MAX_DEVICES).unwrap_or(0)) {
+            // SAFETY: `index` is below `count`.
+            let Ok(device) = (unsafe { collection.Item(index) }) else {
+                continue;
+            };
+            // SAFETY: `device` is live; the identifier is freed below.
+            if let Ok(id) = unsafe { device.GetId() } {
+                // SAFETY: `id` is a NUL-terminated string the OS allocated.
+                let text = unsafe { id.to_string() }.unwrap_or_default();
+                // SAFETY: allocated with the COM allocator, freed once.
+                unsafe { CoTaskMemFree(Some(id.0.cast())) };
+                devices.push(RawMediaDevice {
+                    key: fingerprint(text.as_bytes()),
+                    physical: true,
+                    available: Some(true),
+                });
+            }
+            // SAFETY: `device` is live; the session manager has no activation parameters.
+            let Ok(manager) =
+                (unsafe { device.Activate::<IAudioSessionManager2>(CLSCTX_ALL, None) })
+            else {
+                continue;
+            };
+            // SAFETY: `manager` is live.
+            let Ok(sessions) = (unsafe { manager.GetSessionEnumerator() }) else {
+                continue;
+            };
+            // SAFETY: `sessions` is live.
+            let total = unsafe { sessions.GetCount() }.unwrap_or(0);
+            for session in 0..total.min(256) {
+                // SAFETY: `session` is below the session count.
+                let Ok(control) = (unsafe { sessions.GetSession(session) }) else {
+                    continue;
+                };
+                // SAFETY: `control` is live.
+                let active = unsafe { control.GetState() }
+                    .is_ok_and(|state| state == AudioSessionStateActive);
+                let other = control
+                    .cast::<IAudioSessionControl2>()
+                    // SAFETY: `control` is live.
+                    .and_then(|control| unsafe { control.GetProcessId() })
+                    .is_ok_and(|pid| pid != own);
+                recording |= active && other;
+            }
+        }
+        Some((devices, recording))
+    }
+
+    /// Active audio capture endpoints from Core Audio; no stream is opened.
+    #[must_use]
+    pub fn microphones() -> RawMedia {
+        let _com = Com::enter();
+        let endpoints = capture_endpoints();
+        RawMedia {
+            permission: permission("microphone"),
+            in_use_by_other: endpoints.as_ref().map(|(_, recording)| *recording),
+            devices: endpoints.map(|(devices, _)| devices),
+        }
+    }
+}
+
+pub use media::{cameras, microphones};
