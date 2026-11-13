@@ -159,7 +159,8 @@ statuses immediately before Connect and aborts if a capability's source instance
 changed or an enforce rule stopped being met. At Connect the server begins
 tracking each capability from the report's facts. It checks report/session
 bindings; it cannot independently attest OS state merely because the report is
-authenticated.
+authenticated. Connect is refused with `exam.security.readiness_unmet` when the
+report does not meet the readiness rules.
 
 Preflight is single-use. Exact Connect replay returns the recorded outcome;
 changing its payload with the same key conflicts. A consumed preflight under a
@@ -245,7 +246,8 @@ instead. Neither read allows another candidate's policy or evidence.
 ## Security control on renewal
 
 Both `exam_attempt.renew` and `exam_attempt.security.update` carry a required
-`security_control` member and return a `security_control` result:
+`security_control` member. Their replies, `exam_attempt_renew_reply` and
+`security_control_reply`, return a `security_control` result:
 
 ```typescript
 interface DeliveryWatermark {
@@ -273,7 +275,10 @@ interface SecurityControlResult {
 }
 ```
 
-`security_control` is bounded at 16 KiB. `exam_attempt.renew` keeps the existing
+`security_control` is bounded at 16 KiB. A control is identified by the SHA-256
+of its canonical form (sorted keys, integers only, `JSON.stringify` escaping),
+so key order and whitespace never matter. Duplicate keys, unknown members, and
+non-integer numbers are refused. `exam_attempt.renew` keeps the existing
 lease result fields and renewal-sequence behavior. `exam_attempt.security.update`
 uses the existing connection/continuity/generation envelope and carries only
 `security_control`; it reports delivery watermarks without extending the lease.
@@ -282,7 +287,8 @@ Both operations share one control owner and the same control_sequence.
 A renewal never changes whether the candidate may interact; only closing native
 delivery does. Native rule statuses travel on the native stream, never in the
 control. A control whose policy_digest is not the Participation's current policy
-is refused with `exam.security.policy_changed`.
+is refused with `exam.security.policy_changed`. After native delivery has closed, a Workspace
+change or submit is refused with `exam.security.interaction_blocked`.
 
 security_interaction_allowed reports the shared security/continuity gates only.
 The existing per-capability projection still applies [live corrections](live-corrections.md) and all other
@@ -346,8 +352,9 @@ it.
    and resulting delivery watermarks. A delivery-watermark rejection cannot make
    an otherwise processed control disappear from the ordering history.
 3. A lower sequence never changes delivery watermarks. A matching retained
-   replay remains idempotent; an unknown older sequence changes nothing.
-   Conflicting bytes at a retained sequence fail
+   replay remains idempotent. An older sequence that is no longer retained
+   changes nothing and is answered with the latest processed boundary. A
+   retained sequence sent again with a different canonical digest fails
    (`exam.security.control_conflict`) without installing either body.
 4. Exact replay returns the retained command outcome together with a fresh
    current gate projection. It never returns an old `true` gate as current

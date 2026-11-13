@@ -270,14 +270,16 @@ exact scope/timestamps. For `policy_content_digest`, construct exactly
 `{ policy: P, catalog_bindings: B, capability_matrix_digest: M }`: P is the policy
 with digest, scope, issued_at, and active_from removed; B is the
 binding array sorted by kind then catalog_id, with unique kind/catalog_id pairs;
-M is the verified certification digest. Hash that object's canonical bytes using
+M is the certification digest. Hash that object's canonical bytes using
 [wire conventions](conventions.md). It is the explicit proof that first-join
 scope rebinding did not change selections or authority. The authenticated
 response binds all these values; a hash alone is not authenticity.
 
 `readiness_digest` identifies what the readiness overview shows and Desktop
-enforces: the activations and rules, family selections, recorder switch, and
-the registry, certification and catalogs they rest on. It leaves out the
+enforces. It is the SHA-256 of the canonical bytes of exactly
+`{ activations, rules, capabilities, screen_recording, focus_loss_mode,
+connection_loss_mode, registry_digest, capability_matrix_digest,
+catalog_bindings }`, taken from the policy and its resolution. It leaves out the
 policy's own identity, so the overview and the preflight prepared at Start carry
 the same value exactly when nothing that matters changed.
 
@@ -318,7 +320,8 @@ Verified build agreement data binds the exact capability registry, application
 catalog, configuration manifest, and a signed certification document for each
 release target. The certification is part of the release agreement and is
 verified through an admitted release key; browser/client uploads cannot register
-new claims. `capability_matrix_digest` identifies it and `matrix_id` names it.
+new claims. `capability_matrix_digest` is the SHA-256 of the document's exact
+signed bytes, and `matrix_id` names it.
 
 ```typescript
 interface NativeCertification {

@@ -144,6 +144,30 @@ export interface components {
             readonly suspension_id: components["schemas"]["id"];
         };
         /**
+         * Exam Attempt renewal
+         * @description Renews the Participation lease and carries the security control. The whole data object is at most 16 KiB.
+         */
+        readonly exam_attempt_renew: {
+            /** @description The Attempt Connection's continuity credential. */
+            readonly continuity_credential: string;
+            /** @description The Participation generation. */
+            readonly generation: number;
+            readonly security_control: components["schemas"]["security_control"];
+            /** @description The renewal's own sequence within the generation. */
+            readonly sequence: number;
+        };
+        /** Exam Attempt renewal reply */
+        readonly exam_attempt_renew_reply: {
+            readonly accepted_sequence: number;
+            readonly database_time: components["schemas"]["instant"];
+            /** @description The renewal sequence was already accepted; the lease was not extended again. */
+            readonly duplicate: boolean;
+            /** @description The Participation generation. */
+            readonly generation: number;
+            readonly lease_expires_at: components["schemas"]["instant"];
+            readonly security_control: components["schemas"]["security_control_result"];
+        };
+        /**
          * Screen clips requested
          * @description Tells the candidate's Desktop that its Attempt has screen clip requests it has not taken, so it reads them now instead of at its next poll. Neither the requests nor who made them are included.
          */
@@ -151,6 +175,17 @@ export interface components {
             readonly changed_at: components["schemas"]["instant"];
             readonly exam_attempt_id: components["schemas"]["id"];
             readonly exam_sitting_id: components["schemas"]["id"];
+        };
+        /**
+         * Exam Attempt security update
+         * @description Carries a security control between renewals. It never extends the lease. The whole data object is at most 16 KiB.
+         */
+        readonly exam_attempt_security_update: {
+            /** @description The Attempt Connection's continuity credential. */
+            readonly continuity_credential: string;
+            /** @description The Participation generation. */
+            readonly generation: number;
+            readonly security_control: components["schemas"]["security_control"];
         };
         /**
          * Attempt submitted
@@ -448,6 +483,42 @@ export interface components {
         readonly resource: {
             readonly id: string;
             readonly type: string;
+        };
+        /**
+         * Security control
+         * @description Desktop's security control: its sequence, the binding it renews and the delivery watermarks it has allocated. At most 16 KiB. The server identifies a control by the SHA-256 of its canonical JSON (object keys sorted, integers only, JSON.stringify string escaping), so key order and whitespace do not matter; duplicate keys, unknown members and non-integer numbers are refused. A retained sequence sent again with different content is refused with exam.security.control_conflict; an older sequence changes nothing. The server refuses a control whose policy is no longer current with exam.security.policy_changed.
+         */
+        readonly security_control: {
+            readonly control_sequence: number;
+            /** @description The admitted native stream and the Browser sources owned by the current Participation, each at most once. At most 50. */
+            readonly delivery_watermarks: readonly {
+                /** @description At most allocated_through_sequence. */
+                readonly acknowledged_through_sequence: number;
+                readonly allocated_through_sequence: number;
+                /** @enum {string} */
+                readonly family: "native" | "browser";
+                readonly source_id: string;
+            }[];
+            readonly policy_digest: string;
+            readonly security_session_id: string;
+            readonly stream_id: string;
+        };
+        /**
+         * Security control result
+         * @description How the server processed Desktop's latest security control. A control never changes whether the candidate may interact; only closing native delivery does.
+         */
+        readonly security_control_result: {
+            /** @description At most 50. */
+            readonly delivery_watermark_rejections: readonly {
+                /** @enum {string} */
+                readonly family: "native" | "browser";
+                /** @enum {string} */
+                readonly reason: "closed_source" | "position_limit";
+                readonly source_id: string;
+            }[];
+            readonly processed_control_digest: string | null;
+            readonly processed_control_sequence: number;
+            readonly security_interaction_allowed: boolean;
         };
         /**
          * SHA-256 digest
