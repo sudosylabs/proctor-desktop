@@ -2,7 +2,7 @@ import type {
 	CandidateWindowHostEvent,
 	CandidateWindowState,
 	PlatformFamily
-} from '../common/nativeObservation.generated.js';
+} from './candidateWindowState.js';
 
 export type CandidateWindowContentProtection = 'enabled' | 'failed' | 'unavailable';
 

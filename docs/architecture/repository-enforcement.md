@@ -139,9 +139,9 @@ An optional explicitly enabled hook checks staged hygiene, formatting and syntax
 without rewriting source or staging. It is never installed by npm lifecycle
 hooks. CI remains the required authority. See the
 [development environment](../project/development.md) for the ownership boundary.
-Electron and esbuild now support the isolated security-utility composition:
-the cheap `check` gate runs its process-neutral protocol tests, and the native
-macOS/Windows jobs run its real Electron/Node-API lifecycle test. Forge,
+The native agent is checked by its Rust tests and by `test:native-agent`, which
+drives the real binary through Electron main's connection and service; the
+native macOS/Windows jobs also run its real-OS checks. Forge,
 Playwright, packaging, and packaged-target gates remain absent. A real
 sandboxed Chromium renderer harness covers browser-owned controls and
 workbench interactions, and a real Electron harness verifies the isolated

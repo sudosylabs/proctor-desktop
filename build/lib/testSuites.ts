@@ -25,12 +25,6 @@ export const testSuites = {
 		output: '.build/editor-core-tests/**/*.test.js',
 		runtime: 'node'
 	},
-	'security-utility': {
-		patterns: ['test/security-utility/**/*.test.ts'],
-		build: 'build/buildSecurityUtilityTests.ts',
-		output: '.build/security-utility-tests/**/*.test.js',
-		runtime: 'node'
-	},
 	'native-agent': {
 		patterns: ['test/native-agent/**/*.test.ts'],
 		build: 'build/buildNativeAgentTests.ts',
@@ -65,11 +59,6 @@ export const testSuites = {
 	'desktop-identity': {
 		patterns: ['test/electron/desktopIdentity.real.test.ts'],
 		build: 'build/buildDesktopIdentityTests.ts',
-		runtime: 'electron'
-	},
-	'electron-security': {
-		patterns: ['test/electron/securityUtility.real.test.ts'],
-		build: 'build/buildSecurityUtility.ts',
 		runtime: 'electron'
 	}
 } as const satisfies Record<string, TestSuite>;

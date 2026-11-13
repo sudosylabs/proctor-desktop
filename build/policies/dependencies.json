@@ -33,15 +33,6 @@
       "lifecycleScripts": "allowed",
       "declarations": [
         {
-          "manifest": "native/crates/native-node-bridge/Cargo.toml",
-          "alias": "napi",
-          "kind": "production",
-          "features": ["dyn-symbols", "napi8", "serde-json"],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": null
-        },
-        {
           "manifest": "native/crates/desktop-key-custody/Cargo.toml",
           "alias": "napi",
           "kind": "production",
@@ -51,7 +42,7 @@
           "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility", "electron-main"],
+      "processes": ["electron-main"],
       "networkBehavior": "None at runtime; Node-API calls remain process-local.",
       "nativeBehavior": "Links the platform Node-API symbols and uses its reviewed registration build support; it does not bundle a helper executable.",
       "transitiveRisk": "Adds napi-sys, registration support, futures primitives, serde conversion, and dynamic-symbol loading; exact transitive versions are locked and license checked.",
@@ -71,15 +62,6 @@
       "license": "MIT",
       "lifecycleScripts": "none",
       "declarations": [
-        {
-          "manifest": "native/crates/native-node-bridge/Cargo.toml",
-          "alias": "napi-derive",
-          "kind": "production",
-          "features": ["strict"],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": null
-        },
         {
           "manifest": "native/crates/desktop-key-custody/Cargo.toml",
           "alias": "napi-derive",
@@ -110,33 +92,6 @@
       "license": "MIT OR Apache-2.0",
       "lifecycleScripts": "none",
       "declarations": [
-        {
-          "manifest": "native/crates/native-node-bridge/Cargo.toml",
-          "alias": "serde",
-          "kind": "production",
-          "features": ["derive"],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": null
-        },
-        {
-          "manifest": "native/crates/native-protocol/Cargo.toml",
-          "alias": "serde",
-          "kind": "production",
-          "features": ["derive"],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": null
-        },
-        {
-          "manifest": "native/crates/native-security-helper/Cargo.toml",
-          "alias": "serde",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": null
-        },
         {
           "manifest": "native/crates/prctr-recorder/Cargo.toml",
           "alias": "serde",
@@ -174,12 +129,7 @@
           "targetScope": null
         }
       ],
-      "processes": [
-        "exam-security-utility",
-        "native-build",
-        "native-security-helper",
-        "native-agent"
-      ],
+      "processes": ["native-build", "native-agent"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust serialization traits and derive macros; no native library or helper process.",
       "transitiveRisk": "Adds the exact locked serde core and derive macro graph; generated DTO validation still runs independently after conversion.",
@@ -199,15 +149,6 @@
       "license": "MIT OR Apache-2.0",
       "lifecycleScripts": "none",
       "declarations": [
-        {
-          "manifest": "native/crates/native-security-helper/Cargo.toml",
-          "alias": "serde_json",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": null
-        },
         {
           "manifest": "native/crates/prctr-agent/Cargo.toml",
           "alias": "serde_json",
@@ -263,42 +204,12 @@
           "targetScope": null
         }
       ],
-      "processes": ["native-security-helper", "native-agent", "build"],
+      "processes": ["native-agent", "build"],
       "networkBehavior": "None; all frames use private inherited process handles and are validated before nested allocation.",
       "nativeBehavior": "Pure Rust JSON encoding and decoding; ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Uses the exact locked itoa, memchr, serde_core, and zmij graph; fixed frame limits and generated protocol validation remain independent controls.",
       "bundleTreatment": "bundled",
       "localAlternative": "A handwritten JSON implementation would duplicate a security-sensitive parser and make generated cross-language protocol conformance harder to audit.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
-    },
-    {
-      "ecosystem": "cargo",
-      "package": "hmac",
-      "version": "0.12.1",
-      "kind": "production",
-      "purpose": "Apply the standard HMAC construction to the opaque Attempt collection context and raw removable-device identity before any pseudonym crosses the source boundary.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/hmac/0.12.1",
-      "license": "MIT OR Apache-2.0",
-      "lifecycleScripts": "none",
-      "declarations": [
-        {
-          "manifest": "native/crates/removable-storage-state/Cargo.toml",
-          "alias": "hmac",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": null
-        }
-      ],
-      "processes": ["exam-security-utility"],
-      "networkBehavior": "None.",
-      "nativeBehavior": "Pure Rust message-authentication construction; it ships no native library, helper, or lifecycle script.",
-      "transitiveRisk": "Reuses the exact locked digest graph admitted for SHA-256 and activates the exact locked constant-time subtle primitive; neither adds runtime I/O or platform integration.",
-      "bundleTreatment": "bundled",
-      "localAlternative": "A hand-rolled keyed-hash construction would enlarge the security-sensitive surface and duplicate a standard primitive.",
       "updateOwner": "native-capabilities",
       "removalOwner": "native-capabilities"
     },
@@ -330,201 +241,14 @@
           "defaultFeatures": false,
           "optional": false,
           "targetScope": null
-        },
-        {
-          "manifest": "native/crates/removable-storage-state/Cargo.toml",
-          "alias": "sha2",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": false,
-          "optional": false,
-          "targetScope": null
         }
       ],
-      "processes": ["exam-security-utility", "build"],
+      "processes": ["build"],
       "networkBehavior": "None.",
       "nativeBehavior": "Pure Rust SHA-256 primitives; it ships no native library, helper, or lifecycle script.",
       "transitiveRisk": "Adds the exact locked digest, block-buffer, crypto-common, generic-array and typenum graph; the use is local HMAC derivation over bounded inputs.",
       "bundleTreatment": "bundled",
       "localAlternative": "A repository-local cryptographic hash implementation would create a larger security-sensitive surface with no product-specific value.",
-      "updateOwner": "native-capabilities",
-      "removalOwner": "native-capabilities"
-    },
-    {
-      "ecosystem": "cargo",
-      "package": "windows-sys",
-      "version": "0.61.2",
-      "kind": "production",
-      "purpose": "Typed Windows bindings for display, capture, snapshot process/session inventory, clipboard counters, print queues, mounted removable storage, network topology and proxy state, media-endpoint presence, and packaged helper image/signature verification.",
-      "owner": "native-capabilities",
-      "source": "https://crates.io/crates/windows-sys/0.61.2",
-      "license": "MIT OR Apache-2.0",
-      "lifecycleScripts": "none",
-      "declarations": [
-        {
-          "manifest": "native/crates/capture-session-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Graphics_Gdi",
-            "Win32_System_LibraryLoader",
-            "Win32_System_Registry",
-            "Win32_System_RemoteDesktop",
-            "Win32_System_Threading",
-            "Win32_UI_WindowsAndMessaging"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/display-topology/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Devices_DeviceAndDriverInstallation",
-            "Win32_Devices_Display",
-            "Win32_Foundation",
-            "Win32_Graphics_Gdi",
-            "Win32_System_LibraryLoader",
-            "Win32_System_Threading",
-            "Win32_UI_WindowsAndMessaging"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/process-application-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Security",
-            "Win32_System_Diagnostics_Etw",
-            "Win32_System_Diagnostics_ToolHelp",
-            "Win32_System_Performance",
-            "Win32_System_RemoteDesktop",
-            "Win32_System_Threading",
-            "Win32_System_Time"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/interactive-session-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Security",
-            "Win32_System_RemoteDesktop",
-            "Win32_System_Services",
-            "Win32_System_Threading"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/clipboard-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": ["Win32_System_DataExchange"],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/print-spooler-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Globalization",
-            "Win32_Graphics_Gdi",
-            "Win32_Graphics_Printing",
-            "Win32_System_WindowsProgramming"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/removable-storage-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": ["Win32_Storage_FileSystem", "Win32_System_WindowsProgramming"],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/network-configuration-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_NetworkManagement_IpHelper",
-            "Win32_NetworkManagement_Ndis",
-            "Win32_Networking_WinHttp",
-            "Win32_Networking_WinSock"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/media-device-state/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Devices_DeviceAndDriverInstallation",
-            "Win32_Foundation",
-            "Win32_Media_Audio",
-            "Win32_Media_KernelStreaming"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        },
-        {
-          "manifest": "native/crates/native-security-helper/Cargo.toml",
-          "alias": "windows-sys",
-          "kind": "production",
-          "features": [
-            "Win32_Foundation",
-            "Win32_Security_Cryptography",
-            "Win32_Security_WinTrust",
-            "Win32_Storage_FileSystem",
-            "Win32_System_Threading",
-            "Win32_System_Pipes",
-            "Win32_System_IO",
-            "Win32_System_Services",
-            "Win32_Security_Authorization",
-            "Win32_System_JobObjects",
-            "Win32_System_RemoteDesktop",
-            "Win32_UI_Shell",
-            "Win32_System_Com"
-          ],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"windows\")"
-        }
-      ],
-      "processes": [
-        "exam-security-utility",
-        "native-capture-session",
-        "native-display-topology",
-        "native-security-helper"
-      ],
-      "networkBehavior": "None; the crate provides generated Win32 bindings and links system libraries only.",
-      "nativeBehavior": "No bundled native binary or build script; generated declarations call reviewed Windows display/session, Toolhelp, clipboard, spooler, storage, IP Helper, WinHTTP, SetupAPI, media-class, BCrypt, live-process-image, and Authenticode trust APIs through system linking.",
-      "transitiveRisk": "Locks windows-link 0.2.1, which supplies Windows import linkage without lifecycle scripts or network behavior; it is target-scoped with windows-sys.",
-      "bundleTreatment": "external-platform",
-      "localAlternative": "Handwritten bindings for these ABI-sensitive Windows structures, handles, buffers, and lifecycle functions would enlarge the unsafe surface and increase memory-safety risk.",
       "updateOwner": "native-capabilities",
       "removalOwner": "native-capabilities"
     },
@@ -539,15 +263,6 @@
       "license": "MIT OR Apache-2.0",
       "lifecycleScripts": "none",
       "declarations": [
-        {
-          "manifest": "native/crates/network-configuration-state/Cargo.toml",
-          "alias": "libc",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"macos\")"
-        },
         {
           "manifest": "native/crates/prctr-os/Cargo.toml",
           "alias": "libc",
@@ -565,27 +280,9 @@
           "defaultFeatures": true,
           "optional": false,
           "targetScope": "cfg(target_os = \"linux\")"
-        },
-        {
-          "manifest": "native/crates/process-application-state/Cargo.toml",
-          "alias": "libc",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"macos\")"
-        },
-        {
-          "manifest": "native/crates/removable-storage-state/Cargo.toml",
-          "alias": "libc",
-          "kind": "production",
-          "features": [],
-          "defaultFeatures": true,
-          "optional": false,
-          "targetScope": "cfg(target_os=\"macos\")"
         }
       ],
-      "processes": ["exam-security-utility", "native-security-helper", "native-agent"],
+      "processes": ["native-agent"],
       "networkBehavior": "None; the crate exposes platform C declarations only.",
       "nativeBehavior": "Links macOS system APIs already provided by the operating system and ships no helper or bundled native library.",
       "transitiveRisk": "No additional transitive runtime graph; the exact version is already locked by the native workspace.",
@@ -1281,7 +978,7 @@
       "source": "https://www.npmjs.com/package/electron/v/44.0.0",
       "license": "MIT",
       "lifecycleScripts": "none",
-      "processes": ["electron-main", "exam-security-utility"],
+      "processes": ["electron-main"],
       "networkBehavior": "The development package API acquires the checksum-verified exact Electron distribution on explicit tool invocation when it is absent; the packaged application uses its bundled runtime and product networking remains separately owned.",
       "nativeBehavior": "Installs the exact Electron runtime and its Chromium/Node native binaries for the host platform.",
       "transitiveRisk": "Acquisition and archive extraction dependencies are reachable only from explicit development tooling; the lockfile pins their resolved graph and the application does not import this package as an ordinary Node dependency.",

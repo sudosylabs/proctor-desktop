@@ -57,10 +57,9 @@
   are implemented unprivileged on Windows and macOS and tested on both, with
   Linux reporting unsupported where it must; the Endpoint Security extension and
   the Windows service, which full coverage needs, are not built yet, and nothing
-  native is composed into the app yet. The superseded utility-process implementation
-  stays in the tree for its tests until the agent replaces it. The native parts
-  of `docs/contracts/` describe the superseded design and are updated from the
-  server's published API.
+  native is composed into the app yet. The superseded utility-process
+  implementation has been removed. The native parts of `docs/contracts/` follow
+  the server's published API.
 - One Proctor design system, selective VS Code source admission, one pinned npm/
   NodeNext/esbuild/Forge graph, and invariant-to-assurance mapping govern future
   implementation.

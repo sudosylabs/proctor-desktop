@@ -10,7 +10,7 @@ import {
 	type CandidateWindowHostEvent,
 	type CandidateWindowState,
 	type PlatformFamily
-} from '../common/nativeObservation.generated.js';
+} from './candidateWindowState.js';
 import {
 	CandidateWindowEnforcer,
 	type CandidateWindowConstraintVerification,

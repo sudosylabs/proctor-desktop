@@ -271,10 +271,8 @@
         "build/tsconfig.common-test.json",
         "build/tsconfig.browser.json",
         "build/tsconfig.electron-main.json",
-        "build/tsconfig.electron-utility.json",
         "build/tsconfig.electron-test.json",
-        "package.json",
-        "src/prctr/platform/native/common/nativeObservation.generated.ts"
+        "package.json"
       ]
     },
     {
@@ -384,22 +382,6 @@
       ]
     },
     {
-      "id": "native-security-utility-bridge-tests",
-      "kind": "test",
-      "status": "active",
-      "owner": "native-capabilities",
-      "invariants": ["runtime.handle-isolation"],
-      "evidence": [
-        "src/prctr/platform/native/common/securityUtilityProtocol.ts",
-        "src/prctr/platform/native/electron-main/securityUtilityClient.ts",
-        "src/prctr/platform/native/electron-utility/securityUtilityHost.ts",
-        "test/security-utility/securityUtilityProtocol.test.ts",
-        "test/electron/securityUtility.real.test.ts",
-        ".github/workflows/foundation.yml",
-        "package.json"
-      ]
-    },
-    {
       "id": "native-candidate-window-enforcement-tests",
       "kind": "test",
       "status": "active",
@@ -415,31 +397,6 @@
         "src/prctr/platform/native/electron-main/candidateWindowEnforcer.ts",
         "src/prctr/platform/native/electron-main/electronCandidateWindow.ts",
         "test/checks/candidateWindowEnforcer.test.ts",
-        "test/electron/securityUtilityMain.ts",
-        "test/electron/securityUtility.real.test.ts",
-        ".github/workflows/foundation.yml",
-        "package.json"
-      ]
-    },
-    {
-      "id": "native-permission-broker-tests",
-      "kind": "test",
-      "status": "active",
-      "owner": "native-capabilities",
-      "invariants": [
-        "source.interface-tests",
-        "runtime.handle-isolation",
-        "native.initial-scope",
-        "native.process-boundaries",
-        "native.fail-closed"
-      ],
-      "evidence": [
-        "src/prctr/platform/native/electron-main/nativePermissionBroker.ts",
-        "src/prctr/code/electron-main/securityUtilityComposition.ts",
-        "test/security-utility/nativePermissionBroker.test.ts",
-        "test/electron/securityUtilityMain.ts",
-        "test/electron/securityUtility.real.test.ts",
-        "build/testSecurityUtility.ts",
         ".github/workflows/foundation.yml",
         "package.json"
       ]
@@ -676,229 +633,12 @@
         "native/crates/prctr-capabilities/src/candidate_window.rs",
         "native/crates/prctr-capabilities/src/candidate_window_tests.rs",
         "native/crates/prctr-capabilities/src/interactive_session.rs",
-        "native/crates/prctr-capabilities/registry/registry.json"
-      ]
-    },
-    {
-      "id": "native-display-source-contract-tests",
-      "kind": "test",
-      "status": "active",
-      "owner": "native-capabilities",
-      "invariants": [
-        "native.passive-sources",
-        "native.race-free-session",
-        "toolchain.native-schema-authority"
-      ],
-      "evidence": [
-        "rust-toolchain.toml",
-        "native/Cargo.lock",
-        "native/Cargo.toml",
-        "native/schemas/native-observation.schema.json",
-        "native/schemas/display-topology.schema.json",
-        "native/crates/native-protocol/src/generated.rs",
-        "native/crates/native-protocol/src/lib.rs",
-        "native/crates/native-source-runtime/src/lib.rs",
-        "native/crates/display-topology/src/lib.rs",
-        "native/crates/display-topology/src/platform/linux.rs",
-        "native/crates/display-topology/src/platform/macos.rs",
-        "native/crates/display-topology/src/platform/macos/core_graphics.rs",
-        "native/crates/display-topology/src/platform/macos/notifications.rs",
-        "native/crates/display-topology/src/platform/macos/topology_query.rs",
-        "native/crates/display-topology/src/platform/polling.rs",
-        "native/crates/display-topology/src/platform/windows.rs",
-        "native/crates/display-topology/src/platform/windows/notifications.rs",
-        "native/crates/display-topology/src/platform/windows/topology_query.rs",
-        "native/crates/display-topology/src/platform/windows/window_watcher.rs",
-        "src/prctr/platform/native/common/nativeObservation.generated.ts",
-        "test/checks/nativeProtocol.test.ts",
-        "test/checks/testNative.test.ts",
-        ".github/workflows/foundation.yml",
-        "package.json",
-        "build/testNative.ts"
-      ]
-    },
-    {
-      "id": "native-candidate-window-source-contract-tests",
-      "kind": "test",
-      "status": "active",
-      "owner": "native-capabilities",
-      "invariants": [
-        "native.passive-sources",
-        "native.race-free-session",
-        "runtime.handle-isolation",
-        "toolchain.native-schema-authority"
-      ],
-      "evidence": [
-        "native/Cargo.lock",
-        "native/Cargo.toml",
-        "native/schemas/native-observation.schema.json",
-        "native/schemas/candidate-window-state.schema.json",
-        "native/crates/native-protocol/src/candidate_window.generated.rs",
-        "native/crates/native-protocol/src/lib.rs",
-        "native/crates/native-source-runtime/src/lib.rs",
-        "native/crates/candidate-window-state/Cargo.toml",
-        "native/crates/candidate-window-state/src/lib.rs",
-        "native/crates/candidate-window-state/src/platform/mod.rs",
-        "native/crates/candidate-window-state/src/platform/event_backend.rs",
-        "native/crates/candidate-window-state/src/platform/linux.rs",
-        "native/crates/candidate-window-state/src/platform/macos.rs",
-        "native/crates/candidate-window-state/src/platform/windows.rs",
-        "native/crates/candidate-window-state/tests/backend_stop_fence.rs",
-        "native/crates/candidate-window-state/tests/process_fence.rs",
-        "src/prctr/platform/native/common/nativeObservation.generated.ts",
-        "test/checks/candidateWindowProtocol.test.ts",
-        "test/checks/testNative.test.ts",
-        ".github/workflows/foundation.yml",
-        "package.json",
-        "build/testNative.ts"
-      ]
-    },
-    {
-      "id": "native-capture-session-source-contract-tests",
-      "kind": "test",
-      "status": "active",
-      "owner": "native-capabilities",
-      "invariants": [
-        "native.passive-sources",
-        "native.race-free-session",
-        "toolchain.native-schema-authority"
-      ],
-      "evidence": [
-        "native/Cargo.lock",
-        "native/Cargo.toml",
-        "native/schemas/native-observation.schema.json",
-        "native/schemas/capture-session-state.schema.json",
-        "native/crates/native-protocol/src/capture_session.generated.rs",
-        "native/crates/native-protocol/src/lib.rs",
-        "native/crates/native-source-runtime/src/lib.rs",
-        "native/crates/capture-session-state/Cargo.toml",
-        "native/crates/capture-session-state/src/lib.rs",
-        "native/crates/capture-session-state/src/platform/mod.rs",
-        "native/crates/capture-session-state/src/platform/static_coverage.rs",
-        "native/crates/capture-session-state/src/platform/linux.rs",
-        "native/crates/capture-session-state/src/platform/macos.rs",
-        "native/crates/capture-session-state/src/platform/windows.rs",
-        "native/crates/capture-session-state/src/platform/windows/metrics.rs",
-        "native/crates/capture-session-state/src/platform/windows/notifications.rs",
-        "native/crates/capture-session-state/src/platform/windows/session_watcher.rs",
-        "native/crates/capture-session-state/tests/cleanup_fence.rs",
-        "src/prctr/platform/native/common/nativeObservation.generated.ts",
-        "test/checks/captureSessionProtocol.test.ts",
-        "test/checks/testNative.test.ts",
-        ".github/workflows/foundation.yml",
-        "package.json",
-        "build/testNative.ts"
-      ]
-    },
-    {
-      "id": "native-process-application-source-contract-tests",
-      "kind": "test",
-      "status": "active",
-      "owner": "native-capabilities",
-      "invariants": [
-        "native.passive-sources",
-        "native.race-free-session",
-        "toolchain.native-schema-authority"
-      ],
-      "evidence": [
-        "native/Cargo.lock",
-        "native/Cargo.toml",
-        "native/schemas/native-observation.schema.json",
-        "native/schemas/process-application-state.schema.json",
-        "native/crates/native-protocol/src/process_application.generated.rs",
-        "native/crates/native-protocol/src/lib.rs",
-        "native/crates/native-source-runtime/src/lib.rs",
-        "native/crates/process-application-state/Cargo.toml",
-        "native/crates/process-application-state/src/lib.rs",
-        "native/crates/process-application-state/src/platform/mod.rs",
-        "native/crates/process-application-state/src/platform/snapshot.rs",
-        "native/crates/process-application-state/src/platform/unavailable.rs",
-        "native/crates/process-application-state/src/platform/linux.rs",
-        "native/crates/process-application-state/src/platform/macos.rs",
-        "native/crates/process-application-state/src/platform/windows.rs",
-        "native/crates/native-source-supervisor/src/lib.rs",
-        "native/crates/native-node-bridge/src/lib.rs",
-        "src/prctr/platform/native/common/nativeObservation.generated.ts",
-        "src/prctr/platform/native/common/securityUtilityProtocol.ts",
-        "test/checks/processApplicationProtocol.test.ts",
-        "test/checks/testNative.test.ts",
-        ".github/workflows/foundation.yml",
-        "package.json",
-        "build/testNative.ts"
-      ]
-    },
-    {
-      "id": "native-capability-family-source-contract-tests",
-      "kind": "test",
-      "status": "active",
-      "owner": "native-capabilities",
-      "invariants": [
-        "native.passive-sources",
-        "native.race-free-session",
-        "native.process-boundaries",
-        "native.fail-closed",
-        "toolchain.native-schema-authority",
-        "toolchain.signed-capability-matrix"
-      ],
-      "evidence": [
-        "native/schemas/interactive-session-state.schema.json",
-        "native/schemas/clipboard-state.schema.json",
-        "native/schemas/print-spooler-state.schema.json",
-        "native/schemas/removable-storage-state.schema.json",
-        "native/schemas/virtualization-state.schema.json",
-        "native/schemas/network-configuration-state.schema.json",
-        "native/schemas/media-device-state.schema.json",
-        "native/schemas/native-helper.schema.json",
-        "native/crates/native-source-runtime/src/lib.rs",
-        "native/crates/native-source-supervisor/src/lib.rs",
-        "native/crates/native-helper-protocol/src/lib.rs",
-        "native/crates/interactive-session-state/src/lib.rs",
-        "native/crates/clipboard-state/src/lib.rs",
-        "native/crates/print-spooler-state/src/lib.rs",
-        "native/crates/removable-storage-state/src/lib.rs",
-        "native/crates/virtualization-state/src/lib.rs",
-        "native/crates/network-configuration-state/src/lib.rs",
-        "native/crates/media-device-state/src/lib.rs",
-        "src/prctr/platform/native/common/nativeCapabilityRegistry.ts",
-        "src/prctr/platform/native/common/privateAttemptClipboard.ts",
-        "src/prctr/platform/native/common/candidatePrintCommandGate.ts",
-        "src/prctr/platform/native/electron-main/nativePermissionBroker.ts",
-        "test/checks/nativeCapabilityFamiliesProtocol.test.ts",
-        "test/checks/nativeCapabilityRegistry.test.ts",
-        "test/checks/privateAttemptClipboard.test.ts",
-        "test/checks/candidatePrintCommandGate.test.ts",
-        "test/security-utility/nativePermissionBroker.test.ts",
-        "test/checks/testNative.test.ts"
-      ]
-    },
-    {
-      "id": "exam-security-coordinator-contract-tests",
-      "kind": "test",
-      "status": "active",
-      "owner": "exam-security",
-      "invariants": [
-        "security.privileged-posture",
-        "security.online-only",
-        "security.containment-before-presentation",
-        "security.pause-suspension",
-        "security.fenced-participation",
-        "security.integrity-vocabulary",
-        "native.passive-sources",
-        "native.process-boundaries",
-        "native.fail-closed",
-        "native.abnormal-loss-contained",
-        "toolchain.signed-capability-matrix"
-      ],
-      "evidence": [
-        "src/prctr/workbench/services/examSecurity/common/effectivePolicy.ts",
-        "src/prctr/workbench/services/examSecurity/common/examSecurity.ts",
-        "src/prctr/workbench/services/examSecurity/common/securityProjectionProtocol.ts",
-        "src/prctr/workbench/services/examSecurity/electron-utility/examSecurityCoordinator.ts",
-        "src/prctr/workbench/services/examSecurity/electron-main/examSecurityIpc.ts",
-        "src/prctr/code/electron-main/examSecurityComposition.ts",
-        "src/prctr/code/electron-browser/candidatePreload.ts",
-        "src/prctr/workbench/browser/candidateManifest.ts",
-        "test/workbench/services/examSecurity/common/examSecurityCoordinator.test.ts"
+        "native/crates/prctr-capabilities/registry/registry.json",
+        "native/crates/prctr-recorder/src/recorder_tests.rs",
+        "native/crates/prctr-recorder/src/clip.rs",
+        "native/crates/prctr-recorder/src/store.rs",
+        "test/workbench/services/screenClips/node/screenClipUploader.test.ts",
+        "test/platform/native/node/screenRecordingKey.test.ts"
       ]
     },
     {

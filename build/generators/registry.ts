@@ -5,12 +5,6 @@ import { productMetadataGenerator } from './productMetadata.ts';
 import { bundledThemesGenerator } from './bundledThemes.ts';
 import { phosphorIconsGenerator } from './phosphorIcons.ts';
 import type { Repository } from '../checks/types.ts';
-import {
-	nativeProtocolGenerator,
-	nativeCapabilityProtocolGenerators,
-	nativeHelperProtocolGenerator
-} from './nativeProtocol.ts';
-import { nativeCapabilityRegistryGenerator } from './nativeCapabilityRegistry.ts';
 import { nativeAgentProtocolGenerator } from './nativeAgentProtocol.ts';
 import { localizationCatalogGenerator } from './localizationCatalog.ts';
 import { settingsRegistryGenerator } from './settingsRegistry.ts';
@@ -33,10 +27,6 @@ const productGenerators: readonly Generator[] = [
 	phosphorIconsGenerator,
 	localizationCatalogGenerator,
 	settingsRegistryGenerator,
-	nativeProtocolGenerator,
-	...nativeCapabilityProtocolGenerators,
-	nativeHelperProtocolGenerator,
-	nativeCapabilityRegistryGenerator,
 	nativeAgentProtocolGenerator
 ];
 

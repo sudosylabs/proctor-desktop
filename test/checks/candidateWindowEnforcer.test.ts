@@ -5,7 +5,7 @@ import {
 	type CandidateWindowHostEvent,
 	type CandidateWindowState,
 	type PlatformFamily
-} from '../../src/prctr/platform/native/common/nativeObservation.generated.ts';
+} from '../../src/prctr/platform/native/electron-main/candidateWindowState.ts';
 import {
 	CandidateWindowEnforcementError,
 	CandidateWindowEnforcer,

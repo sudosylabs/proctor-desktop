@@ -57,7 +57,7 @@ enforcement, Browser Activity, protected delivery, privacy, or access.
 Use
 [`develop-native-capabilities`](../../.agents/skills/develop-native-capabilities/SKILL.md)
 when implementing or reviewing a native observation source, OS adapter,
-permission flow, candidate-window effect, utility-process boundary, native IPC,
+permission flow, candidate-window effect, native agent boundary, native IPC,
 or platform-capability test.
 
 Use

@@ -138,8 +138,7 @@ The native agent is a standalone binary, not a Node-API module; no observation
 code loads into an Electron process. Its screen recorder uses the OS H.264
 encoders (VideoToolbox, Media Foundation), never ffmpeg, and RustCrypto's
 `chacha20poly1305`; every key and nonce comes from the OS random source through
-`prctr-os`, so no userspace random-number crate is admitted. The superseded utility-process bridge
-remains in the tree only for its tests until the agent replaces it. The separate
+`prctr-os`, so no userspace random-number crate is admitted. The separate
 identity key-custody adapter is the one Electron-main Node-API module, defined by the
 [identity architecture](./identity-and-exam-security.md#desktop-authorization-and-installation-proof):
 it exposes a public key, bounded digest signing and deletion, with no private-key
@@ -278,14 +277,14 @@ byte-identical signed installers. A release records:
 
 Production source maps and native symbols are stored privately by build
 identity and never shipped. Renderer symbolication follows privacy filtering.
-Security-utility/native symbols and crash dumps are more restricted evidence;
+Native-agent symbols and crash dumps are more restricted evidence;
 dumps require explicit support authorization and are never uploaded
 automatically.
 
 GitHub Actions owns initial CI. Linux may run inexpensive source checks but
 cannot establish supported-platform behavior. Current Windows and macOS jobs
-run native-source verification and the real Electron security-utility bridge;
-that development-runtime evidence establishes no packaged platform claim.
+run the native agent's Rust tests, including real-OS checks, and its end-to-end
+suite; that development-runtime evidence establishes no packaged platform claim.
 Windows x64 and macOS arm64/x64 jobs will own package and native claims once the
 packaged target gates exist. Unsigned verified payloads enter protected signing
 jobs whose credentials are unavailable to pull requests and ordinary builds.
@@ -318,10 +317,7 @@ The foundation currently exposes `check`, focused repository checks,
 test-only scripted capability and drives the real binary through Electron main's
 connection and service: handshake, framing, readiness → participation, containment,
 gaps, crash, hang, the single restart, and orderly close. It is part of
-`test:unit`. `build:security-utility` compiles the superseded native Node-API
-addon and exact Electron-main/utility test bundles. `test:security-utility`
-proves the process-neutral private protocol, while `test:electron` runs the
-real Electron/Node-API lifecycle. `build:browser-harness` bundles a sandboxed
+`test:unit`. `build:browser-harness` bundles a sandboxed
 plain-DOM fixture against Electron's exact Chromium major, and `test:browser`
 verifies DOM execution, locale/direction control, and absence of ambient Node.js
 through that real renderer. `test:base` compiles and executes the localization

@@ -152,7 +152,7 @@ spools. Project only authorized minimized state and keep content/evidence/
 credentials out of ordinary audit, diagnostics, renderer state, and logs.
 
 Let main canonicalize and authenticate minimized batches with the registered
-installation credential; helpers and the utility never receive it. Separate
+installation credential; the native agent and helpers never receive it. Separate
 content receipts from settlement and final declarations from server closure.
 Honor Attempt-wide detail/metadata budgets and reserved lifecycle capacity. Bind batch
 sequence, prior acknowledgement, idempotency key, policy digest, release,

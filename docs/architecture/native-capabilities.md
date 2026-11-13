@@ -23,10 +23,9 @@ privileged components below. Linux keeps the same interfaces and may report a ca
 unsupported. Untested combinations fail preflight; there is no silently weakened mode. Exact
 version ranges belong to the signed release capability matrix.
 
-**Implementation status.** This architecture replaces an earlier design built on an Electron
-utility process, a Node-API bridge and schema-generated Rust. That code remains in the tree, used
-only by tests and harnesses, until the native agent below replaces it; nothing native is composed
-into production yet. A capability counts as implemented on a platform only when its real-OS
+**Implementation status.** This architecture replaced an earlier design built on an Electron
+utility process, a Node-API bridge and schema-generated Rust; that code has been removed. Nothing
+native is composed into the app yet: the agent is wired into secure participation in a later step. A capability counts as implemented on a platform only when its real-OS
 tests prove each fact there.
 
 Implemented in source:

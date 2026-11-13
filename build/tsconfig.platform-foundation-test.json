@@ -44,7 +44,6 @@
     "../test/workbench/contrib/account/common/**/*.ts",
     "../test/workbench/contrib/administration/common/**/*.ts",
     "../test/workbench/services/examSecurity/**/*.test.ts",
-    "../src/prctr/workbench/services/examSecurity/electron-utility/**/*.ts",
     "../test/workbench/services/notification/common/**/*.ts"
   ]
 }

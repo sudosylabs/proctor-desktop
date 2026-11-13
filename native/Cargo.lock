@@ -46,24 +46,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "candidate-window-state"
-version = "0.1.0"
-dependencies = [
- "display-topology",
- "native-protocol",
- "native-source-runtime",
-]
-
-[[package]]
-name = "capture-session-state"
-version = "0.1.0"
-dependencies = [
- "native-protocol",
- "native-source-runtime",
- "windows-sys",
-]
-
-[[package]]
 name = "cfg-if"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -103,15 +85,6 @@ dependencies = [
  "block-buffer 0.12.1",
  "crypto-common 0.2.2",
  "inout",
-]
-
-[[package]]
-name = "clipboard-state"
-version = "0.1.0"
-dependencies = [
- "native-protocol",
- "native-source-runtime",
- "windows-sys",
 ]
 
 [[package]]
@@ -197,7 +170,6 @@ checksum = "9ed9a281f7bc9b7576e61468ba615a66a5c8cfdff42420a70aa82701a3b1e292"
 dependencies = [
  "block-buffer 0.10.4",
  "crypto-common 0.1.7",
- "subtle",
 ]
 
 [[package]]
@@ -208,15 +180,6 @@ checksum = "1e0e367e4e7da84520dedcac1901e4da967309406d1e51017ae1abfb97adbd38"
 dependencies = [
  "bitflags",
  "objc2",
-]
-
-[[package]]
-name = "display-topology"
-version = "0.1.0"
-dependencies = [
- "native-protocol",
- "native-source-runtime",
- "windows-sys",
 ]
 
 [[package]]
@@ -324,15 +287,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hmac"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c49c37c09c17a53d937dfbb742eb3a961d65a994e6bcdcf37e7399d0cc8ab5e"
-dependencies = [
- "digest",
-]
-
-[[package]]
 name = "hybrid-array"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -348,15 +302,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a580c13f0ffc335ef42dd3f6b1a41b726051c5e1656d9a3aa6fddb3c5dfbbf9"
 dependencies = [
  "hybrid-array",
-]
-
-[[package]]
-name = "interactive-session-state"
-version = "0.1.0"
-dependencies = [
- "native-protocol",
- "native-source-runtime",
- "windows-sys",
 ]
 
 [[package]]
@@ -382,15 +327,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "media-device-state"
-version = "0.1.0"
-dependencies = [
- "native-protocol",
- "native-source-runtime",
- "windows-sys",
-]
-
-[[package]]
 name = "memchr"
 version = "2.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -410,8 +346,6 @@ dependencies = [
  "napi-sys",
  "nohash-hasher",
  "rustc-hash",
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -452,94 +386,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85fbf1fa9f1babfe396d74bbbf52b3643770243e8f5b0b46715d4caf7f0dfc9a"
 dependencies = [
  "libloading",
-]
-
-[[package]]
-name = "native-helper-protocol"
-version = "0.1.0"
-dependencies = [
- "native-protocol",
-]
-
-[[package]]
-name = "native-node-bridge"
-version = "0.1.0"
-dependencies = [
- "candidate-window-state",
- "capture-session-state",
- "clipboard-state",
- "display-topology",
- "interactive-session-state",
- "media-device-state",
- "napi",
- "napi-derive",
- "native-protocol",
- "native-security-helper",
- "native-source-supervisor",
- "network-configuration-state",
- "print-spooler-state",
- "process-application-state",
- "removable-storage-state",
- "serde",
- "virtualization-state",
-]
-
-[[package]]
-name = "native-protocol"
-version = "0.1.0"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "native-security-helper"
-version = "0.1.0"
-dependencies = [
- "interactive-session-state",
- "native-helper-protocol",
- "native-protocol",
- "native-source-runtime",
- "process-application-state",
- "serde",
- "serde_json",
- "windows-sys",
-]
-
-[[package]]
-name = "native-source-runtime"
-version = "0.1.0"
-dependencies = [
- "native-protocol",
-]
-
-[[package]]
-name = "native-source-supervisor"
-version = "0.1.0"
-dependencies = [
- "candidate-window-state",
- "capture-session-state",
- "clipboard-state",
- "display-topology",
- "interactive-session-state",
- "media-device-state",
- "native-protocol",
- "native-security-helper",
- "native-source-runtime",
- "network-configuration-state",
- "print-spooler-state",
- "process-application-state",
- "removable-storage-state",
- "virtualization-state",
-]
-
-[[package]]
-name = "network-configuration-state"
-version = "0.1.0"
-dependencies = [
- "libc",
- "native-protocol",
- "native-source-runtime",
- "windows-sys",
 ]
 
 [[package]]
@@ -843,31 +689,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "print-spooler-state"
-version = "0.1.0"
-dependencies = [
- "native-protocol",
- "native-source-runtime",
- "windows-sys",
-]
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
 dependencies = [
  "unicode-ident",
-]
-
-[[package]]
-name = "process-application-state"
-version = "0.1.0"
-dependencies = [
- "libc",
- "native-protocol",
- "native-source-runtime",
- "windows-sys",
 ]
 
 [[package]]
@@ -897,18 +724,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.4",
-]
-
-[[package]]
-name = "removable-storage-state"
-version = "0.1.0"
-dependencies = [
- "hmac",
- "libc",
- "native-protocol",
- "native-source-runtime",
- "sha2",
- "windows-sys",
 ]
 
 [[package]]
@@ -1014,12 +829,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
 
 [[package]]
-name = "subtle"
-version = "2.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
-
-[[package]]
 name = "syn"
 version = "2.0.119"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1074,14 +883,6 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
-
-[[package]]
-name = "virtualization-state"
-version = "0.1.0"
-dependencies = [
- "native-protocol",
- "native-source-runtime",
-]
 
 [[package]]
 name = "windows"
@@ -1180,15 +981,6 @@ name = "windows-strings"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7837d08f69c77cf6b07689544538e017c1bfcf57e34b4c0ff58e6c2cd3b37091"
-dependencies = [
- "windows-link",
-]
-
-[[package]]
-name = "windows-sys"
-version = "0.61.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
 dependencies = [
  "windows-link",
 ]
