@@ -176,12 +176,20 @@ impl RawVirtualization {
 
 /// CPUID evidence on x86-64: the hypervisor-present bit, the vendor leaf, and Hyper-V's root
 /// partition privilege.
+/// One CPUID leaf. Callers only ask for leaf 1 or for hypervisor leaves the vendor leaf reported.
+#[cfg(target_arch = "x86_64")]
+// Newer toolchains made `__cpuid` safe; the pinned toolchain still requires `unsafe`.
+#[allow(unused_unsafe)]
+fn cpuid(leaf: u32) -> std::arch::x86_64::CpuidResult {
+    // SAFETY: CPUID exists on every x86-64 processor, and an unsupported leaf only returns
+    // undefined register values, never faults.
+    unsafe { std::arch::x86_64::__cpuid(leaf) }
+}
+
 #[cfg(target_arch = "x86_64")]
 #[must_use]
 pub fn cpuid_virtualization() -> RawVirtualization {
-    use std::arch::x86_64::__cpuid;
-    // SAFETY: CPUID is available on every x86-64 processor; leaf 1 is always defined.
-    let features = unsafe { __cpuid(1) };
+    let features = cpuid(1);
     if features.ecx & (1 << 31) == 0 {
         return RawVirtualization {
             probed: true,
@@ -189,8 +197,8 @@ pub fn cpuid_virtualization() -> RawVirtualization {
             physical_or_root: false,
         };
     }
-    // SAFETY: with the hypervisor bit set, leaf 0x4000_0000 is the hypervisor vendor leaf.
-    let vendor = unsafe { __cpuid(0x4000_0000) };
+    // With the hypervisor bit set, leaf 0x4000_0000 is the hypervisor vendor leaf.
+    let vendor = cpuid(0x4000_0000);
     let mut name = [0_u8; 12];
     name[0..4].copy_from_slice(&vendor.ebx.to_le_bytes());
     name[4..8].copy_from_slice(&vendor.ecx.to_le_bytes());
@@ -205,8 +213,8 @@ pub fn cpuid_virtualization() -> RawVirtualization {
         _ => RawHypervisor::Other,
     };
     if family == RawHypervisor::HyperV && vendor.eax >= 0x4000_0003 {
-        // SAFETY: the vendor leaf reports leaf 0x4000_0003 as available.
-        let privileges = unsafe { __cpuid(0x4000_0003) };
+        // The vendor leaf reports leaf 0x4000_0003 as available.
+        let privileges = cpuid(0x4000_0003);
         // `CreatePartitions` is granted only to the root partition: a physical host running Hyper-V.
         if privileges.ebx & 1 != 0 {
             return RawVirtualization {
