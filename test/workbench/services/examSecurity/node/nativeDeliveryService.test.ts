@@ -163,6 +163,37 @@ void test('a missing range that covers only acknowledged batches declares nothin
 	assert.equal(server.gaps.length, 0, 'acknowledged batches are never declared lost');
 });
 
+void test('lost batches beyond one declaration are declared by the next', async () => {
+	const store = new Store();
+	const server = new Server();
+	const first = await NativeDeliveryService.open(store, server, binding);
+	await first.enqueue([confirmed(1)]);
+	server.failNext = true;
+	await assert.rejects(first.deliver(access));
+	// The spool keeps batch 1 but has lost batches 2 to 70, as a damaged spool would.
+	const [stored] = await store.list('native_');
+	const snapshot = JSON.parse(new TextDecoder().decode(store.records.get(stored ?? ''))) as {
+		allocated: number;
+	};
+	store.records.set(
+		stored ?? '',
+		new TextEncoder().encode(JSON.stringify({ ...snapshot, allocated: 70 }))
+	);
+	const service = await NativeDeliveryService.open(store, server, binding);
+	server.missing = Array.from({ length: 34 }, (_, index) => ({
+		first: 3 + index * 2,
+		last: 3 + index * 2
+	}));
+	await service.deliver(access);
+	await service.enqueue([confirmed(2)]);
+	await service.deliver(access);
+	assert.deepEqual(
+		server.gaps.map((gap) => gap.ranges.length),
+		[32, 2],
+		'the two ranges left out of the first declaration are declared next'
+	);
+});
+
 void test('sealing declares the final allocated batch at the stream revision', async () => {
 	const server = new Server();
 	const service = await NativeDeliveryService.open(new Store(), server, binding);

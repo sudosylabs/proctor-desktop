@@ -270,7 +270,11 @@ export class NativeDeliveryService {
 				)
 					lost.push(sequence);
 		if (lost.length === 0) return;
+		// One declaration carries at most 32 ranges; the rest stay undeclared for the next one.
 		const merged = mergeRanges(lost).slice(0, 32);
+		const sent = lost.filter((sequence) =>
+			merged.some((range) => range.first <= sequence && sequence <= range.last)
+		);
 		const status = await this.transport.status(
 			this.snapshot.binding.attemptId,
 			this.snapshot.binding.streamId,
@@ -280,7 +284,7 @@ export class NativeDeliveryService {
 			this.snapshot.binding.attemptId,
 			this.snapshot.binding.streamId,
 			{
-				declaration_id: `gaps-${this.snapshot.binding.streamId}-${merged[0]?.first ?? 0}-${lost.length}`,
+				declaration_id: `gaps-${this.snapshot.binding.streamId}-${merged[0]?.first ?? 0}-${sent.length}`,
 				expected_revision: status.declaration_revision,
 				allocated_through_sequence: this.snapshot.allocated,
 				ranges: merged,
@@ -290,7 +294,7 @@ export class NativeDeliveryService {
 		);
 		await this.persist({
 			...this.snapshot,
-			declaredLost: [...this.snapshot.declaredLost, ...lost].slice(-DECLARED_LOST)
+			declaredLost: [...this.snapshot.declaredLost, ...sent].slice(-DECLARED_LOST)
 		});
 	}
 
