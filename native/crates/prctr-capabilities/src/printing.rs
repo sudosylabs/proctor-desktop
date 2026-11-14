@@ -297,10 +297,7 @@ mod platform {
 
         impl Observer {
             pub fn start(sink: Sink) -> Result<Self, SourceError> {
-                let unavailable = SourceError {
-                    reason: "the print spooler cannot be observed",
-                };
-                let mut watch = JobWatch::open().ok_or(unavailable.clone())?;
+                let mut watch = JobWatch::open().ok_or(SourceError)?;
                 let latest = Arc::new(Mutex::new(RawPrint {
                     jobs: Some(watch.jobs()),
                     truncated: false,
@@ -335,7 +332,7 @@ mod platform {
                             }
                         }
                     })
-                    .map_err(|_| unavailable)?;
+                    .map_err(|_| SourceError)?;
                 Ok(Self {
                     latest,
                     stop,
@@ -426,9 +423,7 @@ impl Source for PrintingSource {
 
     fn host_event(&mut self, event: &Value) -> Result<(), SourceError> {
         let HostEvent::PrintBlocked {} =
-            serde_json::from_value(event.clone()).map_err(|_| SourceError {
-                reason: "invalid printing host event",
-            })?;
+            serde_json::from_value(event.clone()).map_err(|_| SourceError)?;
         self.tracking.print_blocked();
         if let Some(sink) = &self.sink {
             sink(SourceEvent::Changed);

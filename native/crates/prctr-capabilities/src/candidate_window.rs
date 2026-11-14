@@ -273,14 +273,10 @@ impl Tracked {
     /// # Errors
     /// When the event is not one of the documented shapes, or the window identity is not decimal.
     pub fn host_event(&mut self, event: &Value) -> Result<(), SourceError> {
-        let invalid = SourceError {
-            reason: "invalid candidate window host event",
-        };
-        let event: HostEvent =
-            serde_json::from_value(event.clone()).map_err(|_| invalid.clone())?;
+        let event: HostEvent = serde_json::from_value(event.clone()).map_err(|_| SourceError)?;
         match event {
             HostEvent::Attach { window } => {
-                let parsed = window.parse::<u64>().map_err(|_| invalid)?;
+                let parsed = window.parse::<u64>().map_err(|_| SourceError)?;
                 self.attached = Some(parsed);
                 self.covered_since = None;
                 self.occlusion = None;
@@ -478,9 +474,7 @@ impl Source for CandidateWindowSource {
                     }
                 }
             })
-            .map_err(|_| SourceError {
-                reason: "cannot start the candidate window poller",
-            })?;
+            .map_err(|_| SourceError)?;
         self.sink = Some(sink);
         self.poller = Some(Poller { stop, thread });
         Ok(self.current())

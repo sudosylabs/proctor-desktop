@@ -435,9 +435,7 @@ impl Source for MediaSource {
         }
         #[cfg(not(target_os = "macos"))]
         {
-            Err(SourceError {
-                reason: "no permission prompt on this platform",
-            })
+            Err(SourceError)
         }
     }
 }

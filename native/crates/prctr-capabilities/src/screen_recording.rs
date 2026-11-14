@@ -203,9 +203,7 @@ impl Source for ScreenRecordingSource {
     /// the permission reads as denied until then if the candidate has not allowed it.
     fn request_permission(&mut self) -> Result<Permission, SourceError> {
         if !cfg!(target_os = "macos") {
-            return Err(SourceError {
-                reason: "no screen recording prompt on this platform",
-            });
+            return Err(SourceError);
         }
         let allowed = prctr_os::request_screen_capture();
         self.refused.store(!allowed, Ordering::Release);

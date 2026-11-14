@@ -50,9 +50,7 @@ impl Poller {
                     }
                 }
             })
-            .map_err(|_| SourceError {
-                reason: "cannot start a capability poller",
-            })?;
+            .map_err(|_| SourceError)?;
         Ok(Self { stop, thread })
     }
 

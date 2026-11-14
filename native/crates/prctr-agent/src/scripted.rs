@@ -91,25 +91,22 @@ impl Source for Scripted {
     }
 
     fn host_event(&mut self, event: &Value) -> Result<(), SourceError> {
-        let invalid = SourceError {
-            reason: "invalid scripted event",
-        };
         let object = event
             .as_object()
             .filter(|object| object.len() == 1)
-            .ok_or(invalid.clone())?;
-        let (command, value) = object.iter().next().ok_or(invalid.clone())?;
+            .ok_or(SourceError)?;
+        let (command, value) = object.iter().next().ok_or(SourceError)?;
         match command.as_str() {
             "set" => {
                 self.count = value
                     .as_u64()
                     .filter(|count| *count <= 1_000)
-                    .ok_or(invalid)?;
+                    .ok_or(SourceError)?;
                 self.notify(SourceEvent::Changed);
             }
-            "lose" => self.notify(SourceEvent::Lost(value.as_u64().ok_or(invalid)?)),
+            "lose" => self.notify(SourceEvent::Lost(value.as_u64().ok_or(SourceError)?)),
             "interrupt" => {
-                let kind = serde_json::from_value(value.clone()).map_err(|_| invalid)?;
+                let kind = serde_json::from_value(value.clone()).map_err(|_| SourceError)?;
                 self.notify(SourceEvent::Interrupted(kind));
             }
             "fail" => {
@@ -120,7 +117,7 @@ impl Source for Scripted {
             "hang" => loop {
                 std::thread::park();
             },
-            _ => return Err(invalid),
+            _ => return Err(SourceError),
         }
         Ok(())
     }

@@ -27,15 +27,14 @@ pub enum SourceEvent {
 /// Receives a source's events. Cheap to clone; safe to call from any thread.
 pub type Sink = std::sync::Arc<dyn Fn(SourceEvent) + Send + Sync>;
 
-/// Why a source could not do what it was asked. The agent reports the capability as failed.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct SourceError {
-    pub reason: &'static str,
-}
+/// A source could not do what it was asked. The agent needs only that fact: it reports the
+/// capability as failed or refuses the request, and never forwards OS detail to Electron main.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SourceError;
 
 impl fmt::Display for SourceError {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str(self.reason)
+        formatter.write_str("the capability source refused the request")
     }
 }
 
@@ -68,9 +67,7 @@ pub trait Source: Send {
     /// # Errors
     /// When this capability accepts no host events, or the event is not valid for it.
     fn host_event(&mut self, _event: &serde_json::Value) -> Result<(), SourceError> {
-        Err(SourceError {
-            reason: "no host events",
-        })
+        Err(SourceError)
     }
 
     /// Shows the OS permission prompt, after explicit candidate action.
@@ -78,8 +75,6 @@ pub trait Source: Send {
     /// # Errors
     /// When this capability has no prompt.
     fn request_permission(&mut self) -> Result<Permission, SourceError> {
-        Err(SourceError {
-            reason: "no prompt",
-        })
+        Err(SourceError)
     }
 }
