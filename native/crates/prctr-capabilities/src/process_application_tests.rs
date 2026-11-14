@@ -159,25 +159,18 @@ fn a_completed_snapshot_is_complete_and_a_changed_match_is_a_change() {
         matched: false,
         catalog_app_ids: Vec::new(),
     }];
-    let first = tracking.classify(Some(clean.clone()), Coverage::SnapshotOnly);
+    let first = tracking.classify(Some(clean.clone()));
     assert_eq!(first.envelope.certainty, Certainty::Complete);
     assert!(first.changes.is_empty());
     assert!(!first.apps.expect("matches").violated[&id("r")]);
-    assert!(
-        tracking
-            .classify(Some(clean.clone()), Coverage::SnapshotOnly)
-            .changes
-            .is_empty()
-    );
+    assert!(tracking.classify(Some(clean.clone())).changes.is_empty());
     let mut found = clean;
     found[0].matched = true;
     assert_eq!(
-        tracking
-            .classify(Some(found), Coverage::SnapshotOnly)
-            .changes,
+        tracking.classify(Some(found)).changes,
         vec![id(CHANGE_MATCHES)]
     );
-    let lost = tracking.classify(None, Coverage::SnapshotOnly);
+    let lost = tracking.classify(None);
     assert_eq!(lost.state["coverage"], "unavailable");
     assert!(lost.apps.is_none());
 }
@@ -221,7 +214,7 @@ fn a_full_lifecycle_violation_is_not_met_through_the_engine() {
             vec![InitialState {
                 capability: id(CAPABILITY),
                 source_instance_id: OpaqueId::new("process0001").expect("valid"),
-                observation: tracking.classify(Some(clean), Coverage::SnapshotOnly),
+                observation: tracking.classify(Some(clean)),
             }],
             0,
         )
@@ -235,7 +228,7 @@ fn a_full_lifecycle_violation_is_not_met_through_the_engine() {
     let numbered = engine
         .handle(Input::Observed {
             capability: id(CAPABILITY),
-            observation: tracking.classify(Some(found), Coverage::SnapshotOnly),
+            observation: tracking.classify(Some(found)),
             at_ms: 10,
         })
         .expect("applies");
@@ -254,8 +247,8 @@ fn a_full_lifecycle_violation_is_not_met_through_the_engine() {
 #[test]
 fn process_application_passes_the_core_conformance_suite() {
     let mut tracking = Tracking::default();
-    let clean = tracking.classify(Some(Vec::new()), Coverage::SnapshotOnly);
-    let gone = tracking.classify(None, Coverage::SnapshotOnly);
+    let clean = tracking.classify(Some(Vec::new()));
+    let gone = tracking.classify(None);
     prctr_core::testing::assert_capability_conformance(&descriptor(), &clean, &gone);
 }
 

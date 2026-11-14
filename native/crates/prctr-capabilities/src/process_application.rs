@@ -280,9 +280,9 @@ pub struct Tracking {
 impl Tracking {
     /// The facts for one read. A completed snapshot classifies every process it sees, so its
     /// matches are complete; a read that returns nothing is unavailable.
-    pub fn classify(&mut self, matches: Option<Vec<RuleMatch>>, coverage: Coverage) -> Observation {
+    pub fn classify(&mut self, matches: Option<Vec<RuleMatch>>) -> Observation {
         let coverage = if matches.is_some() {
-            coverage
+            Coverage::SnapshotOnly
         } else {
             Coverage::Unavailable
         };
@@ -395,7 +395,7 @@ impl Source for ProcessSource {
 
     fn current(&mut self) -> Observation {
         let matches = Self::read(&self.matcher);
-        self.tracking.classify(matches, Coverage::SnapshotOnly)
+        self.tracking.classify(matches)
     }
 
     fn stop(&mut self) {
