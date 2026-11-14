@@ -243,13 +243,12 @@ pub enum RawProxy {
     AutoDetect,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum RawTunnelClass {
     PointToPoint,
     PacketTunnel,
     VirtualEthernet,
     ManagedVpn,
-    Other,
 }
 
 /// One active tunnel interface. `key` is a process-local hash of the interface name, so a tunnel
@@ -258,18 +257,6 @@ pub enum RawTunnelClass {
 pub struct RawTunnel {
     pub key: u64,
     pub class: RawTunnelClass,
-}
-
-impl PartialOrd for RawTunnelClass {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for RawTunnelClass {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        (*self as u8).cmp(&(*other as u8))
-    }
 }
 
 /// A stable, process-local hash: tunnel keys and route fingerprints are compared, never sent.

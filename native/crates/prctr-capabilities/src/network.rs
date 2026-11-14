@@ -340,7 +340,6 @@ impl Tracking {
                         RawTunnelClass::PacketTunnel => TunnelClass::PacketTunnel,
                         RawTunnelClass::VirtualEthernet => TunnelClass::VirtualEthernet,
                         RawTunnelClass::ManagedVpn => TunnelClass::ManagedVpn,
-                        RawTunnelClass::Other => TunnelClass::Other,
                     },
                 })
                 .collect::<Vec<_>>()
