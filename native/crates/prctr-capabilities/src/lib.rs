@@ -20,12 +20,6 @@ pub mod virtualization;
 use prctr_core::{Registry, Source};
 use serde_json::{Value, json};
 
-/// A fresh source for every registered capability.
-#[must_use]
-pub fn sources() -> Vec<Box<dyn Source>> {
-    sources_and_window().0
-}
-
 /// Every source, and a handle on the candidate window's bounds for the recorder's placeholder.
 #[must_use]
 pub fn sources_and_window() -> (Vec<Box<dyn Source>>, candidate_window::WindowBounds) {

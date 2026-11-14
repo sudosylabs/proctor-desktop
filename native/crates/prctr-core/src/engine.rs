@@ -6,7 +6,7 @@ use std::fmt;
 
 use prctr_protocol::facts::{Fact, FactRef, Gap, GapReason, InterruptionKind, Reset};
 use prctr_protocol::messages::Notification;
-use prctr_protocol::rules::{LocalEffect, Mode, Policy, Rule, RuleStatus, Status, UnknownCause};
+use prctr_protocol::rules::{LocalEffect, Mode, Policy, RuleStatus, Status, UnknownCause};
 use prctr_protocol::scalars::{Count, Identifier, OpaqueId};
 
 use crate::evaluate::{Outcome, View, evaluate};
@@ -154,20 +154,6 @@ impl Engine {
                 .activations()
                 .iter()
                 .map(|activation| activation.capability.clone())
-                .collect()
-        })
-    }
-
-    /// The rules with application conditions, for the process capability's on-device matcher.
-    #[must_use]
-    pub fn app_rules(&self) -> Vec<Rule> {
-        self.session.as_ref().map_or_else(Vec::new, |session| {
-            session
-                .policy
-                .rules()
-                .iter()
-                .filter(|rule| contains_app_condition(&rule.requirement))
-                .cloned()
                 .collect()
         })
     }
@@ -655,18 +641,6 @@ impl Tracker {
         }
         self.reported = Some(next);
         true
-    }
-}
-
-fn contains_app_condition(condition: &prctr_protocol::rules::Condition) -> bool {
-    use prctr_protocol::rules::Condition;
-    match condition {
-        Condition::AppsAbsent { .. } | Condition::AppsOnly { .. } => true,
-        Condition::Compare(_) => false,
-        Condition::All { conditions } | Condition::Any { conditions } => {
-            conditions.iter().any(contains_app_condition)
-        }
-        Condition::Not { condition } => contains_app_condition(condition),
     }
 }
 
