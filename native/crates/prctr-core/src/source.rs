@@ -20,7 +20,9 @@ pub enum SourceEvent {
     /// The source lost this many OS events.
     Lost(u64),
     /// The OS interrupted every capability (sleep, screen lock, user switch). The agent ends every
-    /// stream and re-reads every source.
+    /// stream and re-reads every source. In production the agent's interruption watcher reports
+    /// these itself; only the scripted test capability sends this, so agent tests can drive the
+    /// same handling.
     Interrupted(InterruptionKind),
 }
 
