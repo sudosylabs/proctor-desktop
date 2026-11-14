@@ -133,8 +133,10 @@ class FakeAgent implements INativeAgentService {
 	public readonly onDidNotifyEmitter = new Emitter<Notification>();
 	public readonly onDidNotify = this.onDidNotifyEmitter.event;
 	public readonly onDidChangeContainment = new Emitter<boolean>().event;
-	public readonly onDidRestart = new Emitter<NativeAgentSnapshot>().event;
-	public readonly onDidFail = new Emitter<NativeAgentFailure>().event;
+	public readonly restartEmitter = new Emitter<NativeAgentSnapshot>();
+	public readonly onDidRestart = this.restartEmitter.event;
+	public readonly failEmitter = new Emitter<NativeAgentFailure>();
+	public readonly onDidFail = this.failEmitter.event;
 	public readonly onDidClip = new Emitter<NativeAgentClip>().event;
 	public phase: NativeAgentPhase = 'idle';
 	public contained = false;
@@ -481,6 +483,53 @@ void test('the mounted window fact reaches the server before participation_confi
 	);
 	assert.equal(service.projection().posture, 'compliant');
 	assert.equal(service.projection().canSubmit, true);
+	service.dispose();
+});
+
+void test('a restart during readiness replaces the rule statuses', async () => {
+	const { agent, service } = setup();
+	await service.openReadiness(SITTING);
+	agent.restartEmitter.fire({ facts: [], rules: [status('baseline.window', 'not_met')] });
+	assert.deepEqual(service.readinessView()?.rules, [status('baseline.window', 'not_met')]);
+	service.dispose();
+});
+
+void test('an agent failure during readiness fails it until checks are retried', async () => {
+	const { agent, service } = setup();
+	await service.openReadiness(SITTING);
+	agent.failEmitter.fire('exited');
+	assert.equal(service.phase, 'failed');
+	assert.equal(service.projection().posture, 'failed');
+	await service.openReadiness(SITTING);
+	assert.equal(service.phase, 'readiness');
+	service.dispose();
+});
+
+void test('a restart during participation re-attaches the window and delivers the fresh states', async () => {
+	const { server, agent, service } = setup();
+	await service.start(SITTING);
+	await service.candidateMounted({ nativeWindow: '4242' });
+	agent.hostEvents.length = 0;
+	agent.restartEmitter.fire({
+		facts: [fact('display', { displays: [] }, 0)],
+		rules: [status('baseline.window', 'not_met')]
+	});
+	assert.deepEqual(agent.hostEvents, [
+		{ capability: 'candidate_window', event: { attach: { window: '4242' } } }
+	]);
+	const displayFacts = () =>
+		server.calls
+			.filter((call) => call.operation === 'appendNativeDelivery')
+			.flatMap(
+				(call) =>
+					(call.input['body'] as { records: { kind: string; capability?: string }[] })
+						.records
+			)
+			.filter(
+				(record) => record.kind === 'capability_fact' && record.capability === 'display'
+			);
+	await settle(() => displayFacts().length > 0);
+	assert.equal(displayFacts().length, 1, 'the restarted display state is delivered');
 	service.dispose();
 });
 

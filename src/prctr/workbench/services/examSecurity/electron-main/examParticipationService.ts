@@ -143,6 +143,8 @@ interface Admission {
 	processedControl: number;
 	interactionAllowed: boolean;
 	focusSequence: number;
+	/** The mounted CandidateWindow's native handle, for re-attaching a restarted agent. */
+	window: string | undefined;
 	timer: ReturnType<typeof setInterval> | undefined;
 }
 
@@ -197,6 +199,10 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 				this.publish();
 			})
 		);
+		this._register(
+			options.agent.onDidRestart((snapshot) => void this.agentRestarted(snapshot))
+		);
+		this._register(options.agent.onDidFail(() => this.agentFailed()));
 		this._register(
 			options.events.onDidLoseContinuity(() => {
 				void this.recover();
@@ -477,6 +483,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			processedControl: 0,
 			interactionAllowed: true,
 			focusSequence: 0,
+			window: undefined,
 			timer: undefined
 		};
 		this._phase = 'admitted';
@@ -671,6 +678,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 		const admission = this.admission;
 		if (admission === undefined || this._phase !== 'admitted')
 			throw new ParticipationError('invalid_state');
+		admission.window = window.nativeWindow;
 		this.options.agent.sendHostEvent('candidate_window', {
 			attach: { window: window.nativeWindow }
 		});
@@ -693,6 +701,40 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 	public hostEvent(capability: 'candidate_window' | 'printing', event: unknown): void {
 		if (this._phase === 'participating' || this._phase === 'admitted')
 			this.options.agent.sendHostEvent(capability, event);
+	}
+
+	/**
+	 * The agent restarted with fresh source instances. Readiness takes the new statuses; during
+	 * participation the new agent attaches to the window again and its states are delivered.
+	 */
+	private async agentRestarted(snapshot: NativeAgentSnapshot): Promise<void> {
+		const readiness = this.readiness;
+		if (readiness !== undefined) {
+			readiness.rules.clear();
+			this.absorb(snapshot.rules);
+		}
+		const admission = this.admission;
+		if (admission !== undefined && this._phase === 'participating') {
+			if (admission.window !== undefined)
+				this.options.agent.sendHostEvent('candidate_window', {
+					attach: { window: admission.window }
+				});
+			await this.deliver(admission, [
+				...snapshot.facts.map((fact) => admission.mapper.fact(fact)),
+				...admission.mapper.rules(snapshot.rules, this.options.agent.contained)
+			]);
+		}
+		this.publish();
+	}
+
+	/**
+	 * The agent failed for good. Readiness fails until the checks are retried; during
+	 * participation the agent service has already contained the window.
+	 */
+	private agentFailed(): void {
+		if (this._phase !== 'readiness' && this._phase !== 'starting') return;
+		this._phase = 'failed';
+		this.publish();
 	}
 
 	// ---- Server events: suspension and re-entry --------------------------------------------
