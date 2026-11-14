@@ -280,11 +280,29 @@ fn the_baseline_rule_only_uses_registered_fields() {
     assert!(prctr_core::ValidPolicy::new(policy, &registry).is_ok());
 }
 
+/// A CI virtual machine's display is virtual: CoreGraphics cannot classify it and
+/// `system_profiler` lists no GPU for it, so the hardware checks below run on a physical Mac only.
+#[cfg(target_os = "macos")]
+fn on_a_virtual_machine() -> bool {
+    let output = std::process::Command::new("/usr/sbin/sysctl")
+        .args(["-n", "kern.hv_vmm_present"])
+        .output()
+        .expect("sysctl runs");
+    let virtual_machine = String::from_utf8_lossy(&output.stdout).trim() == "1";
+    if virtual_machine {
+        eprintln!("skipped: the display hardware checks need a physical Mac");
+    }
+    virtual_machine
+}
+
 /// Real OS: the agent's connected count matches an independent oracle (`system_profiler`), and two
 /// consecutive reads agree.
 #[cfg(target_os = "macos")]
 #[test]
 fn macos_reports_the_same_number_of_displays_as_system_profiler() {
+    if on_a_virtual_machine() {
+        return;
+    }
     let mut source = DisplaySource::new();
     let first = source.current();
     let second = source.current();
@@ -313,6 +331,9 @@ fn macos_reports_the_same_number_of_displays_as_system_profiler() {
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 #[test]
 fn apple_silicon_topology_is_complete() {
+    if on_a_virtual_machine() {
+        return;
+    }
     let observation = DisplaySource::new().current();
     assert_eq!(observation.envelope.certainty, Certainty::Complete);
     assert_eq!(summary_of(&observation).unknown_kind, 0);
