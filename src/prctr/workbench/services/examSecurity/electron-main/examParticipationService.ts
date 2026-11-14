@@ -166,9 +166,9 @@ function hex(bytes: Uint8Array): string {
  * projections.
  */
 export class ExamParticipationService extends Disposable implements ExamSecurityIpcModel {
-	private readonly _onDidChange = this._register(new Emitter<void>());
-	/** The phase, readiness view or projection changed. */
-	public readonly onDidChange: Event<void> = this._onDidChange.event;
+	private readonly _onDidChange = this._register(new Emitter<CandidateSecurityProjection>());
+	/** The phase, readiness view or projection changed; carries the new projection. */
+	public readonly onDidChange: Event<CandidateSecurityProjection> = this._onDidChange.event;
 
 	private readonly now: () => number;
 	private readonly clock: AgentClock;
@@ -878,16 +878,11 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 		};
 	}
 
-	private listeners = new Set<(projection: CandidateSecurityProjection) => void>();
-
 	/** {@link ExamSecurityIpcModel}: the CandidateWindow bridge's model. */
 	public observe(): ReturnType<ExamSecurityIpcModel['observe']> {
 		return {
 			current: this.projection(),
-			onDidChange: (listener) => {
-				this.listeners.add(listener);
-				return { dispose: () => this.listeners.delete(listener) };
-			}
+			onDidChange: this.onDidChange
 		};
 	}
 
@@ -899,9 +894,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 
 	private publish(): void {
 		this.projectionRevision++;
-		const projection = this.projection();
-		for (const listener of this.listeners) listener(projection);
-		this._onDidChange.fire();
+		this._onDidChange.fire(this.projection());
 	}
 
 	private require(...phases: readonly ParticipationPhase[]): void {
@@ -915,7 +908,6 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			this.admission.pump.dispose();
 		}
 		for (const subscription of this.subscriptions.splice(0)) subscription.dispose();
-		this.listeners.clear();
 		super.dispose();
 	}
 }
