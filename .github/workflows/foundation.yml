@@ -40,6 +40,10 @@ jobs:
       - name: Verify sandboxed Chromium renderer
         run: |
           npm run setup
+          # The runner forbids unprivileged user namespaces, so Chromium's sandbox needs its
+          # setuid helper, as a distribution package installs it.
+          sudo chown root:root node_modules/electron/dist/chrome-sandbox
+          sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
           xvfb-run --auto-servernum npm run test:browser
           xvfb-run --auto-servernum npm run test:window-skeleton
 
