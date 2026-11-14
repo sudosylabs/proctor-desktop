@@ -273,14 +273,13 @@ fn read() -> RawSession {
 
 /// The interactive session source: reconciles the session state every [`POLL_INTERVAL`].
 pub struct InteractiveSessionSource {
-    read: fn() -> RawSession,
     poller: Option<Poller>,
 }
 
 impl InteractiveSessionSource {
     #[must_use]
     pub fn new() -> Self {
-        Self { read, poller: None }
+        Self { poller: None }
     }
 }
 
@@ -301,7 +300,6 @@ impl Source for InteractiveSessionSource {
         sink: Sink,
     ) -> Result<Observation, SourceError> {
         self.stop();
-        let read = self.read;
         self.poller = Some(Poller::start(
             "prctr-session",
             POLL_INTERVAL,
@@ -313,7 +311,7 @@ impl Source for InteractiveSessionSource {
     }
 
     fn current(&mut self) -> Observation {
-        classify((self.read)())
+        classify(read())
     }
 
     fn stop(&mut self) {

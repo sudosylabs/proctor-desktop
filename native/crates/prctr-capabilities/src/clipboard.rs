@@ -108,7 +108,6 @@ fn read() -> Option<u64> {
 
 /// The clipboard source.
 pub struct ClipboardSource {
-    read: fn() -> Option<u64>,
     at_activation: Option<u64>,
     poller: Option<Poller>,
 }
@@ -116,14 +115,7 @@ pub struct ClipboardSource {
 impl ClipboardSource {
     #[must_use]
     pub fn new() -> Self {
-        Self::with_read(read)
-    }
-
-    /// A source over any counter read, for tests.
-    #[must_use]
-    pub fn with_read(read: fn() -> Option<u64>) -> Self {
         Self {
-            read,
             at_activation: None,
             poller: None,
         }
@@ -147,21 +139,21 @@ impl Source for ClipboardSource {
         sink: Sink,
     ) -> Result<Observation, SourceError> {
         self.stop();
-        let first = (self.read)();
+        let first = read();
         self.at_activation = first;
         self.poller = Some(Poller::start(
             "prctr-clipboard",
             POLL_INTERVAL,
             first,
-            self.read,
+            read,
             sink,
         )?);
         Ok(self.current())
     }
 
     fn current(&mut self) -> Observation {
-        let start = self.at_activation.or_else(|| (self.read)());
-        classify((self.read)(), start)
+        let start = self.at_activation.or_else(read);
+        classify(read(), start)
     }
 
     fn stop(&mut self) {

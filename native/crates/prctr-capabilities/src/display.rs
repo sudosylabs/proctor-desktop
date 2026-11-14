@@ -316,7 +316,6 @@ fn query() -> Result<RawTopology, OsError> {
 
 /// The display topology source: reconciles the OS topology every [`POLL_INTERVAL`].
 pub struct DisplaySource {
-    query: fn() -> Result<RawTopology, OsError>,
     ids: TargetIds,
     poller: Option<Poller>,
 }
@@ -324,14 +323,7 @@ pub struct DisplaySource {
 impl DisplaySource {
     #[must_use]
     pub fn new() -> Self {
-        Self::with_query(query)
-    }
-
-    /// A source over any topology query, for tests.
-    #[must_use]
-    pub fn with_query(query: fn() -> Result<RawTopology, OsError>) -> Self {
         Self {
-            query,
             ids: TargetIds::default(),
             poller: None,
         }
@@ -355,7 +347,6 @@ impl Source for DisplaySource {
         sink: Sink,
     ) -> Result<Observation, SourceError> {
         self.stop();
-        let query = self.query;
         self.poller = Some(Poller::start(
             "prctr-display",
             POLL_INTERVAL,
@@ -367,7 +358,7 @@ impl Source for DisplaySource {
     }
 
     fn current(&mut self) -> Observation {
-        let raw = (self.query)();
+        let raw = query();
         classify(&raw, &mut self.ids)
     }
 
