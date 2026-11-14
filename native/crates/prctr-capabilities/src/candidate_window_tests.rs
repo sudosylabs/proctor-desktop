@@ -124,22 +124,38 @@ fn content_protection_is_read_back_from_the_os_not_assumed() {
 }
 
 #[test]
-fn without_a_read_back_the_window_is_partial_and_unknown() {
+fn without_a_read_back_the_unseen_fields_are_left_out() {
     let tracked = attached();
     let observation = tracked.observation();
-    assert_eq!(observation.envelope.certainty, Certainty::Partial);
     assert_eq!(tracked.state().content_protection, Protection::Unknown);
     assert_eq!(tracked.state().occlusion, Occlusion::Unknown);
+    assert_eq!(observation.envelope.health, Health::Degraded);
+    assert_eq!(
+        observation.envelope.certainty,
+        Certainty::Complete,
+        "the fields that are present are certain"
+    );
+    for field in [
+        "candidate_window.content_protection",
+        "candidate_window.occlusion",
+    ] {
+        assert!(
+            !observation.fields.contains_key(&id(field)),
+            "{field} is unseen, so a rule on it is unavailable"
+        );
+    }
+    assert!(
+        observation
+            .fields
+            .contains_key(&id("candidate_window.presence"))
+    );
 }
 
 #[test]
-fn a_complete_read_back_makes_the_window_certain() {
+fn a_complete_read_back_makes_the_window_healthy() {
     let mut tracked = attached();
     tracked.read_back(raw(Some(true), Vec::new()), 0);
-    assert_eq!(
-        tracked.observation().envelope.certainty,
-        Certainty::Complete
-    );
+    assert_eq!(tracked.observation().envelope.health, Health::Healthy);
 }
 
 #[test]

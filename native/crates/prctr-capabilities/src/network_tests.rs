@@ -43,7 +43,7 @@ fn an_unselected_category_is_never_read() {
 }
 
 #[test]
-fn a_selected_category_the_platform_cannot_read_is_unknown_and_partial() {
+fn a_selected_category_the_platform_cannot_read_is_left_out() {
     let mut tracking = Tracking::default();
     let raw = RawNetwork {
         vpn: Some(None),
@@ -52,7 +52,12 @@ fn a_selected_category_the_platform_cannot_read_is_unknown_and_partial() {
     };
     let observation = tracking.classify(&raw);
     assert_eq!(observation.state["managed_vpn"], "unknown");
-    assert_eq!(observation.envelope.certainty, Certainty::Partial);
+    assert_eq!(observation.envelope.health, Health::Degraded);
+    assert_eq!(observation.envelope.certainty, Certainty::Complete);
+    assert!(
+        !observation.fields.contains_key(&id("network.managed_vpn")),
+        "an unread VPN state has no field, so a rule on it is unavailable"
+    );
     assert!(
         !observation
             .fields

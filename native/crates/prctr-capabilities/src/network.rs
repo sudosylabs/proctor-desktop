@@ -372,11 +372,7 @@ impl Tracking {
                 } else {
                     Health::Degraded
                 },
-                certainty: if complete {
-                    Certainty::Complete
-                } else {
-                    Certainty::Partial
-                },
+                certainty: Certainty::Complete,
             },
             state: serde_json::to_value(&state).unwrap_or_default(),
             summary: serde_json::to_value(summary.unwrap_or_default()).unwrap_or_default(),
@@ -387,7 +383,8 @@ impl Tracking {
     }
 }
 
-/// The rule fields for one state; a category that could not be read has no field.
+/// The rule fields for one state. A category that was not selected or could not be read has no
+/// field, so a rule on it is unknown while the other fields still evaluate.
 fn rule_fields(
     state: &NetworkState,
     summary: Option<NetworkSummary>,
@@ -395,13 +392,13 @@ fn rule_fields(
     routes_known: bool,
 ) -> BTreeMap<Identifier, FieldValue> {
     let mut fields: BTreeMap<Identifier, FieldValue> = BTreeMap::new();
-    if let Some(proxy) = state.system_proxy {
+    if let Some(proxy) = state.system_proxy.filter(|proxy| *proxy != Proxy::Unknown) {
         fields.insert(
             id("network.system_proxy"),
             FieldValue::Symbol(id(proxy_text(proxy))),
         );
     }
-    if let Some(vpn) = state.managed_vpn {
+    if let Some(vpn) = state.managed_vpn.filter(|vpn| *vpn != ManagedVpn::Unknown) {
         fields.insert(
             id("network.managed_vpn"),
             FieldValue::Symbol(id(vpn_text(vpn))),

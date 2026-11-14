@@ -47,6 +47,12 @@ macro_rules! symbol_enum {
             const fn text(self) -> &'static str {
                 match self { $(Self::$variant => $text),+ }
             }
+
+            /// The rule field value, or `None` when the window cannot tell: an unseen field is
+            /// left out, so a rule on it is unknown while the other fields still evaluate.
+            fn known(self) -> Option<&'static str> {
+                Some(self.text()).filter(|text| *text != "unknown")
+            }
         }
     };
 }
@@ -235,33 +241,32 @@ impl Tracked {
             } else {
                 Health::Degraded
             },
-            certainty: if complete {
-                Certainty::Complete
-            } else {
-                Certainty::Partial
-            },
+            certainty: Certainty::Complete,
         };
-        let symbol = |name: &str, value: &str| (id(name), FieldValue::Symbol(id(value)));
+        let symbol = |name: &str, value: Option<&str>| {
+            value.map(|value| (id(name), FieldValue::Symbol(id(value))))
+        };
         Observation {
             envelope,
             state: serde_json::to_value(state).unwrap_or_default(),
             summary: serde_json::json!({}),
             fields: [
-                symbol("candidate_window.presence", state.presence.text()),
-                symbol("candidate_window.focus", state.focus.text()),
-                symbol("candidate_window.visibility", state.visibility.text()),
-                symbol("candidate_window.placement", state.placement.text()),
+                symbol("candidate_window.presence", state.presence.known()),
+                symbol("candidate_window.focus", state.focus.known()),
+                symbol("candidate_window.visibility", state.visibility.known()),
+                symbol("candidate_window.placement", state.placement.known()),
                 symbol(
                     "candidate_window.content_protection",
-                    state.content_protection.text(),
+                    state.content_protection.known(),
                 ),
-                symbol("candidate_window.occlusion", state.occlusion.text()),
-                (
+                symbol("candidate_window.occlusion", state.occlusion.known()),
+                Some((
                     id("candidate_window.close_attempts"),
                     FieldValue::Number(state.close_attempts),
-                ),
+                )),
             ]
             .into_iter()
+            .flatten()
             .collect(),
             apps: None,
             changes: Vec::new(),

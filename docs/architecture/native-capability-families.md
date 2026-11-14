@@ -106,7 +106,9 @@ evaluation.
 
 **State.** `certainty`, `presence`, `focus`, `visibility`, `placement` (maximized, normal,
 minimized, fullscreen), `display_target_id`, `content_protection` (verified, failed, unknown, read
-back from the OS), `occlusion` (none, covered, unknown), `close_attempts` (a count).
+back from the OS), `occlusion` (none, covered, unknown), `close_attempts` (a count). A field the
+window cannot tell is `unknown` in the state and left out of the rule fields, so only a rule naming
+it is unknown (`unavailable`) and health is degraded.
 `display_target_id` is not implemented yet: it needs the display capability's target identities.
 
 **Host events.** Electron main sends `attach` (the window's native identity: the CoreGraphics
@@ -362,7 +364,8 @@ A proxy auto-config script is reported as `automatic_config` and never read or r
 **Categories.** The capability is `network`, with sub-categories `system_proxy`, `managed_vpn`,
 `tunnel_interfaces` and `route_change`. An activation selects at least one, and only selected ones
 are read. An unselected category is absent from the state; a selected one the platform cannot read is
-`unknown`, which makes certainty partial.
+`unknown` in the state and left out of the rule fields, so only a rule naming it is unknown
+(`unavailable`) and health is degraded.
 
 **Summary.** Tunnel counts by class: `tunnels_total`, `point_to_point`, `packet_tunnel`,
 `virtual_ethernet`, `managed_vpn_tunnels`.
