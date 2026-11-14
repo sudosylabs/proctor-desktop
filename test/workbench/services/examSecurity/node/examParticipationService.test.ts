@@ -330,6 +330,13 @@ class Server {
 							delivery_watermark_rejections: []
 						}
 					};
+				if (action === 'exam_attempt.security.update')
+					return {
+						processed_control_sequence: 2,
+						processed_control_digest: DIGEST('9'),
+						security_interaction_allowed: false,
+						delivery_watermark_rejections: []
+					};
 				return {};
 			},
 			needsResynchronization: false,
@@ -482,6 +489,15 @@ void test('a renewal carries the security control with the native watermark', as
 		control.delivery_watermarks.map((mark) => [mark.family, mark.source_id]),
 		[['native', 'stream-1']]
 	);
+	service.dispose();
+});
+
+void test('a security update between renewals applies the server result', async () => {
+	const { server, service } = setup();
+	await service.start(SITTING);
+	await service.securityUpdate();
+	assert.ok(server.commands.some((command) => command.action === 'exam_attempt.security.update'));
+	assert.equal(service.projection().posture, 'contained', 'the server withdrew interaction');
 	service.dispose();
 });
 

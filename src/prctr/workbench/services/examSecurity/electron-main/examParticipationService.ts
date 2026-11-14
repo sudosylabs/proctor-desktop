@@ -586,7 +586,7 @@ export class ExamParticipationService extends Disposable implements ExamSecurity
 			continuity_credential: admission.continuityCredential,
 			security_control: this.control(admission)
 		});
-		if (!isValidServerEventPayload('security_control_reply', reply))
+		if (!isValidServerEventPayload('security_control_result', reply))
 			throw new ServerApiError('invalidResponse');
 		this.applyControl(admission, reply as SecurityControlResult);
 		this.publish();
