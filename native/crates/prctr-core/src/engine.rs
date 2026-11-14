@@ -552,18 +552,21 @@ impl Session {
         let mut changed = Vec::new();
         for position in 0..self.trackers.len() {
             let rule = &self.policy.rules()[self.trackers[position].rule];
-            let stream = self.streams.get(&rule.capability);
+            // A valid policy activates every rule's capability, and opening the session gave every
+            // activation a stream.
+            let stream = &self.streams[&rule.capability];
             let outcome = evaluate(
                 &rule.requirement,
                 &rule.rule_id,
                 View {
-                    observation: stream.map(|stream| &stream.observation),
-                    gap: stream.is_some_and(|stream| stream.gap),
+                    observation: &stream.observation,
+                    gap: stream.gap,
                 },
             );
             let stability = registry
                 .capability(&rule.capability)
-                .map_or(0, |descriptor| descriptor.stability_ms);
+                .expect("a valid policy names only registered capabilities")
+                .stability_ms;
             if self.trackers[position].update(outcome, at_ms, stability) {
                 changed.push(position);
             }
@@ -590,9 +593,8 @@ impl Session {
     fn status_of(&self, position: usize, effect: LocalEffect) -> RuleStatus {
         let tracker = &self.trackers[position];
         let rule = &self.policy.rules()[tracker.rule];
-        let (status, unknown_cause) = tracker
-            .reported
-            .unwrap_or((Status::Unknown, Some(UnknownCause::Unavailable)));
+        // Every tracker is evaluated right after it is selected, and the first evaluation reports.
+        let (status, unknown_cause) = tracker.reported.expect("an evaluated tracker has reported");
         RuleStatus {
             rule_id: rule.rule_id.clone(),
             status,

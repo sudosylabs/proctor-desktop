@@ -47,8 +47,8 @@ impl Outcome {
 /// What a rule can see of its capability.
 #[derive(Clone, Copy, Debug)]
 pub struct View<'a> {
-    /// The latest complete state, if any arrived.
-    pub observation: Option<&'a Observation>,
+    /// The latest complete state.
+    pub observation: &'a Observation,
     /// Events were lost and no fresh complete state has arrived since.
     pub gap: bool,
 }
@@ -103,9 +103,7 @@ fn envelope_cause(observation: &Observation, gap: bool) -> Option<UnknownCause> 
 }
 
 fn evaluate_compare(compare: &Compare, view: View<'_>) -> Outcome {
-    let Some(observation) = view.observation else {
-        return Outcome::Unknown(UnknownCause::Unavailable);
-    };
+    let observation = view.observation;
     let Some(actual) = observation.fields.get(&compare.field) else {
         return Outcome::Unknown(UnknownCause::Unavailable);
     };
@@ -120,9 +118,7 @@ fn evaluate_compare(compare: &Compare, view: View<'_>) -> Outcome {
 }
 
 fn evaluate_apps(rule_id: &Identifier, view: View<'_>) -> Outcome {
-    let Some(observation) = view.observation else {
-        return Outcome::Unknown(UnknownCause::Unavailable);
-    };
+    let observation = view.observation;
     let Some(apps) = &observation.apps else {
         return Outcome::Unknown(UnknownCause::Unavailable);
     };

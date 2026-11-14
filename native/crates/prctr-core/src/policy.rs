@@ -123,9 +123,10 @@ fn check_rules(policy: &Policy, registry: &Registry) -> Result<(), PolicyError> 
         {
             return Err(PolicyError::CapabilityNotActivated(id.clone()));
         }
+        // check_activations refused unregistered capabilities, and the rule's is activated.
         let descriptor = registry
             .capability(&rule.capability)
-            .ok_or_else(|| PolicyError::UnknownCapability(rule.capability.clone()))?;
+            .expect("an activated capability is registered");
         if !descriptor.reasons.contains(&rule.reason) {
             return Err(PolicyError::UnknownReason(id.clone()));
         }

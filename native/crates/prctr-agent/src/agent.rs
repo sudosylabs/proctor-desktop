@@ -376,10 +376,11 @@ impl<W: Write> Agent<W> {
                 let _ = events.send(Event::Source(capability.clone(), event));
             });
             let instance = self.fresh_instance();
-            let Some(source) = self.sources.get_mut(&activation.capability) else {
-                self.stop_all();
-                return Err(RefusalCode::InvalidPolicy);
-            };
+            // `pending` and `sources` are built from the same sources, so they share their keys.
+            let source = self
+                .sources
+                .get_mut(&activation.capability)
+                .expect("a capability with a pending flag has a source");
             let rules: Vec<_> = policy
                 .rules
                 .iter()
