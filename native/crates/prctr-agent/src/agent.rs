@@ -143,10 +143,8 @@ impl<W: Write> Agent<W> {
                 Ok(Event::MainInvalid) => return self.fatal(Diagnostic::ProtocolError),
                 Ok(Event::Interrupted(kind)) => self.interrupt(kind),
                 Ok(Event::Recorder(event)) => {
-                    if let Some(notification) = recording::notification(event) {
-                        let numbered = self.engine.notify(notification);
-                        let _ = self.send_numbered(vec![numbered]);
-                    }
+                    let numbered = self.engine.notify(recording::notification(event));
+                    let _ = self.send_numbered(vec![numbered]);
                 }
                 Err(RecvTimeoutError::Timeout) => {
                     if self

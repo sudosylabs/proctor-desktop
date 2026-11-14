@@ -70,6 +70,11 @@ fn count(value: u64) -> Count {
     Count::new(value).unwrap_or(Count::ZERO)
 }
 
+/// A SHA-256 hash in hex is always 64 lowercase hex digits.
+fn digest(hash: &[u8; 32]) -> Digest {
+    Digest::new(clip::hex(hash)).expect("a SHA-256 hash is a digest")
+}
+
 fn gap(gap: &Gap) -> RecordingGap {
     RecordingGap {
         start_ms: count(gap.start_ms),
@@ -82,19 +87,20 @@ fn gap(gap: &Gap) -> RecordingGap {
     }
 }
 
-/// The notification for one recorder event, or `None` when an identifier cannot be expressed.
-pub fn notification(event: RecorderEvent) -> Option<Notification> {
+/// The notification for one recorder event.
+pub fn notification(event: RecorderEvent) -> Notification {
     match event {
-        RecorderEvent::State { state, gaps } => Some(Notification::Recorder {
+        RecorderEvent::State { state, gaps } => Notification::Recorder {
             state: match state {
                 prctr_recorder::RecorderState::Recording => RecorderState::Recording,
                 prctr_recorder::RecorderState::Stopped => RecorderState::Stopped,
                 prctr_recorder::RecorderState::Failed => RecorderState::Failed,
             },
             gaps: gaps.iter().map(gap).collect(),
-        }),
+        },
         RecorderEvent::Clip { request_id, result } => {
-            let clip_request_id = OpaqueId::new(request_id).ok()?;
+            // The recorder echoes the id the agent took from a validated request.
+            let clip_request_id = OpaqueId::new(request_id).expect("a clip request id round-trips");
             let failed = |code| ClipOutcome::Failed { code };
             let outcome = match result {
                 Ok(manifest) => ready(&manifest)
@@ -103,10 +109,10 @@ pub fn notification(event: RecorderEvent) -> Option<Notification> {
                 Err(ClipFailure::TooLarge) => failed(ClipFailureCode::TooLarge),
                 Err(ClipFailure::Failed) => failed(ClipFailureCode::Failed),
             };
-            Some(Notification::Clip {
+            Notification::Clip {
                 clip_request_id,
                 outcome,
-            })
+            }
         }
     }
 }
@@ -116,14 +122,11 @@ fn ready(manifest: &prctr_recorder::ClipManifest) -> Option<ClipReady> {
         path: LocalPath::new(manifest.path.to_str()?).ok()?,
         key: Secret::from_bytes(&manifest.key),
         media_type: MediaType::Mp4,
-        size_bytes: Count::new(manifest.size_bytes).ok()?,
-        chunk_bytes: count(u64::try_from(CHUNK_BYTES).ok()?),
-        chunk_sha256: manifest
-            .chunk_sha256
-            .iter()
-            .map(|hash| Digest::new(clip::hex(hash)).ok())
-            .collect::<Option<_>>()?,
-        content_digest: Digest::new(clip::hex(&manifest.content_digest)).ok()?,
+        // A clip is at most MAX_CLIP_BYTES (3 GiB), far below a count's limit.
+        size_bytes: count(manifest.size_bytes),
+        chunk_bytes: count(CHUNK_BYTES as u64),
+        chunk_sha256: manifest.chunk_sha256.iter().map(digest).collect(),
+        content_digest: digest(&manifest.content_digest),
         start_ms: count(manifest.start_ms),
         end_ms: count(manifest.end_ms),
         gaps: manifest.gaps.iter().map(gap).collect(),

@@ -168,9 +168,8 @@ impl Recorder {
     /// # Errors
     /// When the range is malformed or the recorder has ended.
     pub fn save(&self, request_id: &str, range: ClipRange) -> Result<(), SaveRefusal> {
-        let valid = (range.from_session_start
-            || range.start_ms.is_some_and(|start| start < range.end_ms))
-            && !request_id.is_empty();
+        let valid =
+            range.from_session_start || range.start_ms.is_some_and(|start| start < range.end_ms);
         if !valid {
             return Err(SaveRefusal::InvalidRange);
         }
