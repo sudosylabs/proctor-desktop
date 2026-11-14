@@ -185,9 +185,9 @@ change.
     screen evidence recorder. Each capability declares enforce, observe or
     unavailable coverage per target, without implying external-capture detection.
 64. `native.process-boundaries` One unprivileged native agent, spawned on demand by Electron main over an
-    inherited private pipe, runs the capabilities and rules. Only the agent reaches
-    the privileged components; only Electron main holds the installation credential
-    and talks to the server; renderers receive projections only.
+    inherited private pipe, runs the capabilities and rules without privileged
+    components; only Electron main holds the installation credential and talks to
+    the server; renderers receive projections only.
 65. `native.single-display-window` Candidate admission requires one verified maximized constrained
     CandidateWindow and exactly one physical usable display with no mirrored,
     virtual, wireless, remote, or specialized secondary target.
